@@ -590,225 +590,222 @@ const PostPlayRatingModal = ({
 
               {/* Overlay text */}
               <div className="absolute bottom-4 left-4 right-4">
-                <p className="text-base font-medium uppercase tracking-[0.18em] text-slate-100/80">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/90">
                   {isEditMode ? 'Edit your rating' : 'Rate this course'}
                 </p>
-                <h2 className="mt-1 text-3xl font-semibold text-white">
+                <h2 className="mt-1 text-2xl font-semibold tracking-tight text-white">
                   {course.name}
                 </h2>
               </div>
             </div>
 
-            {/* Overall Rating Slider */}
-            <section className="px-4 mt-6">
-              <div className="mb-2 flex items-center justify-between">
-                <p className="text-base font-medium text-slate-900">
-                  Your overall rating
-                </p>
-                <p className="text-base font-semibold text-slate-900">
-                  {selectedRating != null ? selectedRating.toFixed(1) : '--'}<span className="ml-1">/10</span>
-                </p>
-              </div>
-
-              <div className="py-3">
-                <Slider
-                  value={[selectedRating || 5]}
-                  onValueChange={(values) => setSelectedRating(values[0])}
-                  min={0.5}
-                  max={10}
-                  step={0.1}
-                  className="w-full"
-                />
-              </div>
-
-              {selectedRating == null && (
-                <div className="mt-2 inline-flex rounded-full bg-slate-900 text-sm text-white px-3 py-1">
-                  No rating selected yet
+            {/* Form Content Wrapper */}
+            <div className="space-y-4 px-4 pb-6 pt-4">
+              {/* Section 1 - Overall Rating */}
+              <div>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-slate-900">
+                    Your overall rating
+                  </p>
+                  <p className="text-sm font-semibold text-slate-900">
+                    {selectedRating != null ? selectedRating.toFixed(1) : '--'} <span className="font-semibold">/ 10</span>
+                  </p>
                 </div>
-              )}
-            </section>
 
-            {/* Share Your Thoughts */}
-            <section className="px-4 mt-6">
-              <p className="text-sm font-medium tracking-wide text-slate-500 mb-2">
-                Share your thoughts
-              </p>
+                <div className="mt-2">
+                  <Slider
+                    value={[selectedRating || 5]}
+                    onValueChange={(values) => setSelectedRating(values[0])}
+                    min={0.5}
+                    max={10}
+                    step={0.1}
+                    className="w-full"
+                  />
+                </div>
+              </div>
 
-              <div className="mt-2">
+              {/* Section 2 - Share Your Thoughts */}
+              <div>
+                <p className="text-sm font-medium text-slate-900 mb-2">
+                  Share your thoughts
+                </p>
+
                 <Textarea
                   value={review}
                   onChange={(e) => setReview(e.target.value)}
                   rows={4}
                   placeholder="Share your review with other golfers – what stood out about the design, conditions, clubhouse or overall experience?"
-                  className="w-full rounded-xl border border-slate-200/80 bg-slate-50 text-base text-slate-900 placeholder:text-slate-400 resize-none focus:outline-none focus:border-slate-300 focus:ring-0 focus:shadow-[0_0_0_3px_rgba(148,163,184,0.25)]"
+                  className="w-full rounded-xl border border-slate-200/80 bg-slate-50 text-sm text-slate-900 placeholder:text-slate-400 resize-none focus:outline-none focus:border-slate-300 focus:ring-0 focus:shadow-[0_0_0_3px_rgba(148,163,184,0.25)]"
                   disabled={isSubmitting}
                   maxLength={500}
                 />
-                <p className="mt-1 text-sm text-slate-400 text-right">
+                <p className="mt-1 text-xs text-slate-400 text-right">
                   {review.length}/500
                 </p>
               </div>
-            </section>
 
-            {/* Breakdown Sliders */}
-            <section className="px-4 mt-6">
-              <p className="text-sm font-medium tracking-wide text-slate-500 mb-2">
-                Breakdown (optional)
-              </p>
+              {/* Section 3 - Breakdown */}
+              <div>
+                <p className="text-sm font-medium text-slate-900 mb-3">
+                  Breakdown (optional)
+                </p>
 
-              {[
-                { 
-                  key: 'design', 
-                  label: 'Course Design', 
-                  score: designScore, 
-                  setScore: setDesignScore,
-                  setTouched: setDesignTouched
-                },
-                { 
-                  key: 'condition', 
-                  label: 'Course Condition', 
-                  score: conditionScore, 
-                  setScore: setConditionScore,
-                  setTouched: setConditionTouched
-                },
-                { 
-                  key: 'clubhouse', 
-                  label: 'Clubhouse', 
-                  score: clubhouseScore, 
-                  setScore: setClubhouseScore,
-                  setTouched: setClubhouseTouched
-                },
-                { 
-                  key: 'facilities', 
-                  label: 'Facilities', 
-                  score: facilitiesScore, 
-                  setScore: setFacilitiesScore,
-                  setTouched: setFacilitiesTouched
-                },
-              ].map(({ key, label, score, setScore, setTouched }) => (
-                <div key={key} className="mt-5">
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-base font-medium text-slate-900">{label}</span>
-                    <span className="text-base font-medium text-slate-900">
-                      {score != null ? score.toFixed(1) : '--'}<span className="ml-1">/10</span>
-                    </span>
-                  </div>
+                <div className="space-y-3">
+                  {[
+                    { 
+                      key: 'design', 
+                      label: 'Course Design', 
+                      score: designScore, 
+                      setScore: setDesignScore,
+                      setTouched: setDesignTouched
+                    },
+                    { 
+                      key: 'condition', 
+                      label: 'Course Condition', 
+                      score: conditionScore, 
+                      setScore: setConditionScore,
+                      setTouched: setConditionTouched
+                    },
+                    { 
+                      key: 'clubhouse', 
+                      label: 'Clubhouse', 
+                      score: clubhouseScore, 
+                      setScore: setClubhouseScore,
+                      setTouched: setClubhouseTouched
+                    },
+                    { 
+                      key: 'facilities', 
+                      label: 'Facilities', 
+                      score: facilitiesScore, 
+                      setScore: setFacilitiesScore,
+                      setTouched: setFacilitiesTouched
+                    },
+                  ].map(({ key, label, score, setScore, setTouched }) => (
+                    <div key={key}>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-slate-900">{label}</span>
+                        <span className="text-sm font-semibold text-slate-900">
+                          {score != null ? score.toFixed(1) : '--'} <span className="font-semibold">/ 10</span>
+                        </span>
+                      </div>
 
-                  <div className="py-3">
-                    <Slider
-                      value={[score ?? 5]}
-                      onValueChange={(values) => {
-                        setTouched(true);
-                        setScore(values[0]);
-                      }}
-                      min={0.5}
-                      max={10}
-                      step={0.1}
-                      className="w-full"
-                    />
-                  </div>
+                      <div className="mt-1.5">
+                        <Slider
+                          value={[score ?? 5]}
+                          onValueChange={(values) => {
+                            setTouched(true);
+                            setScore(values[0]);
+                          }}
+                          min={0.5}
+                          max={10}
+                          step={0.1}
+                          className="w-full"
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </section>
+              </div>
 
-            {/* Media Upload Section */}
-            <section className="px-4 mt-6">
-              <p className="text-sm font-medium tracking-wide text-slate-500 mb-2">
-                Media upload (optional)
-              </p>
+              {/* Section 4 - Media Upload */}
+              <div>
+                <p className="text-sm font-medium text-slate-900 mb-2">
+                  Media upload (optional)
+                </p>
 
-              <div className="mt-3">
-                {selectedMedia.length === 0 ? (
-                  <ReviewMediaUpload
-                    onMediaSelected={handleMediaSelected}
-                    selectedMedia={selectedMedia}
-                    onRemoveMedia={handleRemoveMedia}
-                  />
-                ) : (
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-3 gap-1.5 rounded-xl overflow-hidden">
-                      {selectedMedia.map((file, index) => {
-                        const isVideo = file.type.startsWith('video/');
-                        const preview = URL.createObjectURL(file);
-                        return (
-                          <div key={index} className="relative aspect-square overflow-hidden rounded-xl">
-                            {isVideo ? (
-                              <>
-                                <video
+                <div className="rounded-2xl border border-slate-200/70 bg-white px-4 py-3.5 shadow-sm">
+                  {selectedMedia.length === 0 ? (
+                    <ReviewMediaUpload
+                      onMediaSelected={handleMediaSelected}
+                      selectedMedia={selectedMedia}
+                      onRemoveMedia={handleRemoveMedia}
+                    />
+                  ) : (
+                    <>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {selectedMedia.map((file, index) => {
+                          const isVideo = file.type.startsWith('video/');
+                          const preview = URL.createObjectURL(file);
+                          return (
+                            <div key={index} className="relative aspect-square overflow-hidden rounded-xl">
+                              {isVideo ? (
+                                <>
+                                  <video
+                                    src={preview}
+                                    className="h-full w-full object-cover"
+                                  />
+                                  <div className="absolute bottom-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 shadow-md">
+                                    <div className="ml-[2px] h-0 w-0 border-y-[5px] border-y-transparent border-l-[9px] border-l-white" />
+                                  </div>
+                                </>
+                              ) : (
+                                <img
                                   src={preview}
+                                  alt=""
                                   className="h-full w-full object-cover"
                                 />
-                                <div className="absolute bottom-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 shadow-md">
-                                  <div className="ml-[2px] h-0 w-0 border-y-[5px] border-y-transparent border-l-[9px] border-l-white" />
-                                </div>
-                              </>
-                            ) : (
-                              <img
-                                src={preview}
-                                alt=""
-                                className="h-full w-full object-cover"
-                              />
-                            )}
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveMedia(index)}
-                              className="absolute top-1.5 right-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-slate-900/80 shadow-sm hover:bg-slate-900/95 active:scale-95 transition"
-                            >
-                              <span className="text-[11px] leading-none text-white">✕</span>
-                            </button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    {selectedMedia.length < 5 && (
-                      <div className="mt-2 flex justify-end">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const input = document.createElement('input');
-                            input.type = 'file';
-                            input.accept = 'image/*,video/*';
-                            input.multiple = true;
-                            input.onchange = (e) => {
-                              const target = e.target as HTMLInputElement;
-                              if (target.files) {
-                                const files = Array.from(target.files);
-                                const remainingSlots = 5 - selectedMedia.length;
-                                const filesToAdd = files.slice(0, remainingSlots);
-                                
-                                if (files.length > remainingSlots) {
-                                  toast({
-                                    title: "Too many files",
-                                    description: `You can only add ${remainingSlots} more file${remainingSlots === 1 ? '' : 's'} (max 5 total).`,
-                                    variant: "destructive",
-                                  });
-                                }
-                                
-                                handleMediaSelected(filesToAdd);
-                              }
-                            };
-                            input.click();
-                          }}
-                          className="text-sm font-medium text-slate-600 underline-offset-2 hover:text-slate-900 hover:underline"
-                        >
-                          Add more media
-                        </button>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveMedia(index)}
+                                className="absolute top-1.5 right-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-slate-900/80 shadow-sm hover:bg-slate-900/95 active:scale-95 transition"
+                              >
+                                <span className="text-[11px] leading-none text-white">✕</span>
+                              </button>
+                            </div>
+                          );
+                        })}
                       </div>
-                    )}
-                  </div>
-                )}
+                      {selectedMedia.length < 5 && (
+                        <div className="mt-2 flex justify-end">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const input = document.createElement('input');
+                              input.type = 'file';
+                              input.accept = 'image/*,video/*';
+                              input.multiple = true;
+                              input.onchange = (e) => {
+                                const target = e.target as HTMLInputElement;
+                                if (target.files) {
+                                  const files = Array.from(target.files);
+                                  const remainingSlots = 5 - selectedMedia.length;
+                                  const filesToAdd = files.slice(0, remainingSlots);
+                                  
+                                  if (files.length > remainingSlots) {
+                                    toast({
+                                      title: "Too many files",
+                                      description: `You can only add ${remainingSlots} more file${remainingSlots === 1 ? '' : 's'} (max 5 total).`,
+                                      variant: "destructive",
+                                    });
+                                  }
+                                  
+                                  handleMediaSelected(filesToAdd);
+                                }
+                              };
+                              input.click();
+                            }}
+                            className="text-xs font-medium text-slate-700 underline underline-offset-2"
+                          >
+                            Add more photos or videos
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
               </div>
-            </section>
+            </div>
 
             {/* Primary CTA Button */}
-            <footer className="px-4 mt-6 pb-[24px]">
+            <footer className="px-4 mt-6 pb-6">
               <Button
                 type="submit"
                 onClick={handleSubmit}
                 disabled={isSubmitting || !selectedRating}
-                className="w-full h-11 rounded-full text-base font-semibold bg-slate-900 text-white border border-white/10 shadow-[0_8px_20px_rgba(15,23,42,0.45)] hover:bg-slate-900/90 active:bg-slate-900 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                className="w-full h-11 rounded-full"
               >
-                {isSubmitting ? 'Saving…' : (isEditMode ? 'Update rating' : 'Submit rating')}
+                {isSubmitting ? 'Saving…' : ctaLabel}
               </Button>
 
               {isEditMode && (
@@ -816,7 +813,8 @@ const PostPlayRatingModal = ({
                   type="button"
                   onClick={() => setShowRemoveDialog(true)}
                   disabled={isSubmitting}
-                  className="w-full mt-3 rounded-full bg-red-500 text-white border border-red-500/80 shadow-sm hover:bg-red-600 active:bg-red-700 flex items-center gap-2 justify-center"
+                  variant="destructive"
+                  className="w-full mt-3 h-11 rounded-full flex items-center gap-2 justify-center"
                 >
                   <Trash2 className="h-4 w-4" />
                   Remove from played
