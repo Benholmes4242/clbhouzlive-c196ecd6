@@ -743,7 +743,7 @@ const PostPlayRatingModal = ({
                               className="absolute left-2 top-2 flex h-7 w-7 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors"
                               aria-label="Remove media"
                             >
-                              <span className="text-base leading-none text-white">✕</span>
+                              <span className="text-lg leading-none text-white flex items-center justify-center">✕</span>
                             </button>
                           </div>
                         );
