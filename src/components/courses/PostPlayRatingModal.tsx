@@ -726,7 +726,7 @@ const PostPlayRatingModal = ({
                                 />
                                 <div className="absolute bottom-2 right-2 pointer-events-none">
                                   <div className="flex h-7 w-7 items-center justify-center rounded-full bg-black/20 backdrop-blur-sm">
-                                    <div className="ml-[2px] h-0 w-0 border-y-[4px] border-y-transparent border-l-[6px] border-l-white" />
+                                    <div className="ml-[2px] h-0 w-0 border-y-[5px] border-y-transparent border-l-[8px] border-l-white" />
                                   </div>
                                 </div>
                               </div>
@@ -743,7 +743,7 @@ const PostPlayRatingModal = ({
                               className="absolute left-2 top-2 flex h-7 w-7 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors"
                               aria-label="Remove media"
                             >
-                              <span className="text-lg leading-none text-white flex items-center justify-center">✕</span>
+                              <span className="text-xl leading-none text-white flex items-center justify-center">✕</span>
                             </button>
                           </div>
                         );
