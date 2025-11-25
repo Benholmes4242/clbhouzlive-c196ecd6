@@ -740,9 +740,10 @@ const PostPlayRatingModal = ({
                             <button
                               type="button"
                               onClick={() => handleRemoveMedia(index)}
-                              className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-slate-900/80 shadow-sm hover:bg-slate-900/95 active:scale-95 transition"
+                              className="absolute left-2 top-2 flex h-9 w-9 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors"
+                              aria-label="Remove media"
                             >
-                              <span className="text-xs leading-none text-white">✕</span>
+                              <span className="text-sm leading-none text-white">✕</span>
                             </button>
                           </div>
                         );
