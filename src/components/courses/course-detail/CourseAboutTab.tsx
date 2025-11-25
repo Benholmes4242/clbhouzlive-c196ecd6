@@ -131,7 +131,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         {userRating && (
           <Button 
             onClick={handleRateClick}
-            className="w-full justify-center mt-4"
+            className="w-full justify-center mt-4 h-11 rounded-xl"
             variant="outline"
           >
             Edit Your Rating
