@@ -20,6 +20,7 @@ import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 import CourseLocationBreadcrumb from './CourseLocationBreadcrumb';
 import RatingComparisonCard from './RatingComparisonCard';
 import CourseTop100Summary from './CourseTop100Summary';
+import { formatCourseLocation } from '@/utils/courseLocation';
 
 const ArrowUp = () => (
   <svg
@@ -356,7 +357,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <div className="px-4 space-y-3 mb-4">
           <h2 className="text-lg md:text-xl font-semibold">Location</h2>
           <p className="text-base md:text-lg text-foreground">
-            {[course.sub_country, course.country].filter(Boolean).join(', ')}
+            {formatCourseLocation(course)}
           </p>
         </div>
         
@@ -384,8 +385,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               latitude={coords.lat}
               longitude={coords.lng}
               courseName={course.name}
-              country={course.country}
-              subCountry={course.sub_country}
+              locationText={formatCourseLocation(course)}
             />
           </>
         )}
