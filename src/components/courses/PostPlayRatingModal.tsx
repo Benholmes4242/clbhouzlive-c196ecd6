@@ -890,28 +890,40 @@ const PostPlayRatingModal = ({
             </section>
 
             {/* Primary CTA Button */}
-            <footer className="px-6 mt-6 pb-3">
-              <Button
-                type="submit"
-                onClick={handleSubmit}
-                disabled={isSubmitting || !selectedRating}
-                variant="outline"
-                className="w-full h-11 rounded-lg border border-slate-600 bg-white text-slate-600 text-base font-medium py-3 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? 'Saving…' : (isEditMode ? 'Update rating' : 'Submit rating')}
-              </Button>
-
-              {isEditMode && (
-                <div className="flex justify-center">
+            <footer className="px-6 mt-3 pb-3">
+              {isEditMode ? (
+                <div className="flex w-full items-center justify-between gap-3">
+                  {/* Remove rating (left) */}
                   <button
                     type="button"
                     onClick={() => setShowRemoveDialog(true)}
                     disabled={isSubmitting}
-                    className="mt-2 inline-flex items-center justify-center rounded-full border border-red-300 px-4 py-2 text-sm font-medium text-red-600 bg-white/80 hover:bg-red-50 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 inline-flex items-center justify-center rounded-full border border-red-300 px-4 py-2 text-sm font-medium text-red-600 bg-white/80 hover:bg-red-50 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed h-11"
                   >
                     Remove rating
                   </button>
+
+                  {/* Update rating (right) */}
+                  <Button
+                    type="submit"
+                    onClick={handleSubmit}
+                    disabled={isSubmitting || !selectedRating}
+                    variant="outline"
+                    className="flex-1 h-11 rounded-lg border border-slate-600 bg-white text-slate-600 text-base font-medium py-3 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? 'Saving…' : 'Update rating'}
+                  </Button>
                 </div>
+              ) : (
+                <Button
+                  type="submit"
+                  onClick={handleSubmit}
+                  disabled={isSubmitting || !selectedRating}
+                  variant="outline"
+                  className="w-full h-11 rounded-lg border border-slate-600 bg-white text-slate-600 text-base font-medium py-3 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? 'Saving…' : 'Submit rating'}
+                </Button>
               )}
             </footer>
           </div>
