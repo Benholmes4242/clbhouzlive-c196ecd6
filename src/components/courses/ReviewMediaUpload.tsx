@@ -106,7 +106,7 @@ const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia, show
   const mediaOptions = [
     {
       key: "library",
-      label: "Photo or Video Library",
+      label: "Media Library",
       icon: ImageIcon,
       onClick: handleOpenLibrary,
     },
