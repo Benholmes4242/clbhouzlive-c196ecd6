@@ -581,16 +581,16 @@ const PostPlayRatingModal = ({
 
             {/* Overall Rating Slider */}
             <section className="px-4 mt-6">
-              <p className="text-xs font-medium tracking-wide text-slate-500 mb-2">
+              <p className="text-sm font-medium tracking-wide text-slate-500 mb-2">
                 Your overall rating
               </p>
 
               <div className="mt-2">
                 <div className="flex items-baseline justify-between mb-1">
-                  <span className="text-sm font-medium text-slate-900">
+                  <span className="text-base font-medium text-slate-900">
                     {selectedRating != null ? selectedRating.toFixed(1) : '--'}
                   </span>
-                  <span className="text-xs text-slate-500">/ 10</span>
+                  <span className="text-sm text-slate-500">/ 10</span>
                 </div>
 
                 <div className="py-3">
@@ -605,7 +605,7 @@ const PostPlayRatingModal = ({
                 </div>
 
                 {selectedRating == null && (
-                  <div className="mt-2 inline-flex rounded-full bg-slate-900 text-xs text-white px-3 py-1">
+                  <div className="mt-2 inline-flex rounded-full bg-slate-900 text-sm text-white px-3 py-1">
                     No rating selected yet
                   </div>
                 )}
@@ -614,7 +614,7 @@ const PostPlayRatingModal = ({
 
             {/* Share Your Thoughts */}
             <section className="px-4 mt-6">
-              <p className="text-xs font-medium tracking-wide text-slate-500 mb-2">
+              <p className="text-sm font-medium tracking-wide text-slate-500 mb-2">
                 Share your thoughts
               </p>
 
@@ -624,11 +624,11 @@ const PostPlayRatingModal = ({
                   onChange={(e) => setReview(e.target.value)}
                   rows={4}
                   placeholder="Share your review with other golfers – what stood out about the design, conditions, clubhouse or overall experience?"
-                  className="w-full rounded-xl border border-slate-200/80 bg-slate-50 text-sm text-slate-900 placeholder:text-slate-400 resize-none focus:outline-none focus:border-slate-300 focus:ring-0 focus:shadow-[0_0_0_3px_rgba(148,163,184,0.25)]"
+                  className="w-full rounded-xl border border-slate-200/80 bg-slate-50 text-base text-slate-900 placeholder:text-slate-400 resize-none focus:outline-none focus:border-slate-300 focus:ring-0 focus:shadow-[0_0_0_3px_rgba(148,163,184,0.25)]"
                   disabled={isSubmitting}
                   maxLength={500}
                 />
-                <p className="mt-1 text-xs text-slate-400 text-right">
+                <p className="mt-1 text-sm text-slate-400 text-right">
                   {review.length}/500
                 </p>
               </div>
@@ -636,7 +636,7 @@ const PostPlayRatingModal = ({
 
             {/* Breakdown Sliders */}
             <section className="px-4 mt-6">
-              <p className="text-xs font-medium tracking-wide text-slate-500 mb-2">
+              <p className="text-sm font-medium tracking-wide text-slate-500 mb-2">
                 Breakdown (optional)
               </p>
 
@@ -672,8 +672,8 @@ const PostPlayRatingModal = ({
               ].map(({ key, label, score, setScore, setTouched }) => (
                 <div key={key} className="mt-5">
                   <div className="flex items-baseline justify-between">
-                    <span className="text-sm font-medium text-slate-900">{label}</span>
-                    <span className="text-xs text-slate-500">
+                    <span className="text-base font-medium text-slate-900">{label}</span>
+                    <span className="text-sm text-slate-500">
                       {score != null ? `${score.toFixed(1)} / 10` : '-- / 10'}
                     </span>
                   </div>
@@ -697,7 +697,7 @@ const PostPlayRatingModal = ({
 
             {/* Media Upload Section */}
             <section className="px-4 mt-6">
-              <p className="text-xs font-medium tracking-wide text-slate-500 mb-2">
+              <p className="text-sm font-medium tracking-wide text-slate-500 mb-2">
                 Media upload (optional)
               </p>
 
@@ -761,7 +761,7 @@ const PostPlayRatingModal = ({
                             };
                             input.click();
                           }}
-                          className="text-xs font-medium text-slate-600 underline-offset-2 hover:text-slate-900 hover:underline"
+                          className="text-sm font-medium text-slate-600 underline-offset-2 hover:text-slate-900 hover:underline"
                         >
                           Add more photos or videos
                         </button>
@@ -778,7 +778,7 @@ const PostPlayRatingModal = ({
                 type="submit"
                 onClick={handleSubmit}
                 disabled={isSubmitting || !selectedRating}
-                className="w-full h-11 rounded-full text-sm font-semibold bg-slate-900 text-white border border-white/10 shadow-[0_8px_20px_rgba(15,23,42,0.45)] hover:bg-slate-900/90 active:bg-slate-900 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                className="w-full h-11 rounded-full text-base font-semibold bg-slate-900 text-white border border-white/10 shadow-[0_8px_20px_rgba(15,23,42,0.45)] hover:bg-slate-900/90 active:bg-slate-900 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
               >
                 {isSubmitting ? 'Saving…' : (isEditMode ? 'Update rating' : 'Submit rating')}
               </Button>

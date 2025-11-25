@@ -16,16 +16,16 @@ const CourseTop100Summary: React.FC = () => {
     return (
       <section className="px-4 pt-4 pb-5 bg-slate-50">
         <div className="bg-white border border-border rounded-2xl px-4 py-4 shadow-sm">
-          <h2 className="text-base font-semibold text-foreground mb-1">
+          <h2 className="text-lg font-semibold text-foreground mb-1">
             Your Top 100 Progress
           </h2>
-          <p className="text-sm text-muted-foreground mb-3">
+          <p className="text-base text-muted-foreground mb-3">
             Sign in to track how this course fits into your Top 100 journey and
             see your progress across the world's greatest courses.
           </p>
           <button
             onClick={() => navigate('/auth?redirect=/courses')}
-            className="inline-flex items-center justify-center rounded-lg bg-primary-accent px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-opacity"
+            className="inline-flex items-center justify-center rounded-lg bg-primary-accent px-4 py-2 text-base font-medium text-white hover:opacity-90 transition-opacity"
           >
             Sign in to view your journey
           </button>
@@ -68,10 +68,10 @@ const CourseTop100Summary: React.FC = () => {
     <section className="px-4 pt-4 pb-5 bg-slate-50 text-center">
       {/* Header */}
       <div className="mb-3">
-        <h2 className="text-base font-semibold text-foreground mb-1">
+        <h2 className="text-lg font-semibold text-foreground mb-1">
           Your Top 100 Progress
         </h2>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-base text-muted-foreground">
           You've played {total} Top 100 course{total === 1 ? '' : 's'} across{' '}
           {regions} region{regions === 1 ? '' : 's'}.
         </p>
@@ -79,7 +79,7 @@ const CourseTop100Summary: React.FC = () => {
         {/* Prestige Ring & Milestone Chips */}
         <div className="flex flex-wrap items-center justify-center gap-2 mt-3">
           {data.prestige_ring && (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card px-3 py-1 text-xs">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card px-3 py-1 text-sm">
               <span className={cn(
                 "h-4 w-4 rounded-full border border-primary-accent/60 ring-2 ring-offset-[1px] ring-offset-background",
                 getRingColorClass(data.prestige_ring)
@@ -89,14 +89,14 @@ const CourseTop100Summary: React.FC = () => {
           )}
           
           {data.prestige_label && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-surface-alt px-3 py-1 text-xs text-primary-accent">
+            <span className="inline-flex items-center gap-1 rounded-full bg-surface-alt px-3 py-1 text-sm text-primary-accent">
               <Trophy className="h-3 w-3" />
               {data.prestige_label}
             </span>
           )}
           
           {data.next_milestone && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-surface-alt px-3 py-1 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-1 rounded-full bg-surface-alt px-3 py-1 text-sm text-muted-foreground">
               Next milestone: {data.next_milestone.remaining} more{' '}
               {data.next_milestone.remaining === 1 ? 'course' : 'courses'}
             </span>
@@ -114,10 +114,10 @@ const CourseTop100Summary: React.FC = () => {
             }
             className="bg-white border border-border rounded-2xl px-3 py-3 text-left transition-colors hover:bg-muted/50 shadow-sm"
           >
-            <span className="text-xs font-medium text-muted-foreground mb-0.5 block">
+            <span className="text-sm font-medium text-muted-foreground mb-0.5 block">
               {list!.listName}
             </span>
-            <span className="text-sm font-semibold text-foreground block">
+            <span className="text-base font-semibold text-foreground block">
               {list!.played} / {list!.total} played
             </span>
             <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-surface-alt">
@@ -139,7 +139,7 @@ const CourseTop100Summary: React.FC = () => {
       <div className="text-center">
         <button
           onClick={() => navigate('/top100?tab=my-progress')}
-          className="mt-3 text-xs font-medium text-primary-accent hover:text-primary-accent/80 transition-colors"
+          className="mt-3 text-sm font-medium text-primary-accent hover:text-primary-accent/80 transition-colors"
         >
           View full Top 100 Journey →
         </button>

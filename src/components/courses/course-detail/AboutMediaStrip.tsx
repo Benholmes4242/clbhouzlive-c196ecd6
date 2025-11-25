@@ -125,7 +125,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     return (
       <>
         <div className="flex items-center justify-between mb-3 px-4">
-          <h2 className="text-base md:text-lg font-semibold">Media</h2>
+          <h2 className="text-lg md:text-xl font-semibold">Media</h2>
         </div>
         <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 grid grid-cols-3 gap-0.5">
           {Array.from({ length: maxItems }).map((_, i) => (
@@ -141,11 +141,11 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
   return (
     <>
       <div className="flex items-center justify-between mb-3 px-4">
-        <h2 className="text-base md:text-lg font-semibold">Media</h2>
+        <h2 className="text-lg md:text-xl font-semibold">Media</h2>
         {hasMedia && (
           <button
             type="button"
-            className="text-xs font-medium text-foreground hover:underline"
+            className="text-sm font-medium text-foreground hover:underline"
             onClick={(e) => {
               e.stopPropagation();
               onSeeAllClick();
@@ -157,7 +157,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
       </div>
 
       {!hasMedia ? (
-        <div className="mx-4 rounded-xl border border-dashed border-border/60 bg-muted/40 px-4 py-6 text-sm text-muted-foreground">
+        <div className="mx-4 rounded-xl border border-dashed border-border/60 bg-muted/40 px-4 py-6 text-base text-muted-foreground">
           <p className="text-center">No media for this course yet. Review this course and add media or tag this course to be the first.</p>
         </div>
       ) : (
