@@ -28,6 +28,22 @@ const getRatingLabel = (score: number | null | undefined): string | null => {
   return 'Needs improvement';
 };
 
+// Check if a score is "Top rated"
+const TOP_RATED_THRESHOLD = 9.5;
+const isTopRated = (score: number | null | undefined): boolean => {
+  if (score == null) return false;
+  return score >= TOP_RATED_THRESHOLD;
+};
+
+// Top rated pill component
+const TopRatedPill: React.FC = () => {
+  return (
+    <span className="inline-flex items-center px-2 py-0.5 rounded-full border bg-amber-50/90 border-amber-200/80 text-[11px] font-semibold tracking-wide uppercase text-amber-700">
+      Top rated
+    </span>
+  );
+};
+
 const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   courseId,
   ratingAggregates,
@@ -186,7 +202,6 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         <div className="mt-6 space-y-5">
           {categories.map((cat) => {
             const score = cat.score || 0;
-            const labelText = getRatingLabel(score);
 
             return (
               <div key={cat.id} className="space-y-1.5">
@@ -196,12 +211,12 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                     {cat.label}
                   </span>
 
-                  <span className="text-[0.95rem] text-slate-900 font-medium">
-                    {formatScore(score)}
-                    {labelText && (
-                      <span className="text-slate-500"> · {labelText}</span>
-                    )}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-base font-semibold text-slate-900">
+                      {formatScore(score)} /10
+                    </span>
+                    {isTopRated(score) && <TopRatedPill />}
+                  </div>
                 </div>
 
                 {/* Row 2: Full-width bar */}
