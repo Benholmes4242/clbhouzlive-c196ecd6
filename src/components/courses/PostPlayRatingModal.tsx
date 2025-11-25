@@ -725,7 +725,7 @@ const PostPlayRatingModal = ({
                                   playsInline
                                 />
                                 <div className="absolute bottom-2 right-2 pointer-events-none">
-                                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-black/20 backdrop-blur-sm">
+                                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-black/20 backdrop-blur-sm">
                                     <div className="ml-[2px] h-0 w-0 border-y-[5px] border-y-transparent border-l-[8px] border-l-white" />
                                   </div>
                                 </div>
