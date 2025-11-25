@@ -214,7 +214,6 @@ export const CoachFinderModal: React.FC<CoachFinderModalProps> = ({
               <Button 
                 onClick={handleSendRequest}
                 disabled={selectedCoaches.length === 0}
-                className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
               >
                 Send Request ({selectedCoaches.length}/3)
               </Button>
@@ -384,7 +383,7 @@ export const CoachFinderModal: React.FC<CoachFinderModalProps> = ({
             <Button 
               onClick={handleFindCoaches}
               disabled={!isFormValid() || isLoading}
-              className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
+              className="flex-1"
             >
               {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               Find Coaches

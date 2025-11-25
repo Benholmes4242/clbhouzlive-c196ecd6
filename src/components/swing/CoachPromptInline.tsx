@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { CoachFinderForm } from "./CoachFinderForm";
+import { Button } from "@/components/ui/button";
 
 export function CoachPromptInline({
   swingAnalysisId,
@@ -39,18 +40,18 @@ export function CoachPromptInline({
             </p>
           </div>
           <div className="flex gap-3 lg:shrink-0">
-            <button
+            <Button
+              variant="ghost"
               onClick={dismiss}
-              className="text-sm text-muted-foreground hover:text-foreground underline-offset-4 hover:underline transition-colors"
+              className="text-sm"
             >
               No thanks
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setExpanded(true)}
-              className="px-4 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
             >
               Recommend coaches near me
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
