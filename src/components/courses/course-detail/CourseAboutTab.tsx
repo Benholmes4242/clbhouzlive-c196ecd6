@@ -18,6 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 import CourseLocationBreadcrumb from './CourseLocationBreadcrumb';
+import RatingComparisonCard from './RatingComparisonCard';
 import CourseTop100Summary from './CourseTop100Summary';
 import { formatCourseLocation } from '@/utils/courseLocation';
 
@@ -256,6 +257,11 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         {/* Friends Who've Played */}
         <CourseFriendsStrip courseId={course.id} courseName={course.name} />
       </section>
+
+      {/* Your Rating vs Community Comparison */}
+      {user && userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
+        <RatingComparisonCard userRating={userRating} aggregates={ratingAggregates} />
+      )}
 
       {/* CTA for users who haven't rated yet */}
       {user && !userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
