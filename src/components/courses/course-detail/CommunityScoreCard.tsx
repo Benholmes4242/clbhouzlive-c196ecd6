@@ -18,14 +18,14 @@ const formatScore = (score: number) => {
 };
 
 // Get quality label from score
-const getRatingLabel = (score: number | null | undefined): string | null => {
+const getCommunityRatingLabel = (score: number | null | undefined): string | null => {
   if (score == null) return null;
-  if (score >= 9) return 'Outstanding';
-  if (score >= 8) return 'Excellent';
-  if (score >= 7) return 'Very good';
-  if (score >= 6) return 'Good';
-  if (score >= 5) return 'Mixed';
-  return 'Needs improvement';
+  if (score >= 9.0) return 'Outstanding';
+  if (score >= 8.0) return 'Excellent';
+  if (score >= 7.0) return 'Very good';
+  if (score >= 6.0) return 'Good';
+  // Anything below 6.0 is "Fair"
+  return 'Fair';
 };
 
 // Check if a score is "Top rated"
@@ -38,8 +38,17 @@ const isTopRated = (score: number | null | undefined): boolean => {
 // Top rated pill component
 const TopRatedPill: React.FC = () => {
   return (
-    <span className="inline-flex items-center px-2 py-0.5 rounded-full border bg-amber-50/90 border-amber-200/80 text-[11px] font-semibold tracking-wide uppercase text-amber-700">
+    <span className="inline-flex items-center justify-center rounded-full px-3 py-1 border bg-amber-50 border-amber-200 text-xs font-semibold uppercase text-amber-700">
       Top rated
+    </span>
+  );
+};
+
+// Community rating badge component (matches Top Rated styling, different color)
+const CommunityRatingBadge: React.FC<{ label: string }> = ({ label }) => {
+  return (
+    <span className="inline-flex items-center justify-center rounded-full px-3 py-1 border bg-emerald-50 border-emerald-100 text-xs font-semibold uppercase text-emerald-700">
+      {label}
     </span>
   );
 };
@@ -149,7 +158,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
     },
   ].filter((cat) => cat.score !== null && cat.score !== undefined);
 
-  const qualityLabel = getRatingLabel(communityAverage);
+  const qualityLabel = getCommunityRatingLabel(communityAverage);
 
   return (
     <div className="mt-6 rounded-3xl bg-white shadow-sm px-5 py-6">
@@ -186,11 +195,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
           </div>
 
           {/* Quality chip */}
-          {qualityLabel && (
-            <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
-              {qualityLabel}
-            </span>
-          )}
+          {qualityLabel && <CommunityRatingBadge label={qualityLabel} />}
         </div>
       </div>
 
