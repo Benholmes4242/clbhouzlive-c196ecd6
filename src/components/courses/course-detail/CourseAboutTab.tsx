@@ -131,7 +131,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         {userRating && (
           <Button 
             onClick={handleRateClick}
-            className="w-full justify-center mt-4 h-11 rounded-xl"
+            className="w-full justify-center mt-4 h-11 rounded-lg"
             variant="outline"
           >
             Edit Your Rating
@@ -236,7 +236,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <section className="px-4 pt-6 pb-3 bg-slate-50 md:pt-8">
           <Button
             onClick={handleWebsiteClick}
-            className="w-full flex items-center justify-center gap-2 h-11 rounded-xl"
+            className="w-full flex items-center justify-center gap-2 h-11 rounded-lg"
             variant="outline"
           >
             <ExternalLink className="h-4 w-4" />
