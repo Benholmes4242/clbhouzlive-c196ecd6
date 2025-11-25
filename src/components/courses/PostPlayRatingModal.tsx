@@ -792,7 +792,7 @@ const PostPlayRatingModal = ({
                   }}
                   variant="outline"
                   disabled={selectedMedia.length >= 6}
-                  className="w-44 mt-6 rounded-full border border-slate-600 bg-white px-6 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-44 mt-6 h-11 rounded-xl border border-slate-600 bg-white px-6 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {selectedMedia.length >= 6 ? 'Media limit reached' : 'Add Media'}
                 </Button>
@@ -806,7 +806,7 @@ const PostPlayRatingModal = ({
                 onClick={handleSubmit}
                 disabled={isSubmitting || !selectedRating}
                 variant="outline"
-                className="w-full rounded-full border border-slate-600 bg-white text-slate-600 text-base font-medium py-3 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full h-11 rounded-xl border border-slate-600 bg-white text-slate-600 text-base font-medium py-3 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? 'Saving…' : (isEditMode ? 'Update rating' : 'Submit rating')}
               </Button>
