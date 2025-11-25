@@ -724,9 +724,9 @@ const PostPlayRatingModal = ({
                                   muted
                                   playsInline
                                 />
-                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-900/70">
-                                    <div className="ml-[2px] h-0 w-0 border-y-[5px] border-y-transparent border-l-[8px] border-l-white" />
+                                <div className="absolute bottom-2 right-2 pointer-events-none">
+                                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-black/20 backdrop-blur-sm">
+                                    <div className="ml-[2px] h-0 w-0 border-y-[4px] border-y-transparent border-l-[6px] border-l-white" />
                                   </div>
                                 </div>
                               </div>
