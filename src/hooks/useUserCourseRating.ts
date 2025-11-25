@@ -14,10 +14,11 @@ export interface UserCourseRating {
 }
 
 export function useUserCourseRating(courseId: string | undefined, userId: string | undefined) {
-  return useQuery({
+  const result = useQuery({
     queryKey: ['user-course-rating', courseId, userId],
     enabled: !!courseId && !!userId,
     queryFn: async () => {
+      console.log('[useUserCourseRating] queryFn EXECUTING', { courseId, userId });
       if (!courseId || !userId) return null;
 
       const { data, error } = await supabase
@@ -28,9 +29,26 @@ export function useUserCourseRating(courseId: string | undefined, userId: string
         .maybeSingle();
 
       if (error) throw error;
+      console.log('[useUserCourseRating] queryFn RESULT', { 
+        hasData: !!data, 
+        rating: data?.rating,
+        ratingId: data?.id 
+      });
       return data as UserCourseRating | null;
     },
     staleTime: 3 * 60 * 1000, // 3 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
+  
+  console.log('[useUserCourseRating] Hook called', { 
+    courseId, 
+    userId, 
+    hasData: !!result.data,
+    isLoading: result.isLoading,
+    isFetching: result.isFetching,
+    dataUpdatedAt: result.dataUpdatedAt,
+    rating: result.data?.rating
+  });
+  
+  return result;
 }
