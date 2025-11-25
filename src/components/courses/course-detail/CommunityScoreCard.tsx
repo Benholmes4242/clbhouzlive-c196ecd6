@@ -17,15 +17,15 @@ const formatScore = (score: number) => {
   return score % 1 === 0 ? score.toString() : score.toFixed(1);
 };
 
-// Get quality label from score
-const getCommunityRatingLabel = (score: number | null | undefined): string | null => {
+// Get quality label and variant from score
+const getCommunityRatingLabel = (score: number | null | undefined): { label: string; variant: 'fair' | 'good' | 'veryGood' | 'excellent' | 'outstanding' } | null => {
   if (score == null) return null;
-  if (score >= 9.0) return 'Outstanding';
-  if (score >= 8.0) return 'Excellent';
-  if (score >= 7.0) return 'Very good';
-  if (score >= 6.0) return 'Good';
+  if (score >= 9.0) return { label: 'Outstanding', variant: 'outstanding' };
+  if (score >= 8.0) return { label: 'Excellent', variant: 'excellent' };
+  if (score >= 7.0) return { label: 'Very good', variant: 'veryGood' };
+  if (score >= 6.0) return { label: 'Good', variant: 'good' };
   // Anything below 6.0 is "Fair"
-  return 'Fair';
+  return { label: 'Fair', variant: 'fair' };
 };
 
 // Check if a score is "Top rated"
@@ -44,10 +44,18 @@ const TopRatedPill: React.FC = () => {
   );
 };
 
-// Community rating badge component (matches Top Rated styling, different color)
-const CommunityRatingBadge: React.FC<{ label: string }> = ({ label }) => {
+// Community rating badge component with color variants
+const CommunityRatingBadge: React.FC<{ label: string; variant: 'fair' | 'good' | 'veryGood' | 'excellent' | 'outstanding' }> = ({ label, variant }) => {
+  const variantClasses: Record<typeof variant, string> = {
+    fair: 'border-slate-200 bg-slate-50 text-slate-700',
+    good: 'border-sky-200 bg-sky-50 text-sky-700',
+    veryGood: 'border-blue-200 bg-blue-50 text-blue-700',
+    excellent: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+    outstanding: 'border-emerald-300 bg-emerald-100 text-emerald-800',
+  };
+
   return (
-    <span className="inline-flex items-center justify-center rounded-full px-3 py-1 border bg-emerald-50 border-emerald-100 text-xs font-semibold uppercase text-emerald-700">
+    <span className={`inline-flex items-center justify-center rounded-full px-3 py-1 border text-xs font-semibold uppercase ${variantClasses[variant]}`}>
       {label}
     </span>
   );
@@ -158,7 +166,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
     },
   ].filter((cat) => cat.score !== null && cat.score !== undefined);
 
-  const qualityLabel = getCommunityRatingLabel(communityAverage);
+  const qualityData = getCommunityRatingLabel(communityAverage);
 
   return (
     <div className="mt-6 rounded-3xl bg-white shadow-sm px-5 py-6">
@@ -181,21 +189,19 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
           )}
         </div>
 
-        {/* Right - logo + score + quality chip */}
-        <div className="flex flex-col items-end gap-1.5 shrink-0">
+        {/* Right - score + badge stack (centered) */}
+        <div className="inline-flex flex-col items-center gap-1">
           {/* Logo + Score */}
-          <div className="flex items-center gap-2">
-            <ClubhouseLogo size="md" className="shrink-0" />
-            <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-semibold text-slate-900">
-                {formatScore(communityAverage)}
-              </span>
-              <span className="text-base text-slate-500">/10</span>
-            </div>
+          <div className="flex items-baseline gap-1">
+            <ClubhouseLogo size="sm" />
+            <span className="text-2xl font-semibold text-slate-900">
+              {formatScore(communityAverage)}
+            </span>
+            <span className="text-sm font-medium text-slate-500">/10</span>
           </div>
 
-          {/* Quality chip */}
-          {qualityLabel && <CommunityRatingBadge label={qualityLabel} />}
+          {/* Quality chip centered under score */}
+          {qualityData && <CommunityRatingBadge label={qualityData.label} variant={qualityData.variant} />}
         </div>
       </div>
 
