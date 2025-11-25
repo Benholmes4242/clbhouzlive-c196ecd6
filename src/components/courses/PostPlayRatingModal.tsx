@@ -601,7 +601,7 @@ const PostPlayRatingModal = ({
             <section className="px-6 mt-6">
               <div className="mb-3 flex items-baseline justify-between">
                 <span className="text-lg font-semibold text-slate-900">
-                  {isEditMode ? 'Edit your overall rating' : 'Add your overall rating'}
+                  {isEditMode ? 'Edit your overall rating' : 'Submit your overall rating'}
                 </span>
                 <span className="text-base font-semibold text-slate-900">
                   {selectedRating != null ? selectedRating.toFixed(1) : '--'} <span className="font-normal text-slate-600">/10</span>
@@ -645,7 +645,7 @@ const PostPlayRatingModal = ({
             {/* Breakdown Sliders */}
             <section className="px-6 mt-6">
               <h3 className="text-lg font-semibold text-slate-900 mb-3">
-                {isEditMode ? 'Edit your breakdown' : 'Rate design, condition and more'}
+                {isEditMode ? 'Edit your breakdown' : 'Submit your breakdown'}
               </h3>
 
               {[
