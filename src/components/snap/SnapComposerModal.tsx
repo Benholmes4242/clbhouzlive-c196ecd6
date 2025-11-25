@@ -74,7 +74,7 @@ const SnapComposerModal = ({
             <div
               ref={captionInputRef}
               contentEditable
-              className="min-h-20 w-full rounded-lg border border-slate-600 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300/70 focus-visible:ring-offset-1 focus-visible:border-slate-600"
+              className="min-h-20 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:outline-none focus-visible:border-slate-600"
               onInput={onCaptionInput}
               data-placeholder="Write about your photo or video..."
               suppressContentEditableWarning={true}
