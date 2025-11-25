@@ -18,7 +18,7 @@ const RateCoursePage = () => {
       
       const { data, error } = await supabase
         .from('golf_courses')
-        .select('id, name, thumbnail_image')
+        .select('id, name, thumbnail_image, country, sub_country, region')
         .eq('id', courseId)
         .single();
       

@@ -7,12 +7,15 @@ import { Slider } from '@/components/ui/slider';
 import { Star, Check, Trophy, Trash2, Upload, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ReviewMediaUpload from './ReviewMediaUpload';
-import ClubhouseLogo from '@/components/ui/clubhouse-logo';
+import { formatCourseLocation } from '@/utils/courseLocation';
 
 interface Course {
   id: string;
   name: string;
   thumbnail_image?: string;
+  country?: string;
+  sub_country?: string;
+  region?: string;
 }
 
 interface PostPlayRatingModalProps {
@@ -674,11 +677,14 @@ const PostPlayRatingModal = ({
                 <ArrowLeft className="h-5 w-5 text-white" />
               </button>
 
-              {/* Course name overlay on image */}
+              {/* Course name and location overlay on image */}
               <div className="absolute inset-x-0 bottom-4 px-4">
-                <h1 className="text-4xl md:text-5xl font-semibold text-white drop-shadow-2xl">
+                <h1 className="text-4xl md:text-5xl font-semibold text-white drop-shadow-2xl mb-1.5">
                   {course.name}
                 </h1>
+                <p className="text-lg md:text-xl text-white opacity-90 drop-shadow-lg">
+                  {formatCourseLocation(course)}
+                </p>
               </div>
             </div>
 
