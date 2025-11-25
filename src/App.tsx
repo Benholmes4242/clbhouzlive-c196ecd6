@@ -36,6 +36,7 @@ import { DiscoverSkeleton } from '@/components/skeletons/DiscoverSkeleton';
 import { TourSkeleton } from '@/components/skeletons/TourSkeleton';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 import { HubSkeleton } from '@/components/skeletons/HubSkeleton';
+import { RateCoursePageSkeleton } from '@/components/skeletons/RateCoursePageSkeleton';
 import { HubProvider } from '@/features/hub/useHub';
 import { initRecentMediaListener } from '@/hooks/usePostSubmission/recentMediaListener';
 import { longPressHandler } from '@/utils/longPressHandler';
@@ -188,7 +189,7 @@ function AppRoutes() {
         <Route path="/discover" element={<Suspense fallback={<DiscoverSkeleton />}><DiscoverWrapped /></Suspense>} />
         <Route path="/courses" element={<Suspense fallback={<CoursesListSkeleton />}><Courses /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
-        <Route path="/courses/:courseId/rate" element={<RateCoursePage />} />
+        <Route path="/courses/:courseId/rate" element={<Suspense fallback={<RateCoursePageSkeleton />}><RateCoursePage /></Suspense>} />
         <Route path="/courses/:courseId/reviews" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseReviewsPage /></Suspense>} />
         <Route path="/user/:username/courses" element={<UserCoursesPage />} />
         <Route path="/my-ratings" element={<MyRatings />} />

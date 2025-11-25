@@ -5,16 +5,27 @@ import { Navigate, useLocation } from 'react-router-dom';
 interface AccessControlProps {
   children: React.ReactNode;
   requireAuth?: boolean;
+  noBlockingLoader?: boolean;
 }
 
 const AccessControl: React.FC<AccessControlProps> = ({ 
   children, 
-  requireAuth = false 
+  requireAuth = false,
+  noBlockingLoader = false
 }) => {
   const { user, loading } = useSupabaseSession();
   const location = useLocation();
 
-  // Show loading while checking authentication
+  // If noBlockingLoader is true, render children immediately and let them handle loading
+  if (noBlockingLoader) {
+    // Still redirect to auth if not authenticated and auth is required
+    if (requireAuth && !loading && !user) {
+      return <Navigate to="/auth" state={{ from: location }} replace />;
+    }
+    return <>{children}</>;
+  }
+
+  // Show loading while checking authentication (default behavior)
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
