@@ -707,7 +707,7 @@ const PostPlayRatingModal = ({
 
             {/* Media Upload Section */}
             <section className="px-6 mt-8">
-              <div className="px-4 py-8 flex flex-col items-center justify-center gap-4">
+              <div className="py-8 flex flex-col items-center justify-center gap-4">
                 {selectedMedia.length > 0 && (
                   <div className="w-full">
                     <div className="grid grid-cols-3 gap-3">
