@@ -186,9 +186,9 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         <div className="absolute bottom-0 left-0 right-0 z-30">
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
             <TabsList className="grid w-full grid-cols-3 h-12 bg-black/28 backdrop-blur-[22px] border-t border-white/6 rounded-none shadow-[0_8px_30px_rgba(0,0,0,0.45),0_0_1px_rgba(255,255,255,0.16)]">
-              <TabsTrigger value="about" className="text-base text-white data-[state=active]:bg-white/16 data-[state=active]:backdrop-blur-[18px] data-[state=active]:border data-[state=active]:border-white/45 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,0,0,0.35)]">About</TabsTrigger>
-              <TabsTrigger value="reviews" className="text-base text-white data-[state=active]:bg-white/16 data-[state=active]:backdrop-blur-[18px] data-[state=active]:border data-[state=active]:border-white/45 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,0,0,0.35)]">Reviews</TabsTrigger>
-              <TabsTrigger value="media" className="text-base text-white data-[state=active]:bg-white/16 data-[state=active]:backdrop-blur-[18px] data-[state=active]:border data-[state=active]:border-white/45 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,0,0,0.35)]">Media</TabsTrigger>
+              <TabsTrigger value="about" className="text-lg text-white data-[state=active]:bg-white/16 data-[state=active]:backdrop-blur-[18px] data-[state=active]:border data-[state=active]:border-white/45 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,0,0,0.35)]">About</TabsTrigger>
+              <TabsTrigger value="reviews" className="text-lg text-white data-[state=active]:bg-white/16 data-[state=active]:backdrop-blur-[18px] data-[state=active]:border data-[state=active]:border-white/45 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,0,0,0.35)]">Reviews</TabsTrigger>
+              <TabsTrigger value="media" className="text-lg text-white data-[state=active]:bg-white/16 data-[state=active]:backdrop-blur-[18px] data-[state=active]:border data-[state=active]:border-white/45 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,0,0,0.35)]">Media</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>

@@ -160,12 +160,12 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           <>
             {/* Header with premium score + user rating inline */}
             <div className="flex items-start justify-between gap-3 mb-3">
-              <div>
-                <h3 className="text-base font-semibold">Community Score</h3>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Based on {ratingAggregates.review_count} {ratingAggregates.review_count === 1 ? 'rating' : 'ratings'}
-                </p>
-              </div>
+          <div>
+            <h3 className="text-lg font-semibold">Community Score</h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              Based on {ratingAggregates.review_count} {ratingAggregates.review_count === 1 ? 'rating' : 'ratings'}
+            </p>
+          </div>
 
               <div className="flex items-center gap-2 flex-shrink-0">
                 <ClubhouseLogo size="md" className="h-7 w-7" />
@@ -179,9 +179,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             <div className="space-y-3 mb-3">
               {/* Course Design */}
               <div className="space-y-1">
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between text-base">
                   <span className="font-medium">Course Design</span>
-                  <span className="text-xs text-muted-foreground text-right min-w-[60px]">
+                  <span className="text-sm text-muted-foreground text-right min-w-[60px]">
                     {ratingAggregates.avg_design_score ? formatScore(ratingAggregates.avg_design_score) : '–'}/10
                   </span>
                 </div>
@@ -195,9 +195,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
               {/* Course Condition */}
               <div className="space-y-1">
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between text-base">
                   <span className="font-medium">Course Condition</span>
-                  <span className="text-xs text-muted-foreground text-right min-w-[60px]">
+                  <span className="text-sm text-muted-foreground text-right min-w-[60px]">
                     {ratingAggregates.avg_condition_score ? formatScore(ratingAggregates.avg_condition_score) : '–'}/10
                   </span>
                 </div>
@@ -211,9 +211,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
               {/* Clubhouse */}
               <div className="space-y-1">
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between text-base">
                   <span className="font-medium">Clubhouse</span>
-                  <span className="text-xs text-muted-foreground text-right min-w-[60px]">
+                  <span className="text-sm text-muted-foreground text-right min-w-[60px]">
                     {ratingAggregates.avg_clubhouse_score ? formatScore(ratingAggregates.avg_clubhouse_score) : '–'}/10
                   </span>
                 </div>
@@ -227,9 +227,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
               {/* Facilities */}
               <div className="space-y-1">
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between text-base">
                   <span className="font-medium">Facilities</span>
-                  <span className="text-xs text-muted-foreground text-right min-w-[60px]">
+                  <span className="text-sm text-muted-foreground text-right min-w-[60px]">
                     {ratingAggregates.avg_facilities_score ? formatScore(ratingAggregates.avg_facilities_score) : '–'}/10
                   </span>
                 </div>
@@ -244,7 +244,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
             {/* Personal comparison text - if user has rated */}
             {userRating && (
-              <div className="flex items-center gap-2 text-sm text-slate-600 mt-2">
+              <div className="flex items-center gap-2 text-base text-slate-600 mt-2">
                 {userRating.rating > (ratingAggregates.avg_overall_score || 0) ? (
                   <ArrowUp />
                 ) : (
@@ -270,7 +270,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               <button
                 type="button"
                 onClick={() => onTabChange?.('reviews')}
-                className="text-xs font-medium text-muted-foreground hover:text-foreground underline underline-offset-4 transition-all duration-motion-fast ease-standard"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground underline underline-offset-4 transition-all duration-motion-fast ease-standard"
               >
                 See all reviews
               </button>
@@ -291,8 +291,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           <>
             {/* No ratings yet state - Seamless */}
             <div>
-              <h3 className="text-base font-semibold mb-4">Community Score</h3>
-              <p className="text-sm text-muted-foreground mb-4 text-center">
+              <h3 className="text-lg font-semibold mb-4">Community Score</h3>
+              <p className="text-base text-muted-foreground mb-4 text-center">
                 No ratings yet – be the first to rate this course!
               </p>
               
@@ -320,8 +320,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {/* CTA for users who haven't rated yet */}
       {user && !userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
         <section className="px-4 pt-6 pb-5 bg-slate-50 md:pt-8">
-          <h3 className="text-base font-semibold mb-1">How do you rate this course?</h3>
-          <p className="text-sm text-slate-500 mb-3">
+          <h3 className="text-lg font-semibold mb-1">How do you rate this course?</h3>
+          <p className="text-base text-slate-500 mb-3">
             Add your rating to see how it compares with the clbhouz community.
           </p>
           <Button onClick={handleRateClick} className="w-full" variant="outline">
@@ -333,13 +333,13 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {/* About Section - Seamless */}
       {course.description && (
         <section className="px-4 pt-6 pb-5 bg-slate-100 space-y-3 md:pt-8">
-          <h2 className="text-base md:text-lg font-semibold">About</h2>
-          <div className="text-sm md:text-base leading-relaxed text-foreground">
+          <h2 className="text-lg md:text-xl font-semibold">About</h2>
+          <div className="text-base md:text-lg leading-relaxed text-foreground">
             {formatDescription(displayDescription)}
             {shouldShowReadMore && (
               <button
                 onClick={() => setShowFullDescription(!showFullDescription)}
-                className="block mt-4 text-sm font-medium hover:underline text-slate-600"
+                className="block mt-4 text-base font-medium hover:underline text-slate-600"
               >
                 {showFullDescription ? 'Show less' : 'Read more'}
               </button>
@@ -354,8 +354,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {/* Location Section - Seamless */}
       <section className="pt-6 pb-5 bg-slate-50 md:pt-8">
         <div className="px-4 space-y-3 mb-4">
-          <h2 className="text-base md:text-lg font-semibold">Location</h2>
-          <p className="text-sm md:text-base text-foreground">
+          <h2 className="text-lg md:text-xl font-semibold">Location</h2>
+          <p className="text-base md:text-lg text-foreground">
             {[course.sub_country, course.country].filter(Boolean).join(', ')}
           </p>
         </div>
@@ -392,7 +392,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
         {!coords && !coordsLoading && (
           <div className="px-4">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-base text-muted-foreground">
               Location data isn't available for this course yet.
             </p>
           </div>

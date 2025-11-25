@@ -57,7 +57,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
     <div className="px-4 pt-4 pb-3 bg-slate-100 space-y-6">
       {/* Location breadcrumb */}
       {primaryRegionLabel && (
-        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
           {/* Level 1 – Primary region */}
           <button
             type="button"
@@ -120,7 +120,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
 
       {/* Quick filters - Seamless section */}
       <div>
-        <div className="text-xs font-semibold text-muted-foreground tracking-wide uppercase mb-3">
+        <div className="text-sm font-semibold text-muted-foreground tracking-wide uppercase mb-3">
           Explore more from here
         </div>
         
@@ -137,7 +137,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
                 });
                 navigate(`/courses?${params.toString()}`);
               }}
-              className="w-full flex items-center justify-between px-0 pb-2 text-sm hover:opacity-70 transition-opacity"
+              className="w-full flex items-center justify-between px-0 pb-2 text-base hover:opacity-70 transition-opacity"
             >
               <span>
                 See more courses in <span className="font-semibold">{subCountryLabel}</span>
@@ -177,7 +177,7 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
               });
               navigate(`/courses?${params.toString()}`);
             }}
-            className="w-full flex items-center justify-between px-0 pt-2 text-sm hover:opacity-70 transition-opacity"
+            className="w-full flex items-center justify-between px-0 pt-2 text-base hover:opacity-70 transition-opacity"
           >
             <span>
               See Top 100 in <span className="font-semibold">{primaryListName}</span>

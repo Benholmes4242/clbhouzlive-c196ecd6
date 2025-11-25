@@ -30,7 +30,7 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
         onClick={() => setIsModalOpen(true)}
         className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-4 cursor-pointer hover:bg-card/70 transition-colors"
       >
-        <h3 className="text-sm font-medium mb-3">Friends who've played here</h3>
+        <h3 className="text-base font-medium mb-3">Friends who've played here</h3>
         <div className="flex items-center gap-2">
           <div className="flex -space-x-2">
             {displayedFriends.map((friend) => (
@@ -43,7 +43,7 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
               </Avatar>
             ))}
           </div>
-          <span className="text-xs text-muted-foreground">
+          <span className="text-sm text-muted-foreground">
             {friends.length} {friends.length === 1 ? 'friend has' : 'friends have'} logged a round here
             {remainingCount > 0 && ` (+${remainingCount} more)`}
           </span>
@@ -73,17 +73,17 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm truncate">
+                  <p className="font-medium text-base truncate">
                     {friend.profile.display_name || friend.profile.username}
                   </p>
                   {friend.last_played_at && (
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                       Last played {formatDistanceToNow(new Date(friend.last_played_at), { addSuffix: true })}
                     </p>
                   )}
                 </div>
                 {friend.has_review && (
-                  <Badge variant="secondary" className="text-xs">
+                  <Badge variant="secondary" className="text-sm">
                     Left a review
                   </Badge>
                 )}
