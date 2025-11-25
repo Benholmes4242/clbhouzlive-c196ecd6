@@ -173,7 +173,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                       : `Based on ${ratingAggregates.review_count} ratings`}
                   </p>
 
-                  {/* Only-you message or comparison */}
+                  {/* Only-you message or comparison line */}
                   {(() => {
                     const comparison = getRatingComparisonState(
                       ratingAggregates.review_count,
@@ -181,17 +181,47 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                       userRating?.rating ?? null
                     );
 
-                    const onlyUser = comparison?.type === 'only-user' || ratingAggregates.review_count === 1;
+                    const onlyUser = comparison?.type === 'only-user';
 
                     if (onlyUser) {
                       return (
-                        <p className="text-xs text-slate-500 sm:text-sm">
+                        <p className="mt-1 text-xs text-slate-500 sm:text-sm">
                           Only you have rated this course so far.
                         </p>
                       );
                     }
 
-                    return null;
+                    // Show comparison line if user has rated AND there are at least 2 ratings total
+                    const showComparison =
+                      userRating?.rating != null &&
+                      ratingAggregates.review_count > 1 &&
+                      ratingAggregates.avg_overall_score != null &&
+                      comparison;
+
+                    if (!showComparison) return null;
+
+                    const diffOverall = (userRating?.rating ?? 0) - (ratingAggregates.avg_overall_score ?? 0);
+                    const isOnPar = comparison.type === 'on-par';
+
+                    return (
+                      <div className="mt-2 flex items-center gap-2 text-xs">
+                        {isOnPar ? (
+                          <CheckCircle2 className="h-3 w-3 text-emerald-500" />
+                        ) : diffOverall < 0 ? (
+                          <ArrowDown />
+                        ) : (
+                          <ArrowUp />
+                        )}
+
+                        <span className="text-slate-600">
+                          {isOnPar
+                            ? 'You rate this course on par with the community.'
+                            : diffOverall < 0
+                            ? `You rate this course ${Math.abs(diffOverall).toFixed(1)} ${Math.abs(diffOverall) === 1 ? 'point' : 'points'} lower than the community.`
+                            : `You rate this course ${diffOverall.toFixed(1)} ${diffOverall === 1 ? 'point' : 'points'} higher than the community.`}
+                        </span>
+                      </div>
+                    );
                   })()}
                 </div>
 
@@ -209,66 +239,34 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               </div>
             </div>
 
-            {/* Category grid */}
-            <div className="grid grid-cols-1 gap-3 mt-3 sm:grid-cols-2 sm:gap-4">
-              <CategoryScoreCard
-                label="Course Design"
-                user={userRating?.design_score ?? null}
-                community={ratingAggregates.avg_design_score ?? null}
-              />
-              <CategoryScoreCard
-                label="Course Condition"
-                user={userRating?.condition_score ?? null}
-                community={ratingAggregates.avg_condition_score ?? null}
-              />
-              <CategoryScoreCard
-                label="Clubhouse"
-                user={userRating?.clubhouse_score ?? null}
-                community={ratingAggregates.avg_clubhouse_score ?? null}
-              />
-              <CategoryScoreCard
-                label="Facilities"
-                user={userRating?.facilities_score ?? null}
-                community={ratingAggregates.avg_facilities_score ?? null}
-              />
-            </div>
-
-            {/* Helper line */}
+            {/* Category grid - only show if any breakdowns exist */}
             {(() => {
-              const comparison = getRatingComparisonState(
-                ratingAggregates.review_count,
-                ratingAggregates.avg_overall_score ?? null,
-                userRating?.rating ?? null
-              );
+              const categories = [
+                { label: 'Course Design', user: userRating?.design_score ?? null, community: ratingAggregates.avg_design_score ?? null },
+                { label: 'Course Condition', user: userRating?.condition_score ?? null, community: ratingAggregates.avg_condition_score ?? null },
+                { label: 'Clubhouse', user: userRating?.clubhouse_score ?? null, community: ratingAggregates.avg_clubhouse_score ?? null },
+                { label: 'Facilities', user: userRating?.facilities_score ?? null, community: ratingAggregates.avg_facilities_score ?? null },
+              ];
 
-              const showHelper =
-                userRating?.rating != null &&
-                ratingAggregates.review_count > 0 &&
-                comparison?.type !== 'only-user' &&
-                ratingAggregates.avg_overall_score != null;
+              const hasAnyBreakdown = categories.some(cat => cat.user != null || cat.community != null);
 
-              if (!showHelper || !comparison) return null;
-
-              const diffOverall = (userRating?.rating ?? 0) - (ratingAggregates.avg_overall_score ?? 0);
-              const isOnPar = comparison.type === 'on-par';
+              if (!hasAnyBreakdown) return null;
 
               return (
-                <div className="mt-3 flex items-center gap-2 text-xs sm:text-sm">
-                  {isOnPar ? (
-                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                  ) : diffOverall < 0 ? (
-                    <ArrowDown />
-                  ) : (
-                    <ArrowUp />
-                  )}
-
-                  <p className="text-slate-600">
-                    {isOnPar
-                      ? 'You rate this course on par with the community.'
-                      : diffOverall < 0
-                      ? `You rate this course ${Math.abs(diffOverall).toFixed(1)} ${Math.abs(diffOverall) === 1 ? 'point' : 'points'} lower than the community.`
-                      : `You rate this course ${diffOverall.toFixed(1)} ${diffOverall === 1 ? 'point' : 'points'} higher than the community.`}
-                  </p>
+                <div className="grid grid-cols-1 gap-3 mt-3 sm:grid-cols-2 sm:gap-4">
+                  {categories.map(cat => {
+                    // Hide individual card if both are null
+                    if (cat.user == null && cat.community == null) return null;
+                    
+                    return (
+                      <CategoryScoreCard
+                        key={cat.label}
+                        label={cat.label}
+                        user={cat.user}
+                        community={cat.community}
+                      />
+                    );
+                  })}
                 </div>
               );
             })()}
