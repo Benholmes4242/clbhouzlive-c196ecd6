@@ -563,8 +563,8 @@ const PostPlayRatingModal = ({
       <div className="fixed inset-0 z-[999] bg-slate-50 overflow-y-auto">
         {!showConfirmation ? (
           <div>
-            {/* Full Bleed Header with Glass Back Button */}
-            <div className="relative -mx-0 mb-6 h-[280px] sm:h-64 overflow-hidden">
+            {/* Hero Image */}
+            <div className="relative h-[200px] overflow-hidden">
               {course.thumbnail_image ? (
                 <img
                   src={course.thumbnail_image}
@@ -576,7 +576,8 @@ const PostPlayRatingModal = ({
                   <Star className="h-8 w-8 text-white opacity-50" />
                 </div>
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-black/0" />
+              {/* Dark gradient overlay for text legibility */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/35 to-transparent" />
               
               {/* Glass back button */}
               <button
@@ -587,74 +588,68 @@ const PostPlayRatingModal = ({
               >
                 <ArrowLeft className="h-5 w-5 text-white" />
               </button>
+            </div>
 
-              {/* Overlay text */}
-              <div className="absolute bottom-4 left-4 right-4">
-                <p className="text-base font-medium uppercase tracking-[0.18em] text-slate-100/80">
-                  {isEditMode ? 'Edit your rating' : 'Rate this course'}
-                </p>
-                <h2 className="mt-1 text-3xl font-semibold text-white">
-                  {course.name}
-                </h2>
-              </div>
+            {/* Title Block */}
+            <div className="pt-4 pb-3 px-6">
+              <h1 className="text-lg font-semibold text-slate-900">
+                {isEditMode ? 'Edit Your Rating' : 'Rate This Course'}
+              </h1>
+              <p className="mt-1 text-base font-medium text-slate-700">
+                {course.name}
+              </p>
             </div>
 
             {/* Overall Rating Slider */}
-            <section className="px-4 mt-6">
-              <div className="mb-2 flex items-center justify-between">
-                <p className="text-base font-medium text-slate-900">
+            <section className="px-6 mt-6">
+              <div className="mb-2 flex items-baseline justify-between">
+                <span className="text-base font-semibold text-slate-900">
                   Your overall rating
-                </p>
-                <p className="text-base font-semibold text-slate-900">
-                  {selectedRating != null ? selectedRating.toFixed(1) : '--'}<span className="ml-1">/10</span>
-                </p>
+                </span>
+                <span className="text-base font-semibold text-slate-900">
+                  {selectedRating != null ? selectedRating.toFixed(1) : '--'} <span className="font-normal text-slate-600">/10</span>
+                </span>
               </div>
 
-              <div className="py-3">
+              <div className="mt-3">
                 <Slider
                   value={[selectedRating || 5]}
                   onValueChange={(values) => setSelectedRating(values[0])}
                   min={0.5}
                   max={10}
                   step={0.1}
-                  className="w-full"
+                  className="w-full rating-slider-primary"
                 />
               </div>
-
-              {selectedRating == null && (
-                <div className="mt-2 inline-flex rounded-full bg-slate-900 text-sm text-white px-3 py-1">
-                  No rating selected yet
-                </div>
-              )}
             </section>
 
             {/* Share Your Thoughts */}
-            <section className="px-4 mt-6">
-              <p className="text-sm font-medium tracking-wide text-slate-500 mb-2">
+            <section className="px-6 mt-6">
+              <label className="text-base font-semibold text-slate-900 mb-2 block">
                 Share your thoughts
-              </p>
+              </label>
 
-              <div className="mt-2">
-                <Textarea
-                  value={review}
-                  onChange={(e) => setReview(e.target.value)}
-                  rows={4}
-                  placeholder="Share your review with other golfers – what stood out about the design, conditions, clubhouse or overall experience?"
-                  className="w-full rounded-xl border border-slate-200/80 bg-slate-50 text-base text-slate-900 placeholder:text-slate-400 resize-none focus:outline-none focus:border-slate-300 focus:ring-0 focus:shadow-[0_0_0_3px_rgba(148,163,184,0.25)]"
-                  disabled={isSubmitting}
-                  maxLength={500}
-                />
-                <p className="mt-1 text-sm text-slate-400 text-right">
+              <Textarea
+                value={review}
+                onChange={(e) => setReview(e.target.value)}
+                rows={4}
+                placeholder="Share your review with other golfers – what stood out about the design, conditions, clubhouse or overall experience?"
+                className="w-full min-h-[140px] rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-900 placeholder:text-slate-400 resize-none focus:outline-none focus:border-slate-300 focus:shadow-sm"
+                disabled={isSubmitting}
+                maxLength={500}
+              />
+              <div className="mt-1 flex justify-end">
+                <p className="text-xs text-slate-400">
                   {review.length}/500
                 </p>
               </div>
             </section>
 
             {/* Breakdown Sliders */}
-            <section className="px-4 mt-6">
-              <p className="text-sm font-medium tracking-wide text-slate-500 mb-2">
+            <section className="px-6 mt-6">
+              <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-2">
                 Breakdown (optional)
-              </p>
+              </h3>
 
               {[
                 { 
@@ -686,15 +681,17 @@ const PostPlayRatingModal = ({
                   setTouched: setFacilitiesTouched
                 },
               ].map(({ key, label, score, setScore, setTouched }) => (
-                <div key={key} className="mt-5">
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-base font-medium text-slate-900">{label}</span>
-                    <span className="text-base font-medium text-slate-900">
-                      {score != null ? score.toFixed(1) : '--'}<span className="ml-1">/10</span>
+                <div key={key} className="mt-4">
+                  {/* Label row */}
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-base font-semibold text-slate-900">{label}</span>
+                    <span className={`text-sm font-medium ${score != null ? 'text-slate-700' : 'text-slate-400'}`}>
+                      {score != null ? score.toFixed(1) : '--'} <span className="font-normal">/10</span>
                     </span>
                   </div>
 
-                  <div className="py-3">
+                  {/* Slider */}
+                  <div className="mt-2 mb-3">
                     <Slider
                       value={[score ?? 5]}
                       onValueChange={(values) => {
@@ -704,7 +701,7 @@ const PostPlayRatingModal = ({
                       min={0.5}
                       max={10}
                       step={0.1}
-                      className="w-full"
+                      className="w-full rating-slider-breakdown"
                     />
                   </div>
                 </div>
@@ -712,18 +709,25 @@ const PostPlayRatingModal = ({
             </section>
 
             {/* Media Upload Section */}
-            <section className="px-4 mt-6">
-              <p className="text-sm font-medium tracking-wide text-slate-500 mb-2">
+            <section className="px-6 mt-6">
+              <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-2">
                 Media upload (optional)
-              </p>
+              </h3>
 
               <div className="mt-3">
                 {selectedMedia.length === 0 ? (
-                  <ReviewMediaUpload
-                    onMediaSelected={handleMediaSelected}
-                    selectedMedia={selectedMedia}
-                    onRemoveMedia={handleRemoveMedia}
-                  />
+                  <div className="w-full rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-6 flex flex-col items-center justify-center text-center">
+                    <Upload className="w-6 h-6 text-slate-400 mb-2" />
+                    <p className="text-sm font-medium text-slate-700">Drag & drop or click to upload</p>
+                    <p className="mt-1 text-xs text-slate-500">Photos or videos (max 5)</p>
+                    <div className="mt-3">
+                      <ReviewMediaUpload
+                        onMediaSelected={handleMediaSelected}
+                        selectedMedia={selectedMedia}
+                        onRemoveMedia={handleRemoveMedia}
+                      />
+                    </div>
+                  </div>
                 ) : (
                   <div className="space-y-3">
                     <div className="grid grid-cols-3 gap-1.5 rounded-xl overflow-hidden">
@@ -761,39 +765,38 @@ const PostPlayRatingModal = ({
                       })}
                     </div>
                     {selectedMedia.length < 5 && (
-                      <div className="mt-2 flex justify-end">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const input = document.createElement('input');
-                            input.type = 'file';
-                            input.accept = 'image/*,video/*';
-                            input.multiple = true;
-                            input.onchange = (e) => {
-                              const target = e.target as HTMLInputElement;
-                              if (target.files) {
-                                const files = Array.from(target.files);
-                                const remainingSlots = 5 - selectedMedia.length;
-                                const filesToAdd = files.slice(0, remainingSlots);
-                                
-                                if (files.length > remainingSlots) {
-                                  toast({
-                                    title: "Too many files",
-                                    description: `You can only add ${remainingSlots} more file${remainingSlots === 1 ? '' : 's'} (max 5 total).`,
-                                    variant: "destructive",
-                                  });
-                                }
-                                
-                                handleMediaSelected(filesToAdd);
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          const input = document.createElement('input');
+                          input.type = 'file';
+                          input.accept = 'image/*,video/*';
+                          input.multiple = true;
+                          input.onchange = (e) => {
+                            const target = e.target as HTMLInputElement;
+                            if (target.files) {
+                              const files = Array.from(target.files);
+                              const remainingSlots = 5 - selectedMedia.length;
+                              const filesToAdd = files.slice(0, remainingSlots);
+                              
+                              if (files.length > remainingSlots) {
+                                toast({
+                                  title: "Too many files",
+                                  description: `You can only add ${remainingSlots} more file${remainingSlots === 1 ? '' : 's'} (max 5 total).`,
+                                  variant: "destructive",
+                                });
                               }
-                            };
-                            input.click();
-                          }}
-                          className="text-sm font-medium text-slate-600 underline-offset-2 hover:text-slate-900 hover:underline"
-                        >
-                          Add more media
-                        </button>
-                      </div>
+                              
+                              handleMediaSelected(filesToAdd);
+                            }
+                          };
+                          input.click();
+                        }}
+                        variant="outline"
+                        className="mt-3 w-full rounded-full border border-slate-600 bg-white px-6 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50 active:scale-[0.99]"
+                      >
+                        Add Media
+                      </Button>
                     )}
                   </div>
                 )}
@@ -801,12 +804,12 @@ const PostPlayRatingModal = ({
             </section>
 
             {/* Primary CTA Button */}
-            <footer className="px-4 mt-6 pb-[24px]">
+            <footer className="px-6 mt-6 pb-3">
               <Button
                 type="submit"
                 onClick={handleSubmit}
                 disabled={isSubmitting || !selectedRating}
-                className="w-full h-11 rounded-full text-base font-semibold bg-slate-900 text-white border border-white/10 shadow-[0_8px_20px_rgba(15,23,42,0.45)] hover:bg-slate-900/90 active:bg-slate-900 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                className="w-full rounded-full bg-slate-900 text-white text-base font-semibold py-3 shadow-sm hover:bg-slate-800 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? 'Saving…' : (isEditMode ? 'Update rating' : 'Submit rating')}
               </Button>
@@ -816,7 +819,7 @@ const PostPlayRatingModal = ({
                   type="button"
                   onClick={() => setShowRemoveDialog(true)}
                   disabled={isSubmitting}
-                  className="w-full mt-3 rounded-full bg-red-500 text-white border border-red-500/80 shadow-sm hover:bg-red-600 active:bg-red-700 flex items-center gap-2 justify-center"
+                  className="w-full mt-3 rounded-full bg-red-500 text-white text-base font-semibold py-3 hover:bg-red-600 active:scale-[0.99] flex items-center gap-2 justify-center"
                 >
                   <Trash2 className="h-4 w-4" />
                   Remove from played
