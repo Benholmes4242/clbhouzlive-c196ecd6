@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, CheckCircle2 } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AboutMediaStrip from './AboutMediaStrip';
@@ -11,7 +11,6 @@ import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
 import CourseMapPreview from '@/components/courses/CourseMapPreview';
 import CourseMapFullScreen from '@/components/courses/CourseMapFullScreen';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
-import { Progress } from '@/components/ui/progress';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { useToast } from '@/hooks/use-toast';
@@ -21,38 +20,7 @@ import CourseLocationBreadcrumb from './CourseLocationBreadcrumb';
 
 import CourseTop100Summary from './CourseTop100Summary';
 import { formatCourseLocation } from '@/utils/courseLocation';
-
-const ArrowUp = () => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 20 20"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className="shrink-0"
-  >
-    <path
-      d="M10 3L4 9H8V17H12V9H16L10 3Z"
-      fill="#3CC76A"
-    />
-  </svg>
-);
-
-const ArrowDown = () => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 20 20"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className="shrink-0"
-  >
-    <path
-      d="M10 17L16 11H12V3H8V11H4L10 17Z"
-      fill="#E85151"
-    />
-  </svg>
-);
+import CommunityScoreCard from './CommunityScoreCard';
 
 interface Course {
   id: string;
@@ -132,12 +100,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     ? truncateDescription(course.description, 50)
     : course.description;
 
-  const getScorePercentage = (score: number) => (score / 10) * 100;
-  
-  const formatScore = (score: number) => {
-    return score % 1 === 0 ? score.toString() : score.toFixed(1);
-  };
-
   const handleRateClick = () => {
     if (!user) {
       toast({
@@ -155,177 +117,25 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {/* Location Breadcrumb & Quick Filters - now handles its own padding */}
       <CourseLocationBreadcrumb course={course} />
       
-      {/* Community Score Section - Seamless with User Rating inline */}
+      {/* Community Score Section - Card-based design */}
       <section className="px-4 pt-6 pb-5 bg-slate-50 md:px-6 md:pt-8">
-        {ratingAggregates && ratingAggregates.review_count > 0 ? (
-          <>
-            {/* Header with premium score + user rating inline */}
-            <div className="flex items-start justify-between gap-3 mb-3">
-              <div>
-                <h3 className="text-lg font-semibold">Community Score</h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Based on {ratingAggregates.review_count} {ratingAggregates.review_count === 1 ? 'rating' : 'ratings'}
-                </p>
-              </div>
+        <CommunityScoreCard
+          courseId={course.id}
+          ratingAggregates={ratingAggregates}
+          userRating={userRating}
+          onRateClick={handleRateClick}
+          onSeeAllReviews={() => onTabChange?.('reviews')}
+        />
 
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <ClubhouseLogo size="md" className="h-7 w-7" />
-                <span className="text-xl md:text-2xl font-semibold transition-opacity duration-300 text-right">
-                  {formatScore(ratingAggregates.avg_overall_score || 0)}/10
-                </span>
-              </div>
-            </div>
-
-            {/* Personal comparison text - if user has rated */}
-            {(() => {
-              if (!userRating || !ratingAggregates.avg_overall_score || ratingAggregates.review_count <= 1) {
-                return null;
-              }
-
-              const diffRaw = userRating.rating - ratingAggregates.avg_overall_score;
-              const diff = Number(diffRaw.toFixed(1));
-              const absDiff = Math.abs(diff);
-              const pointsLabel = absDiff === 1 ? "point" : "points";
-
-              if (absDiff === 0) {
-                // On par with community
-                return (
-                  <div className="flex items-center gap-2 text-base text-emerald-700 mb-3">
-                    <CheckCircle2 className="h-[18px] w-[18px] text-emerald-500 shrink-0" />
-                    <span>You rate this course on par with the community.</span>
-                  </div>
-                );
-              } else if (diff > 0) {
-                // Higher than community
-                return (
-                  <div className="flex items-center gap-2 text-base text-emerald-700 mb-3">
-                    <ArrowUp />
-                    <span>
-                      You rate this course {absDiff.toFixed(1)} {pointsLabel} higher than the community.
-                    </span>
-                  </div>
-                );
-              } else {
-                // Lower than community
-                return (
-                  <div className="flex items-center gap-2 text-base text-slate-600 mb-3">
-                    <ArrowDown />
-                    <span>
-                      You rate this course {absDiff.toFixed(1)} {pointsLabel} lower than the community.
-                    </span>
-                  </div>
-                );
-              }
-            })()}
-
-            {/* Category bars with animations */}
-            <div className="space-y-3 mb-3">
-              {/* Course Design */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-base">
-                  <span className="font-medium">Course Design</span>
-                  <span className="text-sm text-muted-foreground text-right min-w-[60px]">
-                    {ratingAggregates.avg_design_score ? formatScore(ratingAggregates.avg_design_score) : '–'}/10
-                  </span>
-                </div>
-                <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-foreground transition-[width] duration-500 ease-out"
-                    style={{ width: ratingAggregates.avg_design_score ? `${(ratingAggregates.avg_design_score / 10) * 100}%` : '0%' }}
-                  />
-                </div>
-              </div>
-
-              {/* Course Condition */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-base">
-                  <span className="font-medium">Course Condition</span>
-                  <span className="text-sm text-muted-foreground text-right min-w-[60px]">
-                    {ratingAggregates.avg_condition_score ? formatScore(ratingAggregates.avg_condition_score) : '–'}/10
-                  </span>
-                </div>
-                <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-foreground transition-[width] duration-500 ease-out"
-                    style={{ width: ratingAggregates.avg_condition_score ? `${(ratingAggregates.avg_condition_score / 10) * 100}%` : '0%' }}
-                  />
-                </div>
-              </div>
-
-              {/* Clubhouse */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-base">
-                  <span className="font-medium">Clubhouse</span>
-                  <span className="text-sm text-muted-foreground text-right min-w-[60px]">
-                    {ratingAggregates.avg_clubhouse_score ? formatScore(ratingAggregates.avg_clubhouse_score) : '–'}/10
-                  </span>
-                </div>
-                <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-foreground transition-[width] duration-500 ease-out"
-                    style={{ width: ratingAggregates.avg_clubhouse_score ? `${(ratingAggregates.avg_clubhouse_score / 10) * 100}%` : '0%' }}
-                  />
-                </div>
-              </div>
-
-              {/* Facilities */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-base">
-                  <span className="font-medium">Facilities</span>
-                  <span className="text-sm text-muted-foreground text-right min-w-[60px]">
-                    {ratingAggregates.avg_facilities_score ? formatScore(ratingAggregates.avg_facilities_score) : '–'}/10
-                  </span>
-                </div>
-                <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-foreground transition-[width] duration-500 ease-out"
-                    style={{ width: ratingAggregates.avg_facilities_score ? `${(ratingAggregates.avg_facilities_score / 10) * 100}%` : '0%' }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* See all reviews link */}
-            <div className="flex justify-end mt-3">
-              <button
-                type="button"
-                onClick={() => onTabChange?.('reviews')}
-                className="text-sm font-medium text-muted-foreground hover:text-foreground underline underline-offset-4 transition-all duration-motion-fast ease-standard"
-              >
-                See all reviews
-              </button>
-            </div>
-
-            {/* Edit Rating button - only show if user has rated */}
-            {userRating && (
-              <Button 
-                onClick={handleRateClick}
-                className="w-full justify-center mt-4"
-                variant="outline"
-              >
-                Edit Your Rating
-              </Button>
-            )}
-          </>
-        ) : (
-          <>
-            {/* No ratings yet state - Seamless */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Community Score</h3>
-              <p className="text-base text-muted-foreground mb-4 text-center">
-                No ratings yet – be the first to rate this course!
-              </p>
-              
-              {/* Review button for empty state */}
-              <Button 
-                onClick={handleRateClick}
-                className="w-full justify-center"
-                variant="outline"
-              >
-                Rate this course
-              </Button>
-            </div>
-          </>
+        {/* Edit Rating button - only show if user has rated */}
+        {userRating && (
+          <Button 
+            onClick={handleRateClick}
+            className="w-full justify-center mt-4"
+            variant="outline"
+          >
+            Edit Your Rating
+          </Button>
         )}
 
         {/* Friends Who've Played */}
