@@ -212,10 +212,10 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                   </span>
 
                   <div className="flex items-center gap-2">
+                    {isTopRated(score) && <TopRatedPill />}
                     <span className="text-base font-semibold text-slate-900">
                       {formatScore(score)} /10
                     </span>
-                    {isTopRated(score) && <TopRatedPill />}
                   </div>
                 </div>
 
