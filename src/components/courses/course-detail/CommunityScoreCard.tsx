@@ -136,7 +136,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   const qualityLabel = getRatingLabel(communityAverage);
 
   return (
-    <div className="mt-6 rounded-3xl bg-white shadow-sm px-4 py-6 sm:px-5 sm:py-7">
+    <div className="mt-6 rounded-3xl bg-white shadow-sm px-5 py-6">
       {/* Header row */}
       <div className="flex items-start justify-between gap-4">
         {/* Left - title + meta */}
@@ -160,9 +160,9 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         <div className="flex flex-col items-end gap-1.5 shrink-0">
           {/* Logo + Score */}
           <div className="flex items-center gap-2">
-            <ClubhouseLogo size="sm" className="shrink-0" />
+            <ClubhouseLogo size="md" className="shrink-0" />
             <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-semibold tracking-tight text-slate-900">
+              <span className="text-2xl font-semibold text-slate-900">
                 {formatScore(communityAverage)}
               </span>
               <span className="text-base text-slate-500">/10</span>
@@ -181,40 +181,35 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
       {/* User vs community comparison */}
       {comparisonMessage}
 
-      {/* Category rows */}
+      {/* Category rows - two-line layout */}
       {categories.length > 0 && (
-        <div className="mt-6 space-y-4">
+        <div className="mt-6 space-y-5">
           {categories.map((cat) => {
             const score = cat.score || 0;
             const labelText = getRatingLabel(score);
 
             return (
-              <div key={cat.id} className="flex items-center gap-3">
-                {/* Left label */}
-                <div className="w-36 text-base text-slate-700">
-                  {cat.label}
-                </div>
-
-                {/* Bar */}
-                <div className="flex-1">
-                  <div className="h-3 w-full rounded-full bg-slate-100">
-                    <div
-                      className="h-3 rounded-full bg-gradient-to-r from-slate-900 to-slate-700 transition-[width] duration-300 ease-out"
-                      style={{ width: `${(score / 10) * 100}%` }}
-                    />
-                  </div>
-                </div>
-
-                {/* Right numeric + descriptor */}
-                <div className="ml-2 w-[110px] text-right text-sm text-slate-600">
-                  <span className="font-semibold text-slate-900">
-                    {formatScore(score)}
+              <div key={cat.id} className="space-y-1.5">
+                {/* Row 1: Labels */}
+                <div className="flex items-center justify-between">
+                  <span className="text-base font-medium text-slate-900">
+                    {cat.label}
                   </span>
-                  {labelText && (
-                    <span className="text-xs text-slate-500">
-                      {' · '}{labelText}
-                    </span>
-                  )}
+
+                  <span className="text-[0.95rem] text-slate-900 font-medium">
+                    {formatScore(score)}
+                    {labelText && (
+                      <span className="text-slate-500"> · {labelText}</span>
+                    )}
+                  </span>
+                </div>
+
+                {/* Row 2: Full-width bar */}
+                <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-slate-800 rounded-full transition-all duration-300 ease-out"
+                    style={{ width: `${(score / 10) * 100}%` }}
+                  />
                 </div>
               </div>
             );
@@ -224,7 +219,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
       {/* See all reviews link */}
       {onSeeAllReviews && (
-        <div className="mt-5 flex items-center justify-end gap-4">
+        <div className="mt-3 flex items-center justify-end">
           <button
             type="button"
             onClick={onSeeAllReviews}
