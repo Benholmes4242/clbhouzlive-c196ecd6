@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, CheckCircle2 } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AboutMediaStrip from './AboutMediaStrip';
@@ -18,41 +18,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 import CourseLocationBreadcrumb from './CourseLocationBreadcrumb';
-import RatingComparisonCard from './RatingComparisonCard';
 import CourseTop100Summary from './CourseTop100Summary';
 import { formatCourseLocation } from '@/utils/courseLocation';
-
-const ArrowUp = () => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 20 20"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className="shrink-0"
-  >
-    <path
-      d="M10 3L4 9H8V17H12V9H16L10 3Z"
-      fill="#3CC76A"
-    />
-  </svg>
-);
-
-const ArrowDown = () => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 20 20"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className="shrink-0"
-  >
-    <path
-      d="M10 17L16 11H12V3H8V11H4L10 17Z"
-      fill="#E85151"
-    />
-  </svg>
-);
 
 interface Course {
   id: string;
@@ -243,48 +210,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
               </div>
             </div>
 
-            {/* Personal comparison text - if user has rated */}
-            {(() => {
-              if (!userRating || !ratingAggregates.avg_overall_score || ratingAggregates.review_count <= 1) {
-                return null;
-              }
-
-              const diffRaw = userRating.rating - ratingAggregates.avg_overall_score;
-              const diff = Number(diffRaw.toFixed(1));
-              const absDiff = Math.abs(diff);
-              const pointsLabel = absDiff === 1 ? "point" : "points";
-
-              if (absDiff === 0) {
-                // On par with community
-                return (
-                  <div className="flex items-center gap-2 text-base text-emerald-700 mt-2">
-                    <CheckCircle2 className="h-[18px] w-[18px] text-emerald-500 shrink-0" />
-                    <span>You rate this course on par with the community.</span>
-                  </div>
-                );
-              } else if (diff > 0) {
-                // Higher than community
-                return (
-                  <div className="flex items-center gap-2 text-base text-emerald-700 mt-2">
-                    <ArrowUp />
-                    <span>
-                      You rate this course {absDiff.toFixed(1)} {pointsLabel} higher than the community.
-                    </span>
-                  </div>
-                );
-              } else {
-                // Lower than community
-                return (
-                  <div className="flex items-center gap-2 text-base text-slate-600 mt-2">
-                    <ArrowDown />
-                    <span>
-                      You rate this course {absDiff.toFixed(1)} {pointsLabel} lower than the community.
-                    </span>
-                  </div>
-                );
-              }
-            })()}
-
             {/* See all reviews link */}
             <div className="flex justify-end mt-3">
               <button
@@ -331,11 +256,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         {/* Friends Who've Played */}
         <CourseFriendsStrip courseId={course.id} courseName={course.name} />
       </section>
-
-      {/* Your Rating vs Community Comparison */}
-      {user && userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
-        <RatingComparisonCard userRating={userRating} aggregates={ratingAggregates} />
-      )}
 
       {/* CTA for users who haven't rated yet */}
       {user && !userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
