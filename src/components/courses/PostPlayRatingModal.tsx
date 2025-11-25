@@ -715,7 +715,7 @@ const PostPlayRatingModal = ({
                         const isVideo = file.type.startsWith('video/');
                         const preview = URL.createObjectURL(file);
                         return (
-                          <div key={index} className="relative w-full aspect-[4/3] overflow-hidden rounded-2xl">
+                          <div key={index} className="relative w-full aspect-[4/3] overflow-hidden rounded-md">
                             {isVideo ? (
                               <div className="relative h-full w-full">
                                 <video
