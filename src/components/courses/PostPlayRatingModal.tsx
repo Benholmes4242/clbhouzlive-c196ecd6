@@ -272,6 +272,10 @@ const PostPlayRatingModal = ({
       }
     },
     onSuccess: async () => {
+      // Get userId for proper query invalidation
+      const { data: userResponse } = await supabase.auth.getUser();
+      const userId = userResponse?.user?.id;
+
       // Mark as played after successful rating (only if not in edit mode)
       // Don't let achievements failures block the rating success
       if (!isEditMode) {
@@ -284,7 +288,7 @@ const PostPlayRatingModal = ({
       }
       
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
-      queryClient.invalidateQueries({ queryKey: ['user-course-rating', course?.id] });
+      queryClient.invalidateQueries({ queryKey: ['user-course-rating', course?.id, userId] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews-full', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['course-rating-aggregates', course?.id] });
@@ -382,8 +386,12 @@ const PostPlayRatingModal = ({
     onSuccess: async () => {
       console.log('[Delete Rating] onSuccess - starting invalidations');
       
+      // Get userId for proper query invalidation
+      const { data: userResponse } = await supabase.auth.getUser();
+      const userId = userResponse?.user?.id;
+      
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
-      queryClient.invalidateQueries({ queryKey: ['user-course-rating', course?.id] });
+      queryClient.invalidateQueries({ queryKey: ['user-course-rating', course?.id, userId] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews-full', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['user-course', course?.id] });
