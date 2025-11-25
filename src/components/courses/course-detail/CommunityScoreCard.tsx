@@ -1,6 +1,7 @@
 import React from 'react';
-import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon, Target } from 'lucide-react';
+import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 
@@ -40,11 +41,11 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   // Empty state - no ratings yet
   if (totalRatings === 0) {
     return (
-      <div className="mt-6 rounded-3xl bg-white shadow-sm px-4 py-5 sm:px-5 sm:py-6">
-        <h3 className="text-lg font-semibold text-slate-900">
+      <div className="mt-6 rounded-3xl bg-white shadow-sm px-4 py-6 sm:px-5 sm:py-7">
+        <h3 className="text-xl font-semibold text-slate-900">
           Community Score
         </h3>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-base text-slate-500">
           No ratings yet – be the first to rate this course!
         </p>
 
@@ -72,11 +73,11 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
     if (absDiff < 0.2) {
       // On par (within 0.2 points)
       comparisonMessage = (
-        <div className="mt-3 flex items-start gap-2">
-          <span className="mt-[2px] inline-flex h-4 w-4 items-center justify-center rounded-full bg-emerald-50">
-            <CheckCircle2 className="h-3 w-3 text-emerald-600" />
+        <div className="mt-4 flex items-start gap-2">
+          <span className="mt-[2px] inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-50">
+            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
           </span>
-          <p className="text-xs text-emerald-600">
+          <p className="text-sm text-emerald-600">
             Your score matches the community consensus.
           </p>
         </div>
@@ -84,11 +85,11 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
     } else if (diff > 0) {
       // Higher
       comparisonMessage = (
-        <div className="mt-3 flex items-start gap-2">
-          <span className="mt-[2px] inline-flex h-4 w-4 items-center justify-center rounded-full bg-emerald-50">
-            <ArrowUpIcon className="h-3 w-3 text-emerald-600" />
+        <div className="mt-4 flex items-start gap-2">
+          <span className="mt-[2px] inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-50">
+            <ArrowUpIcon className="h-3.5 w-3.5 text-emerald-600" />
           </span>
-          <p className="text-xs text-emerald-600">
+          <p className="text-sm text-emerald-600">
             You rated this course {absDiff.toFixed(1)} points higher than the community.
           </p>
         </div>
@@ -96,11 +97,11 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
     } else {
       // Lower
       comparisonMessage = (
-        <div className="mt-3 flex items-start gap-2">
-          <span className="mt-[2px] inline-flex h-4 w-4 items-center justify-center rounded-full bg-rose-50">
-            <ArrowDownIcon className="h-3 w-3 text-rose-500" />
+        <div className="mt-4 flex items-start gap-2">
+          <span className="mt-[2px] inline-flex h-5 w-5 items-center justify-center rounded-full bg-rose-50">
+            <ArrowDownIcon className="h-3.5 w-3.5 text-rose-500" />
           </span>
-          <p className="text-xs text-rose-600">
+          <p className="text-sm text-rose-600">
             You rated this course {absDiff.toFixed(1)} points lower than the community.
           </p>
         </div>
@@ -135,53 +136,45 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   const qualityLabel = getRatingLabel(communityAverage);
 
   return (
-    <div className="mt-6 rounded-3xl bg-white shadow-sm px-4 py-5 sm:px-5 sm:py-6">
+    <div className="mt-6 rounded-3xl bg-white shadow-sm px-4 py-6 sm:px-5 sm:py-7">
       {/* Header row */}
       <div className="flex items-start justify-between gap-4">
-        {/* Left - credibility + title + meta */}
+        {/* Left - title + meta */}
         <div className="flex-1 min-w-0">
-          <p className="text-[11px] uppercase tracking-[0.16em] text-slate-400 mb-1">
-            Rated by the clbhouz community
-          </p>
-
-          <h3 className="text-lg font-semibold text-slate-900">
+          <h3 className="text-xl font-semibold text-slate-900">
             Community Score
           </h3>
           
-          <p className="mt-0.5 text-xs text-slate-500">
+          <p className="mt-1 text-sm text-slate-500">
             Based on {totalRatings} {totalRatings === 1 ? 'rating' : 'ratings'}
           </p>
 
           {onlyUserHasRated && (
-            <p className="mt-2 text-xs text-slate-500">
+            <p className="mt-2 text-sm text-slate-500">
               Only you have rated this course so far.
             </p>
           )}
         </div>
 
-        {/* Right - score + quality chip + ring icon */}
-        <div className="flex flex-col items-end gap-1 shrink-0">
-          {/* Score */}
-          <div className="flex items-baseline gap-1">
-            <span className="text-3xl font-semibold tracking-tight text-slate-900">
-              {formatScore(communityAverage)}
-            </span>
-            <span className="text-sm text-slate-500">/10</span>
+        {/* Right - logo + score + quality chip */}
+        <div className="flex flex-col items-end gap-1.5 shrink-0">
+          {/* Logo + Score */}
+          <div className="flex items-center gap-2">
+            <ClubhouseLogo size="sm" className="shrink-0" />
+            <div className="flex items-baseline gap-1">
+              <span className="text-3xl font-semibold tracking-tight text-slate-900">
+                {formatScore(communityAverage)}
+              </span>
+              <span className="text-base text-slate-500">/10</span>
+            </div>
           </div>
 
           {/* Quality chip */}
           {qualityLabel && (
-            <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+            <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
               {qualityLabel}
             </span>
           )}
-
-          {/* Ring icon */}
-          <div className="mt-1 flex items-center justify-center rounded-full bg-gradient-to-tr from-amber-400 to-amber-500 p-[2px]">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white">
-              <Target className="h-5 w-5 text-amber-500" />
-            </div>
-          </div>
         </div>
       </div>
 
@@ -190,7 +183,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
       {/* Category rows */}
       {categories.length > 0 && (
-        <div className="mt-4 space-y-2.5">
+        <div className="mt-6 space-y-4">
           {categories.map((cat) => {
             const score = cat.score || 0;
             const labelText = getRatingLabel(score);
@@ -198,7 +191,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
             return (
               <div key={cat.id} className="flex items-center gap-3">
                 {/* Left label */}
-                <div className="w-32 text-sm text-slate-700">
+                <div className="w-36 text-base text-slate-700">
                   {cat.label}
                 </div>
 
@@ -213,12 +206,12 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                 </div>
 
                 {/* Right numeric + descriptor */}
-                <div className="ml-2 w-[100px] text-right text-xs text-slate-600">
+                <div className="ml-2 w-[110px] text-right text-sm text-slate-600">
                   <span className="font-semibold text-slate-900">
                     {formatScore(score)}
                   </span>
                   {labelText && (
-                    <span className="text-[11px] text-slate-500">
+                    <span className="text-xs text-slate-500">
                       {' · '}{labelText}
                     </span>
                   )}
@@ -231,11 +224,11 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
       {/* See all reviews link */}
       {onSeeAllReviews && (
-        <div className="mt-4 flex items-center justify-end gap-4">
+        <div className="mt-5 flex items-center justify-end gap-4">
           <button
             type="button"
             onClick={onSeeAllReviews}
-            className="text-xs font-medium text-slate-700 underline-offset-2 hover:underline transition-colors"
+            className="text-sm font-medium text-slate-700 underline-offset-2 hover:underline transition-colors"
           >
             See all reviews
           </button>
