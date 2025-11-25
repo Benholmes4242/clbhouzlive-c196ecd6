@@ -771,7 +771,7 @@ const PostPlayRatingModal = ({
                           }}
                           className="text-sm font-medium text-slate-600 underline-offset-2 hover:text-slate-900 hover:underline"
                         >
-                          Add more photos or videos
+                          Add more media
                         </button>
                       </div>
                     )}
