@@ -165,7 +165,7 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
           <div className="flex flex-col sm:flex-row gap-2 px-4">
             {isIOS && (
               <Button
-                className="flex-1 bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90"
+                className="flex-1 bg-[var(--surface-slate)] text-white hover:bg-[var(--surface-slate)]/90 shadow-none"
                 onClick={() => window.open(appleMapsUrl, '_blank')}
               >
                 Open in Apple Maps
