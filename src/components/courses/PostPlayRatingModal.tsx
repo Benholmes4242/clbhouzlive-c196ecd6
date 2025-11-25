@@ -25,6 +25,7 @@ interface PostPlayRatingModalProps {
   isEditMode?: boolean;
   existingRating?: any;
   onRemoveFromPlayed?: () => void;
+  isLoading?: boolean;
 }
 
 const PostPlayRatingModal = ({ 
@@ -33,7 +34,8 @@ const PostPlayRatingModal = ({
   onClose, 
   isEditMode = false,
   existingRating: existingRatingProp,
-  onRemoveFromPlayed 
+  onRemoveFromPlayed,
+  isLoading = false
 }: PostPlayRatingModalProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -641,7 +643,67 @@ const PostPlayRatingModal = ({
   const formatScore = (value: number | null | undefined) =>
     value == null ? '--' : value.toFixed(1);
 
-  if (!course) return null;
+  // Show skeleton while loading
+  if (isLoading || !course) {
+    return (
+      <div className="fixed inset-0 z-[999] bg-background overflow-y-auto">
+        <div className="min-h-screen bg-background pb-24">
+          {/* Header with back button */}
+          <div className="relative h-64 bg-muted animate-pulse">
+            <div className="absolute top-4 left-4">
+              <div className="h-9 w-9 rounded-md bg-white/20" />
+            </div>
+          </div>
+
+          <div className="px-6 mt-6 space-y-6">
+            {/* Overall rating section */}
+            <div className="space-y-3">
+              <div className="h-5 w-48 bg-muted rounded animate-pulse" />
+              <div className="h-10 w-full bg-muted rounded-full animate-pulse" />
+              <div className="h-8 w-32 bg-muted rounded-full mx-auto animate-pulse" />
+            </div>
+
+            {/* Share thoughts textarea */}
+            <div className="space-y-3">
+              <div className="h-5 w-40 bg-muted rounded animate-pulse" />
+              <div className="h-32 w-full bg-muted rounded-2xl animate-pulse" />
+            </div>
+
+            {/* Breakdown section */}
+            <div className="space-y-4">
+              <div className="h-5 w-56 bg-muted rounded animate-pulse" />
+              
+              {/* 4 breakdown sliders */}
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="space-y-2">
+                  <div className="h-4 w-32 bg-muted rounded animate-pulse" />
+                  <div className="h-10 w-full bg-muted rounded-full animate-pulse" />
+                  <div className="h-6 w-20 bg-muted rounded-full ml-auto animate-pulse" />
+                </div>
+              ))}
+            </div>
+
+            {/* Media upload section */}
+            <div className="space-y-3">
+              <div className="h-5 w-48 bg-muted rounded animate-pulse" />
+              <div className="grid grid-cols-3 gap-3">
+                <div className="aspect-square bg-muted rounded-lg animate-pulse" />
+                <div className="aspect-square bg-muted rounded-lg animate-pulse" />
+                <div className="aspect-square bg-muted rounded-lg animate-pulse" />
+              </div>
+              <div className="h-3 w-64 bg-muted rounded animate-pulse" />
+            </div>
+
+            {/* Primary button */}
+            <div className="mt-3 flex w-full items-center justify-between gap-3">
+              <div className="h-11 flex-1 bg-muted rounded-lg animate-pulse" />
+              <div className="h-11 flex-1 bg-muted rounded-lg animate-pulse" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const pageTitle = isEditMode ? 'Edit your rating' : 'Rate this course';
   const ctaLabel = isEditMode ? 'Update Rating' : 'Submit Rating';

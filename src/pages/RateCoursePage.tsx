@@ -55,24 +55,15 @@ const RateCoursePage = () => {
   console.log('[Existing Rating Detected]', !!existingRating);
 
   return (
-    <AccessControl requireAuth={true}>
-      {isLoading ? (
-        <div className="fixed inset-0 z-50 bg-surface-card flex items-center justify-center">
-          <div className="text-center max-w-sm mx-auto px-4">
-            <div className="h-12 w-12 rounded-full bg-surface-alt animate-pulse mx-auto mb-3"></div>
-            <div className="h-4 w-32 bg-surface-alt animate-pulse mx-auto mb-2 rounded"></div>
-            <div className="h-3 w-48 bg-surface-alt animate-pulse mx-auto rounded"></div>
-          </div>
-        </div>
-      ) : (
-        <PostPlayRatingModal
-          course={course}
-          isOpen={true}
-          onClose={handleClose}
-          isEditMode={!!existingRating}
-          existingRating={existingRating}
-        />
-      )}
+    <AccessControl requireAuth={true} noBlockingLoader={true}>
+      <PostPlayRatingModal
+        course={course}
+        isOpen={true}
+        onClose={handleClose}
+        isEditMode={!!existingRating}
+        existingRating={existingRating}
+        isLoading={isLoading}
+      />
     </AccessControl>
   );
 };
