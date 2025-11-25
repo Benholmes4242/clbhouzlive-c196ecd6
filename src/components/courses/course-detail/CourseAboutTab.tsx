@@ -118,7 +118,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <CourseLocationBreadcrumb course={course} />
       
       {/* Community Score Section - Card-based design */}
-      <section className="px-4 pt-6 pb-5 bg-slate-50 md:px-6 md:pt-8">
+      <section className="px-4 pt-6 pb-5 bg-slate-100 md:px-6 md:pt-8">
         <CommunityScoreCard
           courseId={course.id}
           ratingAggregates={ratingAggregates}
@@ -144,7 +144,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* CTA for users who haven't rated yet */}
       {user && !userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
-        <section className="px-4 pt-6 pb-5 bg-slate-50 md:pt-8">
+        <section className="px-4 pt-6 pb-5 bg-slate-100 md:pt-8">
           <h3 className="text-lg font-semibold mb-1">How do you rate this course?</h3>
           <p className="text-base text-slate-500 mb-3">
             Add your rating to see how it compares with the clbhouz community.
@@ -157,7 +157,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* About Section - Seamless */}
       {course.description && (
-        <section className="px-4 pt-6 pb-5 bg-slate-100 space-y-3 md:pt-8">
+        <section className="px-4 pt-6 pb-5 bg-slate-50 space-y-3 md:pt-8">
           <h2 className="text-lg md:text-xl font-semibold">About</h2>
           <div className="text-base md:text-lg leading-relaxed text-foreground">
             {formatDescription(displayDescription)}
@@ -177,7 +177,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <CourseTop100Summary />
 
       {/* Location Section - Seamless */}
-      <section className="pt-6 pb-5 bg-slate-50 md:pt-8">
+      <section className="pt-6 pb-5 bg-slate-100 md:pt-8">
         <div className="px-4 space-y-3 mb-4">
           <h2 className="text-lg md:text-xl font-semibold">Location</h2>
           <p className="text-base md:text-lg text-foreground">
@@ -224,7 +224,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       </section>
 
       {/* Media Section - Seamless */}
-      <section className="pt-6 pb-5 bg-slate-100 space-y-3 md:pt-8">
+      <section className="pt-6 pb-5 bg-slate-50 space-y-3 md:pt-8">
         <AboutMediaStrip 
           clubId={course.id} 
           onSeeAllClick={() => onTabChange?.('media')}
@@ -233,7 +233,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* Visit Website - Seamless section */}
       {course.website_url && (
-        <section className="px-4 pt-6 pb-3 bg-slate-50 md:pt-8">
+        <section className="px-4 pt-6 pb-3 bg-slate-100 md:pt-8">
           <Button
             onClick={handleWebsiteClick}
             className="w-full flex items-center justify-center gap-2 h-11 rounded-lg"
