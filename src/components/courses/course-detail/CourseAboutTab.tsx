@@ -113,16 +113,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   
   // Fetch user's rating if logged in
   const { data: userRating } = useUserCourseRating(course.id, user?.id);
-  
-  console.log('[CourseAboutTab] Render', {
-    courseId: course.id,
-    courseName: course.name,
-    userId: user?.id,
-    hasUserRating: !!userRating,
-    userRatingValue: userRating?.rating,
-    userRatingId: userRating?.id,
-    communityAvg: ratingAggregates?.avg_overall_score
-  });
 
   const handleWebsiteClick = () => {
     if (course.website_url) {

@@ -272,17 +272,9 @@ const PostPlayRatingModal = ({
       }
     },
     onSuccess: async () => {
-      console.log('[Rating Mutation] onSuccess START', { 
-        isEditMode, 
-        courseId: course?.id,
-        courseName: course?.name 
-      });
-      
       // Get userId for proper query invalidation
       const { data: userResponse } = await supabase.auth.getUser();
       const userId = userResponse?.user?.id;
-      
-      console.log('[Rating Mutation] userId for invalidation:', userId);
 
       // Mark as played after successful rating (only if not in edit mode)
       // Don't let achievements failures block the rating success
@@ -295,27 +287,21 @@ const PostPlayRatingModal = ({
         }
       }
       
-      console.log('[Rating Mutation] About to refetch queries');
-      
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
       
       // Force refetch for BOTH user rating AND community aggregates
       const userRatingRefetch = await queryClient.refetchQueries({ 
         queryKey: ['user-course-rating', course?.id, userId] 
       });
-      console.log('[Rating Mutation] user-course-rating refetch result:', userRatingRefetch);
       
       const aggregatesRefetch = await queryClient.refetchQueries({ 
         queryKey: ['course-rating-aggregates', course?.id] 
       });
-      console.log('[Rating Mutation] course-rating-aggregates refetch result:', aggregatesRefetch);
       
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews-full', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
       queryClient.invalidateQueries({ queryKey: ['user-played-course', course?.id] });
-      
-      console.log('[Rating Mutation] onSuccess COMPLETE');
       
       // Show "Added!" text for 1.5 seconds
       setButtonText('Added!');
