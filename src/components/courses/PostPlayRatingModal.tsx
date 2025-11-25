@@ -295,16 +295,23 @@ const PostPlayRatingModal = ({
         }
       }
       
-      console.log('[Rating Mutation] About to refetch user-course-rating with key:', ['user-course-rating', course?.id, userId]);
+      console.log('[Rating Mutation] About to refetch queries');
       
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
-      // Force refetch for user rating to ensure Course Details updates immediately
-      const refetchResult = await queryClient.refetchQueries({ queryKey: ['user-course-rating', course?.id, userId] });
-      console.log('[Rating Mutation] refetchQueries result:', refetchResult);
+      
+      // Force refetch for BOTH user rating AND community aggregates
+      const userRatingRefetch = await queryClient.refetchQueries({ 
+        queryKey: ['user-course-rating', course?.id, userId] 
+      });
+      console.log('[Rating Mutation] user-course-rating refetch result:', userRatingRefetch);
+      
+      const aggregatesRefetch = await queryClient.refetchQueries({ 
+        queryKey: ['course-rating-aggregates', course?.id] 
+      });
+      console.log('[Rating Mutation] course-rating-aggregates refetch result:', aggregatesRefetch);
       
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews-full', course?.id] });
-      queryClient.invalidateQueries({ queryKey: ['course-rating-aggregates', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
       queryClient.invalidateQueries({ queryKey: ['user-played-course', course?.id] });
       
@@ -406,8 +413,11 @@ const PostPlayRatingModal = ({
       const userId = userResponse?.user?.id;
       
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
-      // Force refetch for user rating to ensure Course Details updates immediately
+      
+      // Force refetch for BOTH user rating AND community aggregates
       await queryClient.refetchQueries({ queryKey: ['user-course-rating', course?.id, userId] });
+      await queryClient.refetchQueries({ queryKey: ['course-rating-aggregates', course?.id] });
+      
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews-full', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['user-course', course?.id] });
