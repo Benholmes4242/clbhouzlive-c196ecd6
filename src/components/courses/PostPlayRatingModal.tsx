@@ -39,6 +39,7 @@ const PostPlayRatingModal = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<File[]>([]);
+  const [mediaPreviews, setMediaPreviews] = useState<Map<File, string>>(new Map());
   const [buttonText, setButtonText] = useState('Add to Played');
   const [designScore, setDesignScore] = useState<number | null>(null);
   const [conditionScore, setConditionScore] = useState<number | null>(null);
@@ -490,8 +491,58 @@ const PostPlayRatingModal = ({
       setClubhouseTouched(false);
       setFacilitiesTouched(false);
     }
+    // Clean up media previews
+    mediaPreviews.forEach((url) => {
+      URL.revokeObjectURL(url);
+    });
+    setSelectedMedia([]);
+    setMediaPreviews(new Map());
     setShowConfirmation(false);
     setIsSubmitting(false);
+  };
+
+  // Generate video thumbnail
+  const generateVideoThumbnail = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement('video');
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      
+      video.preload = 'metadata';
+      video.muted = true;
+      video.playsInline = true;
+      
+      video.onloadeddata = () => {
+        // Seek to 1 second or 10% of duration, whichever is smaller
+        const seekTime = Math.min(1, video.duration * 0.1);
+        video.currentTime = seekTime;
+      };
+      
+      video.onseeked = () => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context?.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const thumbnailUrl = URL.createObjectURL(blob);
+            resolve(thumbnailUrl);
+          } else {
+            reject(new Error('Failed to generate thumbnail'));
+          }
+          
+          // Clean up
+          URL.revokeObjectURL(video.src);
+        }, 'image/jpeg', 0.8);
+      };
+      
+      video.onerror = () => {
+        reject(new Error('Failed to load video'));
+        URL.revokeObjectURL(video.src);
+      };
+      
+      video.src = URL.createObjectURL(file);
+    });
   };
 
   const handleClose = () => {
@@ -541,12 +592,46 @@ const PostPlayRatingModal = ({
     submitRatingMutation.mutate(payload);
   };
 
-  const handleMediaSelected = (files: File[]) => {
+  const handleMediaSelected = async (files: File[]) => {
     setSelectedMedia(prev => [...prev, ...files]);
+    
+    // Generate previews for each file
+    const newPreviews = new Map(mediaPreviews);
+    
+    for (const file of files) {
+      if (file.type.startsWith('video/')) {
+        try {
+          const thumbnail = await generateVideoThumbnail(file);
+          newPreviews.set(file, thumbnail);
+        } catch (error) {
+          console.error('Failed to generate video thumbnail:', error);
+          // Fallback to empty preview
+          newPreviews.set(file, '');
+        }
+      } else {
+        // For images, use the file directly
+        newPreviews.set(file, URL.createObjectURL(file));
+      }
+    }
+    
+    setMediaPreviews(newPreviews);
   };
 
   const handleRemoveMedia = (index: number) => {
+    const fileToRemove = selectedMedia[index];
+    const previewUrl = mediaPreviews.get(fileToRemove);
+    
+    // Revoke the object URL to free memory
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    
     setSelectedMedia(prev => prev.filter((_, i) => i !== index));
+    setMediaPreviews(prev => {
+      const newMap = new Map(prev);
+      newMap.delete(fileToRemove);
+      return newMap;
+    });
   };
 
   // Format score for display
@@ -713,16 +798,15 @@ const PostPlayRatingModal = ({
                     <div className="grid grid-cols-3 gap-3">
                       {selectedMedia.map((file, index) => {
                         const isVideo = file.type.startsWith('video/');
-                        const preview = URL.createObjectURL(file);
+                        const preview = mediaPreviews.get(file) || '';
                         return (
                           <div key={index} className="relative w-full aspect-square overflow-hidden rounded-md">
                             {isVideo ? (
                               <div className="relative h-full w-full">
-                                <video
+                                <img
                                   src={preview}
+                                  alt=""
                                   className="h-full w-full object-cover"
-                                  muted
-                                  playsInline
                                 />
                                 <div className="absolute bottom-2 right-2 pointer-events-none">
                                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-black/20 backdrop-blur-sm">
