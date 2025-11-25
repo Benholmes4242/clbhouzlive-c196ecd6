@@ -581,35 +581,31 @@ const PostPlayRatingModal = ({
 
             {/* Overall Rating Slider */}
             <section className="px-4 mt-6">
-              <p className="text-sm font-medium tracking-wide text-slate-500 mb-2">
-                Your overall rating
-              </p>
-
-              <div className="mt-2">
-                <div className="flex items-baseline justify-between mb-1">
-                  <span className="text-base font-medium text-slate-900">
-                    {selectedRating != null ? selectedRating.toFixed(1) : '--'}
-                  </span>
-                  <span className="text-sm text-slate-500">/ 10</span>
-                </div>
-
-                <div className="py-3">
-                  <Slider
-                    value={[selectedRating || 5]}
-                    onValueChange={(values) => setSelectedRating(values[0])}
-                    min={0.5}
-                    max={10}
-                    step={0.1}
-                    className="w-full"
-                  />
-                </div>
-
-                {selectedRating == null && (
-                  <div className="mt-2 inline-flex rounded-full bg-slate-900 text-sm text-white px-3 py-1">
-                    No rating selected yet
-                  </div>
-                )}
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-base font-medium text-slate-900">
+                  Your overall rating
+                </p>
+                <p className="text-base font-semibold text-slate-900">
+                  {selectedRating != null ? selectedRating.toFixed(1) : '--'}<span className="ml-1">/10</span>
+                </p>
               </div>
+
+              <div className="py-3">
+                <Slider
+                  value={[selectedRating || 5]}
+                  onValueChange={(values) => setSelectedRating(values[0])}
+                  min={0.5}
+                  max={10}
+                  step={0.1}
+                  className="w-full"
+                />
+              </div>
+
+              {selectedRating == null && (
+                <div className="mt-2 inline-flex rounded-full bg-slate-900 text-sm text-white px-3 py-1">
+                  No rating selected yet
+                </div>
+              )}
             </section>
 
             {/* Share Your Thoughts */}
@@ -671,10 +667,10 @@ const PostPlayRatingModal = ({
                 },
               ].map(({ key, label, score, setScore, setTouched }) => (
                 <div key={key} className="mt-5">
-                  <div className="flex items-baseline justify-between">
+                  <div className="mb-2 flex items-center justify-between">
                     <span className="text-base font-medium text-slate-900">{label}</span>
-                    <span className="text-sm text-slate-500">
-                      {score != null ? `${score.toFixed(1)} / 10` : '-- / 10'}
+                    <span className="text-base font-medium text-slate-900">
+                      {score != null ? score.toFixed(1) : '--'}<span className="ml-1">/10</span>
                     </span>
                   </div>
 
@@ -751,12 +747,24 @@ const PostPlayRatingModal = ({
                           onClick={() => {
                             const input = document.createElement('input');
                             input.type = 'file';
-                            input.accept = 'image/jpeg,image/png,image/heic,image/webp,video/mp4,video/quicktime,video/mov';
+                            input.accept = 'image/*,video/*';
                             input.multiple = true;
                             input.onchange = (e) => {
                               const target = e.target as HTMLInputElement;
                               if (target.files) {
-                                handleMediaSelected(Array.from(target.files));
+                                const files = Array.from(target.files);
+                                const remainingSlots = 5 - selectedMedia.length;
+                                const filesToAdd = files.slice(0, remainingSlots);
+                                
+                                if (files.length > remainingSlots) {
+                                  toast({
+                                    title: "Too many files",
+                                    description: `You can only add ${remainingSlots} more file${remainingSlots === 1 ? '' : 's'} (max 5 total).`,
+                                    variant: "destructive",
+                                  });
+                                }
+                                
+                                handleMediaSelected(filesToAdd);
                               }
                             };
                             input.click();
