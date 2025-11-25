@@ -1,7 +1,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Image, Video, X, Upload } from 'lucide-react';
+import { ImagePlus, X, Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ReviewMediaUploadProps {
@@ -144,35 +144,20 @@ const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia, show
         </p>
       </div>
 
-      {/* Alternative Upload Buttons */}
-      <div className="flex gap-2 justify-center">
+      {/* Unified Media Upload Button */}
+      <div className="flex justify-center">
         <Button 
           type="button" 
-          variant="outline" 
-          size="sm" 
-          className="gap-2"
+          variant="secondary" 
+          className="w-full justify-center gap-2"
           onClick={(e) => {
             e.stopPropagation();
-            handleFileSelection('image/jpeg,image/png,image/heic,image/webp');
+            handleFileSelection('image/*,video/*');
           }}
           disabled={selectedMedia.length >= 5}
         >
-          <Image className="h-4 w-4" />
-          Photos
-        </Button>
-        <Button 
-          type="button" 
-          variant="outline" 
-          size="sm" 
-          className="gap-2"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleFileSelection('video/mp4,video/quicktime,video/mov');
-          }}
-          disabled={selectedMedia.length >= 5}
-        >
-          <Video className="h-4 w-4" />
-          Videos
+          <ImagePlus className="w-4 h-4" />
+          Add Media
         </Button>
       </div>
     </div>
