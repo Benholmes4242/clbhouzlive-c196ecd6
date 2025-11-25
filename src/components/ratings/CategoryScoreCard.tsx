@@ -20,45 +20,45 @@ export const CategoryScoreCard: React.FC<CategoryScoreCardProps> = ({
 
       {/* Pills row */}
       <div className="flex items-center gap-2">
-        {/* You pill */}
-        <div className="flex-1">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] uppercase tracking-wide text-slate-500">
-              You
-            </span>
-            {hasUser && (
+        {/* You pill - only show if user has rated */}
+        {hasUser && (
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] uppercase tracking-wide text-slate-500">
+                You
+              </span>
               <span className="text-xs font-semibold text-slate-900">
                 {user!.toFixed(1)}
               </span>
-            )}
+            </div>
+            <div className="h-6 rounded-full bg-slate-100 overflow-hidden">
+              <div
+                className="h-full bg-sky-500 rounded-full transition-[width] duration-300 ease-out"
+                style={{ width: `${(user! / 10) * 100}%` }}
+              />
+            </div>
           </div>
-          <div className="h-6 rounded-full bg-slate-100 overflow-hidden">
-            <div
-              className="h-full bg-sky-500 rounded-full transition-[width] duration-300 ease-out"
-              style={{ width: hasUser ? `${(user! / 10) * 100}%` : '0%' }}
-            />
-          </div>
-        </div>
+        )}
 
         {/* Community pill */}
-        <div className="flex-1">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] uppercase tracking-wide text-slate-500">
-              Community
-            </span>
-            {hasCommunity && (
+        {hasCommunity && (
+          <div className={hasUser ? "flex-1" : "flex-1 ml-auto"}>
+            <div className="flex items-center justify-between mb-1">
+              <span className={`text-[11px] uppercase tracking-wide text-slate-500 ${!hasUser ? 'ml-auto' : ''}`}>
+                Community
+              </span>
               <span className="text-xs font-semibold text-slate-900">
                 {community!.toFixed(1)}
               </span>
-            )}
+            </div>
+            <div className="h-6 rounded-full bg-slate-100 overflow-hidden">
+              <div
+                className="h-full bg-slate-700 rounded-full transition-[width] duration-300 ease-out"
+                style={{ width: `${(community! / 10) * 100}%` }}
+              />
+            </div>
           </div>
-          <div className="h-6 rounded-full bg-slate-100 overflow-hidden">
-            <div
-              className="h-full bg-slate-700 rounded-full transition-[width] duration-300 ease-out"
-              style={{ width: hasCommunity ? `${(community! / 10) * 100}%` : '0%' }}
-            />
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
