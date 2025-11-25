@@ -36,7 +36,6 @@ export const CoachPrompt: React.FC<CoachPromptProps> = ({ swingAnalysisId, onOpe
         <Button
           onClick={handleOpen}
           size="sm"
-          className="bg-orange-500 hover:bg-orange-600 text-white"
         >
           <Users className="h-4 w-4 mr-1" />
           Recommend coaches near me

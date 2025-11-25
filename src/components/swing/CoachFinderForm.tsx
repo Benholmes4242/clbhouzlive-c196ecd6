@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 
 export function CoachFinderForm({
   swingAnalysisId,
@@ -258,13 +259,12 @@ export function CoachFinderForm({
         >
           Cancel
         </button>
-        <button
+        <Button
           onClick={submit}
           disabled={loading}
-          className="px-4 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-60 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
         >
           {loading ? "Sending..." : "Find coaches"}
-        </button>
+        </Button>
       </div>
 
       <style>{`
