@@ -1,8 +1,14 @@
 
 import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { ImagePlus, X, Upload } from 'lucide-react';
+import { ImagePlus, X, Upload, ImageIcon, Camera, FolderOpen } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 
 interface ReviewMediaUploadProps {
   onMediaSelected: (files: File[]) => void;
@@ -14,6 +20,7 @@ interface ReviewMediaUploadProps {
 const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia, showAddMoreButton = false }: ReviewMediaUploadProps) => {
   const { toast } = useToast();
   const [isDragOver, setIsDragOver] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
 
   const validateFiles = (files: File[]) => {
     // Check total file count (max 5)
@@ -63,11 +70,14 @@ const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia, show
     setIsDragOver(false);
   }, []);
 
-  const handleFileSelection = (accept: string) => {
+  const handleFileSelection = (accept: string, capture?: boolean) => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = accept;
     input.multiple = true;
+    if (capture) {
+      input.setAttribute('capture', 'environment');
+    }
     input.onchange = (e) => {
       const target = e.target as HTMLInputElement;
       if (target.files) {
@@ -78,7 +88,41 @@ const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia, show
       }
     };
     input.click();
+    setShowPicker(false);
   };
+
+  const handleOpenLibrary = () => {
+    handleFileSelection('image/*,video/*');
+  };
+
+  const handleOpenCamera = () => {
+    handleFileSelection('image/*,video/*', true);
+  };
+
+  const handleOpenFiles = () => {
+    handleFileSelection('image/*,video/*');
+  };
+
+  const mediaOptions = [
+    {
+      key: "library",
+      label: "Photo or Video Library",
+      icon: ImageIcon,
+      onClick: handleOpenLibrary,
+    },
+    {
+      key: "camera",
+      label: "Take Photo or Video",
+      icon: Camera,
+      onClick: handleOpenCamera,
+    },
+    {
+      key: "files",
+      label: "Choose Files",
+      icon: FolderOpen,
+      onClick: handleOpenFiles,
+    },
+  ];
 
   const getMediaPreview = (file: File) => {
     const isVideo = file.type.startsWith('video/');
@@ -121,46 +165,72 @@ const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia, show
   }
 
   return (
-    <div className="space-y-3">
-      {/* Drag and Drop Upload Area */}
-      <div 
-        className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-          isDragOver 
-            ? 'border-primary bg-primary/5' 
-            : 'border-gray-300 hover:border-gray-400'
-        }`}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onClick={() => handleFileSelection('image/jpeg,image/png,image/heic,image/webp,video/mp4,video/quicktime,video/mov')}
-        style={{ cursor: 'pointer' }}
-      >
-        <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-        <p className="text-sm text-gray-600 mb-1">
-          Click or drag to upload photos or videos
-        </p>
-        <p className="text-xs text-gray-500">
-          JPG, PNG, MP4, MOV • Max 5 items • No size limits
-        </p>
+    <>
+      <div className="space-y-3">
+        {/* Drag and Drop Upload Area */}
+        <div 
+          className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+            isDragOver 
+              ? 'border-primary bg-primary/5' 
+              : 'border-gray-300 hover:border-gray-400'
+          }`}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onClick={() => setShowPicker(true)}
+          style={{ cursor: 'pointer' }}
+        >
+          <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+          <p className="text-sm text-gray-600 mb-1">
+            Click or drag to upload photos or videos
+          </p>
+          <p className="text-xs text-gray-500">
+            JPG, PNG, MP4, MOV • Max 5 items • No size limits
+          </p>
+        </div>
+
+        {/* Unified Media Upload Button */}
+        <div className="flex justify-center">
+          <Button 
+            type="button" 
+            variant="secondary" 
+            className="w-full justify-center gap-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowPicker(true);
+            }}
+            disabled={selectedMedia.length >= 5}
+          >
+            <ImagePlus className="w-4 h-4" />
+            Add Media
+          </Button>
+        </div>
       </div>
 
-      {/* Unified Media Upload Button */}
-      <div className="flex justify-center">
-        <Button 
-          type="button" 
-          variant="secondary" 
-          className="w-full justify-center gap-2"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleFileSelection('image/*,video/*');
-          }}
-          disabled={selectedMedia.length >= 5}
-        >
-          <ImagePlus className="w-4 h-4" />
-          Add Media
-        </Button>
-      </div>
-    </div>
+      {/* Media Picker Modal */}
+      <Sheet open={showPicker} onOpenChange={setShowPicker}>
+        <SheetContent side="bottom" className="rounded-t-3xl">
+          <SheetHeader>
+            <SheetTitle>Add Media</SheetTitle>
+          </SheetHeader>
+          <div className="space-y-2 mt-6 pb-6">
+            {mediaOptions.map(({ key, label, icon: Icon, onClick }) => (
+              <button
+                key={key}
+                type="button"
+                onClick={onClick}
+                className="flex w-full items-center gap-3 rounded-2xl bg-background/90 px-4 py-3 shadow-sm active:scale-[0.99] transition-transform"
+              >
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-foreground/5">
+                  <Icon className="w-5 h-5 text-foreground/80" />
+                </div>
+                <span className="text-sm font-medium">{label}</span>
+              </button>
+            ))}
+          </div>
+        </SheetContent>
+      </Sheet>
+    </>
   );
 };
 
