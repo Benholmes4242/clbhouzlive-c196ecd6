@@ -161,13 +161,13 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         {ratingAggregates && ratingAggregates.review_count > 0 ? (
           <>
             {/* Top hero card */}
-            <div className="rounded-2xl border border-slate-200/70 bg-white px-4 py-3.5 shadow-sm">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-base font-semibold text-slate-900">
+            <div className="rounded-3xl border border-slate-200/70 bg-white px-4 py-4 shadow-sm sm:px-5 sm:py-5">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex flex-col gap-1">
+                  <h3 className="text-base font-semibold text-slate-900 sm:text-lg">
                     Community Score
-                  </p>
-                  <p className="text-xs text-slate-600">
+                  </h3>
+                  <p className="text-xs text-slate-500 sm:text-sm">
                     {ratingAggregates.review_count === 1
                       ? 'Based on 1 rating'
                       : `Based on ${ratingAggregates.review_count} ratings`}
@@ -185,44 +185,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
                     if (onlyUser) {
                       return (
-                        <p className="mt-1.5 text-xs text-slate-600">
+                        <p className="text-xs text-slate-500 sm:text-sm">
                           Only you have rated this course so far.
                         </p>
-                      );
-                    }
-
-                    if (!comparison) return null;
-
-                    if (comparison.type === 'on-par') {
-                      return (
-                        <div className="mt-1.5 flex items-center gap-1.5 text-xs text-slate-700">
-                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-                          <span>
-                            You rate this course on par with the community.
-                          </span>
-                        </div>
-                      );
-                    }
-
-                    if (comparison.type === 'higher') {
-                      return (
-                        <div className="mt-1.5 flex items-center gap-1.5 text-xs text-slate-700">
-                          <ArrowUpRight className="h-3.5 w-3.5 text-emerald-500" />
-                          <span>
-                            You rate this course {comparison.diff.toFixed(1)} {comparison.diff === 1 ? 'point' : 'points'} higher than the community.
-                          </span>
-                        </div>
-                      );
-                    }
-
-                    if (comparison.type === 'lower') {
-                      return (
-                        <div className="mt-1.5 flex items-center gap-1.5 text-xs text-rose-600">
-                          <ArrowDownRight className="h-3.5 w-3.5 text-rose-500" />
-                          <span>
-                            You rate this course {comparison.diff.toFixed(1)} {comparison.diff === 1 ? 'point' : 'points'} lower than the community.
-                          </span>
-                        </div>
                       );
                     }
 
@@ -230,46 +195,83 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
                   })()}
                 </div>
 
-                {/* Overall numeric score & ring */}
-                <div className="flex flex-col items-end gap-1">
-                  <div className="h-8 w-8">
+                {/* Right: ring + score */}
+                <div className="flex items-center gap-3">
+                  <div className="h-8 w-8 sm:h-10 sm:w-10">
                     <ClubhouseLogo size="md" className="flex-shrink-0" />
                   </div>
-                  <p className="text-lg font-semibold text-slate-900">
+                  <span className="text-xl font-semibold text-slate-900 sm:text-2xl">
                     {ratingAggregates.avg_overall_score != null
                       ? formatScore(ratingAggregates.avg_overall_score)
-                      : '--'}
-                    <span className="text-sm text-slate-600">/10</span>
-                  </p>
+                      : '--'}/10
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Category grid */}
-            <div className="grid grid-cols-1 gap-3 mt-3 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 mt-3 sm:grid-cols-2 sm:gap-4">
               <CategoryScoreCard
-                title="Course Design"
-                userScore={userRating?.design_score ?? null}
-                communityScore={ratingAggregates.avg_design_score ?? null}
+                label="Course Design"
+                user={userRating?.design_score ?? null}
+                community={ratingAggregates.avg_design_score ?? null}
               />
               <CategoryScoreCard
-                title="Course Condition"
-                userScore={userRating?.condition_score ?? null}
-                communityScore={ratingAggregates.avg_condition_score ?? null}
+                label="Course Condition"
+                user={userRating?.condition_score ?? null}
+                community={ratingAggregates.avg_condition_score ?? null}
               />
               <CategoryScoreCard
-                title="Clubhouse"
-                userScore={userRating?.clubhouse_score ?? null}
-                communityScore={ratingAggregates.avg_clubhouse_score ?? null}
+                label="Clubhouse"
+                user={userRating?.clubhouse_score ?? null}
+                community={ratingAggregates.avg_clubhouse_score ?? null}
               />
               <CategoryScoreCard
-                title="Facilities"
-                userScore={userRating?.facilities_score ?? null}
-                communityScore={ratingAggregates.avg_facilities_score ?? null}
+                label="Facilities"
+                user={userRating?.facilities_score ?? null}
+                community={ratingAggregates.avg_facilities_score ?? null}
               />
             </div>
 
-            {/* See all reviews link */}
+            {/* Helper line */}
+            {(() => {
+              const comparison = getRatingComparisonState(
+                ratingAggregates.review_count,
+                ratingAggregates.avg_overall_score ?? null,
+                userRating?.rating ?? null
+              );
+
+              const showHelper =
+                userRating?.rating != null &&
+                ratingAggregates.review_count > 0 &&
+                comparison?.type !== 'only-user' &&
+                ratingAggregates.avg_overall_score != null;
+
+              if (!showHelper || !comparison) return null;
+
+              const diffOverall = (userRating?.rating ?? 0) - (ratingAggregates.avg_overall_score ?? 0);
+              const isOnPar = comparison.type === 'on-par';
+
+              return (
+                <div className="mt-3 flex items-center gap-2 text-xs sm:text-sm">
+                  {isOnPar ? (
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                  ) : diffOverall < 0 ? (
+                    <ArrowDown />
+                  ) : (
+                    <ArrowUp />
+                  )}
+
+                  <p className="text-slate-600">
+                    {isOnPar
+                      ? 'You rate this course on par with the community.'
+                      : diffOverall < 0
+                      ? `You rate this course ${Math.abs(diffOverall).toFixed(1)} ${Math.abs(diffOverall) === 1 ? 'point' : 'points'} lower than the community.`
+                      : `You rate this course ${diffOverall.toFixed(1)} ${diffOverall === 1 ? 'point' : 'points'} higher than the community.`}
+                  </p>
+                </div>
+              );
+            })()}
             <div className="flex justify-end mt-3">
               <button
                 type="button"
