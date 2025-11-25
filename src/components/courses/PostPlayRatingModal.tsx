@@ -707,67 +707,28 @@ const PostPlayRatingModal = ({
 
             {/* Media Upload Section */}
             <section className="px-6 mt-8">
-              {selectedMedia.length === 0 ? (
-                <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/60 px-4 py-4">
-                  <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wide">
-                    Media upload (optional)
-                  </h3>
-                  <p className="mt-1 text-xs text-slate-500">
-                    Add up to 5 photos or videos (JPG, PNG, MP4, MOV).
-                  </p>
-                  <div className="mt-4">
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        const input = document.createElement('input');
-                        input.type = 'file';
-                        input.accept = 'image/*,video/*';
-                        input.multiple = true;
-                        input.onchange = (e) => {
-                          const target = e.target as HTMLInputElement;
-                          if (target.files) {
-                            const files = Array.from(target.files);
-                            const remainingSlots = 5 - selectedMedia.length;
-                            const filesToAdd = files.slice(0, remainingSlots);
-                            
-                            if (files.length > remainingSlots) {
-                              toast({
-                                title: "Too many files",
-                                description: `You can only add ${remainingSlots} more file${remainingSlots === 1 ? '' : 's'} (max 5 total).`,
-                                variant: "destructive",
-                              });
-                            }
-                            
-                            handleMediaSelected(filesToAdd);
-                          }
-                        };
-                        input.click();
-                      }}
-                      variant="outline"
-                      className="rounded-full border border-slate-600 bg-white px-6 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50 active:scale-[0.99]"
-                    >
-                      Add Media
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <div className="grid grid-cols-3 gap-1.5 rounded-xl overflow-hidden">
+              <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/60 px-4 py-16 flex flex-col items-center justify-center gap-4">
+                {selectedMedia.length > 0 && (
+                  <div className="flex flex-wrap justify-center gap-3">
                     {selectedMedia.map((file, index) => {
                       const isVideo = file.type.startsWith('video/');
                       const preview = URL.createObjectURL(file);
                       return (
-                        <div key={index} className="relative aspect-square overflow-hidden rounded-xl">
+                        <div key={index} className="relative h-20 w-20 overflow-hidden rounded-xl">
                           {isVideo ? (
-                            <>
+                            <div className="relative h-full w-full">
                               <video
                                 src={preview}
                                 className="h-full w-full object-cover"
+                                muted
+                                playsInline
                               />
-                              <div className="absolute bottom-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 shadow-md">
-                                <div className="ml-[2px] h-0 w-0 border-y-[5px] border-y-transparent border-l-[9px] border-l-white" />
+                              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900/70">
+                                  <div className="ml-[2px] h-0 w-0 border-y-[4px] border-y-transparent border-l-[7px] border-l-white" />
+                                </div>
                               </div>
-                            </>
+                            </div>
                           ) : (
                             <img
                               src={preview}
@@ -778,50 +739,62 @@ const PostPlayRatingModal = ({
                           <button
                             type="button"
                             onClick={() => handleRemoveMedia(index)}
-                            className="absolute top-1.5 right-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-slate-900/80 shadow-sm hover:bg-slate-900/95 active:scale-95 transition"
+                            className="absolute -top-1.5 -right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-slate-900/80 shadow-sm hover:bg-slate-900/95 active:scale-95 transition"
                           >
-                            <span className="text-[11px] leading-none text-white">✕</span>
+                            <span className="text-[10px] leading-none text-white">✕</span>
                           </button>
                         </div>
                       );
                     })}
                   </div>
-                  {selectedMedia.length < 5 && (
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        const input = document.createElement('input');
-                        input.type = 'file';
-                        input.accept = 'image/*,video/*';
-                        input.multiple = true;
-                        input.onchange = (e) => {
-                          const target = e.target as HTMLInputElement;
-                          if (target.files) {
-                            const files = Array.from(target.files);
-                            const remainingSlots = 5 - selectedMedia.length;
-                            const filesToAdd = files.slice(0, remainingSlots);
-                            
-                            if (files.length > remainingSlots) {
-                              toast({
-                                title: "Too many files",
-                                description: `You can only add ${remainingSlots} more file${remainingSlots === 1 ? '' : 's'} (max 5 total).`,
-                                variant: "destructive",
-                              });
-                            }
-                            
-                            handleMediaSelected(filesToAdd);
+                )}
+                
+                {selectedMedia.length === 0 && (
+                  <div className="text-center">
+                    <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wide">
+                      Media upload (optional)
+                    </h3>
+                    <p className="mt-1 text-xs text-slate-500">
+                      Add up to 5 photos or videos
+                    </p>
+                  </div>
+                )}
+                
+                {selectedMedia.length < 5 && (
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = 'image/*,video/*';
+                      input.multiple = true;
+                      input.onchange = (e) => {
+                        const target = e.target as HTMLInputElement;
+                        if (target.files) {
+                          const files = Array.from(target.files);
+                          const remainingSlots = 5 - selectedMedia.length;
+                          const filesToAdd = files.slice(0, remainingSlots);
+                          
+                          if (files.length > remainingSlots) {
+                            toast({
+                              title: "Too many files",
+                              description: `You can only add ${remainingSlots} more file${remainingSlots === 1 ? '' : 's'} (max 5 total).`,
+                              variant: "destructive",
+                            });
                           }
-                        };
-                        input.click();
-                      }}
-                      variant="outline"
-                      className="w-full rounded-full border border-slate-600 bg-white px-6 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50 active:scale-[0.99]"
-                    >
-                      Add Media
-                    </Button>
-                  )}
-                </div>
-              )}
+                          
+                          handleMediaSelected(filesToAdd);
+                        }
+                      };
+                      input.click();
+                    }}
+                    variant="outline"
+                    className="w-44 rounded-full border border-slate-600 bg-white px-6 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50 active:scale-[0.99]"
+                  >
+                    Add Media
+                  </Button>
+                )}
+              </div>
             </section>
 
             {/* Primary CTA Button */}
@@ -830,21 +803,23 @@ const PostPlayRatingModal = ({
                 type="submit"
                 onClick={handleSubmit}
                 disabled={isSubmitting || !selectedRating}
-                className="w-full rounded-full bg-slate-900 text-white text-base font-semibold py-3 shadow-sm hover:bg-slate-800 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
+                variant="outline"
+                className="w-full rounded-full border border-slate-600 bg-white text-slate-600 text-base font-medium py-3 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? 'Saving…' : (isEditMode ? 'Update rating' : 'Submit rating')}
               </Button>
 
               {isEditMode && (
-                <Button
-                  type="button"
-                  onClick={() => setShowRemoveDialog(true)}
-                  disabled={isSubmitting}
-                  className="w-full mt-3 rounded-full bg-red-500 text-white text-base font-semibold py-3 hover:bg-red-600 active:scale-[0.99] flex items-center gap-2 justify-center"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Remove from played
-                </Button>
+                <div className="flex justify-center">
+                  <button
+                    type="button"
+                    onClick={() => setShowRemoveDialog(true)}
+                    disabled={isSubmitting}
+                    className="mt-2 inline-flex items-center justify-center rounded-full border border-red-300 px-4 py-2 text-sm font-medium text-red-600 bg-white/80 hover:bg-red-50 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Remove rating
+                  </button>
+                </div>
               )}
             </footer>
           </div>
