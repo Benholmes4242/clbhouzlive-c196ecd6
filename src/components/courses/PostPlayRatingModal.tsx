@@ -288,7 +288,8 @@ const PostPlayRatingModal = ({
       }
       
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
-      queryClient.invalidateQueries({ queryKey: ['user-course-rating', course?.id, userId] });
+      // Force refetch for user rating to ensure Course Details updates immediately
+      await queryClient.refetchQueries({ queryKey: ['user-course-rating', course?.id, userId] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews-full', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['course-rating-aggregates', course?.id] });
@@ -391,7 +392,8 @@ const PostPlayRatingModal = ({
       const userId = userResponse?.user?.id;
       
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
-      queryClient.invalidateQueries({ queryKey: ['user-course-rating', course?.id, userId] });
+      // Force refetch for user rating to ensure Course Details updates immediately
+      await queryClient.refetchQueries({ queryKey: ['user-course-rating', course?.id, userId] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews-full', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['user-course', course?.id] });
