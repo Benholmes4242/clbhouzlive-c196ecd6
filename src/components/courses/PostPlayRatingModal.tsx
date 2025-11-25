@@ -676,7 +676,7 @@ const PostPlayRatingModal = ({
 
               {/* Course name overlay on image */}
               <div className="absolute inset-x-0 bottom-4 px-4">
-                <h1 className="text-2xl font-semibold text-white drop-shadow-sm">
+                <h1 className="text-4xl md:text-5xl font-semibold text-white drop-shadow-2xl">
                   {course.name}
                 </h1>
               </div>
