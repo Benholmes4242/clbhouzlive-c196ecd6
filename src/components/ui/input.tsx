@@ -15,12 +15,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           "flex h-10 w-full rounded-lg border border-slate-600 px-4 py-3 text-body-md",
           "bg-white text-slate-800",
           "placeholder:text-slate-400",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300/70 focus-visible:ring-offset-1",
-          "focus-visible:border-slate-600",
+          "focus-visible:outline-none focus-visible:border-slate-600",
           "file:border-0 file:bg-transparent file:text-body-md file:font-medium",
           "disabled:cursor-not-allowed disabled:opacity-60 disabled:bg-slate-50",
           className
         )}
+        style={{ WebkitAppearance: 'none' }}
         ref={ref}
         {...props}
       />
