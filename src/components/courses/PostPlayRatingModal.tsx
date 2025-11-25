@@ -648,29 +648,30 @@ const PostPlayRatingModal = ({
     return (
       <div className="fixed inset-0 z-[999] bg-background overflow-y-auto">
         <div className="min-h-screen bg-background pb-24">
-          {/* Header with back button */}
-          <div className="relative h-64 bg-muted animate-pulse">
+          {/* Header with back button - Section A (light) */}
+          <div className="relative h-64 bg-slate-50">
+            <div className="animate-pulse bg-slate-200 h-full w-full" />
             <div className="absolute top-4 left-4">
               <div className="h-9 w-9 rounded-md bg-white/20" />
             </div>
           </div>
 
-          <div className="px-6 mt-6 space-y-6">
-            {/* Overall rating section */}
-            <div className="space-y-3">
+          <div className="space-y-0">
+            {/* Overall rating section - Section A continued (light) */}
+            <div className="space-y-3 px-6 pt-6 pb-3 bg-slate-50">
               <div className="h-5 w-48 bg-muted rounded animate-pulse" />
               <div className="h-10 w-full bg-muted rounded-full animate-pulse" />
               <div className="h-8 w-32 bg-muted rounded-full mx-auto animate-pulse" />
             </div>
 
-            {/* Share thoughts textarea */}
-            <div className="space-y-3">
+            {/* Share thoughts textarea - Section B (dark) */}
+            <div className="space-y-3 px-6 pt-6 pb-3 bg-slate-100">
               <div className="h-5 w-40 bg-muted rounded animate-pulse" />
               <div className="h-32 w-full bg-muted rounded-2xl animate-pulse" />
             </div>
 
-            {/* Breakdown section */}
-            <div className="space-y-4">
+            {/* Breakdown section - Section C (light) */}
+            <div className="space-y-4 px-6 pt-6 pb-3 bg-slate-50">
               <div className="h-5 w-56 bg-muted rounded animate-pulse" />
               
               {/* 4 breakdown sliders */}
@@ -683,8 +684,8 @@ const PostPlayRatingModal = ({
               ))}
             </div>
 
-            {/* Media upload section */}
-            <div className="space-y-3">
+            {/* Media upload section - Section D (dark) */}
+            <div className="space-y-3 px-6 pt-6 pb-3 bg-slate-100">
               <div className="h-5 w-48 bg-muted rounded animate-pulse" />
               <div className="grid grid-cols-3 gap-3">
                 <div className="aspect-square bg-muted rounded-lg animate-pulse" />
@@ -694,8 +695,8 @@ const PostPlayRatingModal = ({
               <div className="h-3 w-64 bg-muted rounded animate-pulse" />
             </div>
 
-            {/* Primary button */}
-            <div className="mt-3 flex w-full items-center justify-between gap-3">
+            {/* Primary button - Section E (light) */}
+            <div className="flex w-full items-center justify-between gap-3 px-6 pt-6 pb-3 bg-slate-50">
               <div className="h-11 flex-1 bg-muted rounded-lg animate-pulse" />
               <div className="h-11 flex-1 bg-muted rounded-lg animate-pulse" />
             </div>
@@ -710,11 +711,11 @@ const PostPlayRatingModal = ({
 
   return (
     <>
-      <div className="fixed inset-0 z-[999] bg-slate-50 overflow-y-auto">
+      <div className="fixed inset-0 z-[999] bg-background overflow-y-auto">
         {!showConfirmation ? (
           <div>
-            {/* Hero Image */}
-            <div className="relative h-64 overflow-hidden">
+            {/* Hero Image - Section A (light) */}
+            <div className="relative h-64 overflow-hidden bg-slate-50">
               {course.thumbnail_image ? (
                 <img
                   src={course.thumbnail_image}
@@ -750,8 +751,8 @@ const PostPlayRatingModal = ({
               </div>
             </div>
 
-            {/* Overall Rating Slider */}
-            <section className="px-6 mt-6">
+            {/* Overall Rating Slider - Section A continued (light) */}
+            <section className="px-6 pt-6 pb-3 bg-slate-50">
               <div className="mb-3 flex items-baseline justify-between">
                 <span className="text-lg font-semibold text-slate-900">
                   {isEditMode ? 'Edit your overall rating' : 'Submit your overall rating'}
@@ -773,8 +774,8 @@ const PostPlayRatingModal = ({
               </div>
             </section>
 
-            {/* Share Your Thoughts */}
-            <section className="px-6 mt-6">
+            {/* Share Your Thoughts - Section B (dark) */}
+            <section className="px-6 pt-6 pb-3 bg-slate-100">
               <label className="text-base font-semibold text-slate-900 mb-2 block">
                 Share your thoughts
               </label>
@@ -795,8 +796,8 @@ const PostPlayRatingModal = ({
               </div>
             </section>
 
-            {/* Breakdown Sliders */}
-            <section className="px-6 mt-6">
+            {/* Breakdown Sliders - Section C (light) */}
+            <section className="px-6 pt-6 pb-3 bg-slate-50">
               <h3 className="text-lg font-semibold text-slate-900 mb-3">
                 {isEditMode ? 'Edit your breakdown' : 'Submit your breakdown'}
               </h3>
@@ -858,8 +859,8 @@ const PostPlayRatingModal = ({
               ))}
             </section>
 
-            {/* Media Upload Section */}
-            <section className="px-6 mt-8">
+            {/* Media Upload Section - Section D (dark) */}
+            <section className="px-6 pt-6 pb-3 bg-slate-100">
               <div className="py-8 flex flex-col items-center justify-center gap-4">
                 {selectedMedia.length > 0 && (
                   <div className="w-full">
@@ -951,8 +952,8 @@ const PostPlayRatingModal = ({
               </div>
             </section>
 
-            {/* Primary CTA Button */}
-            <footer className="px-6 mt-3 pb-3">
+            {/* Primary CTA Button - Section E (light) */}
+            <footer className="px-6 pt-6 pb-3 bg-slate-50">
               {isEditMode ? (
                 <div className="flex w-full items-center justify-between gap-3">
                   {/* Remove rating (left) */}
