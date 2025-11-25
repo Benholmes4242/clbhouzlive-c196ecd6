@@ -589,19 +589,23 @@ const PostPlayRatingModal = ({
                 <ArrowLeft className="h-5 w-5 text-white" />
               </button>
 
-              {/* Title overlay on image */}
+              {/* Course name overlay on image */}
               <div className="absolute inset-x-0 bottom-4 px-4">
-                <p className="text-xs font-medium uppercase tracking-[0.16em] text-white/80">
-                  {isEditMode ? 'Edit your rating' : 'Rate this course'}
-                </p>
-                <h1 className="mt-1 text-2xl font-semibold text-white drop-shadow-sm">
+                <h1 className="text-2xl font-semibold text-white drop-shadow-sm">
                   {course.name}
                 </h1>
               </div>
             </div>
 
+            {/* Title Block */}
+            <div className="px-6 pt-4 pb-3">
+              <h2 className="text-lg font-semibold text-slate-900">
+                {isEditMode ? 'Edit your rating' : 'Rate this course'}
+              </h2>
+            </div>
+
             {/* Overall Rating Slider */}
-            <section className="px-6 mt-6">
+            <section className="px-6 mt-4">
               <div className="mb-2 flex items-baseline justify-between">
                 <span className="text-base font-semibold text-slate-900">
                   Your overall rating
