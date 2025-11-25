@@ -15,8 +15,7 @@ interface CourseMapFullScreenProps {
   latitude: number;
   longitude: number;
   courseName: string;
-  country?: string | null;
-  subCountry?: string | null;
+  locationText?: string;
 }
 
 const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
@@ -25,8 +24,7 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
   latitude,
   longitude,
   courseName,
-  country,
-  subCountry,
+  locationText,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -145,9 +143,11 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
                 <MapPin className="h-4 w-4" />
                 {courseName}
               </h2>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {subCountry && `${subCountry}, `}{country}
-              </p>
+              {locationText && (
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {locationText}
+                </p>
+              )}
             </div>
           </div>
         </div>

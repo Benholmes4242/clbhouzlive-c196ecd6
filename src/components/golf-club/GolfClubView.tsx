@@ -13,6 +13,7 @@ import CourseAboutTab from '@/components/courses/course-detail/CourseAboutTab';
 import CourseReviewsTab from '@/components/courses/course-detail/CourseReviewsTab';
 import CourseMediaTab from '@/components/courses/course-detail/CourseMediaTab';
 import CourseRankBadges from '@/components/courses/CourseRankBadges';
+import { formatCourseLocation } from '@/utils/courseLocation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 
 
@@ -167,7 +168,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         <div className="absolute bottom-16 left-6 text-white z-10">
           <h1 className="text-4xl md:text-5xl font-semibold mb-1.5 drop-shadow-2xl">{course.name}</h1>
           <p className="text-lg md:text-xl opacity-90 mb-2.5 drop-shadow-lg">
-            {[course.country, course.sub_country, course.region].filter(Boolean).join(', ')}
+            {formatCourseLocation(course)}
           </p>
           
           {/* Top 100 Pills */}
