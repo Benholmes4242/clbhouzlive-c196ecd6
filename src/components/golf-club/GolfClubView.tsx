@@ -241,7 +241,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
               <CourseReviewsTab
                 courseId={course.id} 
                 courseName={course.name}
-                ratingStats={ratingStats}
               />
             </TabsContent>
           )}
