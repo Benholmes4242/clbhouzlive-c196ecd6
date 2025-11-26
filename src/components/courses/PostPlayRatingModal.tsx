@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
-import { Star, Check, Trophy, Trash2, Upload, ArrowLeft } from 'lucide-react';
+import { Star, Check, Trophy, Trash2, Upload, ArrowLeft, ArrowUp, ArrowDown, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ReviewMediaUpload from './ReviewMediaUpload';
 import { formatCourseLocation } from '@/utils/courseLocation';
@@ -39,6 +39,11 @@ const PostPlayRatingModal = ({
 }: PostPlayRatingModalProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // Capture flow type once on mount and never change it
+  const [flowType] = useState<'create' | 'edit'>(isEditMode ? 'edit' : 'create');
+  const isEditFlow = flowType === 'edit';
+  
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const [review, setReview] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -992,7 +997,7 @@ const PostPlayRatingModal = ({
           </div>
           ) : (
             <RatingConfirmationView
-              mode={isEditMode ? 'updated' : 'submitted'}
+              mode={isEditFlow ? 'updated' : 'submitted'}
               courseName={course!.name}
               userRating={selectedRating || 0}
               breakdown={
@@ -1164,26 +1169,32 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
     ? `Your updated rating for ${courseName} has been saved.`
     : `Your rating for ${courseName} has been saved.`;
 
-  const overallHeading = isEdit ? 'Updated overall rating' : 'Your overall rating';
+  const overallHeading = isEdit ? 'Updated overall rating' : 'Submitted overall rating';
   const breakdownHeading = isEdit ? 'Updated breakdown' : 'Your breakdown';
 
-  // Compute comparison text for inside the rating card
+  // Compute comparison for inside the rating card
   const hasCommunityScore = typeof communityScore === 'number' && !Number.isNaN(communityScore);
   const diffRaw = hasCommunityScore ? userRating - communityScore : 0;
   const diff = Math.round(diffRaw * 10) / 10;
 
+  type ComparisonVariant = 'higher' | 'lower' | 'on-par' | 'first';
+  let comparisonVariant: ComparisonVariant = 'first';
   let comparisonText: string | null = null;
 
-  if (hasCommunityScore && Math.abs(diff) >= 0.1) {
-    if (diff > 0) {
-      comparisonText = `You rated this course ${Math.abs(diff).toFixed(1)} point${Math.abs(diff) === 1.0 ? '' : 's'} higher than the community.`;
-    } else {
-      comparisonText = `You rated this course ${Math.abs(diff).toFixed(1)} point${Math.abs(diff) === 1.0 ? '' : 's'} lower than the community.`;
-    }
-  } else if (hasCommunityScore && Math.abs(diff) < 0.1) {
-    comparisonText = 'You rated this course the same as the community.';
-  } else {
+  if (!hasCommunityScore) {
+    comparisonVariant = 'first';
     comparisonText = "You're the first to rate this course – your rating sets the starting point.";
+  } else if (Math.abs(diff) < 0.1) {
+    comparisonVariant = 'on-par';
+    comparisonText = 'You rated this course on par with the community.';
+  } else if (diff > 0) {
+    comparisonVariant = 'higher';
+    const points = Math.abs(diff);
+    comparisonText = `You rated this course ${points.toFixed(1)} point${points === 1.0 ? '' : 's'} higher than the community.`;
+  } else {
+    comparisonVariant = 'lower';
+    const points = Math.abs(diff);
+    comparisonText = `You rated this course ${points.toFixed(1)} point${points === 1.0 ? '' : 's'} lower than the community.`;
   }
 
   return (
@@ -1215,9 +1226,25 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
           </div>
 
           {comparisonText && (
-            <p className="mt-3 text-xs text-slate-500">
-              {comparisonText}
-            </p>
+            <div className="mt-3 flex items-center gap-1.5">
+              {comparisonVariant === 'higher' && (
+                <ArrowUp className="h-3.5 w-3.5 text-emerald-600" />
+              )}
+              {comparisonVariant === 'lower' && (
+                <ArrowDown className="h-3.5 w-3.5 text-red-500" />
+              )}
+              {comparisonVariant === 'on-par' && (
+                <CheckCircle className="h-3.5 w-3.5 text-emerald-600" />
+              )}
+              <p className={`text-xs font-medium ${
+                comparisonVariant === 'higher' ? 'text-emerald-600' :
+                comparisonVariant === 'lower' ? 'text-red-500' :
+                comparisonVariant === 'on-par' ? 'text-emerald-600' :
+                'text-slate-500'
+              }`}>
+                {comparisonText}
+              </p>
+            </div>
           )}
         </div>
       </section>
