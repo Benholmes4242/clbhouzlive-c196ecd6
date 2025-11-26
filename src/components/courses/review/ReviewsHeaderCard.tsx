@@ -116,20 +116,25 @@ export const ReviewsHeaderCard: React.FC<ReviewsHeaderCardProps> = ({
           <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
             Community score
           </p>
-          <div className="mt-1 flex items-baseline gap-1">
-            <ClubhouseLogo size="sm" />
-            <span className="text-2xl font-semibold text-slate-900">
-              {communityScore.toFixed(1)}
-            </span>
-            <span className="text-sm text-slate-500">/10</span>
-          </div>
           <p className="mt-1 text-xs text-slate-500">
             Based on {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
           </p>
         </div>
 
-        {/* Badge */}
-        {qualityData && <CommunityRatingBadge label={qualityData.label} variant={qualityData.variant} />}
+        {/* Right - score + badge stack matching About tab */}
+        <div className="inline-flex flex-col items-center gap-2">
+          {/* Logo + Score */}
+          <div className="flex items-center gap-3">
+            <ClubhouseLogo size="md" />
+            <span className="text-5xl font-bold text-slate-900">
+              {communityScore.toFixed(1)}
+            </span>
+          </div>
+          <span className="text-base font-medium text-slate-500">/10</span>
+
+          {/* Quality chip centered under score */}
+          {qualityData && <CommunityRatingBadge label={qualityData.label} variant={qualityData.variant} />}
+        </div>
       </div>
 
       {/* Comparison message */}
