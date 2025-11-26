@@ -122,7 +122,7 @@ export default function SlideInModal({
         `}
         style={{
           transitionTimingFunction: animateIn ? "cubic-bezier(0.0,0.0,0.2,1)" : "cubic-bezier(0.4,0.0,1,1)",
-          transitionDuration: animateIn ? "260ms" : "210ms",
+          transitionDuration: "150ms",
         }}
       >
         {/* Header (sticky inside the scroll container) */}
