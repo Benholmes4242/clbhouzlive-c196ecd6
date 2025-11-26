@@ -104,7 +104,7 @@ export default function EnhancedCreateMomentModalCinematic({
   
   // Map sheet animation constants (buttery smooth!)
   const ECM_ENTRY_DURATION = 500;
-  const ECM_EXIT_DURATION = 150;
+  const ECM_EXIT_DURATION = 500;
   const ECM_ENTRY_EASING = 'ease-in-out';
   const ECM_EXIT_EASING = 'ease-in-out';
   const DRAG_THRESHOLD = 120;
