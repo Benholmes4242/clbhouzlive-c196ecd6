@@ -33,6 +33,12 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   const initialTab = (location.state as any)?.activeTab || 'about';
   const [activeTab, setActiveTab] = useState(initialTab);
   
+  console.log('[Navigation] Returned to course page', {
+    courseId,
+    initialTabFromState: initialTab,
+    highlightMyReview: (location.state as any)?.highlightMyReview,
+  });
+  
   // Phase 3: Track which tabs have been visited for keep-mounted pattern
   const [visitedTabs, setVisitedTabs] = useState<Set<string>>(new Set([initialTab]));
 
@@ -226,7 +232,13 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
               value="reviews" 
               className={`mt-0 transition-opacity duration-200 ${activeTab === 'reviews' ? 'opacity-100' : 'hidden'}`}
             >
-              <CourseReviewsTab 
+              {(() => {
+                if (activeTab === 'reviews') {
+                  console.log('[Navigation] Reviews tab mounted for', courseId);
+                }
+                return null;
+              })()}
+              <CourseReviewsTab
                 courseId={course.id} 
                 courseName={course.name}
                 ratingStats={ratingStats}

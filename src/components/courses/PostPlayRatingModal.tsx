@@ -351,11 +351,20 @@ const PostPlayRatingModal = ({
         queryKey: ['course-rating-aggregates', course?.id] 
       });
       
+      console.log('[Reviews Refresh] onSuccess for course', course?.id);
+      
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
       await queryClient.refetchQueries({ 
         queryKey: ['course-reviews-full', course?.id],
+        type: 'active',
         exact: false
       });
+      
+      console.log('[Reviews Refresh] refetchQueries called for key', [
+        'course-reviews-full',
+        course?.id,
+      ]);
+      
       queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
       queryClient.invalidateQueries({ queryKey: ['user-played-course', course?.id] });
       
@@ -470,11 +479,20 @@ const PostPlayRatingModal = ({
       await queryClient.refetchQueries({ queryKey: ['user-course-rating', course?.id, userId] });
       await queryClient.refetchQueries({ queryKey: ['course-rating-aggregates', course?.id] });
       
+      console.log('[Reviews Refresh] onSuccess (DELETE) for course', course?.id);
+      
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
       await queryClient.refetchQueries({ 
         queryKey: ['course-reviews-full', course?.id],
+        type: 'active',
         exact: false
       });
+      
+      console.log('[Reviews Refresh] refetchQueries (DELETE) called for key', [
+        'course-reviews-full',
+        course?.id,
+      ]);
+      
       queryClient.invalidateQueries({ queryKey: ['user-course', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['user-top100-course', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['userTop100Courses'] });

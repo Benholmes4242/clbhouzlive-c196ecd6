@@ -75,6 +75,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   }, [isJustSubmittedOrUpdated]);
 
   // Fetch all reviews with user profiles
+  console.log('[Reviews Query] key', ['course-reviews-full', courseId, SHOW_MOCK_REVIEWS]);
+  
   const { data: reviewsData, isLoading } = useQuery({
     queryKey: ['course-reviews-full', courseId, SHOW_MOCK_REVIEWS],
     queryFn: async () => {
@@ -112,6 +114,13 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
       const { data, error } = await query;
       if (error) throw error;
+      
+      console.log('[Reviews Query] fetched rows', {
+        courseId,
+        count: data?.length ?? 0,
+        sample: data?.slice(0, 3),
+      });
+      
       return (data as any as ReviewData[]) || [];
     },
     enabled: !!courseId,
