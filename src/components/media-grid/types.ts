@@ -2,6 +2,7 @@ import type { MediaItem as BaseMediaItem } from '@/types/media';
 
 export interface ExtendedMediaItem extends BaseMediaItem {
   title?: string;
+  duration?: number; // in seconds
   user?: {
     id: string;
     name: string;
