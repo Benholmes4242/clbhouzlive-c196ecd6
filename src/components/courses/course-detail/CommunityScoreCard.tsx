@@ -29,18 +29,28 @@ const getCommunityRatingLabel = (score: number | null | undefined): { label: str
 };
 
 
+// Badge color mapping
+const BADGE_COLORS = {
+  fair:        '#94A3B8', // neutral grey (0.0–5.9)
+  good:        '#64748B', // soft desaturated blue (6.0–6.9)
+  veryGood:    '#6EE7B7', // mid green (7.0–7.9)
+  excellent:   '#22C55E', // bright green (8.0–8.9)
+  outstanding: '#F4C15D'  // gold (9.0–10.0)
+};
+
 // Community rating badge component with color variants
 const CommunityRatingBadge: React.FC<{ label: string; variant: 'fair' | 'good' | 'veryGood' | 'excellent' | 'outstanding' }> = ({ label, variant }) => {
-  const variantClasses: Record<typeof variant, string> = {
-    fair: 'border-slate-200 bg-slate-50 text-slate-700',
-    good: 'border-sky-200 bg-sky-50 text-sky-700',
-    veryGood: 'border-blue-200 bg-blue-50 text-blue-700',
-    excellent: 'border-emerald-200 bg-emerald-50 text-emerald-700',
-    outstanding: 'border-emerald-300 bg-emerald-100 text-emerald-800',
-  };
-
+  const color = BADGE_COLORS[variant];
+  
   return (
-    <span className={`inline-flex items-center justify-center rounded-full px-3 py-1 border text-xs font-semibold uppercase ${variantClasses[variant]}`}>
+    <span 
+      className="inline-flex items-center justify-center rounded-full px-3 py-1 border text-xs font-semibold uppercase"
+      style={{ 
+        backgroundColor: `${color}15`, // 15% opacity for background
+        borderColor: `${color}40`, // 40% opacity for border
+        color: color
+      }}
+    >
       {label}
     </span>
   );
