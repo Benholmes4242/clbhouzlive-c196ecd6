@@ -6,20 +6,19 @@ import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { adaptClubMediaArrayToExploreItems, ExploreContentItem } from '@/lib/adapters/clubMediaToExplore';
-import { Image as ImageIcon, Video } from 'lucide-react';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
-import { IoFilter } from 'react-icons/io5';
+import { Image as ImageIcon } from 'lucide-react';
 // MediaGrid imports
 import { MediaGrid, GRID_PRESETS, adaptExploreContentToMediaItems } from '@/components/media-grid';
 import type { ExtendedMediaItem as NewMediaItem } from '@/components/media-grid';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { MediaItem as StandardMediaItem } from '@/types/media';
 import { FLAGS } from '@/config/flags';
+// New components for media tab polish
+import { CourseMediaSummaryCard } from './CourseMediaSummaryCard';
+import { MediaFilterRow, MediaFilterMode } from './MediaFilterRow';
+import { useCourseMediaSummary } from '@/hooks/useCourseMediaSummary';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { Button } from '@/components/ui/button';
 
 interface CourseMediaTabProps {
   courseId: string;
@@ -46,12 +45,11 @@ interface LocalMediaItem {
   };
 }
 
-type MediaFilterType = 'all' | 'videos' | 'photos';
-
 const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
+  const { user } = useSupabaseSession();
   const [selectedMediaIndex, setSelectedMediaIndex] = useState<number | null>(null);
   const [modalPortalTarget, setModalPortalTarget] = useState<HTMLElement | null>(null);
-  const [activeFilter, setActiveFilter] = useState<MediaFilterType>('all');
+  const [filterMode, setFilterMode] = useState<MediaFilterMode>('most_recent');
 
   // Vertical feed for consistent UX
   const { 
@@ -90,17 +88,46 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
     [mediaResp]
   );
 
-  // Filter media items based on active filter
+  // Calculate summary stats
+  const mediaSummaryItems = useMemo(() => {
+    return exploreItems.map(item => ({
+      id: item.id,
+      type: item.type as 'image' | 'video',
+      createdAt: new Date().toISOString(), // Placeholder - ideally from API
+      author: {
+        id: item.user?.id || '',
+      },
+    }));
+  }, [exploreItems]);
+
+  const mediaSummary = useCourseMediaSummary(mediaSummaryItems, user?.id || null);
+
+  // Filter media items based on active filter mode
   const filteredExploreItems = useMemo(() => {
-    switch (activeFilter) {
+    let filtered = exploreItems;
+
+    switch (filterMode) {
       case 'videos':
-        return exploreItems.filter(item => item.type === 'video');
+        filtered = exploreItems.filter(item => item.type === 'video');
+        break;
       case 'photos':
-        return exploreItems.filter(item => item.type === 'image');
+        filtered = exploreItems.filter(item => item.type === 'image');
+        break;
+      case 'friends':
+        // TODO: Filter by friends when friends list is available
+        filtered = exploreItems;
+        break;
+      case 'mine':
+        filtered = exploreItems.filter(item => item.user?.id === user?.id);
+        break;
+      case 'most_recent':
       default:
-        return exploreItems;
+        filtered = exploreItems;
+        break;
     }
-  }, [exploreItems, activeFilter]);
+
+    return filtered;
+  }, [exploreItems, filterMode, user?.id]);
 
   // Adapt for new MediaGrid using filtered items
   const mediaItems = useMemo(
@@ -139,80 +166,81 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
     );
   }
 
+  // Empty state - no media at all
   if (exploreItems.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center px-6 pt-10 pb-24 text-center text-muted-foreground gap-3">
-        <div className="w-14 h-14 rounded-full bg-surface-alt flex items-center justify-center">
-          <ImageIcon className="w-7 h-7" />
-        </div>
+      <div className="space-y-6">
+        <CourseMediaSummaryCard
+          photoCount={0}
+          videoCount={0}
+          userMediaCount={0}
+          lastMediaCreatedAt={null}
+        />
 
-        <div className="text-center">
-          <p className="text-base font-medium text-foreground">No media yet</p>
-          <p className="text-sm text-muted-foreground mt-3">
-            Share photos and videos of this course in your posts or reviews!
+        <div className="rounded-3xl bg-white shadow-sm px-5 py-8 text-center">
+          <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+            <ImageIcon className="w-7 h-7 text-slate-400" />
+          </div>
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">
+            No photos or videos yet
+          </h3>
+          <p className="text-sm text-slate-600 mb-5">
+            Help other golfers discover this course — add your first moment.
           </p>
+          <Button 
+            variant="outline"
+            onClick={() => {
+              // TODO: Open create moment flow
+              console.log('Open capture moment flow');
+            }}
+          >
+            Capture a moment
+          </Button>
         </div>
       </div>
     );
   }
 
+  // Filtered state - no results for current filter
   if (filteredExploreItems.length === 0 && exploreItems.length > 0) {
     return (
       <div className="space-y-6">
-        {/* Filter Dropdown */}
-        <div className="flex justify-end">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button 
-                className="p-2 hover:bg-muted/50 transition-colors rounded-md"
-              >
-                <IoFilter className="w-5 h-5 text-foreground" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent 
-              align="end" 
-              className="bg-background border border-border z-[1100]"
-            >
-              <DropdownMenuItem 
-                onClick={() => setActiveFilter('all')}
-                className={`cursor-pointer ${activeFilter === 'all' ? 'bg-accent' : ''}`}
-              >
-                <span className="mr-2">📱</span>
-                All Media
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setActiveFilter('videos')}
-                className={`cursor-pointer ${activeFilter === 'videos' ? 'bg-accent' : ''}`}
-              >
-                <Video className="mr-2 h-4 w-4" />
-                Videos only
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setActiveFilter('photos')}
-                className={`cursor-pointer ${activeFilter === 'photos' ? 'bg-accent' : ''}`}
-              >
-                <ImageIcon className="mr-2 h-4 w-4" />
-                Photos only
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <CourseMediaSummaryCard
+          photoCount={mediaSummary.photoCount}
+          videoCount={mediaSummary.videoCount}
+          userMediaCount={mediaSummary.userMediaCount}
+          lastMediaCreatedAt={mediaSummary.lastMediaCreatedAt}
+          onUserMediaClick={() => setFilterMode('mine')}
+        />
+
+        <MediaFilterRow
+          filterMode={filterMode}
+          onFilterChange={setFilterMode}
+          hasFriends={false} // TODO: Check if user has friends
+          hasUserMedia={mediaSummary.userMediaCount > 0}
+        />
         
-        <div className="text-center py-12">
-          <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-            <ImageIcon className="h-8 w-8 text-muted-foreground" />
+        <div className="rounded-3xl bg-white shadow-sm px-5 py-8 text-center">
+          <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+            <ImageIcon className="w-7 h-7 text-slate-400" />
           </div>
-          <h3 className="text-xl font-semibold mb-2">No {activeFilter === 'all' ? 'media' : activeFilter} found</h3>
-          <p className="text-muted-foreground">
-            {activeFilter === 'all' 
-              ? 'Share photos and videos of this course in your posts or reviews!' 
-              : `No ${activeFilter} available for this course. Try changing the filter.`
-            }
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">
+            No results for this filter
+          </h3>
+          <p className="text-sm text-slate-600">
+            Try changing the filter to see more media.
           </p>
         </div>
       </div>
     );
   }
+
+  // User-only media message
+  const showOnlyYourMediaMessage = 
+    filterMode === 'most_recent' && 
+    mediaSummary.userMediaCount > 0 && 
+    mediaSummary.userMediaCount === exploreItems.length;
+
 
   const renderFullscreenModal = () => {
     if (selectedMediaIndex === null || !filteredExploreItems[selectedMediaIndex]) return null;
@@ -262,61 +290,62 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Filter Dropdown */}
-      <div className="flex justify-end">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button 
-              className="p-2 hover:bg-muted/50 transition-colors rounded-md"
-            >
-              <IoFilter className="w-5 h-5 text-foreground" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent 
-            align="end" 
-            className="bg-background border border-border z-[1100]"
-          >
-            <DropdownMenuItem 
-              onClick={() => setActiveFilter('all')}
-              className={`cursor-pointer ${activeFilter === 'all' ? 'bg-accent' : ''}`}
-            >
-              <span className="mr-2">📱</span>
-              All Media
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => setActiveFilter('videos')}
-              className={`cursor-pointer ${activeFilter === 'videos' ? 'bg-accent' : ''}`}
-            >
-              <Video className="mr-2 h-4 w-4" />
-              Videos only
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => setActiveFilter('photos')}
-              className={`cursor-pointer ${activeFilter === 'photos' ? 'bg-accent' : ''}`}
-            >
-              <ImageIcon className="mr-2 h-4 w-4" />
-              Photos only
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      {/* MediaGrid with modalMedia preset */}
-      <MediaGrid
-        items={mediaItems}
-        config={{
-          ...GRID_PRESETS.modalMedia,
-          features: {
-            ...GRID_PRESETS.modalMedia.features,
-            autoplay: false // Disable autoplay to show play icons instead of mute buttons
-          },
-          interactions: {
-            onMediaClick: handleMediaClick
-          }
-        }}
-        isLoading={isLoading}
+    <div className="space-y-0">
+      {/* Summary Card */}
+      <CourseMediaSummaryCard
+        photoCount={mediaSummary.photoCount}
+        videoCount={mediaSummary.videoCount}
+        userMediaCount={mediaSummary.userMediaCount}
+        lastMediaCreatedAt={mediaSummary.lastMediaCreatedAt}
+        onUserMediaClick={() => setFilterMode('mine')}
       />
+
+      {/* Filter Row */}
+      <MediaFilterRow
+        filterMode={filterMode}
+        onFilterChange={setFilterMode}
+        hasFriends={false} // TODO: Check if user has friends
+        hasUserMedia={mediaSummary.userMediaCount > 0}
+      />
+
+      {/* Only your media message */}
+      {showOnlyYourMediaMessage && (
+        <div className="px-4 py-3 bg-blue-50 border-t border-b border-blue-100">
+          <p className="text-xs text-blue-700">
+            Only your media here so far — invite friends to share theirs.
+          </p>
+        </div>
+      )}
+
+      {/* Squircle Media Grid - 2 columns mobile */}
+      <div className="px-4 py-6 grid grid-cols-2 gap-3 bg-slate-50">
+        {mediaItems.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => handleMediaClick(item)}
+            className="relative aspect-[4/5] rounded-[18px] overflow-hidden bg-slate-200 border border-slate-300/40 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-150"
+          >
+            {/* Thumbnail image */}
+            <img
+              src={item.type === 'video' ? item.posterUrl || item.url : item.url}
+              alt={item.alt || 'Media'}
+              className="w-full h-full object-cover"
+            />
+
+            {/* Video duration badge */}
+            {item.type === 'video' && (
+              <div className="absolute bottom-2 right-2">
+                <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm">
+                  <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M3 2v12l10-6L3 2z" />
+                  </svg>
+                  <span className="text-[10px] font-medium text-white">0:12</span>
+                </div>
+              </div>
+            )}
+          </button>
+        ))}
+      </div>
 
       {/* Conditional Modal/Feed based on feature flag */}
       {FLAGS.USE_VERTICAL_FEED_FOR_PROFILE_MEDIA ? (
