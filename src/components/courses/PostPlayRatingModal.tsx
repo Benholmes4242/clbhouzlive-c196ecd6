@@ -990,17 +990,25 @@ const PostPlayRatingModal = ({
               )}
             </footer>
           </div>
-          ) : isEditMode ? (
-            <EditRatingConfirmation
-              course={course!}
-              userRating={{ rating: selectedRating, review }}
-              onBackToCourse={handleClose}
-            />
           ) : (
-            <NewRatingConfirmation
-              course={course!}
-              userRating={{ rating: selectedRating, review }}
+            <RatingConfirmationView
+              mode={isEditMode ? 'updated' : 'submitted'}
+              courseName={course!.name}
+              userRating={selectedRating || 0}
+              breakdown={
+                [
+                  designScore != null && designTouched ? { label: 'Course Design', value: designScore } : null,
+                  conditionScore != null && conditionTouched ? { label: 'Course Condition', value: conditionScore } : null,
+                  clubhouseScore != null && clubhouseTouched ? { label: 'Clubhouse', value: clubhouseScore } : null,
+                  facilitiesScore != null && facilitiesTouched ? { label: 'Facilities', value: facilitiesScore } : null,
+                ].filter((item): item is BreakdownItem => item !== null)
+              }
+              communityScore={null}
               onBackToCourse={handleClose}
+              onShareReview={() => {
+                // TODO: Implement share review flow
+                console.log('Share review clicked');
+              }}
             />
           )}
         </div>
@@ -1050,108 +1058,210 @@ type RatingConfirmationProps = {
   onBackToCourse: () => void;
 };
 
-/**
- * NewRatingConfirmation
- * Shown after a user submits their first rating for a course
- */
-function NewRatingConfirmation({
-  course,
-  userRating,
-  onBackToCourse,
-}: RatingConfirmationProps) {
+// ===== RATING CONFIRMATION VIEW =====
+// Helpers
+type RatingBand = 'fair' | 'good' | 'veryGood' | 'excellent' | 'outstanding';
+
+const BADGE_COLORS = {
+  fair: { bg: '#F1F5F9', text: '#94A3B8', border: '#CBD5E1' },        // slate-100/400/300
+  good: { bg: '#F0F9FF', text: '#64748B', border: '#BFDBFE' },        // sky-50/slate-500/blue-200
+  veryGood: { bg: '#ECFDF5', text: '#6EE7B7', border: '#A7F3D0' },    // emerald-50/300/200
+  excellent: { bg: '#D1FAE5', text: '#22C55E', border: '#86EFAC' },   // emerald-100/500/300
+  outstanding: { bg: '#FEF3C7', text: '#F4C15D', border: '#FDE68A' }, // amber-100/custom/amber-200
+};
+
+function getRatingBand(score: number): RatingBand {
+  if (score >= 9.0) return 'outstanding';
+  if (score >= 8.0) return 'excellent';
+  if (score >= 7.0) return 'veryGood';
+  if (score >= 6.0) return 'good';
+  return 'fair';
+}
+
+function getRatingBandLabel(band: RatingBand): string {
+  const labels = {
+    fair: 'Fair',
+    good: 'Good',
+    veryGood: 'Very Good',
+    excellent: 'Excellent',
+    outstanding: 'Outstanding',
+  };
+  return labels[band];
+}
+
+function getComparisonCopy(user: number, community: number | null) {
+  if (community == null) return null;
+
+  const delta = user - community;
+  const abs = Math.abs(delta);
+
+  if (abs < 0.2) {
+    return { icon: '✓', text: 'You rated this course on par with the community.', color: '#22C55E' };
+  }
+
+  if (delta > 0) {
+    return {
+      icon: '↑',
+      text: `You rated this course ${abs.toFixed(1)} point${abs === 1.0 ? '' : 's'} higher than the community.`,
+      color: '#22C55E',
+    };
+  }
+
+  return {
+    icon: '↓',
+    text: `You rated this course ${abs.toFixed(1)} point${abs === 1.0 ? '' : 's'} lower than the community.`,
+    color: '#E85151',
+  };
+}
+
+type BreakdownItem = { label: string; value: number };
+
+type RatingConfirmationViewProps = {
+  mode: 'submitted' | 'updated';
+  courseName: string;
+  userRating: number;
+  breakdown?: BreakdownItem[];
+  communityScore?: number | null;
+  onBackToCourse: () => void;
+  onShareReview: () => void;
+};
+
+function RatingBadge({ band }: { band: RatingBand }) {
+  const colors = BADGE_COLORS[band];
+  const label = getRatingBandLabel(band);
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-start px-6 pt-20 pb-10 bg-slate-50">
-      <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100">
-        <Check className="h-10 w-10 text-emerald-600" />
-      </div>
-      
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-        <Check className="h-7 w-7 text-emerald-600" />
-      </div>
-
-      <h1 className="mt-10 text-xl font-semibold text-slate-900">
-        Rating saved 🏆
-      </h1>
-      
-      <p className="mt-2 text-sm text-slate-500 text-center max-w-md px-4">
-        Your rating for {course.name} has been added.
-      </p>
-
-      <div className="mt-6 w-full max-w-md rounded-2xl bg-white/80 p-4 shadow-sm backdrop-blur">
-        <div className="flex items-center gap-3">
-          <Trophy className="h-6 w-6 text-amber-500" />
-          <div className="flex flex-col">
-            <span className="text-lg font-semibold text-slate-900">
-              {userRating.rating?.toFixed(1)}/10
-            </span>
-            {userRating.review && (
-              <span className="mt-0.5 text-xs text-slate-500 line-clamp-1">
-                "{userRating.review}"
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <Button
-        className="mt-8 w-full max-w-md rounded-full text-sm font-semibold bg-slate-900 text-white border border-white/10 shadow-[0_8px_20px_rgba(15,23,42,0.45)] hover:bg-slate-900/90"
-        onClick={onBackToCourse}
-      >
-        Back to course
-      </Button>
+    <div
+      className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide"
+      style={{
+        backgroundColor: colors.bg,
+        borderColor: colors.border,
+        color: colors.text,
+      }}
+    >
+      {label}
     </div>
   );
 }
 
-/**
- * EditRatingConfirmation
- * Shown after a user updates their existing rating for a course
- */
-function EditRatingConfirmation({
-  course,
-  userRating,
-  onBackToCourse,
-}: RatingConfirmationProps) {
+function RatingConfirmationView(props: RatingConfirmationViewProps) {
+  const {
+    mode,
+    courseName,
+    userRating,
+    breakdown = [],
+    communityScore = null,
+    onBackToCourse,
+    onShareReview,
+  } = props;
+
+  const isEdit = mode === 'updated';
+  const band = getRatingBand(userRating);
+  const comparison = getComparisonCopy(userRating, communityScore);
+
+  const title = isEdit ? 'Rating updated ✔' : 'Rating submitted 🎉';
+  const subtitle = isEdit
+    ? `Your updated rating for ${courseName} has been saved.`
+    : `Your rating for ${courseName} has been saved.`;
+
+  const overallHeading = isEdit ? 'Updated overall rating' : 'Your overall rating';
+  const breakdownHeading = isEdit ? 'Updated breakdown' : 'Your breakdown';
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-start px-6 pt-20 pb-10 bg-slate-50">
-      <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100">
-        <Check className="h-10 w-10 text-emerald-600" />
-      </div>
-      
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-        <Check className="h-7 w-7 text-emerald-600" />
-      </div>
+    <div className="flex min-h-screen flex-col bg-slate-50">
+      {/* SECTION A – Success header */}
+      <section className="bg-slate-50 px-6 pt-10 pb-6 text-center">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
+          <Check className="h-7 w-7 text-emerald-600" />
+        </div>
 
-      <h1 className="mt-10 text-xl font-semibold text-slate-900">
-        Rating updated ✔
-      </h1>
-      
-      <p className="mt-2 text-sm text-slate-500 text-center max-w-md px-4">
-        Your updated rating for {course.name} has been saved.
-      </p>
+        <h1 className="text-lg font-semibold text-slate-900">{title}</h1>
+        <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
+      </section>
 
-      <div className="mt-6 w-full max-w-md rounded-2xl bg-white/80 p-4 shadow-sm backdrop-blur">
-        <div className="flex items-center gap-3">
-          <Trophy className="h-6 w-6 text-amber-500" />
-          <div className="flex flex-col">
-            <span className="text-lg font-semibold text-slate-900">
-              {userRating.rating?.toFixed(1)}/10
-            </span>
-            {userRating.review && (
-              <span className="mt-0.5 text-xs text-slate-500 line-clamp-1">
-                "{userRating.review}"
-              </span>
-            )}
+      {/* SECTION B – Overall rating card */}
+      <section className="bg-slate-100 px-6 py-6">
+        <div className="rounded-2xl bg-white px-5 py-4 shadow-sm border border-slate-200">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                {overallHeading}
+              </p>
+              <p className="mt-1 text-2xl font-semibold text-slate-900">
+                {userRating.toFixed(1)} <span className="text-base text-slate-500">/10</span>
+              </p>
+            </div>
+
+            <RatingBadge band={band} />
           </div>
         </div>
-      </div>
+      </section>
 
-      <Button
-        className="mt-8 w-full max-w-md rounded-full text-sm font-semibold bg-slate-900 text-white border border-white/10 shadow-[0_8px_20px_rgba(15,23,42,0.45)] hover:bg-slate-900/90"
-        onClick={onBackToCourse}
-      >
-        Back to course
-      </Button>
+      {/* SECTION C – Breakdown (optional) */}
+      {breakdown.length > 0 && (
+        <section className="bg-slate-50 px-6 py-6">
+          <h2 className="mb-3 text-sm font-semibold text-slate-800">{breakdownHeading}</h2>
+
+          <div className="space-y-4">
+            {breakdown.map((item) => (
+              <div key={item.label}>
+                <div className="mb-1 flex items-center justify-between text-sm">
+                  <span className="text-slate-700">{item.label}</span>
+                  <span className="font-medium text-slate-900">
+                    {item.value.toFixed(1)} <span className="text-slate-500">/10</span>
+                  </span>
+                </div>
+                <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
+                  <div
+                    className="h-2 rounded-full bg-slate-900"
+                    style={{ width: `${(item.value / 10) * 100}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* SECTION D – Comparison vs community (optional) */}
+      {comparison && (
+        <section className="bg-slate-100 px-6 py-5">
+          <div className="rounded-2xl bg-white px-4 py-3 border border-slate-200">
+            <p className="flex items-center text-sm text-slate-700">
+              <span className="mr-2 text-base font-semibold" style={{ color: comparison.color }}>
+                {comparison.icon}
+              </span>
+              {comparison.text}
+            </p>
+          </div>
+        </section>
+      )}
+
+      {/* Spacer so actions sit near the bottom */}
+      <div className="flex-1 bg-slate-50" />
+
+      {/* SECTION E – Actions row */}
+      <section className="bg-slate-50 px-6 pb-8 pt-4">
+        <div className="flex gap-3">
+          {/* Secondary – share review */}
+          <button
+            type="button"
+            onClick={onShareReview}
+            className="inline-flex flex-1 items-center justify-center rounded-lg border border-slate-600 bg-white px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 active:bg-slate-100 transition-colors"
+          >
+            Share your review
+          </button>
+
+          {/* Primary – back to course */}
+          <button
+            type="button"
+            onClick={onBackToCourse}
+            className="inline-flex flex-1 items-center justify-center rounded-lg border border-slate-600 bg-white px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 active:bg-slate-100 transition-colors"
+          >
+            Back to course
+          </button>
+        </div>
+      </section>
     </div>
   );
 }
