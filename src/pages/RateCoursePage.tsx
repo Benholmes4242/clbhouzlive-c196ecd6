@@ -47,11 +47,13 @@ const RateCoursePage = () => {
   });
 
   const handleClose = () => {
-    // Navigate back to course details, Reviews tab, with highlight flag
-    navigate(`/courses/${courseId}`, {
-      replace: true,
-      state: { activeTab: 'reviews', highlightMyReview: true },
-    });
+    // Set flag in sessionStorage to trigger highlight on next reviews tab view
+    if (courseId) {
+      sessionStorage.setItem(`highlight-review-${courseId}`, 'true');
+    }
+    // Navigate back to previous page (should be course details)
+    // Using navigate(-1) ensures we don't stack duplicate history entries
+    navigate(-1);
   };
 
   // Debug logging

@@ -24,13 +24,21 @@ export type CourseReview = {
 export type ReviewsSortBy = 'recent' | 'highest' | 'lowest' | 'helpful';
 export type ReviewsRatingFilter = 'all' | '10-9' | '8-7' | '6-5' | '<5';
 
+export interface ReviewsFilters {
+  hasMedia?: boolean;
+  hasText?: boolean;
+}
+
 export function useCourseReviews(
   courseId: string | undefined,
-  sortBy: ReviewsSortBy,
-  ratingFilter: ReviewsRatingFilter
+  sortBy: ReviewsSortBy = 'recent',
+  ratingFilter: ReviewsRatingFilter = 'all',
+  filters?: ReviewsFilters
 ) {
+  const filtersKey = filters ? JSON.stringify(filters) : 'none';
+
   return useQuery({
-    queryKey: ['course-reviews-full', courseId, sortBy, ratingFilter],
+    queryKey: ['course-reviews-full', courseId, sortBy, ratingFilter, filtersKey],
     enabled: Boolean(courseId),
     queryFn: async (): Promise<CourseReview[]> => {
       if (!courseId) return [];
@@ -78,6 +86,14 @@ export function useCourseReviews(
         default:
           break;
       }
+
+      // Additional filters
+      if (filters?.hasText) {
+        query = query.not('review', 'is', null).not('review', 'eq', '');
+      }
+      
+      // Note: hasMedia filter would require joining course_review_media table
+      // For now, we'll filter client-side if needed
 
       // Sorting
       switch (sortBy) {
