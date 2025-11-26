@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -6,8 +6,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
 import { Star, Check, Trophy, Trash2, Upload, ArrowLeft, ArrowUp, ArrowDown, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 import ReviewMediaUpload from './ReviewMediaUpload';
 import { formatCourseLocation } from '@/utils/courseLocation';
+import { useNavigationGuard } from '@/hooks/useNavigationGuard';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 interface Course {
   id: string;
@@ -47,6 +50,15 @@ const PostPlayRatingModal = ({
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const [review, setReview] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Navigation guard while submitting
+  useNavigationGuard({
+    active: isSubmitting,
+    message: "Your rating is still being submitted.",
+  });
+  
+  // Store last payload for retry
+  const lastPayloadRef = useRef<any>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<File[]>([]);
   const [mediaPreviews, setMediaPreviews] = useState<Map<File, string>>(new Map());
@@ -110,6 +122,18 @@ const PostPlayRatingModal = ({
       setFacilitiesTouched(existingRating.facilities_score != null);
     }
   }, [existingRating, isEditMode]);
+
+  // Track modal open for analytics
+  useEffect(() => {
+    if (!isOpen || !course) return;
+    
+    analyticsEvents.ratings.modalOpened({
+      courseId: course.id,
+      courseName: course.name,
+      isEditMode,
+      deviceType: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop",
+    });
+  }, [isOpen, course, isEditMode]);
 
   const markAsPlayedMutation = useMutation({
     mutationFn: async () => {
@@ -287,6 +311,20 @@ const PostPlayRatingModal = ({
       const { data: userResponse } = await supabase.auth.getUser();
       const userId = userResponse?.user?.id;
 
+      const isNewReview = !isEditMode;
+
+      // Track submission success
+      analyticsEvents.ratings.submitted({
+        courseId: course?.id || '',
+        courseName: course?.name || '',
+        isNewReview,
+        overallRating: selectedRating || 0,
+        design: designScore || undefined,
+        condition: conditionScore || undefined,
+        clubhouse: clubhouseScore || undefined,
+        facilities: facilitiesScore || undefined,
+      });
+
       // Mark as played after successful rating (only if not in edit mode)
       // Don't let achievements failures block the rating success
       if (!isEditMode) {
@@ -336,6 +374,16 @@ const PostPlayRatingModal = ({
         hint: error?.hint
       });
       
+      const isNewReview = !isEditMode;
+
+      // Track submission failure
+      analyticsEvents.ratings.submissionFailed({
+        courseId: course?.id || '',
+        courseName: course?.name || '',
+        isNewReview,
+        errorMessage: error?.message,
+      });
+      
       let errorMessage = "Failed to submit rating. Please try again.";
       
       if (error?.code === '23514') {
@@ -346,6 +394,11 @@ const PostPlayRatingModal = ({
         title: "Error Submitting Rating",
         description: errorMessage,
         variant: "destructive",
+        action: lastPayloadRef.current ? (
+          <ToastAction altText="Retry submission" onClick={retryLastSubmit}>
+            Retry
+          </ToastAction>
+        ) : undefined,
       });
       setIsSubmitting(false);
       setButtonText('Add to Played');
@@ -599,7 +652,17 @@ const PostPlayRatingModal = ({
       facilities: typeof payload.facilities
     });
     
+    // Store payload for retry
+    lastPayloadRef.current = payload;
     submitRatingMutation.mutate(payload);
+  };
+
+  // Retry last submission
+  const retryLastSubmit = () => {
+    if (!lastPayloadRef.current) return;
+    setIsSubmitting(true);
+    setButtonText(isEditMode ? "Updating..." : "Adding...");
+    submitRatingMutation.mutate(lastPayloadRef.current);
   };
 
   const handleMediaSelected = async (files: File[]) => {
@@ -770,7 +833,15 @@ const PostPlayRatingModal = ({
               <div className="mt-3">
                 <Slider
                   value={[selectedRating || 5]}
-                  onValueChange={(values) => setSelectedRating(values[0])}
+                  onValueChange={(values) => {
+                    setSelectedRating(values[0]);
+                    analyticsEvents.ratings.sliderChanged({
+                      courseId: course.id,
+                      courseName: course.name,
+                      category: "overall",
+                      value: values[0],
+                    });
+                  }}
                   min={0.5}
                   max={10}
                   step={0.1}
@@ -999,6 +1070,7 @@ const PostPlayRatingModal = ({
             <RatingConfirmationView
               mode={isEditFlow ? 'updated' : 'submitted'}
               courseName={course!.name}
+              courseId={course!.id}
               userRating={selectedRating || 0}
               breakdown={
                 [
@@ -1124,6 +1196,7 @@ type BreakdownItem = { label: string; value: number };
 type RatingConfirmationViewProps = {
   mode: 'submitted' | 'updated';
   courseName: string;
+  courseId: string;
   userRating: number;
   breakdown?: BreakdownItem[];
   communityScore?: number | null;
@@ -1153,6 +1226,7 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
   const {
     mode,
     courseName,
+    courseId,
     userRating,
     breakdown = [],
     communityScore = null,
@@ -1161,8 +1235,29 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
   } = props;
 
   const isEdit = mode === 'updated';
+  const isNewReview = !isEdit;
   const band = getRatingBand(userRating);
   const comparison = getComparisonCopy(userRating, communityScore);
+
+  // Track confirmation view
+  useEffect(() => {
+    analyticsEvents.ratings.confirmationViewed({
+      courseId,
+      courseName,
+      isNewReview,
+      overallRating: userRating,
+    });
+  }, [courseId, courseName, isNewReview, userRating]);
+
+  // Handle back to course with analytics
+  const handleBackToCourse = () => {
+    analyticsEvents.ratings.flowCompleted({
+      courseId,
+      courseName,
+      isNewReview,
+    });
+    onBackToCourse();
+  };
 
   const title = isEdit ? 'Rating updated' : 'Rating submitted';
   const subtitle = isEdit
@@ -1294,7 +1389,7 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
           {/* Primary – back to course */}
           <button
             type="button"
-            onClick={onBackToCourse}
+            onClick={handleBackToCourse}
             className="inline-flex flex-1 items-center justify-center rounded-lg border border-slate-600 bg-white px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 active:bg-slate-100 transition-colors"
           >
             Back to course

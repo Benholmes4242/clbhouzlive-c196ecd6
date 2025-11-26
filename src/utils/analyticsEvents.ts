@@ -1,5 +1,6 @@
 // Analytics event tracking utility
-// Can be integrated with Google Analytics, Mixpanel, etc.
+// Integrated with PostHog via telemetry wrapper
+import { track as posthogTrack } from "@/lib/telemetry";
 
 type EventParams = Record<string, any>;
 
@@ -8,9 +9,8 @@ export const analyticsEvents = {
     // Console log for development
     console.log(`[Analytics] ${eventName}`, params);
     
-    // TODO: Integrate with your analytics provider
-    // Example: window.gtag?.('event', eventName, params);
-    // Example: window.mixpanel?.track(eventName, params);
+    // Send to PostHog
+    posthogTrack(eventName, params || {});
   },
 
   // Shorts squircle specific events
@@ -225,4 +225,58 @@ export const analyticsEvents = {
   hub_echo_history_open: (mode: 'chat' | 'swing') => ({ event: 'hub_echo_history_open', category: 'hub', label: mode }),
   hub_echo_chat_send: { event: 'hub_echo_chat_send', category: 'hub' },
   hub_echo_swing_view: (id: string) => ({ event: 'hub_echo_swing_view', category: 'hub', label: id }),
+
+  // Course ratings namespace
+  ratings: {
+    modalOpened: (params: {
+      courseId: string;
+      courseName: string;
+      isEditMode: boolean;
+      deviceType?: string;
+    }) =>
+      analyticsEvents.track("rating_modal_opened", params),
+
+    sliderChanged: (params: {
+      courseId: string;
+      courseName: string;
+      category: "overall" | "design" | "condition" | "clubhouse" | "facilities";
+      value: number;
+    }) =>
+      analyticsEvents.track("rating_slider_changed", params),
+
+    submitted: (params: {
+      courseId: string;
+      courseName: string;
+      isNewReview: boolean;
+      overallRating: number;
+      design?: number;
+      condition?: number;
+      clubhouse?: number;
+      facilities?: number;
+    }) =>
+      analyticsEvents.track("rating_submitted", params),
+
+    submissionFailed: (params: {
+      courseId: string;
+      courseName: string;
+      isNewReview: boolean;
+      errorMessage?: string;
+    }) =>
+      analyticsEvents.track("rating_submission_failed", params),
+
+    confirmationViewed: (params: {
+      courseId: string;
+      courseName: string;
+      isNewReview: boolean;
+      overallRating: number;
+    }) =>
+      analyticsEvents.track("rating_confirmation_viewed", params),
+
+    flowCompleted: (params: {
+      courseId: string;
+      courseName: string;
+      isNewReview: boolean;
+    }) =>
+      analyticsEvents.track("rating_flow_completed", params),
+  },
 };
