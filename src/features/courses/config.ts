@@ -3,12 +3,15 @@
  * 
  * Controls visibility of seed/mock reviews in Course Details pages.
  * 
- * Set to true:  Show all reviews from the database (current seed/mock data)
- * Set to false: Hide all reviews, treat as empty state (preparing for real reviews only)
+ * Set to true:  Show ALL reviews (real + mock)
+ * Set to false: Show ONLY real user reviews (is_mock = false)
  * 
- * Usage:
- * 1. To test with mock reviews during development: export const SHOW_MOCK_REVIEWS = true;
- * 2. To prepare for production with real reviews only: export const SHOW_MOCK_REVIEWS = false;
+ * HOW IT WORKS:
+ * - All reviews have an `is_mock` field in the database
+ * - Seed/test reviews have `is_mock = true`
+ * - Real user-submitted reviews have `is_mock = false`
+ * - When SHOW_MOCK_REVIEWS = false, queries filter to only show is_mock = false
+ * - When SHOW_MOCK_REVIEWS = true, all reviews are shown regardless of is_mock value
  * 
  * This flag affects:
  * - Community Score card (rating counts and averages)
