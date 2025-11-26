@@ -116,12 +116,12 @@ export const ReviewsHeaderCard: React.FC<ReviewsHeaderCardProps> = ({
           <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
             Community score
           </p>
-          <div className="mt-1 flex items-baseline gap-1">
-            <ClubhouseLogo size="sm" />
+          <div className="mt-1 flex items-center gap-1">
+            <ClubhouseLogo size="md" />
             <span className="text-2xl font-semibold text-slate-900">
               {communityScore.toFixed(1)}
             </span>
-            <span className="text-sm text-slate-500">/10</span>
+            <span className="text-sm font-medium text-slate-500">/10</span>
           </div>
           <p className="mt-1 text-xs text-slate-500">
             Based on {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
