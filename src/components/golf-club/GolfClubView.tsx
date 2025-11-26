@@ -71,16 +71,17 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
     queryFn: async () => {
       if (!courseId) return null;
 
-      // If mock reviews are disabled, return zeros
-      if (!SHOW_MOCK_REVIEWS) {
-        return { average_rating: 0, total_ratings: 0, total_reviews: 0 };
-      }
-
-      const { data, error } = await supabase
+      let query = supabase
         .from('course_ratings')
-        .select('rating, review')
+        .select('rating, review, is_mock')
         .eq('course_id', courseId);
 
+      // When mock reviews are disabled, only include real reviews
+      if (!SHOW_MOCK_REVIEWS) {
+        query = query.eq('is_mock', false);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
 
       if (!data || data.length === 0) {

@@ -881,6 +881,7 @@ export type Database = {
           facilities_score: number | null
           helpful_count: number | null
           id: string
+          is_mock: boolean
           rating: number
           review: string | null
           review_date: string | null
@@ -897,6 +898,7 @@ export type Database = {
           facilities_score?: number | null
           helpful_count?: number | null
           id?: string
+          is_mock?: boolean
           rating: number
           review?: string | null
           review_date?: string | null
@@ -913,6 +915,7 @@ export type Database = {
           facilities_score?: number | null
           helpful_count?: number | null
           id?: string
+          is_mock?: boolean
           rating?: number
           review?: string | null
           review_date?: string | null
