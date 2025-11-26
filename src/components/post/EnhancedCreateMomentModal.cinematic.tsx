@@ -164,8 +164,6 @@ export default function EnhancedCreateMomentModalCinematic({
       document.body.classList.remove('ecm-open');
     };
   }, [isOpen]);
-  
-  console.log('🔍 EnhancedCreateMomentModal state:', { isOpen, hasDataImmersive: document.documentElement.hasAttribute('data-immersive') });
 
   // Media carousel state - use mediaItems as single source of truth
   const media = useMemo(() => {

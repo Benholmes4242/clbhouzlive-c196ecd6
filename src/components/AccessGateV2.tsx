@@ -178,7 +178,6 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
         return;
       }
       
-      console.log('[AccessGate] Session updated by other tab');
       scheduleRenew(sess.expiresAt, checkOrRefresh);
       // Don't refetch immediately; let renew timer manage cadence
     };
