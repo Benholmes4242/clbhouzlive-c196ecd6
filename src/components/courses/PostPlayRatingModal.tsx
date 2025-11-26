@@ -361,11 +361,6 @@ const PostPlayRatingModal = ({
         setIsSubmitting(false);
         setButtonText('Add to Played');
       }, 1500);
-      
-      toast({
-        title: isEditMode ? "Rating Updated! ✨" : "Rating Submitted! ✨",
-        description: `You ${isEditMode ? 'updated' : 'rated'} ${course?.name} ${selectedRating}/10`,
-      });
     },
     onError: (error: any) => {
       console.error('[Rating Submission] Error:', error);
