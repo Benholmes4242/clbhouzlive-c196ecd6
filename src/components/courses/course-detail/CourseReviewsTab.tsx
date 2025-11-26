@@ -4,7 +4,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { ReviewCard } from '../review/ReviewCard';
 import { ReviewsHeaderCard } from '../review/ReviewsHeaderCard';
@@ -53,9 +52,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   // Fetch rating aggregates (same query as About tab)
   const { data: ratingAggregates } = useCourseRatingAggregates(courseId);
-
-  // Fetch user's rating
-  const { data: userRating } = useUserCourseRating(courseId, user?.id);
 
   console.log('[Rating Stats Query] key:', ['course-rating-aggregates', courseId]);
   console.log('[Rating Stats Query] result:', ratingAggregates);
@@ -312,8 +308,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         <ReviewsHeaderCard
           communityScore={communityScore}
           reviewCount={reviewCount}
-          userScore={userRating?.rating}
-          userHasRating={!!userRating}
+          userScore={myReview?.rating}
+          userHasRating={!!myReview}
           onRateCourse={handleRateClick}
         />
       </section>
