@@ -353,17 +353,15 @@ const PostPlayRatingModal = ({
       
       console.log('[Reviews Refresh] onSuccess for course', course?.id);
       
+      // Invalidate and refetch reviews list with correct prefix matching
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
       await queryClient.refetchQueries({ 
-        queryKey: ['course-reviews-full', course?.id],
+        queryKey: ['course-reviews-full'],
         type: 'active',
         exact: false
       });
       
-      console.log('[Reviews Refresh] refetchQueries called for key', [
-        'course-reviews-full',
-        course?.id,
-      ]);
+      console.log('[Reviews Refresh] refetchQueries called for base key "course-reviews-full"');
       
       queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
       queryClient.invalidateQueries({ queryKey: ['user-played-course', course?.id] });
@@ -481,9 +479,10 @@ const PostPlayRatingModal = ({
       
       console.log('[Reviews Refresh] onSuccess (DELETE) for course', course?.id);
       
+      // Invalidate and refetch reviews list with correct prefix matching
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
       await queryClient.refetchQueries({ 
-        queryKey: ['course-reviews-full', course?.id],
+        queryKey: ['course-reviews-full'],
         type: 'active',
         exact: false
       });

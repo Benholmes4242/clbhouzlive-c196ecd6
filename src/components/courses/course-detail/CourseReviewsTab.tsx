@@ -5,6 +5,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
+import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { ReviewCard } from '../review/ReviewCard';
 import { ReviewsHeaderCard } from '../review/ReviewsHeaderCard';
 import { Button } from '@/components/ui/button';
@@ -13,11 +14,6 @@ import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
 interface CourseReviewsTabProps {
   courseId: string;
   courseName: string;
-  ratingStats?: {
-    average_rating: number;
-    total_ratings: number;
-    total_reviews: number;
-  } | null;
 }
 
 interface ReviewData {
@@ -48,7 +44,6 @@ const getInitials = (name: string) => {
 const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   courseId,
   courseName,
-  ratingStats,
 }) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
@@ -56,8 +51,14 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Fetch rating aggregates (same query as About tab)
+  const { data: ratingAggregates } = useCourseRatingAggregates(courseId);
+
   // Fetch user's rating
   const { data: userRating } = useUserCourseRating(courseId, user?.id);
+
+  console.log('[Rating Stats Query] key:', ['course-rating-aggregates', courseId]);
+  console.log('[Rating Stats Query] result:', ratingAggregates);
 
   // Check if we should highlight the user's review (from confirmation flow)
   const [isJustSubmittedOrUpdated, setIsJustSubmittedOrUpdated] = useState(
@@ -218,11 +219,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     length: reviews.length,
     hasMyReview: !!myReview,
     otherCount: otherReviews.length,
-    ratingStats,
+    ratingAggregates,
   });
 
-  const communityScore = ratingStats?.average_rating || 0;
-  const reviewCount = ratingStats?.total_reviews || 0;
+  const communityScore = ratingAggregates?.avg_overall_score || 0;
+  const reviewCount = ratingAggregates?.text_review_count || 0;
   const hasReviews = reviews.length > 0;
 
   // Transform reviews into ReviewCard format
