@@ -1,25 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { clsx } from 'clsx';
-import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import SquircleImage from '@/components/ui/SquircleImage';
-
-// Get rating variant from score
-export const getRatingVariant = (score: number): 'fair' | 'good' | 'veryGood' | 'excellent' | 'outstanding' => {
-  if (score >= 9.0) return 'outstanding';
-  if (score >= 8.0) return 'excellent';
-  if (score >= 7.0) return 'veryGood';
-  if (score >= 6.0) return 'good';
-  return 'fair';
-};
-
-// Badge color mapping - using hex codes
-const RATING_CHIP_COLORS = {
-  fair: { bg: '#f1f5f9', text: '#64748b', border: '#e2e8f0' },        // slate-50/slate-500/slate-200
-  good: { bg: '#eff6ff', text: '#3b82f6', border: '#dbeafe' },        // blue-50/blue-500/blue-100
-  veryGood: { bg: '#d1fae5', text: '#10b981', border: '#a7f3d0' },    // emerald-100/emerald-500/emerald-200
-  excellent: { bg: '#dcfce7', text: '#22c55e', border: '#bbf7d0' },   // green-100/green-500/green-200
-  outstanding: { bg: '#fef3c7', text: '#f59e0b', border: '#fde68a' }, // amber-100/amber-500/amber-200
-};
+import { ScorePill } from '../common/ScorePill';
+import { ThumbButton } from '@/components/common/ThumbButton';
+import { ExpandableText } from '@/components/common/ExpandableText';
 
 interface Review {
   id: string;
@@ -58,79 +42,6 @@ const formatDate = (dateString: string) => {
   return `${Math.floor(diffInDays / 365)} years ago`;
 };
 
-const RatingChip: React.FC<{ score: number }> = ({ score }) => {
-  const variant = getRatingVariant(score);
-  const colors = RATING_CHIP_COLORS[variant];
-
-  return (
-    <span
-      className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold"
-      style={{
-        backgroundColor: colors.bg,
-        borderColor: colors.border,
-        color: colors.text,
-      }}
-    >
-      {score.toFixed(1)} /10
-    </span>
-  );
-};
-
-const ReviewText: React.FC<{ text: string }> = ({ text }) => {
-  const [expanded, setExpanded] = useState(false);
-  const shouldTruncate = text.length > 260;
-
-  return (
-    <div className="mt-3 text-sm text-slate-800">
-      <p className={clsx(!expanded && shouldTruncate && 'line-clamp-4')}>
-        {text}
-      </p>
-
-      {shouldTruncate && (
-        <button
-          type="button"
-          className="mt-1 text-xs font-medium text-slate-700 underline-offset-2 hover:underline"
-          onClick={() => setExpanded((v) => !v)}
-        >
-          {expanded ? 'Read less' : 'Read more'}
-        </button>
-      )}
-    </div>
-  );
-};
-
-interface HelpfulButtonProps {
-  kind: 'helpful' | 'unhelpful';
-  isActive?: boolean;
-  count: number;
-  onClick: () => void;
-}
-
-const HelpfulButton: React.FC<HelpfulButtonProps> = ({ kind, isActive, count, onClick }) => {
-  const isHelpful = kind === 'helpful';
-
-  const base =
-    'inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium transition';
-
-  const activeClasses = isHelpful
-    ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-    : 'border-rose-200 bg-rose-50 text-rose-700';
-
-  const inactiveClasses = 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50';
-
-  return (
-    <button
-      type="button"
-      className={clsx(base, isActive ? activeClasses : inactiveClasses)}
-      onClick={onClick}
-    >
-      <span>{isHelpful ? '👍' : '👎'}</span>
-      <span>{isHelpful ? 'Helpful' : 'Unhelpful'}</span>
-      <span>({count})</span>
-    </button>
-  );
-};
-
 export const ReviewCard: React.FC<ReviewCardProps> = ({
   review,
   isMine,
@@ -143,13 +54,13 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
   return (
     <article
       className={clsx(
-        'rounded-2xl border border-slate-200 bg-white px-4 py-3',
-        'shadow-sm',
+        'rounded-2xl border border-slate-200 bg-white px-4 py-3 mb-3',
+        'shadow-sm transition-all duration-100 active:scale-[0.98] hover:shadow-md',
         isHighlighted && 'animate-soft-pulse'
       )}
     >
       {/* Header row */}
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-3 mb-2">
         <div className="flex items-center gap-3">
           {user.avatarUrl ? (
             <SquircleImage
@@ -178,25 +89,29 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
         </div>
 
         {/* Numeric rating chip */}
-        <RatingChip score={score} />
+        <ScorePill score={score} size="sm" />
       </div>
 
-      {/* Body - only show if text exists */}
-      {text && text.trim().length > 0 && <ReviewText text={text} />}
+      {/* Body - expandable text */}
+      {text && text.trim().length > 0 && (
+        <div className="mt-1">
+          <ExpandableText text={text} lines={4} />
+        </div>
+      )}
 
       {/* Footer actions */}
       <div className="mt-3 flex items-center justify-end gap-2">
-        <HelpfulButton
-          kind="helpful"
-          isActive={isHelpful}
+        <ThumbButton
+          type="up"
+          active={isHelpful || false}
           count={helpfulCount}
           onClick={() =>
             onToggleHelpful?.(review.id, isHelpful ? 'clear' : 'helpful')
           }
         />
-        <HelpfulButton
-          kind="unhelpful"
-          isActive={isUnhelpful}
+        <ThumbButton
+          type="down"
+          active={isUnhelpful || false}
           count={unhelpfulCount}
           onClick={() =>
             onToggleHelpful?.(review.id, isUnhelpful ? 'clear' : 'unhelpful')

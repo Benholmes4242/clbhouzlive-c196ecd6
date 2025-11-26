@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { ReviewCard } from '../review/ReviewCard';
 import { ReviewsHeaderCard } from '../review/ReviewsHeaderCard';
+import { SortFilterBar, SortOption } from '../review/SortFilterBar';
 import { Button } from '@/components/ui/button';
 import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
 
@@ -50,13 +51,25 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Sorting and filtering state
+  const [sortBy, setSortBy] = useState<SortOption>('recent');
+
   // Fetch rating aggregates (same query as About tab)
   const { data: ratingAggregates } = useCourseRatingAggregates(courseId);
 
   // Check if we should highlight the user's review (from confirmation flow)
-  const [isJustSubmittedOrUpdated, setIsJustSubmittedOrUpdated] = useState(
-    Boolean(location.state?.highlightMyReview)
-  );
+  // Support both location state and sessionStorage flag
+  const [isJustSubmittedOrUpdated, setIsJustSubmittedOrUpdated] = useState(() => {
+    const fromLocationState = Boolean(location.state?.highlightMyReview);
+    const fromSessionStorage = sessionStorage.getItem(`highlight-review-${courseId}`) === 'true';
+    
+    // Clear the sessionStorage flag if it was set
+    if (fromSessionStorage) {
+      sessionStorage.removeItem(`highlight-review-${courseId}`);
+    }
+    
+    return fromLocationState || fromSessionStorage;
+  });
 
   useEffect(() => {
     if (!isJustSubmittedOrUpdated) return;
@@ -70,7 +83,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   // Fetch all reviews with user profiles
   const { data: reviewsData, isLoading } = useQuery({
-    queryKey: ['course-reviews-full', courseId, SHOW_MOCK_REVIEWS],
+    queryKey: ['course-reviews-full', courseId, SHOW_MOCK_REVIEWS, sortBy],
     queryFn: async () => {
       if (!courseId) return [];
 
@@ -95,12 +108,29 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           )
         `
         )
-        .eq('course_id', courseId)
-        .order('review_date', { ascending: false });
+        .eq('course_id', courseId);
 
       // When mock reviews are disabled, only show real reviews
       if (!SHOW_MOCK_REVIEWS) {
         query = query.eq('is_mock', false);
+      }
+
+      // Apply sorting
+      switch (sortBy) {
+        case 'highest':
+          query = query.order('rating', { ascending: false }).order('review_date', {
+            ascending: false,
+          });
+          break;
+        case 'helpful':
+          query = query
+            .order('helpful_count', { ascending: false, nullsFirst: false })
+            .order('review_date', { ascending: false });
+          break;
+        case 'recent':
+        default:
+          query = query.order('review_date', { ascending: false });
+          break;
       }
 
       const { data, error } = await query;
@@ -295,7 +325,13 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         />
       </section>
 
-      {/* Section 2 – Your review + other reviews */}
+      {/* Section 2 – Sort/Filter Bar */}
+      <SortFilterBar
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+      />
+
+      {/* Section 3 – Your review + other reviews */}
       <section className="px-4 pt-3 pb-4 bg-slate-100">
         {myReview && (
           <div className="mb-3">
@@ -312,7 +348,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         )}
 
         {otherReviews.length > 0 && (
-          <div className="space-y-3">
+          <div>
             {otherReviews.map((review) => (
               <ReviewCard
                 key={review.id}
@@ -324,7 +360,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         )}
       </section>
 
-      {/* Section 3 – End message (only show if there are reviews) */}
+      {/* Section 4 – End message (only show if there are reviews) */}
       {reviews.length > 0 && (
         <section className="px-4 pt-4 pb-4 bg-slate-50">
           <p className="text-center text-xs text-slate-500">
