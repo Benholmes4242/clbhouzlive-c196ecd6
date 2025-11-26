@@ -68,15 +68,10 @@ export const SocialDock: React.FC<SocialDockProps> = ({
   return (
     <div
       className={cn(
-        'fixed left-0 right-0 z-[80]',
-        'px-4 pb-[env(safe-area-inset-bottom,12px)]',
+        'fixed left-0 right-0 bottom-0 z-[80]',
+        'px-4 pb-[calc(env(safe-area-inset-bottom,0px)+12px)]',
         'pointer-events-none',
-        'transition-all duration-[220ms] ease-[cubic-bezier(0.19,1,0.22,1)]',
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
       )}
-      style={{
-        bottom: 0,
-      }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -84,8 +79,11 @@ export const SocialDock: React.FC<SocialDockProps> = ({
         className={cn(
           'mx-auto max-w-xl',
           'rounded-t-2xl bg-black/70 backdrop-blur-2xl',
+          'shadow-[0_18px_40px_rgba(0,0,0,0.5)]',
           'px-4 pt-3 pb-3',
-          'pointer-events-auto'
+          'transition-all duration-[220ms] ease-[cubic-bezier(0.19,1,0.22,1)]',
+          'pointer-events-auto',
+          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         )}
         style={{
           borderTop: '1px solid rgba(255, 255, 255, 0.08)',
@@ -136,7 +134,7 @@ export const SocialDock: React.FC<SocialDockProps> = ({
             className={cn(
               'inline-flex items-center gap-2',
               'px-3 py-[6px] rounded-full',
-              'bg-white/8 hover:bg-white/14',
+              'bg-white/10 hover:bg-white/16',
               'text-[11px] font-medium tracking-wide uppercase text-white/90',
               'transition-all duration-150',
               'active:scale-[0.97]'
@@ -153,16 +151,18 @@ export const SocialDock: React.FC<SocialDockProps> = ({
           <button
             type="button"
             onClick={onProfileClick}
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            className="flex items-center gap-2 min-w-0 hover:opacity-80 transition-opacity"
           >
             <img
               src={post.user.avatar || '/placeholder.svg'}
               alt={post.user.name}
-              className="w-8 h-8 rounded-full object-cover"
+              className="h-8 w-8 rounded-full object-cover shrink-0"
             />
-            <span className="text-sm font-semibold leading-tight text-white">
-              {post.user.name}
-            </span>
+            <div className="min-w-0">
+              <div className="truncate text-sm font-semibold leading-tight text-white">
+                {post.user.name}
+              </div>
+            </div>
           </button>
         </div>
 
@@ -170,7 +170,7 @@ export const SocialDock: React.FC<SocialDockProps> = ({
           <button
             type="button"
             onClick={onProfileClick}
-            className="flex-1 text-[13px] text-white/90 text-left truncate hover:opacity-80 transition-opacity"
+            className="flex-1 truncate text-[13px] leading-snug text-white/90 text-left hover:opacity-80 transition-opacity"
           >
             {shortCaption}
           </button>
@@ -179,7 +179,7 @@ export const SocialDock: React.FC<SocialDockProps> = ({
             <button
               type="button"
               onClick={onCourseClick}
-              className="ml-2 shrink-0 rounded-full bg-white/10 px-3 py-[4px] text-[11px] text-white/90 truncate max-w-[40%] hover:bg-white/15 transition-colors"
+              className="ml-2 shrink-0 max-w-[40%] px-3 py-[4px] rounded-full bg-white/10 text-[11px] leading-none text-white/90 truncate text-right hover:bg-white/15 transition-colors"
             >
               {post.courseName}
             </button>
@@ -229,16 +229,15 @@ const ActionButton = ({
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       className={cn(
-        'relative flex items-center justify-center w-11 h-11 rounded-full transition-all duration-200',
-        'hover:bg-white/10 active:scale-95',
-        active ? 'opacity-100' : 'opacity-90'
+        'flex flex-col items-center gap-1',
+        'w-10 h-10 flex items-center justify-center rounded-full',
+        'transition-transform duration-150 active:scale-95',
+        active ? 'text-white scale-105' : 'text-white/85'
       )}
     >
-      <Icon className={cn('w-5 h-5', active ? 'text-red-500 fill-red-500' : 'text-white')} />
-      {!hideCount && showCount && count !== undefined && (
-        <div className="absolute -top-1 -right-1 px-1.5 py-0.5 bg-red-500 text-white text-[10px] font-semibold rounded-full">
-          {count}
-        </div>
+      <Icon className={cn('w-6 h-6', active ? 'fill-current' : '')} />
+      {!hideCount && showCount && count !== undefined && count > 0 && (
+        <span className="text-[11px] leading-none text-white/70">{count}</span>
       )}
     </button>
   );
