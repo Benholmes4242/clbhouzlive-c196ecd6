@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
+import { getScoreTier } from '@/utils/getScoreTier';
 
 interface CommunityScoreCardProps {
   courseId: string;
@@ -17,39 +18,11 @@ const formatScore = (score: number) => {
   return score % 1 === 0 ? score.toString() : score.toFixed(1);
 };
 
-// Get quality label and variant from score
-const getCommunityRatingLabel = (score: number | null | undefined): { label: string; variant: 'fair' | 'good' | 'veryGood' | 'excellent' | 'outstanding' } | null => {
-  if (score == null) return null;
-  if (score >= 9.0) return { label: 'Outstanding', variant: 'outstanding' };
-  if (score >= 8.0) return { label: 'Excellent', variant: 'excellent' };
-  if (score >= 7.0) return { label: 'Very good', variant: 'veryGood' };
-  if (score >= 6.0) return { label: 'Good', variant: 'good' };
-  // Anything below 6.0 is "Fair"
-  return { label: 'Fair', variant: 'fair' };
-};
-
-
-// Badge color mapping
-const BADGE_COLORS = {
-  fair:        '#94A3B8', // neutral grey (0.0–5.9)
-  good:        '#64748B', // soft desaturated blue (6.0–6.9)
-  veryGood:    '#6EE7B7', // mid green (7.0–7.9)
-  excellent:   '#22C55E', // bright green (8.0–8.9)
-  outstanding: '#F4C15D'  // gold (9.0–10.0)
-};
-
-// Community rating badge component with color variants
-const CommunityRatingBadge: React.FC<{ label: string; variant: 'fair' | 'good' | 'veryGood' | 'excellent' | 'outstanding' }> = ({ label, variant }) => {
-  const color = BADGE_COLORS[variant];
-  
+// Community rating badge component using unified tier system
+const CommunityRatingBadge: React.FC<{ label: string; bg: string; border: string; text: string }> = ({ label, bg, border, text }) => {
   return (
     <span 
-      className="inline-flex items-center justify-center rounded-full px-3 py-1 border text-xs font-semibold uppercase"
-      style={{ 
-        backgroundColor: `${color}15`, // 15% opacity for background
-        borderColor: `${color}40`, // 40% opacity for border
-        color: color
-      }}
+      className={`inline-flex items-center justify-center rounded-full px-3 py-1 border text-xs font-semibold uppercase ${bg} ${border} ${text}`}
     >
       {label}
     </span>
@@ -161,7 +134,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
     },
   ].filter((cat) => cat.score !== null && cat.score !== undefined);
 
-  const qualityData = getCommunityRatingLabel(communityAverage);
+  const tierData = getScoreTier(communityAverage);
 
   return (
     <div className="mt-6 rounded-3xl bg-white shadow-sm px-5 py-6">
@@ -196,7 +169,12 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
           </div>
 
           {/* Quality chip centered under score */}
-          {qualityData && <CommunityRatingBadge label={qualityData.label} variant={qualityData.variant} />}
+          <CommunityRatingBadge 
+            label={tierData.label} 
+            bg={tierData.bg} 
+            border={tierData.border} 
+            text={tierData.text} 
+          />
         </div>
       </div>
 
