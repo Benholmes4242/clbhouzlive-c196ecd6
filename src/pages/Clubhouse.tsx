@@ -18,6 +18,7 @@ import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useToast } from '@/hooks/use-toast';
 import CommentsModal from '@/components/posts/CommentsModal';
 import { NewSeasonBanner } from '@/components/feed/NewSeasonBanner';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
@@ -29,6 +30,7 @@ const Clubhouse = () => {
   
   const location = useLocation();
   const clubhouseRootRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
   
   // Clubhouse: explore feed with short videos only (<120s)
   const {
@@ -203,11 +205,17 @@ const Clubhouse = () => {
     },
     onError: (error) => {
       console.error('Like/unlike error:', error);
+      toast({
+        title: "Error",
+        description: "We couldn't update your like. Please try again.",
+        variant: "destructive",
+      });
     }
   });
 
   const handleLike = (postId: string) => {
     if (!user?.id) return;
+    if (likeMutation.isPending) return; // Prevent duplicate submissions
     
     const isLiked = likedPosts?.includes(postId);
     likeMutation.mutate({
