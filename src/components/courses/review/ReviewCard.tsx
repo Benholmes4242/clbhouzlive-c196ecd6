@@ -19,6 +19,7 @@ interface Review {
   unhelpfulCount: number;
   isHelpful?: boolean;
   isUnhelpful?: boolean;
+  isMock?: boolean;
 }
 
 interface ReviewCardProps {
@@ -26,6 +27,7 @@ interface ReviewCardProps {
   isMine?: boolean;
   isHighlighted?: boolean;
   onToggleHelpful?: (id: string, value: 'helpful' | 'unhelpful' | 'clear') => void;
+  disabled?: boolean;
 }
 
 const formatDate = (dateString: string) => {
@@ -47,9 +49,13 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
   isMine,
   isHighlighted,
   onToggleHelpful,
+  disabled,
 }) => {
-  const { user, score, text, createdAt, isHelpful, isUnhelpful, helpfulCount, unhelpfulCount } =
+  const { user, score, text, createdAt, isHelpful, isUnhelpful, helpfulCount, unhelpfulCount, isMock } =
     review;
+
+  // Disable voting on mock reviews or when explicitly disabled
+  const votingDisabled = disabled || isMock || false;
 
   return (
     <article
@@ -106,16 +112,18 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
           active={isHelpful || false}
           count={helpfulCount}
           onClick={() =>
-            onToggleHelpful?.(review.id, isHelpful ? 'clear' : 'helpful')
+            !votingDisabled && onToggleHelpful?.(review.id, isHelpful ? 'clear' : 'helpful')
           }
+          disabled={votingDisabled}
         />
         <ThumbButton
           type="down"
           active={isUnhelpful || false}
           count={unhelpfulCount}
           onClick={() =>
-            onToggleHelpful?.(review.id, isUnhelpful ? 'clear' : 'unhelpful')
+            !votingDisabled && onToggleHelpful?.(review.id, isUnhelpful ? 'clear' : 'unhelpful')
           }
+          disabled={votingDisabled}
         />
       </div>
     </article>

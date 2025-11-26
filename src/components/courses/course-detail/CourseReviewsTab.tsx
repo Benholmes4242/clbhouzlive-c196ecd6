@@ -253,6 +253,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       unhelpfulCount: review.unhelpful_count || 0,
       isHelpful: userVote?.vote_type === 'helpful',
       isUnhelpful: userVote?.vote_type === 'unhelpful',
+      isMock: review.is_mock,
       isHighlighted,
     };
   };
