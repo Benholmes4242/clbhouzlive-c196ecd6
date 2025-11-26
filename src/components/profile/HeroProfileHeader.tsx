@@ -62,6 +62,7 @@ import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import Top100PublicJourneyPanel from '@/components/top100/Top100PublicJourneyPanel';
 import { useTop100Overview } from '@/hooks/useTop100Overview';
 import { Trophy } from 'lucide-react';
+import { ProfileSocialButtons } from './actions/ProfileSocialButtons';
 
 interface Course {
   id: string;
@@ -887,6 +888,17 @@ const HeroProfileHeader = ({
                   </p>
                 )}
 
+                {/* Social Actions - Only for other users' profiles */}
+                {!isOwnProfile && user?.id && profile?.id && (
+                  <div className="mt-4 flex justify-center">
+                    <ProfileSocialButtons
+                      currentUserId={user.id}
+                      profileUserId={profile.id}
+                      isMobile={true}
+                    />
+                  </div>
+                )}
+
                 {/* Stats row */}
                 <div className="stats">
                   <div className="stat">
@@ -1102,10 +1114,25 @@ const HeroProfileHeader = ({
                            </a>
                          </div>
                        )}
-                     </div>
-                   </div>
+                      </div>
+                    </div>
 
-                  {/* Slim Stats Row */}
+                   {/* Social Actions - Only for other users' profiles */}
+                   {!isOwnProfile && user?.id && profile?.id && (
+                     <div className="w-full mt-4 flex justify-center"
+                          style={{
+                            width: 'calc(100% - var(--mini-w) - 8px)',
+                            marginRight: 'calc(var(--mini-w) + 8px)'
+                          }}>
+                       <ProfileSocialButtons
+                         currentUserId={user.id}
+                         profileUserId={profile.id}
+                         isMobile={false}
+                       />
+                     </div>
+                   )}
+
+                   {/* Slim Stats Row */}
                    <div className="w-full grid grid-cols-4 gap-3 text-center mt-5">
                      <div className="flex flex-col">
                        <span className="text-lg font-semibold text-gray-900">{postsCount}</span>
