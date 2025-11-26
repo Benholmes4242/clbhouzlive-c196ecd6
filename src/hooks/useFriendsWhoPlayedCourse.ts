@@ -24,10 +24,9 @@ export function useFriendsWhoPlayedCourse(userId: string | undefined, courseId: 
 
       // Get friend IDs
       const { data: relationships, error: relError } = await supabase
-        .from('user_relationships' as any)
+        .from('user_follows')
         .select('following_id')
-        .eq('follower_id', userId)
-        .eq('status', 'following');
+        .eq('follower_id', userId);
 
       if (relError) throw relError;
       const friendIds = (relationships || []).map((r: any) => r.following_id);

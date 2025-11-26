@@ -5461,6 +5461,10 @@ export type Database = {
         }[]
       }
       get_cloudflare_secrets: { Args: never; Returns: Json }
+      get_relationship_status: {
+        Args: { target_user_id: string }
+        Returns: Json
+      }
       get_user_recent_achievements: {
         Args: { limit_param?: number; user_id_param: string }
         Returns: {
