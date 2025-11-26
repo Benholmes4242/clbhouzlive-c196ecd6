@@ -184,6 +184,8 @@ const PostPlayRatingModal = ({
             user_id: userResponse.user.id,
             played: true,
             played_date: new Date().toISOString().split('T')[0],
+          }, {
+            onConflict: 'user_id,course_id'
           });
         if (top100Error) throw top100Error;
       }
@@ -350,7 +352,10 @@ const PostPlayRatingModal = ({
       });
       
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
-      await queryClient.refetchQueries({ queryKey: ['course-reviews-full'] });
+      await queryClient.refetchQueries({ 
+        queryKey: ['course-reviews-full', course?.id],
+        exact: false
+      });
       queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
       queryClient.invalidateQueries({ queryKey: ['user-played-course', course?.id] });
       
@@ -466,7 +471,10 @@ const PostPlayRatingModal = ({
       await queryClient.refetchQueries({ queryKey: ['course-rating-aggregates', course?.id] });
       
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
-      await queryClient.refetchQueries({ queryKey: ['course-reviews-full'] });
+      await queryClient.refetchQueries({ 
+        queryKey: ['course-reviews-full', course?.id],
+        exact: false
+      });
       queryClient.invalidateQueries({ queryKey: ['user-course', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['user-top100-course', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['userTop100Courses'] });
