@@ -181,8 +181,8 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
         <RatingChip score={score} />
       </div>
 
-      {/* Body */}
-      <ReviewText text={text} />
+      {/* Body - only show if text exists */}
+      {text && text.trim().length > 0 && <ReviewText text={text} />}
 
       {/* Footer actions */}
       <div className="mt-3 flex items-center justify-end gap-2">

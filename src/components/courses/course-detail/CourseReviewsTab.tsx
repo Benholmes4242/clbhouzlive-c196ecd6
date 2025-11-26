@@ -100,8 +100,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         `
         )
         .eq('course_id', courseId)
-        .not('review', 'is', null)
-        .not('review', 'eq', '')
         .order('review_date', { ascending: false });
 
       // When mock reviews are disabled, only show real reviews
@@ -222,8 +220,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   });
 
   const communityScore = ratingAggregates?.avg_overall_score || 0;
-  const reviewCount = ratingAggregates?.text_review_count || 0;
-  const hasReviews = reviews.length > 0;
+  const ratingCount = ratingAggregates?.review_count ?? 0;
+  const hasRatings = ratingCount > 0;
 
   // Transform reviews into ReviewCard format
   const transformReview = (review: ReviewData, isHighlighted = false) => {
@@ -280,8 +278,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     );
   }
 
-  // Empty state - use reviews.length as source of truth
-  if (!hasReviews) {
+  // Empty state - use aggregates as source of truth
+  if (!hasRatings) {
     return (
       <div className="flex flex-col">
         <section className="px-4 pt-6 pb-5 bg-slate-100">
@@ -310,7 +308,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       <section className="px-4 pt-4 pb-3 bg-slate-50">
         <ReviewsHeaderCard
           communityScore={communityScore}
-          reviewCount={reviewCount}
+          reviewCount={ratingCount}
           userScore={myReview?.rating}
           userHasRating={!!myReview}
           onRateCourse={handleRateClick}
