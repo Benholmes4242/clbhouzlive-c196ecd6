@@ -8,6 +8,7 @@ interface CourseMediaSummaryCardProps {
   userMediaCount: number;
   lastMediaCreatedAt: string | null;
   onUserMediaClick?: () => void;
+  subtitle?: string; // Dynamic subtitle based on filter mode
 }
 
 export const CourseMediaSummaryCard: React.FC<CourseMediaSummaryCardProps> = ({
@@ -16,6 +17,7 @@ export const CourseMediaSummaryCard: React.FC<CourseMediaSummaryCardProps> = ({
   userMediaCount,
   lastMediaCreatedAt,
   onUserMediaClick,
+  subtitle,
 }) => {
   const totalCount = photoCount + videoCount;
   const hasMedia = totalCount > 0;
@@ -39,11 +41,11 @@ export const CourseMediaSummaryCard: React.FC<CourseMediaSummaryCardProps> = ({
             <span>{videoCount} video{videoCount !== 1 ? 's' : ''}</span>
           </div>
 
-          {/* Secondary info */}
+          {/* Secondary info - dynamic subtitle or last added time */}
           <p className="mt-2 text-sm text-slate-500">
-            {hasMedia && lastMediaCreatedAt
+            {subtitle || (hasMedia && lastMediaCreatedAt
               ? `Last added ${formatDistanceToNow(new Date(lastMediaCreatedAt), { addSuffix: true })}`
-              : 'Be the first to share a moment from this course.'}
+              : 'Be the first to share a moment from this course.')}
           </p>
         </div>
 
