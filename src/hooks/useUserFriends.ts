@@ -16,18 +16,17 @@ export function useUserFriends(userId: string | undefined) {
       if (!userId) return [];
 
       const { data, error } = await supabase
-        .from('user_relationships' as any)
+        .from('user_follows')
         .select(`
           following_id,
-          user_profiles!user_relationships_following_id_fkey (
+          user_profiles!user_follows_following_id_fkey (
             id,
             username,
             display_name,
             profile_photo_url
           )
         `)
-        .eq('follower_id', userId)
-        .eq('status', 'following');
+        .eq('follower_id', userId);
 
       if (error) throw error;
 
