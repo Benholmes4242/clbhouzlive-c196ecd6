@@ -1,16 +1,13 @@
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Star, MessageSquare } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import EditRatingModal from '@/components/courses/EditRatingModal';
-import ReviewsTab from '@/components/profile/ReviewsTab';
-import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
-import { MediaItem } from '@/types/media';
-import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
+import { ReviewCard } from '../review/ReviewCard';
+import { ReviewsHeaderCard } from '../review/ReviewsHeaderCard';
+import { Button } from '@/components/ui/button';
 
 interface CourseReviewsTabProps {
   courseId: string;
@@ -28,242 +25,306 @@ interface ReviewData {
   review: string | null;
   review_date: string;
   user_id: string;
-  display_name?: string | null;
-  username?: string | null;
-  profile_photo_url?: string | null;
-  media?: MediaItem[];
-  helpful_count?: number;
-  unhelpful_count?: number;
-  user_vote?: string;
+  helpful_count: number;
+  unhelpful_count: number;
+  user_profiles?: {
+    id: string;
+    display_name: string | null;
+    username: string | null;
+    profile_photo_url: string | null;
+  } | null;
 }
 
-const CourseReviewsTab = ({ courseId, courseName, ratingStats }: CourseReviewsTabProps) => {
+const getInitials = (name: string) => {
+  const parts = name.split(' ').filter(Boolean);
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+};
+
+const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
+  courseId,
+  courseName,
+  ratingStats,
+}) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedReview, setSelectedReview] = useState<ReviewData | null>(null);
-  
+  const queryClient = useQueryClient();
+
   // Fetch user's rating
   const { data: userRating } = useUserCourseRating(courseId, user?.id);
-  const hasUserReviewed = !!userRating?.review;
 
-  // Fix N+1 pattern: fetch all data in parallel
+  // Check if we should highlight the user's review (from confirmation flow)
+  const [isJustSubmittedOrUpdated, setIsJustSubmittedOrUpdated] = useState(
+    Boolean(location.state?.highlightMyReview)
+  );
+
+  useEffect(() => {
+    if (!isJustSubmittedOrUpdated) return;
+
+    const timeout = setTimeout(() => {
+      setIsJustSubmittedOrUpdated(false);
+    }, 2500); // ~2.5s subtle pulse
+
+    return () => clearTimeout(timeout);
+  }, [isJustSubmittedOrUpdated]);
+
+  // Fetch all reviews with user profiles
   const { data: reviewsData, isLoading } = useQuery({
-    queryKey: ['course-reviews-detailed', courseId],
+    queryKey: ['course-reviews-full', courseId],
     queryFn: async () => {
-      // Fetch ratings with reviews
-      const ratingsPromise = supabase
+      const { data, error } = await supabase
         .from('course_ratings')
-        .select('id, rating, review, review_date, user_id, helpful_count, unhelpful_count')
+        .select(
+          `
+          id,
+          rating,
+          review,
+          review_date,
+          user_id,
+          helpful_count,
+          unhelpful_count,
+          user_profiles:user_id (
+            id,
+            display_name,
+            username,
+            profile_photo_url
+          )
+        `
+        )
         .eq('course_id', courseId)
         .not('review', 'is', null)
         .not('review', 'eq', '')
         .order('review_date', { ascending: false });
 
-      const { data: ratingsData, error: ratingsError } = await ratingsPromise;
-      
-      if (ratingsError) throw ratingsError;
-      if (!ratingsData || ratingsData.length === 0) {
-        return { 
-          reviews: [], 
-          stats: ratingStats ? {
-            average: ratingStats.average_rating,
-            total: ratingStats.total_ratings
-          } : { average: 0, total: 0 }
-        };
-      }
-
-      const userIds = ratingsData.map(rating => rating.user_id);
-      const ratingIds = ratingsData.map(rating => rating.id);
-
-      // Fetch all related data in parallel with Promise.all
-      const [profilesResult, mediaResult, votesResult] = await Promise.all([
-        supabase
-          .from('user_profiles')
-          .select('id, display_name, username, profile_photo_url')
-          .in('id', userIds),
-        
-        ratingIds.length > 0
-          ? supabase
-              .from('course_review_media')
-              .select('id, review_id, media_url, media_type, file_name')
-              .in('review_id', ratingIds)
-          : Promise.resolve({ data: [], error: null }),
-        
-        user?.id && ratingIds.length > 0
-          ? supabase
-              .from('review_votes')
-              .select('review_id, value')
-              .eq('user_id', user.id)
-              .in('review_id', ratingIds)
-          : Promise.resolve({ data: [], error: null }),
-      ]);
-
-      if (profilesResult.error) throw profilesResult.error;
-      if (mediaResult.error) throw mediaResult.error;
-
-      const profilesData = profilesResult.data || [];
-      const mediaData = mediaResult.data || [];
-      const userVotes = votesResult.data || [];
-
-      // Combine the data
-      const reviewsWithProfiles = ratingsData.map(rating => {
-        const profile = profilesData?.find(p => p.id === rating.user_id);
-        const reviewMedia = mediaData.filter(m => m.review_id === rating.id);
-        const userVote = userVotes.find(vote => vote.review_id === rating.id);
-        return {
-          ...rating,
-          display_name: profile?.display_name,
-          username: profile?.username,
-          profile_photo_url: profile?.profile_photo_url,
-          media: reviewMedia.map(m => {
-            if (m.media_type === 'video') {
-              const streamId = getStreamIdFromUrl(m.media_url);
-              return {
-                id: m.id,
-                type: 'video' as const,
-                url: m.media_url,
-                streamId,
-                posterUrl: getStreamPoster(m.media_url, '1s') ?? undefined,
-                alt: m.file_name ?? 'Video',
-              };
-            }
-            return { 
-              id: m.id, 
-              type: 'image' as const, 
-              url: m.media_url, 
-              alt: m.file_name ?? 'Photo' 
-            };
-          }),
-          helpful_count: rating.helpful_count || 0,
-          unhelpful_count: rating.unhelpful_count || 0,
-          user_vote: userVote?.value === 1 ? 'helpful' : userVote?.value === -1 ? 'unhelpful' : 'none'
-        };
-      });
-
-      return {
-        reviews: reviewsWithProfiles,
-        stats: ratingStats ? {
-          average: ratingStats.average_rating,
-          total: ratingStats.total_ratings
-        } : { average: 0, total: 0 }
-      };
+      if (error) throw error;
+      return (data as any as ReviewData[]) || [];
     },
     enabled: !!courseId,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
-  const getUserDisplayName = (review: ReviewData) => {
-    return review.display_name || review.username || 'Anonymous';
-  };
+  // Fetch user's votes on reviews
+  const { data: userVotes } = useQuery({
+    queryKey: ['review-votes', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const { data, error } = await supabase
+        .from('course_review_votes')
+        .select('rating_id, vote_type')
+        .eq('user_id', user.id);
 
-  const handleEditReview = (review: ReviewData) => {
-    setSelectedReview(review);
-    setEditModalOpen(true);
-  };
-
-  const isUserReview = (review: ReviewData) => {
-    return user?.id === review.user_id;
-  };
-
-  // Transform data for the new ReviewsTab component
-  const transformedReviews = reviewsData?.reviews.map(review => ({
-    id: review.id,
-    user: {
-      name: getUserDisplayName(review),
-      avatarUrl: review.profile_photo_url || ''
+      if (error) throw error;
+      return data || [];
     },
-    rating10: review.rating,
-    dateISO: review.review_date,
-    text: review.review || '',
-    helpfulCount: (review as any).helpful_count || 0,
-    unhelpfulCount: (review as any).unhelpful_count || 0,
-    userVote: (review as any).user_vote || 'none',
-    isYourReview: isUserReview(review),
-    media: review.media || []
-  })) || [];
+    enabled: !!user?.id,
+  });
+
+  // Toggle helpful mutation
+  const toggleHelpfulMutation = useMutation({
+    mutationFn: async ({
+      reviewId,
+      action,
+    }: {
+      reviewId: string;
+      action: 'helpful' | 'unhelpful' | 'clear';
+    }) => {
+      if (!user?.id) throw new Error('Must be logged in');
+
+      if (action === 'clear') {
+        // Remove vote
+        const { error } = await supabase
+          .from('course_review_votes')
+          .delete()
+          .eq('rating_id', reviewId)
+          .eq('user_id', user.id);
+
+        if (error) throw error;
+      } else {
+        // Upsert vote
+        const { error } = await supabase.from('course_review_votes').upsert(
+          {
+            rating_id: reviewId,
+            user_id: user.id,
+            vote_type: action,
+          },
+          {
+            onConflict: 'rating_id,user_id',
+          }
+        );
+
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['course-reviews-full', courseId] });
+      queryClient.invalidateQueries({ queryKey: ['review-votes', user?.id] });
+    },
+  });
+
+  const handleToggleHelpful = (reviewId: string, action: 'helpful' | 'unhelpful' | 'clear') => {
+    if (!user) {
+      toast({
+        title: 'Sign in required',
+        description: 'Please sign in to vote on reviews',
+      });
+      navigate('/auth');
+      return;
+    }
+    toggleHelpfulMutation.mutate({ reviewId, action });
+  };
+
+  const handleRateClick = () => {
+    if (!user) {
+      toast({
+        title: 'Sign in required',
+        description: 'Please sign in to rate courses',
+      });
+      navigate('/auth');
+      return;
+    }
+    navigate(`/courses/${courseId}/rate`);
+  };
+
+  const reviews = reviewsData || [];
+  const myReview = reviews.find((r) => r.user_id === user?.id);
+  const otherReviews = reviews.filter((r) => r.user_id !== user?.id);
+
+  const communityScore = ratingStats?.average_rating || 0;
+  const reviewCount = ratingStats?.total_reviews || 0;
+
+  // Transform reviews into ReviewCard format
+  const transformReview = (review: ReviewData, isHighlighted = false) => {
+    const profile = review.user_profiles;
+    const displayName = profile?.display_name || profile?.username || 'Anonymous';
+    const userVote = userVotes?.find((v) => v.rating_id === review.id);
+
+    return {
+      id: review.id,
+      user: {
+        name: displayName,
+        avatarUrl: profile?.profile_photo_url || null,
+        initials: getInitials(displayName),
+      },
+      score: review.rating,
+      text: review.review || '',
+      createdAt: review.review_date,
+      helpfulCount: review.helpful_count || 0,
+      unhelpfulCount: review.unhelpful_count || 0,
+      isHelpful: userVote?.vote_type === 'helpful',
+      isUnhelpful: userVote?.vote_type === 'unhelpful',
+      isHighlighted,
+    };
+  };
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="animate-pulse">
-            <div className="flex gap-4">
-              <div className="w-12 h-12 bg-muted rounded-full" />
-              <div className="flex-1 space-y-2">
-                <div className="h-4 bg-muted rounded w-1/3" />
-                <div className="h-4 bg-muted rounded w-full" />
-                <div className="h-4 bg-muted rounded w-2/3" />
+      <div className="flex flex-col">
+        {/* Skeleton header */}
+        <section className="px-4 pt-4 pb-3 bg-slate-50">
+          <div className="rounded-2xl bg-white shadow-sm px-4 py-4 animate-pulse">
+            <div className="h-4 bg-slate-200 rounded w-1/3 mb-2" />
+            <div className="h-6 bg-slate-200 rounded w-1/4 mb-1" />
+            <div className="h-3 bg-slate-200 rounded w-1/2" />
+          </div>
+        </section>
+
+        {/* Skeleton reviews */}
+        <section className="px-4 pt-3 pb-4 bg-slate-100 space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="rounded-2xl bg-white shadow-sm px-4 py-3 animate-pulse">
+              <div className="flex gap-3">
+                <div className="w-10 h-10 bg-slate-200 rounded-lg" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 bg-slate-200 rounded w-1/3" />
+                  <div className="h-3 bg-slate-200 rounded w-1/4" />
+                  <div className="h-4 bg-slate-200 rounded w-full" />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </section>
       </div>
     );
   }
 
-  if (!reviewsData?.reviews || reviewsData.reviews.length === 0) {
+  // Empty state
+  if (reviewCount === 0) {
     return (
-      <div className="flex flex-col items-center justify-center px-6 pt-10 pb-24 text-center text-muted-foreground gap-3">
-        <div className="w-14 h-14 rounded-full bg-surface-alt flex items-center justify-center">
-          <Star className="w-7 h-7" />
-        </div>
-
-        <div>
-          <p className="text-base font-medium text-foreground">No reviews yet</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            Be the first to leave a review for this course!
-          </p>
-        </div>
-
-        {!hasUserReviewed && (
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => {
-              if (!user) {
-                toast({
-                  title: "Sign in required",
-                  description: "Please sign in to write a review",
-                });
-                navigate('/auth');
-                return;
-              }
-              // Open rating modal logic here if needed
-            }}
-          >
-            Write a review
-          </Button>
-        )}
+      <div className="flex flex-col">
+        <section className="px-4 pt-6 pb-5 bg-slate-100">
+          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4 text-center">
+            <p className="text-sm font-semibold text-slate-900">No reviews yet</p>
+            <p className="mt-1 text-xs text-slate-500">
+              Be the first to share your experience at {courseName}.
+            </p>
+            <Button
+              type="button"
+              className="mt-3 w-full h-11 rounded-lg"
+              variant="outline"
+              onClick={handleRateClick}
+            >
+              Rate this course
+            </Button>
+          </div>
+        </section>
       </div>
     );
   }
 
   return (
-    <>
-      <ReviewsTab
-        averageRating10={reviewsData.stats.average}
-        totalReviews={reviewsData.stats.total}
-        reviews={transformedReviews}
-        courseId={courseId}
-      />
-
-      {selectedReview && (
-        <EditRatingModal
-          courseId={courseId}
-          courseName={courseName}
-          currentRating={selectedReview.rating}
-          currentReview={selectedReview.review}
-          isOpen={editModalOpen}
-          onClose={() => {
-            setEditModalOpen(false);
-            setSelectedReview(null);
-          }}
+    <div className="flex flex-col">
+      {/* Section 1 – Header card */}
+      <section className="px-4 pt-4 pb-3 bg-slate-50">
+        <ReviewsHeaderCard
+          communityScore={communityScore}
+          reviewCount={reviewCount}
+          userScore={userRating?.rating}
+          userHasRating={!!userRating}
+          onRateCourse={handleRateClick}
         />
-      )}
-    </>
+      </section>
+
+      {/* Section 2 – Your review + other reviews */}
+      <section className="px-4 pt-3 pb-4 bg-slate-100">
+        {myReview && (
+          <div className="mb-3">
+            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
+              Your review
+            </p>
+            <ReviewCard
+              review={transformReview(myReview, isJustSubmittedOrUpdated)}
+              isMine
+              isHighlighted={isJustSubmittedOrUpdated}
+              onToggleHelpful={handleToggleHelpful}
+            />
+          </div>
+        )}
+
+        {otherReviews.length > 0 && (
+          <div className="space-y-3">
+            {otherReviews.map((review) => (
+              <ReviewCard
+                key={review.id}
+                review={transformReview(review)}
+                onToggleHelpful={handleToggleHelpful}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Section 3 – End message */}
+      <section className="px-4 pt-4 pb-4 bg-slate-50">
+        <p className="text-center text-xs text-slate-500">
+          You've reached the end of the reviews.
+        </p>
+      </section>
+    </div>
   );
 };
 
