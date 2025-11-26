@@ -10,6 +10,7 @@
 @import './styles/dropdown-portal.css';
 @import './styles/style-tokens.css';
 @import './styles/studio-filters.css';
+@import './styles/social-dock.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

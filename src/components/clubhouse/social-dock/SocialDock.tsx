@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Heart, MessageCircle, Share, Search, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -42,7 +42,20 @@ export const SocialDock: React.FC<SocialDockProps> = ({
 }) => {
   const [showCounts, setShowCounts] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [motionState, setMotionState] = useState<'idle' | 'expand' | 'collapse'>('idle');
   const startYRef = useRef<number | null>(null);
+
+  // Track expand/collapse for bounce animation
+  useEffect(() => {
+    const next = isExpanded ? 'expand' : 'collapse';
+    setMotionState(next);
+
+    const timeout = window.setTimeout(() => {
+      setMotionState('idle');
+    }, 260);
+
+    return () => window.clearTimeout(timeout);
+  }, [isExpanded]);
 
   // Touch handlers for swipe-up (when collapsed) and swipe-down (when expanded)
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -96,7 +109,6 @@ export const SocialDock: React.FC<SocialDockProps> = ({
             'mx-0',
             'rounded-t-2xl rounded-b-none bg-black/70 backdrop-blur-2xl',
             'shadow-[0_18px_40px_rgba(0,0,0,0.5)]',
-            'px-4 pt-3 pb-[10px]',
             'transition-all duration-[220ms] ease-[cubic-bezier(0.19,1,0.22,1)]',
             'pointer-events-auto',
             'overflow-hidden',
@@ -110,6 +122,15 @@ export const SocialDock: React.FC<SocialDockProps> = ({
           onTouchEnd={handleTouchEnd}
           onClick={(e) => e.stopPropagation()}
         >
+          {/* Inner wrapper for bounce animation */}
+          <div
+            className={cn(
+              'social-dock-card-inner',
+              'px-4 pt-3 pb-[10px]',
+              motionState === 'expand' && 'social-dock-card-expand',
+              motionState === 'collapse' && 'social-dock-card-collapse'
+            )}
+          >
         {/* 1) TOP: ACTION ROW */}
         <div className="mb-2 flex items-center justify-between gap-1">
           <ActionButton
@@ -224,6 +245,7 @@ export const SocialDock: React.FC<SocialDockProps> = ({
             </div>
           )}
         </div>
+          </div>
         </div>
       </div>
     </>
