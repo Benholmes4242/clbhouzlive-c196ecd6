@@ -90,6 +90,9 @@ const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
 const FriendsPage = lazy(() => import("./pages/FriendsPage"));
 const FollowersPage = lazy(() => import("./pages/FollowersPage"));
 const FollowingPage = lazy(() => import("./pages/FollowingPage"));
+const FollowersListPage = lazy(() => import("./pages/FollowersListPage"));
+const FollowingListPage = lazy(() => import("./pages/FollowingListPage"));
+const FriendsListPage = lazy(() => import("./pages/FriendsListPage"));
 
 const GlobalTop100 = lazy(() => import("./pages/GlobalTop100"));
 const Top100Hub = lazy(() => import("./pages/Top100Hub"));
@@ -204,6 +207,9 @@ function AppRoutes() {
         <Route path="/friends" element={<Suspense fallback={<GenericPageSkeleton />}><FriendsPage /></Suspense>} />
         <Route path="/followers" element={<Suspense fallback={<GenericPageSkeleton />}><FollowersPage /></Suspense>} />
         <Route path="/following" element={<Suspense fallback={<GenericPageSkeleton />}><FollowingPage /></Suspense>} />
+        <Route path="/profile/:username/followers" element={<Suspense fallback={<GenericPageSkeleton />}><FollowersListPage /></Suspense>} />
+        <Route path="/profile/:username/following" element={<Suspense fallback={<GenericPageSkeleton />}><FollowingListPage /></Suspense>} />
+        <Route path="/profile/:username/friends" element={<Suspense fallback={<GenericPageSkeleton />}><FriendsListPage /></Suspense>} />
         
         <Route path="/global-top100" element={<GlobalTop100 />} />
         <Route path="/top100" element={<Top100Hub />} />
