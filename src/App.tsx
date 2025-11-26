@@ -301,19 +301,19 @@ function AppRoutes() {
       {/* Hub Overlays - rendered over origin page when background location exists */}
       {showHubOverlay && FEATURE_FLAGS.HUB && (
         <Routes>
-          <Route path="/hub" element={<HubHomePage />} />
-          <Route path="/hub/golfers" element={<HubGolfersPage />} />
-          <Route path="/hub/echo" element={<HubEchoChatPage />} />
-          <Route path="/hub/create-game" element={<HubCreateGamePage />} />
-          <Route path="/hub/games" element={<HubGamesPage />} />
-          <Route path="/hub/your-games" element={<HubYourGamesPage />} />
-          <Route path="/hub/swing" element={<HubSwingPage />} />
-          <Route path="/hub/swing/history" element={<HubSwingHistoryPage />} />
-          <Route path="/hub/swing/history/:id" element={<HubSwingDetailPage />} />
-          <Route path="/hub/echo/history" element={<HubEchoHistoryPage />} />
-          <Route path="/hub/echo/history/chat/:id" element={<HubEchoHistoryDetailPage />} />
-          <Route path="/hub/echo/tags" element={<HubEchoTagsPage />} />
-          <Route path="/echo/share/:token" element={<HubEchoSharePage />} />
+          <Route path="/hub" element={<Suspense fallback={<HubSkeleton />}><HubHomePage /></Suspense>} />
+          <Route path="/hub/golfers" element={<Suspense fallback={<HubSkeleton />}><HubGolfersPage /></Suspense>} />
+          <Route path="/hub/echo" element={<Suspense fallback={<HubSkeleton />}><HubEchoChatPage /></Suspense>} />
+          <Route path="/hub/create-game" element={<Suspense fallback={<HubSkeleton />}><HubCreateGamePage /></Suspense>} />
+          <Route path="/hub/games" element={<Suspense fallback={<HubSkeleton />}><HubGamesPage /></Suspense>} />
+          <Route path="/hub/your-games" element={<Suspense fallback={<HubSkeleton />}><HubYourGamesPage /></Suspense>} />
+          <Route path="/hub/swing" element={<Suspense fallback={<HubSkeleton />}><HubSwingPage /></Suspense>} />
+          <Route path="/hub/swing/history" element={<Suspense fallback={<HubSkeleton />}><HubSwingHistoryPage /></Suspense>} />
+          <Route path="/hub/swing/history/:id" element={<Suspense fallback={<HubSkeleton />}><HubSwingDetailPage /></Suspense>} />
+          <Route path="/hub/echo/history" element={<Suspense fallback={<HubSkeleton />}><HubEchoHistoryPage /></Suspense>} />
+          <Route path="/hub/echo/history/chat/:id" element={<Suspense fallback={<HubSkeleton />}><HubEchoHistoryDetailPage /></Suspense>} />
+          <Route path="/hub/echo/tags" element={<Suspense fallback={<HubSkeleton />}><HubEchoTagsPage /></Suspense>} />
+          <Route path="/echo/share/:token" element={<Suspense fallback={<HubSkeleton />}><HubEchoSharePage /></Suspense>} />
           <Route path="/hub/new" element={<Navigate to="/hub/echo/history" replace />} />
         </Routes>
       )}

@@ -406,57 +406,55 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
         </div>
       )}
 
-      {/* Square Squircle Media Grid - full width with card borders and 4px gaps */}
-      <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-1 border-y border-border/60 sm:border-border/40 sm:rounded-xl sm:border overflow-hidden">
-          {mediaItems.map((item) => {
-            const isVideo = item.type === 'video';
-            const imageSrc = isVideo ? (item.posterUrl || item.url) : item.url;
-            
-            // Format duration for display
-            const formatDuration = (seconds?: number) => {
-              if (!seconds || Number.isNaN(seconds)) return '0:00';
-              const m = Math.floor(seconds / 60);
-              const s = Math.floor(seconds % 60);
-              return `${m}:${s.toString().padStart(2, '0')}`;
-            };
+      {/* Square Squircle Media Grid - 2 columns mobile, 4 desktop */}
+      <div className="px-4 py-6 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 bg-slate-50">
+        {mediaItems.map((item) => {
+          const isVideo = item.type === 'video';
+          const imageSrc = isVideo ? (item.posterUrl || item.url) : item.url;
+          
+          // Format duration for display
+          const formatDuration = (seconds?: number) => {
+            if (!seconds || Number.isNaN(seconds)) return '0:00';
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m}:${s.toString().padStart(2, '0')}`;
+          };
 
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleMediaClick(item)}
-                className="relative aspect-square overflow-hidden bg-slate-200 hover:opacity-90 active:opacity-75 transition-opacity duration-150"
-              >
-                {/* Thumbnail image */}
-                <img
-                  src={imageSrc}
-                  alt={item.alt || 'Media'}
-                  className="w-full h-full object-cover"
-                />
+          return (
+            <button
+              key={item.id}
+              onClick={() => handleMediaClick(item)}
+              className="relative aspect-square rounded-[var(--squircle-radius)] overflow-hidden bg-slate-200 border border-slate-300/40 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-150"
+            >
+              {/* Thumbnail image */}
+              <img
+                src={imageSrc}
+                alt={item.alt || 'Media'}
+                className="w-full h-full object-cover"
+              />
 
-                {/* Video overlays: gradient + duration */}
-                {isVideo && (
-                  <>
-                    {/* Bottom gradient for readability */}
-                    <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
+              {/* Video overlays: gradient + duration */}
+              {isVideo && (
+                <>
+                  {/* Bottom gradient for readability */}
+                  <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
 
-                    {/* Duration pill */}
-                    <div className="absolute bottom-2 right-2">
-                      <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-black/70 backdrop-blur-sm">
-                        <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 16 16">
-                          <path d="M3 2v12l10-6L3 2z" />
-                        </svg>
-                        <span className="text-[10px] font-medium text-white">
-                          {formatDuration(item.duration)}
-                        </span>
-                      </div>
+                  {/* Duration pill */}
+                  <div className="absolute bottom-2 right-2">
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-black/70 backdrop-blur-sm">
+                      <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M3 2v12l10-6L3 2z" />
+                      </svg>
+                      <span className="text-[10px] font-medium text-white">
+                        {formatDuration(item.duration)}
+                      </span>
                     </div>
-                  </>
-                )}
-              </button>
-            );
-          })}
-        </div>
+                  </div>
+                </>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       {/* Conditional Modal/Feed based on feature flag */}
