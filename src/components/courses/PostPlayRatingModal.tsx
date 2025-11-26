@@ -11,6 +11,7 @@ import ReviewMediaUpload from './ReviewMediaUpload';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
 
 interface Course {
   id: string;
@@ -366,16 +367,13 @@ const PostPlayRatingModal = ({
       
       console.log('[Reviews Refresh] onSuccess for course', course?.id);
       
-      // Invalidate and refetch reviews list with correct prefix matching
-      queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
+      // Refetch reviews list with exact key structure matching CourseReviewsTab
       await queryClient.refetchQueries({ 
-        queryKey: ['course-reviews-full'],
+        queryKey: ['course-reviews-full', course?.id, SHOW_MOCK_REVIEWS],
         type: 'active',
-        exact: false
       });
       
-      console.log('[Reviews Refresh] refetchQueries called for key', ['course-reviews-full', course?.id]);
-      console.log('[Reviews Refresh] refetchQueries finished for', course?.id);
+      console.log('[Reviews Refresh] refetchQueries finished for', ['course-reviews-full', course?.id, SHOW_MOCK_REVIEWS]);
       
       queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
       queryClient.invalidateQueries({ queryKey: ['user-played-course', course?.id] });

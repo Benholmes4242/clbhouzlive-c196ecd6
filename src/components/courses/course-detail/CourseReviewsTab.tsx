@@ -87,6 +87,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           rating,
           review,
           review_date,
+          updated_at,
           user_id,
           helpful_count,
           unhelpful_count,
@@ -110,10 +111,16 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       const { data, error } = await query;
       if (error) throw error;
       
-      console.log('[Reviews Query] fetched rows', {
+      // Log raw rows from Supabase
+      console.log('[Reviews Raw Rows]', {
         courseId,
-        count: data?.length ?? 0,
-        sample: data?.slice(0, 3),
+        rows: data?.map((r: any) => ({
+          id: r.id,
+          user_id: r.user_id,
+          rating: r.rating,
+          review: r.review,
+          updated_at: r.updated_at,
+        })),
       });
       
       return (data as any as ReviewData[]) || [];
