@@ -310,12 +310,25 @@ const PostPlayRatingModal = ({
         await Promise.all(uploadPromises);
       }
     },
-    onSuccess: async () => {
+    onSuccess: async (result, variables) => {
       // Get userId for proper query invalidation
       const { data: userResponse } = await supabase.auth.getUser();
       const userId = userResponse?.user?.id;
 
       const isNewReview = !isEditMode;
+
+      console.log('[Rating Mutation onSuccess]', {
+        courseId: course?.id,
+        isNewReview,
+        payload: {
+          rating: variables.rating,
+          reviewText: variables.reviewText,
+          design: variables.design,
+          condition: variables.condition,
+          clubhouse: variables.clubhouse,
+          facilities: variables.facilities,
+        },
+      });
 
       // Track submission success
       analyticsEvents.ratings.submitted({
@@ -361,7 +374,8 @@ const PostPlayRatingModal = ({
         exact: false
       });
       
-      console.log('[Reviews Refresh] refetchQueries called for base key "course-reviews-full"');
+      console.log('[Reviews Refresh] refetchQueries called for key', ['course-reviews-full', course?.id]);
+      console.log('[Reviews Refresh] refetchQueries finished for', course?.id);
       
       queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
       queryClient.invalidateQueries({ queryKey: ['user-played-course', course?.id] });

@@ -212,8 +212,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const otherReviews = reviews.filter((r) => r.user_id !== user?.id);
 
   console.log('[Reviews Render]', {
+    courseId,
     length: reviews.length,
     hasMyReview: !!myReview,
+    myReviewRating: myReview?.rating,
+    myReviewText: myReview?.review,
     otherCount: otherReviews.length,
     ratingAggregates,
   });
