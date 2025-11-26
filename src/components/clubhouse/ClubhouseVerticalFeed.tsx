@@ -1213,7 +1213,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
           onShare={handleShare}
           onMuteToggle={() => setGlobalMute(!isGloballyMuted)}
           onSearch={() => console.log('Search clicked')}
-          onNavOverlayRequest={onNavOverlayRequest}
+          onNavigationTap={onNavOverlayRequest}
         />
       )}
 
