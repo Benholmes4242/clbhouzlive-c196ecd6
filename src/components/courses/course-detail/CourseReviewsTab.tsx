@@ -126,7 +126,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       return (data as any as ReviewData[]) || [];
     },
     enabled: !!courseId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 0, // Always refetch when explicitly requested
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
 

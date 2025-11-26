@@ -367,13 +367,13 @@ const PostPlayRatingModal = ({
       
       console.log('[Reviews Refresh] onSuccess for course', course?.id);
       
-      // Refetch reviews list with exact key structure matching CourseReviewsTab
+      // Force aggressive refetch of ALL reviews queries (bypasses staleTime)
       await queryClient.refetchQueries({ 
-        queryKey: ['course-reviews-full', course?.id, SHOW_MOCK_REVIEWS],
-        type: 'active',
+        queryKey: ['course-reviews-full'],
+        type: 'all',
       });
       
-      console.log('[Reviews Refresh] refetchQueries finished for', ['course-reviews-full', course?.id, SHOW_MOCK_REVIEWS]);
+      console.log('[Reviews Refresh] refetchQueries finished (prefix match)');
       
       queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
       queryClient.invalidateQueries({ queryKey: ['user-played-course', course?.id] });
