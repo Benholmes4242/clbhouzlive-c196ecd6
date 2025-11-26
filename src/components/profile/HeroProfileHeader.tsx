@@ -332,6 +332,7 @@ const HeroProfileHeader = ({
   const [averageRating, setAverageRating] = useState(0);
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
+  const [friendsCount, setFriendsCount] = useState(0);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
   const [userProgressData, setUserProgressData] = useState({
     coursesPlayed: 0,
@@ -459,6 +460,19 @@ const HeroProfileHeader = ({
           console.error('Error fetching following:', followingError);
         } else {
           setFollowingCount(followingCount || 0);
+        }
+
+        // Fetch friends count
+        const { count: friendsCount, error: friendsError } = await supabase
+          .from('user_friends')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'accepted')
+          .or(`user_id.eq.${profile.id},friend_id.eq.${profile.id}`);
+
+        if (friendsError) {
+          console.error('Error fetching friends:', friendsError);
+        } else {
+          setFriendsCount(friendsCount || 0);
         }
 
         // Fetch progress data for course counts
@@ -921,20 +935,16 @@ const HeroProfileHeader = ({
                 {/* Stats row */}
                 <div className="stats">
                   <div className="stat">
-                    <div className="stat-value">{handicap}</div>
-                    <div className="stat-label">Handicap</div>
-                  </div>
-                  <div className="stat">
                     <div className="stat-value">{postsCount}</div>
                     <div className="stat-label">Posts</div>
                   </div>
                   <button
                     type="button"
-                    onClick={handleOpenFollowers}
+                    onClick={handleOpenFriends}
                     className="stat cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
                   >
-                    <div className="stat-value">{followersCount}</div>
-                    <div className="stat-label">Followers</div>
+                    <div className="stat-value">{friendsCount}</div>
+                    <div className="stat-label">Friends</div>
                   </button>
                   <button
                     type="button"
@@ -943,6 +953,14 @@ const HeroProfileHeader = ({
                   >
                     <div className="stat-value">{followingCount}</div>
                     <div className="stat-label">Following</div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleOpenFollowers}
+                    className="stat cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
+                  >
+                    <div className="stat-value">{followersCount}</div>
+                    <div className="stat-label">Followers</div>
                   </button>
                 </div>
 
@@ -1165,10 +1183,14 @@ const HeroProfileHeader = ({
                        <span className="text-lg font-semibold text-gray-900">{postsCount}</span>
                        <span className="text-base font-normal text-neutral-800">Posts</span>
                      </div>
-                     <div className="flex flex-col border-l border-gray-300 pl-3">
-                       <span className="text-lg font-semibold text-gray-900">2,500</span>
-                       <span className="text-base font-normal text-neutral-800">Total XP</span>
-                     </div>
+                     <button
+                       type="button"
+                       onClick={handleOpenFriends}
+                       className="flex flex-col border-l border-gray-300 pl-3 cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
+                     >
+                       <span className="text-lg font-semibold text-gray-900">{friendsCount}</span>
+                       <span className="text-base font-normal text-neutral-800">Friends</span>
+                     </button>
                      <button
                        type="button"
                        onClick={handleOpenFollowing}
