@@ -53,9 +53,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   // Fetch rating aggregates (same query as About tab)
   const { data: ratingAggregates } = useCourseRatingAggregates(courseId);
 
-  console.log('[Rating Stats Query] key:', ['course-rating-aggregates', courseId]);
-  console.log('[Rating Stats Query] result:', ratingAggregates);
-
   // Check if we should highlight the user's review (from confirmation flow)
   const [isJustSubmittedOrUpdated, setIsJustSubmittedOrUpdated] = useState(
     Boolean(location.state?.highlightMyReview)
@@ -72,8 +69,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   }, [isJustSubmittedOrUpdated]);
 
   // Fetch all reviews with user profiles
-  console.log('[Reviews Query] key', ['course-reviews-full', courseId, SHOW_MOCK_REVIEWS]);
-  
   const { data: reviewsData, isLoading } = useQuery({
     queryKey: ['course-reviews-full', courseId, SHOW_MOCK_REVIEWS],
     queryFn: async () => {
@@ -110,18 +105,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
       const { data, error } = await query;
       if (error) throw error;
-      
-      // Log raw rows from Supabase
-      console.log('[Reviews Raw Rows]', {
-        courseId,
-        rows: data?.map((r: any) => ({
-          id: r.id,
-          user_id: r.user_id,
-          rating: r.rating,
-          review: r.review,
-          updated_at: r.updated_at,
-        })),
-      });
       
       return (data as any as ReviewData[]) || [];
     },
@@ -215,16 +198,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const reviews = reviewsData || [];
   const myReview = reviews.find((r) => r.user_id === user?.id);
   const otherReviews = reviews.filter((r) => r.user_id !== user?.id);
-
-  console.log('[Reviews Render]', {
-    courseId,
-    length: reviews.length,
-    hasMyReview: !!myReview,
-    myReviewRating: myReview?.rating,
-    myReviewText: myReview?.review,
-    otherCount: otherReviews.length,
-    ratingAggregates,
-  });
 
   const communityScore = ratingAggregates?.avg_overall_score || 0;
   const ratingCount = ratingAggregates?.review_count ?? 0;

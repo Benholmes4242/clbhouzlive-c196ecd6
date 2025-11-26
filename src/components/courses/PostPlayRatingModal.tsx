@@ -365,15 +365,11 @@ const PostPlayRatingModal = ({
         queryKey: ['course-rating-aggregates', course?.id] 
       });
       
-      console.log('[Reviews Refresh] onSuccess for course', course?.id);
-      
       // Force aggressive refetch of ALL reviews queries (bypasses staleTime)
       await queryClient.refetchQueries({ 
         queryKey: ['course-reviews-full'],
         type: 'all',
       });
-      
-      console.log('[Reviews Refresh] refetchQueries finished (prefix match)');
       
       queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
       queryClient.invalidateQueries({ queryKey: ['user-played-course', course?.id] });
@@ -489,8 +485,6 @@ const PostPlayRatingModal = ({
       await queryClient.refetchQueries({ queryKey: ['user-course-rating', course?.id, userId] });
       await queryClient.refetchQueries({ queryKey: ['course-rating-aggregates', course?.id] });
       
-      console.log('[Reviews Refresh] onSuccess (DELETE) for course', course?.id);
-      
       // Invalidate and refetch reviews list with correct prefix matching
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
       await queryClient.refetchQueries({ 
@@ -498,11 +492,6 @@ const PostPlayRatingModal = ({
         type: 'active',
         exact: false
       });
-      
-      console.log('[Reviews Refresh] refetchQueries (DELETE) called for key', [
-        'course-reviews-full',
-        course?.id,
-      ]);
       
       queryClient.invalidateQueries({ queryKey: ['user-course', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['user-top100-course', course?.id] });
