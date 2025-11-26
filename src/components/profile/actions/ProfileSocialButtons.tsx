@@ -5,6 +5,7 @@ import { useRelationshipStatus } from '@/hooks/useRelationshipStatus';
 import { useFriendActions } from '@/hooks/useFriendActions';
 import { useBlockActions } from '@/hooks/useBlockActions';
 import { useProfileActions } from './useProfileActions';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -86,12 +87,21 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
                 This user will be able to interact with you again.
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={() => unblockUser(profileUserId)}>
-                Unblock
-              </AlertDialogAction>
-            </AlertDialogFooter>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                analyticsEvents.social.blockChanged({
+                  targetUserId: profileUserId,
+                  action: "unblock",
+                  from: "profile",
+                });
+                unblockUser(profileUserId);
+              }}
+            >
+              Unblock
+            </AlertDialogAction>
+          </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
       </>
@@ -113,7 +123,14 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
         <Button
           variant="default"
           size="sm"
-          onClick={() => acceptFriendRequest(profileUserId)}
+          onClick={() => {
+            analyticsEvents.social.friendRequestResponded({
+              targetUserId: profileUserId,
+              from: "profile",
+              action: "accepted",
+            });
+            acceptFriendRequest(profileUserId);
+          }}
           disabled={friendLoading}
           className="flex-1"
         >
@@ -123,7 +140,14 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
         <Button
           variant="outline"
           size="sm"
-          onClick={() => declineFriendRequest(profileUserId)}
+          onClick={() => {
+            analyticsEvents.social.friendRequestResponded({
+              targetUserId: profileUserId,
+              from: "profile",
+              action: "declined",
+            });
+            declineFriendRequest(profileUserId);
+          }}
           disabled={friendLoading}
           className="flex-1"
         >
@@ -175,7 +199,13 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
       <Button
         variant="outline"
         size="sm"
-        onClick={() => sendFriendRequest(profileUserId)}
+        onClick={() => {
+          analyticsEvents.social.friendRequestSent({
+            targetUserId: profileUserId,
+            from: "profile",
+          });
+          sendFriendRequest(profileUserId);
+        }}
         disabled={friendLoading}
         className={isMobile ? 'flex-1' : ''}
       >
@@ -189,7 +219,14 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
     <Button
       variant={relationship.isFollowing ? 'secondary' : 'default'}
       size="sm"
-      onClick={() => handleFollow(relationship.isFollowing)}
+      onClick={() => {
+        analyticsEvents.social.followToggled({
+          targetUserId: profileUserId,
+          from: "profile",
+          isFollowing: !relationship.isFollowing,
+        });
+        handleFollow(relationship.isFollowing);
+      }}
       disabled={followLoading}
       className={isMobile ? 'flex-1' : ''}
     >
@@ -215,7 +252,17 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setShowBlockDialog(true)} className="text-destructive">
+        <DropdownMenuItem
+          onClick={() => {
+            analyticsEvents.social.blockChanged({
+              targetUserId: profileUserId,
+              action: "block",
+              from: "profile",
+            });
+            setShowBlockDialog(true);
+          }}
+          className="text-destructive"
+        >
           Block user
         </DropdownMenuItem>
       </DropdownMenuContent>

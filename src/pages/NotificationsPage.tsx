@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import BottomNavigation from '@/components/BottomNavigation';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -7,6 +7,9 @@ import { useNotifications } from '@/hooks/useNotifications';
 import NotificationsHeader from '@/components/notifications/NotificationsHeader';
 import NotificationsEmptyState from '@/components/notifications/NotificationsEmptyState';
 import NotificationsList from '@/components/notifications/NotificationsList';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+
+type NotificationFilter = "all" | "social" | "messages" | "system";
 
 const NotificationsPage = () => {
   const { user } = useSupabaseSession();
@@ -15,6 +18,13 @@ const NotificationsPage = () => {
     isLoading, 
     markAllNonFriendRequestsAsRead 
   } = useNotifications();
+  
+  const [filter, setFilter] = useState<NotificationFilter>("all");
+
+  // Track page open
+  useEffect(() => {
+    analyticsEvents.notifications.opened({ source: "bell" });
+  }, []);
 
   // Mark non-friend-request notifications as read when visiting the page
   useEffect(() => {
@@ -22,6 +32,22 @@ const NotificationsPage = () => {
       markAllNonFriendRequestsAsRead();
     }
   }, [notifications.length, markAllNonFriendRequestsAsRead]);
+  
+  // Filter notifications by type
+  const filteredNotifications = useMemo(() => {
+    if (filter === "all") return notifications;
+    
+    const socialTypes = ['follow', 'friend_request', 'friend_accepted', 'like', 'comment', 'tag', 'share'];
+    const messageTypes = ['message'];
+    const systemTypes = ['golf_news', 'course_activity'];
+    
+    return notifications.filter((n) => {
+      if (filter === "social") return socialTypes.includes(n.type);
+      if (filter === "messages") return messageTypes.includes(n.type);
+      if (filter === "system") return systemTypes.includes(n.type);
+      return true;
+    });
+  }, [notifications, filter]);
 
   if (!user) {
     return (
@@ -54,12 +80,36 @@ const NotificationsPage = () => {
       <main className="px-4 md:container md:mx-auto md:px-0 py-6">
         <div className="max-w-2xl mx-auto">
           <NotificationsHeader />
+          
+          {/* Filter Tabs */}
+          <div className="flex gap-2 mb-4 border-b border-border">
+            {(['all', 'social', 'messages', 'system'] as NotificationFilter[]).map((filterType) => (
+              <button
+                key={filterType}
+                onClick={() => setFilter(filterType)}
+                className={`px-4 py-2 text-sm font-medium transition-colors capitalize ${
+                  filter === filterType
+                    ? 'text-foreground border-b-2 border-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {filterType}
+              </button>
+            ))}
+          </div>
 
-          {notifications.length === 0 ? (
+          {filteredNotifications.length === 0 ? (
             <NotificationsEmptyState />
           ) : (
             <NotificationsList
-              notifications={notifications}
+              notifications={filteredNotifications}
+              onNotificationClick={(notification) => {
+                analyticsEvents.notifications.clicked({
+                  id: notification.id,
+                  type: notification.type,
+                  source: "notifications_page",
+                });
+              }}
             />
           )}
         </div>

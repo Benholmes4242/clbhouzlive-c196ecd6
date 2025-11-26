@@ -226,6 +226,52 @@ export const analyticsEvents = {
   hub_echo_chat_send: { event: 'hub_echo_chat_send', category: 'hub' },
   hub_echo_swing_view: (id: string) => ({ event: 'hub_echo_swing_view', category: 'hub', label: id }),
 
+  // Notifications namespace
+  notifications: {
+    opened: (params: { source: "bell" | "deep_link" }) =>
+      analyticsEvents.track("notifications_opened", params),
+
+    clicked: (params: {
+      id: string;
+      type: string;
+      source: "notifications_page";
+      targetType?: "profile" | "post" | "course" | "message";
+      targetId?: string;
+    }) => analyticsEvents.track("notification_clicked", params),
+  },
+
+  // Social namespace
+  social: {
+    followToggled: (params: {
+      targetUserId: string;
+      from: "profile" | "list" | "clubhouse" | "nearby";
+      isFollowing: boolean;
+    }) => analyticsEvents.track("social_follow_toggled", params),
+
+    friendRequestSent: (params: {
+      targetUserId: string;
+      from: "profile" | "nearby" | "notifications";
+    }) => analyticsEvents.track("social_friend_request_sent", params),
+
+    friendRequestResponded: (params: {
+      targetUserId: string;
+      from: "notifications" | "profile";
+      action: "accepted" | "declined";
+    }) => analyticsEvents.track("social_friend_request_responded", params),
+
+    blockChanged: (params: {
+      targetUserId: string;
+      action: "block" | "unblock";
+      from: "profile" | "list";
+    }) => analyticsEvents.track("social_block_changed", params),
+
+    listViewed: (params: {
+      type: "followers" | "following" | "friends";
+      profileUserId: string;
+      from: "profile_stats";
+    }) => analyticsEvents.track("social_list_viewed", params),
+  },
+
   // Course ratings namespace
   ratings: {
     modalOpened: (params: {
