@@ -887,7 +887,7 @@ export type Database = {
           review_date: string | null
           unhelpful_count: number | null
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           clubhouse_score?: number | null
@@ -904,7 +904,7 @@ export type Database = {
           review_date?: string | null
           unhelpful_count?: number | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           clubhouse_score?: number | null
@@ -921,7 +921,7 @@ export type Database = {
           review_date?: string | null
           unhelpful_count?: number | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
