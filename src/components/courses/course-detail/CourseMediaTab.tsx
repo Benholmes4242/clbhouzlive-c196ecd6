@@ -407,7 +407,7 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
       )}
 
       {/* Square Squircle Media Grid - 2 columns mobile, 4 desktop */}
-      <div className="py-6 grid grid-cols-2 md:grid-cols-4 gap-1 bg-slate-50">
+      <div className="py-6 grid grid-cols-2 md:grid-cols-4 gap-0.5 bg-slate-50">
         {mediaItems.map((item) => {
           const isVideo = item.type === 'video';
           const imageSrc = isVideo ? (item.posterUrl || item.url) : item.url;
