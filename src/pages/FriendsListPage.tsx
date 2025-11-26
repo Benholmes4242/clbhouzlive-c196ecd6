@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFriends } from '@/hooks/useFollowersList';
 import { useUserByUsername } from '@/hooks/useUserByUsername';
 import { SocialListPageShell } from '@/components/profile/social/SocialListPageShell';
 import { SocialUserRow } from '@/components/profile/social/SocialUserRow';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { Loader2 } from 'lucide-react';
 
 const FriendsListPage = () => {
@@ -18,6 +19,17 @@ const FriendsListPage = () => {
   const { data: friends = [], isLoading: friendsLoading } = useFriends(profileUser?.id);
 
   const isOwnProfile = currentUser?.id === profileUser?.id;
+  
+  // Track list view
+  useEffect(() => {
+    if (profileUser?.id) {
+      analyticsEvents.social.listViewed({
+        type: "friends",
+        profileUserId: profileUser.id,
+        from: "profile_stats",
+      });
+    }
+  }, [profileUser?.id]);
 
   if (profileLoading) {
     return (

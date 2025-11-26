@@ -4924,6 +4924,10 @@ export type Database = {
           total_users: number
         }[]
       }
+      are_users_blocked: {
+        Args: { user_a: string; user_b: string }
+        Returns: boolean
+      }
       backfill_course_top100_memberships: {
         Args: never
         Returns: {

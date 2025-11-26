@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
+import { useRelationshipStatus } from '@/hooks/useRelationshipStatus';
 
 interface UseProfileActionsProps {
   targetUserId: string;
@@ -12,6 +13,9 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // Check relationship status to respect blocks
+  const { data: relationship } = useRelationshipStatus(targetUserId);
 
   const invalidateAllRelatedQueries = () => {
     // Invalidate all relationship-related queries for both users
@@ -24,6 +28,16 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
   };
 
   const handleFollow = async (isFollowing: boolean) => {
+    // Guard: check if blocked before allowing action
+    if (relationship?.hasBlockedThem || relationship?.isBlockedByThem) {
+      toast({
+        title: "Action not allowed",
+        description: "You can't interact with this user.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setLoading(true);
     try {
       if (isFollowing) {

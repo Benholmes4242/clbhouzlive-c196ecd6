@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFollowing } from '@/hooks/useFollowersList';
 import { useUserByUsername } from '@/hooks/useUserByUsername';
 import { SocialListPageShell } from '@/components/profile/social/SocialListPageShell';
 import { SocialUserRow } from '@/components/profile/social/SocialUserRow';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { Loader2 } from 'lucide-react';
 
 const FollowingListPage = () => {
@@ -16,6 +17,17 @@ const FollowingListPage = () => {
   
   // Fetch following
   const { data: following = [], isLoading: followingLoading } = useFollowing(profileUser?.id);
+  
+  // Track list view
+  useEffect(() => {
+    if (profileUser?.id) {
+      analyticsEvents.social.listViewed({
+        type: "following",
+        profileUserId: profileUser.id,
+        from: "profile_stats",
+      });
+    }
+  }, [profileUser?.id]);
 
   if (profileLoading) {
     return (

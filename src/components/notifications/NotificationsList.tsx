@@ -7,12 +7,19 @@ import TagNotification from './TagNotification';
 
 interface NotificationsListProps {
   notifications: any[];
+  onNotificationClick?: (notification: any) => void;
 }
 
 const NotificationsList: React.FC<NotificationsListProps> = ({ 
-  notifications
+  notifications,
+  onNotificationClick
 }) => {
   const navigate = useNavigate();
+  
+  const handleClick = (notification: any, callback?: () => void) => {
+    onNotificationClick?.(notification);
+    callback?.();
+  };
 
   const formatTimeAgo = (dateString: string) => {
     const now = new Date();
@@ -84,7 +91,7 @@ const NotificationsList: React.FC<NotificationsListProps> = ({
               <div 
                 key={notification.id} 
                 className="flex items-center gap-3 p-4 border-b border-border cursor-pointer hover:bg-muted/50"
-                onClick={() => handleMessageNotificationClick(notification)}
+                onClick={() => handleClick(notification, () => handleMessageNotificationClick(notification))}
               >
                 <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <MessageSquare className="h-5 w-5 text-blue-600" />
