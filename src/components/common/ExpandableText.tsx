@@ -17,25 +17,27 @@ export const ExpandableText: React.FC<ExpandableTextProps> = ({
   const shouldTruncate = text.length > 260;
 
   return (
-    <div className="relative">
-      <p
-        className={
-          expanded
-            ? 'text-sm leading-relaxed text-slate-800'
-            : `text-sm leading-relaxed text-slate-800 line-clamp-${lines}`
-        }
-      >
-        {text}
-      </p>
+    <div>
+      <div className="relative">
+        <p
+          className={
+            expanded
+              ? 'text-sm leading-relaxed text-slate-800'
+              : `text-sm leading-relaxed text-slate-800 line-clamp-${lines}`
+          }
+        >
+          {text}
+        </p>
 
-      {!expanded && shouldTruncate && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white to-transparent" />
-      )}
+        {!expanded && shouldTruncate && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white to-transparent" />
+        )}
+      </div>
 
       {shouldTruncate && (
         <button
           type="button"
-          className="mt-1 text-xs font-semibold text-slate-700 flex items-center gap-1 hover:text-slate-900 transition-colors"
+          className="mt-1 text-xs font-semibold text-slate-700 flex items-center gap-1 hover:text-slate-900 transition-colors relative z-10"
           onClick={() => setExpanded((v) => !v)}
         >
           {expanded ? 'Show less' : 'Read more'}

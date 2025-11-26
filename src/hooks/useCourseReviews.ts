@@ -13,6 +13,9 @@ export type CourseReview = {
   review: string | null;
   review_date: string | null;
   helpful_count: number | null;
+  unhelpful_count: number | null;
+  current_user_vote?: 'helpful' | 'unhelpful' | null;
+  is_mock?: boolean;
   user_profiles?: {
     id: string;
     username: string | null;
@@ -33,7 +36,8 @@ export function useCourseReviews(
   courseId: string | undefined,
   sortBy: ReviewsSortBy = 'recent',
   ratingFilter: ReviewsRatingFilter = 'all',
-  filters?: ReviewsFilters
+  filters?: ReviewsFilters,
+  currentUserId?: string
 ) {
   const filtersKey = filters ? JSON.stringify(filters) : 'none';
 
@@ -58,6 +62,8 @@ export function useCourseReviews(
           review,
           review_date,
           helpful_count,
+          unhelpful_count,
+          is_mock,
           user_profiles:user_id (
             id,
             username,
@@ -121,7 +127,29 @@ export function useCourseReviews(
       const { data, error } = await query.limit(100);
       if (error) throw error;
 
-      return (data as any as CourseReview[]) ?? [];
+      const reviews = (data as any as CourseReview[]) ?? [];
+
+      // If user is logged in, fetch their votes for these reviews
+      if (currentUserId && reviews.length > 0) {
+        const reviewIds = reviews.map((r) => r.id);
+        const { data: votes } = await supabase
+          .from('course_review_votes')
+          .select('rating_id, vote_type')
+          .eq('user_id', currentUserId)
+          .in('rating_id', reviewIds);
+
+        // Map votes to reviews
+        const voteMap = new Map(
+          votes?.map((v) => [v.rating_id, v.vote_type as 'helpful' | 'unhelpful']) ?? []
+        );
+
+        return reviews.map((review) => ({
+          ...review,
+          current_user_vote: voteMap.get(review.id) ?? null,
+        }));
+      }
+
+      return reviews;
     },
     staleTime: 0, // Always refetch when explicitly requested
     gcTime: 10 * 60 * 1000, // 10 minutes
