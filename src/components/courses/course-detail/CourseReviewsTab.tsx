@@ -214,8 +214,16 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const myReview = reviews.find((r) => r.user_id === user?.id);
   const otherReviews = reviews.filter((r) => r.user_id !== user?.id);
 
+  console.log('[Reviews Render]', {
+    length: reviews.length,
+    hasMyReview: !!myReview,
+    otherCount: otherReviews.length,
+    ratingStats,
+  });
+
   const communityScore = ratingStats?.average_rating || 0;
   const reviewCount = ratingStats?.total_reviews || 0;
+  const hasReviews = reviews.length > 0;
 
   // Transform reviews into ReviewCard format
   const transformReview = (review: ReviewData, isHighlighted = false) => {
@@ -272,8 +280,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     );
   }
 
-  // Empty state
-  if (reviewCount === 0) {
+  // Empty state - use reviews.length as source of truth
+  if (!hasReviews) {
     return (
       <div className="flex flex-col">
         <section className="px-4 pt-6 pb-5 bg-slate-100">
