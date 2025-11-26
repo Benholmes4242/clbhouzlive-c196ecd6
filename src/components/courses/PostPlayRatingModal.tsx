@@ -1159,7 +1159,7 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
   const band = getRatingBand(userRating);
   const comparison = getComparisonCopy(userRating, communityScore);
 
-  const title = isEdit ? 'Rating updated ✔' : 'Rating submitted 🎉';
+  const title = isEdit ? 'Rating updated' : 'Rating submitted';
   const subtitle = isEdit
     ? `Your updated rating for ${courseName} has been saved.`
     : `Your rating for ${courseName} has been saved.`;
@@ -1167,12 +1167,31 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
   const overallHeading = isEdit ? 'Updated overall rating' : 'Your overall rating';
   const breakdownHeading = isEdit ? 'Updated breakdown' : 'Your breakdown';
 
+  // Compute comparison text for inside the rating card
+  const hasCommunityScore = typeof communityScore === 'number' && !Number.isNaN(communityScore);
+  const diffRaw = hasCommunityScore ? userRating - communityScore : 0;
+  const diff = Math.round(diffRaw * 10) / 10;
+
+  let comparisonText: string | null = null;
+
+  if (hasCommunityScore && Math.abs(diff) >= 0.1) {
+    if (diff > 0) {
+      comparisonText = `You rated this course ${Math.abs(diff).toFixed(1)} point${Math.abs(diff) === 1.0 ? '' : 's'} higher than the community.`;
+    } else {
+      comparisonText = `You rated this course ${Math.abs(diff).toFixed(1)} point${Math.abs(diff) === 1.0 ? '' : 's'} lower than the community.`;
+    }
+  } else if (hasCommunityScore && Math.abs(diff) < 0.1) {
+    comparisonText = 'You rated this course the same as the community.';
+  } else {
+    comparisonText = "You're the first to rate this course – your rating sets the starting point.";
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-slate-50">
       {/* SECTION A – Success header */}
-      <section className="bg-slate-50 px-6 pt-10 pb-6 text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
-          <Check className="h-7 w-7 text-emerald-600" />
+      <section className="bg-slate-50 px-6 pt-16 pb-6 text-center">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
+          <Check className="h-8 w-8 text-emerald-600" />
         </div>
 
         <h1 className="text-lg font-semibold text-slate-900">{title}</h1>
@@ -1194,6 +1213,12 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
 
             <RatingBadge band={band} />
           </div>
+
+          {comparisonText && (
+            <p className="mt-3 text-xs text-slate-500">
+              {comparisonText}
+            </p>
+          )}
         </div>
       </section>
 
@@ -1223,19 +1248,6 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
         </section>
       )}
 
-      {/* SECTION D – Comparison vs community (optional) */}
-      {comparison && (
-        <section className="bg-slate-100 px-6 py-5">
-          <div className="rounded-2xl bg-white px-4 py-3 border border-slate-200">
-            <p className="flex items-center text-sm text-slate-700">
-              <span className="mr-2 text-base font-semibold" style={{ color: comparison.color }}>
-                {comparison.icon}
-              </span>
-              {comparison.text}
-            </p>
-          </div>
-        </section>
-      )}
 
       {/* Spacer so actions sit near the bottom */}
       <div className="flex-1 bg-slate-50" />
