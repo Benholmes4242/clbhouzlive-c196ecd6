@@ -494,7 +494,7 @@ const PostPlayRatingModal = ({
       toast({
         title: "Course removed",
         description: `${course?.name} has been removed from your played list. You can add a new rating at any time.`,
-        className: "pointer-events-auto w-full max-w-md rounded-2xl bg-slate-900/80 text-slate-50 border border-white/15 shadow-[0_18px_35px_rgba(15,23,42,0.75)] backdrop-blur-xl",
+        className: "pointer-events-auto mx-4 mb-6 max-w-md rounded-2xl bg-slate-50 shadow-lg border border-slate-200 px-4 py-3",
       });
       
       if (onRemoveFromPlayed) {
@@ -1093,23 +1093,22 @@ const PostPlayRatingModal = ({
         {/* Custom Remove Confirmation Dialog */}
         {showRemoveDialog && (
           <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-            <div className="w-full max-w-sm mx-4 rounded-2xl bg-slate-900 text-slate-50 border border-white/10 p-5 shadow-xl">
-              <h2 className="text-base font-semibold">Remove rating?</h2>
-              <p className="mt-2 text-sm text-slate-300">
+            <div className="w-[90%] max-w-sm rounded-2xl bg-slate-50 shadow-xl border border-slate-200 px-5 py-6 space-y-3">
+              <h2 className="text-base font-semibold text-slate-900">Remove rating?</h2>
+              <p className="text-sm text-slate-600">
                 This will permanently delete your rating and review for this course.
               </p>
-              <div className="mt-5 flex gap-3">
+              <div className="mt-4 flex items-center justify-end gap-3">
                 <Button
                   type="button"
-                  variant="outline"
-                  className="flex-1 border border-white/20 bg-transparent text-slate-50 hover:bg-white/5"
+                  className="h-11 rounded-lg border border-slate-600 bg-white text-slate-600 text-base font-medium px-5 py-2 hover:bg-slate-50 active:scale-[0.99]"
                   onClick={() => setShowRemoveDialog(false)}
                 >
                   Cancel
                 </Button>
                 <Button
                   type="button"
-                  className="flex-1 bg-red-500 text-white border border-red-500/80 shadow-sm hover:bg-red-600 active:bg-red-700"
+                  className="h-11 rounded-lg border border-red-300 bg-white/80 text-red-600 text-base font-medium px-5 py-2 hover:bg-red-50 active:scale-[0.99]"
                   onClick={() => {
                     setShowRemoveDialog(false);
                     handleRemoveFromPlayed();
