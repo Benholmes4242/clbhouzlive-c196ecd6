@@ -8,6 +8,7 @@ import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { ReviewCard } from '../review/ReviewCard';
 import { ReviewsHeaderCard } from '../review/ReviewsHeaderCard';
 import { Button } from '@/components/ui/button';
+import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
 
 interface CourseReviewsTabProps {
   courseId: string;
@@ -74,8 +75,13 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   // Fetch all reviews with user profiles
   const { data: reviewsData, isLoading } = useQuery({
-    queryKey: ['course-reviews-full', courseId],
+    queryKey: ['course-reviews-full', courseId, SHOW_MOCK_REVIEWS],
     queryFn: async () => {
+      // If mock reviews are disabled, return empty array
+      if (!SHOW_MOCK_REVIEWS) {
+        return [];
+      }
+
       const { data, error } = await supabase
         .from('course_ratings')
         .select(

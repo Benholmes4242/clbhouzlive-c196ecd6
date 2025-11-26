@@ -15,6 +15,7 @@ import CourseMediaTab from '@/components/courses/course-detail/CourseMediaTab';
 import CourseRankBadges from '@/components/courses/CourseRankBadges';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
+import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
 
 
 interface GolfClubViewProps {
@@ -66,9 +67,14 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
 
   // Lifted rating query to parent - will be shared across tabs
   const { data: ratingStats, isLoading: ratingStatsLoading } = useQuery({
-    queryKey: ['course-rating-stats', courseId],
+    queryKey: ['course-rating-stats', courseId, SHOW_MOCK_REVIEWS],
     queryFn: async () => {
       if (!courseId) return null;
+
+      // If mock reviews are disabled, return zeros
+      if (!SHOW_MOCK_REVIEWS) {
+        return { average_rating: 0, total_ratings: 0, total_reviews: 0 };
+      }
 
       const { data, error } = await supabase
         .from('course_ratings')
