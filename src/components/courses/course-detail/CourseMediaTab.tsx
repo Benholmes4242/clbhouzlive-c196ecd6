@@ -255,25 +255,25 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
           subtitle={subtitle}
         />
 
-        <div className="rounded-3xl bg-white shadow-sm px-5 py-8 text-center">
-          <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-            <ImageIcon className="w-7 h-7 text-slate-400" />
+        <div className="rounded-xl bg-white shadow-sm px-6 py-14 text-center flex flex-col items-center">
+          <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+            <ImageIcon className="w-6 h-6 text-slate-400" />
           </div>
           <h3 className="text-lg font-semibold text-slate-900 mb-2">
             No photos or videos yet
           </h3>
-          <p className="text-sm text-slate-600 mb-5">
+          <p className="text-sm text-slate-600 max-w-sm mb-6">
             Help other golfers discover this course — add your first moment.
           </p>
-          <Button 
-            variant="outline"
+          <button
+            className="px-6 py-3 rounded-xl border border-slate-300 text-sm font-medium text-slate-900 active:scale-95 transition"
             onClick={() => {
               // TODO: Open create moment flow
               console.log('Open capture moment flow');
             }}
           >
             Capture a moment
-          </Button>
+          </button>
         </div>
       </div>
     );
@@ -299,9 +299,9 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
           hasUserMedia={mediaSummary.userMediaCount > 0}
         />
         
-        <div className="rounded-3xl bg-white shadow-sm px-5 py-8 text-center">
-          <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-            <ImageIcon className="w-7 h-7 text-slate-400" />
+        <div className="rounded-xl bg-white shadow-sm px-6 py-14 text-center">
+          <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+            <ImageIcon className="w-6 h-6 text-slate-400" />
           </div>
           <h3 className="text-lg font-semibold text-slate-900 mb-2">
             No results for this filter
@@ -406,34 +406,55 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
         </div>
       )}
 
-      {/* Squircle Media Grid - 2 columns mobile */}
-      <div className="px-4 py-6 grid grid-cols-2 gap-3 bg-slate-50">
-        {mediaItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => handleMediaClick(item)}
-            className="relative aspect-[4/5] rounded-[18px] overflow-hidden bg-slate-200 border border-slate-300/40 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-150"
-          >
-            {/* Thumbnail image */}
-            <img
-              src={item.type === 'video' ? item.posterUrl || item.url : item.url}
-              alt={item.alt || 'Media'}
-              className="w-full h-full object-cover"
-            />
+      {/* Square Squircle Media Grid - 2 columns mobile, 4 desktop */}
+      <div className="px-4 py-6 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 bg-slate-50">
+        {mediaItems.map((item) => {
+          const isVideo = item.type === 'video';
+          const imageSrc = isVideo ? (item.posterUrl || item.url) : item.url;
+          
+          // Format duration for display
+          const formatDuration = (seconds?: number) => {
+            if (!seconds || Number.isNaN(seconds)) return '0:00';
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m}:${s.toString().padStart(2, '0')}`;
+          };
 
-            {/* Video duration badge */}
-            {item.type === 'video' && (
-              <div className="absolute bottom-2 right-2">
-                <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm">
-                  <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M3 2v12l10-6L3 2z" />
-                  </svg>
-                  <span className="text-[10px] font-medium text-white">0:12</span>
-                </div>
-              </div>
-            )}
-          </button>
-        ))}
+          return (
+            <button
+              key={item.id}
+              onClick={() => handleMediaClick(item)}
+              className="relative aspect-square rounded-[var(--squircle-radius)] overflow-hidden bg-slate-200 border border-slate-300/40 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-150"
+            >
+              {/* Thumbnail image */}
+              <img
+                src={imageSrc}
+                alt={item.alt || 'Media'}
+                className="w-full h-full object-cover"
+              />
+
+              {/* Video overlays: gradient + duration */}
+              {isVideo && (
+                <>
+                  {/* Bottom gradient for readability */}
+                  <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
+
+                  {/* Duration pill */}
+                  <div className="absolute bottom-2 right-2">
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-black/70 backdrop-blur-sm">
+                      <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M3 2v12l10-6L3 2z" />
+                      </svg>
+                      <span className="text-[10px] font-medium text-white">
+                        {formatDuration(item.duration)}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       {/* Conditional Modal/Feed based on feature flag */}
