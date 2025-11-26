@@ -63,11 +63,11 @@ export default function SlideInModal({
     } else if (mounted) {
       // start slide-out animation
       setAnimateIn(false);
-      // unmount after the animation completes
-      const timer = setTimeout(() => setMounted(false), 220);
+      // unmount after the animation completes (match 150ms duration)
+      const timer = setTimeout(() => setMounted(false), 150);
       // restore focus to trigger element
       const el = triggerRef.current;
-      if (el) setTimeout(() => el.focus(), 230);
+      if (el) setTimeout(() => el.focus(), 160);
       return () => clearTimeout(timer);
     }
   }, [open, mounted, initialFocusRef]);
