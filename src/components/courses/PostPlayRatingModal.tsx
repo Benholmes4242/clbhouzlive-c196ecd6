@@ -990,50 +990,18 @@ const PostPlayRatingModal = ({
               )}
             </footer>
           </div>
+          ) : isEditMode ? (
+            <EditRatingConfirmation
+              course={course!}
+              userRating={{ rating: selectedRating, review }}
+              onBackToCourse={handleClose}
+            />
           ) : (
-            /* Confirmation Screen */
-            <div className="flex min-h-screen flex-col items-center justify-start px-6 pt-20 pb-10 bg-slate-50">
-              <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100">
-                <Check className="h-10 w-10 text-emerald-600" />
-              </div>
-              
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-                <Check className="h-7 w-7 text-emerald-600" />
-              </div>
-
-              <h1 className="mt-10 text-xl font-semibold text-slate-900">
-                {isEditMode ? 'Rating updated ✔' : 'Rating saved 🏆'}
-              </h1>
-              
-              <p className="mt-2 text-sm text-slate-500 text-center max-w-md px-4">
-                {isEditMode
-                  ? `Your updated rating for ${course.name} has been saved.`
-                  : `Your rating for ${course.name} has been added.`}
-              </p>
-
-              <div className="mt-6 w-full max-w-md rounded-2xl bg-white/80 p-4 shadow-sm backdrop-blur">
-                <div className="flex items-center gap-3">
-                  <Trophy className="h-6 w-6 text-amber-500" />
-                  <div className="flex flex-col">
-                    <span className="text-lg font-semibold text-slate-900">
-                      {selectedRating?.toFixed(1)}/10
-                    </span>
-                    {review && (
-                      <span className="mt-0.5 text-xs text-slate-500 line-clamp-1">
-                        "{review}"
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <Button
-                className="mt-8 w-full max-w-md rounded-full text-sm font-semibold bg-slate-900 text-white border border-white/10 shadow-[0_8px_20px_rgba(15,23,42,0.45)] hover:bg-slate-900/90"
-                onClick={handleClose}
-              >
-                Back to course
-              </Button>
-            </div>
+            <NewRatingConfirmation
+              course={course!}
+              userRating={{ rating: selectedRating, review }}
+              onBackToCourse={handleClose}
+            />
           )}
         </div>
 
@@ -1071,5 +1039,121 @@ const PostPlayRatingModal = ({
     </>
   );
 };
+
+// ============================================
+// Confirmation Components
+// ============================================
+
+type RatingConfirmationProps = {
+  course: Course;
+  userRating: { rating: number | null; review: string };
+  onBackToCourse: () => void;
+};
+
+/**
+ * NewRatingConfirmation
+ * Shown after a user submits their first rating for a course
+ */
+function NewRatingConfirmation({
+  course,
+  userRating,
+  onBackToCourse,
+}: RatingConfirmationProps) {
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-start px-6 pt-20 pb-10 bg-slate-50">
+      <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100">
+        <Check className="h-10 w-10 text-emerald-600" />
+      </div>
+      
+      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
+        <Check className="h-7 w-7 text-emerald-600" />
+      </div>
+
+      <h1 className="mt-10 text-xl font-semibold text-slate-900">
+        Rating saved 🏆
+      </h1>
+      
+      <p className="mt-2 text-sm text-slate-500 text-center max-w-md px-4">
+        Your rating for {course.name} has been added.
+      </p>
+
+      <div className="mt-6 w-full max-w-md rounded-2xl bg-white/80 p-4 shadow-sm backdrop-blur">
+        <div className="flex items-center gap-3">
+          <Trophy className="h-6 w-6 text-amber-500" />
+          <div className="flex flex-col">
+            <span className="text-lg font-semibold text-slate-900">
+              {userRating.rating?.toFixed(1)}/10
+            </span>
+            {userRating.review && (
+              <span className="mt-0.5 text-xs text-slate-500 line-clamp-1">
+                "{userRating.review}"
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <Button
+        className="mt-8 w-full max-w-md rounded-full text-sm font-semibold bg-slate-900 text-white border border-white/10 shadow-[0_8px_20px_rgba(15,23,42,0.45)] hover:bg-slate-900/90"
+        onClick={onBackToCourse}
+      >
+        Back to course
+      </Button>
+    </div>
+  );
+}
+
+/**
+ * EditRatingConfirmation
+ * Shown after a user updates their existing rating for a course
+ */
+function EditRatingConfirmation({
+  course,
+  userRating,
+  onBackToCourse,
+}: RatingConfirmationProps) {
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-start px-6 pt-20 pb-10 bg-slate-50">
+      <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100">
+        <Check className="h-10 w-10 text-emerald-600" />
+      </div>
+      
+      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
+        <Check className="h-7 w-7 text-emerald-600" />
+      </div>
+
+      <h1 className="mt-10 text-xl font-semibold text-slate-900">
+        Rating updated ✔
+      </h1>
+      
+      <p className="mt-2 text-sm text-slate-500 text-center max-w-md px-4">
+        Your updated rating for {course.name} has been saved.
+      </p>
+
+      <div className="mt-6 w-full max-w-md rounded-2xl bg-white/80 p-4 shadow-sm backdrop-blur">
+        <div className="flex items-center gap-3">
+          <Trophy className="h-6 w-6 text-amber-500" />
+          <div className="flex flex-col">
+            <span className="text-lg font-semibold text-slate-900">
+              {userRating.rating?.toFixed(1)}/10
+            </span>
+            {userRating.review && (
+              <span className="mt-0.5 text-xs text-slate-500 line-clamp-1">
+                "{userRating.review}"
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <Button
+        className="mt-8 w-full max-w-md rounded-full text-sm font-semibold bg-slate-900 text-white border border-white/10 shadow-[0_8px_20px_rgba(15,23,42,0.45)] hover:bg-slate-900/90"
+        onClick={onBackToCourse}
+      >
+        Back to course
+      </Button>
+    </div>
+  );
+}
 
 export default PostPlayRatingModal;
