@@ -1034,7 +1034,7 @@ const PostPlayRatingModal = ({
             </section>
 
             {/* Primary CTA Button - Section E (light) */}
-            <footer className="px-6 pt-6 pb-3 bg-slate-50">
+            <footer className="px-6 pt-6 mb-3 bg-slate-50">
               {isEditMode ? (
                 <div className="flex w-full items-center justify-between gap-3">
                   {/* Remove rating (left) */}
