@@ -76,6 +76,8 @@ const PostPlayRatingModal = ({
   
   // Custom remove confirmation dialog
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
+  const [isDeleted, setIsDeleted] = useState(false);
+  const [isFadingOut, setIsFadingOut] = useState(false);
 
   // Use passed existingRating or fetch internally as fallback
   const { data: existingRatingFetched } = useQuery({
@@ -489,22 +491,30 @@ const PostPlayRatingModal = ({
         // Don't block delete success
       }
       
-      console.log('[Delete Rating] onSuccess - showing toast and closing modal');
+      console.log('[Delete Rating] onSuccess - showing success state in modal');
       
-      toast({
-        title: "Course removed",
-        description: `${course?.name} has been removed from your played list. You can add a new rating at any time.`,
-        className: "pointer-events-auto mx-auto mb-6 max-w-md rounded-2xl bg-slate-50 shadow-lg border border-slate-200 px-4 py-3",
-      });
+      // Show success state in modal
+      setIsDeleted(true);
       
-      if (onRemoveFromPlayed) {
-        onRemoveFromPlayed();
-      }
+      // Start fade-out after 1.8s
+      setTimeout(() => {
+        setIsFadingOut(true);
+      }, 1800);
       
-      onClose();
-      resetForm();
-      
-      console.log('[Delete Rating] Success - complete');
+      // Close modal and reset after 2.2s
+      setTimeout(() => {
+        if (onRemoveFromPlayed) {
+          onRemoveFromPlayed();
+        }
+        
+        setShowRemoveDialog(false);
+        setIsDeleted(false);
+        setIsFadingOut(false);
+        onClose();
+        resetForm();
+        
+        console.log('[Delete Rating] Success - complete');
+      }, 2200);
     },
     onError: (error: any) => {
       console.error('[Delete Rating] Error:', error);
@@ -1093,30 +1103,44 @@ const PostPlayRatingModal = ({
         {/* Custom Remove Confirmation Dialog */}
         {showRemoveDialog && (
           <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-            <div className="w-[90%] max-w-sm rounded-2xl bg-slate-50 shadow-xl border border-slate-200 px-5 py-6 space-y-3">
-              <h2 className="text-base font-semibold text-slate-900">Remove rating?</h2>
-              <p className="text-sm text-slate-600">
-                This will permanently delete your rating and review for this course.
-              </p>
-              <div className="mt-4 flex items-center justify-end gap-3">
-                <Button
-                  type="button"
-                  className="h-11 rounded-lg border border-slate-600 bg-white text-slate-600 text-base font-medium px-5 py-2 hover:bg-slate-50 active:scale-[0.99]"
-                  onClick={() => setShowRemoveDialog(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="button"
-                  className="h-11 rounded-lg border border-red-300 bg-white/80 text-red-600 text-base font-medium px-5 py-2 hover:bg-red-50 active:scale-[0.99]"
-                  onClick={() => {
-                    setShowRemoveDialog(false);
-                    handleRemoveFromPlayed();
-                  }}
-                >
-                  Delete
-                </Button>
-              </div>
+            <div 
+              className={`w-[90%] max-w-sm rounded-3xl bg-slate-50 shadow-xl border border-slate-200 px-5 py-6 space-y-3 transition-opacity duration-300 ease-out ${
+                isFadingOut ? 'opacity-0' : 'opacity-100'
+              }`}
+            >
+              {!isDeleted ? (
+                <>
+                  <h2 className="text-lg font-semibold text-slate-900 mb-2">Remove rating?</h2>
+                  <p className="text-sm text-slate-600 mb-6">
+                    This will permanently delete your rating and review for this course.
+                  </p>
+                  <div className="flex items-center justify-end gap-3">
+                    <Button
+                      type="button"
+                      className="h-11 rounded-lg border border-slate-600 bg-white text-slate-600 text-base font-medium px-5 py-2 hover:bg-slate-50 active:scale-[0.99]"
+                      onClick={() => setShowRemoveDialog(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="button"
+                      className="h-11 rounded-full border border-red-300 bg-white/80 text-red-600 text-base font-semibold px-5 py-2 hover:bg-red-50 active:scale-[0.99]"
+                      onClick={() => {
+                        handleRemoveFromPlayed();
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-lg font-semibold text-slate-900 mb-2">Course removed</h2>
+                  <p className="text-sm text-slate-600">
+                    {course?.name} has been removed from your played list. You can add a new rating at any time.
+                  </p>
+                </>
+              )}
             </div>
           </div>
         )}
