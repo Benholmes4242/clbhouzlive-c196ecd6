@@ -318,12 +318,14 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         )}
       </section>
 
-      {/* Section 3 – End message */}
-      <section className="px-4 pt-4 pb-4 bg-slate-50">
-        <p className="text-center text-xs text-slate-500">
-          You've reached the end of the reviews.
-        </p>
-      </section>
+      {/* Section 3 – End message (only show if there are reviews) */}
+      {reviews.length > 0 && (
+        <section className="px-4 pt-4 pb-4 bg-slate-50">
+          <p className="text-center text-xs text-slate-500">
+            You've reached the end of the reviews.
+          </p>
+        </section>
+      )}
     </div>
   );
 };
