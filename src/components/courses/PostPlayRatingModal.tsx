@@ -494,7 +494,7 @@ const PostPlayRatingModal = ({
       toast({
         title: "Course removed",
         description: `${course?.name} has been removed from your played list. You can add a new rating at any time.`,
-        className: "pointer-events-auto mx-4 mb-6 max-w-md rounded-2xl bg-slate-50 shadow-lg border border-slate-200 px-4 py-3",
+        className: "pointer-events-auto mx-auto mb-6 max-w-md rounded-2xl bg-slate-50 shadow-lg border border-slate-200 px-4 py-3",
       });
       
       if (onRemoveFromPlayed) {
