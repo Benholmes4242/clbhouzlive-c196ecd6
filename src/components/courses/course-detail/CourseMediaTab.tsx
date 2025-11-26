@@ -16,8 +16,10 @@ import { FLAGS } from '@/config/flags';
 // New components for media tab polish
 import { CourseMediaSummaryCard } from './CourseMediaSummaryCard';
 import { MediaFilterRow, MediaFilterMode } from './MediaFilterRow';
+import { FriendsAvatarRow } from './FriendsAvatarRow';
 import { useCourseMediaSummary } from '@/hooks/useCourseMediaSummary';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useUserFriends } from '@/hooks/useUserFriends';
 import { Button } from '@/components/ui/button';
 
 interface CourseMediaTabProps {
@@ -50,6 +52,11 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
   const [selectedMediaIndex, setSelectedMediaIndex] = useState<number | null>(null);
   const [modalPortalTarget, setModalPortalTarget] = useState<HTMLElement | null>(null);
   const [filterMode, setFilterMode] = useState<MediaFilterMode>('most_recent');
+  const [focusedFriendId, setFocusedFriendId] = useState<string | null>(null);
+
+  // Get user's friends
+  const { data: friendsData } = useUserFriends(user?.id);
+  const friendIds = useMemo(() => friendsData?.map(f => f.id) || [], [friendsData]);
 
   // Vertical feed for consistent UX
   const { 
@@ -102,7 +109,53 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
 
   const mediaSummary = useCourseMediaSummary(mediaSummaryItems, user?.id || null);
 
-  // Filter media items based on active filter mode
+  // Calculate friends with media for avatar row
+  const friendsWithMedia = useMemo(() => {
+    const friendMediaMap = new Map<string, { id: string; name: string; avatarUrl?: string | null; count: number }>();
+
+    exploreItems.forEach(item => {
+      if (item.user && friendIds.includes(item.user.id)) {
+        const existing = friendMediaMap.get(item.user.id);
+        if (existing) {
+          existing.count++;
+        } else {
+          friendMediaMap.set(item.user.id, {
+            id: item.user.id,
+            name: item.user.name,
+            avatarUrl: item.user.avatar,
+            count: 1,
+          });
+        }
+      }
+    });
+
+    return Array.from(friendMediaMap.values()).map(f => ({
+      id: f.id,
+      name: f.name,
+      avatarUrl: f.avatarUrl,
+      mediaCount: f.count,
+    }));
+  }, [exploreItems, friendIds]);
+
+  // Calculate dynamic subtitle based on filter mode
+  const subtitle = useMemo(() => {
+    if (filterMode === 'friends') {
+      const count = friendsWithMedia.length;
+
+      if (count === 0) {
+        return 'No media from your friends here yet.';
+      } else if (focusedFriendId) {
+        const friendName = friendsWithMedia.find(f => f.id === focusedFriendId)?.name || 'Friend';
+        const firstName = friendName.split(' ')[0];
+        return `Showing media from ${firstName}.`;
+      } else {
+        return `Showing media from your friends (${count}).`;
+      }
+    }
+    return undefined; // Use default subtitle from summary card
+  }, [filterMode, friendsWithMedia, focusedFriendId]);
+
+  // Filter media items based on active filter mode and focused friend
   const filteredExploreItems = useMemo(() => {
     let filtered = exploreItems;
 
@@ -114,8 +167,13 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
         filtered = exploreItems.filter(item => item.type === 'image');
         break;
       case 'friends':
-        // TODO: Filter by friends when friends list is available
-        filtered = exploreItems;
+        // Filter by friends
+        filtered = exploreItems.filter(item => item.user && friendIds.includes(item.user.id));
+        
+        // Then narrow by focused friend if set
+        if (focusedFriendId) {
+          filtered = filtered.filter(item => item.user?.id === focusedFriendId);
+        }
         break;
       case 'mine':
         filtered = exploreItems.filter(item => item.user?.id === user?.id);
@@ -127,13 +185,32 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
     }
 
     return filtered;
-  }, [exploreItems, filterMode, user?.id]);
+  }, [exploreItems, filterMode, friendIds, focusedFriendId, user?.id]);
 
   // Adapt for new MediaGrid using filtered items
   const mediaItems = useMemo(
     () => adaptExploreContentToMediaItems(filteredExploreItems),
     [filteredExploreItems]
   );
+
+  // Handle filter mode change - clear focused friend when switching away from friends
+  const handleFilterChange = (mode: MediaFilterMode) => {
+    setFilterMode(mode);
+    if (mode !== 'friends') {
+      setFocusedFriendId(null);
+    }
+  };
+
+  // Handle friend avatar click - toggle focused friend
+  const handleFriendClick = (friendId: string) => {
+    if (focusedFriendId === friendId) {
+      // Second tap: clear focused friend
+      setFocusedFriendId(null);
+    } else {
+      // First tap: focus this friend
+      setFocusedFriendId(friendId);
+    }
+  };
 
   const handleMediaClick = (item: NewMediaItem) => {
     if (FLAGS.USE_VERTICAL_FEED_FOR_PROFILE_MEDIA) {
@@ -175,6 +252,7 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
           videoCount={0}
           userMediaCount={0}
           lastMediaCreatedAt={null}
+          subtitle={subtitle}
         />
 
         <div className="rounded-3xl bg-white shadow-sm px-5 py-8 text-center">
@@ -211,12 +289,13 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
           userMediaCount={mediaSummary.userMediaCount}
           lastMediaCreatedAt={mediaSummary.lastMediaCreatedAt}
           onUserMediaClick={() => setFilterMode('mine')}
+          subtitle={subtitle}
         />
 
         <MediaFilterRow
           filterMode={filterMode}
-          onFilterChange={setFilterMode}
-          hasFriends={false} // TODO: Check if user has friends
+          onFilterChange={handleFilterChange}
+          hasFriends={friendsWithMedia.length > 0}
           hasUserMedia={mediaSummary.userMediaCount > 0}
         />
         
@@ -298,15 +377,25 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
         userMediaCount={mediaSummary.userMediaCount}
         lastMediaCreatedAt={mediaSummary.lastMediaCreatedAt}
         onUserMediaClick={() => setFilterMode('mine')}
+        subtitle={subtitle}
       />
 
       {/* Filter Row */}
       <MediaFilterRow
         filterMode={filterMode}
-        onFilterChange={setFilterMode}
-        hasFriends={false} // TODO: Check if user has friends
+        onFilterChange={handleFilterChange}
+        hasFriends={friendsWithMedia.length > 0}
         hasUserMedia={mediaSummary.userMediaCount > 0}
       />
+
+      {/* Friends Avatar Row - shown when "From friends" is active and friends have media */}
+      {filterMode === 'friends' && friendsWithMedia.length > 0 && (
+        <FriendsAvatarRow
+          friends={friendsWithMedia}
+          focusedFriendId={focusedFriendId}
+          onFriendClick={handleFriendClick}
+        />
+      )}
 
       {/* Only your media message */}
       {showOnlyYourMediaMessage && (
