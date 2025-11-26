@@ -47,7 +47,11 @@ const RateCoursePage = () => {
   });
 
   const handleClose = () => {
-    navigate(-1);
+    // Navigate back to course details, Reviews tab, with highlight flag
+    navigate(`/courses/${courseId}`, {
+      replace: true,
+      state: { activeTab: 'reviews', highlightMyReview: true },
+    });
   };
 
   // Debug logging

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Earth, ArrowLeft } from 'lucide-react';
 import { IoMdArrowBack } from 'react-icons/io';
@@ -26,10 +26,14 @@ interface GolfClubViewProps {
 const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false, onClose }) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('about');
+  const location = useLocation();
+  
+  // Check location state for initial tab and highlight flag
+  const initialTab = (location.state as any)?.activeTab || 'about';
+  const [activeTab, setActiveTab] = useState(initialTab);
   
   // Phase 3: Track which tabs have been visited for keep-mounted pattern
-  const [visitedTabs, setVisitedTabs] = useState<Set<string>>(new Set(['about']));
+  const [visitedTabs, setVisitedTabs] = useState<Set<string>>(new Set([initialTab]));
 
   // Fire both queries in parallel for faster initial load
   const { data: course, isLoading: courseLoading } = useQuery({

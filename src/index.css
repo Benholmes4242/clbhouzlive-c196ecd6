@@ -3810,6 +3810,20 @@ html[data-immersive="true"] .app-shell--topSpacer {
   }
 }
 
+/* Soft pulse animation for highlighted reviews */
+@keyframes softPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.25);
+  }
+  100% {
+    box-shadow: 0 0 0 12px rgba(56, 189, 248, 0);
+  }
+}
+
+.animate-soft-pulse {
+  animation: softPulse 1.2s ease-out 0s 2;
+}
+
 /* Respect prefers-reduced-motion globally */
 @media (prefers-reduced-motion: reduce) {
   *,
