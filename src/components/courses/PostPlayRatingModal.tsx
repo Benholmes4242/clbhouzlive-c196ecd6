@@ -1124,7 +1124,7 @@ const PostPlayRatingModal = ({
                     </Button>
                     <Button
                       type="button"
-                      className="h-11 rounded-full border border-red-300 bg-white/80 text-red-600 text-base font-semibold px-5 py-2 hover:bg-red-50 active:scale-[0.99]"
+                      className="h-11 rounded-lg border border-red-300 bg-white/80 text-red-600 text-base font-semibold px-5 py-2 hover:bg-red-50 active:scale-[0.99]"
                       onClick={() => {
                         handleRemoveFromPlayed();
                       }}
