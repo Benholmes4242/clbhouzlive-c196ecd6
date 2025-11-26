@@ -350,7 +350,7 @@ const PostPlayRatingModal = ({
       });
       
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
-      queryClient.invalidateQueries({ queryKey: ['course-reviews-full', course?.id] });
+      queryClient.invalidateQueries({ queryKey: ['course-reviews-full'] });
       queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
       queryClient.invalidateQueries({ queryKey: ['user-played-course', course?.id] });
       
@@ -466,7 +466,7 @@ const PostPlayRatingModal = ({
       await queryClient.refetchQueries({ queryKey: ['course-rating-aggregates', course?.id] });
       
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
-      queryClient.invalidateQueries({ queryKey: ['course-reviews-full', course?.id] });
+      queryClient.invalidateQueries({ queryKey: ['course-reviews-full'] });
       queryClient.invalidateQueries({ queryKey: ['user-course', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['user-top100-course', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['userTop100Courses'] });
