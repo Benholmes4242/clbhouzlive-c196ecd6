@@ -58,9 +58,7 @@ export function useCourseReviews(
           )
         `
         )
-        .eq('course_id', courseId)
-        .not('review', 'is', null)
-        .not('review', 'eq', '');
+        .eq('course_id', courseId);
 
       // Rating range filter
       switch (ratingFilter) {
