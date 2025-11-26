@@ -159,14 +159,14 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
         {/* Right - score + badge stack (centered) */}
         <div className="inline-flex flex-col items-center gap-2">
-          {/* Logo + Score - centered layout matching About tab */}
-          <div className="flex items-center gap-2">
-            <ClubhouseLogo size="sm" />
-            <span className="text-3xl font-bold text-slate-900">
+          {/* Logo + Score */}
+          <div className="flex items-center gap-3">
+            <ClubhouseLogo size="md" />
+            <span className="text-5xl font-bold text-slate-900">
               {formatScore(communityAverage)}
             </span>
-            <span className="text-lg font-medium text-slate-500 translate-y-[2px]">/10</span>
           </div>
+          <span className="text-base font-medium text-slate-500">/10</span>
 
           {/* Quality chip centered under score */}
           <CommunityRatingBadge 
