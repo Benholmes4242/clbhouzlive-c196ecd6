@@ -24,7 +24,7 @@ interface SocialDockProps {
   onShare: () => void;
   onMuteToggle: () => void;
   onSearch: () => void;
-  onNavOverlayRequest?: () => void;
+  onNavigationTap?: () => void;
 }
 
 export const SocialDock: React.FC<SocialDockProps> = ({
@@ -38,7 +38,7 @@ export const SocialDock: React.FC<SocialDockProps> = ({
   onShare,
   onMuteToggle,
   onSearch,
-  onNavOverlayRequest,
+  onNavigationTap,
 }) => {
   const [showCounts, setShowCounts] = useState(false);
   const [startY, setStartY] = useState<number | null>(null);
@@ -68,105 +68,123 @@ export const SocialDock: React.FC<SocialDockProps> = ({
   return (
     <div
       className={cn(
-        'fixed left-0 right-0 z-[80] rounded-t-3xl px-4 py-3',
-        'transition-all ease-[cubic-bezier(0.19,1,0.22,1)]',
-        isVisible ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
+        'fixed left-0 right-0 z-[80]',
+        'px-4 pb-[env(safe-area-inset-bottom,12px)]',
+        'pointer-events-none',
+        'transition-all duration-[220ms] ease-[cubic-bezier(0.19,1,0.22,1)]',
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
       )}
       style={{
         bottom: 0,
-        paddingBottom: '12px',
-        background: 'rgba(15, 15, 15, 0.75)',
-        backdropFilter: 'blur(20px)',
-        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-        transitionDuration: '220ms',
       }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Handle Bar for Nav Recall */}
-      <button
-        className="mx-auto mb-2 h-1.5 w-12 rounded-full bg-white/20 hover:bg-white/30 active:bg-white/40 transition-colors"
-        onClick={() => onNavOverlayRequest?.()}
-        aria-label="Show navigation"
-      />
-      
-      {/* Top Row: Avatar + Creator + Caption */}
-      <div className="flex items-center gap-3 mb-3">
-        {/* Avatar */}
-        <button
-          onClick={onProfileClick}
-          className="shrink-0"
-        >
-          <img
-            src={post.user.avatar || '/placeholder.svg'}
-            alt={post.user.name}
-            className="w-11 h-11 rounded-xl object-cover"
+      <div
+        className={cn(
+          'mx-auto max-w-xl',
+          'rounded-t-2xl bg-black/70 backdrop-blur-2xl',
+          'px-4 pt-3 pb-3',
+          'pointer-events-auto'
+        )}
+        style={{
+          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+        }}
+      >
+        {/* 1) TOP: ACTION ROW */}
+        <div className="mb-2 flex items-center justify-between gap-1">
+          <ActionButton
+            icon={Heart}
+            count={post.likes}
+            showCount={showCounts}
+            active={post.isLiked}
+            onClick={onLike}
+            onLongPress={handleActionLongPress}
           />
-        </button>
-
-        {/* Creator + Caption */}
-        <div className="flex-1 min-w-0">
-          <button
-            onClick={onProfileClick}
-            className="block text-[15px] font-semibold text-white hover:opacity-80 transition-opacity text-left truncate"
-          >
-            {post.user.name}
-          </button>
-          <div className="text-[13px] text-white/80 leading-snug truncate">
-            {shortCaption}
-          </div>
+          <ActionButton
+            icon={MessageCircle}
+            count={post.comments}
+            showCount={showCounts}
+            onClick={onComment}
+            onLongPress={handleActionLongPress}
+          />
+          <ActionButton
+            icon={Share}
+            count={post.shares}
+            showCount={showCounts}
+            onClick={onShare}
+            onLongPress={handleActionLongPress}
+          />
+          <ActionButton
+            icon={post.isMuted ? VolumeX : Volume2}
+            hideCount
+            active={!post.isMuted}
+            onClick={onMuteToggle}
+          />
+          <ActionButton
+            icon={Search}
+            hideCount
+            onClick={onSearch}
+          />
         </div>
 
-        {/* Course Chip - Right aligned */}
-        {post.courseName && (
+        {/* 2) MIDDLE: NAVIGATION MICRO-PILL */}
+        <div className="mb-2 flex items-center justify-center">
           <button
-            onClick={onCourseClick}
-            className="shrink-0 px-2.5 py-1 rounded-full text-[11px] font-medium text-white/90 hover:bg-white/10 transition-all"
-            style={{
-              background: 'rgba(255, 255, 255, 0.08)',
-              backdropFilter: 'blur(8px)',
-            }}
+            type="button"
+            onClick={onNavigationTap}
+            className={cn(
+              'inline-flex items-center gap-2',
+              'px-3 py-[6px] rounded-full',
+              'bg-white/8 hover:bg-white/14',
+              'text-[11px] font-medium tracking-wide uppercase text-white/90',
+              'transition-all duration-150',
+              'active:scale-[0.97]'
+            )}
+            aria-label="Show navigation"
           >
-            {post.courseName.length > 15 ? post.courseName.slice(0, 15) + '…' : post.courseName}
+            <span className="inline-block text-xs leading-none">↑</span>
+            <span>Navigation</span>
           </button>
-        )}
-      </div>
+        </div>
 
-      {/* Action Row */}
-      <div className="flex items-center justify-between gap-1">
-        <ActionButton
-          icon={Heart}
-          count={post.likes}
-          showCount={showCounts}
-          active={post.isLiked}
-          onClick={onLike}
-          onLongPress={handleActionLongPress}
-        />
-        <ActionButton
-          icon={MessageCircle}
-          count={post.comments}
-          showCount={showCounts}
-          onClick={onComment}
-          onLongPress={handleActionLongPress}
-        />
-        <ActionButton
-          icon={Share}
-          count={post.shares}
-          showCount={showCounts}
-          onClick={onShare}
-          onLongPress={handleActionLongPress}
-        />
-        <ActionButton
-          icon={post.isMuted ? VolumeX : Volume2}
-          hideCount
-          active={!post.isMuted}
-          onClick={onMuteToggle}
-        />
-        <ActionButton
-          icon={Search}
-          hideCount
-          onClick={onSearch}
-        />
+        {/* 3) BOTTOM: CREATOR + CAPTION */}
+        <div className="flex items-center gap-3 mb-1">
+          <button
+            type="button"
+            onClick={onProfileClick}
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
+            <img
+              src={post.user.avatar || '/placeholder.svg'}
+              alt={post.user.name}
+              className="w-8 h-8 rounded-full object-cover"
+            />
+            <span className="text-sm font-semibold leading-tight text-white">
+              {post.user.name}
+            </span>
+          </button>
+        </div>
+
+        <div className="flex items-center justify-between gap-2">
+          <button
+            type="button"
+            onClick={onProfileClick}
+            className="flex-1 text-[13px] text-white/90 text-left truncate hover:opacity-80 transition-opacity"
+          >
+            {shortCaption}
+          </button>
+
+          {post.courseName && (
+            <button
+              type="button"
+              onClick={onCourseClick}
+              className="ml-2 shrink-0 rounded-full bg-white/10 px-3 py-[4px] text-[11px] text-white/90 truncate max-w-[40%] hover:bg-white/15 transition-colors"
+            >
+              {post.courseName}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

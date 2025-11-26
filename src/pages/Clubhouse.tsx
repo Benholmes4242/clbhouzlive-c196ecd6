@@ -97,49 +97,25 @@ const Clubhouse = () => {
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState(false);
   const [isCommentsDrawerOpen, setIsCommentsDrawerOpen] = useState(false);
   
-  // Nav overlay state for quick recall
-  const [navOverlayVisible, setNavOverlayVisible] = useState(false);
-  const navOverlayTimer = useRef<number | null>(null);
-  
-  const showNavOverlay = useCallback(() => {
-    setNavOverlayVisible(true);
-    if (navOverlayTimer.current) {
-      clearTimeout(navOverlayTimer.current);
-    }
-    navOverlayTimer.current = window.setTimeout(() => {
-      setNavOverlayVisible(false);
-    }, 2500);
-  }, []);
-  
-  const hideNavOverlay = useCallback(() => {
-    setNavOverlayVisible(false);
-    if (navOverlayTimer.current) {
-      clearTimeout(navOverlayTimer.current);
-      navOverlayTimer.current = null;
-    }
-  }, []);
-  
   // Chrome auto-hide state - force hidden when any overlay is open
   const isAnyOverlayOpen = isProfileDrawerOpen || isCommentsDrawerOpen || isComposerOpen;
   const chromeControls = useChromeState({
     forceHidden: isAnyOverlayOpen,
-    disabled: false, // Set to true via env var for emergency rollback
-    onNavOverlayRequest: showNavOverlay,
+    disabled: false,
     disableDirectionalReveal: true, // Clubhouse only - swipe between posts should not toggle chrome
   });
   
+  // Navigation pill tap handler - directly reveals chrome
+  const showNavOverlay = useCallback(() => {
+    chromeControls.showChrome();
+  }, [chromeControls]);
+  
+  const hideNavOverlay = useCallback(() => {
+    // No-op now since we're not using overlay state
+  }, []);
+  
   // Chrome anchors for dynamic re-positioning
   useChromeAnchors();
-  
-  // Apply nav overlay class to body
-  useEffect(() => {
-    if (navOverlayVisible) {
-      document.body.classList.add('chrome-nav-overlay');
-    } else {
-      document.body.classList.remove('chrome-nav-overlay');
-    }
-    return () => document.body.classList.remove('chrome-nav-overlay');
-  }, [navOverlayVisible]);
 
   // Check which posts the user has liked
   const { data: likedPosts } = useQuery({
