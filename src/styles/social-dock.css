@@ -1,0 +1,37 @@
+/* Social Dock Bounce Animations */
+
+@keyframes dock-bounce-expand {
+  0% {
+    transform: scale(0.97);
+  }
+  60% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes dock-bounce-collapse {
+  0% {
+    transform: scale(1.01);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Base inner wrapper - transform origin at bottom */
+.social-dock-card-inner {
+  transform-origin: center bottom;
+}
+
+/* Apply bounce on expand */
+.social-dock-card-expand {
+  animation: dock-bounce-expand 220ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Apply bounce on collapse */
+.social-dock-card-collapse {
+  animation: dock-bounce-collapse 180ms ease-out;
+}
