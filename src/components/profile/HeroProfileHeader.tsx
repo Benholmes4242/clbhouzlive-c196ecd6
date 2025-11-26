@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef, useLayoutEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { splitName } from '@/utils/name';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { XPRingPopover } from './XPRingPopover';
@@ -127,6 +128,7 @@ const HeroProfileHeader = ({
 }: HeroProfileHeaderProps) => {
   console.log('HeroProfileHeader render with profile:', profile?.id);
   const { user } = useSupabaseSession();
+  const navigate = useNavigate();
   
   // Refs for dynamic gap calculation
   const nameBlockRef = useRef<HTMLDivElement | null>(null);
@@ -180,6 +182,7 @@ const HeroProfileHeader = ({
     { id: 'stats', label: 'Handicap' }
   ];
 
+  
   const handleTabChange = useCallback((newTab: string) => {
     if (newTab === activeSection || transitionState !== 'idle') return;
     
@@ -606,6 +609,22 @@ const HeroProfileHeader = ({
   const username = useMemo(() => profile?.username || 'user', [profile?.username]);
   const homeClub = useMemo(() => profile?.home_club || 'Home Club', [profile?.home_club]);
   
+  // Navigation handlers for social stats
+  const handleOpenFollowers = useCallback(() => {
+    if (!username) return;
+    navigate(`/profile/${username}/followers`);
+  }, [username, navigate]);
+
+  const handleOpenFollowing = useCallback(() => {
+    if (!username) return;
+    navigate(`/profile/${username}/following`);
+  }, [username, navigate]);
+
+  const handleOpenFriends = useCallback(() => {
+    if (!username) return;
+    navigate(`/profile/${username}/friends`);
+  }, [username, navigate]);
+  
   // Function to wrap text with max 2 words per line
   const wrapHomeClubText = (text: string) => {
     const words = text.split(' ');
@@ -909,14 +928,22 @@ const HeroProfileHeader = ({
                     <div className="stat-value">{postsCount}</div>
                     <div className="stat-label">Posts</div>
                   </div>
-                  <div className="stat">
+                  <button
+                    type="button"
+                    onClick={handleOpenFollowers}
+                    className="stat cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
+                  >
                     <div className="stat-value">{followersCount}</div>
                     <div className="stat-label">Followers</div>
-                  </div>
-                  <div className="stat">
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleOpenFollowing}
+                    className="stat cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
+                  >
                     <div className="stat-value">{followingCount}</div>
                     <div className="stat-label">Following</div>
-                  </div>
+                  </button>
                 </div>
 
                 {/* Top 100 Prestige Chip */}
@@ -1142,14 +1169,22 @@ const HeroProfileHeader = ({
                        <span className="text-lg font-semibold text-gray-900">2,500</span>
                        <span className="text-base font-normal text-neutral-800">Total XP</span>
                      </div>
-                     <div className="flex flex-col border-l border-gray-300 pl-3">
+                     <button
+                       type="button"
+                       onClick={handleOpenFollowing}
+                       className="flex flex-col border-l border-gray-300 pl-3 cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
+                     >
                        <span className="text-lg font-semibold text-gray-900">{followingCount}</span>
                        <span className="text-base font-normal text-neutral-800">Following</span>
-                     </div>
-                     <div className="flex flex-col border-l border-gray-300 pl-3">
+                     </button>
+                     <button
+                       type="button"
+                       onClick={handleOpenFollowers}
+                       className="flex flex-col border-l border-gray-300 pl-3 cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
+                     >
                        <span className="text-lg font-semibold text-gray-900">{followersCount}</span>
                        <span className="text-base font-normal text-neutral-800">Followers</span>
-                     </div>
+                     </button>
                    </div>
 
                    {/* Top 100 Prestige Chip */}
