@@ -41,18 +41,27 @@ export const SocialDock: React.FC<SocialDockProps> = ({
   onNavigationTap,
 }) => {
   const [showCounts, setShowCounts] = useState(false);
-  const [startY, setStartY] = useState<number | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const startYRef = useRef<number | null>(null);
 
-  // Swipe-up detection
+  // Touch handlers for swipe-up (when collapsed) and swipe-down (when expanded)
   const handleTouchStart = (e: React.TouchEvent) => {
-    setStartY(e.touches[0].clientY);
+    startYRef.current = e.touches[0].clientY;
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (startY === null) return;
-    const deltaY = e.changedTouches[0].clientY - startY;
-    if (deltaY < -40) onSwipeUp();
-    setStartY(null);
+    if (startYRef.current === null) return;
+    const deltaY = e.changedTouches[0].clientY - startYRef.current;
+    
+    if (isExpanded && deltaY > 40) {
+      // Swipe down when expanded: collapse
+      setIsExpanded(false);
+    } else if (!isExpanded && deltaY < -40) {
+      // Swipe up when collapsed: show chrome
+      onSwipeUp();
+    }
+    
+    startYRef.current = null;
   };
 
   // Long-press to show counts
@@ -62,33 +71,45 @@ export const SocialDock: React.FC<SocialDockProps> = ({
   };
 
   const caption = post.caption ?? '';
-  const isTruncated = caption.length > 60;
-  const shortCaption = isTruncated ? caption.slice(0, 60) + '…' : caption;
 
   return (
-    <div
-      className={cn(
-        'fixed left-0 right-0 bottom-0 z-[80]',
-        'px-4 pb-[calc(env(safe-area-inset-bottom,0px)+12px)]',
-        'pointer-events-none',
+    <>
+      {/* Backdrop for tap-outside when expanded */}
+      {isExpanded && (
+        <div
+          className="fixed inset-0 z-[79] bg-transparent"
+          onClick={() => setIsExpanded(false)}
+        />
       )}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-    >
+
       <div
         className={cn(
-          'mx-auto max-w-xl',
-          'rounded-t-2xl bg-black/70 backdrop-blur-2xl',
-          'shadow-[0_18px_40px_rgba(0,0,0,0.5)]',
-          'px-4 pt-3 pb-3',
-          'transition-all duration-[220ms] ease-[cubic-bezier(0.19,1,0.22,1)]',
-          'pointer-events-auto',
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          'fixed inset-x-0 bottom-0 z-[80]',
+          'pointer-events-none',
         )}
         style={{
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          paddingBottom: `calc(env(safe-area-inset-bottom, 0px))`,
         }}
       >
+        <div
+          className={cn(
+            'mx-0',
+            'rounded-t-2xl rounded-b-none bg-black/70 backdrop-blur-2xl',
+            'shadow-[0_18px_40px_rgba(0,0,0,0.5)]',
+            'px-4 pt-3 pb-[10px]',
+            'transition-all duration-[220ms] ease-[cubic-bezier(0.19,1,0.22,1)]',
+            'pointer-events-auto',
+            'overflow-hidden',
+            isExpanded ? 'max-h-[45vh]' : 'max-h-[26vh]',
+            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          )}
+          style={{
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          }}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          onClick={(e) => e.stopPropagation()}
+        >
         {/* 1) TOP: ACTION ROW */}
         <div className="mb-2 flex items-center justify-between gap-1">
           <ActionButton
@@ -126,32 +147,13 @@ export const SocialDock: React.FC<SocialDockProps> = ({
           />
         </div>
 
-        {/* 2) MIDDLE: NAVIGATION MICRO-PILL */}
-        <div className="mb-2 flex items-center justify-center">
-          <button
-            type="button"
-            onClick={onNavigationTap}
-            className={cn(
-              'inline-flex items-center gap-2',
-              'px-3 py-[6px] rounded-full',
-              'bg-white/10 hover:bg-white/16',
-              'text-[11px] font-medium tracking-wide uppercase text-white/90',
-              'transition-all duration-150',
-              'active:scale-[0.97]'
-            )}
-            aria-label="Show navigation"
-          >
-            <span className="inline-block text-xs leading-none">↑</span>
-            <span>Navigation</span>
-          </button>
-        </div>
-
-        {/* 3) BOTTOM: CREATOR + CAPTION */}
-        <div className="flex items-center gap-3 mb-1">
+        {/* 2) MIDDLE: USERNAME + NAVIGATION PILL */}
+        <div className="mb-2 flex items-center justify-between gap-3">
+          {/* Left: avatar + username */}
           <button
             type="button"
             onClick={onProfileClick}
-            className="flex items-center gap-2 min-w-0 hover:opacity-80 transition-opacity"
+            className="flex items-center gap-3 min-w-0 hover:opacity-80 transition-opacity"
           >
             <img
               src={post.user.avatar || '/placeholder.svg'}
@@ -164,29 +166,67 @@ export const SocialDock: React.FC<SocialDockProps> = ({
               </div>
             </div>
           </button>
-        </div>
 
-        <div className="flex items-center justify-between gap-2">
+          {/* Right: Navigation pill */}
           <button
             type="button"
-            onClick={onProfileClick}
-            className="flex-1 truncate text-[13px] leading-snug text-white/90 text-left hover:opacity-80 transition-opacity"
+            onClick={onNavigationTap}
+            className={cn(
+              'inline-flex items-center gap-2',
+              'px-3 py-[6px] rounded-full',
+              'bg-white/10 hover:bg-white/16',
+              'text-[11px] font-medium tracking-wide uppercase text-white/90',
+              'transition-all duration-150',
+              'active:scale-[0.97]',
+              'flex-shrink-0'
+            )}
+            aria-label="Show navigation"
           >
-            {shortCaption}
+            <span className="inline-block text-xs leading-none">↑</span>
+            <span>Navigation</span>
           </button>
+        </div>
 
+        {/* 3) BOTTOM: CAPTION WITH EXPAND/COLLAPSE */}
+        <div className={cn('relative', isExpanded ? 'pb-2' : 'pb-3')}>
+          <p
+            className={cn(
+              'text-[13px] leading-snug text-white/90 text-left',
+              !isExpanded && 'line-clamp-2'
+            )}
+          >
+            {caption}
+          </p>
+
+          {/* Course chip if present */}
           {post.courseName && (
             <button
               type="button"
               onClick={onCourseClick}
-              className="ml-2 shrink-0 max-w-[40%] px-3 py-[4px] rounded-full bg-white/10 text-[11px] leading-none text-white/90 truncate text-right hover:bg-white/15 transition-colors"
+              className="mt-2 inline-flex px-3 py-[4px] rounded-full bg-white/10 text-[11px] leading-none text-white/90 hover:bg-white/15 transition-colors"
             >
               {post.courseName}
             </button>
           )}
+
+          {/* Fade + Show more when collapsed */}
+          {!isExpanded && caption.length > 80 && (
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-end items-end">
+              <div className="flex items-center pl-6 pr-1 pb-[2px] bg-gradient-to-l from-[rgba(15,15,15,0.95)] via-[rgba(15,15,15,0.9)] to-transparent">
+                <button
+                  type="button"
+                  onClick={() => setIsExpanded(true)}
+                  className="pointer-events-auto text-[11px] font-medium text-white/90 hover:text-white transition-colors"
+                >
+                  Show more
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
