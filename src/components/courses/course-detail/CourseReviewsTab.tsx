@@ -28,6 +28,7 @@ interface ReviewData {
   user_id: string;
   helpful_count: number;
   unhelpful_count: number;
+  is_mock: boolean;
   user_profiles?: {
     id: string;
     display_name: string | null;
@@ -77,12 +78,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const { data: reviewsData, isLoading } = useQuery({
     queryKey: ['course-reviews-full', courseId, SHOW_MOCK_REVIEWS],
     queryFn: async () => {
-      // If mock reviews are disabled, return empty array
-      if (!SHOW_MOCK_REVIEWS) {
-        return [];
-      }
+      if (!courseId) return [];
 
-      const { data, error } = await supabase
+      let query = supabase
         .from('course_ratings')
         .select(
           `
@@ -93,6 +91,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           user_id,
           helpful_count,
           unhelpful_count,
+          is_mock,
           user_profiles:user_id (
             id,
             display_name,
@@ -106,6 +105,12 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         .not('review', 'eq', '')
         .order('review_date', { ascending: false });
 
+      // When mock reviews are disabled, only show real reviews
+      if (!SHOW_MOCK_REVIEWS) {
+        query = query.eq('is_mock', false);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       return (data as any as ReviewData[]) || [];
     },
