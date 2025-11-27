@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
-import { useProfileData } from '@/hooks/useProfileData';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { LoadoutModal } from '@/components/cosmetics/LoadoutModal';
@@ -19,35 +20,32 @@ const ProfilePage = () => {
   const queryClient = useQueryClient();
   const [loadoutModalOpen, setLoadoutModalOpen] = useState(false);
   
-  // Phase 1 Perf: Removed forced cache invalidation - rely on staleTime instead
-  // React Query's built-in caching with 5min staleTime (from perfTuning) is sufficient
+  // Get current user
+  const { user } = useSupabaseSession();
   
+  // Fetch profile using shared hook
   const {
-    user,
-    profile,
-    loading,
-    error,
-    setProfile,
-    fetchProfile,
-    refreshProfile,
-    updateProfileField
-  } = useProfileData();
+    data: profile,
+    isLoading: profileLoading,
+    isError: profileError,
+    refetch: refreshProfile
+  } = useUserProfile(user?.id);
 
   // Redirect to auth page if user is not logged in
   useEffect(() => {
-    if (!loading && !user) {
+    if (!profileLoading && !user) {
       navigate('/auth', { replace: true });
     }
-  }, [user, loading, navigate]);
+  }, [user, profileLoading, navigate]);
 
   // Loading state handled by route-level Suspense with ProfileSkeleton
   // Auth check still returns early
-  if (loading) {
+  if (profileLoading) {
     return null;
   }
 
   // Show error if there's an issue
-  if (error) {
+  if (profileError) {
     return (
       <div className="min-h-screen bg-background page-with-header">
         <div className="flex items-center justify-center min-h-[60vh]">
@@ -111,9 +109,9 @@ const ProfilePage = () => {
       <div className="h-16 md:h-18" />
       
       <HeroProfileHeader
-        profile={profile}
+        profile={profile ?? null}
         isOwnProfile={true} // This is always the user's own profile on this route
-        onProfileUpdate={refreshProfile}
+        onProfileUpdate={() => refreshProfile()}
         activeSection={activeSection}
         onSectionChange={handleSectionChange}
       />
