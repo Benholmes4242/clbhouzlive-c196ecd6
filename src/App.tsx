@@ -468,7 +468,7 @@ const AppInner: React.FC = () => {
                                 <AuthWrapper>
                                   <SeasonWrapModal />
                                   <AchievementToastWrapper />
-                                  <Suspense fallback={<AppBootstrapLoader />}>
+                                  <Suspense fallback={null}>
                                     <div className="app-depth">
                                       {/* No global header - each page renders its own ClubhouseHeaderNew */}
                                       <AppRoutes />
