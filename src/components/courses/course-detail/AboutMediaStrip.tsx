@@ -127,7 +127,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
         <div className="flex items-center justify-between mb-3 px-4">
           <h2 className="text-lg md:text-xl font-semibold">Media</h2>
         </div>
-        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 grid grid-cols-3 gap-0.5">
+        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 grid grid-cols-3 gap-[1px]">
           {Array.from({ length: maxItems }).map((_, i) => (
             <div key={i} className="aspect-square bg-muted/70 animate-pulse border border-border/60 sm:border-border/40" />
           ))}
@@ -161,7 +161,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
           <p className="text-center">No media for this course yet. Review this course and add media or tag this course to be the first.</p>
         </div>
       ) : (
-        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 grid grid-cols-3 gap-0.5">
+        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 grid grid-cols-3 gap-[1px]">
           {mediaTiles.map((media) => (
             <button
               key={media.id}
