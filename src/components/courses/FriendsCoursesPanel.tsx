@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Users, MapPin, Flame, Video } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { FLAGS } from '@/config/flags';
 import { MOCK_FRIEND_COURSES } from './mockFriendCourses';
 import FriendsSnapshotCard from './friends/FriendsSnapshotCard';
@@ -34,8 +35,8 @@ const FriendsCoursesPanel: React.FC = () => {
   const [page, setPage] = useState(1);
   const [recentPage, setRecentPage] = useState(0);
   
-  const PAGE_SIZE = 25;
-  const RECENT_PAGE_SIZE = 10;
+  const PAGE_SIZE = 5;
+  const RECENT_PAGE_SIZE = 8;
   
   // Fetch real course data directly when using mock friends
   const mockCourseNames = useMemo(() => {
@@ -359,9 +360,53 @@ const FriendsCoursesPanel: React.FC = () => {
   // Paginate recent rounds
   const totalRecent = sortedRecent.length;
   const totalRecentPages = Math.ceil(totalRecent / RECENT_PAGE_SIZE);
-  const startRecentIndex = recentPage * RECENT_PAGE_SIZE;
-  const endRecentIndex = startRecentIndex + RECENT_PAGE_SIZE;
-  const visibleRecent = sortedRecent.slice(startRecentIndex, endRecentIndex);
+  const visibleRecent = useMemo(() => {
+    const startIdx = recentPage * RECENT_PAGE_SIZE;
+    return sortedRecent.slice(startIdx, startIdx + RECENT_PAGE_SIZE);
+  }, [sortedRecent, recentPage]);
+
+  // Build course index for jump-to-card functionality
+  const allFriendsCourses = heroCourse
+    ? [heroCourse, ...regularCourses]
+    : regularCourses;
+
+  const courseIndexById = useMemo(() => {
+    const map = new Map<string, number>();
+    allFriendsCourses.forEach((course, idx) => {
+      map.set(course.course_id, idx);
+    });
+    return map;
+  }, [allFriendsCourses]);
+
+  // Handle clicking a recent round to jump to its course card
+  const handleRecentRoundClick = (hit: FriendCourseHit) => {
+    const index = courseIndexById.get(hit.course_id);
+
+    if (index == null) {
+      // Fallback – if not in list, navigate to course detail
+      navigate(`/courses/${hit.course_id}`);
+      return;
+    }
+
+    const targetPage = Math.floor(index / PAGE_SIZE) + 1;
+    setPage(targetPage);
+
+    // Wait for DOM update, then scroll to and highlight the card
+    requestAnimationFrame(() => {
+      const cardEl = document.querySelector<HTMLElement>(
+        `[data-friends-course-card="${hit.course_id}"]`
+      );
+      if (cardEl) {
+        cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        cardEl.classList.add('ring-2', 'ring-primary', 'ring-offset-2');
+
+        // Remove highlight after a short delay
+        setTimeout(() => {
+          cardEl.classList.remove('ring-2', 'ring-primary', 'ring-offset-2');
+        }, 1400);
+      }
+    });
+  };
 
   // Now conditional returns - no more hooks after this point
   if (!user) return null;
@@ -586,113 +631,135 @@ const FriendsCoursesPanel: React.FC = () => {
         </div>
       )}
 
-      {/* Regular courses - Paginated list */}
+      {/* Regular courses - Paginated list with slide animation */}
       {paginatedCourses.length > 0 && (
         <div className="space-y-4">
-          {paginatedCourses.map((course) => {
-            const mostRecentFriend = course.friends[0];
-            
-            return (
-              <Card key={course.course_id} className="relative overflow-hidden rounded-xl hover:shadow-md transition-all cursor-pointer bg-card border shadow-sm"
-                onClick={() => navigate(`/courses/${course.course_id}`)}>
-              {/* Course Image - Taller, Full Width */}
-              {course.thumbnail_url && (
-                <div className="relative w-full aspect-[1.7/1] overflow-hidden">
-                  <img
-                    src={course.thumbnail_url}
-                    alt={course.course_name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src = '/placeholder.svg';
-                    }}
-                  />
-                  {/* Bottom gradient */}
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/55 via-black/25 to-transparent" />
-                </div>
-              )}
+          <motion.div
+            key={page}
+            initial={{ x: 40, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -40, opacity: 0 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            className="space-y-4"
+          >
+            {paginatedCourses.map((course) => {
+              const mostRecentFriend = course.friends[0];
               
-              {/* Rank badges (top-right) */}
-              <div className="absolute top-3 right-3 z-10 flex gap-1.5">
-                {(() => {
-                  const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
-                  return (
-                    <CourseRankBadges
-                      globalRank={ranks.globalRank}
-                      regionalRank={ranks.regionalRank}
-                      usaRank={ranks.usaRank}
-                      country={course.country || ''}
-                      positioning="inline"
-                    />
-                  );
-                })()}
+              return (
+                <Card 
+                  key={course.course_id} 
+                  data-friends-course-card={course.course_id}
+                  className="relative overflow-hidden rounded-xl hover:shadow-md transition-all cursor-pointer bg-card border shadow-sm"
+                  onClick={() => navigate(`/courses/${course.course_id}`)}
+                >
+                  {/* Course Image - Taller, Full Width */}
+                  {course.thumbnail_url && (
+                    <div className="relative w-full aspect-[1.7/1] overflow-hidden">
+                      <img
+                        src={course.thumbnail_url}
+                        alt={course.course_name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = '/placeholder.svg';
+                        }}
+                      />
+                      {/* Bottom gradient */}
+                      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/55 via-black/25 to-transparent" />
+                    </div>
+                  )}
+                  
+                  {/* Rank badges (top-right) */}
+                  <div className="absolute top-3 right-3 z-10 flex gap-1.5">
+                    {(() => {
+                      const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
+                      return (
+                        <CourseRankBadges
+                          globalRank={ranks.globalRank}
+                          regionalRank={ranks.regionalRank}
+                          usaRank={ranks.usaRank}
+                          country={course.country || ''}
+                          positioning="inline"
+                        />
+                      );
+                    })()}
+                  </div>
+                  
+                  {/* Course Info */}
+                  <div className="p-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <h3 className="font-semibold text-lg truncate text-foreground">
+                        {course.course_name}
+                      </h3>
+
+                      {course.average_rating != null && (
+                        <span className="inline-flex items-center rounded-full border border-border bg-background/70 px-2 py-[2px] text-xs font-medium text-foreground shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
+                          <span className="mr-1 text-[11px]">★</span>
+                          {course.average_rating.toFixed(1)}/10
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {course.country}{course.sub_country ? `, ${course.sub_country}` : ''}
+                    </p>
+
+                    {/* Bottom row: "Played by..." with avatar */}
+                    <div className="mt-1 flex items-center justify-between gap-3">
+                      <p className="text-xs text-muted-foreground">
+                        Played by{" "}
+                        <span className="font-medium text-foreground">
+                          {mostRecentFriend.friend_profile.display_name || mostRecentFriend.friend_profile.username}
+                        </span>
+                        {course.total_friends_played > 1 && (
+                          <span> & {course.total_friends_played - 1} more</span>
+                        )}
+                        {" "}· {formatDistanceToNow(new Date(mostRecentFriend.played_at), { addSuffix: true })}
+                      </p>
+
+                      <Squircle width={32} height={32} className="shrink-0">
+                        <img 
+                          src={mostRecentFriend.friend_profile.profile_photo_url || '/placeholder.svg'} 
+                          alt={mostRecentFriend.friend_profile.display_name || mostRecentFriend.friend_profile.username}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          onError={(e) => {
+                            e.currentTarget.src = '/placeholder.svg';
+                          }}
+                        />
+                      </Squircle>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+          </motion.div>
+
+          {/* Pagination Footer */}
+          {totalPages > 1 && (
+            <div className="flex flex-col items-center gap-3 mt-6">
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  disabled={page === 1}
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  className="h-11 px-6 rounded-lg shadow-[0_4px_10px_rgba(15,23,42,0.08)] disabled:shadow-none"
+                >
+                  Previous courses
+                </Button>
+
+                <Button
+                  variant="outline"
+                  disabled={page >= totalPages}
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  className="h-11 px-6 rounded-lg shadow-[0_4px_10px_rgba(15,23,42,0.08)] disabled:shadow-none"
+                >
+                  Next courses
+                </Button>
               </div>
-              
-              {/* Course Info */}
-              <div className="p-4">
-                <h3 className="font-semibold text-lg mb-1 text-foreground">
-                  {course.course_name}
-                </h3>
-                <p className="text-sm text-muted-foreground mb-3">
-                  {course.country}{course.sub_country ? `, ${course.sub_country}` : ''}
-                </p>
 
-                {/* Bottom row: "Played by..." with avatar */}
-                <div className="mt-1 flex items-center justify-between gap-3">
-                  <p className="text-xs text-muted-foreground">
-                    Played by{" "}
-                    <span className="font-medium text-foreground">
-                      {mostRecentFriend.friend_profile.display_name || mostRecentFriend.friend_profile.username}
-                    </span>
-                    {course.total_friends_played > 1 && (
-                      <span> & {course.total_friends_played - 1} more</span>
-                    )}
-                    {" "}· {formatDistanceToNow(new Date(mostRecentFriend.played_at), { addSuffix: true })}
-                  </p>
-
-                  <Squircle width={32} height={32} className="shrink-0">
-                    <img 
-                      src={mostRecentFriend.friend_profile.profile_photo_url || '/placeholder.svg'} 
-                      alt={mostRecentFriend.friend_profile.display_name || mostRecentFriend.friend_profile.username}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      onError={(e) => {
-                        e.currentTarget.src = '/placeholder.svg';
-                      }}
-                    />
-                  </Squircle>
-                </div>
-              </div>
-            </Card>
-          );
-        })}
-
-        {/* Pagination Footer */}
-        {totalPages > 1 && (
-          <div className="flex flex-col items-center gap-3 mt-6">
-            <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                disabled={page === 1}
-                onClick={() => setPage(p => Math.max(1, p - 1))}
-                className="h-11 px-6 rounded-lg"
-              >
-                Previous 25 courses
-              </Button>
-
-              <Button
-                variant="outline"
-                disabled={page >= totalPages}
-                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                className="h-11 px-6 rounded-lg"
-              >
-                Next 25 courses
-              </Button>
+              <p className="text-xs text-muted-foreground">
+                Showing {((page - 1) * PAGE_SIZE) + 1}–{Math.min(page * PAGE_SIZE, regularCourses.length)} of {regularCourses.length} courses
+              </p>
             </div>
-
-            <p className="text-sm text-muted-foreground">
-              Showing {((page - 1) * PAGE_SIZE) + 1}–{Math.min(page * PAGE_SIZE, regularCourses.length)} of {regularCourses.length} courses
-            </p>
-          </div>
-        )}
+          )}
         </div>
       )}
 
@@ -705,63 +772,71 @@ const FriendsCoursesPanel: React.FC = () => {
               Rounds played in the last {timeframe === '7d' ? '7 days' : timeframe === '30d' ? '30 days' : timeframe === '90d' ? '90 days' : timeframe === '12m' ? '12 months' : 'all time'}
             </p>
           </div>
-          <div className="space-y-0">
-          {visibleRecent.map((hit, idx) => (
-            <div key={`${hit.friend_id}-${hit.course_id}-${idx}`}
-              className={`flex items-center gap-3 py-3 hover:bg-muted/50 transition-colors cursor-pointer ${
-                idx !== visibleRecent.length - 1 ? 'border-b border-border' : ''
-              }`}
-              onClick={() => navigate(`/courses/${hit.course_id}`)}>
-              <Squircle width={36} height={36} className="shrink-0">
-                <img 
-                  src={hit.friend_profile.profile_photo_url || '/placeholder.svg'} 
-                  alt={hit.friend_profile.display_name || hit.friend_profile.username}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  onError={(e) => {
-                    e.currentTarget.src = '/placeholder.svg';
-                  }}
-                />
-              </Squircle>
-              <div className="flex-1 min-w-0">
-                <span className="text-sm block">
-                  <span className="font-semibold">{hit.friend_profile.display_name || hit.friend_profile.username}</span> played {hit.course_name}
-                </span>
-                <span className="text-xs text-muted-foreground block">
-                  {formatDistanceToNow(new Date(hit.played_at), { addSuffix: true })}
-                </span>
-              </div>
+          
+          <motion.div
+            key={recentPage}
+            initial={{ y: 12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+          >
+            <div className="space-y-0">
+              {visibleRecent.map((hit, idx) => (
+                <div 
+                  key={`${hit.friend_id}-${hit.course_id}-${idx}`}
+                  className={`flex items-center gap-3 py-3 hover:bg-muted/50 transition-colors cursor-pointer ${
+                    idx !== visibleRecent.length - 1 ? 'border-b border-border' : ''
+                  }`}
+                  onClick={() => handleRecentRoundClick(hit)}
+                >
+                  <Squircle width={36} height={36} className="shrink-0">
+                    <img 
+                      src={hit.friend_profile.profile_photo_url || '/placeholder.svg'} 
+                      alt={hit.friend_profile.display_name || hit.friend_profile.username}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={(e) => {
+                        e.currentTarget.src = '/placeholder.svg';
+                      }}
+                    />
+                  </Squircle>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm block">
+                      <span className="font-semibold">{hit.friend_profile.display_name || hit.friend_profile.username}</span> played {hit.course_name}
+                    </span>
+                    <span className="text-xs text-muted-foreground block">
+                      {formatDistanceToNow(new Date(hit.played_at), { addSuffix: true })}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </motion.div>
 
-        {/* Recent rounds pagination */}
-        {totalRecentPages > 1 && (
-          <div className="mt-4 flex items-center justify-between gap-2">
-            <button
-              type="button"
-              disabled={recentPage === 0}
-              onClick={() => setRecentPage((p) => Math.max(p - 1, 0))}
-              className="px-3 py-1.5 rounded-lg border border-border text-sm disabled:opacity-40 disabled:cursor-default hover:bg-muted/50 transition"
-            >
-              Previous
-            </button>
+          {/* Recent rounds pagination */}
+          {totalRecentPages > 1 && (
+            <div className="mt-3 flex items-center justify-between gap-3">
+              <Button
+                variant="outline"
+                disabled={recentPage === 0}
+                onClick={() => setRecentPage((p) => Math.max(0, p - 1))}
+                className="px-3 py-1.5 rounded-lg h-9 text-xs shadow-[0_2px_6px_rgba(15,23,42,0.06)] disabled:shadow-none"
+              >
+                Previous rounds
+              </Button>
 
-            <div className="text-xs text-muted-foreground">
-              Page {recentPage + 1} of {totalRecentPages}
+              <p className="text-xs text-muted-foreground">
+                Page {recentPage + 1} of {totalRecentPages}
+              </p>
+
+              <Button
+                variant="outline"
+                disabled={recentPage === totalRecentPages - 1}
+                onClick={() => setRecentPage((p) => Math.min(totalRecentPages - 1, p + 1))}
+                className="px-3 py-1.5 rounded-lg h-9 text-xs shadow-[0_2px_6px_rgba(15,23,42,0.06)] disabled:shadow-none"
+              >
+                Next rounds
+              </Button>
             </div>
-
-            <button
-              type="button"
-              disabled={recentPage >= totalRecentPages - 1}
-              onClick={() =>
-                setRecentPage((p) => Math.min(p + 1, totalRecentPages - 1))
-              }
-              className="px-3 py-1.5 rounded-lg border border-border text-sm disabled:opacity-40 disabled:cursor-default hover:bg-muted/50 transition"
-            >
-              Next
-            </button>
-          </div>
-        )}
+          )}
         </div>
       )}
     </div>
