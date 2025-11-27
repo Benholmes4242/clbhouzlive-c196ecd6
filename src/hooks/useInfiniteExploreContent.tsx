@@ -7,6 +7,43 @@ import { useMockPostsHandler } from './explore/useMockPostsHandler';
 const POSTS_PER_PAGE = 20; // Increased for better performance
 const PRELOAD_THRESHOLD = 2; // Reduced threshold for faster preloading
 
+// Keep Discover feed memory under control – only cache current + previous filter
+const MAX_FILTER_CACHE = 2;
+
+type FilterStateMap<T> = Record<string, T>;
+
+function pruneFilterMap<T>(
+  map: FilterStateMap<T>,
+  activeFilterKey: string,
+  maxEntries: number = MAX_FILTER_CACHE
+): FilterStateMap<T> {
+  const entries = Object.entries(map);
+
+  // If we're already under the limit, nothing to do
+  if (entries.length <= maxEntries) return map;
+
+  // Keep the active filter plus the most recent previous ones
+  const preservedKeys = new Set<string>();
+  preservedKeys.add(activeFilterKey);
+
+  // Walk from the end (newest) backwards, keeping up to maxEntries
+  for (let i = entries.length - 1; i >= 0 && preservedKeys.size < maxEntries; i--) {
+    const [key] = entries[i];
+    if (!preservedKeys.has(key)) {
+      preservedKeys.add(key);
+    }
+  }
+
+  const pruned: FilterStateMap<T> = {};
+  for (const [key, value] of entries) {
+    if (preservedKeys.has(key)) {
+      pruned[key] = value;
+    }
+  }
+
+  return pruned;
+}
+
 export const useInfiniteExploreContent = (
   activeFilter?: string, 
   subFilter?: string,
@@ -62,10 +99,13 @@ export const useInfiniteExploreContent = (
       if (abortSignal?.aborted) return;
       
       if (posts.length > 0) {
-        setPreloadedContent(prev => ({
-          ...prev,
-          [currentFilter]: posts
-        }));
+        setPreloadedContent(prev => {
+          const updated: FilterStateMap<ExploreContentItem[]> = {
+            ...prev,
+            [currentFilter]: posts
+          };
+          return pruneFilterMap(updated, currentFilter);
+        });
       }
     } catch (error) {
       console.error('Error preloading content:', error);
@@ -83,33 +123,48 @@ export const useInfiniteExploreContent = (
       const newContent = [...content, ...preloaded];
       
       // Update cache instantly
-      setContentCache(prev => ({
-        ...prev,
-        [currentFilter]: newContent
-      }));
+      setContentCache(prev => {
+        const updated: FilterStateMap<ExploreContentItem[]> = {
+          ...prev,
+          [currentFilter]: newContent
+        };
+        return pruneFilterMap(updated, currentFilter);
+      });
       
-      setOffsetStates(prev => ({
-        ...prev,
-        [currentFilter]: (prev[currentFilter] || 0) + POSTS_PER_PAGE
-      }));
+      setOffsetStates(prev => {
+        const updated: FilterStateMap<number> = {
+          ...prev,
+          [currentFilter]: (prev[currentFilter] || 0) + POSTS_PER_PAGE
+        };
+        return pruneFilterMap(updated, currentFilter);
+      });
       
       // Clear preloaded content and start next preload
-      setPreloadedContent(prev => ({
-        ...prev,
-        [currentFilter]: []
-      }));
+      setPreloadedContent(prev => {
+        const updated: FilterStateMap<ExploreContentItem[]> = {
+          ...prev,
+          [currentFilter]: []
+        };
+        return pruneFilterMap(updated, currentFilter);
+      });
       
       setTimeout(() => preloadMore(abortSignal), 50); // Fast preload trigger
       
       if (preloaded.length < POSTS_PER_PAGE) {
-        setHasMoreStates(prev => ({ ...prev, [currentFilter]: false }));
+        setHasMoreStates(prev => {
+          const updated: FilterStateMap<boolean> = { ...prev, [currentFilter]: false };
+          return pruneFilterMap(updated, currentFilter);
+        });
       }
       
       return;
     }
     
     // Set loading for current filter
-    setLoadingStates(prev => ({ ...prev, [currentFilter]: true }));
+    setLoadingStates(prev => {
+      const updated: FilterStateMap<boolean> = { ...prev, [currentFilter]: true };
+      return pruneFilterMap(updated, currentFilter);
+    });
 
     try {
       // Get fresh offset value from state to avoid stale closure
@@ -126,58 +181,94 @@ export const useInfiniteExploreContent = (
       
       // Check if aborted before setting state
       if (abortSignal?.aborted) {
-        setLoadingStates(prev => ({ ...prev, [currentFilter]: false }));
+        setLoadingStates(prev => {
+          const updated: FilterStateMap<boolean> = { ...prev, [currentFilter]: false };
+          return pruneFilterMap(updated, currentFilter);
+        });
         return;
       }
       
       if (posts.length > 0) {
         // Update content cache for current filter
-        setContentCache(prev => ({
-          ...prev,
-          [currentFilter]: [...(prev[currentFilter] || []), ...posts]
-        }));
+        setContentCache(prev => {
+          const updated: FilterStateMap<ExploreContentItem[]> = {
+            ...prev,
+            [currentFilter]: [...(prev[currentFilter] || []), ...posts]
+          };
+          return pruneFilterMap(updated, currentFilter);
+        });
         
         // Update offset for current filter
-        setOffsetStates(prev => ({
-          ...prev,
-          [currentFilter]: freshOffset + POSTS_PER_PAGE
-        }));
+        setOffsetStates(prev => {
+          const updated: FilterStateMap<number> = {
+            ...prev,
+            [currentFilter]: freshOffset + POSTS_PER_PAGE
+          };
+          return pruneFilterMap(updated, currentFilter);
+        });
         
         // Start preloading next batch
         setTimeout(() => preloadMore(abortSignal), 100);
         
         // If we got fewer posts than requested, we might be at the end
         if (posts.length < POSTS_PER_PAGE) {
-          setHasMoreStates(prev => ({ ...prev, [currentFilter]: false }));
+          setHasMoreStates(prev => {
+            const updated: FilterStateMap<boolean> = { ...prev, [currentFilter]: false };
+            return pruneFilterMap(updated, currentFilter);
+          });
         }
       } else {
         // No posts available - mark as end instead of falling back to mock data
-        setHasMoreStates(prev => ({ ...prev, [currentFilter]: false }));
+        setHasMoreStates(prev => {
+          const updated: FilterStateMap<boolean> = { ...prev, [currentFilter]: false };
+          return pruneFilterMap(updated, currentFilter);
+        });
       }
     } catch (error) {
       console.error('Error loading content:', error);
-      setHasMoreStates(prev => ({ ...prev, [currentFilter]: false }));
+      setHasMoreStates(prev => {
+        const updated: FilterStateMap<boolean> = { ...prev, [currentFilter]: false };
+        return pruneFilterMap(updated, currentFilter);
+      });
     } finally {
-      setLoadingStates(prev => ({ ...prev, [currentFilter]: false }));
+      setLoadingStates(prev => {
+        const updated: FilterStateMap<boolean> = { ...prev, [currentFilter]: false };
+        return pruneFilterMap(updated, currentFilter);
+      });
     }
   }, [loading, hasMore, offsetStates, fetchRealPosts, fetchFriendsPosts, currentFilter, preloadedContent, preloadMore, activeFilter, subFilter, durationFilter]);
 
   // Initialize states for new filters (but don't reset existing ones)
   useEffect(() => {
     if (!(currentFilter in contentCache)) {
-      setContentCache(prev => ({ ...prev, [currentFilter]: [] }));
+      setContentCache(prev => {
+        const updated: FilterStateMap<ExploreContentItem[]> = { ...prev, [currentFilter]: [] };
+        return pruneFilterMap(updated, currentFilter);
+      });
     }
     if (!(currentFilter in loadingStates)) {
-      setLoadingStates(prev => ({ ...prev, [currentFilter]: false }));
+      setLoadingStates(prev => {
+        const updated: FilterStateMap<boolean> = { ...prev, [currentFilter]: false };
+        return pruneFilterMap(updated, currentFilter);
+      });
     }
     if (!(currentFilter in hasMoreStates)) {
-      setHasMoreStates(prev => ({ ...prev, [currentFilter]: true }));
+      setHasMoreStates(prev => {
+        const updated: FilterStateMap<boolean> = { ...prev, [currentFilter]: true };
+        return pruneFilterMap(updated, currentFilter);
+      });
     }
     if (!(currentFilter in offsetStates)) {
-      setOffsetStates(prev => ({ ...prev, [currentFilter]: 0 }));
+      setOffsetStates(prev => {
+        const updated: FilterStateMap<number> = { ...prev, [currentFilter]: 0 };
+        return pruneFilterMap(updated, currentFilter);
+      });
     }
     if (!(currentFilter in mockOffsetStates)) {
-      setMockOffsetStates(prev => ({ ...prev, [currentFilter]: 0 }));
+      setMockOffsetStates(prev => {
+        const updated: FilterStateMap<number> = { ...prev, [currentFilter]: 0 };
+        return pruneFilterMap(updated, currentFilter);
+      });
     }
   }, [currentFilter]);
 
