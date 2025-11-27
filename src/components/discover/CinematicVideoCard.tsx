@@ -6,6 +6,7 @@ import { useVideoProgressSync } from '@/hooks/useVideoProgressSync';
 import { Volume2, VolumeX, Heart } from 'lucide-react';
 import { Squircle } from '@/components/ui/squircle';
 import { formatRelativeTime, formatLikes } from '@/utils/dateFormat';
+import { buildImageThumbnailUrl, buildVideoPosterUrl } from '@/utils/mediaThumbs';
 import { clsx } from 'clsx';
 import ClubTagPill from '@/components/clubhouse/ClubTagPill';
 
@@ -59,7 +60,10 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
   };
 
   const videoUrl = item.media?.[0]?.media_url || item.src || '';
-  const thumbnailUrl = item.thumbnailSrc || '';
+  const baseThumbnailUrl = item.thumbnailSrc || '';
+  const thumbnailUrl = baseThumbnailUrl 
+    ? buildVideoPosterUrl(baseThumbnailUrl, { width: 800, height: 800 })
+    : '';
 
   return (
     <div ref={containerRef} className="w-full mb-2">
@@ -146,11 +150,15 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
             <Squircle width={24} height={24}>
               {item.user?.avatar ? (
                 <img 
-                  src={item.user.avatar} 
+                  src={buildImageThumbnailUrl(item.user.avatar, { width: 128, height: 128 })}
                   alt={item.user?.username || item.user?.name || 'User'} 
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                   loading="lazy"
                   decoding="async"
+                  draggable={false}
+                  onError={(e) => {
+                    e.currentTarget.src = '/default-avatar.svg';
+                  }}
                 />
               ) : (
                 <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.1)', fontSize: '10px', fontWeight: 600 }}>
