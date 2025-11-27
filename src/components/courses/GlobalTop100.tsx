@@ -18,7 +18,7 @@ import {
   subregionKeyToLabel,
 } from '@/constants/courseRegions';
 import { getOptimalPageSize } from '@/utils/deviceDetection';
-import { UnifiedControlBar } from './UnifiedControlBar';
+import { Top100ResultSummaryBar } from './Top100ResultSummaryBar';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 
 const PAGE_SIZE = getOptimalPageSize(50); // 30 on mobile, 50 on desktop
@@ -307,12 +307,12 @@ const GlobalTop100 = () => {
   };
 
   return (
-    <div className="mt-4 space-y-4 max-w-2xl mx-auto px-4 pb-0">
+    <div className="flex flex-col gap-4 px-4 pb-6 pt-2 max-w-2xl mx-auto">
       {/* Top 100 Club Callout */}
       <Top100ClubCallout />
 
       {/* Search */}
-      <div className="relative max-w-xl mx-auto">
+      <div className="relative max-w-xl mx-auto mt-3">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           value={searchTerm}
@@ -332,7 +332,7 @@ const GlobalTop100 = () => {
       </div>
 
       {/* Top 100 List Selector + Sub-region */}
-      <div className="max-w-xl mx-auto flex items-center justify-center gap-3">
+      <div className="max-w-xl mx-auto flex items-center justify-center gap-3 mt-2">
         <div className="flex-1">
           <Select
             value={selectedList}
@@ -387,22 +387,17 @@ const GlobalTop100 = () => {
         })()}
       </div>
 
-      {/* Optional context line */}
+      {/* Unified metadata + sort bar */}
       {totalCount > 0 && (
-        <p className="text-xs text-muted-foreground">
-          Showing courses in <span className="font-medium">{currentListLabel}</span>
-        </p>
-      )}
-
-      {/* Unified Control Bar */}
-      {totalCount > 0 && (
-        <UnifiedControlBar
-          from={startIndex}
-          to={endIndex}
-          total={totalCount}
-          sortLabel={sortLabelMap[sortOption]}
-          onSortClick={() => setShowSortSheet(true)}
-        />
+        <div className="mt-3">
+          <Top100ResultSummaryBar
+            visibleCount={endIndex}
+            totalCount={totalCount}
+            currentListName={currentListLabel}
+            sort={sortOption}
+            onSortClick={() => setShowSortSheet(true)}
+          />
+        </div>
       )}
 
       {/* Results */}
@@ -432,6 +427,9 @@ const GlobalTop100 = () => {
         <div className="space-y-6">
         {/* Scroll target for pagination */}
         <div ref={listTopRef} className="h-0" />
+        
+        {/* Divider before cards */}
+        <hr className="mt-3 border-border/20" />
         
         <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
             <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">

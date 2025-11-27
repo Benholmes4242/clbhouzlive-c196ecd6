@@ -20,7 +20,7 @@ import {
   subregionKeyToLabel,
 } from '@/constants/courseRegions';
 import { getOptimalPageSize } from '@/utils/deviceDetection';
-import { UnifiedControlBar } from './UnifiedControlBar';
+import { ExploreResultSummaryBar } from './ExploreResultSummaryBar';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 
 const PAGE_SIZE = 25; // Reduced from 50 to 25 for better performance
@@ -336,10 +336,9 @@ const CourseExplorer = () => {
   };
 
   return (
-    <div className="mt-4 space-y-4 max-w-2xl mx-auto px-4 pb-0">
-      {/* Scroll to top button */}
+    <div className="flex flex-col gap-4 px-4 pb-6 pt-2 max-w-2xl mx-auto">
       {/* Search */}
-      <div className="relative max-w-xl mx-auto">
+      <div className="relative max-w-xl mx-auto mt-3">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
         <Input
           placeholder="Search by name, county or area..."
@@ -360,7 +359,7 @@ const CourseExplorer = () => {
       </div>
 
       {/* Region + sub-region filters */}
-      <div className="max-w-xl mx-auto flex items-center justify-center gap-3">
+      <div className="max-w-xl mx-auto flex items-center justify-center gap-3 mt-2">
         {/* Primary region */}
         <div className="flex-1">
           <Select value={selectedRegion} onValueChange={(value) => {
@@ -437,38 +436,20 @@ const CourseExplorer = () => {
         {/* Scroll target for pagination */}
         <div ref={listTopRef} className="h-0" />
         
-        {/* Optional context line */}
+        {/* Unified metadata + sort bar */}
         {totalCount > 0 && (
-          <p className="text-xs text-muted-foreground">
-            {hasSearch ? (
-              <>
-                Results for "{debouncedSearch}" {selectedRegion === PRIMARY_REGIONS.ALL
-                  ? 'worldwide'
-                  : <>in <span className="font-medium text-foreground">{getRegionLabel()}</span></>}
-                {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
-              </>
-            ) : selectedRegion === PRIMARY_REGIONS.ALL ? (
-              'Showing all courses worldwide'
-            ) : (
-              <>
-                Showing courses in{' '}
-                <span className="font-medium text-foreground">{getRegionLabel()}</span>
-                {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
-              </>
-            )}
-          </p>
+          <div className="mt-3">
+            <ExploreResultSummaryBar
+              visibleCount={endIndex}
+              totalCount={totalCount}
+              sort={sortOption}
+              onSortClick={() => setShowSortSheet(true)}
+            />
+          </div>
         )}
 
-        {/* Unified Control Bar */}
-        {totalCount > 0 && (
-          <UnifiedControlBar
-            from={startIndex}
-            to={endIndex}
-            total={totalCount}
-            sortLabel={sortLabelMap[sortOption]}
-            onSortClick={() => setShowSortSheet(true)}
-          />
-        )}
+        {/* Divider before cards */}
+        <hr className="mt-3 border-border/20" />
           
         {/* Phase 2 Perf: Use virtualized list for better performance */}
         <VirtualizedCourseList 
