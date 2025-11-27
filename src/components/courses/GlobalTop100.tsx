@@ -18,6 +18,8 @@ import {
   subregionKeyToLabel,
 } from '@/constants/courseRegions';
 import { getOptimalPageSize } from '@/utils/deviceDetection';
+import { UnifiedControlBar } from './UnifiedControlBar';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 
 const PAGE_SIZE = getOptimalPageSize(50); // 30 on mobile, 50 on desktop
 
@@ -90,6 +92,7 @@ const GlobalTop100 = () => {
   });
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
   const [sortOption, setSortOption] = useState<Top100SortOption>('official');
+  const [showSortSheet, setShowSortSheet] = useState(false);
 
   // Save filters to sessionStorage whenever they change (only after URL initialization)
   useEffect(() => {
@@ -292,6 +295,17 @@ const GlobalTop100 = () => {
 
   const currentListLabel = listOptions.find((opt) => opt.value === selectedList)?.label || 'Global Top 100';
 
+  const sortLabelMap: Record<Top100SortOption, string> = {
+    official: 'Official ranking',
+    name_asc: 'A–Z',
+    name_desc: 'Z–A',
+  };
+
+  const handleSortSelection = (option: Top100SortOption) => {
+    setSortOption(option);
+    setShowSortSheet(false);
+  };
+
   return (
     <div className="mt-4 space-y-4 max-w-2xl mx-auto px-4 pb-0">
       {/* Top 100 Club Callout */}
@@ -373,44 +387,23 @@ const GlobalTop100 = () => {
         })()}
       </div>
 
-      {/* Stats row */}
-      <div className="max-w-xl mx-auto mt-2 space-y-2">
-        <p className="text-sm md:text-base text-muted-foreground">
+      {/* Optional context line */}
+      {totalCount > 0 && (
+        <p className="text-xs text-muted-foreground">
           Showing courses in <span className="font-medium">{currentListLabel}</span>
         </p>
-        <div className="flex items-center justify-between text-sm md:text-base">
-          <div className="flex items-center gap-4 text-muted-foreground">
-            <span>
-              Showing {startIndex}–{endIndex} of {totalCount} courses
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">Sort by</span>
-              <Select value={sortOption} onValueChange={(value) => setSortOption(value as Top100SortOption)}>
-                <SelectTrigger className="h-9 w-[150px] text-sm">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="official">Official ranking</SelectItem>
-                  <SelectItem value="name_asc">A → Z</SelectItem>
-                  <SelectItem value="name_desc">Z → A</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            {hasActiveFilters && (
-              <button
-                type="button"
-                onClick={handleResetFilters}
-                className="inline-flex items-center gap-1 text-slate-700 hover:text-slate-900 text-sm"
-              >
-                <span className="text-[10px] leading-none">&times;</span>
-                <span>Reset filters</span>
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
+      )}
+
+      {/* Unified Control Bar */}
+      {totalCount > 0 && (
+        <UnifiedControlBar
+          from={startIndex}
+          to={endIndex}
+          total={totalCount}
+          sortLabel={sortLabelMap[sortOption]}
+          onSortClick={() => setShowSortSheet(true)}
+        />
+      )}
 
       {/* Results */}
       {isLoading ? (
@@ -479,6 +472,34 @@ const GlobalTop100 = () => {
           </div>
         </div>
       )}
+
+      {/* Sort Bottom Sheet */}
+      <BottomSheet
+        open={showSortSheet}
+        onClose={() => setShowSortSheet(false)}
+        ariaLabelledBy="sort-options-title"
+      >
+        <div className="px-4 py-6 space-y-4">
+          <h2 id="sort-options-title" className="text-lg font-semibold">Sort by</h2>
+          <div className="space-y-2">
+            {(['official', 'name_asc', 'name_desc'] as Top100SortOption[]).map((option) => (
+              <button
+                key={option}
+                onClick={() => handleSortSelection(option)}
+                className={`
+                  w-full text-left px-4 py-3 rounded-lg transition-colors
+                  ${sortOption === option
+                    ? 'bg-accent text-accent-foreground font-medium'
+                    : 'hover:bg-accent/50'
+                  }
+                `}
+              >
+                {sortLabelMap[option]}
+              </button>
+            ))}
+          </div>
+        </div>
+      </BottomSheet>
     </div>
   );
 };
