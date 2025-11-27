@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import SquareCardMedia from '@/components/explore/media/SquareCardMedia';
 import { CardType } from '@/components/explore/media/CardMediaTypes';
@@ -138,10 +138,29 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
 
   const hasMedia = mediaTiles.length > 0;
 
+  // Calculate photo and video counts
+  const { photoCount, videoCount } = useMemo(() => {
+    const photos = mediaTiles.filter(m => m.media_type === 'image').length;
+    const videos = mediaTiles.filter(m => m.media_type === 'video').length;
+    return { photoCount: photos, videoCount: videos };
+  }, [mediaTiles]);
+
+  // Hide entire section if no media
+  if (!loading && !hasMedia) {
+    return null;
+  }
+
   return (
     <>
       <div className="flex items-center justify-between mb-3 px-4">
-        <h2 className="text-lg md:text-xl font-semibold">Media</h2>
+        <div>
+          <h2 className="text-lg md:text-xl font-semibold">Media</h2>
+          {hasMedia && (
+            <p className="text-sm text-slate-600 mt-0.5">
+              {photoCount} photo{photoCount !== 1 ? 's' : ''}   {videoCount} video{videoCount !== 1 ? 's' : ''}
+            </p>
+          )}
+        </div>
         {hasMedia && (
           <button
             type="button"
@@ -156,32 +175,26 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
         )}
       </div>
 
-      {!hasMedia ? (
-        <div className="mx-4 rounded-xl border border-dashed border-border/60 bg-muted/40 px-4 py-6 text-base text-muted-foreground">
-          <p className="text-center">No media for this course yet. Review this course and add media or tag this course to be the first.</p>
-        </div>
-      ) : (
-        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 grid grid-cols-3 gap-[1px]">
-          {mediaTiles.map((media) => (
-            <button
-              key={media.id}
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onSeeAllClick();
-              }}
-              className="overflow-hidden w-full aspect-square focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all border border-border/60 sm:border-border/40"
-              aria-label="Open Media tab"
-            >
-              <SquareCardMedia
-                media={media}
-                cardType={CardType.SQUARE}
-                className="w-full h-full"
-              />
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 grid grid-cols-3 gap-[1px]">
+        {mediaTiles.map((media) => (
+          <button
+            key={media.id}
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSeeAllClick();
+            }}
+            className="overflow-hidden w-full aspect-square focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all border border-border/60 sm:border-border/40"
+            aria-label="Open Media tab"
+          >
+            <SquareCardMedia
+              media={media}
+              cardType={CardType.SQUARE}
+              className="w-full h-full"
+            />
+          </button>
+        ))}
+      </div>
     </>
   );
 };
