@@ -5,18 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Z } from '@/config/zIndex';
 import { cn } from '@/lib/utils';
-
-interface Comment {
-  id: string;
-  user: {
-    username: string;
-    avatar: string;
-  };
-  content: string;
-  timestamp: string;
-  likes: number;
-  isLiked: boolean;
-}
+import { usePostEngagement } from '@/hooks/usePostEngagement';
+import { formatDistanceToNow } from 'date-fns';
 
 interface CommentsModalProps {
   isOpen: boolean;
@@ -28,127 +18,16 @@ interface CommentsModalProps {
 const ENTRY_DURATION = 500;
 const EXIT_DURATION = 500;
 
-// Mock comments data
-const generateMockComments = (postId: string): Comment[] => {
-  const mockComments: Comment[] = [
-    {
-      id: '1',
-      user: {
-        username: 'golfpro_mike',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
-      },
-      content: 'Amazing shot! What club did you use? That trajectory looks perfect for this hole.',
-      timestamp: '2h',
-      likes: 12,
-      isLiked: false
-    },
-    {
-      id: '2',
-      user: {
-        username: 'sarah_golf',
-        avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b950?w=150&h=150&fit=crop&crop=face'
-      },
-      content: 'Beautiful course! Need to play here soon 🏌️‍♀️',
-      timestamp: '4h',
-      likes: 8,
-      isLiked: true
-    },
-    {
-      id: '3',
-      user: {
-        username: 'clubhouse_tom',
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
-      },
-      content: 'Incredible view from the tee! 🔥',
-      timestamp: '6h',
-      likes: 15,
-      isLiked: false
-    },
-    {
-      id: '4',
-      user: {
-        username: 'jenny_links',
-        avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
-      },
-      content: 'Love this, Rahul! Your swing has improved so much since last season. Keep it up! 💪',
-      timestamp: '8h',
-      likes: 23,
-      isLiked: true
-    },
-    {
-      id: '5',
-      user: {
-        username: 'pro_caddie_steve',
-        avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face'
-      },
-      content: 'Thanks for sharing, Rahul! This is exactly the kind of approach shot I was telling you about.',
-      timestamp: '1d',
-      likes: 31,
-      isLiked: false
-    },
-    {
-      id: '6',
-      user: {
-        username: 'golf_enthusiast_lisa',
-        avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=crop&crop=face'
-      },
-      content: 'Stunning xx',
-      timestamp: '1d',
-      likes: 5,
-      isLiked: true
-    },
-    {
-      id: '7',
-      user: {
-        username: 'fairway_finder',
-        avatar: 'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=150&h=150&fit=crop&crop=face'
-      },
-      content: 'Great progress level view. Here is my approach to the same hole from last week.',
-      timestamp: '2d',
-      likes: 18,
-      isLiked: false
-    }
-  ];
-
-  // Return different comments based on postId for variety
-  const startIndex = parseInt(postId.slice(-1) || '0') % 3;
-  return mockComments.slice(0, 5 + startIndex);
-};
-
 const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }) => {
   const [newComment, setNewComment] = useState('');
-  const [comments, setComments] = useState(() => generateMockComments(postId));
   const [isClosing, setIsClosing] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
-
-  const handleLike = (commentId: string) => {
-    setComments(prev => prev.map(comment => 
-      comment.id === commentId 
-        ? { 
-            ...comment, 
-            isLiked: !comment.isLiked,
-            likes: comment.isLiked ? comment.likes - 1 : comment.likes + 1
-          }
-        : comment
-    ));
-  };
+  
+  const { comments, commentsLoading, addComment, isAddingComment } = usePostEngagement(postId);
 
   const handleSubmitComment = () => {
-    if (!newComment.trim()) return;
-    
-    const comment: Comment = {
-      id: Date.now().toString(),
-      user: {
-        username: 'you',
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
-      },
-      content: newComment,
-      timestamp: 'now',
-      likes: 0,
-      isLiked: false
-    };
-    
-    setComments(prev => [comment, ...prev]);
+    if (!newComment.trim() || isAddingComment) return;
+    addComment(newComment);
     setNewComment('');
   };
 
@@ -231,43 +110,39 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
               overscrollBehavior: 'contain'
             }}
           >
-            {comments.map((comment) => (
-              <div key={comment.id} className="flex gap-3 pb-3">
-                <img
-                  src={comment.user.avatar}
-                  alt={comment.user.username}
-                  className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
-                  }}
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 text-[13px] text-white font-semibold">
-                    <span className="truncate">{comment.user.username}</span>
-                    <span className="text-[11px] text-white/50 whitespace-nowrap">
-                      {comment.timestamp}
-                    </span>
-                  </div>
-                  <p className="mt-0.5 text-[13px] leading-snug text-white/85">
-                    {comment.content}
-                  </p>
-                  <div className="flex items-center gap-4 mt-2">
-                    <button
-                      onClick={() => handleLike(comment.id)}
-                      className="flex items-center gap-1 text-[11px] text-white/60 hover:text-white transition-colors"
-                    >
-                      <Heart 
-                        className={`w-3.5 h-3.5 ${comment.isLiked ? 'fill-red-500 text-red-500' : ''}`} 
-                      />
-                      <span>{comment.likes}</span>
-                    </button>
-                    <button className="text-[11px] text-white/60 hover:text-white transition-colors">
-                      Reply
-                    </button>
+            {commentsLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="text-white/50 text-sm">Loading comments...</div>
+              </div>
+            ) : comments.length === 0 ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="text-white/50 text-sm">No comments yet. Be the first!</div>
+              </div>
+            ) : (
+              comments.map((comment) => (
+                <div key={comment.id} className="flex gap-3 pb-3">
+                  <img
+                    src={comment.avatar_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+                    alt={comment.user_name}
+                    className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
+                    }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 text-[13px] text-white font-semibold">
+                      <span className="truncate">{comment.user_name}</span>
+                      <span className="text-[11px] text-white/50 whitespace-nowrap">
+                        {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                      </span>
+                    </div>
+                    <p className="mt-0.5 text-[13px] leading-snug text-white/85">
+                      {comment.content}
+                    </p>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
 
           {/* Comment Input - Fixed Bottom */}
@@ -301,10 +176,10 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
               {/* Send button - Frosted White */}
               <button
                 onClick={handleSubmitComment}
-                disabled={!newComment.trim()}
+                disabled={!newComment.trim() || isAddingComment}
                 className="btn-frosted-white px-4 py-1.5 text-[13px] font-semibold rounded-full bg-white/16 backdrop-blur-[18px] border border-white/45 text-white shadow-[0_0_12px_rgba(0,0,0,0.35)] transition-all duration-150 hover:bg-white/22 hover:-translate-y-px hover:shadow-[0_6px_14px_rgba(0,0,0,0.45)] active:translate-y-0 active:shadow-[0_2px_8px_rgba(0,0,0,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Send
+                {isAddingComment ? 'Sending...' : 'Send'}
               </button>
             </div>
           </div>
