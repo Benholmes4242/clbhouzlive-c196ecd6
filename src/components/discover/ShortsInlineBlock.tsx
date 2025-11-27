@@ -3,6 +3,7 @@ import { ExploreContentItem } from '@/components/explore/types';
 import { Squircle } from '@/components/ui/squircle';
 import { Heart, Flame } from 'lucide-react';
 import { formatLikes } from '@/utils/dateFormat';
+import { buildImageThumbnailUrl, buildVideoPosterUrl } from '@/utils/mediaThumbs';
 import { useInView } from 'react-intersection-observer';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
@@ -71,6 +72,12 @@ const ShortTile: React.FC<ShortTileProps> = ({ short, height, onClick }) => {
   const { ref: tileRef, inView } = useInView({ threshold: 0.3, triggerOnce: false });
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  // Optimize thumbnail and poster URLs
+  const basePosterUrl = short.thumbnailSrc || '';
+  const posterUrl = basePosterUrl 
+    ? buildVideoPosterUrl(basePosterUrl, { width: 600, height: 600 })
+    : '';
+
   // Handle tile impression analytics
   useEffect(() => {
     if (inView) {
@@ -113,7 +120,7 @@ const ShortTile: React.FC<ShortTileProps> = ({ short, height, onClick }) => {
           loop
           muted
           playsInline
-          poster={short.thumbnailSrc}
+          poster={posterUrl || '/placeholder.svg'}
         />
 
         {/* Gradient Overlay */}
@@ -148,11 +155,15 @@ const ShortTile: React.FC<ShortTileProps> = ({ short, height, onClick }) => {
                 <Squircle width={24} height={24}>
                   {short.user.avatar ? (
                     <img 
-                      src={short.user.avatar} 
+                      src={buildImageThumbnailUrl(short.user.avatar, { width: 128, height: 128 })}
                       alt={short.user.name} 
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                       loading="lazy"
                       decoding="async"
+                      draggable={false}
+                      onError={(e) => {
+                        e.currentTarget.src = '/default-avatar.svg';
+                      }}
                     />
                   ) : (
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.1)', fontSize: '10px', fontWeight: 600 }}>

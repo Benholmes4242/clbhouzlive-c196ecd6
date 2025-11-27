@@ -6,6 +6,7 @@ import { useRelationshipStatus } from '@/hooks/useRelationshipStatus';
 import { useProfileActions } from '@/components/profile/actions/useProfileActions';
 import { useFriendActions } from '@/hooks/useFriendActions';
 import { SocialUser } from '@/hooks/useFollowersList';
+import { buildImageThumbnailUrl } from '@/utils/mediaThumbs';
 import { UserCheck, UserPlus } from 'lucide-react';
 
 interface SocialUserRowProps {
@@ -65,7 +66,7 @@ export const SocialUserRow: React.FC<SocialUserRowProps> = ({ user, currentUserI
       {/* Avatar & Info */}
       <Avatar className="h-12 w-12 flex-shrink-0">
         <AvatarImage 
-          src={user.avatarUrl || undefined} 
+          src={user.avatarUrl ? buildImageThumbnailUrl(user.avatarUrl, { width: 128, height: 128 }) : undefined}
           alt={user.displayName}
           loading="lazy"
           decoding="async"
