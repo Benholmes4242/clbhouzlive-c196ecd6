@@ -34,13 +34,13 @@ export const CourseMediaSummaryCard: React.FC<CourseMediaSummaryCardProps> = ({
             Help other golfers see {courseName || 'this course'} before they play – add your photos or a short video.
           </p>
           {onAddMedia && (
-            <button
-              type="button"
-              onClick={onAddMedia}
-              className="inline-flex items-center justify-center px-4 py-2 rounded-full text-sm font-semibold bg-slate-900 text-white shadow-sm active:scale-[0.98] transition"
-            >
-              Add photos or videos
-            </button>
+          <button
+            type="button"
+            onClick={onAddMedia}
+            className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold bg-slate-900 text-white shadow-sm active:scale-[0.98] transition"
+          >
+            Add photos or videos
+          </button>
           )}
         </div>
       </section>
