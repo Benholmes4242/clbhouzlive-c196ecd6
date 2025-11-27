@@ -156,3 +156,9 @@ export const useExploreContent = () => {
     refetch: fetchExploreContent
   };
 };
+
+// Note: This hook uses manual state management rather than React Query.
+// If converting to useQuery in the future, use these cache settings:
+// staleTime: 2 * 60 * 1000,   // 2 min – feed data
+// gcTime:   5 * 60 * 1000,   // 5 min – limits memory
+// refetchOnWindowFocus: false,

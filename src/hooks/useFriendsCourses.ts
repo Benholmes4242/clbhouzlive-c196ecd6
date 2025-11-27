@@ -232,6 +232,8 @@ export function useFriendsCourses(userId?: string) {
         totalFriendsActive: activeFriendIds.size,
       };
     },
-    staleTime: 60_000,
+    staleTime: 30 * 60 * 1000,  // 30 min – friend courses are stable
+    gcTime:   60 * 60 * 1000,  // 60 min – keep for session
+    refetchOnWindowFocus: false,
   });
 }
