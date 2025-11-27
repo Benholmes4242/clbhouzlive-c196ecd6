@@ -43,12 +43,12 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
                   src={friend.profile.profile_photo_url}
                   alt={displayName}
                   size={32}
-                  className="border-2 border-background"
+                  className=""
                 />
               ) : (
                 <div
                   key={friend.user_id}
-                  className="w-8 h-8 flex items-center justify-center bg-muted text-foreground text-xs font-semibold border-2 border-background"
+                  className="w-8 h-8 flex items-center justify-center bg-muted text-foreground text-xs font-semibold"
                   style={{ borderRadius: '20%' }}
                 >
                   {initial}
