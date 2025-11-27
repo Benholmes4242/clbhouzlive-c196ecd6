@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Heart, MessageCircle, Share, Search, Volume2, VolumeX } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface SocialDockProps {
@@ -9,12 +10,11 @@ interface SocialDockProps {
     caption?: string;
     courseName?: string;
     holeNumber?: number | null | undefined;
-    isLiked: boolean;
     isMuted: boolean;
-    likes: number;
-    comments: number;
-    shares: number;
   };
+  likesCount: number;
+  commentsCount: number;
+  hasLiked: boolean;
   isVisible: boolean;
   onSwipeUp: () => void;
   onProfileClick: () => void;
@@ -29,6 +29,9 @@ interface SocialDockProps {
 
 export const SocialDock: React.FC<SocialDockProps> = ({
   post,
+  likesCount,
+  commentsCount,
+  hasLiked,
   isVisible,
   onSwipeUp,
   onProfileClick,
@@ -98,62 +101,67 @@ export const SocialDock: React.FC<SocialDockProps> = ({
       <div
         className={cn(
           'fixed inset-x-0 bottom-0 z-[80]',
-          'pointer-events-none',
+          'transition-all duration-[220ms]',
+          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
         )}
       >
-        <div
-          className={cn(
-            'mx-0',
-            'rounded-t-2xl rounded-b-none bg-black/70 backdrop-blur-2xl',
-            'shadow-[0_18px_40px_rgba(0,0,0,0.5)]',
-            'transition-all duration-[220ms] ease-[cubic-bezier(0.19,1,0.22,1)]',
-            'pointer-events-auto',
-            'overflow-hidden',
-            isExpanded ? 'max-h-[45vh]' : 'max-h-[26vh]',
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          )}
-          style={{
-            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-          }}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Inner wrapper for bounce animation */}
-          <div
-            className={cn(
-              'social-dock-card-inner',
-              'px-4 pt-3',
-              motionState === 'expand' && 'social-dock-card-expand',
-              motionState === 'collapse' && 'social-dock-card-collapse'
-            )}
-            style={{
-              paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)',
+        <div className="px-4 pb-[max(env(safe-area-inset-bottom,8px),8px)]">
+          <motion.div
+            initial={{ scale: 0.99 }}
+            animate={{ scale: isExpanded ? 1.02 : 1.0 }}
+            transition={{
+              type: 'spring',
+              stiffness: 260,
+              damping: 22,
+              mass: 0.9,
             }}
+            className={cn(
+              'w-full rounded-t-2xl pointer-events-auto overflow-hidden',
+              'bg-[rgba(10,10,10,0.78)] backdrop-blur-[22px]',
+              'shadow-[0_-10px_30px_rgba(0,0,0,0.55)]',
+              'border-t border-white/5',
+              'px-4 pt-4 pb-5',
+              'transition-all duration-[220ms]',
+              isExpanded ? 'max-h-[45vh]' : 'max-h-[26vh]'
+            )}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            onClick={(e) => e.stopPropagation()}
           >
         {/* 1) TOP: ACTION ROW */}
-        <div className="mb-2 flex items-center justify-between gap-1">
-          <ActionButton
-            icon={Heart}
-            count={post.likes}
-            showCount={showCounts}
-            active={post.isLiked}
+        <div className="flex items-center justify-between gap-6 pb-3">
+          <motion.button
+            whileTap={{ scale: 0.92 }}
+            animate={{ scale: hasLiked ? 1.06 : 1.0 }}
+            transition={{ type: 'spring', stiffness: 340, damping: 18 }}
             onClick={onLike}
-            onLongPress={handleActionLongPress}
-          />
+            onTouchStart={handleActionLongPress}
+            className={cn(
+              'flex h-10 w-10 items-center justify-center rounded-full',
+              'transition-transform duration-150 active:scale-95',
+              hasLiked ? 'text-white' : 'text-white/85'
+            )}
+          >
+            <Heart className={cn('h-5 w-5', hasLiked && 'fill-current')} />
+            {showCounts && likesCount > 0 && (
+              <span className="absolute -bottom-4 text-[11px] leading-none text-white/70">
+                {likesCount}
+              </span>
+            )}
+          </motion.button>
+          
           <ActionButton
             icon={MessageCircle}
-            count={post.comments}
+            count={commentsCount}
             showCount={showCounts}
             onClick={onComment}
             onLongPress={handleActionLongPress}
           />
           <ActionButton
             icon={Share}
-            count={post.shares}
-            showCount={showCounts}
+            count={0}
+            showCount={false}
             onClick={onShare}
-            onLongPress={handleActionLongPress}
           />
           <ActionButton
             icon={post.isMuted ? VolumeX : Volume2}
@@ -245,7 +253,7 @@ export const SocialDock: React.FC<SocialDockProps> = ({
             </div>
           )}
         </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </>

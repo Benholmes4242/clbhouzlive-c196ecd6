@@ -29,6 +29,7 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
 import { logClubhouseFiltering } from '@/utils/clubhouseTelemetry';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
+import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { 
   auditComponentMount, 
   auditIntersectionObserver,
@@ -203,6 +204,10 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const [selectedPostId, setSelectedPostId] = useState<string>('');
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [showMiniProfile, setShowMiniProfile] = useState(false);
+
+  // Get engagement data for the current post
+  const currentPost = filteredPosts[currentIndex];
+  const currentPostEngagement = usePostEngagement(currentPost?.id || null);
 
   // Notify parent when drawer states change
   useEffect(() => {
@@ -1195,12 +1200,11 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
             ),
             courseName: filteredPosts[currentIndex].golfCourse?.name,
             holeNumber: undefined,
-            isLiked: likedPostSet.has(filteredPosts[currentIndex].id),
             isMuted: isGloballyMuted,
-            likes: filteredPosts[currentIndex].likes || 0,
-            comments: filteredPosts[currentIndex].comments || 0,
-            shares: filteredPosts[currentIndex].shares || 0,
           }}
+          likesCount={currentPostEngagement.likesCount}
+          commentsCount={currentPostEngagement.commentsCount}
+          hasLiked={currentPostEngagement.hasLiked}
           isVisible={true}
           onSwipeUp={() => onPostDetailsOpen?.()}
           onProfileClick={() => {
@@ -1208,7 +1212,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
             setShowMiniProfile(true);
           }}
           onCourseClick={() => console.log('Course clicked')}
-          onLike={() => handleLike(filteredPosts[currentIndex].id)}
+          onLike={() => currentPostEngagement.toggleLike()}
           onComment={() => handleComment(filteredPosts[currentIndex].id)}
           onShare={handleShare}
           onMuteToggle={() => setGlobalMute(!isGloballyMuted)}
