@@ -2,7 +2,7 @@
  * Hub Echo Chat Page
  * Full-screen glass page with Apple-style chat interface
  */
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -16,6 +16,8 @@ import type { EchoMessage } from '@/features/echo/state/echoTypes';
 import { haptic } from '@/utils/haptics';
 import { useToast } from '@/hooks/use-toast';
 import '../home/hubTheme.css';
+
+const MAX_VISIBLE_MESSAGES = 100;
 
 export function HubEchoChatPage() {
   const nav = useNavigate();
@@ -41,6 +43,16 @@ export function HubEchoChatPage() {
     sendMessage,
     abortStream,
   } = useEchoConversation({ resetOnMount: true });
+
+  // Cap messages to prevent excessive DOM rendering
+  const visibleMessages = useMemo(() => {
+    if (!messages || messages.length <= MAX_VISIBLE_MESSAGES) return messages;
+    return messages.slice(-MAX_VISIBLE_MESSAGES);
+  }, [messages]);
+
+  const hiddenCount = (messages?.length ?? 0) > MAX_VISIBLE_MESSAGES
+    ? messages.length - MAX_VISIBLE_MESSAGES
+    : 0;
 
   // Auto-send from query param (tooltips & Hub search)
   useAutoSendFromQuery(
@@ -206,7 +218,13 @@ export function HubEchoChatPage() {
           </div>
         ) : (
           <>
-            {messages.map(message => (
+            {hiddenCount > 0 && (
+              <div className="text-center text-xs text-white/40 mb-3">
+                Showing latest {MAX_VISIBLE_MESSAGES} messages ({hiddenCount} older messages hidden)
+              </div>
+            )}
+            
+            {visibleMessages.map(message => (
               <EchoMessageRow
                 key={message.id}
                 message={message}

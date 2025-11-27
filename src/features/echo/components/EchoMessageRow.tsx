@@ -34,7 +34,14 @@ export function EchoMessageRow({ message, onContextMenu }: EchoMessageRowProps) 
           <div className="flex-shrink-0">
             <Squircle width={42} height={42}>
               {userProfile?.profile_photo_url ? (
-                <img src={userProfile.profile_photo_url} alt="You" className="w-full h-full object-cover" />
+                <img 
+                  src={userProfile.profile_photo_url} 
+                  alt="You" 
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                  draggable={false}
+                />
               ) : (
                 <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12}}>
                   {userProfile?.display_name?.[0]?.toUpperCase() || 'Y'}
