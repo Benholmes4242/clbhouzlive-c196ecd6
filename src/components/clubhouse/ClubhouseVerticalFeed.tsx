@@ -39,6 +39,10 @@ import {
   markPerformance
 } from '@/utils/clubhouseAudit';
 
+// Video ref management - keep only current + neighbors to prevent memory leaks
+const MAX_VIDEO_REFS = 20;
+const VIDEO_WINDOW_RADIUS = 2; // keep current ± 2 posts "warm"
+
 interface ClubhouseVerticalFeedProps {
   posts: ExploreContentItem[];
   onLike: (contentId: string) => void;
@@ -59,6 +63,26 @@ interface ClubhouseVerticalFeedProps {
   onNavOverlayRequest?: () => void;
 }
 
+// Helper to compute which video IDs to keep in memory
+function computeAllowedVideoIds(
+  posts: { id: string }[],
+  currentIndex: number
+): Set<string> {
+  const allowed = new Set<string>();
+
+  if (!posts || posts.length === 0) return allowed;
+
+  const start = Math.max(0, currentIndex - VIDEO_WINDOW_RADIUS);
+  const end = Math.min(posts.length - 1, currentIndex + VIDEO_WINDOW_RADIUS);
+
+  for (let i = start; i <= end; i++) {
+    const post = posts[i];
+    if (post?.id) allowed.add(post.id);
+  }
+
+  return allowed;
+}
+
 // VideoWithAutoplay component moved outside to prevent recreation on re-renders
 const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   src: string;
@@ -68,7 +92,8 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   shouldAttach?: boolean;
   autoplay?: boolean;
   isNearby?: boolean;
-}>(({ src, muted, className, isMobile: isMobileProp = false, shouldAttach = false, autoplay = false, isNearby = true }, ref) => {
+  isActive?: boolean;
+}>(({ src, muted, className, isMobile: isMobileProp = false, shouldAttach = false, autoplay = false, isNearby = true, isActive = true }, ref) => {
   // Generate HLS URL from source
   const uid = uidFromNode({ src });
   const hlsUrl = uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null;
@@ -94,6 +119,7 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
             externallyManaged={true}
             fit="cover"
             isNearby={isNearby}
+            isActive={isActive}
           />
         </div>
       ) : (
@@ -319,6 +345,35 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   useEffect(() => {
     onCurrentPostChange?.(currentIndex);
   }, [currentIndex, onCurrentPostChange]);
+
+  // Prune videoRefs to prevent memory leaks
+  useEffect(() => {
+    if (!filteredPosts || filteredPosts.length === 0) return;
+
+    const allowedIds = computeAllowedVideoIds(filteredPosts, currentIndex);
+
+    const entries = Object.entries(videoRefs.current);
+    if (entries.length <= MAX_VIDEO_REFS && allowedIds.size === entries.length) {
+      return;
+    }
+
+    const pruned: { [key: string]: HTMLVideoElement | null } = {};
+
+    for (const [key, value] of entries) {
+      if (allowedIds.has(key)) {
+        pruned[key] = value;
+      } else {
+        // Pause and clear video that's being pruned
+        if (value) {
+          value.pause();
+          value.removeAttribute('src');
+          value.load();
+        }
+      }
+    }
+
+    videoRefs.current = pruned;
+  }, [filteredPosts, currentIndex]);
 
   // Track video progress for the current video
   useEffect(() => {
@@ -1028,6 +1083,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                       shouldAttach={!!shouldAttachMap[item.id]}
                       autoplay={!!autoplayMap[item.id]}
                       isNearby={isNearby}
+                      isActive={index === currentIndex}
                     />
                     
                     {/* Simple video controls overlay */}
