@@ -118,7 +118,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <CourseLocationBreadcrumb course={course} />
       
       {/* Community Score Section - Card-based design */}
-      <section className="px-4 pt-7 pb-5 bg-slate-100 md:px-6 md:pt-9">
+      <section className="px-4 pt-[30px] pb-5 bg-slate-100 md:px-6 md:pt-[38px]">
         <CommunityScoreCard
           courseId={course.id}
           ratingAggregates={ratingAggregates}
