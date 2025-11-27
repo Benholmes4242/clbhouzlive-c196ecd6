@@ -6,6 +6,7 @@ import { haptic } from '@/utils/haptics';
 import { useToast } from '@/hooks/use-toast';
 import { getFilterClass } from '@/utils/studioFilters';
 import { cn } from '@/lib/utils';
+import { buildImageThumbnailUrl, buildVideoPosterUrl } from '@/utils/mediaThumbs';
 
 interface CarouselSlideProps {
   item: {
@@ -57,7 +58,13 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
     haptic('light');
   });
 
-  const src = item.previewUrl || item.url || (item.file ? URL.createObjectURL(item.file) : '');
+  // Generate base URL for media
+  const baseUrl = item.previewUrl || item.url || (item.file ? URL.createObjectURL(item.file) : '');
+  
+  // Use thumbnail URLs for composer previews to save memory
+  const src = item.type === 'video' 
+    ? buildVideoPosterUrl(baseUrl, { width: 600, height: 600 })
+    : buildImageThumbnailUrl(baseUrl, { width: 600, height: 600 });
 
   useEffect(() => {
     if (videoRef.current && onVideoRef) {
@@ -113,50 +120,51 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
           <div className="w-full h-full animate-pulse bg-white/10" />
         </div>
 
-        <video
-          ref={videoRef}
+        {/* Use poster image only - no video element to save memory */}
+        <img
           src={src}
-          preload="metadata"
-          playsInline
-          controls={false}
-          muted
-          poster={src} // Use the same src as poster to ensure thumbnail shows
-          onLoadedMetadata={(e) => {
-            const video = e.target as HTMLVideoElement;
-            setDuration(formatDuration(video.duration || 0));
-            // Seek to a frame to show a thumbnail
-            video.currentTime = 1;
-          }}
-          onLoadedData={() => {
-            setLoaded(true);
-            // Ensure we show a frame for thumbnail
-            if (videoRef.current && !isPlaying) {
-              videoRef.current.currentTime = 1;
-            }
-          }}
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
-          className={cn("w-full h-full object-cover transition-all duration-300", 
+          alt={item.alt || `Video thumbnail ${item.id}`}
+          onLoad={() => setLoaded(true)}
+          className={cn("w-full h-full object-cover transition-all duration-300",
             loaded ? 'scale-100 blur-0' : 'scale-105 blur-sm',
             filterClass
           )}
           style={testStyle}
+          loading="lazy"
+          decoding="async"
+          draggable={false}
         />
 
-        {/* Play overlay */}
-        {!isPlaying && loaded && (
-          <button
-            aria-label="Play video"
-            onClick={handleVideoPlay}
-            className="absolute inset-0 flex items-center justify-center group"
-          >
-            <div className="w-8 h-8 rounded-full bg-white/55 backdrop-blur-[10px] border border-white/70 shadow-[0_4px_16px_rgba(0,0,0,0.12)] group-hover:bg-white/65 group-hover:shadow-[0_6px_18px_rgba(0,0,0,0.16)] transition-all flex items-center justify-center">
-              <Play className="w-3.5 h-3.5 text-[rgba(25,25,28,0.85)] fill-[rgba(25,25,28,0.85)] ml-0.5" />
+        {/* Hidden video element for metadata only */}
+        <video
+          ref={videoRef}
+          src={baseUrl}
+          preload="metadata"
+          playsInline
+          controls={false}
+          muted
+          className="hidden"
+          onLoadedMetadata={(e) => {
+            const video = e.target as HTMLVideoElement;
+            setDuration(formatDuration(video.duration || 0));
+          }}
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+        />
+
+        {/* Play icon overlay */}
+        {loaded && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="w-12 h-12 rounded-full bg-black/50 backdrop-blur-[10px] border border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.24)] flex items-center justify-center">
+              <Play className="w-5 h-5 text-white fill-white ml-0.5" />
             </div>
-          </button>
+          </div>
         )}
 
-
+        {/* Video badge in corner */}
+        <div className="absolute bottom-2 right-2 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-[10px] font-medium uppercase tracking-wide text-white/90">
+          Video
+        </div>
       </div>
     );
   }
@@ -177,6 +185,8 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
           filterClass
         )}
         style={testStyle}
+        loading="lazy"
+        decoding="async"
         draggable={false}
       />
     </div>
