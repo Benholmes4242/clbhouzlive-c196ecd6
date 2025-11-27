@@ -64,7 +64,12 @@ export const SocialUserRow: React.FC<SocialUserRowProps> = ({ user, currentUserI
     >
       {/* Avatar & Info */}
       <Avatar className="h-12 w-12 flex-shrink-0">
-        <AvatarImage src={user.avatarUrl || undefined} alt={user.displayName} />
+        <AvatarImage 
+          src={user.avatarUrl || undefined} 
+          alt={user.displayName}
+          loading="lazy"
+          decoding="async"
+        />
         <AvatarFallback>{getInitials(user.displayName)}</AvatarFallback>
       </Avatar>
 
