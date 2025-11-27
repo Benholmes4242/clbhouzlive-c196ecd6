@@ -17,11 +17,8 @@ import {
   normalizeLabel,
   subregionKeyToLabel,
 } from '@/constants/courseRegions';
-import { getOptimalPageSize } from '@/utils/deviceDetection';
-import { UnifiedControlBar } from './UnifiedControlBar';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-
-const PAGE_SIZE = getOptimalPageSize(50); // 30 on mobile, 50 on desktop
+import { COURSES_PAGE_SIZE } from '@/config/pagination';
 
 type Top100SortOption = 'official' | 'name_asc' | 'name_desc';
 
@@ -171,11 +168,11 @@ const GlobalTop100 = () => {
     });
   }, [lists]);
 
-  // Use the search hook for Top 100 lists - reduced limit to prevent memory issues
+  // Use the search hook for Top 100 lists - fetch all courses to get proper total count
   const { data: courses = [], isLoading } = useGolfCoursesSearch({
     searchQuery: debouncedSearch,
     listSlug: selectedList,
-    limit: PAGE_SIZE, // Uses mobile-optimized page size (30 on mobile, 50 on desktop)
+    limit: 999, // Fetch all courses to get proper total count
   });
 
   // Apply subregion filter and sorting client-side
@@ -215,10 +212,13 @@ const GlobalTop100 = () => {
   });
 
   const totalCount = filteredCourses.length;
-  const hasMore = totalCount > (page + 1) * PAGE_SIZE;
   
   // Paginate courses
-  const paginatedCourses = filteredCourses.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  const paginatedCourses = filteredCourses.slice(page * COURSES_PAGE_SIZE, (page + 1) * COURSES_PAGE_SIZE);
+  
+  const startIndex = totalCount === 0 ? 0 : page * COURSES_PAGE_SIZE + 1;
+  const endIndex = Math.min((page + 1) * COURSES_PAGE_SIZE, totalCount);
+  const hasNextPage = endIndex < totalCount;
 
   const LoadingSkeleton = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -270,9 +270,6 @@ const GlobalTop100 = () => {
     listOptions.find((o) => o.value === selectedList)?.label || 'this Top 100 list';
 
   const hasSearch = debouncedSearch.trim().length > 0;
-
-  const startIndex = totalCount === 0 ? 0 : page * PAGE_SIZE + 1;
-  const endIndex = Math.min((page + 1) * PAGE_SIZE, totalCount);
 
   const handleResetFilters = () => {
     setSelectedList('global');
@@ -387,23 +384,23 @@ const GlobalTop100 = () => {
         })()}
       </div>
 
-      {/* Optional context line */}
+      {/* Context line with sort button */}
       {totalCount > 0 && (
-        <p className="text-xs text-muted-foreground">
-          Showing courses in <span className="font-medium">{currentListLabel}</span>
-        </p>
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-xs text-muted-foreground flex-1">
+            Showing courses in <span className="font-medium">{currentListLabel}</span>
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowSortSheet(true)}
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium bg-card border border-border/60 shadow-sm hover:bg-accent/50 transition-colors whitespace-nowrap"
+          >
+            <span className="text-muted-foreground">Sort:</span>
+            <span className="text-foreground">{sortLabelMap[sortOption]}</span>
+          </button>
+        </div>
       )}
 
-      {/* Unified Control Bar */}
-      {totalCount > 0 && (
-        <UnifiedControlBar
-          from={startIndex}
-          to={endIndex}
-          total={totalCount}
-          sortLabel={sortLabelMap[sortOption]}
-          onSortClick={() => setShowSortSheet(true)}
-        />
-      )}
 
       {/* Results */}
       {isLoading ? (
@@ -447,28 +444,21 @@ const GlobalTop100 = () => {
             </div>
           </div>
           
-          {/* Pagination Controls */}
-          <div className="flex justify-center items-center gap-3 mt-6 mb-0">
-            {page > 0 && (
-              <Button
-                variant="outline"
-                onClick={() => setPage((p) => p - 1)}
-                disabled={isLoading}
-                className="h-11 px-6 rounded-xl"
-              >
-                Previous {PAGE_SIZE} courses
-              </Button>
-            )}
-            {hasMore && (
-              <Button
-                variant="outline"
+          {/* Pagination Footer */}
+          <div className="flex flex-col items-center gap-3 py-8">
+            {hasNextPage && (
+              <button
+                type="button"
                 onClick={() => setPage((p) => p + 1)}
                 disabled={isLoading}
-                className="h-11 px-6 rounded-xl"
+                className="px-8 py-3 rounded-full border border-slate-300 bg-white text-sm font-medium text-slate-900 shadow-sm active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Next {PAGE_SIZE} courses
-              </Button>
+                Next {COURSES_PAGE_SIZE} courses
+              </button>
             )}
+            <p className="text-xs text-slate-500">
+              Showing {startIndex}–{endIndex} of {totalCount} courses
+            </p>
           </div>
         </div>
       )}
