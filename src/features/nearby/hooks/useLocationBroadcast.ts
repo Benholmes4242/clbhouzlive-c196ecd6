@@ -6,6 +6,7 @@ import { useVisibility } from './useVisibility';
 import { MIN_LOCATION_CHANGE_METERS } from '../constants';
 import { logError } from '@/utils/errorLogger';
 import { useSafeQueryClient } from '@/lib/useSafeQueryClient';
+import { FLAGS } from '@/config/flags';
 
 const BROADCAST_INTERVAL_MS = 15 * 1000; // 15 seconds - efficient battery usage
 
@@ -47,12 +48,17 @@ export function useLocationBroadcast() {
   const lastWriteRef = useRef<number | null>(null);
   const lastLocationRef = useRef<{ lat: number; lng: number } | null>(null);
 
+  const enabled = FLAGS.LOCATION_BROADCAST_ENABLED && 
+                  hasQueryClient && 
+                  !loading && 
+                  !!user?.id &&
+                  visibilityMode !== 'hidden' &&
+                  permissionState !== 'denied' &&
+                  permissionState !== 'unavailable';
+
   useEffect(() => {
-    // Early exit if no QueryClient, still loading session, or other conditions not met
-    if (!hasQueryClient || loading || !user?.id || 
-        visibilityMode === 'hidden' || 
-        permissionState === 'denied' || 
-        permissionState === 'unavailable') {
+    // 🔌 Beacon OFF: do nothing when flag is disabled or conditions not met
+    if (!enabled) {
       // Clear any existing interval
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -144,7 +150,7 @@ export function useLocationBroadcast() {
         intervalRef.current = null;
       }
     };
-  }, [hasQueryClient, loading, user?.id, visibilityMode, permissionState, getCurrentLocation]);
+  }, [enabled, getCurrentLocation]);
 
   return null;
 }
