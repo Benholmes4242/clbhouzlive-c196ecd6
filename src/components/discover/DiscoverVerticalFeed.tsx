@@ -222,6 +222,14 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   const playObserverRef = useRef<IntersectionObserver | null>(null);
   const queryClient = useQueryClient();
 
+  // Helper to safely disconnect observers
+  const disconnectObserver = useCallback((observerRef: React.MutableRefObject<IntersectionObserver | null>) => {
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+      observerRef.current = null;
+    }
+  }, []);
+
   // Register modal state for Echo detection
   useModalState(isOpen);
 
@@ -237,7 +245,18 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
 
   // Two-observer pattern for seamless autoplay
   useEffect(() => {
-    nearObserverRef.current = new IntersectionObserver((entries) => {
+    if (!posts?.length) {
+      // Nothing to observe; clean up existing observers
+      disconnectObserver(nearObserverRef);
+      disconnectObserver(playObserverRef);
+      return;
+    }
+
+    // Always clear old observers before creating new ones
+    disconnectObserver(nearObserverRef);
+    disconnectObserver(playObserverRef);
+
+    const nearObserver = new IntersectionObserver((entries) => {
       setShouldAttach((prev) => {
         const next = { ...prev };
         for (const e of entries) {
@@ -248,7 +267,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
       });
     }, { root: null, rootMargin: '300px 0px', threshold: 0 });
 
-    playObserverRef.current = new IntersectionObserver((entries) => {
+    const playObserver = new IntersectionObserver((entries) => {
       setAutoplay((prev) => {
         const next = { ...prev };
         for (const e of entries) {
@@ -259,11 +278,15 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
       });
     }, { root: null, threshold: [0, 0.65, 1] });
 
+    nearObserverRef.current = nearObserver;
+    playObserverRef.current = playObserver;
+
+    // Cleanup when deps change / component unmounts
     return () => {
-      nearObserverRef.current?.disconnect();
-      playObserverRef.current?.disconnect();
+      disconnectObserver(nearObserverRef);
+      disconnectObserver(playObserverRef);
     };
-  }, []);
+  }, [posts, disconnectObserver]);
 
   // Hide header when modal opens, show when closed
   useEffect(() => {
@@ -309,6 +332,11 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
       }
     }
   }, [isOpen, initialItem, posts, initialMediaIndex]);
+
+  // Reset itemRefs when posts change dramatically
+  useEffect(() => {
+    itemRefs.current = {};
+  }, [posts]);
 
   // Prune videoRefs to prevent memory leaks
   useEffect(() => {

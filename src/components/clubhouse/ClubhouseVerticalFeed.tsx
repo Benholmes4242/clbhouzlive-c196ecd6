@@ -264,6 +264,14 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const playRef = useRef<IntersectionObserver | null>(null);
   const [shouldAttachMap, setShouldAttachMap] = useState<Record<string, boolean>>({});
   const [autoplayMap, setAutoplayMap] = useState<Record<string, boolean>>({});
+
+  // Helper to safely disconnect observers
+  const disconnectObserver = useCallback((observerRef: React.MutableRefObject<IntersectionObserver | null>) => {
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+      observerRef.current = null;
+    }
+  }, []);
   const [videoProgress, setVideoProgress] = useState(0); // 0-100
   
   // Post reactions
@@ -304,9 +312,20 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
   // Setup dual intersection observers
   useEffect(() => {
+    if (!filteredPosts?.length) {
+      // Nothing to observe; clean up existing observers
+      disconnectObserver(nearRef);
+      disconnectObserver(playRef);
+      return;
+    }
+
+    // Always clear old observers before creating new ones
+    disconnectObserver(nearRef);
+    disconnectObserver(playRef);
+
     markPerformance('feed-observer-setup-start');
     
-    nearRef.current = new IntersectionObserver(
+    const nearObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           const id = e.target.getAttribute('data-postid');
@@ -318,7 +337,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       { root: null, rootMargin: '300px 0px 300px 0px', threshold: 0 }
     );
 
-    playRef.current = new IntersectionObserver(
+    const playObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           const id = e.target.getAttribute('data-postid');
@@ -330,16 +349,25 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       { root: null, threshold: [0.0, 0.65, 1.0] }
     );
 
-    auditIntersectionObserver(nearRef.current, 'nearRef (prebuffer)');
-    auditIntersectionObserver(playRef.current, 'playRef (autoplay@65%)');
+    nearRef.current = nearObserver;
+    playRef.current = playObserver;
+
+    auditIntersectionObserver(nearObserver, 'nearRef (prebuffer)');
+    auditIntersectionObserver(playObserver, 'playRef (autoplay@65%)');
     
     markPerformance('feed-observer-setup-end');
 
+    // Cleanup when deps change / component unmounts
     return () => {
-      nearRef.current?.disconnect();
-      playRef.current?.disconnect();
+      disconnectObserver(nearRef);
+      disconnectObserver(playRef);
     };
-  }, []);
+  }, [filteredPosts, disconnectObserver]);
+
+  // Reset itemRefs when posts change dramatically
+  useEffect(() => {
+    itemRefs.current = {};
+  }, [filteredPosts]);
 
   // Notify parent component when current post changes
   useEffect(() => {
