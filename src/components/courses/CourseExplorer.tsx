@@ -475,7 +475,7 @@ const CourseExplorer = () => {
         />
           
           {/* Pagination Footer */}
-          <div className="flex flex-col items-center gap-3 py-8">
+          <div className="flex flex-col items-center gap-3 mt-8 pb-8">
             {hasNextPage && (
               <button
                 type="button"
