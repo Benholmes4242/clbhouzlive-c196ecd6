@@ -33,23 +33,25 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
         <h3 className="text-base font-medium mb-3">Friends who've played here</h3>
         <div className="flex items-center gap-2">
           <div className="flex -space-x-2">
-            {displayedFriends.map((friend) => {
+            {displayedFriends.map((friend, index) => {
               const displayName = friend.profile.display_name || friend.profile.username || '?';
               const initial = displayName[0]?.toUpperCase() || '?';
+              const zIndex = displayedFriends.length - index;
               
               return friend.profile.profile_photo_url ? (
-                <SquircleImage
-                  key={friend.user_id}
-                  src={friend.profile.profile_photo_url}
-                  alt={displayName}
-                  size={32}
-                  className="border-2 border-background"
-                />
+                <div key={friend.user_id} style={{ zIndex }} className="relative">
+                  <SquircleImage
+                    src={friend.profile.profile_photo_url}
+                    alt={displayName}
+                    size={32}
+                    className="border-2 border-background"
+                  />
+                </div>
               ) : (
                 <div
                   key={friend.user_id}
-                  className="w-8 h-8 flex items-center justify-center bg-muted text-foreground text-xs font-semibold border-2 border-background"
-                  style={{ borderRadius: '20%' }}
+                  className="w-8 h-8 flex items-center justify-center bg-muted text-foreground text-xs font-semibold border-2 border-background relative"
+                  style={{ borderRadius: '20%', zIndex }}
                 >
                   {initial}
                 </div>
