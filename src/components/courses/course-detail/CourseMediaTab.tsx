@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
@@ -15,12 +16,10 @@ import { MediaItem as StandardMediaItem } from '@/types/media';
 import { FLAGS } from '@/config/flags';
 // New components for media tab polish
 import { CourseMediaSummaryCard } from './CourseMediaSummaryCard';
-import { MediaFilterRow, MediaFilterMode } from './MediaFilterRow';
-import { FriendsAvatarRow } from './FriendsAvatarRow';
+import { PillTabs, PillOption } from '@/components/ui/PillTabs';
+import type { MediaFilterMode } from './MediaFilterRow';
 import { useCourseMediaSummary } from '@/hooks/useCourseMediaSummary';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useUserFriends } from '@/hooks/useUserFriends';
-import { Button } from '@/components/ui/button';
 
 interface CourseMediaTabProps {
   courseId: string;
@@ -49,14 +48,10 @@ interface LocalMediaItem {
 
 const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
   const { user } = useSupabaseSession();
+  const navigate = useNavigate();
   const [selectedMediaIndex, setSelectedMediaIndex] = useState<number | null>(null);
   const [modalPortalTarget, setModalPortalTarget] = useState<HTMLElement | null>(null);
   const [filterMode, setFilterMode] = useState<MediaFilterMode>('most_recent');
-  const [focusedFriendId, setFocusedFriendId] = useState<string | null>(null);
-
-  // Get user's friends
-  const { data: friendsData } = useUserFriends(user?.id);
-  const friendIds = useMemo(() => friendsData?.map(f => f.id) || [], [friendsData]);
 
   // Vertical feed for consistent UX
   const { 
@@ -107,56 +102,18 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
     }));
   }, [exploreItems]);
 
-  const mediaSummary = useCourseMediaSummary(mediaSummaryItems, user?.id || null);
+  const summary = useCourseMediaSummary(mediaSummaryItems, user?.id || null);
 
-  // Calculate friends with media for avatar row
-  const friendsWithMedia = useMemo(() => {
-    const friendMediaMap = new Map<string, { id: string; name: string; avatarUrl?: string | null; count: number }>();
+  // Filter pill options
+  const filterOptions: PillOption[] = [
+    { id: 'most_recent', label: 'Most recent' },
+    { id: 'photos', label: 'Photos' },
+    { id: 'videos', label: 'Videos' },
+    { id: 'mine', label: 'From you' },
+  ];
 
-    exploreItems.forEach(item => {
-      if (item.user && friendIds.includes(item.user.id)) {
-        const existing = friendMediaMap.get(item.user.id);
-        if (existing) {
-          existing.count++;
-        } else {
-          friendMediaMap.set(item.user.id, {
-            id: item.user.id,
-            name: item.user.name,
-            avatarUrl: item.user.avatar,
-            count: 1,
-          });
-        }
-      }
-    });
-
-    return Array.from(friendMediaMap.values()).map(f => ({
-      id: f.id,
-      name: f.name,
-      avatarUrl: f.avatarUrl,
-      mediaCount: f.count,
-    }));
-  }, [exploreItems, friendIds]);
-
-  // Calculate dynamic subtitle based on filter mode
-  const subtitle = useMemo(() => {
-    if (filterMode === 'friends') {
-      const count = friendsWithMedia.length;
-
-      if (count === 0) {
-        return 'No media from your friends here yet.';
-      } else if (focusedFriendId) {
-        const friendName = friendsWithMedia.find(f => f.id === focusedFriendId)?.name || 'Friend';
-        const firstName = friendName.split(' ')[0];
-        return `Showing media from ${firstName}.`;
-      } else {
-        return `Showing media from your friends (${count}).`;
-      }
-    }
-    return undefined; // Use default subtitle from summary card
-  }, [filterMode, friendsWithMedia, focusedFriendId]);
-
-  // Filter media items based on active filter mode and focused friend
-  const filteredExploreItems = useMemo(() => {
+  // Filter media items based on active filter mode
+  const filteredItems = useMemo(() => {
     let filtered = exploreItems;
 
     switch (filterMode) {
@@ -165,15 +122,6 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
         break;
       case 'photos':
         filtered = exploreItems.filter(item => item.type === 'image');
-        break;
-      case 'friends':
-        // Filter by friends
-        filtered = exploreItems.filter(item => item.user && friendIds.includes(item.user.id));
-        
-        // Then narrow by focused friend if set
-        if (focusedFriendId) {
-          filtered = filtered.filter(item => item.user?.id === focusedFriendId);
-        }
         break;
       case 'mine':
         filtered = exploreItems.filter(item => item.user?.id === user?.id);
@@ -185,42 +133,23 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
     }
 
     return filtered;
-  }, [exploreItems, filterMode, friendIds, focusedFriendId, user?.id]);
+  }, [exploreItems, filterMode, user?.id]);
 
   // Adapt for new MediaGrid using filtered items
   const mediaItems = useMemo(
-    () => adaptExploreContentToMediaItems(filteredExploreItems),
-    [filteredExploreItems]
+    () => adaptExploreContentToMediaItems(filteredItems),
+    [filteredItems]
   );
-
-  // Handle filter mode change - clear focused friend when switching away from friends
-  const handleFilterChange = (mode: MediaFilterMode) => {
-    setFilterMode(mode);
-    if (mode !== 'friends') {
-      setFocusedFriendId(null);
-    }
-  };
-
-  // Handle friend avatar click - toggle focused friend
-  const handleFriendClick = (friendId: string) => {
-    if (focusedFriendId === friendId) {
-      // Second tap: clear focused friend
-      setFocusedFriendId(null);
-    } else {
-      // First tap: focus this friend
-      setFocusedFriendId(friendId);
-    }
-  };
 
   const handleMediaClick = (item: NewMediaItem) => {
     if (FLAGS.USE_VERTICAL_FEED_FOR_PROFILE_MEDIA) {
-      const index = filteredExploreItems.findIndex(media => media.id === item.id);
+      const index = filteredItems.findIndex(media => media.id === item.id);
       if (index !== -1) {
-        setPosts(filteredExploreItems);
-        openFeed(filteredExploreItems[index]);
+        setPosts(filteredItems);
+        openFeed(filteredItems[index]);
       }
     } else {
-      const index = filteredExploreItems.findIndex(media => media.id === item.id);
+      const index = filteredItems.findIndex(media => media.id === item.id);
       setSelectedMediaIndex(index);
     }
   };
@@ -243,89 +172,14 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
     );
   }
 
-  // Empty state - no media at all
-  if (exploreItems.length === 0) {
-    return (
-      <div className="space-y-6">
-        <CourseMediaSummaryCard
-          photoCount={0}
-          videoCount={0}
-          userMediaCount={0}
-          lastMediaCreatedAt={null}
-          subtitle={subtitle}
-        />
-
-        <div className="rounded-xl bg-white shadow-sm px-6 py-14 text-center flex flex-col items-center">
-          <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-4">
-            <ImageIcon className="w-6 h-6 text-slate-400" />
-          </div>
-          <h3 className="text-lg font-semibold text-slate-900 mb-2">
-            No photos or videos yet
-          </h3>
-          <p className="text-sm text-slate-600 max-w-sm mb-6">
-            Help other golfers discover this course — add your first moment.
-          </p>
-          <button
-            className="px-6 py-3 rounded-xl border border-slate-300 text-sm font-medium text-slate-900 active:scale-95 transition"
-            onClick={() => {
-              // TODO: Open create moment flow
-              console.log('Open capture moment flow');
-            }}
-          >
-            Capture a moment
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Filtered state - no results for current filter
-  if (filteredExploreItems.length === 0 && exploreItems.length > 0) {
-    return (
-      <div className="space-y-6">
-        <CourseMediaSummaryCard
-          photoCount={mediaSummary.photoCount}
-          videoCount={mediaSummary.videoCount}
-          userMediaCount={mediaSummary.userMediaCount}
-          lastMediaCreatedAt={mediaSummary.lastMediaCreatedAt}
-          onUserMediaClick={() => setFilterMode('mine')}
-          subtitle={subtitle}
-        />
-
-        <MediaFilterRow
-          filterMode={filterMode}
-          onFilterChange={handleFilterChange}
-          hasFriends={friendsWithMedia.length > 0}
-          hasUserMedia={mediaSummary.userMediaCount > 0}
-        />
-        
-        <div className="rounded-xl bg-white shadow-sm px-6 py-14 text-center">
-          <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-            <ImageIcon className="w-6 h-6 text-slate-400" />
-          </div>
-          <h3 className="text-lg font-semibold text-slate-900 mb-2">
-            No results for this filter
-          </h3>
-          <p className="text-sm text-slate-600">
-            Try changing the filter to see more media.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // User-only media message
-  const showOnlyYourMediaMessage = 
-    filterMode === 'most_recent' && 
-    mediaSummary.userMediaCount > 0 && 
-    mediaSummary.userMediaCount === exploreItems.length;
+  // Empty state and filtered state are handled inline in the main render
 
 
   const renderFullscreenModal = () => {
-    if (selectedMediaIndex === null || !filteredExploreItems[selectedMediaIndex]) return null;
+    if (selectedMediaIndex === null || !filteredItems[selectedMediaIndex]) return null;
 
-    // Transform filteredExploreItems to StandardMediaItem[] with proper poster URLs
-    const standardizedMediaItems: StandardMediaItem[] = filteredExploreItems.map(item => {
+    // Transform filteredItems to StandardMediaItem[] with proper poster URLs
+    const standardizedMediaItems: StandardMediaItem[] = filteredItems.map(item => {
       if (item.type === 'video') {
         const streamId = getStreamIdFromUrl(item.src);
         return {
@@ -345,7 +199,7 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
       };
     });
 
-    const currentItem = filteredExploreItems[selectedMediaIndex];
+    const currentItem = filteredItems[selectedMediaIndex];
     const mediaUrls = standardizedMediaItems.map(item => item.url);
     const mediaTypes = standardizedMediaItems.map(item => item.type);
 
@@ -372,37 +226,35 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
     <div className="space-y-0">
       {/* Summary Card */}
       <CourseMediaSummaryCard
-        photoCount={mediaSummary.photoCount}
-        videoCount={mediaSummary.videoCount}
-        userMediaCount={mediaSummary.userMediaCount}
-        lastMediaCreatedAt={mediaSummary.lastMediaCreatedAt}
-        onUserMediaClick={() => setFilterMode('mine')}
-        subtitle={subtitle}
+        photoCount={summary.photoCount}
+        videoCount={summary.videoCount}
       />
 
-      {/* Filter Row */}
-      <MediaFilterRow
-        filterMode={filterMode}
-        onFilterChange={handleFilterChange}
-        hasFriends={friendsWithMedia.length > 0}
-        hasUserMedia={mediaSummary.userMediaCount > 0}
-      />
-
-      {/* Friends Avatar Row - shown when "From friends" is active and friends have media */}
-      {filterMode === 'friends' && friendsWithMedia.length > 0 && (
-        <FriendsAvatarRow
-          friends={friendsWithMedia}
-          focusedFriendId={focusedFriendId}
-          onFriendClick={handleFriendClick}
+      {/* Sort/Filter Bar */}
+      <div className="px-4 py-3 bg-slate-50">
+        <PillTabs
+          options={filterOptions}
+          activeId={filterMode}
+          onChange={(id) => setFilterMode(id as MediaFilterMode)}
         />
-      )}
+      </div>
 
-      {/* Only your media message */}
-      {showOnlyYourMediaMessage && (
-        <div className="px-4 py-3 bg-blue-50 border-t border-b border-blue-100">
-          <p className="text-xs text-blue-700">
-            Only your media here so far — invite friends to share theirs.
-          </p>
+      {/* Empty state - matches Reviews tab styling */}
+      {filteredItems.length === 0 && !isLoading && (
+        <div className="px-4 py-8 bg-slate-100">
+          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-6 text-center">
+            <p className="text-sm font-semibold text-slate-900">No photos or videos yet</p>
+            <p className="mt-1 text-xs text-slate-500">
+              Help other golfers discover this course — share your experience.
+            </p>
+            <button
+              type="button"
+              className="mt-4 w-full h-11 rounded-lg border border-slate-200 bg-white text-slate-900 text-sm font-medium hover:bg-slate-50 transition-colors"
+              onClick={() => navigate(`/courses/${courseId}/rate`)}
+            >
+              Rate this course
+            </button>
+          </div>
         </div>
       )}
 
