@@ -1,4 +1,5 @@
 import React from 'react';
+import { Squircle } from '@/components/ui/squircle';
 
 interface CourseMediaSummaryCardProps {
   photoCount: number;
@@ -72,12 +73,15 @@ export const CourseMediaSummaryCard: React.FC<CourseMediaSummaryCardProps> = ({
         {contributors.length > 0 && (
           <div className="flex -space-x-2">
             {contributors.slice(0, 3).map((user) => (
-              <img
-                key={user.id}
-                src={user.avatarUrl || 'https://via.placeholder.com/32'}
-                alt={user.name}
-                className="h-7 w-7 rounded-full ring-2 ring-white object-cover"
-              />
+              <div key={user.id} className="ring-2 ring-white rounded-lg">
+                <Squircle width={28} height={28}>
+                  <img
+                    src={user.avatarUrl || 'https://via.placeholder.com/32'}
+                    alt={user.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                </Squircle>
+              </div>
             ))}
           </div>
         )}
