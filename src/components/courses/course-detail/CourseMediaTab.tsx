@@ -264,10 +264,10 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
             </p>
             <button
               type="button"
-              className="mt-4 w-full h-11 rounded-lg border border-slate-200 bg-white text-slate-900 text-sm font-medium hover:bg-slate-50 transition-colors"
+              className="mt-4 w-full h-11 rounded-lg border border-slate-200 bg-slate-100 text-slate-900 text-sm font-medium hover:bg-slate-200 transition-colors"
               onClick={() => navigate(`/courses/${courseId}/rate`)}
             >
-              Rate this course
+              Add photos or videos
             </button>
           </div>
         </div>
@@ -291,7 +291,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
             <button
               key={item.id}
               onClick={() => handleMediaClick(item)}
-              className="relative aspect-square rounded-[var(--squircle-radius)] overflow-hidden bg-slate-200 border border-slate-300/40 shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-150"
+              className="relative aspect-square rounded-[var(--squircle-radius)] overflow-hidden bg-slate-200 border border-slate-300/40 shadow-sm hover:shadow-md transition-shadow duration-150"
             >
               {/* Thumbnail image */}
               <img

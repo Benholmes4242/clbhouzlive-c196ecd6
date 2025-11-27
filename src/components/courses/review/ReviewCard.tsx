@@ -61,7 +61,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
     <article
       className={clsx(
         'rounded-2xl border border-slate-200 bg-white px-4 py-3 mb-3',
-        'shadow-sm transition-all duration-100 active:scale-[0.98] hover:shadow-md',
+        'shadow-sm transition-shadow duration-100 hover:shadow-md',
         isHighlighted && 'animate-soft-pulse'
       )}
     >
