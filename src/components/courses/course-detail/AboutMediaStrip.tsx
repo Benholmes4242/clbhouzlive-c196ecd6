@@ -121,6 +121,16 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
   // Ensure slots with placeholders up to maxItems
   const displayItems = Array.from({ length: maxItems }, (_, i) => mediaTiles[i] || null);
 
+  // Calculate photo and video counts (MUST be before ANY early returns)
+  const { photoCount, videoCount } = useMemo(() => {
+    if (loading) return { photoCount: 0, videoCount: 0 };
+    const photos = mediaTiles.filter(m => m.media_type === 'image').length;
+    const videos = mediaTiles.filter(m => m.media_type === 'video').length;
+    return { photoCount: photos, videoCount: videos };
+  }, [loading, mediaTiles]);
+
+  const hasMedia = mediaTiles.length > 0;
+
   if (loading) {
     return (
       <>
@@ -135,15 +145,6 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
       </>
     );
   }
-
-  // Calculate photo and video counts (must be called before any conditional returns)
-  const { photoCount, videoCount } = useMemo(() => {
-    const photos = mediaTiles.filter(m => m.media_type === 'image').length;
-    const videos = mediaTiles.filter(m => m.media_type === 'video').length;
-    return { photoCount: photos, videoCount: videos };
-  }, [mediaTiles]);
-
-  const hasMedia = mediaTiles.length > 0;
 
   // Hide entire section if no media
   if (!loading && !hasMedia) {
