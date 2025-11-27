@@ -825,7 +825,8 @@ const HeroProfileHeader = ({
                     objectPosition: getMobileCropPosition(profile),
                     objectFit: 'cover'
                   }}
-                  loading="eager"
+                  loading="lazy"
+                  decoding="async"
                   onLoad={(e) => {
                     e.currentTarget.style.opacity = '1';
                     e.currentTarget.previousElementSibling?.remove();
@@ -881,7 +882,9 @@ const HeroProfileHeader = ({
                         <img 
                           src={profile.profile_photo_url} 
                           alt={profile.display_name || 'Profile'}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          loading="lazy"
+                          decoding="async"
                         />
                       </Squircle>
                     </div>
@@ -1043,7 +1046,8 @@ const HeroProfileHeader = ({
                     })(),
                     objectFit: 'cover'
                   }}
-                  loading="eager"
+                  loading="lazy"
+                  decoding="async"
                   onLoad={(e) => {
                     e.currentTarget.style.opacity = '1';
                     e.currentTarget.previousElementSibling?.remove();
@@ -1096,7 +1100,9 @@ const HeroProfileHeader = ({
                       <img 
                         src={profile.profile_photo_url} 
                         alt={profile.display_name || 'Profile'}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        loading="lazy"
+                        decoding="async"
                       />
                     </Squircle>
                   ) : null}
