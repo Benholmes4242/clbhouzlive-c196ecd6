@@ -75,6 +75,18 @@ body {
   overscroll-behavior-x: none !important;
 }
 
+/* Phase 2 Fix #8: Lightbox body scroll lock using CSS class */
+body.lightbox-open {
+  position: fixed;
+  width: 100%;
+  overflow: hidden;
+}
+
+html.lightbox-open {
+  overflow: hidden;
+  height: 100%;
+}
+
 /* Glass panel utilities for Clubhouse overlays */
 :root {
   --radius-tile: 18px;

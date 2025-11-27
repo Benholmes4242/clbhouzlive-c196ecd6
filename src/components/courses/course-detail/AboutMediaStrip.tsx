@@ -1,11 +1,9 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import React, { useMemo } from 'react';
 import SquareCardMedia from '@/components/explore/media/SquareCardMedia';
 import { CardType } from '@/components/explore/media/CardMediaTypes';
-import { adaptClubMediaArrayToExploreItems, ExploreContentItem } from '@/lib/adapters/clubMediaToExplore';
+import { adaptClubMediaArrayToExploreItems } from '@/lib/adapters/clubMediaToExplore';
 import { useIsMobile } from '@/hooks/use-mobile';
-
-import { MediaItem } from '@/types/media';
+import { useClubMedia } from '@/hooks/useClubMedia';
 
 interface LocalMediaItem {
   id: string;
@@ -32,41 +30,20 @@ interface AboutMediaStripProps {
 }
 
 const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick }) => {
-  const [items, setItems] = useState<ExploreContentItem[]>([]);
-  const [loading, setLoading] = useState(true);
   const isMobile = useIsMobile();
   
   // Responsive limits: 9 on desktop, 3 on mobile
   const maxItems = isMobile ? 3 : 9;
 
-  useEffect(() => {
-    const fetchMedia = async () => {
-      try {
-        const { data, error } = await supabase.functions.invoke('get-club-media', {
-          body: { clubId, limit: maxItems }
-        });
-
-        if (error) {
-          console.error('Error fetching media:', error);
-          setItems([]);
-        } else {
-          // Use edges array and adapt to ExploreContentItem format
-          const rawMedia = data?.edges?.slice(0, maxItems) || [];
-          const adaptedItems = adaptClubMediaArrayToExploreItems(rawMedia);
-          setItems(adaptedItems);
-        }
-      } catch (error) {
-        console.error('Error fetching media:', error);
-        setItems([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (clubId) {
-      fetchMedia();
-    }
-  }, [clubId, maxItems]);
+  // Phase 1 Fix #2: Use shared hook - consumes same cache as CourseMediaTab
+  const { data: rawMedia, isLoading: loading } = useClubMedia(clubId, maxItems);
+  
+  // Slice to required limit from cached data
+  const items = useMemo(() => {
+    if (!rawMedia) return [];
+    const sliced = rawMedia.slice(0, maxItems);
+    return adaptClubMediaArrayToExploreItems(sliced);
+  }, [rawMedia, maxItems]);
 
   // Helper to extract Stream UID from HLS URL
   const extractStreamUidFromHls = (hls: string) => {
