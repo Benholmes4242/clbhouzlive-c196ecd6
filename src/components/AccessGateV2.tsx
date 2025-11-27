@@ -13,6 +13,55 @@ interface AccessGateV2Props {
 const KEY = 'clubhouz_gate_session';
 type GateSession = { token: string; expiresAt: string };
 
+// ===== Validation Cache Utils =====
+const VALIDATION_CACHE_KEY = 'clubhouz_gate_validation_cache';
+const VALIDATION_CACHE_TTL_MS = 60_000; // 60 seconds
+
+type ValidationCache = {
+  timestamp: number;
+  status: 'valid' | 'invalid';
+};
+
+const getValidationCache = (): ValidationCache | null => {
+  try {
+    const raw = sessionStorage.getItem(VALIDATION_CACHE_KEY);
+    if (!raw) return null;
+    
+    const parsed = JSON.parse(raw) as ValidationCache;
+    if (!parsed?.timestamp) return null;
+    
+    const age = Date.now() - parsed.timestamp;
+    if (age > VALIDATION_CACHE_TTL_MS) {
+      sessionStorage.removeItem(VALIDATION_CACHE_KEY);
+      return null;
+    }
+    
+    return parsed;
+  } catch {
+    return null;
+  }
+};
+
+const setValidationCache = (status: 'valid' | 'invalid') => {
+  try {
+    const cache: ValidationCache = {
+      timestamp: Date.now(),
+      status,
+    };
+    sessionStorage.setItem(VALIDATION_CACHE_KEY, JSON.stringify(cache));
+  } catch {
+    // Ignore storage errors
+  }
+};
+
+const clearValidationCache = () => {
+  try {
+    sessionStorage.removeItem(VALIDATION_CACHE_KEY);
+  } catch {
+    // Ignore
+  }
+};
+
 const getSession = (): GateSession | null => {
   try {
     return JSON.parse(localStorage.getItem(KEY) || 'null');
@@ -24,6 +73,7 @@ const getSession = (): GateSession | null => {
 const setSession = (s: GateSession | null) => {
   if (!s) {
     localStorage.removeItem(KEY);
+    clearValidationCache(); // Clear validation cache when session is removed
   } else {
     localStorage.setItem(KEY, JSON.stringify(s));
   }
@@ -59,19 +109,37 @@ async function retry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
 }
 
 // ===== Schedule Renewal =====
-function scheduleRenew(expiresAtIso: string, checkFn: () => Promise<void>) {
+function scheduleRenew(expiresAtIso: string, checkFn: (skipCache?: boolean) => Promise<void>) {
   const t = new Date(expiresAtIso).getTime() - Date.now() - SAFETY_MS;
   clearTimeout(renewTimer);
   renewTimer = setTimeout(() => {
-    singleFlight(checkFn);
+    // Force fresh validation on renewal, skip cache
+    singleFlight(() => checkFn(true));
   }, Math.max(15_000, t)); // Never less than 15s
 }
 
 // ===== Check/Refresh Token =====
-async function checkOrRefresh(): Promise<void> {
+async function checkOrRefresh(skipCache = false): Promise<void> {
   const sess = getSession();
   if (!sess?.token) throw new Error('NO_SESSION');
 
+  // Check validation cache first (unless explicitly skipped)
+  if (!skipCache) {
+    const cached = getValidationCache();
+    if (cached) {
+      console.log('[AccessGate] Using cached validation result (age: ' + (Date.now() - cached.timestamp) + 'ms)');
+      if (cached.status === 'valid') {
+        // Token was recently validated, skip the network call
+        scheduleRenew(sess.expiresAt, checkOrRefresh);
+        return;
+      } else {
+        // Cached as invalid, throw immediately
+        throw new Error('EXPIRED');
+      }
+    }
+  }
+
+  console.log('[AccessGate] Performing fresh validation check');
   const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/secure-site-access-check`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -83,6 +151,8 @@ async function checkOrRefresh(): Promise<void> {
   if (!res.ok) {
     if (data.code === 'TOKEN_EXPIRED' || data.code === 'INVALID_TOKEN') {
       setSession(null);
+      clearValidationCache();
+      setValidationCache('invalid');
       throw new Error('EXPIRED');
     }
     // Transient edge/network error - retry
@@ -95,6 +165,7 @@ async function checkOrRefresh(): Promise<void> {
   };
   
   setSession(next);
+  setValidationCache('valid'); // Cache the successful validation
   scheduleRenew(next.expiresAt, checkOrRefresh);
 }
 
@@ -227,6 +298,7 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
         const { sessionToken, expiresAt } = data;
         
         setSession({ token: sessionToken, expiresAt });
+        setValidationCache('valid'); // Cache the successful validation
         scheduleRenew(expiresAt, checkOrRefresh);
         
         toast.success("Access Granted - Welcome to clubhouz!");
