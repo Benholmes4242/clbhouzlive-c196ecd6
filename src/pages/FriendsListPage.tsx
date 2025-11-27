@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useFriends } from '@/hooks/useFollowersList';
+import { usePaginatedFriends } from '@/hooks/useSocialLists';
 import { useUserByUsername } from '@/hooks/useUserByUsername';
 import { SocialListPageShell } from '@/components/profile/social/SocialListPageShell';
 import { SocialUserRow } from '@/components/profile/social/SocialUserRow';
@@ -15,8 +15,16 @@ const FriendsListPage = () => {
   // Fetch profile user by username
   const { data: profileUser, isLoading: profileLoading } = useUserByUsername(username);
   
-  // Fetch friends
-  const { data: friends = [], isLoading: friendsLoading } = useFriends(profileUser?.id);
+  // Fetch friends with pagination
+  const {
+    data,
+    isLoading: friendsLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = usePaginatedFriends(profileUser?.id);
+
+  const friends = data?.pages.flatMap(page => page.users) ?? [];
 
   const isOwnProfile = currentUser?.id === profileUser?.id;
   
@@ -69,15 +77,29 @@ const FriendsListPage = () => {
       )}
 
       {!friendsLoading && friends.length > 0 && (
-        <div className="divide-y divide-border">
-          {friends.map((user) => (
-            <SocialUserRow
-              key={user.id}
-              user={user}
-              currentUserId={currentUser?.id || null}
-            />
-          ))}
-        </div>
+        <>
+          <div className="divide-y divide-border">
+            {friends.map((user) => (
+              <SocialUserRow
+                key={user.id}
+                user={user}
+                currentUserId={currentUser?.id || null}
+              />
+            ))}
+          </div>
+
+          {hasNextPage && (
+            <div className="flex justify-center py-6">
+              <button
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                className="px-4 py-2 rounded-lg bg-background border border-border text-sm font-medium disabled:opacity-50 transition-opacity"
+              >
+                {isFetchingNextPage ? 'Loading more…' : 'Load more'}
+              </button>
+            </div>
+          )}
+        </>
       )}
     </SocialListPageShell>
   );
