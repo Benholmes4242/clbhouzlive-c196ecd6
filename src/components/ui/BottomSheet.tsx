@@ -46,13 +46,13 @@ export function BottomSheet({
   return createPortal(
     <>
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 bg-black/40 backdrop-blur-md"
         style={{ zIndex: zIndexBase }}
         onClick={onClose}
         aria-hidden="true"
       />
       <div
-        className={`fixed bottom-0 left-0 right-0 bg-background rounded-t-3xl shadow-xl transform transition-transform duration-300 ${className}`}
+        className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-[28px] shadow-[0_-4px_24px_rgba(0,0,0,0.12)] transform transition-transform duration-300 ${className}`}
         style={{ 
           zIndex: zIndexBase + 1,
           maxHeight: '90vh',

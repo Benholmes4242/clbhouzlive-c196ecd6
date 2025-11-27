@@ -30,19 +30,19 @@ const Top100ClubCallout: React.FC = () => {
         onClick={handleClick}
         className="cursor-pointer border border-border/60 bg-card shadow-lg shadow-black/5 hover:-translate-y-[1px] hover:shadow-xl transition-all"
       >
-        <div className="flex flex-col items-center px-5 py-4 text-center">
-          {/* Icon in capsule */}
-          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary-accent/10 to-primary-accent/5">
-            <Trophy className="h-5 w-5 text-primary-accent" />
+        <div className="flex flex-col items-center px-5 py-3.5 text-center">
+          {/* Title with inline trophy icon */}
+          <div className="flex items-center gap-2 mb-1">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-primary-accent/10 to-primary-accent/5">
+              <Trophy className="h-3.5 w-3.5 text-primary-accent" />
+            </div>
+            <h3 className="text-base font-semibold text-foreground">
+              Top 100 Club
+            </h3>
           </div>
 
-          {/* Title */}
-          <h3 className="text-base font-semibold text-foreground">
-            Top 100 Club
-          </h3>
-
           {/* Tagline */}
-          <p className="mt-1 text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             Track your pilgrimage through the world&apos;s Top 100 courses.
           </p>
 
@@ -50,7 +50,7 @@ const Top100ClubCallout: React.FC = () => {
           {session ? (
             <>
               <p className="mt-2 text-xs font-medium text-foreground">
-                You&apos;ve played {coursesCount} Top 100 course{coursesCount === 1 ? '' : 's'} across {regionsCount} region{regionsCount === 1 ? '' : 's'}.
+                You&apos;ve played {coursesCount} course{coursesCount === 1 ? '' : 's'} across {regionsCount} Top 100 list{regionsCount === 1 ? '' : 's'}.
               </p>
 
               {/* Progress bar */}
