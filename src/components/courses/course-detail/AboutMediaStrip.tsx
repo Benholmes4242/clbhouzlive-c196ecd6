@@ -136,14 +136,14 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     );
   }
 
-  const hasMedia = mediaTiles.length > 0;
-
-  // Calculate photo and video counts
+  // Calculate photo and video counts (must be called before any conditional returns)
   const { photoCount, videoCount } = useMemo(() => {
     const photos = mediaTiles.filter(m => m.media_type === 'image').length;
     const videos = mediaTiles.filter(m => m.media_type === 'video').length;
     return { photoCount: photos, videoCount: videos };
   }, [mediaTiles]);
+
+  const hasMedia = mediaTiles.length > 0;
 
   // Hide entire section if no media
   if (!loading && !hasMedia) {
