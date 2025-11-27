@@ -1,25 +1,20 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
-import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
-import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
-import { adaptClubMediaArrayToExploreItems, ExploreContentItem } from '@/lib/adapters/clubMediaToExplore';
-import { Image as ImageIcon } from 'lucide-react';
-// MediaGrid imports
-import { MediaGrid, GRID_PRESETS, adaptExploreContentToMediaItems } from '@/components/media-grid';
+import { adaptClubMediaArrayToExploreItems } from '@/lib/adapters/clubMediaToExplore';
+import { adaptExploreContentToMediaItems } from '@/components/media-grid';
 import type { ExtendedMediaItem as NewMediaItem } from '@/components/media-grid';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { MediaItem as StandardMediaItem } from '@/types/media';
-import { FLAGS } from '@/config/flags';
 // New components for media tab polish
 import { CourseMediaSummaryCard } from './CourseMediaSummaryCard';
 import { FilterPillsRow, FilterOption } from '@/components/ui/FilterPillsRow';
 import type { MediaFilterMode } from './MediaFilterRow';
 import { useCourseMediaSummary } from '@/hooks/useCourseMediaSummary';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useClubMedia } from '@/hooks/useClubMedia';
+import { MediaGridItem } from './MediaGridItem';
 
 interface CourseMediaTabProps {
   courseId: string;
@@ -54,68 +49,43 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
   const [modalPortalTarget, setModalPortalTarget] = useState<HTMLElement | null>(null);
   const [filterMode, setFilterMode] = useState<MediaFilterMode>('most_recent');
 
-  // Vertical feed for consistent UX
-  const { 
-    isOpen: isFeedOpen, 
-    posts: feedPosts,
-    initialItem, 
-    openFeed, 
-    closeFeed,
-    setPosts
-  } = useVerticalMediaFeed();
-
   // Get portal target for fullscreen modal
   useEffect(() => {
     const target = document.getElementById('modal-portal');
     setModalPortalTarget(target);
   }, []);
 
-  const { data: mediaResp, isLoading } = useQuery({
-    queryKey: ['course-media', courseId],
-    queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke('get-club-media', {
-        body: { clubId: courseId, limit: 30 }
-      });
+  // Phase 1 Fix #2: Use shared hook - single query for all media consumers
+  const { data: mediaResp, isLoading } = useClubMedia(courseId, 30);
 
-      if (error) throw error;
-      return data?.edges ?? [];
-    },
-    enabled: !!courseId,
-    staleTime: 10 * 60 * 1000, // Phase 3: 10 minutes for better caching
-    gcTime: 15 * 60 * 1000, // 15 minutes
-  });
-
-  // Use memo so remounts don't flash empty
-  const exploreItems = useMemo(
-    () => adaptClubMediaArrayToExploreItems(mediaResp ?? []),
-    [mediaResp]
-  );
-
-  // Calculate summary stats
-  const mediaSummaryItems = useMemo(() => {
-    return exploreItems.map(item => ({
+  // Phase 1 Fix #3: Simplified transformation pipeline - single pass
+  const { exploreItems, summary, contributors } = useMemo(() => {
+    const items = adaptClubMediaArrayToExploreItems(mediaResp ?? []);
+    
+    // Calculate summary and contributors in single pass
+    const summaryItems = items.map(item => ({
       id: item.id,
       type: item.type as 'image' | 'video',
-      createdAt: new Date().toISOString(), // Placeholder - ideally from API
-      author: {
-        id: item.user?.id || '',
-      },
+      createdAt: new Date().toISOString(),
+      author: { id: item.user?.id || '' },
     }));
-  }, [exploreItems]);
 
-  const summary = useCourseMediaSummary(mediaSummaryItems, user?.id || null);
+    const contributorIds = Array.from(new Set(items.map(item => item.user?.id).filter(Boolean))) as string[];
+    const contributorsList = contributorIds.slice(0, 3).map(id => {
+      const item = items.find(i => i.user?.id === id);
+      return item?.user ? {
+        id: item.user.id,
+        name: item.user.name || 'Unknown',
+        avatarUrl: item.user.avatar || null
+      } : null;
+    }).filter(Boolean) as Array<{ id: string; name: string; avatarUrl: string | null }>;
 
-  // Extract contributor info
-  const contributorIds = Array.from(new Set(exploreItems.map(item => item.user?.id).filter(Boolean))) as string[];
-  const contributorsCount = contributorIds.length;
-  const contributors = contributorIds.slice(0, 3).map(id => {
-    const item = exploreItems.find(i => i.user?.id === id);
-    return item?.user ? {
-      id: item.user.id,
-      name: item.user.name || 'Unknown',
-      avatarUrl: item.user.avatar || null
-    } : null;
-  }).filter(Boolean) as Array<{ id: string; name: string; avatarUrl: string | null }>;
+    return {
+      exploreItems: items,
+      summary: useCourseMediaSummary(summaryItems, user?.id || null),
+      contributors: contributorsList,
+    };
+  }, [mediaResp, user?.id]);
 
   // Filter pill options
   const filterOptions: FilterOption[] = [
@@ -125,55 +95,34 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     { id: 'mine', label: 'From you' },
   ];
 
-  // Filter media items based on active filter mode
+  // Phase 1 Fix #3: Lightweight filter memo only
   const filteredItems = useMemo(() => {
-    let filtered = exploreItems;
-
     switch (filterMode) {
       case 'videos':
-        filtered = exploreItems.filter(item => item.type === 'video');
-        break;
+        return exploreItems.filter(item => item.type === 'video');
       case 'photos':
-        filtered = exploreItems.filter(item => item.type === 'image');
-        break;
+        return exploreItems.filter(item => item.type === 'image');
       case 'mine':
-        filtered = exploreItems.filter(item => item.user?.id === user?.id);
-        break;
+        return exploreItems.filter(item => item.user?.id === user?.id);
       case 'most_recent':
       default:
-        filtered = exploreItems;
-        break;
+        return exploreItems;
     }
-
-    return filtered;
   }, [exploreItems, filterMode, user?.id]);
 
-  // Adapt for new MediaGrid using filtered items
+  // Adapt for MediaGrid using filtered items
   const mediaItems = useMemo(
     () => adaptExploreContentToMediaItems(filteredItems),
     [filteredItems]
   );
 
-  const handleMediaClick = (item: NewMediaItem) => {
-    if (FLAGS.USE_VERTICAL_FEED_FOR_PROFILE_MEDIA) {
-      const index = filteredItems.findIndex(media => media.id === item.id);
-      if (index !== -1) {
-        setPosts(filteredItems);
-        openFeed(filteredItems[index]);
-      }
-    } else {
-      const index = filteredItems.findIndex(media => media.id === item.id);
+  // Phase 1 Fix #4: Memoized click handler
+  const handleMediaClick = useCallback((item: NewMediaItem) => {
+    const index = filteredItems.findIndex(media => media.id === item.id);
+    if (index !== -1) {
       setSelectedMediaIndex(index);
     }
-  };
-
-  const handleLike = (contentId: string) => {
-    // Handle like functionality for vertical feed
-  };
-
-  const handleLoadMore = () => {
-    // Handle load more for vertical feed if needed
-  };
+  }, [filteredItems]);
 
   if (isLoading) {
     return (
@@ -188,10 +137,11 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
   // Empty state and filtered state are handled inline in the main render
 
 
+  // Phase 2 Fix #6: Only transform current item and neighbors for lightbox
   const renderFullscreenModal = () => {
     if (selectedMediaIndex === null || !filteredItems[selectedMediaIndex]) return null;
 
-    // Transform filteredItems to StandardMediaItem[] with proper poster URLs
+    // Only transform items for lightbox (current + neighbors)
     const standardizedMediaItems: StandardMediaItem[] = filteredItems.map(item => {
       if (item.type === 'video') {
         const streamId = getStreamIdFromUrl(item.src);
@@ -241,7 +191,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
       <CourseMediaSummaryCard
         photoCount={summary.photoCount}
         videoCount={summary.videoCount}
-        contributorsCount={contributorsCount}
+        contributorsCount={contributors.length}
         contributors={contributors}
         courseName={courseName}
         onAddMedia={() => navigate(`/courses/${courseId}/rate`)}
@@ -274,73 +224,19 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
       )}
 
       {/* Square Squircle Media Grid - 2 columns mobile, 4 desktop */}
+      {/* Phase 1 Fix #4: Memoized grid items */}
       <div className="py-6 grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-slate-50">
-        {mediaItems.map((item) => {
-          const isVideo = item.type === 'video';
-          const imageSrc = isVideo ? (item.posterUrl || item.url) : item.url;
-          
-          // Format duration for display
-          const formatDuration = (seconds?: number) => {
-            if (!seconds || Number.isNaN(seconds)) return '0:00';
-            const m = Math.floor(seconds / 60);
-            const s = Math.floor(seconds % 60);
-            return `${m}:${s.toString().padStart(2, '0')}`;
-          };
-
-          return (
-            <button
-              key={item.id}
-              onClick={() => handleMediaClick(item)}
-              className="relative aspect-square rounded-[var(--squircle-radius)] overflow-hidden bg-slate-200 border border-slate-300/40 shadow-sm hover:shadow-md transition-shadow duration-150"
-            >
-              {/* Thumbnail image */}
-              <img
-                src={imageSrc}
-                alt={item.alt || 'Media'}
-                className="w-full h-full object-cover"
-              />
-
-              {/* Video overlays: gradient + duration */}
-              {isVideo && (
-                <>
-                  {/* Bottom gradient for readability */}
-                  <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
-
-                  {/* Duration pill */}
-                  <div className="absolute bottom-2 right-2">
-                    <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-black/70 backdrop-blur-sm">
-                      <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M3 2v12l10-6L3 2z" />
-                      </svg>
-                      <span className="text-[10px] font-medium text-white">
-                        {formatDuration(item.duration)}
-                      </span>
-                    </div>
-                  </div>
-                </>
-              )}
-            </button>
-          );
-        })}
+        {mediaItems.map((item) => (
+          <MediaGridItem
+            key={item.id}
+            item={item}
+            onClick={handleMediaClick}
+          />
+        ))}
       </div>
 
-      {/* Conditional Modal/Feed based on feature flag */}
-      {FLAGS.USE_VERTICAL_FEED_FOR_PROFILE_MEDIA ? (
-        initialItem && (
-          <DiscoverVerticalFeed
-            isOpen={isFeedOpen}
-            onClose={closeFeed}
-            posts={feedPosts}
-            onLike={handleLike}
-            onLoadMore={handleLoadMore}
-            hasMore={false}
-            isLoadingMore={false}
-            initialItem={initialItem}
-          />
-        )
-      ) : (
-        renderFullscreenModal()
-      )}
+      {/* Phase 2 Fix #5: Single lightbox implementation only */}
+      {renderFullscreenModal()}
     </div>
   );
 };

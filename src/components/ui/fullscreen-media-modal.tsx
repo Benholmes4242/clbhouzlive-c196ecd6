@@ -314,46 +314,24 @@ const FullscreenMediaModal = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, hasMultipleMedia, currentIndex, mediaUrls.length, canNavigatePosts, onNextPost, onPreviousPost, onClose]);
 
-  // Prevent background scrolling when modal is open - Simple but effective approach
+  // Phase 2 Fix #8: Body scroll lock using CSS class instead of dynamic <style> injection
   useEffect(() => {
     if (isOpen) {
       // Store the current scroll position
       const scrollY = window.scrollY;
       
-      // Add a CSS class to body that locks scrolling
-      document.body.classList.add('modal-open');
-      
-      // Add CSS directly to ensure it works
-      const style = document.createElement('style');
-      style.id = 'modal-scroll-lock';
-      style.textContent = `
-        .modal-open {
-          position: fixed !important;
-          top: -${scrollY}px !important;
-          left: 0 !important;
-          width: 100% !important;
-          height: 100% !important;
-          overflow: hidden !important;
-          -webkit-overflow-scrolling: touch !important;
-        }
-        html.modal-open {
-          overflow: hidden !important;
-          height: 100% !important;
-        }
-      `;
-      document.head.appendChild(style);
-      document.documentElement.classList.add('modal-open');
+      // Set body position and add class
+      document.body.style.top = `-${scrollY}px`;
+      document.body.classList.add('lightbox-open');
+      document.documentElement.classList.add('lightbox-open');
       
       return () => {
-        // Remove the CSS class and styles
-        document.body.classList.remove('modal-open');
-        document.documentElement.classList.remove('modal-open');
-        const styleElement = document.getElementById('modal-scroll-lock');
-        if (styleElement) {
-          styleElement.remove();
-        }
+        // Remove the class
+        document.body.classList.remove('lightbox-open');
+        document.documentElement.classList.remove('lightbox-open');
         
         // Restore scroll position
+        document.body.style.top = '';
         window.scrollTo(0, scrollY);
       };
     }

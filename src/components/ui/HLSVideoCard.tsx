@@ -20,6 +20,7 @@ interface HLSVideoCardProps {
   externallyManaged?: boolean; // Disable internal autoplay when externally managed
   shouldAttach?: boolean; // Prebuffer when near viewport
   isNearby?: boolean; // For off-screen cleanup
+  isActive?: boolean; // Phase 2 Fix #7: Explicit active state for proper cleanup
 }
 
 declare global {
@@ -46,7 +47,8 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
   onEnded,
   externallyManaged = false,
   shouldAttach = false,
-  isNearby = true
+  isNearby = true,
+  isActive = true // Phase 2 Fix #7: Default to true for backward compatibility
 }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -259,7 +261,29 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     return () => v.removeEventListener('ended', handleEnded);
   }, [loop]);
 
-  // Off-screen cleanup (frees memory)
+  // Phase 2 Fix #7: Cleanup when video becomes inactive (not currently visible)
+  useEffect(() => {
+    if (!isActive) {
+      const v = videoRef.current;
+      if (!v) return;
+
+      // Pause video
+      v.pause();
+
+      // Destroy HLS instance and release buffer
+      if (hlsInstanceRef.current) {
+        hlsInstanceRef.current.destroy();
+        hlsInstanceRef.current = null;
+      }
+
+      // Clear video source
+      v.removeAttribute('src');
+      v.load();
+      setAttached(false);
+    }
+  }, [isActive]);
+
+  // Off-screen cleanup (frees memory) - only runs if isNearby becomes false
   useEffect(() => {
     if (isNearby) return;
 
