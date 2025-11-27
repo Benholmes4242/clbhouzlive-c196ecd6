@@ -52,9 +52,9 @@ import { useAchievementSharing } from '@/hooks/useAchievementSharing';
 
 
 
-// Direct import for ProfilePage and Discover to avoid dynamic import issues
-import ProfilePage from "./pages/ProfilePage";
-import Discover from "./pages/Discover";
+// Lazy-load ProfilePage and Discover for smaller initial bundle
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const Discover = lazy(() => import("./pages/Discover"));
 import ErrorLogPage from "./pages/ErrorLogPage";
 import { HeaderProvider } from '@/contexts/GlobalHeaderContext';
 
@@ -327,7 +327,7 @@ const queryClient = new QueryClient({
       retry: 1,
       refetchOnWindowFocus: false,
       staleTime: 5 * 60 * 1000, // 5 minutes cache for better performance
-      gcTime: 15 * 60 * 1000, // 15 minutes garbage collection
+      gcTime: 10 * 60 * 1000, // 10 minutes garbage collection (reduced from 15)
       refetchOnMount: false,
       refetchOnReconnect: false,
       networkMode: 'online',
