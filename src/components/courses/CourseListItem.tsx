@@ -46,12 +46,13 @@ const CourseListItem: React.FC<CourseListItemProps> = ({
       className="relative h-24 rounded-lg overflow-hidden cursor-pointer group transition-all duration-300 hover:shadow-lg"
       onClick={handleClick}
     >
-      {/* Full background image */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `url(${course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'})`
-        }}
+      {/* Full background image with lazy loading */}
+      <img
+        src={course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'}
+        alt={`Background image for ${course.name}`}
+        className="absolute inset-0 w-full h-full object-cover"
+        loading="lazy"
+        decoding="async"
       />
 
       {/* Dark overlay for text readability */}
