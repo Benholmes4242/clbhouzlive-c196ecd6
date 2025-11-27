@@ -131,8 +131,8 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
         const Hls = await loadHlsJs();
         if (Hls.isSupported()) {
           const hls = new Hls({
-            maxBufferLength: 10,
-            backBufferLength: 5,
+            maxBufferLength: 6,
+            backBufferLength: 3,
           });
           
           // Handle HLS errors
