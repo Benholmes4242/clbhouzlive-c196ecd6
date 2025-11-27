@@ -14,26 +14,28 @@ import { formatDistanceToNow } from 'date-fns';
 import { Users, MapPin, Flame, Video } from 'lucide-react';
 import { FLAGS } from '@/config/flags';
 import { MOCK_FRIEND_COURSES } from './mockFriendCourses';
-import { FriendsCoursesHero } from './friends/FriendsCoursesHero';
-import { FriendsActivityLeaderboard } from './friends/FriendsActivityLeaderboard';
-import { calculateFriendAchievements } from './friends/achievementUtils';
+import FriendsSnapshotCard from './friends/FriendsSnapshotCard';
+import FriendsHeroCourseCard from './friends/FriendsHeroCourseCard';
+import FriendsActivityCard from './friends/FriendsActivityCard';
 import CourseRankBadges from './CourseRankBadges';
 import { extractRanksFromMemberships } from '@/utils/rankingUtils';
 import type { CourseWithFriends, FriendCourseHit, Top100Membership } from '@/hooks/useFriendsCourses';
 
-type TimeRange = 'week' | '30' | '90' | 'year' | 'all';
-type CourseTypeFilter = 'all' | 'top100';
+type Timeframe = '7d' | '30d' | '90d' | '12m' | 'all';
+type CourseFilter = 'all' | 'new' | 'most_played' | 'highest_rated';
 
 const FriendsCoursesPanel: React.FC = () => {
   // All hooks must be called before any conditional returns
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const { data: realData, isLoading } = useFriendsCourses(user?.id);
-  const [timeRange, setTimeRange] = useState<TimeRange>('30');
-  const [courseTypeFilter, setCourseTypeFilter] = useState<CourseTypeFilter>('all');
+  const [timeframe, setTimeframe] = useState<Timeframe>('30d');
+  const [courseFilter, setCourseFilter] = useState<CourseFilter>('all');
+  const [page, setPage] = useState(1);
   const [recentPage, setRecentPage] = useState(0);
   
-  const PAGE_SIZE = 8;
+  const PAGE_SIZE = 25;
+  const RECENT_PAGE_SIZE = 10;
   
   // Fetch real course data directly when using mock friends
   const mockCourseNames = useMemo(() => {
@@ -158,15 +160,15 @@ const FriendsCoursesPanel: React.FC = () => {
     
     // Calculate time cutoff
     let cutoff: Date | null = null;
-    if (timeRange !== 'all') {
+    if (timeframe !== 'all') {
       cutoff = new Date();
-      if (timeRange === 'week') {
+      if (timeframe === '7d') {
         cutoff.setDate(cutoff.getDate() - 7);
-      } else if (timeRange === '30') {
+      } else if (timeframe === '30d') {
         cutoff.setDate(cutoff.getDate() - 30);
-      } else if (timeRange === '90') {
+      } else if (timeframe === '90d') {
         cutoff.setDate(cutoff.getDate() - 90);
-      } else if (timeRange === 'year') {
+      } else if (timeframe === '12m') {
         cutoff.setFullYear(cutoff.getFullYear() - 1);
       }
     }
@@ -176,12 +178,13 @@ const FriendsCoursesPanel: React.FC = () => {
       ? data.recent.filter(hit => new Date(hit.played_at) >= cutoff)
       : data.recent;
     
-    // Filter by course type (Top 100 only)
-    const courseTypeFilteredRecent = courseTypeFilter === 'top100'
-      ? timeFilteredRecent.filter(hit => {
-          const ranks = extractRanksFromMemberships(hit.top100_memberships, hit.course_country);
-          return ranks.isTop100;
-        })
+    // Filter by course type (Top 100 only or other filters)
+    const courseTypeFilteredRecent = courseFilter === 'most_played'
+      ? timeFilteredRecent
+      : courseFilter === 'highest_rated'
+      ? timeFilteredRecent.filter(hit => hit.rating != null)
+      : courseFilter === 'new'
+      ? timeFilteredRecent
       : timeFilteredRecent;
     
     // Group into courses
@@ -230,13 +233,85 @@ const FriendsCoursesPanel: React.FC = () => {
       totalCourses: filteredCourses.length,
       totalFriendsActive: uniqueFriends.size,
     };
-  }, [data, timeRange, courseTypeFilter]);
+  }, [data, timeframe, courseFilter]);
 
   // Derive lists safely even while loading
   const courses = filteredData?.courses || [];
   const recent = filteredData?.recent || [];
   const totalCourses = filteredData?.totalCourses || 0;
   const totalFriendsActive = filteredData?.totalFriendsActive || 0;
+
+  // Calculate additional aggregations for snapshot card
+  const totalRegions = useMemo(() => {
+    const regions = new Set(courses.map(c => c.country).filter(Boolean));
+    return regions.size;
+  }, [courses]);
+
+  const averageRating = useMemo(() => {
+    const ratings = courses
+      .map(c => c.average_rating)
+      .filter((r): r is number => r != null);
+    if (ratings.length === 0) return null;
+    return ratings.reduce((sum, r) => sum + r, 0) / ratings.length;
+  }, [courses]);
+
+  const totalRounds = recent.length;
+
+  // Generate leaderboard data
+  const leaderboard = useMemo(() => {
+    const friendMap = new Map<string, {
+      friendId: string;
+      friendName: string;
+      avatarUrl: string | null;
+      roundCount: number;
+      lastPlayedAt: string;
+    }>();
+
+    recent.forEach(hit => {
+      const existing = friendMap.get(hit.friend_id);
+      const name = hit.friend_profile.display_name || hit.friend_profile.username;
+      if (!existing) {
+        friendMap.set(hit.friend_id, {
+          friendId: hit.friend_id,
+          friendName: name,
+          avatarUrl: hit.friend_profile.profile_photo_url,
+          roundCount: 1,
+          lastPlayedAt: hit.played_at,
+        });
+      } else {
+        existing.roundCount++;
+        if (new Date(hit.played_at) > new Date(existing.lastPlayedAt)) {
+          existing.lastPlayedAt = hit.played_at;
+        }
+      }
+    });
+
+    return Array.from(friendMap.values())
+      .sort((a, b) => {
+        if (b.roundCount !== a.roundCount) return b.roundCount - a.roundCount;
+        return new Date(b.lastPlayedAt).getTime() - new Date(a.lastPlayedAt).getTime();
+      });
+  }, [recent]);
+
+  // Select hero course based on filter
+  const heroCourse = useMemo(() => {
+    if (courses.length === 0) return null;
+    
+    switch (courseFilter) {
+      case 'most_played':
+        return courses.sort((a, b) => b.total_friends_played - a.total_friends_played)[0];
+      case 'highest_rated':
+        return courses
+          .filter(c => c.average_rating != null)
+          .sort((a, b) => (b.average_rating || 0) - (a.average_rating || 0))[0] || courses[0];
+      case 'new':
+        return courses.sort((a, b) => 
+          new Date(b.most_recent_play).getTime() - new Date(a.most_recent_play).getTime()
+        )[0];
+      default:
+        return courses.sort((a, b) => b.total_friends_played - a.total_friends_played)[0];
+    }
+  }, [courses, courseFilter]);
 
   // Hot courses: courses with 2+ friends, sorted by friends then recency
   const hotCourses = useMemo(() => {
@@ -256,13 +331,23 @@ const FriendsCoursesPanel: React.FC = () => {
 
   const regularCourses = useMemo(() => {
     const hotIds = new Set(hotCourses.map(c => c.course_id));
-    return courses.filter(c => !hotIds.has(c.course_id));
-  }, [courses, hotCourses]);
+    const heroId = heroCourse?.course_id;
+    return courses.filter(c => !hotIds.has(c.course_id) && c.course_id !== heroId);
+  }, [courses, hotCourses, heroCourse]);
+
+  // Paginate main courses list
+  const paginatedCourses = useMemo(() => {
+    const startIndex = (page - 1) * PAGE_SIZE;
+    return regularCourses.slice(startIndex, startIndex + PAGE_SIZE);
+  }, [regularCourses, page]);
+
+  const totalPages = Math.ceil(regularCourses.length / PAGE_SIZE);
 
   // Reset page when filter changes
   useEffect(() => {
+    setPage(1);
     setRecentPage(0);
-  }, [timeRange]);
+  }, [timeframe, courseFilter]);
 
   // Sort recent rounds by played_at descending (most recent first)
   const sortedRecent = useMemo(() => {
@@ -273,10 +358,10 @@ const FriendsCoursesPanel: React.FC = () => {
 
   // Paginate recent rounds
   const totalRecent = sortedRecent.length;
-  const totalPages = Math.ceil(totalRecent / PAGE_SIZE);
-  const startIndex = recentPage * PAGE_SIZE;
-  const endIndex = startIndex + PAGE_SIZE;
-  const visibleRecent = sortedRecent.slice(startIndex, endIndex);
+  const totalRecentPages = Math.ceil(totalRecent / RECENT_PAGE_SIZE);
+  const startRecentIndex = recentPage * RECENT_PAGE_SIZE;
+  const endRecentIndex = startRecentIndex + RECENT_PAGE_SIZE;
+  const visibleRecent = sortedRecent.slice(startRecentIndex, endRecentIndex);
 
   // Now conditional returns - no more hooks after this point
   if (!user) return null;
@@ -346,48 +431,63 @@ const FriendsCoursesPanel: React.FC = () => {
           <p className="text-sm text-muted-foreground">See where your friends have been playing lately</p>
         </div>
         
-        {/* Filter Dropdowns - Match Explore/Top100 */}
-        <div className="max-w-xl mx-auto flex items-center justify-center gap-3">
+        {/* Filter Dropdowns */}
+        <div className="flex items-center gap-3">
           {/* Time Range Dropdown */}
           <div className="flex-1">
-            <Select value={timeRange} onValueChange={(value) => setTimeRange(value as TimeRange)}>
+            <Select value={timeframe} onValueChange={(value) => setTimeframe(value as Timeframe)}>
               <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
                 <SelectValue placeholder="Select time range" />
               </SelectTrigger>
               <SelectContent className="bg-card border-border z-50">
-                <SelectItem value="week">This week</SelectItem>
-                <SelectItem value="30">Last 30 days</SelectItem>
-                <SelectItem value="90">Last 90 days</SelectItem>
-                <SelectItem value="year">This year</SelectItem>
+                <SelectItem value="7d">Last 7 days</SelectItem>
+                <SelectItem value="30d">Last 30 days</SelectItem>
+                <SelectItem value="90d">Last 90 days</SelectItem>
+                <SelectItem value="12m">Last 12 months</SelectItem>
                 <SelectItem value="all">All time</SelectItem>
               </SelectContent>
             </Select>
           </div>
           
-          {/* Course Type Dropdown */}
+          {/* Course Filter Dropdown */}
           <div className="flex-1">
-            <Select value={courseTypeFilter} onValueChange={(value) => setCourseTypeFilter(value as CourseTypeFilter)}>
+            <Select value={courseFilter} onValueChange={(value) => setCourseFilter(value as CourseFilter)}>
               <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
-                <SelectValue placeholder="Select course type" />
+                <SelectValue placeholder="Select filter" />
               </SelectTrigger>
               <SelectContent className="bg-card border-border z-50">
                 <SelectItem value="all">All courses</SelectItem>
-                <SelectItem value="top100">Top 100 only</SelectItem>
+                <SelectItem value="new">New this period</SelectItem>
+                <SelectItem value="most_played">Most played</SelectItem>
+                <SelectItem value="highest_rated">Highest rated</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
       </div>
 
-      {/* Hero Banner - Full width breakout */}
-      <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
-        <FriendsCoursesHero courses={regularCourses} timeRange={timeRange} />
-      </div>
+      {/* Friends Snapshot Card */}
+      <FriendsSnapshotCard
+        timeframe={timeframe}
+        totalCourses={totalCourses}
+        totalRegions={totalRegions}
+        averageRating={averageRating}
+        totalRounds={totalRounds}
+      />
 
-      {/* Activity Leaderboard - Full width breakout */}
-      <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
-        <FriendsActivityLeaderboard recent={recent} timeRange={timeRange} />
-      </div>
+      {/* Hero Course Card */}
+      {heroCourse && (
+        <FriendsHeroCourseCard 
+          course={heroCourse} 
+          filterType={courseFilter}
+        />
+      )}
+
+      {/* Friends Activity Leaderboard */}
+      <FriendsActivityCard 
+        leaderboard={leaderboard}
+        timeframe={timeframe}
+      />
 
       {hotCourses.length > 0 && (
         <div className="space-y-3">
@@ -486,172 +586,182 @@ const FriendsCoursesPanel: React.FC = () => {
         </div>
       )}
 
-      {/* Regular courses - Full width breakout */}
-      {regularCourses.length > 0 && (
-        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
-          <div className="mt-4 space-y-4">
-            {regularCourses.map((course) => {
-              const mostRecentFriend = course.friends[0];
-              // TODO: Replace with real media_count from database
-              const hasMedia = false; // course.media_count > 0;
-              
-              return (
-                <Card key={course.course_id} className="relative overflow-hidden rounded-none sm:rounded-xl hover:shadow-md transition-all cursor-pointer bg-card border shadow-sm w-full"
-                  onClick={() => navigate(`/courses/${course.course_id}`)}>
-                {/* Course Image - Taller, Full Width */}
-                {course.thumbnail_url && (
-                  <div className="relative w-full aspect-[1.7/1] overflow-hidden">
-                    <img
-                      src={course.thumbnail_url}
-                      alt={course.course_name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src = '/placeholder.svg';
-                      }}
-                    />
-                    {/* Stronger bottom gradient */}
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/55 via-black/25 to-transparent" />
-                  </div>
-                )}
-                
-                {/* Rank badges (top-right) - tighter gap */}
-                <div className="absolute top-3 right-3 z-10 flex gap-1.5">
-                  {(() => {
-                    const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
-                    return (
-                      <CourseRankBadges
-                        globalRank={ranks.globalRank}
-                        regionalRank={ranks.regionalRank}
-                        usaRank={ranks.usaRank}
-                        country={course.country || ''}
-                        positioning="inline"
-                      />
-                    );
-                  })()}
+      {/* Regular courses - Paginated list */}
+      {paginatedCourses.length > 0 && (
+        <div className="space-y-4">
+          {paginatedCourses.map((course) => {
+            const mostRecentFriend = course.friends[0];
+            
+            return (
+              <Card key={course.course_id} className="relative overflow-hidden rounded-xl hover:shadow-md transition-all cursor-pointer bg-card border shadow-sm"
+                onClick={() => navigate(`/courses/${course.course_id}`)}>
+              {/* Course Image - Taller, Full Width */}
+              {course.thumbnail_url && (
+                <div className="relative w-full aspect-[1.7/1] overflow-hidden">
+                  <img
+                    src={course.thumbnail_url}
+                    alt={course.course_name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder.svg';
+                    }}
+                  />
+                  {/* Bottom gradient */}
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/55 via-black/25 to-transparent" />
                 </div>
-                
-                {/* Course Info */}
-                <div className="p-4">
-                  <h3 className="font-semibold text-lg mb-1 text-foreground">
-                    {course.course_name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    {course.country}{course.sub_country ? `, ${course.sub_country}` : ''}
+              )}
+              
+              {/* Rank badges (top-right) */}
+              <div className="absolute top-3 right-3 z-10 flex gap-1.5">
+                {(() => {
+                  const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
+                  return (
+                    <CourseRankBadges
+                      globalRank={ranks.globalRank}
+                      regionalRank={ranks.regionalRank}
+                      usaRank={ranks.usaRank}
+                      country={course.country || ''}
+                      positioning="inline"
+                    />
+                  );
+                })()}
+              </div>
+              
+              {/* Course Info */}
+              <div className="p-4">
+                <h3 className="font-semibold text-lg mb-1 text-foreground">
+                  {course.course_name}
+                </h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  {course.country}{course.sub_country ? `, ${course.sub_country}` : ''}
+                </p>
+
+                {/* Bottom row: "Played by..." with avatar */}
+                <div className="mt-1 flex items-center justify-between gap-3">
+                  <p className="text-xs text-muted-foreground">
+                    Played by{" "}
+                    <span className="font-medium text-foreground">
+                      {mostRecentFriend.friend_profile.display_name || mostRecentFriend.friend_profile.username}
+                    </span>
+                    {course.total_friends_played > 1 && (
+                      <span> & {course.total_friends_played - 1} more</span>
+                    )}
+                    {" "}· {formatDistanceToNow(new Date(mostRecentFriend.played_at), { addSuffix: true })}
                   </p>
 
-                  {/* Bottom row: "Played by..." with avatar */}
-                  <div className="mt-1 flex items-center justify-between gap-3">
-                    <p className="text-xs text-muted-foreground">
-                      Played by{" "}
-                      <span className="font-medium text-foreground">
-                        {mostRecentFriend.friend_profile.display_name || mostRecentFriend.friend_profile.username}
-                      </span>{" "}
-                      · {formatDistanceToNow(new Date(mostRecentFriend.played_at), { addSuffix: true })}
-                    </p>
-
-                    <Squircle width={32} height={32} className="shrink-0">
-                      <img 
-                        src={mostRecentFriend.friend_profile.profile_photo_url || '/placeholder.svg'} 
-                        alt={mostRecentFriend.friend_profile.display_name || mostRecentFriend.friend_profile.username}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        onError={(e) => {
-                          e.currentTarget.src = '/placeholder.svg';
-                        }}
-                      />
-                    </Squircle>
-                  </div>
-
-                  {hasMedia && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        console.log('TODO: View media for course', course.course_id);
-                      }}
-                      className="mt-2 flex items-center gap-1 text-muted-foreground hover:text-foreground text-sm"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                      View media
-                    </button>
-                  )}
-                </div>
-              </Card>
-            );
-          })}
-          </div>
-        </div>
-      )}
-
-      {/* Recent rounds - Full width breakout */}
-      {sortedRecent.length > 0 && (
-        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
-          <div className="space-y-3">
-            <div>
-              <h3 className="text-base font-semibold text-foreground">Your friends' recent rounds</h3>
-              <p className="text-xs text-muted-foreground mt-1">Rounds played in the last 30 days</p>
-            </div>
-            <div className="space-y-0">
-            {visibleRecent.map((hit, idx) => (
-              <div key={`${hit.friend_id}-${hit.course_id}-${idx}`}
-                className={`flex items-center justify-between py-2 hover:bg-surface-alt/50 transition-colors cursor-pointer ${
-                  idx !== visibleRecent.length - 1 ? 'border-b border-border' : ''
-                }`}
-                onClick={() => navigate(`/courses/${hit.course_id}`)}>
-                <div className="flex items-center gap-3">
                   <Squircle width={32} height={32} className="shrink-0">
                     <img 
-                      src={hit.friend_profile.profile_photo_url || '/placeholder.svg'} 
-                      alt={hit.friend_profile.display_name || hit.friend_profile.username}
+                      src={mostRecentFriend.friend_profile.profile_photo_url || '/placeholder.svg'} 
+                      alt={mostRecentFriend.friend_profile.display_name || mostRecentFriend.friend_profile.username}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       onError={(e) => {
                         e.currentTarget.src = '/placeholder.svg';
                       }}
                     />
                   </Squircle>
-                  <div className="flex flex-col">
-                    <span className="text-sm">
-                      <span className="font-semibold">{hit.friend_profile.display_name || hit.friend_profile.username}</span> played {hit.course_name}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      {formatDistanceToNow(new Date(hit.played_at), { addSuffix: true })}
-                    </span>
-                  </div>
                 </div>
               </div>
-            ))}
-          </div>
+            </Card>
+          );
+        })}
 
-          {/* Pagination controls */}
-          {totalPages > 1 && (
-            <div className="mt-3 flex items-center justify-between gap-2">
-              <button
-                type="button"
-                disabled={recentPage === 0}
-                onClick={() => setRecentPage((p) => Math.max(p - 1, 0))}
-                className="px-3 py-1 rounded-full border border-border text-sm disabled:opacity-40 disabled:cursor-default"
+        {/* Pagination Footer */}
+        {totalPages > 1 && (
+          <div className="flex flex-col items-center gap-3 mt-6">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                disabled={page === 1}
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                className="h-11 px-6 rounded-lg"
               >
-                Previous
-              </button>
+                Previous 25 courses
+              </Button>
 
-              <div className="text-xs text-muted-foreground">
-                Page {recentPage + 1} of {totalPages}
-              </div>
-
-              <button
-                type="button"
-                disabled={recentPage >= totalPages - 1}
-                onClick={() =>
-                  setRecentPage((p) => Math.min(p + 1, totalPages - 1))
-                }
-                className="px-3 py-1 rounded-full border border-border text-sm disabled:opacity-40 disabled:cursor-default"
+              <Button
+                variant="outline"
+                disabled={page >= totalPages}
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                className="h-11 px-6 rounded-lg"
               >
-                Next
-              </button>
+                Next 25 courses
+              </Button>
             </div>
-          )}
+
+            <p className="text-sm text-muted-foreground">
+              Showing {((page - 1) * PAGE_SIZE) + 1}–{Math.min(page * PAGE_SIZE, regularCourses.length)} of {regularCourses.length} courses
+            </p>
           </div>
+        )}
+        </div>
+      )}
+
+      {/* Recent rounds timeline */}
+      {sortedRecent.length > 0 && (
+        <div className="space-y-3">
+          <div>
+            <h3 className="text-base font-semibold text-foreground">Your friends' recent rounds</h3>
+            <p className="text-xs text-muted-foreground mt-1">
+              Rounds played in the last {timeframe === '7d' ? '7 days' : timeframe === '30d' ? '30 days' : timeframe === '90d' ? '90 days' : timeframe === '12m' ? '12 months' : 'all time'}
+            </p>
+          </div>
+          <div className="space-y-0">
+          {visibleRecent.map((hit, idx) => (
+            <div key={`${hit.friend_id}-${hit.course_id}-${idx}`}
+              className={`flex items-center gap-3 py-3 hover:bg-muted/50 transition-colors cursor-pointer ${
+                idx !== visibleRecent.length - 1 ? 'border-b border-border' : ''
+              }`}
+              onClick={() => navigate(`/courses/${hit.course_id}`)}>
+              <Squircle width={36} height={36} className="shrink-0">
+                <img 
+                  src={hit.friend_profile.profile_photo_url || '/placeholder.svg'} 
+                  alt={hit.friend_profile.display_name || hit.friend_profile.username}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  onError={(e) => {
+                    e.currentTarget.src = '/placeholder.svg';
+                  }}
+                />
+              </Squircle>
+              <div className="flex-1 min-w-0">
+                <span className="text-sm block">
+                  <span className="font-semibold">{hit.friend_profile.display_name || hit.friend_profile.username}</span> played {hit.course_name}
+                </span>
+                <span className="text-xs text-muted-foreground block">
+                  {formatDistanceToNow(new Date(hit.played_at), { addSuffix: true })}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Recent rounds pagination */}
+        {totalRecentPages > 1 && (
+          <div className="mt-4 flex items-center justify-between gap-2">
+            <button
+              type="button"
+              disabled={recentPage === 0}
+              onClick={() => setRecentPage((p) => Math.max(p - 1, 0))}
+              className="px-3 py-1.5 rounded-lg border border-border text-sm disabled:opacity-40 disabled:cursor-default hover:bg-muted/50 transition"
+            >
+              Previous
+            </button>
+
+            <div className="text-xs text-muted-foreground">
+              Page {recentPage + 1} of {totalRecentPages}
+            </div>
+
+            <button
+              type="button"
+              disabled={recentPage >= totalRecentPages - 1}
+              onClick={() =>
+                setRecentPage((p) => Math.min(p + 1, totalRecentPages - 1))
+              }
+              className="px-3 py-1.5 rounded-lg border border-border text-sm disabled:opacity-40 disabled:cursor-default hover:bg-muted/50 transition"
+            >
+              Next
+            </button>
+          </div>
+        )}
         </div>
       )}
     </div>
