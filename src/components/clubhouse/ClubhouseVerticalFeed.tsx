@@ -519,7 +519,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     });
   };
 
-  const handleLike = (postId: string) => {
+  const handleLike = useCallback((postId: string) => {
     if (!user?.id) return;
     
     const isLiked = likedPosts?.includes(postId);
@@ -527,7 +527,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       postId,
       action: isLiked ? 'unlike' : 'like'
     });
-  };
+  }, [user?.id, likedPosts, likeMutation]);
 
   // Double-tap like handler
   const handleDoubleTap = useCallback((postId: string, e: React.MouseEvent | React.TouchEvent) => {
@@ -558,7 +558,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     }
     
     return false; // Not a double-tap
-  }, [likedPosts, user?.id]);
+  }, [likedPosts, handleLike]);
   
   // Video play/pause state
   const [videoControlsVisible, setVideoControlsVisible] = useState<Record<string, boolean>>({});
@@ -633,6 +633,57 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       delete videoLongPressTimers.current[postId];
     }
   }, []);
+
+  // Media swipe gesture handlers (memoized to prevent re-renders)
+  const handleMediaTouchStart = useCallback((e: React.TouchEvent, postId: string, hasMultipleMedia: boolean) => {
+    if (e.currentTarget.closest('[data-media-container]')) {
+      handleVideoLongPressStart(e, postId);
+    }
+    
+    if (hasMultipleMedia) {
+      (e.currentTarget as any).touchStartX = e.touches[0].clientX;
+      (e.currentTarget as any).touchStartY = e.touches[0].clientY;
+    }
+  }, [handleVideoLongPressStart]);
+
+  const handleMediaTouchEnd = useCallback((
+    e: React.TouchEvent,
+    postId: string,
+    hasMultipleMedia: boolean,
+    currentMediaIndex: number,
+    mediaItemsLength: number,
+    isVideo: boolean
+  ) => {
+    if (isVideo) {
+      handleVideoLongPressEnd(postId);
+    }
+    
+    if (!hasMultipleMedia) return;
+    
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const touchStartX = (e.currentTarget as any).touchStartX || 0;
+    const touchStartY = (e.currentTarget as any).touchStartY || 0;
+    const deltaX = touchEndX - touchStartX;
+    const deltaY = touchEndY - touchStartY;
+    
+    // Only trigger swipe if horizontal movement is greater than vertical
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+      if (deltaX > 0) {
+        // Swipe right - previous media
+        setMediaIndices(prev => ({
+          ...prev,
+          [postId]: currentMediaIndex > 0 ? currentMediaIndex - 1 : mediaItemsLength - 1
+        }));
+      } else {
+        // Swipe left - next media
+        setMediaIndices(prev => ({
+          ...prev,
+          [postId]: currentMediaIndex < mediaItemsLength - 1 ? currentMediaIndex + 1 : 0
+        }));
+      }
+    }
+  }, [handleVideoLongPressEnd]);
 
   // Helper function to truncate text to 9 words
   const truncateToWords = (text: string, wordLimit: number = 9) => {
@@ -712,7 +763,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     }, 150);
 
     prevScrollTopRef.current = scrollTop;
-  }, [currentIndex, filteredPosts.length, hasMore, isLoadingMore, onLoadMore]);
+  }, [currentIndex, filteredPosts, hasMore, isLoadingMore, onLoadMore, onScroll]);
 
   // Notify parent of active video ref changes
   useEffect(() => {
@@ -1013,47 +1064,24 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   }
                 }}
                 onTouchStart={(e) => {
-                  if (currentMedia.media_type === 'video') {
-                    handleVideoLongPressStart(e, item.id);
-                  }
-                  
-                  if (hasMultipleMedia) {
-                    (e.currentTarget as any).touchStartX = e.touches[0].clientX;
-                    (e.currentTarget as any).touchStartY = e.touches[0].clientY;
-                  }
+                  handleMediaTouchStart(
+                    e,
+                    item.id,
+                    hasMultipleMedia
+                  );
                 }}
                 onTouchEnd={(e) => {
-                  if (currentMedia.media_type === 'video') {
-                    handleVideoLongPressEnd(item.id);
-                  }
-                  
-                  if (!hasMultipleMedia) return;
-                  
-                  const touchEndX = e.changedTouches[0].clientX;
-                  const touchEndY = e.changedTouches[0].clientY;
-                  const touchStartX = (e.currentTarget as any).touchStartX || 0;
-                  const touchStartY = (e.currentTarget as any).touchStartY || 0;
-                  const deltaX = touchEndX - touchStartX;
-                  const deltaY = touchEndY - touchStartY;
-                  
-                  // Only trigger swipe if horizontal movement is greater than vertical
-                  if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
-                    if (deltaX > 0) {
-                      // Swipe right - previous media
-                      setMediaIndices(prev => ({
-                        ...prev,
-                        [item.id]: currentMediaIndex > 0 ? currentMediaIndex - 1 : mediaItems.length - 1
-                      }));
-                    } else {
-                      // Swipe left - next media
-                      setMediaIndices(prev => ({
-                        ...prev,
-                        [item.id]: currentMediaIndex < mediaItems.length - 1 ? currentMediaIndex + 1 : 0
-                      }));
-                    }
-                  }
+                  handleMediaTouchEnd(
+                    e,
+                    item.id,
+                    hasMultipleMedia,
+                    currentMediaIndex,
+                    mediaItems.length,
+                    currentMedia.media_type === 'video'
+                  );
                 }}
                 className="relative w-full h-full z-10"
+                data-media-container
               >
                 {/* Double-tap heart burst */}
                 {showTapHeart[item.id] && (
