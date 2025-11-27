@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
+import { loadHlsJs } from '@/utils/hlsLoader';
 
 interface HLSVideoCardProps {
   hlsUrl: string;
@@ -84,19 +85,6 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     return video.canPlayType('application/vnd.apple.mpegurl') !== '';
   };
 
-  // Load hls.js library
-  const loadHlsJs = async () => {
-    if (window.Hls) return window.Hls;
-    
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js';
-      script.onload = () => resolve(window.Hls);
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-  };
-
   // Attach HLS source to video when shouldAttach becomes true
   useEffect(() => {
     const v = videoRef.current;
@@ -114,47 +102,35 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
       return;
     }
 
-    const loadHlsJs = async () => {
-      if (window.Hls) return window.Hls;
-      
-      return new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js';
-        script.onload = () => resolve(window.Hls);
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
-    };
-
     const setupHls = async () => {
       try {
         const Hls = await loadHlsJs();
-        if (Hls.isSupported()) {
-          const hls = new Hls({
-            maxBufferLength: 6,
-            backBufferLength: 3,
-          });
-          
-          // Handle HLS errors
-          hls.on(Hls.Events.ERROR, (event, data) => {
-            console.error('HLS error:', data);
-            if (data.fatal) {
-              setHasError(true);
-            }
-          });
-          
-          hls.loadSource(hlsUrl);
-          hls.attachMedia(v);
-          const onParsed = () => setAttached(true);
-          hls.on(Hls.Events.MANIFEST_PARSED, onParsed);
-          hlsInstanceRef.current = hls;
-          setIsLoaded(true);
-          
-          return () => {
-            hls.off(Hls.Events.MANIFEST_PARSED, onParsed);
-            hls.destroy();
-          };
-        }
+        if (!Hls || !Hls.isSupported()) return;
+        
+        const hls = new Hls({
+          maxBufferLength: 6,
+          backBufferLength: 3,
+        });
+        
+        // Handle HLS errors
+        hls.on(Hls.Events.ERROR, (event, data) => {
+          console.error('HLS error:', data);
+          if (data.fatal) {
+            setHasError(true);
+          }
+        });
+        
+        hls.loadSource(hlsUrl);
+        hls.attachMedia(v);
+        const onParsed = () => setAttached(true);
+        hls.on(Hls.Events.MANIFEST_PARSED, onParsed);
+        hlsInstanceRef.current = hls;
+        setIsLoaded(true);
+        
+        return () => {
+          hls.off(Hls.Events.MANIFEST_PARSED, onParsed);
+          hls.destroy();
+        };
       } catch (error) {
         console.error('Error loading HLS:', error);
         setHasError(true);
