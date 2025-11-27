@@ -43,7 +43,7 @@ const MediaCarousel = ({
 
   const hasMultipleItems = items.length > 1;
 
-  // Preload adjacent slides
+  // Preload adjacent slides (lightweight thumbnails only)
   useEffect(() => {
     if (!items?.length) return;
     
@@ -54,13 +54,13 @@ const MediaCarousel = ({
       const item = items[i];
       if (!item) return;
       
+      // Only preload images, not videos (saves memory)
       if (item.type === 'image') {
         const img = new Image();
-        img.src = item.previewUrl || item.url || (item.file ? URL.createObjectURL(item.file) : '');
-      } else if (item.type === 'video') {
-        const video = document.createElement('video');
-        video.preload = 'metadata';
-        video.src = item.previewUrl || item.url || (item.file ? URL.createObjectURL(item.file) : '');
+        const baseUrl = item.previewUrl || item.url || (item.file ? URL.createObjectURL(item.file) : '');
+        // Preload thumbnail, not full-res
+        const sep = baseUrl.includes('?') ? '&' : '?';
+        img.src = baseUrl.startsWith('blob:') ? baseUrl : `${baseUrl}${sep}width=600&height=600&fit=cover`;
       }
     });
   }, [activeIndex, items]);

@@ -9,6 +9,54 @@ export function streamPosterFrom(url?: string) {
   catch { return undefined; }
 }
 
+/**
+ * Build a thumbnail URL for images with size constraints
+ * Optimizes memory by loading resized versions instead of full-res
+ */
+export function buildImageThumbnailUrl(
+  url: string | null | undefined,
+  {
+    width = 600,
+    height = 600,
+    fit = 'cover',
+  }: { width?: number; height?: number; fit?: 'cover' | 'contain' } = {}
+): string {
+  if (!url) return '/placeholder.svg';
+
+  // For blob URLs (local files), return as-is since we can't transform them
+  if (url.startsWith('blob:')) return url;
+
+  const sep = url.includes('?') ? '&' : '?';
+  
+  // Add transformation params (works with Cloudflare R2/Images)
+  return `${url}${sep}width=${width}&height=${height}&fit=${fit}`;
+}
+
+/**
+ * Build a poster/thumbnail URL for videos
+ * Returns a still frame instead of loading the video stream
+ */
+export function buildVideoPosterUrl(
+  url: string | null | undefined,
+  {
+    width = 600,
+    height = 600,
+  }: { width?: number; height?: number } = {}
+): string {
+  if (!url) return '/placeholder.svg';
+
+  // For blob URLs (local files), return as-is
+  if (url.startsWith('blob:')) return url;
+
+  // Check if this is a Cloudflare Stream URL
+  if (url.includes('cloudflarestream.com') || url.includes('customer-')) {
+    return streamPosterFrom(url) || url;
+  }
+
+  const sep = url.includes('?') ? '&' : '?';
+  return `${url}${sep}width=${width}&height=${height}&fit=cover`;
+}
+
 // Ensure every item has a renderable image (image.url or video.thumbUrl).
 export function normalizeMedia(items: Media[]): Media[] {
   return items
