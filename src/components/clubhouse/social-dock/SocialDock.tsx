@@ -100,9 +100,6 @@ export const SocialDock: React.FC<SocialDockProps> = ({
           'fixed inset-x-0 bottom-0 z-[80]',
           'pointer-events-none',
         )}
-        style={{
-          paddingBottom: `calc(env(safe-area-inset-bottom, 0px))`,
-        }}
       >
         <div
           className={cn(
@@ -126,10 +123,13 @@ export const SocialDock: React.FC<SocialDockProps> = ({
           <div
             className={cn(
               'social-dock-card-inner',
-              'px-4 pt-3 pb-[10px]',
+              'px-4 pt-3',
               motionState === 'expand' && 'social-dock-card-expand',
               motionState === 'collapse' && 'social-dock-card-collapse'
             )}
+            style={{
+              paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)',
+            }}
           >
         {/* 1) TOP: ACTION ROW */}
         <div className="mb-2 flex items-center justify-between gap-1">
