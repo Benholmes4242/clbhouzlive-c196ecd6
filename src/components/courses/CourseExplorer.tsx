@@ -19,11 +19,8 @@ import {
   regionKeyToDbValue,
   subregionKeyToLabel,
 } from '@/constants/courseRegions';
-import { getOptimalPageSize } from '@/utils/deviceDetection';
-import { UnifiedControlBar } from './UnifiedControlBar';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-
-const PAGE_SIZE = 25; // Reduced from 50 to 25 for better performance
+import { COURSES_PAGE_SIZE } from '@/config/pagination';
 
 type SortOption = 'popular' | 'rating_desc' | 'rating_asc' | 'name_asc' | 'name_desc';
 
@@ -227,8 +224,8 @@ const CourseExplorer = () => {
         }
         
         // Pagination
-        const from = page * PAGE_SIZE;
-        const to = from + PAGE_SIZE - 1;
+        const from = page * COURSES_PAGE_SIZE;
+        const to = from + COURSES_PAGE_SIZE - 1;
         query = query.range(from, to);
 
         const { data, error, count } = await query;
@@ -258,7 +255,7 @@ const CourseExplorer = () => {
 
   const courses = data?.courses || [];
   const totalCount = data?.totalCount || 0;
-  const hasMore = courses.length === PAGE_SIZE && (page + 1) * PAGE_SIZE < totalCount;
+  const hasMore = courses.length === COURSES_PAGE_SIZE && (page + 1) * COURSES_PAGE_SIZE < totalCount;
 
   // Phase 2 Perf: Import skeleton component with minimum display time
   const LoadingSkeleton = () => {
@@ -302,8 +299,9 @@ const CourseExplorer = () => {
   const hasSearch = debouncedSearch.trim().length > 0;
   const hasActiveFilters = selectedRegion !== PRIMARY_REGIONS.ALL || selectedSubregion !== 'all' || hasSearch;
 
-  const startIndex = totalCount === 0 ? 0 : page * PAGE_SIZE + 1;
-  const endIndex = Math.min((page + 1) * PAGE_SIZE, totalCount);
+  const startIndex = totalCount === 0 ? 0 : page * COURSES_PAGE_SIZE + 1;
+  const endIndex = Math.min((page + 1) * COURSES_PAGE_SIZE, totalCount);
+  const hasNextPage = endIndex < totalCount;
 
   const handleResetFilters = () => {
     setSelectedRegion(PRIMARY_REGIONS.ALL);
@@ -437,38 +435,38 @@ const CourseExplorer = () => {
         {/* Scroll target for pagination */}
         <div ref={listTopRef} className="h-0" />
         
-        {/* Optional context line */}
+        {/* Context line with sort button */}
         {totalCount > 0 && (
-          <p className="text-xs text-muted-foreground">
-            {hasSearch ? (
-              <>
-                Results for "{debouncedSearch}" {selectedRegion === PRIMARY_REGIONS.ALL
-                  ? 'worldwide'
-                  : <>in <span className="font-medium text-foreground">{getRegionLabel()}</span></>}
-                {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
-              </>
-            ) : selectedRegion === PRIMARY_REGIONS.ALL ? (
-              'Showing all courses worldwide'
-            ) : (
-              <>
-                Showing courses in{' '}
-                <span className="font-medium text-foreground">{getRegionLabel()}</span>
-                {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
-              </>
-            )}
-          </p>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs text-muted-foreground flex-1">
+              {hasSearch ? (
+                <>
+                  Results for "{debouncedSearch}" {selectedRegion === PRIMARY_REGIONS.ALL
+                    ? 'worldwide'
+                    : <>in <span className="font-medium text-foreground">{getRegionLabel()}</span></>}
+                  {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
+                </>
+              ) : selectedRegion === PRIMARY_REGIONS.ALL ? (
+                'Showing all courses worldwide'
+              ) : (
+                <>
+                  Showing courses in{' '}
+                  <span className="font-medium text-foreground">{getRegionLabel()}</span>
+                  {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
+                </>
+              )}
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowSortSheet(true)}
+              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium bg-card border border-border/60 shadow-sm hover:bg-accent/50 transition-colors whitespace-nowrap"
+            >
+              <span className="text-muted-foreground">Sort:</span>
+              <span className="text-foreground">{sortLabelMap[sortOption]}</span>
+            </button>
+          </div>
         )}
 
-        {/* Unified Control Bar */}
-        {totalCount > 0 && (
-          <UnifiedControlBar
-            from={startIndex}
-            to={endIndex}
-            total={totalCount}
-            sortLabel={sortLabelMap[sortOption]}
-            onSortClick={() => setShowSortSheet(true)}
-          />
-        )}
           
         {/* Phase 2 Perf: Use virtualized list for better performance */}
         <VirtualizedCourseList 
@@ -476,28 +474,21 @@ const CourseExplorer = () => {
           onCourseClick={handleCourseClick}
         />
           
-          {/* Pagination Controls */}
-          <div className="flex justify-center items-center gap-3 mt-6 mb-0">
-            {page > 0 && (
-              <Button
-                variant="outline"
-                onClick={() => setPage((p) => p - 1)}
-                disabled={isLoading}
-                className="h-11 px-6 rounded-xl"
-              >
-                Previous {PAGE_SIZE} courses
-              </Button>
-            )}
-            {hasMore && (
-              <Button
-                variant="outline"
+          {/* Pagination Footer */}
+          <div className="flex flex-col items-center gap-3 py-8">
+            {hasNextPage && (
+              <button
+                type="button"
                 onClick={() => setPage((p) => p + 1)}
                 disabled={isLoading}
-                className="h-11 px-6 rounded-xl"
+                className="px-8 py-3 rounded-full border border-slate-300 bg-white text-sm font-medium text-slate-900 shadow-sm active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Next {PAGE_SIZE} courses
-              </Button>
+                Next {COURSES_PAGE_SIZE} courses
+              </button>
             )}
+            <p className="text-xs text-slate-500">
+              Showing {startIndex}–{endIndex} of {totalCount.toLocaleString()} courses
+            </p>
           </div>
         </div>
       )}
