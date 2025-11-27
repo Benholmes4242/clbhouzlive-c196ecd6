@@ -129,7 +129,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
         </div>
         <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 grid grid-cols-3 gap-0.5">
           {Array.from({ length: maxItems }).map((_, i) => (
-            <div key={i} className="aspect-square bg-muted/70 rounded-2xl animate-pulse border border-border/60 sm:border-border/40" />
+            <div key={i} className="aspect-square bg-muted/70 animate-pulse border border-border/60 sm:border-border/40" />
           ))}
         </div>
       </>
@@ -170,7 +170,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                 e.stopPropagation();
                 onSeeAllClick();
               }}
-              className="rounded-2xl overflow-hidden w-full aspect-square focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all hover:scale-[1.02] border border-border/60 sm:border-border/40"
+              className="overflow-hidden w-full aspect-square focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all hover:scale-[1.02] border border-border/60 sm:border-border/40"
               aria-label="Open Media tab"
             >
               <SquareCardMedia
