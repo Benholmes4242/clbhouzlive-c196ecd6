@@ -23,6 +23,8 @@ import { getOptimalPageSize } from '@/utils/deviceDetection';
 
 const PAGE_SIZE = 25; // Reduced from 50 to 25 for better performance
 
+type SortOption = 'popular' | 'rating_desc' | 'rating_asc' | 'name_asc' | 'name_desc';
+
 const CourseExplorer = () => {
   const listTopRef = useRef<HTMLDivElement>(null);
   const [searchParams] = useSearchParams();
@@ -86,6 +88,7 @@ const CourseExplorer = () => {
     return '';
   });
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
+  const [sortOption, setSortOption] = useState<SortOption>('popular');
 
   // Save filters to sessionStorage whenever they change (only after URL initialization)
   useEffect(() => {
@@ -159,7 +162,7 @@ const CourseExplorer = () => {
   // Reset page when filters change
   useEffect(() => {
     setPage(0);
-  }, [selectedRegion, selectedSubregion, debouncedSearch]);
+  }, [selectedRegion, selectedSubregion, debouncedSearch, sortOption]);
 
   // Scroll to top when page changes (for pagination buttons)
   useEffect(() => {
@@ -170,7 +173,7 @@ const CourseExplorer = () => {
 
   // Fetch courses with region filtering based on country
   const { data, isLoading } = useQuery({
-    queryKey: ['explore-courses', selectedRegion, selectedSubregion, debouncedSearch, page],
+    queryKey: ['explore-courses', selectedRegion, selectedSubregion, debouncedSearch, sortOption, page],
     queryFn: async () => {
       if (!mountedRef.current) throw new Error('Component unmounted');
       
@@ -198,9 +201,27 @@ const CourseExplorer = () => {
           query = query.ilike('name', `%${debouncedSearch}%`);
         }
 
-        // Order by global rank first (Top 100 courses), then alphabetically
-        query = query.order('global_rank', { ascending: true, nullsFirst: false });
-        query = query.order('name', { ascending: true });
+        // Apply sorting
+        switch (sortOption) {
+          case 'rating_desc':
+            query = query.order('global_rank', { ascending: true, nullsFirst: false });
+            break;
+          case 'rating_asc':
+            query = query.order('global_rank', { ascending: false, nullsFirst: true });
+            break;
+          case 'name_asc':
+            query = query.order('name', { ascending: true });
+            break;
+          case 'name_desc':
+            query = query.order('name', { ascending: false });
+            break;
+          case 'popular':
+          default:
+            // Popular: Top 100 courses first, then alphabetically
+            query = query.order('global_rank', { ascending: true, nullsFirst: false });
+            query = query.order('name', { ascending: true });
+            break;
+        }
         
         // Pagination
         const from = page * PAGE_SIZE;
@@ -402,7 +423,7 @@ const CourseExplorer = () => {
         
         {/* Compact meta info block: region + range on left, reset on right */}
         {totalCount > 0 && (
-          <div className="mt-3 space-y-1">
+          <div className="mt-3 space-y-2">
             <p className="text-sm md:text-base text-muted-foreground">
               {hasSearch ? (
                 <>
@@ -421,24 +442,43 @@ const CourseExplorer = () => {
                 </>
               )}
             </p>
-            <div className="flex items-center justify-between text-sm md:text-base text-muted-foreground">
-              <span>
-                {totalCount <= PAGE_SIZE && page === 0 ? (
-                  <>Showing all {totalCount} course{totalCount !== 1 && 's'}</>
-                ) : (
-                  <>Showing {startIndex}–{endIndex} of {totalCount.toLocaleString()} courses</>
+            <div className="flex items-center justify-between text-sm md:text-base">
+              <div className="flex items-center gap-4 text-muted-foreground">
+                <span>
+                  {totalCount <= PAGE_SIZE && page === 0 ? (
+                    <>Showing all {totalCount} course{totalCount !== 1 && 's'}</>
+                  ) : (
+                    <>Showing {startIndex}–{endIndex} of {totalCount.toLocaleString()} courses</>
+                  )}
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">Sort by</span>
+                  <Select value={sortOption} onValueChange={(value) => setSortOption(value as SortOption)}>
+                    <SelectTrigger className="h-9 w-[140px] text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="popular">Most popular</SelectItem>
+                      <SelectItem value="rating_desc">Highest rated</SelectItem>
+                      <SelectItem value="rating_asc">Lowest rated</SelectItem>
+                      <SelectItem value="name_asc">A → Z</SelectItem>
+                      <SelectItem value="name_desc">Z → A</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {hasActiveFilters && (
+                  <button
+                    type="button"
+                    onClick={handleResetFilters}
+                    className="inline-flex items-center gap-1 text-slate-700 hover:text-slate-900 text-sm"
+                  >
+                    <span className="text-[10px] leading-none">&times;</span>
+                    <span>Reset filters</span>
+                  </button>
                 )}
-              </span>
-              {hasActiveFilters && (
-                <button
-                  type="button"
-                  onClick={handleResetFilters}
-                  className="inline-flex items-center gap-1 text-slate-700 hover:text-slate-900 text-sm md:text-base"
-                >
-                  <span className="text-[10px] leading-none">&times;</span>
-                  <span>Reset filters</span>
-                </button>
-              )}
+              </div>
             </div>
           </div>
         )}

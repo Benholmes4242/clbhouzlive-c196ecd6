@@ -21,6 +21,8 @@ import { getOptimalPageSize } from '@/utils/deviceDetection';
 
 const PAGE_SIZE = getOptimalPageSize(50); // 30 on mobile, 50 on desktop
 
+type Top100SortOption = 'official' | 'name_asc' | 'name_desc';
+
 function listSlugToRegionKey(slug: string): PrimaryRegionKey {
   switch (slug) {
     case 'gb-i':
@@ -87,6 +89,7 @@ const GlobalTop100 = () => {
     return '';
   });
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
+  const [sortOption, setSortOption] = useState<Top100SortOption>('official');
 
   // Save filters to sessionStorage whenever they change (only after URL initialization)
   useEffect(() => {
@@ -126,7 +129,7 @@ const GlobalTop100 = () => {
   // Reset page when filters change
   useEffect(() => {
     setPage(0);
-  }, [selectedList, selectedSubregion, debouncedSearch]);
+  }, [selectedList, selectedSubregion, debouncedSearch, sortOption]);
 
   // Scroll to top when page changes (for pagination buttons)
   useEffect(() => {
@@ -172,15 +175,40 @@ const GlobalTop100 = () => {
     limit: PAGE_SIZE, // Uses mobile-optimized page size (30 on mobile, 50 on desktop)
   });
 
-  // Apply subregion filter client-side
+  // Apply subregion filter and sorting client-side
   const normalizedSelectedSub = selectedSubregion === 'all' ? null : selectedSubregion;
 
-  const filteredCourses = (courses || []).filter((course) => {
+  let filteredCourses = (courses || []).filter((course) => {
     if (!normalizedSelectedSub) return true;
 
     if (!course.sub_country) return false;
 
     return normalizeLabel(course.sub_country) === normalizedSelectedSub;
+  });
+
+  // Apply sorting
+  filteredCourses = [...filteredCourses].sort((a, b) => {
+    switch (sortOption) {
+      case 'name_asc':
+        return a.name.localeCompare(b.name);
+      case 'name_desc':
+        return b.name.localeCompare(a.name);
+      case 'official':
+      default:
+        // Sort by the relevant rank based on selected list
+        const rankA = selectedList.includes('global') ? a.list_memberships.find(m => m.list_slug.includes('global'))?.rank :
+                     selectedList.includes('usa') ? a.list_memberships.find(m => m.list_slug.includes('usa'))?.rank :
+                     selectedList.includes('gb-i') ? a.list_memberships.find(m => m.list_slug.includes('gb-i'))?.rank :
+                     selectedList.includes('europe') ? a.list_memberships.find(m => m.list_slug.includes('europe'))?.rank :
+                     a.list_memberships[0]?.rank;
+        const rankB = selectedList.includes('global') ? b.list_memberships.find(m => m.list_slug.includes('global'))?.rank :
+                     selectedList.includes('usa') ? b.list_memberships.find(m => m.list_slug.includes('usa'))?.rank :
+                     selectedList.includes('gb-i') ? b.list_memberships.find(m => m.list_slug.includes('gb-i'))?.rank :
+                     selectedList.includes('europe') ? b.list_memberships.find(m => m.list_slug.includes('europe'))?.rank :
+                     b.list_memberships[0]?.rank;
+        
+        return (rankA || 999) - (rankB || 999);
+    }
   });
 
   const totalCount = filteredCourses.length;
@@ -346,24 +374,41 @@ const GlobalTop100 = () => {
       </div>
 
       {/* Stats row */}
-      <div className="max-w-xl mx-auto mt-2 space-y-1">
+      <div className="max-w-xl mx-auto mt-2 space-y-2">
         <p className="text-sm md:text-base text-muted-foreground">
           Showing courses in <span className="font-medium">{currentListLabel}</span>
         </p>
-        <div className="flex items-center justify-between text-sm md:text-base text-muted-foreground">
-          <span>
-            Showing {startIndex}–{endIndex} of {totalCount} courses
-          </span>
-          {hasActiveFilters && (
-            <button
-              type="button"
-              onClick={handleResetFilters}
-              className="inline-flex items-center gap-1 text-slate-700 hover:text-slate-900 text-sm md:text-base"
-            >
-              <span className="text-[10px] leading-none">&times;</span>
-              <span>Reset filters</span>
-            </button>
-          )}
+        <div className="flex items-center justify-between text-sm md:text-base">
+          <div className="flex items-center gap-4 text-muted-foreground">
+            <span>
+              Showing {startIndex}–{endIndex} of {totalCount} courses
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Sort by</span>
+              <Select value={sortOption} onValueChange={(value) => setSortOption(value as Top100SortOption)}>
+                <SelectTrigger className="h-9 w-[150px] text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="official">Official ranking</SelectItem>
+                  <SelectItem value="name_asc">A → Z</SelectItem>
+                  <SelectItem value="name_desc">Z → A</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="inline-flex items-center gap-1 text-slate-700 hover:text-slate-900 text-sm"
+              >
+                <span className="text-[10px] leading-none">&times;</span>
+                <span>Reset filters</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

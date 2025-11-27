@@ -1,9 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy } from 'lucide-react';
+import { Trophy, ChevronRight } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMyTop100Progress } from '@/hooks/useMyTop100Progress';
-import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 const Top100ClubCallout: React.FC = () => {
   const { session } = useSupabaseSession();
@@ -20,65 +20,67 @@ const Top100ClubCallout: React.FC = () => {
 
   const coursesCount = progress?.total_played_top100 ?? 0;
   const regionsCount = progress?.regions_count ?? 0;
+  
+  // Calculate progress percentage (out of 100)
+  const progressPercent = Math.min((coursesCount / 100) * 100, 100);
 
   return (
     <section className="mb-4">
-      <div className="flex flex-col gap-4 rounded-2xl border border-border/60 bg-card px-4 py-3 shadow-sm sm:px-5 sm:py-4 text-center">
-        {/* Title + icon */}
-        <div className="flex items-center justify-center gap-3">
-          <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary-accent/10">
+      <Card 
+        onClick={handleClick}
+        className="cursor-pointer border border-border/60 bg-card shadow-lg shadow-black/5 hover:-translate-y-[1px] hover:shadow-xl transition-all"
+      >
+        <div className="flex flex-col items-center px-5 py-4 text-center">
+          {/* Icon in capsule */}
+          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary-accent/10 to-primary-accent/5">
             <Trophy className="h-5 w-5 text-primary-accent" />
           </div>
-          <div className="text-left">
-            <h3 className="text-sm font-semibold text-foreground">
-              Top 100 Club
-            </h3>
-            <p className="text-xs text-muted-foreground">
-              Elite pilgrimage mode for the whales and hardcore nuts chasing the
-              world&apos;s Top 100.
+
+          {/* Title */}
+          <h3 className="text-base font-semibold text-foreground">
+            Top 100 Club
+          </h3>
+
+          {/* Tagline */}
+          <p className="mt-1 text-xs text-muted-foreground">
+            Track your pilgrimage through the world&apos;s Top 100 courses.
+          </p>
+
+          {/* Progress line */}
+          {session ? (
+            <>
+              <p className="mt-2 text-xs font-medium text-foreground">
+                You&apos;ve played {coursesCount} Top 100 course{coursesCount === 1 ? '' : 's'} across {regionsCount} region{regionsCount === 1 ? '' : 's'}.
+              </p>
+
+              {/* Progress bar */}
+              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                <div
+                  className="h-full bg-primary-accent transition-all"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+            </>
+          ) : (
+            <p className="mt-2 text-xs text-muted-foreground">
+              Sign in to track your progress and see where you rank on the global leaderboard.
             </p>
-          </div>
-        </div>
+          )}
 
-        {/* Copy differs for signed-in vs logged-out */}
-        {session ? (
-          <p className="text-xs text-muted-foreground">
-            You&apos;ve played{' '}
-            <span className="font-semibold text-foreground">
-              {coursesCount}
-            </span>{' '}
-            Top 100 course{coursesCount === 1 ? '' : 's'}
-            {coursesCount > 0 && (
-              <>
-                {' '}
-                across{' '}
-                <span className="font-semibold text-foreground">
-                  {regionsCount}
-                </span>{' '}
-                region{regionsCount === 1 ? '' : 's'}.
-              </>
-            )}
-          </p>
-        ) : (
-          <p className="text-xs text-muted-foreground">
-            Track which Top 100 courses you&apos;ve conquered and see where you
-            rank on the global leaderboard.
-          </p>
-        )}
-
-        {/* CTA */}
-        <div>
-          <Button 
-            size="sm" 
-            className="w-full bg-[color:var(--surface-slate)] hover:bg-[color:var(--surface-slate)]/90 text-white" 
-            onClick={handleClick}
+          {/* CTA button */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClick();
+            }}
+            className="mt-3 inline-flex w-full items-center justify-center rounded-full border border-slate-500/70 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm active:scale-[0.99] transition hover:bg-slate-50"
           >
-            {session
-              ? 'Open your Top 100 Journey'
-              : 'Sign in to join the Top 100 Club'}
-          </Button>
+            {session ? 'Open your Top 100 Journey' : 'Sign in to join the Top 100 Club'}
+            <ChevronRight className="ml-1.5 h-4 w-4" />
+          </button>
         </div>
-      </div>
+      </Card>
     </section>
   );
 };
