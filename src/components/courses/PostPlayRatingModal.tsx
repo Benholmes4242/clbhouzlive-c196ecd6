@@ -12,6 +12,10 @@ import { formatCourseLocation } from '@/utils/courseLocation';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
+import { generateVideoThumbnail } from '@/utils/videoThumbnail';
+
+// Maximum number of media items (photos + videos) per review
+const MAX_REVIEW_MEDIA_ITEMS = 6;
 
 interface Course {
   id: string;
@@ -700,32 +704,49 @@ const PostPlayRatingModal = ({
     console.log('[Media Audit] CHECKPOINT A - Picked items:', files);
     console.log('[Media Audit] CHECKPOINT A - First picked item:', files[0]);
     
-    setSelectedMedia(prev => [...prev, ...files]);
+    // Respect 6-item maximum
+    const remainingSlots = MAX_REVIEW_MEDIA_ITEMS - selectedMedia.length;
+    const filesToAdd = files.slice(0, Math.max(0, remainingSlots));
     
-    // Generate previews for each file
+    if (filesToAdd.length === 0) {
+      return;
+    }
+    
+    // Show toast if user tried to add more than allowed
+    if (files.length > remainingSlots && remainingSlots > 0) {
+      toast({
+        title: "Media limit reached",
+        description: `You can attach up to ${MAX_REVIEW_MEDIA_ITEMS} photos or videos per review.`,
+      });
+    }
+    
+    // Generate ALL previews first, before updating state
     const newPreviews = new Map(mediaPreviews);
     
-    for (const file of files) {
-      if (file.type.startsWith('video/')) {
-        try {
+    for (const file of filesToAdd) {
+      try {
+        if (file.type.startsWith('video/')) {
           const thumbnail = await generateVideoThumbnail(file);
-          newPreviews.set(file, thumbnail);
-        } catch (error) {
-          console.error('Failed to generate video thumbnail:', error);
-          // Fallback to empty preview
-          newPreviews.set(file, '');
+          if (thumbnail) {
+            newPreviews.set(file, thumbnail);
+          }
+        } else {
+          const previewUrl = URL.createObjectURL(file);
+          newPreviews.set(file, previewUrl);
         }
-      } else {
-        // For images, use the file directly
-        newPreviews.set(file, URL.createObjectURL(file));
+      } catch (error) {
+        console.error('[Media] Failed to generate preview for file', file.name, error);
       }
     }
     
+    // Only after ALL previews are ready, update both states together
+    setSelectedMedia(prev => [...prev, ...filesToAdd]);
     setMediaPreviews(newPreviews);
     
-    console.log('[Media Audit] CHECKPOINT B - Setting state media. Total count:', files.length + selectedMedia.length);
-    console.log('[Media Audit] CHECKPOINT B - Preview map size:', newPreviews.size);
-    console.log('[Media Audit] CHECKPOINT B - First item in new previews:', Array.from(newPreviews.entries())[0]);
+    console.log('[Media Audit] CHECKPOINT B - State media after add:', {
+      count: selectedMedia.length + filesToAdd.length,
+      previewMapSize: newPreviews.size,
+    });
   };
 
   const handleRemoveMedia = (index: number) => {
@@ -1052,27 +1073,16 @@ const PostPlayRatingModal = ({
                       const target = e.target as HTMLInputElement;
                       if (target.files) {
                         const files = Array.from(target.files);
-                        const remainingSlots = 6 - selectedMedia.length;
-                        const filesToAdd = files.slice(0, remainingSlots);
-                        
-                        if (files.length > remainingSlots) {
-                          toast({
-                            title: "Too many files",
-                            description: `You can only add ${remainingSlots} more file${remainingSlots === 1 ? '' : 's'} (max 6 total).`,
-                            variant: "destructive",
-                          });
-                        }
-                        
-                        handleMediaSelected(filesToAdd);
+                        handleMediaSelected(files);
                       }
                     };
                     input.click();
                   }}
                   variant="outline"
-                  disabled={selectedMedia.length >= 6}
+                  disabled={selectedMedia.length >= MAX_REVIEW_MEDIA_ITEMS}
                   className="w-44 mt-6 h-11 rounded-lg border border-slate-600 bg-white px-6 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  {selectedMedia.length >= 6 ? 'Media limit reached' : 'Add Media'}
+                  {selectedMedia.length >= MAX_REVIEW_MEDIA_ITEMS ? 'Media limit reached' : 'Add Media'}
                 </Button>
               </div>
             </section>
