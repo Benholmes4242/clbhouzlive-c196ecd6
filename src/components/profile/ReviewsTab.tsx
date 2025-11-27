@@ -8,8 +8,6 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
 import { cn } from "@/lib/utils";
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
-import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
-import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import ReviewMediaThumb from './ReviewMediaThumb';
 import { MediaItem } from '@/types/media';
 import { ExploreContentItem } from '@/components/explore/types';
@@ -45,36 +43,6 @@ export default function ReviewsTab({
   reviews,
   courseId,
 }: ReviewsTabProps) {
-  const feed = useVerticalMediaFeed();
-
-  // Helper: map ONE review -> ONE ExploreContentItem with all its media
-  const reviewToExplore = (review: Review): ExploreContentItem => ({
-    id: review.id,
-    type: 'image', // Default, will be overridden by media
-    src: review.media?.[0]?.url || '',
-    title: review.text,
-    likes: review.helpfulCount,
-    user: {
-      id: review.id, // Using review id as user id for now
-      name: review.user.name,
-      avatar: review.user.avatarUrl,
-    },
-    media: (review.media || []).map((m) => ({
-      id: m.id,
-      media_type: m.type,
-      media_url: m.url,
-    })),
-  });
-
-  // Build posts array once we have reviews
-  const posts: ExploreContentItem[] = reviews.map(reviewToExplore);
-
-  // When a thumbnail is clicked, open the feed at that review and media index
-  const onThumbClick = (reviewIndex: number, mediaIndex: number) => {
-    // Make sure the hook sees the same posts array
-    feed.setPosts(posts);
-    feed.openFeed(posts[reviewIndex], { initialMediaIndex: mediaIndex });
-  };
   return (
     <div className="space-y-4 md:space-y-6">
       <SummaryBar
@@ -92,25 +60,10 @@ export default function ReviewsTab({
       <div className="space-y-4 md:space-y-5">
         {reviews
           .sort((a, b) => +new Date(b.dateISO) - +new Date(a.dateISO))
-          .map((r, reviewIndex) => (
-            <ReviewCard key={r.id} review={r} reviewIndex={reviewIndex} onThumbClick={onThumbClick} courseId={courseId} />
+          .map((r) => (
+            <ReviewCard key={r.id} review={r} courseId={courseId} />
           ))}
       </div>
-
-      {/* Vertical Feed Modal */}
-      {feed.initialItem && (
-        <DiscoverVerticalFeed
-          isOpen={feed.isOpen}
-          onClose={feed.closeFeed}
-          posts={feed.posts}
-          onLike={() => {}} // No-op for reviews
-          onLoadMore={() => {}}
-          hasMore={false}
-          isLoadingMore={false}
-          initialItem={feed.initialItem}
-          initialMediaIndex={feed.initialMediaIndex}
-        />
-      )}
     </div>
   );
 }
@@ -150,13 +103,9 @@ function SummaryBar({
 
 function ReviewCard({ 
   review, 
-  reviewIndex, 
-  onThumbClick,
   courseId
 }: { 
   review: Review; 
-  reviewIndex?: number;
-  onThumbClick?: (reviewIndex: number, mediaIndex: number) => void;
   courseId?: string;
 }) {
   const { user } = useSupabaseSession();
@@ -171,12 +120,8 @@ function ReviewCard({
   const MAX_THUMBS = 3;
 
   const openModal = (index: number) => {
-    if (FLAGS.USE_VERTICAL_FEED_FOR_PROFILE_MEDIA && onThumbClick && reviewIndex !== undefined) {
-      onThumbClick(reviewIndex, index);
-    } else {
-      setStartIndex(index);
-      setIsModalOpen(true);
-    }
+    setStartIndex(index);
+    setIsModalOpen(true);
   };
 
   // Vote handling logic
@@ -360,8 +305,8 @@ function ReviewCard({
         </div>
       </CardContent>
 
-      {/* Fullscreen Media Modal (only when not using vertical feed) */}
-      {!FLAGS.USE_VERTICAL_FEED_FOR_PROFILE_MEDIA && isModalOpen && review.media && review.media.length > 0 && (
+      {/* Fullscreen Media Modal */}
+      {isModalOpen && review.media && review.media.length > 0 && (
         <FullscreenMediaModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}

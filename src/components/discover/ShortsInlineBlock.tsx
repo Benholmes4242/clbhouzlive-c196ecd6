@@ -147,7 +147,13 @@ const ShortTile: React.FC<ShortTileProps> = ({ short, height, onClick }) => {
               <>
                 <Squircle width={24} height={24}>
                   {short.user.avatar ? (
-                    <img src={short.user.avatar} alt={short.user.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img 
+                      src={short.user.avatar} 
+                      alt={short.user.name} 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                      loading="lazy"
+                      decoding="async"
+                    />
                   ) : (
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.1)', fontSize: '10px', fontWeight: 600 }}>
                       {short.user.name[0].toUpperCase()}

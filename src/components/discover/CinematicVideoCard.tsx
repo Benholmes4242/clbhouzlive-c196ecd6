@@ -145,7 +145,13 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
           <div className="flex items-center gap-2 truncate max-w-[45vw]">
             <Squircle width={24} height={24}>
               {item.user?.avatar ? (
-                <img src={item.user.avatar} alt={item.user?.username || item.user?.name || 'User'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img 
+                  src={item.user.avatar} 
+                  alt={item.user?.username || item.user?.name || 'User'} 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                  loading="lazy"
+                  decoding="async"
+                />
               ) : (
                 <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.1)', fontSize: '10px', fontWeight: 600 }}>
                   {(item.user?.username?.[0] || item.user?.name?.[0] || 'U').toUpperCase()}
