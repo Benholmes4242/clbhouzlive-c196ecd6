@@ -24,7 +24,7 @@ export const FilterPillsRow: React.FC<FilterPillsRowProps> = ({
   className,
 }) => {
   return (
-    <section className={cn('px-4 pt-3 pb-1', className)}>
+    <section className={cn('px-4 pt-3 pb-3', className)}>
       <div className="flex items-center justify-between mb-2">
         <p className="text-[11px] font-semibold tracking-[0.08em] uppercase text-slate-500">
           Sort &amp; filter

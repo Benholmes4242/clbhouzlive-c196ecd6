@@ -120,9 +120,9 @@ const CourseLocationBreadcrumb: React.FC<CourseLocationBreadcrumbProps> = ({ cou
 
       {/* Quick filters - Seamless section */}
       <div>
-        <div className="text-sm font-semibold text-muted-foreground tracking-wide uppercase mb-3">
-          Explore more from here
-        </div>
+        <h2 className="text-lg font-semibold mb-3">
+          Explore More
+        </h2>
         
         <div className="space-y-2">
           {/* Sub-country filter */}

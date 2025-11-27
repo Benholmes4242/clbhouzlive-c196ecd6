@@ -32,7 +32,7 @@ export const CourseMediaSummaryCard: React.FC<CourseMediaSummaryCardProps> = ({
             No photos or videos yet
           </p>
           <p className="text-sm text-slate-500">
-            Help other golfers see {courseName || 'this course'} before they play – add your photos or a short video.
+            Help other golfers see {courseName || 'this course'} before they play - add your photos or a short video.
           </p>
         </div>
       </section>
