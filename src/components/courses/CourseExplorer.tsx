@@ -345,7 +345,7 @@ const CourseExplorer = () => {
           onChange={(e) => {
             setSearchTerm(e.target.value);
           }}
-          className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-xl shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--slate-secondary)]/70 focus-visible:border-[color:var(--slate-secondary)] transition-shadow text-base placeholder:text-[15px]"
+          className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-xl shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--slate-secondary)]/70 focus-visible:border-[color:var(--slate-secondary)] transition-shadow text-base placeholder:text-[15px]"
         />
         {searchTerm && (
           <button
@@ -365,7 +365,7 @@ const CourseExplorer = () => {
             setSelectedRegion(value as PrimaryRegionKey);
             setSelectedSubregion('all');
           }}>
-            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
+            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
               <div className="flex items-center">
                 <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
                 <SelectValue placeholder="Select region" />
@@ -391,7 +391,7 @@ const CourseExplorer = () => {
             onValueChange={setSelectedSubregion}
             disabled={selectedRegion === PRIMARY_REGIONS.ALL || !SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length}
           >
-            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
+            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
               <SelectValue placeholder="All sub-regions" />
             </SelectTrigger>
             <SelectContent className="bg-card border-border z-50">
@@ -459,7 +459,7 @@ const CourseExplorer = () => {
             <button
               type="button"
               onClick={() => setShowSortSheet(true)}
-              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium bg-card border border-border/60 shadow-sm hover:bg-accent/50 transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium bg-card border border-border/60 shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-accent/50 transition-colors whitespace-nowrap"
             >
               <span className="text-muted-foreground">Sort:</span>
               <span className="text-foreground">{sortLabelMap[sortOption]}</span>
@@ -481,7 +481,7 @@ const CourseExplorer = () => {
                 type="button"
                 onClick={() => setPage((p) => p + 1)}
                 disabled={isLoading}
-                className="px-8 py-3 rounded-full border border-slate-300 bg-white text-sm font-medium text-slate-900 shadow-sm active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-5 py-2.5 rounded-lg border border-border/60 bg-card text-sm font-medium text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-accent/50 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next {COURSES_PAGE_SIZE} courses
               </button>
@@ -499,25 +499,26 @@ const CourseExplorer = () => {
         onClose={() => setShowSortSheet(false)}
         ariaLabelledBy="sort-options-title"
       >
-        <div className="px-4 py-6 space-y-4">
-          <h2 id="sort-options-title" className="text-lg font-semibold">Sort by</h2>
-          <div className="space-y-2">
-            {(['popular', 'rating_desc', 'rating_asc', 'name_asc', 'name_desc'] as SortOption[]).map((option) => (
+        <div className="px-4 py-3">
+          {(['popular', 'rating_desc', 'rating_asc', 'name_asc', 'name_desc'] as SortOption[]).map((option, index, arr) => (
+            <React.Fragment key={option}>
               <button
-                key={option}
                 onClick={() => handleSortSelection(option)}
                 className={`
-                  w-full text-left px-4 py-3 rounded-lg transition-colors
+                  w-full text-left px-4 py-3.5 transition-colors rounded-lg
                   ${sortOption === option
-                    ? 'bg-accent text-accent-foreground font-medium'
-                    : 'hover:bg-accent/50'
+                    ? 'bg-slate-100 text-slate-900 font-medium'
+                    : 'text-slate-900 hover:bg-slate-50'
                   }
                 `}
               >
                 {sortLabelMap[option]}
               </button>
-            ))}
-          </div>
+              {index < arr.length - 1 && (
+                <div className="border-t border-slate-200/40 my-0.5" />
+              )}
+            </React.Fragment>
+          ))}
         </div>
       </BottomSheet>
     </div>
