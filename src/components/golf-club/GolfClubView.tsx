@@ -197,10 +197,10 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         {/* Tab Navigation - overlaid on hero */}
         <div className="absolute bottom-0 left-0 right-0 z-30">
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 h-12 bg-black/28 backdrop-blur-[22px] border-t border-white/6 rounded-none shadow-[0_8px_30px_rgba(0,0,0,0.45),0_0_1px_rgba(255,255,255,0.16)]">
-              <TabsTrigger value="about" className="text-lg text-white data-[state=active]:bg-white/16 data-[state=active]:backdrop-blur-[18px] data-[state=active]:border data-[state=active]:border-white/45 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,0,0,0.35)]">About</TabsTrigger>
-              <TabsTrigger value="reviews" className="text-lg text-white data-[state=active]:bg-white/16 data-[state=active]:backdrop-blur-[18px] data-[state=active]:border data-[state=active]:border-white/45 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,0,0,0.35)]">Reviews</TabsTrigger>
-              <TabsTrigger value="media" className="text-lg text-white data-[state=active]:bg-white/16 data-[state=active]:backdrop-blur-[18px] data-[state=active]:border data-[state=active]:border-white/45 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,0,0,0.35)]">Media</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 bg-black/28 backdrop-blur-[22px] border-t border-white/6 rounded-none shadow-[0_8px_30px_rgba(0,0,0,0.45),0_0_1px_rgba(255,255,255,0.16)] py-2.5 px-4 gap-2">
+              <TabsTrigger value="about" className="py-2 text-sm font-semibold text-white data-[state=active]:py-2.5 data-[state=active]:bg-white/16 data-[state=active]:backdrop-blur-[18px] data-[state=active]:border data-[state=active]:border-white/45 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,0,0,0.35)]">About</TabsTrigger>
+              <TabsTrigger value="reviews" className="py-2 text-sm font-semibold text-white data-[state=active]:py-2.5 data-[state=active]:bg-white/16 data-[state=active]:backdrop-blur-[18px] data-[state=active]:border data-[state=active]:border-white/45 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,0,0,0.35)]">Reviews</TabsTrigger>
+              <TabsTrigger value="media" className="py-2 text-sm font-semibold text-white data-[state=active]:py-2.5 data-[state=active]:bg-white/16 data-[state=active]:backdrop-blur-[18px] data-[state=active]:border data-[state=active]:border-white/45 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,0,0,0.35)]">Media</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -239,7 +239,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
               value="media" 
               className={`mt-0 transition-opacity duration-200 ${activeTab === 'media' ? 'opacity-100' : 'hidden'}`}
             >
-              <CourseMediaTab courseId={course.id} />
+              <CourseMediaTab courseId={course.id} courseName={course.name} />
             </TabsContent>
           )}
         </Tabs>

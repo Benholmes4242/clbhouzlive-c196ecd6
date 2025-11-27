@@ -16,13 +16,14 @@ import { MediaItem as StandardMediaItem } from '@/types/media';
 import { FLAGS } from '@/config/flags';
 // New components for media tab polish
 import { CourseMediaSummaryCard } from './CourseMediaSummaryCard';
-import { PillTabs, PillOption } from '@/components/ui/PillTabs';
+import { FilterPillsRow, FilterOption } from '@/components/ui/FilterPillsRow';
 import type { MediaFilterMode } from './MediaFilterRow';
 import { useCourseMediaSummary } from '@/hooks/useCourseMediaSummary';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface CourseMediaTabProps {
   courseId: string;
+  courseName?: string;
   portalTarget?: HTMLElement | null;
 }
 
@@ -46,7 +47,7 @@ interface LocalMediaItem {
   };
 }
 
-const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
+const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabProps) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const [selectedMediaIndex, setSelectedMediaIndex] = useState<number | null>(null);
@@ -104,8 +105,20 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
 
   const summary = useCourseMediaSummary(mediaSummaryItems, user?.id || null);
 
+  // Extract contributor info
+  const contributorIds = Array.from(new Set(exploreItems.map(item => item.user?.id).filter(Boolean))) as string[];
+  const contributorsCount = contributorIds.length;
+  const contributors = contributorIds.slice(0, 3).map(id => {
+    const item = exploreItems.find(i => i.user?.id === id);
+    return item?.user ? {
+      id: item.user.id,
+      name: item.user.name || 'Unknown',
+      avatarUrl: item.user.avatar || null
+    } : null;
+  }).filter(Boolean) as Array<{ id: string; name: string; avatarUrl: string | null }>;
+
   // Filter pill options
-  const filterOptions: PillOption[] = [
+  const filterOptions: FilterOption[] = [
     { id: 'most_recent', label: 'Most recent' },
     { id: 'photos', label: 'Photos' },
     { id: 'videos', label: 'Videos' },
@@ -228,16 +241,18 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
       <CourseMediaSummaryCard
         photoCount={summary.photoCount}
         videoCount={summary.videoCount}
+        contributorsCount={contributorsCount}
+        contributors={contributors}
+        courseName={courseName}
+        onAddMedia={() => navigate(`/courses/${courseId}/rate`)}
       />
 
       {/* Sort/Filter Bar */}
-      <div className="px-4 py-3 bg-slate-50">
-        <PillTabs
-          options={filterOptions}
-          activeId={filterMode}
-          onChange={(id) => setFilterMode(id as MediaFilterMode)}
-        />
-      </div>
+      <FilterPillsRow
+        options={filterOptions}
+        activeId={filterMode}
+        onChange={(id) => setFilterMode(id as MediaFilterMode)}
+      />
 
       {/* Empty state - matches Reviews tab styling */}
       {filteredItems.length === 0 && !isLoading && (
