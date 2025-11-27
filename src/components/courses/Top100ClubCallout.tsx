@@ -1,8 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy, ArrowRight } from 'lucide-react';
+import { Trophy, ChevronRight } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMyTop100Progress } from '@/hooks/useMyTop100Progress';
+import { Card } from '@/components/ui/card';
 
 const Top100ClubCallout: React.FC = () => {
   const { session } = useSupabaseSession();
@@ -24,70 +25,62 @@ const Top100ClubCallout: React.FC = () => {
   const progressPercent = Math.min((coursesCount / 100) * 100, 100);
 
   return (
-    <section 
-      onClick={handleClick}
-      className="mt-3 rounded-3xl border border-border/25 bg-card shadow-sm hover:-translate-y-[1px] hover:shadow-md transition-all cursor-pointer"
-    >
-      <div className="px-5 py-5">
-        {/* Top: icon */}
-        <div className="flex justify-center">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary-accent/15 to-primary-accent/5">
+    <section className="mb-4">
+      <Card 
+        onClick={handleClick}
+        className="cursor-pointer border border-border/60 bg-card shadow-lg shadow-black/5 hover:-translate-y-[1px] hover:shadow-xl transition-all"
+      >
+        <div className="flex flex-col items-center px-5 py-4 text-center">
+          {/* Icon in capsule */}
+          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary-accent/10 to-primary-accent/5">
             <Trophy className="h-5 w-5 text-primary-accent" />
           </div>
-        </div>
 
-        {/* Title + description */}
-        <div className="mt-3 text-center">
-          <h2 className="text-base font-semibold text-foreground">
+          {/* Title */}
+          <h3 className="text-base font-semibold text-foreground">
             Top 100 Club
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
+          </h3>
+
+          {/* Tagline */}
+          <p className="mt-1 text-xs text-muted-foreground">
             Track your pilgrimage through the world&apos;s Top 100 courses.
           </p>
-        </div>
 
-        {/* Stats line or sign-in prompt */}
-        {session ? (
-          <>
-            <p className="mt-3 text-center text-sm font-medium text-foreground">
-              You&apos;ve played {coursesCount} Top 100 course{coursesCount === 1 ? '' : 's'} across {regionsCount} region{regionsCount === 1 ? '' : 's'}.
-            </p>
+          {/* Progress line */}
+          {session ? (
+            <>
+              <p className="mt-2 text-xs font-medium text-foreground">
+                You&apos;ve played {coursesCount} Top 100 course{coursesCount === 1 ? '' : 's'} across {regionsCount} region{regionsCount === 1 ? '' : 's'}.
+              </p>
 
-            {/* Progress bar */}
-            <div className="mt-3">
-              <div className="h-2 w-full overflow-hidden rounded-full bg-muted/40">
+              {/* Progress bar */}
+              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
                 <div
-                  className="h-full rounded-full bg-primary-accent transition-[width] duration-300 ease-out"
+                  className="h-full bg-primary-accent transition-all"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
-              <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
-                <span>0</span>
-                <span>100 courses</span>
-              </div>
-            </div>
-          </>
-        ) : (
-          <p className="mt-3 text-center text-sm text-muted-foreground">
-            Sign in to track your progress and see where you rank on the global leaderboard.
-          </p>
-        )}
+            </>
+          ) : (
+            <p className="mt-2 text-xs text-muted-foreground">
+              Sign in to track your progress and see where you rank on the global leaderboard.
+            </p>
+          )}
 
-        {/* CTA button */}
-        <div className="mt-4 flex justify-center">
+          {/* CTA button */}
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
               handleClick();
             }}
-            className="inline-flex items-center justify-center rounded-full border border-border/60 bg-background px-5 py-2.5 text-sm font-semibold text-foreground shadow-sm hover:bg-accent/50 active:scale-[0.98] transition-all duration-150"
+            className="mt-3 inline-flex w-full items-center justify-center rounded-full border border-slate-500/70 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm active:scale-[0.99] transition hover:bg-slate-50"
           >
             {session ? 'Open your Top 100 Journey' : 'Sign in to join the Top 100 Club'}
-            <ArrowRight className="ml-1.5 h-4 w-4" />
+            <ChevronRight className="ml-1.5 h-4 w-4" />
           </button>
         </div>
-      </div>
+      </Card>
     </section>
   );
 };
