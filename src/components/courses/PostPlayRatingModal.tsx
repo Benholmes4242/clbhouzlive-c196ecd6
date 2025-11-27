@@ -697,6 +697,9 @@ const PostPlayRatingModal = ({
   };
 
   const handleMediaSelected = async (files: File[]) => {
+    console.log('[Media Audit] CHECKPOINT A - Picked items:', files);
+    console.log('[Media Audit] CHECKPOINT A - First picked item:', files[0]);
+    
     setSelectedMedia(prev => [...prev, ...files]);
     
     // Generate previews for each file
@@ -719,6 +722,10 @@ const PostPlayRatingModal = ({
     }
     
     setMediaPreviews(newPreviews);
+    
+    console.log('[Media Audit] CHECKPOINT B - Setting state media. Total count:', files.length + selectedMedia.length);
+    console.log('[Media Audit] CHECKPOINT B - Preview map size:', newPreviews.size);
+    console.log('[Media Audit] CHECKPOINT B - First item in new previews:', Array.from(newPreviews.entries())[0]);
   };
 
   const handleRemoveMedia = (index: number) => {
@@ -975,6 +982,17 @@ const PostPlayRatingModal = ({
                       {selectedMedia.map((file, index) => {
                         const isVideo = file.type.startsWith('video/');
                         const preview = mediaPreviews.get(file) || '';
+                        
+                        console.log('[Media Audit] CHECKPOINT C - Thumbnail render:', {
+                          index,
+                          fileName: file.name,
+                          fileType: file.type,
+                          isVideo,
+                          previewUrl: preview,
+                          previewExists: !!preview,
+                          previewLength: preview?.length || 0
+                        });
+                        
                         return (
                           <div key={index} className="relative w-full aspect-square overflow-hidden rounded-md">
                             {isVideo ? (
