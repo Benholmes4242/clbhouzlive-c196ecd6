@@ -194,23 +194,27 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
         {coords && (
           <>
-            <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 sm:px-0 md:px-4">
-              <CourseMapPreview
+            {!mapOpen && (
+              <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 sm:px-0 md:px-4">
+                <CourseMapPreview
+                  latitude={coords.lat}
+                  longitude={coords.lng}
+                  courseName={course.name}
+                  onOpenFullMap={() => setMapOpen(true)}
+                />
+              </div>
+            )}
+
+            {mapOpen && (
+              <CourseMapFullScreen
+                open={mapOpen}
+                onOpenChange={setMapOpen}
                 latitude={coords.lat}
                 longitude={coords.lng}
                 courseName={course.name}
-                onOpenFullMap={() => setMapOpen(true)}
+                locationText={formatCourseLocation(course)}
               />
-            </div>
-
-            <CourseMapFullScreen
-              open={mapOpen}
-              onOpenChange={setMapOpen}
-              latitude={coords.lat}
-              longitude={coords.lng}
-              courseName={course.name}
-              locationText={formatCourseLocation(course)}
-            />
+            )}
           </>
         )}
 
