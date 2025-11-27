@@ -24,30 +24,45 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
 
-  const visibleEntries = isExpanded ? leaderboard : leaderboard.slice(0, 3);
+  // Limit to max 10 entries
+  const trimmedLeaderboard = leaderboard.slice(0, 10);
+  const visibleEntries = isExpanded ? trimmedLeaderboard : trimmedLeaderboard.slice(0, 3);
 
   const getRankBadge = (index: number) => {
     const rank = index + 1;
-    const badges = {
-      1: { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700' },
-      2: { bg: 'bg-slate-100', border: 'border-slate-300', text: 'text-slate-700' },
-      3: { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-600' },
-    };
     
-    const style = badges[rank as keyof typeof badges] || { 
-      bg: 'bg-muted', 
-      border: 'border-border', 
-      text: 'text-muted-foreground' 
-    };
-
+    // Podium styling for ranks 1-3
+    if (rank === 1) {
+      return (
+        <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2 py-[2px] text-xs font-semibold text-amber-700">
+          #{rank}
+        </span>
+      );
+    }
+    if (rank === 2) {
+      return (
+        <span className="inline-flex items-center rounded-full border border-slate-300 bg-slate-100 px-2 py-[2px] text-xs font-semibold text-slate-700">
+          #{rank}
+        </span>
+      );
+    }
+    if (rank === 3) {
+      return (
+        <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2 py-[2px] text-xs font-semibold text-orange-600">
+          #{rank}
+        </span>
+      );
+    }
+    
+    // Ghost pill for ranks 4-10
     return (
-      <div className={`inline-flex items-center justify-center px-2 py-0.5 rounded-full border ${style.bg} ${style.border}`}>
-        <span className={`text-xs font-semibold ${style.text}`}>#{rank}</span>
-      </div>
+      <span className="inline-flex items-center rounded-full border border-border/60 bg-background/40 px-2 py-[2px] text-xs font-medium text-muted-foreground">
+        #{rank}
+      </span>
     );
   };
 
-  if (leaderboard.length === 0) {
+  if (trimmedLeaderboard.length === 0) {
     return null;
   }
 
@@ -69,7 +84,9 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
         </div>
 
         <div className="flex items-center gap-2">
-          {getRankBadge(0)}
+          <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 py-[2px] text-xs font-semibold text-amber-700">
+            Top 10
+          </span>
           {isExpanded ? (
             <ChevronUp className="w-5 h-5 text-muted-foreground" />
           ) : (
@@ -112,10 +129,10 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
       </div>
 
       {/* Show more indicator */}
-      {!isExpanded && leaderboard.length > 3 && (
+      {!isExpanded && trimmedLeaderboard.length > 3 && (
         <div className="px-5 py-2 text-center border-t border-border/60">
           <p className="text-xs text-muted-foreground">
-            +{leaderboard.length - 3} more player{leaderboard.length - 3 !== 1 ? 's' : ''}
+            +{trimmedLeaderboard.length - 3} more player{trimmedLeaderboard.length - 3 !== 1 ? 's' : ''}
           </p>
         </div>
       )}

@@ -49,27 +49,45 @@ const FriendsSnapshotCard: React.FC<FriendsSnapshotCardProps> = ({
           </div>
         </div>
 
-        {/* Stats Row */}
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <span className="text-foreground font-medium">{totalCourses}</span> different course{totalCourses !== 1 ? 's' : ''}
-          </span>
-          <span className="text-muted-foreground/50">•</span>
-          <span className="flex items-center gap-1">
-            in <span className="text-foreground font-medium">{totalRegions}</span> region{totalRegions !== 1 ? 's' : ''}
-          </span>
-          {averageRating && (
-            <>
-              <span className="text-muted-foreground/50">•</span>
-              <span className="flex items-center gap-1">
-                average rating <span className="text-foreground font-medium">{averageRating.toFixed(1)}/10</span>
-              </span>
-            </>
-          )}
-          <span className="text-muted-foreground/50">•</span>
-          <span className="flex items-center gap-1">
-            <span className="text-foreground font-medium">{totalRounds}</span> round{totalRounds !== 1 ? 's' : ''}
-          </span>
+        {/* Stats Grid - 2×2 layout */}
+        <div className="mt-3 grid grid-cols-2 gap-y-1 text-sm">
+          {/* Row 1: Courses / Regions */}
+          <div className="flex flex-col">
+            <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
+              Courses
+            </span>
+            <span className="font-medium">
+              {totalCourses} course{totalCourses !== 1 ? "s" : ""}
+            </span>
+          </div>
+
+          <div className="flex flex-col">
+            <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
+              Regions
+            </span>
+            <span className="font-medium">
+              {totalRegions} region{totalRegions !== 1 ? "s" : ""}
+            </span>
+          </div>
+
+          {/* Row 2: Average rating / Rounds */}
+          <div className="flex flex-col">
+            <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
+              Average rating
+            </span>
+            <span className="font-medium">
+              {averageRating ? `${averageRating.toFixed(1)}/10` : "—"}
+            </span>
+          </div>
+
+          <div className="flex flex-col">
+            <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
+              Rounds
+            </span>
+            <span className="font-medium">
+              {totalRounds} round{totalRounds !== 1 ? "s" : ""}
+            </span>
+          </div>
         </div>
       </div>
     </Card>
