@@ -445,7 +445,7 @@ const GlobalTop100 = () => {
           </div>
           
           {/* Pagination Footer */}
-          <div className="flex flex-col items-center gap-3 mt-8 pb-8">
+          <div className="flex flex-col items-center gap-3 mt-8">
             {hasNextPage && (
               <button
                 type="button"
