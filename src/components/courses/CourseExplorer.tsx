@@ -447,10 +447,10 @@ const CourseExplorer = () => {
                   {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
                 </>
               ) : selectedRegion === PRIMARY_REGIONS.ALL ? (
-                'Showing all courses worldwide'
+                'Exploring all courses worldwide'
               ) : (
                 <>
-                  Showing courses in{' '}
+                  Exploring courses in{' '}
                   <span className="font-medium text-foreground">{getRegionLabel()}</span>
                   {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
                 </>

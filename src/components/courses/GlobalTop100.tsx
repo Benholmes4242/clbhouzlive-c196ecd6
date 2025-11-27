@@ -388,7 +388,7 @@ const GlobalTop100 = () => {
       {totalCount > 0 && (
         <div className="flex items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground flex-1">
-            Showing courses in <span className="font-medium">{currentListLabel}</span>
+            Exploring the <span className="font-medium">{currentListLabel}</span>
           </p>
           <button
             type="button"
