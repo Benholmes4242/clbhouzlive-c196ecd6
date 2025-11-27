@@ -58,34 +58,39 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
   // Phase 1 Fix #2: Use shared hook - single query for all media consumers
   const { data: mediaResp, isLoading } = useClubMedia(courseId, 30);
 
-  // Phase 1 Fix #3: Simplified transformation pipeline - single pass
-  const { exploreItems, summary, contributors } = useMemo(() => {
-    const items = adaptClubMediaArrayToExploreItems(mediaResp ?? []);
-    
-    // Calculate summary and contributors in single pass
-    const summaryItems = items.map(item => ({
-      id: item.id,
-      type: item.type as 'image' | 'video',
-      createdAt: new Date().toISOString(),
-      author: { id: item.user?.id || '' },
-    }));
+  // Phase 1 Fix #3: Simplified transformation pipeline - pure data transformation
+  const exploreItems = useMemo(
+    () => adaptClubMediaArrayToExploreItems(mediaResp ?? []),
+    [mediaResp]
+  );
 
-    const contributorIds = Array.from(new Set(items.map(item => item.user?.id).filter(Boolean))) as string[];
-    const contributorsList = contributorIds.slice(0, 3).map(id => {
-      const item = items.find(i => i.user?.id === id);
+  // Build summary input items - pure memo
+  const summaryItems = useMemo(
+    () =>
+      exploreItems.map(item => ({
+        id: item.id,
+        type: item.type as 'image' | 'video',
+        createdAt: new Date().toISOString(),
+        author: { id: item.user?.id || '' },
+      })),
+    [exploreItems]
+  );
+
+  // ✅ Hook called at top level, outside any memo/effect
+  const summary = useCourseMediaSummary(summaryItems, user?.id || null);
+
+  // Contributors in separate memo - pure
+  const contributors = useMemo(() => {
+    const contributorIds = Array.from(new Set(exploreItems.map(item => item.user?.id).filter(Boolean))) as string[];
+    return contributorIds.slice(0, 3).map(id => {
+      const item = exploreItems.find(i => i.user?.id === id);
       return item?.user ? {
         id: item.user.id,
         name: item.user.name || 'Unknown',
         avatarUrl: item.user.avatar || null
       } : null;
     }).filter(Boolean) as Array<{ id: string; name: string; avatarUrl: string | null }>;
-
-    return {
-      exploreItems: items,
-      summary: useCourseMediaSummary(summaryItems, user?.id || null),
-      contributors: contributorsList,
-    };
-  }, [mediaResp, user?.id]);
+  }, [exploreItems]);
 
   // Filter pill options
   const filterOptions: FilterOption[] = [
