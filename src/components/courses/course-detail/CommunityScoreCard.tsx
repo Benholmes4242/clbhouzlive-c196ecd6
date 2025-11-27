@@ -41,11 +41,11 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
   // Empty state - no ratings yet
   if (totalRatings === 0) {
-    return (
-      <div className="mt-6 rounded-3xl bg-white shadow-sm px-4 py-6 sm:px-5 sm:py-7">
-        <h3 className="text-xl font-semibold text-slate-900">
-          Community Score
-        </h3>
+  return (
+    <div className="rounded-3xl bg-white shadow-sm px-4 py-6 sm:px-5 sm:py-7">
+      <h3 className="text-xl font-semibold text-slate-900">
+        Community Score
+      </h3>
         <p className="mt-1 text-base text-slate-500">
           No ratings yet – be the first to rate this course!
         </p>
@@ -137,7 +137,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   const tierData = getScoreTier(communityAverage);
 
   return (
-    <div className="mt-6 rounded-3xl bg-white shadow-sm px-5 py-6">
+    <div className="rounded-3xl bg-white shadow-sm px-5 py-6">
       {/* Header row */}
       <div className="flex items-start justify-between gap-4">
         {/* Left - title + meta */}
