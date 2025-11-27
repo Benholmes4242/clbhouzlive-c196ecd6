@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect, useCallback, forwardRef, useImperat
 import { Volume2, VolumeX } from 'lucide-react';
 import { safePlayAfterAnimation, safePlay, isIOS } from '@/utils/safePlay';
 import { logVideoTelemetry } from '@/utils/videoTelemetry';
+import { loadHlsJs } from '@/utils/hlsLoader';
 
 interface FlickerFreeHLSPlayerProps {
   hlsUrl: string;
@@ -69,19 +70,6 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
     return video.canPlayType('application/vnd.apple.mpegurl') !== '';
   };
 
-  // Load hls.js library
-  const loadHlsJs = async () => {
-    if (window.Hls) return window.Hls;
-    
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js';
-      script.onload = () => resolve(window.Hls);
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-  };
-
   // Safe src-swap sequence with proper cleanup
   useEffect(() => {
     const video = videoRef.current;
@@ -141,7 +129,7 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
           video.addEventListener("canplay", handleCanPlayOnce);
         } else {
           const Hls = await loadHlsJs();
-          if (Hls.isSupported()) {
+          if (Hls && Hls.isSupported()) {
             const hls = new Hls({
               maxBufferLength: 6,  // Modest buffer for mobile
               backBufferLength: 4,
