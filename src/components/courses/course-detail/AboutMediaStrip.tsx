@@ -135,7 +135,11 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     return (
       <>
         <div className="flex items-center justify-between mb-3 px-4">
-          <h2 className="text-lg md:text-xl font-semibold">Media</h2>
+          <div>
+            <p className="text-[11px] font-semibold tracking-[0.12em] uppercase text-slate-500">
+              Course media
+            </p>
+          </div>
         </div>
         <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 grid grid-cols-3 gap-[1px]">
           {Array.from({ length: maxItems }).map((_, i) => (
@@ -146,34 +150,57 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     );
   }
 
-  // Hide entire section if no media
-  if (!loading && !hasMedia) {
-    return null;
+  // Empty state when no media
+  if (!hasMedia) {
+    return (
+      <>
+        <div className="px-4 mb-3">
+          <p className="text-[11px] font-semibold tracking-[0.12em] uppercase text-slate-500 mb-2">
+            Course media
+          </p>
+        </div>
+        <div className="px-4">
+          <div className="rounded-2xl bg-white shadow-sm px-4 py-4 border border-slate-200">
+            <p className="text-sm font-medium text-slate-900 mb-1">
+              No photos or videos yet
+            </p>
+            <p className="text-sm text-slate-500 mb-3">
+              Help other golfers discover this course — be the first to share your experience.
+            </p>
+            <button
+              type="button"
+              onClick={onSeeAllClick}
+              className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold bg-slate-900 text-white shadow-sm transition"
+            >
+              Rate this course
+            </button>
+          </div>
+        </div>
+      </>
+    );
   }
 
   return (
     <>
       <div className="flex items-center justify-between mb-3 px-4">
         <div>
-          <h2 className="text-lg md:text-xl font-semibold">Media</h2>
-          {hasMedia && (
-            <p className="text-sm text-slate-600 mt-0.5">
-              {photoCount} photo{photoCount !== 1 ? 's' : ''}   {videoCount} video{videoCount !== 1 ? 's' : ''}
-            </p>
-          )}
+          <p className="text-[11px] font-semibold tracking-[0.12em] uppercase text-slate-500">
+            Course media
+          </p>
+          <p className="mt-1 text-sm font-medium text-slate-900">
+            {photoCount} {photoCount === 1 ? 'photo' : 'photos'} · {videoCount} {videoCount === 1 ? 'video' : 'videos'}
+          </p>
         </div>
-        {hasMedia && (
-          <button
-            type="button"
-            className="text-sm font-medium text-foreground hover:underline"
-            onClick={(e) => {
-              e.stopPropagation();
-              onSeeAllClick();
-            }}
-          >
-            See all
-          </button>
-        )}
+        <button
+          type="button"
+          className="text-sm font-medium text-foreground hover:underline"
+          onClick={(e) => {
+            e.stopPropagation();
+            onSeeAllClick();
+          }}
+        >
+          See all
+        </button>
       </div>
 
       <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 grid grid-cols-3 gap-[1px]">
@@ -185,7 +212,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
               e.stopPropagation();
               onSeeAllClick();
             }}
-            className="overflow-hidden w-full aspect-square focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all border border-border/60 sm:border-border/40"
+            className="overflow-hidden w-full aspect-square focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow hover:shadow-md border border-border/60 sm:border-border/40"
             aria-label="Open Media tab"
           >
             <SquareCardMedia
