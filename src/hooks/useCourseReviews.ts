@@ -151,7 +151,8 @@ export function useCourseReviews(
 
       return reviews;
     },
-    staleTime: 0, // Always refetch when explicitly requested
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 30 * 60 * 1000,  // 30 min – reviews are stable
+    gcTime:   60 * 60 * 1000,  // 60 min – keep for session
+    refetchOnWindowFocus: false,
   });
 }

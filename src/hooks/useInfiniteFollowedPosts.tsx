@@ -29,7 +29,10 @@ export const useInfiniteClubhouseShorts = () => {
     },
     getNextPageParam: (lastPage: any) => lastPage.nextCursor,
     initialPageParam: null,
-    staleTime: 30_000, // 30s for explore feed
+    staleTime: 2 * 60 * 1000,   // 2 min – fine for feed scrolling
+    gcTime:   5 * 60 * 1000,   // 5 min – limits memory growth
+    refetchOnWindowFocus: false,
+    refetchOnReconnect:   false,
     dedupe: true,
     ttl: 3000,
   });
@@ -85,7 +88,10 @@ export const useInfiniteFollowedPosts = () => {
     },
     getNextPageParam: (lastPage: any) => lastPage.nextCursor,
     initialPageParam: 0,
-    staleTime: 2 * 60 * 1000, // 2 minutes for social feed
+    staleTime: 2 * 60 * 1000,   // 2 min – avoids hammering Supabase
+    gcTime:   5 * 60 * 1000,   // 5 min – free memory between sessions
+    refetchOnWindowFocus: false,
+    refetchOnReconnect:   false,
     dedupe: true,
     ttl: 3000,
   });
