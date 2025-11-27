@@ -308,14 +308,13 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
             <p className="mt-1 text-xs text-slate-500">
               Be the first to share your experience at {courseName}.
             </p>
-            <Button
+            <button
               type="button"
-              className="mt-3 w-full h-11 rounded-lg"
-              variant="outline"
+              className="mt-3 w-full h-11 rounded-lg inline-flex items-center justify-center px-4 py-2 text-sm font-semibold bg-white text-slate-900 border border-slate-600 shadow-sm transition"
               onClick={handleRateClick}
             >
               Rate this course
-            </Button>
+            </button>
           </div>
         </section>
       </div>

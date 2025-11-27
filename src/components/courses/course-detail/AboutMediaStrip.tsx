@@ -155,12 +155,12 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     return (
       <>
         <div className="px-4 mb-3">
-          <p className="text-[11px] font-semibold tracking-[0.12em] uppercase text-slate-500 mb-2">
-            Course media
-          </p>
+          <h3 className="text-lg font-semibold text-slate-900">
+            Media
+          </h3>
         </div>
         <div className="px-4">
-          <div className="rounded-2xl bg-white shadow-sm px-4 py-4 border border-slate-200">
+          <div className="rounded-2xl bg-white shadow-sm px-4 py-4 border border-slate-200 text-center">
             <p className="text-sm font-medium text-slate-900 mb-1">
               No photos or videos yet
             </p>
@@ -170,7 +170,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
             <button
               type="button"
               onClick={onSeeAllClick}
-              className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold bg-slate-900 text-white shadow-sm transition"
+              className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold bg-white text-slate-900 border border-slate-600 shadow-sm transition"
             >
               Rate this course
             </button>
@@ -184,9 +184,9 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     <>
       <div className="flex items-center justify-between mb-3 px-4">
         <div>
-          <p className="text-[11px] font-semibold tracking-[0.12em] uppercase text-slate-500">
-            Course media
-          </p>
+          <h3 className="text-lg font-semibold text-slate-900">
+            Media
+          </h3>
           <p className="mt-1 text-sm font-medium text-slate-900">
             {photoCount} {photoCount === 1 ? 'photo' : 'photos'} · {videoCount} {videoCount === 1 ? 'video' : 'videos'}
           </p>
