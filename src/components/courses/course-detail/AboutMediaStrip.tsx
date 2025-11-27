@@ -170,7 +170,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                 e.stopPropagation();
                 onSeeAllClick();
               }}
-              className="overflow-hidden w-full aspect-square focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all hover:scale-[1.02] border border-border/60 sm:border-border/40"
+              className="overflow-hidden w-full aspect-square focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all border border-border/60 sm:border-border/40"
               aria-label="Open Media tab"
             >
               <SquareCardMedia
