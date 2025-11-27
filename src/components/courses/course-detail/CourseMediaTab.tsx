@@ -424,7 +424,7 @@ const CourseMediaTab = ({ courseId, portalTarget }: CourseMediaTabProps) => {
             <button
               key={item.id}
               onClick={() => handleMediaClick(item)}
-              className="relative aspect-square rounded-[var(--squircle-radius)] overflow-hidden bg-slate-200 border border-slate-300/40 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-150"
+              className="relative aspect-square rounded-[var(--squircle-radius)] overflow-hidden bg-slate-200 border border-slate-300/40 shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-150"
             >
               {/* Thumbnail image */}
               <img
