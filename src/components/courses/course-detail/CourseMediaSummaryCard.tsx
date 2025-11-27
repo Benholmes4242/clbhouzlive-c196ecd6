@@ -24,25 +24,16 @@ export const CourseMediaSummaryCard: React.FC<CourseMediaSummaryCardProps> = ({
   if (!hasMedia) {
     return (
       <section className="px-4 pt-4 pb-6">
-        <div className="rounded-2xl bg-white shadow-[0_8px_24px_rgba(15,23,42,0.06)] px-4 py-4">
+        <div className="rounded-2xl bg-white shadow-[0_8px_24px_rgba(15,23,42,0.06)] px-4 py-4 text-center">
           <p className="text-[11px] font-semibold tracking-[0.12em] uppercase text-slate-500 mb-1.5">
             Course media
           </p>
           <p className="text-sm font-medium text-slate-900 mb-1">
             No photos or videos yet
           </p>
-          <p className="text-sm text-slate-500 mb-3">
+          <p className="text-sm text-slate-500">
             Help other golfers see {courseName || 'this course'} before they play – add your photos or a short video.
           </p>
-          {onAddMedia && (
-          <button
-            type="button"
-            onClick={onAddMedia}
-            className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold bg-slate-900 text-white shadow-sm transition"
-          >
-            Add photos or videos
-          </button>
-          )}
         </div>
       </section>
     );
