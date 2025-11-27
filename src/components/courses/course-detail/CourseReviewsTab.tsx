@@ -7,9 +7,11 @@ import { useToast } from '@/hooks/use-toast';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { ReviewCard } from '../review/ReviewCard';
 import { ReviewsHeaderCard } from '../review/ReviewsHeaderCard';
-import { SortFilterBar, SortOption } from '../review/SortFilterBar';
+import { FilterPillsRow, FilterOption } from '@/components/ui/FilterPillsRow';
 import { Button } from '@/components/ui/button';
 import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
+
+export type SortOption = 'recent' | 'highest' | 'helpful';
 
 interface CourseReviewsTabProps {
   courseId: string;
@@ -53,6 +55,13 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   // Sorting and filtering state
   const [sortBy, setSortBy] = useState<SortOption>('recent');
+
+  // Filter pill options for Reviews tab
+  const sortOptions: FilterOption[] = [
+    { id: 'recent', label: 'Most recent' },
+    { id: 'highest', label: 'Highest rated' },
+    { id: 'helpful', label: 'Most helpful' },
+  ];
 
   // Fetch rating aggregates (same query as About tab)
   const { data: ratingAggregates } = useCourseRatingAggregates(courseId);
@@ -327,9 +336,10 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       </section>
 
       {/* Section 2 – Sort/Filter Bar */}
-      <SortFilterBar
-        sortBy={sortBy}
-        onSortChange={setSortBy}
+      <FilterPillsRow
+        options={sortOptions}
+        activeId={sortBy}
+        onChange={(id) => setSortBy(id as SortOption)}
       />
 
       {/* Section 3 – Your review + other reviews */}
