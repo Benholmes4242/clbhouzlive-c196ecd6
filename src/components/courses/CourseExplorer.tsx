@@ -20,6 +20,8 @@ import {
   subregionKeyToLabel,
 } from '@/constants/courseRegions';
 import { getOptimalPageSize } from '@/utils/deviceDetection';
+import { UnifiedControlBar } from './UnifiedControlBar';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 
 const PAGE_SIZE = 25; // Reduced from 50 to 25 for better performance
 
@@ -89,6 +91,7 @@ const CourseExplorer = () => {
   });
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
   const [sortOption, setSortOption] = useState<SortOption>('popular');
+  const [showSortSheet, setShowSortSheet] = useState(false);
 
   // Save filters to sessionStorage whenever they change (only after URL initialization)
   useEffect(() => {
@@ -319,6 +322,19 @@ const CourseExplorer = () => {
     sessionStorage.setItem('explore-scroll', window.scrollY.toString());
   };
 
+  const sortLabelMap: Record<SortOption, string> = {
+    popular: 'Most popular',
+    rating_desc: 'Highest rated',
+    rating_asc: 'Lowest rated',
+    name_asc: 'A–Z',
+    name_desc: 'Z–A',
+  };
+
+  const handleSortSelection = (option: SortOption) => {
+    setSortOption(option);
+    setShowSortSheet(false);
+  };
+
   return (
     <div className="mt-4 space-y-4 max-w-2xl mx-auto px-4 pb-0">
       {/* Scroll to top button */}
@@ -421,72 +437,44 @@ const CourseExplorer = () => {
         {/* Scroll target for pagination */}
         <div ref={listTopRef} className="h-0" />
         
-        {/* Compact meta info block: region + range on left, reset on right */}
+        {/* Optional context line */}
         {totalCount > 0 && (
-          <div className="mt-3 space-y-2">
-            <p className="text-sm md:text-base text-muted-foreground">
-              {hasSearch ? (
-                <>
-                  Results for "{debouncedSearch}" {selectedRegion === PRIMARY_REGIONS.ALL
-                    ? 'worldwide'
-                    : <>in <span className="font-medium text-foreground">{getRegionLabel()}</span></>}
-                  {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
-                </>
-              ) : selectedRegion === PRIMARY_REGIONS.ALL ? (
-                'Showing all courses worldwide'
-              ) : (
-                <>
-                  Showing courses in{' '}
-                  <span className="font-medium text-foreground">{getRegionLabel()}</span>
-                  {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
-                </>
-              )}
-            </p>
-            <div className="flex items-center justify-between text-sm md:text-base">
-              <div className="flex items-center gap-4 text-muted-foreground">
-                <span>
-                  {totalCount <= PAGE_SIZE && page === 0 ? (
-                    <>Showing all {totalCount} course{totalCount !== 1 && 's'}</>
-                  ) : (
-                    <>Showing {startIndex}–{endIndex} of {totalCount.toLocaleString()} courses</>
-                  )}
-                </span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">Sort by</span>
-                  <Select value={sortOption} onValueChange={(value) => setSortOption(value as SortOption)}>
-                    <SelectTrigger className="h-9 w-[140px] text-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="popular">Most popular</SelectItem>
-                      <SelectItem value="rating_desc">Highest rated</SelectItem>
-                      <SelectItem value="rating_asc">Lowest rated</SelectItem>
-                      <SelectItem value="name_asc">A → Z</SelectItem>
-                      <SelectItem value="name_desc">Z → A</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                {hasActiveFilters && (
-                  <button
-                    type="button"
-                    onClick={handleResetFilters}
-                    className="inline-flex items-center gap-1 text-slate-700 hover:text-slate-900 text-sm"
-                  >
-                    <span className="text-[10px] leading-none">&times;</span>
-                    <span>Reset filters</span>
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
+          <p className="text-xs text-muted-foreground">
+            {hasSearch ? (
+              <>
+                Results for "{debouncedSearch}" {selectedRegion === PRIMARY_REGIONS.ALL
+                  ? 'worldwide'
+                  : <>in <span className="font-medium text-foreground">{getRegionLabel()}</span></>}
+                {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
+              </>
+            ) : selectedRegion === PRIMARY_REGIONS.ALL ? (
+              'Showing all courses worldwide'
+            ) : (
+              <>
+                Showing courses in{' '}
+                <span className="font-medium text-foreground">{getRegionLabel()}</span>
+                {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
+              </>
+            )}
+          </p>
         )}
-          {/* Phase 2 Perf: Use virtualized list for better performance */}
-          <VirtualizedCourseList 
-            courses={courses}
-            onCourseClick={handleCourseClick}
+
+        {/* Unified Control Bar */}
+        {totalCount > 0 && (
+          <UnifiedControlBar
+            from={startIndex}
+            to={endIndex}
+            total={totalCount}
+            sortLabel={sortLabelMap[sortOption]}
+            onSortClick={() => setShowSortSheet(true)}
           />
+        )}
+          
+        {/* Phase 2 Perf: Use virtualized list for better performance */}
+        <VirtualizedCourseList 
+          courses={courses}
+          onCourseClick={handleCourseClick}
+        />
           
           {/* Pagination Controls */}
           <div className="flex justify-center items-center gap-3 mt-6 mb-0">
@@ -513,6 +501,34 @@ const CourseExplorer = () => {
           </div>
         </div>
       )}
+
+      {/* Sort Bottom Sheet */}
+      <BottomSheet
+        open={showSortSheet}
+        onClose={() => setShowSortSheet(false)}
+        ariaLabelledBy="sort-options-title"
+      >
+        <div className="px-4 py-6 space-y-4">
+          <h2 id="sort-options-title" className="text-lg font-semibold">Sort by</h2>
+          <div className="space-y-2">
+            {(['popular', 'rating_desc', 'rating_asc', 'name_asc', 'name_desc'] as SortOption[]).map((option) => (
+              <button
+                key={option}
+                onClick={() => handleSortSelection(option)}
+                className={`
+                  w-full text-left px-4 py-3 rounded-lg transition-colors
+                  ${sortOption === option
+                    ? 'bg-accent text-accent-foreground font-medium'
+                    : 'hover:bg-accent/50'
+                  }
+                `}
+              >
+                {sortLabelMap[option]}
+              </button>
+            ))}
+          </div>
+        </div>
+      </BottomSheet>
     </div>
   );
 };
