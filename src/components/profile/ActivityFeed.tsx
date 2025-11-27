@@ -12,9 +12,8 @@ import { Video, Image, MapPin, Trophy } from 'lucide-react';
 import { IoFilter } from 'react-icons/io5';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 import { useActivityPosts } from './hooks/useActivityPosts';
-import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import ExploreGrid from '@/components/explore/ExploreGrid';
-import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
+import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { ExploreContentItem } from '@/components/explore/types';
 import { ActivityPost } from './types/ActivityTypes';
 
@@ -38,7 +37,8 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   onAchievementsClick
 }) => {
   const { posts, loading, fetchUserPosts } = useActivityPosts(userId);
-  const { isOpen, initialItem, openFeed, closeFeed } = useVerticalMediaFeed();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalStartIndex, setModalStartIndex] = useState(0);
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [achievementsModalOpen, setAchievementsModalOpen] = useState(false);
 
@@ -110,8 +110,13 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   }, []);
 
   const handleMediaClick = useCallback((item: ExploreContentItem) => {
-    openFeed(item);
-  }, [openFeed]);
+    // Find the index in exploreContent
+    const clickedIndex = exploreContent.findIndex(content => content.id === item.id);
+    if (clickedIndex !== -1) {
+      setModalStartIndex(clickedIndex);
+      setModalOpen(true);
+    }
+  }, [exploreContent]);
 
   const handleLoadMore = useCallback(() => {
     // No pagination for profile posts currently
@@ -204,19 +209,14 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
         />
       )}
 
-      {/* Vertical Media Feed Modal */}
-      {isOpen && initialItem && (
-        <DiscoverVerticalFeed
-          isOpen={isOpen}
-          onClose={closeFeed}
-          posts={exploreContent}
-          onLike={handleLike}
-          onLoadMore={handleLoadMore}
-          hasMore={false}
-          isLoadingMore={false}
-          initialItem={initialItem}
-        />
-      )}
+      {/* Fullscreen Media Modal */}
+      <FullscreenMediaModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        mediaUrl={exploreContent.map(item => item.src)}
+        mediaType={exploreContent.map(item => item.type === 'cta' ? 'image' : item.type)}
+        initialIndex={modalStartIndex}
+      />
 
       {/* Achievements Modal */}
       <ClbhouzAchievementsModal

@@ -11,7 +11,6 @@ import SlidingPanels from '@/components/ui/SlidingPanels';
 import { useVideoLengthFilter } from '@/hooks/useVideoLengthFilter';
 import { DURATION_FILTERS } from '@/constants/videoFilters';
 
-import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 // import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned'; // Stored for future use
 import DiscoverContent from '@/components/discover/DiscoverContent';
 import { ChannelsFeed } from '@/components/channels/ChannelsFeed';
@@ -31,9 +30,6 @@ const VideosPage = lazy(() => import('@/features/videos2/pages/VideosPage'));
 type MainKey = 'shorts' | 'videos' | 'channels' | 'following';
 
 const Discover = () => {
-  // Use vertical feed for consistency with Activity tab
-  const USE_MODAL_DISCOVER = false; // using DiscoverVerticalFeed for consistency
-  
   const [modalOpen, setModalOpen] = useState(false);
   const [modalStartIndex, setModalStartIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
@@ -78,15 +74,6 @@ const Discover = () => {
     hasMore, 
     loadMore 
   } = useInfiniteExploreContent(activeFilter, sub, durationRange);
-
-  const { 
-    isOpen: isFeedOpen, 
-    posts: feedPosts,
-    initialItem, 
-    openFeed, 
-    closeFeed,
-    setPosts
-  } = useVerticalMediaFeed();
 
   const { optimisticPosts } = useOptimisticPostInsertion();
 
@@ -142,19 +129,13 @@ const Discover = () => {
   };
 
   const handleMediaClick = (item: any) => {
-    if (USE_MODAL_DISCOVER) {
-      // Find the index of the clicked item in our flattened media array
-      const clickedIndex = mediaItems.findIndex(mediaItem => 
-        mediaItem.url === item.src || mediaItem.id === item.id
-      );
-      if (clickedIndex !== -1) {
-        setModalStartIndex(clickedIndex);
-        setModalOpen(true);
-      }
-    } else {
-      // Use vertical feed - set posts and open feed, using allContent instead of content
-      setPosts(allContent || []);
-      openFeed(item);
+    // Find the index of the clicked item in our flattened media array
+    const clickedIndex = mediaItems.findIndex(mediaItem => 
+      mediaItem.url === item.src || mediaItem.id === item.id
+    );
+    if (clickedIndex !== -1) {
+      setModalStartIndex(clickedIndex);
+      setModalOpen(true);
     }
   };
 
@@ -249,32 +230,14 @@ const Discover = () => {
       </FadeInContent>
 
 
-        {/* Conditional Modal/Feed based on feature flag */}
-        {USE_MODAL_DISCOVER ? (
-          // New FullscreenMediaModal approach
-          <FullscreenMediaModal
-            isOpen={modalOpen}
-            onClose={() => setModalOpen(false)}
-            mediaUrl={mediaItems.map(item => item.url)}
-            mediaType={mediaItems.map(item => item.type)}
-            initialIndex={modalStartIndex}
-            // Optional: Add user info if available from posts
-          />
-        ) : (
-          // DiscoverVerticalFeed approach
-          initialItem && (
-            <DiscoverVerticalFeed
-              isOpen={isFeedOpen}
-              onClose={closeFeed}
-              posts={feedPosts}
-              onLike={handleLike}
-              onLoadMore={loadMore}
-              hasMore={hasMore}
-              isLoadingMore={loading}
-              initialItem={initialItem}
-            />
-          )
-        )}
+        {/* Fullscreen Media Modal */}
+        <FullscreenMediaModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          mediaUrl={mediaItems.map(item => item.url)}
+          mediaType={mediaItems.map(item => item.type)}
+          initialIndex={modalStartIndex}
+        />
 
         <style>{`
           .scrollbar-hide {
