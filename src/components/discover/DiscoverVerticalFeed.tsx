@@ -28,6 +28,29 @@ import { MediaNavigationDots } from '@/components/posts/user-post/overlays/Media
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import { FLAGS } from '@/config/flags';
 
+// Video ref management - keep only current + neighbors to prevent memory leaks
+const MAX_VIDEO_REFS = 20;
+const VIDEO_WINDOW_RADIUS = 2; // keep current ± 2 posts "warm"
+
+// Helper to compute which video IDs to keep in memory
+function computeAllowedVideoIds(
+  posts: { id: string }[],
+  currentIndex: number
+): Set<string> {
+  const allowed = new Set<string>();
+
+  if (!posts || posts.length === 0) return allowed;
+
+  const start = Math.max(0, currentIndex - VIDEO_WINDOW_RADIUS);
+  const end = Math.min(posts.length - 1, currentIndex + VIDEO_WINDOW_RADIUS);
+
+  for (let i = start; i <= end; i++) {
+    const post = posts[i];
+    if (post?.id) allowed.add(post.id);
+  }
+
+  return allowed;
+}
 
 interface DiscoverVerticalFeedProps {
   isOpen: boolean;
@@ -50,7 +73,8 @@ const VideoWithAutoplay: React.FC<{
   objectFit?: 'cover' | 'contain';
   shouldAttach: boolean;
   autoplay: boolean;
-}> = React.memo(({ src, muted, className, objectFit = 'contain', shouldAttach, autoplay }) => {
+  isActive?: boolean;
+}> = React.memo(({ src, muted, className, objectFit = 'contain', shouldAttach, autoplay, isActive = true }) => {
   const [apiHlsUrl, setApiHlsUrl] = useState<string | null>(null);
   const [apiPoster, setApiPoster] = useState<string | null>(null);
   const { getHlsUrl } = useHlsUrlCache();
@@ -101,6 +125,7 @@ const VideoWithAutoplay: React.FC<{
           externallyManaged={true}
           showMuteButton={false}
           fit={objectFit}
+          isActive={isActive}
         />
       ) : (
         <div className="absolute inset-0 w-full h-full bg-black flex items-center justify-center">
@@ -192,6 +217,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   const [swipeDisabled, setSwipeDisabled] = useState(false);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
+  const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
   const nearObserverRef = useRef<IntersectionObserver | null>(null);
   const playObserverRef = useRef<IntersectionObserver | null>(null);
   const queryClient = useQueryClient();
@@ -283,6 +309,35 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
       }
     }
   }, [isOpen, initialItem, posts, initialMediaIndex]);
+
+  // Prune videoRefs to prevent memory leaks
+  useEffect(() => {
+    if (!posts || posts.length === 0) return;
+
+    const allowedIds = computeAllowedVideoIds(posts, currentIndex);
+
+    const entries = Object.entries(videoRefs.current);
+    if (entries.length <= MAX_VIDEO_REFS && allowedIds.size === entries.length) {
+      return;
+    }
+
+    const pruned: { [key: string]: HTMLVideoElement | null } = {};
+
+    for (const [key, value] of entries) {
+      if (allowedIds.has(key)) {
+        pruned[key] = value;
+      } else {
+        // Pause and clear video that's being pruned
+        if (value) {
+          value.pause();
+          value.removeAttribute('src');
+          value.load();
+        }
+      }
+    }
+
+    videoRefs.current = pruned;
+  }, [posts, currentIndex]);
 
   // Check if current user follows the displayed user
   const { data: isFollowing, isLoading: isFollowingLoading } = useQuery({
@@ -715,6 +770,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                     objectFit="contain"
                     shouldAttach={!!shouldAttach[item.id]}
                     autoplay={!!autoplay[item.id]}
+                    isActive={index === currentIndex}
                   />
                 ) : (
                   <ImageWithPinchZoom
