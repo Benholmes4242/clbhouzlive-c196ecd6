@@ -195,13 +195,18 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
         return;
       }
 
+      // Optimistically grant access if we have a session token
+      // Validation happens in background
+      console.log('[AccessGate] Session found - granting access optimistically');
+      setHasAccess(true);
+      setLoading(false);
+
       try {
-        console.log('[AccessGate] Session found, validating...');
+        console.log('[AccessGate] Validating session in background...');
         await retry(() => singleFlight(checkOrRefresh), 3);
         
         if (!cancelledRef.current) {
-          console.log('[AccessGate] Session valid - granting access');
-          setHasAccess(true);
+          console.log('[AccessGate] Session valid');
         }
       } catch (e: any) {
         if (cancelledRef.current) return;
@@ -214,11 +219,6 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
           console.warn('[AccessGate] Transient error, staying in last-known-good state:', e);
           // Keep user in, schedule another check
           setTimeout(() => singleFlight(checkOrRefresh).catch(() => {}), 10_000);
-          setHasAccess(true); // Optimistic: stay in
-        }
-      } finally {
-        if (!cancelledRef.current) {
-          setLoading(false);
         }
       }
     };
@@ -319,14 +319,7 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
+  // No loading screen - render immediately
   if (hasAccess) {
     return <>{children}</>;
   }
