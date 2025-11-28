@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -157,6 +157,7 @@ const FriendsCoursesPanel: React.FC = () => {
   const [courseFilter, setCourseFilter] = useState<CourseFilter>('all');
   const [page, setPage] = useState(1);
   const [recentPage, setRecentPage] = useState(0);
+  const coursesListAnchorRef = useRef<HTMLDivElement | null>(null);
   
   const PAGE_SIZE = 5;
   const RECENT_PAGE_SIZE = 8;
@@ -380,6 +381,33 @@ const FriendsCoursesPanel: React.FC = () => {
     return map;
   }, [allFriendsCourses]);
 
+  // Scroll to top of courses list
+  const scrollToCoursesList = () => {
+    if (!coursesListAnchorRef.current) return;
+
+    const rect = coursesListAnchorRef.current.getBoundingClientRect();
+    const absoluteTop = rect.top + window.scrollY;
+
+    // Offset so the anchor sits nicely under the sticky header/nav
+    const OFFSET = 80;
+
+    window.scrollTo({
+      top: absoluteTop - OFFSET,
+      behavior: 'smooth',
+    });
+  };
+
+  // Handle course pagination with scroll-to-top
+  const handleChangeCoursesPage = (direction: 'next' | 'prev') => {
+    setPage((prev) => {
+      const nextIndex = direction === 'next' ? prev + 1 : prev - 1;
+      return Math.max(1, nextIndex);
+    });
+
+    // Wait until the DOM updates, then scroll
+    requestAnimationFrame(scrollToCoursesList);
+  };
+
   // Handle clicking a recent round to jump to its course card
   const handleRecentRoundClick = (hit: FriendCourseHit) => {
     const index = courseIndexById.get(hit.course_id);
@@ -592,6 +620,9 @@ const FriendsCoursesPanel: React.FC = () => {
         </div>
       )}
 
+      {/* Anchor for scrolling to start of course list */}
+      <div ref={coursesListAnchorRef} />
+
       {/* Regular courses - Paginated list with slide animation */}
       {paginatedCourses.length > 0 && (
         <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 mt-9">
@@ -700,7 +731,7 @@ const FriendsCoursesPanel: React.FC = () => {
                 <Button
                   variant="outline"
                   disabled={page === 1}
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  onClick={() => handleChangeCoursesPage('prev')}
                   className="h-11 px-6 rounded-lg shadow-[0_4px_10px_rgba(15,23,42,0.08)] disabled:shadow-none"
                 >
                   Previous courses
@@ -709,7 +740,7 @@ const FriendsCoursesPanel: React.FC = () => {
                 <Button
                   variant="outline"
                   disabled={page >= totalPages}
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  onClick={() => handleChangeCoursesPage('next')}
                   className="h-11 px-6 rounded-lg shadow-[0_4px_10px_rgba(15,23,42,0.08)] disabled:shadow-none"
                 >
                   Next courses
