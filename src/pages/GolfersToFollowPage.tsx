@@ -1,141 +1,173 @@
-import React, { useState } from 'react';
-import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
-import { FadeInContent } from '@/components/ui/FadeInContent';
-import { Input } from '@/components/ui/input';
+import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { GolferCard } from '@/components/golfers/GolferCard';
 import { GolferCardSkeleton } from '@/components/golfers/GolferCardSkeleton';
-import { useGolfersDiscovery, FilterType } from '@/hooks/useGolfersDiscovery';
-import { useFollowUser } from '@/hooks/useFollowUser';
+import { useGolfersDiscovery, useSearchGolfers, FilterType } from '@/hooks/useGolfersDiscovery';
+import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
+import { cn } from '@/lib/utils';
 
-const GolfersToFollowPage = () => {
-  const {
-    golfers,
-    loading,
-    searchQuery,
-    setSearchQuery,
-    activeFilter,
-    setActiveFilter,
-    followingIds,
-    updateFollowingStatus,
-  } = useGolfersDiscovery();
+const filterOptions: { value: FilterType; label: string }[] = [
+  { value: 'suggested', label: 'Suggested' },
+  { value: 'club', label: 'At your golf club' },
+  { value: 'popular', label: 'Popular golfers' },
+  { value: 'low_hcap', label: 'Lowest handicap golfers' },
+];
 
-  const { followUser, unfollowUser, loading: followLoading } = useFollowUser();
-  const [actioningUserId, setActioningUserId] = useState<string | null>(null);
+export default function GolfersToFollowPage() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState<FilterType>('suggested');
+  const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
 
-  const handleFollowToggle = async (userId: string, isFollowing: boolean) => {
-    setActioningUserId(userId);
-    
-    const success = isFollowing
-      ? await unfollowUser(userId)
-      : await followUser(userId);
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
-    if (success) {
-      updateFollowingStatus(userId, !isFollowing);
-    }
-    
-    setActioningUserId(null);
+  // Reset page when filter changes
+  useEffect(() => {
+    setPage(1);
+  }, [activeFilter]);
+
+  const isSearching = debouncedQuery.trim().length > 0;
+
+  // Filtered/paginated results
+  const { data: filteredData, isLoading: filteredLoading } = useGolfersDiscovery(activeFilter, page);
+  
+  // Search results
+  const { data: searchResults, isLoading: searchLoading } = useSearchGolfers(debouncedQuery);
+
+  const golfers = isSearching ? (searchResults || []) : (filteredData?.golfers || []);
+  const totalCount = filteredData?.totalCount || 0;
+  const isLoading = isSearching ? searchLoading : filteredLoading;
+
+  const totalPages = Math.ceil(totalCount / 15);
+  const startIndex = (page - 1) * 15 + 1;
+  const endIndex = Math.min(page * 15, totalCount);
+
+  useEffect(() => {
+    setLastPage(page);
+  }, [page]);
+
+  const direction = page > lastPage ? 'right' : 'left';
+
+  const handlePrevPage = () => {
+    setPage(p => Math.max(1, p - 1));
   };
 
-  const filterOptions: { value: FilterType; label: string }[] = [
-    { value: 'suggested', label: 'Suggested' },
-    { value: 'club', label: 'From your club' },
-    { value: 'popular', label: 'Popular' },
-    { value: 'low', label: 'Low handicap' },
-  ];
+  const handleNextPage = () => {
+    setPage(p => Math.min(totalPages, p + 1));
+  };
 
   return (
-    <div className="min-h-screen bg-background page-with-header m-0 p-0">
+    <div className="min-h-screen bg-background pb-24">
       <ClubhouseHeaderNew />
-      <FadeInContent>
-        <main className="px-4 md:container md:mx-auto md:px-0 pt-[72px] pb-[30px]">
-          <div className="max-w-5xl mx-auto">
-            {/* Header */}
-            <div className="space-y-2 mb-[30px]">
-              <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                Find golfers to follow
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Discover new golfers, see where they play, and build your friends' courses feed.
-              </p>
-            </div>
 
-            {/* Search Bar */}
-            <div className="relative mb-6">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search golfers by name or club"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 h-11 rounded-lg border-slate-200 focus:border-slate-600"
-              />
-            </div>
+      <section className="max-w-3xl mx-auto px-4 pt-8 pb-6">
+        <h1 className="text-2xl font-semibold text-foreground">Find golfers to follow</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Discover new golfers, see where they play, and build your friends' courses feed.
+        </p>
+      </section>
 
-            {/* Filter Chips */}
-            <div className="flex gap-2 flex-wrap mb-6">
-              {filterOptions.map((filter) => (
-                <button
-                  key={filter.value}
-                  onClick={() => setActiveFilter(filter.value)}
-                  className={`
-                    px-4 py-2 rounded-full text-xs font-medium transition-colors
-                    ${
-                      activeFilter === filter.value
-                        ? 'bg-foreground text-background'
-                        : 'bg-card border border-border/60 text-foreground hover:bg-slate-50'
-                    }
-                  `}
-                >
-                  {filter.label}
-                </button>
-              ))}
-            </div>
+      <div className="max-w-3xl mx-auto px-4 mb-6">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search golfers by name or club"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 h-11 rounded-lg border-slate-200 focus:border-slate-600"
+          />
+        </div>
+      </div>
 
-            {/* Golfers List */}
-            <div className="space-y-3">
-              {loading ? (
-                // Loading skeletons
-                <>
-                  <GolferCardSkeleton />
-                  <GolferCardSkeleton />
-                  <GolferCardSkeleton />
-                  <GolferCardSkeleton />
-                  <GolferCardSkeleton />
-                </>
-              ) : golfers.length === 0 ? (
-                // Empty state
-                <div className="text-center py-12">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
-                    <Search className="w-8 h-8 text-slate-400" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">No golfers found</h3>
-                  <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-                    {searchQuery.trim()
-                      ? 'Try a different name or club, or clear your filters.'
-                      : 'No golfers match your current filter.'}
-                  </p>
-                </div>
-              ) : (
-                // Golfer cards
-                golfers.map((golfer) => (
-                  <GolferCard
-                    key={golfer.id}
-                    golfer={golfer}
-                    isFollowing={followingIds.has(golfer.id)}
-                    loading={actioningUserId === golfer.id}
-                    onFollowToggle={() =>
-                      handleFollowToggle(golfer.id, followingIds.has(golfer.id))
-                    }
-                  />
-                ))
+      <div className="max-w-3xl mx-auto px-4 mb-6">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          {filterOptions.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => setActiveFilter(option.value)}
+              className={cn(
+                "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors shrink-0",
+                activeFilter === option.value
+                  ? "bg-foreground text-background"
+                  : "bg-background border border-border text-foreground/80 hover:bg-slate-50"
               )}
-            </div>
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="max-w-3xl mx-auto px-4">
+        {isLoading ? (
+          <div className="space-y-3">
+            {[...Array(5)].map((_, i) => (
+              <GolferCardSkeleton key={i} />
+            ))}
           </div>
-        </main>
-      </FadeInContent>
+        ) : golfers.length === 0 ? (
+          <div className="mt-12 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
+              <Search className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold text-foreground mb-2">
+              {isSearching ? 'No golfers found' : 'No golfers found for this filter'}
+            </h3>
+            <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+              {isSearching
+                ? `No golfers match "${searchQuery}". Try a different name or club.`
+                : 'Try switching filters or searching by name/club.'}
+            </p>
+          </div>
+        ) : (
+          <>
+            <ul
+              key={`${activeFilter}-${page}`}
+              className={cn(
+                "space-y-3",
+                direction === 'right' ? 'animate-slide-in-from-right' : 'animate-slide-in-from-left'
+              )}
+            >
+              {golfers.map((golfer) => (
+                <GolferCard key={golfer.id} golfer={golfer} />
+              ))}
+            </ul>
+
+            {!isSearching && totalPages > 1 && (
+              <div className="mt-6 flex items-center justify-between gap-3 text-sm text-muted-foreground">
+                <button
+                  disabled={page === 1}
+                  onClick={handlePrevPage}
+                  className="h-11 px-6 rounded-lg border border-border bg-background shadow-sm disabled:opacity-40 disabled:cursor-default hover:bg-slate-50 transition-colors"
+                >
+                  Previous 15 golfers
+                </button>
+
+                <span className="flex-1 text-center">
+                  Showing {startIndex}–{endIndex} of {totalCount} golfers
+                </span>
+
+                <button
+                  disabled={page === totalPages}
+                  onClick={handleNextPage}
+                  className="h-11 px-6 rounded-lg border border-border bg-background shadow-sm disabled:opacity-40 disabled:cursor-default hover:bg-slate-50 transition-colors"
+                >
+                  Next 15 golfers
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
-};
-
-export default GolfersToFollowPage;
+}
