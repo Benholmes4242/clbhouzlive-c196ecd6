@@ -49,44 +49,44 @@ const FriendsSnapshotCard: React.FC<FriendsSnapshotCardProps> = ({
           </div>
         </div>
 
-        {/* Stats Grid - 2×2 layout */}
-        <div className="mt-3 grid grid-cols-2 gap-y-1 text-sm">
+        {/* Stats Grid - 2×2 centered layout */}
+        <div className="mt-6 grid grid-cols-2 gap-x-8 gap-y-4 text-center justify-items-center">
           {/* Row 1: Courses / Regions */}
-          <div className="flex flex-col">
-            <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
+          <div>
+            <div className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground/70">
               Courses
-            </span>
-            <span className="font-medium">
+            </div>
+            <div className="mt-1 font-medium text-foreground">
               {totalCourses} course{totalCourses !== 1 ? "s" : ""}
-            </span>
+            </div>
           </div>
 
-          <div className="flex flex-col">
-            <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
+          <div>
+            <div className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground/70">
               Regions
-            </span>
-            <span className="font-medium">
+            </div>
+            <div className="mt-1 font-medium text-foreground">
               {totalRegions} region{totalRegions !== 1 ? "s" : ""}
-            </span>
+            </div>
           </div>
 
           {/* Row 2: Average rating / Rounds */}
-          <div className="flex flex-col">
-            <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
+          <div>
+            <div className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground/70">
               Average rating
-            </span>
-            <span className="font-medium">
+            </div>
+            <div className="mt-1 font-medium text-foreground">
               {averageRating ? `${averageRating.toFixed(1)}/10` : "—"}
-            </span>
+            </div>
           </div>
 
-          <div className="flex flex-col">
-            <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
+          <div>
+            <div className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground/70">
               Rounds
-            </span>
-            <span className="font-medium">
+            </div>
+            <div className="mt-1 font-medium text-foreground">
               {totalRounds} round{totalRounds !== 1 ? "s" : ""}
-            </span>
+            </div>
           </div>
         </div>
       </div>
