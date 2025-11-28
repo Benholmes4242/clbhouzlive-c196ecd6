@@ -21,7 +21,7 @@ const ProfilePage = () => {
   const [loadoutModalOpen, setLoadoutModalOpen] = useState(false);
   
   // Get current user
-  const { user } = useSupabaseSession();
+  const { user, loading: authLoading } = useSupabaseSession();
   
   // Fetch profile using shared hook
   const {
@@ -32,15 +32,16 @@ const ProfilePage = () => {
   } = useUserProfile(user?.id);
 
   // Redirect to auth page if user is not logged in
+  // CRITICAL: Must check authLoading, not profileLoading, to avoid redirect during initial auth check
   useEffect(() => {
-    if (!profileLoading && !user) {
+    if (!authLoading && !user) {
       navigate('/auth', { replace: true });
     }
-  }, [user, profileLoading, navigate]);
+  }, [user, authLoading, navigate]);
 
   // Loading state handled by route-level Suspense with ProfileSkeleton
-  // Auth check still returns early
-  if (profileLoading) {
+  // Auth check still returns early - wait for both auth and profile to load
+  if (authLoading || profileLoading) {
     return null;
   }
 
