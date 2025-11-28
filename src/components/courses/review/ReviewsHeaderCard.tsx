@@ -2,36 +2,14 @@ import React from 'react';
 import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
-import { getRatingBadgeKey, getRatingBadgeLabel, RATING_BADGE_COLORS } from '@/utils/ratingBadge';
+import { getScoreTier } from '@/utils/getScoreTier';
 
-// Re-export for backwards compatibility within this component
-const BADGE_COLORS = RATING_BADGE_COLORS;
-
-const getCommunityRatingLabel = (
-  score: number | null | undefined
-): { label: string; variant: 'fair' | 'good' | 'veryGood' | 'excellent' | 'outstanding' } | null => {
-  const badgeKey = getRatingBadgeKey(score);
-  if (!badgeKey) return null;
-  const label = getRatingBadgeLabel(badgeKey);
-  return { label, variant: badgeKey };
-};
-
-const CommunityRatingBadge: React.FC<{
-  label: string;
-  variant: 'fair' | 'good' | 'veryGood' | 'excellent' | 'outstanding';
-}> = ({ label, variant }) => {
-  const color = BADGE_COLORS[variant];
-
+const CommunityRatingBadge: React.FC<{ tierData: ReturnType<typeof getScoreTier> }> = ({ tierData }) => {
   return (
     <span
-      className="inline-flex items-center justify-center rounded-full px-3 py-1 border text-xs font-semibold uppercase"
-      style={{
-        backgroundColor: `${color}15`, // 15% opacity for background
-        borderColor: `${color}40`, // 40% opacity for border
-        color: color,
-      }}
+      className={`inline-flex items-center justify-center rounded-full px-3 py-1 border text-xs font-semibold uppercase ${tierData.bg} ${tierData.border} ${tierData.text}`}
     >
-      {label}
+      {tierData.label}
     </span>
   );
 };
@@ -51,7 +29,7 @@ export const ReviewsHeaderCard: React.FC<ReviewsHeaderCardProps> = ({
   userHasRating,
   onRateCourse,
 }) => {
-  const qualityData = getCommunityRatingLabel(communityScore);
+  const tierData = getScoreTier(communityScore);
   const onlyUserHasRated = reviewCount === 1 && userHasRating;
 
   // Calculate comparison message
@@ -122,7 +100,7 @@ export const ReviewsHeaderCard: React.FC<ReviewsHeaderCardProps> = ({
         </div>
 
         {/* Badge */}
-        {qualityData && <CommunityRatingBadge label={qualityData.label} variant={qualityData.variant} />}
+        <CommunityRatingBadge tierData={tierData} />
       </div>
 
       {/* Comparison message */}

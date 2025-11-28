@@ -6,6 +6,7 @@ export interface ScoreTierData {
   bg: string;
   border: string;
   text: string;
+  barFill: string; // Color for distribution/progress bars
 }
 
 /**
@@ -20,6 +21,7 @@ export function getScoreTier(score: number): ScoreTierData {
       bg: 'bg-amber-50',
       border: 'border-amber-300',
       text: 'text-amber-700',
+      barFill: 'bg-amber-500',
     };
   }
   
@@ -30,6 +32,7 @@ export function getScoreTier(score: number): ScoreTierData {
       bg: 'bg-emerald-50',
       border: 'border-emerald-300',
       text: 'text-emerald-700',
+      barFill: 'bg-emerald-500',
     };
   }
   
@@ -40,6 +43,7 @@ export function getScoreTier(score: number): ScoreTierData {
       bg: 'bg-blue-50',
       border: 'border-blue-300',
       text: 'text-blue-700',
+      barFill: 'bg-blue-500',
     };
   }
   
@@ -50,6 +54,7 @@ export function getScoreTier(score: number): ScoreTierData {
       bg: 'bg-sky-50',
       border: 'border-sky-300',
       text: 'text-sky-700',
+      barFill: 'bg-sky-500',
     };
   }
   
@@ -59,5 +64,6 @@ export function getScoreTier(score: number): ScoreTierData {
     bg: 'bg-slate-50',
     border: 'border-slate-300',
     text: 'text-slate-700',
+    barFill: 'bg-slate-500',
   };
 }
