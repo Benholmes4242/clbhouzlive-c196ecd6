@@ -5,7 +5,7 @@ import { useSuggestedUsers } from '@/hooks/useSuggestedUsers';
 import { useFollowUserState } from '@/hooks/useFollowUserState';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import { Input } from '@/components/ui/input';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Squircle } from '@/components/ui/squircle';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Search, UserPlus, UserCheck } from 'lucide-react';
@@ -74,10 +74,10 @@ const SuggestedGolfersPage = () => {
       <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-24 max-w-3xl">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold tracking-tight mb-2">
+          <h1 className="text-2xl font-semibold tracking-tight mb-2 text-gray-900">
             Find golfers to follow
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-gray-600">
             Discover new golfers, see where they play, and build your friends' courses feed.
           </p>
         </div>
@@ -158,7 +158,7 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer }) => {
 
   return (
     <Card
-      className="p-4 hover:shadow-md transition-shadow cursor-pointer"
+      className="p-4 hover:shadow-md transition-shadow cursor-pointer bg-white"
       onClick={(e) => {
         // Only navigate if not clicking the button
         if (!(e.target as HTMLElement).closest('button')) {
@@ -168,24 +168,25 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer }) => {
     >
       <div className="flex items-center gap-4">
         {/* Avatar */}
-        <Avatar className="h-12 w-12 flex-shrink-0">
-          <AvatarImage src={golfer.profileImage} alt={golfer.displayName} />
-          <AvatarFallback>
-            {golfer.displayName.substring(0, 2).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+        <Squircle width={48} height={48} className="flex-shrink-0">
+          <img 
+            src={golfer.profileImage} 
+            alt={golfer.displayName}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        </Squircle>
 
         {/* Details */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <p className="font-semibold text-sm truncate">
+            <p className="font-semibold text-sm truncate text-gray-900">
               {golfer.displayName}
             </p>
             {golfer.isVerified && (
               <span className="text-blue-500 text-xs">✓</span>
             )}
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-gray-600">
             {golfer.bio && handicap ? `HCP ${handicap}` : golfer.username}
             {golfer.followersCount > 0 && ` · ${golfer.followersCount} followers`}
           </p>
@@ -221,9 +222,9 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer }) => {
 
 const GolferCardSkeleton = () => {
   return (
-    <Card className="p-4">
+    <Card className="p-4 bg-white">
       <div className="flex items-center gap-4">
-        <Skeleton className="h-12 w-12 rounded-full flex-shrink-0" />
+        <Skeleton className="h-12 w-12 flex-shrink-0" style={{ borderRadius: '20px' }} />
         <div className="flex-1 space-y-2">
           <Skeleton className="h-4 w-32" />
           <Skeleton className="h-3 w-48" />
