@@ -117,7 +117,7 @@ const GolfersToFollowPage = () => {
               Find golfers to follow
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Discover new golfers, see where they play, and build your friends&apos; courses feed.
+              Discover new golfers, see where they play, and build your community.
             </p>
           </header>
 
