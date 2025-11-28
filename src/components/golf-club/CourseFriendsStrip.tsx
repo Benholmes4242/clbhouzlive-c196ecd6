@@ -1,7 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import SquircleImage from '@/components/ui/SquircleImage';
 import { useFriendsWhoPlayedCourse } from '@/hooks/useFriendsWhoPlayedCourse';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { ChevronRight } from 'lucide-react';
 
 interface CourseFriendsStripProps {
   courseId: string;
@@ -10,6 +12,7 @@ interface CourseFriendsStripProps {
 
 export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId, courseName }) => {
   const { user } = useSupabaseSession();
+  const navigate = useNavigate();
   
   const { data: friends = [] } = useFriendsWhoPlayedCourse(user?.id, courseId);
 
@@ -26,8 +29,10 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
       : `${totalFriends} friends have logged a round here`;
 
   return (
-    <div
-      className="w-full rounded-3xl bg-card shadow-sm px-4 py-4 flex items-center justify-between text-left"
+    <button
+      type="button"
+      onClick={() => navigate('/golferssharedcourses')}
+      className="w-full rounded-3xl bg-card shadow-sm px-4 py-4 flex items-center justify-between hover:bg-muted/60 transition text-left"
     >
       <div className="flex flex-col min-w-0 flex-1">
         <span className="text-sm font-medium text-foreground">
@@ -68,7 +73,8 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
           </div>
         )}
 
+        <ChevronRight className="ml-1 h-4 w-4 text-muted-foreground shrink-0" />
       </div>
-    </div>
+    </button>
   );
 };
