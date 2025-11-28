@@ -16,27 +16,17 @@ type FilterType = 'suggested' | 'popular' | 'low';
 
 const SuggestedGolfersPage = () => {
   const navigate = useNavigate();
-  const { user, loading: sessionLoading } = useSupabaseSession();
+  const { user } = useSupabaseSession();
   const { users, loading } = useSuggestedUsers();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterType>('suggested');
 
-  // Track when we've had at least one "definitive" session check
-  const [hasCheckedSession, setHasCheckedSession] = useState(false);
-
-  // Mark the session as "checked" once loading finishes the first time
+  // Redirect if no user (but don't block render)
   useEffect(() => {
-    if (!sessionLoading && !hasCheckedSession) {
-      setHasCheckedSession(true);
-    }
-  }, [sessionLoading, hasCheckedSession]);
-
-  // Handle auth redirect once we *know* the session has been checked
-  useEffect(() => {
-    if (hasCheckedSession && !user) {
+    if (!user) {
       navigate('/auth', { replace: true });
     }
-  }, [hasCheckedSession, user, navigate]);
+  }, [user, navigate]);
 
   // Filter and sort users based on active filter
   const filteredUsers = useMemo(() => {
@@ -80,25 +70,7 @@ const SuggestedGolfersPage = () => {
     { value: 'low' as FilterType, label: 'Low handicap' },
   ];
 
-  // While we haven't finished the first session check, or Supabase is still loading,
-  // show a simple full-page loader
-  if (!hasCheckedSession || sessionLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <ClubhouseHeaderNew />
-        <div className="flex min-h-[60vh] items-center justify-center">
-          <InlineSpinner size="lg" />
-        </div>
-      </div>
-    );
-  }
-
-  // At this point, hasCheckedSession === true and sessionLoading === false.
-  // If there's still no user, the redirect effect will fire; just don't render UI.
-  if (!user) {
-    return null;
-  }
-
+  // Render the page immediately - redirect happens in useEffect
   return (
     <div className="min-h-screen bg-background">
       <ClubhouseHeaderNew />
