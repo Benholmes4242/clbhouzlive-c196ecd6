@@ -84,6 +84,7 @@ const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
 const MyRatings = lazy(() => import("./pages/MyRatings"));
 const News = lazy(() => import("./pages/News"));
 const TourCentral = lazy(() => import("./pages/TourCentral"));
+const SuggestedGolfersPage = lazy(() => import("./pages/SuggestedGolfersPage"));
 
 const MessagesPage = lazy(() => import("./pages/MessagesPage"));
 const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
@@ -197,6 +198,7 @@ function AppRoutes() {
         <Route path="/user/:username/courses" element={<UserCoursesPage />} />
         <Route path="/my-ratings" element={<MyRatings />} />
         <Route path="/news" element={<News />} />
+        <Route path="/golfers" element={<Suspense fallback={<GenericPageSkeleton />}><SuggestedGolfersPage /></Suspense>} />
         <Route path="/tour-central" element={<Suspense fallback={<TourSkeleton />}><TourCentral /></Suspense>} />
         <Route path="/videos" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><VideosPage /></Suspense>} />
           <Route path="/season-shop" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><SeasonShop /></Suspense>} />
