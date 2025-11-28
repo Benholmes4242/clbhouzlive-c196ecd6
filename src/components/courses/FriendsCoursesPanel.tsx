@@ -637,15 +637,17 @@ const FriendsCoursesPanel: React.FC = () => {
                   
                   {/* Course Info */}
                   <div className="p-4">
-                    <div className="flex items-center justify-between gap-2">
-                      <h3 className="font-semibold text-lg truncate text-foreground">
+                    <div className="flex items-center justify-between">
+                      <h3 className="flex-1 min-w-0 pr-3 font-semibold text-base text-foreground truncate">
                         {course.course_name}
                       </h3>
-                      {/* Community rating badge - right side */}
+                      {/* Community rating - logo + text on white */}
                       {course.average_rating != null && (
-                        <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 text-xs font-medium text-foreground shadow-sm shrink-0">
-                          <ClubhouseLogo size="xs" />
-                          <span>{course.average_rating.toFixed(1)} /10</span>
+                        <div className="flex-shrink-0 flex items-center gap-1.5">
+                          <ClubhouseLogo className="h-5 w-5" />
+                          <span className="text-sm font-semibold text-foreground">
+                            {course.average_rating.toFixed(1)} /10
+                          </span>
                         </div>
                       )}
                     </div>
@@ -764,7 +766,7 @@ const FriendsCoursesPanel: React.FC = () => {
 
           {/* Recent rounds pagination */}
           {totalRecentPages > 1 && (
-            <div className="mt-4 flex items-center justify-between gap-3">
+            <div className="mt-8 pb-8 flex items-center justify-between gap-3">
               <Button
                 variant="outline"
                 disabled={recentPage === 0}
