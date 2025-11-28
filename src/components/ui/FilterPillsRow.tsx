@@ -40,7 +40,7 @@ export const FilterPillsRow: React.FC<FilterPillsRowProps> = ({
               type="button"
               onClick={() => onChange(option.id)}
               className={cn(
-                'px-3.5 py-1.5 text-sm whitespace-nowrap rounded-full border transition-all text-center',
+                'px-3.5 py-1.5 text-sm whitespace-nowrap rounded-full border transition-all',
                 isActive
                   ? 'bg-white text-slate-900 border-transparent shadow-sm'
                   : 'bg-transparent text-slate-600 border-slate-200/70'
