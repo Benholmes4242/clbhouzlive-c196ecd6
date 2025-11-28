@@ -2,14 +2,14 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon } from 'lucide-react';
-import { getRatingBand, RATING_BANDS } from '@/utils/ratingBands';
+import { getRatingBadgeKey, getRatingBadgeLabel } from '@/utils/ratingBadge';
 
 interface DistributionData {
-  outstanding: number; // 9.0-10.0
-  excellent: number;   // 8.0-8.9
-  veryGood: number;    // 7.0-7.9
-  good: number;        // 6.0-6.9
-  fair: number;        // 0.0-5.9
+  excellent: number; // 9-10
+  veryGood: number;  // 8-8.9
+  good: number;      // 7-7.9
+  fair: number;      // 6-6.9
+  poor: number;      // <6
 }
 
 interface CategoryAverage {
@@ -41,9 +41,8 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
   userHasRating,
   onRateCourse,
 }) => {
-  const band = getRatingBand(averageRating);
-  const ratingLabel = band.label;
-  const ratingColor = band.colorHex;
+  const badgeKey = getRatingBadgeKey(averageRating);
+  const ratingLabel = badgeKey ? getRatingBadgeLabel(badgeKey) : '';
 
   const onlyUserHasRated = reviewCount === 1 && userHasRating;
 
@@ -95,12 +94,13 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
     }
   }
 
-  // Use System 2 bands for distribution
-  const distributionItems = RATING_BANDS.map(band => ({
-    label: band.label,
-    count: distribution[band.id as keyof DistributionData] || 0,
-    colorHex: band.colorHex,
-  }));
+  const distributionItems = [
+    { label: 'Excellent', count: distribution.excellent, color: 'bg-emerald-500' },
+    { label: 'Very good', count: distribution.veryGood, color: 'bg-blue-500' },
+    { label: 'Good', count: distribution.good, color: 'bg-sky-500' },
+    { label: 'Fair', count: distribution.fair, color: 'bg-slate-500' },
+    { label: 'Poor', count: distribution.poor, color: 'bg-slate-400' },
+  ];
 
   const maxCount = Math.max(...distributionItems.map(d => d.count), 1);
 
@@ -111,17 +111,14 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
         {/* Left: Rating display */}
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <ClubhouseLogo size="lg" showTooltip />
+            <ClubhouseLogo size="md" showTooltip />
             <span className="text-4xl font-bold text-slate-900">
               {averageRating.toFixed(1)}
             </span>
             <span className="text-lg font-medium text-slate-500">/10</span>
           </div>
           {ratingLabel && (
-            <p 
-              className="text-[11px] font-semibold uppercase tracking-wide mb-2"
-              style={{ color: ratingColor }}
-            >
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 mb-2">
               {ratingLabel}
             </p>
           )}
@@ -141,11 +138,8 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                 </span>
                 <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full transition-all duration-300"
-                    style={{ 
-                      width: `${percentage}%`,
-                      backgroundColor: item.colorHex
-                    }}
+                    className={`h-full ${item.color} transition-all duration-300`}
+                    style={{ width: `${percentage}%` }}
                   />
                 </div>
                 <span className="text-[11px] font-medium text-slate-500 w-5 text-right">

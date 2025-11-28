@@ -1,5 +1,5 @@
 import React from 'react';
-import { getRatingBand } from '@/utils/ratingBands';
+import { getScoreTier } from '@/utils/getScoreTier';
 
 interface ScorePillProps {
   score: number;
@@ -7,7 +7,7 @@ interface ScorePillProps {
 }
 
 export const ScorePill: React.FC<ScorePillProps> = ({ score, size = 'md' }) => {
-  const band = getRatingBand(score);
+  const tierData = getScoreTier(score);
   
   const baseClasses =
     size === 'sm'
@@ -16,12 +16,7 @@ export const ScorePill: React.FC<ScorePillProps> = ({ score, size = 'md' }) => {
 
   return (
     <span
-      className={`inline-flex items-center ${baseClasses}`}
-      style={{
-        backgroundColor: `${band.colorHex}15`,
-        borderColor: `${band.colorHex}40`,
-        color: band.colorHex,
-      }}
+      className={`inline-flex items-center ${baseClasses} ${tierData.bg} ${tierData.border} ${tierData.text}`}
     >
       {score.toFixed(1)} <span className="opacity-70">/10</span>
     </span>

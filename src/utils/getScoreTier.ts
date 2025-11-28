@@ -1,8 +1,3 @@
-// DEPRECATED: Use ratingBands.ts instead
-// This file is kept for backwards compatibility only
-
-import { getRatingBand } from './ratingBands';
-
 export type ScoreTier = 'outstanding' | 'excellent' | 'veryGood' | 'good' | 'fair';
 
 export interface ScoreTierData {
@@ -14,42 +9,55 @@ export interface ScoreTierData {
 }
 
 /**
- * @deprecated Use getRatingBand() from ratingBands.ts instead
- * This is a thin wrapper for backwards compatibility
+ * Get the score tier data for a given rating score.
+ * Returns consistent badge styling tokens used across Community Score and Review Cards.
  */
 export function getScoreTier(score: number): ScoreTierData {
-  const band = getRatingBand(score);
+  if (score >= 9.5) {
+    return {
+      tier: 'outstanding',
+      label: 'Outstanding',
+      bg: 'bg-amber-50',
+      border: 'border-amber-300',
+      text: 'text-amber-700',
+    };
+  }
   
-  // Map to old Tailwind class format (deprecated pattern)
-  const bgMap: Record<string, string> = {
-    outstanding: 'bg-amber-50',
-    excellent: 'bg-emerald-50',
-    veryGood: 'bg-blue-50',
-    good: 'bg-sky-50',
-    fair: 'bg-slate-50',
-  };
+  if (score >= 8.5) {
+    return {
+      tier: 'excellent',
+      label: 'Excellent',
+      bg: 'bg-emerald-50',
+      border: 'border-emerald-300',
+      text: 'text-emerald-700',
+    };
+  }
   
-  const borderMap: Record<string, string> = {
-    outstanding: 'border-amber-300',
-    excellent: 'border-emerald-300',
-    veryGood: 'border-blue-300',
-    good: 'border-sky-300',
-    fair: 'border-slate-300',
-  };
+  if (score >= 7.5) {
+    return {
+      tier: 'veryGood',
+      label: 'Very Good',
+      bg: 'bg-blue-50',
+      border: 'border-blue-300',
+      text: 'text-blue-700',
+    };
+  }
   
-  const textMap: Record<string, string> = {
-    outstanding: 'text-amber-700',
-    excellent: 'text-emerald-700',
-    veryGood: 'text-blue-700',
-    good: 'text-sky-700',
-    fair: 'text-slate-700',
-  };
+  if (score >= 6.5) {
+    return {
+      tier: 'good',
+      label: 'Good',
+      bg: 'bg-sky-50',
+      border: 'border-sky-300',
+      text: 'text-sky-700',
+    };
+  }
   
   return {
-    tier: band.id as ScoreTier,
-    label: band.label,
-    bg: bgMap[band.id] || 'bg-slate-50',
-    border: borderMap[band.id] || 'border-slate-300',
-    text: textMap[band.id] || 'text-slate-700',
+    tier: 'fair',
+    label: 'Fair',
+    bg: 'bg-slate-50',
+    border: 'border-slate-300',
+    text: 'text-slate-700',
   };
 }
