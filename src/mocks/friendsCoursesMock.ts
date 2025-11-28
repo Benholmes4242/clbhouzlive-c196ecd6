@@ -308,7 +308,14 @@ for (let i = 0; i < 110; i++) {
       profile_photo_url: friend.avatar,
     },
     course_country: course.country,
-    top100_memberships: course.memberships,
+    course_sub_country: course.subCountry,
+    thumbnail_url: course.thumbnail,
+    top100_memberships: course.memberships.map((slug: string, idx: number) => ({
+      list_id: `mock-list-${slug}`,
+      list_slug: slug,
+      short_label: slug === 'world-top-100' ? 'World' : slug === 'usa-top-100' ? 'USA' : 'GB&I',
+      rank: 10 + idx * 5,
+    })),
     rating: Math.round(randomBetween(7.5, 10) * 10) / 10, // 7.5–10.0
   });
 }
@@ -328,12 +335,18 @@ recentRounds.forEach((round) => {
       country: courseMeta.country,
       sub_country: courseMeta.subCountry,
       thumbnail_url: courseMeta.thumbnail,
-      top100_memberships: courseMeta.memberships,
+      top100_memberships: courseMeta.memberships.map((slug: string, idx: number) => ({
+        list_id: `mock-list-${slug}`,
+        list_slug: slug,
+        short_label: slug === 'world-top-100' ? 'World' : slug === 'usa-top-100' ? 'USA' : 'GB&I',
+        rank: 10 + idx * 5,
+      })),
       friends: [
         {
           friend_id: round.friend_id,
           played_at: round.played_at,
           friend_profile: round.friend_profile,
+          rating: round.rating,
         },
       ],
       total_friends_played: 1,
