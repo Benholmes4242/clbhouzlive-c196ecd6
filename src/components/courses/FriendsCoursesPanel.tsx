@@ -13,8 +13,6 @@ import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Users, MapPin, Flame, Video } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { FLAGS } from '@/config/flags';
-import { MOCK_FRIEND_COURSES } from './mockFriendCourses';
 import { friendsCoursesMockData } from '@/mocks/friendsCoursesMock';
 import FriendsSnapshotCard from './friends/FriendsSnapshotCard';
 import FriendsHeroCourseCard from './friends/FriendsHeroCourseCard';
@@ -37,26 +35,15 @@ const FriendsCoursesPanel: React.FC = () => {
   const navigate = useNavigate();
   const { data: realData, isLoading } = useFriendsCourses(user?.id);
   
-  const sourceData = USE_FRIENDS_COURSES_MOCK ? friendsCoursesMockData : realData;
-  const loading = USE_FRIENDS_COURSES_MOCK ? false : isLoading;
-  
-  const [timeframe, setTimeframe] = useState<Timeframe>('30d');
-  const [courseFilter, setCourseFilter] = useState<CourseFilter>('all');
-  const [page, setPage] = useState(1);
-  const [recentPage, setRecentPage] = useState(0);
-  
-  const PAGE_SIZE = 5;
-  const RECENT_PAGE_SIZE = 8;
-  
-  // Fetch real course data directly when using mock friends
-  const mockCourseNames = useMemo(() => {
-    if (!FLAGS.FRIEND_COURSES_MOCK_ENABLED) return [];
-    return [...new Set(MOCK_FRIEND_COURSES.recent.map(hit => hit.course_name))];
+  // When using mock, we still fetch real course data for photos/details
+  const mockCourseIds = useMemo(() => {
+    if (!USE_FRIENDS_COURSES_MOCK) return [];
+    return [...new Set(friendsCoursesMockData.recent.map(hit => hit.course_id))];
   }, []);
-  
-  const { data: realCoursesForMock } = useQuery({
-    queryKey: ['real-courses-for-mock', mockCourseNames],
-    enabled: FLAGS.FRIEND_COURSES_MOCK_ENABLED && mockCourseNames.length > 0,
+
+  const { data: realCoursesForMock, isLoading: loadingRealCourses } = useQuery({
+    queryKey: ['real-courses-for-friends-mock', mockCourseIds],
+    enabled: USE_FRIENDS_COURSES_MOCK && mockCourseIds.length > 0,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('golf_courses')
@@ -76,102 +63,94 @@ const FriendsCoursesPanel: React.FC = () => {
             )
           )
         `)
-        .in('name', mockCourseNames);
+        .in('id', mockCourseIds);
       
       if (error) throw error;
       
-      return (data || []).map((course: any) => ({
-        course_id: course.id,
-        course_name: course.name,
-        country: course.country,
-        sub_country: course.sub_country,
-        thumbnail_url: course.thumbnail_image,
-        top100_memberships: (course.course_top100_memberships || []).map((m: any) => ({
-          list_id: m.list_id,
-          list_slug: m.top100_lists?.slug || '',
-          short_label: m.top100_lists?.short_label || '',
-          rank: m.rank,
-        })),
-      }));
+      return (data || []).reduce((map, course: any) => {
+        map.set(course.id, {
+          course_id: course.id,
+          course_name: course.name,
+          country: course.country,
+          sub_country: course.sub_country,
+          thumbnail_url: course.thumbnail_image,
+          top100_memberships: (course.course_top100_memberships || []).map((m: any) => ({
+            list_id: m.list_id,
+            list_slug: m.top100_lists?.slug || '',
+            short_label: m.top100_lists?.short_label || '',
+            rank: m.rank,
+          })),
+        });
+        return map;
+      }, new Map());
     },
     staleTime: 60_000,
   });
-  
-  type RealCourseData = {
-    course_id: string;
-    course_name: string;
-    country: string | null;
-    sub_country: string | null;
-    thumbnail_url: string | null;
-    top100_memberships: Top100Membership[];
-  };
-  
-  // When mock flag is enabled, use mock friend profiles but real course data
-  const data = useMemo(() => {
-    if (FLAGS.FRIEND_COURSES_MOCK_ENABLED) {
-      // Wait for real course data to load before showing anything
-      if (!realCoursesForMock) return null;
-      
-      // Match courses by name
-      const realCoursesByName = new Map<string, RealCourseData>(
-        realCoursesForMock.map((c) => [c.course_name.toLowerCase(), c])
-      );
-      
-      // Merge mock friend data with real course data matched by name
-      const enrichedRecent = MOCK_FRIEND_COURSES.recent.map(mockHit => {
-        const realCourse = realCoursesByName.get(mockHit.course_name.toLowerCase());
-        if (realCourse) {
-          return {
-            ...mockHit,
-            course_id: realCourse.course_id,
-            thumbnail_url: realCourse.thumbnail_url,
-            top100_memberships: realCourse.top100_memberships,
-          };
-        }
-        return mockHit;
-      });
-      
-      // Rebuild courses from enriched recent data
-      const courseMap = new Map<string, CourseWithFriends>();
-      for (const hit of enrichedRecent) {
-        if (!hit.course_id) continue;
-        const existing = courseMap.get(hit.course_id);
-        if (!existing) {
-          courseMap.set(hit.course_id, {
-            course_id: hit.course_id,
-            course_name: hit.course_name,
-            country: hit.course_country,
-            sub_country: hit.course_sub_country,
-            thumbnail_url: hit.thumbnail_url,
-            average_rating: hit.rating,
-            top100_memberships: hit.top100_memberships, // Real rankings
-            friends: [hit],
-            most_recent_play: hit.played_at,
-            total_friends_played: 1,
-          });
-        } else {
-          existing.friends.push(hit);
-          existing.total_friends_played = existing.friends.length;
-        }
-      }
+
+  // Merge mock friend data with real course data
+  const enrichedMockData = useMemo(() => {
+    if (!USE_FRIENDS_COURSES_MOCK || !realCoursesForMock) return null;
+    
+    const enrichedRecent = friendsCoursesMockData.recent.map(mockHit => {
+      const realCourse = realCoursesForMock.get(mockHit.course_id);
+      if (!realCourse) return mockHit;
       
       return {
-        courses: Array.from(courseMap.values()),
-        recent: enrichedRecent,
-        totalCourses: courseMap.size,
-        totalFriendsActive: MOCK_FRIEND_COURSES.totalFriendsActive,
+        ...mockHit,
+        course_name: realCourse.course_name,
+        course_country: realCourse.country,
+        course_sub_country: realCourse.sub_country,
+        thumbnail_url: realCourse.thumbnail_url,
+        top100_memberships: realCourse.top100_memberships,
       };
+    });
+    
+    // Rebuild courses from enriched recent data
+    const courseMap = new Map<string, CourseWithFriends>();
+    for (const hit of enrichedRecent) {
+      if (!hit.course_id) continue;
+      const existing = courseMap.get(hit.course_id);
+      if (!existing) {
+        courseMap.set(hit.course_id, {
+          course_id: hit.course_id,
+          course_name: hit.course_name,
+          country: hit.course_country,
+          sub_country: hit.course_sub_country,
+          thumbnail_url: hit.thumbnail_url,
+          average_rating: hit.rating,
+          top100_memberships: hit.top100_memberships,
+          friends: [hit],
+          most_recent_play: hit.played_at,
+          total_friends_played: 1,
+        });
+      } else {
+        existing.friends.push(hit);
+        existing.total_friends_played = existing.friends.length;
+      }
     }
-    return realData;
-  }, [realData, realCoursesForMock]);
+    
+    return {
+      courses: Array.from(courseMap.values()),
+      recent: enrichedRecent,
+      totalCourses: courseMap.size,
+      totalFriendsActive: friendsCoursesMockData.totalFriendsActive,
+    };
+  }, [realCoursesForMock]);
+
+  const sourceData = USE_FRIENDS_COURSES_MOCK ? enrichedMockData : realData;
+  const loading = USE_FRIENDS_COURSES_MOCK ? loadingRealCourses : isLoading;
+  
+  const [timeframe, setTimeframe] = useState<Timeframe>('30d');
+  const [courseFilter, setCourseFilter] = useState<CourseFilter>('all');
+  const [page, setPage] = useState(1);
+  const [recentPage, setRecentPage] = useState(0);
+  
+  const PAGE_SIZE = 5;
+  const RECENT_PAGE_SIZE = 8;
 
   // Filter data by time range and course type
   const filteredData = useMemo(() => {
     if (!sourceData) return null;
-    
-    // Use sourceData directly if we're not using the old FLAGS system
-    const baseData = USE_FRIENDS_COURSES_MOCK ? sourceData : data;
-    if (!baseData) return null;
     
     // Calculate time cutoff
     let cutoff: Date | null = null;
@@ -190,8 +169,8 @@ const FriendsCoursesPanel: React.FC = () => {
     
     // Filter by time
     const timeFilteredRecent = cutoff 
-      ? baseData.recent.filter(hit => new Date(hit.played_at) >= cutoff)
-      : baseData.recent;
+      ? sourceData.recent.filter(hit => new Date(hit.played_at) >= cutoff)
+      : sourceData.recent;
     
     // Filter by course type (Top 100 only or other filters)
     const courseTypeFilteredRecent = courseFilter === 'most_played'
@@ -248,7 +227,7 @@ const FriendsCoursesPanel: React.FC = () => {
       totalCourses: filteredCourses.length,
       totalFriendsActive: uniqueFriends.size,
     };
-  }, [sourceData, data, timeframe, courseFilter]);
+  }, [sourceData, timeframe, courseFilter]);
 
   // Derive lists safely even while loading
   const courses = filteredData?.courses || [];
