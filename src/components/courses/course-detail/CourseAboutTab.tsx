@@ -15,9 +15,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 import CourseLocationBreadcrumb from './CourseLocationBreadcrumb';
-import { useFriendsWhoPlayedCourse } from '@/hooks/useFriendsWhoPlayedCourse';
-import { FriendsWhoPlayedSummaryCard } from './FriendsWhoPlayedSummaryCard';
 
 import CourseTop100Summary from './CourseTop100Summary';
 import { formatCourseLocation } from '@/utils/courseLocation';
@@ -82,10 +81,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   
   // Fetch user's rating if logged in
   const { data: userRating } = useUserCourseRating(course.id, user?.id);
-  
-  // Fetch friends who've played this course
-  const { data: friendsWhoPlayed = [] } = useFriendsWhoPlayedCourse(user?.id, course.id);
-  const hasFriendsWhoPlayed = friendsWhoPlayed.length > 0;
 
   const handleWebsiteClick = () => {
     if (course.website_url) {
@@ -123,7 +118,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <CourseLocationBreadcrumb course={course} />
       
       {/* Community Score Section - Card-based design */}
-      <section className="px-4 pt-7 pb-5 bg-slate-100 md:px-6 md:pt-9 space-y-6">
+      <section className="px-4 pt-7 pb-5 bg-slate-100 md:px-6 md:pt-9">
         <CommunityScoreCard
           courseId={course.id}
           ratingAggregates={ratingAggregates}
@@ -136,21 +131,15 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         {userRating && (
           <Button 
             onClick={handleRateClick}
-            className="w-full justify-center h-11 rounded-lg"
+            className="w-full justify-center mt-4 h-11 rounded-lg"
             variant="outline"
           >
             Edit Your Rating
           </Button>
         )}
 
-        {/* Friends Who've Played - only show if there are friends */}
-        {hasFriendsWhoPlayed && (
-          <FriendsWhoPlayedSummaryCard
-            courseId={course.id}
-            courseName={course.name}
-            friends={friendsWhoPlayed}
-          />
-        )}
+        {/* Friends Who've Played */}
+        <CourseFriendsStrip courseId={course.id} courseName={course.name} />
       </section>
 
       {/* CTA for users who haven't rated yet */}
