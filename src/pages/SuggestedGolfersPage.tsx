@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useSuggestedUsers } from '@/hooks/useSuggestedUsers';
@@ -10,15 +10,23 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Search, UserPlus, UserCheck } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { InlineSpinner } from '@/components/ui/InlineSpinner';
 
 type FilterType = 'suggested' | 'popular' | 'low';
 
 const SuggestedGolfersPage = () => {
   const navigate = useNavigate();
-  const { user } = useSupabaseSession();
+  const { user, loading: sessionLoading } = useSupabaseSession();
   const { users, loading } = useSuggestedUsers();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterType>('suggested');
+
+  // Handle auth redirect in effect to avoid navigation during render
+  useEffect(() => {
+    if (!sessionLoading && !user) {
+      navigate('/auth', { replace: true });
+    }
+  }, [sessionLoading, user, navigate]);
 
   // Filter and sort users based on active filter
   const filteredUsers = useMemo(() => {
@@ -62,8 +70,20 @@ const SuggestedGolfersPage = () => {
     { value: 'low' as FilterType, label: 'Low handicap' },
   ];
 
+  // Show loading state while session is loading
+  if (sessionLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <ClubhouseHeaderNew />
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <InlineSpinner size="lg" />
+        </div>
+      </div>
+    );
+  }
+
+  // If no user after session loaded, effect will handle redirect
   if (!user) {
-    navigate('/auth');
     return null;
   }
 
