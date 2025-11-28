@@ -1228,35 +1228,7 @@ type RatingConfirmationProps = {
 };
 
 // ===== RATING CONFIRMATION VIEW =====
-// Helpers
-type RatingBand = 'fair' | 'good' | 'veryGood' | 'excellent' | 'outstanding';
-
-const BADGE_COLORS = {
-  fair: { bg: '#F1F5F9', text: '#94A3B8', border: '#CBD5E1' },        // slate-100/400/300
-  good: { bg: '#F0F9FF', text: '#64748B', border: '#BFDBFE' },        // sky-50/slate-500/blue-200
-  veryGood: { bg: '#ECFDF5', text: '#6EE7B7', border: '#A7F3D0' },    // emerald-50/300/200
-  excellent: { bg: '#D1FAE5', text: '#22C55E', border: '#86EFAC' },   // emerald-100/500/300
-  outstanding: { bg: '#FEF3C7', text: '#F4C15D', border: '#FDE68A' }, // amber-100/custom/amber-200
-};
-
-function getRatingBand(score: number): RatingBand {
-  if (score >= 9.0) return 'outstanding';
-  if (score >= 8.0) return 'excellent';
-  if (score >= 7.0) return 'veryGood';
-  if (score >= 6.0) return 'good';
-  return 'fair';
-}
-
-function getRatingBandLabel(band: RatingBand): string {
-  const labels = {
-    fair: 'Fair',
-    good: 'Good',
-    veryGood: 'Very Good',
-    excellent: 'Excellent',
-    outstanding: 'Outstanding',
-  };
-  return labels[band];
-}
+// Uses unified System-2 rating bands from getScoreTier()
 
 function getComparisonCopy(user: number, community: number | null) {
   if (community == null) return null;
@@ -1296,20 +1268,14 @@ type RatingConfirmationViewProps = {
   onShareReview: () => void;
 };
 
-function RatingBadge({ band }: { band: RatingBand }) {
-  const colors = BADGE_COLORS[band];
-  const label = getRatingBandLabel(band);
+function RatingBadge({ score }: { score: number }) {
+  const tierData = getScoreTier(score);
 
   return (
     <div
-      className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide"
-      style={{
-        backgroundColor: colors.bg,
-        borderColor: colors.border,
-        color: colors.text,
-      }}
+      className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${tierData.bg} ${tierData.border} ${tierData.text}`}
     >
-      {label}
+      {tierData.label}
     </div>
   );
 }
@@ -1328,7 +1294,6 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
 
   const isEdit = mode === 'updated';
   const isNewReview = !isEdit;
-  const band = getRatingBand(userRating);
   const comparison = getComparisonCopy(userRating, communityScore);
 
   // Track confirmation view
@@ -1409,7 +1374,7 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
               </p>
             </div>
 
-            <RatingBadge band={band} />
+            <RatingBadge score={userRating} />
           </div>
 
           {comparisonText && (
