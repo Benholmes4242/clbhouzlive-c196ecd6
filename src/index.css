@@ -2285,7 +2285,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
   .z-bottom-nav { z-index: 55; }
   
   /* Legacy z-index classes */
-  .z-header { z-index: 60; }
+  .z-header { z-index: 10000; }
   .z-overlay { z-index: 50; }
   .z-gradient { z-index: 10; }
   .z-video { z-index: 0; }
