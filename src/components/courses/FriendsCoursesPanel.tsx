@@ -20,6 +20,7 @@ import FriendsActivityCard from './friends/FriendsActivityCard';
 import FriendsCoursesSkeleton from './friends/FriendsCoursesSkeleton';
 import FriendsCoursesEmpty from './friends/FriendsCoursesEmpty';
 import CourseRankBadges from './CourseRankBadges';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { extractRanksFromMemberships } from '@/utils/rankingUtils';
 import type { CourseWithFriends, FriendCourseHit, Top100Membership } from '@/hooks/useFriendsCourses';
 
@@ -493,7 +494,7 @@ const FriendsCoursesPanel: React.FC = () => {
       </div>
 
       {hotCourses.length > 0 && (
-        <div className="mt-9 space-y-3">
+        <div className="mt-12 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Flame className="w-4 h-4 text-primary-accent" />
@@ -513,14 +514,19 @@ const FriendsCoursesPanel: React.FC = () => {
                 {/* Course Image - Taller */}
                 {course.thumbnail_url && (
                   <div className="relative w-full aspect-[1.7/1] overflow-hidden">
-                    {/* Rating badge (top-left) */}
-                    {course.average_rating != null && (
-                      <div className="absolute top-3 left-3 z-20">
-                        <span className="inline-flex items-center rounded-full border border-border bg-card/90 backdrop-blur-sm px-3 py-1 text-xs sm:text-[13px] font-medium text-foreground shadow-sm">
-                          {course.average_rating.toFixed(1)} /10
-                        </span>
-                      </div>
-                    )}
+                    {/* Rank badges (top-left) */}
+                    {(() => {
+                      const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
+                      return (
+                        <CourseRankBadges
+                          globalRank={ranks.globalRank}
+                          regionalRank={ranks.regionalRank}
+                          usaRank={ranks.usaRank}
+                          country={course.country || ''}
+                          positioning="top-left"
+                        />
+                      );
+                    })()}
                     
                     <img
                       src={course.thumbnail_url}
@@ -569,18 +575,6 @@ const FriendsCoursesPanel: React.FC = () => {
                       </div>
                       <span className="text-xs text-muted-foreground">Played by {formatFriendsList(course.friends, 2)}</span>
                     </div>
-                    {(() => {
-                      const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
-                      return (
-                        <CourseRankBadges
-                          globalRank={ranks.globalRank}
-                          regionalRank={ranks.regionalRank}
-                          usaRank={ranks.usaRank}
-                          country={course.country || ''}
-                          positioning="inline"
-                        />
-                      );
-                    })()}
                   </div>
                 </div>
               </Card>
@@ -614,14 +608,19 @@ const FriendsCoursesPanel: React.FC = () => {
                   {/* Course Image - Taller, Full Width */}
                   {course.thumbnail_url && (
                     <div className="relative w-full aspect-[1.7/1] overflow-hidden">
-                      {/* Rating badge (top-left) */}
-                      {course.average_rating != null && (
-                        <div className="absolute top-3 left-3 z-10">
-                          <span className="inline-flex items-center rounded-full border border-border bg-card/90 backdrop-blur-sm px-3 py-1 text-xs sm:text-[13px] font-medium text-foreground shadow-sm">
-                            {course.average_rating.toFixed(1)} /10
-                          </span>
-                        </div>
-                      )}
+                      {/* Rank badges (top-left) */}
+                      {(() => {
+                        const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
+                        return (
+                          <CourseRankBadges
+                            globalRank={ranks.globalRank}
+                            regionalRank={ranks.regionalRank}
+                            usaRank={ranks.usaRank}
+                            country={course.country || ''}
+                            positioning="top-left"
+                          />
+                        );
+                      })()}
                       
                       <img
                         src={course.thumbnail_url}
@@ -633,22 +632,6 @@ const FriendsCoursesPanel: React.FC = () => {
                       />
                       {/* Bottom gradient */}
                       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/55 via-black/25 to-transparent" />
-                      
-                      {/* Rank badges (top-right) */}
-                      <div className="absolute top-3 right-3 z-10 flex gap-1.5">
-                        {(() => {
-                          const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
-                          return (
-                            <CourseRankBadges
-                              globalRank={ranks.globalRank}
-                              regionalRank={ranks.regionalRank}
-                              usaRank={ranks.usaRank}
-                              country={course.country || ''}
-                              positioning="inline"
-                            />
-                          );
-                        })()}
-                      </div>
                     </div>
                   )}
                   
@@ -658,6 +641,13 @@ const FriendsCoursesPanel: React.FC = () => {
                       <h3 className="font-semibold text-lg truncate text-foreground">
                         {course.course_name}
                       </h3>
+                      {/* Community rating badge - right side */}
+                      {course.average_rating != null && (
+                        <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 text-xs font-medium text-foreground shadow-sm shrink-0">
+                          <ClubhouseLogo size="xs" />
+                          <span>{course.average_rating.toFixed(1)} /10</span>
+                        </div>
+                      )}
                     </div>
                     <p className="text-sm text-muted-foreground mb-3">
                       {course.country}{course.sub_country ? `, ${course.sub_country}` : ''}
@@ -726,7 +716,7 @@ const FriendsCoursesPanel: React.FC = () => {
 
       {/* Recent rounds timeline */}
       {sortedRecent.length > 0 && (
-        <div className="space-y-3 mt-9">
+        <div className="space-y-3 mt-12">
           <div>
             <h3 className="text-base font-semibold text-foreground">Your friends' recent rounds</h3>
             <p className="text-xs text-muted-foreground mt-1">
