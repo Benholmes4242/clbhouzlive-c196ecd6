@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon } from 'lucide-react';
-import { getRatingBadgeKey, getRatingBadgeLabel } from '@/utils/ratingBadge';
+import { getScoreTier } from '@/utils/getScoreTier';
 
 interface DistributionData {
   excellent: number; // 9-10
@@ -41,9 +41,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
   userHasRating,
   onRateCourse,
 }) => {
-  const badgeKey = getRatingBadgeKey(averageRating);
-  const ratingLabel = badgeKey ? getRatingBadgeLabel(badgeKey) : '';
-
+  const tierData = getScoreTier(averageRating);
   const onlyUserHasRated = reviewCount === 1 && userHasRating;
 
   // Calculate comparison message
@@ -108,20 +106,26 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
     <div className="bg-white rounded-xl border border-slate-200 px-4 py-5">
       {/* Top row: Rating + Distribution */}
       <div className="grid grid-cols-2 gap-6 mb-5">
-        {/* Left: Rating display */}
+        {/* Left: Rating display - matching About tab */}
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <ClubhouseLogo size="md" showTooltip />
-            <span className="text-4xl font-bold text-slate-900">
-              {averageRating.toFixed(1)}
+          <div className="inline-flex flex-col items-start gap-1 mb-2">
+            {/* Logo + Score */}
+            <div className="flex items-center gap-1">
+              <ClubhouseLogo size="md" />
+              <span className="text-2xl font-semibold text-slate-900">
+                {averageRating.toFixed(1)}
+              </span>
+              <span className="text-sm font-medium text-slate-500">/10</span>
+            </div>
+
+            {/* Quality badge */}
+            <span 
+              className={`inline-flex items-center justify-center rounded-full px-3 py-1 border text-xs font-semibold uppercase ${tierData.bg} ${tierData.border} ${tierData.text}`}
+            >
+              {tierData.label}
             </span>
-            <span className="text-lg font-medium text-slate-500">/10</span>
           </div>
-          {ratingLabel && (
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 mb-2">
-              {ratingLabel}
-            </p>
-          )}
+          
           <p className="text-xs text-slate-500">
             Based on {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
           </p>
