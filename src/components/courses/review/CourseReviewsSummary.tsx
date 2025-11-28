@@ -5,11 +5,11 @@ import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon } from
 import { getScoreTier } from '@/utils/getScoreTier';
 
 interface DistributionData {
-  excellent: number; // 9-10
-  veryGood: number;  // 8-8.9
-  good: number;      // 7-7.9
-  fair: number;      // 6-6.9
-  poor: number;      // <6
+  outstanding: number;
+  excellent: number;
+  veryGood: number;
+  good: number;
+  fair: number;
 }
 
 interface CategoryAverage {
@@ -92,13 +92,13 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
     }
   }
 
-  // Map distribution to our unified tier system
+  // Map distribution directly from System-2 tier buckets
   const distributionItems = [
-    { label: 'Outstanding', count: distribution.excellent, tier: getScoreTier(9.5) },
-    { label: 'Excellent', count: distribution.veryGood, tier: getScoreTier(8.5) },
-    { label: 'Very good', count: distribution.good, tier: getScoreTier(7.5) },
-    { label: 'Good', count: distribution.fair, tier: getScoreTier(6.5) },
-    { label: 'Fair', count: distribution.poor, tier: getScoreTier(5) },
+    { count: distribution.outstanding, tier: getScoreTier(9.5) },
+    { count: distribution.excellent, tier: getScoreTier(8.5) },
+    { count: distribution.veryGood, tier: getScoreTier(7.5) },
+    { count: distribution.good, tier: getScoreTier(6.5) },
+    { count: distribution.fair, tier: getScoreTier(5) },
   ];
 
   const maxCount = Math.max(...distributionItems.map(d => d.count), 1);
@@ -137,9 +137,9 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
           {distributionItems.map((item) => {
             const percentage = (item.count / maxCount) * 100;
             return (
-              <div key={item.label} className="flex items-center gap-2 text-xs">
+              <div key={item.tier.tier} className="flex items-center gap-2 text-xs">
                 <span className="text-[10px] font-medium text-slate-600 w-16 text-right">
-                  {item.label}
+                  {item.tier.label}
                 </span>
                 <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                   <div
