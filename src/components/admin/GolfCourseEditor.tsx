@@ -306,6 +306,8 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         continent = 'Europe';
       } else if (selectedCountry === 'Africa') {
         continent = 'Africa';
+      } else if (selectedCountry === 'Oceania') {
+        continent = 'Oceania';
       } else if (selectedCountry === 'Rest of World') {
         // Puerto Rico and other Rest of World territories default to North America
         continent = 'North America';
