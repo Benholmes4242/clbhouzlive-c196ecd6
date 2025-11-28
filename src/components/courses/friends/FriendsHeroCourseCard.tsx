@@ -32,7 +32,7 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
 
   return (
     <Card 
-      className="relative overflow-hidden rounded-xl hover:shadow-lg transition-all cursor-pointer bg-card border border-border/60 shadow-md"
+      className="relative overflow-hidden rounded-none sm:rounded-xl hover:shadow-lg transition-all cursor-pointer bg-card border border-border/60 shadow-md"
       onClick={() => navigate(`/courses/${course.course_id}`)}
     >
       {/* Course Image - Slightly taller */}
