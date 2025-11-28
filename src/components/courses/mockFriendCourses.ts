@@ -139,7 +139,7 @@ const mockCoursesWithFriends: CourseWithFriends[] = [
     country: 'Northern Ireland',
     sub_country: 'Down',
     thumbnail_url: 'https://media.clbhouz.co.uk/courses/1751019826333-fvps9vadl5.jpg',
-    average_rating: 9.8,
+    community_rating: null, // Will be populated from real database
     top100_memberships: [], // Will be populated from real database
     friends: mockFriendHits.filter(hit => hit.course_id === '8df6dde5-49e2-4b1d-bbec-bd5f6e3c2b66'),
     most_recent_play: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
@@ -151,7 +151,7 @@ const mockCoursesWithFriends: CourseWithFriends[] = [
     country: 'USA',
     sub_country: 'New Jersey',
     thumbnail_url: 'https://courses.clbhouz.co.uk/courses/1751276611299-o0zgdrh03f.webp',
-    average_rating: 9.9,
+    community_rating: null, // Will be populated from real database
     top100_memberships: [], // Will be populated from real database
     friends: mockFriendHits.filter(hit => hit.course_id === 'd917f7fb-ca74-4813-bc27-35ba95c04e03'),
     most_recent_play: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
@@ -163,7 +163,7 @@ const mockCoursesWithFriends: CourseWithFriends[] = [
     country: 'USA',
     sub_country: 'California',
     thumbnail_url: 'https://courses.clbhouz.co.uk/courses/1751281932418-mrfli213o3.jpg',
-    average_rating: 9.3,
+    community_rating: null, // Will be populated from real database
     top100_memberships: [], // Will be populated from real database
     friends: mockFriendHits.filter(hit => hit.course_id === 'a2426246-5314-42f7-8637-de23bd8d7665'),
     most_recent_play: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
@@ -175,7 +175,7 @@ const mockCoursesWithFriends: CourseWithFriends[] = [
     country: 'USA',
     sub_country: 'California',
     thumbnail_url: 'https://courses.clbhouz.co.uk/courses/1751276189835-wrt1zm4sg.jpeg',
-    average_rating: 9.7,
+    community_rating: null, // Will be populated from real database
     top100_memberships: [], // Will be populated from real database
     friends: mockFriendHits.filter(hit => hit.course_id === 'e69aee30-744d-4089-a127-285a62216e2c'),
     most_recent_play: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
@@ -187,7 +187,7 @@ const mockCoursesWithFriends: CourseWithFriends[] = [
     country: 'Scotland',
     sub_country: 'Highlands',
     thumbnail_url: 'https://courses.clbhouz.co.uk/courses/1751024326684-enjmz2ztth8.jpg',
-    average_rating: 9.5,
+    community_rating: null, // Will be populated from real database
     top100_memberships: [], // Will be populated from real database
     friends: mockFriendHits.filter(hit => hit.course_id === '47f1f73e-6265-4568-8b39-c7babfa22019'),
     most_recent_play: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
@@ -199,7 +199,7 @@ const mockCoursesWithFriends: CourseWithFriends[] = [
     country: 'Scotland',
     sub_country: 'Fife',
     thumbnail_url: 'https://media.clbhouz.co.uk/courses/1751031782943-po0xpgjl1bj.jpg',
-    average_rating: 9.1,
+    community_rating: null, // Will be populated from real database
     top100_memberships: [], // Will be populated from real database
     friends: mockFriendHits.filter(hit => hit.course_id === '5cdf162c-c3f3-44fa-b1ef-7b30d5d66b96'),
     most_recent_play: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
@@ -211,7 +211,7 @@ const mockCoursesWithFriends: CourseWithFriends[] = [
     country: 'Ireland',
     sub_country: 'Kerry',
     thumbnail_url: 'https://media.clbhouz.co.uk/courses/1751024716708-ovsjdt1owx9.jpg',
-    average_rating: 9.4,
+    community_rating: null, // Will be populated from real database
     top100_memberships: [], // Will be populated from real database
     friends: mockFriendHits.filter(hit => hit.course_id === '3674f9c2-3322-4580-bddb-c1123c92ec42'),
     most_recent_play: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),

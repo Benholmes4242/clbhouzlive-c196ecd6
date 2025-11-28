@@ -67,6 +67,16 @@ const FriendsCoursesPanel: React.FC = () => {
         .in('id', mockCourseIds);
       
       if (error) throw error;
+
+      // Get community ratings for all courses
+      const { data: communityRatings } = await supabase
+        .from('course_rating_aggregates' as any)
+        .select('course_id, avg_overall_score')
+        .in('course_id', mockCourseIds);
+
+      const ratingByCourseId = new Map(
+        (communityRatings || []).map((r: any) => [r.course_id, r.avg_overall_score])
+      );
       
       return (data || []).reduce((map, course: any) => {
         map.set(course.id, {
@@ -75,6 +85,7 @@ const FriendsCoursesPanel: React.FC = () => {
           country: course.country,
           sub_country: course.sub_country,
           thumbnail_url: course.thumbnail_image,
+          community_rating: ratingByCourseId.get(course.id) ?? null,
           top100_memberships: (course.course_top100_memberships || []).map((m: any) => ({
             list_id: m.list_id,
             list_slug: m.top100_lists?.slug || '',
@@ -102,6 +113,7 @@ const FriendsCoursesPanel: React.FC = () => {
         course_country: realCourse.country,
         course_sub_country: realCourse.sub_country,
         thumbnail_url: realCourse.thumbnail_url,
+        community_rating: realCourse.community_rating,
         top100_memberships: realCourse.top100_memberships,
       };
     });
@@ -118,7 +130,7 @@ const FriendsCoursesPanel: React.FC = () => {
           country: hit.course_country,
           sub_country: hit.course_sub_country,
           thumbnail_url: hit.thumbnail_url,
-          average_rating: hit.rating,
+          community_rating: hit.community_rating ?? null,
           top100_memberships: hit.top100_memberships,
           friends: [hit],
           most_recent_play: hit.played_at,
@@ -194,7 +206,7 @@ const FriendsCoursesPanel: React.FC = () => {
           country: hit.course_country,
           sub_country: hit.course_sub_country,
           thumbnail_url: hit.thumbnail_url,
-          average_rating: hit.rating || null,
+          community_rating: hit.community_rating ?? null,
           top100_memberships: hit.top100_memberships,
           friends: [hit],
           most_recent_play: hit.played_at,
@@ -205,10 +217,6 @@ const FriendsCoursesPanel: React.FC = () => {
         existing.total_friends_played = existing.friends.length;
         if (new Date(hit.played_at) > new Date(existing.most_recent_play)) {
           existing.most_recent_play = hit.played_at;
-        }
-        const ratings = existing.friends.map(f => f.rating).filter((r): r is number => r != null);
-        if (ratings.length > 0) {
-          existing.average_rating = ratings.reduce((sum, r) => sum + r, 0) / ratings.length;
         }
       }
     }
@@ -244,7 +252,7 @@ const FriendsCoursesPanel: React.FC = () => {
 
   const averageRating = useMemo(() => {
     const ratings = courses
-      .map(c => c.average_rating)
+      .map(c => c.community_rating)
       .filter((r): r is number => r != null);
     if (ratings.length === 0) return null;
     return ratings.reduce((sum, r) => sum + r, 0) / ratings.length;
@@ -297,8 +305,8 @@ const FriendsCoursesPanel: React.FC = () => {
         return courses.sort((a, b) => b.total_friends_played - a.total_friends_played)[0];
       case 'highest_rated':
         return courses
-          .filter(c => c.average_rating != null)
-          .sort((a, b) => (b.average_rating || 0) - (a.average_rating || 0))[0] || courses[0];
+          .filter(c => c.community_rating != null)
+          .sort((a, b) => (b.community_rating || 0) - (a.community_rating || 0))[0] || courses[0];
       case 'new':
         return courses.sort((a, b) => 
           new Date(b.most_recent_play).getTime() - new Date(a.most_recent_play).getTime()
@@ -642,11 +650,11 @@ const FriendsCoursesPanel: React.FC = () => {
                         {course.course_name}
                       </h3>
                       {/* Community rating - logo + text on white */}
-                      {course.average_rating != null && (
+                      {typeof course.community_rating === 'number' && !Number.isNaN(course.community_rating) && (
                         <div className="flex-shrink-0 flex items-center gap-1.5">
                           <ClubhouseLogo className="h-5 w-5" />
                           <span className="text-sm font-semibold text-foreground">
-                            {course.average_rating.toFixed(1)} /10
+                            {course.community_rating.toFixed(1)} /10
                           </span>
                         </div>
                       )}

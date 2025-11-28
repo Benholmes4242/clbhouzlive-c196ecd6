@@ -32,7 +32,7 @@ export type CourseWithFriends = {
   country: string | null;
   sub_country: string | null;
   thumbnail_url?: string | null;
-  average_rating?: number | null;
+  community_rating?: number | null;
   top100_memberships: Top100Membership[];
   friends: FriendCourseHit[];
   most_recent_play: string;
@@ -129,6 +129,17 @@ export function useFriendsCourses(userId?: string) {
         };
       }
 
+      // Get community ratings for all courses
+      const courseIds = [...new Set(friendCourses.map((row: any) => row.golf_courses?.id).filter(Boolean))];
+      const { data: communityRatings } = await supabase
+        .from('course_rating_aggregates' as any)
+        .select('course_id, avg_overall_score')
+        .in('course_id', courseIds);
+
+      const ratingByCourseId = new Map(
+        (communityRatings || []).map((r: any) => [r.course_id, r.avg_overall_score])
+      );
+
       // Get friend profiles for all users who have logged courses
       const userIds = [...new Set(friendCourses.map((row: any) => row.user_id))];
       const { data: profiles } = await supabase
@@ -183,14 +194,14 @@ export function useFriendsCourses(userId?: string) {
 
         const existing = courseMap.get(key);
         if (!existing) {
-          const avgRating = hit.rating ? hit.rating : null;
+          const communityRating = ratingByCourseId.get(hit.course_id) ?? null;
           courseMap.set(key, {
             course_id: hit.course_id,
             course_name: hit.course_name,
             country: hit.course_country,
             sub_country: hit.course_sub_country,
             thumbnail_url: hit.thumbnail_url,
-            average_rating: avgRating,
+            community_rating: communityRating,
             top100_memberships: hit.top100_memberships,
             friends: [hit],
             most_recent_play: hit.played_at,
@@ -201,11 +212,6 @@ export function useFriendsCourses(userId?: string) {
           existing.total_friends_played = existing.friends.length;
           if (new Date(hit.played_at) > new Date(existing.most_recent_play)) {
             existing.most_recent_play = hit.played_at;
-          }
-          // Update average rating
-          const ratings = existing.friends.map(f => f.rating).filter((r): r is number => r != null);
-          if (ratings.length > 0) {
-            existing.average_rating = ratings.reduce((sum, r) => sum + r, 0) / ratings.length;
           }
         }
       }
