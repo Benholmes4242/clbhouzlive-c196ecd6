@@ -2,8 +2,11 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
 import { useUserProfile } from './useUserProfile';
+import { useQuery } from '@tanstack/react-query';
 
 export type FilterType = 'suggested' | 'club' | 'popular' | 'low';
+
+const PAGE_SIZE = 15;
 
 interface GolferProfile {
   id: string;
@@ -20,115 +23,103 @@ export function useGolfersDiscovery() {
   const { user } = useSupabaseSession();
   const { data: currentProfile } = useUserProfile(user?.id);
   
-  const [golfers, setGolfers] = useState<GolferProfile[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterType>('suggested');
+  const [page, setPage] = useState(1);
   const [followingIds, setFollowingIds] = useState<Set<string>>(new Set());
 
-  // Fetch all golfers and following status
+  // Fetch following status once
   useEffect(() => {
-    const fetchGolfers = async () => {
-      if (!user) {
-        setLoading(false);
-        return;
-      }
+    const fetchFollowing = async () => {
+      if (!user) return;
 
-      try {
-        // Fetch user profiles
-        const { data: profiles, error } = await supabase
-          .from('user_profiles')
-          .select('id, display_name, username, profile_photo_url, home_club, eg_handicap_index')
-          .neq('id', user.id)
-          .limit(100);
+      const { data: followingData } = await supabase
+        .from('user_follows')
+        .select('following_id')
+        .eq('follower_id', user.id);
 
-        if (error) throw error;
-
-        // Fetch follower counts for each user
-        const profilesWithCounts = await Promise.all(
-          (profiles || []).map(async (profile) => {
-            const { count } = await supabase
-              .from('user_follows')
-              .select('*', { count: 'exact', head: true })
-              .eq('following_id', profile.id);
-
-            return {
-              id: profile.id,
-              displayName: profile.display_name || profile.username || 'User',
-              username: profile.username,
-              profileImage: profile.profile_photo_url || '',
-              homeClub: profile.home_club,
-              handicap: profile.eg_handicap_index,
-              followersCount: count || 0,
-            };
-          })
-        );
-
-        // Fetch current user's following list
-        const { data: followingData } = await supabase
-          .from('user_follows')
-          .select('following_id')
-          .eq('follower_id', user.id);
-
-        const followingSet = new Set(followingData?.map(f => f.following_id) || []);
-        setFollowingIds(followingSet);
-
-        setGolfers(profilesWithCounts);
-      } catch (error) {
-        console.error('Error fetching golfers:', error);
-      } finally {
-        setLoading(false);
-      }
+      const followingSet = new Set(followingData?.map(f => f.following_id) || []);
+      setFollowingIds(followingSet);
     };
 
-    fetchGolfers();
+    fetchFollowing();
   }, [user]);
 
-  // Filter and sort golfers based on active filter and search query
-  const filteredGolfers = useMemo(() => {
-    let filtered = [...golfers];
+  // Global search query (ignores filter)
+  const { data: searchResults, isLoading: searchLoading } = useQuery({
+    queryKey: ['search-golfers', searchQuery],
+    enabled: searchQuery.trim().length > 0 && !!user,
+    queryFn: async () => {
+      const query = searchQuery.trim().toLowerCase();
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url, home_club, eg_handicap_index')
+        .neq('id', user!.id)
+        .or(`display_name.ilike.%${query}%,username.ilike.%${query}%,home_club.ilike.%${query}%`)
+        .limit(50);
 
-    // Apply search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (g) =>
-          g.displayName.toLowerCase().includes(query) ||
-          g.username?.toLowerCase().includes(query) ||
-          g.homeClub?.toLowerCase().includes(query)
-      );
-    }
+      if (error) throw error;
 
-    // Apply filter type
-    switch (activeFilter) {
-      case 'suggested':
-        // Sort by followers count descending
-        filtered.sort((a, b) => b.followersCount - a.followersCount);
-        break;
+      return (data || []).map(profile => ({
+        id: profile.id,
+        displayName: profile.display_name || profile.username || 'User',
+        username: profile.username,
+        profileImage: profile.profile_photo_url || '',
+        homeClub: profile.home_club,
+        handicap: profile.eg_handicap_index,
+        followersCount: 0,
+      }));
+    },
+  });
 
-      case 'club':
-        // Filter by same home club
-        if (currentProfile?.home_club) {
-          filtered = filtered.filter(
-            (g) => g.homeClub?.toLowerCase() === currentProfile.home_club?.toLowerCase()
-          );
-        }
-        break;
+  // Paginated filtered query
+  const { data: filteredData, isLoading: filterLoading } = useQuery({
+    queryKey: ['golfers-filtered', activeFilter, page, currentProfile?.home_club],
+    enabled: searchQuery.trim().length === 0 && !!user,
+    queryFn: async () => {
+      let query = supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url, home_club, eg_handicap_index', { count: 'exact' })
+        .neq('id', user!.id);
 
-      case 'popular':
-        // Sort by followers count descending (same as suggested but more explicit)
-        filtered.sort((a, b) => b.followersCount - a.followersCount);
-        break;
+      // Apply filter
+      switch (activeFilter) {
+        case 'club':
+          if (currentProfile?.home_club) {
+            query = query.ilike('home_club', currentProfile.home_club);
+          }
+          break;
+        case 'low':
+          query = query.not('eg_handicap_index', 'is', null).order('eg_handicap_index', { ascending: true });
+          break;
+        case 'popular':
+        case 'suggested':
+          // For popular/suggested, we'll sort by follower count (would need a join or view in production)
+          // For now, just return all users
+          break;
+      }
 
-      case 'low':
-        // Filter and sort by low handicap
-        filtered = filtered.filter((g) => g.handicap != null);
-        filtered.sort((a, b) => (a.handicap || 99) - (b.handicap || 99));
-        break;
-    }
+      const offset = (page - 1) * PAGE_SIZE;
+      const { data, error, count } = await query.range(offset, offset + PAGE_SIZE - 1);
 
-    return filtered;
-  }, [golfers, searchQuery, activeFilter, currentProfile?.home_club]);
+      if (error) throw error;
+
+      const profiles = (data || []).map(profile => ({
+        id: profile.id,
+        displayName: profile.display_name || profile.username || 'User',
+        username: profile.username,
+        profileImage: profile.profile_photo_url || '',
+        homeClub: profile.home_club,
+        handicap: profile.eg_handicap_index,
+        followersCount: 0,
+      }));
+
+      return {
+        golfers: profiles,
+        totalCount: count || 0,
+      };
+    },
+  });
 
   const updateFollowingStatus = (userId: string, isFollowing: boolean) => {
     setFollowingIds((prev) => {
@@ -142,8 +133,14 @@ export function useGolfersDiscovery() {
     });
   };
 
+  const isSearching = searchQuery.trim().length > 0;
+  const golfers = isSearching ? searchResults || [] : filteredData?.golfers || [];
+  const totalCount = isSearching ? searchResults?.length || 0 : filteredData?.totalCount || 0;
+  const loading = isSearching ? searchLoading : filterLoading;
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+
   return {
-    golfers: filteredGolfers,
+    golfers,
     loading,
     searchQuery,
     setSearchQuery,
@@ -151,5 +148,11 @@ export function useGolfersDiscovery() {
     setActiveFilter,
     followingIds,
     updateFollowingStatus,
+    page,
+    setPage,
+    totalPages,
+    totalCount,
+    pageSize: PAGE_SIZE,
+    isSearching,
   };
 }
