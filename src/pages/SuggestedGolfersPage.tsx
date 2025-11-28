@@ -71,13 +71,13 @@ const SuggestedGolfersPage = () => {
     <div className="min-h-screen bg-background">
       <ClubhouseHeaderNew />
       
-      <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-24 max-w-3xl">
+      <main className="mx-auto w-full max-w-3xl px-4 py-6 pb-24">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold tracking-tight mb-2">
+          <h1 className="text-lg md:text-2xl font-semibold tracking-tight text-foreground mb-2">
             Find golfers to follow
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm md:text-base text-muted-foreground max-w-xl">
             Discover new golfers, see where they play, and build your friends' courses feed.
           </p>
         </div>
@@ -166,29 +166,31 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer }) => {
         }
       }}
     >
-      <div className="flex items-center gap-4">
-        {/* Avatar */}
-        <Avatar className="h-12 w-12 flex-shrink-0">
-          <AvatarImage src={golfer.profileImage} alt={golfer.displayName} />
-          <AvatarFallback>
-            {golfer.displayName.substring(0, 2).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          {/* Avatar */}
+          <Avatar className="h-12 w-12 flex-shrink-0">
+            <AvatarImage src={golfer.profileImage} alt={golfer.displayName} />
+            <AvatarFallback>
+              {golfer.displayName.substring(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
 
-        {/* Details */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <p className="font-semibold text-sm truncate">
-              {golfer.displayName}
+          {/* Details */}
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <p className="font-semibold text-sm text-foreground truncate">
+                {golfer.displayName}
+              </p>
+              {golfer.isVerified && (
+                <span className="text-blue-500 text-xs flex-shrink-0">✓</span>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground truncate">
+              {golfer.bio && handicap ? `HCP ${handicap}` : golfer.username}
+              {golfer.followersCount > 0 && ` · ${golfer.followersCount} followers`}
             </p>
-            {golfer.isVerified && (
-              <span className="text-blue-500 text-xs">✓</span>
-            )}
           </div>
-          <p className="text-xs text-muted-foreground">
-            {golfer.bio && handicap ? `HCP ${handicap}` : golfer.username}
-            {golfer.followersCount > 0 && ` · ${golfer.followersCount} followers`}
-          </p>
         </div>
 
         {/* Follow Button */}
@@ -200,7 +202,7 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer }) => {
             toggleFollow();
           }}
           disabled={followLoading}
-          className="flex-shrink-0"
+          className="flex-shrink-0 inline-flex items-center"
         >
           {isFollowing ? (
             <>
