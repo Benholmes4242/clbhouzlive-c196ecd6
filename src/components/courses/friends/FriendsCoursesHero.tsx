@@ -40,8 +40,8 @@ export const FriendsCoursesHero: React.FC<FriendsCoursesHeroProps> = ({ courses,
   const coursesCount = courses.length;
   const regionsSet = new Set(courses.map(c => `${c.country}-${c.sub_country || 'none'}`));
   const regionsCount = regionsSet.size;
-  const ratingsWithValues = courses.filter(c => c.average_rating != null).map(c => c.average_rating!);
-  const avgRating = ratingsWithValues.length > 0 
+  const ratingsWithValues = courses.filter(c => c.community_rating != null).map(c => c.community_rating!);
+  const avgRating = ratingsWithValues.length > 0
     ? (ratingsWithValues.reduce((sum, r) => sum + r, 0) / ratingsWithValues.length).toFixed(1)
     : null;
 
