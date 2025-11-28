@@ -630,15 +630,15 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
             {/* Main Content Area */}
             <div className="flex-1 overflow-y-auto">
               <form id="course-form" onSubmit={handleSubmit(onSubmit)} className="h-full flex flex-col">
-                 <div className="flex-1 p-6">
+                 <div className="flex-1 p-4">
                    <Tabs value={activeTab} onValueChange={(value) => {
                      setActiveTab(value);
                      saveDraft({ activeTab: value });
                    }} className="h-full">
                      <TabsContent value="details" className="mt-0 h-full">
-                      <div className="grid grid-cols-3 gap-8 h-full">
+                      <div className="grid grid-cols-3 gap-6 h-full">
                         {/* Left Column - Main Fields */}
-                        <div className="col-span-2 space-y-6">
+                        <div className="col-span-2 space-y-4">
                           <div className="space-y-2">
                             <Label htmlFor="name" className="flex items-center gap-1">
                               Golf Course Name <span className="text-red-500">*</span>
@@ -676,11 +676,11 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
                                  onChange: (e) => saveDraft({ description: e.target.value })
                                })}
                                placeholder="Short overview of the club... (Markdown supported)"
-                               rows={6}
+                               rows={4}
                              />
                            </div>
 
-                          <div className="space-y-4">
+                          <div className="space-y-3">
                             <h3 className="font-medium">Quick actions</h3>
                             <div className="flex gap-3">
                               {!isCreating && course && (
@@ -706,7 +706,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
                         </div>
 
                         {/* Right Column - Meta Info */}
-                        <div className="space-y-6">
+                        <div className="space-y-4">
                           <div className="space-y-4">
                             <h3 className="font-medium">Primary Location</h3>
                             <div className="space-y-3">
@@ -793,7 +793,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
                     </TabsContent>
 
                     <TabsContent value="location" className="mt-0">
-                      <div className="space-y-6">
+                      <div className="space-y-4">
                         <h2 className="text-lg font-semibold">Location Details</h2>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
@@ -854,7 +854,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
                     </TabsContent>
 
                     <TabsContent value="rankings" className="mt-0">
-                      <div className="space-y-6">
+                      <div className="space-y-4">
                         <h2 className="text-lg font-semibold">Top 100 Rankings</h2>
                         <div className="grid grid-cols-2 gap-6">
                           <div className="space-y-4">
@@ -927,7 +927,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
                     </TabsContent>
 
                     <TabsContent value="media" className="mt-0">
-                      <div className="space-y-6">
+                      <div className="space-y-4">
                         <h2 className="text-lg font-semibold">Course Media</h2>
                         <CourseImageUpload
                           currentImageUrl={courseImageUrl}
@@ -948,7 +948,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
 
                     {!isCreating && (
                       <TabsContent value="history" className="mt-0">
-                        <div className="space-y-6">
+                        <div className="space-y-4">
                           <h2 className="text-lg font-semibold">Course History</h2>
                           <p className="text-muted-foreground">Course change history will be displayed here.</p>
                         </div>
