@@ -31,7 +31,7 @@ export const FilterPillsRow: React.FC<FilterPillsRowProps> = ({
         </p>
       </div>
 
-      <div className="rounded-2xl bg-slate-100 px-1.5 py-1 flex gap-1.5 overflow-x-auto no-scrollbar">
+      <div className="rounded-2xl bg-slate-100 px-1.5 py-1 flex justify-center gap-1.5 overflow-x-auto no-scrollbar">
         {options.map((option) => {
           const isActive = option.id === activeId;
           return (
