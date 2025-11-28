@@ -1,269 +1,252 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useSuggestedUsers } from '@/hooks/useSuggestedUsers';
 import { useFollowUserState } from '@/hooks/useFollowUserState';
-import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
-import { Input } from '@/components/ui/input';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Search, UserPlus, UserCheck } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
-import { InlineSpinner } from '@/components/ui/InlineSpinner';
+import { useNavigate } from 'react-router-dom';
+import { Search } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-type FilterType = 'suggested' | 'popular' | 'low';
+type FilterType = 'suggested' | 'popular' | 'low_handicap';
+
+type Golfer = {
+  id: string;
+  displayName: string;
+  username: string;
+  profileImage: string;
+  bio?: string;
+  followersCount: number;
+  isVerified?: boolean;
+};
 
 const SuggestedGolfersPage = () => {
-  const navigate = useNavigate();
   const { user, loading: sessionLoading } = useSupabaseSession();
-  const { users, loading } = useSuggestedUsers();
+  const { users, loading: usersLoading } = useSuggestedUsers();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterType>('suggested');
 
-  // Track when we've had at least one "definitive" session check
-  const [hasCheckedSession, setHasCheckedSession] = useState(false);
+  const isLoading = sessionLoading || usersLoading;
 
-  // Mark the session as "checked" once loading finishes the first time
-  useEffect(() => {
-    if (!sessionLoading && !hasCheckedSession) {
-      setHasCheckedSession(true);
-    }
-  }, [sessionLoading, hasCheckedSession]);
-
-  // Handle auth redirect once we *know* the session has been checked
-  useEffect(() => {
-    if (hasCheckedSession && !user) {
-      navigate('/auth', { replace: true });
-    }
-  }, [hasCheckedSession, user, navigate]);
-
-  // Filter and sort users based on active filter
-  const filteredUsers = useMemo(() => {
-    if (!users) return [];
-    
-    let filtered = [...users];
-
-    // Apply search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        u =>
-          u.displayName.toLowerCase().includes(query) ||
-          u.username.toLowerCase().includes(query) ||
-          (u.bio && u.bio.toLowerCase().includes(query))
-      );
-    }
-
-    // Apply filter sorting
-    switch (activeFilter) {
-      case 'popular':
-        filtered.sort((a, b) => b.followersCount - a.followersCount);
-        break;
-      case 'low':
-        // Filter out users without handicap and sort by handicap ascending
-        filtered = filtered.filter(u => u.bio && /HCP/i.test(u.bio));
-        break;
-      case 'suggested':
-      default:
-        // Default: mix of followers and activity
-        filtered.sort((a, b) => b.followersCount - a.followersCount);
-        break;
-    }
-
-    return filtered;
-  }, [users, searchQuery, activeFilter]);
-
-  const filterChips = [
-    { value: 'suggested' as FilterType, label: 'Suggested' },
-    { value: 'popular' as FilterType, label: 'Popular' },
-    { value: 'low' as FilterType, label: 'Low handicap' },
-  ];
-
-  // While we haven't finished the first session check, or Supabase is still loading,
-  // show a simple full-page loader
-  if (!hasCheckedSession || sessionLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <ClubhouseHeaderNew />
-        <div className="flex min-h-[60vh] items-center justify-center">
-          <InlineSpinner size="lg" />
-        </div>
-      </div>
-    );
-  }
-
-  // At this point, hasCheckedSession === true and sessionLoading === false.
-  // If there's still no user, the redirect effect will fire; just don't render UI.
-  if (!user) {
+  // Let layout/auth wrapper handle redirect; don't navigate here
+  if (!user && !sessionLoading) {
     return null;
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <ClubhouseHeaderNew />
-      
-      <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-24 max-w-3xl">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold tracking-tight mb-2">
+    <div className="min-h-screen bg-page">
+      <div className="mx-auto w-full max-w-[960px] px-4 pb-16 pt-6 sm:px-6 lg:px-0">
+        {/* Page title */}
+        <header className="mb-4">
+          <h1 className="text-2xl font-semibold text-foreground">
             Find golfers to follow
           </h1>
-          <p className="text-sm text-muted-foreground">
-            Discover new golfers, see where they play, and build your friends' courses feed.
+          <p className="mt-1 text-sm text-muted-foreground">
+            Discover golfers by club, handicap and popularity, and grow your clubhouse.
           </p>
-        </div>
+        </header>
 
-        {/* Search Bar */}
-        <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="text"
-            placeholder="Search golfers by name or club"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
+        {/* Search + filters */}
+        <section className="mb-6 space-y-3">
+          {/* Search input */}
+          <div className="relative">
+            <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-muted-foreground">
+              <Search className="h-4 w-4" />
+            </span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search golfers by name or club"
+              className="h-11 w-full rounded-xl border border-border bg-card pl-9 pr-3 text-sm placeholder:text-muted-foreground/70 focus:border-border-strong focus:outline-none focus:ring-0"
+            />
+          </div>
 
-        {/* Filter Chips */}
-        <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-          {filterChips.map((chip) => (
-            <button
-              key={chip.value}
-              onClick={() => setActiveFilter(chip.value)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
-                activeFilter === chip.value
-                  ? 'bg-slate-600 text-white'
-                  : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100'
-              }`}
-            >
-              {chip.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Golfers List */}
-        {loading ? (
-          <div className="space-y-3">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <GolferCardSkeleton key={i} />
+          {/* Filter pills */}
+          <div className="inline-flex gap-2 rounded-full bg-muted/40 p-1">
+            {[
+              { key: 'suggested' as FilterType, label: 'Suggested' },
+              { key: 'popular' as FilterType, label: 'Popular' },
+              { key: 'low_handicap' as FilterType, label: 'Low handicap' },
+            ].map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() => setActiveFilter(item.key)}
+                className={cn(
+                  'px-3 py-1.5 text-xs font-medium rounded-full transition',
+                  activeFilter === item.key
+                    ? 'bg-background shadow-sm text-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                {item.label}
+              </button>
             ))}
           </div>
-        ) : filteredUsers.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-lg font-semibold mb-2">No golfers found</p>
-            <p className="text-sm text-muted-foreground">
-              Try a different search or clear your filters.
-            </p>
-          </div>
+        </section>
+
+        {/* Content / skeleton */}
+        {isLoading ? (
+          <GolfersSkeleton />
         ) : (
-          <div className="space-y-3">
-            {filteredUsers.map((golfer) => (
-              <GolferCard key={golfer.id} golfer={golfer} />
-            ))}
-          </div>
+          <GolfersResultsGrid users={users} searchQuery={searchQuery} activeFilter={activeFilter} />
         )}
-      </main>
+      </div>
     </div>
   );
 };
 
-interface GolferCardProps {
-  golfer: {
-    id: string;
-    displayName: string;
-    username: string;
-    profileImage: string;
-    bio?: string;
-    followersCount: number;
-    isVerified?: boolean;
-  };
-}
+const GolfersResultsGrid: React.FC<{
+  users: Golfer[];
+  searchQuery: string;
+  activeFilter: FilterType;
+}> = ({ users, searchQuery, activeFilter }) => {
+  // filter by search
+  const filtered = users
+    .filter((u) => {
+      const q = searchQuery.trim().toLowerCase();
+      if (!q) return true;
+      const name = (u.displayName || u.username || '').toLowerCase();
+      const bio = (u.bio || '').toLowerCase();
+      return name.includes(q) || bio.includes(q);
+    })
+    .sort((a, b) => {
+      if (activeFilter === 'popular') {
+        return (b.followersCount || 0) - (a.followersCount || 0);
+      }
+      if (activeFilter === 'low_handicap') {
+        // Extract handicap from bio for sorting
+        const getHandicap = (golfer: Golfer) => {
+          const match = golfer.bio?.match(/HCP\s*([\d.]+)/i);
+          return match ? parseFloat(match[1]) : 99;
+        };
+        return getHandicap(a) - getHandicap(b);
+      }
+      // suggested – leave as backend order
+      return 0;
+    });
 
-const GolferCard: React.FC<GolferCardProps> = ({ golfer }) => {
-  const { toggleFollow, isFollowing, isLoading: followLoading } = useFollowUserState(golfer.id);
-  const navigate = useNavigate();
-
-  // Extract handicap from bio if present
-  const handicap = golfer.bio?.match(/HCP\s*([\d.]+)/i)?.[1];
+  if (filtered.length === 0) {
+    return (
+      <div className="mt-8 text-center text-sm text-muted-foreground">
+        No golfers found. Try another name or club.
+      </div>
+    );
+  }
 
   return (
-    <Card
-      className="p-4 hover:shadow-md transition-shadow cursor-pointer"
-      onClick={(e) => {
-        // Only navigate if not clicking the button
-        if (!(e.target as HTMLElement).closest('button')) {
-          navigate(`/profile/${golfer.username.replace('@', '')}`);
-        }
-      }}
-    >
-      <div className="flex items-center gap-4">
-        {/* Avatar */}
-        <Avatar className="h-12 w-12 flex-shrink-0">
-          <AvatarImage src={golfer.profileImage} alt={golfer.displayName} />
-          <AvatarFallback>
-            {golfer.displayName.substring(0, 2).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+    <div className="mt-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {filtered.map((golfer) => (
+        <GolferCard key={golfer.id} golfer={golfer} />
+      ))}
+    </div>
+  );
+};
 
-        {/* Details */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <p className="font-semibold text-sm truncate">
-              {golfer.displayName}
-            </p>
-            {golfer.isVerified && (
-              <span className="text-blue-500 text-xs">✓</span>
-            )}
-          </div>
-          <p className="text-xs text-muted-foreground">
-            {golfer.bio && handicap ? `HCP ${handicap}` : golfer.username}
-            {golfer.followersCount > 0 && ` · ${golfer.followersCount} followers`}
-          </p>
+const GolferCard: React.FC<{ golfer: Golfer }> = ({ golfer }) => {
+  const { toggleFollow, isFollowing, isLoading: followLoading } = useFollowUserState(golfer.id);
+  const navigate = useNavigate();
+  const name = golfer.displayName || golfer.username;
+
+  // Extract handicap from bio
+  const handicapMatch = golfer.bio?.match(/HCP\s*([\d.]+)/i);
+  const handicap = handicapMatch ? parseFloat(handicapMatch[1]) : null;
+
+  // Extract club from bio (simple heuristic)
+  const clubMatch = golfer.bio?.match(/(?:Member at|Club:|@)\s*([^•|]+)/i);
+  const club = clubMatch ? clubMatch[1].trim() : null;
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Only navigate if not clicking the button
+    if (!(e.target as HTMLElement).closest('button')) {
+      navigate(`/profile/${golfer.username.replace('@', '')}`);
+    }
+  };
+
+  return (
+    <article 
+      className="flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-xs cursor-pointer hover:shadow-sm transition-shadow"
+      onClick={handleCardClick}
+    >
+      <div className="flex gap-3 p-3">
+        {/* Squircle avatar */}
+        <div className="flex-shrink-0">
+          <img
+            src={golfer.profileImage ?? '/placeholder-avatar.png'}
+            alt={name}
+            className="h-20 w-16 rounded-[24%] object-cover bg-muted"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = '/placeholder-avatar.png';
+            }}
+          />
         </div>
 
-        {/* Follow Button */}
-        <Button
-          size="sm"
-          variant={isFollowing ? 'outline' : 'default'}
+        {/* Text block */}
+        <div className="flex min-w-0 flex-1 flex-col justify-center">
+          <h3 className="truncate text-sm font-semibold text-foreground">
+            {name}
+          </h3>
+          {club && (
+            <p className="mt-0.5 truncate text-xs text-muted-foreground">
+              {club}
+            </p>
+          )}
+          <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            {handicap != null && (
+              <span className="rounded-full bg-muted px-2 py-0.5 text-[11px]">
+                Hcp {handicap.toFixed(1)}
+              </span>
+            )}
+            {typeof golfer.followersCount === 'number' && golfer.followersCount > 0 && (
+              <span className="text-[11px]">
+                {golfer.followersCount} follower{golfer.followersCount === 1 ? '' : 's'}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Follow button footer */}
+      <div className="border-t border-border bg-muted/40 px-3 py-2.5">
+        <button
+          type="button"
           onClick={(e) => {
             e.stopPropagation();
             toggleFollow();
           }}
           disabled={followLoading}
-          className="flex-shrink-0"
+          className="inline-flex w-full items-center justify-center rounded-xl bg-foreground px-3 py-1.5 text-xs font-semibold text-background hover:opacity-90 transition disabled:opacity-50"
         >
-          {isFollowing ? (
-            <>
-              <UserCheck className="h-3 w-3 mr-1" />
-              Following
-            </>
-          ) : (
-            <>
-              <UserPlus className="h-3 w-3 mr-1" />
-              Follow
-            </>
-          )}
-        </Button>
+          {isFollowing ? 'Following' : 'Follow'}
+        </button>
       </div>
-    </Card>
+    </article>
   );
 };
 
-const GolferCardSkeleton = () => {
-  return (
-    <Card className="p-4">
-      <div className="flex items-center gap-4">
-        <Skeleton className="h-12 w-12 rounded-full flex-shrink-0" />
-        <div className="flex-1 space-y-2">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-3 w-48" />
+const GolfersSkeleton = () => (
+  <div className="mt-4 space-y-4">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {[0, 1, 2, 3, 4, 5].map((i) => (
+        <div
+          key={i}
+          className="flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card"
+        >
+          <div className="flex gap-3 p-3">
+            <div className="h-20 w-16 rounded-[24%] bg-muted animate-pulse" />
+            <div className="flex-1 space-y-2">
+              <div className="h-3 w-2/3 rounded bg-muted animate-pulse" />
+              <div className="h-3 w-1/2 rounded bg-muted animate-pulse" />
+              <div className="mt-2 flex gap-2">
+                <div className="h-4 w-14 rounded-full bg-muted animate-pulse" />
+                <div className="h-4 w-10 rounded-full bg-muted animate-pulse" />
+              </div>
+            </div>
+          </div>
+          <div className="h-8 bg-muted/40" />
         </div>
-        <Skeleton className="h-9 w-24 flex-shrink-0" />
-      </div>
-    </Card>
-  );
-};
+      ))}
+    </div>
+  </div>
+);
 
 export default SuggestedGolfersPage;
