@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import { FadeInContent } from '@/components/ui/FadeInContent';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Search, ChevronLeft } from 'lucide-react';
 import { GolferCard } from '@/components/golfers/GolferCard';
 import { GolferCardSkeleton } from '@/components/golfers/GolferCardSkeleton';
 import { useGolfersDiscovery, FilterType } from '@/hooks/useGolfersDiscovery';
@@ -15,6 +16,7 @@ import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
 const GolfersToFollowPage = () => {
+  const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState('');
   const debouncedSearchQuery = useDebounce(searchInput, 300);
   
@@ -102,6 +104,14 @@ const GolfersToFollowPage = () => {
     { id: 'popular', label: 'Popular golfers' },
   ];
 
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/courses?tab=friends');
+    }
+  };
+
   const startIndex = (page - 1) * pageSize + 1;
   const endIndex = Math.min(page * pageSize, totalCount);
   const direction = page > lastPage ? 'right' : 'left';
@@ -112,11 +122,20 @@ const GolfersToFollowPage = () => {
       <FadeInContent>
         <main className="max-w-3xl mx-auto pb-[30px]">
           {/* Header - Centered */}
-          <header className="px-4 pt-8 pb-4 text-center">
-            <h1 className="text-xl font-semibold text-foreground">
+          <header className="px-4 pt-8 pb-4">
+            <button
+              type="button"
+              onClick={handleBack}
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-full px-3 py-1 transition mb-2"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span>Back to Friends&apos; Courses</span>
+            </button>
+
+            <h1 className="text-xl font-semibold text-foreground text-center">
               Find golfers to follow
             </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="mt-1 text-sm text-muted-foreground text-center">
               Discover new golfers, see where they play, and build your community.
             </p>
           </header>
