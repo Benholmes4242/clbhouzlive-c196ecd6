@@ -55,7 +55,7 @@ export function UnifiedControlBar({
             bg-background
             border border-border/60
             shadow-sm
-            hover:bg-accent/50
+            hover:bg-slate-50
             transition-colors
           "
         >
@@ -78,7 +78,7 @@ export function UnifiedControlBar({
               bg-background
               border border-border/60
               shadow-sm
-              hover:bg-accent/50
+              hover:bg-slate-50
               transition-colors
             "
           >
