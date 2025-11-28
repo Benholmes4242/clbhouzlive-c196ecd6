@@ -629,7 +629,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
 
             {/* Main Content Area */}
             <div className="flex-1 overflow-y-auto">
-              <form id="course-form" onSubmit={handleSubmit(onSubmit)} className="h-full flex flex-col">
+              <form id="course-form" onSubmit={handleSubmit(onSubmit)} className="h-full flex flex-col pb-20">
                  <div className="flex-1 p-4">
                    <Tabs value={activeTab} onValueChange={(value) => {
                      setActiveTab(value);
