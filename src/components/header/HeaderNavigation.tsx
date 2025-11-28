@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAdaptiveTextColor } from "@/hooks/useAdaptiveTextColor";
 import { useHeader } from "@/contexts/GlobalHeaderContext";
 import { cn } from "@/lib/utils";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +25,9 @@ const HeaderNavigation = () => {
   const { user } = useSupabaseSession();
   const { unreadCount } = useNotifications();
   const { variant } = useHeader();
+  
+  // Fetch current user's profile to get username
+  const { data: currentUserProfile } = useUserProfile(user?.id);
   
   // Create refs for adaptive text color detection
   const navigationRef = useRef<HTMLDivElement>(null);
@@ -84,7 +88,14 @@ const HeaderNavigation = () => {
     if (!user) {
       navigate('/auth');
     } else {
-      navigate('/profile');
+      // Navigate to user's profile using their username
+      const username = currentUserProfile?.username;
+      if (username) {
+        navigate(`/profile/${username}`);
+      } else {
+        // Fallback to user ID if username not yet loaded
+        navigate(`/profile`);
+      }
     }
   };
 
