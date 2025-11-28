@@ -522,10 +522,12 @@ const FriendsCoursesPanel: React.FC = () => {
 
       {/* Hero Course Card */}
       {heroCourse && (
-        <FriendsHeroCourseCard 
-          course={heroCourse} 
-          filterType={courseFilter}
-        />
+        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
+          <FriendsHeroCourseCard 
+            course={heroCourse} 
+            filterType={courseFilter}
+          />
+        </div>
       )}
 
       {/* Friends Activity Leaderboard */}
@@ -633,7 +635,7 @@ const FriendsCoursesPanel: React.FC = () => {
 
       {/* Regular courses - Paginated list with slide animation */}
       {paginatedCourses.length > 0 && (
-        <div className="space-y-4">
+        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
           <motion.div
             key={page}
             initial={{ x: 40, opacity: 0 }}
@@ -649,7 +651,7 @@ const FriendsCoursesPanel: React.FC = () => {
                 <Card 
                   key={course.course_id} 
                   data-friends-course-card={course.course_id}
-                  className="relative overflow-hidden rounded-xl hover:shadow-md transition-all cursor-pointer bg-card border shadow-sm"
+                  className="relative overflow-hidden rounded-none sm:rounded-xl hover:shadow-md transition-all cursor-pointer bg-card border shadow-sm"
                   onClick={() => navigate(`/courses/${course.course_id}`)}
                 >
                   {/* Course Image - Taller, Full Width */}
