@@ -66,18 +66,13 @@ export function GolferCard({
 
       {/* Right side - stacked buttons with fixed width */}
       <div className="flex flex-col gap-2 ml-3 shrink-0 w-[110px]">
-        {/* Follow Button */}
+        {/* Follow Button - Lighter secondary style */}
         <Button
-          variant={isFollowing ? 'outline' : 'outline'}
+          variant="secondary"
           size="sm"
           onClick={onFollowToggle}
           disabled={loading}
-          className={cn(
-            "h-9 w-full rounded-lg text-sm font-medium transition",
-            isFollowing 
-              ? "border-slate-600 bg-slate-50 text-foreground hover:bg-slate-100"
-              : "border-slate-600 text-foreground hover:bg-slate-50"
-          )}
+          className="h-9 w-full rounded-lg text-sm font-medium"
         >
           {isFollowing ? (
             <>

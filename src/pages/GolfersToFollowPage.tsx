@@ -122,20 +122,20 @@ const GolfersToFollowPage = () => {
       <FadeInContent>
         <main className="max-w-3xl mx-auto pb-[30px]">
           {/* Header - Centered */}
-          <header className="px-4 pt-8 pb-4">
+          <header className="px-4 pt-4 pb-5">
             <button
               type="button"
               onClick={handleBack}
-              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-full px-3 py-1 transition mb-2"
+              className="inline-flex items-center text-xs font-medium text-muted-foreground hover:text-foreground transition"
             >
-              <ChevronLeft className="h-4 w-4" />
-              <span>Back to Friends&apos; Courses</span>
+              <ChevronLeft className="mr-1 h-3 w-3" />
+              Back to Friends&apos; Courses
             </button>
 
-            <h1 className="text-xl font-semibold text-foreground text-center">
+            <h1 className="mt-3 text-xl font-semibold text-foreground text-center">
               Find golfers to follow
             </h1>
-            <p className="mt-1 text-sm text-muted-foreground text-center">
+            <p className="mt-2 text-sm text-muted-foreground text-center max-w-xs mx-auto">
               Discover new golfers, see where they play, and build your community.
             </p>
           </header>
