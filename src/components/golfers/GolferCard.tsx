@@ -31,11 +31,9 @@ export function GolferCard({
 }: GolferCardProps) {
   const navigate = useNavigate();
 
-  // Build secondary line text
+  // Build separate lines for club and handicap
   const clubLine = golfer.homeClub || 'No home club set';
   const handicapLine = golfer.handicap != null ? `HCP ${golfer.handicap.toFixed(1)}` : null;
-  
-  const secondaryLine = [clubLine, handicapLine].filter(Boolean).join(' · ');
 
   return (
     <article className="flex items-center justify-between rounded-2xl border border-border bg-card shadow-sm px-4 py-3 hover:shadow-md transition-shadow">
@@ -56,8 +54,13 @@ export function GolferCard({
             {golfer.displayName}
           </div>
           <div className="mt-0.5 text-sm text-muted-foreground truncate">
-            {secondaryLine}
+            {clubLine}
           </div>
+          {handicapLine && (
+            <div className="mt-0.5 text-sm text-muted-foreground truncate">
+              {handicapLine}
+            </div>
+          )}
         </div>
       </button>
 
