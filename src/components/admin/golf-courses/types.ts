@@ -134,9 +134,16 @@ export const continentalEuropeCountries = [
   'Slovakia', 'Spain', 'Sweden', 'Switzerland', 'Turkey', 'Russia'
 ];
 
-// Worldwide countries
+// Oceania countries
+export const oceaniaCountries = [
+  'Australia', 'Cook Islands', 'Fiji', 'French Polynesia', 'Guam', 'New Caledonia',
+  'New Zealand', 'Norfolk Island', 'Northern Mariana Islands', 'Papua New Guinea',
+  'Samoa', 'Vanuatu'
+];
+
+// Worldwide countries (other regions)
 export const worldwideCountries = [
-  'Australia', 'New Zealand', 'South Africa', 'Japan', 'South Korea', 'China',
+  'South Africa', 'Japan', 'South Korea', 'China',
   'Thailand', 'Singapore', 'Malaysia', 'Philippines', 'India', 'UAE', 'Canada',
   'Mexico', 'Brazil', 'Argentina', 'Chile', 'Morocco', 'Egypt', 'Kenya'
 ];
