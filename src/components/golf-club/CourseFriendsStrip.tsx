@@ -43,8 +43,8 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
         </span>
       </div>
 
-      <div className="flex items-center gap-2 ml-3 shrink-0">
-        {visibleFriends.map((friend) => {
+      <div className="flex items-center ml-3 shrink-0">
+        {visibleFriends.map((friend, index) => {
           const displayName = friend.profile.display_name || friend.profile.username || '?';
           const initial = displayName[0]?.toUpperCase() || '?';
           
@@ -54,12 +54,12 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
               src={friend.profile.profile_photo_url}
               alt={displayName}
               size={36}
-              className="shrink-0"
+              className={`shrink-0 ${index > 0 ? '-ml-2' : ''}`}
             />
           ) : (
             <div
               key={friend.user_id}
-              className="w-9 h-9 flex items-center justify-center bg-muted text-foreground text-xs font-semibold shrink-0"
+              className={`w-9 h-9 flex items-center justify-center bg-muted text-foreground text-xs font-semibold shrink-0 ${index > 0 ? '-ml-2' : ''}`}
               style={{ borderRadius: '22%' }}
             >
               {initial}
@@ -68,7 +68,7 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
         })}
 
         {overflowCount > 0 && (
-          <div className="flex items-center justify-center rounded-[18px] bg-muted px-2 h-9 text-xs font-medium text-muted-foreground shrink-0">
+          <div className="flex items-center justify-center rounded-[18px] bg-muted px-2 h-9 text-xs font-medium text-muted-foreground shrink-0 -ml-2">
             +{overflowCount}
           </div>
         )}
