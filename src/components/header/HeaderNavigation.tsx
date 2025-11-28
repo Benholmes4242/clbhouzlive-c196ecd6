@@ -10,7 +10,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAdaptiveTextColor } from "@/hooks/useAdaptiveTextColor";
 import { useHeader } from "@/contexts/GlobalHeaderContext";
 import { cn } from "@/lib/utils";
-import { useUserProfile } from "@/hooks/useUserProfile";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,9 +24,6 @@ const HeaderNavigation = () => {
   const { user } = useSupabaseSession();
   const { unreadCount } = useNotifications();
   const { variant } = useHeader();
-  
-  // Fetch current user's profile to get username
-  const { data: currentUserProfile } = useUserProfile(user?.id);
   
   // Create refs for adaptive text color detection
   const navigationRef = useRef<HTMLDivElement>(null);
@@ -88,14 +84,7 @@ const HeaderNavigation = () => {
     if (!user) {
       navigate('/auth');
     } else {
-      // Navigate to user's profile using their username
-      const username = currentUserProfile?.username;
-      if (username) {
-        navigate(`/profile/${username}`);
-      } else {
-        // Fallback to user ID if username not yet loaded
-        navigate(`/profile`);
-      }
+      navigate('/profile');
     }
   };
 
@@ -192,7 +181,7 @@ const HeaderNavigation = () => {
             <User className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48 mr-2 bg-white border shadow-lg z-[10001]">
+        <DropdownMenuContent align="end" className="w-48 mr-2 bg-white border shadow-lg z-50">
           <DropdownMenuItem onClick={handleProfileClick}>
             View Profile
           </DropdownMenuItem>
@@ -218,7 +207,7 @@ const HeaderNavigation = () => {
             <Settings className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48 mr-2 z-[10001]">
+        <DropdownMenuContent align="end" className="w-48 mr-2">
           <DropdownMenuItem onClick={() => navigate('/settings')}>
             Settings
           </DropdownMenuItem>
