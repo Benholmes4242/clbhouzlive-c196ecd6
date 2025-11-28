@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
+import { useNavigate } from 'react-router-dom';
 import { FadeInContent } from '@/components/ui/FadeInContent';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Search, ArrowLeft } from 'lucide-react';
 import { GolferCard } from '@/components/golfers/GolferCard';
 import { GolferCardSkeleton } from '@/components/golfers/GolferCardSkeleton';
 import { useGolfersDiscovery, FilterType } from '@/hooks/useGolfersDiscovery';
@@ -15,6 +15,7 @@ import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
 const GolfersToFollowPage = () => {
+  const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState('');
   const debouncedSearchQuery = useDebounce(searchInput, 300);
   
@@ -107,8 +108,19 @@ const GolfersToFollowPage = () => {
   const direction = page > lastPage ? 'right' : 'left';
 
   return (
-    <div className="min-h-screen bg-background page-with-header m-0 p-0">
-      <ClubhouseHeaderNew />
+    <div className="min-h-screen bg-background m-0 p-0">
+      {/* Glass back button - same styling as Course Details */}
+      <button
+        onClick={() => navigate(-1)}
+        className="absolute top-3 left-3 md:top-4 md:left-4 z-20 h-9 w-9 bg-black/20 backdrop-blur-sm rounded-md flex items-center justify-center hover:bg-black/40 transition-colors focus:outline-none"
+        style={{ 
+          paddingTop: 'max(0.75rem, env(safe-area-inset-top))',
+        }}
+        aria-label="Go back"
+      >
+        <ArrowLeft className="!h-5 !w-5 text-white" />
+      </button>
+
       <FadeInContent>
         <main className="max-w-3xl mx-auto pb-[30px]">
           {/* Header - Centered */}
