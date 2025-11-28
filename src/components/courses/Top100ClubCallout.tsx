@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Trophy, ChevronRight } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMyTop100Progress } from '@/hooks/useMyTop100Progress';
+import { useUserTop100Progress } from '@/hooks/useUserTop100Progress';
 import { Card } from '@/components/ui/card';
 
 const Top100ClubCallout: React.FC = () => {
   const { session } = useSupabaseSession();
   const navigate = useNavigate();
   const { data: progress } = useMyTop100Progress();
+  const { data: listProgress } = useUserTop100Progress(session?.user?.id);
 
   const handleClick = () => {
     if (session) {
@@ -21,8 +23,16 @@ const Top100ClubCallout: React.FC = () => {
   const coursesCount = progress?.total_played_top100 ?? 0;
   const regionsCount = progress?.regions_count ?? 0;
   
-  // Calculate progress percentage (out of 100)
-  const progressPercent = Math.min((coursesCount / 100) * 100, 100);
+  // Calculate total courses across all active Top 100 lists
+  const totalCoursesAcrossAllLists = (listProgress || []).reduce(
+    (sum, list) => sum + list.total,
+    0
+  );
+  
+  // Calculate progress percentage based on total courses across all lists
+  const progressPercent = totalCoursesAcrossAllLists > 0
+    ? Math.min((coursesCount / totalCoursesAcrossAllLists) * 100, 100)
+    : 0;
 
   return (
     <section className="mb-4">
