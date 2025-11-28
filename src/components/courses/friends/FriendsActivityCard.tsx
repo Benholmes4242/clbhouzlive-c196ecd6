@@ -71,7 +71,7 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
       {/* Header - Always visible, clickable */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-5 py-4 flex items-center justify-between hover:bg-muted/30 transition-colors"
+        className="w-full px-5 py-4 flex items-center justify-between hover:bg-muted/30 transition-colors min-h-[64px]"
       >
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center w-9 h-9 rounded-full bg-amber-50 border border-amber-200">
@@ -88,9 +88,9 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
             Top 10
           </span>
           {isExpanded ? (
-            <ChevronUp className="w-5 h-5 text-muted-foreground" />
+            <ChevronUp className="w-5 h-5 text-muted-foreground transition-transform duration-200" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-muted-foreground" />
+            <ChevronDown className="w-5 h-5 text-muted-foreground transition-transform duration-200" />
           )}
         </div>
       </button>

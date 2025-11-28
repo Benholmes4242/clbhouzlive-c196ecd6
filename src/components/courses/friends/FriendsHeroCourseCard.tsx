@@ -20,13 +20,13 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
   const getHighlightLabel = () => {
     switch (filterType) {
       case 'most_played':
-        return 'Most played this period';
+        return 'Most popular course this month';
       case 'highest_rated':
         return 'Highest rated this period';
       case 'new':
         return 'Recently discovered';
       default:
-        return "Friends' highlight this period";
+        return 'Most popular course this month';
     }
   };
 
@@ -48,6 +48,15 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
           />
           {/* Bottom gradient */}
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
+          
+          {/* Rating badge (top-left) */}
+          {course.average_rating != null && (
+            <div className="absolute top-3 left-3 z-10">
+              <span className="inline-flex items-center rounded-full border border-border bg-card/90 backdrop-blur-sm px-3 py-1 text-xs sm:text-[13px] font-medium text-foreground shadow-sm">
+                {course.average_rating.toFixed(1)} /10
+              </span>
+            </div>
+          )}
           
           {/* Rank badges (top-right) */}
           <div className="absolute top-3 right-3 z-10 flex gap-1.5">

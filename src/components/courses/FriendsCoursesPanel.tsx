@@ -320,7 +320,7 @@ const FriendsCoursesPanel: React.FC = () => {
           new Date(a.most_recent_play).getTime()
         );
       })
-      .slice(0, 4);
+      .slice(0, 2);
   }, [courses]);
 
   const regularCourses = useMemo(() => {
@@ -421,7 +421,7 @@ const FriendsCoursesPanel: React.FC = () => {
   };
 
   return (
-    <div className="w-full space-y-4 pb-6">
+    <div className="w-full pb-6">
       <div className="space-y-3">
         <div>
           <h2 className="text-lg font-semibold tracking-tight">Friends' Courses</h2>
@@ -464,17 +464,19 @@ const FriendsCoursesPanel: React.FC = () => {
       </div>
 
       {/* Friends Snapshot Card */}
-      <FriendsSnapshotCard
-        timeframe={timeframe}
-        totalCourses={totalCourses}
-        totalRegions={totalRegions}
-        averageRating={averageRating}
-        totalRounds={totalRounds}
-      />
+      <div className="mt-8">
+        <FriendsSnapshotCard
+          timeframe={timeframe}
+          totalCourses={totalCourses}
+          totalRegions={totalRegions}
+          averageRating={averageRating}
+          totalRounds={totalRounds}
+        />
+      </div>
 
-      {/* Hero Course Card */}
+      {/* Hero Course Card - Most Popular */}
       {heroCourse && (
-        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
+        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 mt-8">
           <FriendsHeroCourseCard 
             course={heroCourse} 
             filterType={courseFilter}
@@ -483,13 +485,15 @@ const FriendsCoursesPanel: React.FC = () => {
       )}
 
       {/* Friends Activity Leaderboard */}
-      <FriendsActivityCard 
-        leaderboard={leaderboard}
-        timeframe={timeframe}
-      />
+      <div className="mt-8">
+        <FriendsActivityCard 
+          leaderboard={leaderboard}
+          timeframe={timeframe}
+        />
+      </div>
 
       {hotCourses.length > 0 && (
-        <div className="space-y-3">
+        <div className="mt-9 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Flame className="w-4 h-4 text-primary-accent" />
@@ -509,19 +513,14 @@ const FriendsCoursesPanel: React.FC = () => {
                 {/* Course Image - Taller */}
                 {course.thumbnail_url && (
                   <div className="relative w-full aspect-[1.7/1] overflow-hidden">
-                    {/* Friend avatar - inward positioning */}
-                    <div className="absolute top-3 left-3 z-20">
-                      <Squircle width={40} height={40}>
-                        <img 
-                          src={course.friends[0]?.friend_profile.profile_photo_url || '/placeholder.svg'} 
-                          alt={course.friends[0]?.friend_profile.display_name || 'Friend'}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                          onError={(e) => {
-                            e.currentTarget.src = '/placeholder.svg';
-                          }}
-                        />
-                      </Squircle>
-                    </div>
+                    {/* Rating badge (top-left) */}
+                    {course.average_rating != null && (
+                      <div className="absolute top-3 left-3 z-20">
+                        <span className="inline-flex items-center rounded-full border border-border bg-card/90 backdrop-blur-sm px-3 py-1 text-xs sm:text-[13px] font-medium text-foreground shadow-sm">
+                          {course.average_rating.toFixed(1)} /10
+                        </span>
+                      </div>
+                    )}
                     
                     <img
                       src={course.thumbnail_url}
@@ -538,24 +537,19 @@ const FriendsCoursesPanel: React.FC = () => {
                 
                 <div className="p-4 space-y-3">
                   <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h3 className="font-semibold text-base">{course.course_name}</h3>
-                      <p className="text-sm text-muted-foreground">{course.country}{course.sub_country ? `, ${course.sub_country}` : ''}</p>
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <h3 className="font-semibold text-base">{course.course_name}</h3>
+                          <p className="text-sm text-muted-foreground">{course.country}{course.sub_country ? `, ${course.sub_country}` : ''}</p>
+                        </div>
+                        <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 whitespace-nowrap">
+                          Hot this month
+                        </span>
+                      </div>
                     </div>
-                    {(() => {
-                      const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
-                      return (
-                        <CourseRankBadges
-                          globalRank={ranks.globalRank}
-                          regionalRank={ranks.regionalRank}
-                          usaRank={ranks.usaRank}
-                          country={course.country || ''}
-                          positioning="inline"
-                        />
-                      );
-                    })()}
                   </div>
-                    <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="flex -space-x-2">
                         {course.friends.slice(0, 3).map((friend, idx) => (
@@ -575,7 +569,18 @@ const FriendsCoursesPanel: React.FC = () => {
                       </div>
                       <span className="text-xs text-muted-foreground">Played by {formatFriendsList(course.friends, 2)}</span>
                     </div>
-                    <Badge className="bg-primary-accent/10 text-primary-accent border-primary-accent/20 text-xs">Hot this month</Badge>
+                    {(() => {
+                      const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
+                      return (
+                        <CourseRankBadges
+                          globalRank={ranks.globalRank}
+                          regionalRank={ranks.regionalRank}
+                          usaRank={ranks.usaRank}
+                          country={course.country || ''}
+                          positioning="inline"
+                        />
+                      );
+                    })()}
                   </div>
                 </div>
               </Card>
@@ -587,7 +592,7 @@ const FriendsCoursesPanel: React.FC = () => {
 
       {/* Regular courses - Paginated list with slide animation */}
       {paginatedCourses.length > 0 && (
-        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
+        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 mt-9">
           <motion.div
             key={page}
             initial={{ x: 40, opacity: 0 }}
@@ -609,6 +614,15 @@ const FriendsCoursesPanel: React.FC = () => {
                   {/* Course Image - Taller, Full Width */}
                   {course.thumbnail_url && (
                     <div className="relative w-full aspect-[1.7/1] overflow-hidden">
+                      {/* Rating badge (top-left) */}
+                      {course.average_rating != null && (
+                        <div className="absolute top-3 left-3 z-10">
+                          <span className="inline-flex items-center rounded-full border border-border bg-card/90 backdrop-blur-sm px-3 py-1 text-xs sm:text-[13px] font-medium text-foreground shadow-sm">
+                            {course.average_rating.toFixed(1)} /10
+                          </span>
+                        </div>
+                      )}
+                      
                       <img
                         src={course.thumbnail_url}
                         alt={course.course_name}
@@ -619,24 +633,24 @@ const FriendsCoursesPanel: React.FC = () => {
                       />
                       {/* Bottom gradient */}
                       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/55 via-black/25 to-transparent" />
+                      
+                      {/* Rank badges (top-right) */}
+                      <div className="absolute top-3 right-3 z-10 flex gap-1.5">
+                        {(() => {
+                          const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
+                          return (
+                            <CourseRankBadges
+                              globalRank={ranks.globalRank}
+                              regionalRank={ranks.regionalRank}
+                              usaRank={ranks.usaRank}
+                              country={course.country || ''}
+                              positioning="inline"
+                            />
+                          );
+                        })()}
+                      </div>
                     </div>
                   )}
-                  
-                  {/* Rank badges (top-right) */}
-                  <div className="absolute top-3 right-3 z-10 flex gap-1.5">
-                    {(() => {
-                      const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
-                      return (
-                        <CourseRankBadges
-                          globalRank={ranks.globalRank}
-                          regionalRank={ranks.regionalRank}
-                          usaRank={ranks.usaRank}
-                          country={course.country || ''}
-                          positioning="inline"
-                        />
-                      );
-                    })()}
-                  </div>
                   
                   {/* Course Info */}
                   <div className="p-4">
@@ -644,13 +658,6 @@ const FriendsCoursesPanel: React.FC = () => {
                       <h3 className="font-semibold text-lg truncate text-foreground">
                         {course.course_name}
                       </h3>
-
-                      {course.average_rating != null && (
-                        <span className="inline-flex items-center rounded-full border border-border bg-background/70 px-2 py-[2px] text-xs font-medium text-foreground shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
-                          <span className="mr-1 text-[11px]">★</span>
-                          {course.average_rating.toFixed(1)}/10
-                        </span>
-                      )}
                     </div>
                     <p className="text-sm text-muted-foreground mb-3">
                       {course.country}{course.sub_country ? `, ${course.sub_country}` : ''}
@@ -688,7 +695,7 @@ const FriendsCoursesPanel: React.FC = () => {
 
           {/* Pagination Footer */}
           {totalPages > 1 && (
-            <div className="flex flex-col items-center gap-3 mt-6">
+            <div className="flex flex-col items-center gap-3 mt-4">
               <div className="flex items-center gap-3">
                 <Button
                   variant="outline"
@@ -719,7 +726,7 @@ const FriendsCoursesPanel: React.FC = () => {
 
       {/* Recent rounds timeline */}
       {sortedRecent.length > 0 && (
-        <div className="space-y-3">
+        <div className="space-y-3 mt-9">
           <div>
             <h3 className="text-base font-semibold text-foreground">Your friends' recent rounds</h3>
             <p className="text-xs text-muted-foreground mt-1">
@@ -767,7 +774,7 @@ const FriendsCoursesPanel: React.FC = () => {
 
           {/* Recent rounds pagination */}
           {totalRecentPages > 1 && (
-            <div className="mt-3 flex items-center justify-between gap-3">
+            <div className="mt-4 flex items-center justify-between gap-3">
               <Button
                 variant="outline"
                 disabled={recentPage === 0}
