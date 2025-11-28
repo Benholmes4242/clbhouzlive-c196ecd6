@@ -39,7 +39,7 @@ export function GolferAvatar({ name, photoUrl, size = 56 }: GolferAvatarProps) {
         borderRadius: '22%',
       }}
     >
-      <span className="text-sm font-semibold text-muted-foreground">
+      <span className="text-base font-semibold text-muted-foreground">
         {getInitials(name)}
       </span>
     </div>
