@@ -1,0 +1,255 @@
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
+import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon } from 'lucide-react';
+import { getRatingBadgeKey, getRatingBadgeLabel } from '@/utils/ratingBadge';
+
+interface DistributionData {
+  excellent: number; // 9-10
+  veryGood: number;  // 8-8.9
+  good: number;      // 7-7.9
+  fair: number;      // 6-6.9
+  poor: number;      // <6
+}
+
+interface CategoryAverage {
+  design: number | null;
+  condition: number | null;
+  clubhouse: number | null;
+  facilities: number | null;
+}
+
+interface CourseReviewsSummaryProps {
+  averageRating: number;
+  reviewCount: number;
+  distribution: DistributionData;
+  categoryAverages: CategoryAverage;
+  userScore?: number | null;
+  userHasRating: boolean;
+  onRateCourse: () => void;
+}
+
+const formatScore = (value: number | null | undefined) =>
+  value == null ? '—' : value.toFixed(1);
+
+export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
+  averageRating,
+  reviewCount,
+  distribution,
+  categoryAverages,
+  userScore,
+  userHasRating,
+  onRateCourse,
+}) => {
+  const badgeKey = getRatingBadgeKey(averageRating);
+  const ratingLabel = badgeKey ? getRatingBadgeLabel(badgeKey) : '';
+
+  const onlyUserHasRated = reviewCount === 1 && userHasRating;
+
+  // Calculate comparison message
+  let comparisonMessage: React.ReactNode = null;
+  if (!onlyUserHasRated && userHasRating && userScore && averageRating) {
+    const diffRaw = userScore - averageRating;
+    const diff = Number(diffRaw.toFixed(1));
+    const absDiff = Math.abs(diff);
+
+    if (absDiff < 0.2) {
+      // On par
+      comparisonMessage = (
+        <div className="flex items-start gap-2">
+          <span className="mt-[2px] inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-50">
+            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+          </span>
+          <p className="text-xs text-emerald-600">
+            Your score matches the community consensus.
+          </p>
+        </div>
+      );
+    } else if (diff > 0) {
+      // Higher
+      comparisonMessage = (
+        <div className="flex items-start gap-2">
+          <span className="mt-[2px] inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-50">
+            <ArrowUpIcon className="h-3.5 w-3.5 text-emerald-600" />
+          </span>
+          <p className="text-xs text-emerald-600">
+            You rated this course {absDiff.toFixed(1)} point{absDiff === 1.0 ? '' : 's'} higher than
+            the community.
+          </p>
+        </div>
+      );
+    } else {
+      // Lower
+      comparisonMessage = (
+        <div className="flex items-start gap-2">
+          <span className="mt-[2px] inline-flex h-5 w-5 items-center justify-center rounded-full bg-rose-50">
+            <ArrowDownIcon className="h-3.5 w-3.5 text-rose-500" />
+          </span>
+          <p className="text-xs text-rose-600">
+            You rated this course {absDiff.toFixed(1)} point{absDiff === 1.0 ? '' : 's'} lower than
+            the community.
+          </p>
+        </div>
+      );
+    }
+  }
+
+  const distributionItems = [
+    { label: 'Excellent', count: distribution.excellent, color: 'bg-emerald-500' },
+    { label: 'Very good', count: distribution.veryGood, color: 'bg-blue-500' },
+    { label: 'Good', count: distribution.good, color: 'bg-sky-500' },
+    { label: 'Fair', count: distribution.fair, color: 'bg-slate-500' },
+    { label: 'Poor', count: distribution.poor, color: 'bg-slate-400' },
+  ];
+
+  const maxCount = Math.max(...distributionItems.map(d => d.count), 1);
+
+  return (
+    <div className="bg-white rounded-xl border border-slate-200 px-4 py-5">
+      {/* Top row: Rating + Distribution */}
+      <div className="grid grid-cols-2 gap-6 mb-5">
+        {/* Left: Rating display */}
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <ClubhouseLogo size="md" showTooltip />
+            <span className="text-4xl font-bold text-slate-900">
+              {averageRating.toFixed(1)}
+            </span>
+            <span className="text-lg font-medium text-slate-500">/10</span>
+          </div>
+          {ratingLabel && (
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 mb-2">
+              {ratingLabel}
+            </p>
+          )}
+          <p className="text-xs text-slate-500">
+            Based on {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
+          </p>
+        </div>
+
+        {/* Right: Distribution bars */}
+        <div className="space-y-1.5">
+          {distributionItems.map((item) => {
+            const percentage = (item.count / maxCount) * 100;
+            return (
+              <div key={item.label} className="flex items-center gap-2 text-xs">
+                <span className="text-[10px] font-medium text-slate-600 w-14 text-right">
+                  {item.label}
+                </span>
+                <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full ${item.color} transition-all duration-300`}
+                    style={{ width: `${percentage}%` }}
+                  />
+                </div>
+                <span className="text-[11px] font-medium text-slate-500 w-5 text-right">
+                  {item.count}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Category averages - 2x2 grid */}
+      {(categoryAverages.design || categoryAverages.condition || categoryAverages.clubhouse || categoryAverages.facilities) && (
+        <div className="grid grid-cols-2 gap-x-4 gap-y-3 mb-4 pb-4 border-b border-slate-100">
+          {/* Design */}
+          {categoryAverages.design !== null && (
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                Design
+              </span>
+              <div className="flex items-center gap-2">
+                <div className="w-12 h-1 bg-slate-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-slate-600 transition-all"
+                    style={{ width: `${(categoryAverages.design / 10) * 100}%` }}
+                  />
+                </div>
+                <span className="text-xs font-semibold text-slate-900 w-6 text-right">
+                  {formatScore(categoryAverages.design)}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Condition */}
+          {categoryAverages.condition !== null && (
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                Condition
+              </span>
+              <div className="flex items-center gap-2">
+                <div className="w-12 h-1 bg-slate-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-slate-600 transition-all"
+                    style={{ width: `${(categoryAverages.condition / 10) * 100}%` }}
+                  />
+                </div>
+                <span className="text-xs font-semibold text-slate-900 w-6 text-right">
+                  {formatScore(categoryAverages.condition)}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Clubhouse */}
+          {categoryAverages.clubhouse !== null && (
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                Clubhouse
+              </span>
+              <div className="flex items-center gap-2">
+                <div className="w-12 h-1 bg-slate-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-slate-600 transition-all"
+                    style={{ width: `${(categoryAverages.clubhouse / 10) * 100}%` }}
+                  />
+                </div>
+                <span className="text-xs font-semibold text-slate-900 w-6 text-right">
+                  {formatScore(categoryAverages.clubhouse)}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Facilities */}
+          {categoryAverages.facilities !== null && (
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                Facilities
+              </span>
+              <div className="flex items-center gap-2">
+                <div className="w-12 h-1 bg-slate-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-slate-600 transition-all"
+                    style={{ width: `${(categoryAverages.facilities / 10) * 100}%` }}
+                  />
+                </div>
+                <span className="text-xs font-semibold text-slate-900 w-6 text-right">
+                  {formatScore(categoryAverages.facilities)}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Comparison message */}
+      {comparisonMessage && <div className="mb-3">{comparisonMessage}</div>}
+
+      {/* CTA button */}
+      {!userHasRating && (
+        <Button
+          type="button"
+          className="w-full h-11 rounded-lg"
+          variant="outline"
+          onClick={onRateCourse}
+        >
+          Rate this course
+        </Button>
+      )}
+    </div>
+  );
+};
