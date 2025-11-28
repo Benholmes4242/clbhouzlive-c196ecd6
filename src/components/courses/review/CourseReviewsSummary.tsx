@@ -92,12 +92,13 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
     }
   }
 
+  // Map distribution to our unified tier system
   const distributionItems = [
-    { label: 'Excellent', count: distribution.excellent, color: 'bg-emerald-500' },
-    { label: 'Very good', count: distribution.veryGood, color: 'bg-blue-500' },
-    { label: 'Good', count: distribution.good, color: 'bg-sky-500' },
-    { label: 'Fair', count: distribution.fair, color: 'bg-slate-500' },
-    { label: 'Poor', count: distribution.poor, color: 'bg-slate-400' },
+    { label: 'Outstanding', count: distribution.excellent, tier: getScoreTier(9.5) },
+    { label: 'Excellent', count: distribution.veryGood, tier: getScoreTier(8.5) },
+    { label: 'Very good', count: distribution.good, tier: getScoreTier(7.5) },
+    { label: 'Good', count: distribution.fair, tier: getScoreTier(6.5) },
+    { label: 'Fair', count: distribution.poor, tier: getScoreTier(5) },
   ];
 
   const maxCount = Math.max(...distributionItems.map(d => d.count), 1);
@@ -118,9 +119,9 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
               <span className="text-sm font-medium text-slate-500">/10</span>
             </div>
 
-            {/* Quality badge */}
+            {/* Quality badge - one size smaller */}
             <span 
-              className={`inline-flex items-center justify-center rounded-full px-3 py-1 border text-xs font-semibold uppercase ${tierData.bg} ${tierData.border} ${tierData.text}`}
+              className={`inline-flex items-center justify-center rounded-full px-2.5 py-0.5 border text-[10px] font-semibold uppercase ${tierData.bg} ${tierData.border} ${tierData.text}`}
             >
               {tierData.label}
             </span>
@@ -137,12 +138,12 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
             const percentage = (item.count / maxCount) * 100;
             return (
               <div key={item.label} className="flex items-center gap-2 text-xs">
-                <span className="text-[10px] font-medium text-slate-600 w-14 text-right">
+                <span className="text-[10px] font-medium text-slate-600 w-16 text-right">
                   {item.label}
                 </span>
                 <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                   <div
-                    className={`h-full ${item.color} transition-all duration-300`}
+                    className={`h-full ${item.tier.barFill} transition-all duration-300`}
                     style={{ width: `${percentage}%` }}
                   />
                 </div>

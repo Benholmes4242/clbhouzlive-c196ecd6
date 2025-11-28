@@ -13,7 +13,7 @@ import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
 import { generateVideoThumbnail } from '@/utils/videoThumbnail';
-import { getRatingBadgeKey, getRatingBadgeLabel, RATING_BADGE_COLORS } from '@/utils/ratingBadge';
+import { getScoreTier } from '@/utils/getScoreTier';
 
 // Maximum number of media items (photos + videos) per review
 const MAX_REVIEW_MEDIA_ITEMS = 6;
@@ -910,13 +910,9 @@ const PostPlayRatingModal = ({
                 />
               </div>
 
-              {/* Rating badge - mirrors Community Score logic */}
+              {/* Rating badge - uses unified tier system */}
               {(() => {
-                const ratingBadgeKey = getRatingBadgeKey(selectedRating);
-                const ratingBadgeLabel = getRatingBadgeLabel(ratingBadgeKey);
-                const badgeColor = ratingBadgeKey ? RATING_BADGE_COLORS[ratingBadgeKey] : null;
-
-                if (!ratingBadgeKey || !badgeColor) return null;
+                const tierData = getScoreTier(selectedRating);
 
                 return (
                   <div className="mt-4 flex flex-col items-center gap-1">
@@ -924,14 +920,9 @@ const PostPlayRatingModal = ({
                       Your rating summary
                     </span>
                     <span
-                      className="inline-flex items-center px-3 py-1 rounded-full border text-[11px] font-semibold uppercase"
-                      style={{
-                        backgroundColor: `${badgeColor}15`,
-                        borderColor: `${badgeColor}40`,
-                        color: badgeColor,
-                      }}
+                      className={`inline-flex items-center px-3 py-1 rounded-full border text-[11px] font-semibold uppercase ${tierData.bg} ${tierData.border} ${tierData.text}`}
                     >
-                      {ratingBadgeLabel}
+                      {tierData.label}
                     </span>
                   </div>
                 );
