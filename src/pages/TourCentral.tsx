@@ -30,13 +30,21 @@ const TourCentral = () => {
             <TabsTrigger value="rankings">Rankings</TabsTrigger>
           </TabsList>
 
-          {/* Lazy tab mounting - only render active tab to reduce initial load */}
-          <div className="mt-6">
-            {activeTab === 'upcoming' && <UpcomingEvents />}
-            {activeTab === 'leaderboards' && <LiveLeaderboards />}
-            {activeTab === 'news' && <NewsComponent />}
-            {activeTab === 'rankings' && <RankingsSection />}
-          </div>
+          <TabsContent value="upcoming" className="mt-6">
+            <UpcomingEvents />
+          </TabsContent>
+          
+          <TabsContent value="leaderboards" className="mt-6">
+            <LiveLeaderboards />
+          </TabsContent>
+          
+          <TabsContent value="news" className="mt-6">
+            <NewsComponent />
+          </TabsContent>
+          
+          <TabsContent value="rankings" className="mt-6">
+            <RankingsSection />
+          </TabsContent>
         </Tabs>
       </div>
       
