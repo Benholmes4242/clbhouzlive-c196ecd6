@@ -20,18 +20,16 @@ const Top100ClubCallout: React.FC = () => {
     }
   };
 
-  const coursesCount = progress?.total_played_top100 ?? 0;
-  const regionsCount = progress?.regions_count ?? 0;
+  // Filter to only lists where user has played at least one course
+  const startedLists = (listProgress || []).filter(list => list.played > 0);
   
-  // Calculate total courses across all active Top 100 lists
-  const totalCoursesAcrossAllLists = (listProgress || []).reduce(
-    (sum, list) => sum + list.total,
-    0
-  );
+  const coursesPlayed = startedLists.reduce((sum, list) => sum + list.played, 0);
+  const totalCoursesInStartedLists = startedLists.reduce((sum, list) => sum + list.total, 0);
+  const listsStarted = startedLists.length;
   
-  // Calculate progress percentage based on total courses across all lists
-  const progressPercent = totalCoursesAcrossAllLists > 0
-    ? Math.min((coursesCount / totalCoursesAcrossAllLists) * 100, 100)
+  // Calculate progress percentage based on started lists only
+  const progressPercent = totalCoursesInStartedLists > 0
+    ? Math.min((coursesPlayed / totalCoursesInStartedLists) * 100, 100)
     : 0;
 
   return (
@@ -59,17 +57,25 @@ const Top100ClubCallout: React.FC = () => {
           {/* Progress line */}
           {session ? (
             <>
-              <p className="mt-2 text-xs font-medium text-foreground">
-                You&apos;ve played {coursesCount} course{coursesCount === 1 ? '' : 's'} across {regionsCount} Top 100 list{regionsCount === 1 ? '' : 's'}.
-              </p>
+              {listsStarted > 0 ? (
+                <>
+                  <p className="mt-2 text-xs font-medium text-foreground">
+                    You&apos;ve played {coursesPlayed} course{coursesPlayed === 1 ? '' : 's'} {listsStarted === 1 ? 'in' : 'across'} {listsStarted} Top 100 list{listsStarted === 1 ? '' : 's'}.
+                  </p>
 
-              {/* Progress bar */}
-              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                <div
-                  className="h-full bg-primary-accent transition-all"
-                  style={{ width: `${progressPercent}%` }}
-                />
-              </div>
+                  {/* Progress bar */}
+                  <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full bg-primary-accent transition-all"
+                      style={{ width: `${progressPercent}%` }}
+                    />
+                  </div>
+                </>
+              ) : (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  You haven&apos;t started your Top 100 journey yet. Play your first Top 100 course to begin.
+                </p>
+              )}
             </>
           ) : (
             <p className="mt-2 text-xs text-muted-foreground">
