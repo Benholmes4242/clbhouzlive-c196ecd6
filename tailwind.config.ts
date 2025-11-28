@@ -189,7 +189,7 @@ export default {
 				},
 				'slide-in-right': {
 					'0%': {
-						transform: 'translateX(100%)',
+						transform: 'translateX(16px)',
 						opacity: '0'
 					},
 					'100%': {
@@ -327,6 +327,16 @@ export default {
 						transform: 'scale(1.2)',
 						opacity: '1'
 					}
+				},
+				'slide-in-left': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateX(-16px)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'translateX(0)'
+					}
 				}
 			},
 			transitionDuration: {
@@ -345,7 +355,7 @@ export default {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'slide-in-up': 'slide-in-up 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-				'slide-in-right': 'slide-in-right 0.3s ease-out',
+				'slide-in-right': 'slide-in-right 220ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
 				'slide-out-left': 'slide-out-left 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
 				'slide-in-from-right': 'slide-in-from-right 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
 				'slide-out-right': 'slide-out-right 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
@@ -358,7 +368,8 @@ export default {
 				'slow-spin': 'slow-spin 20s linear infinite',
 				'slide-in-from-right-modal': 'slide-in-from-right-modal 250ms ease-out',
 				'slide-out-to-right-modal': 'slide-out-to-right-modal 250ms ease-out',
-				'echo-typing-dot': 'echo-typing-dot 1.4s ease-in-out infinite'
+				'echo-typing-dot': 'echo-typing-dot 1.4s ease-in-out infinite',
+				'slide-in-left': 'slide-in-left 220ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
 			}
 		}
 	},
