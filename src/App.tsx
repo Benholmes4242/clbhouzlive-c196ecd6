@@ -205,7 +205,7 @@ function AppRoutes() {
         
         <Route path="/messages" element={<Suspense fallback={<GenericPageSkeleton />}><MessagesPage /></Suspense>} />
         <Route path="/notifications" element={<Suspense fallback={<GenericPageSkeleton />}><NotificationsPage /></Suspense>} />
-        <Route path="/golfers" element={<Suspense fallback={<GenericPageSkeleton />}><GolfersToFollowPage /></Suspense>} />
+        <Route path="/golferstofollow" element={<Suspense fallback={<GenericPageSkeleton />}><GolfersToFollowPage /></Suspense>} />
         <Route path="/friends" element={<Suspense fallback={<GenericPageSkeleton />}><FriendsPage /></Suspense>} />
         <Route path="/followers" element={<Suspense fallback={<GenericPageSkeleton />}><FollowersPage /></Suspense>} />
         <Route path="/following" element={<Suspense fallback={<GenericPageSkeleton />}><FollowingPage /></Suspense>} />

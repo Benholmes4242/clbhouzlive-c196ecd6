@@ -24,7 +24,7 @@ const FriendsCoursesEmpty: React.FC = () => {
       {/* Button - global outline style */}
       <Button
         variant="outline"
-        onClick={() => navigate('/golfers')}
+        onClick={() => navigate('/golferstofollow')}
         className="w-full max-w-[320px]"
       >
         Find golfers to follow
