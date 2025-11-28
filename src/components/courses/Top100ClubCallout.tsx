@@ -34,7 +34,7 @@ const Top100ClubCallout: React.FC = () => {
           {/* Title with inline trophy icon */}
           <div className="flex items-center gap-2 mb-1">
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-primary-accent/10 to-primary-accent/5">
-              <Trophy className="h-3.5 w-3.5 text-primary-accent" />
+              <Trophy className="h-4 w-4 text-primary-accent" />
             </div>
             <h3 className="text-base font-semibold text-foreground">
               Top 100 Club
