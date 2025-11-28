@@ -111,174 +111,55 @@ const mockFriends = [
   },
 ];
 
+// Real course IDs from the database - mock data uses REAL courses, only friend activity is mocked
 const mockCourses = [
   {
-    id: 'mock-rdc',
-    name: 'Royal County Down (Championship)',
-    country: 'Northern Ireland',
-    subCountry: 'Down',
-    thumbnail: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=600&fit=crop',
-    memberships: ['world-top-100', 'gb-ireland-top-100'],
+    id: '29b33f45-7dd0-468b-ab29-046a0bda9832',
+    name: 'Royal County Down Golf Club',
   },
   {
-    id: 'mock-pine-valley',
+    id: 'd917f7fb-ca74-4813-bc27-35ba95c04e03',
     name: 'Pine Valley Golf Club',
-    country: 'USA',
-    subCountry: 'New Jersey',
-    thumbnail: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800&h=600&fit=crop',
-    memberships: ['world-top-100', 'usa-top-100'],
   },
   {
-    id: 'mock-pebble',
+    id: 'a2426246-5314-42f7-8637-de23bd8d7665',
     name: 'Pebble Beach Golf Links',
-    country: 'USA',
-    subCountry: 'California',
-    thumbnail: 'https://images.unsplash.com/photo-1592919505780-303950717480?w=800&h=600&fit=crop',
-    memberships: ['world-top-100', 'usa-top-100'],
   },
   {
-    id: 'mock-ballybunion',
-    name: 'Ballybunion Golf Club (Old)',
-    country: 'Ireland',
-    subCountry: 'Kerry',
-    thumbnail: 'https://images.unsplash.com/photo-1591491718746-47c47a6d7a2c?w=800&h=600&fit=crop',
-    memberships: ['gb-ireland-top-100', 'world-top-100'],
+    id: '1c484d0a-7113-4b57-a133-986cfb0eec23',
+    name: 'Royal Dornoch Golf Club',
   },
   {
-    id: 'mock-dornoch',
-    name: 'Royal Dornoch Golf Club (Championship)',
-    country: 'Scotland',
-    subCountry: 'Highlands',
-    thumbnail: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800&h=600&fit=crop&q=80',
-    memberships: ['gb-ireland-top-100', 'world-top-100'],
-  },
-  {
-    id: 'mock-kingsbarns',
+    id: '5cdf162c-c3f3-44fa-b1ef-7b30d5d66b96',
     name: 'Kingsbarns Golf Links',
-    country: 'Scotland',
-    subCountry: 'Fife',
-    thumbnail: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=600&fit=crop&q=80',
-    memberships: ['gb-ireland-top-100', 'world-top-100'],
   },
   {
-    id: 'mock-sunningdale-old',
-    name: 'Sunningdale Golf Club (Old)',
-    country: 'England',
-    subCountry: 'Berkshire',
-    thumbnail: 'https://images.unsplash.com/photo-1593111774240-d529f12995a8?w=800&h=600&fit=crop',
-    memberships: ['gb-ireland-top-100'],
-  },
-  {
-    id: 'mock-sunningdale-new',
-    name: 'Sunningdale Golf Club (New)',
-    country: 'England',
-    subCountry: 'Berkshire',
-    thumbnail: 'https://images.unsplash.com/photo-1593111774240-d529f12995a8?w=800&h=600&fit=crop&q=85',
-    memberships: ['gb-ireland-top-100'],
-  },
-  {
-    id: 'mock-muirfield',
-    name: 'Muirfield',
-    country: 'Scotland',
-    subCountry: 'East Lothian',
-    thumbnail: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800&h=600&fit=crop&q=85',
-    memberships: ['gb-ireland-top-100', 'world-top-100'],
-  },
-  {
-    id: 'mock-birkdale',
+    id: '622610f7-7e53-404d-a5da-b9fb1e562e51',
     name: 'Royal Birkdale Golf Club',
-    country: 'England',
-    subCountry: 'Merseyside',
-    thumbnail: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=600&fit=crop&q=85',
-    memberships: ['gb-ireland-top-100', 'world-top-100'],
   },
   {
-    id: 'mock-hillside',
-    name: 'Hillside Golf Club',
-    country: 'England',
-    subCountry: 'Merseyside',
-    thumbnail: 'https://images.unsplash.com/photo-1591491718746-47c47a6d7a2c?w=800&h=600&fit=crop&q=80',
-    memberships: [],
-  },
-  {
-    id: 'mock-royal-portrush',
+    id: 'd0ff24bd-6297-4f0d-9bec-873162449c8e',
     name: 'Royal Portrush Golf Club',
-    country: 'Northern Ireland',
-    subCountry: 'Antrim',
-    thumbnail: 'https://images.unsplash.com/photo-1592919505780-303950717480?w=800&h=600&fit=crop&q=85',
-    memberships: ['gb-ireland-top-100', 'world-top-100'],
   },
   {
-    id: 'mock-portmarnock',
+    id: 'bda5912f-a46e-47af-9aad-4db21235cb61',
     name: 'Portmarnock Golf Club',
-    country: 'Ireland',
-    subCountry: 'Dublin',
-    thumbnail: 'https://images.unsplash.com/photo-1593111774240-d529f12995a8?w=800&h=600&fit=crop&q=80',
-    memberships: ['gb-ireland-top-100'],
   },
   {
-    id: 'mock-sand-hills',
+    id: '42ff8b7b-a788-4ec3-922c-62c49b38a365',
     name: 'Sand Hills Golf Club',
-    country: 'USA',
-    subCountry: 'Nebraska',
-    thumbnail: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800&h=600&fit=crop&q=90',
-    memberships: ['world-top-100', 'usa-top-100'],
   },
   {
-    id: 'mock-county-louth',
-    name: 'County Louth Golf Club',
-    country: 'Ireland',
-    subCountry: 'Louth',
-    thumbnail: 'https://images.unsplash.com/photo-1591491718746-47c47a6d7a2c?w=800&h=600&fit=crop&q=85',
-    memberships: [],
-  },
-  {
-    id: 'mock-carnoustie',
-    name: 'Carnoustie Golf Links',
-    country: 'Scotland',
-    subCountry: 'Angus',
-    thumbnail: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=600&fit=crop&q=90',
-    memberships: ['gb-ireland-top-100', 'world-top-100'],
-  },
-  {
-    id: 'mock-lahinch',
+    id: '92457337-a89a-439c-aa01-c304a2ba6f8e',
     name: 'Lahinch Golf Club',
-    country: 'Ireland',
-    subCountry: 'Clare',
-    thumbnail: 'https://images.unsplash.com/photo-1592919505780-303950717480?w=800&h=600&fit=crop&q=80',
-    memberships: ['gb-ireland-top-100'],
   },
   {
-    id: 'mock-turnberry',
-    name: 'Trump Turnberry (Ailsa)',
-    country: 'Scotland',
-    subCountry: 'South Ayrshire',
-    thumbnail: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800&h=600&fit=crop&q=95',
-    memberships: ['gb-ireland-top-100', 'world-top-100'],
+    id: '9e2b180d-755c-41bb-b8cf-c6108cbd4a46',
+    name: 'Royal Lytham & St Annes Golf Club',
   },
   {
-    id: 'mock-lytham',
-    name: 'Royal Lytham & St Annes',
-    country: 'England',
-    subCountry: 'Lancashire',
-    thumbnail: 'https://images.unsplash.com/photo-1593111774240-d529f12995a8?w=800&h=600&fit=crop&q=90',
-    memberships: ['gb-ireland-top-100', 'world-top-100'],
-  },
-  {
-    id: 'mock-troon',
-    name: 'Royal Troon Golf Club (Old)',
-    country: 'Scotland',
-    subCountry: 'South Ayrshire',
-    thumbnail: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=600&fit=crop&q=95',
-    memberships: ['gb-ireland-top-100', 'world-top-100'],
-  },
-  {
-    id: 'mock-cypress',
+    id: 'e69aee30-744d-4089-a127-285a62216e2c',
     name: 'Cypress Point Club',
-    country: 'USA',
-    subCountry: 'California',
-    thumbnail: 'https://images.unsplash.com/photo-1592919505780-303950717480?w=800&h=600&fit=crop&q=90',
-    memberships: ['world-top-100', 'usa-top-100'],
   },
 ];
 
@@ -291,6 +172,7 @@ function randomBetween(min: number, max: number) {
 }
 
 // Build recent rounds: ~100–120 rounds in last 30 days
+// Note: We only mock the friend activity - course details come from real DB
 const recentRounds: any[] = [];
 for (let i = 0; i < 110; i++) {
   const friend = pick(mockFriends);
@@ -299,28 +181,24 @@ for (let i = 0; i < 110; i++) {
 
   recentRounds.push({
     friend_id: friend.id,
-    course_id: course.id,
-    course_name: course.name,
+    course_id: course.id, // Real course ID - details will be fetched from DB
+    course_name: course.name, // Placeholder - will be replaced with real data
     played_at: daysAgo(dayOffset),
     friend_profile: {
       display_name: friend.name,
       username: friend.username,
       profile_photo_url: friend.avatar,
     },
-    course_country: course.country,
-    course_sub_country: course.subCountry,
-    thumbnail_url: course.thumbnail,
-    top100_memberships: course.memberships.map((slug: string, idx: number) => ({
-      list_id: `mock-list-${slug}`,
-      list_slug: slug,
-      short_label: slug === 'world-top-100' ? 'World' : slug === 'usa-top-100' ? 'USA' : 'GB&I',
-      rank: 10 + idx * 5,
-    })),
+    course_country: null, // Will be filled from real DB
+    course_sub_country: null, // Will be filled from real DB
+    thumbnail_url: null, // Will be filled from real DB
+    top100_memberships: [], // Will be filled from real DB
     rating: Math.round(randomBetween(7.5, 10) * 10) / 10, // 7.5–10.0
   });
 }
 
 // Aggregate by course for the "courses" array the panel expects
+// Note: Course details will be enriched from real DB data in the panel
 const courseIdToFriendsMap = new Map<string, any>();
 
 recentRounds.forEach((round) => {
@@ -332,15 +210,10 @@ recentRounds.forEach((round) => {
     courseIdToFriendsMap.set(round.course_id, {
       course_id: courseMeta.id,
       course_name: courseMeta.name,
-      country: courseMeta.country,
-      sub_country: courseMeta.subCountry,
-      thumbnail_url: courseMeta.thumbnail,
-      top100_memberships: courseMeta.memberships.map((slug: string, idx: number) => ({
-        list_id: `mock-list-${slug}`,
-        list_slug: slug,
-        short_label: slug === 'world-top-100' ? 'World' : slug === 'usa-top-100' ? 'USA' : 'GB&I',
-        rank: 10 + idx * 5,
-      })),
+      country: null, // Will be filled from real DB
+      sub_country: null, // Will be filled from real DB
+      thumbnail_url: null, // Will be filled from real DB
+      top100_memberships: [], // Will be filled from real DB
       friends: [
         {
           friend_id: round.friend_id,
