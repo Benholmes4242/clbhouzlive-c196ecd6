@@ -13,6 +13,7 @@ import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
 import { generateVideoThumbnail } from '@/utils/videoThumbnail';
+import { getRatingBadgeKey, getRatingBadgeLabel, RATING_BADGE_COLORS } from '@/utils/ratingBadge';
 
 // Maximum number of media items (photos + videos) per review
 const MAX_REVIEW_MEDIA_ITEMS = 6;
@@ -907,6 +908,33 @@ const PostPlayRatingModal = ({
                   className="w-full rating-slider-primary"
                 />
               </div>
+
+              {/* Rating badge - mirrors Community Score logic */}
+              {(() => {
+                const ratingBadgeKey = getRatingBadgeKey(selectedRating);
+                const ratingBadgeLabel = getRatingBadgeLabel(ratingBadgeKey);
+                const badgeColor = ratingBadgeKey ? RATING_BADGE_COLORS[ratingBadgeKey] : null;
+
+                if (!ratingBadgeKey || !badgeColor) return null;
+
+                return (
+                  <div className="mt-4 flex flex-col items-center gap-1">
+                    <span className="text-xs text-slate-500 tracking-wide uppercase">
+                      Your rating summary
+                    </span>
+                    <span
+                      className="inline-flex items-center px-3 py-1 rounded-full border text-[11px] font-semibold uppercase"
+                      style={{
+                        backgroundColor: `${badgeColor}15`,
+                        borderColor: `${badgeColor}40`,
+                        color: badgeColor,
+                      }}
+                    >
+                      {ratingBadgeLabel}
+                    </span>
+                  </div>
+                );
+              })()}
             </section>
 
             {/* Share Your Thoughts - Section B (dark) */}

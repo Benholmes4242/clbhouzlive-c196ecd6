@@ -2,25 +2,18 @@ import React from 'react';
 import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
+import { getRatingBadgeKey, getRatingBadgeLabel, RATING_BADGE_COLORS } from '@/utils/ratingBadge';
 
-// Badge color mapping - using hex codes from CommunityScoreCard
-const BADGE_COLORS = {
-  fair: '#94A3B8',        // neutral grey (0.0–5.9)
-  good: '#64748B',        // soft desaturated blue (6.0–6.9)
-  veryGood: '#6EE7B7',    // mid green (7.0–7.9)
-  excellent: '#22C55E',   // bright green (8.0–8.9)
-  outstanding: '#F4C15D'  // gold (9.0–10.0)
-};
+// Re-export for backwards compatibility within this component
+const BADGE_COLORS = RATING_BADGE_COLORS;
 
 const getCommunityRatingLabel = (
   score: number | null | undefined
 ): { label: string; variant: 'fair' | 'good' | 'veryGood' | 'excellent' | 'outstanding' } | null => {
-  if (score == null) return null;
-  if (score >= 9.0) return { label: 'Outstanding', variant: 'outstanding' };
-  if (score >= 8.0) return { label: 'Excellent', variant: 'excellent' };
-  if (score >= 7.0) return { label: 'Very good', variant: 'veryGood' };
-  if (score >= 6.0) return { label: 'Good', variant: 'good' };
-  return { label: 'Fair', variant: 'fair' };
+  const badgeKey = getRatingBadgeKey(score);
+  if (!badgeKey) return null;
+  const label = getRatingBadgeLabel(badgeKey);
+  return { label, variant: badgeKey };
 };
 
 const CommunityRatingBadge: React.FC<{
