@@ -1,9 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import SquircleImage from '@/components/ui/SquircleImage';
 import { Button } from '@/components/ui/button';
-import { UserCheck, UserPlus, UserRoundPlus } from 'lucide-react';
-import { formatHcp } from '@/lib/formatHcp';
+import { UserCheck, UserPlus, UserRoundPlus, Clock } from 'lucide-react';
+import { GolferAvatar } from './GolferAvatar';
 import { cn } from '@/lib/utils';
 
 interface GolferCardProps {
@@ -16,7 +15,7 @@ interface GolferCardProps {
     handicap?: number | null;
   };
   isFollowing: boolean;
-  isFriend?: boolean;
+  friendStatus?: 'none' | 'pending' | 'friends';
   loading?: boolean;
   onFollowToggle: () => void;
   onFriendRequest?: () => void;
@@ -25,12 +24,18 @@ interface GolferCardProps {
 export function GolferCard({ 
   golfer, 
   isFollowing, 
-  isFriend = false,
+  friendStatus = 'none',
   loading, 
   onFollowToggle,
   onFriendRequest
 }: GolferCardProps) {
   const navigate = useNavigate();
+
+  // Build secondary line text
+  const clubLine = golfer.homeClub || 'No home club set';
+  const handicapLine = golfer.handicap != null ? `HCP ${golfer.handicap.toFixed(1)}` : null;
+  
+  const secondaryLine = [clubLine, handicapLine].filter(Boolean).join(' · ');
 
   return (
     <article className="flex items-center justify-between rounded-2xl border border-border bg-card shadow-sm px-4 py-3 hover:shadow-md transition-shadow">
@@ -39,12 +44,11 @@ export function GolferCard({
         onClick={() => navigate(`/users/${golfer.id}`)}
         className="flex items-center gap-3 min-w-0 text-left flex-1"
       >
-        {/* Squircle Avatar */}
-        <SquircleImage
-          size={52}
-          src={golfer.profileImage || ''}
-          alt={golfer.displayName}
-          className="flex-shrink-0"
+        {/* Squircle Avatar with initials fallback */}
+        <GolferAvatar
+          name={golfer.displayName}
+          photoUrl={golfer.profileImage}
+          size={56}
         />
 
         <div className="min-w-0 flex-1">
@@ -52,27 +56,24 @@ export function GolferCard({
             {golfer.displayName}
           </div>
           <div className="mt-0.5 text-sm text-muted-foreground truncate">
-            {golfer.homeClub || 'No home club set'}
-          </div>
-          <div className="mt-0.5 text-xs text-muted-foreground">
-            {golfer.handicap != null ? `HCP ${formatHcp(golfer.handicap)}` : 'Handicap not set'}
+            {secondaryLine}
           </div>
         </div>
       </button>
 
-      {/* Right side - stacked buttons */}
-      <div className="flex flex-col gap-1.5 ml-3 shrink-0">
+      {/* Right side - stacked buttons with fixed width */}
+      <div className="flex flex-col gap-2 ml-3 shrink-0 w-[110px]">
         {/* Follow Button */}
         <Button
-          variant={isFollowing ? 'outline' : 'default'}
+          variant={isFollowing ? 'outline' : 'outline'}
           size="sm"
           onClick={onFollowToggle}
           disabled={loading}
           className={cn(
-            "h-9 px-4 rounded-lg text-sm font-medium transition",
+            "h-9 w-full rounded-lg text-sm font-medium transition",
             isFollowing 
-              ? "border-border bg-background text-foreground hover:bg-muted/60"
-              : "border-primary text-primary hover:bg-primary/5"
+              ? "border-slate-600 bg-slate-50 text-foreground hover:bg-slate-100"
+              : "border-slate-600 text-foreground hover:bg-slate-50"
           )}
         >
           {isFollowing ? (
@@ -93,20 +94,23 @@ export function GolferCard({
           <Button
             variant="outline"
             size="sm"
-            onClick={onFriendRequest}
-            disabled={loading || isFriend}
+            onClick={friendStatus === 'pending' ? undefined : onFriendRequest}
+            disabled={loading || friendStatus === 'pending'}
             className={cn(
-              "h-8 px-3 rounded-lg text-xs font-medium transition",
-              isFriend
-                ? "border-emerald-500 bg-emerald-50 text-emerald-700 cursor-default"
-                : "border-border text-muted-foreground hover:bg-muted/50"
+              "h-9 w-full rounded-lg text-sm font-medium transition",
+              friendStatus === 'pending'
+                ? "border-slate-300 bg-slate-50/80 text-slate-500 cursor-default"
+                : "border-slate-600 text-foreground hover:bg-slate-50"
             )}
           >
-            {isFriend ? (
-              'Friends'
+            {friendStatus === 'pending' ? (
+              <>
+                <Clock className="w-3.5 h-3.5 mr-1.5" />
+                Pending
+              </>
             ) : (
               <>
-                <UserRoundPlus className="w-3 h-3 mr-1.5" />
+                <UserRoundPlus className="w-3.5 h-3.5 mr-1.5" />
                 Add friend
               </>
             )}
