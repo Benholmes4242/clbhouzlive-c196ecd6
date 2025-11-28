@@ -15,7 +15,6 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { CourseFriendsStrip } from '@/components/golf-club/CourseFriendsStrip';
 import CourseLocationBreadcrumb from './CourseLocationBreadcrumb';
 
 import CourseTop100Summary from './CourseTop100Summary';
@@ -137,9 +136,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             Edit Your Rating
           </Button>
         )}
-
-        {/* Friends Who've Played */}
-        <CourseFriendsStrip courseId={course.id} courseName={course.name} />
       </section>
 
       {/* CTA for users who haven't rated yet */}
