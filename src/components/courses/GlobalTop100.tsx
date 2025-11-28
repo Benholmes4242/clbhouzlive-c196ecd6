@@ -304,7 +304,7 @@ const GlobalTop100 = () => {
   };
 
   return (
-    <div className="mt-4 space-y-4 max-w-2xl mx-auto px-4 pb-0">
+    <div className="w-full space-y-4">
       {/* Top 100 Club Callout */}
       <Top100ClubCallout />
 

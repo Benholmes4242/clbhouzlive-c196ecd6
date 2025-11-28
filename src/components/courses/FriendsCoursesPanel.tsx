@@ -469,7 +469,7 @@ const FriendsCoursesPanel: React.FC = () => {
   };
 
   return (
-    <div className="mt-4 space-y-4 max-w-2xl mx-auto px-4 pb-6">
+    <div className="w-full space-y-4 pb-6">
       <div className="space-y-3">
         <div>
           <h2 className="text-lg font-semibold tracking-tight">Friends' Courses</h2>
