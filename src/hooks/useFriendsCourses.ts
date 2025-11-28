@@ -91,7 +91,7 @@ export function useFriendsCourses(userId?: string) {
         .select(
           `
           user_id,
-          golf_course_id,
+          course_id,
           created_at,
           rating,
           golf_courses!inner (

@@ -23,91 +23,91 @@ const mockFriends = [
     id: 'andrew',
     name: 'Andrew Yetzis',
     username: 'andrew',
-    avatar: '/placeholder.svg',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop',
   },
   {
     id: 'sarah',
     name: 'Sarah Miles',
     username: 'sarah',
-    avatar: '/placeholder.svg',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop',
   },
   {
     id: 'james',
     name: 'James Porter',
     username: 'james',
-    avatar: '/placeholder.svg',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop',
   },
   {
     id: 'chris',
     name: 'Chris Walker',
     username: 'chris',
-    avatar: '/placeholder.svg',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop',
   },
   {
     id: 'emma',
     name: 'Emma Collins',
     username: 'emma',
-    avatar: '/placeholder.svg',
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop',
   },
   {
     id: 'lucas',
     name: 'Lucas Brown',
     username: 'lucas',
-    avatar: '/placeholder.svg',
+    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop',
   },
   {
     id: 'olivia',
     name: 'Olivia Green',
     username: 'olivia',
-    avatar: '/placeholder.svg',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop',
   },
   {
     id: 'matt',
     name: 'Matt Turner',
     username: 'matt',
-    avatar: '/placeholder.svg',
+    avatar: 'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=200&h=200&fit=crop',
   },
   {
     id: 'hannah',
     name: 'Hannah Price',
     username: 'hannah',
-    avatar: '/placeholder.svg',
+    avatar: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200&h=200&fit=crop',
   },
   {
     id: 'tom',
     name: 'Tom Hughes',
     username: 'tom',
-    avatar: '/placeholder.svg',
+    avatar: 'https://images.unsplash.com/photo-1463453091185-61582044d556?w=200&h=200&fit=crop',
   },
   {
     id: 'alex',
     name: 'Alex Shaw',
     username: 'alex',
-    avatar: '/placeholder.svg',
+    avatar: 'https://images.unsplash.com/photo-1499952127939-9bbf5af6c51c?w=200&h=200&fit=crop',
   },
   {
     id: 'kate',
     name: 'Kate Wilson',
     username: 'kate',
-    avatar: '/placeholder.svg',
+    avatar: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=200&h=200&fit=crop',
   },
   {
     id: 'ben',
     name: 'Ben Knight',
     username: 'ben',
-    avatar: '/placeholder.svg',
+    avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=200&h=200&fit=crop',
   },
   {
     id: 'zoe',
     name: 'Zoe Harris',
     username: 'zoe',
-    avatar: '/placeholder.svg',
+    avatar: 'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=200&h=200&fit=crop',
   },
   {
     id: 'liam',
     name: 'Liam Murphy',
     username: 'liam',
-    avatar: '/placeholder.svg',
+    avatar: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&h=200&fit=crop',
   },
 ];
 
@@ -117,7 +117,7 @@ const mockCourses = [
     name: 'Royal County Down (Championship)',
     country: 'Northern Ireland',
     subCountry: 'Down',
-    thumbnail: '/placeholder.svg',
+    thumbnail: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=600&fit=crop',
     memberships: ['world-top-100', 'gb-ireland-top-100'],
   },
   {
@@ -125,7 +125,7 @@ const mockCourses = [
     name: 'Pine Valley Golf Club',
     country: 'USA',
     subCountry: 'New Jersey',
-    thumbnail: '/placeholder.svg',
+    thumbnail: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800&h=600&fit=crop',
     memberships: ['world-top-100', 'usa-top-100'],
   },
   {
@@ -133,7 +133,7 @@ const mockCourses = [
     name: 'Pebble Beach Golf Links',
     country: 'USA',
     subCountry: 'California',
-    thumbnail: '/placeholder.svg',
+    thumbnail: 'https://images.unsplash.com/photo-1592919505780-303950717480?w=800&h=600&fit=crop',
     memberships: ['world-top-100', 'usa-top-100'],
   },
   {
@@ -141,7 +141,7 @@ const mockCourses = [
     name: 'Ballybunion Golf Club (Old)',
     country: 'Ireland',
     subCountry: 'Kerry',
-    thumbnail: '/placeholder.svg',
+    thumbnail: 'https://images.unsplash.com/photo-1591491718746-47c47a6d7a2c?w=800&h=600&fit=crop',
     memberships: ['gb-ireland-top-100', 'world-top-100'],
   },
   {
@@ -149,7 +149,7 @@ const mockCourses = [
     name: 'Royal Dornoch Golf Club (Championship)',
     country: 'Scotland',
     subCountry: 'Highlands',
-    thumbnail: '/placeholder.svg',
+    thumbnail: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800&h=600&fit=crop&q=80',
     memberships: ['gb-ireland-top-100', 'world-top-100'],
   },
   {
@@ -157,7 +157,7 @@ const mockCourses = [
     name: 'Kingsbarns Golf Links',
     country: 'Scotland',
     subCountry: 'Fife',
-    thumbnail: '/placeholder.svg',
+    thumbnail: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=600&fit=crop&q=80',
     memberships: ['gb-ireland-top-100', 'world-top-100'],
   },
   {
@@ -165,7 +165,7 @@ const mockCourses = [
     name: 'Sunningdale Golf Club (Old)',
     country: 'England',
     subCountry: 'Berkshire',
-    thumbnail: '/placeholder.svg',
+    thumbnail: 'https://images.unsplash.com/photo-1593111774240-d529f12995a8?w=800&h=600&fit=crop',
     memberships: ['gb-ireland-top-100'],
   },
   {
@@ -173,7 +173,7 @@ const mockCourses = [
     name: 'Sunningdale Golf Club (New)',
     country: 'England',
     subCountry: 'Berkshire',
-    thumbnail: '/placeholder.svg',
+    thumbnail: 'https://images.unsplash.com/photo-1593111774240-d529f12995a8?w=800&h=600&fit=crop&q=85',
     memberships: ['gb-ireland-top-100'],
   },
   {
@@ -181,7 +181,7 @@ const mockCourses = [
     name: 'Muirfield',
     country: 'Scotland',
     subCountry: 'East Lothian',
-    thumbnail: '/placeholder.svg',
+    thumbnail: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800&h=600&fit=crop&q=85',
     memberships: ['gb-ireland-top-100', 'world-top-100'],
   },
   {
@@ -189,7 +189,7 @@ const mockCourses = [
     name: 'Royal Birkdale Golf Club',
     country: 'England',
     subCountry: 'Merseyside',
-    thumbnail: '/placeholder.svg',
+    thumbnail: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=600&fit=crop&q=85',
     memberships: ['gb-ireland-top-100', 'world-top-100'],
   },
   {
@@ -197,7 +197,7 @@ const mockCourses = [
     name: 'Hillside Golf Club',
     country: 'England',
     subCountry: 'Merseyside',
-    thumbnail: '/placeholder.svg',
+    thumbnail: 'https://images.unsplash.com/photo-1591491718746-47c47a6d7a2c?w=800&h=600&fit=crop&q=80',
     memberships: [],
   },
   {
@@ -205,7 +205,7 @@ const mockCourses = [
     name: 'Royal Portrush Golf Club',
     country: 'Northern Ireland',
     subCountry: 'Antrim',
-    thumbnail: '/placeholder.svg',
+    thumbnail: 'https://images.unsplash.com/photo-1592919505780-303950717480?w=800&h=600&fit=crop&q=85',
     memberships: ['gb-ireland-top-100', 'world-top-100'],
   },
   {
@@ -213,7 +213,7 @@ const mockCourses = [
     name: 'Portmarnock Golf Club',
     country: 'Ireland',
     subCountry: 'Dublin',
-    thumbnail: '/placeholder.svg',
+    thumbnail: 'https://images.unsplash.com/photo-1593111774240-d529f12995a8?w=800&h=600&fit=crop&q=80',
     memberships: ['gb-ireland-top-100'],
   },
   {
@@ -221,7 +221,7 @@ const mockCourses = [
     name: 'Sand Hills Golf Club',
     country: 'USA',
     subCountry: 'Nebraska',
-    thumbnail: '/placeholder.svg',
+    thumbnail: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800&h=600&fit=crop&q=90',
     memberships: ['world-top-100', 'usa-top-100'],
   },
   {
@@ -229,7 +229,7 @@ const mockCourses = [
     name: 'County Louth Golf Club',
     country: 'Ireland',
     subCountry: 'Louth',
-    thumbnail: '/placeholder.svg',
+    thumbnail: 'https://images.unsplash.com/photo-1591491718746-47c47a6d7a2c?w=800&h=600&fit=crop&q=85',
     memberships: [],
   },
   {
@@ -237,7 +237,7 @@ const mockCourses = [
     name: 'Carnoustie Golf Links',
     country: 'Scotland',
     subCountry: 'Angus',
-    thumbnail: '/placeholder.svg',
+    thumbnail: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=600&fit=crop&q=90',
     memberships: ['gb-ireland-top-100', 'world-top-100'],
   },
   {
@@ -245,7 +245,7 @@ const mockCourses = [
     name: 'Lahinch Golf Club',
     country: 'Ireland',
     subCountry: 'Clare',
-    thumbnail: '/placeholder.svg',
+    thumbnail: 'https://images.unsplash.com/photo-1592919505780-303950717480?w=800&h=600&fit=crop&q=80',
     memberships: ['gb-ireland-top-100'],
   },
   {
@@ -253,7 +253,7 @@ const mockCourses = [
     name: 'Trump Turnberry (Ailsa)',
     country: 'Scotland',
     subCountry: 'South Ayrshire',
-    thumbnail: '/placeholder.svg',
+    thumbnail: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800&h=600&fit=crop&q=95',
     memberships: ['gb-ireland-top-100', 'world-top-100'],
   },
   {
@@ -261,7 +261,7 @@ const mockCourses = [
     name: 'Royal Lytham & St Annes',
     country: 'England',
     subCountry: 'Lancashire',
-    thumbnail: '/placeholder.svg',
+    thumbnail: 'https://images.unsplash.com/photo-1593111774240-d529f12995a8?w=800&h=600&fit=crop&q=90',
     memberships: ['gb-ireland-top-100', 'world-top-100'],
   },
   {
@@ -269,7 +269,7 @@ const mockCourses = [
     name: 'Royal Troon Golf Club (Old)',
     country: 'Scotland',
     subCountry: 'South Ayrshire',
-    thumbnail: '/placeholder.svg',
+    thumbnail: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=600&fit=crop&q=95',
     memberships: ['gb-ireland-top-100', 'world-top-100'],
   },
   {
@@ -277,7 +277,7 @@ const mockCourses = [
     name: 'Cypress Point Club',
     country: 'USA',
     subCountry: 'California',
-    thumbnail: '/placeholder.svg',
+    thumbnail: 'https://images.unsplash.com/photo-1592919505780-303950717480?w=800&h=600&fit=crop&q=90',
     memberships: ['world-top-100', 'usa-top-100'],
   },
 ];
