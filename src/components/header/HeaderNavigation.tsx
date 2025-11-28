@@ -181,7 +181,7 @@ const HeaderNavigation = () => {
             <User className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48 mr-2 bg-white border shadow-lg z-50">
+        <DropdownMenuContent align="end" className="w-48 mr-2 bg-white border shadow-lg z-[10001]">
           <DropdownMenuItem onClick={handleProfileClick}>
             View Profile
           </DropdownMenuItem>
@@ -207,7 +207,7 @@ const HeaderNavigation = () => {
             <Settings className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48 mr-2">
+        <DropdownMenuContent align="end" className="w-48 mr-2 z-[10001]">
           <DropdownMenuItem onClick={() => navigate('/settings')}>
             Settings
           </DropdownMenuItem>
