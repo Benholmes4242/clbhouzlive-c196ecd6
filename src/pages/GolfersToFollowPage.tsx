@@ -49,9 +49,9 @@ const GolfersToFollowPage = () => {
       <ClubhouseHeaderNew />
       <FadeInContent>
         <main className="px-4 md:container md:mx-auto md:px-0 pt-[72px] pb-[30px]">
-          <div className="max-w-5xl mx-auto space-y-6">
+          <div className="max-w-5xl mx-auto">
             {/* Header */}
-            <div className="space-y-2">
+            <div className="space-y-2 mb-[30px]">
               <h1 className="text-2xl font-bold tracking-tight text-foreground">
                 Find golfers to follow
               </h1>
@@ -61,7 +61,7 @@ const GolfersToFollowPage = () => {
             </div>
 
             {/* Search Bar */}
-            <div className="relative">
+            <div className="relative mb-6">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
@@ -73,7 +73,7 @@ const GolfersToFollowPage = () => {
             </div>
 
             {/* Filter Chips */}
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-2 flex-wrap mb-6">
               {filterOptions.map((filter) => (
                 <button
                   key={filter.value}
