@@ -15,12 +15,16 @@ import { Users, MapPin, Flame, Video } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { FLAGS } from '@/config/flags';
 import { MOCK_FRIEND_COURSES } from './mockFriendCourses';
+import { friendsCoursesMockData } from '@/mocks/friendsCoursesMock';
 import FriendsSnapshotCard from './friends/FriendsSnapshotCard';
 import FriendsHeroCourseCard from './friends/FriendsHeroCourseCard';
 import FriendsActivityCard from './friends/FriendsActivityCard';
 import CourseRankBadges from './CourseRankBadges';
 import { extractRanksFromMemberships } from '@/utils/rankingUtils';
 import type { CourseWithFriends, FriendCourseHit, Top100Membership } from '@/hooks/useFriendsCourses';
+
+// Temporary: toggle to use high-activity mock data for Friends' Courses
+const USE_FRIENDS_COURSES_MOCK = true; // flip to false to use real data
 
 type Timeframe = '7d' | '30d' | '90d' | '12m' | 'all';
 type CourseFilter = 'all' | 'new' | 'most_played' | 'highest_rated';
@@ -30,6 +34,10 @@ const FriendsCoursesPanel: React.FC = () => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const { data: realData, isLoading } = useFriendsCourses(user?.id);
+  
+  const sourceData = USE_FRIENDS_COURSES_MOCK ? friendsCoursesMockData : realData;
+  const loading = USE_FRIENDS_COURSES_MOCK ? false : isLoading;
+  
   const [timeframe, setTimeframe] = useState<Timeframe>('30d');
   const [courseFilter, setCourseFilter] = useState<CourseFilter>('all');
   const [page, setPage] = useState(1);
@@ -157,7 +165,11 @@ const FriendsCoursesPanel: React.FC = () => {
 
   // Filter data by time range and course type
   const filteredData = useMemo(() => {
-    if (!data) return null;
+    if (!sourceData) return null;
+    
+    // Use sourceData directly if we're not using the old FLAGS system
+    const baseData = USE_FRIENDS_COURSES_MOCK ? sourceData : data;
+    if (!baseData) return null;
     
     // Calculate time cutoff
     let cutoff: Date | null = null;
@@ -176,8 +188,8 @@ const FriendsCoursesPanel: React.FC = () => {
     
     // Filter by time
     const timeFilteredRecent = cutoff 
-      ? data.recent.filter(hit => new Date(hit.played_at) >= cutoff)
-      : data.recent;
+      ? baseData.recent.filter(hit => new Date(hit.played_at) >= cutoff)
+      : baseData.recent;
     
     // Filter by course type (Top 100 only or other filters)
     const courseTypeFilteredRecent = courseFilter === 'most_played'
@@ -234,7 +246,7 @@ const FriendsCoursesPanel: React.FC = () => {
       totalCourses: filteredCourses.length,
       totalFriendsActive: uniqueFriends.size,
     };
-  }, [data, timeframe, courseFilter]);
+  }, [sourceData, data, timeframe, courseFilter]);
 
   // Derive lists safely even while loading
   const courses = filteredData?.courses || [];
@@ -412,7 +424,7 @@ const FriendsCoursesPanel: React.FC = () => {
   if (!user) return null;
 
   // Show skeleton only while loading AND before we have any filtered data
-  if (isLoading && !filteredData) {
+  if (loading && !filteredData) {
     return (
       <div className="space-y-6">
         <div className="flex items-baseline justify-between">
