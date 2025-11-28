@@ -98,9 +98,8 @@ const GolfersToFollowPage = () => {
 
   const filterOptions: FilterOption[] = [
     { id: 'suggested', label: 'Suggested' },
-    { id: 'club', label: 'At your golf club' },
+    { id: 'club', label: 'Home club' },
     { id: 'popular', label: 'Popular golfers' },
-    { id: 'low', label: 'Lowest handicap golfers' },
   ];
 
   const startIndex = (page - 1) * pageSize + 1;

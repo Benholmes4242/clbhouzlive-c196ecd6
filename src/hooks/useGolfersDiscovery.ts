@@ -4,7 +4,7 @@ import { useSupabaseSession } from './useSupabaseSession';
 import { useUserProfile } from './useUserProfile';
 import { useQuery } from '@tanstack/react-query';
 
-export type FilterType = 'suggested' | 'club' | 'popular' | 'low';
+export type FilterType = 'suggested' | 'club' | 'popular';
 
 const PAGE_SIZE = 15;
 
@@ -88,9 +88,6 @@ export function useGolfersDiscovery() {
           if (currentProfile?.home_club) {
             query = query.ilike('home_club', currentProfile.home_club);
           }
-          break;
-        case 'low':
-          query = query.not('eg_handicap_index', 'is', null).order('eg_handicap_index', { ascending: true });
           break;
         case 'popular':
         case 'suggested':
