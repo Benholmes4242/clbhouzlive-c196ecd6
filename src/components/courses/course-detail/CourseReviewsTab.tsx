@@ -5,11 +5,12 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
-import { ReviewCard } from '../review/ReviewCard';
-import { ReviewsHeaderCard } from '../review/ReviewsHeaderCard';
+import { ReviewBlockFlat } from '../review/ReviewBlockFlat';
+import { CourseReviewsSummary } from '../review/CourseReviewsSummary';
 import { FilterPillsRow, FilterOption } from '@/components/ui/FilterPillsRow';
-import { Button } from '@/components/ui/button';
+import { Search } from 'lucide-react';
 import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
+import { ReviewMediaItem } from '../review/ReviewMediaStrip';
 
 export type SortOption = 'recent' | 'highest' | 'helpful';
 
@@ -27,12 +28,17 @@ interface ReviewData {
   helpful_count: number;
   unhelpful_count: number;
   is_mock: boolean;
+  design_score: number | null;
+  condition_score: number | null;
+  clubhouse_score: number | null;
+  facilities_score: number | null;
   user_profiles?: {
     id: string;
     display_name: string | null;
     username: string | null;
     profile_photo_url: string | null;
   } | null;
+  media?: ReviewMediaItem[];
 }
 
 const getInitials = (name: string) => {
@@ -53,8 +59,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Sorting and filtering state
+  // Sorting, filtering, and search state
   const [sortBy, setSortBy] = useState<SortOption>('recent');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Filter pill options for Reviews tab
   const sortOptions: FilterOption[] = [
@@ -90,9 +97,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     return () => clearTimeout(timeout);
   }, [isJustSubmittedOrUpdated]);
 
-  // Fetch all reviews with user profiles
+  // Fetch all reviews with user profiles and media
   const { data: reviewsData, isLoading } = useQuery({
-    queryKey: ['course-reviews-full', courseId, SHOW_MOCK_REVIEWS, sortBy],
+    queryKey: ['course-reviews-full', courseId, SHOW_MOCK_REVIEWS, sortBy, searchQuery],
     queryFn: async () => {
       if (!courseId) return [];
 
@@ -109,11 +116,21 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           helpful_count,
           unhelpful_count,
           is_mock,
+          design_score,
+          condition_score,
+          clubhouse_score,
+          facilities_score,
           user_profiles:user_id (
             id,
             display_name,
             username,
             profile_photo_url
+          ),
+          course_review_media (
+            id,
+            media_type,
+            media_url,
+            poster_url
           )
         `
         )
@@ -122,6 +139,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       // When mock reviews are disabled, only show real reviews
       if (!SHOW_MOCK_REVIEWS) {
         query = query.eq('is_mock', false);
+      }
+
+      // Search filter
+      if (searchQuery.trim()) {
+        query = query.ilike('review', `%${searchQuery.trim()}%`);
       }
 
       // Apply sorting
@@ -145,7 +167,13 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       const { data, error } = await query;
       if (error) throw error;
       
-      return (data as any as ReviewData[]) || [];
+      const reviews = (data as any as ReviewData[]) || [];
+      
+      // Transform media arrays
+      return reviews.map(review => ({
+        ...review,
+        media: (review as any).course_review_media as ReviewMediaItem[] || [],
+      }));
     },
     enabled: !!courseId,
     staleTime: 0, // Always refetch when explicitly requested
@@ -242,7 +270,40 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const ratingCount = ratingAggregates?.review_count ?? 0;
   const hasRatings = ratingCount > 0;
 
-  // Transform reviews into ReviewCard format
+  // Calculate distribution (simplified - counts by rating tier)
+  const calculateDistribution = () => {
+    const dist = { excellent: 0, veryGood: 0, good: 0, fair: 0, poor: 0 };
+    reviews.forEach(r => {
+      if (r.rating >= 9) dist.excellent++;
+      else if (r.rating >= 8) dist.veryGood++;
+      else if (r.rating >= 7) dist.good++;
+      else if (r.rating >= 6) dist.fair++;
+      else dist.poor++;
+    });
+    return dist;
+  };
+
+  // Calculate category averages
+  const calculateCategoryAverages = () => {
+    const categories = { design: 0, condition: 0, clubhouse: 0, facilities: 0 };
+    const counts = { design: 0, condition: 0, clubhouse: 0, facilities: 0 };
+
+    reviews.forEach(r => {
+      if (r.design_score) { categories.design += r.design_score; counts.design++; }
+      if (r.condition_score) { categories.condition += r.condition_score; counts.condition++; }
+      if (r.clubhouse_score) { categories.clubhouse += r.clubhouse_score; counts.clubhouse++; }
+      if (r.facilities_score) { categories.facilities += r.facilities_score; counts.facilities++; }
+    });
+
+    return {
+      design: counts.design > 0 ? categories.design / counts.design : null,
+      condition: counts.condition > 0 ? categories.condition / counts.condition : null,
+      clubhouse: counts.clubhouse > 0 ? categories.clubhouse / counts.clubhouse : null,
+      facilities: counts.facilities > 0 ? categories.facilities / counts.facilities : null,
+    };
+  };
+
+  // Transform reviews into ReviewBlockFlat format
   const transformReview = (review: ReviewData, isHighlighted = false) => {
     const profile = review.user_profiles;
     const displayName = profile?.display_name || profile?.username || 'Anonymous';
@@ -263,6 +324,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       isHelpful: userVote?.vote_type === 'helpful',
       isUnhelpful: userVote?.vote_type === 'unhelpful',
       isMock: review.is_mock,
+      design_score: review.design_score,
+      condition_score: review.condition_score,
+      clubhouse_score: review.clubhouse_score,
+      facilities_score: review.facilities_score,
+      media: review.media || [],
       isHighlighted,
     };
   };
@@ -323,36 +389,56 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   return (
     <div className="flex flex-col">
-      {/* Section 1 – Header card */}
-      <section className="px-4 pt-4 pb-3 bg-slate-50">
-        <ReviewsHeaderCard
-          communityScore={communityScore}
+      {/* Section 1 – Summary header */}
+      <section className="px-4 pt-4 pb-4 bg-slate-50">
+        <CourseReviewsSummary
+          averageRating={communityScore}
           reviewCount={ratingCount}
+          distribution={calculateDistribution()}
+          categoryAverages={calculateCategoryAverages()}
           userScore={myReview?.rating}
           userHasRating={!!myReview}
           onRateCourse={handleRateClick}
         />
       </section>
 
-      {/* Section 2 – Sort/Filter Bar */}
+      {/* Section 2 – Search bar */}
+      <section className="px-4 pt-3 pb-2 bg-slate-100">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search reviews"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full h-10 pl-10 pr-4 rounded-full border border-slate-200 bg-white text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300/70 focus:ring-offset-1 focus:border-slate-600 transition"
+          />
+        </div>
+      </section>
+
+      {/* Section 3 – Sort pills */}
       <FilterPillsRow
         options={sortOptions}
         activeId={sortBy}
         onChange={(id) => setSortBy(id as SortOption)}
       />
 
-      {/* Section 3 – Your review + other reviews */}
-      <section className="px-4 pt-3 pb-4 bg-slate-100">
+      {/* Section 4 – Your review + other reviews (flat blocks) */}
+      <section className="px-4 pt-3 pb-4 bg-slate-50">
         {myReview && (
-          <div className="mb-3">
-            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
+          <div className="mb-4">
+            <p className="mb-3 text-xs font-medium uppercase tracking-wide text-slate-500">
               Your review
             </p>
-            <ReviewCard
+            <ReviewBlockFlat
               review={transformReview(myReview, isJustSubmittedOrUpdated)}
               isMine
               isHighlighted={isJustSubmittedOrUpdated}
               onToggleHelpful={handleToggleHelpful}
+              onMediaClick={(index) => {
+                // TODO: Open media lightbox
+                console.log('Open media', index);
+              }}
             />
           </div>
         )}
@@ -360,19 +446,30 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         {otherReviews.length > 0 && (
           <div>
             {otherReviews.map((review) => (
-              <ReviewCard
+              <ReviewBlockFlat
                 key={review.id}
                 review={transformReview(review)}
                 onToggleHelpful={handleToggleHelpful}
+                onMediaClick={(index) => {
+                  // TODO: Open media lightbox
+                  console.log('Open media', index);
+                }}
               />
             ))}
           </div>
         )}
+
+        {/* No results message for search */}
+        {searchQuery && reviews.length === 0 && (
+          <div className="text-center py-8">
+            <p className="text-sm text-slate-500">No reviews match your search.</p>
+          </div>
+        )}
       </section>
 
-      {/* Section 4 – End message (only show if there are reviews) */}
-      {reviews.length > 0 && (
-        <section className="px-4 pt-4 pb-4 bg-slate-50">
+      {/* Section 5 – End message (only show if there are reviews) */}
+      {reviews.length > 0 && !searchQuery && (
+        <section className="px-4 pt-4 pb-4 bg-slate-100">
           <p className="text-center text-xs text-slate-500">
             You've reached the end of the reviews.
           </p>
