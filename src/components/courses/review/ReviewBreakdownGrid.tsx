@@ -36,18 +36,18 @@ export const ReviewBreakdownGrid: React.FC<ReviewBreakdownGridProps> = ({ scores
     <div className="mt-3 pt-3 border-t border-slate-100">
       <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
         {categories.map((cat) => (
-          <div key={cat.label} className="flex items-center justify-between">
-            <span className="text-[11px] font-medium text-slate-600">
+          <div key={cat.label} className="flex items-center justify-between gap-2">
+            <span className="text-[11px] font-medium text-slate-600 flex-shrink-0">
               {cat.label}
             </span>
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-1 bg-slate-100 rounded-full overflow-hidden">
+            <div className="flex items-center gap-2 flex-1 max-w-[160px]">
+              <div className="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-slate-600 transition-all"
                   style={{ width: `${((cat.value || 0) / 10) * 100}%` }}
                 />
               </div>
-              <span className="text-xs font-semibold text-slate-900 w-6 text-right">
+              <span className="text-xs font-semibold text-slate-900 w-6 text-right flex-shrink-0">
                 {formatScore(cat.value)}
               </span>
             </div>

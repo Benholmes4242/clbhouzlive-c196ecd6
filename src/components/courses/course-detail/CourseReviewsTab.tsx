@@ -270,15 +270,15 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const ratingCount = ratingAggregates?.review_count ?? 0;
   const hasRatings = ratingCount > 0;
 
-  // Calculate distribution (simplified - counts by rating tier)
+  // Calculate distribution using System 2 bands
   const calculateDistribution = () => {
-    const dist = { excellent: 0, veryGood: 0, good: 0, fair: 0, poor: 0 };
+    const dist = { outstanding: 0, excellent: 0, veryGood: 0, good: 0, fair: 0 };
     reviews.forEach(r => {
-      if (r.rating >= 9) dist.excellent++;
-      else if (r.rating >= 8) dist.veryGood++;
-      else if (r.rating >= 7) dist.good++;
-      else if (r.rating >= 6) dist.fair++;
-      else dist.poor++;
+      if (r.rating >= 9.0) dist.outstanding++;
+      else if (r.rating >= 8.0) dist.excellent++;
+      else if (r.rating >= 7.0) dist.veryGood++;
+      else if (r.rating >= 6.0) dist.good++;
+      else dist.fair++;
     });
     return dist;
   };
