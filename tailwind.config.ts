@@ -154,9 +154,7 @@ export default {
 				'screen-dynamic': '100dvh'
 			},
 			boxShadow: {
-				'hud': 'var(--hud-shadow)',
-				'card': 'var(--shadow-card)',
-				'card-hover': 'var(--shadow-medium)'
+				'hud': 'var(--hud-shadow)'
 			},
 			keyframes: {
 				'accordion-down': {

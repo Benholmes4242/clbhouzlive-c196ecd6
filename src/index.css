@@ -106,12 +106,6 @@ html.lightbox-open {
   --ease-pop: cubic-bezier(0.175, 0.885, 0.32, 1.275);    /* subtle "pop" */
   --ease-out: cubic-bezier(0.0, 0, 0.2, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
-
-  /* Surface & Border Tokens */
-  --surface-card: hsl(0, 0%, 100%);
-  --border-subtle: hsl(0, 0%, 90%);
-  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 /* Rating slider improvements - larger touch areas, smooth mobile interaction */
@@ -360,17 +354,6 @@ html, body, #root {
   --bg-card-hover: rgba(255,255,255,0.08);
   --bg-card-subtle: rgba(255,255,255,0.03);
   --bg-modal: #1A1A1A;
-  
-  /* Shadcn/Radix UI color variables */
-  --background: 244 245 247;  /* #F4F5F7 in RGB for hsl() */
-  --foreground: 31 36 40;     /* #1F2428 in RGB for hsl() */
-  --border: 226 229 234;      /* Light border */
-  --input: 226 229 234;       /* Input border */
-  --ring: 247 147 30;         /* Focus ring (brand orange) */
-  
-  /* Shadcn card colors */
-  --card: 255 255 255;        /* White */
-  --card-foreground: 31 36 40;
   
   /* Hub specific tokens */
   --hub-stroke: rgba(255,255,255,0.08);
