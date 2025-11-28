@@ -455,21 +455,21 @@ const FriendsCoursesPanel: React.FC = () => {
 
   if (totalCourses === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center px-4">
-        <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 border border-slate-200">
-          <Users className="h-8 w-8 text-slate-400" />
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
+          <span className="text-lg">👥</span>
         </div>
-        <h3 className="text-lg font-semibold mb-2">No friends' courses yet</h3>
-        <p className="text-sm text-muted-foreground mb-6 max-w-sm">
-          Follow other golfers to see where they've been playing and discover new courses.
+        <h3 className="text-base font-semibold mb-1">No friends added yet</h3>
+        <p className="text-sm text-muted-foreground mb-4 max-w-xs">
+          Follow or add golfers to see where they've been playing.
         </p>
-        <Button
-          variant="outline"
-          onClick={() => navigate('/golfers')}
-          className="w-full max-w-[320px]"
+        <button
+          type="button"
+          onClick={() => navigate('/discover/people')}
+          className="inline-flex h-10 items-center rounded-full bg-[#3A3F46] px-5 text-sm font-medium text-white shadow-sm hover:opacity-90 transition"
         >
           Find golfers to follow
-        </Button>
+        </button>
       </div>
     );
   }
