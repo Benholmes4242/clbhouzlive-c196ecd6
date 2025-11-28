@@ -19,6 +19,8 @@ import { friendsCoursesMockData } from '@/mocks/friendsCoursesMock';
 import FriendsSnapshotCard from './friends/FriendsSnapshotCard';
 import FriendsHeroCourseCard from './friends/FriendsHeroCourseCard';
 import FriendsActivityCard from './friends/FriendsActivityCard';
+import FriendsCoursesSkeleton from './friends/FriendsCoursesSkeleton';
+import FriendsCoursesEmpty from './friends/FriendsCoursesEmpty';
 import CourseRankBadges from './CourseRankBadges';
 import { extractRanksFromMemberships } from '@/utils/rankingUtils';
 import type { CourseWithFriends, FriendCourseHit, Top100Membership } from '@/hooks/useFriendsCourses';
@@ -425,53 +427,12 @@ const FriendsCoursesPanel: React.FC = () => {
 
   // Show skeleton only while loading AND before we have any filtered data
   if (loading && !filteredData) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-baseline justify-between">
-          <div>
-            <h2 className="text-xl font-semibold tracking-tight">
-              Friends' Courses
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              See where your friends have been playing lately
-            </p>
-          </div>
-        </div>
-
-        {/* simple skeleton cards */}
-        <div className="space-y-3">
-          {[1, 2, 3].map(i => (
-            <div
-              key={i}
-              className="h-20 rounded-none sm:rounded-xl bg-muted/80 animate-pulse"
-            />
-          ))}
-        </div>
-      </div>
-    );
+    return <FriendsCoursesSkeleton />;
   }
 
   // Empty state: no courses from friends in this time range
-
   if (totalCourses === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
-          <span className="text-lg">👥</span>
-        </div>
-        <h3 className="text-base font-semibold mb-1">No friends added yet</h3>
-        <p className="text-sm text-muted-foreground mb-4 max-w-xs">
-          Follow or add golfers to see where they've been playing.
-        </p>
-        <button
-          type="button"
-          onClick={() => navigate('/discover/people')}
-          className="inline-flex h-10 items-center rounded-full bg-[#3A3F46] px-5 text-sm font-medium text-white shadow-sm hover:opacity-90 transition"
-        >
-          Find golfers to follow
-        </button>
-      </div>
-    );
+    return <FriendsCoursesEmpty />;
   }
 
   const formatFriendsList = (friends: FriendCourseHit[], limit = 3) => {
