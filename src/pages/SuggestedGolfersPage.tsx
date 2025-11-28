@@ -5,7 +5,7 @@ import { useSuggestedUsers } from '@/hooks/useSuggestedUsers';
 import { useFollowUserState } from '@/hooks/useFollowUserState';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import { Input } from '@/components/ui/input';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Squircle } from '@/components/ui/squircle';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Search, UserPlus, UserCheck } from 'lucide-react';
@@ -168,12 +168,14 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer }) => {
     >
       <div className="flex items-center gap-4">
         {/* Avatar */}
-        <Avatar className="h-12 w-12 flex-shrink-0">
-          <AvatarImage src={golfer.profileImage} alt={golfer.displayName} />
-          <AvatarFallback>
-            {golfer.displayName.substring(0, 2).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+        <Squircle width={48} height={48}>
+          <img
+            src={golfer.profileImage}
+            alt={golfer.displayName}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            loading="lazy"
+          />
+        </Squircle>
 
         {/* Details */}
         <div className="flex-1 min-w-0">
@@ -223,7 +225,7 @@ const GolferCardSkeleton = () => {
   return (
     <Card className="p-4">
       <div className="flex items-center gap-4">
-        <Skeleton className="h-12 w-12 rounded-full flex-shrink-0" />
+        <Skeleton className="h-12 w-12 flex-shrink-0" style={{ borderRadius: '20%' }} />
         <div className="flex-1 space-y-2">
           <Skeleton className="h-4 w-32" />
           <Skeleton className="h-3 w-48" />
