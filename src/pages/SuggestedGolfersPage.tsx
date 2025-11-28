@@ -21,12 +21,22 @@ const SuggestedGolfersPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterType>('suggested');
 
-  // Handle auth redirect in effect to avoid navigation during render
+  // Track when we've had at least one "definitive" session check
+  const [hasCheckedSession, setHasCheckedSession] = useState(false);
+
+  // Mark the session as "checked" once loading finishes the first time
   useEffect(() => {
-    if (!sessionLoading && !user) {
+    if (!sessionLoading && !hasCheckedSession) {
+      setHasCheckedSession(true);
+    }
+  }, [sessionLoading, hasCheckedSession]);
+
+  // Handle auth redirect once we *know* the session has been checked
+  useEffect(() => {
+    if (hasCheckedSession && !user) {
       navigate('/auth', { replace: true });
     }
-  }, [sessionLoading, user, navigate]);
+  }, [hasCheckedSession, user, navigate]);
 
   // Filter and sort users based on active filter
   const filteredUsers = useMemo(() => {
@@ -70,8 +80,9 @@ const SuggestedGolfersPage = () => {
     { value: 'low' as FilterType, label: 'Low handicap' },
   ];
 
-  // Show loading state while session is loading
-  if (sessionLoading) {
+  // While we haven't finished the first session check, or Supabase is still loading,
+  // show a simple full-page loader
+  if (!hasCheckedSession || sessionLoading) {
     return (
       <div className="min-h-screen bg-background">
         <ClubhouseHeaderNew />
@@ -82,7 +93,8 @@ const SuggestedGolfersPage = () => {
     );
   }
 
-  // If no user after session loaded, effect will handle redirect
+  // At this point, hasCheckedSession === true and sessionLoading === false.
+  // If there's still no user, the redirect effect will fire; just don't render UI.
   if (!user) {
     return null;
   }
