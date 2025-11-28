@@ -16,17 +16,17 @@ type FilterType = 'suggested' | 'popular' | 'low';
 
 const SuggestedGolfersPage = () => {
   const navigate = useNavigate();
-  const { user } = useSupabaseSession();
+  const { user, loading: sessionLoading } = useSupabaseSession();
   const { users, loading } = useSuggestedUsers();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterType>('suggested');
 
-  // Redirect if no user (but don't block render)
+  // Only redirect after session has loaded
   useEffect(() => {
-    if (!user) {
+    if (!sessionLoading && !user) {
       navigate('/auth', { replace: true });
     }
-  }, [user, navigate]);
+  }, [sessionLoading, user, navigate]);
 
   // Filter and sort users based on active filter
   const filteredUsers = useMemo(() => {
