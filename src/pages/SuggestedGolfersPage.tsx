@@ -68,7 +68,7 @@ const SuggestedGolfersPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen" style={{ backgroundColor: '#F4F5F7' }}>
       <ClubhouseHeaderNew />
       
       <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-24 max-w-3xl">
