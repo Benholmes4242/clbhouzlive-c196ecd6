@@ -69,7 +69,7 @@ export function QuickActionsTile() {
   const navigate = useNavigate();
   const { navigateFromHub } = useHub();
 
-  const openProfile = () => navigateFromHub('/profile');
+  const openProfile = () => navigate('/profile');
   const openCreateGame = () => navigateFromHub('/hub/create-game');
   const openSwing = () => navigateFromHub('/hub/swing');
   const openEcho = () => navigateFromHub('/hub/echo');
