@@ -29,6 +29,128 @@ const USE_FRIENDS_COURSES_MOCK = false; // flip to false to use real data
 type Timeframe = '7d' | '30d' | '90d' | '12m' | 'all';
 type CourseFilter = 'all' | 'new' | 'most_played' | 'highest_rated';
 
+const FriendsCoursesSkeleton: React.FC = () => {
+  return (
+    <div className="w-full space-y-4 pb-6">
+      <div className="space-y-3">
+        {/* Title and subtitle */}
+        <div>
+          <Skeleton className="h-6 w-48 mb-2" />
+          <Skeleton className="h-4 w-64" />
+        </div>
+        
+        {/* Filter dropdowns */}
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-11 flex-1 rounded-xl" />
+          <Skeleton className="h-11 flex-1 rounded-xl" />
+        </div>
+      </div>
+
+      {/* Snapshot card */}
+      <div className="rounded-3xl bg-card border border-border p-5 space-y-4">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-10 w-10 rounded-full" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-3 w-40" />
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4 pt-2">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="space-y-2">
+              <Skeleton className="h-3 w-16" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Hero course card */}
+      <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
+        <div className="rounded-none sm:rounded-xl overflow-hidden bg-card border border-border">
+          <Skeleton className="w-full aspect-[1.7/1]" />
+          <div className="p-4 space-y-2">
+            <Skeleton className="h-3 w-28" />
+            <Skeleton className="h-5 w-64" />
+            <Skeleton className="h-4 w-40" />
+          </div>
+        </div>
+      </div>
+
+      {/* Friends activity leaderboard */}
+      <div className="rounded-3xl bg-card border border-border">
+        <div className="px-5 py-4 flex items-center justify-between border-b border-border/40">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-8 w-8 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-3 w-40" />
+            </div>
+          </div>
+          <Skeleton className="h-6 w-16 rounded-full" />
+        </div>
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="px-5 py-3 flex items-center justify-between border-b border-border/40"
+          >
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-9 w-9 rounded-full" />
+              <div className="space-y-1">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-48" />
+              </div>
+            </div>
+            <Skeleton className="h-6 w-8 rounded-full" />
+          </div>
+        ))}
+      </div>
+
+      {/* Main course cards */}
+      <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 space-y-4">
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="rounded-none sm:rounded-xl overflow-hidden bg-card border border-border"
+          >
+            <Skeleton className="w-full aspect-[1.7/1]" />
+            <div className="p-4 space-y-2">
+              <Skeleton className="h-5 w-56" />
+              <Skeleton className="h-4 w-40" />
+              <div className="flex items-center justify-between pt-2">
+                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-8 w-8 rounded-full" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Recent rounds section */}
+      <div className="mt-4 space-y-3">
+        <div className="space-y-1">
+          <Skeleton className="h-4 w-48" />
+          <Skeleton className="h-3 w-40" />
+        </div>
+        
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="flex items-center gap-3 py-3 border-b border-border"
+          >
+            <Skeleton className="h-9 w-9 rounded-full shrink-0" />
+            <div className="flex-1 space-y-1">
+              <Skeleton className="h-4 w-52" />
+              <Skeleton className="h-3 w-32" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const FriendsCoursesPanel: React.FC = () => {
   // All hooks must be called before any conditional returns
   const { user } = useSupabaseSession();
@@ -425,30 +547,7 @@ const FriendsCoursesPanel: React.FC = () => {
 
   // Show skeleton only while loading AND before we have any filtered data
   if (loading && !filteredData) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-baseline justify-between">
-          <div>
-            <h2 className="text-xl font-semibold tracking-tight">
-              Friends' Courses
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              See where your friends have been playing lately
-            </p>
-          </div>
-        </div>
-
-        {/* simple skeleton cards */}
-        <div className="space-y-3">
-          {[1, 2, 3].map(i => (
-            <div
-              key={i}
-              className="h-20 rounded-none sm:rounded-xl bg-muted/80 animate-pulse"
-            />
-          ))}
-        </div>
-      </div>
-    );
+    return <FriendsCoursesSkeleton />;
   }
 
   // Empty state: no courses from friends in this time range
