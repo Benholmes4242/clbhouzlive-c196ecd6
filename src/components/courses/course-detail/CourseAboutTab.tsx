@@ -118,7 +118,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       <CourseLocationBreadcrumb course={course} />
       
       {/* Community Score Section - Card-based design */}
-      <section className="px-4 pt-7 pb-5 bg-slate-100 md:px-6 md:pt-9">
+      <section className="px-4 pt-7 pb-5 bg-slate-100 md:px-6 md:pt-9 space-y-6">
         <CommunityScoreCard
           courseId={course.id}
           ratingAggregates={ratingAggregates}
@@ -131,14 +131,14 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         {userRating && (
           <Button 
             onClick={handleRateClick}
-            className="w-full justify-center mt-4 h-11 rounded-lg"
+            className="w-full justify-center h-11 rounded-lg"
             variant="outline"
           >
             Edit Your Rating
           </Button>
         )}
 
-        {/* Friends Who've Played */}
+        {/* Friends Who've Played - only show if there are friends */}
         <CourseFriendsStrip courseId={course.id} courseName={course.name} />
       </section>
 
