@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Earth, ArrowLeft } from 'lucide-react';
 import { IoMdArrowBack } from 'react-icons/io';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import CountryFlag from '@/components/ui/country-flag';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -13,6 +13,7 @@ import CourseAboutTab from '@/components/courses/course-detail/CourseAboutTab';
 import CourseReviewsTab from '@/components/courses/course-detail/CourseReviewsTab';
 import CourseMediaTab from '@/components/courses/course-detail/CourseMediaTab';
 import CourseRankBadges from '@/components/courses/CourseRankBadges';
+import { CourseTabs } from '@/components/courses/course-detail/CourseTabs';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
@@ -193,18 +194,10 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
             />
           )}
         </div>
-
-        {/* Tab Navigation - overlaid on hero */}
-        <div className="absolute bottom-0 left-0 right-0 z-30">
-          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-black/28 backdrop-blur-[22px] border-t border-white/6 rounded-none shadow-[0_8px_30px_rgba(0,0,0,0.45),0_0_1px_rgba(255,255,255,0.16)] py-0 px-4 gap-2">
-              <TabsTrigger value="about" className="flex items-center justify-center py-1 -mt-0.5 text-base font-semibold text-white/70 !rounded-lg transition-opacity data-[state=active]:py-1 data-[state=active]:mt-[1.5px] data-[state=active]:bg-white/16 data-[state=active]:backdrop-blur-[18px] data-[state=active]:border data-[state=active]:border-white/45 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,0,0,0.35)]">About</TabsTrigger>
-              <TabsTrigger value="reviews" className="flex items-center justify-center py-1 -mt-0.5 text-base font-semibold text-white/70 !rounded-lg transition-opacity data-[state=active]:py-1 data-[state=active]:mt-[1.5px] data-[state=active]:bg-white/16 data-[state=active]:backdrop-blur-[18px] data-[state=active]:border data-[state=active]:border-white/45 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,0,0,0.35)]">Reviews</TabsTrigger>
-              <TabsTrigger value="media" className="flex items-center justify-center py-1 -mt-0.5 text-base font-semibold text-white/70 !rounded-lg transition-opacity data-[state=active]:py-1 data-[state=active]:mt-[1.5px] data-[state=active]:bg-white/16 data-[state=active]:backdrop-blur-[18px] data-[state=active]:border data-[state=active]:border-white/45 data-[state=active]:text-white data-[state=active]:shadow-[0_0_12px_rgba(0,0,0,0.35)]">Media</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
       </div>
+
+      {/* Segmented Control Tabs - positioned below hero */}
+      <CourseTabs activeTab={activeTab as any} onChange={handleTabChange as any} />
 
       {/* Phase 3: Keep-mounted tabs - render all visited tabs, hide inactive */}
       <div className="course-hero-wrapper bg-slate-50">
