@@ -18,10 +18,10 @@ export function getScoreTier(score: number): ScoreTierData {
     return {
       tier: 'outstanding',
       label: 'Outstanding',
-      bg: 'bg-amber-50',
-      border: 'border-amber-300',
-      text: 'text-amber-700',
-      barFill: 'bg-amber-500',
+      bg: 'bg-[#FFF3E4]',       // soft bronze tint
+      border: 'border-[#D8A265]',
+      text: 'text-[#7A4C1F]',
+      barFill: 'bg-[#D8A265]',  // Sunset Bronze
     };
   }
   
@@ -29,10 +29,10 @@ export function getScoreTier(score: number): ScoreTierData {
     return {
       tier: 'excellent',
       label: 'Excellent',
-      bg: 'bg-emerald-50',
-      border: 'border-emerald-300',
-      text: 'text-emerald-700',
-      barFill: 'bg-emerald-500',
+      bg: 'bg-[#E5ECF3]',       // soft slate-blue tint
+      border: 'border-[#37546B]',
+      text: 'text-[#243345]',
+      barFill: 'bg-[#37546B]',  // Slate Blue-Grey
     };
   }
   
@@ -40,10 +40,10 @@ export function getScoreTier(score: number): ScoreTierData {
     return {
       tier: 'veryGood',
       label: 'Very Good',
-      bg: 'bg-blue-50',
-      border: 'border-blue-300',
-      text: 'text-blue-700',
-      barFill: 'bg-blue-500',
+      bg: 'bg-[#E6F1EC]',       // soft pine-green tint
+      border: 'border-[#2F604A]',
+      text: 'text-[#1E3D2F]',
+      barFill: 'bg-[#2F604A]',  // Pine Green
     };
   }
   
@@ -51,19 +51,19 @@ export function getScoreTier(score: number): ScoreTierData {
     return {
       tier: 'good',
       label: 'Good',
-      bg: 'bg-sky-50',
-      border: 'border-sky-300',
-      text: 'text-sky-700',
-      barFill: 'bg-sky-500',
+      bg: 'bg-[#EAF6F0]',       // soft sea-mist tint
+      border: 'border-[#8FBCA8]',
+      text: 'text-[#305948]',
+      barFill: 'bg-[#8FBCA8]',  // Sea Mist Green
     };
   }
   
   return {
     tier: 'fair',
     label: 'Fair',
-    bg: 'bg-slate-50',
-    border: 'border-slate-300',
-    text: 'text-slate-700',
-    barFill: 'bg-slate-500',
+    bg: 'bg-[#F4ECE0]',         // soft sand-dune tint
+    border: 'border-[#D2C6B2]',
+    text: 'text-[#6E5A43]',
+    barFill: 'bg-[#D2C6B2]',    // Sand Dune
   };
 }
