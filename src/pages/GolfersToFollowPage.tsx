@@ -145,7 +145,8 @@ const GolfersToFollowPage = () => {
                 placeholder="Search golfers by name or club"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="pl-9 h-11 rounded-lg border-slate-200 focus:border-slate-600"
+                className="pl-9 h-11 border-slate-200 focus:border-slate-600"
+                style={{ borderRadius: 'var(--radius)' }}
               />
             </div>
           </div>

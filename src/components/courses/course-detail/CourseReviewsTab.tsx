@@ -403,13 +403,14 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       {/* Section 2 – Search bar */}
       <section className="px-4 pt-3 pb-2 bg-slate-100">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
             type="text"
             placeholder="Search reviews"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-10 pl-10 pr-4 rounded-full border border-slate-200 bg-white text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300/70 focus:ring-offset-1 focus:border-slate-600 transition"
+            className="w-full h-11 pl-10 pr-4 border border-slate-200 bg-white text-base placeholder:text-[15px] placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-300/70 focus:ring-offset-1 focus:border-slate-600 shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition"
+            style={{ borderRadius: 'var(--radius)' }}
           />
         </div>
       </section>
