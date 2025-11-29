@@ -393,7 +393,8 @@ const GlobalTop100 = () => {
           <button
             type="button"
             onClick={() => setShowSortSheet(true)}
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium bg-card border border-border/60 shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-slate-50 transition-colors whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-card border border-border/60 shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-slate-50 transition-colors whitespace-nowrap"
+            style={{ borderRadius: 'var(--radius)' }}
           >
             <span className="text-muted-foreground">Sort:</span>
             <span className="text-foreground">{sortLabelMap[sortOption]}</span>
