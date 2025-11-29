@@ -176,7 +176,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         
         {/* Course Title & Location - Bottom Left */}
-        <div className="absolute bottom-3 left-6 text-white z-10">
+        <div className="absolute bottom-8 left-6 text-white z-10">
           <h1 className="text-4xl md:text-5xl font-semibold mb-1.5 drop-shadow-2xl">{course.name}</h1>
           <p className="text-lg md:text-xl opacity-90 mb-2.5 drop-shadow-lg">
             {formatCourseLocation(course)}
