@@ -160,7 +160,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           alt={course.name}
           loading="lazy"
           className="course-hero-image w-full h-full object-cover !rounded-bl-none"
-          style={{ height: 'calc(100% + 48px)' }}
           onLoad={(e) => {
             e.currentTarget.classList.add('loaded');
           }}
