@@ -104,7 +104,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
   const maxCount = Math.max(...distributionItems.map(d => d.count), 1);
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 px-4 py-5">
+    <div>
       {/* Top row: Rating + Distribution */}
       <div className="grid grid-cols-2 gap-6 mb-5">
         {/* Left: Rating display - matching About tab */}

@@ -387,8 +387,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   return (
     <div className="flex flex-col">
-      {/* Section 1 – Summary header */}
-      <section className="px-4 pt-4 pb-4 bg-slate-50">
+      {/* Section 1 – Summary header (flattened on background) */}
+      <section className="px-4 pt-4 pb-6 bg-slate-50">
         <CourseReviewsSummary
           averageRating={communityScore}
           reviewCount={ratingCount}
