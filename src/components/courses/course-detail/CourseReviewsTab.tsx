@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { ReviewBlockFlat } from '../review/ReviewBlockFlat';
 import { CourseReviewsSummary } from '../review/CourseReviewsSummary';
-import { FilterPillsRow, FilterOption } from '@/components/ui/FilterPillsRow';
+import { SegmentedControl, SegmentOption } from '@/components/ui/SegmentedControl';
 import { Search } from 'lucide-react';
 import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
 import { ReviewMediaItem } from '../review/ReviewMediaStrip';
@@ -65,7 +65,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
 
   // Filter pill options for Reviews tab
-  const sortOptions: FilterOption[] = [
+  const sortOptions: SegmentOption<SortOption>[] = [
     { id: 'recent', label: 'Most recent' },
     { id: 'highest', label: 'Highest rated' },
     { id: 'helpful', label: 'Most helpful' },
@@ -415,11 +415,16 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       </section>
 
       {/* Section 3 – Sort pills */}
-      <FilterPillsRow
-        options={sortOptions}
-        activeId={sortBy}
-        onChange={(id) => setSortBy(id as SortOption)}
-      />
+      <div className="px-4 pt-3 pb-3 bg-slate-100">
+        <p className="mb-2 text-xs font-semibold tracking-[0.08em] uppercase text-slate-500">
+          Sort &amp; filter
+        </p>
+        <SegmentedControl
+          options={sortOptions}
+          value={sortBy}
+          onChange={(value) => setSortBy(value as SortOption)}
+        />
+      </div>
 
       {/* Section 4 – Your review + other reviews (flat blocks) */}
       <section className="px-4 pt-3 pb-4 bg-slate-50">
