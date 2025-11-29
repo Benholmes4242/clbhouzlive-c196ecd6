@@ -18,9 +18,12 @@ export function SegmentedControl<T extends string>({
   onChange,
   className = '',
 }: SegmentedControlProps<T>) {
-  const activeIndex = options.findIndex((o) => o.id === value);
+  const activeIndexRaw = options.findIndex((o) => o.id === value);
   const segmentCount = options.length || 1;
   const segmentWidth = 100 / segmentCount;
+
+  // Safety: if value not found, fall back to first segment
+  const activeIndex = activeIndexRaw < 0 ? 0 : activeIndexRaw;
 
   return (
     <div
