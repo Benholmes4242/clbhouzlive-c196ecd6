@@ -609,17 +609,17 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
               {/* Scroll to bottom button */}
               {showScrollToBottom && (
-                <button
+                <Button
+                  variant="secondary"
                   onClick={scrollToBottom}
-                  className="fixed bottom-[88px] right-3 z-[2] h-10 px-3.5 rounded-full bg-white/08 backdrop-blur border border-white/12 shadow-[0_6px_20px_rgba(0,0,0,0.6)] text-body-sm text-white flex items-center gap-2 hover:bg-white/12 hover:border-white/20 transition"
+                  className="fixed bottom-[88px] right-3 z-[2] flex items-center gap-2"
                   aria-label="Jump to latest"
-                  type="button"
                 >
                   <span className="inline-block h-4 w-4 rounded-full grid place-items-center bg-white/08">
                     <ChevronDown className="h-3 w-3" />
                   </span>
                   <span>Newer messages</span>
-                </button>
+                </Button>
               )}
             </div>
           </TabsContent>
@@ -1158,11 +1158,11 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
 
                 {/* Scroll-to-bottom FAB - Phase 59 */}
                 {showScrollToBottom && (
-                  <button
+                  <Button
+                    variant="secondary"
                     onClick={scrollToBottom}
-                    className="fixed md:absolute bottom-[88px] right-3 md:right-4 z-[2] h-10 px-3.5 rounded-full bg-white/08 backdrop-blur border border-white/12 shadow-[0_6px_20px_rgba(0,0,0,0.6)] text-body-sm text-white flex items-center gap-2 hover:bg-white/12 hover:border-white/20 active:shadow-sm transition-all duration-motion-fast ease-standard will-change-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                    className="fixed md:absolute bottom-[88px] right-3 md:right-4 z-[2] flex items-center gap-2"
                     aria-label="Jump to latest"
-                    type="button"
                     data-visible="true"
                   >
                     {/* Down chevron icon */}
@@ -1176,7 +1176,7 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                         {newMessageCount}
                       </span>
                     )}
-                  </button>
+                  </Button>
                 )}
                 </div>
               </div>

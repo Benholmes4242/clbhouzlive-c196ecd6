@@ -729,19 +729,17 @@ const FriendsCoursesPanel: React.FC = () => {
             <div className="flex flex-col items-center gap-3 mt-4">
               <div className="flex items-center gap-3">
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   disabled={page === 1}
                   onClick={() => handleChangeCoursesPage('prev')}
-                  className="h-11 px-6 rounded-lg shadow-[0_4px_10px_rgba(15,23,42,0.08)] disabled:shadow-none"
                 >
                   Previous courses
                 </Button>
 
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   disabled={page >= totalPages}
                   onClick={() => handleChangeCoursesPage('next')}
-                  className="h-11 px-6 rounded-lg shadow-[0_4px_10px_rgba(15,23,42,0.08)] disabled:shadow-none"
                 >
                   Next courses
                 </Button>
