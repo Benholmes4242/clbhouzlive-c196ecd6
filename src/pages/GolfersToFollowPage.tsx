@@ -113,7 +113,7 @@ const GolfersToFollowPage = () => {
   const direction = page > lastPage ? 'right' : 'left';
 
   return (
-    <div className="min-h-screen bg-background page-with-header m-0 p-0">
+    <div className="min-h-screen bg-slate-50 page-with-header m-0 p-0">
       <ClubhouseHeaderNew />
       <FadeInContent>
         <main className="max-w-3xl mx-auto pb-[30px]">
@@ -136,57 +136,63 @@ const GolfersToFollowPage = () => {
             </p>
           </header>
 
-          {/* Search Bar */}
-          <div className="px-4 mt-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search golfers by name or club"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                className="pl-9 h-11 border-slate-200 focus:border-slate-600"
-                style={{ borderRadius: 'var(--radius)' }}
-              />
+          {/* Sticky Search Bar + Tabs */}
+          <div className="sticky top-[56px] z-20 bg-slate-50/95 backdrop-blur">
+            <div className="border-b border-slate-100">
+              {/* Search Bar */}
+              <div className="px-4 pt-3 pb-2">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="search"
+                    placeholder="Search golfers by name or club"
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    className="pl-9 h-11 border-slate-200 focus:border-slate-600"
+                    style={{ borderRadius: 'var(--radius)' }}
+                  />
+                </div>
+              </div>
+
+              {/* Filter Tabs */}
+              <div className="px-4 pb-2">
+                <SegmentedTabs
+                  options={filterOptions}
+                  value={activeFilter}
+                  onChange={(value) => {
+                    setActiveFilter(value as FilterType);
+                    setPage(1);
+                  }}
+                />
+              </div>
             </div>
           </div>
 
-          {/* Filter Tabs - Match Golf Courses page styling */}
-          <div className="px-4 mt-4">
-            <SegmentedTabs
-              options={filterOptions}
-              value={activeFilter}
-              onChange={(value) => {
-                setActiveFilter(value as FilterType);
-                setPage(1);
-              }}
-            />
-          </div>
-
           {/* Golfers List */}
-          <div className="px-4 mt-6">
+          <div className="space-y-3 px-4 pt-3 pb-8 bg-slate-50">
             {loading ? (
-              <div className="space-y-3">
-                <GolferCardSkeleton />
-                <GolferCardSkeleton />
-                <GolferCardSkeleton />
-                <GolferCardSkeleton />
-                <GolferCardSkeleton />
-              </div>
+              <>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between rounded-2xl bg-white px-4 py-4 shadow-sm"
+                  >
+                    <div className="flex flex-1 items-center gap-3">
+                      <div className="h-12 w-12 rounded-2xl bg-slate-200 animate-pulse" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-3 w-1/2 rounded-full bg-slate-200 animate-pulse" />
+                        <div className="h-3 w-1/3 rounded-full bg-slate-100 animate-pulse" />
+                      </div>
+                    </div>
+                    <div className="ml-3 h-7 w-20 rounded-full bg-slate-200 animate-pulse" />
+                  </div>
+                ))}
+              </>
             ) : golfers.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
-                  <Search className="w-8 h-8 text-slate-400" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2">No golfers found</h3>
-                <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-                  {searchInput.trim()
-                    ? `No golfers match "${searchInput}". Try a different name or club.`
-                    : 'No golfers to show here yet.'}
-                  <br />
-                  <span className="mt-1 inline-block">
-                    Try another filter or search by name or club.
-                  </span>
+              <div className="px-4 pt-6 pb-10 text-center text-slate-500">
+                <p className="text-sm font-medium">No golfers found here yet.</p>
+                <p className="mt-1 text-xs">
+                  Try another tab, search by name or club, or invite a friend to join Clbhouz.
                 </p>
               </div>
             ) : (

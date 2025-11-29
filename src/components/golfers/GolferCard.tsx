@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { UserCheck, UserPlus, UserRoundPlus, Clock } from 'lucide-react';
+import { UserCheck, UserPlus, UserRoundPlus, Clock, ChevronRight } from 'lucide-react';
 import { GolferAvatar } from './GolferAvatar';
 import { cn } from '@/lib/utils';
 
@@ -36,83 +36,72 @@ export function GolferCard({
   const handicapLine = golfer.handicap != null ? `HCP ${golfer.handicap.toFixed(1)}` : null;
 
   return (
-    <article className="flex items-center justify-between rounded-2xl border border-border bg-card shadow-sm px-4 py-3 hover:shadow-md transition-shadow">
-      {/* Left side - clickable to profile */}
+    <article className="flex items-center justify-between rounded-2xl bg-white shadow-sm px-4 py-4">
+      {/* Left side - tappable to profile */}
       <button
+        type="button"
         onClick={() => navigate(`/users/${golfer.id}`)}
-        className="flex items-center gap-3 min-w-0 text-left flex-1"
+        className="flex flex-1 items-center gap-3 text-left"
       >
         {/* Squircle Avatar with initials fallback */}
         <GolferAvatar
           name={golfer.displayName}
           photoUrl={golfer.profileImage}
-          size={56}
+          size={48}
         />
 
-        <div className="min-w-0 flex-1">
-          <div className="font-medium truncate text-foreground">
-            {golfer.displayName}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-[15px] font-semibold text-slate-900 truncate">
+              {golfer.displayName}
+            </p>
+            <ChevronRight className="h-4 w-4 text-slate-300 shrink-0" />
           </div>
-          <div className="mt-0.5 text-sm text-muted-foreground truncate">
+          <p className="mt-0.5 text-xs text-slate-500 truncate">
             {clubLine}
-          </div>
+          </p>
           {handicapLine && (
-            <div className="mt-0.5 text-sm text-muted-foreground truncate">
+            <p className="mt-0.5 text-[11px] font-medium text-slate-500">
               {handicapLine}
-            </div>
+            </p>
           )}
         </div>
       </button>
 
-      {/* Right side - stacked buttons with fixed width */}
-      <div className="flex flex-col gap-2 ml-3 shrink-0 w-[110px]">
-        {/* Follow Button - Lighter secondary style */}
-        <Button
-          variant="secondary"
-          size="sm"
+      {/* Right side - stacked buttons */}
+      <div className="ml-3 flex flex-col items-end gap-2">
+        {/* Follow Button - Primary */}
+        <button
+          type="button"
           onClick={onFollowToggle}
           disabled={loading}
-          className="h-9 w-full rounded-lg text-sm font-medium"
-        >
-          {isFollowing ? (
-            <>
-              <UserCheck className="w-3.5 h-3.5 mr-1.5" />
-              Following
-            </>
-          ) : (
-            <>
-              <UserPlus className="w-3.5 h-3.5 mr-1.5" />
-              Follow
-            </>
+          className={cn(
+            "inline-flex items-center justify-center rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors",
+            isFollowing
+              ? "bg-slate-900 text-white"
+              : "bg-slate-800 text-white hover:bg-slate-900"
           )}
-        </Button>
+        >
+          <UserPlus className="mr-1.5 h-3.5 w-3.5" />
+          {isFollowing ? 'Following' : 'Follow'}
+        </button>
 
-        {/* Friend Request Button */}
+        {/* Friend Request Button - Secondary */}
         {onFriendRequest && (
-          <Button
-            variant="outline"
-            size="sm"
+          <button
+            type="button"
             onClick={friendStatus === 'pending' ? undefined : onFriendRequest}
             disabled={loading || friendStatus === 'pending'}
             className={cn(
-              "h-9 w-full rounded-lg text-sm font-medium transition",
+              "inline-flex items-center justify-center rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors",
               friendStatus === 'pending'
-                ? "border-slate-300 bg-slate-50/80 text-slate-500 cursor-default"
-                : "border-slate-600 text-foreground hover:bg-slate-50"
+                ? "border border-slate-300 bg-slate-50/80 text-slate-500 cursor-default"
+                : "border border-slate-300 text-slate-700 hover:bg-slate-50"
             )}
           >
-            {friendStatus === 'pending' ? (
-              <>
-                <Clock className="w-3.5 h-3.5 mr-1.5" />
-                Pending
-              </>
-            ) : (
-              <>
-                <UserRoundPlus className="w-3.5 h-3.5 mr-1.5" />
-                Add friend
-              </>
-            )}
-          </Button>
+            <UserRoundPlus className="mr-1.5 h-3.5 w-3.5" />
+            {friendStatus === 'pending' ? 'Pending' : 'Add friend'}
+          </button>
         )}
       </div>
     </article>
