@@ -17,7 +17,7 @@ const CTACard: React.FC<CTACardProps> = ({ item }) => {
       <Plus className="h-8 w-8 mx-auto mb-3 text-amber-600" />
       <h3 className="font-semibold text-lg mb-2">{item.ctaTitle || item.title}</h3>
       <p className="text-muted-foreground text-sm mb-4">{item.ctaDescription || 'Share your golf moments'}</p>
-      <Button size="sm" className="bg-[#2a2626] text-white hover:bg-[#2a2626]/90">
+      <Button variant="primary" size="sm">
         <Plus className="h-4 w-4 mr-2" />
         {item.ctaButton || 'Create Post'}
       </Button>
