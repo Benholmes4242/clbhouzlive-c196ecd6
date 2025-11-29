@@ -457,15 +457,14 @@ const CourseExplorer = () => {
                 </>
               )}
             </p>
-            <button
-              type="button"
+            <Button
+              variant="secondary"
               onClick={() => setShowSortSheet(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-card border border-border/60 shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-slate-50 transition-colors whitespace-nowrap"
-              style={{ borderRadius: 'var(--radius)' }}
+              className="whitespace-nowrap"
             >
               <span className="text-muted-foreground">Sort:</span>
               <span className="text-foreground">{sortLabelMap[sortOption]}</span>
-            </button>
+            </Button>
           </div>
         )}
 
@@ -482,24 +481,22 @@ const CourseExplorer = () => {
             {(page > 0 || hasNextPage) && (
               <div className={`flex items-center gap-3 w-full ${page === 0 ? 'justify-center' : 'justify-between'}`}>
                 {page > 0 && (
-                  <button
-                    type="button"
+                  <Button
+                    variant="secondary"
                     onClick={() => setPage((p) => p - 1)}
                     disabled={isLoading}
-                    className="px-5 py-2.5 rounded-lg border border-border/60 bg-card text-sm font-medium text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-accent/50 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Previous {COURSES_PAGE_SIZE} courses
-                  </button>
+                  </Button>
                 )}
                 {hasNextPage && (
-                  <button
-                    type="button"
+                  <Button
+                    variant="secondary"
                     onClick={() => setPage((p) => p + 1)}
                     disabled={isLoading}
-                    className="px-5 py-2.5 rounded-lg border border-border/60 bg-card text-sm font-medium text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-accent/50 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Next {COURSES_PAGE_SIZE} courses
-                  </button>
+                  </Button>
                 )}
               </div>
             )}
