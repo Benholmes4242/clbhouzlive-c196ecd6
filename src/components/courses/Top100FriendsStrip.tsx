@@ -43,10 +43,10 @@ export const Top100FriendsStrip: React.FC = () => {
     <button
       type="button"
       onClick={handleClick}
-      className="w-full flex items-center justify-between hover:bg-muted/30 transition text-left mt-4 px-4 py-2"
+      className="w-full flex items-center justify-between text-left mt-3 px-1"
     >
       <div className="flex flex-col min-w-0 flex-1">
-        <span className="text-xs text-muted-foreground">
+        <span className="text-xs text-slate-600">
           {label}
         </span>
       </div>
