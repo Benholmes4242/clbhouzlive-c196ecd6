@@ -3071,9 +3071,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
 
 /* Hero Image Container with Responsive Aspect Ratios */
 .course-hero-container {
-  aspect-ratio: 16 / 9;
-  min-height: 24rem; /* 384px */
-  max-height: 32rem; /* 512px */
+  height: 12.5rem; /* 200px */
   position: relative;
   overflow: hidden;
   display: block;
@@ -3109,9 +3107,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
   }
   
   .course-hero-container {
-    aspect-ratio: 4 / 3;
-    min-height: 20rem;
-    max-height: 24rem;
+    height: 12.5rem; /* 200px */
   }
   
   .course-hero-image {
@@ -3131,16 +3127,14 @@ html[data-immersive="true"] .app-shell--topSpacer {
 /* Tablet optimization */
 @media (min-width: 769px) and (max-width: 1023px) {
   .course-hero-container {
-    aspect-ratio: 16 / 9;
-    max-height: 28rem;
+    height: 12.5rem; /* 200px */
   }
 }
 
 /* Desktop optimization for hero images */
 @media (min-width: 1024px) {
   .course-hero-container {
-    aspect-ratio: 21 / 9; /* Wider cinematic ratio for desktop */
-    max-height: 32rem; /* 512px */
+    height: 12.5rem; /* 200px */
   }
 }
 
