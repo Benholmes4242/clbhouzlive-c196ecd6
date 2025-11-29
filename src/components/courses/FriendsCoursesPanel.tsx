@@ -729,21 +729,19 @@ const FriendsCoursesPanel: React.FC = () => {
             <div className="flex flex-col items-center gap-3 mt-4">
               <div className="flex items-center gap-3">
                 <Button
-                  variant="outline"
                   disabled={page === 1}
                   onClick={() => handleChangeCoursesPage('prev')}
-                  className="h-11 px-6 rounded-lg shadow-[0_4px_10px_rgba(15,23,42,0.08)] disabled:shadow-none"
+                  className="h-11 px-6 rounded-lg bg-primary-accent text-white active:scale-99 disabled:opacity-60"
                 >
-                  Previous courses
+                  Previous 25 courses
                 </Button>
 
                 <Button
-                  variant="outline"
                   disabled={page >= totalPages}
                   onClick={() => handleChangeCoursesPage('next')}
-                  className="h-11 px-6 rounded-lg shadow-[0_4px_10px_rgba(15,23,42,0.08)] disabled:shadow-none"
+                  className="h-11 px-6 rounded-lg bg-primary-accent text-white active:scale-99 disabled:opacity-60"
                 >
-                  Next courses
+                  Next 25 courses
                 </Button>
               </div>
 
@@ -807,12 +805,11 @@ const FriendsCoursesPanel: React.FC = () => {
           {totalRecentPages > 1 && (
             <div className="mt-8 pb-8 flex items-center justify-between gap-3">
               <Button
-                variant="outline"
                 disabled={recentPage === 0}
                 onClick={() => setRecentPage((p) => Math.max(0, p - 1))}
-                className="px-3 py-1.5 rounded-lg h-9 text-xs shadow-[0_2px_6px_rgba(15,23,42,0.06)] disabled:shadow-none"
+                className="px-3 py-1.5 rounded-lg h-9 text-xs bg-primary-accent text-white active:scale-99 disabled:opacity-60"
               >
-                Previous rounds
+                Previous 25 rounds
               </Button>
 
               <p className="text-xs text-muted-foreground">
@@ -820,12 +817,11 @@ const FriendsCoursesPanel: React.FC = () => {
               </p>
 
               <Button
-                variant="outline"
                 disabled={recentPage === totalRecentPages - 1}
                 onClick={() => setRecentPage((p) => Math.min(totalRecentPages - 1, p + 1))}
-                className="px-3 py-1.5 rounded-lg h-9 text-xs shadow-[0_2px_6px_rgba(15,23,42,0.06)] disabled:shadow-none"
+                className="px-3 py-1.5 rounded-lg h-9 text-xs bg-primary-accent text-white active:scale-99 disabled:opacity-60"
               >
-                Next rounds
+                Next 25 rounds
               </Button>
             </div>
           )}
