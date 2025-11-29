@@ -24,15 +24,15 @@ export function SegmentedControl<T extends string>({
 
   return (
     <div
-      className={`relative mx-auto flex h-9 max-w-[360px] items-center rounded-full bg-slate-100/90 px-1 py-1 shadow-[0_1px_0_rgba(0,0,0,0.04)] ${className}`}
+      className={`relative mx-auto flex h-9 max-w-[360px] items-center rounded-full bg-slate-100/90 px-1.5 py-1.5 shadow-[0_1px_0_rgba(0,0,0,0.04)] ${className}`}
     >
       {/* Sliding active pill */}
       <div
-        className="absolute inset-y-1 rounded-full bg-white shadow-[0_2px_7px_rgba(0,0,0,0.12)] transition-transform duration-200 ease-out"
+        className="absolute inset-y-1.5 rounded-full bg-white shadow-[0_2px_7px_rgba(0,0,0,0.12)] transition-transform duration-200 ease-out"
         style={{
-          width: `calc(${segmentWidth}% - 0.25rem)`,
-          transform: `translateX(calc(${activeIndex * 100}% + ${activeIndex * 0.25}rem))`,
-          left: '0.25rem'
+          width: `calc(${segmentWidth}% - 0.375rem)`,
+          transform: `translateX(calc(${activeIndex * 100}% + ${activeIndex * 0.375}rem))`,
+          left: '0.375rem'
         }}
       />
 
