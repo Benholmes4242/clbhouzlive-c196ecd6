@@ -152,10 +152,10 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
           </div>
         </div>
         
-        <div className="flex flex-col flex-1 pb-3 gap-4">
+        <div className="flex flex-col flex-1 pb-5 gap-4">
           {/* Map - Full bleed with borders */}
           <div 
-            className="relative flex-1 rounded-none overflow-hidden border border-border/60 sm:border-border/40 bg-surface-alt w-[100vw] left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 sm:rounded-2xl sm:mx-4" 
+            className="relative h-[calc(100vh-300px)] max-h-[52vh] rounded-none overflow-hidden border border-border/60 sm:border-border/40 bg-surface-alt w-[100vw] left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 sm:rounded-2xl sm:mx-4" 
             style={{ minHeight: '320px' }}
           >
             <div ref={mapContainerRef} className="w-full h-full" />
