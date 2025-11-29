@@ -40,52 +40,50 @@ export const Top100FriendsStrip: React.FC = () => {
   };
 
   return (
-    <button
-      type="button"
+    <div
       onClick={handleClick}
-      className="w-full flex items-center justify-between text-left mt-3 px-1"
+      className="mt-2 flex items-center justify-between rounded-2xl bg-white/80 px-3 py-2.5 shadow-[0_4px_14px_rgba(15,23,42,0.10)] border border-slate-200/70 cursor-pointer transition-transform active:scale-[0.99]"
     >
       <div className="flex flex-col min-w-0 flex-1">
-        <span className="text-xs text-slate-600">
+        <p className="text-xs font-medium text-slate-700">
           {label}
-        </span>
+        </p>
       </div>
 
-      <div className="flex items-center ml-3 shrink-0">
-        {visibleFriends.map((friend, index) => {
-          const displayName = friend.profile.display_name || friend.profile.username || '?';
-          const initial = displayName[0]?.toUpperCase() || '?';
-          
-          return friend.profile.profile_photo_url ? (
-            <SquircleImage
-              key={friend.user_id}
-              src={friend.profile.profile_photo_url}
-              alt={displayName}
-              size={36}
-              className={`shrink-0 ${index > 0 ? '-ml-2' : ''}`}
-            />
-          ) : (
-            <div
-              key={friend.user_id}
-              className={`w-9 h-9 flex items-center justify-center bg-muted text-foreground text-xs font-semibold shrink-0 ${index > 0 ? '-ml-2' : ''}`}
-              style={{ borderRadius: '22%' }}
+      <div className="flex items-center space-x-2 shrink-0">
+        <div className="flex -space-x-2">
+          {visibleFriends.map((friend, index) => {
+            const displayName = friend.profile.display_name || friend.profile.username || '?';
+            const initial = displayName[0]?.toUpperCase() || '?';
+            
+            return friend.profile.profile_photo_url ? (
+              <SquircleImage
+                key={friend.user_id}
+                src={friend.profile.profile_photo_url}
+                alt={displayName}
+                size={36}
+                className="shrink-0 h-9 w-9 rounded-[22%] border-2 border-white"
+              />
+            ) : (
+              <div
+                key={friend.user_id}
+                className="w-9 h-9 flex items-center justify-center bg-slate-100 text-slate-600 text-[11px] font-semibold shrink-0 rounded-[22%] border-2 border-white"
+              >
+                {initial}
+              </div>
+            );
+          })}
+
+          {overflowCount > 0 && (
+            <div 
+              className="flex h-9 w-9 items-center justify-center rounded-[22%] bg-slate-100 text-[11px] font-semibold text-slate-600 border-2 border-white shrink-0"
             >
-              {initial}
+              +{overflowCount}
             </div>
-          );
-        })}
-
-        {overflowCount > 0 && (
-          <div 
-            className="w-9 h-9 flex items-center justify-center bg-muted text-foreground text-xs font-semibold shrink-0 -ml-2"
-            style={{ borderRadius: '22%' }}
-          >
-            +{overflowCount}
-          </div>
-        )}
-
-        <ChevronRight className="ml-1 h-4 w-4 text-muted-foreground shrink-0" />
+          )}
+        </div>
+        <ChevronRight className="h-4 w-4 text-slate-400 shrink-0" />
       </div>
-    </button>
+    </div>
   );
 };
