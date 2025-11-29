@@ -189,7 +189,7 @@ export function CourseSearchSheet({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-600"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-600"
                   autoComplete="off"
                   autoCapitalize="off"
                   spellCheck="false"

@@ -57,7 +57,7 @@ export default function StudioPanelEdit({ edits, updateEdits, onApply, onReset, 
           <label className="block text-body-sm font-medium text-zinc-700 mb-3">Rotate</label>
           <button
             onClick={handleRotate}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 transition-colors"
           >
             <RotateCw className="w-5 h-5" />
             <span className="text-sm font-medium">Rotate 90°</span>

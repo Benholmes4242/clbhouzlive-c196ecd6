@@ -30,7 +30,7 @@ const CaptionInput = ({
       <div
         ref={captionInputRef}
         contentEditable
-        className="min-h-20 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:outline-none focus-visible:border-slate-600"
+        className="min-h-20 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:outline-none focus-visible:border-slate-600"
         onInput={onInput}
         data-placeholder="Write your caption and tag friends with @..."
         suppressContentEditableWarning={true}

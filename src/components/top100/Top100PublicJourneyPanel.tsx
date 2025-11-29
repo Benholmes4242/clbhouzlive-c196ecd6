@@ -110,7 +110,7 @@ const Top100PublicJourneyPanel: React.FC<Top100PublicJourneyPanelProps> = ({
                 {shared.shared_courses.slice(0, 5).map((course) => (
                   <div
                     key={course.course_id}
-                    className="p-3 rounded-lg bg-card/50 border border-border/30"
+                    className="p-3 rounded-xl bg-card/50 border border-border/30"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
