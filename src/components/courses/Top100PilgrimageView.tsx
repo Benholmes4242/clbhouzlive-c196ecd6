@@ -1,6 +1,5 @@
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTop100Pilgrimage } from '@/hooks/useTop100Pilgrimage';
-import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -23,12 +22,12 @@ export function Top100PilgrimageView({ userId }: Top100PilgrimageViewProps) {
         <p className="text-sm text-muted-foreground mb-4">
           Sign in to track your Top 100 pilgrimage
         </p>
-        <Button
-          variant="primary"
+        <button
           onClick={() => navigate('/auth')}
+          className="px-4 py-2 rounded-lg bg-primary-accent text-white text-sm font-medium"
         >
           Sign in
-        </Button>
+        </button>
       </div>
     );
   }

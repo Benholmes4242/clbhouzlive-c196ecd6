@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import SquareCardMedia from '@/components/explore/media/SquareCardMedia';
 import { CardType } from '@/components/explore/media/CardMediaTypes';
 import { adaptClubMediaArrayToExploreItems } from '@/lib/adapters/clubMediaToExplore';
@@ -147,12 +146,13 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
             <p className="text-sm text-slate-500 mb-3">
               Help other golfers discover this course — be the first to share your experience.
             </p>
-            <Button
-              variant="secondary"
+            <button
+              type="button"
               onClick={() => navigate(`/courses/${clubId}/rate`)}
+              className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold bg-white text-slate-900 border border-slate-600 shadow-sm transition"
             >
               Rate this course
-            </Button>
+            </button>
           </div>
         </div>
       </>

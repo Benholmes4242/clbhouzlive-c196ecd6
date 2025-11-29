@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePaginatedFollowers } from '@/hooks/useSocialLists';
 import { useUserByUsername } from '@/hooks/useUserByUsername';
@@ -87,13 +86,13 @@ const FollowersListPage = () => {
 
           {hasNextPage && (
             <div className="flex justify-center py-6">
-              <Button
-                variant="secondary"
+              <button
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
+                className="px-4 py-2 rounded-lg bg-background border border-border text-sm font-medium disabled:opacity-50 transition-opacity"
               >
                 {isFetchingNextPage ? 'Loading more…' : 'Load more'}
-              </Button>
+              </button>
             </div>
           )}
         </>

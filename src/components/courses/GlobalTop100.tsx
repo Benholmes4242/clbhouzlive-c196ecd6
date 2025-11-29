@@ -453,13 +453,14 @@ const GlobalTop100 = () => {
             {(page > 0 || hasNextPage) && (
               <div className={`flex items-center gap-3 w-full ${page === 0 ? 'justify-center' : 'justify-between'}`}>
                 {page > 0 && (
-                  <Button
-                    variant="secondary"
+                  <button
+                    type="button"
                     onClick={() => setPage((p) => p - 1)}
                     disabled={isLoading}
+                    className="px-5 py-2.5 rounded-lg border border-border/60 bg-card text-sm font-medium text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-accent/50 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Previous {COURSES_PAGE_SIZE} courses
-                  </Button>
+                  </button>
                 )}
                 {hasNextPage && (
                   <Button
