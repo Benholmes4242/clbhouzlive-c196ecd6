@@ -143,7 +143,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                 </span>
                 <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                   <div
-                    className={`h-full ${item.tier.bg} transition-all duration-300`}
+                    className={`h-full ${item.tier.barFill} transition-all duration-300`}
                     style={{ width: `${percentage}%` }}
                   />
                 </div>
