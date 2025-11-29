@@ -18,54 +18,50 @@ export function useFriendsOnTop100Journey(userId: string | undefined) {
     queryFn: async () => {
       if (!userId) return [];
 
-      // Get list of friends (users the current user follows)
+      // Step 1: Get list of following IDs
       const { data: followsData, error: followsError } = await supabase
         .from('user_follows')
-        .select(`
-          following_id,
-          user_profiles!user_follows_following_id_fkey (
-            id,
-            username,
-            display_name,
-            profile_photo_url
-          )
-        `)
+        .select('following_id')
         .eq('follower_id', userId);
 
       if (followsError) throw followsError;
+      if (!followsData || followsData.length === 0) return [];
 
-      const friends = (followsData || [])
-        .map((row: any) => row.user_profiles)
-        .filter(Boolean);
+      const followingIds = followsData.map(f => f.following_id);
 
-      if (friends.length === 0) return [];
+      // Step 2: Get profiles for those users
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('user_profiles')
+        .select('id, username, display_name, profile_photo_url')
+        .in('id', followingIds);
 
-      // For each friend, check if they've played any Top 100 course
+      if (profilesError) throw profilesError;
+      if (!profilesData || profilesData.length === 0) return [];
+
+      // Step 3: For each friend, check if they've played any Top 100 course
       const friendsWithTop100: FriendOnTop100[] = [];
 
-      for (const friend of friends) {
-        // Check user_top100_courses table
+      for (const friend of profilesData) {
         const { data: top100Data, error: top100Error } = await supabase
           .from('user_top100_courses')
           .select('course_id')
-          .eq('user_id', friend.id);
+          .eq('user_id', friend.id)
+          .limit(1); // Only need to know if they have at least one
 
         if (top100Error) {
           console.error('Error fetching Top 100 courses for friend:', top100Error);
           continue;
         }
 
-        const top100Count = top100Data?.length || 0;
-
-        if (top100Count > 0) {
+        if (top100Data && top100Data.length > 0) {
           friendsWithTop100.push({
             user_id: friend.id,
             profile: {
-              display_name: friend.display_name,
-              username: friend.username,
+              display_name: friend.display_name || '',
+              username: friend.username || '',
               profile_photo_url: friend.profile_photo_url,
             },
-            top100CoursesPlayed: top100Count,
+            top100CoursesPlayed: top100Data.length,
           });
         }
       }
