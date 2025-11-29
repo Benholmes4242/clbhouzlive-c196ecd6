@@ -105,11 +105,7 @@ const GolfersToFollowPage = () => {
   ];
 
   const handleBack = () => {
-    if (window.history.length > 1) {
-      navigate(-1);
-    } else {
-      navigate('/courses?tab=friends');
-    }
+    navigate('/courses?tab=friends');
   };
 
   const startIndex = (page - 1) * pageSize + 1;
