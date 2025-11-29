@@ -34,73 +34,71 @@ const Top100ClubCallout: React.FC = () => {
     : 0;
 
   return (
-    <section className="mb-4">
-      <Card 
-        onClick={handleClick}
-        className="cursor-pointer border border-border/60 bg-card shadow-lg shadow-black/5 hover:-translate-y-[1px] hover:shadow-xl transition-all"
-      >
-        <div className="flex flex-col items-center px-5 py-3.5 text-center">
-          {/* Title with inline trophy icon */}
-          <div className="flex items-center gap-2 mb-1">
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-primary-accent/10 to-primary-accent/5">
-              <Trophy className="h-4 w-4 text-primary-accent" />
-            </div>
-            <h3 className="text-base font-semibold text-foreground">
-              Top 100 Club
-            </h3>
+    <section 
+      onClick={handleClick}
+      className="px-4 pt-4 pb-6 cursor-pointer"
+    >
+      <div className="flex flex-col items-center text-center">
+        {/* Title with inline trophy icon */}
+        <div className="flex items-center gap-2 mb-1">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-primary-accent/10 to-primary-accent/5">
+            <Trophy className="h-4 w-4 text-primary-accent" />
           </div>
-
-          {/* Tagline */}
-          <p className="text-xs text-muted-foreground">
-            Track your pilgrimage through the world&apos;s Top 100 courses.
-          </p>
-
-          {/* Progress line */}
-          {session ? (
-            <>
-              {listsStarted > 0 ? (
-                <>
-                  <p className="mt-2 text-xs font-medium text-foreground">
-                    You&apos;ve played {coursesPlayed} course{coursesPlayed === 1 ? '' : 's'} {listsStarted === 1 ? 'in' : 'across'} {listsStarted} Top 100 list{listsStarted === 1 ? '' : 's'}.
-                  </p>
-
-                  {/* Progress bar */}
-                  <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="h-full bg-primary-accent transition-all"
-                      style={{ width: `${progressPercent}%` }}
-                    />
-                  </div>
-                </>
-              ) : (
-                <p className="mt-2 text-xs text-muted-foreground">
-                  You haven&apos;t started your Top 100 journey yet. Play your first Top 100 course to begin.
-                </p>
-              )}
-            </>
-          ) : (
-            <p className="mt-2 text-xs text-muted-foreground">
-              Sign in to track your progress and see where you rank on the global leaderboard.
-            </p>
-          )}
-
-          {/* CTA button */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleClick();
-            }}
-            className="mt-3 inline-flex w-full items-center justify-center rounded-full border border-slate-500/70 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm active:scale-[0.99] transition hover:bg-slate-50"
-          >
-            {session ? 'Open your Top 100 Journey' : 'Sign in to join the Top 100 Club'}
-            <ChevronRight className="ml-1.5 h-4 w-4" />
-          </button>
-
-          {/* Friends on Top 100 Journey */}
-          <Top100FriendsStrip />
+          <h3 className="text-base font-semibold text-foreground">
+            Top 100 Club
+          </h3>
         </div>
-      </Card>
+
+        {/* Tagline */}
+        <p className="text-xs text-muted-foreground mb-3">
+          Track your pilgrimage through the world&apos;s Top 100 courses.
+        </p>
+
+        {/* Progress line */}
+        {session ? (
+          <>
+            {listsStarted > 0 ? (
+              <>
+                <p className="mt-2 text-xs font-medium text-foreground mb-3">
+                  You&apos;ve played {coursesPlayed} course{coursesPlayed === 1 ? '' : 's'} {listsStarted === 1 ? 'in' : 'across'} {listsStarted} Top 100 list{listsStarted === 1 ? '' : 's'}.
+                </p>
+
+                {/* Progress bar */}
+                <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted mb-3">
+                  <div
+                    className="h-full bg-primary-accent transition-all"
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
+              </>
+            ) : (
+              <p className="mt-2 text-xs text-muted-foreground mb-3">
+                You haven&apos;t started your Top 100 journey yet. Play your first Top 100 course to begin.
+              </p>
+            )}
+          </>
+        ) : (
+          <p className="mt-2 text-xs text-muted-foreground mb-3">
+            Sign in to track your progress and see where you rank on the global leaderboard.
+          </p>
+        )}
+
+        {/* CTA button */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleClick();
+          }}
+          className="mt-3 mb-3 inline-flex w-full items-center justify-center rounded-full border border-slate-500/70 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm active:scale-[0.99] transition hover:bg-slate-50"
+        >
+          {session ? 'Open your Top 100 Journey' : 'Sign in to join the Top 100 Club'}
+          <ChevronRight className="ml-1.5 h-4 w-4" />
+        </button>
+
+        {/* Friends on Top 100 Journey */}
+        <Top100FriendsStrip />
+      </div>
     </section>
   );
 };
