@@ -27,7 +27,7 @@ export function useFriendsOnTop100Journey(userId: string | undefined) {
       if (followsError) throw followsError;
       if (!followsData || followsData.length === 0) return [];
 
-      const followingIds = followsData.map(f => f.following_id);
+      const followingIds = followsData.map((f) => f.following_id);
 
       // Step 2: Get profiles for those users
       const { data: profilesData, error: profilesError } = await supabase
@@ -38,33 +38,29 @@ export function useFriendsOnTop100Journey(userId: string | undefined) {
       if (profilesError) throw profilesError;
       if (!profilesData || profilesData.length === 0) return [];
 
-      // Step 3: For each friend, check if they've played any Top 100 course
-      const friendsWithTop100: FriendOnTop100[] = [];
+      // Step 3: Which of them have at least one Top 100 course?
+      const { data: top100Data, error: top100Error } = await supabase
+        .from('user_top100_courses')
+        .select('user_id')
+        .in('user_id', followingIds);
 
-      for (const friend of profilesData) {
-        const { data: top100Data, error: top100Error } = await supabase
-          .from('user_top100_courses')
-          .select('course_id')
-          .eq('user_id', friend.id)
-          .limit(1); // Only need to know if they have at least one
+      if (top100Error) throw top100Error;
+      if (!top100Data || top100Data.length === 0) return [];
 
-        if (top100Error) {
-          console.error('Error fetching Top 100 courses for friend:', top100Error);
-          continue;
-        }
+      const userIdsWithTop100 = new Set(top100Data.map((row) => row.user_id));
 
-        if (top100Data && top100Data.length > 0) {
-          friendsWithTop100.push({
-            user_id: friend.id,
-            profile: {
-              display_name: friend.display_name || '',
-              username: friend.username || '',
-              profile_photo_url: friend.profile_photo_url,
-            },
-            top100CoursesPlayed: top100Data.length,
-          });
-        }
-      }
+      const friendsWithTop100: FriendOnTop100[] = profilesData
+        .filter((friend) => userIdsWithTop100.has(friend.id))
+        .map((friend) => ({
+          user_id: friend.id,
+          profile: {
+            display_name: friend.display_name || '',
+            username: friend.username || '',
+            profile_photo_url: friend.profile_photo_url,
+          },
+          // Flag indicating they're on a Top 100 journey
+          top100CoursesPlayed: 1,
+        }));
 
       return friendsWithTop100;
     },
