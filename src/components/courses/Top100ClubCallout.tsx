@@ -5,6 +5,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMyTop100Progress } from '@/hooks/useMyTop100Progress';
 import { useUserTop100Progress } from '@/hooks/useUserTop100Progress';
 import { Card } from '@/components/ui/card';
+import { Top100FriendsStrip } from './Top100FriendsStrip';
 
 const Top100ClubCallout: React.FC = () => {
   const { session } = useSupabaseSession();
@@ -95,6 +96,9 @@ const Top100ClubCallout: React.FC = () => {
             {session ? 'Open your Top 100 Journey' : 'Sign in to join the Top 100 Club'}
             <ChevronRight className="ml-1.5 h-4 w-4" />
           </button>
+
+          {/* Friends on Top 100 Journey */}
+          <Top100FriendsStrip />
         </div>
       </Card>
     </section>
