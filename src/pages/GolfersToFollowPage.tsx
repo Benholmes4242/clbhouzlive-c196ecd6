@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import { FadeInContent } from '@/components/ui/FadeInContent';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Search, ChevronLeft } from 'lucide-react';
 import { GolferCard } from '@/components/golfers/GolferCard';
 import { GolferCardSkeleton } from '@/components/golfers/GolferCardSkeleton';
@@ -221,25 +222,25 @@ const GolfersToFollowPage = () => {
                 {/* Pagination - only show when not searching */}
                 {!isSearching && totalPages > 1 && (
                   <div className="mt-6 flex items-center justify-between gap-3 text-sm text-muted-foreground">
-                    <button
+                    <Button
+                      variant="secondary"
                       disabled={page === 1}
                       onClick={() => setPage(p => Math.max(1, p - 1))}
-                      className="h-11 px-6 rounded-lg border border-border bg-background shadow-sm disabled:opacity-40 disabled:cursor-default hover:bg-slate-50 transition"
                     >
                       Previous 15 golfers
-                    </button>
+                    </Button>
 
                     <span className="flex-1 text-center">
                       Showing {startIndex}–{endIndex} of {totalCount} golfers
                     </span>
 
-                    <button
+                    <Button
+                      variant="secondary"
                       disabled={page === totalPages}
                       onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                      className="h-11 px-6 rounded-lg border border-border bg-background shadow-sm disabled:opacity-40 disabled:cursor-default hover:bg-slate-50 transition"
                     >
                       Next 15 golfers
-                    </button>
+                    </Button>
                   </div>
                 )}
               </>
