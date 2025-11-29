@@ -245,7 +245,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
 
       {/* Comparison message */}
       {comparisonMessage && (
-        <div className="mt-3 mb-3 flex items-center justify-center">
+        <div className="mt-3 mb-3 pb-[2px] flex items-center justify-center">
           {comparisonMessage}
         </div>
       )}
