@@ -62,12 +62,12 @@ export const Top100FriendsStrip: React.FC = () => {
                 src={friend.profile.profile_photo_url}
                 alt={displayName}
                 size={36}
-                className="shrink-0 h-9 w-9 rounded-[22%] border-2 border-white"
+                className="shrink-0 h-9 w-9 rounded-[22%]"
               />
             ) : (
               <div
                 key={friend.user_id}
-                className="w-9 h-9 flex items-center justify-center bg-slate-100 text-slate-600 text-[11px] font-semibold shrink-0 rounded-[22%] border-2 border-white"
+                className="w-9 h-9 flex items-center justify-center bg-slate-100 text-slate-600 text-[11px] font-semibold shrink-0 rounded-[22%]"
               >
                 {initial}
               </div>
@@ -76,7 +76,7 @@ export const Top100FriendsStrip: React.FC = () => {
 
           {overflowCount > 0 && (
             <div 
-              className="flex h-9 w-9 items-center justify-center rounded-[22%] bg-slate-100 text-[11px] font-semibold text-slate-600 border-2 border-white shrink-0"
+              className="flex h-9 w-9 items-center justify-center rounded-[22%] bg-slate-100 text-[11px] font-semibold text-slate-600 shrink-0"
             >
               +{overflowCount}
             </div>
