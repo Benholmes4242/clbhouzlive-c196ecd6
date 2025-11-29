@@ -22,7 +22,7 @@ const CourseDetailImage: React.FC<CourseDetailImageProps> = ({
   const { data: top100Memberships = [] } = useCourseTop100Memberships(courseId);
 
   return (
-    <div className="relative h-[236px] rounded-lg overflow-hidden">
+    <div className="relative h-64 rounded-lg overflow-hidden">
       <img
         src={thumbnailImage || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&h=400&fit=crop'}
         alt={courseName}
