@@ -920,7 +920,8 @@ const PostPlayRatingModal = ({
                       Your rating summary
                     </span>
                     <span
-                      className={`inline-flex items-center px-3 py-1 rounded-full border text-[11px] font-semibold uppercase ${tierData.bg} ${tierData.border} ${tierData.text}`}
+                      className={`inline-flex items-center px-3 py-1 border text-[11px] font-semibold uppercase ${tierData.bg} ${tierData.border} ${tierData.text}`}
+                      style={{ borderRadius: 'var(--radius)' }}
                     >
                       {tierData.label}
                     </span>
