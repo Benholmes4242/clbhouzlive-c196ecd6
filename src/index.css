@@ -3071,7 +3071,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
 
 /* Hero Image Container with Responsive Aspect Ratios */
 .course-hero-container {
-  height: 18.75rem; /* 300px */
+  height: 17.5rem; /* 280px */
   position: relative;
   overflow: hidden;
   display: block;
@@ -3107,7 +3107,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
   }
   
   .course-hero-container {
-    height: 18.75rem; /* 300px */
+    height: 17.5rem; /* 280px */
   }
   
   .course-hero-image {
@@ -3127,16 +3127,16 @@ html[data-immersive="true"] .app-shell--topSpacer {
 /* Tablet optimization */
 @media (min-width: 769px) and (max-width: 1023px) {
   .course-hero-container {
-    height: 18.75rem; /* 300px */
+    height: 17.5rem; /* 280px */
   }
 }
 
 /* Desktop optimization for hero images */
-@media (min-width: 1024px) {
-  .course-hero-container {
-    height: 18.75rem; /* 300px */
+  @media (min-width: 1024px) {
+    .course-hero-container {
+      height: 17.5rem; /* 280px */
+    }
   }
-}
 
 /* Large desktop optimization */
 @media (min-width: 1440px) {
