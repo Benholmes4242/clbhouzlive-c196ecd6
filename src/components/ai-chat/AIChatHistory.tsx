@@ -423,12 +423,13 @@ const ErrorState: React.FC<{
     <div className="text-body-md text-white/60 max-w-[280px]">
       {message}
     </div>
-    <button
+    <Button
+      variant="secondary"
       onClick={onRetry}
-      className="mt-2 h-10 px-5 rounded-full bg-white/08 border border-white/12 text-white font-medium hover:bg-white/12 hover:border-white/20 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+      className="mt-2"
     >
       Retry
-    </button>
+    </Button>
   </div>
 );
 
@@ -1060,10 +1061,10 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                   </button>
                 )}
               </label>
-              <button className="h-11 px-4 rounded-lg bg-muted/50 border border-border hover:bg-muted transition flex items-center gap-2">
+              <Button variant="secondary" className="flex items-center gap-2">
                 <Filter className="h-4 w-4 text-muted-foreground" />
                 <span className="hidden sm:inline text-sm">Filter</span>
-              </button>
+              </Button>
             </div>
 
             {/* Category tabs */}
@@ -1316,13 +1317,14 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                   </label>
 
                   {/* Filter button (UI placeholder) */}
-                  <button
-                    className="h-11 px-4 rounded-xl bg-white/06 backdrop-blur border border-white/12 hover:bg-white/08 hover:border-white/20 text-body-md font-medium text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 flex items-center gap-1.5"
+                  <Button
+                    variant="secondary"
+                    className="flex items-center gap-1.5"
                     aria-label="Open filters"
                   >
                     <Filter className="h-4 w-4 text-white/60" />
                     <span className="hidden sm:inline">Filter</span>
-                  </button>
+                  </Button>
                 </div>
 
                 {/* Tabs */}
@@ -1410,12 +1412,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                               Try a different search term or clear filters.
                             </div>
                             <div className="mt-4 flex items-center justify-center gap-2">
-                              <button 
-                                className="h-10 px-4 rounded-full bg-white/08 border border-white/12 hover:bg-white/12 hover:border-white/20 shadow-sm text-body-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 text-white"
+                              <Button 
+                                variant="secondary"
                                 onClick={() => setSearchQuery('')}
                               >
                                 Clear search
-                              </button>
+                              </Button>
                             </div>
                           </div>
                         </div>
@@ -1834,12 +1836,12 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({ isOpen, onClose, onSelect
                               Try a different search term or clear filters.
                             </div>
                             <div className="mt-4 flex items-center justify-center gap-2">
-                             <button 
-                                className="h-10 px-4 rounded-full bg-white border border-black/10 hover:bg-gray-50 shadow-sm text-body-md transition-all duration-motion-fast ease-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                             <Button 
+                                variant="secondary"
                                 onClick={() => setSearchQuery('')}
                               >
                                 Clear search
-                              </button>
+                              </Button>
                             </div>
                           </div>
                         </div>

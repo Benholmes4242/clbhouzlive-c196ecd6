@@ -340,10 +340,10 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           {/* Quick reactions strip (inline) - Phase 42 */}
           {false && ( /* Set data-reacting="true" to show */
             <div className="mt-1 flex flex-wrap gap-1.5 data-[reacting=true]:flex hidden" data-reacting="false">
-              <button className="h-8 px-2.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[13px] hover:bg-white active:scale-95 transition" type="button">👍</button>
-              <button className="h-8 px-2.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[13px] hover:bg-white active:scale-95 transition" type="button">👏</button>
-              <button className="h-8 px-2.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[13px] hover:bg-white active:scale-95 transition" type="button">❤️</button>
-              <button className="h-8 px-2.5 rounded-full bg-white/90 backdrop-blur border border-black/10 shadow-sm text-[13px] hover:bg-white active:scale-95 transition" type="button">🤯</button>
+              <Button variant="secondary" size="sm" className="h-8 text-[13px]">👍</Button>
+              <Button variant="secondary" size="sm" className="h-8 text-[13px]">👏</Button>
+              <Button variant="secondary" size="sm" className="h-8 text-[13px]">❤️</Button>
+              <Button variant="secondary" size="sm" className="h-8 text-[13px]">🤯</Button>
             </div>
           )}
           
@@ -352,9 +352,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             <div className="mt-2 flex items-center gap-2 text-[12px] text-amber-700">
               <span className="h-5 w-5 grid place-items-center rounded-full bg-amber-50 border border-amber-200">!</span>
               <span className="flex-1">Delivery failed. Tap to retry.</span>
-              <button className="h-8 px-3 rounded-full bg-white border border-black/10 shadow-sm hover:bg-gray-50 text-[12px] transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/40" type="button">
+              <Button variant="secondary" size="sm" className="h-8 text-[12px]">
                 Retry
-              </button>
+              </Button>
             </div>
           )}
           
