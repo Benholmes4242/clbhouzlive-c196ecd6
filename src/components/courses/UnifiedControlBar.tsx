@@ -49,7 +49,6 @@ export function UnifiedControlBar({
           onClick={onSortClick}
           className="
             inline-flex items-center gap-1.5
-            rounded-full
             px-3 py-1.5
             text-xs font-medium
             bg-background
@@ -58,6 +57,7 @@ export function UnifiedControlBar({
             hover:bg-slate-50
             transition-colors
           "
+          style={{ borderRadius: 'var(--radius)' }}
         >
           <span className="text-muted-foreground">Sort</span>
           <span className="text-foreground">{sortLabel}</span>
@@ -72,7 +72,6 @@ export function UnifiedControlBar({
             className="
               hidden sm:inline-flex
               items-center gap-1.5
-              rounded-full
               px-3 py-1.5
               text-xs font-medium
               bg-background
@@ -81,6 +80,7 @@ export function UnifiedControlBar({
               hover:bg-slate-50
               transition-colors
             "
+            style={{ borderRadius: 'var(--radius)' }}
           >
             <span className="text-foreground">Filters</span>
           </button>
