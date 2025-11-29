@@ -30,9 +30,8 @@ export function SegmentedControl<T extends string>({
       <div
         className="absolute inset-y-1.5 rounded-full bg-white shadow-[0_2px_7px_rgba(0,0,0,0.12)] transition-transform duration-200 ease-out"
         style={{
-          width: `calc(${segmentWidth}% - 0.375rem)`,
-          transform: `translateX(calc(${activeIndex * 100}% + ${activeIndex * 0.375}rem))`,
-          left: '0.375rem'
+          width: `calc(${segmentWidth}% - 0.75rem)`,
+          transform: `translateX(calc(${activeIndex * segmentWidth}% + 0.375rem))`,
         }}
       />
 
