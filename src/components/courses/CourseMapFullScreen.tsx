@@ -132,7 +132,7 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent 
         side="bottom" 
-        className="h-[81vh] sm:h-[76vh] flex flex-col p-0"
+        className="h-[77vh] sm:h-[72vh] flex flex-col p-0"
       >
         {/* Header - swipe to close area */}
         <div {...swipeHandlers} className="px-4 pt-3">
