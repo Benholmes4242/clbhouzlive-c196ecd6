@@ -109,7 +109,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
       <div className="grid grid-cols-2 gap-6 mb-5">
         {/* Left: Rating display - matching About tab */}
         <div>
-          <div className="inline-flex flex-col items-start gap-1 mb-2">
+          <div className="inline-flex flex-col items-center gap-1 mb-2">
             {/* Logo + Score */}
             <div className="flex items-center gap-1">
               <ClubhouseLogo size="md" />
