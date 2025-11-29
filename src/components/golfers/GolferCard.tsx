@@ -78,10 +78,10 @@ export function GolferCard({
           disabled={loading}
           className={cn(
             "h-7 px-3.5 text-xs",
-            isFollowing && "bg-slate-900 text-white hover:bg-slate-800"
+            isFollowing && "border-[rgba(247,158,27,0.65)] bg-[rgba(247,158,27,0.10)] text-[rgba(247,158,27,1)] hover:bg-[rgba(247,158,27,0.16)] active:bg-[rgba(247,158,27,0.22)]"
           )}
         >
-          <UserPlus className="mr-1.5 h-3.5 w-3.5" />
+          <UserPlus className={cn("mr-1.5 h-3.5 w-3.5", isFollowing && "text-[rgba(247,158,27,1)]")} />
           {isFollowing ? 'Following' : 'Follow'}
         </Button>
 
