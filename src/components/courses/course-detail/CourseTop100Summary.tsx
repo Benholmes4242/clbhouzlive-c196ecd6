@@ -89,7 +89,7 @@ const CourseTop100Summary: React.FC = () => {
           )}
           
           {data.prestige_label && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-surface-alt px-3 py-1 text-sm text-primary-accent">
+            <span className="inline-flex items-center gap-1 rounded-full bg-surface-alt px-3 py-1 text-sm text-[#f79e1b]">
               <Trophy className="h-3 w-3" />
               {data.prestige_label}
             </span>
