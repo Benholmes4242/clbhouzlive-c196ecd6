@@ -12,37 +12,29 @@ export const ScrollRestoration = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Exclude course detail routes and courses list page from triggering scroll-to-top on location changes
+    // Exclude course detail routes from scroll restoration
     const isCourseDetail = /^\/courses\/[^/]+$/.test(location.pathname);
-    const isCoursesListPage = location.pathname === '/courses';
     
     // Save current scroll position before leaving (only for non-course-detail routes)
     return () => {
       if (!isCourseDetail) {
-        // For courses list page, ignore search params (tab changes) when saving scroll position
-        const currentPath = isCoursesListPage 
-          ? location.pathname 
-          : location.pathname + location.search;
+        const currentPath = location.pathname + location.search;
         scrollPositions.set(currentPath, window.scrollY);
       }
     };
-  }, [location.pathname, location.search]);
+  }, [location]);
 
   useEffect(() => {
-    // Exclude course detail routes and courses list page from scroll-to-top on location changes
+    // Exclude course detail routes from scroll restoration
     const isCourseDetail = /^\/courses\/[^/]+$/.test(location.pathname);
-    const isCoursesListPage = location.pathname === '/courses';
     
     if (isCourseDetail) {
-      // Course details handle their own scroll-to-top and preserve scroll on tab changes
+      // Course details handle their own scroll-to-top
       return;
     }
     
     // Restore scroll position for this route
-    // For courses list page, ignore search params (tab changes) when restoring scroll position
-    const currentPath = isCoursesListPage 
-      ? location.pathname 
-      : location.pathname + location.search;
+    const currentPath = location.pathname + location.search;
     const savedPosition = scrollPositions.get(currentPath);
     
     if (savedPosition !== undefined) {
@@ -67,11 +59,11 @@ export const ScrollRestoration = () => {
       }, 100);
       
       return () => clearTimeout(timeoutId);
-    } else if (!isCoursesListPage) {
-      // New route - scroll to top (but not for courses list page tab changes)
+    } else {
+      // New route - scroll to top
       window.scrollTo(0, 0);
     }
-  }, [location.pathname, location.search]);
+  }, [location]);
 
   return null;
 };

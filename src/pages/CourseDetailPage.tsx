@@ -11,8 +11,8 @@ const CourseDetailPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Always scroll to top when navigating to a different course
-  // Only watches courseId - tab changes don't trigger scroll
+  // Always scroll to top on every course detail visit
+  // Fires when navigating to a new course OR revisiting the same course
   useEffect(() => {
     // Scroll both window and #root container to ensure it works
     window.scrollTo({
@@ -29,7 +29,7 @@ const CourseDetailPage = () => {
         behavior: 'auto',
       });
     }
-  }, [courseId]);
+  }, [courseId, location.pathname]);
 
   // Add defensive check for courseId
   if (!courseId) {
