@@ -36,7 +36,7 @@ const Top100ClubCallout: React.FC = () => {
   return (
     <section 
       onClick={handleClick}
-      className="px-4 pt-5 pb-3.5 cursor-pointer"
+      className="px-4 pt-5 pb-7 cursor-pointer"
     >
       <div className="flex flex-col items-center text-center">
         {/* Title with inline trophy icon */}
@@ -50,7 +50,7 @@ const Top100ClubCallout: React.FC = () => {
         </div>
 
         {/* Tagline */}
-        <p className="mt-2 mb-3 max-w-[22rem] text-sm text-slate-600">
+        <p className="mt-1 mb-3 max-w-[22rem] text-sm text-slate-600">
           Track your pilgrimage through the world&apos;s Top 100 courses.
         </p>
 
