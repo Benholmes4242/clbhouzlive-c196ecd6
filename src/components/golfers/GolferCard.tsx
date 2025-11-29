@@ -70,38 +70,36 @@ export function GolferCard({
 
       {/* Right side - stacked buttons */}
       <div className="ml-3 flex flex-col items-end gap-2">
-        {/* Follow Button - Primary */}
-        <button
-          type="button"
+        {/* Follow Button */}
+        <Button
+          variant="secondary"
+          size="sm"
           onClick={onFollowToggle}
           disabled={loading}
           className={cn(
-            "inline-flex items-center justify-center rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors",
-            isFollowing
-              ? "bg-slate-900 text-white"
-              : "bg-slate-800 text-white hover:bg-slate-900"
+            "h-7 px-3.5 text-xs",
+            isFollowing && "bg-slate-900 text-white hover:bg-slate-800"
           )}
         >
           <UserPlus className="mr-1.5 h-3.5 w-3.5" />
           {isFollowing ? 'Following' : 'Follow'}
-        </button>
+        </Button>
 
-        {/* Friend Request Button - Secondary */}
+        {/* Friend Request Button */}
         {onFriendRequest && (
-          <button
-            type="button"
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={friendStatus === 'pending' ? undefined : onFriendRequest}
             disabled={loading || friendStatus === 'pending'}
             className={cn(
-              "inline-flex items-center justify-center rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors",
-              friendStatus === 'pending'
-                ? "border border-slate-300 bg-slate-50/80 text-slate-500 cursor-default"
-                : "border border-slate-300 text-slate-700 hover:bg-slate-50"
+              "h-7 px-3.5 text-xs",
+              friendStatus === 'pending' && "opacity-50 cursor-default"
             )}
           >
             <UserRoundPlus className="mr-1.5 h-3.5 w-3.5" />
             {friendStatus === 'pending' ? 'Pending' : 'Add friend'}
-          </button>
+          </Button>
         )}
       </div>
     </article>
