@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { ReviewBlockFlat } from '../review/ReviewBlockFlat';
 import { CourseReviewsSummary } from '../review/CourseReviewsSummary';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SegmentedTabs, SegmentedTabOption } from '@/components/ui/SegmentedTabs';
 import { Search } from 'lucide-react';
 import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
 import { ReviewMediaItem } from '../review/ReviewMediaStrip';
@@ -63,6 +63,13 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   // Sorting, filtering, and search state
   const [sortBy, setSortBy] = useState<SortOption>('recent');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Sort options for Reviews tab
+  const sortOptions: SegmentedTabOption[] = [
+    { value: 'recent', label: 'Most recent' },
+    { value: 'highest', label: 'Highest rated' },
+    { value: 'helpful', label: 'Most helpful' },
+  ];
 
   // Fetch rating aggregates (same query as About tab)
   const { data: ratingAggregates } = useCourseRatingAggregates(courseId);
@@ -412,28 +419,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         <p className="mb-2 text-xs font-semibold tracking-[0.08em] uppercase text-slate-500">
           Sort &amp; filter
         </p>
-        <Tabs value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
-          <TabsList className="grid w-full grid-cols-3 bg-muted/70 border border-border/60 px-2 py-[3px]">
-            <TabsTrigger 
-              value="recent"
-              className="text-sm px-3 py-[6px] rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard"
-            >
-              Most recent
-            </TabsTrigger>
-            <TabsTrigger 
-              value="highest"
-              className="text-sm px-3 py-[6px] rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard"
-            >
-              Highest rated
-            </TabsTrigger>
-            <TabsTrigger 
-              value="helpful"
-              className="text-sm px-3 py-[6px] rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard"
-            >
-              Most helpful
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <SegmentedTabs
+          options={sortOptions}
+          value={sortBy}
+          onChange={(value) => setSortBy(value as SortOption)}
+        />
       </div>
 
       {/* Section 4 – Your review + other reviews (flat blocks) */}
