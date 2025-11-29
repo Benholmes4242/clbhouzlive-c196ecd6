@@ -9,7 +9,7 @@ import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { MediaItem as StandardMediaItem } from '@/types/media';
 // New components for media tab polish
 import { CourseMediaSummaryCard } from './CourseMediaSummaryCard';
-import { FilterPillsRow, FilterOption } from '@/components/ui/FilterPillsRow';
+import { SegmentedControl, SegmentOption } from '@/components/ui/SegmentedControl';
 import type { MediaFilterMode } from './MediaFilterRow';
 import { useCourseMediaSummary } from '@/hooks/useCourseMediaSummary';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -93,7 +93,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
   }, [exploreItems]);
 
   // Filter pill options
-  const filterOptions: FilterOption[] = [
+  const filterOptions: SegmentOption<MediaFilterMode>[] = [
     { id: 'most_recent', label: 'Most recent' },
     { id: 'photos', label: 'Photos' },
     { id: 'videos', label: 'Videos' },
@@ -203,11 +203,16 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
       />
 
       {/* Sort/Filter Bar */}
-      <FilterPillsRow
-        options={filterOptions}
-        activeId={filterMode}
-        onChange={(id) => setFilterMode(id as MediaFilterMode)}
-      />
+      <div className="px-4 pt-3 pb-3 bg-slate-50">
+        <p className="mb-2 text-xs font-semibold tracking-[0.08em] uppercase text-slate-500">
+          Sort &amp; filter
+        </p>
+        <SegmentedControl
+          options={filterOptions}
+          value={filterMode}
+          onChange={(value) => setFilterMode(value as MediaFilterMode)}
+        />
+      </div>
 
       {/* Empty state - matches Reviews tab styling */}
       {filteredItems.length === 0 && !isLoading && (
