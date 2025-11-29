@@ -50,7 +50,7 @@ const Top100ClubCallout: React.FC = () => {
         </div>
 
         {/* Tagline */}
-        <p className="mb-4 max-w-[22rem] text-sm text-slate-600">
+        <p className="mb-3 max-w-[22rem] text-sm text-slate-600">
           Track your pilgrimage through the world&apos;s Top 100 courses.
         </p>
 
@@ -59,12 +59,12 @@ const Top100ClubCallout: React.FC = () => {
           <>
             {listsStarted > 0 ? (
               <>
-                <p className="mb-2 text-sm font-medium text-slate-900">
+                <p className="mb-1 text-sm font-medium text-slate-900">
                   You&apos;ve played {coursesPlayed} course{coursesPlayed === 1 ? '' : 's'} {listsStarted === 1 ? 'in' : 'across'} {listsStarted} Top 100 list{listsStarted === 1 ? '' : 's'}.
                 </p>
 
                 {/* Progress bar */}
-                <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-200 mb-4">
+                <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-200 mb-3">
                   <div
                     className="h-full rounded-full bg-primary-accent transition-all"
                     style={{ width: `${progressPercent}%` }}
@@ -72,13 +72,13 @@ const Top100ClubCallout: React.FC = () => {
                 </div>
               </>
             ) : (
-              <p className="mt-2 text-sm text-slate-600 mb-4">
+              <p className="mt-2 text-sm text-slate-600 mb-3">
                 You haven&apos;t started your Top 100 journey yet. Play your first Top 100 course to begin.
               </p>
             )}
           </>
         ) : (
-          <p className="mt-2 text-sm text-slate-600 mb-4">
+          <p className="mt-2 text-sm text-slate-600 mb-3">
             Sign in to track your progress and see where you rank on the global leaderboard.
           </p>
         )}
@@ -90,16 +90,14 @@ const Top100ClubCallout: React.FC = () => {
             e.stopPropagation();
             handleClick();
           }}
-          className="mt-1 mb-3 inline-flex w-full items-center justify-center rounded-full border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 shadow-sm active:scale-[0.99] transition hover:bg-slate-50"
+          className="mt-1 mb-2 inline-flex w-full items-center justify-center rounded-full bg-primary-accent px-4 py-2.5 text-sm font-semibold text-white shadow-sm active:scale-[0.99] transition-transform"
         >
           {session ? 'Open your Top 100 Journey' : 'Sign in to join the Top 100 Club'}
           <ChevronRight className="ml-1.5 h-4 w-4" />
         </button>
 
         {/* Friends on Top 100 Journey */}
-        <div className="mt-4">
-          <Top100FriendsStrip />
-        </div>
+        <Top100FriendsStrip />
       </div>
     </section>
   );
