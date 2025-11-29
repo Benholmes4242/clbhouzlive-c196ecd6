@@ -1,7 +1,7 @@
 import React from 'react';
 import { Settings2 } from 'lucide-react';
 
-export type MediaFilterMode = 'most_recent' | 'photos' | 'videos' | 'friends' | 'mine';
+export type MediaFilterMode = 'most_recent' | 'photos' | 'videos' | 'friends';
 
 interface MediaFilterPillProps {
   label: string;
@@ -61,13 +61,6 @@ export const MediaFilterRow: React.FC<MediaFilterRowProps> = ({
               label="From friends"
               active={filterMode === 'friends'}
               onClick={() => onFilterChange('friends')}
-            />
-          )}
-          {hasUserMedia && (
-            <MediaFilterPill
-              label="From you"
-              active={filterMode === 'mine'}
-              onClick={() => onFilterChange('mine')}
             />
           )}
         </div>
