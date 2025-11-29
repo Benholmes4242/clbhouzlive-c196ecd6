@@ -29,7 +29,7 @@ const CourseDetailPage = () => {
         behavior: 'auto',
       });
     }
-  }, [courseId, location.pathname]);
+  }, [courseId]); // Only when switching courses, not on filter/sort changes
 
   // Add defensive check for courseId
   if (!courseId) {
