@@ -12,7 +12,7 @@ export const ScrollRestoration = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Exclude course detail routes from scroll restoration
+    // Exclude course detail routes and courses list page from triggering scroll-to-top on location changes
     const isCourseDetail = /^\/courses\/[^/]+$/.test(location.pathname);
     const isCoursesListPage = location.pathname === '/courses';
     
@@ -26,15 +26,15 @@ export const ScrollRestoration = () => {
         scrollPositions.set(currentPath, window.scrollY);
       }
     };
-  }, [location]);
+  }, [location.pathname, location.search]);
 
   useEffect(() => {
-    // Exclude course detail routes from scroll restoration
+    // Exclude course detail routes and courses list page from scroll-to-top on location changes
     const isCourseDetail = /^\/courses\/[^/]+$/.test(location.pathname);
     const isCoursesListPage = location.pathname === '/courses';
     
     if (isCourseDetail) {
-      // Course details handle their own scroll-to-top
+      // Course details handle their own scroll-to-top and preserve scroll on tab changes
       return;
     }
     
@@ -71,7 +71,7 @@ export const ScrollRestoration = () => {
       // New route - scroll to top (but not for courses list page tab changes)
       window.scrollTo(0, 0);
     }
-  }, [location]);
+  }, [location.pathname, location.search]);
 
   return null;
 };
