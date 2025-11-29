@@ -36,21 +36,21 @@ const Top100ClubCallout: React.FC = () => {
   return (
     <section 
       onClick={handleClick}
-      className="px-4 pt-4 pb-6 cursor-pointer"
+      className="px-4 pt-5 pb-7 cursor-pointer"
     >
       <div className="flex flex-col items-center text-center">
         {/* Title with inline trophy icon */}
-        <div className="flex items-center gap-2 mb-1">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-primary-accent/10 to-primary-accent/5">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary-accent/10">
             <Trophy className="h-4 w-4 text-primary-accent" />
           </div>
-          <h3 className="text-base font-semibold text-foreground">
+          <h2 className="text-lg font-semibold text-slate-900">
             Top 100 Club
-          </h3>
+          </h2>
         </div>
 
         {/* Tagline */}
-        <p className="text-xs text-muted-foreground mb-3">
+        <p className="mb-4 max-w-[22rem] text-sm text-slate-600">
           Track your pilgrimage through the world&apos;s Top 100 courses.
         </p>
 
@@ -59,26 +59,26 @@ const Top100ClubCallout: React.FC = () => {
           <>
             {listsStarted > 0 ? (
               <>
-                <p className="mt-2 text-xs font-medium text-foreground mb-3">
+                <p className="mb-2 text-sm font-medium text-slate-900">
                   You&apos;ve played {coursesPlayed} course{coursesPlayed === 1 ? '' : 's'} {listsStarted === 1 ? 'in' : 'across'} {listsStarted} Top 100 list{listsStarted === 1 ? '' : 's'}.
                 </p>
 
                 {/* Progress bar */}
-                <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted mb-3">
+                <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-200 mb-4">
                   <div
-                    className="h-full bg-primary-accent transition-all"
+                    className="h-full rounded-full bg-primary-accent transition-all"
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
               </>
             ) : (
-              <p className="mt-2 text-xs text-muted-foreground mb-3">
+              <p className="mt-2 text-sm text-slate-600 mb-4">
                 You haven&apos;t started your Top 100 journey yet. Play your first Top 100 course to begin.
               </p>
             )}
           </>
         ) : (
-          <p className="mt-2 text-xs text-muted-foreground mb-3">
+          <p className="mt-2 text-sm text-slate-600 mb-4">
             Sign in to track your progress and see where you rank on the global leaderboard.
           </p>
         )}
@@ -90,14 +90,16 @@ const Top100ClubCallout: React.FC = () => {
             e.stopPropagation();
             handleClick();
           }}
-          className="mt-3 mb-3 inline-flex w-full items-center justify-center rounded-full border border-slate-500/70 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm active:scale-[0.99] transition hover:bg-slate-50"
+          className="mt-1 mb-3 inline-flex w-full items-center justify-center rounded-full border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-900 shadow-sm active:scale-[0.99] transition hover:bg-slate-50"
         >
           {session ? 'Open your Top 100 Journey' : 'Sign in to join the Top 100 Club'}
           <ChevronRight className="ml-1.5 h-4 w-4" />
         </button>
 
         {/* Friends on Top 100 Journey */}
-        <Top100FriendsStrip />
+        <div className="mt-4">
+          <Top100FriendsStrip />
+        </div>
       </div>
     </section>
   );

@@ -308,6 +308,9 @@ const GlobalTop100 = () => {
       {/* Top 100 Club Callout */}
       <Top100ClubCallout />
 
+      {/* Divider */}
+      <div className="mt-4 mb-2 h-px w-full bg-slate-200/70" />
+
       {/* Search */}
       <div className="relative max-w-xl mx-auto">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
