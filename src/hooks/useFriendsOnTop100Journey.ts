@@ -9,6 +9,7 @@ export interface FriendOnTop100 {
     profile_photo_url: string | null;
   };
   top100CoursesPlayed: number;
+  lastActivityAt?: string;
 }
 
 export function useFriendsOnTop100Journey(userId: string | undefined) {
@@ -38,19 +39,26 @@ export function useFriendsOnTop100Journey(userId: string | undefined) {
       if (profilesError) throw profilesError;
       if (!profilesData || profilesData.length === 0) return [];
 
-      // Step 3: Which of them have at least one Top 100 course?
+      // Step 3: Get Top 100 courses with most recent activity timestamp per user
       const { data: top100Data, error: top100Error } = await supabase
         .from('user_top100_courses')
-        .select('user_id')
-        .in('user_id', followingIds);
+        .select('user_id, updated_at')
+        .in('user_id', followingIds)
+        .order('updated_at', { ascending: false });
 
       if (top100Error) throw top100Error;
       if (!top100Data || top100Data.length === 0) return [];
 
-      const userIdsWithTop100 = new Set(top100Data.map((row) => row.user_id));
+      // Get most recent activity per user
+      const userActivityMap = new Map<string, string>();
+      top100Data.forEach((row) => {
+        if (!userActivityMap.has(row.user_id)) {
+          userActivityMap.set(row.user_id, row.updated_at);
+        }
+      });
 
       const friendsWithTop100: FriendOnTop100[] = profilesData
-        .filter((friend) => userIdsWithTop100.has(friend.id))
+        .filter((friend) => userActivityMap.has(friend.id))
         .map((friend) => ({
           user_id: friend.id,
           profile: {
@@ -60,7 +68,13 @@ export function useFriendsOnTop100Journey(userId: string | undefined) {
           },
           // Flag indicating they're on a Top 100 journey
           top100CoursesPlayed: 1,
+          lastActivityAt: userActivityMap.get(friend.id) || '',
         }));
+
+      // Sort by most recent activity
+      friendsWithTop100.sort((a, b) => {
+        return b.lastActivityAt.localeCompare(a.lastActivityAt);
+      });
 
       return friendsWithTop100;
     },

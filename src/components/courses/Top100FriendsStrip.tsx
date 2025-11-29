@@ -15,13 +15,24 @@ export const Top100FriendsStrip: React.FC = () => {
   if (!user || friends.length === 0) return null;
 
   const totalFriends = friends.length;
-  const visibleFriends = friends.slice(0, 5);
-  const overflowCount = Math.max(0, totalFriends - visibleFriends.length);
+  const visibleFriends = friends.slice(0, 3);
+  const overflowCount = Math.max(0, totalFriends - 3);
 
-  const label =
-    totalFriends === 1
-      ? '1 of your friends is on their own Top 100 journey.'
-      : `${totalFriends} of your friends are on their own Top 100 journey.`;
+  // Generate name-drop label
+  const getName = (friend: typeof friends[0]) => 
+    friend.profile.display_name || friend.profile.username || 'A friend';
+
+  let label: string;
+  
+  if (totalFriends === 1) {
+    label = `${getName(friends[0])} is on their Top 100 journey too.`;
+  } else if (totalFriends === 2) {
+    label = `${getName(friends[0])} and ${getName(friends[1])} are doing their Top 100 journey.`;
+  } else if (totalFriends === 3) {
+    label = `${getName(friends[0])}, ${getName(friends[1])} and 1 other are doing their Top 100 journey.`;
+  } else {
+    label = `${getName(friends[0])}, ${getName(friends[1])} and ${totalFriends - 2} others are doing their Top 100 journey.`;
+  }
 
   const handleClick = () => {
     // Placeholder: navigate to Friends' Top 100 Progress page when implemented
@@ -65,7 +76,10 @@ export const Top100FriendsStrip: React.FC = () => {
         })}
 
         {overflowCount > 0 && (
-          <div className="flex items-center justify-center rounded-[18px] bg-muted px-2 h-9 text-xs font-medium text-muted-foreground shrink-0 -ml-2">
+          <div 
+            className="w-9 h-9 flex items-center justify-center bg-muted text-foreground text-xs font-semibold shrink-0 -ml-2"
+            style={{ borderRadius: '22%' }}
+          >
             +{overflowCount}
           </div>
         )}
