@@ -137,8 +137,8 @@ const GolfersToFollowPage = () => {
             </p>
           </header>
 
-          {/* Sticky Search Bar + Tabs */}
-          <div className="sticky top-[56px] z-20 bg-slate-50/95 backdrop-blur">
+          {/* Search Bar + Tabs - Non-sticky */}
+          <div className="w-full pb-3 bg-slate-50">
             <div className="border-b border-slate-100">
               {/* Search Bar */}
               <div className="px-4 pt-3 pb-2">
