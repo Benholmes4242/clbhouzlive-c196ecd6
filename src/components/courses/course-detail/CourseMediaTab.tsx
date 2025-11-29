@@ -97,7 +97,6 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     { value: 'most_recent', label: 'Most recent' },
     { value: 'photos', label: 'Photos' },
     { value: 'videos', label: 'Videos' },
-    { value: 'mine', label: 'From you' },
   ];
 
   // Phase 1 Fix #3: Lightweight filter memo only
