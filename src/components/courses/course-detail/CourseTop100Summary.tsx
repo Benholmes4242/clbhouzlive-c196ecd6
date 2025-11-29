@@ -122,7 +122,7 @@ const CourseTop100Summary: React.FC = () => {
             </span>
             <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-surface-alt">
               <div
-                className="h-full bg-[var(--primary-accent)]"
+                className="h-full bg-[#f79e1b]"
                 style={{
                   width: `${Math.min(
                     100,
