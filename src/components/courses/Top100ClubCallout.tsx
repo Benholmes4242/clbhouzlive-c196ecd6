@@ -41,7 +41,7 @@ const Top100ClubCallout: React.FC = () => {
       <div className="flex flex-col items-center text-center">
         {/* Title with inline trophy icon */}
         <div className="flex items-center gap-2 mb-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary-accent/10">
+          <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-full bg-primary-accent/10">
             <Trophy className="h-4 w-4 text-primary-accent" />
           </div>
           <h2 className="text-lg font-semibold text-slate-900">
@@ -50,7 +50,7 @@ const Top100ClubCallout: React.FC = () => {
         </div>
 
         {/* Tagline */}
-        <p className="mb-3 max-w-[22rem] text-sm text-slate-600">
+        <p className="mt-1 mb-3 max-w-[22rem] text-sm text-slate-600">
           Track your pilgrimage through the world&apos;s Top 100 courses.
         </p>
 
@@ -59,12 +59,12 @@ const Top100ClubCallout: React.FC = () => {
           <>
             {listsStarted > 0 ? (
               <>
-                <p className="mb-1 text-sm font-medium text-slate-900">
+                <p className="mb-2 text-sm font-medium text-slate-900">
                   You&apos;ve played {coursesPlayed} course{coursesPlayed === 1 ? '' : 's'} {listsStarted === 1 ? 'in' : 'across'} {listsStarted} Top 100 list{listsStarted === 1 ? '' : 's'}.
                 </p>
 
                 {/* Progress bar */}
-                <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-200 mb-3">
+                <div className="mt-1 mb-4 h-2 w-full overflow-hidden rounded-full bg-slate-200">
                   <div
                     className="h-full rounded-full bg-primary-accent transition-all"
                     style={{ width: `${progressPercent}%` }}
@@ -90,10 +90,10 @@ const Top100ClubCallout: React.FC = () => {
             e.stopPropagation();
             handleClick();
           }}
-          className="mt-1 mb-2 inline-flex w-full items-center justify-center rounded-full bg-primary-accent px-4 py-2.5 text-sm font-semibold text-white shadow-sm active:scale-[0.99] transition-transform"
+          className="mt-1 mb-3 inline-flex w-full items-center justify-center rounded-full bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_18px_rgba(15,23,42,0.35)] transition-transform active:scale-[0.99]"
         >
-          {session ? 'Open your Top 100 Journey' : 'Sign in to join the Top 100 Club'}
-          <ChevronRight className="ml-1.5 h-4 w-4" />
+          <span className="mr-1.5">{session ? 'Open your Top 100 Journey' : 'Sign in to join the Top 100 Club'}</span>
+          <ChevronRight className="h-4 w-4 text-primary-accent" />
         </button>
 
         {/* Friends on Top 100 Journey */}
