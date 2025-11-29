@@ -91,7 +91,10 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
             <div className="flex items-center gap-2">
               <p className="text-sm font-semibold text-slate-900">{user.name}</p>
               {isMine && (
-                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
+                <span 
+                  className="bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700"
+                  style={{ borderRadius: 'var(--radius)' }}
+                >
                   You
                 </span>
               )}
