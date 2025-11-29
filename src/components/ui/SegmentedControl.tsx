@@ -25,6 +25,9 @@ export function SegmentedControl<T extends string>({
   // Safety: if value not found, fall back to first segment
   const activeIndex = activeIndexRaw < 0 ? 0 : activeIndexRaw;
 
+  // Horizontal inset inside each segment (in rem) - creates comfortable margin
+  const pillInsetRem = 0.25; // 4px
+
   return (
     <div
       className={`
@@ -37,12 +40,13 @@ export function SegmentedControl<T extends string>({
     >
       {/* Sliding active pill */}
       <div
-        className="absolute inset-y-1 rounded-full bg-white
+        className="absolute top-1.5 bottom-1.5 rounded-full bg-white
                    shadow-[0_2px_7px_rgba(0,0,0,0.12)]
                    transition-transform duration-200 ease-out"
         style={{
-          width: `${segmentWidth}%`,
-          transform: `translateX(${activeIndex * 100}%)`,
+          width: `calc(${segmentWidth}% - ${pillInsetRem * 2}rem)`,
+          transform: `translateX(calc(${activeIndex * 100}% + ${activeIndex * pillInsetRem * 2}rem))`,
+          left: `${pillInsetRem}rem`,
         }}
       />
 
