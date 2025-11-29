@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SquareCardMedia from '@/components/explore/media/SquareCardMedia';
 import { CardType } from '@/components/explore/media/CardMediaTypes';
 import { adaptClubMediaArrayToExploreItems } from '@/lib/adapters/clubMediaToExplore';
@@ -31,6 +32,7 @@ interface AboutMediaStripProps {
 
 const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick }) => {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   
   // Responsive limits: 9 on desktop, 3 on mobile
   const maxItems = isMobile ? 3 : 9;
@@ -146,7 +148,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
             </p>
             <button
               type="button"
-              onClick={onSeeAllClick}
+              onClick={() => navigate(`/courses/${clubId}/rate`)}
               className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold bg-white text-slate-900 border border-slate-600 shadow-sm transition"
             >
               Rate this course
