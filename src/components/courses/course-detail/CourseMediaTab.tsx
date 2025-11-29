@@ -9,7 +9,7 @@ import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import { MediaItem as StandardMediaItem } from '@/types/media';
 // New components for media tab polish
 import { CourseMediaSummaryCard } from './CourseMediaSummaryCard';
-import { SegmentedControl, SegmentOption } from '@/components/ui/SegmentedControl';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { MediaFilterMode } from './MediaFilterRow';
 import { useCourseMediaSummary } from '@/hooks/useCourseMediaSummary';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -91,14 +91,6 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
       } : null;
     }).filter(Boolean) as Array<{ id: string; name: string; avatarUrl: string | null }>;
   }, [exploreItems]);
-
-  // Filter pill options
-  const filterOptions: SegmentOption<MediaFilterMode>[] = [
-    { id: 'most_recent', label: 'Most recent' },
-    { id: 'photos', label: 'Photos' },
-    { id: 'videos', label: 'Videos' },
-    { id: 'mine', label: 'From you' },
-  ];
 
   // Phase 1 Fix #3: Lightweight filter memo only
   const filteredItems = useMemo(() => {
@@ -207,11 +199,34 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
         <p className="mb-2 text-xs font-semibold tracking-[0.08em] uppercase text-slate-500">
           Sort &amp; filter
         </p>
-        <SegmentedControl
-          options={filterOptions}
-          value={filterMode}
-          onChange={(value) => setFilterMode(value as MediaFilterMode)}
-        />
+        <Tabs value={filterMode} onValueChange={(value) => setFilterMode(value as MediaFilterMode)}>
+          <TabsList className="grid w-full grid-cols-4 bg-muted/70 border border-border/60 px-2 py-[3px]">
+            <TabsTrigger 
+              value="most_recent"
+              className="text-sm px-3 py-[6px] rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard"
+            >
+              Most recent
+            </TabsTrigger>
+            <TabsTrigger 
+              value="photos"
+              className="text-sm px-3 py-[6px] rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard"
+            >
+              Photos
+            </TabsTrigger>
+            <TabsTrigger 
+              value="videos"
+              className="text-sm px-3 py-[6px] rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard"
+            >
+              Videos
+            </TabsTrigger>
+            <TabsTrigger 
+              value="mine"
+              className="text-sm px-3 py-[6px] rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard"
+            >
+              From you
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
 
       {/* Empty state - matches Reviews tab styling */}
