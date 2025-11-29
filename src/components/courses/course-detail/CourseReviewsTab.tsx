@@ -388,9 +388,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   return (
     <div className="flex flex-col">
       {/* Section 1 – Summary header (flattened on background) */}
-      <section className="px-4 pt-4 pb-6 bg-slate-50">
+      <section className="px-4 pt-4 pb-2 bg-slate-50">
         {/* Section label */}
-        <p className="text-[11px] font-semibold tracking-[0.12em] text-slate-500 uppercase mb-3">
+        <p className="text-[11px] font-semibold tracking-[0.12em] text-slate-500 uppercase mb-0.5">
           Community rating
         </p>
 
@@ -406,7 +406,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       </section>
 
       {/* Section 2 – Search bar */}
-      <section className="px-4 pt-3 pb-2 bg-slate-100">
+      <section className="px-4 pt-2 pb-2 bg-slate-100">
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input

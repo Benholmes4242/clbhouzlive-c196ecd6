@@ -110,7 +110,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
         <div className="grid grid-cols-[minmax(0,1.1fr)_minmax(0,1.3fr)] gap-x-6 gap-y-2 items-start">
           {/* LEFT: score hero */}
           <div>
-            <div className="flex items-center gap-2">
+            <div className="mt-0.5 flex items-center gap-2">
               <ClubhouseLogo size="md" />
               <span className="text-[28px] font-semibold text-slate-900 leading-none">
                 {averageRating.toFixed(1)}
@@ -118,7 +118,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
               <span className="text-xs text-slate-500 ml-1">/10</span>
             </div>
 
-            <div className="mt-2 inline-flex items-center">
+            <div className="mt-2 mb-1 inline-flex items-center">
               <span 
                 className={`rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] ${tierData.bg} ${tierData.text}`}
               >
@@ -137,7 +137,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
               const percentage = (item.count / maxCount) * 100;
               return (
                 <div key={item.tier.tier} className="flex items-center gap-3">
-                  <span className="w-24 text-[11px] text-slate-500">
+                  <span className="w-20 text-[11px] text-slate-500">
                     {item.tier.label}
                   </span>
                   <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
