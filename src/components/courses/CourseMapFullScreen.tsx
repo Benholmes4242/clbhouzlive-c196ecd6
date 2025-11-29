@@ -137,7 +137,7 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
         {/* Header - swipe to close area */}
         <div {...swipeHandlers} className="px-4 pt-3">
           {/* Header */}
-          <div className="flex items-start justify-between mb-2">
+          <div className="flex items-start justify-between mb-0">
             <div>
               <h2 className="text-base font-semibold flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
