@@ -136,22 +136,25 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
       ) : (
         /* Main courses page - show Explore, Global Top 100, and Friends' Courses */
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-muted/70 border border-border/60 px-2 py-[3px] mb-5">
+          <TabsList className="grid w-full grid-cols-3 bg-muted/70 border border-border/60 px-2 py-[3px] mb-5" style={{ borderRadius: 'var(--radius)' }}>
             <TabsTrigger 
               value="explore"
-              className="text-sm px-3 py-[6px] rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard"
+              className="text-sm px-3 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard"
+              style={{ borderRadius: 'var(--radius)' }}
             >
               Explore
             </TabsTrigger>
             <TabsTrigger 
               value="top100"
-              className="text-sm px-3 py-[6px] rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard"
+              className="text-sm px-3 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard"
+              style={{ borderRadius: 'var(--radius)' }}
             >
               Top 100
             </TabsTrigger>
             <TabsTrigger 
               value="friends-courses"
-              className="text-sm px-3 py-[6px] rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard"
+              className="text-sm px-3 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard"
+              style={{ borderRadius: 'var(--radius)' }}
             >
               Friends' Courses
             </TabsTrigger>
