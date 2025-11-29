@@ -106,144 +106,149 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
   return (
     <div>
       {/* Top row: Rating + Distribution */}
-      <div className="grid grid-cols-2 gap-6 mb-5">
-        {/* Left: Rating display - matching About tab */}
-        <div>
-          <div className="inline-flex flex-col items-center gap-1 mb-2">
-            {/* Logo + Score */}
-            <div className="flex items-center gap-1">
+      <div className="mb-5">
+        <div className="grid grid-cols-[minmax(0,1.1fr)_minmax(0,1.3fr)] gap-x-6 gap-y-2 items-start">
+          {/* LEFT: score hero */}
+          <div>
+            <div className="flex items-center gap-2">
               <ClubhouseLogo size="md" />
-              <span className="text-2xl font-semibold text-slate-900">
+              <span className="text-[28px] font-semibold text-slate-900 leading-none">
                 {averageRating.toFixed(1)}
               </span>
-              <span className="text-sm font-medium text-slate-500">/10</span>
+              <span className="text-xs text-slate-500 ml-1">/10</span>
             </div>
 
-            {/* Quality badge - one size smaller */}
-            <span 
-              className={`inline-flex items-center justify-center px-2.5 py-0.5 border text-[10px] font-semibold uppercase ${tierData.bg} ${tierData.border} ${tierData.text}`}
-              style={{ borderRadius: 'var(--radius)' }}
-            >
-              {tierData.label}
-            </span>
-          </div>
-          
-          <p className="text-xs text-slate-500">
-            Based on {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
-          </p>
-        </div>
+            <div className="mt-2 inline-flex items-center">
+              <span 
+                className={`rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] ${tierData.bg} ${tierData.text}`}
+              >
+                {tierData.label}
+              </span>
+            </div>
 
-        {/* Right: Distribution bars */}
-        <div className="space-y-1.5">
-          {distributionItems.map((item) => {
-            const percentage = (item.count / maxCount) * 100;
-            return (
-              <div key={item.tier.tier} className="flex items-center gap-2 text-xs">
-                <span className="text-[10px] font-medium text-slate-600 w-16 text-right">
-                  {item.tier.label}
-                </span>
-                <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full ${item.tier.barFill} transition-all duration-300`}
-                    style={{ width: `${percentage}%` }}
-                  />
+            <p className="mt-2 text-[12px] text-slate-600">
+              Based on {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
+            </p>
+          </div>
+
+          {/* RIGHT: rating distribution */}
+          <div className="space-y-1.5">
+            {distributionItems.map((item) => {
+              const percentage = (item.count / maxCount) * 100;
+              return (
+                <div key={item.tier.tier} className="flex items-center gap-3">
+                  <span className="w-24 text-[11px] text-slate-500">
+                    {item.tier.label}
+                  </span>
+                  <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${item.tier.barFill} transition-all duration-300`}
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+                  <span className="w-4 text-right text-[11px] text-slate-500">
+                    {item.count}
+                  </span>
                 </div>
-                <span className="text-[11px] font-medium text-slate-500 w-5 text-right">
-                  {item.count}
-                </span>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
 
       {/* Category averages - 2x2 grid */}
       {(categoryAverages.design || categoryAverages.condition || categoryAverages.clubhouse || categoryAverages.facilities) && (
-        <div className="grid grid-cols-2 gap-x-4 gap-y-3 mb-4 pb-4 border-b border-slate-100">
-          {/* Design */}
-          {categoryAverages.design !== null && (
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                Design
-              </span>
-              <div className="flex items-center gap-2">
-                <div className="w-12 h-1 bg-slate-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-slate-600 transition-all"
-                    style={{ width: `${(categoryAverages.design / 10) * 100}%` }}
-                  />
-                </div>
-                <span className="text-xs font-semibold text-slate-900 w-6 text-right">
-                  {formatScore(categoryAverages.design)}
+        <div className="border-t border-slate-200/60 pt-3 mb-4">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+            {/* Design */}
+            {categoryAverages.design !== null && (
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-slate-500">
+                  Design
                 </span>
+                <div className="flex items-center gap-2">
+                  <div className="w-12 h-1 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-slate-600 transition-all"
+                      style={{ width: `${(categoryAverages.design / 10) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-xs font-semibold text-slate-900 w-6 text-right">
+                    {formatScore(categoryAverages.design)}
+                  </span>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Condition */}
-          {categoryAverages.condition !== null && (
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                Condition
-              </span>
-              <div className="flex items-center gap-2">
-                <div className="w-12 h-1 bg-slate-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-slate-600 transition-all"
-                    style={{ width: `${(categoryAverages.condition / 10) * 100}%` }}
-                  />
-                </div>
-                <span className="text-xs font-semibold text-slate-900 w-6 text-right">
-                  {formatScore(categoryAverages.condition)}
+            {/* Condition */}
+            {categoryAverages.condition !== null && (
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-slate-500">
+                  Condition
                 </span>
+                <div className="flex items-center gap-2">
+                  <div className="w-12 h-1 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-slate-600 transition-all"
+                      style={{ width: `${(categoryAverages.condition / 10) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-xs font-semibold text-slate-900 w-6 text-right">
+                    {formatScore(categoryAverages.condition)}
+                  </span>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Clubhouse */}
-          {categoryAverages.clubhouse !== null && (
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                Clubhouse
-              </span>
-              <div className="flex items-center gap-2">
-                <div className="w-12 h-1 bg-slate-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-slate-600 transition-all"
-                    style={{ width: `${(categoryAverages.clubhouse / 10) * 100}%` }}
-                  />
-                </div>
-                <span className="text-xs font-semibold text-slate-900 w-6 text-right">
-                  {formatScore(categoryAverages.clubhouse)}
+            {/* Clubhouse */}
+            {categoryAverages.clubhouse !== null && (
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-slate-500">
+                  Clubhouse
                 </span>
+                <div className="flex items-center gap-2">
+                  <div className="w-12 h-1 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-slate-600 transition-all"
+                      style={{ width: `${(categoryAverages.clubhouse / 10) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-xs font-semibold text-slate-900 w-6 text-right">
+                    {formatScore(categoryAverages.clubhouse)}
+                  </span>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Facilities */}
-          {categoryAverages.facilities !== null && (
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                Facilities
-              </span>
-              <div className="flex items-center gap-2">
-                <div className="w-12 h-1 bg-slate-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-slate-600 transition-all"
-                    style={{ width: `${(categoryAverages.facilities / 10) * 100}%` }}
-                  />
-                </div>
-                <span className="text-xs font-semibold text-slate-900 w-6 text-right">
-                  {formatScore(categoryAverages.facilities)}
+            {/* Facilities */}
+            {categoryAverages.facilities !== null && (
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-slate-500">
+                  Facilities
                 </span>
+                <div className="flex items-center gap-2">
+                  <div className="w-12 h-1 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-slate-600 transition-all"
+                      style={{ width: `${(categoryAverages.facilities / 10) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-xs font-semibold text-slate-900 w-6 text-right">
+                    {formatScore(categoryAverages.facilities)}
+                  </span>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
 
       {/* Comparison message */}
-      {comparisonMessage && <div className="mb-3">{comparisonMessage}</div>}
+      {comparisonMessage && (
+        <div className="mt-3 mb-3 flex items-center justify-center">
+          {comparisonMessage}
+        </div>
+      )}
 
       {/* CTA button */}
       {!userHasRating && (
