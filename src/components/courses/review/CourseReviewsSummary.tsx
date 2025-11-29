@@ -121,7 +121,8 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
 
             {/* Quality badge - one size smaller */}
             <span 
-              className={`inline-flex items-center justify-center rounded-full px-2.5 py-0.5 border text-[10px] font-semibold uppercase ${tierData.bg} ${tierData.border} ${tierData.text}`}
+              className={`inline-flex items-center justify-center px-2.5 py-0.5 border text-[10px] font-semibold uppercase ${tierData.bg} ${tierData.border} ${tierData.text}`}
+              style={{ borderRadius: 'var(--radius)' }}
             >
               {tierData.label}
             </span>

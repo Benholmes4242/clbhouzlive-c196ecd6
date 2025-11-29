@@ -22,7 +22,8 @@ const formatScore = (score: number) => {
 const CommunityRatingBadge: React.FC<{ label: string; bg: string; border: string; text: string }> = ({ label, bg, border, text }) => {
   return (
     <span 
-      className={`inline-flex items-center justify-center rounded-full px-3 py-1 border text-xs font-semibold uppercase ${bg} ${border} ${text}`}
+      className={`inline-flex items-center justify-center px-3 py-1 border text-xs font-semibold uppercase ${bg} ${border} ${text}`}
+      style={{ borderRadius: 'var(--radius)' }}
     >
       {label}
     </span>
