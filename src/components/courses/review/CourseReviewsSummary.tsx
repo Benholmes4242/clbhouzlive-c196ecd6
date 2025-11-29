@@ -241,8 +241,14 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
         </div>
       )}
 
-      {/* Comparison message */}
-      {comparisonMessage && <div className="mb-3">{comparisonMessage}</div>}
+      {/* Comparison message footer */}
+      {comparisonMessage && (
+        <div className="border-t border-slate-100">
+          <div className="flex min-h-[40px] items-center justify-center px-4 py-3">
+            {comparisonMessage}
+          </div>
+        </div>
+      )}
 
       {/* CTA button */}
       {!userHasRating && (
