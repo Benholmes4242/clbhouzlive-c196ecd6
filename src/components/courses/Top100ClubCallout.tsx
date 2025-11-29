@@ -5,6 +5,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMyTop100Progress } from '@/hooks/useMyTop100Progress';
 import { useUserTop100Progress } from '@/hooks/useUserTop100Progress';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Top100FriendsStrip } from './Top100FriendsStrip';
 
 const Top100ClubCallout: React.FC = () => {
@@ -84,17 +85,18 @@ const Top100ClubCallout: React.FC = () => {
         )}
 
         {/* CTA button */}
-        <button
-          type="button"
+        <Button
+          variant="primary"
+          fullWidth
           onClick={(e) => {
             e.stopPropagation();
             handleClick();
           }}
-          className="mt-1 mb-3 inline-flex w-full items-center justify-center rounded-full bg-slate-100/90 px-4 py-2.5 text-sm font-semibold text-slate-900 border border-slate-300 shadow-[0_4px_10px_rgba(15,23,42,0.10)] transition-transform active:scale-[0.99]"
+          className="mt-1 mb-3"
         >
-          <span className="mr-1.5">{session ? 'Open your Top 100 Journey' : 'Sign in to join the Top 100 Club'}</span>
-          <ChevronRight className="h-4 w-4 text-primary-accent" />
-        </button>
+          {session ? 'Open your Top 100 Journey' : 'Sign in to join the Top 100 Club'}
+          <ChevronRight className="h-4 w-4" />
+        </Button>
 
         {/* Friends on Top 100 Journey */}
         <Top100FriendsStrip />
