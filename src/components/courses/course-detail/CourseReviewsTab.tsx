@@ -179,7 +179,6 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     enabled: !!courseId,
     staleTime: 0, // Always refetch when explicitly requested
     gcTime: 10 * 60 * 1000, // 10 minutes
-    placeholderData: (previousData) => previousData, // Keep previous reviews visible while fetching new sort
   });
 
   // Fetch user's votes on reviews

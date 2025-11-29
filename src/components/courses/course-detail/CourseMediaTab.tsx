@@ -97,6 +97,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     { id: 'most_recent', label: 'Most recent' },
     { id: 'photos', label: 'Photos' },
     { id: 'videos', label: 'Videos' },
+    { id: 'mine', label: 'From you' },
   ];
 
   // Phase 1 Fix #3: Lightweight filter memo only
@@ -106,11 +107,13 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
         return exploreItems.filter(item => item.type === 'video');
       case 'photos':
         return exploreItems.filter(item => item.type === 'image');
+      case 'mine':
+        return exploreItems.filter(item => item.user?.id === user?.id);
       case 'most_recent':
       default:
         return exploreItems;
     }
-  }, [exploreItems, filterMode]);
+  }, [exploreItems, filterMode, user?.id]);
 
   // Adapt for MediaGrid using filtered items
   const mediaItems = useMemo(
