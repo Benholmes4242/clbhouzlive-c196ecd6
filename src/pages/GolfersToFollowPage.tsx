@@ -10,7 +10,7 @@ import { useGolfersDiscovery, FilterType } from '@/hooks/useGolfersDiscovery';
 import { useFollowUser } from '@/hooks/useFollowUser';
 import { useFriendActions } from '@/hooks/useFriendActions';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { FilterPillsRow, FilterOption } from '@/components/ui/FilterPillsRow';
+import { SegmentedTabs, SegmentedTabOption } from '@/components/ui/SegmentedTabs';
 import { useDebounce } from '@/hooks/useDebounce';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -98,10 +98,10 @@ const GolfersToFollowPage = () => {
     setActioningUserId(null);
   };
 
-  const filterOptions: FilterOption[] = [
-    { id: 'suggested', label: 'Suggested' },
-    { id: 'club', label: 'Home club' },
-    { id: 'popular', label: 'Popular golfers' },
+  const filterOptions: SegmentedTabOption[] = [
+    { value: 'suggested', label: 'Suggested' },
+    { value: 'club', label: 'Home club' },
+    { value: 'popular', label: 'Popular golfers' },
   ];
 
   const handleBack = () => {
@@ -151,16 +151,17 @@ const GolfersToFollowPage = () => {
             </div>
           </div>
 
-          {/* Filter Pills Row - Reuse from Course Details */}
-          <FilterPillsRow
-            options={filterOptions}
-            activeId={activeFilter}
-            onChange={(id) => {
-              setActiveFilter(id as FilterType);
-              setPage(1);
-            }}
-            className="mt-4"
-          />
+          {/* Filter Tabs - Match Golf Courses page styling */}
+          <div className="px-4 mt-4">
+            <SegmentedTabs
+              options={filterOptions}
+              value={activeFilter}
+              onChange={(value) => {
+                setActiveFilter(value as FilterType);
+                setPage(1);
+              }}
+            />
+          </div>
 
           {/* Golfers List */}
           <div className="px-4 mt-6">
