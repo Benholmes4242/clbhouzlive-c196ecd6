@@ -1781,7 +1781,7 @@ html[data-immersive="true"] .app-shell--topSpacer {
     --input: 210 8% 86%;                 /* #D4D7DB - border for inputs */
     --input-focus: 31 93% 54%;           /* #F7931E - orange accent for focus */
     --ring: 31 93% 54%;                  /* #F7931E - orange accent */
-    --radius: 0.5rem;
+    --radius: 0.75rem;
     /* ========================================
        SHADOWS & EFFECTS
        ======================================== */

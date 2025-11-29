@@ -61,7 +61,7 @@ export function JoinRequestCard({ request, onAccept, onDecline }: JoinRequestCar
       <div className="flex gap-2">
         <button
           onClick={() => onDecline(request.id)}
-          className="flex-1 rounded-lg bg-white/5 border border-white/20 text-white/70 text-[13px] font-medium py-2 hover:bg-white/10 transition-all"
+          className="flex-1 rounded-xl bg-white/5 border border-white/20 text-white/70 text-[13px] font-medium py-2 hover:bg-white/10 transition-all"
         >
           Decline
         </button>

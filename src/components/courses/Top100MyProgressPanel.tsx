@@ -237,7 +237,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
                   return (
                     <div
                       key={`${round.course_id}-${round.played_at}`}
-                      className="p-3 rounded-lg bg-card border border-border/50 space-y-1"
+                      className="p-3 rounded-xl bg-card border border-border/50 space-y-1"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">

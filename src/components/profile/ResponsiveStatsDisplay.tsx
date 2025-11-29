@@ -25,7 +25,7 @@ const ResponsiveStatsDisplay: React.FC<ResponsiveStatsDisplayProps> = ({
     <button
       onClick={onClick}
       className={`
-        flex flex-col items-center gap-1 p-3 rounded-lg bg-white/80 
+        flex flex-col items-center gap-1 p-3 rounded-xl bg-white/80 
         hover:bg-white/90 transition-all duration-200 backdrop-blur-sm 
         border border-gray-200 hover:border-gray-300 hover:scale-105
         ${isMobile ? 'w-full' : 'flex-1'}

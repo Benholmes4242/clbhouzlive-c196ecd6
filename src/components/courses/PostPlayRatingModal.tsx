@@ -1101,7 +1101,7 @@ const PostPlayRatingModal = ({
                   }}
                   variant="outline"
                   disabled={selectedMedia.length >= MAX_REVIEW_MEDIA_ITEMS}
-                  className="w-44 mt-6 h-11 rounded-lg border border-slate-600 bg-white px-6 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-44 mt-6 h-11 rounded-xl border border-slate-600 bg-white px-6 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {selectedMedia.length >= MAX_REVIEW_MEDIA_ITEMS ? 'Media limit reached' : 'Add Media'}
                 </Button>
@@ -1117,7 +1117,7 @@ const PostPlayRatingModal = ({
                     type="button"
                     onClick={() => setShowRemoveDialog(true)}
                     disabled={isSubmitting}
-                    className="flex-1 inline-flex items-center justify-center rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-600 bg-white/80 hover:bg-red-50 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed h-11"
+                    className="flex-1 inline-flex items-center justify-center rounded-xl border border-red-300 px-4 py-2 text-sm font-medium text-red-600 bg-white/80 hover:bg-red-50 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed h-11"
                   >
                     Remove rating
                   </button>
@@ -1128,7 +1128,7 @@ const PostPlayRatingModal = ({
                     onClick={handleSubmit}
                     disabled={isSubmitting || !selectedRating}
                     variant="outline"
-                    className="flex-1 h-11 rounded-lg border border-slate-600 bg-white text-slate-600 text-base font-medium py-3 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="flex-1 h-11 rounded-xl border border-slate-600 bg-white text-slate-600 text-base font-medium py-3 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? 'Saving…' : 'Update rating'}
                   </Button>
@@ -1139,7 +1139,7 @@ const PostPlayRatingModal = ({
                   onClick={handleSubmit}
                   disabled={isSubmitting || !selectedRating}
                   variant="outline"
-                  className="w-full h-11 rounded-lg border border-slate-600 bg-white text-slate-600 text-base font-medium py-3 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full h-11 rounded-xl border border-slate-600 bg-white text-slate-600 text-base font-medium py-3 hover:bg-slate-50 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? 'Saving…' : 'Submit rating'}
                 </Button>
@@ -1187,14 +1187,14 @@ const PostPlayRatingModal = ({
                   <div className="flex items-center justify-end gap-3">
                     <Button
                       type="button"
-                      className="h-11 rounded-lg border border-slate-600 bg-white text-slate-600 text-base font-medium px-5 py-2 hover:bg-slate-50 active:scale-[0.99]"
+                      className="h-11 rounded-xl border border-slate-600 bg-white text-slate-600 text-base font-medium px-5 py-2 hover:bg-slate-50 active:scale-[0.99]"
                       onClick={() => setShowRemoveDialog(false)}
                     >
                       Cancel
                     </Button>
                     <Button
                       type="button"
-                      className="h-11 rounded-lg border border-red-300 bg-white/80 text-red-600 text-base font-semibold px-5 py-2 hover:bg-red-50 active:scale-[0.99]"
+                      className="h-11 rounded-xl border border-red-300 bg-white/80 text-red-600 text-base font-semibold px-5 py-2 hover:bg-red-50 active:scale-[0.99]"
                       onClick={() => {
                         handleRemoveFromPlayed();
                       }}
@@ -1439,7 +1439,7 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
           <button
             type="button"
             onClick={onShareReview}
-            className="inline-flex flex-1 items-center justify-center rounded-lg border border-slate-600 bg-white px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 active:bg-slate-100 transition-colors"
+            className="inline-flex flex-1 items-center justify-center rounded-xl border border-slate-600 bg-white px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 active:bg-slate-100 transition-colors"
           >
             Share your review
           </button>
@@ -1448,7 +1448,7 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
           <button
             type="button"
             onClick={handleBackToCourse}
-            className="inline-flex flex-1 items-center justify-center rounded-lg border border-slate-600 bg-white px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 active:bg-slate-100 transition-colors"
+            className="inline-flex flex-1 items-center justify-center rounded-xl border border-slate-600 bg-white px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 active:bg-slate-100 transition-colors"
           >
             Back to course
           </button>

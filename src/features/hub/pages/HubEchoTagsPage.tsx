@@ -132,7 +132,7 @@ export default function HubEchoTagsPage() {
           )}
           {filtered.map((row) => (
             <div key={row.name}
-              className="group flex items-center gap-3 p-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all cursor-pointer"
+              className="group flex items-center gap-3 p-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all cursor-pointer"
               role="button"
               onClick={() => goFilter(row)}
               aria-label={`Filter by tag ${row.name}`}

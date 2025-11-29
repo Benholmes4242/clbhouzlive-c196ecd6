@@ -223,7 +223,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
             </p>
             <button
               type="button"
-              className="mt-4 w-full h-11 rounded-lg border border-slate-200 bg-slate-100 text-slate-900 text-sm font-medium hover:bg-slate-200 transition-colors"
+              className="mt-4 w-full h-11 rounded-xl border border-slate-200 bg-slate-100 text-slate-900 text-sm font-medium hover:bg-slate-200 transition-colors"
               onClick={() => navigate(`/courses/${courseId}/rate`)}
             >
               Add photos or videos
