@@ -14,11 +14,15 @@ export const ScrollRestoration = () => {
   useEffect(() => {
     // Exclude course detail routes from scroll restoration
     const isCourseDetail = /^\/courses\/[^/]+$/.test(location.pathname);
+    const isCoursesListPage = location.pathname === '/courses';
     
     // Save current scroll position before leaving (only for non-course-detail routes)
     return () => {
       if (!isCourseDetail) {
-        const currentPath = location.pathname + location.search;
+        // For courses list page, ignore search params (tab changes) when saving scroll position
+        const currentPath = isCoursesListPage 
+          ? location.pathname 
+          : location.pathname + location.search;
         scrollPositions.set(currentPath, window.scrollY);
       }
     };
@@ -27,6 +31,7 @@ export const ScrollRestoration = () => {
   useEffect(() => {
     // Exclude course detail routes from scroll restoration
     const isCourseDetail = /^\/courses\/[^/]+$/.test(location.pathname);
+    const isCoursesListPage = location.pathname === '/courses';
     
     if (isCourseDetail) {
       // Course details handle their own scroll-to-top
@@ -34,7 +39,10 @@ export const ScrollRestoration = () => {
     }
     
     // Restore scroll position for this route
-    const currentPath = location.pathname + location.search;
+    // For courses list page, ignore search params (tab changes) when restoring scroll position
+    const currentPath = isCoursesListPage 
+      ? location.pathname 
+      : location.pathname + location.search;
     const savedPosition = scrollPositions.get(currentPath);
     
     if (savedPosition !== undefined) {
@@ -59,8 +67,8 @@ export const ScrollRestoration = () => {
       }, 100);
       
       return () => clearTimeout(timeoutId);
-    } else {
-      // New route - scroll to top
+    } else if (!isCoursesListPage) {
+      // New route - scroll to top (but not for courses list page tab changes)
       window.scrollTo(0, 0);
     }
   }, [location]);

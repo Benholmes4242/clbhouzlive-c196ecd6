@@ -16,7 +16,7 @@ export const ScorePill: React.FC<ScorePillProps> = ({ score, size = 'md' }) => {
 
   return (
     <span
-      className={`inline-flex items-center ${baseClasses} ${tierData.bg} ${tierData.border} ${tierData.text}`}
+      className={`inline-flex items-center justify-center ${baseClasses} ${tierData.bg} ${tierData.border} ${tierData.text}`}
       style={{ borderRadius: 'var(--radius)' }}
     >
       {score.toFixed(1)} <span className="opacity-70">/10</span>
