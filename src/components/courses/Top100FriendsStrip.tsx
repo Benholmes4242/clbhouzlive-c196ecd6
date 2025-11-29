@@ -42,15 +42,15 @@ export const Top100FriendsStrip: React.FC = () => {
   return (
     <div
       onClick={handleClick}
-      className="mt-3 flex items-center justify-between rounded-2xl bg-white/70 px-3 py-2.5 border border-slate-100 shadow-[0_2px_8px_rgba(15,23,42,0.06)] cursor-pointer transition-transform active:scale-[0.99]"
+      className="mt-4 flex items-center justify-between cursor-pointer transition-opacity hover:opacity-80"
     >
       <div className="flex flex-col min-w-0 flex-1">
-        <p className="text-xs font-medium text-slate-600">
+        <p className="text-sm text-slate-600">
           {label}
         </p>
       </div>
 
-      <div className="flex items-center space-x-2 shrink-0">
+      <div className="flex items-center space-x-3 shrink-0">
         <div className="flex -space-x-2">
           {visibleFriends.map((friend, index) => {
             const displayName = friend.profile.display_name || friend.profile.username || '?';

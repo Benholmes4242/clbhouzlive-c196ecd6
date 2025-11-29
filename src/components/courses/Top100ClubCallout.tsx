@@ -41,7 +41,7 @@ const Top100ClubCallout: React.FC = () => {
       <div className="flex flex-col items-center text-center">
         {/* Title with inline trophy icon */}
         <div className="flex items-center gap-2 mb-2">
-          <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-full bg-primary-accent/10">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-accent/10">
             <Trophy className="h-4 w-4 text-primary-accent" />
           </div>
           <h2 className="text-lg font-semibold text-slate-900">
