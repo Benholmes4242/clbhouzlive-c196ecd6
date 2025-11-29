@@ -57,10 +57,6 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
     setActiveTab(value);
   };
 
-  // Generate reset key based on activeTab only
-  // This will trigger filter resets when switching tabs, but not on every navigation
-  const resetKey = activeTab;
-
   // Dynamic subtitle logic
   const getSubtitle = () => {
     // Only show custom subtitles when on "My Courses" tab (user profile pages only)
@@ -125,7 +121,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           </TabsList>
 
           <TabsContent value="explore" className="mt-6">
-            <CourseExplorer key={resetKey} />
+            <CourseExplorer />
           </TabsContent>
 
 
@@ -161,11 +157,11 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           </TabsList>
 
           <TabsContent value="explore" className="mt-6">
-            <CourseExplorer key={resetKey} />
+            <CourseExplorer />
           </TabsContent>
 
           <TabsContent value="top100" className="mt-6">
-            <GlobalTop100 key={resetKey} />
+            <GlobalTop100 />
           </TabsContent>
 
           <TabsContent value="friends-courses" className="mt-6">
