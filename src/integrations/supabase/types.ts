@@ -5539,6 +5539,24 @@ export type Database = {
         Args: { target_user_id: string }
         Returns: Json
       }
+      get_top100_course_leaderboard: {
+        Args: {
+          limit_param: number
+          offset_param: number
+          scope_param: string
+          time_range_param: string
+        }
+        Returns: {
+          avg_rating: number
+          country: string
+          course_id: string
+          course_name: string
+          list_slug: string
+          sub_country: string
+          thumbnail_url: string
+          times_played: number
+        }[]
+      }
       get_top100_leaderboard: {
         Args: {
           current_user_id?: string

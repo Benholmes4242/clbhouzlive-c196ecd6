@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LeaderboardScope, LeaderboardTimeRange, useTop100Leaderboard } from '@/hooks/useTop100Leaderboard';
+import { useTop100CourseLeaderboard } from '@/hooks/useTop100CourseLeaderboard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Trophy, Award } from 'lucide-react';
@@ -31,11 +32,27 @@ const Top100LeaderboardPanel = () => {
     pageSize: 20,
   });
 
+  const {
+    data: courseData,
+    isLoading: isLoadingCourses,
+    isError: isErrorCourses,
+    refetch: refetchCourses,
+    fetchNextPage: fetchNextCoursePage,
+    hasNextPage: hasNextCoursePage,
+    isFetchingNextPage: isFetchingNextCoursePage,
+  } = useTop100CourseLeaderboard({
+    scope,
+    timeRange,
+    pageSize: 20,
+  });
+
   // NOTE: total_count and current_user_entry come from the RPC summary,
   // which is identical for every page. It's safe to read from pages[0].
   const allEntries = data?.pages.flatMap(page => page.entries) || [];
   const totalCount = data?.pages[0]?.total_count || 0;
   const currentUserEntry = data?.pages[0]?.current_user_entry || null;
+
+  const allCourseEntries = courseData?.pages.flatMap(page => page.entries) || [];
 
   // Smooth scroll on pagination
   useEffect(() => {
@@ -148,12 +165,151 @@ const Top100LeaderboardPanel = () => {
       </div>
 
       {viewType === 'courses' ? (
-        <div className="text-center py-12 px-4 rounded-xl bg-card border border-border/50">
-          <Trophy className="w-12 h-12 mx-auto mb-3 text-muted-foreground/50" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">Coming soon</h3>
-          <p className="text-sm text-muted-foreground max-w-md mx-auto">
-            Soon you'll see which Top 100 courses are most played and highest rated this month.
-          </p>
+        <div className="space-y-6">
+          {/* Filters – reuse same UI as players */}
+          <div className="flex flex-wrap gap-3">
+            <Select value={scope} onValueChange={handleScopeChange}>
+              <SelectTrigger className="flex-1 min-w-[180px] bg-card border-border/50">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {(Object.keys(scopeLabels) as LeaderboardScope[]).map((key) => (
+                  <SelectItem key={key} value={key}>
+                    {scopeLabels[key]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={timeRange} onValueChange={handleTimeRangeChange}>
+              <SelectTrigger className="flex-1 min-w-[180px] bg-card border-border/50">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {(Object.keys(timeRangeLabels) as LeaderboardTimeRange[]).map((key) => (
+                  <SelectItem key={key} value={key}>
+                    {timeRangeLabels[key]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Loading state */}
+          {isLoadingCourses && !courseData && (
+            <div className="space-y-3">
+              {[...Array(5)].map((_, i) => (
+                <div
+                  key={i}
+                  className="h-20 rounded-xl bg-surface-alt animate-pulse"
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Error state */}
+          {isErrorCourses && (
+            <div className="text-center py-12 px-4 rounded-xl bg-destructive/10 border border-destructive/20">
+              <p className="text-sm text-destructive mb-3">
+                Failed to load course leaderboard data.
+              </p>
+              <Button variant="outline" size="sm" onClick={() => refetchCourses()}>
+                Retry
+              </Button>
+            </div>
+          )}
+
+          {/* Empty state */}
+          {!isErrorCourses &&
+            !isLoadingCourses &&
+            allCourseEntries.length === 0 && (
+              <div className="text-center py-12 text-muted-foreground">
+                <p>No Top 100 course rounds logged here yet.</p>
+                <p className="text-sm mt-1">Be the first to put a famous track on the map.</p>
+              </div>
+            )}
+
+          {/* Course leaderboard list */}
+          {!isErrorCourses && allCourseEntries.length > 0 && (
+            <div className="space-y-2">
+              {allCourseEntries.map((course, index) => {
+                const rank = index + 1;
+                const location = course.sub_country
+                  ? `${course.sub_country}, ${course.country ?? ''}`.trim()
+                  : course.country || 'Location not set';
+
+                return (
+                  <button
+                    key={course.course_id + '-' + rank}
+                    onClick={() => navigate(`/courses/${course.course_id}`)}
+                    className="w-full flex items-center gap-4 p-4 rounded-xl bg-card border border-border/50 hover:border-primary-accent/40 hover:shadow-md transition-all text-left"
+                  >
+                    {/* Rank */}
+                    <div className="flex-shrink-0 w-10 text-center">
+                      <span className="text-xl font-bold text-foreground">
+                        #{rank}
+                      </span>
+                    </div>
+
+                    {/* Thumbnail */}
+                    <div className="w-16 h-16 rounded-xl overflow-hidden bg-muted flex-shrink-0">
+                      {course.thumbnail_url ? (
+                        <img
+                          src={course.thumbnail_url}
+                          alt={course.course_name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
+                          No image
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <div className="font-semibold text-foreground truncate">
+                          {course.course_name}
+                        </div>
+                        {course.list_slug && course.list_slug !== 'worldwide' && (
+                          <Badge variant="outline" className="text-xs flex-shrink-0">
+                            {listShortLabels[course.list_slug] ?? 'Top 100'}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="text-sm text-muted-foreground mt-1">
+                        {location}
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Played {course.times_played} time
+                        {course.times_played === 1 ? '' : 's'} by members
+                        {course.avg_rating != null && (
+                          <>
+                            {' · '}
+                            Avg {course.avg_rating.toFixed(1)}/10
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+
+              {/* Load more */}
+              {hasNextCoursePage && (
+                <div className="flex justify-center pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => fetchNextCoursePage()}
+                    disabled={isFetchingNextCoursePage}
+                  >
+                    {isFetchingNextCoursePage ? 'Loading...' : 'Load more'}
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       ) : (
         <>
