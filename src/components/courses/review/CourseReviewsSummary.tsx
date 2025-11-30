@@ -1,6 +1,5 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon } from 'lucide-react';
 import { getScoreTier } from '@/utils/getScoreTier';
 
@@ -110,8 +109,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
         <div className="grid grid-cols-[minmax(0,1.1fr)_minmax(0,1.3fr)] gap-x-6 gap-y-2 items-start">
           {/* LEFT: score hero */}
           <div>
-            <div className="mt-0.5 flex items-center gap-2">
-              <ClubhouseLogo size="md" />
+            <div className="mt-0.5 flex items-center">
               <span className="text-[34px] font-semibold text-slate-900 leading-none">
                 {averageRating.toFixed(1)}
               </span>
