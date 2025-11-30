@@ -139,7 +139,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   </span>
 
                   {/* Bar – takes remaining width */}
-                  <div className="flex-1">
+                  <div className="flex-1 max-w-[65%]">
                     <RatingBar 
                       value={percentage}
                       max={100}
