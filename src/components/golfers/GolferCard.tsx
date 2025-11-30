@@ -36,7 +36,7 @@ export function GolferCard({
   const handicapLine = golfer.handicap != null ? `HCP ${golfer.handicap.toFixed(1)}` : null;
 
   return (
-    <article className="flex items-center justify-between rounded-2xl bg-white shadow-sm px-4 py-4">
+    <article className="flex items-center justify-between rounded-xl bg-white border border-gray-200 shadow-[0_2px_8px_rgba(0,0,0,0.08)] px-4 py-4">
       {/* Left side - tappable to profile */}
       <button
         type="button"
