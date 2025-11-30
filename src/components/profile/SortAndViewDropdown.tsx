@@ -109,7 +109,7 @@ const SortAndViewDropdown: React.FC<SortAndViewDropdownProps> = ({
           <div className="flex gap-2">
             <button
               onClick={() => onViewTypeChange('cards')}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-all duration-200 text-sm font-medium ${
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium ${
                 viewType === 'cards'
                   ? 'bg-muted text-foreground shadow-sm'
                   : 'bg-muted/30 text-muted-foreground hover:bg-muted/50'
@@ -120,7 +120,7 @@ const SortAndViewDropdown: React.FC<SortAndViewDropdownProps> = ({
             </button>
             <button
               onClick={() => onViewTypeChange('list')}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-all duration-200 text-sm font-medium ${
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium ${
                 viewType === 'list'
                   ? 'bg-muted text-foreground shadow-sm'
                   : 'bg-muted/30 text-muted-foreground hover:bg-muted/50'
