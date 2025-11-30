@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, RefObject } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CourseExplorer from './CourseExplorer';
 import MyCourses from './MyCourses';
@@ -15,9 +15,10 @@ import CoursesErrorBoundary from './CoursesErrorBoundary';
 interface CoursesContentProps {
   username?: string;
   displayName?: string;
+  coursesScrollRef?: RefObject<HTMLDivElement>;
 }
 
-const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }) => {
+const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName, coursesScrollRef }) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -173,7 +174,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
       )}
 
         {/* Global scroll-to-top button */}
-        <ScrollToTopGlass />
+        <ScrollToTopGlass targetRef={coursesScrollRef} />
       </div>
     </CoursesErrorBoundary>
   );
