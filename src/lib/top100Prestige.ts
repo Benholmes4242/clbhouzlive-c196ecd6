@@ -49,3 +49,15 @@ export function getRingColorClass(ring?: Top100PrestigeRing | null): string {
     default: return 'ring-border';
   }
 }
+
+export function getTop100Title(count: number | null | undefined): string | null {
+  if (!count || count <= 0) return null;
+
+  if (count >= 100) return 'Century Club';
+  if (count >= 50) return '50 Club';
+  if (count >= 20) return '20 Club';
+  if (count >= 10) return 'Top 100 Regular';
+  if (count >= 5) return 'Emerging Pilgrim';
+
+  return null;
+}

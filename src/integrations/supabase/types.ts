@@ -4405,6 +4405,33 @@ export type Database = {
           },
         ]
       }
+      user_xp_events: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          metadata: Json | null
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          reason: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       weekly_challenge_ladder: {
         Row: {
           created_at: string | null
