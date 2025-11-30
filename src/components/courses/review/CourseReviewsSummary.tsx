@@ -134,6 +134,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
               // Reduce outstanding bar by 10%
               if (item.tier.tier === 'outstanding') {
                 percentage *= 0.9;
+                console.log('Outstanding bar percentage:', percentage, 'count:', item.count, 'maxCount:', maxCount);
               }
               return (
                 <div key={item.tier.tier} className="mb-1.5 flex items-center gap-0">
