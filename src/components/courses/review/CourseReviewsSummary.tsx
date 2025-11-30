@@ -106,11 +106,6 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
 
   return (
     <div>
-      {/* Label */}
-      <div className="text-[10px] font-semibold tracking-[0.08em] uppercase text-slate-500 mb-2 -ml-3">
-        Community Rating
-      </div>
-
       {/* Top row: Rating + Distribution */}
       <div className="mb-5">
         <div className="mt-3 flex w-full items-start gap-1.5">
