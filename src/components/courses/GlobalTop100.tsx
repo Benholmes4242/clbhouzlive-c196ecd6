@@ -416,28 +416,34 @@ const GlobalTop100 = () => {
       )}
 
 
+      {/* Error state */}
+      {!isLoading && false && ( // isError condition - placeholder until we have proper error handling
+        <div className="mb-3 rounded-xl border border-red-900/70 bg-red-950/50 px-3 py-2.5 text-[12px] text-red-100">
+          <p className="font-semibold">We couldn't load Top 100 courses</p>
+          <p className="mt-0.5 opacity-80">
+            Please refresh the page or try again in a moment.
+          </p>
+        </div>
+      )}
+
       {/* Results */}
       {isLoading ? (
         <LoadingSkeleton />
       ) : filteredCourses.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
-          <div className="w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 flex items-center justify-center text-muted-foreground mb-1">
-            <Award className="w-4 h-4" />
-          </div>
-          <h3 className="text-sm font-semibold">No courses match your filters</h3>
-          <p className="text-sm text-muted-foreground max-w-xs">
-            Try clearing your search or choosing a different Top 100 list to browse.
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-800/70 bg-slate-950/70 px-4 py-6 text-center">
+          <p className="text-[13px] font-semibold text-slate-50">
+            No Top 100 courses match these filters
           </p>
-          {hasActiveFilters && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="mt-2"
-              onClick={handleResetFilters}
-            >
-              Reset filters
-            </Button>
-          )}
+          <p className="mt-1 text-[13px] text-slate-400">
+            Try broadening your filters or switching to a different Top 100 list.
+          </p>
+          <button
+            type="button"
+            onClick={handleResetFilters}
+            className="mt-3 inline-flex items-center justify-center rounded-full border border-slate-700/80 bg-slate-950 px-4 py-1.5 text-[13px] font-medium text-slate-200 hover:border-slate-500 hover:text-slate-50"
+          >
+            Reset filters
+          </button>
         </div>
       ) : (
         <div className="space-y-6">

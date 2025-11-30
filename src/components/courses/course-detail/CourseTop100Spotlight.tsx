@@ -68,6 +68,11 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
   const communityLine =
     communityLineParts.length > 0 ? communityLineParts.join(' · ') : null;
 
+  const hasCommunity =
+    (data.unique_players ?? 0) > 0 ||
+    (data.total_rounds ?? 0) > 0 ||
+    data.avg_rating != null;
+
   const handlePrimaryCta = () => {
     if (data.user_has_played) {
       // Send them to log / create a moment for this course
@@ -141,8 +146,15 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
           {lastPlayedText && (
             <p className="text-[11px] text-slate-400">{lastPlayedText}</p>
           )}
-          {communityLine && (
-            <p className="text-[11px] text-slate-400">{communityLine}</p>
+          {hasCommunity ? (
+            communityLine && (
+              <p className="text-[11px] text-slate-400">{communityLine}</p>
+            )
+          ) : (
+            <p className="text-[11px] text-slate-500">
+              Be one of the first to log a round here and set the tone for this
+              course's Top 100 rating.
+            </p>
           )}
         </div>
 
