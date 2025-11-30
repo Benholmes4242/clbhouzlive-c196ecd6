@@ -971,45 +971,31 @@ const HeroProfileHeader = ({
                 {/* Top 100 journey pill */}
                 {top100Overview && top100Overview.total_played > 0 && (() => {
                   const top100Title = getTop100Title(top100Overview.total_played);
-                  const total = top100Overview.total_played;
-                  const regions = top100Overview.regions_count ?? 0;
-
-                  const summaryParts: string[] = [];
-                  summaryParts.push(
-                    `${total} Top 100 course${total === 1 ? '' : 's'}`
-                  );
-                  if (regions > 0) {
-                    summaryParts.push(
-                      `${regions} region${regions === 1 ? '' : 's'}`
-                    );
-                  }
-                  if (top100Title) {
-                    summaryParts.push(top100Title);
-                  }
-
-                  const summary = summaryParts.join(' · ');
-
                   return (
                     <div className="mt-3 flex justify-center">
                       <button
                         type="button"
                         onClick={() => handleTabChange('top100')}
-                        className="inline-flex w-full items-center gap-3 rounded-2xl border border-slate-800/70 bg-slate-900/90 px-4 py-3 text-left text-xs text-slate-50 shadow-[0_12px_40px_rgba(15,23,42,0.45)] transition-transform transition-colors hover:bg-slate-900 hover:border-slate-100/30 active:scale-[0.99]"
+                        className="inline-flex w-full items-center gap-1.5 rounded-full border border-slate-800/70 bg-slate-950/80 px-3 py-1.5 text-[11px] text-slate-200 hover:border-emerald-400/70 hover:text-emerald-100"
                       >
-                        {/* Icon */}
-                        <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-amber-500/10 text-base">
-                          🏆
+                        <span className="text-[13px]">🏆</span>
+                        <span className="font-medium">Top 100</span>
+                        <span className="text-slate-400">·</span>
+                        <span>
+                          {top100Overview.total_played} course
+                          {top100Overview.total_played === 1 ? '' : 's'}
                         </span>
-
-                        {/* Text */}
-                        <span className="flex flex-col flex-1 min-w-0">
-                          <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-slate-300">
-                            Top 100 journey
-                          </span>
-                          <span className="mt-0.5 text-[11px] font-medium text-slate-50 truncate">
-                            {summary}
-                          </span>
+                        <span className="text-slate-400">·</span>
+                        <span>
+                          {top100Overview.regions_count}{' '}
+                          {top100Overview.regions_count === 1 ? 'region' : 'regions'}
                         </span>
+                        {top100Title && (
+                          <>
+                            <span className="text-slate-500">·</span>
+                            <span>{top100Title}</span>
+                          </>
+                        )}
                       </button>
                     </div>
                   );
