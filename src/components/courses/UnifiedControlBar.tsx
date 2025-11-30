@@ -1,5 +1,7 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 type UnifiedControlBarProps = {
   from: number;
@@ -44,46 +46,27 @@ export function UnifiedControlBar({
       {/* Right: controls */}
       <div className="flex items-center gap-2 ml-2">
         {/* Sort */}
-        <button
-          type="button"
+        <Button
+          variant="tertiary"
+          size="tertiary"
           onClick={onSortClick}
-          className="
-            inline-flex items-center gap-1.5
-            px-3 py-1.5
-            text-xs font-medium
-            bg-background
-            border border-border/60
-            shadow-sm
-            hover:bg-slate-50
-            transition-colors
-          "
-          style={{ borderRadius: 'var(--radius)' }}
+          className="inline-flex items-center gap-1.5"
         >
-          <span className="text-muted-foreground">Sort</span>
+          <span className="text-muted-foreground">Sort:</span>
           <span className="text-foreground">{sortLabel}</span>
           <ChevronDown className="h-3 w-3 text-muted-foreground" />
-        </button>
+        </Button>
 
         {/* Optional Filters – can be hidden for now if not needed */}
         {onFiltersClick && (
-          <button
-            type="button"
+          <Button
+            variant="tertiary"
+            size="tertiary"
             onClick={onFiltersClick}
-            className="
-              hidden sm:inline-flex
-              items-center gap-1.5
-              px-3 py-1.5
-              text-xs font-medium
-              bg-background
-              border border-border/60
-              shadow-sm
-              hover:bg-slate-50
-              transition-colors
-            "
-            style={{ borderRadius: 'var(--radius)' }}
+            className="hidden sm:inline-flex items-center gap-1.5"
           >
             <span className="text-foreground">Filters</span>
-          </button>
+          </Button>
         )}
       </div>
     </div>
