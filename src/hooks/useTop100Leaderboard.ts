@@ -28,6 +28,27 @@ export type Top100LeaderboardResponse = {
   current_user_entry: Top100LeaderboardEntry | null;
 };
 
+// Internal RPC types
+type LeaderboardRpcEntry = {
+  user_id: string;
+  rank: number;
+  display_name: string | null;
+  avatar_url: string | null;
+  home_club: string | null;
+  total_top100_played: number;
+  milestone_label: string | null;
+};
+
+type LeaderboardRpcPayload = {
+  // IMPORTANT:
+  // - total_count and current_user_entry are for the FULL dataset
+  //   (not just this page of entries).
+  // - entries is the paginated slice.
+  entries: LeaderboardRpcEntry[];
+  total_count: number;
+  current_user_entry: LeaderboardRpcEntry | null;
+};
+
 export function useTop100Leaderboard(args: UseTop100LeaderboardArgs) {
   const { scope, timeRange, pageSize = 20 } = args;
 
@@ -48,36 +69,26 @@ export function useTop100Leaderboard(args: UseTop100LeaderboardArgs) {
 
       if (error) throw error;
 
-      const parsed = data as {
-        entries: any[];
-        total_count: number;
-        current_user_entry: any | null;
-      };
+      const parsed = data as LeaderboardRpcPayload;
+
+      const mapEntry = (e: LeaderboardRpcEntry): Top100LeaderboardEntry => ({
+        user_id: e.user_id,
+        rank: e.rank,
+        display_name: e.display_name || 'Anonymous',
+        avatar_url: e.avatar_url || null,
+        home_club: e.home_club || null,
+        country: null,
+        total_top100_played: e.total_top100_played,
+        lists_completed: [],
+        milestone_label: e.milestone_label || null,
+      });
 
       return {
-        entries: (parsed.entries || []).map(e => ({
-          user_id: e.user_id,
-          rank: e.rank,
-          display_name: e.display_name || 'Anonymous',
-          avatar_url: e.avatar_url || null,
-          home_club: e.home_club || null,
-          country: null,
-          total_top100_played: e.total_top100_played,
-          lists_completed: [],
-          milestone_label: e.milestone_label || null,
-        })),
+        entries: (parsed.entries || []).map(mapEntry),
         total_count: parsed.total_count || 0,
-        current_user_entry: parsed.current_user_entry ? {
-          user_id: parsed.current_user_entry.user_id,
-          rank: parsed.current_user_entry.rank,
-          display_name: parsed.current_user_entry.display_name || 'Anonymous',
-          avatar_url: parsed.current_user_entry.avatar_url || null,
-          home_club: parsed.current_user_entry.home_club || null,
-          country: null,
-          total_top100_played: parsed.current_user_entry.total_top100_played,
-          lists_completed: [],
-          milestone_label: parsed.current_user_entry.milestone_label || null,
-        } : null,
+        current_user_entry: parsed.current_user_entry
+          ? mapEntry(parsed.current_user_entry)
+          : null,
       };
     },
     getNextPageParam: (lastPage, allPages) => {

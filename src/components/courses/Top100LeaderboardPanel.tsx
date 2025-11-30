@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LeaderboardScope, LeaderboardTimeRange, useTop100Leaderboard } from '@/hooks/useTop100Leaderboard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -10,6 +10,9 @@ import { getTop100PrestigeRing, getRingColorClass } from '@/lib/top100Prestige';
 
 const Top100LeaderboardPanel = () => {
   const navigate = useNavigate();
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const prevIsFetchingNextPage = useRef(false);
+  const prevEntriesCount = useRef(0);
   const [viewType, setViewType] = useState<'players' | 'courses'>('players');
   const [scope, setScope] = useState<LeaderboardScope>('worldwide');
   const [timeRange, setTimeRange] = useState<LeaderboardTimeRange>('all_time');
@@ -28,10 +31,34 @@ const Top100LeaderboardPanel = () => {
     pageSize: 20,
   });
 
-  // Flatten all pages into single entries array
+  // NOTE: total_count and current_user_entry come from the RPC summary,
+  // which is identical for every page. It's safe to read from pages[0].
   const allEntries = data?.pages.flatMap(page => page.entries) || [];
   const totalCount = data?.pages[0]?.total_count || 0;
   const currentUserEntry = data?.pages[0]?.current_user_entry || null;
+
+  // Smooth scroll on pagination
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const container = containerRef.current;
+    const currentCount = allEntries.length;
+
+    // Detect the moment a "next page" finishes loading
+    const justFinishedNextPage =
+      prevIsFetchingNextPage.current && !isFetchingNextPage;
+
+    if (justFinishedNextPage && currentCount > prevEntriesCount.current) {
+      // Nudge the scroll slightly so new rows are pulled into view
+      container.scrollTo({
+        top: container.scrollTop + 120,
+        behavior: 'smooth',
+      });
+    }
+
+    prevIsFetchingNextPage.current = isFetchingNextPage;
+    prevEntriesCount.current = currentCount;
+  }, [allEntries.length, isFetchingNextPage]);
 
   const scopeLabels: Record<LeaderboardScope, string> = {
     worldwide: 'Worldwide',
@@ -80,7 +107,7 @@ const Top100LeaderboardPanel = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 px-4 pb-6">
+    <div ref={containerRef} className="max-w-2xl mx-auto space-y-6 px-4 pb-6">
       {/* Header */}
       <div className="text-center space-y-2">
         <div className="flex items-center justify-center gap-2">
