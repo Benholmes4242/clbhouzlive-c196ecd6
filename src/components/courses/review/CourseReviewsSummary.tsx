@@ -120,7 +120,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
             </div>
 
             {/* Rating badge – flush left aligned with "Based on" text */}
-            <RatingBadge tierData={tierData} className="mt-2 self-start !px-0" />
+            <RatingBadge tierData={tierData} className="mt-2 self-start !pl-0" />
 
             {/* Based on X reviews */}
             <p className="mt-2 text-xs text-slate-500">
