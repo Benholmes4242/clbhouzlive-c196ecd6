@@ -11,10 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, CheckCircle2, Circle } from 'lucide-react';
-import CountryFlag from '@/components/ui/country-flag';
+import { ArrowLeft } from 'lucide-react';
 import GolfClubView from '@/components/golf-club/GolfClubView';
-import Top100Pills from '@/components/courses/Top100Pills';
 import { useCourseTop100Memberships } from '@/hooks/useCourseTop100Memberships';
 import { FriendsTop100Panel } from '@/components/top100/FriendsTop100Panel';
 import { Top100AchievementsBlock } from '@/components/top100/Top100AchievementsBlock';
@@ -114,21 +112,6 @@ const Top100List = () => {
     return filtered;
   }, [courses, sortMode, filterMode, playedCourseIds, showFriends]);
 
-  const getRegionBackground = (slug: string) => {
-    switch (slug) {
-      case 'global-top-100':
-        return '/lovable-uploads/bd96819b-505e-4a35-b242-d106babe5179.png';
-      case 'gb-i-top-100':
-        return 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=400&fit=crop';
-      case 'usa-top-100':
-        return 'https://images.unsplash.com/photo-1629048821995-e30a7ba7f063?w=1200&h=400&fit=crop';
-      case 'europe-top-100':
-        return 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=1200&h=400&fit=crop';
-      default:
-        return '';
-    }
-  };
-
   const listProgress = progressData?.lists?.find((p) => p.listId === currentList?.id);
   const playedCount = listProgress?.played || 0;
   const totalCount = listProgress?.total || 100;
@@ -156,51 +139,64 @@ const Top100List = () => {
 
       <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
         <div className="max-w-6xl mx-auto space-y-6">
-          {/* Hero Header */}
-          <div
-            className="relative h-64 rounded-2xl overflow-hidden"
-            style={{
-              backgroundImage: `url(${getRegionBackground(slug || '')})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
+          {/* Back Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/top100')}
+            className="mb-4 text-muted-foreground hover:text-foreground"
           >
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
-            
-            <div className="relative h-full flex flex-col justify-between p-6">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate('/top100')}
-                className="self-start text-foreground hover:bg-white/20"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Hub
-              </Button>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Top 100 Hub
+          </Button>
 
-              <div className="space-y-3">
-                <h1 className="font-display text-4xl font-bold text-foreground">
+          {/* Hero Header */}
+          <section className="mb-6 rounded-3xl border border-slate-800/70 bg-slate-950/80 px-4 py-4 shadow-[0_18px_60px_rgba(15,23,42,0.55)] sm:px-6 sm:py-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              {/* Left: title + description */}
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-2 rounded-full bg-slate-900/80 px-2.5 py-1">
+                  <span className="text-xs">🏆</span>
+                  <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-slate-300">
+                    Top 100 · {currentList?.short_label ?? currentList?.name}
+                  </span>
+                </div>
+
+                <h1 className="text-base font-semibold text-slate-50 sm:text-lg">
                   {currentList?.name}
                 </h1>
+
                 {currentList?.description && (
-                  <p className="text-foreground/90 text-lg">{currentList.description}</p>
-                )}
-                {session && (
-                  <>
-                    <p className="text-foreground/90 text-sm font-medium">
-                      You've played {playedCount} of {totalCount} courses in this list.
-                    </p>
-                    <div className="h-2 w-full max-w-md rounded-full bg-white/20 backdrop-blur-sm overflow-hidden">
-                      <div
-                        className="h-full bg-primary-accent transition-all duration-300"
-                        style={{ width: `${(playedCount / totalCount) * 100}%` }}
-                      />
-                    </div>
-                  </>
+                  <p className="text-xs text-slate-400">
+                    {currentList.description}
+                  </p>
                 )}
               </div>
+
+              {/* Right: progress pill for this list */}
+              {session && (
+                <div className="w-full max-w-[260px] rounded-2xl bg-slate-900/80 px-3 py-2.5 text-xs text-slate-100 sm:w-auto">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-medium">Your journey in this list</span>
+                    <span className="text-[11px] text-slate-300">
+                      {playedCount} / {totalCount} played
+                    </span>
+                  </div>
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-800">
+                    <div
+                      className="h-full rounded-full bg-primary-accent"
+                      style={{
+                        width: `${Math.min(
+                          100,
+                          (playedCount / Math.max(totalCount, 1)) * 100,
+                        ).toFixed(1)}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
+          </section>
 
           {/* Friends on this list */}
           {currentList && session && (
@@ -213,22 +209,11 @@ const Top100List = () => {
           )}
 
           {/* Controls */}
-          <div className="space-y-4">
-            {/* Sort & Filter */}
-            <div className="flex flex-wrap gap-3">
-              <Select value={sortMode} onValueChange={(v) => setSortMode(v as SortMode)}>
-                <SelectTrigger className="w-[180px] bg-card border-border/50">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="rank">Rank</SelectItem>
-                  <SelectItem value="alphabetical">A → Z</SelectItem>
-                  <SelectItem value="country">Country</SelectItem>
-                </SelectContent>
-              </Select>
-
+          <section className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            {/* Left: Filters */}
+            <div className="flex flex-wrap items-center gap-2">
               <Select value={filterMode} onValueChange={(v) => setFilterMode(v as FilterMode)}>
-                <SelectTrigger className="w-[180px] bg-card border-border/50">
+                <SelectTrigger className="w-[140px] h-9 bg-card border-border/50 text-sm">
                   <SelectValue placeholder="Filter" />
                 </SelectTrigger>
                 <SelectContent>
@@ -237,23 +222,37 @@ const Top100List = () => {
                   <SelectItem value="unplayed">Unplayed</SelectItem>
                 </SelectContent>
               </Select>
+
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card border border-border/50">
+                <Switch
+                  id="show-friends"
+                  checked={showFriends}
+                  onCheckedChange={setShowFriends}
+                />
+                <Label htmlFor="show-friends" className="text-xs font-medium cursor-pointer">
+                  Friends only
+                </Label>
+              </div>
             </div>
 
-            {/* Show Friends Only Toggle */}
-            <div className="flex items-center gap-3 p-4 rounded-lg bg-card border border-border/50">
-              <Switch
-                id="show-friends"
-                checked={showFriends}
-                onCheckedChange={setShowFriends}
-              />
-              <Label htmlFor="show-friends" className="text-sm font-medium cursor-pointer">
-                Show Friends Only
-              </Label>
+            {/* Right: Sort */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Sort:</span>
+              <Select value={sortMode} onValueChange={(v) => setSortMode(v as SortMode)}>
+                <SelectTrigger className="w-[140px] h-9 bg-card border-border/50 text-sm">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="rank">Rank</SelectItem>
+                  <SelectItem value="alphabetical">A → Z</SelectItem>
+                  <SelectItem value="country">Country</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          </div>
+          </section>
 
           {/* Course List */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             {filteredAndSortedCourses.map((course) => (
               <CourseListItem
                 key={course.id}
@@ -298,53 +297,57 @@ const CourseListItem: React.FC<CourseListItemProps> = React.memo(({ course, isPl
   return (
     <div
       onClick={onClick}
-      className="group flex items-center gap-4 p-4 rounded-xl bg-card border border-border/50 hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer"
+      className="group flex items-center gap-3 rounded-2xl border border-slate-800/70 bg-slate-900/60 px-3 py-2.5 text-xs text-slate-100 transition-colors hover:border-slate-200/40 hover:bg-slate-900 cursor-pointer"
     >
       {/* Rank */}
-      <div className="flex-shrink-0 w-12 text-center">
-        <span className="text-2xl font-bold text-primary">#{course.rank}</span>
+      <div className="flex w-10 flex-col items-center justify-center">
+        <span className="text-sm font-semibold text-slate-50">
+          #{course.rank}
+        </span>
       </div>
 
-      {/* Thumbnail */}
-      <div className="relative flex-shrink-0 w-24 h-16 rounded-lg overflow-hidden">
-        <img
-          src={course.thumbnail_image || '/placeholder.svg'}
-          alt={course.name}
-          className="w-full h-full object-cover"
-        />
-        {memberships && memberships.length > 0 && (
-          <div className="absolute top-1 left-1">
-            <Top100Pills memberships={memberships} variant="overlay" size="sm" />
-          </div>
-        )}
-      </div>
-
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <h3 className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">
-          {course.name}
-        </h3>
-        <div className="flex items-center gap-2 mt-1">
-          <CountryFlag country={course.country} size="sm" />
-          <span className="text-sm text-muted-foreground truncate">
-            {course.country}
-            {course.sub_country && `, ${course.sub_country}`}
+      {/* Main content */}
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <div className="flex items-center gap-2">
+          <span className="truncate text-sm font-medium text-slate-50">
+            {course.name}
           </span>
+          {course.country && (
+            <span className="truncate text-[11px] text-slate-400">
+              · {course.country}
+            </span>
+          )}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-1.5">
+          {/* Top 100 badges */}
+          {memberships && memberships.length > 0 && (
+            <div className="flex items-center gap-1">
+              {memberships.map((m) => (
+                <span
+                  key={m.list_id}
+                  className="rounded-full bg-slate-800/80 px-2 py-0.5 text-[10px] font-medium text-slate-300"
+                >
+                  {m.short_label} #{m.rank}
+                </span>
+              ))}
+            </div>
+          )}
+          
+          {/* Status badges */}
+          {isPlayed && (
+            <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] text-emerald-300">
+              Played by you
+            </span>
+          )}
         </div>
       </div>
 
-      {/* Status Indicators */}
-      <div className="flex items-center gap-3 flex-shrink-0">
-        {isPlayed ? (
-          <div className="flex items-center gap-1 text-primary">
-            <CheckCircle2 className="w-5 h-5" />
-            <span className="text-sm font-medium">Played</span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-1 text-muted-foreground">
-            <Circle className="w-5 h-5" />
-          </div>
-        )}
+      {/* Right: chevron */}
+      <div className="flex shrink-0 flex-col items-end gap-1 pl-2">
+        <span className="text-[11px] text-slate-400 group-hover:text-slate-200">
+          View →
+        </span>
       </div>
     </div>
   );
