@@ -972,7 +972,7 @@ const HeroProfileHeader = ({
                   <div className="mt-3 flex justify-center">
                     <button
                       type="button"
-                      onClick={() => handleTabChange('top100')}
+                      onClick={() => navigate('/top100?tab=my-progress')}
                       className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-3 py-1.5 text-xs text-muted-foreground hover:border-primary-accent/60 hover:text-foreground transition-colors"
                     >
                       <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-alt text-meta">

@@ -110,7 +110,7 @@ const CourseTop100Summary: React.FC = () => {
           <button
             key={list!.listSlug}
             onClick={() =>
-              navigate(`/courses?tab=top-100&list=${list!.listSlug}`)
+              navigate(`/top100/${list!.listSlug}`)
             }
             className="bg-white border border-border rounded-2xl px-3 py-3 text-left transition-colors hover:bg-muted/50 shadow-sm"
           >

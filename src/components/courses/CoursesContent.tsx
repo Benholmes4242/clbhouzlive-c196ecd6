@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CourseExplorer from './CourseExplorer';
-import GlobalTop100 from './GlobalTop100';
 import MyCourses from './MyCourses';
 import FriendsCoursesPanel from './FriendsCoursesPanel';
 import FriendsCoursesSignedOutEmpty from './FriendsCoursesSignedOutEmpty';
@@ -10,7 +9,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
-import { User } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import CoursesErrorBoundary from './CoursesErrorBoundary';
 
@@ -161,7 +160,24 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           </TabsContent>
 
           <TabsContent value="top100" className="mt-6">
-            <GlobalTop100 />
+            <div className="max-w-md mx-auto">
+              <Card className="border border-border/60 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/top100')}>
+                <CardContent className="p-6 text-center space-y-3">
+                  <div className="mx-auto w-12 h-12 rounded-full bg-primary-accent/10 flex items-center justify-center">
+                    <Trophy className="h-6 w-6 text-primary-accent" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground mb-1">World's Top 100</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Explore the most iconic golf courses in the world
+                    </p>
+                  </div>
+                  <Button variant="primary" fullWidth className="mt-2">
+                    Open Top 100 Journey
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="friends-courses" className="mt-6">
