@@ -38,6 +38,12 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
     mapboxgl.accessToken = MAPBOX_TOKEN;
 
     const regionConfig = REGION_CONFIG[scope];
+    
+    // Guard against invalid scope
+    if (!regionConfig) {
+      console.warn(`Invalid Top100MapScope: ${scope}`);
+      return;
+    }
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,

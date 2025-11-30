@@ -1,4 +1,3 @@
-
 import React from 'react';
 import SiteBrandingCard from './settings/SiteBrandingCard';
 import GeneralSettingsCard from './settings/GeneralSettingsCard';
@@ -10,6 +9,7 @@ import { ManualVideoMigration } from './ManualVideoMigration';
 import { DatabaseUrlUpdater } from './DatabaseUrlUpdater';
 import { StreamAccountIdFixer } from './StreamAccountIdFixer';
 import { VideoUrlAnalyzer } from './VideoUrlAnalyzer';
+import Top100DebugPanel from './Top100DebugPanel';
 
 const AdminSettings = () => {
   return (
@@ -25,6 +25,12 @@ const AdminSettings = () => {
         <SecuritySettingsCard />
         <FeatureFlagsCard />
         <MaintenanceModeCard />
+      </div>
+
+      {/* Top 100 Debug Panel */}
+      <div>
+        <h3 className="text-lg font-semibold mb-2">Top 100 Debug (Local Override)</h3>
+        <Top100DebugPanel />
       </div>
 
       {/* Migration Tools Section */}

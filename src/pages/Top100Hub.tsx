@@ -20,23 +20,39 @@ const Top100Hub = () => {
   const { data: lists, isLoading: listsLoading } = useTop100Lists();
   const { data: progress } = useTop100ProgressForUser(session?.user?.id);
 
-  const tabFromUrl = searchParams.get('tab') as
-    | 'courses'
-    | 'my-progress'
-    | 'leaderboard'
-    | null;
+  const tabFromUrl = searchParams.get('tab');
+  
+  // Validate tab and use safe default
+  const validTabs = ['courses', 'my-progress', 'leaderboard'] as const;
+  type ValidTab = typeof validTabs[number];
+  const safeTab: ValidTab = validTabs.includes(tabFromUrl as any) 
+    ? (tabFromUrl as ValidTab) 
+    : 'courses';
   
   const viewFromUrl = searchParams.get('view') as 'list' | 'map' | null;
 
-  const [activeTab, setActiveTab] = useState<'courses' | 'my-progress' | 'leaderboard'>(
-    tabFromUrl ?? 'courses'
-  );
+  const [activeTab, setActiveTab] = useState<ValidTab>(safeTab);
   
   const [coursesViewMode, setCoursesViewMode] = useState<'list' | 'map'>(
     viewFromUrl ?? 'list'
   );
   
   const [selectedListSlug, setSelectedListSlug] = useState<Top100MapScope>('global-top-100');
+
+  // Guard against invalid data
+  if (!lists && !listsLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <ClubhouseHeaderNew />
+        <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
+          <div className="text-center py-12">
+            <h2 className="text-xl font-semibold text-foreground mb-2">Unable to load Top 100 lists</h2>
+            <p className="text-muted-foreground">Please try refreshing the page.</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   const getRegionIcon = (slug: string) => {
     switch (slug) {

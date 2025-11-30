@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useTop100Debug } from '@/context/Top100DebugContext';
+import { applyFriendsDebug } from '@/lib/top100DebugHelpers';
 
 export type Top100FriendSnapshot = {
   friend_id: string;
@@ -15,7 +17,9 @@ export type Top100FriendsSnapshotResponse = {
 };
 
 export function useTop100FriendsSnapshot() {
-  return useQuery({
+  const { state: debugState } = useTop100Debug();
+  
+  const query = useQuery({
     queryKey: ['top100-friends-snapshot'],
     queryFn: async (): Promise<Top100FriendsSnapshotResponse | null> => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -36,4 +40,14 @@ export function useTop100FriendsSnapshot() {
     },
     staleTime: 60_000,
   });
+  
+  // Apply debug override if enabled
+  if (debugState.enabled && debugState.friendsPreset !== 'real') {
+    return {
+      ...query,
+      data: applyFriendsDebug(query.data, debugState.friendsPreset),
+    };
+  }
+  
+  return query;
 }

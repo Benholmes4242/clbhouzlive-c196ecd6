@@ -22,6 +22,7 @@ import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { usePresenceTracker } from '@/hooks/usePresenceTracker';
 import { useLocationBroadcast } from '@/features/nearby/hooks/useLocationBroadcast';
 import { TopTenProvider } from '@/context/TopTenContext';
+import { Top100DebugProvider } from '@/context/Top100DebugContext';
 import { UIProvider } from '@/contexts/UIContext';
 import { ModalProvider } from '@/contexts/ModalContext';
 import { BottomNavigationProvider } from '@/contexts/BottomNavigationContext';
@@ -507,9 +508,11 @@ const App: React.FC = () => {
     <AppShell>
       <ReviewIslandLoader />
       <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
-        <QueryClientProvider client={queryClient}>
-          <AppInner />
-        </QueryClientProvider>
+        <Top100DebugProvider>
+          <QueryClientProvider client={queryClient}>
+            <AppInner />
+          </QueryClientProvider>
+        </Top100DebugProvider>
       </ThemeProvider>
     </AppShell>
   );

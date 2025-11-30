@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { getTop100PrestigeRing, getTop100MilestoneLabel, Top100PrestigeRing } from '@/lib/top100Prestige';
+import { useTop100Debug } from '@/context/Top100DebugContext';
+import { applyMyJourneyDebug } from '@/lib/top100DebugHelpers';
 
 export type Top100ListProgress = {
   listId: string;
@@ -57,7 +59,9 @@ function getMilestoneLabel(count: number): Top100NextMilestone | null {
 }
 
 export function useTop100ProgressForUser(userId: string | undefined | null) {
-  return useQuery({
+  const { state: debugState } = useTop100Debug();
+  
+  const query = useQuery({
     queryKey: ['top100-progress-user', userId],
     enabled: !!userId,
     queryFn: async (): Promise<Top100ProgressResponse> => {
@@ -203,4 +207,14 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
     },
     staleTime: 60 * 1000,
   });
+  
+  // Apply debug override if enabled
+  if (debugState.enabled && debugState.myPreset !== 'real') {
+    return {
+      ...query,
+      data: applyMyJourneyDebug(query.data, debugState.myPreset),
+    };
+  }
+  
+  return query;
 }
