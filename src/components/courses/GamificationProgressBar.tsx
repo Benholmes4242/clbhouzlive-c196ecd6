@@ -349,8 +349,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             <div className="flex items-center justify-between pb-6">
             <h4 className="text-xl font-semibold text-foreground">
               {isCurrentUser 
-                ? `You've played ${completedCount} of 300 top 100 courses`
-                : `${userFirstName || 'User'} has played ${completedCount} of 300 top 100 courses`
+                ? `You've rated ${completedCount} of 300 top 100 courses`
+                : `${userFirstName || 'User'} has rated ${completedCount} of 300 top 100 courses`
               }
             </h4>
               <div className="text-lg font-bold text-foreground transition-all duration-500">

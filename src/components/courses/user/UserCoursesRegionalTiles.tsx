@@ -72,28 +72,28 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
   const tiles = [
     {
       key: 'britain-ireland',
-      label: 'Top 100 GB&I Played',
+      label: 'Top 100 GB&I Rated',
       country: 'Britain & Ireland',
       flag: '🇬🇧',
       progress: regionProgress['britain-ireland'] || { played: 0, total: 100 }
     },
     {
       key: 'europe',
-      label: 'Top 100 Continental Europe Played',
+      label: 'Top 100 Continental Europe Rated',
       country: 'Continental Europe',
       flag: '🇪🇺',
       progress: regionProgress['europe'] || { played: 0, total: 100 }
     },
     {
       key: 'usa',
-      label: 'Top 100 USA Played',
+      label: 'Top 100 USA Rated',
       country: 'USA',
       flag: '🇺🇸',
       progress: regionProgress['usa'] || { played: 0, total: 100 }
     },
     {
       key: 'global',
-      label: 'Top 100 Worldwide Played',
+      label: 'Top 100 Worldwide Rated',
       country: 'Worldwide',
       flag: 'earth',
       progress: regionProgress['global'] || { played: 0, total: 100 }

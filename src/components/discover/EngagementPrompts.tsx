@@ -69,10 +69,10 @@ const EngagementPrompts: React.FC<EngagementPromptsProps> = ({
           </div>
           <div className="flex-1">
             <h3 className="text-lg font-semibold text-foreground mb-2">
-              Which top 100 courses have you played? ⛳
+              Which top 100 courses have you rated? ⛳
             </h3>
             <p className="text-muted-foreground text-sm mb-4">
-              Tag courses you've played to connect with fellow golfers.
+              Tag courses you've rated to connect with fellow golfers.
             </p>
             <Button 
               onClick={onTagCourse}

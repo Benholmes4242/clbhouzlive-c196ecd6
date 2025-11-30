@@ -21,7 +21,7 @@ const UserCoursesStats: React.FC<UserCoursesStatsProps> = ({
       <div className="bg-card border border-border rounded-full px-6 py-4 min-h-[100px] flex flex-col justify-center shadow-sm">
         <div className="flex items-center gap-2 mb-2">
           <Trophy className="h-4 w-4 text-yellow-600" />
-          <span className="text-sm font-medium text-foreground">Top 100 Played</span>
+          <span className="text-sm font-medium text-foreground">Top 100 Rated</span>
         </div>
         <div className="text-2xl font-bold text-foreground">{totalTop100Played}</div>
       </div>

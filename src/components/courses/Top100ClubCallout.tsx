@@ -59,7 +59,7 @@ const Top100ClubCallout: React.FC = () => {
             {listsStarted > 0 ? (
               <>
                 <p className="mb-2 text-sm font-medium text-slate-900">
-                  You&apos;ve played {coursesPlayed} course{coursesPlayed === 1 ? '' : 's'} {listsStarted === 1 ? 'in' : 'across'} {listsStarted} Top 100 list{listsStarted === 1 ? '' : 's'}.
+                  You&apos;ve rated {coursesPlayed} course{coursesPlayed === 1 ? '' : 's'} {listsStarted === 1 ? 'in' : 'across'} {listsStarted} Top 100 list{listsStarted === 1 ? '' : 's'}.
                 </p>
 
                 {/* Progress bar */}

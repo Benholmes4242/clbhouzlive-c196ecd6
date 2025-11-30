@@ -102,7 +102,7 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
       id: '20-club',
       emoji: '🥉',
       title: '20 Club',
-      description: 'Played 20 Top 100 courses',
+      description: 'Rated 20 Top 100 courses',
       threshold: 20,
       isEarned: userProgress >= 20,
       tier: 'bronze'
@@ -111,7 +111,7 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
       id: '50-club',
       emoji: '🥈',
       title: '50 Club',
-      description: 'Played 50 Top 100 courses',
+      description: 'Rated 50 Top 100 courses',
       threshold: 50,
       isEarned: userProgress >= 50,
       tier: 'silver'
@@ -120,7 +120,7 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
       id: '75-club',
       emoji: '🥇',
       title: '75 Club',
-      description: 'Played 75 Top 100 courses',
+      description: 'Rated 75 Top 100 courses',
       threshold: 75,
       isEarned: userProgress >= 75,
       tier: 'gold'
@@ -129,7 +129,7 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
       id: '200-club',
       emoji: '🏆',
       title: '200 Club',
-      description: 'Played 200 Top 100 courses',
+      description: 'Rated 200 Top 100 courses',
       threshold: 200,
       isEarned: userProgress >= 200,
       tier: 'platinum'
