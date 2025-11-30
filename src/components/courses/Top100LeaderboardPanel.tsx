@@ -13,14 +13,25 @@ const Top100LeaderboardPanel = () => {
   const [viewType, setViewType] = useState<'players' | 'courses'>('players');
   const [scope, setScope] = useState<LeaderboardScope>('worldwide');
   const [timeRange, setTimeRange] = useState<LeaderboardTimeRange>('all_time');
-  const [page, setPage] = useState(0);
 
-  const { data, isLoading, isError, refetch } = useTop100Leaderboard({
+  const { 
+    data, 
+    isLoading, 
+    isError, 
+    refetch, 
+    fetchNextPage, 
+    hasNextPage,
+    isFetchingNextPage 
+  } = useTop100Leaderboard({
     scope,
     timeRange,
-    page,
     pageSize: 20,
   });
+
+  // Flatten all pages into single entries array
+  const allEntries = data?.pages.flatMap(page => page.entries) || [];
+  const totalCount = data?.pages[0]?.total_count || 0;
+  const currentUserEntry = data?.pages[0]?.current_user_entry || null;
 
   const scopeLabels: Record<LeaderboardScope, string> = {
     worldwide: 'Worldwide',
@@ -43,21 +54,15 @@ const Top100LeaderboardPanel = () => {
     'europe-top-100': 'Europe',
   };
 
-  const handleLoadMore = () => {
-    setPage(p => p + 1);
-  };
-
   const handleScopeChange = (newScope: string) => {
     setScope(newScope as LeaderboardScope);
-    setPage(0);
   };
 
   const handleTimeRangeChange = (newTimeRange: string) => {
     setTimeRange(newTimeRange as LeaderboardTimeRange);
-    setPage(0);
   };
 
-  if (isLoading && page === 0) {
+  if (isLoading && !data) {
     return (
       <div className="max-w-2xl mx-auto space-y-6 px-4 pb-6 animate-pulse">
         <div className="h-24 bg-surface-alt rounded-xl" />
@@ -155,7 +160,7 @@ const Top100LeaderboardPanel = () => {
           </div>
 
       {/* Your Position Card */}
-      {data?.current_user_entry && (
+      {currentUserEntry && (
         <div className="p-4 rounded-xl bg-primary-accent/10 border border-primary-accent/20 space-y-2">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
             Your position
@@ -163,12 +168,12 @@ const Top100LeaderboardPanel = () => {
           <div className="flex items-center gap-2">
             <Award className="w-5 h-5 text-primary-accent" />
             <p className="text-lg font-bold text-foreground">
-              #{data.current_user_entry.rank} · {data.current_user_entry.total_top100_played} Top 100 courses
+              #{currentUserEntry.rank} · {currentUserEntry.total_top100_played} Top 100 courses
             </p>
           </div>
           <p className="text-sm text-muted-foreground">
-            {data.current_user_entry.milestone_label
-              ? `You're in the ${data.current_user_entry.milestone_label} – keep going.`
+            {currentUserEntry.milestone_label
+              ? `You're in the ${currentUserEntry.milestone_label} – keep going.`
               : 'Log more Top 100 rounds to climb the leaderboard.'}
           </p>
         </div>
@@ -187,7 +192,7 @@ const Top100LeaderboardPanel = () => {
           )}
 
           {/* Empty State */}
-          {!isError && data && data.entries.length === 0 && (
+          {!isError && allEntries.length === 0 && !isLoading && (
             <div className="text-center py-12 text-muted-foreground">
               <p>No Top 100 rounds logged here yet.</p>
               <p className="text-sm mt-1">Be the first to start your pilgrimage.</p>
@@ -195,9 +200,9 @@ const Top100LeaderboardPanel = () => {
           )}
 
           {/* Leaderboard List */}
-          {!isError && data && data.entries.length > 0 && (
+          {!isError && allEntries.length > 0 && (
             <div className="space-y-2">
-              {data.entries.map((entry) => {
+              {allEntries.map((entry) => {
                 const ringColor = entry.rank <= 3 ? 'ring-primary-accent/60' : getRingColorClass(getTop100PrestigeRing(entry.total_top100_played));
                 
                 return (
@@ -258,14 +263,14 @@ const Top100LeaderboardPanel = () => {
               })}
 
               {/* Load More */}
-              {data.entries.length < data.total_count && (
+              {hasNextPage && (
                 <div className="flex justify-center pt-4">
                   <Button
                     variant="outline"
-                    onClick={handleLoadMore}
-                    disabled={isLoading}
+                    onClick={() => fetchNextPage()}
+                    disabled={isFetchingNextPage}
                   >
-                    {isLoading ? 'Loading...' : 'Load more'}
+                    {isFetchingNextPage ? 'Loading...' : 'Load more'}
                   </Button>
                 </div>
               )}
