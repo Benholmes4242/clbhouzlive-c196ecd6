@@ -303,7 +303,7 @@ const Top100CoursesHubPanel = () => {
       {/* 2. Region progress strip */}
       {user && listSummaries.length > 0 && (
         <section>
-          <h3 className="mb-2 text-[13px] font-semibold text-slate-200">
+          <h3 className="mb-2 text-[13px] font-semibold text-slate-800">
             Your Top 100 region progress
           </h3>
 
@@ -315,15 +315,15 @@ const Top100CoursesHubPanel = () => {
               return (
                 <div
                   key={region.id}
-                  className="min-w-[150px] rounded-2xl border border-slate-800/80 bg-slate-950/80 px-3 py-2 text-[11px]"
+                  className="min-w-[150px] rounded-2xl border border-slate-200 bg-white shadow-sm px-4 py-3 flex flex-col gap-2"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-slate-100">{label}</span>
-                    <span className="text-slate-400">
+                    <span className="font-semibold text-slate-800 text-[14px]">{label}</span>
+                    <span className="text-slate-500 text-[13px]">
                       {region.played_count}/{region.total_courses}
                     </span>
                   </div>
-                  <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-slate-800">
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
                     <div
                       className="h-full rounded-full bg-amber-400"
                       style={{ width: `${Math.min(100, pct)}%` }}
