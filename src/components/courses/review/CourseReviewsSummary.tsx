@@ -108,46 +108,55 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
     <div>
       {/* Top row: Rating + Distribution */}
       <div className="mb-5">
-        <div className="grid grid-cols-[minmax(0,1.1fr)_minmax(0,1.3fr)] gap-x-6 gap-y-2 items-start">
-          {/* LEFT: score hero - centered */}
-          <div className="flex flex-col items-center">
-            <span className="text-[34px] font-semibold text-slate-900 leading-none">
-              {averageRating.toFixed(1)}<span className="text-lg text-slate-500">/10</span>
-            </span>
+        <div className="grid grid-cols-1 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-6 md:items-start">
+          {/* LEFT COLUMN – score, badge, review count */}
+          <div className="space-y-3 text-left">
+            <div className="text-xs font-semibold tracking-[0.12em] text-slate-600 uppercase">
+              Community rating
+            </div>
 
-            <div className="mt-2 mb-1">
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl font-semibold tabular-nums leading-none text-slate-900">
+                {averageRating.toFixed(1)}
+              </span>
+              <span className="text-base text-slate-500">/10</span>
+            </div>
+
+            <div>
               <RatingBadge tierData={tierData} />
             </div>
 
-            <p className="mt-2 text-sm text-slate-600">
-              Based on {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
-            </p>
+            <div className="text-xs text-slate-600">
+              Based on {reviewCount} review{reviewCount === 1 ? '' : 's'}
+            </div>
           </div>
 
-          {/* RIGHT: rating distribution - TripAdvisor style */}
-          <div className="grid grid-cols-[auto,minmax(0,1fr)] gap-x-4 gap-y-2 items-center">
+          {/* RIGHT COLUMN – distribution bars */}
+          <div className="space-y-2">
             {distributionItems.map((item) => {
               const percentage = (item.count / maxCount) * 100;
               return (
-                <React.Fragment key={item.tier.tier}>
-                  {/* Left column: label, right-aligned */}
-                  <div className="pr-1 text-sm text-slate-600 text-right">
+                <div key={item.tier.tier} className="flex items-center gap-3">
+                  {/* Label column – fixed width */}
+                  <span className="w-24 text-xs font-medium text-slate-600">
                     {item.tier.label}
-                  </div>
+                  </span>
 
-                  {/* Right column: bar + count - using RatingBar */}
-                  <div className="flex items-center gap-3">
+                  {/* Bar column – takes remaining width */}
+                  <div className="flex-1">
                     <RatingBar 
                       value={percentage}
                       max={100}
                       mode="banded"
                       band={item.tier.tier}
                     />
-                    <span className="min-w-[32px] text-sm text-slate-500 text-right">
-                      {item.count}
-                    </span>
                   </div>
-                </React.Fragment>
+
+                  {/* Count – small, right-aligned */}
+                  <span className="w-8 text-xs text-right tabular-nums text-slate-500">
+                    {item.count}
+                  </span>
+                </div>
               );
             })}
           </div>
