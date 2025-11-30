@@ -158,7 +158,8 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           `}
           sizes="(max-width: 768px) 100vw, 1200px"
           alt={course.name}
-          loading="lazy"
+          loading="eager"
+          fetchPriority="high"
           className="course-hero-image w-full h-full object-cover !rounded-bl-none"
           onLoad={(e) => {
             e.currentTarget.classList.add('loaded');

@@ -151,8 +151,9 @@ export function useCourseReviews(
 
       return reviews;
     },
-    staleTime: 30 * 60 * 1000,  // 30 min – reviews are stable
-    gcTime:   60 * 60 * 1000,  // 60 min – keep for session
+    // E1: Increased staleTime from 0 to 5 minutes to prevent tab-switch refetches
+    staleTime: 5 * 60 * 1000,   // 5 min – only refetch after mutations
+    gcTime:   10 * 60 * 1000,   // 10 min – keep for session
     refetchOnWindowFocus: false,
   });
 }
