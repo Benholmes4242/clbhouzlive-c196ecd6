@@ -205,7 +205,9 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
         prestige_label: getTop100MilestoneLabel(totalPlayed),
       };
     },
-    staleTime: 60 * 1000,
+    // C1: Increased staleTime to 5 minutes for My Progress tab
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000,   // 10 minutes
   });
   
   // Apply debug override if enabled

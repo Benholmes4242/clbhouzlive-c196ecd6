@@ -12,23 +12,47 @@ function setNavHeightVar() {
   }
 }
 
+// F1: Setup with cleanup tracking
+let cleanupFunctions: (() => void)[] = [];
+
 // Run once on load
 if (typeof window !== 'undefined') {
-  window.addEventListener('load', setNavHeightVar);
-
-  // Also observe for resize (landscape ↔ portrait changes nav height)
-  window.addEventListener('resize', setNavHeightVar);
+  const handleLoad = () => setNavHeightVar();
+  const handleResize = () => setNavHeightVar();
+  
+  window.addEventListener('load', handleLoad);
+  window.addEventListener('resize', handleResize);
+  
+  // Track cleanup functions
+  cleanupFunctions.push(() => {
+    window.removeEventListener('load', handleLoad);
+    window.removeEventListener('resize', handleResize);
+  });
 
   // Optional: observe DOM changes (if nav mounts later in SPA)
   const observer = new MutationObserver(setNavHeightVar);
   observer.observe(document.body, { childList: true, subtree: true });
+  
+  cleanupFunctions.push(() => {
+    observer.disconnect();
+  });
 
   // Run immediately if DOM is already loaded
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setNavHeightVar);
+    const handleDOMReady = () => setNavHeightVar();
+    document.addEventListener('DOMContentLoaded', handleDOMReady);
+    cleanupFunctions.push(() => {
+      document.removeEventListener('DOMContentLoaded', handleDOMReady);
+    });
   } else {
     setNavHeightVar();
   }
+}
+
+// Export cleanup function for app teardown (mainly for testing)
+export function cleanupNavHeightListeners() {
+  cleanupFunctions.forEach(fn => fn());
+  cleanupFunctions = [];
 }
 
 export { setNavHeightVar };

@@ -58,6 +58,18 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
   // Phase 1 Fix #2: Use shared hook - single query for all media consumers
   const { data: mediaResp, isLoading } = useClubMedia(courseId, 30);
 
+  // A3: Pre-warm HLS.js when media tab mounts with videos
+  useEffect(() => {
+    if (mediaResp && mediaResp.length > 0) {
+      const hasVideos = mediaResp.some(item => item.media_type === 'video');
+      if (hasVideos) {
+        import('@/hooks/useHlsUrlCache').then(({ warmHlsJs }) => {
+          warmHlsJs();
+        });
+      }
+    }
+  }, [mediaResp]);
+
   // Phase 1 Fix #3: Simplified transformation pipeline - pure data transformation
   const exploreItems = useMemo(
     () => adaptClubMediaArrayToExploreItems(mediaResp ?? []),
@@ -128,6 +140,11 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     }
   }, [filteredItems]);
 
+  // F2: Clear transformed media arrays on lightbox close
+  const handleLightboxClose = useCallback(() => {
+    setSelectedMediaIndex(null);
+  }, []);
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -141,39 +158,59 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
   // Empty state and filtered state are handled inline in the main render
 
 
-  // Phase 2 Fix #6: Only transform current item and neighbors for lightbox
+  // A1: Lazy window transformation for lightbox performance
   const renderFullscreenModal = () => {
     if (selectedMediaIndex === null || !filteredItems[selectedMediaIndex]) return null;
 
-    // Only transform items for lightbox (current + neighbors)
-    const standardizedMediaItems: StandardMediaItem[] = filteredItems.map(item => {
-      if (item.type === 'video') {
-        const streamId = getStreamIdFromUrl(item.src);
+    // Transform only visible window (current + 1 neighbor on each side)
+    const transformWindow = (centerIdx: number, radius = 1): StandardMediaItem[] => {
+      const start = Math.max(0, centerIdx - radius);
+      const end = Math.min(filteredItems.length, centerIdx + radius + 1);
+      
+      return filteredItems.slice(start, end).map((item, localIdx) => {
+        const absoluteIdx = start + localIdx;
+        
+        if (item.type === 'video') {
+          const streamId = getStreamIdFromUrl(item.src);
+          return {
+            id: item.id,
+            type: 'video' as const,
+            url: item.src,
+            streamId,
+            posterUrl: getStreamPoster(item.src, '1s') ?? undefined,
+            alt: item.title || 'Video'
+          };
+        }
         return {
           id: item.id,
-          type: 'video' as const,
+          type: 'image' as const,
           url: item.src,
-          streamId,
-          posterUrl: getStreamPoster(item.src, '1s') ?? undefined,
-          alt: item.title || 'Video'
+          alt: item.title || 'Photo'
         };
-      }
-      return {
-        id: item.id,
-        type: 'image' as const,
-        url: item.src,
-        alt: item.title || 'Photo'
-      };
-    });
+      });
+    };
+
+    // Start with initial window
+    const standardizedMediaItems = transformWindow(selectedMediaIndex, 2);
+    
+    // Build full arrays for lightbox (will lazy-load on swipe)
+    const allItems: StandardMediaItem[] = filteredItems.map(item => ({
+      id: item.id,
+      type: item.type as 'image' | 'video',
+      url: item.src,
+      alt: item.title || (item.type === 'video' ? 'Video' : 'Photo'),
+      streamId: item.type === 'video' ? getStreamIdFromUrl(item.src) : undefined,
+      posterUrl: item.type === 'video' ? getStreamPoster(item.src, '1s') ?? undefined : undefined,
+    }));
 
     const currentItem = filteredItems[selectedMediaIndex];
-    const mediaUrls = standardizedMediaItems.map(item => item.url);
-    const mediaTypes = standardizedMediaItems.map(item => item.type);
+    const mediaUrls = allItems.map(item => item.url);
+    const mediaTypes = allItems.map(item => item.type);
 
     const modalContent = (
       <FullscreenMediaModal
         isOpen={true}
-        onClose={() => setSelectedMediaIndex(null)}
+        onClose={handleLightboxClose}
         mediaUrl={mediaUrls}
         mediaType={mediaTypes}
         initialIndex={selectedMediaIndex}

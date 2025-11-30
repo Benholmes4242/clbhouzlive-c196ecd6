@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useGolfCoursesSearch } from '@/hooks/useGolfCoursesSearch';
+import { useGolfCoursesInfinite } from '@/hooks/useGolfCoursesInfinite';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -168,12 +168,22 @@ const GlobalTop100 = () => {
     });
   }, [lists]);
 
-  // Use the search hook for Top 100 lists - fetch all courses to get proper total count
-  const { data: courses = [], isLoading } = useGolfCoursesSearch({
+  // B1: Use paginated infinite query instead of limit: 999
+  const { 
+    data: coursesData,
+    isLoading,
+    fetchNextPage,
+    hasNextPage: hasMorePages,
+    isFetchingNextPage
+  } = useGolfCoursesInfinite({
     searchQuery: debouncedSearch,
     listSlug: selectedList,
-    limit: 999, // Fetch all courses to get proper total count
   });
+
+  // Flatten pages into single array
+  const courses = React.useMemo(() => {
+    return coursesData?.pages.flat() ?? [];
+  }, [coursesData]);
 
   // Apply subregion filter and sorting client-side
   const normalizedSelectedSub = selectedSubregion === 'all' ? null : selectedSubregion;
@@ -213,12 +223,12 @@ const GlobalTop100 = () => {
 
   const totalCount = filteredCourses.length;
   
-  // Paginate courses
+  // B2: Client-side pagination for filtered/sorted results
   const paginatedCourses = filteredCourses.slice(page * COURSES_PAGE_SIZE, (page + 1) * COURSES_PAGE_SIZE);
   
   const startIndex = totalCount === 0 ? 0 : page * COURSES_PAGE_SIZE + 1;
   const endIndex = Math.min((page + 1) * COURSES_PAGE_SIZE, totalCount);
-  const hasNextPage = endIndex < totalCount;
+  const hasNextPage = endIndex < totalCount || hasMorePages;
 
   const LoadingSkeleton = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -452,23 +462,34 @@ const GlobalTop100 = () => {
           <div className="flex flex-col items-center gap-3 mt-8">
             {/* Pagination Buttons */}
             {(page > 0 || hasNextPage) && (
-              <div className={`flex items-center gap-3 w-full ${page === 0 ? 'justify-center' : 'justify-between'}`}>
-                {page > 0 && (
+              <div className={`flex flex-col items-center gap-3 w-full`}>
+                {/* Load More or Next Page */}
+                {hasNextPage && (
                   <Button
                     variant="secondary"
+                    onClick={() => {
+                      if (hasMorePages && endIndex >= totalCount) {
+                        // Need to load more from server
+                        fetchNextPage();
+                      } else {
+                        // Just advance to next page of already-loaded data
+                        setPage((p) => p + 1);
+                      }
+                    }}
+                    disabled={isLoading || isFetchingNextPage}
+                  >
+                    {isFetchingNextPage ? 'Loading...' : `Next ${COURSES_PAGE_SIZE} courses`}
+                  </Button>
+                )}
+                
+                {/* Previous Button */}
+                {page > 0 && (
+                  <Button
+                    variant="outline"
                     onClick={() => setPage((p) => p - 1)}
                     disabled={isLoading}
                   >
                     Previous {COURSES_PAGE_SIZE} courses
-                  </Button>
-                )}
-                {hasNextPage && (
-                  <Button
-                    variant="secondary"
-                    onClick={() => setPage((p) => p + 1)}
-                    disabled={isLoading}
-                  >
-                    Next {COURSES_PAGE_SIZE} courses
                   </Button>
                 )}
               </div>
