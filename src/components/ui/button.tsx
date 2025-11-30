@@ -18,7 +18,7 @@ const buttonVariants = cva(
         // Secondary – default for everything else
         secondary: "rounded-xl border border-border/60 bg-card text-sm text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-slate-50",
         // Tertiary - micro buttons for filters, sort controls, small utilities
-        tertiary: "rounded-xl border border-border/60 bg-card text-xs font-medium text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-accent/50 active:scale-[0.98]",
+        tertiary: "rounded-xl border border-border/60 bg-card text-xs font-medium text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-slate-100 active:bg-slate-100 active:scale-[0.98]",
         // Legacy variants - preserved for backward compatibility
         default: "rounded-xl bg-white border border-slate-600 text-slate-600 hover:bg-slate-50 active:bg-slate-100",
         destructive: "rounded-xl bg-red-500 text-white border border-red-500/80 shadow-sm hover:bg-red-600 active:bg-red-700",
