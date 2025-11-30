@@ -112,9 +112,8 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
           {/* LEFT: score hero - centered */}
           <div className="flex flex-col items-center">
             <span className="text-[34px] font-semibold text-slate-900 leading-none">
-              {averageRating.toFixed(1)}
+              {averageRating.toFixed(1)}<span className="text-lg text-slate-500">/10</span>
             </span>
-            <span className="text-xs text-slate-500 mt-0.5">/10</span>
 
             <div className="mt-2 mb-1">
               <RatingBadge tierData={tierData} />
