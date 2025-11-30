@@ -12,6 +12,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
 import ClubTagPill from './ClubTagPill';
+import { Top100OverlayPills } from './Top100OverlayPills';
 import MiniProfileSheetWithData from './MiniProfileSheetWithData';
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
@@ -1207,9 +1208,16 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     >
                       <ChevronRight className="w-6 h-6 text-white" />
                     </button>
-                  </>
+                   </>
                 )}
               </div>
+
+              {/* Top 100 Pills Overlay - Show if course is a Top 100 */}
+              {item.golfCourse?.id && (
+                <div className="absolute top-20 left-4 z-30 animate-fade-in">
+                  <Top100OverlayPills courseId={item.golfCourse.id} />
+                </div>
+              )}
 
               {/* Social Dock removed from here - now rendered as sibling outside the feed */}
             </div>

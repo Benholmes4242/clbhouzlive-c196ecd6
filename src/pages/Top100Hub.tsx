@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
-import { useMyTop100Progress } from '@/hooks/useMyTop100Progress';
+import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Globe, MapPin, List, Map as MapIcon, Trophy } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
@@ -18,7 +18,7 @@ const Top100Hub = () => {
   const [searchParams] = useSearchParams();
   const { session } = useSupabaseSession();
   const { data: lists, isLoading: listsLoading } = useTop100Lists();
-  const { data: progress } = useMyTop100Progress();
+  const { data: progress } = useTop100ProgressForUser(session?.user?.id);
 
   const tabFromUrl = searchParams.get('tab') as
     | 'courses'

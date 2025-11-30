@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useUserAchievements } from './useUserAchievements';
-import { useUserTop100Progress } from './useUserTop100Progress';
+import { useTop100ProgressForUser } from './useTop100ProgressForUser';
 
 export interface Top100AchievementPrompt {
   code: string;
@@ -16,7 +16,8 @@ export interface Top100AchievementPrompt {
 
 export function useTop100AchievementPrompts(listId: string | undefined, userId: string | undefined) {
   const { data: achievements = [] } = useUserAchievements(userId);
-  const { data: top100Progress = [] } = useUserTop100Progress(userId);
+  const { data: progressData } = useTop100ProgressForUser(userId);
+  const top100Progress = progressData?.lists || [];
 
   return useMemo(() => {
     if (!listId || !userId) return [];
