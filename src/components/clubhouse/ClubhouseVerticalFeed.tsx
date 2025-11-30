@@ -31,6 +31,7 @@ import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featur
 import { logClubhouseFiltering } from '@/utils/clubhouseTelemetry';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
+import { useUserTop100CourseIds } from '@/hooks/useUserTop100CourseIds';
 import { 
   auditComponentMount, 
   auditIntersectionObserver,
@@ -235,6 +236,10 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   // Get engagement data for the current post
   const currentPost = filteredPosts[currentIndex];
   const currentPostEngagement = usePostEngagement(currentPost?.id || null);
+
+  // Get Top 100 courses the user has played
+  const { data: playedTop100CourseIds = [] } = useUserTop100CourseIds();
+  const playedSet = useMemo(() => new Set(playedTop100CourseIds), [playedTop100CourseIds]);
 
   // Notify parent when drawer states change
   useEffect(() => {

@@ -25,6 +25,7 @@ import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 import { useUserTop100Intent } from '@/hooks/useUserTop100Intent';
 import { useTop100DiscoverRecommendations } from '@/hooks/useTop100DiscoverRecommendations';
 import { useTrendingTop100Moments } from '@/hooks/useTrendingTop100Moments';
+import { useTop100FriendsSnapshot } from '@/hooks/useTop100FriendsSnapshot';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
@@ -65,6 +66,31 @@ const Discover = () => {
   const hasTop100Journey =
     (intent?.total_top100_played ?? 0) > 0 ||
     (intent?.wishlist_list_slugs?.length ?? 0) > 0;
+
+  // Friends snapshot for nudges
+  const { data: friendsSnapshot } = useTop100FriendsSnapshot();
+
+  // Derive personalTop100Nudge
+  const personalTop100Nudge = React.useMemo(() => {
+    if (!friendsSnapshot) return null;
+    const me = friendsSnapshot.me;
+    const friends = friendsSnapshot.friends || [];
+    if (!me || friends.length === 0) return null;
+
+    const myCount = me.total_top100_played;
+    const sorted = friends
+      .slice()
+      .sort((a, b) => b.total_top100_played - a.total_top100_played);
+
+    const leader = sorted[0];
+
+    if (leader && leader.total_top100_played > myCount) {
+      const diff = leader.total_top100_played - myCount;
+      return `You're ${diff} Top 100 course${diff === 1 ? '' : 's'} behind ${leader.display_name}.`;
+    }
+
+    return "You're leading your friends on the Top 100 journey – don't let them catch up.";
+  }, [friendsSnapshot]);
   
   // Convert durationFilter key to range for API
   const durationRange = React.useMemo(() => {
@@ -229,6 +255,11 @@ const Discover = () => {
                         <p className="text-xs text-muted-foreground">
                           Moments from Top 100 courses you haven't ticked off yet.
                         </p>
+                        {personalTop100Nudge && (
+                          <p className="text-[11px] text-muted-foreground mt-1">
+                            {personalTop100Nudge}
+                          </p>
+                        )}
                       </div>
                       {intent?.wishlist_list_slugs?.[0] && (
                         <Button

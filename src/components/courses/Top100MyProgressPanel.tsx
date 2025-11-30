@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -9,6 +9,9 @@ import { Top100RegionProgressGrid } from './Top100RegionProgressGrid';
 import { Top100RecentRoundsFeed } from './Top100RecentRoundsFeed';
 import ProfileBadgeStrip from '@/components/profile/ProfileBadgeStrip';
 import { cn } from '@/lib/utils';
+import { useTop100FriendsSnapshot } from '@/hooks/useTop100FriendsSnapshot';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
 
 interface Top100MyProgressPanelProps {
   userId?: string | null;
@@ -18,9 +21,12 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   const { session } = useSupabaseSession();
   const effectiveUserId = userId ?? session?.user?.id ?? null;
   const { data, isLoading } = useTop100ProgressForUser(effectiveUserId);
+  const { data: friendsSnapshot } = useTop100FriendsSnapshot();
   const navigate = useNavigate();
   const isOwnProfile = !userId || userId === session?.user?.id;
   const [journeyView, setJourneyView] = useState<'overview' | 'pilgrimage'>('overview');
+  const { toast } = useToast();
+  const prevTotalRef = useRef<number | null>(null);
 
   // Calculate badge props for ProfileBadgeStrip
   const badgeProps = React.useMemo(() => {
@@ -65,6 +71,57 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   if (!data) return null;
 
   const lastPlayedDate = data.recent_rounds[0]?.played_at || null;
+
+  // Milestone "Share to Clubhouse" logic
+  useEffect(() => {
+    if (!data || !isOwnProfile) return;
+
+    const current = data.total_played_top100;
+    const prev = prevTotalRef.current ?? 0;
+
+    const thresholds = [20, 50, 100];
+    const justHit = thresholds.find((t) => prev < t && current >= t);
+
+    if (justHit) {
+      toast({
+        title: `Top 100 milestone unlocked – ${justHit} Club 🎉`,
+        description: 'Share your journey with the Clubhouse community?',
+        action: (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => navigate('/create-moment')}
+          >
+            Share to Clubhouse
+          </Button>
+        ),
+      });
+    }
+
+    prevTotalRef.current = current;
+  }, [data?.total_played_top100, isOwnProfile, toast, navigate]);
+
+  // Friends comparison logic
+  const myCount = data?.total_played_top100 ?? 0;
+  const friends = friendsSnapshot?.friends ?? [];
+
+  const topFriends = friends
+    .slice()
+    .sort((a, b) => b.total_top100_played - a.total_top100_played)
+    .slice(0, 3);
+
+  let friendMessage: string | null = null;
+
+  if (friendsSnapshot?.me && friends.length > 0) {
+    const bestFriend = topFriends[0];
+
+    if (bestFriend && bestFriend.total_top100_played > myCount) {
+      const diff = bestFriend.total_top100_played - myCount;
+      friendMessage = `${bestFriend.display_name} is ahead by ${diff} course${diff === 1 ? '' : 's'}.`;
+    } else {
+      friendMessage = "You're leading your friends – keep your edge.";
+    }
+  }
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 px-4 pb-6">
@@ -123,6 +180,68 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
             lastPlayedDate={lastPlayedDate}
             isOwnProfile={isOwnProfile}
           />
+
+          {/* Friends Chasing the Top 100 */}
+          {isOwnProfile && friendsSnapshot && friends.length > 0 && (
+            <div className="rounded-xl border border-border/60 bg-card/60 p-4">
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <div>
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    Friends chasing the Top 100
+                  </p>
+                  {friendMessage && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {friendMessage}
+                    </p>
+                  )}
+                </div>
+                <button
+                  onClick={() => navigate('/top100?tab=leaderboard')}
+                  className="text-xs font-medium text-primary-accent hover:text-primary-accent/80"
+                >
+                  View full leaderboard →
+                </button>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                {topFriends.map((f) => (
+                  <button
+                    key={f.friend_id}
+                    onClick={() => navigate(`/profile/${f.friend_id}?tab=top100`)}
+                    className="flex items-center justify-between rounded-lg px-3 py-2 hover:bg-muted/60 text-left transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      {f.profile_photo_url ? (
+                        <img
+                          src={f.profile_photo_url}
+                          alt={f.display_name}
+                          className="h-8 w-8 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold">
+                          {f.display_name?.charAt(0).toUpperCase() || '?'}
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-xs font-medium">{f.display_name}</p>
+                        <p className="text-[11px] text-muted-foreground">
+                          {f.home_club || 'No club set'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs font-semibold">
+                        {f.total_top100_played}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground">
+                        Top 100{f.total_top100_played === 1 ? '' : 's'}
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Milestones Carousel */}
           <Top100MilestonesCarousel

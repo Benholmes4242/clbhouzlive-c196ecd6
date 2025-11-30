@@ -9,13 +9,16 @@ interface SocialDockProps {
     user: { id: string; name: string; avatar?: string };
     caption?: string;
     courseName?: string;
+    courseId?: string;
     holeNumber?: number | null | undefined;
     isMuted: boolean;
+    isTop100Course?: boolean;
   };
   likesCount: number;
   commentsCount: number;
   hasLiked: boolean;
   isVisible: boolean;
+  isPlayedByUser?: boolean;
   onSwipeUp: () => void;
   onProfileClick: () => void;
   onCourseClick: () => void;
@@ -33,6 +36,7 @@ export const SocialDock: React.FC<SocialDockProps> = ({
   commentsCount,
   hasLiked,
   isVisible,
+  isPlayedByUser = false,
   onSwipeUp,
   onProfileClick,
   onCourseClick,
@@ -236,6 +240,20 @@ export const SocialDock: React.FC<SocialDockProps> = ({
             >
               {post.courseName}
             </button>
+          )}
+
+          {/* Not yet on journey label */}
+          {post.courseId && post.isTop100Course && !isPlayedByUser && (
+            <p className="mt-1 text-[11px] text-[rgba(247,158,27,0.9)]">
+              Not yet on your Top 100 journey.{' '}
+              <button
+                type="button"
+                onClick={onCourseClick}
+                className="underline underline-offset-2 hover:text-[rgba(247,158,27,1)]"
+              >
+                View this course
+              </button>
+            </p>
           )}
 
           {/* Fade + Show more when collapsed */}

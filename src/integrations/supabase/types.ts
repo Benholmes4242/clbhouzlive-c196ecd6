@@ -5599,6 +5599,10 @@ export type Database = {
           thumbnail_url: string
         }[]
       }
+      get_top100_friends_snapshot: {
+        Args: { target_user_id: string }
+        Returns: Json
+      }
       get_top100_leaderboard: {
         Args: {
           current_user_id?: string
@@ -5640,6 +5644,10 @@ export type Database = {
           created_at: string
           id: string
         }[]
+      }
+      get_user_top100_course_ids: {
+        Args: { target_user_id: string }
+        Returns: string[]
       }
       get_user_top100_courses_count: {
         Args: { user_id_param: string }
