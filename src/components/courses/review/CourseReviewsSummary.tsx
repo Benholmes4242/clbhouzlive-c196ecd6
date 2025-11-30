@@ -112,7 +112,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
           {/* LEFT: score + badge */}
           <div className="flex min-w-[140px] max-w-[40%] flex-col">
             {/* Number + /10 - centered above badge */}
-            <div className="flex items-baseline justify-center gap-1">
+            <div className="flex items-baseline justify-start gap-1">
               <span className="text-4xl font-semibold tracking-tight text-slate-900">
                 {averageRating.toFixed(1)}
               </span>
