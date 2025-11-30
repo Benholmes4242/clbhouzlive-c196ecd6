@@ -119,8 +119,8 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
               <span className="text-sm text-slate-500">/10</span>
             </div>
 
-            {/* Rating badge – aligned with "Based on" text */}
-            <RatingBadge tierData={tierData} className="mt-2 self-start" />
+            {/* Rating badge – centered with score */}
+            <RatingBadge tierData={tierData} className="mt-2 self-center" />
 
             {/* Based on X reviews */}
             <p className="mt-2 text-xs text-slate-500">
