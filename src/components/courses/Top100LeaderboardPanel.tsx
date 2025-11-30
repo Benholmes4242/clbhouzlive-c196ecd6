@@ -322,6 +322,16 @@ const Top100LeaderboardPanel = () => {
         </div>
       </div>
 
+      {/* User not ranked hint - only show for players view when entries exist but user not ranked */}
+      {viewType === 'players' && allEntries.length > 0 && !currentUserEntry && (
+        <div className="mb-3 rounded-xl border border-slate-800/80 bg-slate-950/80 px-3 py-2">
+          <p className="text-[12px] text-slate-300">
+            You're not on this leaderboard yet. Log more Top 100 rounds to climb
+            into the rankings.
+          </p>
+        </div>
+      )}
+
       {viewType === 'courses' ? (
         <div className="space-y-4">
           {/* Loading state */}
@@ -352,9 +362,27 @@ const Top100LeaderboardPanel = () => {
           {!isErrorCourses &&
             !isLoadingCourses &&
             allCourseEntries.length === 0 && (
-              <div className="text-center py-12 text-slate-400">
-                <p className="text-[12px]">No Top 100 course rounds logged here yet.</p>
-                <p className="text-[11px] mt-1">Be the first to put a famous track on the map.</p>
+              <div className="flex flex-col items-center gap-3 px-4 pb-6 pt-4 text-center">
+                <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-slate-100">
+                  🏆
+                </div>
+                <div className="space-y-1">
+                  <h2 className="text-base font-semibold text-slate-50">
+                    The leaderboard is warming up
+                  </h2>
+                  <p className="text-[13px] text-slate-400">
+                    As golfers log more Top 100 rounds, the course leaderboard will start
+                    to fill up. Play a Top 100 course and log your round to be one of the
+                    first on the board.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => navigate('/courses?tab=top100')}
+                  className="mt-1 inline-flex items-center justify-center rounded-full bg-slate-100 px-4 py-1.5 text-[13px] font-semibold text-slate-900 hover:bg-white"
+                >
+                  Find a Top 100 course to play
+                </button>
               </div>
             )}
 
@@ -466,6 +494,32 @@ const Top100LeaderboardPanel = () => {
                       className="h-9 animate-pulse rounded-xl bg-slate-900/70"
                     />
                   ))}
+                </div>
+              )}
+
+              {/* Empty state for players */}
+              {!isLoading && allEntries.length === 0 && (
+                <div className="flex flex-col items-center gap-3 px-4 pb-6 pt-4 text-center">
+                  <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-slate-100">
+                    🏆
+                  </div>
+                  <div className="space-y-1">
+                    <h2 className="text-base font-semibold text-slate-50">
+                      The leaderboard is warming up
+                    </h2>
+                    <p className="text-[13px] text-slate-400">
+                      As golfers log more Top 100 rounds, the global leaderboard will start
+                      to fill up. Play a Top 100 course and log your round to be one of the
+                      first on the board.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/courses?tab=top100')}
+                    className="mt-1 inline-flex items-center justify-center rounded-full bg-slate-100 px-4 py-1.5 text-[13px] font-semibold text-slate-900 hover:bg-white"
+                  >
+                    Find a Top 100 course to play
+                  </button>
                 </div>
               )}
 

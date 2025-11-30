@@ -80,8 +80,26 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
 
   if (!effectiveUserId) {
     return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground">Sign in to track your Top 100 progress</p>
+      <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-3 px-4 pb-6 pt-6 text-center">
+        <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-slate-100">
+          🏆
+        </div>
+        <div className="space-y-1">
+          <h2 className="text-base font-semibold text-slate-50">
+            Track your Top 100 journey
+          </h2>
+          <p className="text-[13px] text-slate-400">
+            Sign in to see which Top 100 courses you've already played and where
+            to go next.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => navigate('/auth')}
+          className="mt-1 inline-flex items-center justify-center rounded-full bg-slate-100 px-4 py-1.5 text-[13px] font-semibold text-slate-900 hover:bg-white"
+        >
+          Sign in to continue
+        </button>
       </div>
     );
   }
@@ -100,6 +118,61 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   }
 
   if (!data) return null;
+
+  // Zero Top 100 courses state
+  if (data.total_played_top100 === 0) {
+    return (
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-4 px-4 pb-6 pt-4">
+        {/* Hero "zero state" */}
+        <section
+          className="
+            rounded-3xl border border-slate-800/70 bg-slate-950/80
+            px-5 py-5 shadow-[0_22px_70px_rgba(15,23,42,0.85)]
+          "
+        >
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+            Top 100 journey
+          </p>
+          <h2 className="mt-1 text-base font-semibold text-slate-50">
+            Start your Top 100 adventure
+          </h2>
+          <p className="mt-1 text-[13px] text-slate-400">
+            You haven't logged any Top 100 rounds yet. Once you tick off your
+            first course, we'll track your progress, milestones, and rankings
+            right here.
+          </p>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => navigate('/courses?tab=top100')}
+              className="inline-flex items-center justify-center rounded-full bg-slate-100 px-4 py-1.5 text-[13px] font-semibold text-slate-900 hover:bg-white"
+            >
+              Explore Top 100 courses
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/clubhouse')}
+              className="inline-flex items-center justify-center rounded-full border border-slate-700/80 bg-slate-950 px-4 py-1.5 text-[13px] font-medium text-slate-200 hover:border-slate-500 hover:text-slate-50"
+            >
+              See how others are playing
+            </button>
+          </div>
+        </section>
+
+        {/* Optional: small "How it works" block */}
+        <section className="rounded-2xl border border-slate-800/70 bg-slate-950/70 px-4 py-3.5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+            How this works
+          </p>
+          <p className="mt-1 text-[13px] text-slate-300">
+            Play any course in a Top 100 list, log your round, and we'll
+            automatically update your counts, titles, and regional badges.
+          </p>
+        </section>
+      </div>
+    );
+  }
 
   const lastPlayedDate = data.recent_rounds[0]?.played_at || null;
   const clubTitle = getTop100Title(data.total_played_top100);
@@ -323,7 +396,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
             </div>
 
             {/* Right Column: Friends */}
-            {isOwnProfile && friendsSnapshot && friends.length > 0 && (
+            {isOwnProfile && friendsSnapshot && (
               <aside className="w-full sm:w-[280px]">
                 <section className="mt-2 rounded-2xl border border-slate-800/70 bg-slate-950/70 px-4 py-3.5 shadow-[0_18px_50px_rgba(15,23,42,0.7)]">
                   <div className="mb-2 flex items-baseline justify-between gap-2">
@@ -331,9 +404,15 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
                       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
                         Friends chasing the Top 100
                       </p>
-                      {friendMessage && (
-                        <p className="mt-0.5 text-[12px] text-slate-300">
-                          {friendMessage}
+                      {friends.length > 0 ? (
+                        friendMessage && (
+                          <p className="mt-0.5 text-[12px] text-slate-300">
+                            {friendMessage}
+                          </p>
+                        )
+                      ) : (
+                        <p className="mt-0.5 text-[12px] text-slate-400">
+                          When friends log Top 100 rounds, you'll see how you compare here.
                         </p>
                       )}
                     </div>
@@ -347,8 +426,9 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
                     </button>
                   </div>
 
-                  <div className="divide-y divide-slate-800/70">
-                    {topFriends.map((f) => (
+                  {friends.length > 0 ? (
+                    <div className="divide-y divide-slate-800/70">
+                      {topFriends.map((f) => (
                       <button
                         key={f.friend_id}
                         type="button"
@@ -388,7 +468,15 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
                         </div>
                       </button>
                     ))}
-                  </div>
+                    </div>
+                  ) : (
+                    <div className="mt-1 rounded-xl border border-dashed border-slate-800/80 bg-slate-950/60 px-3 py-2.5">
+                      <p className="text-[11px] text-slate-400">
+                        Add friends and invite them to log their Top 100 rounds to unlock
+                        this view.
+                      </p>
+                    </div>
+                  )}
                 </section>
               </aside>
             )}
