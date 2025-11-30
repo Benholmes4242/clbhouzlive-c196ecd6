@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useTop100ListSummaries } from '@/hooks/useTop100ListSummaries';
 import { useFriendsOnTop100Journey } from '@/hooks/useFriendsOnTop100Journey';
-import { Top100RecentRoundsFeed } from './Top100RecentRoundsFeed';
 import SquircleImage from '@/components/ui/SquircleImage';
-import { Search, Settings } from 'lucide-react';
+import { Settings } from 'lucide-react';
+import Top100CourseListSection from './Top100CourseListSection';
 
 const Top100CoursesHubPanel = () => {
   const { user } = useSupabaseSession();
@@ -23,7 +23,6 @@ const Top100CoursesHubPanel = () => {
   const regionsCount = progress?.regions_count || 0;
   const ringLabel = progress?.prestige_label;
   const clubTitle = totalPlayed >= 100 ? '100 Century Club' : totalPlayed >= 50 ? '50 Club' : totalPlayed >= 20 ? '20 Club' : null;
-  const recentRounds = progress?.recent_rounds || [];
 
   // Calculate lists count from summaries (only lists where user has played at least one course)
   const listsCount = listSummaries.filter(list => list.played_count > 0).length;
@@ -38,10 +37,6 @@ const Top100CoursesHubPanel = () => {
 
   const handleOpenTop100Leaderboard = () => {
     navigate('/top100?tab=leaderboard');
-  };
-
-  const handleOpenRecentRounds = () => {
-    navigate('/top100?tab=my-progress');
   };
 
   const hasFriends = friends && friends.length > 0;
@@ -157,14 +152,14 @@ const Top100CoursesHubPanel = () => {
       {user && (
         <section>
           <div className="mb-2 flex items-center justify-between">
-            <h3 className="text-[13px] font-semibold text-slate-200">
+            <h3 className="text-[13px] font-semibold text-slate-900">
               Friends on the Top 100 journey
             </h3>
             {hasFriends && (
               <button
                 type="button"
                 onClick={handleOpenTop100Leaderboard}
-                className="text-[11px] font-medium text-amber-300"
+                className="text-[11px] font-medium text-primary-accent"
               >
                 View leaderboard →
               </button>
@@ -188,7 +183,7 @@ const Top100CoursesHubPanel = () => {
                     key={f.user_id}
                     type="button"
                     onClick={() => navigate(`/profile/${f.profile.username}?tab=top100`)}
-                    className="flex min-w-[110px] flex-col items-center rounded-2xl border border-slate-800/80 bg-slate-950/80 px-3 py-3 text-[11px] text-slate-200"
+                    className="flex min-w-[110px] flex-col items-center rounded-2xl border border-slate-100 bg-white shadow-sm px-3 py-3 text-[11px]"
                   >
                     {f.profile.profile_photo_url ? (
                       <SquircleImage
@@ -198,13 +193,13 @@ const Top100CoursesHubPanel = () => {
                         className="h-10 w-10 rounded-full object-cover"
                       />
                     ) : (
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-800 text-[14px]">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-700 text-[14px]">
                         {initial}
                       </div>
                     )}
-                    <span className="mt-2 line-clamp-1 font-medium">{displayName}</span>
+                    <span className="mt-2 line-clamp-1 font-medium text-slate-900">{displayName}</span>
                     {typeof f.top100CoursesPlayed === 'number' && (
-                      <span className="text-slate-400">
+                      <span className="text-slate-500">
                         {f.top100CoursesPlayed} course{f.top100CoursesPlayed === 1 ? '' : 's'}
                       </span>
                     )}
@@ -216,22 +211,20 @@ const Top100CoursesHubPanel = () => {
         </section>
       )}
 
-      {/* 4. Search bar */}
-      <section>
-        <div className="relative">
+      {/* 4. Search bar + Filters + Course List */}
+      <section className="space-y-4">
+        <div className="rounded-2xl bg-white shadow-sm border border-slate-100 px-3 py-2 flex items-center gap-2">
+          <span className="text-slate-400 text-sm">🔍</span>
           <input
-            type="search"
+            type="text"
+            placeholder="Search Top 100 courses"
+            className="flex-1 bg-transparent text-[14px] text-slate-800 placeholder:text-slate-400 focus:outline-none"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search Top 100 courses"
-            className="w-full rounded-2xl border border-slate-800/80 bg-slate-950/80 px-10 py-2.5 text-[13px] text-slate-100 placeholder:text-slate-500 shadow-[0_10px_25px_rgba(0,0,0,0.35)] focus:outline-none focus:ring-1 focus:ring-amber-400"
           />
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[16px] text-slate-500">
-            🔍
-          </span>
           <button
             type="button"
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
+            className="text-slate-400"
             onClick={() => {
               // Future: open filters
             }}
@@ -239,48 +232,9 @@ const Top100CoursesHubPanel = () => {
             <Settings className="h-4 w-4" />
           </button>
         </div>
+
+        <Top100CourseListSection searchQuery={searchQuery} />
       </section>
-
-      {/* 5. Recent Top 100 rounds */}
-      {user && recentRounds.length > 0 && (
-        <section>
-          <div className="mb-2 flex items-center justify-between">
-            <h3 className="text-[13px] font-semibold text-slate-200">
-              Recent Top 100 rounds
-            </h3>
-            <button
-              type="button"
-              onClick={handleOpenRecentRounds}
-              className="text-[11px] font-medium text-amber-300"
-            >
-              View all →
-            </button>
-          </div>
-
-          <Top100RecentRoundsFeed 
-            rounds={recentRounds} 
-            isOwnProfile={true}
-            maxDisplay={5}
-          />
-        </section>
-      )}
-
-      {/* Empty state for recent rounds when user has none */}
-      {user && recentRounds.length === 0 && (
-        <section>
-          <h3 className="mb-2 text-[13px] font-semibold text-slate-200">
-            Recent Top 100 rounds
-          </h3>
-          <div className="text-center py-8 px-4 rounded-xl bg-slate-950/50 border border-slate-800/60">
-            <p className="text-sm text-slate-400">
-              You haven&apos;t logged any rounds at Top 100 courses yet.
-            </p>
-            <p className="text-xs text-slate-500 mt-1">
-              Play a course from one of the lists above to get started.
-            </p>
-          </div>
-        </section>
-      )}
     </div>
   );
 };
