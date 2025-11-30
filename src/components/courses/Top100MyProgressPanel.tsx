@@ -28,6 +28,35 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   const { toast } = useToast();
   const prevTotalRef = useRef<number | null>(null);
 
+  // Milestone "Share to Clubhouse" logic - MUST be before early returns
+  useEffect(() => {
+    if (!data || !isOwnProfile) return;
+
+    const current = data.total_played_top100;
+    const prev = prevTotalRef.current ?? 0;
+
+    const thresholds = [20, 50, 100];
+    const justHit = thresholds.find((t) => prev < t && current >= t);
+
+    if (justHit) {
+      toast({
+        title: `Top 100 milestone unlocked – ${justHit} Club 🎉`,
+        description: 'Share your journey with the Clubhouse community?',
+        action: (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => navigate('/create-moment')}
+          >
+            Share to Clubhouse
+          </Button>
+        ),
+      });
+    }
+
+    prevTotalRef.current = current;
+  }, [data?.total_played_top100, isOwnProfile, toast, navigate]);
+
   // Calculate badge props for ProfileBadgeStrip
   const badgeProps = React.useMemo(() => {
     if (!data) return null;
@@ -71,35 +100,6 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   if (!data) return null;
 
   const lastPlayedDate = data.recent_rounds[0]?.played_at || null;
-
-  // Milestone "Share to Clubhouse" logic
-  useEffect(() => {
-    if (!data || !isOwnProfile) return;
-
-    const current = data.total_played_top100;
-    const prev = prevTotalRef.current ?? 0;
-
-    const thresholds = [20, 50, 100];
-    const justHit = thresholds.find((t) => prev < t && current >= t);
-
-    if (justHit) {
-      toast({
-        title: `Top 100 milestone unlocked – ${justHit} Club 🎉`,
-        description: 'Share your journey with the Clubhouse community?',
-        action: (
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => navigate('/create-moment')}
-          >
-            Share to Clubhouse
-          </Button>
-        ),
-      });
-    }
-
-    prevTotalRef.current = current;
-  }, [data?.total_played_top100, isOwnProfile, toast, navigate]);
 
   // Friends comparison logic
   const myCount = data?.total_played_top100 ?? 0;
