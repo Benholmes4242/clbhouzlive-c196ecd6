@@ -110,19 +110,17 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
       <div className="mb-5">
         <div className="mt-3 flex w-full items-start gap-6">
           {/* LEFT: score + badge */}
-          <div className="flex min-w-[140px] max-w-[40%] flex-col items-start">
+          <div className="flex min-w-[140px] max-w-[40%] flex-col">
             {/* Number + /10 - centered above badge */}
-            <div className="flex w-full items-baseline justify-center gap-1">
+            <div className="flex items-baseline justify-center gap-1">
               <span className="text-4xl font-semibold tracking-tight text-slate-900">
                 {averageRating.toFixed(1)}
               </span>
               <span className="text-sm text-slate-500">/10</span>
             </div>
 
-            {/* Rating badge – left aligned */}
-            <div className="mt-2">
-              <RatingBadge tierData={tierData} />
-            </div>
+            {/* Rating badge – left aligned with no wrapper padding */}
+            <RatingBadge tierData={tierData} className="mt-2" />
 
             {/* Based on X reviews */}
             <p className="mt-2 text-xs text-slate-500">
