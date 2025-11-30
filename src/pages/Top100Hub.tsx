@@ -117,24 +117,27 @@ const Top100Hub = () => {
 
             <TabsContent value="courses" className="mt-0">
               {/* Progress Chip */}
-              {session && progress && progress.total_played_top100 > 0 && (
-                <div className="flex justify-center mb-6">
-                  <button
-                    onClick={() => setActiveTab('my-progress')}
-                    className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-4 py-2 text-sm hover:border-primary-accent/60 hover:bg-muted/50 transition-all"
-                  >
-                    <Trophy className="h-4 w-4 text-primary-accent" />
-                    <span className="font-medium">
-                      You've played {progress.total_played_top100} Top 100 course{progress.total_played_top100 === 1 ? '' : 's'}
-                    </span>
-    {progress.club_ring && progress.club_ring !== 'none' && (
-      <span className="text-muted-foreground">
-        · {progress.club_label}
-      </span>
-    )}
-                  </button>
-                </div>
-              )}
+              {session && progress && (progress.total_top100_rated ?? progress.total_played_top100 ?? 0) > 0 && (() => {
+                const totalRated = progress.total_top100_rated ?? progress.total_played_top100 ?? 0;
+                return (
+                  <div className="flex justify-center mb-6">
+                    <button
+                      onClick={() => setActiveTab('my-progress')}
+                      className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-4 py-2 text-sm hover:border-primary-accent/60 hover:bg-muted/50 transition-all"
+                    >
+                      <Trophy className="h-4 w-4 text-primary-accent" />
+                      <span className="font-medium">
+                        You've rated {totalRated} Top 100 course{totalRated === 1 ? '' : 's'}
+                      </span>
+                      {progress.club_ring && progress.club_ring !== 'none' && (
+                        <span className="text-muted-foreground">
+                          · {progress.club_label}
+                        </span>
+                      )}
+                    </button>
+                  </div>
+                );
+              })()}
               
               {/* View Mode Toggle */}
               <div className="flex justify-center mb-6">

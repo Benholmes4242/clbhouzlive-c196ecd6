@@ -57,7 +57,7 @@ export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
   }
 
   const club = getTop100Club(data.total_top100_rated ?? data.total_played_top100);
-  const total = data.total_played_top100;
+  const totalRated = data.total_top100_rated ?? data.total_played_top100;
   const regions = data.regions_count;
 
   // Helper to get a list by slug (we only care about the 4 hero lists)
@@ -79,7 +79,7 @@ export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
           Your Top 100 Progress
         </h2>
         <p className="text-base text-muted-foreground">
-          You've played {total} Top 100 course{total === 1 ? '' : 's'} across{' '}
+          You've rated {totalRated} Top 100 course{totalRated === 1 ? '' : 's'} across{' '}
           {regions} region{regions === 1 ? '' : 's'}.
         </p>
         
