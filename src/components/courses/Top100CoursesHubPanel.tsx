@@ -290,14 +290,14 @@ const Top100CoursesHubPanel = () => {
         </div>
 
         {/* CTA */}
-        <button
-          type="button"
+        <Button
+          variant="primary"
           onClick={handleOpenTop100Journey}
-          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-slate-100 text-slate-950 text-[14px] font-semibold py-2.5 shadow-[0_4px_12px_rgba(0,0,0,0.12)] active:scale-[0.98] transition hover:bg-slate-50 hover:shadow-[0_6px_16px_rgba(0,0,0,0.15)]"
+          className="mt-4 w-full"
         >
           {user ? 'Open your Top 100 Journey' : 'Sign in to join the Top 100 Club'}
           <span className="text-[16px]">↗</span>
-        </button>
+        </Button>
       </section>
 
       {/* 2. Region progress strip */}
