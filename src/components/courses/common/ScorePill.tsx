@@ -19,7 +19,7 @@ export const ScorePill: React.FC<ScorePillProps> = ({ score, size = 'md' }) => {
       className={`inline-flex items-center ${baseClasses} ${tierData.bg} ${tierData.border} ${tierData.text}`}
       style={{ borderRadius: 'var(--radius)' }}
     >
-      {score.toFixed(1)}
+      {score === 10 ? '10' : score.toFixed(1)}
     </span>
   );
 };
