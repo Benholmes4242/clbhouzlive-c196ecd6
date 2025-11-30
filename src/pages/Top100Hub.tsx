@@ -127,11 +127,11 @@ const Top100Hub = () => {
                     <span className="font-medium">
                       You've played {progress.total_played_top100} Top 100 course{progress.total_played_top100 === 1 ? '' : 's'}
                     </span>
-                    {progress.prestige_ring && (
-                      <span className="text-muted-foreground">
-                        · {getRingLabel(progress.prestige_ring)}
-                      </span>
-                    )}
+    {progress.club_ring && progress.club_ring !== 'none' && (
+      <span className="text-muted-foreground">
+        · {progress.club_label}
+      </span>
+    )}
                   </button>
                 </div>
               )}

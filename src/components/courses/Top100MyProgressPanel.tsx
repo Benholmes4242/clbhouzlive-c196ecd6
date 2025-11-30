@@ -175,8 +175,8 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
             displayName={session?.user?.user_metadata?.full_name}
             totalPlayed={data.total_played_top100}
             regionsCount={data.regions_count}
-            prestigeRing={data.prestige_ring}
-            prestigeLabel={data.prestige_label}
+            clubRing={data.club_ring || 'none'}
+            clubLabel={data.club_label || null}
             lastPlayedDate={lastPlayedDate}
             isOwnProfile={isOwnProfile}
           />

@@ -4,7 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserCourseSummary } from '@/hooks/useUserCourseSummary';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { useRecentAchievements } from '@/hooks/useRecentAchievements';
-import { useUserXPOverview } from '@/hooks/useUserXPOverview';
+// XP system disabled - import { useUserXPOverview } from '@/hooks/useUserXPOverview';
 import { useCurrentSeason } from '@/hooks/useCurrentSeason';
 import { useUserSeasonXP } from '@/hooks/useUserSeasonXP';
 import { useSeasonLeaderboard } from '@/hooks/useSeasonLeaderboard';
@@ -82,7 +82,7 @@ const AchievementsHub = () => {
   // Fetch all data
   const { data: achievements } = useUserAchievements(userId);
   const { data: recentAchievements } = useRecentAchievements(userId, 10);
-  const xpOverview = useUserXPOverview(userId);
+  // XP system disabled - const xpOverview = useUserXPOverview(userId);
   const { data: currentSeason } = useCurrentSeason();
   const { data: seasonXP } = useUserSeasonXP(userId, currentSeason?.id);
   const { data: leaderboard = [] } = useSeasonLeaderboard(currentSeason?.id, 20);
@@ -171,74 +171,7 @@ const AchievementsHub = () => {
               </div>
             </div>
 
-            {/* Right: XP & Level */}
-            {xpOverview && (
-              <div className="flex-1 space-y-4">
-                {/* Global XP & Level */}
-                <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 shadow-lg">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <div className="text-sm text-muted-foreground mb-1">Global Level</div>
-                      <div className="text-2xl font-bold" style={{ color: xpOverview.currentLevelColor }}>
-                        {xpOverview.currentLevel} Ring
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm text-muted-foreground mb-1">Total XP</div>
-                      <div className="text-2xl font-bold">{xpOverview.totalXP.toLocaleString()}</div>
-                    </div>
-                  </div>
-
-                  {xpOverview.nextLevel && (
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Progress to {xpOverview.nextLevel.name}</span>
-                        <span className="font-medium">{xpOverview.nextLevel.remainingXP.toLocaleString()} XP to go</span>
-                      </div>
-                      <Progress value={xpOverview.nextLevel.progressPercent} className="h-3" />
-                    </div>
-                  )}
-
-                  {!xpOverview.nextLevel && (
-                    <div className="text-center text-sm text-muted-foreground">
-                      🏆 Maximum level reached!
-                    </div>
-                  )}
-                </div>
-
-                {/* Season XP & Level */}
-                {currentSeason && (
-                  <div className="bg-gradient-to-br from-primary/10 via-card/50 to-card/50 backdrop-blur-sm border border-primary/30 rounded-2xl p-6 shadow-lg">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <div className="text-xs text-primary uppercase font-semibold mb-1">Current Season</div>
-                        <div className="text-lg font-bold">{currentSeason.name}</div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {getSeasonLevel(seasonXP?.total_xp || 0)}
-                        </div>
-                      </div>
-                      {seasonXP?.season_rank && (
-                        <div className="text-right">
-                          <div className="text-2xl font-bold text-primary">#{seasonXP.season_rank}</div>
-                          <div className="text-xs text-muted-foreground">Season Rank</div>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Season XP</span>
-                        <span className="font-medium">{(seasonXP?.total_xp || 0).toLocaleString()} XP</span>
-                      </div>
-                      <Progress value={Math.min(100, ((seasonXP?.total_xp || 0) / 2000) * 100)} className="h-3" />
-                      <p className="text-xs text-muted-foreground">
-                        Keep earning XP to climb the seasonal leaderboard!
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
+            {/* XP system disabled - no XP display on Achievements Hub */}
           </div>
 
           <p className="text-center md:text-left text-muted-foreground mt-6 max-w-2xl">
