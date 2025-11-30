@@ -111,7 +111,7 @@ const ProfileReviewsStrip: React.FC<Props> = ({ userId, username, displayName })
                 </div>
                 <div className="flex items-center gap-1 text-meta text-foreground">
                   <Star className="h-3 w-3 fill-current" />
-                  <span>{rating.toFixed(1)}/10</span>
+                  <span>{rating.toFixed(1)}</span>
                 </div>
               </div>
 

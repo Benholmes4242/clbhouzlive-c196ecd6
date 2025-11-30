@@ -51,7 +51,7 @@ const CourseDetailRatingSection = ({
         <div className="flex items-center gap-4 mb-4">
           <div className="flex items-center gap-2">
             <ClubhouseLogo size="md" showTooltip />
-            <span className="text-2xl font-bold">{ratingStats.average_rating}/10</span>
+            <span className="text-2xl font-bold">{ratingStats.average_rating}</span>
           </div>
           <div className="flex items-center gap-1 text-muted-foreground">
             <Users className="h-4 w-4" />

@@ -92,7 +92,7 @@ const OptimizedProfileTabs: React.FC<OptimizedProfileTabsProps> = ({
               <div className="bg-card rounded-lg border p-6">
                 <h3 className="text-lg font-semibold mb-2">Average Rating</h3>
                 <p className="text-3xl font-bold text-primary">
-                  {profileData.averageRating ? `${profileData.averageRating}/10` : 'N/A'}
+                  {profileData.averageRating ? profileData.averageRating : 'N/A'}
                 </p>
               </div>
             </div>

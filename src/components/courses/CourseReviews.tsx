@@ -169,7 +169,7 @@ const CourseReviews = ({ courseId, courseName, currentUser }: CourseReviewsProps
                             </span>
                             <Badge variant="secondary" className="flex items-center gap-1">
                               <Star className="h-3 w-3 fill-current" />
-                              {review.rating}/10
+                              {review.rating}
                             </Badge>
                             {isUserReview(review) && (
                               <Badge variant="outline" className="text-xs">

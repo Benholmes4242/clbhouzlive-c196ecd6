@@ -78,7 +78,7 @@ const RatingComparisonCard: React.FC<RatingComparisonProps> = ({ userRating, agg
             <div className="flex items-baseline justify-between text-base">
               <span className="font-medium">{row.label}</span>
               <span className="text-sm text-slate-500">
-                You: {formatScore(row.you)}/10 · Community: {formatScore(row.community)}/10
+                You: {formatScore(row.you)} · Community: {formatScore(row.community)}
               </span>
             </div>
 

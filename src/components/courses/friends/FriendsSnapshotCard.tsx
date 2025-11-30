@@ -76,7 +76,7 @@ const FriendsSnapshotCard: React.FC<FriendsSnapshotCardProps> = ({
               Average rating
             </div>
             <div className="mt-1 font-medium text-foreground">
-              {averageRating ? `${averageRating.toFixed(1)}/10` : "—"}
+              {averageRating ? averageRating.toFixed(1) : "—"}
             </div>
           </div>
 
