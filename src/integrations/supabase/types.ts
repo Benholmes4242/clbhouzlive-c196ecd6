@@ -5539,6 +5539,16 @@ export type Database = {
         Args: { target_user_id: string }
         Returns: Json
       }
+      get_top100_leaderboard: {
+        Args: {
+          current_user_id?: string
+          limit_param?: number
+          offset_param?: number
+          scope_param?: string
+          time_range_param?: string
+        }
+        Returns: Json
+      }
       get_user_recent_achievements: {
         Args: { limit_param?: number; user_id_param: string }
         Returns: {
