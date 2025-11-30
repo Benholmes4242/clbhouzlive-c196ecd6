@@ -187,6 +187,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         <div className="mt-6 space-y-5">
           {categories.map((cat) => {
             const score = cat.score || 0;
+            const categoryTier = getScoreTier(score);
 
             return (
               <div key={cat.id} className="space-y-1.5">
@@ -201,10 +202,10 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                   </span>
                 </div>
 
-                {/* Row 2: Full-width bar */}
-                <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                {/* Row 2: Full-width bar with rating color */}
+                <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-slate-800 rounded-full transition-all duration-300 ease-out"
+                    className={`h-full rounded-full ${categoryTier.barFill} transition-all duration-300 ease-out`}
                     style={{ width: `${(score / 10) * 100}%` }}
                   />
                 </div>
