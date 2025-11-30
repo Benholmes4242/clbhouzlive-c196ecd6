@@ -58,7 +58,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
           <span className="mt-[2px] inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-50">
             <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
           </span>
-          <p className="text-xs text-emerald-600">
+          <p className="text-sm text-emerald-600">
             Your score matches the community consensus.
           </p>
         </div>
@@ -70,7 +70,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
           <span className="mt-[2px] inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-50">
             <ArrowUpIcon className="h-3.5 w-3.5 text-emerald-600" />
           </span>
-          <p className="text-xs text-emerald-600">
+          <p className="text-sm text-emerald-600">
             You rated this course {absDiff.toFixed(1)} point{absDiff === 1.0 ? '' : 's'} higher than
             the community.
           </p>
@@ -83,7 +83,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
           <span className="mt-[2px] inline-flex h-5 w-5 items-center justify-center rounded-full bg-rose-50">
             <ArrowDownIcon className="h-3.5 w-3.5 text-rose-500" />
           </span>
-          <p className="text-xs text-rose-600">
+          <p className="text-sm text-rose-600">
             You rated this course {absDiff.toFixed(1)} point{absDiff === 1.0 ? '' : 's'} lower than
             the community.
           </p>
@@ -112,7 +112,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
           <div>
             <div className="mt-0.5 flex items-center gap-2">
               <ClubhouseLogo size="md" />
-              <span className="text-[28px] font-semibold text-slate-900 leading-none">
+              <span className="text-[34px] font-semibold text-slate-900 leading-none">
                 {averageRating.toFixed(1)}
               </span>
               <span className="text-xs text-slate-500 ml-1">/10</span>
@@ -120,122 +120,131 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
 
             <div className="mt-2 mb-1 inline-flex items-center">
               <span 
-                className={`rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] ${tierData.bg} ${tierData.text}`}
+                className={`rounded-full px-3 py-[6px] text-xs font-semibold uppercase tracking-[0.08em] ${tierData.bg} ${tierData.text}`}
               >
                 {tierData.label}
               </span>
             </div>
 
-            <p className="mt-2 text-[12px] text-slate-600">
+            <p className="mt-2 text-sm text-slate-600">
               Based on {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
             </p>
           </div>
 
-          {/* RIGHT: rating distribution */}
-          <div className="space-y-1.5">
+          {/* RIGHT: rating distribution - TripAdvisor style */}
+          <div className="grid grid-cols-[auto,minmax(0,1fr)] gap-x-4 gap-y-2 items-center">
             {distributionItems.map((item) => {
               const percentage = (item.count / maxCount) * 100;
               return (
-                <div key={item.tier.tier} className="flex items-center gap-3">
-                  <span className="w-20 text-[11px] text-slate-500">
+                <React.Fragment key={item.tier.tier}>
+                  {/* Left column: label, right-aligned */}
+                  <div className="pr-1 text-sm text-slate-600 text-right">
                     {item.tier.label}
-                  </span>
-                  <div className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                    <div
-                      className={`h-full rounded-full ${item.tier.barFill} transition-all duration-300`}
-                      style={{ width: `${percentage}%` }}
-                    />
                   </div>
-                  <span className="w-4 text-right text-[11px] text-slate-500">
-                    {item.count}
-                  </span>
-                </div>
+
+                  {/* Right column: bar + count */}
+                  <div className="flex items-center gap-3">
+                    <div className="relative h-2.5 flex-1 overflow-hidden rounded-full bg-slate-100">
+                      <div
+                        className={`h-full rounded-full ${item.tier.barFill} transition-all duration-300`}
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                    <span className="min-w-[32px] text-sm text-slate-500 text-right">
+                      {item.count}
+                    </span>
+                  </div>
+                </React.Fragment>
               );
             })}
           </div>
         </div>
       </div>
 
-      {/* Category averages - 2x2 grid */}
+      {/* Category averages - 2x2 grid with labels above bars */}
       {(categoryAverages.design || categoryAverages.condition || categoryAverages.clubhouse || categoryAverages.facilities) && (
-        <div className="border-t border-slate-200/60 pt-3 mb-4">
-          <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+        <div className="border-t border-slate-200/60 pt-3 mt-3 mb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
             {/* Design */}
             {categoryAverages.design !== null && (
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-slate-500">
-                  Design
-                </span>
-                <div className="flex items-center gap-2">
-                  <div className="w-12 h-1 bg-slate-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-slate-600 transition-all"
-                      style={{ width: `${(categoryAverages.design / 10) * 100}%` }}
-                    />
-                  </div>
-                  <span className="text-xs font-semibold text-slate-900 w-6 text-right">
-                    {formatScore(categoryAverages.design)}
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-baseline justify-between">
+                  <span className="text-sm font-medium text-slate-700">
+                    Design
                   </span>
+                  <span className="text-sm font-semibold text-slate-900">
+                    {formatScore(categoryAverages.design)}
+                    <span className="ml-0.5 text-xs text-slate-500">/10</span>
+                  </span>
+                </div>
+                <div className="relative mt-0.5 h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className="h-full rounded-full bg-slate-900/80 transition-all"
+                    style={{ width: `${(categoryAverages.design / 10) * 100}%` }}
+                  />
                 </div>
               </div>
             )}
 
             {/* Condition */}
             {categoryAverages.condition !== null && (
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-slate-500">
-                  Condition
-                </span>
-                <div className="flex items-center gap-2">
-                  <div className="w-12 h-1 bg-slate-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-slate-600 transition-all"
-                      style={{ width: `${(categoryAverages.condition / 10) * 100}%` }}
-                    />
-                  </div>
-                  <span className="text-xs font-semibold text-slate-900 w-6 text-right">
-                    {formatScore(categoryAverages.condition)}
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-baseline justify-between">
+                  <span className="text-sm font-medium text-slate-700">
+                    Condition
                   </span>
+                  <span className="text-sm font-semibold text-slate-900">
+                    {formatScore(categoryAverages.condition)}
+                    <span className="ml-0.5 text-xs text-slate-500">/10</span>
+                  </span>
+                </div>
+                <div className="relative mt-0.5 h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className="h-full rounded-full bg-slate-900/80 transition-all"
+                    style={{ width: `${(categoryAverages.condition / 10) * 100}%` }}
+                  />
                 </div>
               </div>
             )}
 
             {/* Clubhouse */}
             {categoryAverages.clubhouse !== null && (
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-slate-500">
-                  Clubhouse
-                </span>
-                <div className="flex items-center gap-2">
-                  <div className="w-12 h-1 bg-slate-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-slate-600 transition-all"
-                      style={{ width: `${(categoryAverages.clubhouse / 10) * 100}%` }}
-                    />
-                  </div>
-                  <span className="text-xs font-semibold text-slate-900 w-6 text-right">
-                    {formatScore(categoryAverages.clubhouse)}
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-baseline justify-between">
+                  <span className="text-sm font-medium text-slate-700">
+                    Clubhouse
                   </span>
+                  <span className="text-sm font-semibold text-slate-900">
+                    {formatScore(categoryAverages.clubhouse)}
+                    <span className="ml-0.5 text-xs text-slate-500">/10</span>
+                  </span>
+                </div>
+                <div className="relative mt-0.5 h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className="h-full rounded-full bg-slate-900/80 transition-all"
+                    style={{ width: `${(categoryAverages.clubhouse / 10) * 100}%` }}
+                  />
                 </div>
               </div>
             )}
 
             {/* Facilities */}
             {categoryAverages.facilities !== null && (
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-slate-500">
-                  Facilities
-                </span>
-                <div className="flex items-center gap-2">
-                  <div className="w-12 h-1 bg-slate-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-slate-600 transition-all"
-                      style={{ width: `${(categoryAverages.facilities / 10) * 100}%` }}
-                    />
-                  </div>
-                  <span className="text-xs font-semibold text-slate-900 w-6 text-right">
-                    {formatScore(categoryAverages.facilities)}
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-baseline justify-between">
+                  <span className="text-sm font-medium text-slate-700">
+                    Facilities
                   </span>
+                  <span className="text-sm font-semibold text-slate-900">
+                    {formatScore(categoryAverages.facilities)}
+                    <span className="ml-0.5 text-xs text-slate-500">/10</span>
+                  </span>
+                </div>
+                <div className="relative mt-0.5 h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className="h-full rounded-full bg-slate-900/80 transition-all"
+                    style={{ width: `${(categoryAverages.facilities / 10) * 100}%` }}
+                  />
                 </div>
               </div>
             )}
