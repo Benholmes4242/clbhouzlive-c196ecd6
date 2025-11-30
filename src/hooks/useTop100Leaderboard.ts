@@ -17,12 +17,9 @@ export type Top100LeaderboardEntry = {
   avatar_url: string | null;
   home_club: string | null;
   country: string | null;
-  country_code?: string | null;
-  prestige_ring?: string | null;
   total_top100_played: number;
   lists_completed: string[];
   milestone_label: string | null;
-  is_current_user?: boolean;
 };
 
 export type Top100LeaderboardResponse = {

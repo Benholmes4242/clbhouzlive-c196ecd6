@@ -313,8 +313,6 @@ const GlobalTop100 = () => {
     setShowSortSheet(false);
   };
 
-  const selectedListLabel = listOptions.find((o) => o.value === selectedList)?.label || null;
-
   return (
     <div className="w-full space-y-4">
       {/* Top 100 Club Callout */}
@@ -323,52 +321,28 @@ const GlobalTop100 = () => {
       {/* Divider */}
       <div className="mt-4 mb-3 h-px w-full bg-slate-200/70" />
 
-      {/* Header */}
-      <section className="mb-4 flex flex-col gap-3 px-4 sm:px-0">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-            Top 100 explorer
-          </p>
-          <div className="mt-1 flex flex-wrap items-baseline gap-2">
-            <h1 className="text-lg font-semibold text-slate-50 sm:text-xl">
-              Top 100 golf courses
-            </h1>
-            {selectedListLabel && (
-              <span className="rounded-full border border-slate-800/80 bg-slate-950/70 px-2.5 py-1 text-[11px] font-medium text-slate-300">
-                {selectedListLabel}
-              </span>
-            )}
-          </div>
-          <p className="mt-1 text-[13px] text-slate-400 max-w-2xl">
-            Browse every course in the Top 100 lists, filter by region, and track
-            which ones you've already played.
-          </p>
-        </div>
+      {/* Search */}
+      <div className="relative max-w-xl mx-auto">
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search within this Top 100 list"
+          className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-xl shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--slate-secondary)]/70 focus-visible:border-[color:var(--slate-secondary)] transition-shadow text-base placeholder:text-[15px]"
+        />
+        {searchTerm && (
+          <button
+            type="button"
+            onClick={() => setSearchTerm('')}
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
+      </div>
 
-        {/* Filters bar */}
-        <div className="mt-1 flex flex-col gap-3">
-          {/* Search */}
-          <div className="relative max-w-xl">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search within this Top 100 list"
-              className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-xl shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--slate-secondary)]/70 focus-visible:border-[color:var(--slate-secondary)] transition-shadow text-base placeholder:text-[15px]"
-            />
-            {searchTerm && (
-              <button
-                type="button"
-                onClick={() => setSearchTerm('')}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
-
-          {/* Top 100 List Selector + Sub-region */}
-          <div className="max-w-xl flex items-center justify-center gap-3">
+      {/* Top 100 List Selector + Sub-region */}
+      <div className="max-w-xl mx-auto flex items-center justify-center gap-3">
         <div className="flex-1">
           <Select
             value={selectedList}
@@ -421,57 +395,49 @@ const GlobalTop100 = () => {
             </div>
           );
         })()}
-          </div>
+      </div>
 
-          {/* Context line with sort button */}
-          {totalCount > 0 && (
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-xs text-muted-foreground flex-1">
-                Exploring the <span className="font-medium">{currentListLabel}</span>
-              </p>
-              <Button
-                variant="tertiary"
-                size="tertiary"
-                onClick={() => setShowSortSheet(true)}
-                className="inline-flex items-center gap-1.5 whitespace-nowrap"
-              >
-                <span className="text-muted-foreground">Sort:</span>
-                <span className="text-foreground">{sortLabelMap[sortOption]}</span>
-              </Button>
-            </div>
-          )}
-        </div>
-      </section>
-
-
-      {/* Error state */}
-      {!isLoading && false && ( // isError condition - placeholder until we have proper error handling
-        <div className="mb-3 rounded-xl border border-red-900/70 bg-red-950/50 px-3 py-2.5 text-[12px] text-red-100">
-          <p className="font-semibold">We couldn't load Top 100 courses</p>
-          <p className="mt-0.5 opacity-80">
-            Please refresh the page or try again in a moment.
+      {/* Context line with sort button */}
+      {totalCount > 0 && (
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-xs text-muted-foreground flex-1">
+            Exploring the <span className="font-medium">{currentListLabel}</span>
           </p>
+          <Button
+            variant="tertiary"
+            size="tertiary"
+            onClick={() => setShowSortSheet(true)}
+            className="inline-flex items-center gap-1.5 whitespace-nowrap"
+          >
+            <span className="text-muted-foreground">Sort:</span>
+            <span className="text-foreground">{sortLabelMap[sortOption]}</span>
+          </Button>
         </div>
       )}
+
 
       {/* Results */}
       {isLoading ? (
         <LoadingSkeleton />
       ) : filteredCourses.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-800/70 bg-slate-950/70 px-4 py-6 text-center">
-          <p className="text-[13px] font-semibold text-slate-50">
-            No Top 100 courses match these filters
+        <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+          <div className="w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 flex items-center justify-center text-muted-foreground mb-1">
+            <Award className="w-4 h-4" />
+          </div>
+          <h3 className="text-sm font-semibold">No courses match your filters</h3>
+          <p className="text-sm text-muted-foreground max-w-xs">
+            Try clearing your search or choosing a different Top 100 list to browse.
           </p>
-          <p className="mt-1 text-[13px] text-slate-400">
-            Try broadening your filters or switching to a different Top 100 list.
-          </p>
-          <button
-            type="button"
-            onClick={handleResetFilters}
-            className="mt-3 inline-flex items-center justify-center rounded-full border border-slate-700/80 bg-slate-950 px-4 py-1.5 text-[13px] font-medium text-slate-200 hover:border-slate-500 hover:text-slate-50"
-          >
-            Reset filters
-          </button>
+          {hasActiveFilters && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-2"
+              onClick={handleResetFilters}
+            >
+              Reset filters
+            </Button>
+          )}
         </div>
       ) : (
         <div className="space-y-6">

@@ -20,14 +20,13 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
 
   if (isLoading) {
     return (
-      <div className="mt-4 rounded-2xl border border-slate-800/70 bg-slate-950/80 px-4 py-3.5 shadow-[0_18px_50px_rgba(15,23,42,0.7)]">
-        <div className="mb-3 h-5 w-40 animate-pulse rounded bg-slate-800" />
-        <div className="mb-3 h-4 w-64 animate-pulse rounded bg-slate-800" />
-        <div className="mb-3 flex gap-2">
-          <div className="h-7 w-24 animate-pulse rounded-full bg-slate-800" />
-          <div className="h-7 w-28 animate-pulse rounded-full bg-slate-800" />
+      <div className="mb-4 rounded-xl border border-border/60 bg-card px-4 py-4">
+        <div className="mb-2 h-4 w-32 animate-pulse rounded bg-muted" />
+        <div className="mb-3 h-3 w-56 animate-pulse rounded bg-muted" />
+        <div className="flex gap-2">
+          <div className="h-7 w-20 animate-pulse rounded-full bg-muted" />
+          <div className="h-7 w-24 animate-pulse rounded-full bg-muted" />
         </div>
-        <div className="h-7 w-32 animate-pulse rounded-full bg-slate-800" />
       </div>
     );
   }
@@ -38,7 +37,7 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
   }
 
   const primaryList = data.list_memberships[0];
-  
+
   const subtitle =
     data.list_memberships.length === 1
       ? `This course appears in the ${primaryList.list_name}.`
@@ -63,15 +62,10 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
     );
   }
   if (data.avg_rating != null) {
-    communityLineParts.push(`${data.avg_rating.toFixed(1)} community rating`);
+    communityLineParts.push(`Avg rating ${data.avg_rating.toFixed(1)}`);
   }
   const communityLine =
     communityLineParts.length > 0 ? communityLineParts.join(' · ') : null;
-
-  const hasCommunity =
-    (data.unique_players ?? 0) > 0 ||
-    (data.total_rounds ?? 0) > 0 ||
-    data.avg_rating != null;
 
   const handlePrimaryCta = () => {
     if (data.user_has_played) {
@@ -89,111 +83,84 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
   };
 
   return (
-    <section className="mt-4 rounded-3xl border border-slate-800/80 bg-slate-950/80 px-4 py-4 sm:px-5 sm:py-5 shadow-[0_22px_70px_rgba(15,23,42,0.85)]">
-      {/* Two-column layout */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
-        {/* Left: title + rating badge + user status */}
-        <div className="flex flex-col gap-3 sm:w-[260px]">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-              Top 100 spotlight
-            </p>
-            <p className="mt-1 text-[13px] text-slate-300">{subtitle}</p>
+    <section className="mb-5 rounded-xl border border-border/70 bg-card/80 px-4 py-4 shadow-sm">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-2 text-sm font-semibold">
+            <Trophy className="h-4 w-4 text-primary-accent" />
+            <span>Top 100 Spotlight</span>
           </div>
-
-          {/* Rating badge block */}
-          {data.avg_rating != null && (
-            <div className="flex flex-col items-center rounded-2xl border border-slate-800/80 bg-slate-950/80 px-3 py-3">
-              {/* Centered community rating value */}
-              <p className="text-[22px] font-semibold leading-none text-slate-50">
-                {data.avg_rating.toFixed(1)}
-              </p>
-              <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.18em] text-slate-400">
-                Community rating
-              </p>
-            </div>
-          )}
-
-          {/* User status pill */}
-          <div className="rounded-full border border-slate-800/80 bg-slate-950/80 px-3 py-1.5">
-            <p className="text-[12px] text-slate-200">
-              {data.user_has_played
-                ? 'Played by you'
-                : 'Not yet on your Top 100 journey'}
-              {data.user_round_count > 0 && (
-                <span className="text-slate-400">
-                  {' '}
-                  · {data.user_round_count} round
-                  {data.user_round_count === 1 ? '' : 's'}
-                </span>
-              )}
-            </p>
-            {lastPlayedText && (
-              <p className="mt-0.5 text-[11px] text-slate-400">
-                {lastPlayedText}
-              </p>
-            )}
-          </div>
+          <p className="text-xs text-muted-foreground">{subtitle}</p>
         </div>
 
-        {/* Right: list memberships + community */}
-        <div className="flex-1 space-y-3 sm:pl-4">
-          {/* List pills row */}
-          <div className="flex flex-wrap gap-1.5">
-            {data.list_memberships.map((m) => (
-              <button
-                key={m.list_slug}
-                type="button"
-                onClick={() => navigate(`/top100/${m.list_slug}`)}
-                className="inline-flex items-center gap-1 rounded-full border border-slate-800/80 bg-slate-950/80 px-2.5 py-1 text-[11px] text-slate-200 hover:border-slate-600"
-              >
-                <span className="font-medium">
-                  {m.short_label || m.list_name}
-                </span>
-                {m.rank != null && (
-                  <span className="text-[11px] text-emerald-300">
-                    #{m.rank}
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-
-          {/* Community text line */}
-          {hasCommunity ? (
-            communityLine && (
-              <p className="text-[11px] text-slate-400">
-                {communityLine}
-              </p>
-            )
-          ) : (
-            <p className="text-[11px] text-slate-500">
-              Be one of the first to log a round here and set the tone for this
-              course's Top 100 rating.
-            </p>
-          )}
-
-          {/* Actions row */}
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={handlePrimaryCta}
-              className="inline-flex items-center justify-center rounded-full bg-slate-100 px-4 py-1.5 text-[13px] font-semibold text-slate-900 hover:bg-white"
+        {/* List pills */}
+        <div className="flex flex-wrap gap-2">
+          {data.list_memberships.map((m) => (
+            <div
+              key={m.list_slug}
+              className="rounded-full border border-primary-accent/40 bg-primary-accent/5 px-3 py-1 text-[11px] font-medium"
             >
-              {data.user_has_played
-                ? 'Log a new round here'
-                : `Plan a round at ${courseName}`}
-            </button>
-            {primaryList && (
-              <button
-                type="button"
-                onClick={handleViewList}
-                className="inline-flex items-center justify-center rounded-full border border-slate-700/80 bg-slate-950 px-4 py-1.5 text-[13px] font-medium text-slate-200 hover:border-slate-500 hover:text-slate-50"
-              >
-                View in Top 100 list
-              </button>
+              {m.short_label || m.list_name}
+              {m.rank != null && (
+                <span className="ml-1 text-[10px] text-primary-accent/80">
+                  #{m.rank}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div className="my-3 h-px w-full bg-border/60" />
+
+      {/* Your status + community */}
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="space-y-1 text-sm">
+          {/* User status pill */}
+          <div
+            className={cn(
+              'inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium',
+              data.user_has_played
+                ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/40'
+                : 'bg-amber-500/10 text-amber-200 border border-amber-500/40'
+            )}
+          >
+            {data.user_has_played ? 'Played by you' : 'Not yet on your Top 100 journey'}
+            {data.user_round_count > 0 && (
+              <span className="text-[11px] text-emerald-200/80">
+                · {data.user_round_count} round
+                {data.user_round_count === 1 ? '' : 's'}
+              </span>
             )}
           </div>
+
+          {/* Last played + community line */}
+          {lastPlayedText && (
+            <p className="text-xs text-muted-foreground">{lastPlayedText}</p>
+          )}
+          {communityLine && (
+            <p className="text-xs text-muted-foreground">{communityLine}</p>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="flex flex-wrap items-center gap-2">
+          <Button size="sm" variant="secondary" onClick={handlePrimaryCta}>
+            {data.user_has_played
+              ? 'Log a new round here'
+              : `Plan a round at ${courseName}`}
+          </Button>
+
+          <Button
+            size="sm"
+            variant="ghost"
+            className="text-xs text-muted-foreground hover:text-foreground"
+            onClick={handleViewList}
+          >
+            View in Top 100 list
+          </Button>
         </div>
       </div>
     </section>

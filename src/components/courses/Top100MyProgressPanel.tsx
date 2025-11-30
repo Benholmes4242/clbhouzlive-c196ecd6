@@ -8,12 +8,10 @@ import { Top100MilestonesCarousel } from './Top100MilestonesCarousel';
 import { Top100RegionProgressGrid } from './Top100RegionProgressGrid';
 import { Top100RecentRoundsFeed } from './Top100RecentRoundsFeed';
 import ProfileBadgeStrip from '@/components/profile/ProfileBadgeStrip';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useTop100FriendsSnapshot } from '@/hooks/useTop100FriendsSnapshot';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { getTop100Title } from '@/lib/top100Prestige';
 
 interface Top100MyProgressPanelProps {
   userId?: string | null;
@@ -80,26 +78,8 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
 
   if (!effectiveUserId) {
     return (
-      <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-3 px-4 pb-6 pt-6 text-center">
-        <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-slate-100">
-          🏆
-        </div>
-        <div className="space-y-1">
-          <h2 className="text-base font-semibold text-slate-50">
-            Track your Top 100 journey
-          </h2>
-          <p className="text-[13px] text-slate-400">
-            Sign in to see which Top 100 courses you've already played and where
-            to go next.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => navigate('/auth')}
-          className="mt-1 inline-flex items-center justify-center rounded-full bg-slate-100 px-4 py-1.5 text-[13px] font-semibold text-slate-900 hover:bg-white"
-        >
-          Sign in to continue
-        </button>
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">Sign in to track your Top 100 progress</p>
       </div>
     );
   }
@@ -119,63 +99,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
 
   if (!data) return null;
 
-  // Zero Top 100 courses state
-  if (data.total_played_top100 === 0) {
-    return (
-      <div className="mx-auto flex w-full max-w-4xl flex-col gap-4 px-4 pb-6 pt-4">
-        {/* Hero "zero state" */}
-        <section
-          className="
-            rounded-3xl border border-slate-800/70 bg-slate-950/80
-            px-5 py-5 shadow-[0_22px_70px_rgba(15,23,42,0.85)]
-          "
-        >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-            Top 100 journey
-          </p>
-          <h2 className="mt-1 text-base font-semibold text-slate-50">
-            Start your Top 100 adventure
-          </h2>
-          <p className="mt-1 text-[13px] text-slate-400">
-            You haven't logged any Top 100 rounds yet. Once you tick off your
-            first course, we'll track your progress, milestones, and rankings
-            right here.
-          </p>
-
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => navigate('/courses?tab=top100')}
-              className="inline-flex items-center justify-center rounded-full bg-slate-100 px-4 py-1.5 text-[13px] font-semibold text-slate-900 hover:bg-white"
-            >
-              Explore Top 100 courses
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate('/clubhouse')}
-              className="inline-flex items-center justify-center rounded-full border border-slate-700/80 bg-slate-950 px-4 py-1.5 text-[13px] font-medium text-slate-200 hover:border-slate-500 hover:text-slate-50"
-            >
-              See how others are playing
-            </button>
-          </div>
-        </section>
-
-        {/* Optional: small "How it works" block */}
-        <section className="rounded-2xl border border-slate-800/70 bg-slate-950/70 px-4 py-3.5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-            How this works
-          </p>
-          <p className="mt-1 text-[13px] text-slate-300">
-            Play any course in a Top 100 list, log your round, and we'll
-            automatically update your counts, titles, and regional badges.
-          </p>
-        </section>
-      </div>
-    );
-  }
-
   const lastPlayedDate = data.recent_rounds[0]?.played_at || null;
-  const clubTitle = getTop100Title(data.total_played_top100);
 
   // Friends comparison logic
   const myCount = data?.total_played_top100 ?? 0;
@@ -200,287 +124,153 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-3 pb-6 pt-2 sm:px-4 sm:pt-3">
+    <div className="max-w-2xl mx-auto space-y-6 px-4 pb-6">
+      {/* Header */}
+      <div className="text-center space-y-3">
+        <h1 className="text-3xl font-bold text-foreground">
+          {isOwnProfile ? 'Your Top 100 Journey' : 'Top 100 Journey'}
+        </h1>
+        <p className="text-muted-foreground">
+          {isOwnProfile 
+            ? 'Track your elite pilgrimage across the world\'s greatest courses'
+            : 'See how far they\'ve come across the world\'s greatest courses'}
+        </p>
+        
+        {/* View Toggle */}
+        <div className="flex justify-center pt-2">
+          <div className="inline-flex rounded-full bg-surface-alt p-1 text-xs">
+            <button
+              type="button"
+              onClick={() => setJourneyView('overview')}
+              className={cn(
+                'px-3 py-1 rounded-full transition-all',
+                journeyView === 'overview'
+                  ? 'bg-background shadow-sm text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              Overview
+            </button>
+            <button
+              type="button"
+              onClick={() => setJourneyView('pilgrimage')}
+              className={cn(
+                'px-3 py-1 rounded-full transition-all',
+                journeyView === 'pilgrimage'
+                  ? 'bg-background shadow-sm text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              Pilgrimage Mode
+            </button>
+          </div>
+        </div>
+      </div>
+
       {journeyView === 'overview' ? (
         <>
-          {/* Hero Card */}
-          <section className="rounded-3xl border border-slate-800/70 bg-slate-950/80 px-4 py-4 shadow-[0_18px_60px_rgba(15,23,42,0.55)] sm:px-6 sm:py-5">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              {/* Left: Ring + Stats */}
-              <div className="flex flex-1 items-center gap-3 sm:gap-4">
-                {/* Ring/Avatar */}
-                <div className="flex-shrink-0">
-                  <div className="relative">
-                    <div
-                      className={cn(
-                        'h-24 w-24 rounded-full flex items-center justify-center border-4 ring-4 ring-offset-4 ring-offset-slate-950 transition-all sm:h-28 sm:w-28',
-                        data.prestige_ring === 'bronze' && 'ring-amber-500/80',
-                        data.prestige_ring === 'blue' && 'ring-sky-500/80',
-                        data.prestige_ring === 'green' && 'ring-emerald-500/80',
-                        data.prestige_ring === 'silver' && 'ring-slate-200/80',
-                        data.prestige_ring === 'gold' && 'ring-yellow-400/90',
-                        data.prestige_ring === 'platinum' && 'ring-fuchsia-400/90',
-                        !data.prestige_ring && 'ring-slate-700'
-                      )}
-                    >
-                      <Avatar className="h-20 w-20 sm:h-24 sm:w-24">
-                        <AvatarImage src={session?.user?.user_metadata?.avatar_url || undefined} />
-                        <AvatarFallback className="text-xl bg-slate-800 text-slate-100 sm:text-2xl">
-                          {session?.user?.user_metadata?.full_name
-                            ?.split(' ')
-                            .map((n: string) => n[0])
-                            .join('')
-                            .toUpperCase()
-                            .slice(0, 2) || '?'}
-                        </AvatarFallback>
-                      </Avatar>
-                    </div>
-                  </div>
-                </div>
+          {/* Hero Section with Big Ring */}
+          <Top100HeroSection
+            avatarUrl={session?.user?.user_metadata?.avatar_url}
+            displayName={session?.user?.user_metadata?.full_name}
+            totalPlayed={data.total_played_top100}
+            regionsCount={data.regions_count}
+            prestigeRing={data.prestige_ring}
+            prestigeLabel={data.prestige_label}
+            lastPlayedDate={lastPlayedDate}
+            isOwnProfile={isOwnProfile}
+          />
 
-                {/* Headline Stats */}
-                <div className="min-w-0 space-y-1.5">
-                  <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-slate-300">
-                    Top 100 journey
+          {/* Friends Chasing the Top 100 */}
+          {isOwnProfile && friendsSnapshot && friends.length > 0 && (
+            <div className="rounded-xl border border-border/60 bg-card/60 p-4">
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <div>
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    Friends chasing the Top 100
                   </p>
-
-                  <h1 className="text-base font-semibold text-slate-50 sm:text-lg">
-                    {isOwnProfile ? "Your Top 100 progress" : `${session?.user?.user_metadata?.full_name || 'Their'}'s Top 100 progress`}
-                  </h1>
-
-                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-2xl font-semibold text-slate-50 sm:text-3xl">
-                        {data.total_played_top100}
-                      </span>
-                      <span className="text-xs text-slate-400">
-                        Top 100 courses played
-                      </span>
-                    </div>
-
-                    <div className="inline-flex items-center gap-1 rounded-full bg-slate-900/90 px-2.5 py-[3px] text-[11px] text-slate-300">
-                      <span className="font-medium">
-                        {data.regions_count || 0} {data.regions_count === 1 ? 'region' : 'regions'}
-                      </span>
-                      {clubTitle && (
-                        <>
-                          <span className="text-slate-600">·</span>
-                          <span>{clubTitle}</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                  {lastPlayedDate && (
-                    <p className="text-[11px] text-slate-400">
-                      Last Top 100 round:{' '}
-                      {new Date(lastPlayedDate).toLocaleDateString()}
+                  {friendMessage && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {friendMessage}
                     </p>
                   )}
                 </div>
+                <button
+                  onClick={() => navigate('/top100?tab=leaderboard')}
+                  className="text-xs font-medium text-primary-accent hover:text-primary-accent/80"
+                >
+                  View full leaderboard →
+                </button>
               </div>
 
-              {/* Right: Quick Stats Pill */}
-              <div className="w-full max-w-[240px] space-y-2 rounded-2xl bg-slate-900/80 px-3 py-2.5 text-xs text-slate-100 sm:w-auto">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-medium text-slate-300">Milestone</span>
-                  {clubTitle && <span className="text-[11px] font-semibold text-slate-50">{clubTitle}</span>}
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Total Top 100 courses</span>
-                  <span className="font-semibold text-slate-50">{data.total_played_top100}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Regions completed</span>
-                  <span className="font-semibold text-slate-50">{data.regions_count}</span>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Main Content: Two Columns */}
-          <section className="mt-1 flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
-            {/* Left Column: Journey Summary + Content */}
-            <div className="flex-1 space-y-3">
-              {/* Journey Toggle + Summary */}
-              <div className="space-y-2">
-                {/* Toggle Row */}
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
-                    Journey overview
-                  </h2>
-
-                  <div className="inline-flex items-center rounded-full bg-slate-900/80 p-0.5 text-[11px]">
-                    <button
-                      type="button"
-                      onClick={() => setJourneyView('overview')}
-                      className="rounded-full px-2.5 py-1 transition-colors bg-slate-700 text-slate-50"
-                    >
-                      Overview
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setJourneyView('pilgrimage')}
-                      className="rounded-full px-2.5 py-1 transition-colors text-slate-400 hover:text-slate-200"
-                    >
-                      Pilgrimage
-                    </button>
-                  </div>
-                </div>
-
-                {/* Summary Card */}
-                <div className="rounded-2xl border border-slate-800/70 bg-slate-950/70 px-3.5 py-3 text-xs text-slate-200 sm:px-4 sm:py-3.5">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span>
-                      {isOwnProfile ? "You've" : "They've"} visited{' '}
-                      <span className="font-semibold text-slate-50">{data.total_played_top100}</span> Top 100 course
-                      {data.total_played_top100 === 1 ? '' : 's'} across{' '}
-                      <span className="font-semibold text-slate-50">{data.regions_count}</span> region
-                      {data.regions_count === 1 ? '' : 's'}.
-                    </span>
-                    {clubTitle && (
-                      <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] text-emerald-300">
-                        Current milestone: {clubTitle}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Milestones Rail */}
-              {data.total_played_top100 > 0 && (
-                <section>
-                  <div className="mb-2 flex items-center justify-between">
-                    <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-300">Milestones</h3>
-                  </div>
-                  <Top100MilestonesCarousel
-                    totalPlayed={data.total_played_top100}
-                    onMilestoneClick={() => {}}
-                  />
-                </section>
-              )}
-
-              {/* Region Progress Grid */}
-              <section>
-                <div className="mb-2 flex items-center justify-between">
-                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-300">
-                    Lists & Regions
-                  </h3>
-                </div>
-                <Top100RegionProgressGrid lists={data.lists} onListClick={(slug) => navigate(`/top100/${slug}`)} />
-              </section>
-
-              {/* Achievements & Badges */}
-              {badgeProps && badgeProps.coursesPlayed >= 20 && (
-                <section>
-                  <div className="mb-2 flex items-center justify-between">
-                    <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-300">
-                      Achievements & Badges
-                    </h3>
-                  </div>
-                  <ProfileBadgeStrip {...badgeProps} />
-                </section>
-              )}
-
-              {/* Recent Rounds */}
-              {data.recent_rounds && data.recent_rounds.length > 0 && (
-                <section>
-                  <div className="mb-2 flex items-center justify-between">
-                    <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-300">
-                      Recent Top 100 rounds
-                    </h3>
-                  </div>
-                  <Top100RecentRoundsFeed rounds={data.recent_rounds} isOwnProfile={isOwnProfile} maxDisplay={4} />
-                </section>
-              )}
-            </div>
-
-            {/* Right Column: Friends */}
-            {isOwnProfile && friendsSnapshot && (
-              <aside className="w-full sm:w-[280px]">
-                <section className="mt-2 rounded-2xl border border-slate-800/70 bg-slate-950/70 px-4 py-3.5 shadow-[0_18px_50px_rgba(15,23,42,0.7)]">
-                  <div className="mb-2 flex items-baseline justify-between gap-2">
-                    <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-                        Friends chasing the Top 100
-                      </p>
-                      {friends.length > 0 ? (
-                        friendMessage && (
-                          <p className="mt-0.5 text-[12px] text-slate-300">
-                            {friendMessage}
-                          </p>
-                        )
+              <div className="flex flex-col gap-2">
+                {topFriends.map((f) => (
+                  <button
+                    key={f.friend_id}
+                    onClick={() => navigate(`/profile/${f.friend_id}?tab=top100`)}
+                    className="flex items-center justify-between rounded-lg px-3 py-2 hover:bg-muted/60 text-left transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      {f.profile_photo_url ? (
+                        <img
+                          src={f.profile_photo_url}
+                          alt={f.display_name}
+                          className="h-8 w-8 rounded-full object-cover"
+                        />
                       ) : (
-                        <p className="mt-0.5 text-[12px] text-slate-400">
-                          When friends log Top 100 rounds, you'll see how you compare here.
-                        </p>
+                        <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold">
+                          {f.display_name?.charAt(0).toUpperCase() || '?'}
+                        </div>
                       )}
+                      <div>
+                        <p className="text-xs font-medium">{f.display_name}</p>
+                        <p className="text-[11px] text-muted-foreground">
+                          {f.home_club || 'No club set'}
+                        </p>
+                      </div>
                     </div>
-
-                    <button
-                      type="button"
-                      onClick={() => navigate('/top100?tab=leaderboard')}
-                      className="text-[11px] font-medium text-emerald-300 hover:text-emerald-200"
-                    >
-                      View full leaderboard →
-                    </button>
-                  </div>
-
-                  {friends.length > 0 ? (
-                    <div className="divide-y divide-slate-800/70">
-                      {topFriends.map((f) => (
-                      <button
-                        key={f.friend_id}
-                        type="button"
-                        onClick={() => navigate(`/profile/${f.friend_id}?tab=top100`)}
-                        className="flex w-full items-center justify-between gap-3 py-2.5 text-left hover:bg-slate-900/60"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          {f.profile_photo_url ? (
-                            <img
-                              src={f.profile_photo_url}
-                              alt={f.display_name}
-                              className="h-8 w-8 rounded-full object-cover"
-                            />
-                          ) : (
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-[11px] font-semibold text-slate-100">
-                              {f.display_name?.charAt(0).toUpperCase() || '?'}
-                            </div>
-                          )}
-
-                          <div className="min-w-0">
-                            <p className="truncate text-[12px] font-medium text-slate-50">
-                              {f.display_name}
-                            </p>
-                            <p className="truncate text-[11px] text-slate-400">
-                              {f.home_club || 'No club set'}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="text-right">
-                          <p className="text-[13px] font-semibold text-slate-50">
-                            {f.total_top100_played}
-                          </p>
-                          <p className="text-[11px] text-slate-400">
-                            Top 100 {f.total_top100_played === 1 ? 'course' : 'courses'}
-                          </p>
-                        </div>
-                      </button>
-                    ))}
-                    </div>
-                  ) : (
-                    <div className="mt-1 rounded-xl border border-dashed border-slate-800/80 bg-slate-950/60 px-3 py-2.5">
-                      <p className="text-[11px] text-slate-400">
-                        Add friends and invite them to log their Top 100 rounds to unlock
-                        this view.
+                    <div className="text-right">
+                      <p className="text-xs font-semibold">
+                        {f.total_top100_played}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground">
+                        Top 100{f.total_top100_played === 1 ? '' : 's'}
                       </p>
                     </div>
-                  )}
-                </section>
-              </aside>
-            )}
-          </section>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Milestones Carousel */}
+          <Top100MilestonesCarousel
+            totalPlayed={data.total_played_top100}
+            onMilestoneClick={() => {
+              // Already on My Progress, could open a modal in future
+            }}
+          />
+
+          {/* Region Progress Grid */}
+          <Top100RegionProgressGrid
+            lists={data.lists}
+            onListClick={(slug) => navigate(`/top100/${slug}`)}
+          />
+
+          {/* Achievements & Badges Strip */}
+          {badgeProps && badgeProps.coursesPlayed >= 20 && (
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-foreground">Achievements & Badges</h3>
+              <ProfileBadgeStrip {...badgeProps} />
+            </div>
+          )}
+
+          {/* Recent Top 100 Rounds */}
+          <Top100RecentRoundsFeed
+            rounds={data.recent_rounds}
+            isOwnProfile={isOwnProfile}
+            maxDisplay={5}
+          />
         </>
       ) : (
         <Top100PilgrimageView userId={userId} />

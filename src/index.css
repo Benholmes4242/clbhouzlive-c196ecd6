@@ -92,19 +92,6 @@ html.lightbox-open {
   --radius-tile: 18px;
   
   /* ========================================
-     TOP 100 CARD TOKENS
-     ======================================== */
-  --top100-card-radius: 24px;
-  --top100-card-padding-y: 18px;
-  --top100-card-padding-x: 20px;
-  --pill-radius: 999px;
-  --pill-border: 1px solid rgba(255,255,255,0.16);
-  --pill-padding-x: 12px;
-  --pill-padding-y: 4px;
-  --top100-progress-height: 6px;
-  --top100-progress-radius: 999px;
-  
-  /* ========================================
      PHASE 4: GLOBAL MOTION TOKENS
      ======================================== */
   

@@ -3,9 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import mapboxgl from 'mapbox-gl';
 import { useTop100MapCourses, Top100MapScope, Top100MapCourse } from '@/hooks/useTop100MapCourses';
 import { Button } from '@/components/ui/button';
-import { X, MapPin, Trophy, Navigation } from 'lucide-react';
+import { X, MapPin, Trophy } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useTop100Lists } from '@/hooks/useTop100Lists';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-streets-v12';
@@ -25,16 +24,11 @@ interface Top100MapViewProps {
 const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
-  const { data: lists } = useTop100Lists();
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<Top100MapCourse | null>(null);
   const { data: courses = [], isLoading } = useTop100MapCourses(scope, session?.user?.id);
-
-  // Get active list label
-  const activeList = lists?.find((l) => l.slug === scope);
-  const activeListShortLabel = activeList?.short_label || 'Top 100';
 
   // Initialize map
   useEffect(() => {
@@ -125,18 +119,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
     }
   };
 
-  // Focus course on map
-  const focusCourseOnMap = (courseId: string) => {
-    const course = courses.find((c) => c.id === courseId);
-    if (course && map.current) {
-      map.current.flyTo({
-        center: [course.longitude, course.latitude],
-        zoom: 12,
-        duration: 1500,
-      });
-    }
-  };
-
   // Error state
   if (!MAPBOX_TOKEN) {
     return (
@@ -153,113 +135,72 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-3 pb-6 pt-2 sm:px-4 sm:pt-3">
-      {/* Header */}
-      <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div className="space-y-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-            Top 100 map
-          </p>
-          <h1 className="text-base font-semibold text-slate-50 sm:text-lg">
-            Explore the Top 100 on the map
-          </h1>
-          <p className="max-w-xl text-[12px] text-slate-400">
-            Pan and zoom to discover Top 100 courses around the world. Tap markers
-            to see course details.
-          </p>
+    <div className="relative">
+      {/* Floating Summary Widget */}
+      {!isLoading && courses.length > 0 && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 px-4 py-2 rounded-full bg-card/95 backdrop-blur-sm border border-border shadow-lg">
+          <span className="text-sm font-medium text-foreground">
+            {courses.filter(c => c.is_played).length} / {courses.length} courses played
+          </span>
         </div>
-      </header>
+      )}
+      
+      {/* Map Container */}
+      <div
+        ref={mapContainer}
+        className="w-full h-[600px] rounded-2xl overflow-hidden border border-border/60"
+      />
 
-      {/* Map Container Card */}
-      <section className="relative mt-1 overflow-hidden rounded-3xl border border-slate-800/70 bg-slate-950/90 shadow-[0_22px_70px_rgba(15,23,42,0.8)]">
-        {/* Map itself */}
-        <div className="h-[420px] w-full sm:h-[520px]">
-          <div
-            ref={mapContainer}
-            className="h-full w-full"
-          />
-        </div>
-
-        {/* Top-left overlay: list pill */}
-        <div className="pointer-events-none absolute left-3 top-3 flex gap-2 sm:left-4 sm:top-4">
-          <div className="pointer-events-auto inline-flex items-center gap-1 rounded-full border border-slate-700/70 bg-slate-950/90 px-3 py-1.5 text-[11px] text-slate-200 shadow-lg">
-            <Trophy className="h-3 w-3" />
-            <span className="font-medium">{activeListShortLabel}</span>
+      {/* Loading State */}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-surface-card/80 backdrop-blur-sm rounded-2xl">
+          <div className="text-center space-y-2">
+            <div className="animate-spin h-8 w-8 border-4 border-primary-accent border-t-transparent rounded-full mx-auto" />
+            <p className="text-sm text-muted-foreground">Loading map...</p>
           </div>
         </div>
+      )}
 
-        {/* Top-right overlay: legend */}
-        <div className="pointer-events-none absolute right-3 top-3 sm:right-4 sm:top-4">
-          <div className="pointer-events-auto inline-flex items-center gap-3 rounded-full bg-slate-950/85 px-3 py-1.5 text-[10px] text-slate-300 shadow-lg">
-            <span className="inline-flex items-center gap-1">
-              <span className="h-2 w-2 rounded-full bg-emerald-400" /> Played
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <span className="h-2 w-2 rounded-full bg-slate-300" /> Not yet played
-            </span>
+      {/* Course Info Card - Bottom Sheet on Mobile, Side Card on Desktop */}
+      {selectedCourse && (
+        <div className="fixed md:absolute bottom-0 md:bottom-4 right-0 md:right-4 left-0 md:left-auto md:w-80 bg-card border border-border shadow-lg rounded-t-2xl md:rounded-2xl p-4 space-y-3 z-10">
+          {/* Close Button */}
+          <button
+            onClick={() => setSelectedCourse(null)}
+            className="absolute top-3 right-3 p-1 hover:bg-surface-alt rounded-full transition-colors"
+          >
+            <X className="h-4 w-4 text-muted-foreground" />
+          </button>
+
+          {/* Course Info */}
+          <div className="pr-8">
+            <h3 className="font-semibold text-foreground mb-1">{selectedCourse.name}</h3>
+            <p className="text-sm text-muted-foreground">
+              {selectedCourse.sub_country && `${selectedCourse.sub_country}, `}
+              {selectedCourse.country}
+            </p>
           </div>
-        </div>
 
-        {/* Loading State */}
-        {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm">
-            <div className="text-center space-y-2">
-              <div className="animate-spin h-8 w-8 border-4 border-primary-accent border-t-transparent rounded-full mx-auto" />
-              <p className="text-sm text-slate-400">Loading map...</p>
+          {/* Rank Badge */}
+          {selectedCourse.rank && (
+            <div className="inline-flex items-center gap-1 rounded-full bg-surface-alt px-3 py-1 text-xs">
+              <Trophy className="h-3 w-3 text-primary-accent" />
+              <span className="text-foreground">
+                {scope === 'global-top-100' && 'Global Top 100'}
+                {scope === 'gb-i-top-100' && 'GB&I Top 100'}
+                {scope === 'usa-top-100' && 'USA Top 100'}
+                {scope === 'europe-top-100' && 'Europe Top 100'}
+                {' · '}#{selectedCourse.rank}
+              </span>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Bottom course info bar */}
-        {selectedCourse && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 pb-3 pt-2 sm:pb-4">
-            <div className="pointer-events-auto mx-auto flex w-full max-w-3xl items-center gap-2 rounded-2xl border border-slate-800/80 bg-slate-950/95 px-3 py-2.5 sm:px-4 sm:py-3">
-              {/* Text */}
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-[13px] font-semibold text-slate-50">
-                  {selectedCourse.name}
-                </p>
-                <p className="truncate text-[11px] text-slate-400">
-                  {selectedCourse.sub_country && `${selectedCourse.sub_country}, `}
-                  {selectedCourse.country}
-                </p>
-
-                <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-slate-400">
-                  {selectedCourse.rank && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-slate-900/90 px-2 py-[2px] text-[10px] text-amber-300">
-                      <span className="text-[11px]">#{selectedCourse.rank}</span>
-                      <span>{activeListShortLabel}</span>
-                    </span>
-                  )}
-                  {selectedCourse.is_played && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-900/50 px-2 py-[2px] text-[10px] text-emerald-200">
-                      Played by you
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* CTA */}
-              <div className="flex flex-col items-end gap-1">
-                <button
-                  type="button"
-                  onClick={handleViewCourse}
-                  className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1.5 text-[11px] font-semibold text-slate-900 hover:bg-white"
-                >
-                  View course
-                </button>
-                <button
-                  type="button"
-                  onClick={() => focusCourseOnMap(selectedCourse.id)}
-                  className="text-[10px] text-slate-400 hover:text-slate-200"
-                >
-                  Center on map
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </section>
+          {/* CTA */}
+          <Button onClick={handleViewCourse} className="w-full">
+            View Course
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

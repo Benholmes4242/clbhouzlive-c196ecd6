@@ -968,42 +968,36 @@ const HeroProfileHeader = ({
                   </button>
                 </div>
 
-                {/* Top 100 progress pill */}
+                {/* Top 100 Prestige Chip */}
                 {top100Overview && top100Overview.total_played > 0 && (() => {
                   const top100Title = getTop100Title(top100Overview.total_played);
-
                   return (
                     <div className="mt-3 flex justify-center">
                       <button
                         type="button"
-                        onClick={() => handleTabChange('top100')}
-                        className="
-                          inline-flex items-center gap-2 rounded-full
-                          border border-slate-800/80 bg-slate-950/80
-                          px-3 py-1.5 text-[11px] text-slate-200
-                          hover:border-slate-600 hover:text-slate-50
-                          transition-colors
-                        "
+                        onClick={() => navigate('/top100?tab=my-progress')}
+                        className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-3 py-1.5 text-xs text-muted-foreground hover:border-primary-accent/60 hover:text-foreground transition-colors"
                       >
-                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-900 text-[11px]">
+                        <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-alt text-meta">
                           🏆
                         </span>
-                        <span className="flex flex-col items-start leading-tight">
-                          <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
-                            Top 100
-                          </span>
-                          <span className="text-[11px] text-slate-100">
-                            {top100Overview.total_played} course
-                            {top100Overview.total_played === 1 ? '' : 's'} ·{' '}
-                            {top100Overview.regions_count}{' '}
-                            {top100Overview.regions_count === 1 ? 'region' : 'regions'}
-                          </span>
-                          {top100Title && (
-                            <span className="text-[11px] text-emerald-300">
-                              {top100Title}
-                            </span>
-                          )}
+                        <span className="font-medium">
+                          Top 100:
                         </span>
+                        <span>
+                          {top100Overview.total_played} course{top100Overview.total_played === 1 ? '' : 's'} · {top100Overview.regions_count}{' '}
+                          {top100Overview.regions_count === 1 ? 'region' : 'regions'}
+                        </span>
+                        {top100Title && (
+                          <span>
+                            · {top100Title}
+                          </span>
+                        )}
+                        {top100Overview.milestone_label && (
+                          <span className="text-primary-accent">
+                            · {top100Overview.milestone_label}
+                          </span>
+                        )}
                       </button>
                     </div>
                   );
@@ -1230,54 +1224,36 @@ const HeroProfileHeader = ({
                      </button>
                    </div>
 
-                   {/* Top 100 journey pill */}
+                   {/* Top 100 Prestige Chip */}
                    {top100Overview && top100Overview.total_played > 0 && (() => {
                      const top100Title = getTop100Title(top100Overview.total_played);
-                     const total = top100Overview.total_played;
-                     const regions = top100Overview.regions_count ?? 0;
-
-                     const summaryParts: string[] = [];
-                     summaryParts.push(
-                       `${total} Top 100 course${total === 1 ? '' : 's'}`
-                     );
-                     if (regions > 0) {
-                       summaryParts.push(
-                         `${regions} region${regions === 1 ? '' : 's'}`
-                       );
-                     }
-                     if (top100Title) {
-                       summaryParts.push(top100Title);
-                     }
-
-                     const summary = summaryParts.join(' · ');
-
                      return (
                        <div className="w-full mt-3 flex justify-center">
                          <button
                            type="button"
                            onClick={() => handleTabChange('top100')}
-                           className="inline-flex items-center gap-3 rounded-2xl border border-slate-800/70 bg-slate-900/90 px-4 py-3 text-left text-xs text-slate-50 shadow-[0_12px_40px_rgba(15,23,42,0.45)] transition-transform transition-colors hover:bg-slate-900 hover:border-slate-100/30 active:scale-[0.99] md:w-auto"
+                           className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-3 py-1.5 text-xs text-muted-foreground hover:border-primary-accent/60 hover:text-foreground transition-colors"
                          >
-                           {/* Icon */}
-                           <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-amber-500/10 text-base">
+                           <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-alt text-meta">
                              🏆
                            </span>
-
-                           {/* Text */}
-                           <span className="flex flex-col">
-                             <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-slate-300">
-                               Top 100 journey
-                             </span>
-                             <span className="mt-0.5 text-[11px] font-medium text-slate-50">
-                               {summary}
-                             </span>
+                           <span className="font-medium">
+                             Top 100:
                            </span>
-
-                           {/* Right chevron / CTA text */}
-                           <span className="ml-auto hidden items-center text-[11px] font-medium text-slate-300 md:inline-flex">
-                             View
-                             <span className="ml-1 text-xs">→</span>
+                           <span>
+                             {top100Overview.total_played} course{top100Overview.total_played === 1 ? '' : 's'} · {top100Overview.regions_count}{' '}
+                             {top100Overview.regions_count === 1 ? 'region' : 'regions'}
                            </span>
+                           {top100Title && (
+                             <span>
+                               · {top100Title}
+                             </span>
+                           )}
+                           {top100Overview.milestone_label && (
+                             <span className="text-primary-accent">
+                               · {top100Overview.milestone_label}
+                             </span>
+                           )}
                          </button>
                        </div>
                      );
