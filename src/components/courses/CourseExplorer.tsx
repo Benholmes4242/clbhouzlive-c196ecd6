@@ -458,9 +458,10 @@ const CourseExplorer = () => {
               )}
             </p>
             <Button
-              variant="secondary"
+              variant="tertiary"
+              size="tertiary"
               onClick={() => setShowSortSheet(true)}
-              className="whitespace-nowrap"
+              className="inline-flex items-center gap-1.5 whitespace-nowrap"
             >
               <span className="text-muted-foreground">Sort:</span>
               <span className="text-foreground">{sortLabelMap[sortOption]}</span>
