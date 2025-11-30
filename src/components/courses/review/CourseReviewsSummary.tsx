@@ -108,41 +108,40 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
     <div>
       {/* Top row: Rating + Distribution */}
       <div className="mb-5">
-        <div className="grid grid-cols-1 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-6 md:items-start">
-          {/* LEFT COLUMN – score, badge, review count */}
-          <div className="space-y-3 text-left">
-            <div className="text-xs font-semibold tracking-[0.12em] text-slate-600 uppercase">
-              Community rating
-            </div>
-
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-semibold tabular-nums leading-none text-slate-900">
+        <div className="mt-3 flex w-full items-start gap-6">
+          {/* LEFT: score + badge */}
+          <div className="flex min-w-[140px] max-w-[40%] flex-col items-start">
+            {/* Number + /10 */}
+            <div className="flex items-baseline gap-1">
+              <span className="text-4xl font-semibold tracking-tight text-slate-900">
                 {averageRating.toFixed(1)}
               </span>
-              <span className="text-base text-slate-500">/10</span>
+              <span className="text-sm text-slate-500">/10</span>
             </div>
 
-            <div>
+            {/* Rating badge – left aligned */}
+            <div className="mt-2">
               <RatingBadge tierData={tierData} />
             </div>
 
-            <div className="text-xs text-slate-600">
+            {/* Based on X reviews */}
+            <p className="mt-2 text-xs text-slate-500">
               Based on {reviewCount} review{reviewCount === 1 ? '' : 's'}
-            </div>
+            </p>
           </div>
 
-          {/* RIGHT COLUMN – distribution bars */}
-          <div className="space-y-2">
+          {/* RIGHT: distribution bars */}
+          <div className="flex-1">
             {distributionItems.map((item) => {
               const percentage = (item.count / maxCount) * 100;
               return (
-                <div key={item.tier.tier} className="flex items-center gap-3">
-                  {/* Label column – fixed width */}
-                  <span className="w-24 text-xs font-medium text-slate-600">
+                <div key={item.tier.tier} className="mb-1.5 flex items-center gap-3">
+                  {/* Label */}
+                  <span className="w-24 text-sm text-slate-700">
                     {item.tier.label}
                   </span>
 
-                  {/* Bar column – takes remaining width */}
+                  {/* Bar – takes remaining width */}
                   <div className="flex-1">
                     <RatingBar 
                       value={percentage}
@@ -152,8 +151,8 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                     />
                   </div>
 
-                  {/* Count – small, right-aligned */}
-                  <span className="w-8 text-xs text-right tabular-nums text-slate-500">
+                  {/* Count */}
+                  <span className="w-6 text-right text-xs text-slate-500">
                     {item.count}
                   </span>
                 </div>
