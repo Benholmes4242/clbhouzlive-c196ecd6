@@ -7,8 +7,11 @@ export type Top100DiscoverMoment = {
   course_name: string;
   list_slug: string;
   list_rank: number | null;
+  list_short_label: string | null;
   engagement_score: number;
   created_at: string;
+  thumbnail_url: string | null;
+  caption: string | null;
 };
 
 export function useTop100DiscoverRecommendations(limit = 12) {
