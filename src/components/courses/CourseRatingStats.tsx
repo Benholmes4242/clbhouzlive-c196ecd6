@@ -32,7 +32,7 @@ const CourseRatingStats = ({ courseId }: CourseRatingStatsProps) => {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <ClubhouseLogo size="md" showTooltip />
-              <span className="text-2xl font-bold">{formatScore(aggregates.avg_overall_score)}</span>
+              <span className="text-2xl font-bold">{formatScore(aggregates.avg_overall_score)}/10</span>
             </div>
             <div className="flex items-center gap-1 text-muted-foreground">
               <Users className="h-4 w-4" />
@@ -44,19 +44,19 @@ const CourseRatingStats = ({ courseId }: CourseRatingStatsProps) => {
           <div className="mt-3 space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Design</span>
-              <span className="font-medium">{formatScore(aggregates.avg_design_score)}</span>
+              <span className="font-medium">{formatScore(aggregates.avg_design_score)} / 10</span>
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Condition</span>
-              <span className="font-medium">{formatScore(aggregates.avg_condition_score)}</span>
+              <span className="font-medium">{formatScore(aggregates.avg_condition_score)} / 10</span>
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Clubhouse</span>
-              <span className="font-medium">{formatScore(aggregates.avg_clubhouse_score)}</span>
+              <span className="font-medium">{formatScore(aggregates.avg_clubhouse_score)} / 10</span>
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Facilities</span>
-              <span className="font-medium">{formatScore(aggregates.avg_facilities_score)}</span>
+              <span className="font-medium">{formatScore(aggregates.avg_facilities_score)} / 10</span>
             </div>
           </div>
         </div>

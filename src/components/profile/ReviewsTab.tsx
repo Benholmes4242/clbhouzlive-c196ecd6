@@ -328,7 +328,7 @@ function RatingPill({ value10, your }: { value10: number; your?: boolean }) {
       aria-label={`Rating ${formatScore(value10)} out of 10`}
     >
       <ClubhouseLogo size="xs" />
-      {formatScore(value10)}
+      {formatScore(value10)}/10
       {your && (
         <span className="rounded-full bg-white/70 px-1.5 py-[1px] text-meta text-yellow-900 dark:bg-white/10 dark:text-yellow-100">
           Your Review

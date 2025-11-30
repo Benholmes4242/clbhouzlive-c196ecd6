@@ -46,7 +46,7 @@ const MyCoursesStats = ({ totalCoursesPlayed, totalTop100Played, averageRating }
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {averageRating ? averageRating : 'N/A'}
+            {averageRating ? `${averageRating}/10` : 'N/A'}
           </div>
           <p className="text-xs text-muted-foreground">
             Click to view all ratings

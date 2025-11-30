@@ -47,7 +47,7 @@ const CourseDetailImage: React.FC<CourseDetailImageProps> = ({
       {showUserRating && userRating && (
         <div className="absolute top-3 right-3">
           <div className="bg-white/16 backdrop-blur-[18px] border border-white/45 text-white shadow-[0_0_12px_rgba(0,0,0,0.35)] text-[10px] font-semibold px-2 py-0.5 rounded flex items-center gap-1">
-            Your: {userRating}
+            Your: {userRating}/10
           </div>
         </div>
       )}

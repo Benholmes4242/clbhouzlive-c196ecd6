@@ -223,7 +223,7 @@ const CourseLeaderboardTab = ({ courseId }: CourseLeaderboardTabProps) => {
 
               <div className="text-center">
                 <div className="text-lg font-semibold text-green-600">
-                  {user.avg_rating > 0 ? user.avg_rating : 'N/A'}
+                  {user.avg_rating > 0 ? `${user.avg_rating}/10` : 'N/A'}
                 </div>
                 <div className="text-xs text-muted-foreground">Avg Rating</div>
               </div>

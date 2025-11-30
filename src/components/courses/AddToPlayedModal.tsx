@@ -203,7 +203,7 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
                 />
               </div>
               <div className="text-center text-2xl font-bold" style={{ color: '#F5A623' }}>
-                {rating[0]}
+                {rating[0]}/10
               </div>
             </div>
           </div>

@@ -97,7 +97,7 @@ const EditRatingModal = ({
       
       toast({
         title: "Rating Updated!",
-        description: `You updated your rating for ${courseName} to ${rating}`,
+        description: `You updated your rating for ${courseName} to ${rating}/10`,
       });
       
       setIsSubmitting(false);
