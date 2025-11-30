@@ -972,8 +972,8 @@ const HeroProfileHeader = ({
                 </div>
 
                 {/* Top 100 Prestige Chip */}
-                {top100Overview && top100Overview.total_played > 0 && (() => {
-                  const totalRated = top100Overview.total_played;
+                {top100Overview && (top100Overview.total_rated ?? top100Overview.total_played ?? 0) > 0 && (() => {
+                  const totalRated = top100Overview.total_rated ?? top100Overview.total_played ?? 0;
                   const club = getTop100Club(totalRated);
                   const ringDotClass = getTop100RingDotClass(club?.ring ?? 'none');
                   

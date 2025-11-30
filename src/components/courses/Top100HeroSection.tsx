@@ -63,7 +63,7 @@ export function Top100HeroSection({
       {/* Stats */}
       <div className="space-y-1">
         <p className="text-lg font-semibold text-foreground">
-          {isOwnProfile ? "You've" : "They've"} played{' '}
+          {isOwnProfile ? "You've" : "They've"} rated{' '}
           <span className="text-primary-accent">{totalPlayed}</span> Top 100 course
           {totalPlayed === 1 ? '' : 's'}
         </p>
