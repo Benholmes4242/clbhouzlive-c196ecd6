@@ -1,105 +1,105 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy, ChevronRight } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Top100FriendsStrip } from './Top100FriendsStrip';
+import { getRingLabel, getTop100Title } from '@/lib/top100Prestige';
 
 const Top100ClubCallout: React.FC = () => {
   const { session } = useSupabaseSession();
   const navigate = useNavigate();
   const { data: progress } = useTop100ProgressForUser(session?.user?.id);
 
-  const handleClick = () => {
-    if (session) {
-      navigate('/top100?tab=my-progress');
-    } else {
-      navigate('/auth?redirect=/top100?tab=my-progress');
-    }
-  };
-
-  // Filter to only lists where user has played at least one course
-  const startedLists = (progress?.lists || []).filter(list => list.played > 0);
+  const totalPlayed = progress?.total_played_top100 || 0;
+  const regionsCount = progress?.regions_count || 0;
+  const ringLabel = progress?.prestige_ring ? getRingLabel(progress.prestige_ring) : null;
+  const clubTitle = getTop100Title(totalPlayed);
   
-  const coursesPlayed = startedLists.reduce((sum, list) => sum + list.played, 0);
-  const totalCoursesInStartedLists = startedLists.reduce((sum, list) => sum + list.total, 0);
-  const listsStarted = startedLists.length;
-  
-  // Calculate progress percentage based on started lists only
-  const progressPercent = totalCoursesInStartedLists > 0
-    ? Math.min((coursesPlayed / totalCoursesInStartedLists) * 100, 100)
+  // Calculate total courses across all lists for percentage
+  const totalInAllLists = (progress?.lists || []).reduce((sum, list) => sum + list.total, 0);
+  const progressPercent = totalInAllLists > 0
+    ? Math.min((totalPlayed / totalInAllLists) * 100, 100)
     : 0;
 
   return (
-    <section 
-      onClick={handleClick}
-      className="px-4 pt-5 pb-7 cursor-pointer"
-    >
-      <div className="flex flex-col items-center text-center">
-        {/* Title with inline trophy icon */}
-        <div className="flex items-center gap-0 mb-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-accent/10">
-            <Trophy className="h-5 w-5 text-primary-accent" />
+    <div className="space-y-4 pb-6">
+      {/* Pill - tight spacing */}
+      {session && totalPlayed > 0 && (
+        <div className="inline-flex items-center gap-2 rounded-full bg-slate-900/3 px-4 py-2 text-sm text-slate-900">
+          <span className="text-amber-500">🏆</span>
+          <span className="font-medium">
+            You&apos;ve played {totalPlayed} Top 100 course{totalPlayed === 1 ? '' : 's'}
+          </span>
+          {ringLabel && <span className="text-slate-500">· {ringLabel}</span>}
+          {clubTitle && <span className="text-slate-500">· {clubTitle}</span>}
+        </div>
+      )}
+
+      {/* Top 100 Club panel */}
+      <section className="rounded-3xl border border-slate-100 bg-white/90 px-5 py-4 shadow-[0_10px_40px_rgba(15,23,42,0.04)]">
+        {/* Row 1 – header + count */}
+        <div className="mb-3 flex items-baseline justify-between gap-3">
+          <div>
+            <h2 className="text-[20px] font-semibold tracking-tight text-slate-900">
+              Top 100 Club
+            </h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Track your pilgrimage through the world&apos;s Top 100 courses.
+            </p>
           </div>
-          <h2 className="text-lg font-semibold text-slate-900">
-            Top 100 Club
-          </h2>
+          {session && totalInAllLists > 0 && (
+            <div className="text-right text-sm text-slate-500">
+              {totalPlayed} played
+            </div>
+          )}
         </div>
 
-        {/* Tagline */}
-        <p className="mt-1 mb-3 max-w-[22rem] text-sm text-slate-600">
-          Track your pilgrimage through the world&apos;s Top 100 courses.
-        </p>
+        {/* Row 2 – progress bar */}
+        {session && totalPlayed > 0 && (
+          <div className="mb-2 h-[6px] w-full overflow-hidden rounded-full bg-slate-100">
+            <div
+              className="h-full rounded-full bg-amber-400 transition-all"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+        )}
 
-        {/* Progress line */}
-        {session ? (
-          <>
-            {listsStarted > 0 ? (
-              <>
-                <p className="mb-2 text-sm font-medium text-slate-900">
-                  You&apos;ve played {coursesPlayed} course{coursesPlayed === 1 ? '' : 's'} {listsStarted === 1 ? 'in' : 'across'} {listsStarted} Top 100 list{listsStarted === 1 ? '' : 's'}.
-                </p>
-
-                {/* Progress bar */}
-                <div className="mt-1 mb-4 h-2 w-full overflow-hidden rounded-full bg-slate-200">
-                  <div
-                    className="h-full rounded-full bg-primary-accent transition-all"
-                    style={{ width: `${progressPercent}%` }}
-                  />
-                </div>
-              </>
-            ) : (
-              <p className="mt-2 text-sm text-slate-600 mb-3">
-                You haven&apos;t started your Top 100 journey yet. Play your first Top 100 course to begin.
-              </p>
-            )}
-          </>
-        ) : (
-          <p className="mt-2 text-sm text-slate-600 mb-3">
-            Sign in to track your progress and see where you rank on the global leaderboard.
+        {/* Row 3 – stats line */}
+        {session && totalPlayed > 0 && (
+          <p className="text-xs text-slate-500">
+            Across {regionsCount} {regionsCount === 1 ? 'region' : 'regions'}
+            {clubTitle && <> · {clubTitle}</>}
+            {ringLabel && <> · {ringLabel}</>}
           </p>
         )}
 
-        {/* CTA button */}
-        <Button
-          variant="primary"
-          fullWidth
-          onClick={(e) => {
-            e.stopPropagation();
-            handleClick();
-          }}
-          className="mt-1 mb-3"
-        >
-          {session ? 'Open your Top 100 Journey' : 'Sign in to join the Top 100 Club'}
-          <ChevronRight className="h-4 w-4" />
-        </Button>
+        {/* Row 4 – CTA */}
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <Button
+            variant="primary"
+            onClick={() => {
+              if (session) {
+                navigate('/top100?tab=my-progress');
+              } else {
+                navigate('/auth?redirect=/top100?tab=my-progress');
+              }
+            }}
+            className="w-full sm:w-auto"
+          >
+            {session ? 'Open Top 100 Journey' : 'Sign in to join the Top 100 Club'}
+          </Button>
 
-        {/* Friends on Top 100 Journey */}
-        <Top100FriendsStrip />
-      </div>
-    </section>
+          {session && (
+            <button
+              onClick={() => navigate('/top100')}
+              className="text-sm font-medium text-slate-600 underline-offset-2 hover:text-slate-900 hover:underline"
+            >
+              View Top 100 hub →
+            </button>
+          )}
+        </div>
+      </section>
+    </div>
   );
 };
 
