@@ -89,66 +89,82 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
   };
 
   return (
-    <section className="mt-4 rounded-2xl border border-slate-800/70 bg-slate-950/80 px-4 py-3.5 shadow-[0_18px_50px_rgba(15,23,42,0.7)]">
-      {/* Header row */}
-      <div className="mb-2.5 flex flex-wrap items-start justify-between gap-2">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-300">
-            Top 100 Spotlight
-          </p>
-          <h3 className="text-[13px] font-semibold text-slate-50 sm:text-sm">
-            {courseName}
-          </h3>
-          <p className="mt-0.5 text-[11px] text-slate-400">{subtitle}</p>
-        </div>
+    <section className="mt-4 rounded-3xl border border-slate-800/80 bg-slate-950/80 px-4 py-4 sm:px-5 sm:py-5 shadow-[0_22px_70px_rgba(15,23,42,0.85)]">
+      {/* Two-column layout */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+        {/* Left: title + rating badge + user status */}
+        <div className="flex flex-col gap-3 sm:w-[260px]">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+              Top 100 spotlight
+            </p>
+            <p className="mt-1 text-[13px] text-slate-300">{subtitle}</p>
+          </div>
 
-        {/* List pills */}
-        <div className="flex flex-wrap justify-end gap-1.5">
-          {data.list_memberships.map((m) => (
-            <span
-              key={m.list_slug}
-              className="inline-flex items-center gap-1 rounded-full bg-slate-900/90 px-2.5 py-[3px] text-[10px] text-slate-200"
-            >
-              <span>{m.short_label || m.list_name}</span>
-              {m.rank != null && (
-                <span className="rounded-full bg-slate-800/90 px-1.5 py-[1px] text-[10px] text-amber-300">
-                  #{m.rank}
-                </span>
-              )}
-            </span>
-          ))}
-        </div>
-      </div>
+          {/* Rating badge block */}
+          {data.avg_rating != null && (
+            <div className="flex flex-col items-center rounded-2xl border border-slate-800/80 bg-slate-950/80 px-3 py-3">
+              {/* Centered community rating value */}
+              <p className="text-[22px] font-semibold leading-none text-slate-50">
+                {data.avg_rating.toFixed(1)}
+              </p>
+              <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.18em] text-slate-400">
+                Community rating
+              </p>
+            </div>
+          )}
 
-      {/* Divider */}
-      <div className="mb-2 border-t border-slate-800/70" />
-
-      {/* Status + community + CTAs */}
-      <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
-          <p className="inline-flex items-center gap-1.5 rounded-full bg-slate-900/90 px-2.5 py-[3px] text-[11px] text-slate-200">
-            <span>
+          {/* User status pill */}
+          <div className="rounded-full border border-slate-800/80 bg-slate-950/80 px-3 py-1.5">
+            <p className="text-[12px] text-slate-200">
               {data.user_has_played
                 ? 'Played by you'
                 : 'Not yet on your Top 100 journey'}
-            </span>
-            {data.user_round_count > 0 && (
-              <>
-                <span className="text-slate-600">·</span>
-                <span>
-                  {data.user_round_count} round
+              {data.user_round_count > 0 && (
+                <span className="text-slate-400">
+                  {' '}
+                  · {data.user_round_count} round
                   {data.user_round_count === 1 ? '' : 's'}
                 </span>
-              </>
+              )}
+            </p>
+            {lastPlayedText && (
+              <p className="mt-0.5 text-[11px] text-slate-400">
+                {lastPlayedText}
+              </p>
             )}
-          </p>
+          </div>
+        </div>
 
-          {lastPlayedText && (
-            <p className="text-[11px] text-slate-400">{lastPlayedText}</p>
-          )}
+        {/* Right: list memberships + community */}
+        <div className="flex-1 space-y-3 sm:pl-4">
+          {/* List pills row */}
+          <div className="flex flex-wrap gap-1.5">
+            {data.list_memberships.map((m) => (
+              <button
+                key={m.list_slug}
+                type="button"
+                onClick={() => navigate(`/top100/${m.list_slug}`)}
+                className="inline-flex items-center gap-1 rounded-full border border-slate-800/80 bg-slate-950/80 px-2.5 py-1 text-[11px] text-slate-200 hover:border-slate-600"
+              >
+                <span className="font-medium">
+                  {m.short_label || m.list_name}
+                </span>
+                {m.rank != null && (
+                  <span className="text-[11px] text-emerald-300">
+                    #{m.rank}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Community text line */}
           {hasCommunity ? (
             communityLine && (
-              <p className="text-[11px] text-slate-400">{communityLine}</p>
+              <p className="text-[11px] text-slate-400">
+                {communityLine}
+              </p>
             )
           ) : (
             <p className="text-[11px] text-slate-500">
@@ -156,26 +172,28 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
               course's Top 100 rating.
             </p>
           )}
-        </div>
 
-        <div className="mt-1 flex flex-wrap items-center gap-2 sm:mt-0 sm:justify-end">
-          <button
-            type="button"
-            onClick={handlePrimaryCta}
-            className="inline-flex items-center justify-center rounded-full bg-slate-100 px-3.5 py-1.5 text-[11px] font-semibold text-slate-900 hover:bg-white"
-          >
-            {data.user_has_played
-              ? 'Log a new round here'
-              : `Plan a round at ${courseName}`}
-          </button>
-
-          <button
-            type="button"
-            onClick={handleViewList}
-            className="inline-flex items-center justify-center rounded-full border border-slate-700/80 bg-slate-950 px-3.5 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-500 hover:text-slate-50"
-          >
-            View in Top 100 list
-          </button>
+          {/* Actions row */}
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={handlePrimaryCta}
+              className="inline-flex items-center justify-center rounded-full bg-slate-100 px-4 py-1.5 text-[13px] font-semibold text-slate-900 hover:bg-white"
+            >
+              {data.user_has_played
+                ? 'Log a new round here'
+                : `Plan a round at ${courseName}`}
+            </button>
+            {primaryList && (
+              <button
+                type="button"
+                onClick={handleViewList}
+                className="inline-flex items-center justify-center rounded-full border border-slate-700/80 bg-slate-950 px-4 py-1.5 text-[13px] font-medium text-slate-200 hover:border-slate-500 hover:text-slate-50"
+              >
+                View in Top 100 list
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </section>

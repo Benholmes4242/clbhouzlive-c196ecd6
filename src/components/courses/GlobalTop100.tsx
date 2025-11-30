@@ -313,6 +313,8 @@ const GlobalTop100 = () => {
     setShowSortSheet(false);
   };
 
+  const selectedListLabel = listOptions.find((o) => o.value === selectedList)?.label || null;
+
   return (
     <div className="w-full space-y-4">
       {/* Top 100 Club Callout */}
@@ -321,28 +323,52 @@ const GlobalTop100 = () => {
       {/* Divider */}
       <div className="mt-4 mb-3 h-px w-full bg-slate-200/70" />
 
-      {/* Search */}
-      <div className="relative max-w-xl mx-auto">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search within this Top 100 list"
-          className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-xl shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--slate-secondary)]/70 focus-visible:border-[color:var(--slate-secondary)] transition-shadow text-base placeholder:text-[15px]"
-        />
-        {searchTerm && (
-          <button
-            type="button"
-            onClick={() => setSearchTerm('')}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        )}
-      </div>
+      {/* Header */}
+      <section className="mb-4 flex flex-col gap-3 px-4 sm:px-0">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+            Top 100 explorer
+          </p>
+          <div className="mt-1 flex flex-wrap items-baseline gap-2">
+            <h1 className="text-lg font-semibold text-slate-50 sm:text-xl">
+              Top 100 golf courses
+            </h1>
+            {selectedListLabel && (
+              <span className="rounded-full border border-slate-800/80 bg-slate-950/70 px-2.5 py-1 text-[11px] font-medium text-slate-300">
+                {selectedListLabel}
+              </span>
+            )}
+          </div>
+          <p className="mt-1 text-[13px] text-slate-400 max-w-2xl">
+            Browse every course in the Top 100 lists, filter by region, and track
+            which ones you've already played.
+          </p>
+        </div>
 
-      {/* Top 100 List Selector + Sub-region */}
-      <div className="max-w-xl mx-auto flex items-center justify-center gap-3">
+        {/* Filters bar */}
+        <div className="mt-1 flex flex-col gap-3">
+          {/* Search */}
+          <div className="relative max-w-xl">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search within this Top 100 list"
+              className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-xl shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--slate-secondary)]/70 focus-visible:border-[color:var(--slate-secondary)] transition-shadow text-base placeholder:text-[15px]"
+            />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm('')}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+
+          {/* Top 100 List Selector + Sub-region */}
+          <div className="max-w-xl flex items-center justify-center gap-3">
         <div className="flex-1">
           <Select
             value={selectedList}
@@ -395,25 +421,27 @@ const GlobalTop100 = () => {
             </div>
           );
         })()}
-      </div>
+          </div>
 
-      {/* Context line with sort button */}
-      {totalCount > 0 && (
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-xs text-muted-foreground flex-1">
-            Exploring the <span className="font-medium">{currentListLabel}</span>
-          </p>
-          <Button
-            variant="tertiary"
-            size="tertiary"
-            onClick={() => setShowSortSheet(true)}
-            className="inline-flex items-center gap-1.5 whitespace-nowrap"
-          >
-            <span className="text-muted-foreground">Sort:</span>
-            <span className="text-foreground">{sortLabelMap[sortOption]}</span>
-          </Button>
+          {/* Context line with sort button */}
+          {totalCount > 0 && (
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs text-muted-foreground flex-1">
+                Exploring the <span className="font-medium">{currentListLabel}</span>
+              </p>
+              <Button
+                variant="tertiary"
+                size="tertiary"
+                onClick={() => setShowSortSheet(true)}
+                className="inline-flex items-center gap-1.5 whitespace-nowrap"
+              >
+                <span className="text-muted-foreground">Sort:</span>
+                <span className="text-foreground">{sortLabelMap[sortOption]}</span>
+              </Button>
+            </div>
+          )}
         </div>
-      )}
+      </section>
 
 
       {/* Error state */}

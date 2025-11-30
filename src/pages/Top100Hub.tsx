@@ -12,6 +12,7 @@ import Top100LeaderboardPanel from '@/components/courses/Top100LeaderboardPanel'
 import Top100MapView from '@/components/courses/Top100MapView';
 import { Top100MapScope } from '@/hooks/useTop100MapCourses';
 import { getRingLabel } from '@/lib/top100Prestige';
+import { cn } from '@/lib/utils';
 
 const Top100Hub = () => {
   const navigate = useNavigate();
@@ -110,37 +111,50 @@ const Top100Hub = () => {
       <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
         <div className="max-w-6xl mx-auto space-y-6">
           {/* Hero Section */}
-          <div className="text-center mb-8">
-            <h1 className="font-display text-4xl font-bold text-foreground mb-3">
-              World's Top 100 Golf Courses
-            </h1>
-            <p className="text-xl text-muted-foreground">
-              Explore the most prestigious golf courses across the globe
-            </p>
-          </div>
+          <header className="mb-4 flex flex-col gap-3 px-4 sm:px-0">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                Top 100 hub
+              </p>
+              <h1 className="mt-1 text-lg font-semibold text-slate-50 sm:text-xl">
+                Your global Top 100 journey
+              </h1>
+              <p className="mt-1 text-[13px] text-slate-400 max-w-2xl">
+                Switch between the full course lists, your personal progress, and the
+                global leaderboard – all in one place.
+              </p>
+            </div>
+          </header>
 
           {/* Tabs: Courses | My Progress | Leaderboard */}
+          <nav className="mb-3 px-4 sm:px-0">
+            <div className="inline-flex items-center gap-1 rounded-full border border-slate-800/80 bg-slate-950/80 p-1">
+              {[
+                { id: 'courses', label: 'Courses' },
+                { id: 'my-progress', label: 'My progress' },
+                { id: 'leaderboard', label: 'Leaderboard' },
+              ].map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveTab(tab.id as any)}
+                    className={cn(
+                      'rounded-full px-3.5 py-1.5 text-[12px] font-medium transition-colors',
+                      isActive
+                        ? 'bg-slate-100 text-slate-900 shadow-sm'
+                        : 'text-slate-300 hover:text-slate-50 hover:bg-slate-900/70'
+                    )}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+          </nav>
+
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-muted/70 border border-border/60 px-2 py-[3px] mb-5">
-              <TabsTrigger 
-                value="courses" 
-                className="text-sm px-3 py-[6px] rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Courses
-              </TabsTrigger>
-              <TabsTrigger 
-                value="my-progress" 
-                className="text-sm px-3 py-[6px] rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"
-              >
-                My Progress
-              </TabsTrigger>
-              <TabsTrigger 
-                value="leaderboard" 
-                className="text-sm px-3 py-[6px] rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Leaderboard
-              </TabsTrigger>
-            </TabsList>
 
             <TabsContent value="courses" className="mt-0">
               {/* Progress Chip */}
