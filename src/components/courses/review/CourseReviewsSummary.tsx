@@ -144,7 +144,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
 
                   {/* Right column: bar + count */}
                   <div className="flex items-center gap-3">
-                    <div className="relative h-2.5 flex-1 overflow-hidden rounded-full bg-slate-100">
+                    <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
                       <div
                         className={`h-full rounded-full ${item.tier.barFill} transition-all duration-300`}
                         style={{ width: `${percentage}%` }}
