@@ -246,7 +246,10 @@ const Discover = () => {
                     {personalLoading ? (
                       <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
                         {[...Array(4)].map((_, i) => (
-                          <Skeleton key={i} className="h-40 w-32 rounded-xl flex-shrink-0" />
+                          <div
+                            key={i}
+                            className="h-40 w-32 rounded-xl bg-card/60 border border-border/60 flex-shrink-0 animate-pulse"
+                          />
                         ))}
                       </div>
                     ) : personalRecs.length === 0 ? null : (
@@ -254,35 +257,51 @@ const Discover = () => {
                         {personalRecs.map((moment) => (
                           <button
                             key={moment.post_id}
-                            className="relative flex-shrink-0 w-32 rounded-xl overflow-hidden bg-card border border-border/60 hover:border-primary-accent/50 hover:shadow-md transition-all"
-                            onClick={() => {
-                              navigate(`/clubhouse/post/${moment.post_id}`);
-                            }}
+                            onClick={() => navigate(`/clubhouse/post/${moment.post_id}`)}
+                            className="relative flex-shrink-0 w-32 rounded-xl overflow-hidden bg-card border border-border/60 hover:border-primary-accent/50 hover:shadow-md transition-all text-left"
                           >
-                            <div className="h-32 w-full bg-slate-100 flex items-center justify-center">
-                              <span className="text-xs text-muted-foreground">Preview</span>
-                            </div>
+                            {/* Thumbnail */}
+                            {moment.thumbnail_url ? (
+                              <img
+                                src={moment.thumbnail_url}
+                                alt={moment.course_name}
+                                className="h-32 w-full object-cover"
+                                loading="lazy"
+                              />
+                            ) : (
+                              <div className="h-32 w-full bg-slate-100 flex items-center justify-center">
+                                <span className="text-xs text-muted-foreground">No image</span>
+                              </div>
+                            )}
+
                             {/* Top 100 pill overlay */}
                             {moment.list_slug && (
                               <div className="absolute left-1.5 bottom-9">
                                 <Top100Pills
-                                  memberships={[{
-                                    list_slug: moment.list_slug,
-                                    rank: moment.list_rank ?? undefined,
-                                    short_label: moment.list_slug.toUpperCase(),
-                                  }]}
+                                  memberships={[
+                                    {
+                                      list_slug: moment.list_slug,
+                                      rank: moment.list_rank ?? undefined,
+                                      short_label: moment.list_short_label ?? 'TOP 100',
+                                    },
+                                  ]}
                                   size="sm"
                                   variant="overlay"
                                   courseId={moment.course_id}
                                 />
                               </div>
                             )}
+
+                            {/* Text content */}
                             <div className="p-2">
                               <p className="line-clamp-2 text-xs text-foreground">
-                                {moment.course_name}
+                                {moment.caption || moment.course_name}
                               </p>
                               <p className="mt-1 text-[10px] text-muted-foreground">
-                                Rank #{moment.list_rank ?? '—'}
+                                {moment.course_name}
+                                {moment.list_rank && (
+                                  <> · #{moment.list_rank}</>
+                                )}
                               </p>
                             </div>
                           </button>
@@ -308,7 +327,10 @@ const Discover = () => {
                   {trendingLoading ? (
                     <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
                       {[...Array(4)].map((_, i) => (
-                        <Skeleton key={i} className="h-40 w-32 rounded-xl flex-shrink-0" />
+                        <div
+                          key={i}
+                          className="h-40 w-32 rounded-xl bg-card/60 border border-border/60 flex-shrink-0 animate-pulse"
+                        />
                       ))}
                     </div>
                   ) : trendingTop100.length === 0 ? (
@@ -320,32 +342,51 @@ const Discover = () => {
                       {trendingTop100.map((moment) => (
                         <button
                           key={moment.post_id}
-                          className="relative flex-shrink-0 w-32 rounded-xl overflow-hidden bg-card border border-border/60 hover:border-primary-accent/50 hover:shadow-md transition-all"
                           onClick={() => navigate(`/clubhouse/post/${moment.post_id}`)}
+                          className="relative flex-shrink-0 w-32 rounded-xl overflow-hidden bg-card border border-border/60 hover:border-primary-accent/50 hover:shadow-md transition-all text-left"
                         >
-                          <div className="h-32 w-full bg-slate-100 flex items-center justify-center">
-                            <span className="text-xs text-muted-foreground">Preview</span>
-                          </div>
+                          {/* Thumbnail */}
+                          {moment.thumbnail_url ? (
+                            <img
+                              src={moment.thumbnail_url}
+                              alt={moment.course_name}
+                              className="h-32 w-full object-cover"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="h-32 w-full bg-slate-100 flex items-center justify-center">
+                              <span className="text-xs text-muted-foreground">No image</span>
+                            </div>
+                          )}
+
+                          {/* Top 100 pill overlay */}
                           {moment.list_slug && (
                             <div className="absolute left-1.5 bottom-9">
                               <Top100Pills
-                                memberships={[{
-                                  list_slug: moment.list_slug,
-                                  rank: moment.list_rank ?? undefined,
-                                  short_label: moment.list_slug.toUpperCase(),
-                                }]}
+                                memberships={[
+                                  {
+                                    list_slug: moment.list_slug,
+                                    rank: moment.list_rank ?? undefined,
+                                    short_label: moment.list_short_label ?? 'TOP 100',
+                                  },
+                                ]}
                                 size="sm"
                                 variant="overlay"
                                 courseId={moment.course_id}
                               />
                             </div>
                           )}
+
+                          {/* Text content */}
                           <div className="p-2">
                             <p className="line-clamp-2 text-xs text-foreground">
-                              {moment.course_name}
+                              {moment.caption || moment.course_name}
                             </p>
                             <p className="mt-1 text-[10px] text-muted-foreground">
-                              Rank #{moment.list_rank ?? '—'}
+                              {moment.course_name}
+                              {moment.list_rank && (
+                                <> · #{moment.list_rank}</>
+                              )}
                             </p>
                           </div>
                         </button>

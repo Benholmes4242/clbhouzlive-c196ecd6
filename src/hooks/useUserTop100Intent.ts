@@ -12,7 +12,8 @@ export type UserTop100Intent = {
 export function useUserTop100Intent(userId?: string | null) {
   return useQuery({
     queryKey: ['user-top100-intent', userId ?? 'me'],
-    enabled: userId !== undefined, // if you pass undefined, we assume "me"
+    // Always enabled – the query function will early-return if no user
+    enabled: true,
     queryFn: async (): Promise<UserTop100Intent | null> => {
       let effectiveUserId = userId;
 
