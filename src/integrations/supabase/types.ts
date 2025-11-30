@@ -5566,6 +5566,10 @@ export type Database = {
         Args: { target_user_id: string }
         Returns: Json
       }
+      get_top100_course_insights: {
+        Args: { target_course_id: string; target_user_id: string }
+        Returns: Json
+      }
       get_top100_course_leaderboard: {
         Args: {
           limit_param: number
