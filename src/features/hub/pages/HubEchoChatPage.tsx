@@ -151,34 +151,17 @@ export function HubEchoChatPage() {
   };
 
   return (
-    <div className="fixed inset-0 z-[9999]">
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
-      
-      {/* Glass Sheet */}
-      <div
-        className="hub-glass-page fixed inset-0 flex flex-col"
-        style={{
-          zIndex: Z.page,
-          background: 'rgba(0, 0, 0, 0.28)',
-          backdropFilter: 'blur(22px)',
-          WebkitBackdropFilter: 'blur(22px)',
-          border: '1px solid rgba(255, 255, 255, 0.06)',
-          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.45), 0 0 1px rgba(255, 255, 255, 0.16)',
-        }}
-      >
+    <div className="fixed inset-0 z-[9999] bg-background">
+      {/* Content */}
+      <div className="fixed inset-0 flex flex-col" style={{ zIndex: Z.page }}>
       {/* Header */}
       <header 
         className={cn(
-          "relative z-10 fixed top-0 left-0 right-0 flex items-center justify-between px-4 h-14 border-b transition-shadow duration-200",
-          hasScrolled ? "shadow-[0_6px_12px_rgba(0,0,0,0.45)]" : "shadow-none"
+          "relative z-10 fixed top-0 left-0 right-0 flex items-center justify-between px-4 h-14 border-b border-border bg-background transition-shadow duration-200",
+          hasScrolled ? "shadow-sm" : "shadow-none"
         )}
         style={{
           zIndex: Z.pageHeader,
-          borderColor: 'var(--hub-stroke)',
-          background: 'rgba(22, 24, 27, 0.98)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
           paddingTop: 'env(safe-area-inset-top, 0px)',
         }}
       >
