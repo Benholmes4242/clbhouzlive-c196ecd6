@@ -111,11 +111,6 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
         <div className="mt-3 flex w-full items-start gap-6">
           {/* LEFT: score + badge */}
           <div className="flex min-w-[140px] max-w-[40%] flex-col">
-            {/* Section label - centered above badge */}
-            <p className="text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase mb-2 text-center">
-              COMMUNITY RATING
-            </p>
-            
             {/* Number + /10 - centered above badge */}
             <div className="flex items-baseline justify-center gap-1">
               <span className="text-4xl font-semibold tracking-tight text-slate-900">

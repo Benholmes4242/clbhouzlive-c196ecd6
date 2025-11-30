@@ -389,6 +389,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     <div className="flex flex-col">
       {/* Section 1 – Summary header (flattened on background) */}
       <section className="px-4 pt-3 pb-2 bg-slate-50 sm:pt-5">
+        {/* Section label */}
+        <p className="text-sm font-semibold tracking-[0.14em] text-slate-500 uppercase mb-0.5">
+          Community rating
+        </p>
+
         <CourseReviewsSummary
           averageRating={communityScore}
           reviewCount={ratingCount}
