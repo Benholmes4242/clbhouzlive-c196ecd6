@@ -540,8 +540,18 @@ const Top100CoursesHubPanel = () => {
           
           {/* Pagination Footer */}
           <div className="flex flex-col items-center gap-3 mt-8">
+            {/* Pagination Buttons */}
             {(page > 0 || hasNextPage) && (
-              <div className="flex flex-col items-center gap-3 w-full">
+              <div className={`flex items-center gap-3 w-full ${page === 0 ? 'justify-center' : 'justify-between'}`}>
+                {page > 0 && (
+                  <Button
+                    variant="secondary"
+                    onClick={() => setPage((p) => p - 1)}
+                    disabled={isLoading}
+                  >
+                    Previous {COURSES_PAGE_SIZE} courses
+                  </Button>
+                )}
                 {hasNextPage && (
                   <Button
                     variant="secondary"
@@ -555,16 +565,6 @@ const Top100CoursesHubPanel = () => {
                     disabled={isLoading || isFetchingNextPage}
                   >
                     {isFetchingNextPage ? 'Loading...' : `Next ${COURSES_PAGE_SIZE} courses`}
-                  </Button>
-                )}
-                
-                {page > 0 && (
-                  <Button
-                    variant="outline"
-                    onClick={() => setPage((p) => p - 1)}
-                    disabled={isLoading}
-                  >
-                    Previous {COURSES_PAGE_SIZE} courses
                   </Button>
                 )}
               </div>
