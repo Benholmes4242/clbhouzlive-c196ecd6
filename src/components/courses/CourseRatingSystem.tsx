@@ -79,7 +79,7 @@ const CourseRatingSystem = ({
       
       toast({
         title: "Rating Submitted! ✨",
-        description: `You rated ${courseName} ${selectedRating}/10`,
+        description: `You rated ${courseName} ${selectedRating}`,
       });
       
       setIsSubmitting(false);

@@ -55,11 +55,11 @@ export const EmptyTop100State: React.FC<EmptyStateProps> = ({ isOwnProfile, disp
     <CardContent className="p-8 text-center">
       <Trophy className="h-12 w-12 mx-auto mb-4 text-yellow-600" />
       <h3 className="text-lg font-semibold mb-2">
-        {isOwnProfile ? 'No Top 100 courses played yet' : `${displayName.replace("'s", '')} hasn't played any Top 100 courses yet`}
+        {isOwnProfile ? 'No Top 100 courses rated yet' : `${displayName.replace("'s", '')} hasn't rated any Top 100 courses yet`}
       </h3>
       <p className="text-muted-foreground">
         {isOwnProfile 
-          ? 'Explore the world\'s greatest golf courses and add them to your played list'
+          ? 'Explore the world\'s greatest golf courses and rate them to track your journey'
           : 'Check back later to see their golf course journey'
         }
       </p>

@@ -52,7 +52,6 @@ import MediaManagerModal from './immersive/MediaManagerModal';
 import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
 import GlassmorphicProfileCard from './GlassmorphicProfileCard';
 import SwipeToReturnZone from './SwipeToReturnZone';
-import { getTop100Title } from '@/lib/top100Prestige';
 import { getTop100Club } from '@/lib/top100Club';
 import { getTop100RingBorderClass, getTop100RingDotClass } from '@/lib/top100RingStyles';
 

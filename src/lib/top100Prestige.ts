@@ -1,3 +1,10 @@
+/**
+ * @deprecated This file contains legacy Top 100 prestige functions.
+ * Use src/lib/top100Club.ts instead for the new unified club system.
+ * 
+ * These functions are kept for backward compatibility but should not be used in new code.
+ */
+
 export type Top100PrestigeRing =
   | 'bronze'
   | 'blue'
@@ -7,6 +14,9 @@ export type Top100PrestigeRing =
   | 'platinum'
   | null;
 
+/**
+ * @deprecated Use getTop100Club() from src/lib/top100Club.ts instead
+ */
 export function getTop100PrestigeRing(totalTop100: number): Top100PrestigeRing {
   if (totalTop100 >= 300) return 'platinum';
   if (totalTop100 >= 200) return 'gold';
@@ -17,6 +27,9 @@ export function getTop100PrestigeRing(totalTop100: number): Top100PrestigeRing {
   return null;
 }
 
+/**
+ * @deprecated Use getTop100Club() from src/lib/top100Club.ts instead
+ */
 export function getTop100MilestoneLabel(totalTop100: number): string | null {
   if (totalTop100 >= 300) return '300 Club Champion';
   if (totalTop100 >= 200) return '200 Clubhouse Elite';
@@ -26,6 +39,9 @@ export function getTop100MilestoneLabel(totalTop100: number): string | null {
   return null;
 }
 
+/**
+ * @deprecated Use getTop100Club() from src/lib/top100Club.ts instead
+ */
 export function getRingLabel(ring?: Top100PrestigeRing | null): string | null {
   switch (ring) {
     case 'bronze': return 'Bronze Ring';
@@ -38,6 +54,9 @@ export function getRingLabel(ring?: Top100PrestigeRing | null): string | null {
   }
 }
 
+/**
+ * @deprecated Use getTop100RingBorderClass() from src/lib/top100RingStyles.ts instead
+ */
 export function getRingColorClass(ring?: Top100PrestigeRing | null): string {
   switch (ring) {
     case 'bronze': return 'ring-amber-500/80';
@@ -50,6 +69,9 @@ export function getRingColorClass(ring?: Top100PrestigeRing | null): string {
   }
 }
 
+/**
+ * @deprecated Use getTop100Club() from src/lib/top100Club.ts instead
+ */
 export function getTop100Title(count: number | null | undefined): string | null {
   if (!count || count <= 0) return null;
 

@@ -12,7 +12,6 @@ import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import Top100LeaderboardPanel from '@/components/courses/Top100LeaderboardPanel';
 import Top100MapView from '@/components/courses/Top100MapView';
 import { Top100MapScope } from '@/hooks/useTop100MapCourses';
-import { getRingLabel } from '@/lib/top100Prestige';
 import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
 
 const Top100Hub = () => {

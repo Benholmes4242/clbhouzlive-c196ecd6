@@ -74,9 +74,9 @@ const FriendCourseTabs: React.FC<FriendCourseTabsProps> = ({
             <Card>
               <CardContent className="p-8 text-center">
                 <Trophy className="h-12 w-12 mx-auto mb-4 text-yellow-600" />
-                <h3 className="text-lg font-semibold mb-2">No Top 100 courses played yet</h3>
+                <h3 className="text-lg font-semibold mb-2">No Top 100 courses rated yet</h3>
                 <p className="text-muted-foreground">
-                  {friendName} hasn't played any Top 100 courses yet
+                  {friendName} hasn't rated any Top 100 courses yet
                 </p>
               </CardContent>
             </Card>
