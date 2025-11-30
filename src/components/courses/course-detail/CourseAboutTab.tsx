@@ -21,6 +21,7 @@ import CourseLocationBreadcrumb from './CourseLocationBreadcrumb';
 import CourseTop100Summary from './CourseTop100Summary';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import CommunityScoreCard from './CommunityScoreCard';
+import { CourseTop100Spotlight } from './CourseTop100Spotlight';
 
 interface Course {
   id: string;
@@ -116,6 +117,16 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     <div>
       {/* Location Breadcrumb & Quick Filters - now handles its own padding */}
       <CourseLocationBreadcrumb course={course} />
+      
+      {/* Top 100 Spotlight (only shows if course is in any Top 100 list) */}
+      {course.id && (
+        <section className="px-4 pt-5 bg-slate-50 md:px-6">
+          <CourseTop100Spotlight
+            courseId={course.id}
+            courseName={course.name}
+          />
+        </section>
+      )}
       
       {/* Community Score Section - Card-based design */}
       <section className="px-4 pt-7 pb-5 bg-slate-100 md:px-6 md:pt-9 space-y-6">
