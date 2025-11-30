@@ -2,6 +2,7 @@ import React from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTop100ListsWithHero } from '@/hooks/useTop100ListsWithHero';
 import { Top100RegionCard } from './Top100RegionCard';
+import { Top100ClubSummary } from './Top100ClubSummary';
 import { Skeleton } from '@/components/ui/skeleton';
 import GlobalTop100 from './GlobalTop100';
 
@@ -11,6 +12,9 @@ const Top100CoursesHubPanel = () => {
 
   return (
     <div className="space-y-6">
+      {/* Top 100 Club Summary */}
+      <Top100ClubSummary />
+
       {/* Top 100 Region Cards */}
       <div className="space-y-4">
         {isLoading ? (
