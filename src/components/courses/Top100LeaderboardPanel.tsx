@@ -1,140 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { LeaderboardScope, LeaderboardTimeRange, useTop100Leaderboard, Top100LeaderboardEntry } from '@/hooks/useTop100Leaderboard';
+import { LeaderboardScope, LeaderboardTimeRange, useTop100Leaderboard } from '@/hooks/useTop100Leaderboard';
 import { useTop100CourseLeaderboard, CourseLeaderboardEntry } from '@/hooks/useTop100CourseLeaderboard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-
-type LeaderboardRowDesktopProps = {
-  row: Top100LeaderboardEntry;
-  isCurrentUser: boolean;
-};
-
-const LeaderboardRowDesktop: React.FC<LeaderboardRowDesktopProps> = ({ row, isCurrentUser }) => {
-  const navigate = useNavigate();
-
-  return (
-    <button
-      type="button"
-      onClick={() => navigate(`/profile/${row.user_id}?tab=top100`)}
-      className={cn(
-        'grid w-full grid-cols-[44px,2fr,1.4fr,1.2fr,1.1fr] items-center px-3 py-2 text-left text-[12px] transition-colors',
-        'hover:bg-slate-900/70',
-        isCurrentUser && 'bg-slate-900/90'
-      )}
-    >
-      {/* Rank */}
-      <div className="text-[11px] font-semibold text-slate-400">
-        {row.rank}
-      </div>
-
-      {/* Player */}
-      <div className="flex items-center gap-2">
-        {row.avatar_url ? (
-          <img
-            src={row.avatar_url}
-            alt={row.display_name ?? 'Player avatar'}
-            className="h-7 w-7 rounded-full object-cover"
-          />
-        ) : (
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-800 text-[11px] font-semibold text-slate-100">
-            {(row.display_name?.charAt(0) ?? '?').toUpperCase()}
-          </div>
-        )}
-        <div className="min-w-0">
-          <p className="truncate text-[12px] font-medium text-slate-50">
-            {row.display_name || 'Unknown golfer'}
-          </p>
-          {isCurrentUser && (
-            <span className="text-[10px] font-medium text-emerald-300">
-              You
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Home club */}
-      <div className="truncate text-[11px] text-slate-400">
-        {row.home_club || 'No club set'}
-      </div>
-
-      {/* Top 100 courses */}
-      <div className="text-[12px] font-semibold text-slate-50">
-        {row.total_top100_played}
-      </div>
-
-      {/* Lists completed (placeholder - will show 0 for now) */}
-      <div className="text-[11px] text-slate-300">
-        {row.lists_completed?.length ?? 0}
-      </div>
-    </button>
-  );
-};
-
-type LeaderboardRowMobileProps = {
-  row: Top100LeaderboardEntry;
-  isCurrentUser: boolean;
-};
-
-const LeaderboardRowMobile: React.FC<LeaderboardRowMobileProps> = ({ row, isCurrentUser }) => {
-  const navigate = useNavigate();
-
-  return (
-    <button
-      type="button"
-      onClick={() => navigate(`/profile/${row.user_id}?tab=top100`)}
-      className={cn(
-        'flex w-full items-center justify-between gap-2 rounded-2xl border border-slate-800/70 bg-slate-950/80 px-3 py-2 text-left text-[12px] transition-colors',
-        'active:bg-slate-900/90',
-        isCurrentUser && 'border-emerald-500/60 bg-slate-900/90'
-      )}
-    >
-      <div className="flex items-center gap-2">
-        <span className="w-4 text-[11px] font-semibold text-slate-400">
-          {row.rank}
-        </span>
-        {row.avatar_url ? (
-          <img
-            src={row.avatar_url}
-            alt={row.display_name ?? 'Player avatar'}
-            className="h-7 w-7 rounded-full object-cover"
-          />
-        ) : (
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-800 text-[11px] font-semibold text-slate-100">
-            {(row.display_name?.charAt(0) ?? '?').toUpperCase()}
-          </div>
-        )}
-        <div className="min-w-0">
-          <p className="truncate text-[12px] font-medium text-slate-50">
-            {row.display_name || 'Unknown golfer'}
-          </p>
-          <p className="truncate text-[11px] text-slate-400">
-            {row.home_club || 'No club set'}
-          </p>
-          {isCurrentUser && (
-            <span className="text-[10px] font-medium text-emerald-300">
-              You
-            </span>
-          )}
-        </div>
-      </div>
-
-      <div className="flex flex-col items-end gap-0.5">
-        <div className="flex items-baseline gap-1">
-          <span className="text-[13px] font-semibold text-slate-50">
-            {row.total_top100_played}
-          </span>
-          <span className="text-[10px] text-slate-400">Top 100</span>
-        </div>
-        <div className="text-[10px] text-slate-400">
-          {row.lists_completed?.length ?? 0} list{(row.lists_completed?.length ?? 0) === 1 ? '' : 's'}
-        </div>
-      </div>
-    </button>
-  );
-};
+import { Top100LeaderboardRow } from '@/components/top100/Top100LeaderboardRow';
 
 const Top100LeaderboardPanel = () => {
   const navigate = useNavigate();
@@ -249,48 +121,49 @@ const Top100LeaderboardPanel = () => {
   return (
     <div ref={containerRef} className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-3 pb-6 pt-2 sm:px-4 sm:pt-3">
       {/* Header */}
-      <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div className="space-y-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-            Top 100 leaderboard
-          </p>
-          <h1 className="text-base font-semibold text-slate-50 sm:text-lg">
-            See who's leading the global Top 100 journey
-          </h1>
-          <p className="max-w-xl text-[12px] text-slate-400">
-            Ranking golfers by Top 100 courses played. Use the filters to browse by list and region.
-          </p>
+      <header className="mb-4 flex flex-col gap-2 px-4 sm:px-0">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+          Top 100 leaderboard
+        </p>
+        <div className="flex flex-wrap items-baseline gap-2">
+          <h2 className="text-base font-semibold text-slate-50 sm:text-lg">
+            Who's leading the Top 100 journey
+          </h2>
         </div>
-
-        {/* Filters */}
-        <div className="mt-1 flex flex-wrap gap-2 sm:mt-0 sm:justify-end">
-          <Select value={scope} onValueChange={handleScopeChange}>
-            <SelectTrigger className="min-w-[140px] bg-slate-900/80 border-slate-800/70 text-[12px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {(Object.keys(scopeLabels) as LeaderboardScope[]).map((key) => (
-                <SelectItem key={key} value={key}>
-                  {scopeLabels[key]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={timeRange} onValueChange={handleTimeRangeChange}>
-            <SelectTrigger className="min-w-[120px] bg-slate-900/80 border-slate-800/70 text-[12px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {(Object.keys(timeRangeLabels) as LeaderboardTimeRange[]).map((key) => (
-                <SelectItem key={key} value={key}>
-                  {timeRangeLabels[key]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <p className="text-[13px] text-slate-400 max-w-2xl">
+          See how many Top 100 courses other golfers have played – and where you sit
+          in the rankings.
+        </p>
       </header>
+
+      {/* Filters */}
+      <div className="flex flex-wrap gap-2 px-4 sm:px-0">
+        <Select value={scope} onValueChange={handleScopeChange}>
+          <SelectTrigger className="min-w-[140px] bg-slate-900/80 border-slate-800/70 text-[12px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {(Object.keys(scopeLabels) as LeaderboardScope[]).map((key) => (
+              <SelectItem key={key} value={key}>
+                {scopeLabels[key]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={timeRange} onValueChange={handleTimeRangeChange}>
+          <SelectTrigger className="min-w-[120px] bg-slate-900/80 border-slate-800/70 text-[12px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {(Object.keys(timeRangeLabels) as LeaderboardTimeRange[]).map((key) => (
+              <SelectItem key={key} value={key}>
+                {timeRangeLabels[key]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       {/* View Type Toggle */}
       <div className="flex justify-center">
@@ -321,6 +194,13 @@ const Top100LeaderboardPanel = () => {
           </button>
         </div>
       </div>
+
+      {/* User rank hint */}
+      {viewType === 'players' && currentUserEntry && (
+        <p className="mb-2 px-4 text-[11px] text-slate-400 sm:px-0">
+          You're currently #{currentUserEntry.rank} on the Top 100 leaderboard.
+        </p>
+      )}
 
       {/* User not ranked hint - only show for players view when entries exist but user not ranked */}
       {viewType === 'players' && allEntries.length > 0 && !currentUserEntry && (
@@ -524,30 +404,19 @@ const Top100LeaderboardPanel = () => {
               )}
 
               {!isLoading && data && allEntries.length > 0 && (
-                <div className="overflow-hidden rounded-2xl border border-slate-900/80 bg-slate-950">
-                  {/* Table header */}
-                  <div className="grid grid-cols-[44px,2fr,1.4fr,1.2fr,1.1fr] border-b border-slate-900/80 bg-slate-950/95 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
-                    <div>#</div>
-                    <div>Golfer</div>
-                    <div>Home club</div>
-                    <div>Top 100 courses</div>
-                    <div>Lists</div>
-                  </div>
-
-                  {/* Table body */}
-                  <div className="divide-y divide-slate-900/80">
-                    {allEntries.map((row) => {
-                      const isCurrentUser = row.user_id === session?.user?.id;
-                      return (
-                        <LeaderboardRowDesktop
-                          key={row.user_id}
-                          row={row}
-                          isCurrentUser={isCurrentUser}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
+                <ul className="space-y-1.5">
+                  {allEntries.map((row) => {
+                    return (
+                      <Top100LeaderboardRow
+                        key={row.user_id}
+                        entry={{
+                          ...row,
+                          is_current_user: row.user_id === session?.user?.id
+                        }}
+                      />
+                    );
+                  })}
+                </ul>
               )}
 
               {!isLoading && (!data || allEntries.length === 0) && (
@@ -572,18 +441,19 @@ const Top100LeaderboardPanel = () => {
               )}
 
               {!isLoading && data && allEntries.length > 0 && (
-                <div className="mt-1 space-y-1.5">
+                <ul className="mt-1 space-y-1.5">
                   {allEntries.map((row) => {
-                    const isCurrentUser = row.user_id === session?.user?.id;
                     return (
-                      <LeaderboardRowMobile
+                      <Top100LeaderboardRow
                         key={row.user_id}
-                        row={row}
-                        isCurrentUser={isCurrentUser}
+                        entry={{
+                          ...row,
+                          is_current_user: row.user_id === session?.user?.id
+                        }}
                       />
                     );
                   })}
-                </div>
+                </ul>
               )}
 
               {!isLoading && (!data || allEntries.length === 0) && (

@@ -968,34 +968,42 @@ const HeroProfileHeader = ({
                   </button>
                 </div>
 
-                {/* Top 100 journey pill */}
+                {/* Top 100 progress pill */}
                 {top100Overview && top100Overview.total_played > 0 && (() => {
                   const top100Title = getTop100Title(top100Overview.total_played);
+
                   return (
                     <div className="mt-3 flex justify-center">
                       <button
                         type="button"
                         onClick={() => handleTabChange('top100')}
-                        className="inline-flex w-full items-center gap-1.5 rounded-full border border-slate-800/70 bg-slate-950/80 px-3 py-1.5 text-[11px] text-slate-200 hover:border-emerald-400/70 hover:text-emerald-100"
+                        className="
+                          inline-flex items-center gap-2 rounded-full
+                          border border-slate-800/80 bg-slate-950/80
+                          px-3 py-1.5 text-[11px] text-slate-200
+                          hover:border-slate-600 hover:text-slate-50
+                          transition-colors
+                        "
                       >
-                        <span className="text-[13px]">🏆</span>
-                        <span className="font-medium">Top 100</span>
-                        <span className="text-slate-400">·</span>
-                        <span>
-                          {top100Overview.total_played} course
-                          {top100Overview.total_played === 1 ? '' : 's'}
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-900 text-[11px]">
+                          🏆
                         </span>
-                        <span className="text-slate-400">·</span>
-                        <span>
-                          {top100Overview.regions_count}{' '}
-                          {top100Overview.regions_count === 1 ? 'region' : 'regions'}
+                        <span className="flex flex-col items-start leading-tight">
+                          <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+                            Top 100
+                          </span>
+                          <span className="text-[11px] text-slate-100">
+                            {top100Overview.total_played} course
+                            {top100Overview.total_played === 1 ? '' : 's'} ·{' '}
+                            {top100Overview.regions_count}{' '}
+                            {top100Overview.regions_count === 1 ? 'region' : 'regions'}
+                          </span>
+                          {top100Title && (
+                            <span className="text-[11px] text-emerald-300">
+                              {top100Title}
+                            </span>
+                          )}
                         </span>
-                        {top100Title && (
-                          <>
-                            <span className="text-slate-500">·</span>
-                            <span>{top100Title}</span>
-                          </>
-                        )}
                       </button>
                     </div>
                   );
