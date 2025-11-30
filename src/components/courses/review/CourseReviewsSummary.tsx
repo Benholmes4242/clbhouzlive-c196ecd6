@@ -132,7 +132,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
             {distributionItems.map((item) => {
               const percentage = (item.count / maxCount) * 100;
               return (
-                <div key={item.tier.tier} className="mb-1.5 flex items-center gap-1.5">
+                <div key={item.tier.tier} className="mb-1.5 flex items-center gap-0">
                   {/* Label */}
                   <span className="w-24 text-sm text-slate-700">
                     {item.tier.label}
