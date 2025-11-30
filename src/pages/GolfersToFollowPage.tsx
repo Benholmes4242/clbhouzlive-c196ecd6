@@ -176,7 +176,7 @@ const GolfersToFollowPage = () => {
                 {Array.from({ length: 5 }).map((_, i) => (
                   <div
                     key={i}
-                    className="flex items-center justify-between rounded-2xl bg-white px-4 py-4 shadow-sm"
+                    className="flex items-center justify-between rounded-xl bg-white border border-gray-200 shadow-[0_2px_8px_rgba(0,0,0,0.08)] px-4 py-4"
                   >
                     <div className="flex flex-1 items-center gap-3">
                       <div className="h-12 w-12 rounded-2xl bg-slate-200 animate-pulse" />
