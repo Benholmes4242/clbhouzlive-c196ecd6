@@ -22,6 +22,13 @@ import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { useOptimisticPostInsertion } from '@/hooks/useOptimisticPostInsertion';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
+import { useUserTop100Intent } from '@/hooks/useUserTop100Intent';
+import { useTop100DiscoverRecommendations } from '@/hooks/useTop100DiscoverRecommendations';
+import { useTrendingTop100Moments } from '@/hooks/useTrendingTop100Moments';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useNavigate } from 'react-router-dom';
+import Top100Pills from '@/components/courses/Top100Pills';
 
 // Lazy load heavy/inactive components for better initial bundle size
 const FollowingFeed = lazy(() => import('@/components/discover/FollowingFeed'));
@@ -30,6 +37,7 @@ const VideosPage = lazy(() => import('@/features/videos2/pages/VideosPage'));
 type MainKey = 'shorts' | 'videos' | 'channels' | 'following';
 
 const Discover = () => {
+  const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
   const [modalStartIndex, setModalStartIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
@@ -37,6 +45,26 @@ const Discover = () => {
   
   const { main, sub } = useDiscoverQuery();
   const [durationFilter, setDurationFilter] = useVideoLengthFilter();
+
+  // Top 100 integration hooks
+  const {
+    data: intent,
+    isLoading: intentLoading,
+  } = useUserTop100Intent();
+
+  const {
+    data: personalRecs = [],
+    isLoading: personalLoading,
+  } = useTop100DiscoverRecommendations(12);
+
+  const {
+    data: trendingTop100 = [],
+    isLoading: trendingLoading,
+  } = useTrendingTop100Moments(12, 7);
+
+  const hasTop100Journey =
+    (intent?.total_top100_played ?? 0) > 0 ||
+    (intent?.wishlist_list_slugs?.length ?? 0) > 0;
   
   // Convert durationFilter key to range for API
   const durationRange = React.useMemo(() => {
@@ -186,6 +214,147 @@ const Discover = () => {
               <SuggestedUsersRedesigned onUserFollow={handleUserFollow} />
             </div> */}
             {/* Commented out for future use - SuggestedUsersRedesigned component is stored in /components/discover/ */}
+
+            {/* Top 100 Journey Rails - only show on shorts/videos tabs */}
+            {(main === 'shorts' || main === 'videos') && (
+              <div className="md:container md:mx-auto md:px-4 space-y-6 mt-6">
+                {/* Personalised Top 100 Journey rail */}
+                {hasTop100Journey && (
+                  <section className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h2 className="text-sm font-semibold">
+                          Your Top 100 Journey – Next Stops
+                        </h2>
+                        <p className="text-xs text-muted-foreground">
+                          Moments from Top 100 courses you haven't ticked off yet.
+                        </p>
+                      </div>
+                      {intent?.wishlist_list_slugs?.[0] && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() =>
+                            navigate(`/top100/${intent.wishlist_list_slugs[0]}`)
+                          }
+                        >
+                          View list
+                        </Button>
+                      )}
+                    </div>
+
+                    {personalLoading ? (
+                      <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
+                        {[...Array(4)].map((_, i) => (
+                          <Skeleton key={i} className="h-40 w-32 rounded-xl flex-shrink-0" />
+                        ))}
+                      </div>
+                    ) : personalRecs.length === 0 ? null : (
+                      <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
+                        {personalRecs.map((moment) => (
+                          <button
+                            key={moment.post_id}
+                            className="relative flex-shrink-0 w-32 rounded-xl overflow-hidden bg-card border border-border/60 hover:border-primary-accent/50 hover:shadow-md transition-all"
+                            onClick={() => {
+                              navigate(`/clubhouse/post/${moment.post_id}`);
+                            }}
+                          >
+                            <div className="h-32 w-full bg-slate-100 flex items-center justify-center">
+                              <span className="text-xs text-muted-foreground">Preview</span>
+                            </div>
+                            {/* Top 100 pill overlay */}
+                            {moment.list_slug && (
+                              <div className="absolute left-1.5 bottom-9">
+                                <Top100Pills
+                                  memberships={[{
+                                    list_slug: moment.list_slug,
+                                    rank: moment.list_rank ?? undefined,
+                                    short_label: moment.list_slug.toUpperCase(),
+                                  }]}
+                                  size="sm"
+                                  variant="overlay"
+                                  courseId={moment.course_id}
+                                />
+                              </div>
+                            )}
+                            <div className="p-2">
+                              <p className="line-clamp-2 text-xs text-foreground">
+                                {moment.course_name}
+                              </p>
+                              <p className="mt-1 text-[10px] text-muted-foreground">
+                                Rank #{moment.list_rank ?? '—'}
+                              </p>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </section>
+                )}
+
+                {/* Global Trending Top 100 rail */}
+                <section className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-sm font-semibold">
+                        Trending from the World's Top 100
+                      </h2>
+                      <p className="text-xs text-muted-foreground">
+                        Hype from the most iconic courses on Clbhouz this week.
+                      </p>
+                    </div>
+                  </div>
+
+                  {trendingLoading ? (
+                    <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
+                      {[...Array(4)].map((_, i) => (
+                        <Skeleton key={i} className="h-40 w-32 rounded-xl flex-shrink-0" />
+                      ))}
+                    </div>
+                  ) : trendingTop100.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">
+                      No Top 100 activity yet – check back soon.
+                    </p>
+                  ) : (
+                    <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
+                      {trendingTop100.map((moment) => (
+                        <button
+                          key={moment.post_id}
+                          className="relative flex-shrink-0 w-32 rounded-xl overflow-hidden bg-card border border-border/60 hover:border-primary-accent/50 hover:shadow-md transition-all"
+                          onClick={() => navigate(`/clubhouse/post/${moment.post_id}`)}
+                        >
+                          <div className="h-32 w-full bg-slate-100 flex items-center justify-center">
+                            <span className="text-xs text-muted-foreground">Preview</span>
+                          </div>
+                          {moment.list_slug && (
+                            <div className="absolute left-1.5 bottom-9">
+                              <Top100Pills
+                                memberships={[{
+                                  list_slug: moment.list_slug,
+                                  rank: moment.list_rank ?? undefined,
+                                  short_label: moment.list_slug.toUpperCase(),
+                                }]}
+                                size="sm"
+                                variant="overlay"
+                                courseId={moment.course_id}
+                              />
+                            </div>
+                          )}
+                          <div className="p-2">
+                            <p className="line-clamp-2 text-xs text-foreground">
+                              {moment.course_name}
+                            </p>
+                            <p className="mt-1 text-[10px] text-muted-foreground">
+                              Rank #{moment.list_rank ?? '—'}
+                            </p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </section>
+              </div>
+            )}
 
             {/* Main Content - Conditional based on active tab with slide animation */}
             <SlidingPanels
