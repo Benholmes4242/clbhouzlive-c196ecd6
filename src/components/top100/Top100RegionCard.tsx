@@ -1,77 +1,110 @@
 import React from 'react';
+import { MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 
 type Top100RegionCardProps = {
-  title: string;              // "Global", "GB&I", "USA", "Europe"
-  eyebrow: string;            // "GLOBAL TOP 100" etc
-  played: number;             // 26
-  total: number;              // 77
-  heroImageUrl?: string | null;
+  list: Top100ListSummary;
   onClick?: () => void;
 };
 
 export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
-  title,
-  eyebrow,
-  played,
-  total,
-  heroImageUrl,
+  list,
   onClick,
 }) => {
-  const hasImage = Boolean(heroImageUrl);
+  const total = list.total_courses ?? 0;
+  const played = list.played_count ?? 0;
+  const progress = total > 0 ? Math.min(100, Math.round((played / total) * 100)) : 0;
+  const hero = list.hero_course;
 
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
-        'relative w-full overflow-hidden rounded-3xl',
-        'bg-slate-900 text-left text-slate-50',
+        'relative w-full overflow-hidden',
+        'text-left text-slate-50',
         'shadow-lg shadow-slate-900/30',
         'active:scale-[0.99] transition-transform duration-100',
         'h-[230px] sm:h-[250px]'
       )}
+      style={{ borderRadius: 'var(--top100-card-radius)' }}
     >
       {/* Background image */}
-      {hasImage && (
+      {hero?.cover_image_url ? (
         <div className="absolute inset-0">
           <img
-            src={heroImageUrl!}
-            alt={`${title} Top 100 hero`}
+            src={hero.cover_image_url}
+            alt={hero.name}
             className="h-full w-full object-cover"
+            loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent" />
+          {/* Bottom gradient only */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
         </div>
+      ) : (
+        <div className="absolute inset-0 bg-neutral-900" />
       )}
 
-      {/* Fallback gradient if no image */}
-      {!hasImage && (
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900" />
-      )}
-
-      {/* Location pin pill (top-right) */}
-      <div className="relative flex justify-end px-4 pt-3">
-        <div className="inline-flex items-center justify-center rounded-full bg-slate-900/60 px-2 py-1 backdrop-blur-sm">
-          <span className="text-xs text-slate-200">📍</span>
-        </div>
-      </div>
-
-      {/* Content block (bottom) */}
-      <div className="relative px-5 pb-5 pt-10">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-300">
-          {eyebrow}
+      {/* Content */}
+      <div className="relative px-5 py-4 space-y-3 h-full flex flex-col justify-between">
+        {/* Row 1: Region name + location icon */}
+        <div className="flex items-center justify-between">
+          <div className="text-[19px] font-semibold text-white tracking-tight">
+            {list.name}
+          </div>
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-black/35 backdrop-blur">
+            <MapPin className="h-4 w-4 text-white/80" />
+          </div>
         </div>
 
-        <div className="mt-1 text-2xl font-semibold tracking-tight">
-          {title}
-        </div>
+        {/* Bottom section */}
+        <div className="space-y-3">
+          {/* Row 2: counts + hero course pill */}
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-sm text-white/80">
+              {played} / {total} played
+            </div>
 
-        <div className="mt-3 inline-flex items-center rounded-full bg-slate-950/70 px-3 py-1 text-[12px] font-medium text-slate-100">
-          {played} / {total} played
-        </div>
+            {hero && (
+              <div 
+                className="max-w-[56%] rounded-full bg-black/35 px-3 py-1 text-xs text-white/90 backdrop-blur truncate"
+                style={{ border: 'var(--pill-border)' }}
+              >
+                <span className="font-semibold mr-1">#{hero.rank_in_list}</span>
+                <span className="truncate">{hero.name}</span>
+              </div>
+            )}
+          </div>
 
-        <div className="mt-3 text-[13px] font-medium text-slate-100/90">
-          View courses <span aria-hidden="true">→</span>
+          {/* Row 3: progress bar + helper */}
+          <div className="space-y-1">
+            <div 
+              className="w-full overflow-hidden bg-white/16"
+              style={{ 
+                height: 'var(--top100-progress-height)', 
+                borderRadius: 'var(--top100-progress-radius)' 
+              }}
+            >
+              <div
+                className="h-full bg-amber-400"
+                style={{ 
+                  width: `${progress}%`,
+                  borderRadius: 'var(--top100-progress-radius)'
+                }}
+              />
+            </div>
+            <div className="text-[11px] text-white/75">
+              {progress === 0
+                ? 'Start your journey on this list'
+                : `${100 - progress}% remaining to complete this list`}
+            </div>
+          </div>
+
+          {/* Row 4: CTA */}
+          <div className="pt-1 text-sm font-medium text-white">
+            View courses →
+          </div>
         </div>
       </div>
     </button>

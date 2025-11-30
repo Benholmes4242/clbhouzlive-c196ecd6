@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
-import { useTop100ListTopCourses } from '@/hooks/useTop100ListTopCourses';
+import { useTop100ListSummaries } from '@/hooks/useTop100ListSummaries';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Globe, MapPin, List, Map as MapIcon, Trophy } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
@@ -21,7 +21,7 @@ const Top100Hub = () => {
   const { session } = useSupabaseSession();
   const { data: lists, isLoading: listsLoading } = useTop100Lists();
   const { data: progress } = useTop100ProgressForUser(session?.user?.id);
-  const { data: topCourses } = useTop100ListTopCourses();
+  const { data: listSummaries, isLoading: summariesLoading } = useTop100ListSummaries(session?.user?.id);
 
   const tabFromUrl = searchParams.get('tab');
   
@@ -167,30 +167,19 @@ const Top100Hub = () => {
               {coursesViewMode === 'list' ? (
                 /* Region Cards */
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {lists?.map((list) => {
-                    const progressData = getProgress(list.id);
-                    const topCourse = topCourses?.find(tc => tc.listId === list.id);
-                    const heroImageUrl = topCourse?.topCourse?.thumbnail_image ?? null;
-
-                    // Build eyebrow and title from list data
-                    const eyebrow = list.short_label.includes('Top 100') 
-                      ? list.short_label.toUpperCase()
-                      : `${list.short_label.toUpperCase()} TOP 100`;
-                    
-                    const title = list.short_label.replace(/\s*Top 100$/i, '').trim();
-
-                    return (
+                  {summariesLoading ? (
+                    <div className="col-span-full text-center py-12 text-muted-foreground">
+                      Loading Top 100 lists...
+                    </div>
+                  ) : (
+                    listSummaries?.map((list) => (
                       <Top100RegionCard
                         key={list.id}
-                        title={title}
-                        eyebrow={eyebrow}
-                        played={progressData?.played ?? 0}
-                        total={progressData?.total ?? 0}
-                        heroImageUrl={heroImageUrl}
+                        list={list}
                         onClick={() => navigate(`/top100/${list.slug}`)}
                       />
-                    );
-                  })}
+                    ))
+                  )}
                 </div>
               ) : (
                 /* Map View */
