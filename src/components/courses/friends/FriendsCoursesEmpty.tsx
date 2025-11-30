@@ -21,9 +21,9 @@ const FriendsCoursesEmpty: React.FC = () => {
         Follow other golfers to see where they've been playing and discover new courses.
       </p>
 
-      {/* Button - global outline style */}
+      {/* Button - tier two secondary style */}
       <Button
-        variant="outline"
+        variant="secondary"
         onClick={() => navigate('/golferstofollow')}
         className="w-full max-w-[320px]"
       >

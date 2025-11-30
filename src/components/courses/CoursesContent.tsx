@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import CoursesErrorBoundary from './CoursesErrorBoundary';
+import { Trophy } from 'lucide-react';
 
 interface CoursesContentProps {
   username?: string;
@@ -143,7 +144,8 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
               className="text-sm px-3 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard"
               style={{ borderRadius: 'var(--radius)' }}
             >
-              🏆 Top 100
+              <Trophy className="h-3.5 w-3.5 mr-1.5" />
+              Top 100
             </TabsTrigger>
             <TabsTrigger 
               value="friends-courses"
