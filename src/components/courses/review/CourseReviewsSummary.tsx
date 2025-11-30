@@ -128,7 +128,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
           </div>
 
           {/* RIGHT: distribution bars */}
-          <div className="flex-1">
+          <div className="flex-1 ml-4">
             {distributionItems.map((item) => {
               const percentage = (item.count / maxCount) * 100;
               return (
