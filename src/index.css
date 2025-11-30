@@ -127,6 +127,25 @@ html.lightbox-open {
   --rating-band-very-good: #2F604A;   /* Pine Green */
   --rating-band-good: #8FBCA8;        /* Sea Mist Green */
   --rating-band-fair: #D2C6B2;        /* Sand Dune */
+  
+  /* ========================================
+     TOP 100 CARDS DESIGN TOKENS
+     ======================================== */
+  
+  /* Card geometry */
+  --top100-card-radius: 24px;
+  --top100-card-padding-y: 18px;
+  --top100-card-padding-x: 20px;
+  
+  /* Pill styling */
+  --pill-radius: 999px;
+  --pill-border: 1px solid rgba(255, 255, 255, 0.16);
+  --pill-padding-x: 12px;
+  --pill-padding-y: 4px;
+  
+  /* Progress bar styling */
+  --top100-progress-height: 6px;
+  --top100-progress-radius: 999px;
 }
 
 /* Rating slider improvements - larger touch areas, smooth mobile interaction */
