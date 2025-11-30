@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
+import { useTop100ListTopCourses } from '@/hooks/useTop100ListTopCourses';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Globe, MapPin, List, Map as MapIcon, Trophy } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
@@ -12,6 +13,7 @@ import Top100LeaderboardPanel from '@/components/courses/Top100LeaderboardPanel'
 import Top100MapView from '@/components/courses/Top100MapView';
 import { Top100MapScope } from '@/hooks/useTop100MapCourses';
 import { getRingLabel } from '@/lib/top100Prestige';
+import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
 
 const Top100Hub = () => {
   const navigate = useNavigate();
@@ -19,6 +21,7 @@ const Top100Hub = () => {
   const { session } = useSupabaseSession();
   const { data: lists, isLoading: listsLoading } = useTop100Lists();
   const { data: progress } = useTop100ProgressForUser(session?.user?.id);
+  const { data: topCourses } = useTop100ListTopCourses();
 
   const tabFromUrl = searchParams.get('tab');
   
@@ -53,36 +56,6 @@ const Top100Hub = () => {
       </div>
     );
   }
-
-  const getRegionIcon = (slug: string) => {
-    switch (slug) {
-      case 'global-top-100':
-        return <Globe className="w-8 h-8" />;
-      case 'gb-i-top-100':
-        return <CountryFlag country="Britain & Ireland" size="lg" />;
-      case 'usa-top-100':
-        return <CountryFlag country="USA" size="lg" />;
-      case 'europe-top-100':
-        return <CountryFlag country="Continental Europe" size="lg" />;
-      default:
-        return <MapPin className="w-8 h-8" />;
-    }
-  };
-
-  const getRegionBackground = (slug: string) => {
-    switch (slug) {
-      case 'global-top-100':
-        return '/lovable-uploads/bd96819b-505e-4a35-b242-d106babe5179.png';
-      case 'gb-i-top-100':
-        return 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=800&fit=crop';
-      case 'usa-top-100':
-        return 'https://images.unsplash.com/photo-1629048821995-e30a7ba7f063?w=1200&h=800&fit=crop';
-      case 'europe-top-100':
-        return 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=1200&h=800&fit=crop';
-      default:
-        return '';
-    }
-  };
 
   const getProgress = (listId: string) => {
     if (!progress || !progress.lists) return null;
@@ -195,61 +168,27 @@ const Top100Hub = () => {
                 /* Region Cards */
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {lists?.map((list) => {
-                  const progressData = getProgress(list.id);
-                  const backgroundImage = getRegionBackground(list.slug);
+                    const progressData = getProgress(list.id);
+                    const topCourse = topCourses?.find(tc => tc.listId === list.id);
+                    const heroImageUrl = topCourse?.topCourse?.thumbnail_image ?? null;
 
-                  return (
-                    <div
-                      key={list.id}
-                      onClick={() => navigate(`/top100/${list.slug}`)}
-                      className="group relative h-80 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl"
-                      style={{
-                        backgroundImage: backgroundImage
-                          ? `url(${backgroundImage})`
-                          : 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%)',
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                      }}
-                    >
-                      {/* Dark Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+                    // Build eyebrow and title from list data
+                    const eyebrow = list.short_label.includes('Top 100') 
+                      ? list.short_label.toUpperCase()
+                      : `${list.short_label.toUpperCase()} TOP 100`;
+                    
+                    const title = list.short_label.replace(/\s*Top 100$/i, '').trim();
 
-                      {/* Content */}
-                      <div className="relative h-full flex flex-col justify-between p-6">
-                        {/* Icon */}
-                        <div className="flex justify-end">
-                          <div className="text-foreground/90">{getRegionIcon(list.slug)}</div>
-                        </div>
-
-                        {/* Text Content */}
-                        <div className="space-y-3">
-                          <h2 className="font-display text-3xl font-bold text-foreground">
-                            {list.short_label}
-                          </h2>
-                          
-                          {list.description && (
-                            <p className="text-foreground/80 text-lg">{list.description}</p>
-                          )}
-
-                          {/* Progress Pill */}
-                          {progressData && session && (
-                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20">
-                              <span className="text-foreground font-medium">
-                                {progressData.played} / {progressData.total} played
-                              </span>
-                            </div>
-                          )}
-
-                          {/* CTA */}
-                          <div className="pt-2">
-                            <span className="text-foreground/90 text-lg font-medium group-hover:text-foreground transition-colors flex items-center gap-2">
-                              View Courses
-                              <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    return (
+                      <Top100RegionCard
+                        key={list.id}
+                        title={title}
+                        eyebrow={eyebrow}
+                        played={progressData?.played ?? 0}
+                        total={progressData?.total ?? 0}
+                        heroImageUrl={heroImageUrl}
+                        onClick={() => navigate(`/top100/${list.slug}`)}
+                      />
                     );
                   })}
                 </div>
