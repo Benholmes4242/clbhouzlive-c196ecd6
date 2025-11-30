@@ -2,6 +2,7 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Earth } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
+import { useNavigate } from 'react-router-dom';
 
 interface Top100Membership {
   list_slug: string;
@@ -13,14 +14,25 @@ interface Top100PillsProps {
   memberships: Top100Membership[];
   variant?: 'overlay' | 'inline';
   size?: 'sm' | 'md' | 'lg';
+  courseId?: string; // Add courseId prop for navigation
 }
 
 const Top100Pills: React.FC<Top100PillsProps> = ({ 
   memberships, 
   variant = 'overlay',
-  size = 'sm'
+  size = 'sm',
+  courseId
 }) => {
+  const navigate = useNavigate();
+  
   if (!memberships || memberships.length === 0) return null;
+
+  const handlePillClick = (e: React.MouseEvent, slug: string) => {
+    e.stopPropagation();
+    if (courseId) {
+      navigate(`/top100/${slug}?courseId=${courseId}`);
+    }
+  };
 
   const getIcon = (slug: string) => {
     switch (slug) {
@@ -50,7 +62,8 @@ const Top100Pills: React.FC<Top100PillsProps> = ({
         <Badge
           key={membership.list_slug}
           variant="outline"
-          className={`${pillClasses} ${textSize} font-semibold px-2 py-0.5 flex items-center gap-1`}
+          className={`${pillClasses} ${textSize} font-semibold px-2 py-0.5 flex items-center gap-1 ${courseId ? 'cursor-pointer active:scale-95 transition-transform' : ''}`}
+          onClick={courseId ? (e) => handlePillClick(e, membership.list_slug) : undefined}
         >
           {getIcon(membership.list_slug)}
           <span>#{membership.rank}</span>

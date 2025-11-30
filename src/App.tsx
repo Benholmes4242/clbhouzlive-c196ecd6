@@ -96,7 +96,6 @@ const FollowersListPage = lazy(() => import("./pages/FollowersListPage"));
 const FollowingListPage = lazy(() => import("./pages/FollowingListPage"));
 const FriendsListPage = lazy(() => import("./pages/FriendsListPage"));
 
-const GlobalTop100 = lazy(() => import("./pages/GlobalTop100"));
 const Top100Hub = lazy(() => import("./pages/Top100Hub"));
 const Top100List = lazy(() => import("./pages/Top100List"));
 const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
@@ -215,7 +214,6 @@ function AppRoutes() {
         <Route path="/profile/:username/following" element={<Suspense fallback={<GenericPageSkeleton />}><FollowingListPage /></Suspense>} />
         <Route path="/profile/:username/friends" element={<Suspense fallback={<GenericPageSkeleton />}><FriendsListPage /></Suspense>} />
         
-        <Route path="/global-top100" element={<GlobalTop100 />} />
         <Route path="/top100" element={<Top100Hub />} />
         <Route path="/top100/:slug" element={<Top100List />} />
         <Route path="/admin-setup" element={<AdminSetupPage />} />

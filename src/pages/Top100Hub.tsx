@@ -4,13 +4,14 @@ import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { useMyTop100Progress } from '@/hooks/useMyTop100Progress';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { Globe, MapPin, List, Map as MapIcon } from 'lucide-react';
+import { Globe, MapPin, List, Map as MapIcon, Trophy } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import Top100LeaderboardPanel from '@/components/courses/Top100LeaderboardPanel';
 import Top100MapView from '@/components/courses/Top100MapView';
 import { Top100MapScope } from '@/hooks/useTop100MapCourses';
+import { getRingLabel } from '@/lib/top100Prestige';
 
 const Top100Hub = () => {
   const navigate = useNavigate();
@@ -126,6 +127,26 @@ const Top100Hub = () => {
             </TabsList>
 
             <TabsContent value="courses" className="mt-0">
+              {/* Progress Chip */}
+              {session && progress && progress.total_played_top100 > 0 && (
+                <div className="flex justify-center mb-6">
+                  <button
+                    onClick={() => setActiveTab('my-progress')}
+                    className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-4 py-2 text-sm hover:border-primary-accent/60 hover:bg-muted/50 transition-all"
+                  >
+                    <Trophy className="h-4 w-4 text-primary-accent" />
+                    <span className="font-medium">
+                      You've played {progress.total_played_top100} Top 100 course{progress.total_played_top100 === 1 ? '' : 's'}
+                    </span>
+                    {progress.prestige_ring && (
+                      <span className="text-muted-foreground">
+                        · {getRingLabel(progress.prestige_ring)}
+                      </span>
+                    )}
+                  </button>
+                </div>
+              )}
+              
               {/* View Mode Toggle */}
               <div className="flex justify-center mb-6">
                 <div className="inline-flex h-10 items-center justify-center rounded-lg bg-muted p-1">
@@ -198,15 +219,16 @@ const Top100Hub = () => {
                           {progressData && session && (
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20">
                               <span className="text-foreground font-medium">
-                                You've played {progressData.played} of {progressData.total}
+                                {progressData.played} / {progressData.total} played
                               </span>
                             </div>
                           )}
 
                           {/* CTA */}
                           <div className="pt-2">
-                            <span className="text-foreground/90 text-lg font-medium group-hover:text-foreground transition-colors">
-                              Explore List →
+                            <span className="text-foreground/90 text-lg font-medium group-hover:text-foreground transition-colors flex items-center gap-2">
+                              View Courses
+                              <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
                             </span>
                           </div>
                         </div>

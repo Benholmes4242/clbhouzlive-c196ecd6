@@ -4,13 +4,10 @@ import mapboxgl from 'mapbox-gl';
 import { useTop100MapCourses, Top100MapScope, Top100MapCourse } from '@/hooks/useTop100MapCourses';
 import { Button } from '@/components/ui/button';
 import { X, MapPin, Trophy } from 'lucide-react';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-streets-v12';
-
-interface Top100MapViewProps {
-  scope: Top100MapScope;
-}
 
 // Region center and zoom configurations
 const REGION_CONFIG: Record<Top100MapScope, { center: [number, number]; zoom: number }> = {
@@ -20,13 +17,18 @@ const REGION_CONFIG: Record<Top100MapScope, { center: [number, number]; zoom: nu
   'europe-top-100': { center: [10, 50], zoom: 4 },
 };
 
+interface Top100MapViewProps {
+  scope: Top100MapScope;
+}
+
 const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
   const navigate = useNavigate();
+  const { session } = useSupabaseSession();
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<Top100MapCourse | null>(null);
-  const { data: courses = [], isLoading } = useTop100MapCourses(scope);
+  const { data: courses = [], isLoading } = useTop100MapCourses(scope, session?.user?.id);
 
   // Initialize map
   useEffect(() => {
@@ -60,22 +62,24 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
     markersRef.current.forEach((marker) => marker.remove());
     markersRef.current = [];
 
-    // Add new markers
+    // Add new markers with color based on played status
     courses.forEach((course) => {
+      const isPlayed = course.is_played;
       const el = document.createElement('div');
       el.className = 'top100-marker';
       el.style.cssText = `
         width: 20px;
         height: 20px;
         border-radius: 50%;
-        background: white;
-        border: 2px solid hsl(var(--primary-accent));
+        background: ${isPlayed ? '#22c55e' : 'white'};
+        border: 2px solid ${isPlayed ? '#16a34a' : 'hsl(var(--primary-accent))'};
         cursor: pointer;
         transition: all 0.2s;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
       `;
 
       el.addEventListener('mouseenter', () => {
-        el.style.transform = 'scale(1.2)';
+        el.style.transform = 'scale(1.3)';
         el.style.borderWidth = '3px';
       });
 
@@ -126,6 +130,15 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
 
   return (
     <div className="relative">
+      {/* Floating Summary Widget */}
+      {!isLoading && courses.length > 0 && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 px-4 py-2 rounded-full bg-card/95 backdrop-blur-sm border border-border shadow-lg">
+          <span className="text-sm font-medium text-foreground">
+            {courses.filter(c => c.is_played).length} / {courses.length} courses played
+          </span>
+        </div>
+      )}
+      
       {/* Map Container */}
       <div
         ref={mapContainer}

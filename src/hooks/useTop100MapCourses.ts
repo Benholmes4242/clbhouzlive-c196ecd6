@@ -12,11 +12,12 @@ export interface Top100MapCourse {
   longitude: number;
   rank: number | null;
   list_slug: Top100MapScope;
+  is_played: boolean;
 }
 
-export function useTop100MapCourses(scope: Top100MapScope) {
+export function useTop100MapCourses(scope: Top100MapScope, userId?: string) {
   return useQuery({
-    queryKey: ['top100-map-courses', scope],
+    queryKey: ['top100-map-courses', scope, userId],
     queryFn: async (): Promise<Top100MapCourse[]> => {
       // 1) Find the list matching the scope
       const { data: lists, error: listsError } = await supabase
@@ -49,7 +50,20 @@ export function useTop100MapCourses(scope: Top100MapScope) {
 
       if (membershipsError) throw membershipsError;
 
-      // 3) Transform and filter for courses with coordinates
+      // 3) Get user's played courses if userId provided
+      let playedCourseIds = new Set<string>();
+      if (userId) {
+        const { data: userActivity, error: activityError } = await supabase
+          .from('user_course_activity')
+          .select('course_id')
+          .eq('user_id', userId);
+
+        if (!activityError && userActivity) {
+          playedCourseIds = new Set(userActivity.map((a: any) => a.course_id));
+        }
+      }
+
+      // 4) Transform and filter for courses with coordinates
       const coursesMap = new Map<string, Top100MapCourse>();
 
       (memberships || []).forEach((m: any) => {
@@ -70,6 +84,7 @@ export function useTop100MapCourses(scope: Top100MapScope) {
             longitude: course.longitude,
             rank: m.rank,
             list_slug: scope,
+            is_played: playedCourseIds.has(course.id),
           });
         }
       });

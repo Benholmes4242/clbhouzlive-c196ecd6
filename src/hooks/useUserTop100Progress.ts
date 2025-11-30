@@ -9,6 +9,10 @@ interface ListProgress {
   total: number;
 }
 
+/**
+ * Fetches user's Top 100 progress across all lists
+ * @deprecated Use useTop100ProgressForUser instead for complete progress data including rings and milestones
+ */
 export function useUserTop100Progress(userId: string | undefined) {
   return useQuery({
     queryKey: ['user-top100-progress', userId],
