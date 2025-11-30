@@ -1,7 +1,6 @@
 import React from 'react';
 import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { getScoreTier } from '@/utils/getScoreTier';
@@ -143,7 +142,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         {/* Left - title + meta */}
         <div className="flex-1 min-w-0">
           <h3 className="text-xl font-semibold text-slate-900">
-            Community Score
+            Community Rating
           </h3>
           
           <p className="mt-1 text-sm text-slate-500">
@@ -159,9 +158,8 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
         {/* Right - score + badge stack (centered) */}
         <div className="inline-flex flex-col items-center gap-2">
-          {/* Logo + Score */}
-          <div className="flex items-center gap-1.5">
-            <ClubhouseLogo size="md" />
+          {/* Score without logo */}
+          <div className="flex items-center">
             <span className="text-[34px] font-semibold text-slate-900 leading-none">
               {formatScore(communityAverage)}
             </span>
