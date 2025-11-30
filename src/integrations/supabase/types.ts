@@ -4822,6 +4822,37 @@ export type Database = {
           },
         ]
       }
+      user_top100_rated_courses: {
+        Row: {
+          course_id: string | null
+          first_rated_at: string | null
+          last_rated_at: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_top100_memberships_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       _postgis_deprecate: {
@@ -5633,6 +5664,10 @@ export type Database = {
           played_count: number
           total_courses: number
         }[]
+      }
+      get_top100_progress_for_user: {
+        Args: { target_user_id: string }
+        Returns: Json
       }
       get_top100_season_stats: {
         Args: {
