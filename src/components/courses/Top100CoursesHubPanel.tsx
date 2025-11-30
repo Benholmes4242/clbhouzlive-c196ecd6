@@ -6,12 +6,15 @@ import { useTop100ListSummaries } from '@/hooks/useTop100ListSummaries';
 import { useFriendsOnTop100Journey } from '@/hooks/useFriendsOnTop100Journey';
 import { useGolfCoursesInfinite } from '@/hooks/useGolfCoursesInfinite';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
+import { getTop100PrestigeRing, type Top100PrestigeRing } from '@/lib/top100Prestige';
 import SquircleImage from '@/components/ui/SquircleImage';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Search, Award, X } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 import CourseCard from './CourseCard';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { COURSES_PAGE_SIZE } from '@/config/pagination';
@@ -67,6 +70,18 @@ const Top100CoursesHubPanel = () => {
   const regionsCount = progress?.regions_count || 0;
   const ringLabel = progress?.prestige_label;
   const clubTitle = totalPlayed >= 100 ? '100 Century Club' : totalPlayed >= 50 ? '50 Club' : totalPlayed >= 20 ? '20 Club' : null;
+  const prestigeRing = getTop100PrestigeRing(totalPlayed);
+  
+  // Map ring to dot color
+  const ringDotClass: Record<Top100PrestigeRing | 'null', string> = {
+    'bronze': 'bg-amber-500',
+    'blue': 'bg-sky-400',
+    'green': 'bg-emerald-400',
+    'silver': 'bg-slate-300',
+    'gold': 'bg-yellow-400',
+    'platinum': 'bg-fuchsia-400',
+    'null': 'bg-slate-300',
+  };
 
   // Calculate lists count from summaries (only lists where user has played at least one course)
   const listsCount = listSummaries.filter(list => list.played_count > 0).length;
@@ -257,20 +272,16 @@ const Top100CoursesHubPanel = () => {
                 )}
               </p>
 
-              {/* Ring + Club badges if available */}
-              {(ringLabel || clubTitle) && (
+              {/* Club badge with ring-colored dot */}
+              {clubTitle && (
                 <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
-                  {ringLabel && (
-                    <span className="inline-flex items-center gap-1 rounded-xl border border-border/60 bg-card px-2 py-0.5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-                      <span className="inline-block h-2 w-2 rounded-full bg-emerald-400" />
-                      {ringLabel}
-                    </span>
-                  )}
-                  {clubTitle && (
-                    <span className="inline-flex items-center gap-1 rounded-xl border border-border/60 bg-card px-2 py-0.5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-                      🥇 {clubTitle}
-                    </span>
-                  )}
+                  <span className="inline-flex items-center gap-1.5 rounded-xl border border-border/60 bg-card px-2 py-0.5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+                    <span className={cn(
+                      "inline-block h-2 w-2 rounded-full",
+                      ringDotClass[prestigeRing || 'null']
+                    )} />
+                    <span className="font-medium text-foreground">{clubTitle}</span>
+                  </span>
                 </div>
               )}
 
@@ -336,58 +347,49 @@ const Top100CoursesHubPanel = () => {
         </section>
       )}
 
-      {/* 3. Friends on this journey */}
+      {/* 3. Friends on the Top 100 journey - horizontal avatar strip */}
       {user && (
-        <section>
-          <div className="mb-2 flex items-center justify-between">
-            <h3 className="text-[13px] font-semibold text-slate-900">
+        <section className="mt-6">
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-[13px] font-medium text-foreground">
               Friends on the Top 100 journey
-            </h3>
-            {hasFriends && (
-              <button
-                type="button"
-                onClick={handleOpenTop100Leaderboard}
-                className="text-[11px] font-medium text-primary-accent"
-              >
-                View leaderboard →
-              </button>
-            )}
+            </p>
+            <button
+              type="button"
+              className="text-[12px] font-medium text-amber-500 hover:text-amber-600 transition-colors"
+              onClick={handleOpenTop100Leaderboard}
+            >
+              View leaderboard →
+            </button>
           </div>
 
-          {!hasFriends && (
-            <p className="text-[12px] text-slate-500">
-              None of your friends have started the Top 100 journey yet.
+          {!hasFriends ? (
+            <p className="text-[12px] text-muted-foreground">
+              None of your friends have started the Top 100 yet.
             </p>
-          )}
-
-          {hasFriends && (
-            <div className="flex gap-3 overflow-x-auto pb-1">
+          ) : (
+            <div className="flex gap-10 overflow-x-auto pb-2">
               {friends.slice(0, 10).map((f) => {
                 const displayName = f.profile.display_name || f.profile.username || '?';
-                const initial = displayName[0]?.toUpperCase() || '?';
                 
                 return (
                   <button
                     key={f.user_id}
                     type="button"
                     onClick={() => navigate(`/profile/${f.profile.username}?tab=top100`)}
-                    className="flex min-w-[110px] flex-col items-center rounded-xl border border-border/60 bg-card px-3 py-3 text-[11px] shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-slate-50 transition-colors"
+                    className="flex flex-col items-center gap-1.5 flex-shrink-0"
                   >
-                    {f.profile.profile_photo_url ? (
-                      <SquircleImage
-                        src={f.profile.profile_photo_url}
-                        alt={displayName}
-                        size={40}
-                        className="h-10 w-10 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-foreground text-[14px]">
-                        {initial}
-                      </div>
-                    )}
-                    <span className="mt-2 line-clamp-1 font-medium text-foreground">{displayName}</span>
+                    <Avatar className="h-12 w-12 ring-1 ring-border/30">
+                      <AvatarImage src={f.profile.profile_photo_url || undefined} alt={displayName} />
+                      <AvatarFallback className="bg-muted text-[11px] font-medium text-muted-foreground">
+                        {displayName.slice(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="max-w-[96px] truncate text-[12px] font-medium text-foreground">
+                      {displayName}
+                    </span>
                     {typeof f.top100CoursesPlayed === 'number' && (
-                      <span className="text-muted-foreground">
+                      <span className="text-[11px] text-muted-foreground">
                         {f.top100CoursesPlayed} course{f.top100CoursesPlayed === 1 ? '' : 's'}
                       </span>
                     )}
