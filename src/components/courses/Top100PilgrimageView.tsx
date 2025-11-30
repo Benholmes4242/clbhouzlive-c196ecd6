@@ -1,20 +1,129 @@
+import { useMemo } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useTop100Pilgrimage } from '@/hooks/useTop100Pilgrimage';
-import { Progress } from '@/components/ui/progress';
-import { formatDistanceToNow } from 'date-fns';
+import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
+import { useTop100SeasonStats } from '@/hooks/useTop100SeasonStats';
+import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 interface Top100PilgrimageViewProps {
   userId?: string | null;
+}
+
+function computeMonthlyStreak(firstPlayDates: string[]) {
+  if (!firstPlayDates.length) {
+    return {
+      currentStreak: 0,
+      bestStreak: 0,
+      months: [] as { key: string; label: string; hasPlay: boolean }[],
+    };
+  }
+
+  // Group first-play dates by year-month
+  const monthMap = new Map<string, number>();
+  firstPlayDates.forEach((iso) => {
+    const d = new Date(iso);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    monthMap.set(key, (monthMap.get(key) ?? 0) + 1);
+  });
+
+  const sortedKeys = Array.from(monthMap.keys()).sort();
+  let best = 0;
+  let current = 0;
+  let lastYear = 0;
+  let lastMonth = 0;
+
+  sortedKeys.forEach((key) => {
+    const [yStr, mStr] = key.split('-');
+    const y = Number(yStr);
+    const m = Number(mStr); // 1–12
+
+    if (
+      lastYear === 0 ||
+      (y === lastYear && m === lastMonth + 1) ||
+      (y === lastYear + 1 && lastMonth === 12 && m === 1)
+    ) {
+      current += 1;
+    } else {
+      current = 1;
+    }
+
+    if (current > best) best = current;
+    lastYear = y;
+    lastMonth = m;
+  });
+
+  // Build a simple month row for the current year
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const months = Array.from({ length: 12 }).map((_, idx) => {
+    const monthIndex = idx + 1;
+    const key = `${currentYear}-${String(monthIndex).padStart(2, '0')}`;
+    const hasPlay = monthMap.has(key);
+    const label = format(new Date(currentYear, monthIndex - 1, 1), 'MMM');
+    return { key, label, hasPlay };
+  });
+
+  return {
+    currentStreak: current,
+    bestStreak: best,
+    months,
+  };
+}
+
+function getSeasonGoal(lifetimeTotal: number) {
+  if (lifetimeTotal < 10) return 3;
+  if (lifetimeTotal < 30) return 5;
+  return 10;
 }
 
 export function Top100PilgrimageView({ userId }: Top100PilgrimageViewProps) {
   const { session } = useSupabaseSession();
   const navigate = useNavigate();
   const effectiveUserId = userId ?? session?.user?.id ?? null;
-  const { data, isLoading } = useTop100Pilgrimage(effectiveUserId);
+  const { data, isLoading } = useTop100ProgressForUser(effectiveUserId);
+  const { data: seasonStats } = useTop100SeasonStats({ userId: effectiveUserId });
 
   const isOwnProfile = !userId || userId === session?.user?.id;
+
+  const streak = useMemo(
+    () => computeMonthlyStreak(seasonStats?.first_play_dates ?? []),
+    [seasonStats?.first_play_dates]
+  );
+
+  const seasonGoal = getSeasonGoal(seasonStats?.lifetime_total_top100 ?? 0);
+  const seasonProgress = seasonStats?.new_top100_this_season ?? 0;
+  const listsTouched = seasonStats?.lists_touched_this_season ?? 0;
+
+  // Derive journeys started/completed
+  const journeys = useMemo(() => {
+    if (!data || !seasonStats) {
+      return { started: 0, completed: 0 };
+    }
+
+    const newByList = seasonStats.new_by_list || {};
+    let started = 0;
+    let completed = 0;
+
+    data.lists.forEach((list) => {
+      const newThisSeason = newByList[list.listSlug] ?? 0;
+
+      if (newThisSeason > 0) {
+        // If lifetime played equals newThisSeason: they only started this list this season
+        if (list.played === newThisSeason) {
+          started += 1;
+        }
+
+        // Completed list where some of that progress came this season
+        if (list.played >= list.total && list.total > 0) {
+          completed += 1;
+        }
+      }
+    });
+
+    return { started, completed };
+  }, [data, seasonStats]);
 
   if (!effectiveUserId) {
     return (
@@ -48,144 +157,171 @@ export function Top100PilgrimageView({ userId }: Top100PilgrimageViewProps) {
     );
   }
 
-  return (
-    <div className="space-y-6">
-      {/* Hero Season Card */}
-      <div className="rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-50 p-5 shadow-lg border border-slate-700/60">
-        <div className="text-xs uppercase tracking-wide opacity-80 mb-1">
-          Pilgrimage Mode
+  // If they have no Top 100 journey at all yet
+  if (!data || data.total_played_top100 === 0) {
+    return (
+      <div className="mt-6 rounded-2xl border border-dashed border-border/60 bg-card/40 p-6 text-sm text-muted-foreground">
+        <div className="font-medium text-foreground mb-1">
+          Your Top 100 pilgrimage hasn&apos;t started yet.
         </div>
-        <h2 className="text-xl font-semibold mb-1">
-          {isOwnProfile ? 'Your current Top 100 season' : 'Current Top 100 season'}
-        </h2>
-        <p className="text-sm text-slate-200/80 mb-4">
-          {isOwnProfile
-            ? 'Chasing new pins, one Top 100 at a time.'
-            : 'Their chase for new pins across the Top 100.'}
+        <p>
+          Play your first Top 100 course and log the round to unlock Pilgrimage Mode.
         </p>
-
-        {/* Season Goal + progress bar */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs">
-            <span>
-              Season goal: {data.season_goal} new Top 100s in {data.season_year}
-            </span>
-            <span>
-              {data.season_progress}/{data.season_goal}
-            </span>
-          </div>
-          <Progress
-            value={(data.season_progress / data.season_goal) * 100}
-            className="h-2 bg-slate-800"
-          />
-          <div className="text-xs text-slate-200/80">
-            {data.has_hit_goal
-              ? 'Season goal completed – all bonus golf from here.'
-              : `${data.season_remaining} more course${
-                  data.season_remaining === 1 ? '' : 's'
-                } to hit your goal.`}
-          </div>
-        </div>
+        <Button
+          className="mt-3"
+          variant="outline"
+          onClick={() => navigate('/discover?sub=top100')}
+        >
+          Find a Top 100 course
+        </Button>
       </div>
+    );
+  }
 
-      {/* Streak Stats */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-xl bg-card border border-border/60 p-3">
-          <div className="text-xs text-muted-foreground">Current streak</div>
-          <div className="mt-1 text-2xl font-semibold">
-            {data.streak_months} month{data.streak_months === 1 ? '' : 's'}
+  return (
+    <div className="mt-6 space-y-6">
+      {/* Season Goal Card */}
+      <div className="rounded-2xl border border-border/70 bg-card p-5 md:p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <div className="text-xs font-semibold tracking-wide uppercase text-primary-accent mb-1">
+            This season&apos;s pilgrimage
           </div>
-          <div className="mt-1 text-xs text-muted-foreground">
-            Consecutive months with a new Top 100.
+          <div className="text-lg md:text-xl font-semibold text-foreground">
+            Play {seasonGoal} new Top 100 courses
           </div>
-        </div>
-
-        <div className="rounded-xl bg-card border border-border/60 p-3">
-          <div className="text-xs text-muted-foreground">Longest streak</div>
-          <div className="mt-1 text-2xl font-semibold">
-            {data.longest_streak_months} month
-            {data.longest_streak_months === 1 ? '' : 's'}
-          </div>
-          <div className="mt-1 text-xs text-muted-foreground">
-            Personal best run of monthly new pins.
-          </div>
-        </div>
-      </div>
-
-      {/* Big Wins */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold">Recent big wins</h3>
-        </div>
-        {data.big_wins.length === 0 ? (
-          <p className="text-xs text-muted-foreground">
-            No first-time Top 100 rounds yet this season.
+          <p className="mt-1 text-sm text-muted-foreground">
+            You&apos;ve unlocked{' '}
+            <span className="font-semibold text-foreground">
+              {seasonProgress} / {seasonGoal}
+            </span>{' '}
+            new Top 100s this season across{' '}
+            <span className="font-semibold text-foreground">
+              {listsTouched}
+            </span>{' '}
+            region{listsTouched === 1 ? '' : 's'}.
           </p>
-        ) : (
-          <div className="space-y-2">
-            {data.big_wins.slice(0, 4).map(win => (
-              <button
-                key={win.course_id + win.played_at}
-                onClick={() => navigate(`/courses/${win.course_id}`)}
-                className="w-full flex items-center justify-between rounded-xl border border-border/60 bg-card p-3 hover:border-primary-accent/60 transition-all text-left"
-              >
-                <div>
-                  <div className="text-sm font-medium">{win.course_name}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {win.sub_country && `${win.sub_country}, `}
-                    {win.country} · {win.list_name}
-                  </div>
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {formatDistanceToNow(new Date(win.played_at), {
-                    addSuffix: true,
-                  })}
-                </div>
-              </button>
-            ))}
+          {(streak.currentStreak > 0 || streak.bestStreak > 0) && (
+            <p className="mt-1 text-xs text-muted-foreground">
+              Current streak:{' '}
+              <span className="font-medium text-foreground">
+                {streak.currentStreak} month
+                {streak.currentStreak === 1 ? '' : 's'}
+              </span>
+              {streak.bestStreak > 0 && (
+                <>
+                  {' '}· Best:{' '}
+                  <span className="font-medium text-foreground">
+                    {streak.bestStreak} month
+                    {streak.bestStreak === 1 ? '' : 's'}
+                  </span>
+                </>
+              )}
+            </p>
+          )}
+        </div>
+
+        <div className="flex flex-col md:items-end gap-2">
+          <div className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="inline-flex h-2 w-2 rounded-full bg-primary-accent" />
+            New Top 100 unlocked this season
           </div>
-        )}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => navigate('/discover?sub=top100')}
+          >
+            Find your next Top 100 stop
+          </Button>
+        </div>
       </div>
 
-      {/* Next Stops */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold">Next stops</h3>
+      {/* Streak Month Row */}
+      <div className="rounded-2xl border border-border/60 bg-card p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-sm font-medium text-foreground">
+            Monthly streak
+          </div>
+          <div className="text-xs text-muted-foreground">
+            Filled dots = months you added a new Top 100
+          </div>
         </div>
-        {data.next_stops.length === 0 ? (
-          <p className="text-xs text-muted-foreground">
-            Once you log some Top 100 rounds we'll suggest high-impact next stops.
-          </p>
-        ) : (
-          <div className="grid gap-3 sm:grid-cols-2">
-            {data.next_stops.slice(0, 4).map(stop => (
-              <button
-                key={stop.course_id}
-                className="flex flex-col items-start rounded-xl border border-border/60 bg-card p-3 text-left hover:border-primary-accent/60 hover:shadow-lg transition-all"
-                onClick={() => navigate(`/courses/${stop.course_id}`)}
-              >
-                <div className="text-sm font-medium mb-1">{stop.course_name}</div>
-                <div className="text-xs text-muted-foreground mb-1">
-                  {stop.sub_country && `${stop.sub_country}, `}
-                  {stop.country}
-                </div>
-                {stop.rank && (
-                  <div className="inline-flex items-center rounded-full bg-surface-alt px-2 py-0.5 text-[11px] text-muted-foreground">
-                    #{stop.rank} · {stop.list_name}
-                  </div>
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+          {streak.months.map((m) => (
+            <div
+              key={m.key}
+              className={cn(
+                'flex flex-col items-center gap-1 text-xs',
+              )}
+            >
+              <div
+                className={cn(
+                  'h-6 w-6 rounded-full border flex items-center justify-center text-[0.75rem]',
+                  m.hasPlay
+                    ? 'bg-primary-accent text-background border-primary-accent'
+                    : 'border-border text-muted-foreground'
                 )}
-                <div className="mt-1 text-[11px] text-primary-accent/90">
-                  {stop.reason === 'list_completion' &&
-                    'Closest to completing this list.'}
-                  {stop.reason === 'closest_rank' &&
-                    'Highest-ranked unplayed course.'}
-                  {stop.reason === 'milestone_push' &&
-                    'High impact towards your next milestone.'}
-                </div>
-              </button>
-            ))}
+              >
+                {m.label.charAt(0)}
+              </div>
+              <span className="text-[0.65rem] text-muted-foreground">
+                {m.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Quests */}
+      <div className="rounded-2xl border border-border/60 bg-card p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="text-sm font-medium text-foreground">
+            Pilgrimage quests
           </div>
-        )}
+          <div className="text-xs text-muted-foreground">
+            Soft goals to nudge your next moves
+          </div>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-3">
+          {/* Quest 1: New region */}
+          <div className="rounded-xl border border-border/60 bg-background/60 p-3 text-xs">
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-medium text-foreground">
+                New region
+              </span>
+              <span className="text-[0.7rem] text-muted-foreground">
+                {listsTouched >= 3 ? 'Done' : `${listsTouched}/3`}
+              </span>
+            </div>
+            <p className="text-muted-foreground">
+              Play a new Top 100 course in a region you&apos;ve barely touched.
+            </p>
+          </div>
+
+          {/* Quest 2: GB&I push (example) */}
+          <div className="rounded-xl border border-border/60 bg-background/60 p-3 text-xs">
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-medium text-foreground">
+                GB&I push
+              </span>
+            </div>
+            <p className="text-muted-foreground">
+              Add 2 more Top 100 courses in Great Britain &amp; Ireland this season.
+            </p>
+          </div>
+
+          {/* Quest 3: Review quest */}
+          <div className="rounded-xl border border-border/60 bg-background/60 p-3 text-xs">
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-medium text-foreground">
+                Leave your mark
+              </span>
+            </div>
+            <p className="text-muted-foreground">
+              Go back to a Top 100 you&apos;ve played and leave a full review &amp; rating.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
