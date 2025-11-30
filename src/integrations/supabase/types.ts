@@ -5557,6 +5557,18 @@ export type Database = {
           times_played: number
         }[]
       }
+      get_top100_discover_recommendations: {
+        Args: { limit_param?: number; target_user_id: string }
+        Returns: {
+          course_id: string
+          course_name: string
+          created_at: string
+          engagement_score: number
+          list_rank: number
+          list_slug: string
+          post_id: string
+        }[]
+      }
       get_top100_leaderboard: {
         Args: {
           current_user_id?: string
@@ -5566,6 +5578,18 @@ export type Database = {
           time_range_param?: string
         }
         Returns: Json
+      }
+      get_trending_top100_moments: {
+        Args: { days_window?: number; limit_param?: number }
+        Returns: {
+          course_id: string
+          course_name: string
+          created_at: string
+          engagement_score: number
+          list_rank: number
+          list_slug: string
+          post_id: string
+        }[]
       }
       get_user_recent_achievements: {
         Args: { limit_param?: number; user_id_param: string }
@@ -5579,6 +5603,10 @@ export type Database = {
       get_user_top100_courses_count: {
         Args: { user_id_param: string }
         Returns: number
+      }
+      get_user_top100_intent: {
+        Args: { target_user_id: string }
+        Returns: Json
       }
       get_users_paged: {
         Args: { p_limit?: number; p_offset?: number; q?: string }
