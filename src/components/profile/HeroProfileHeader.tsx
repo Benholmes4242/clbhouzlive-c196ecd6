@@ -51,6 +51,7 @@ import MediaManagerModal from './immersive/MediaManagerModal';
 import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
 import GlassmorphicProfileCard from './GlassmorphicProfileCard';
 import SwipeToReturnZone from './SwipeToReturnZone';
+import { getTop100Title } from '@/lib/top100Prestige';
 
 import ResponsiveStatsDisplay from './ResponsiveStatsDisplay';
 import ProfileModalRouter from './ProfileModalRouter';
@@ -968,31 +969,39 @@ const HeroProfileHeader = ({
                 </div>
 
                 {/* Top 100 Prestige Chip */}
-                {top100Overview && top100Overview.total_played > 0 && (
-                  <div className="mt-3 flex justify-center">
-                    <button
-                      type="button"
-                      onClick={() => navigate('/top100?tab=my-progress')}
-                      className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-3 py-1.5 text-xs text-muted-foreground hover:border-primary-accent/60 hover:text-foreground transition-colors"
-                    >
-                      <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-alt text-meta">
-                        🏆
-                      </span>
-                      <span className="font-medium">
-                        Top 100:
-                      </span>
-                      <span>
-                        {top100Overview.total_played} course{top100Overview.total_played === 1 ? '' : 's'} · {top100Overview.regions_count}{' '}
-                        {top100Overview.regions_count === 1 ? 'region' : 'regions'}
-                      </span>
-                      {top100Overview.milestone_label && (
-                        <span className="text-primary-accent">
-                          · {top100Overview.milestone_label}
+                {top100Overview && top100Overview.total_played > 0 && (() => {
+                  const top100Title = getTop100Title(top100Overview.total_played);
+                  return (
+                    <div className="mt-3 flex justify-center">
+                      <button
+                        type="button"
+                        onClick={() => navigate('/top100?tab=my-progress')}
+                        className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-3 py-1.5 text-xs text-muted-foreground hover:border-primary-accent/60 hover:text-foreground transition-colors"
+                      >
+                        <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-alt text-meta">
+                          🏆
                         </span>
-                      )}
-                    </button>
-                  </div>
-                )}
+                        <span className="font-medium">
+                          Top 100:
+                        </span>
+                        <span>
+                          {top100Overview.total_played} course{top100Overview.total_played === 1 ? '' : 's'} · {top100Overview.regions_count}{' '}
+                          {top100Overview.regions_count === 1 ? 'region' : 'regions'}
+                        </span>
+                        {top100Title && (
+                          <span>
+                            · {top100Title}
+                          </span>
+                        )}
+                        {top100Overview.milestone_label && (
+                          <span className="text-primary-accent">
+                            · {top100Overview.milestone_label}
+                          </span>
+                        )}
+                      </button>
+                    </div>
+                  );
+                })()}
 
                 {/* Tabs */}
                 <nav className="tabs">
@@ -1216,31 +1225,39 @@ const HeroProfileHeader = ({
                    </div>
 
                    {/* Top 100 Prestige Chip */}
-                   {top100Overview && top100Overview.total_played > 0 && (
-                     <div className="w-full mt-3 flex justify-center">
-                        <button
-                          type="button"
-                          onClick={() => handleTabChange('top100')}
-                          className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-3 py-1.5 text-xs text-muted-foreground hover:border-primary-accent/60 hover:text-foreground transition-colors"
-                        >
-                          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-alt text-meta">
-                            🏆
-                          </span>
-                          <span className="font-medium">
-                            Top 100:
-                          </span>
-                         <span>
-                           {top100Overview.total_played} course{top100Overview.total_played === 1 ? '' : 's'} · {top100Overview.regions_count}{' '}
-                           {top100Overview.regions_count === 1 ? 'region' : 'regions'}
-                         </span>
-                         {top100Overview.milestone_label && (
-                           <span className="text-primary-accent">
-                             · {top100Overview.milestone_label}
+                   {top100Overview && top100Overview.total_played > 0 && (() => {
+                     const top100Title = getTop100Title(top100Overview.total_played);
+                     return (
+                       <div className="w-full mt-3 flex justify-center">
+                         <button
+                           type="button"
+                           onClick={() => handleTabChange('top100')}
+                           className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-3 py-1.5 text-xs text-muted-foreground hover:border-primary-accent/60 hover:text-foreground transition-colors"
+                         >
+                           <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-alt text-meta">
+                             🏆
                            </span>
-                         )}
-                       </button>
-                     </div>
-                   )}
+                           <span className="font-medium">
+                             Top 100:
+                           </span>
+                           <span>
+                             {top100Overview.total_played} course{top100Overview.total_played === 1 ? '' : 's'} · {top100Overview.regions_count}{' '}
+                             {top100Overview.regions_count === 1 ? 'region' : 'regions'}
+                           </span>
+                           {top100Title && (
+                             <span>
+                               · {top100Title}
+                             </span>
+                           )}
+                           {top100Overview.milestone_label && (
+                             <span className="text-primary-accent">
+                               · {top100Overview.milestone_label}
+                             </span>
+                           )}
+                         </button>
+                       </div>
+                     );
+                   })()}
 
                    {/* Tab Navigation - pinned to bottom */}
                    <div className="w-full border-t border-gray-300 mt-4 pt-4">

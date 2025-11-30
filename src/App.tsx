@@ -49,6 +49,7 @@ import { ToastHost } from '@/components/toast/ToastHost';
 import { AchievementToastContainer } from '@/components/achievements/AchievementToastContainer';
 import { LevelUpToastContainer } from '@/components/achievements/LevelUpToastContainer';
 import { useAchievementSharing } from '@/hooks/useAchievementSharing';
+import { useTop100XpNotifications } from '@/hooks/useTop100XpNotifications';
 
 
 
@@ -410,6 +411,9 @@ const AppInner: React.FC = () => {
   
   // Continuously broadcast location when visibility is active
   useLocationBroadcast();
+  
+  // Listen for Top 100 XP notifications
+  useTop100XpNotifications();
   
   // Run chat history migration once on app init
   useEffect(() => {

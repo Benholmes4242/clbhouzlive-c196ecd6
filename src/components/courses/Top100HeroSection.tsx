@@ -1,6 +1,6 @@
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getRingLabel, getRingColorClass, Top100PrestigeRing } from '@/lib/top100Prestige';
+import { getRingLabel, getRingColorClass, getTop100Title, Top100PrestigeRing } from '@/lib/top100Prestige';
 import { Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -31,6 +31,8 @@ export function Top100HeroSection({
     .join('')
     .toUpperCase()
     .slice(0, 2) || '?';
+
+  const title = getTop100Title(totalPlayed);
 
   return (
     <div className="flex flex-col items-center text-center space-y-4 py-6">
@@ -69,6 +71,14 @@ export function Top100HeroSection({
           <span>
             Across {regionsCount} {regionsCount === 1 ? 'region' : 'regions'}
           </span>
+          {title && (
+            <>
+              <span>·</span>
+              <span className="font-medium text-foreground">
+                {title}
+              </span>
+            </>
+          )}
           {prestigeLabel && (
             <>
               <span>·</span>
