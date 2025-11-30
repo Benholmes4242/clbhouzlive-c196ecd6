@@ -2,6 +2,8 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon } from 'lucide-react';
 import { getScoreTier } from '@/utils/getScoreTier';
+import { RatingBar } from '@/components/ui/RatingBar';
+import { RatingBadge } from '@/components/ui/RatingBadge';
 
 interface DistributionData {
   outstanding: number;
@@ -107,21 +109,15 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
       {/* Top row: Rating + Distribution */}
       <div className="mb-5">
         <div className="grid grid-cols-[minmax(0,1.1fr)_minmax(0,1.3fr)] gap-x-6 gap-y-2 items-start">
-          {/* LEFT: score hero */}
-          <div>
-            <div className="mt-0.5 flex items-center">
-              <span className="text-[34px] font-semibold text-slate-900 leading-none">
-                {averageRating.toFixed(1)}
-              </span>
-              <span className="text-xs text-slate-500 ml-1">/10</span>
-            </div>
+          {/* LEFT: score hero - centered */}
+          <div className="flex flex-col items-center">
+            <span className="text-[34px] font-semibold text-slate-900 leading-none">
+              {averageRating.toFixed(1)}
+            </span>
+            <span className="text-xs text-slate-500 mt-0.5">/10</span>
 
-            <div className="mt-2 mb-1 inline-flex items-center">
-              <span 
-                className={`rounded-full px-3 py-[6px] text-xs font-semibold uppercase tracking-[0.08em] ${tierData.bg} ${tierData.text}`}
-              >
-                {tierData.label}
-              </span>
+            <div className="mt-2 mb-1">
+              <RatingBadge tierData={tierData} />
             </div>
 
             <p className="mt-2 text-sm text-slate-600">
@@ -140,14 +136,14 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                     {item.tier.label}
                   </div>
 
-                  {/* Right column: bar + count */}
+                  {/* Right column: bar + count - using RatingBar */}
                   <div className="flex items-center gap-3">
-                    <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-slate-300">
-                      <div
-                        className={`h-full rounded-full ${item.tier.barFill} transition-all duration-300`}
-                        style={{ width: `${percentage}%` }}
-                      />
-                    </div>
+                    <RatingBar 
+                      value={percentage}
+                      max={100}
+                      mode="banded"
+                      band={item.tier.tier}
+                    />
                     <span className="min-w-[32px] text-sm text-slate-500 text-right">
                       {item.count}
                     </span>
@@ -170,12 +166,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   Design
                 </span>
                 <div className="flex items-center gap-2">
-                  <div className="relative flex-1 h-2 rounded-full bg-slate-300 overflow-hidden">
-                    <div
-                      className="absolute inset-y-0 left-0 rounded-full bg-slate-800 transition-all"
-                      style={{ width: `${(categoryAverages.design / 10) * 100}%` }}
-                    />
-                  </div>
+                  <RatingBar value={categoryAverages.design} mode="neutral" />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
                     {formatScore(categoryAverages.design)}/10
                   </span>
@@ -190,12 +181,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   Condition
                 </span>
                 <div className="flex items-center gap-2">
-                  <div className="relative flex-1 h-2 rounded-full bg-slate-300 overflow-hidden">
-                    <div
-                      className="absolute inset-y-0 left-0 rounded-full bg-slate-800 transition-all"
-                      style={{ width: `${(categoryAverages.condition / 10) * 100}%` }}
-                    />
-                  </div>
+                  <RatingBar value={categoryAverages.condition} mode="neutral" />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
                     {formatScore(categoryAverages.condition)}/10
                   </span>
@@ -210,12 +196,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   Clubhouse
                 </span>
                 <div className="flex items-center gap-2">
-                  <div className="relative flex-1 h-2 rounded-full bg-slate-300 overflow-hidden">
-                    <div
-                      className="absolute inset-y-0 left-0 rounded-full bg-slate-800 transition-all"
-                      style={{ width: `${(categoryAverages.clubhouse / 10) * 100}%` }}
-                    />
-                  </div>
+                  <RatingBar value={categoryAverages.clubhouse} mode="neutral" />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
                     {formatScore(categoryAverages.clubhouse)}/10
                   </span>
@@ -230,12 +211,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   Facilities
                 </span>
                 <div className="flex items-center gap-2">
-                  <div className="relative flex-1 h-2 rounded-full bg-slate-300 overflow-hidden">
-                    <div
-                      className="absolute inset-y-0 left-0 rounded-full bg-slate-800 transition-all"
-                      style={{ width: `${(categoryAverages.facilities / 10) * 100}%` }}
-                    />
-                  </div>
+                  <RatingBar value={categoryAverages.facilities} mode="neutral" />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
                     {formatScore(categoryAverages.facilities)}/10
                   </span>

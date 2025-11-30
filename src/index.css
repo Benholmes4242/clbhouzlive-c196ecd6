@@ -106,6 +106,27 @@ html.lightbox-open {
   --ease-pop: cubic-bezier(0.175, 0.885, 0.32, 1.275);    /* subtle "pop" */
   --ease-out: cubic-bezier(0.0, 0, 0.2, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  
+  /* ========================================
+     RATING SYSTEM DESIGN TOKENS
+     ======================================== */
+  
+  /* Geometry */
+  --rating-bar-height-sm: 0.5rem;    /* h-2 */
+  --rating-bar-radius: 9999px;       /* rounded-full */
+  
+  /* Tracks - visible grey for white backgrounds */
+  --rating-bar-track: #D7DDE3;       /* slate-300 equivalent */
+  
+  /* Neutral fill - dark slate for non-banded bars */
+  --rating-bar-fill-neutral: #1e293b; /* slate-800 */
+  
+  /* Rating band colors - Modern Links palette */
+  --rating-band-outstanding: #D8A265; /* Sunset Bronze */
+  --rating-band-excellent: #37546B;   /* Slate Blue-Grey */
+  --rating-band-very-good: #2F604A;   /* Pine Green */
+  --rating-band-good: #8FBCA8;        /* Sea Mist Green */
+  --rating-band-fair: #D2C6B2;        /* Sand Dune */
 }
 
 /* Rating slider improvements - larger touch areas, smooth mobile interaction */

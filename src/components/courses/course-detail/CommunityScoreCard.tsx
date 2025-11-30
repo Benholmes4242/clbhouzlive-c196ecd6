@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { getScoreTier } from '@/utils/getScoreTier';
+import { RatingBar } from '@/components/ui/RatingBar';
+import { RatingBadge } from '@/components/ui/RatingBadge';
 
 interface CommunityScoreCardProps {
   courseId: string;
@@ -15,17 +17,6 @@ interface CommunityScoreCardProps {
 
 const formatScore = (score: number) => {
   return score % 1 === 0 ? score.toString() : score.toFixed(1);
-};
-
-// Community rating badge component using unified tier system
-const CommunityRatingBadge: React.FC<{ label: string; bg: string; border: string; text: string }> = ({ label, bg, border, text }) => {
-  return (
-    <span 
-      className={`inline-flex items-center justify-center rounded-full px-3 py-[6px] text-xs font-semibold uppercase tracking-[0.08em] ${bg} ${text}`}
-    >
-      {label}
-    </span>
-  );
 };
 
 const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
@@ -158,21 +149,16 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
         {/* Right - score + badge stack (centered) */}
         <div className="inline-flex flex-col items-center gap-2">
-          {/* Score without logo */}
-          <div className="flex items-center">
+          {/* Score centered above badge */}
+          <div className="flex flex-col items-center">
             <span className="text-[34px] font-semibold text-slate-900 leading-none">
               {formatScore(communityAverage)}
             </span>
-            <span className="text-xs text-slate-500 ml-1">/10</span>
+            <span className="text-xs text-slate-500 mt-0.5">/10</span>
           </div>
 
           {/* Quality chip centered under score */}
-          <CommunityRatingBadge 
-            label={tierData.label} 
-            bg={tierData.bg} 
-            border={tierData.border} 
-            text={tierData.text} 
-          />
+          <RatingBadge tierData={tierData} />
         </div>
       </div>
 
@@ -198,13 +184,8 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                   </span>
                 </div>
 
-                {/* Row 2: Full-width bar - dark slate */}
-                <div className="w-full h-2 bg-slate-300 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-slate-800 transition-all duration-300 ease-out"
-                    style={{ width: `${(score / 10) * 100}%` }}
-                  />
-                </div>
+                {/* Row 2: Full-width bar - dark slate using RatingBar */}
+                <RatingBar value={score} mode="neutral" />
               </div>
             );
           })}

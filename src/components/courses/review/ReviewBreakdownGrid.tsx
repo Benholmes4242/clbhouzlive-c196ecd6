@@ -1,4 +1,5 @@
 import React from 'react';
+import { RatingBar } from '@/components/ui/RatingBar';
 
 interface BreakdownScores {
   design_score?: number | null;
@@ -41,12 +42,7 @@ export const ReviewBreakdownGrid: React.FC<ReviewBreakdownGridProps> = ({ scores
               {cat.label}
             </span>
             <div className="flex items-center gap-2">
-              <div className="relative flex-1 h-2 rounded-full bg-slate-300 overflow-hidden">
-                <div
-                  className="absolute inset-y-0 left-0 rounded-full bg-slate-800 transition-all"
-                  style={{ width: `${((cat.value || 0) / 10) * 100}%` }}
-                />
-              </div>
+              <RatingBar value={cat.value || 0} mode="neutral" />
               <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
                 {formatScore(cat.value)}/10
               </span>
