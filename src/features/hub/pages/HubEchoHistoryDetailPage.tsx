@@ -22,11 +22,28 @@ export default function HubEchoHistoryDetailPage() {
   const { data, isLoading, error } = useEchoChatThread(id);
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-background">
-      {/* Content */}
-      <div className="fixed inset-0">
+    <div className="fixed inset-0 z-[9999]">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
+      
+      {/* Glass Sheet */}
+      <div
+        className="hub-glass-page fixed inset-0"
+        style={{
+          background: 'rgba(0, 0, 0, 0.28)',
+          backdropFilter: 'blur(22px)',
+          WebkitBackdropFilter: 'blur(22px)',
+          border: '1px solid rgba(255, 255, 255, 0.06)',
+          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.45), 0 0 1px rgba(255, 255, 255, 0.16)',
+        }}
+      >
       {/* Header */}
-      <header className="sticky top-0 z-10 flex items-center justify-between px-4 h-14 border-b border-border bg-background">
+      <header className="sticky top-0 z-10 flex items-center justify-between px-4 h-14 border-b"
+        style={{
+          borderColor: 'rgba(255,255,255,0.1)',
+          background: 'rgba(0,0,0,0.2)',
+        }}
+      >
         <button
           onClick={goBack}
           className="text-white/90 hover:text-white text-[15px] font-medium transition-colors"

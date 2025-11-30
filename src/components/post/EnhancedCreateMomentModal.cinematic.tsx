@@ -530,15 +530,20 @@ export default function EnhancedCreateMomentModalCinematic({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-background">
-      {/* Content Sheet with Hub-style slide animation */}
+    <div className="fixed inset-0 z-[9999]">
+      {/* Glass Sheet with Hub-style slide animation - unified background and backdrop */}
       <div 
         ref={wrapperRef}
         role="dialog"
         aria-modal="true"
         aria-label="Create a Moment"
-        className="ecm-glass-sheet fixed inset-0 bg-background"
+        className="ecm-glass-sheet fixed inset-0"
         style={{
+          background: 'rgba(0, 0, 0, 0.65)',
+          backdropFilter: 'blur(22px)',
+          WebkitBackdropFilter: 'blur(22px)',
+          border: '1px solid rgba(255, 255, 255, 0.06)',
+          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.45), 0 0 1px rgba(255, 255, 255, 0.16)',
           transform: `translateY(${translateY}px)`,
           transition:
             // no transition while dragging or before first frame
