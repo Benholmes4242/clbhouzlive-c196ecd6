@@ -164,87 +164,83 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
       {/* Category averages - 2x2 grid with labels above bars */}
       {(categoryAverages.design || categoryAverages.condition || categoryAverages.clubhouse || categoryAverages.facilities) && (
         <div className="border-t border-slate-200/60 pt-3 mt-3 mb-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-4">
             {/* Design */}
             {categoryAverages.design !== null && (
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-baseline justify-between">
-                  <span className="text-sm font-medium text-slate-700">
-                    Design
+              <div className="flex flex-col">
+                <span className="text-[11px] font-medium tracking-wide text-slate-600 mb-1">
+                  Design
+                </span>
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                    <div
+                      className="absolute inset-y-0 left-0 rounded-full bg-slate-800 transition-all"
+                      style={{ width: `${(categoryAverages.design / 10) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
+                    {formatScore(categoryAverages.design)}/10
                   </span>
-                  <span className="text-sm font-semibold text-slate-900">
-                    {formatScore(categoryAverages.design)}
-                    <span className="ml-0.5 text-xs text-slate-500">/10</span>
-                  </span>
-                </div>
-                <div className="relative mt-0.5 h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
-                  <div
-                    className="h-full rounded-full bg-slate-900/80 transition-all"
-                    style={{ width: `${(categoryAverages.design / 10) * 100}%` }}
-                  />
                 </div>
               </div>
             )}
 
             {/* Condition */}
             {categoryAverages.condition !== null && (
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-baseline justify-between">
-                  <span className="text-sm font-medium text-slate-700">
-                    Condition
+              <div className="flex flex-col">
+                <span className="text-[11px] font-medium tracking-wide text-slate-600 mb-1">
+                  Condition
+                </span>
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                    <div
+                      className="absolute inset-y-0 left-0 rounded-full bg-slate-800 transition-all"
+                      style={{ width: `${(categoryAverages.condition / 10) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
+                    {formatScore(categoryAverages.condition)}/10
                   </span>
-                  <span className="text-sm font-semibold text-slate-900">
-                    {formatScore(categoryAverages.condition)}
-                    <span className="ml-0.5 text-xs text-slate-500">/10</span>
-                  </span>
-                </div>
-                <div className="relative mt-0.5 h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
-                  <div
-                    className="h-full rounded-full bg-slate-900/80 transition-all"
-                    style={{ width: `${(categoryAverages.condition / 10) * 100}%` }}
-                  />
                 </div>
               </div>
             )}
 
             {/* Clubhouse */}
             {categoryAverages.clubhouse !== null && (
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-baseline justify-between">
-                  <span className="text-sm font-medium text-slate-700">
-                    Clubhouse
+              <div className="flex flex-col">
+                <span className="text-[11px] font-medium tracking-wide text-slate-600 mb-1">
+                  Clubhouse
+                </span>
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                    <div
+                      className="absolute inset-y-0 left-0 rounded-full bg-slate-800 transition-all"
+                      style={{ width: `${(categoryAverages.clubhouse / 10) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
+                    {formatScore(categoryAverages.clubhouse)}/10
                   </span>
-                  <span className="text-sm font-semibold text-slate-900">
-                    {formatScore(categoryAverages.clubhouse)}
-                    <span className="ml-0.5 text-xs text-slate-500">/10</span>
-                  </span>
-                </div>
-                <div className="relative mt-0.5 h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
-                  <div
-                    className="h-full rounded-full bg-slate-900/80 transition-all"
-                    style={{ width: `${(categoryAverages.clubhouse / 10) * 100}%` }}
-                  />
                 </div>
               </div>
             )}
 
             {/* Facilities */}
             {categoryAverages.facilities !== null && (
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-baseline justify-between">
-                  <span className="text-sm font-medium text-slate-700">
-                    Facilities
+              <div className="flex flex-col">
+                <span className="text-[11px] font-medium tracking-wide text-slate-600 mb-1">
+                  Facilities
+                </span>
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                    <div
+                      className="absolute inset-y-0 left-0 rounded-full bg-slate-800 transition-all"
+                      style={{ width: `${(categoryAverages.facilities / 10) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
+                    {formatScore(categoryAverages.facilities)}/10
                   </span>
-                  <span className="text-sm font-semibold text-slate-900">
-                    {formatScore(categoryAverages.facilities)}
-                    <span className="ml-0.5 text-xs text-slate-500">/10</span>
-                  </span>
-                </div>
-                <div className="relative mt-0.5 h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
-                  <div
-                    className="h-full rounded-full bg-slate-900/80 transition-all"
-                    style={{ width: `${(categoryAverages.facilities / 10) * 100}%` }}
-                  />
                 </div>
               </div>
             )}
