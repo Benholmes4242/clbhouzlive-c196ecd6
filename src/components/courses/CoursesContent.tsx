@@ -143,7 +143,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
               className="text-sm px-3 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard"
               style={{ borderRadius: 'var(--radius)' }}
             >
-              Top 100
+              🏆 Top 100
             </TabsTrigger>
             <TabsTrigger 
               value="friends-courses"
