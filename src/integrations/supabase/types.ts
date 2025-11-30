@@ -5617,6 +5617,23 @@ export type Database = {
         }
         Returns: Json
       }
+      get_top100_lists_with_hero_courses: {
+        Args: { target_user_id?: string }
+        Returns: {
+          hero_course_country: string
+          hero_course_id: string
+          hero_course_name: string
+          hero_course_rank: number
+          hero_course_region: string
+          hero_course_thumbnail: string
+          list_id: string
+          list_name: string
+          list_short_label: string
+          list_slug: string
+          played_count: number
+          total_courses: number
+        }[]
+      }
       get_top100_season_stats: {
         Args: {
           season_end?: string
