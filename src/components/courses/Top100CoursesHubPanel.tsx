@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Trophy, Globe } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import { getRingLabel } from '@/lib/top100Prestige';
+import GlobalTop100 from './GlobalTop100';
 
 const Top100CoursesHubPanel = () => {
   const navigate = useNavigate();
@@ -103,67 +104,8 @@ const Top100CoursesHubPanel = () => {
         </Card>
       </div>
 
-      {/* Region Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {lists?.map((list) => {
-          const progressData = getProgress(list.id);
-          const backgroundImage = getRegionBackground(list.slug);
-
-          return (
-            <div
-              key={list.id}
-              onClick={() => navigate(`/top100/${list.slug}`)}
-              className="group relative h-80 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl"
-              style={{
-                backgroundImage: backgroundImage
-                  ? `url(${backgroundImage})`
-                  : 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }}
-            >
-              {/* Dark Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
-
-              {/* Content */}
-              <div className="relative h-full flex flex-col justify-between p-6">
-                {/* Icon */}
-                <div className="flex justify-end">
-                  <div className="text-foreground/90">{getRegionIcon(list.slug)}</div>
-                </div>
-
-                {/* Text Content */}
-                <div className="space-y-3">
-                  <h2 className="font-display text-3xl font-bold text-foreground">
-                    {list.short_label}
-                  </h2>
-                  
-                  {list.description && (
-                    <p className="text-foreground/80 text-lg">{list.description}</p>
-                  )}
-
-                  {/* Progress Pill */}
-                  {progressData && session && (
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20">
-                      <span className="text-foreground font-medium">
-                        {progressData.played} / {progressData.total} played
-                      </span>
-                    </div>
-                  )}
-
-                  {/* CTA */}
-                  <div className="pt-2">
-                    <span className="text-foreground/90 text-lg font-medium group-hover:text-foreground transition-colors flex items-center gap-2">
-                      View Courses
-                      <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      {/* Full Top 100 Course List with Search/Filters */}
+      <GlobalTop100 />
     </div>
   );
 };
