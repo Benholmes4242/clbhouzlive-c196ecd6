@@ -130,12 +130,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
           {/* RIGHT: distribution bars */}
           <div className="flex-1">
             {distributionItems.map((item) => {
-              let percentage = (item.count / maxCount) * 100;
-              // Reduce outstanding bar by 10%
-              if (item.tier.tier === 'outstanding') {
-                percentage *= 0.9;
-                console.log('Outstanding bar percentage:', percentage, 'count:', item.count, 'maxCount:', maxCount);
-              }
+              const percentage = (item.count / maxCount) * 100;
               return (
                 <div key={item.tier.tier} className="mb-1.5 flex items-center gap-0">
                   {/* Label */}
