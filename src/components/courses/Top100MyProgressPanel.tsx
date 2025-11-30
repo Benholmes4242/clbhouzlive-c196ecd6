@@ -168,37 +168,42 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
                 {/* Headline Stats */}
                 <div className="min-w-0 space-y-1.5">
                   <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-slate-300">
-                    Your Top 100 journey
+                    Top 100 journey
                   </p>
 
-                  <h1 className="truncate text-base font-semibold text-slate-50 sm:text-lg">
-                    {isOwnProfile ? "You've" : "They've"} played {data.total_played_top100} Top 100 course
-                    {data.total_played_top100 === 1 ? '' : 's'}
+                  <h1 className="text-base font-semibold text-slate-50 sm:text-lg">
+                    {isOwnProfile ? "Your Top 100 progress" : `${session?.user?.user_metadata?.full_name || 'Their'}'s Top 100 progress`}
                   </h1>
 
-                  <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
-                    <span>
-                      Across {data.regions_count} {data.regions_count === 1 ? 'region' : 'regions'}
-                    </span>
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-2xl font-semibold text-slate-50 sm:text-3xl">
+                        {data.total_played_top100}
+                      </span>
+                      <span className="text-xs text-slate-400">
+                        Top 100 courses played
+                      </span>
+                    </div>
 
-                    {clubTitle && (
-                      <>
-                        <span className="text-slate-600">·</span>
-                        <span className="rounded-full bg-slate-900/80 px-2 py-0.5 text-[11px] text-slate-100">
-                          {clubTitle}
-                        </span>
-                      </>
-                    )}
-
-                    {data.prestige_label && (
-                      <>
-                        <span className="text-slate-600">·</span>
-                        <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] text-emerald-300">
-                          {data.prestige_label}
-                        </span>
-                      </>
-                    )}
+                    <div className="inline-flex items-center gap-1 rounded-full bg-slate-900/90 px-2.5 py-[3px] text-[11px] text-slate-300">
+                      <span className="font-medium">
+                        {data.regions_count || 0} {data.regions_count === 1 ? 'region' : 'regions'}
+                      </span>
+                      {clubTitle && (
+                        <>
+                          <span className="text-slate-600">·</span>
+                          <span>{clubTitle}</span>
+                        </>
+                      )}
+                    </div>
                   </div>
+
+                  {lastPlayedDate && (
+                    <p className="text-[11px] text-slate-400">
+                      Last Top 100 round:{' '}
+                      {new Date(lastPlayedDate).toLocaleDateString()}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -320,60 +325,71 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
             {/* Right Column: Friends */}
             {isOwnProfile && friendsSnapshot && friends.length > 0 && (
               <aside className="w-full sm:w-[280px]">
-                <div className="rounded-2xl border border-slate-800/70 bg-slate-950/80 px-3.5 py-3 text-xs text-slate-100 sm:px-4 sm:py-3.5">
-                  <div className="mb-2 flex flex-col gap-2">
-                    <div className="flex items-start justify-between gap-2">
-                      <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-300">
+                <section className="mt-2 rounded-2xl border border-slate-800/70 bg-slate-950/70 px-4 py-3.5 shadow-[0_18px_50px_rgba(15,23,42,0.7)]">
+                  <div className="mb-2 flex items-baseline justify-between gap-2">
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
                         Friends chasing the Top 100
-                      </h2>
-
-                      <button
-                        type="button"
-                        onClick={() => navigate('/top100?tab=leaderboard')}
-                        className="flex-shrink-0 text-[11px] font-medium text-primary-accent hover:text-primary-accent/80"
-                      >
-                        View →
-                      </button>
+                      </p>
+                      {friendMessage && (
+                        <p className="mt-0.5 text-[12px] text-slate-300">
+                          {friendMessage}
+                        </p>
+                      )}
                     </div>
-                    {friendMessage && <p className="text-[11px] text-slate-400">{friendMessage}</p>}
+
+                    <button
+                      type="button"
+                      onClick={() => navigate('/top100?tab=leaderboard')}
+                      className="text-[11px] font-medium text-emerald-300 hover:text-emerald-200"
+                    >
+                      View full leaderboard →
+                    </button>
                   </div>
 
-                  <div className="space-y-1.5">
+                  <div className="divide-y divide-slate-800/70">
                     {topFriends.map((f) => (
                       <button
                         key={f.friend_id}
                         type="button"
                         onClick={() => navigate(`/profile/${f.friend_id}?tab=top100`)}
-                        className="flex w-full items-center justify-between gap-2 rounded-xl px-2.5 py-1.5 text-left transition-colors hover:bg-slate-900/80"
+                        className="flex w-full items-center justify-between gap-3 py-2.5 text-left hover:bg-slate-900/60"
                       >
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2.5">
                           {f.profile_photo_url ? (
                             <img
                               src={f.profile_photo_url}
-                              alt={f.display_name ?? 'Friend avatar'}
-                              className="h-7 w-7 rounded-full object-cover"
+                              alt={f.display_name}
+                              className="h-8 w-8 rounded-full object-cover"
                             />
                           ) : (
-                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-800 text-[11px] font-semibold text-slate-100">
-                              {(f.display_name?.charAt(0) ?? '?').toUpperCase()}
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-[11px] font-semibold text-slate-100">
+                              {f.display_name?.charAt(0).toUpperCase() || '?'}
                             </div>
                           )}
+
                           <div className="min-w-0">
-                            <p className="truncate text-[12px] font-medium text-slate-50">{f.display_name}</p>
-                            <p className="truncate text-[11px] text-slate-400">{f.home_club || 'No club set'}</p>
+                            <p className="truncate text-[12px] font-medium text-slate-50">
+                              {f.display_name}
+                            </p>
+                            <p className="truncate text-[11px] text-slate-400">
+                              {f.home_club || 'No club set'}
+                            </p>
                           </div>
                         </div>
 
                         <div className="text-right">
-                          <p className="text-[11px] font-semibold text-slate-50">{f.total_top100_played}</p>
-                          <p className="text-[10px] text-slate-400">
-                            Top 100 course{f.total_top100_played === 1 ? '' : 's'}
+                          <p className="text-[13px] font-semibold text-slate-50">
+                            {f.total_top100_played}
+                          </p>
+                          <p className="text-[11px] text-slate-400">
+                            Top 100 {f.total_top100_played === 1 ? 'course' : 'courses'}
                           </p>
                         </div>
                       </button>
                     ))}
                   </div>
-                </div>
+                </section>
               </aside>
             )}
           </section>
