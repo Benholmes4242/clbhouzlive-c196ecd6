@@ -232,16 +232,16 @@ const Top100CoursesHubPanel = () => {
   return (
     <div className="space-y-6 pb-8">
       {/* 1. Top 100 Club hero */}
-      <section className="rounded-3xl bg-slate-950/90 text-slate-50 shadow-lg shadow-black/30 border border-slate-800/80 px-4 py-5">
+      <section className="rounded-xl border border-border/60 bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)] px-4 py-5">
         {/* Title + subtitle */}
         <div className="flex items-center gap-2">
           <span className="text-xl">🏆</span>
-          <div>
-            <h2 className="text-[18px] font-semibold">Top 100 Club</h2>
-            <p className="text-[12px] text-slate-400">
-              Your journey across the world&apos;s greatest courses.
-            </p>
-          </div>
+            <div>
+              <h2 className="text-[18px] font-semibold text-foreground">Top 100 Club</h2>
+              <p className="text-[12px] text-muted-foreground">
+                Your journey across the world&apos;s greatest courses.
+              </p>
+            </div>
         </div>
 
         {/* Big stat row */}
@@ -249,11 +249,11 @@ const Top100CoursesHubPanel = () => {
           {user ? (
             <>
               <p className="text-[14px]">
-                <span className="font-semibold text-slate-50">
+                <span className="font-semibold text-foreground">
                   You&apos;ve played {totalPlayed} Top 100 course{totalPlayed === 1 ? '' : 's'}
                 </span>
                 {listsCount > 0 && (
-                  <span className="text-slate-400"> across {listsCount} Top 100 list{listsCount === 1 ? '' : 's'}.</span>
+                  <span className="text-muted-foreground"> across {listsCount} Top 100 list{listsCount === 1 ? '' : 's'}.</span>
                 )}
               </p>
 
@@ -261,13 +261,13 @@ const Top100CoursesHubPanel = () => {
               {(ringLabel || clubTitle) && (
                 <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
                   {ringLabel && (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/70 bg-emerald-500/10 px-2 py-0.5">
+                    <span className="inline-flex items-center gap-1 rounded-xl border border-border/60 bg-card px-2 py-0.5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
                       <span className="inline-block h-2 w-2 rounded-full bg-emerald-400" />
                       {ringLabel}
                     </span>
                   )}
                   {clubTitle && (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/70 bg-amber-400/10 px-2 py-0.5">
+                    <span className="inline-flex items-center gap-1 rounded-xl border border-border/60 bg-card px-2 py-0.5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
                       🥇 {clubTitle}
                     </span>
                   )}
@@ -275,7 +275,7 @@ const Top100CoursesHubPanel = () => {
               )}
 
               {/* Progress bar */}
-              <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
+              <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-muted">
                 <div
                   className="h-full rounded-full bg-amber-400 transition-[width] duration-500"
                   style={{ width: `${Math.min(100, (totalPlayed / 100) * 100)}%` }}
@@ -283,7 +283,7 @@ const Top100CoursesHubPanel = () => {
               </div>
             </>
           ) : (
-            <p className="text-[14px] text-slate-300">
+            <p className="text-[14px] text-muted-foreground">
               Sign in to track your progress and see where you rank on the global leaderboard.
             </p>
           )}
@@ -293,7 +293,7 @@ const Top100CoursesHubPanel = () => {
         <button
           type="button"
           onClick={handleOpenTop100Journey}
-          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-slate-100 text-slate-950 text-[14px] font-semibold py-2.5 active:scale-[0.98] transition"
+          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-slate-100 text-slate-950 text-[14px] font-semibold py-2.5 active:scale-[0.98] transition hover:bg-slate-50"
         >
           {user ? 'Open your Top 100 Journey' : 'Sign in to join the Top 100 Club'}
           <span className="text-[16px]">↗</span>
@@ -303,7 +303,7 @@ const Top100CoursesHubPanel = () => {
       {/* 2. Region progress strip */}
       {user && listSummaries.length > 0 && (
         <section>
-          <h3 className="mb-2 text-[13px] font-semibold text-slate-200">
+          <h3 className="mb-2 text-[13px] font-semibold text-foreground">
             Your Top 100 region progress
           </h3>
 
@@ -315,15 +315,15 @@ const Top100CoursesHubPanel = () => {
               return (
                 <div
                   key={region.id}
-                  className="min-w-[150px] rounded-2xl border border-slate-800/80 bg-slate-950/80 px-3 py-2 text-[11px]"
+                  className="min-w-[150px] rounded-xl border border-border/60 bg-card px-3 py-2 text-[11px] shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-slate-100">{label}</span>
-                    <span className="text-slate-400">
+                    <span className="font-semibold text-foreground">{label}</span>
+                    <span className="text-muted-foreground">
                       {region.played_count}/{region.total_courses}
                     </span>
                   </div>
-                  <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-slate-800">
+                  <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-muted">
                     <div
                       className="h-full rounded-full bg-amber-400"
                       style={{ width: `${Math.min(100, pct)}%` }}
@@ -371,7 +371,7 @@ const Top100CoursesHubPanel = () => {
                     key={f.user_id}
                     type="button"
                     onClick={() => navigate(`/profile/${f.profile.username}?tab=top100`)}
-                    className="flex min-w-[110px] flex-col items-center rounded-2xl border border-slate-100 bg-white shadow-sm px-3 py-3 text-[11px]"
+                    className="flex min-w-[110px] flex-col items-center rounded-xl border border-border/60 bg-card px-3 py-3 text-[11px] shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-slate-50 transition-colors"
                   >
                     {f.profile.profile_photo_url ? (
                       <SquircleImage
@@ -381,13 +381,13 @@ const Top100CoursesHubPanel = () => {
                         className="h-10 w-10 rounded-full object-cover"
                       />
                     ) : (
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-700 text-[14px]">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-foreground text-[14px]">
                         {initial}
                       </div>
                     )}
-                    <span className="mt-2 line-clamp-1 font-medium text-slate-900">{displayName}</span>
+                    <span className="mt-2 line-clamp-1 font-medium text-foreground">{displayName}</span>
                     {typeof f.top100CoursesPlayed === 'number' && (
-                      <span className="text-slate-500">
+                      <span className="text-muted-foreground">
                         {f.top100CoursesPlayed} course{f.top100CoursesPlayed === 1 ? '' : 's'}
                       </span>
                     )}
