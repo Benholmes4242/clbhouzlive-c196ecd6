@@ -8,6 +8,9 @@ import { Trophy, Award } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { getTop100PrestigeRing, getRingColorClass } from '@/lib/top100Prestige';
+import { getTop100Club } from '@/lib/top100Club';
+import { getTop100RingDotClass } from '@/lib/top100RingStyles';
+import { cn } from '@/lib/utils';
 
 const Top100LeaderboardPanel = () => {
   const navigate = useNavigate();
@@ -386,6 +389,8 @@ const Top100LeaderboardPanel = () => {
           {!isError && allEntries.length > 0 && (
             <div className="space-y-2">
               {allEntries.map((entry) => {
+                const club = getTop100Club(entry.total_top100_played);
+                const ringDotClass = getTop100RingDotClass(club?.ring ?? 'none');
                 const ringColor = entry.rank <= 3 ? 'ring-primary-accent/60' : getRingColorClass(getTop100PrestigeRing(entry.total_top100_played));
                 
                 return (
@@ -423,9 +428,10 @@ const Top100LeaderboardPanel = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="font-semibold text-foreground truncate">{entry.display_name}</p>
-                        {entry.milestone_label && (
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-primary-accent/10 text-primary-accent border border-primary-accent/20">
-                            {entry.milestone_label}
+                        {club && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-900/80 px-2 py-0.5 text-[11px] text-slate-100">
+                            <span className={cn('h-1.5 w-1.5 rounded-full', ringDotClass)} />
+                            <span>{club.shortLabel}</span>
                           </span>
                         )}
                       </div>

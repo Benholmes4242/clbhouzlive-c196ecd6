@@ -6,7 +6,8 @@ import { useTop100ListSummaries } from '@/hooks/useTop100ListSummaries';
 import { useFriendsOnTop100Journey } from '@/hooks/useFriendsOnTop100Journey';
 import { useGolfCoursesInfinite } from '@/hooks/useGolfCoursesInfinite';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
-import { getTop100PrestigeRing, type Top100PrestigeRing } from '@/lib/top100Prestige';
+import { getTop100Club } from '@/lib/top100Club';
+import { getTop100RingDotClass } from '@/lib/top100RingStyles';
 import SquircleImage from '@/components/ui/SquircleImage';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Search, Award, X } from 'lucide-react';
@@ -65,23 +66,14 @@ const Top100CoursesHubPanel = () => {
   const { data: listSummaries = [] } = useTop100ListSummaries(user?.id);
   const { data: friends = [] } = useFriendsOnTop100Journey(user?.id);
 
-  // Extract stats from progress
-  const totalPlayed = progress?.total_played_top100 || 0;
+  // Extract stats from progress - prefer new field, fallback to old
+  const totalRated = progress?.total_top100_rated ?? progress?.total_played_top100 ?? 0;
   const regionsCount = progress?.regions_count || 0;
-  const ringLabel = progress?.prestige_label;
-  const clubTitle = totalPlayed >= 100 ? '100 Century Club' : totalPlayed >= 50 ? '50 Club' : totalPlayed >= 20 ? '20 Club' : null;
-  const prestigeRing = getTop100PrestigeRing(totalPlayed);
   
-  // Map ring to dot color
-  const ringDotClass: Record<Top100PrestigeRing | 'null', string> = {
-    'bronze': 'bg-amber-500',
-    'blue': 'bg-sky-400',
-    'green': 'bg-emerald-400',
-    'silver': 'bg-slate-300',
-    'gold': 'bg-yellow-400',
-    'platinum': 'bg-fuchsia-400',
-    'null': 'bg-slate-300',
-  };
+  // Use new unified club system
+  const club = getTop100Club(totalRated);
+  const ringKey = club?.ring ?? 'none';
+  const ringDotClass = getTop100RingDotClass(ringKey);
 
   // Calculate lists count from summaries (only lists where user has played at least one course)
   const listsCount = listSummaries.filter(list => list.played_count > 0).length;
@@ -265,7 +257,7 @@ const Top100CoursesHubPanel = () => {
             <>
               <p className="text-[14px]">
                 <span className="font-semibold text-foreground">
-                  You&apos;ve played {totalPlayed} Top 100 course{totalPlayed === 1 ? '' : 's'}
+                  You&apos;ve rated {totalRated} Top 100 course{totalRated === 1 ? '' : 's'}
                 </span>
                 {listsCount > 0 && (
                   <span className="text-muted-foreground"> across {listsCount} Top 100 list{listsCount === 1 ? '' : 's'}.</span>
@@ -273,14 +265,14 @@ const Top100CoursesHubPanel = () => {
               </p>
 
               {/* Club badge with ring-colored dot */}
-              {clubTitle && (
+              {club && (
                 <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
                   <span className="inline-flex items-center gap-1.5 rounded-xl border border-border/60 bg-card px-2 py-0.5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
                     <span className={cn(
                       "inline-block h-2 w-2 rounded-full",
-                      ringDotClass[prestigeRing || 'null']
+                      ringDotClass
                     )} />
-                    <span className="font-medium text-foreground">{clubTitle}</span>
+                    <span className="font-medium text-foreground">{club.label}</span>
                   </span>
                 </div>
               )}
@@ -289,7 +281,7 @@ const Top100CoursesHubPanel = () => {
               <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-muted">
                 <div
                   className="h-full rounded-full bg-amber-400 transition-[width] duration-500"
-                  style={{ width: `${Math.min(100, (totalPlayed / 100) * 100)}%` }}
+                  style={{ width: `${Math.min(100, (totalRated / 100) * 100)}%` }}
                 />
               </div>
             </>
