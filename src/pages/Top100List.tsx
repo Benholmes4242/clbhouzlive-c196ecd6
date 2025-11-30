@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
-import { useUserTop100Progress } from '@/hooks/useUserTop100Progress';
+import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserCourseActivity } from '@/hooks/useUserCourseActivity';
 import { useQuery } from '@tanstack/react-query';
@@ -27,7 +27,7 @@ const Top100List = () => {
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
   const { data: lists } = useTop100Lists();
-  const { data: progress } = useUserTop100Progress(session?.user?.id);
+  const { data: progressData } = useTop100ProgressForUser(session?.user?.id);
   const { data: userActivity } = useUserCourseActivity(session?.user?.id);
 
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
@@ -91,6 +91,12 @@ const Top100List = () => {
       filtered = filtered.filter((c) => !playedCourseIds.has(c.id));
     }
 
+    // Apply friends filter (placeholder for now)
+    if (showFriends) {
+      // TODO: filter by friends who have played these courses
+      // For now, just return all courses
+    }
+
     // Apply sort
     filtered.sort((a, b) => {
       switch (sortMode) {
@@ -106,7 +112,7 @@ const Top100List = () => {
     });
 
     return filtered;
-  }, [courses, sortMode, filterMode, playedCourseIds]);
+  }, [courses, sortMode, filterMode, playedCourseIds, showFriends]);
 
   const getRegionBackground = (slug: string) => {
     switch (slug) {
@@ -123,7 +129,9 @@ const Top100List = () => {
     }
   };
 
-  const progressData = progress?.find((p) => p.listId === currentList?.id);
+  const listProgress = progressData?.lists?.find((p) => p.listId === currentList?.id);
+  const playedCount = listProgress?.played || 0;
+  const totalCount = listProgress?.total || 100;
 
   if (isLoading) {
     return (
@@ -170,19 +178,25 @@ const Top100List = () => {
                 Back to Hub
               </Button>
 
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <h1 className="font-display text-4xl font-bold text-foreground">
                   {currentList?.name}
                 </h1>
                 {currentList?.description && (
                   <p className="text-foreground/90 text-lg">{currentList.description}</p>
                 )}
-                {progressData && session && (
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20">
-                    <span className="text-foreground font-medium">
-                      You've played {progressData.played} of {progressData.total}
-                    </span>
-                  </div>
+                {session && (
+                  <>
+                    <p className="text-foreground/90 text-sm font-medium">
+                      You've played {playedCount} of {totalCount} courses in this list.
+                    </p>
+                    <div className="h-2 w-full max-w-md rounded-full bg-white/20 backdrop-blur-sm overflow-hidden">
+                      <div
+                        className="h-full bg-primary-accent transition-all duration-300"
+                        style={{ width: `${(playedCount / totalCount) * 100}%` }}
+                      />
+                    </div>
+                  </>
                 )}
               </div>
             </div>
@@ -225,7 +239,7 @@ const Top100List = () => {
               </Select>
             </div>
 
-            {/* Show My Friends Toggle */}
+            {/* Show Friends Only Toggle */}
             <div className="flex items-center gap-3 p-4 rounded-lg bg-card border border-border/50">
               <Switch
                 id="show-friends"
@@ -233,7 +247,7 @@ const Top100List = () => {
                 onCheckedChange={setShowFriends}
               />
               <Label htmlFor="show-friends" className="text-sm font-medium cursor-pointer">
-                Show My Friends (Coming Soon)
+                Show Friends Only
               </Label>
             </div>
           </div>

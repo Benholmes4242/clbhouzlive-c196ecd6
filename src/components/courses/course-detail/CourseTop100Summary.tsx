@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useMyTop100Progress } from '@/hooks/useMyTop100Progress';
+import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { getRingLabel, getRingColorClass } from '@/lib/top100Prestige';
 import { cn } from '@/lib/utils';
 import { Trophy } from 'lucide-react';
@@ -9,7 +9,7 @@ import { Trophy } from 'lucide-react';
 const CourseTop100Summary: React.FC = () => {
   const { session } = useSupabaseSession();
   const navigate = useNavigate();
-  const { data, isLoading } = useMyTop100Progress();
+  const { data, isLoading } = useTop100ProgressForUser(session?.user?.id);
 
   // Logged out state
   if (!session) {

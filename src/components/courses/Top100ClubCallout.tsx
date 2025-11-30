@@ -2,8 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, ChevronRight } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useMyTop100Progress } from '@/hooks/useMyTop100Progress';
-import { useUserTop100Progress } from '@/hooks/useUserTop100Progress';
+import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Top100FriendsStrip } from './Top100FriendsStrip';
@@ -11,8 +10,7 @@ import { Top100FriendsStrip } from './Top100FriendsStrip';
 const Top100ClubCallout: React.FC = () => {
   const { session } = useSupabaseSession();
   const navigate = useNavigate();
-  const { data: progress } = useMyTop100Progress();
-  const { data: listProgress } = useUserTop100Progress(session?.user?.id);
+  const { data: progress } = useTop100ProgressForUser(session?.user?.id);
 
   const handleClick = () => {
     if (session) {
@@ -23,7 +21,7 @@ const Top100ClubCallout: React.FC = () => {
   };
 
   // Filter to only lists where user has played at least one course
-  const startedLists = (listProgress || []).filter(list => list.played > 0);
+  const startedLists = (progress?.lists || []).filter(list => list.played > 0);
   
   const coursesPlayed = startedLists.reduce((sum, list) => sum + list.played, 0);
   const totalCoursesInStartedLists = startedLists.reduce((sum, list) => sum + list.total, 0);

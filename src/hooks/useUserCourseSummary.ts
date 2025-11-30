@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useUserTop100Progress } from './useUserTop100Progress';
+import { useTop100ProgressForUser } from './useTop100ProgressForUser';
 
 export function useUserCourseSummary(userId: string | undefined) {
   const { data: coursesPlayed = 0, isLoading: coursesLoading } = useQuery({
@@ -50,7 +50,8 @@ export function useUserCourseSummary(userId: string | undefined) {
   });
 
   // Reuse the optimized Top 100 progress hook
-  const { data: top100Progress = [], isLoading: progressLoading } = useUserTop100Progress(userId);
+  const { data: progressData, isLoading: progressLoading } = useTop100ProgressForUser(userId);
+  const top100Progress = progressData?.lists || [];
 
   return {
     totalCoursesPlayed: coursesPlayed,
