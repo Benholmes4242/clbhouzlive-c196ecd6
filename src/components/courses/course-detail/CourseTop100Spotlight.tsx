@@ -1,5 +1,9 @@
 import React from 'react';
 import { useTop100CourseInsights } from '@/hooks/useTop100CourseInsights';
+import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { getTop100Club } from '@/lib/top100Club';
+import { getTop100RingDotClass } from '@/lib/top100RingStyles';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -16,7 +20,14 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
   courseName,
 }) => {
   const { data, isLoading } = useTop100CourseInsights(courseId);
+  const { user } = useSupabaseSession();
+  const { data: progress } = useTop100ProgressForUser(user?.id);
   const navigate = useNavigate();
+
+  // Calculate user's club from their progress
+  const totalRated = progress?.total_top100_rated ?? progress?.total_played_top100 ?? 0;
+  const club = getTop100Club(totalRated);
+  const ringDotClass = getTop100RingDotClass(club?.ring ?? 'none');
 
   if (isLoading) {
     return (
@@ -119,20 +130,30 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="space-y-1 text-sm">
           {/* User status pill */}
-          <div
-            className={cn(
-              'inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium',
-              data.user_has_played
-                ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/40'
-                : 'bg-amber-500/10 text-amber-200 border border-amber-500/40'
-            )}
-          >
-            {data.user_has_played ? 'Played by you' : 'Not yet on your Top 100 journey'}
-            {data.user_round_count > 0 && (
-              <span className="text-[11px] text-emerald-200/80">
-                · {data.user_round_count} round
-                {data.user_round_count === 1 ? '' : 's'}
-              </span>
+          <div className="space-y-1.5">
+            <div
+              className={cn(
+                'inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium',
+                data.user_has_played
+                  ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/40'
+                  : 'bg-amber-500/10 text-amber-200 border border-amber-500/40'
+              )}
+            >
+              {data.user_has_played ? 'Played by you' : 'Not yet on your Top 100 journey'}
+              {data.user_round_count > 0 && (
+                <span className="text-[11px] text-emerald-200/80">
+                  · {data.user_round_count} round
+                  {data.user_round_count === 1 ? '' : 's'}
+                </span>
+              )}
+            </div>
+
+            {/* Show club badge if user has a Top 100 club */}
+            {club && (
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-slate-900/70 px-2.5 py-1 text-[11px] text-slate-100">
+                <span className={cn('h-1.5 w-1.5 rounded-full', ringDotClass)} />
+                <span>{club.label}</span>
+              </div>
             )}
           </div>
 

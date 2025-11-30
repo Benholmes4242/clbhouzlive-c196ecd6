@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { splitName } from '@/utils/name';
+import { cn } from '@/lib/utils';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { XPRingPopover } from './XPRingPopover';
 import { Button } from '@/components/ui/button';
@@ -52,6 +53,8 @@ import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
 import GlassmorphicProfileCard from './GlassmorphicProfileCard';
 import SwipeToReturnZone from './SwipeToReturnZone';
 import { getTop100Title } from '@/lib/top100Prestige';
+import { getTop100Club } from '@/lib/top100Club';
+import { getTop100RingBorderClass, getTop100RingDotClass } from '@/lib/top100RingStyles';
 
 import ResponsiveStatsDisplay from './ResponsiveStatsDisplay';
 import ProfileModalRouter from './ProfileModalRouter';
@@ -970,34 +973,39 @@ const HeroProfileHeader = ({
 
                 {/* Top 100 Prestige Chip */}
                 {top100Overview && top100Overview.total_played > 0 && (() => {
-                  const top100Title = getTop100Title(top100Overview.total_played);
+                  const totalRated = top100Overview.total_played;
+                  const club = getTop100Club(totalRated);
+                  const ringDotClass = getTop100RingDotClass(club?.ring ?? 'none');
+                  
                   return (
                     <div className="mt-3 flex justify-center">
                       <button
                         type="button"
                         onClick={() => navigate('/top100?tab=my-progress')}
-                        className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-3 py-1.5 text-xs text-muted-foreground hover:border-primary-accent/60 hover:text-foreground transition-colors"
+                        className="inline-flex items-center gap-2 rounded-2xl border border-slate-800/80 bg-slate-950/80 px-3 py-1.5 text-[11px] text-slate-200 hover:border-slate-600 hover:text-slate-50 transition-colors"
                       >
-                        <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-alt text-meta">
-                          🏆
-                        </span>
-                        <span className="font-medium">
-                          Top 100:
-                        </span>
-                        <span>
-                          {top100Overview.total_played} course{top100Overview.total_played === 1 ? '' : 's'} · {top100Overview.regions_count}{' '}
-                          {top100Overview.regions_count === 1 ? 'region' : 'regions'}
-                        </span>
-                        {top100Title && (
-                          <span>
-                            · {top100Title}
+                        <Trophy className="h-3.5 w-3.5 text-amber-400" />
+                        <span className="flex flex-col leading-tight text-left">
+                          <span className="font-medium uppercase text-[10px] tracking-wide">TOP 100 JOURNEY</span>
+                          <span className="text-[11px] text-slate-300 flex items-center gap-1.5">
+                            {totalRated} course{totalRated === 1 ? '' : 's'}
+                            {top100Overview.regions_count > 0 && (
+                              <>
+                                <span className="text-slate-500">·</span>
+                                {top100Overview.regions_count} {top100Overview.regions_count === 1 ? 'region' : 'regions'}
+                              </>
+                            )}
+                            {club && (
+                              <>
+                                <span className="text-slate-500">·</span>
+                                <span className="inline-flex items-center gap-1">
+                                  <span className={cn('h-1.5 w-1.5 rounded-full', ringDotClass)} />
+                                  {club.label}
+                                </span>
+                              </>
+                            )}
                           </span>
-                        )}
-                        {top100Overview.milestone_label && (
-                          <span className="text-primary-accent">
-                            · {top100Overview.milestone_label}
-                          </span>
-                        )}
+                        </span>
                       </button>
                     </div>
                   );
@@ -1226,34 +1234,39 @@ const HeroProfileHeader = ({
 
                    {/* Top 100 Prestige Chip */}
                    {top100Overview && top100Overview.total_played > 0 && (() => {
-                     const top100Title = getTop100Title(top100Overview.total_played);
+                     const totalRated = top100Overview.total_played;
+                     const club = getTop100Club(totalRated);
+                     const ringDotClass = getTop100RingDotClass(club?.ring ?? 'none');
+                     
                      return (
                        <div className="w-full mt-3 flex justify-center">
                          <button
                            type="button"
                            onClick={() => handleTabChange('top100')}
-                           className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-3 py-1.5 text-xs text-muted-foreground hover:border-primary-accent/60 hover:text-foreground transition-colors"
+                           className="inline-flex items-center gap-2 rounded-2xl border border-slate-800/80 bg-slate-950/80 px-3 py-1.5 text-[11px] text-slate-200 hover:border-slate-600 hover:text-slate-50 transition-colors"
                          >
-                           <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-alt text-meta">
-                             🏆
-                           </span>
-                           <span className="font-medium">
-                             Top 100:
-                           </span>
-                           <span>
-                             {top100Overview.total_played} course{top100Overview.total_played === 1 ? '' : 's'} · {top100Overview.regions_count}{' '}
-                             {top100Overview.regions_count === 1 ? 'region' : 'regions'}
-                           </span>
-                           {top100Title && (
-                             <span>
-                               · {top100Title}
+                           <Trophy className="h-3.5 w-3.5 text-amber-400" />
+                           <span className="flex flex-col leading-tight text-left">
+                             <span className="font-medium uppercase text-[10px] tracking-wide">TOP 100 JOURNEY</span>
+                             <span className="text-[11px] text-slate-300 flex items-center gap-1.5">
+                               {totalRated} course{totalRated === 1 ? '' : 's'}
+                               {top100Overview.regions_count > 0 && (
+                                 <>
+                                   <span className="text-slate-500">·</span>
+                                   {top100Overview.regions_count} {top100Overview.regions_count === 1 ? 'region' : 'regions'}
+                                 </>
+                               )}
+                               {club && (
+                                 <>
+                                   <span className="text-slate-500">·</span>
+                                   <span className="inline-flex items-center gap-1">
+                                     <span className={'h-1.5 w-1.5 rounded-full ' + ringDotClass} />
+                                     {club.label}
+                                   </span>
+                                 </>
+                               )}
                              </span>
-                           )}
-                           {top100Overview.milestone_label && (
-                             <span className="text-primary-accent">
-                               · {top100Overview.milestone_label}
-                             </span>
-                           )}
+                           </span>
                          </button>
                        </div>
                      );

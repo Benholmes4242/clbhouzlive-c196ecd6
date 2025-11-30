@@ -30,6 +30,7 @@ export type Top100NextMilestone = {
 
 export type Top100ProgressResponse = {
   total_played_top100: number;
+  total_top100_rated?: number; // NEW: canonical field from RPC
   regions_count: number;
   lists: Top100ListProgress[];
   recent_rounds: Top100RecentRound[];
