@@ -1,16 +1,144 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LeaderboardScope, LeaderboardTimeRange, useTop100Leaderboard } from '@/hooks/useTop100Leaderboard';
-import { useTop100CourseLeaderboard } from '@/hooks/useTop100CourseLeaderboard';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { LeaderboardScope, LeaderboardTimeRange, useTop100Leaderboard, Top100LeaderboardEntry } from '@/hooks/useTop100Leaderboard';
+import { useTop100CourseLeaderboard, CourseLeaderboardEntry } from '@/hooks/useTop100CourseLeaderboard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Trophy, Award } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { getTop100PrestigeRing, getRingColorClass } from '@/lib/top100Prestige';
+import { cn } from '@/lib/utils';
+
+type LeaderboardRowDesktopProps = {
+  row: Top100LeaderboardEntry;
+  isCurrentUser: boolean;
+};
+
+const LeaderboardRowDesktop: React.FC<LeaderboardRowDesktopProps> = ({ row, isCurrentUser }) => {
+  const navigate = useNavigate();
+
+  return (
+    <button
+      type="button"
+      onClick={() => navigate(`/profile/${row.user_id}?tab=top100`)}
+      className={cn(
+        'grid w-full grid-cols-[44px,2fr,1.4fr,1.2fr,1.1fr] items-center px-3 py-2 text-left text-[12px] transition-colors',
+        'hover:bg-slate-900/70',
+        isCurrentUser && 'bg-slate-900/90'
+      )}
+    >
+      {/* Rank */}
+      <div className="text-[11px] font-semibold text-slate-400">
+        {row.rank}
+      </div>
+
+      {/* Player */}
+      <div className="flex items-center gap-2">
+        {row.avatar_url ? (
+          <img
+            src={row.avatar_url}
+            alt={row.display_name ?? 'Player avatar'}
+            className="h-7 w-7 rounded-full object-cover"
+          />
+        ) : (
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-800 text-[11px] font-semibold text-slate-100">
+            {(row.display_name?.charAt(0) ?? '?').toUpperCase()}
+          </div>
+        )}
+        <div className="min-w-0">
+          <p className="truncate text-[12px] font-medium text-slate-50">
+            {row.display_name || 'Unknown golfer'}
+          </p>
+          {isCurrentUser && (
+            <span className="text-[10px] font-medium text-emerald-300">
+              You
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Home club */}
+      <div className="truncate text-[11px] text-slate-400">
+        {row.home_club || 'No club set'}
+      </div>
+
+      {/* Top 100 courses */}
+      <div className="text-[12px] font-semibold text-slate-50">
+        {row.total_top100_played}
+      </div>
+
+      {/* Lists completed (placeholder - will show 0 for now) */}
+      <div className="text-[11px] text-slate-300">
+        {row.lists_completed?.length ?? 0}
+      </div>
+    </button>
+  );
+};
+
+type LeaderboardRowMobileProps = {
+  row: Top100LeaderboardEntry;
+  isCurrentUser: boolean;
+};
+
+const LeaderboardRowMobile: React.FC<LeaderboardRowMobileProps> = ({ row, isCurrentUser }) => {
+  const navigate = useNavigate();
+
+  return (
+    <button
+      type="button"
+      onClick={() => navigate(`/profile/${row.user_id}?tab=top100`)}
+      className={cn(
+        'flex w-full items-center justify-between gap-2 rounded-2xl border border-slate-800/70 bg-slate-950/80 px-3 py-2 text-left text-[12px] transition-colors',
+        'active:bg-slate-900/90',
+        isCurrentUser && 'border-emerald-500/60 bg-slate-900/90'
+      )}
+    >
+      <div className="flex items-center gap-2">
+        <span className="w-4 text-[11px] font-semibold text-slate-400">
+          {row.rank}
+        </span>
+        {row.avatar_url ? (
+          <img
+            src={row.avatar_url}
+            alt={row.display_name ?? 'Player avatar'}
+            className="h-7 w-7 rounded-full object-cover"
+          />
+        ) : (
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-800 text-[11px] font-semibold text-slate-100">
+            {(row.display_name?.charAt(0) ?? '?').toUpperCase()}
+          </div>
+        )}
+        <div className="min-w-0">
+          <p className="truncate text-[12px] font-medium text-slate-50">
+            {row.display_name || 'Unknown golfer'}
+          </p>
+          <p className="truncate text-[11px] text-slate-400">
+            {row.home_club || 'No club set'}
+          </p>
+          {isCurrentUser && (
+            <span className="text-[10px] font-medium text-emerald-300">
+              You
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className="flex flex-col items-end gap-0.5">
+        <div className="flex items-baseline gap-1">
+          <span className="text-[13px] font-semibold text-slate-50">
+            {row.total_top100_played}
+          </span>
+          <span className="text-[10px] text-slate-400">Top 100</span>
+        </div>
+        <div className="text-[10px] text-slate-400">
+          {row.lists_completed?.length ?? 0} list{(row.lists_completed?.length ?? 0) === 1 ? '' : 's'}
+        </div>
+      </div>
+    </button>
+  );
+};
 
 const Top100LeaderboardPanel = () => {
   const navigate = useNavigate();
+  const { session } = useSupabaseSession();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const prevIsFetchingNextPage = useRef(false);
   const prevEntriesCount = useRef(0);
@@ -46,8 +174,6 @@ const Top100LeaderboardPanel = () => {
     pageSize: 20,
   });
 
-  // NOTE: total_count and current_user_entry come from the RPC summary,
-  // which is identical for every page. It's safe to read from pages[0].
   const allEntries = data?.pages.flatMap(page => page.entries) || [];
   const totalCount = data?.pages[0]?.total_count || 0;
   const currentUserEntry = data?.pages[0]?.current_user_entry || null;
@@ -61,12 +187,10 @@ const Top100LeaderboardPanel = () => {
     const container = containerRef.current;
     const currentCount = allEntries.length;
 
-    // Detect the moment a "next page" finishes loading
     const justFinishedNextPage =
       prevIsFetchingNextPage.current && !isFetchingNextPage;
 
     if (justFinishedNextPage && currentCount > prevEntriesCount.current) {
-      // Nudge the scroll slightly so new rows are pulled into view
       container.scrollTo({
         top: container.scrollTop + 120,
         behavior: 'smooth',
@@ -108,56 +232,90 @@ const Top100LeaderboardPanel = () => {
 
   if (isLoading && !data) {
     return (
-      <div className="max-w-2xl mx-auto space-y-6 px-4 pb-6 animate-pulse">
-        <div className="h-24 bg-surface-alt rounded-xl" />
-        <div className="h-10 bg-surface-alt rounded-lg" />
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-3 pb-6 pt-2 animate-pulse sm:px-4 sm:pt-3">
+        <div className="h-24 bg-slate-900/70 rounded-3xl" />
+        <div className="h-10 bg-slate-900/70 rounded-2xl" />
         <div className="flex gap-3">
-          <div className="h-10 bg-surface-alt rounded-lg flex-1" />
-          <div className="h-10 bg-surface-alt rounded-lg flex-1" />
+          <div className="h-10 bg-slate-900/70 rounded-2xl flex-1" />
+          <div className="h-10 bg-slate-900/70 rounded-2xl flex-1" />
         </div>
-        <div className="h-32 bg-surface-alt rounded-xl" />
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-20 bg-surface-alt rounded-xl" />
+          <div key={i} className="h-20 bg-slate-900/70 rounded-2xl" />
         ))}
       </div>
     );
   }
 
   return (
-    <div ref={containerRef} className="max-w-2xl mx-auto space-y-6 px-4 pb-6">
+    <div ref={containerRef} className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-3 pb-6 pt-2 sm:px-4 sm:pt-3">
       {/* Header */}
-      <div className="text-center space-y-2">
-        <div className="flex items-center justify-center gap-2">
-          <Trophy className="w-6 h-6 text-primary-accent" />
-          <h1 className="text-3xl font-bold text-foreground">Top 100 Club – Leaderboard</h1>
+      <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div className="space-y-1">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+            Top 100 leaderboard
+          </p>
+          <h1 className="text-base font-semibold text-slate-50 sm:text-lg">
+            See who's leading the global Top 100 journey
+          </h1>
+          <p className="max-w-xl text-[12px] text-slate-400">
+            Ranking golfers by Top 100 courses played. Use the filters to browse by list and region.
+          </p>
         </div>
-        <p className="text-sm text-muted-foreground max-w-lg mx-auto">
-          Elite pilgrimage mode for the whales and hardcore nuts chasing the world's Top 100.
-        </p>
-      </div>
+
+        {/* Filters */}
+        <div className="mt-1 flex flex-wrap gap-2 sm:mt-0 sm:justify-end">
+          <Select value={scope} onValueChange={handleScopeChange}>
+            <SelectTrigger className="min-w-[140px] bg-slate-900/80 border-slate-800/70 text-[12px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {(Object.keys(scopeLabels) as LeaderboardScope[]).map((key) => (
+                <SelectItem key={key} value={key}>
+                  {scopeLabels[key]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={timeRange} onValueChange={handleTimeRangeChange}>
+            <SelectTrigger className="min-w-[120px] bg-slate-900/80 border-slate-800/70 text-[12px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {(Object.keys(timeRangeLabels) as LeaderboardTimeRange[]).map((key) => (
+                <SelectItem key={key} value={key}>
+                  {timeRangeLabels[key]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </header>
 
       {/* View Type Toggle */}
       <div className="flex justify-center">
-        <div className="inline-flex rounded-full bg-surface-alt p-1 text-xs">
+        <div className="inline-flex rounded-full bg-slate-900/80 p-0.5 text-[11px]">
           <button
             type="button"
             onClick={() => setViewType('players')}
-            className={`px-3 py-1 rounded-full transition-all ${
+            className={cn(
+              'rounded-full px-3 py-1',
               viewType === 'players'
-                ? 'bg-background shadow-sm text-foreground'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
+                ? 'bg-slate-700 text-slate-50'
+                : 'text-slate-400'
+            )}
           >
             Players
           </button>
           <button
             type="button"
             onClick={() => setViewType('courses')}
-            className={`px-3 py-1 rounded-full transition-all ${
+            className={cn(
+              'rounded-full px-3 py-1',
               viewType === 'courses'
-                ? 'bg-background shadow-sm text-foreground'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
+                ? 'bg-slate-700 text-slate-50'
+                : 'text-slate-400'
+            )}
           >
             Courses
           </button>
@@ -165,43 +323,14 @@ const Top100LeaderboardPanel = () => {
       </div>
 
       {viewType === 'courses' ? (
-        <div className="space-y-6">
-          {/* Filters – reuse same UI as players */}
-          <div className="flex flex-wrap gap-3">
-            <Select value={scope} onValueChange={handleScopeChange}>
-              <SelectTrigger className="flex-1 min-w-[180px] bg-card border-border/50">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {(Object.keys(scopeLabels) as LeaderboardScope[]).map((key) => (
-                  <SelectItem key={key} value={key}>
-                    {scopeLabels[key]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={timeRange} onValueChange={handleTimeRangeChange}>
-              <SelectTrigger className="flex-1 min-w-[180px] bg-card border-border/50">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {(Object.keys(timeRangeLabels) as LeaderboardTimeRange[]).map((key) => (
-                  <SelectItem key={key} value={key}>
-                    {timeRangeLabels[key]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
+        <div className="space-y-4">
           {/* Loading state */}
           {isLoadingCourses && !courseData && (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {[...Array(5)].map((_, i) => (
                 <div
                   key={i}
-                  className="h-20 rounded-xl bg-surface-alt animate-pulse"
+                  className="h-20 rounded-2xl bg-slate-900/70 animate-pulse"
                 />
               ))}
             </div>
@@ -209,8 +338,8 @@ const Top100LeaderboardPanel = () => {
 
           {/* Error state */}
           {isErrorCourses && (
-            <div className="text-center py-12 px-4 rounded-xl bg-destructive/10 border border-destructive/20">
-              <p className="text-sm text-destructive mb-3">
+            <div className="text-center py-12 px-4 rounded-2xl bg-slate-900/80 border border-slate-800/70">
+              <p className="text-[12px] text-slate-300 mb-3">
                 Failed to load course leaderboard data.
               </p>
               <Button variant="outline" size="sm" onClick={() => refetchCourses()}>
@@ -223,15 +352,15 @@ const Top100LeaderboardPanel = () => {
           {!isErrorCourses &&
             !isLoadingCourses &&
             allCourseEntries.length === 0 && (
-              <div className="text-center py-12 text-muted-foreground">
-                <p>No Top 100 course rounds logged here yet.</p>
-                <p className="text-sm mt-1">Be the first to put a famous track on the map.</p>
+              <div className="text-center py-12 text-slate-400">
+                <p className="text-[12px]">No Top 100 course rounds logged here yet.</p>
+                <p className="text-[11px] mt-1">Be the first to put a famous track on the map.</p>
               </div>
             )}
 
           {/* Course leaderboard list */}
           {!isErrorCourses && allCourseEntries.length > 0 && (
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {allCourseEntries.map((course, index) => {
                 const rank = index + 1;
                 const location = course.sub_country
@@ -242,48 +371,48 @@ const Top100LeaderboardPanel = () => {
                   <button
                     key={course.course_id + '-' + rank}
                     onClick={() => navigate(`/courses/${course.course_id}`)}
-                    className="w-full flex items-center gap-4 p-4 rounded-xl bg-card border border-border/50 hover:border-primary-accent/40 hover:shadow-md transition-all text-left"
+                    className="group flex w-full items-center gap-3 rounded-2xl border border-slate-800/70 bg-slate-900/60 px-3 py-2.5 text-left text-[12px] text-slate-100 transition-colors hover:border-slate-200/40 hover:bg-slate-900"
                   >
                     {/* Rank */}
-                    <div className="flex-shrink-0 w-10 text-center">
-                      <span className="text-xl font-bold text-foreground">
+                    <div className="w-10 flex-shrink-0 text-center">
+                      <span className="text-sm font-semibold text-slate-50">
                         #{rank}
                       </span>
                     </div>
 
                     {/* Thumbnail */}
-                    <div className="w-16 h-16 rounded-xl overflow-hidden bg-muted flex-shrink-0">
+                    <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-xl bg-slate-800">
                       {course.thumbnail_url ? (
                         <img
                           src={course.thumbnail_url}
                           alt={course.course_name}
-                          className="w-full h-full object-cover"
+                          className="h-full w-full object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
+                        <div className="flex h-full w-full items-center justify-center text-[10px] text-slate-400">
                           No image
                         </div>
                       )}
                     </div>
 
                     {/* Info */}
-                    <div className="flex-1 min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <div className="font-semibold text-foreground truncate">
+                        <span className="truncate text-[13px] font-medium text-slate-50">
                           {course.course_name}
-                        </div>
+                        </span>
                         {course.list_slug && course.list_slug !== 'worldwide' && (
-                          <Badge variant="outline" className="text-xs flex-shrink-0">
+                          <span className="flex-shrink-0 rounded-full bg-slate-800/80 px-2 py-0.5 text-[10px] text-slate-300">
                             {listShortLabels[course.list_slug] ?? 'Top 100'}
-                          </Badge>
+                          </span>
                         )}
                       </div>
-                      <div className="text-sm text-muted-foreground mt-1">
+                      <div className="mt-0.5 text-[11px] text-slate-400">
                         {location}
                       </div>
-                      <div className="text-xs text-muted-foreground mt-1">
+                      <div className="mt-0.5 text-[10px] text-slate-500">
                         Played {course.times_played} time
-                        {course.times_played === 1 ? '' : 's'} by members
+                        {course.times_played === 1 ? '' : 's'}
                         {course.avg_rating != null && (
                           <>
                             {' · '}
@@ -292,20 +421,25 @@ const Top100LeaderboardPanel = () => {
                         )}
                       </div>
                     </div>
+
+                    <span className="text-[11px] text-slate-400 group-hover:text-slate-200">
+                      View →
+                    </span>
                   </button>
                 );
               })}
 
               {/* Load more */}
               {hasNextCoursePage && (
-                <div className="flex justify-center pt-4">
-                  <Button
-                    variant="outline"
+                <div className="flex justify-center pt-3">
+                  <button
+                    type="button"
                     onClick={() => fetchNextCoursePage()}
                     disabled={isFetchingNextCoursePage}
+                    className="inline-flex items-center rounded-full border border-slate-700 bg-slate-900/80 px-3 py-1.5 text-[12px] font-medium text-slate-100 hover:border-slate-500 disabled:opacity-60"
                   >
-                    {isFetchingNextCoursePage ? 'Loading...' : 'Load more'}
-                  </Button>
+                    {isFetchingNextCoursePage ? 'Loading more…' : 'Load more courses'}
+                  </button>
                 </div>
               )}
             </div>
@@ -313,59 +447,103 @@ const Top100LeaderboardPanel = () => {
         </div>
       ) : (
         <>
-          {/* Filters */}
-          <div className="flex flex-wrap gap-3">
-            <Select value={scope} onValueChange={handleScopeChange}>
-              <SelectTrigger className="flex-1 min-w-[180px] bg-card border-border/50">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {(Object.keys(scopeLabels) as LeaderboardScope[]).map((key) => (
-                  <SelectItem key={key} value={key}>
-                    {scopeLabels[key]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          {/* Main leaderboard card */}
+          <section
+            className="
+              rounded-3xl border border-slate-800/70 bg-slate-950/85
+              px-2.5 py-2.5 shadow-[0_18px_60px_rgba(15,23,42,0.55)]
+              sm:px-3 sm:py-3
+            "
+          >
+            {/* Desktop table */}
+            <div className="hidden md:block">
+              {/* Loading state */}
+              {isLoading && (
+                <div className="space-y-1.5 px-1 py-1">
+                  {[...Array(6)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="h-9 animate-pulse rounded-xl bg-slate-900/70"
+                    />
+                  ))}
+                </div>
+              )}
 
-            <Select value={timeRange} onValueChange={handleTimeRangeChange}>
-              <SelectTrigger className="flex-1 min-w-[180px] bg-card border-border/50">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {(Object.keys(timeRangeLabels) as LeaderboardTimeRange[]).map((key) => (
-                  <SelectItem key={key} value={key}>
-                    {timeRangeLabels[key]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+              {!isLoading && data && allEntries.length > 0 && (
+                <div className="overflow-hidden rounded-2xl border border-slate-900/80 bg-slate-950">
+                  {/* Table header */}
+                  <div className="grid grid-cols-[44px,2fr,1.4fr,1.2fr,1.1fr] border-b border-slate-900/80 bg-slate-950/95 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+                    <div>#</div>
+                    <div>Golfer</div>
+                    <div>Home club</div>
+                    <div>Top 100 courses</div>
+                    <div>Lists</div>
+                  </div>
 
-      {/* Your Position Card */}
-      {currentUserEntry && (
-        <div className="p-4 rounded-xl bg-primary-accent/10 border border-primary-accent/20 space-y-2">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            Your position
-          </p>
-          <div className="flex items-center gap-2">
-            <Award className="w-5 h-5 text-primary-accent" />
-            <p className="text-lg font-bold text-foreground">
-              #{currentUserEntry.rank} · {currentUserEntry.total_top100_played} Top 100 courses
-            </p>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            {currentUserEntry.milestone_label
-              ? `You're in the ${currentUserEntry.milestone_label} – keep going.`
-              : 'Log more Top 100 rounds to climb the leaderboard.'}
-          </p>
-        </div>
-      )}
+                  {/* Table body */}
+                  <div className="divide-y divide-slate-900/80">
+                    {allEntries.map((row) => {
+                      const isCurrentUser = row.user_id === session?.user?.id;
+                      return (
+                        <LeaderboardRowDesktop
+                          key={row.user_id}
+                          row={row}
+                          isCurrentUser={isCurrentUser}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {!isLoading && (!data || allEntries.length === 0) && (
+                <p className="px-3 py-4 text-[12px] text-slate-400">
+                  No leaderboard data found for this view yet.
+                </p>
+              )}
+            </div>
+
+            {/* Mobile list */}
+            <div className="md:hidden">
+              {/* Loading */}
+              {isLoading && (
+                <div className="space-y-2 pt-1">
+                  {[...Array(6)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="h-16 animate-pulse rounded-2xl bg-slate-900/70"
+                    />
+                  ))}
+                </div>
+              )}
+
+              {!isLoading && data && allEntries.length > 0 && (
+                <div className="mt-1 space-y-1.5">
+                  {allEntries.map((row) => {
+                    const isCurrentUser = row.user_id === session?.user?.id;
+                    return (
+                      <LeaderboardRowMobile
+                        key={row.user_id}
+                        row={row}
+                        isCurrentUser={isCurrentUser}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+
+              {!isLoading && (!data || allEntries.length === 0) && (
+                <p className="px-1 py-3 text-[12px] text-slate-400">
+                  No leaderboard data found for this view yet.
+                </p>
+              )}
+            </div>
+          </section>
 
           {/* Error State */}
           {isError && (
-            <div className="text-center py-12 px-4 rounded-xl bg-destructive/10 border border-destructive/20">
-              <p className="text-sm text-destructive mb-3">
+            <div className="text-center py-12 px-4 rounded-2xl bg-slate-900/80 border border-slate-800/70">
+              <p className="text-[12px] text-slate-300 mb-3">
                 Failed to load leaderboard data.
               </p>
               <Button variant="outline" size="sm" onClick={() => refetch()}>
@@ -374,89 +552,17 @@ const Top100LeaderboardPanel = () => {
             </div>
           )}
 
-          {/* Empty State */}
-          {!isError && allEntries.length === 0 && !isLoading && (
-            <div className="text-center py-12 text-muted-foreground">
-              <p>No Top 100 rounds logged here yet.</p>
-              <p className="text-sm mt-1">Be the first to start your pilgrimage.</p>
-            </div>
-          )}
-
-          {/* Leaderboard List */}
-          {!isError && allEntries.length > 0 && (
-            <div className="space-y-2">
-              {allEntries.map((entry) => {
-                const ringColor = entry.rank <= 3 ? 'ring-primary-accent/60' : getRingColorClass(getTop100PrestigeRing(entry.total_top100_played));
-                
-                return (
-                  <button
-                    key={entry.user_id}
-                    onClick={() => navigate(`/profile/${entry.user_id}?tab=top100`)}
-                    className="w-full flex items-center gap-4 p-4 rounded-xl bg-card border border-border/50 hover:border-primary-accent/40 hover:shadow-md transition-all text-left"
-                  >
-                    {/* Rank */}
-                    <div className="flex-shrink-0 w-10 text-center">
-                      <span className={`text-xl font-bold ${
-                        entry.rank === 1 ? 'text-yellow-500' :
-                        entry.rank === 2 ? 'text-slate-400' :
-                        entry.rank === 3 ? 'text-amber-600' :
-                        'text-foreground'
-                      }`}>
-                        #{entry.rank}
-                      </span>
-                    </div>
-
-                    {/* Avatar + Ring */}
-                    <div className="relative h-12 w-12 flex-shrink-0">
-                      <Avatar className="h-12 w-12">
-                        <AvatarImage src={entry.avatar_url || undefined} alt={entry.display_name} />
-                        <AvatarFallback className="bg-surface-slate text-white">
-                          {(entry.display_name || 'A').charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span 
-                        className={`pointer-events-none absolute inset-0 rounded-full ring-2 ring-offset-[2px] ring-offset-background ${ringColor}`}
-                      />
-                    </div>
-                    
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="font-semibold text-foreground truncate">{entry.display_name}</p>
-                        {entry.milestone_label && (
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-primary-accent/10 text-primary-accent border border-primary-accent/20">
-                            {entry.milestone_label}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground truncate">
-                        {entry.home_club || 'No club set'}
-                      </p>
-                    </div>
-
-                    {/* Count */}
-                    <div className="flex-shrink-0 text-right">
-                      <p className="text-2xl font-bold text-foreground">{entry.total_top100_played}</p>
-                      <p className="text-xs text-muted-foreground whitespace-nowrap">
-                        Top 100{entry.total_top100_played === 1 ? '' : 's'}
-                      </p>
-                    </div>
-                  </button>
-                );
-              })}
-
-              {/* Load More */}
-              {hasNextPage && (
-                <div className="flex justify-center pt-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => fetchNextPage()}
-                    disabled={isFetchingNextPage}
-                  >
-                    {isFetchingNextPage ? 'Loading...' : 'Load more'}
-                  </Button>
-                </div>
-              )}
+          {/* Load more */}
+          {hasNextPage && !isError && (
+            <div className="flex justify-center">
+              <button
+                type="button"
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                className="inline-flex items-center rounded-full border border-slate-700 bg-slate-900/80 px-3 py-1.5 text-[12px] font-medium text-slate-100 hover:border-slate-500 disabled:opacity-60"
+              >
+                {isFetchingNextPage ? 'Loading more…' : 'Load more golfers'}
+              </button>
             </div>
           )}
         </>
