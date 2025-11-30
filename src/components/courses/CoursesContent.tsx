@@ -144,7 +144,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
               className="text-sm px-3 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard"
               style={{ borderRadius: 'var(--radius)' }}
             >
-              <Trophy className="h-3.5 w-3.5 mr-1.5" />
+              <Trophy className="h-4 w-4 mr-1.5" />
               Top 100
             </TabsTrigger>
             <TabsTrigger 
