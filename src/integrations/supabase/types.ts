@@ -5582,6 +5582,14 @@ export type Database = {
         }
         Returns: Json
       }
+      get_top100_season_stats: {
+        Args: {
+          season_end?: string
+          season_start?: string
+          target_user_id: string
+        }
+        Returns: Json
+      }
       get_trending_top100_moments: {
         Args: { days_param?: number; limit_param?: number }
         Returns: {
