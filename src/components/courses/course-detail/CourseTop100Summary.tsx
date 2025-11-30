@@ -1,47 +1,28 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
-import { getRingLabel, getRingColorClass } from '@/lib/top100Prestige';
-import { cn } from '@/lib/utils';
 import { Trophy } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { getTop100Club } from '@/lib/top100Club';
+import { getTop100RingBorderClass } from '@/lib/top100RingStyles';
 
-const CourseTop100Summary: React.FC = () => {
-  const { session } = useSupabaseSession();
-  const navigate = useNavigate();
-  const { data, isLoading } = useTop100ProgressForUser(session?.user?.id);
+interface CourseTop100SummaryProps {
+  userId?: string;
+}
 
-  // Logged out state
-  if (!session) {
+export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
+  const { data, isLoading } = useTop100ProgressForUser(userId);
+
+  // TOOD: if loading, show skeleton...
+  if (isLoading) {
     return (
-      <section className="px-4 pt-4 pb-5 bg-slate-50">
-        <div className="bg-white border border-border rounded-2xl px-4 py-4 shadow-sm">
-          <h2 className="text-lg font-semibold text-foreground mb-1">
-            Your Top 100 Progress
-          </h2>
-          <p className="text-base text-muted-foreground mb-3">
-            Sign in to track how this course fits into your Top 100 journey and
-            see your progress across the world's greatest courses.
-          </p>
-          <button
-            onClick={() => navigate('/auth?redirect=/courses')}
-            className="inline-flex items-center justify-center rounded-lg bg-primary-accent px-4 py-2 text-base font-medium text-white hover:opacity-90 transition-opacity"
-          >
-            Sign in to view your journey
-          </button>
-        </div>
-      </section>
-    );
-  }
-
-  if (isLoading || !data) {
-    return (
-      <section className="px-4 pt-4 pb-5 bg-slate-50">
-        <div className="h-4 w-40 rounded bg-surface-alt mb-3" />
-        <div className="h-3 w-64 rounded bg-surface-alt mb-4" />
-        <div className="grid grid-cols-2 gap-3">
-          <div className="h-20 rounded-xl bg-surface-alt" />
-          <div className="h-20 rounded-xl bg-surface-alt" />
+      <section className="px-4 pt-4 pb-5 bg-slate-50 text-center">
+        <div className="animate-pulse space-y-3">
+          <div className="h-6 w-48 mx-auto rounded bg-surface-alt" />
+          <div className="h-4 w-64 mx-auto rounded bg-surface-alt" />
+          <div className="flex justify-center gap-2">
+            <div className="h-8 w-24 rounded-full bg-surface-alt" />
+            <div className="h-8 w-24 rounded-full bg-surface-alt" />
+          </div>
           <div className="h-20 rounded-xl bg-surface-alt" />
           <div className="h-20 rounded-xl bg-surface-alt" />
         </div>
@@ -49,7 +30,33 @@ const CourseTop100Summary: React.FC = () => {
     );
   }
 
-  const ringLabel = getRingLabel(data.prestige_ring);
+  if (!data) {
+    return (
+      <section className="px-4 pt-4 pb-5 bg-slate-50 text-center">
+        <p className="text-sm text-muted-foreground">No Top 100 progress data available.</p>
+      </section>
+    );
+  }
+
+  // TOOD: skeletons for missing data
+  if (!data || !data.lists || data.lists.length === 0) {
+    return (
+      <section className="px-4 pt-4 pb-5 bg-slate-50 text-center">
+        <div className="animate-pulse space-y-3">
+          <div className="h-6 w-48 mx-auto rounded bg-surface-alt" />
+          <div className="h-4 w-64 mx-auto rounded bg-surface-alt" />
+          <div className="flex justify-center gap-2">
+            <div className="h-8 w-24 rounded-full bg-surface-alt" />
+            <div className="h-8 w-24 rounded-full bg-surface-alt" />
+          </div>
+          <div className="h-20 rounded-xl bg-surface-alt" />
+          <div className="h-20 rounded-xl bg-surface-alt" />
+        </div>
+      </section>
+    );
+  }
+
+  const club = getTop100Club(data.total_top100_rated ?? data.total_played_top100);
   const total = data.total_played_top100;
   const regions = data.regions_count;
 
@@ -76,76 +83,63 @@ const CourseTop100Summary: React.FC = () => {
           {regions} region{regions === 1 ? '' : 's'}.
         </p>
         
-        {/* Prestige Ring & Milestone Chips */}
+        {/* Club Ring & Milestone Chips */}
         <div className="flex flex-wrap items-center justify-center gap-2 mt-3">
-          {data.prestige_ring && (
+          {club && (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card px-3 py-1 text-sm">
               <span className={cn(
                 "h-4 w-4 rounded-full border border-primary-accent/60 ring-2 ring-offset-[1px] ring-offset-background",
-                getRingColorClass(data.prestige_ring)
+                getTop100RingBorderClass(club.ring)
               )} />
-              {getRingLabel(data.prestige_ring)}
-            </span>
-          )}
-          
-          {data.prestige_label && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-surface-alt px-3 py-1 text-sm text-[#f79e1b]">
-              <Trophy className="h-3 w-3" />
-              {data.prestige_label}
+              {club.label}
             </span>
           )}
           
           {data.next_milestone && (
             <span className="inline-flex items-center gap-1 rounded-full bg-surface-alt px-3 py-1 text-sm text-muted-foreground">
               Next milestone: {data.next_milestone.remaining} more{' '}
-              {data.next_milestone.remaining === 1 ? 'course' : 'courses'}
+              {data.next_milestone.remaining === 1 ? 'course' : 'courses'} to{' '}
+              {data.next_milestone.label}
             </span>
           )}
         </div>
       </div>
 
-      {/* 4-list grid with card tiles */}
-      <div className="grid grid-cols-2 gap-3 max-w-md mx-auto">
-        {listsToShow.map((list) => (
-          <button
-            key={list!.listSlug}
-            onClick={() =>
-              navigate(`/top100/${list!.listSlug}`)
-            }
-            className="bg-white border border-border rounded-2xl px-3 py-3 text-left transition-colors hover:bg-muted/50 shadow-sm"
-          >
-            <span className="text-sm font-medium text-muted-foreground mb-0.5 block">
-              {list!.listName}
-            </span>
-            <span className="text-base font-semibold text-foreground block">
-              {list!.played} / {list!.total} played
-            </span>
-            <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-surface-alt">
-              <div
-                className="h-full bg-[#f79e1b]"
-                style={{
-                  width: `${Math.min(
-                    100,
-                    (list!.played / Math.max(1, list!.total)) * 100
-                  )}%`,
-                }}
-              />
-            </div>
-          </button>
-        ))}
-      </div>
+      {/* Mini progress cards for each list */}
+      <div className="grid grid-cols-2 gap-3">
+        {listsToShow.map((list: any) => {
+          const percentage = list.total > 0 ? (list.played / list.total) * 100 : 0;
 
-      {/* Link to full journey */}
-      <div className="text-center">
-        <button
-          onClick={() => navigate('/top100?tab=my-progress')}
-          className="mt-3 text-sm font-medium text-primary-accent hover:text-primary-accent/80 transition-colors"
-        >
-          View full Top 100 Journey →
-        </button>
+          return (
+            <div
+              key={list.listId}
+              className="bg-card rounded-2xl border border-border/60 p-4 text-left space-y-2"
+            >
+              {/* Title */}
+              <h3 className="font-semibold text-sm text-foreground">{list.listName}</h3>
+
+              {/* Fraction */}
+              <div className="text-2xl font-bold text-foreground">
+                {list.played}
+                <span className="text-base text-muted-foreground"> / {list.total}</span>
+              </div>
+
+              {/* Progress bar */}
+              <div className="h-1.5 rounded-full bg-surface-alt overflow-hidden">
+                <div
+                  className="h-full bg-primary-accent rounded-full transition-all duration-300"
+                  style={{ width: `${percentage}%` }}
+                />
+              </div>
+
+              {/* Completion % */}
+              <div className="text-xs text-muted-foreground">
+                {percentage.toFixed(0)}% complete
+              </div>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
-};
-
-export default CourseTop100Summary;
+}

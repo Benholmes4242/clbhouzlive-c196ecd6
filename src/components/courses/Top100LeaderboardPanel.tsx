@@ -7,9 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Trophy, Award } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { getTop100PrestigeRing, getRingColorClass } from '@/lib/top100Prestige';
 import { getTop100Club } from '@/lib/top100Club';
-import { getTop100RingDotClass } from '@/lib/top100RingStyles';
+import { getTop100RingDotClass, getTop100RingBorderClass } from '@/lib/top100RingStyles';
 import { cn } from '@/lib/utils';
 
 const Top100LeaderboardPanel = () => {
@@ -391,7 +390,7 @@ const Top100LeaderboardPanel = () => {
               {allEntries.map((entry) => {
                 const club = getTop100Club(entry.total_top100_played);
                 const ringDotClass = getTop100RingDotClass(club?.ring ?? 'none');
-                const ringColor = entry.rank <= 3 ? 'ring-primary-accent/60' : getRingColorClass(getTop100PrestigeRing(entry.total_top100_played));
+                const ringColor = entry.rank <= 3 ? 'ring-primary-accent/60' : getTop100RingBorderClass(club?.ring ?? 'none');
                 
                 return (
                   <button

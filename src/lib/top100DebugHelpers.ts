@@ -1,5 +1,6 @@
 import type { Top100ProgressResponse } from '@/hooks/useTop100ProgressForUser';
-import type { Top100FriendsSnapshotResponse } from '@/hooks/useTop100FriendsSnapshot';
+import type { Top100FriendsSnapshotResponse, Top100FriendSnapshot } from '@/hooks/useTop100FriendsSnapshot';
+import { getTop100Club } from './top100Club';
 
 type MyJourneyPreset = 'real' | 'none' | '5' | '20' | '50' | '100' | '200';
 type FriendsPreset = 'real' | 'none' | 'low' | 'mid' | 'high';
@@ -12,19 +13,14 @@ export function applyMyJourneyDebug(
 
   const target = presetToNumber(preset);
   
-  // Determine prestige ring based on target
-  let prestigeRing: 'bronze' | 'blue' | 'green' | 'silver' | 'gold' | 'platinum' | null = null;
-  if (target >= 300) prestigeRing = 'platinum';
-  else if (target >= 200) prestigeRing = 'gold';
-  else if (target >= 100) prestigeRing = 'silver';
-  else if (target >= 50) prestigeRing = 'green';
-  else if (target >= 20) prestigeRing = 'blue';
-  else if (target > 0) prestigeRing = 'bronze';
+  // Determine club based on target
+  const club = getTop100Club(target);
   
   // Create a simplified override
   const override: Top100ProgressResponse = {
     ...realData,
     total_played_top100: target,
+    total_top100_rated: target,
     regions_count: target > 0 ? Math.min(target, 4) : 0,
     lists: realData.lists.map((list, idx) => {
       // Distribute courses roughly across lists
@@ -35,8 +31,10 @@ export function applyMyJourneyDebug(
         played: share + extra,
       };
     }),
-    prestige_ring: prestigeRing,
-    prestige_label: target >= 300 ? '300 Club Champion' : target >= 200 ? '200 Clubhouse Elite' : target >= 100 ? '100 Century Club' : target >= 50 ? '50 Club' : target >= 20 ? '20 Club' : target >= 5 ? 'Emerging Pilgrim' : null,
+    club_ring: club?.ring ?? 'none',
+    club_label: club?.label ?? null,
+    next_milestone: realData.next_milestone,
+    recent_rounds: realData.recent_rounds,
   };
   
   return override;
@@ -50,17 +48,55 @@ export function applyFriendsDebug(
   
   if (preset === 'none') {
     return {
-      me: realData.me,
+      me: realData?.me ?? null,
       friends: [],
     };
   }
   
-  // Generate fake friends based on preset
-  const fakeFriends = generateFakeFriends(preset);
+  // Simulate friends
+  const mockFriends: Top100FriendSnapshot[] = [
+    { 
+      friend_id: 'mock-1', 
+      display_name: 'Alex Chen',
+      profile_photo_url: null,
+      home_club: null,
+      total_top100_played: 0 
+    },
+    { 
+      friend_id: 'mock-2', 
+      display_name: 'Jamie Parker',
+      profile_photo_url: null,
+      home_club: null,
+      total_top100_played: 0 
+    },
+    { 
+      friend_id: 'mock-3', 
+      display_name: 'Sam Rivera',
+      profile_photo_url: null,
+      home_club: null,
+      total_top100_played: 0 
+    },
+  ];
+  
+  const baseValue = realData?.me?.total_top100_played ?? 20;
+  
+  if (preset === 'low') {
+    mockFriends[0].total_top100_played = Math.max(0, baseValue - 1);
+    mockFriends[1].total_top100_played = Math.max(0, baseValue - 3);
+    mockFriends[2].total_top100_played = Math.max(0, baseValue - 5);
+  } else if (preset === 'mid') {
+    mockFriends[0].total_top100_played = baseValue + 2;
+    mockFriends[1].total_top100_played = baseValue + 1;
+    mockFriends[2].total_top100_played = Math.max(0, baseValue - 1);
+  } else if (preset === 'high') {
+    mockFriends[0].total_top100_played = baseValue + 10;
+    mockFriends[1].total_top100_played = baseValue + 5;
+    mockFriends[2].total_top100_played = baseValue + 2;
+  }
   
   return {
-    me: realData.me,
-    friends: fakeFriends,
+    me: realData?.me ?? null,
+    friends: mockFriends,
   };
 }
 
@@ -74,22 +110,4 @@ function presetToNumber(preset: MyJourneyPreset): number {
     case '200': return 200;
     default: return 0;
   }
-}
-
-function generateFakeFriends(preset: FriendsPreset) {
-  const counts = {
-    low: [10, 15, 18],
-    mid: [40, 52, 58],
-    high: [120, 200, 350],
-  };
-  
-  const targets = counts[preset] || [0, 0, 0];
-  
-  return targets.map((count, idx) => ({
-    friend_id: `debug-friend-${idx}`,
-    display_name: `Debug Friend ${String.fromCharCode(65 + idx)}`,
-    profile_photo_url: null,
-    home_club: `Debug Club ${idx + 1}`,
-    total_top100_played: count,
-  }));
 }

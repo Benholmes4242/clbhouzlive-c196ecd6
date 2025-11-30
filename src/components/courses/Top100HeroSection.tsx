@@ -1,18 +1,20 @@
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getRingLabel, getRingColorClass, getTop100Title, Top100PrestigeRing } from '@/lib/top100Prestige';
+import type { Top100Ring } from '@/lib/top100Club';
+import { getTop100Club } from '@/lib/top100Club';
+import { getTop100RingBorderClass } from '@/lib/top100RingStyles';
 import { Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-interface Top100HeroSectionProps {
+export interface Top100HeroSectionProps {
   avatarUrl?: string | null;
-  displayName?: string;
+  displayName?: string | null;
   totalPlayed: number;
   regionsCount: number;
-  prestigeRing?: Top100PrestigeRing | null;
-  prestigeLabel?: string | null;
+  clubRing?: Top100Ring;
+  clubLabel?: string | null;
   lastPlayedDate?: string | null;
-  isOwnProfile: boolean;
+  isOwnProfile?: boolean;
 }
 
 export function Top100HeroSection({
@@ -20,8 +22,8 @@ export function Top100HeroSection({
   displayName,
   totalPlayed,
   regionsCount,
-  prestigeRing,
-  prestigeLabel,
+  clubRing = 'none',
+  clubLabel,
   lastPlayedDate,
   isOwnProfile,
 }: Top100HeroSectionProps) {
@@ -32,16 +34,14 @@ export function Top100HeroSection({
     .toUpperCase()
     .slice(0, 2) || '?';
 
-  const title = getTop100Title(totalPlayed);
-
   return (
     <div className="flex flex-col items-center text-center space-y-4 py-6">
-      {/* Big Prestige Ring with Avatar */}
+      {/* Big Ring with Avatar */}
       <div className="relative">
         <div
           className={cn(
             'h-32 w-32 rounded-full flex items-center justify-center border-4 ring-4 ring-offset-4 ring-offset-background transition-all',
-            getRingColorClass(prestigeRing)
+            getTop100RingBorderClass(clubRing)
           )}
         >
           <Avatar className="h-28 w-28">
@@ -51,10 +51,10 @@ export function Top100HeroSection({
             </AvatarFallback>
           </Avatar>
         </div>
-        {prestigeRing && (
+        {clubLabel && (
           <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-background px-3 py-1 rounded-full border border-border shadow-sm">
             <span className="text-xs font-medium text-muted-foreground">
-              {getRingLabel(prestigeRing)}
+              {clubLabel}
             </span>
           </div>
         )}
@@ -71,20 +71,12 @@ export function Top100HeroSection({
           <span>
             Across {regionsCount} {regionsCount === 1 ? 'region' : 'regions'}
           </span>
-          {title && (
-            <>
-              <span>·</span>
-              <span className="font-medium text-foreground">
-                {title}
-              </span>
-            </>
-          )}
-          {prestigeLabel && (
+          {clubLabel && (
             <>
               <span>·</span>
               <span className="inline-flex items-center gap-1 text-primary-accent">
                 <Trophy className="h-3.5 w-3.5" />
-                {prestigeLabel}
+                {clubLabel}
               </span>
             </>
           )}
