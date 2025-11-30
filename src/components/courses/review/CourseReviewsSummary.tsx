@@ -144,7 +144,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
 
                   {/* Right column: bar + count */}
                   <div className="flex items-center gap-3">
-                    <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
+                    <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-slate-300">
                       <div
                         className={`h-full rounded-full ${item.tier.barFill} transition-all duration-300`}
                         style={{ width: `${percentage}%` }}
@@ -172,7 +172,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   Design
                 </span>
                 <div className="flex items-center gap-2">
-                  <div className="relative flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                  <div className="relative flex-1 h-2 rounded-full bg-slate-300 overflow-hidden">
                     <div
                       className="absolute inset-y-0 left-0 rounded-full bg-slate-800 transition-all"
                       style={{ width: `${(categoryAverages.design / 10) * 100}%` }}
@@ -192,7 +192,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   Condition
                 </span>
                 <div className="flex items-center gap-2">
-                  <div className="relative flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                  <div className="relative flex-1 h-2 rounded-full bg-slate-300 overflow-hidden">
                     <div
                       className="absolute inset-y-0 left-0 rounded-full bg-slate-800 transition-all"
                       style={{ width: `${(categoryAverages.condition / 10) * 100}%` }}
@@ -212,7 +212,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   Clubhouse
                 </span>
                 <div className="flex items-center gap-2">
-                  <div className="relative flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                  <div className="relative flex-1 h-2 rounded-full bg-slate-300 overflow-hidden">
                     <div
                       className="absolute inset-y-0 left-0 rounded-full bg-slate-800 transition-all"
                       style={{ width: `${(categoryAverages.clubhouse / 10) * 100}%` }}
@@ -232,7 +232,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   Facilities
                 </span>
                 <div className="flex items-center gap-2">
-                  <div className="relative flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                  <div className="relative flex-1 h-2 rounded-full bg-slate-300 overflow-hidden">
                     <div
                       className="absolute inset-y-0 left-0 rounded-full bg-slate-800 transition-all"
                       style={{ width: `${(categoryAverages.facilities / 10) * 100}%` }}
