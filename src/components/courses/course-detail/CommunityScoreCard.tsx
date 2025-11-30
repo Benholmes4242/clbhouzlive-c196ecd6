@@ -151,7 +151,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         <div className="inline-flex flex-col items-center gap-2">
           {/* Score centered above badge */}
           <span className="text-[34px] font-semibold text-slate-900 leading-none">
-            {formatScore(communityAverage)}<span className="text-lg text-slate-500">/10</span>
+            {formatScore(communityAverage)}
           </span>
 
           {/* Quality chip centered under score */}
@@ -177,7 +177,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                   </span>
 
                   <span className="text-base font-semibold text-slate-900">
-                    {formatScore(score)} /10
+                    {formatScore(score)}
                   </span>
                 </div>
 

@@ -111,12 +111,11 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
         <div className="mt-3 flex w-full items-start gap-1.5">
           {/* LEFT: score + badge */}
           <div className="flex min-w-[140px] max-w-[40%] flex-col items-start">
-            {/* Number + /10 - centered above badge accounting for badge padding */}
+            {/* Number - centered above badge accounting for badge padding */}
             <div className="flex items-baseline gap-1 ml-3">
               <span className="text-4xl font-semibold tracking-tight text-slate-900">
                 {averageRating.toFixed(1)}
               </span>
-              <span className="text-sm text-slate-500">/10</span>
             </div>
 
             {/* Rating badge – left-aligned */}
@@ -173,7 +172,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                 <div className="flex items-center gap-2">
                   <RatingBar value={categoryAverages.design} mode="neutral" />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
-                    {formatScore(categoryAverages.design)}/10
+                    {formatScore(categoryAverages.design)}
                   </span>
                 </div>
               </div>
@@ -188,7 +187,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                 <div className="flex items-center gap-2">
                   <RatingBar value={categoryAverages.condition} mode="neutral" />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
-                    {formatScore(categoryAverages.condition)}/10
+                    {formatScore(categoryAverages.condition)}
                   </span>
                 </div>
               </div>
@@ -203,7 +202,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                 <div className="flex items-center gap-2">
                   <RatingBar value={categoryAverages.clubhouse} mode="neutral" />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
-                    {formatScore(categoryAverages.clubhouse)}/10
+                    {formatScore(categoryAverages.clubhouse)}
                   </span>
                 </div>
               </div>
@@ -218,7 +217,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                 <div className="flex items-center gap-2">
                   <RatingBar value={categoryAverages.facilities} mode="neutral" />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
-                    {formatScore(categoryAverages.facilities)}/10
+                    {formatScore(categoryAverages.facilities)}
                   </span>
                 </div>
               </div>

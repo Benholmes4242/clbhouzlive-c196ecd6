@@ -287,7 +287,7 @@ const Top100LeaderboardPanel = () => {
                         {course.avg_rating != null && (
                           <>
                             {' · '}
-                            Avg {course.avg_rating.toFixed(1)}/10
+                            Avg {course.avg_rating.toFixed(1)}
                           </>
                         )}
                       </div>

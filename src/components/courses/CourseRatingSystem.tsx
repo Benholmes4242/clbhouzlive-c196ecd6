@@ -153,7 +153,7 @@ const CourseRatingSystem = ({
         </div>
 
         <div className="mt-3 inline-flex px-3 py-1 rounded-full bg-slate-900 text-xs font-medium text-background">
-          Selected: {selectedRating ?? '—'}/10
+          Selected: {selectedRating ?? '—'}
         </div>
       </div>
 

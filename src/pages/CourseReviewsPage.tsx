@@ -114,7 +114,7 @@ const CourseReviewsPage: React.FC = () => {
             </div>
             <div>
               <div className="text-sm font-semibold">
-                {avg !== null ? avg.toFixed(1) : '—'} / 10
+                {avg !== null ? avg.toFixed(1) : '—'}
               </div>
               <div className="text-xs text-muted-foreground">
                 Based on {count} rating{count === 1 ? '' : 's'}
@@ -253,16 +253,16 @@ const CourseReviewsPage: React.FC = () => {
                   {/* Breakdown row */}
                   <div className="flex flex-wrap gap-2 text-[11px] text-muted-foreground">
                     {r.design_score !== null && (
-                      <span>Design {r.design_score.toFixed(1)}/10</span>
+                      <span>Design {r.design_score.toFixed(1)}</span>
                     )}
                     {r.condition_score !== null && (
-                      <span>Condition {r.condition_score.toFixed(1)}/10</span>
+                      <span>Condition {r.condition_score.toFixed(1)}</span>
                     )}
                     {r.clubhouse_score !== null && (
-                      <span>Clubhouse {r.clubhouse_score.toFixed(1)}/10</span>
+                      <span>Clubhouse {r.clubhouse_score.toFixed(1)}</span>
                     )}
                     {r.facilities_score !== null && (
-                      <span>Facilities {r.facilities_score.toFixed(1)}/10</span>
+                      <span>Facilities {r.facilities_score.toFixed(1)}</span>
                     )}
                   </div>
 

@@ -35,7 +35,7 @@ const UserCoursesStats: React.FC<UserCoursesStatsProps> = ({
           <span className="text-sm font-medium text-foreground">Average Rating</span>
         </div>
         <div className="text-2xl font-bold text-foreground">
-          {averageRating ? `${averageRating}/10` : 'N/A'}
+          {averageRating ? averageRating : 'N/A'}
         </div>
         {isOwnProfile && (
           <p className="text-xs text-muted-foreground mt-1">

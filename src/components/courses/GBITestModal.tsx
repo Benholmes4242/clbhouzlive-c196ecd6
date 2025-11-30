@@ -453,7 +453,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                     {communityRatings[displayedCourse.id] && (
                       <div className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-white rounded-full">
                         <ClubhouseLogo size="sm" />
-                        <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[3px]">{communityRatings[displayedCourse.id]}/10</span>
+                        <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[3px]">{communityRatings[displayedCourse.id]}</span>
                       </div>
                     )}
                   </div>
@@ -601,7 +601,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                             {communityRatings[course.id] && (
                               <div className="flex items-center gap-1 px-1 md:px-1.5 py-0.5 bg-white rounded-full">
                                 <ClubhouseLogo size="xs" className="md:!w-5 md:!h-5" />
-                                <span className="text-xs md:text-sm font-bold text-gray-800 translate-y-[2px] md:translate-y-[3px]">{communityRatings[course.id]}/10</span>
+                                <span className="text-xs md:text-sm font-bold text-gray-800 translate-y-[2px] md:translate-y-[3px]">{communityRatings[course.id]}</span>
                               </div>
                             )}
                           </div>

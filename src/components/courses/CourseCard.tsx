@@ -247,12 +247,12 @@ const CourseCard: React.FC<CourseCardProps> = ({
             )}
             {showUserRating && userRating && (
               <div className="bg-white/16 backdrop-blur-[18px] border border-white/45 text-white shadow-[0_0_12px_rgba(0,0,0,0.35)] text-meta font-semibold px-2 py-0.5 rounded flex items-center gap-1">
-                Your: {userRating}/10
+                Your: {userRating}
               </div>
             )}
             {showAverageRating && course.average_rating && (
               <div className="bg-white/16 backdrop-blur-[18px] border border-white/45 text-white shadow-[0_0_12px_rgba(0,0,0,0.35)] text-meta font-semibold px-2 py-0.5 rounded flex items-center gap-1">
-                Avg: {course.average_rating}/10
+                Avg: {course.average_rating}
               </div>
             )}
           </div>
@@ -296,7 +296,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
                     {/* Average rating badge */}
                     {course.average_rating && (
                       <div className="bg-muted border-border text-foreground text-meta font-semibold px-2 py-0.5 rounded flex items-center gap-1">
-                        Avg: {course.average_rating}/10
+                        Avg: {course.average_rating}
                       </div>
                     )}
                   </div>
@@ -311,7 +311,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
                             onClick={(e) => e.stopPropagation()}
                           >
                             <div className="relative z-10 flex items-center justify-between w-full">
-                              <span className="text-sm font-bold text-white">{userRating}/10</span>
+                              <span className="text-sm font-bold text-white">{userRating}</span>
                             </div>
                           </div>
                         </TooltipTrigger>

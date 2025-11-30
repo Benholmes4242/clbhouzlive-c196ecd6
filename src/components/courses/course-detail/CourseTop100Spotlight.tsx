@@ -62,7 +62,7 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
     );
   }
   if (data.avg_rating != null) {
-    communityLineParts.push(`Avg rating ${data.avg_rating.toFixed(1)}/10`);
+    communityLineParts.push(`Avg rating ${data.avg_rating.toFixed(1)}`);
   }
   const communityLine =
     communityLineParts.length > 0 ? communityLineParts.join(' · ') : null;

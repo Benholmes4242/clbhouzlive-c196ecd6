@@ -213,7 +213,7 @@ const MyRatingsContent = () => {
                         </div>
                         <Badge variant="default" className="flex items-center gap-1">
                           <Star className="h-3 w-3 fill-current" />
-                          {ratedCourse.rating}/10
+                          {ratedCourse.rating}
                         </Badge>
                       </div>
 

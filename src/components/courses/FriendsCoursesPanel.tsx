@@ -685,7 +685,7 @@ const FriendsCoursesPanel: React.FC = () => {
                         <div className="flex-shrink-0 flex items-center gap-1.5">
                           <ClubhouseLogo className="h-5 w-5" />
                           <span className="text-sm font-semibold text-foreground">
-                            {course.community_rating.toFixed(1)} /10
+                            {course.community_rating.toFixed(1)}
                           </span>
                         </div>
                       )}
