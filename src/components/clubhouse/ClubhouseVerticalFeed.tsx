@@ -241,6 +241,26 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const { data: playedTop100CourseIds = [] } = useUserTop100CourseIds();
   const playedSet = useMemo(() => new Set(playedTop100CourseIds), [playedTop100CourseIds]);
 
+  // Check if current post's course is Top 100 and if user has played it
+  const currentCourseId = currentPost?.golfCourse?.id;
+  const { data: currentCourseMemberships } = useQuery({
+    queryKey: ['course-top100-memberships', currentCourseId],
+    enabled: !!currentCourseId,
+    queryFn: async () => {
+      if (!currentCourseId) return [];
+      const { data } = await supabase
+        .from('course_top100_memberships')
+        .select('course_id')
+        .eq('course_id', currentCourseId)
+        .limit(1);
+      return data || [];
+    },
+    staleTime: 10 * 60 * 1000,
+  });
+
+  const isCurrentCourseTop100 = (currentCourseMemberships?.length ?? 0) > 0;
+  const isCurrentCoursePlayed = currentCourseId ? playedSet.has(currentCourseId) : false;
+
   // Notify parent when drawer states change
   useEffect(() => {
     onCommentsOpenChange?.(commentsModalOpen);
@@ -1324,12 +1344,15 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               (filteredPosts[currentIndex].ctaDescription as string | null) ?? ''
             ),
             courseName: filteredPosts[currentIndex].golfCourse?.name,
+            courseId: currentCourseId,
+            isTop100Course: isCurrentCourseTop100,
             holeNumber: undefined,
             isMuted: isGloballyMuted,
           }}
           likesCount={currentPostEngagement.likesCount}
           commentsCount={currentPostEngagement.commentsCount}
           hasLiked={currentPostEngagement.hasLiked}
+          isPlayedByUser={isCurrentCoursePlayed}
           isVisible={true}
           onSwipeUp={() => onPostDetailsOpen?.()}
           onProfileClick={() => {
