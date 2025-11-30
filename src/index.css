@@ -64,9 +64,16 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
   overscroll-behavior-y: none !important;
   overscroll-behavior-x: none !important;
   touch-action: pan-y pinch-zoom !important;
+}
+
+/* Courses page scroll region - ensure iOS momentum scrolling */
+.courses-scroll-region {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
 /* Ensure all scrollable containers prevent overscroll */
