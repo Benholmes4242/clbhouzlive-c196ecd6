@@ -887,7 +887,7 @@ const PostPlayRatingModal = ({
                   {isEditMode ? 'Edit your overall rating' : 'Submit your overall rating'}
                 </span>
                 <span className="text-base font-semibold text-slate-900">
-                  {selectedRating != null ? selectedRating.toFixed(1) : '--'} <span className="font-normal text-slate-600">/10</span>
+                  {selectedRating != null ? selectedRating.toFixed(1) : '--'}
                 </span>
               </div>
 
@@ -993,7 +993,7 @@ const PostPlayRatingModal = ({
                   <div className="flex items-baseline justify-between">
                     <span className="text-base font-semibold text-slate-900">{label}</span>
                     <span className={`text-sm font-medium ${score != null ? 'text-slate-700' : 'text-slate-400'}`}>
-                      {score != null ? score.toFixed(1) : '--'} <span className="font-normal">/10</span>
+                      {score != null ? score.toFixed(1) : '--'}
                     </span>
                   </div>
 
@@ -1371,7 +1371,7 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
                 {overallHeading}
               </p>
               <p className="mt-1 text-2xl font-semibold text-slate-900">
-                {userRating.toFixed(1)} <span className="text-base text-slate-500">/10</span>
+                {userRating.toFixed(1)}
               </p>
             </div>
 
@@ -1413,7 +1413,7 @@ function RatingConfirmationView(props: RatingConfirmationViewProps) {
                 <div className="mb-1 flex items-center justify-between text-sm">
                   <span className="text-slate-700">{item.label}</span>
                   <span className="font-medium text-slate-900">
-                    {item.value.toFixed(1)} <span className="text-slate-500">/10</span>
+                    {item.value.toFixed(1)}
                   </span>
                 </div>
                 <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">

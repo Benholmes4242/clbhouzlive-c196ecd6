@@ -92,7 +92,6 @@ export const ReviewsHeaderCard: React.FC<ReviewsHeaderCardProps> = ({
             <span className="text-2xl font-semibold text-slate-900">
               {communityScore.toFixed(1)}
             </span>
-            <span className="text-sm font-medium text-slate-500">/10</span>
           </div>
           <p className="mt-1 text-xs text-slate-500">
             Based on {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
