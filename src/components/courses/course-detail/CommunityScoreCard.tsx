@@ -22,8 +22,7 @@ const formatScore = (score: number) => {
 const CommunityRatingBadge: React.FC<{ label: string; bg: string; border: string; text: string }> = ({ label, bg, border, text }) => {
   return (
     <span 
-      className={`inline-flex items-center justify-center px-3 py-1 border text-xs font-semibold uppercase ${bg} ${border} ${text}`}
-      style={{ borderRadius: 'var(--radius)' }}
+      className={`inline-flex items-center justify-center rounded-full px-3 py-[6px] text-xs font-semibold uppercase tracking-[0.08em] ${bg} ${text}`}
     >
       {label}
     </span>
@@ -159,14 +158,14 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         </div>
 
         {/* Right - score + badge stack (centered) */}
-        <div className="inline-flex flex-col items-center gap-1">
+        <div className="inline-flex flex-col items-center gap-2">
           {/* Logo + Score */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <ClubhouseLogo size="md" />
-            <span className="text-2xl font-semibold text-slate-900">
+            <span className="text-[34px] font-semibold text-slate-900 leading-none">
               {formatScore(communityAverage)}
             </span>
-            <span className="text-sm font-medium text-slate-500">/10</span>
+            <span className="text-xs text-slate-500 ml-1">/10</span>
           </div>
 
           {/* Quality chip centered under score */}
