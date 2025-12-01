@@ -3871,6 +3871,12 @@ html[data-immersive="true"] .app-shell--topSpacer {
   animation: softPulse 1.2s ease-out 0s 2;
 }
 
+/* Top 100 Map: Lift Mapbox controls to clear bottom sheet */
+.top100-map-shell .mapboxgl-ctrl-bottom-left,
+.top100-map-shell .mapboxgl-ctrl-bottom-right {
+  margin-bottom: 96px;
+}
+
 /* Respect prefers-reduced-motion globally */
 @media (prefers-reduced-motion: reduce) {
   *,
