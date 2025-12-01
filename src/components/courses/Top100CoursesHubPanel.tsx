@@ -276,7 +276,7 @@ const Top100CoursesHubPanel = () => {
               {/* Progress bar */}
               <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-slate-100">
                 <div
-                  className="h-full rounded-full bg-amber-400 transition-[width] duration-500"
+                  className="h-full rounded-full bg-brand-orange transition-[width] duration-500"
                   style={{ width: `${Math.min(100, (totalRated / 100) * 100)}%` }}
                 />
               </div>
@@ -326,7 +326,7 @@ const Top100CoursesHubPanel = () => {
                   </div>
                   <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-slate-100">
                     <div
-                      className="h-full rounded-full bg-amber-400"
+                      className="h-full rounded-full bg-brand-orange"
                       style={{ width: `${Math.min(100, pct)}%` }}
                     />
                   </div>
