@@ -298,7 +298,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
   return (
     <div className="flex flex-col">
       {/* Rated filter toggle: All / Rated / Not yet rated */}
-      <div className="flex items-center justify-between gap-3 mt-5">
+      <div className="flex items-end justify-between gap-3 mt-5">
         <div className="inline-flex rounded-lg bg-muted/70 border border-border/60 p-0.5 shadow-sm">
           {(['all', 'rated', 'unrated'] as RatedFilter[]).map((opt) => (
             <button
@@ -306,7 +306,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
               type="button"
               onClick={() => setRatedFilter(opt)}
               className={cn(
-                'rounded-lg px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors',
+                'rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
                 ratedFilter === opt
                   ? 'bg-background text-foreground shadow-sm'
                   : 'bg-transparent text-muted-foreground hover:text-foreground'
@@ -324,7 +324,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         <button
           type="button"
           onClick={handleResetView}
-          className="text-sm font-medium text-slate-400 hover:text-slate-600 transition-colors whitespace-nowrap"
+          className="mb-[2px] text-xs font-medium text-slate-500 underline-offset-2 hover:underline"
         >
           Reset view
         </button>
