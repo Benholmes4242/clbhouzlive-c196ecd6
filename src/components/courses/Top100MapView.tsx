@@ -11,6 +11,14 @@ import { cn } from '@/lib/utils';
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v11';
 
+// Canonical list sizes for the Top 100 maps
+const REGION_TOTALS: Record<Top100MapScope, number> = {
+  global: 77,
+  'gb-i': 100,
+  usa: 100,
+  europe: 99,
+};
+
 // Region center and zoom configurations
 const REGION_CONFIG: Record<Top100MapScope, { center: [number, number]; zoom: number; label: string }> = {
   'global': { center: [20, 30], zoom: 2, label: 'Global Top 100' },
@@ -45,9 +53,12 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
     return courses;
   }, [courses, ratedFilter]);
 
-  const totalInList = courses.length;
-  const ratedCount = courses.filter(c => c.user_has_rated).length;
-  const remaining = Math.max(totalInList - ratedCount, 0);
+  // Official list size for this map (falls back to what we have, just in case)
+  const officialTotal =
+    REGION_TOTALS[scope] !== undefined ? REGION_TOTALS[scope] : courses.length;
+
+  const ratedCount = courses.filter((c) => c.user_has_rated).length;
+  const remaining = Math.max(officialTotal - ratedCount, 0);
 
   const regionConfig = REGION_CONFIG[scope];
 
@@ -360,7 +371,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         )}
 
         {/* Map Container */}
-        <div ref={mapContainer} className="h-[420px] w-full" />
+        <div ref={mapContainer} className="h-[460px] w-full sm:h-[480px]" />
 
         {/* Legend & Stats Overlays */}
         <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-between items-start p-3 text-xs gap-2">
@@ -377,9 +388,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
           </div>
 
           {/* Count Pill */}
-          {totalInList > 0 && (
+          {officialTotal > 0 && (
             <div className="pointer-events-auto !rounded-2xl bg-slate-900/80 px-3 py-1.5 text-white backdrop-blur-md shadow-lg font-medium">
-              {ratedCount}/{totalInList} rated · {remaining} left
+              {ratedCount}/{officialTotal} rated · {remaining} left
             </div>
           )}
         </div>

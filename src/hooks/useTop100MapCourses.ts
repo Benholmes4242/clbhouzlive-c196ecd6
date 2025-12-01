@@ -120,6 +120,7 @@ export function useTop100MapCourses(scope: Top100MapScope, userId?: string) {
       const finalCourses = Array.from(coursesMap.values());
       
       console.log('[Top100Map] 📊 Final results:', {
+        scope,
         totalMemberships: memberships?.length || 0,
         skippedNoCoords,
         finalCoursesWithCoords: finalCourses.length,

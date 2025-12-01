@@ -163,25 +163,27 @@ const Top100Hub = () => {
               
               {/* View Mode Toggle */}
               <div className="mt-3 flex justify-center mb-6">
-                <div className="inline-flex rounded-2xl border border-slate-200 bg-white p-0.5 shadow-sm">
+                <div className="inline-flex h-11 items-center rounded-2xl border border-slate-200 bg-white shadow-sm">
                   <button
                     onClick={() => setCoursesViewMode('list')}
-                    className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all ${
+                    className={cn(
+                      'flex h-9 items-center gap-2 rounded-xl px-4 text-sm font-medium transition-colors',
                       coursesViewMode === 'list'
-                        ? 'bg-slate-100 text-foreground shadow-sm'
-                        : 'text-muted-foreground hover:text-foreground'
-                    }`}
+                        ? 'bg-slate-900 text-white shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
+                    )}
                   >
                     <List className="h-4 w-4" />
                     List
                   </button>
                   <button
                     onClick={() => setCoursesViewMode('map')}
-                    className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all ${
+                    className={cn(
+                      'flex h-9 items-center gap-2 rounded-xl px-4 text-sm font-medium transition-colors',
                       coursesViewMode === 'map'
-                        ? 'bg-slate-100 text-foreground shadow-sm'
-                        : 'text-muted-foreground hover:text-foreground'
-                    }`}
+                        ? 'bg-slate-900 text-white shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
+                    )}
                   >
                     <MapIcon className="h-4 w-4" />
                     Map
@@ -225,22 +227,23 @@ const Top100Hub = () => {
                     </div>
                     
                     {/* Right: Quick List Switcher */}
-                    <div className="inline-flex items-center gap-1 !rounded-2xl bg-slate-100 p-0.5">
+                    <div className="inline-flex items-center gap-2">
                       {lists?.map((list) => (
                         <button
                           key={list.id}
                           onClick={() => setSelectedListSlug(list.slug as Top100MapScope)}
-                          className={`inline-flex items-center gap-1 !rounded-xl px-2 py-1.5 text-xs font-medium transition-all ${
+                          className={cn(
+                            'inline-flex items-center gap-2 rounded-2xl bg-white px-3 py-1.5 text-xs font-medium shadow-sm transition-colors',
                             selectedListSlug === list.slug
-                              ? 'bg-white text-foreground shadow-sm'
-                              : 'text-muted-foreground hover:text-foreground'
-                          }`}
-                          title={list.short_label}
+                              ? 'text-slate-900'
+                              : 'text-slate-500 hover:text-slate-900'
+                          )}
                         >
-                          {list.slug === 'global' && <Globe className="h-3.5 w-3.5" />}
-                          {list.slug === 'gb-i' && <CountryFlag country="Britain & Ireland" size="sm" />}
-                          {list.slug === 'usa' && <CountryFlag country="USA" size="sm" />}
-                          {list.slug === 'europe' && <CountryFlag country="Continental Europe" size="sm" />}
+                          {list.slug === 'global' && <Globe className="h-4 w-4" />}
+                          {list.slug === 'gb-i' && <span className="text-base">🇬🇧</span>}
+                          {list.slug === 'usa' && <span className="text-base">🇺🇸</span>}
+                          {list.slug === 'europe' && <span className="text-base">🇪🇺</span>}
+                          <span>{list.short_label}</span>
                         </button>
                       ))}
                     </div>
