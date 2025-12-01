@@ -21,6 +21,8 @@ export function useTop100MapCourses(scope: Top100MapScope, userId?: string) {
   return useQuery({
     queryKey: ['top100-map-courses', scope, userId],
     queryFn: async (): Promise<Top100MapCourse[]> => {
+      console.log('[Top100Map] DEBUG - Query starting with scope:', scope);
+      
       // 1) Find the list matching the scope
       const { data: lists, error: listsError } = await supabase
         .from('top100_lists')
@@ -28,10 +30,17 @@ export function useTop100MapCourses(scope: Top100MapScope, userId?: string) {
         .eq('slug', scope)
         .eq('is_active', true);
 
+      console.log('[Top100Map] DEBUG - Lists query result:', { lists, error: listsError });
+      
       if (listsError) throw listsError;
-      if (!lists || lists.length === 0) return [];
+      if (!lists || lists.length === 0) {
+        console.log('[Top100Map] ❌ No list found for scope:', scope);
+        return [];
+      }
 
       const listId = lists[0].id;
+
+      console.log('[Top100Map] ✅ Found list:', lists[0], 'with ID:', listId);
 
       // 2) Get course memberships + golf_courses data
       const { data: memberships, error: membershipsError } = await supabase
@@ -50,6 +59,12 @@ export function useTop100MapCourses(scope: Top100MapScope, userId?: string) {
           )
         `)
         .eq('list_id', listId);
+
+      console.log('[Top100Map] DEBUG - Memberships query result:', { 
+        count: memberships?.length || 0, 
+        error: membershipsError,
+        sampleCourse: memberships?.[0]
+      });
 
       if (membershipsError) throw membershipsError;
 
@@ -71,10 +86,14 @@ export function useTop100MapCourses(scope: Top100MapScope, userId?: string) {
 
       // 4) Transform and filter for courses with coordinates
       const coursesMap = new Map<string, Top100MapCourse>();
+      let skippedNoCoords = 0;
 
       (memberships || []).forEach((m: any) => {
         const course = m.golf_courses;
-        if (!course || !course.latitude || !course.longitude) return;
+        if (!course || !course.latitude || !course.longitude) {
+          skippedNoCoords++;
+          return;
+        }
 
         const existingCourse = coursesMap.get(course.id);
         const currentRank = m.rank || 9999;
@@ -98,7 +117,21 @@ export function useTop100MapCourses(scope: Top100MapScope, userId?: string) {
         }
       });
 
-      return Array.from(coursesMap.values());
+      const finalCourses = Array.from(coursesMap.values());
+      
+      console.log('[Top100Map] 📊 Final results:', {
+        totalMemberships: memberships?.length || 0,
+        skippedNoCoords,
+        finalCoursesWithCoords: finalCourses.length,
+        sampleCourse: finalCourses[0] ? {
+          name: finalCourses[0].name,
+          coords: [finalCourses[0].longitude, finalCourses[0].latitude],
+          rank: finalCourses[0].rank,
+          user_has_rated: finalCourses[0].user_has_rated
+        } : null
+      });
+      
+      return finalCourses;
     },
     staleTime: 60_000,
   });
