@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { splitName } from '@/utils/name';
 import { cn } from '@/lib/utils';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
-import { XPRingPopover } from './XPRingPopover';
 import { Button } from '@/components/ui/button';
 import { Squircle } from '@/components/ui/squircle';
 import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck, MoreVertical } from 'lucide-react';
@@ -870,15 +869,14 @@ const HeroProfileHeader = ({
             >
               <div className="relative">
                 {/* Mini profile card */}
-                <XPRingPopover userId={profile?.id || ''}>
-                  <button
-                    data-mini-card
-                    type="button"
-                    aria-label="Open mini profile media"
-                    className="mini-card cursor-pointer"
-                    onClick={() => openImmersive?.(0)}
-                    style={{ padding: 0, border: 'none', background: 'none', overflow: 'visible' }}
-                  >
+                <button
+                  data-mini-card
+                  type="button"
+                  aria-label="Open mini profile media"
+                  className="mini-card cursor-pointer"
+                  onClick={() => openImmersive?.(0)}
+                  style={{ padding: 0, border: 'none', background: 'none', overflow: 'visible' }}
+                >
                   {profile?.profile_photo_url && (
                     <div style={{ width: '100%', height: '100%' }}>
                       <Squircle width={255} height={255}>
@@ -892,8 +890,7 @@ const HeroProfileHeader = ({
                       </Squircle>
                     </div>
                   )}
-                  </button>
-                </XPRingPopover>
+                </button>
 
                 {/* Name & handle block */}
                 <div className="name-wrap relative top-6 md:top-0" data-nameblock>
