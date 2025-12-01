@@ -8,11 +8,13 @@ export interface Top100MapCourse {
   name: string;
   country: string | null;
   sub_country: string | null;
+  region: string | null;
   latitude: number;
   longitude: number;
   rank: number | null;
   list_slug: Top100MapScope;
-  is_played: boolean;
+  user_has_rated: boolean;
+  user_rating: number | null;
 }
 
 export function useTop100MapCourses(scope: Top100MapScope, userId?: string) {
@@ -42,6 +44,7 @@ export function useTop100MapCourses(scope: Top100MapScope, userId?: string) {
             name,
             country,
             sub_country,
+            region,
             latitude,
             longitude
           )
@@ -50,16 +53,19 @@ export function useTop100MapCourses(scope: Top100MapScope, userId?: string) {
 
       if (membershipsError) throw membershipsError;
 
-      // 3) Get user's played courses if userId provided
-      let playedCourseIds = new Set<string>();
+      // 3) Get user's rated courses if userId provided
+      let ratedCoursesMap = new Map<string, number>();
       if (userId) {
-        const { data: userActivity, error: activityError } = await supabase
-          .from('user_course_activity')
-          .select('course_id')
-          .eq('user_id', userId);
+        const { data: ratings, error: ratingsError } = await supabase
+          .from('course_ratings')
+          .select('course_id, rating')
+          .eq('user_id', userId)
+          .not('rating', 'is', null);
 
-        if (!activityError && userActivity) {
-          playedCourseIds = new Set(userActivity.map((a: any) => a.course_id));
+        if (!ratingsError && ratings) {
+          ratings.forEach((r: any) => {
+            ratedCoursesMap.set(r.course_id, r.rating);
+          });
         }
       }
 
@@ -75,16 +81,19 @@ export function useTop100MapCourses(scope: Top100MapScope, userId?: string) {
 
         // Keep the best (lowest) rank if duplicate
         if (!existingCourse || (existingCourse.rank || 9999) > currentRank) {
+          const userRating = ratedCoursesMap.get(course.id);
           coursesMap.set(course.id, {
             id: course.id,
             name: course.name,
             country: course.country,
             sub_country: course.sub_country,
+            region: course.region,
             latitude: course.latitude,
             longitude: course.longitude,
             rank: m.rank,
             list_slug: scope,
-            is_played: playedCourseIds.has(course.id),
+            user_has_rated: ratedCoursesMap.has(course.id),
+            user_rating: userRating || null,
           });
         }
       });
