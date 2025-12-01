@@ -37,6 +37,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
 
   // Filter courses by rated status
   const filteredCourses = useMemo(() => {
+    console.log('[Top100MapView] Raw courses data:', courses.length, 'courses');
+    console.log('[Top100MapView] Sample course:', courses[0]);
+    
     if (ratedFilter === 'rated') return courses.filter(c => c.user_has_rated);
     if (ratedFilter === 'unrated') return courses.filter(c => !c.user_has_rated);
     return courses;
@@ -87,7 +90,10 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
       if (mapInstance.getLayer('unclustered-point')) mapInstance.removeLayer('unclustered-point');
       if (mapInstance.getSource('courses')) mapInstance.removeSource('courses');
 
-      if (!filteredCourses.length) return;
+      if (!filteredCourses.length) {
+        console.log('[Top100MapView] ❌ No filtered courses to display');
+        return;
+      }
 
       // Create GeoJSON from courses
       const geojson: GeoJSON.FeatureCollection = {
@@ -111,6 +117,13 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         })),
       };
 
+      console.log('[Top100MapView] 🗺️ GeoJSON created:', {
+        type: geojson.type,
+        featureCount: geojson.features.length,
+        sampleFeature: geojson.features[0],
+        sampleCoords: geojson.features[0] ? (geojson.features[0].geometry as GeoJSON.Point).coordinates : null
+      });
+
       // Add clustered source
       mapInstance.addSource('courses', {
         type: 'geojson',
@@ -119,6 +132,12 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         clusterMaxZoom: 6, // Max zoom to cluster points on
         clusterRadius: 40, // Radius of each cluster when clustering points
       });
+
+      console.log('[Top100MapView] ✅ Source "courses" added to map');
+      
+      // Verify source was added
+      const verifySource = mapInstance.getSource('courses');
+      console.log('[Top100MapView] Source verification:', verifySource ? 'EXISTS' : 'MISSING');
 
       // Cluster circles layer
       mapInstance.addLayer({
@@ -196,6 +215,18 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
             'rgba(148, 163, 184, 0.9)', // slate-400
           ],
         },
+      });
+
+      console.log('[Top100MapView] ✅ All 3 layers added:', {
+        clusters: mapInstance.getLayer('clusters') ? 'EXISTS' : 'MISSING',
+        clusterCount: mapInstance.getLayer('cluster-count') ? 'EXISTS' : 'MISSING',
+        unclusteredPoint: mapInstance.getLayer('unclustered-point') ? 'EXISTS' : 'MISSING'
+      });
+
+      // Log current map viewport
+      console.log('[Top100MapView] 📍 Current map view:', {
+        center: mapInstance.getCenter(),
+        zoom: mapInstance.getZoom()
       });
 
       // Click handler for clusters - zoom in
