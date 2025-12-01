@@ -254,26 +254,32 @@ const Top100CoursesHubPanel = () => {
         <div className="mt-4">
           {user ? (
             <>
-              <p className="text-[14px]">
-                <span className="font-semibold text-foreground">
+              {/* Combined pill with trophy, text, and club badge */}
+              <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/80 backdrop-blur-sm px-3 py-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+                <Trophy className="h-4 w-4 text-foreground" />
+                <span className="font-semibold text-foreground text-[14px]">
                   You&apos;ve rated {totalRated} Top 100 course{totalRated === 1 ? '' : 's'}
                 </span>
-                {listsCount > 0 && (
-                  <span className="text-muted-foreground"> across {listsCount} Top 100 list{listsCount === 1 ? '' : 's'}.</span>
+                {club && (
+                  <>
+                    <span className="mx-1 text-slate-500">·</span>
+                    <span className="inline-flex items-center gap-1">
+                      <span
+                        className={cn(
+                          'h-2 w-2 rounded-full border border-slate-950/20',
+                          ringDotClass
+                        )}
+                      />
+                      <span className="font-medium text-foreground text-[14px]">{club.label}</span>
+                    </span>
+                  </>
                 )}
-              </p>
+              </div>
 
-              {/* Club badge with ring-colored dot */}
-              {club && (
-                <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
-                  <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/80 backdrop-blur-sm px-3 py-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-                    <span className={cn(
-                      "inline-block h-2.5 w-2.5 rounded-full",
-                      ringDotClass
-                    )} />
-                    <span className="font-medium text-foreground text-[14px]">{club.label}</span>
-                  </span>
-                </div>
+              {listsCount > 0 && (
+                <p className="mt-2 text-[14px] text-muted-foreground">
+                  across {listsCount} Top 100 list{listsCount === 1 ? '' : 's'}.
+                </p>
               )}
 
               {/* Progress bar */}
