@@ -34,7 +34,7 @@ export function Top100AchievementBadge({ tier }: Top100AchievementBadgeProps) {
           <Trophy className={cn("h-4 w-4", style.icon)} />
         </div>
 
-        <div className="text-left">
+        <div className="text-center">
           <p className="text-[11px] uppercase tracking-[0.12em] text-slate-500">
             Achievement unlocked
           </p>
