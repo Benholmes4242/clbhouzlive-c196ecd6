@@ -971,7 +971,7 @@ const HeroProfileHeader = ({
                 {top100Overview && (top100Overview.total_rated ?? top100Overview.total_played ?? 0) > 0 && (() => {
                   const totalRated = top100Overview.total_rated ?? top100Overview.total_played ?? 0;
                   const club = getTop100Club(totalRated);
-                  const ringDotClass = getTop100RingDotClass(club?.ring ?? 'none');
+                  const ringDotClass = getTop100RingDotClass(club.tierId);
                   
                   return (
                     <div className="mt-3 flex justify-center">
@@ -991,12 +991,12 @@ const HeroProfileHeader = ({
                                 {top100Overview.regions_count} {top100Overview.regions_count === 1 ? 'region' : 'regions'}
                               </>
                             )}
-                            {club && (
+                            {club.shortLabel && (
                               <>
                                 <span className="text-slate-500">·</span>
                                 <span className="inline-flex items-center gap-1">
                                   <span className={cn('h-1.5 w-1.5 rounded-full', ringDotClass)} />
-                                  {club.label}
+                                  {club.shortLabel}
                                 </span>
                               </>
                             )}
@@ -1232,7 +1232,7 @@ const HeroProfileHeader = ({
                    {top100Overview && top100Overview.total_played > 0 && (() => {
                      const totalRated = top100Overview.total_played;
                      const club = getTop100Club(totalRated);
-                     const ringDotClass = getTop100RingDotClass(club?.ring ?? 'none');
+                     const ringDotClass = getTop100RingDotClass(club.tierId);
                      
                      return (
                        <div className="w-full mt-3 flex justify-center">
@@ -1252,12 +1252,12 @@ const HeroProfileHeader = ({
                                    {top100Overview.regions_count} {top100Overview.regions_count === 1 ? 'region' : 'regions'}
                                  </>
                                )}
-                               {club && (
+                               {club.shortLabel && (
                                  <>
                                    <span className="text-slate-500">·</span>
                                    <span className="inline-flex items-center gap-1">
                                      <span className={'h-1.5 w-1.5 rounded-full ' + ringDotClass} />
-                                     {club.label}
+                                     {club.shortLabel}
                                    </span>
                                  </>
                                )}

@@ -1,7 +1,7 @@
 // src/lib/top100Club.ts
 // New unified Top 100 club tier system based on total_top100_rated
 
-export type Top100Ring =
+export type Top100TierId =
   | 'none'
   | 'bronze'
   | 'blue'
@@ -12,37 +12,78 @@ export type Top100Ring =
   | 'obsidian';
 
 export type Top100ClubMeta = {
-  threshold: number;          // e.g. 20
-  label: string;              // e.g. '20 Club'
-  shortLabel: string;         // e.g. '20 Club'
-  ring: Top100Ring;           // which ring to use
+  threshold: number;
+  shortLabel: string;   // numeric label e.g. "50 Club"
+  tierName: string;     // user-facing name e.g. "Trailmaster"
+  tierId: Top100TierId;
 };
 
 // Ordered lowest → highest
-const CLUB_STEPS: Top100ClubMeta[] = [
-  { threshold: 5,   label: '5 Club',   shortLabel: '5 Club',   ring: 'bronze'   },
-  { threshold: 10,  label: '10 Club',  shortLabel: '10 Club',  ring: 'bronze'   },
-  { threshold: 20,  label: '20 Club',  shortLabel: '20 Club',  ring: 'blue'     },
-  { threshold: 50,  label: '50 Club',  shortLabel: '50 Club',  ring: 'green'    },
-  { threshold: 100, label: '100 Club', shortLabel: '100 Club', ring: 'silver'   },
-  { threshold: 200, label: '200 Club', shortLabel: '200 Club', ring: 'gold'     },
-  { threshold: 300, label: '300 Club', shortLabel: '300 Club', ring: 'platinum' },
-  { threshold: 400, label: '400 Club', shortLabel: '400 Club', ring: 'obsidian' },
+export const CLUB_STEPS: Top100ClubMeta[] = [
+  { threshold: 5,   shortLabel: '5 Club',   tierName: 'New Member',      tierId: 'bronze'   },
+  { threshold: 10,  shortLabel: '10 Club',  tierName: 'Explorer',        tierId: 'bronze'   },
+  { threshold: 20,  shortLabel: '20 Club',  tierName: 'Voyager',         tierId: 'blue'     },
+  { threshold: 50,  shortLabel: '50 Club',  tierName: 'Trailmaster',     tierId: 'green'    },
+  { threshold: 100, shortLabel: '100 Club', tierName: 'Century Club',    tierId: 'silver'   },
+  { threshold: 200, shortLabel: '200 Club', tierName: 'Clubhouse Elite', tierId: 'gold'     },
+  { threshold: 300, shortLabel: '300 Club', tierName: 'Global Master',   tierId: 'platinum' },
+  { threshold: 400, shortLabel: '400 Club', tierName: 'Clbhouz Legend',  tierId: 'obsidian' },
 ];
 
-export function getTop100Club(totalRated: number | null | undefined): Top100ClubMeta | null {
-  const n = totalRated ?? 0;
-  if (n < 5) return null; // below 5, no club
+export type Top100ClubResult = {
+  meta: Top100ClubMeta | null;
+  tierId: Top100TierId;
+  tierName: string | null;
+  shortLabel: string | null;
+  threshold: number | null;
+};
+
+export function getTop100Club(totalPlayed: number): Top100ClubResult {
+  if (totalPlayed < 5) {
+    return {
+      meta: null,
+      tierId: 'none',
+      tierName: null,
+      shortLabel: null,
+      threshold: null,
+    };
+  }
 
   let current: Top100ClubMeta | null = null;
 
   for (const step of CLUB_STEPS) {
-    if (n >= step.threshold) {
+    if (totalPlayed >= step.threshold) {
       current = step;
     } else {
       break;
     }
   }
 
-  return current;
+  if (!current) {
+    return {
+      meta: null,
+      tierId: 'none',
+      tierName: null,
+      shortLabel: null,
+      threshold: null,
+    };
+  }
+
+  return {
+    meta: current,
+    tierId: current.tierId,
+    tierName: current.tierName,
+    shortLabel: current.shortLabel,
+    threshold: current.threshold,
+  };
 }
+
+export function getNextTop100Club(totalPlayed: number): Top100ClubMeta | null {
+  for (const step of CLUB_STEPS) {
+    if (totalPlayed < step.threshold) return step;
+  }
+  return null;
+}
+
+// Backwards compatibility export (deprecated)
+export type Top100Ring = Top100TierId;

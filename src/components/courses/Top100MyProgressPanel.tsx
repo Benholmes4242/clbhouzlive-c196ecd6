@@ -32,15 +32,18 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   useEffect(() => {
     if (!data || !isOwnProfile) return;
 
-    const current = data.total_top100_rated ?? data.total_played_top100;
+    const current = data.totalTop100Played;
     const prev = prevTotalRef.current ?? 0;
 
-    const thresholds = [20, 50, 100];
+    const thresholds = [5, 10, 20, 50, 100, 200, 300, 400];
     const justHit = thresholds.find((t) => prev < t && current >= t);
 
     if (justHit) {
+      const club = data.club_tier_name;
       toast({
-        title: `Top 100 milestone unlocked – ${justHit} Club 🎉`,
+        title: club 
+          ? `You've just unlocked ${club} (${justHit} Top 100 courses). Share to Clubhouse?`
+          : `Top 100 milestone unlocked – ${justHit} Club 🎉`,
         description: 'Share your journey with the Clubhouse community?',
         action: (
           <Button
@@ -55,20 +58,20 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
     }
 
     prevTotalRef.current = current;
-  }, [data?.total_top100_rated, data?.total_played_top100, isOwnProfile, toast, navigate]);
+  }, [data?.totalTop100Played, data?.club_tier_name, isOwnProfile, toast, navigate]);
 
   // Calculate badge props for ProfileBadgeStrip
   const badgeProps = React.useMemo(() => {
     if (!data) return null;
     
-    const totalRated = data.total_top100_rated ?? data.total_played_top100;
-    const gbIList = data.lists.find(l => l.listSlug === 'gb-i-top-100');
-    const europeList = data.lists.find(l => l.listSlug === 'europe-top-100');
-    const usaList = data.lists.find(l => l.listSlug === 'usa-top-100');
-    const globalList = data.lists.find(l => l.listSlug === 'global-top-100');
+    const totalPlayed = data.totalTop100Played;
+    const gbIList = data.lists.find(l => l.listSlug === 'gb-i');
+    const europeList = data.lists.find(l => l.listSlug === 'europe');
+    const usaList = data.lists.find(l => l.listSlug === 'usa');
+    const globalList = data.lists.find(l => l.listSlug === 'global');
 
     return {
-      coursesPlayed: totalRated,
+      coursesPlayed: totalPlayed,
       totalXP: 0, // XP not tracked in Top 100 context
       britainIrelandCompleted: gbIList?.played || 0,
       europeCompleted: europeList?.played || 0,
@@ -103,7 +106,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   const lastPlayedDate = data.recent_rounds[0]?.played_at || null;
 
   // Friends comparison logic
-  const myCount = data?.total_top100_rated ?? data?.total_played_top100 ?? 0;
+  const myCount = data?.totalTop100Played ?? 0;
   const friends = friendsSnapshot?.friends ?? [];
 
   const topFriends = friends
@@ -174,10 +177,11 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
           <Top100HeroSection
             avatarUrl={session?.user?.user_metadata?.avatar_url}
             displayName={session?.user?.user_metadata?.full_name}
-            totalPlayed={data.total_top100_rated ?? data.total_played_top100}
+            totalPlayed={data.totalTop100Played}
             regionsCount={data.regions_count}
             clubRing={data.club_ring || 'none'}
             clubLabel={data.club_label || null}
+            clubTierName={data.club_tier_name || null}
             lastPlayedDate={lastPlayedDate}
             isOwnProfile={isOwnProfile}
           />
@@ -246,7 +250,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
 
           {/* Milestones Carousel */}
           <Top100MilestonesCarousel
-            totalPlayed={data.total_top100_rated ?? data.total_played_top100}
+            totalPlayed={data.totalTop100Played}
             onMilestoneClick={() => {
               // Already on My Progress, could open a modal in future
             }}
@@ -257,14 +261,6 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
             lists={data.lists}
             onListClick={(slug) => navigate(`/top100/${slug}`)}
           />
-
-          {/* Achievements & Badges Strip */}
-          {badgeProps && (badgeProps.coursesPlayed ?? 0) >= 20 && (
-            <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-foreground">Achievements & Badges</h3>
-              <ProfileBadgeStrip {...badgeProps} />
-            </div>
-          )}
 
           {/* Recent Top 100 Rounds */}
           <Top100RecentRoundsFeed

@@ -85,13 +85,13 @@ export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
         
         {/* Club Ring & Milestone Chips */}
         <div className="flex flex-wrap items-center justify-center gap-2 mt-3">
-          {club && (
+          {club.shortLabel && (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card px-3 py-1 text-sm">
               <span className={cn(
                 "h-4 w-4 rounded-full border border-primary-accent/60 ring-2 ring-offset-[1px] ring-offset-background",
-                getTop100RingBorderClass(club.ring)
+                getTop100RingBorderClass(club.tierId)
               )} />
-              {club.label}
+              {club.shortLabel}
             </span>
           )}
           
@@ -99,7 +99,7 @@ export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
             <span className="inline-flex items-center gap-1 rounded-full bg-surface-alt px-3 py-1 text-sm text-muted-foreground">
               Next milestone: {data.next_milestone.remaining} more{' '}
               {data.next_milestone.remaining === 1 ? 'course' : 'courses'} to{' '}
-              {data.next_milestone.label}
+              {data.next_milestone.tierName}
             </span>
           )}
         </div>

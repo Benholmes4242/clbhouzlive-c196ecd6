@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Trophy, Star, Target, Zap } from 'lucide-react';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { cn } from '@/lib/utils';
+import { getTop100Club } from '@/lib/top100Club';
 
 interface ProfileBadgeStripProps {
   coursesPlayed: number;
@@ -27,25 +28,33 @@ const ProfileBadgeStrip: React.FC<ProfileBadgeStripProps> = ({
   const navigate = useNavigate();
   const badges = [];
 
-  // Trophy Level Badge - Skip rookie since it's shown in profile ring
-  const getTrophyBadge = () => {
-    if (coursesPlayed >= 300) return { emoji: '👑', name: 'Club Collector', color: 'from-purple-500 to-violet-600', type: 'milestone' };
-    if (coursesPlayed >= 200) return { emoji: '🏆', name: 'Clubhouse Elite', color: 'from-emerald-500 to-green-600', type: 'milestone' };
-    if (coursesPlayed >= 100) return { emoji: '🥇', name: 'The Century Club', color: 'from-blue-500 to-indigo-600', type: 'milestone' };
-    if (coursesPlayed >= 50) return { emoji: '🥈', name: 'The 50 Club', color: 'from-gray-400 to-slate-500', type: 'milestone' };
-    // Skip rookie badge since it's now shown as profile ring
-    return null;
-  };
+  // Trophy Level Badge using unified tier system
+  const club = getTop100Club(coursesPlayed);
+  
+  if (club.meta && club.threshold && club.threshold >= 50) {
+    const colorMap: Record<string, string> = {
+      green: 'from-emerald-500 to-green-600',
+      silver: 'from-blue-500 to-indigo-600',
+      gold: 'from-amber-500 to-orange-600',
+      platinum: 'from-purple-500 to-violet-600',
+      obsidian: 'from-slate-700 to-slate-900',
+    };
+    
+    const emojiMap: Record<string, string> = {
+      green: '🥈',
+      silver: '🥇',
+      gold: '🏆',
+      platinum: '👑',
+      obsidian: '💎',
+    };
 
-  const trophyBadge = getTrophyBadge();
-  if (trophyBadge) {
     badges.push({
       id: 'trophy',
-      icon: trophyBadge.emoji,
-      text: trophyBadge.name,
-      color: trophyBadge.color,
-      tooltip: `${trophyBadge.name} Trophy - ${coursesPlayed} courses played`,
-      type: trophyBadge.type,
+      icon: emojiMap[club.tierId] || '🎯',
+      text: club.tierName,
+      color: colorMap[club.tierId] || 'from-gray-400 to-slate-500',
+      tooltip: `${club.tierName} - ${coursesPlayed} courses played`,
+      type: 'milestone',
     });
   }
 
@@ -58,7 +67,7 @@ const ProfileBadgeStrip: React.FC<ProfileBadgeStripProps> = ({
       color: 'from-red-500 to-blue-600',
       tooltip: 'Completed Great Britain & Ireland Top 100 list',
       type: 'regional',
-      slug: 'gb-i-top-100',
+      slug: 'gb-i',
     });
   }
 
@@ -70,7 +79,7 @@ const ProfileBadgeStrip: React.FC<ProfileBadgeStripProps> = ({
       color: 'from-blue-500 to-yellow-500',
       tooltip: 'Completed Continental Europe Top 100 list',
       type: 'regional',
-      slug: 'europe-top-100',
+      slug: 'europe',
     });
   }
 
@@ -82,7 +91,7 @@ const ProfileBadgeStrip: React.FC<ProfileBadgeStripProps> = ({
       color: 'from-red-500 to-blue-700',
       tooltip: 'Completed USA Top 100 list',
       type: 'regional',
-      slug: 'usa-top-100',
+      slug: 'usa',
     });
   }
 
@@ -94,7 +103,7 @@ const ProfileBadgeStrip: React.FC<ProfileBadgeStripProps> = ({
       color: 'from-green-500 to-blue-500',
       tooltip: 'Completed Worldwide Top 100 list',
       type: 'regional',
-      slug: 'global-top-100',
+      slug: 'global',
     });
   }
 

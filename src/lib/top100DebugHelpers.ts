@@ -31,8 +31,8 @@ export function applyMyJourneyDebug(
         played: share + extra,
       };
     }),
-    club_ring: club?.ring ?? 'none',
-    club_label: club?.label ?? null,
+    club_ring: club.tierId,
+    club_label: club.shortLabel,
     next_milestone: realData.next_milestone,
     recent_rounds: realData.recent_rounds,
   };

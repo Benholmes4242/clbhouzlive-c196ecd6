@@ -89,7 +89,7 @@ const Top100CoursesHubPanel = () => {
   
   // Use new unified club system
   const club = getTop100Club(totalRated);
-  const ringKey = club?.ring ?? 'none';
+  const ringKey = club.tierId;
   const ringDotClass = getTop100RingDotClass(ringKey);
   
   // Calculate tier for achievement badge
