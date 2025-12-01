@@ -350,7 +350,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
           {/* Legend & Stats Overlays */}
           <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-between items-start p-3 text-xs gap-2">
           {/* Legend */}
-          <div className="pointer-events-auto flex items-center gap-3 !rounded-2xl bg-slate-900/95 px-4 py-1.5 text-white backdrop-blur-md shadow-lg border border-white/10">
+          <div className="pointer-events-auto flex items-center gap-3 !rounded-2xl bg-slate-700/90 px-4 py-1.5 text-white backdrop-blur-md shadow-lg border border-white/10">
             <span className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-full shadow-sm" style={{ backgroundColor: '#F7931E' }} />
               <span className="font-medium">Rated</span>
@@ -363,7 +363,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
 
             {/* Count Pill */}
             {officialTotal > 0 && (
-              <div className="pointer-events-auto !rounded-2xl bg-slate-900/80 px-3 py-1.5 text-white backdrop-blur-md shadow-lg font-medium">
+              <div className="pointer-events-auto !rounded-2xl bg-slate-700/90 px-3 py-1.5 text-white backdrop-blur-md shadow-lg font-medium">
                 {ratedCount}/{officialTotal} rated · {remaining} left
               </div>
             )}
