@@ -358,7 +358,7 @@ const Top100CoursesHubPanel = () => {
               None of your friends have started the Top 100 yet.
             </p>
           ) : (
-            <div className="flex gap-8 overflow-x-auto pb-2">
+            <div className="flex gap-8 overflow-x-auto">
               {friends.slice(0, 10).map((f) => {
                 const displayName = f.profile.display_name || f.profile.username || '?';
                 const initial = displayName.slice(0, 1).toUpperCase();
@@ -401,7 +401,7 @@ const Top100CoursesHubPanel = () => {
       )}
 
       {/* Divider */}
-      <div className="mt-7 mb-6 h-px w-full bg-slate-200/70" />
+      <div className="mt-6 mb-6 h-px w-full bg-slate-200/70" />
 
       {/* 4. Search */}
       <div className="relative max-w-xl mx-auto">
