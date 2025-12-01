@@ -361,13 +361,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
               <span className="font-medium">Not yet rated</span>
             </span>
           </div>
-
-          {/* Count Pill */}
-          {officialTotal > 0 && (
-            <div className="pointer-events-auto !rounded-2xl bg-slate-700/90 px-3 py-1.5 text-white backdrop-blur-md shadow-lg font-medium">
-              {ratedCount}/{officialTotal} rated · {remaining} left
-            </div>
-          )}
         </div>
 
         {/* Selected Course Bottom Sheet */}
