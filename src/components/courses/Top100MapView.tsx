@@ -158,8 +158,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
             22,
           ],
           'circle-color': '#0f172a', // slate-900
-          'circle-stroke-width': 2,
-          'circle-stroke-color': '#ffffff',
+          'circle-stroke-width': 0,
         },
       });
 
