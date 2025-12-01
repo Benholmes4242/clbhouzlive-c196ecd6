@@ -148,34 +148,18 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         source: 'courses',
         filter: ['has', 'point_count'],
         paint: {
-          'circle-color': [
-            'step',
-            ['get', 'point_count'],
-            'rgba(15, 23, 42, 0.90)', // slate-900 for small clusters
-            10,
-            'rgba(37, 99, 235, 0.95)', // blue-600 for medium
-            30,
-            'rgba(22, 163, 74, 0.95)', // emerald-600 for large
-          ],
           'circle-radius': [
             'step',
             ['get', 'point_count'],
-            15, // 30px diameter for small
+            14,
             10,
-            17, // 34px for medium
-            30,
-            20, // 40px for large
+            18,
+            25,
+            22,
           ],
+          'circle-color': '#0f172a', // slate-900
           'circle-stroke-width': 2,
-          'circle-stroke-color': [
-            'step',
-            ['get', 'point_count'],
-            'rgba(148, 163, 184, 0.90)', // slate-400
-            10,
-            'rgba(30, 64, 175, 0.95)', // blue-800
-            30,
-            'rgba(22, 101, 52, 0.95)', // emerald-800
-          ],
+          'circle-stroke-color': '#ffffff',
         },
       });
 
@@ -187,11 +171,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         filter: ['has', 'point_count'],
         layout: {
           'text-field': '{point_count_abbreviated}',
-          'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+          'text-font': ['Inter Semi Bold', 'Arial Unicode MS Bold'],
           'text-size': 12,
         },
         paint: {
-          'text-color': '#f9fafb',
+          'text-color': '#ffffff',
         },
       });
 
@@ -204,17 +188,17 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         paint: {
           'circle-color': [
             'case',
-            ['get', 'user_has_rated'],
-            '#22c55e', // emerald-500 for rated
-            'rgba(15, 23, 42, 0.9)', // slate-900 for unrated
+            ['==', ['get', 'user_has_rated'], true],
+            '#16a34a', // rated: green
+            '#020617', // unrated: very dark slate
           ],
-          'circle-radius': 7,
+          'circle-radius': 6,
           'circle-stroke-width': 2,
           'circle-stroke-color': [
             'case',
-            ['get', 'user_has_rated'],
-            '#22c55e', // emerald-500
-            'rgba(148, 163, 184, 0.9)', // slate-400
+            ['==', ['get', 'user_has_rated'], true],
+            '#ffffff', // rated pins: white ring
+            '#cbd5e1', // unrated pins: pale slate ring
           ],
         },
       });
@@ -321,132 +305,139 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
   return (
     <div className="flex flex-col gap-4 pb-6">
       {/* Filter Row */}
-      <div className="flex items-center justify-between gap-2">
-        <div className="inline-flex !rounded-2xl bg-slate-100 p-0.5 text-xs">
-          {(['all', 'rated', 'unrated'] as RatedFilter[]).map((opt) => (
-            <button
-              key={opt}
-              type="button"
-              onClick={() => setRatedFilter(opt)}
-              className={cn(
-                '!rounded-xl px-3 py-1.5 transition-colors font-medium',
-                ratedFilter === opt
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700'
-              )}
-            >
-              {opt === 'all' ? 'All' : opt === 'rated' ? 'Rated' : 'Not yet rated'}
-            </button>
-          ))}
+      <div className="mt-4 flex items-center justify-between gap-2">
+        <div className="inline-flex rounded-full bg-slate-100 p-1 shadow-inner">
+          {(['all', 'rated', 'unrated'] as RatedFilter[]).map((opt) => {
+            const isActive = ratedFilter === opt;
+            const label = opt === 'all' ? 'All' : opt === 'rated' ? 'Rated' : 'Not yet rated';
+
+            return (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => setRatedFilter(opt)}
+                className={cn(
+                  'rounded-full px-4 py-1.5 text-xs sm:text-sm font-medium transition-all',
+                  isActive
+                    ? 'bg-slate-900 text-white shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
+                )}
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
 
         <button
           type="button"
           onClick={handleResetView}
-          className="text-[11px] font-medium text-slate-500 hover:text-slate-700 transition-colors"
+          className="text-xs font-medium text-slate-500 hover:text-slate-700"
         >
           Reset view
         </button>
       </div>
 
       {/* Map Card */}
-      <div className="relative overflow-hidden rounded-3xl bg-slate-900 shadow-md shadow-slate-900/5 border border-slate-200/70">
-        {/* Loading skeleton */}
-        {isLoading && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
-            <div className="text-center space-y-2">
-              <div className="animate-spin h-8 w-8 border-3 border-white/30 border-t-white rounded-full mx-auto" />
-              <p className="text-sm text-white/80">Loading map...</p>
+      <div className="mt-4 rounded-3xl bg-white p-3 shadow-md">
+        <div className="relative h-[340px] sm:h-[380px] rounded-3xl overflow-hidden">
+          {/* Loading skeleton */}
+          {isLoading && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
+              <div className="text-center space-y-2">
+                <div className="animate-spin h-8 w-8 border-3 border-white/30 border-t-white rounded-full mx-auto" />
+                <p className="text-sm text-white/80">Loading map...</p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Map Container */}
-        <div ref={mapContainer} className="h-[460px] w-full sm:h-[480px]" />
+          {/* Map Container */}
+          <div ref={mapContainer} className="h-full w-full" />
 
-        {/* Legend & Stats Overlays */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-between items-start p-3 text-xs gap-2">
+          {/* Legend & Stats Overlays */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-between items-start p-3 text-xs gap-2">
           {/* Legend */}
           <div className="pointer-events-auto flex items-center gap-3 !rounded-2xl bg-slate-900/80 px-3 py-1.5 text-white backdrop-blur-md shadow-lg">
             <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-sm" />
+              <span className="h-2.5 w-2.5 rounded-full bg-green-500 shadow-sm" />
               <span className="font-medium">Rated</span>
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full border-2 border-slate-300 bg-slate-800 shadow-sm" />
+              <span className="h-2.5 w-2.5 rounded-full border-2 border-slate-300 bg-slate-900 shadow-sm" />
               <span className="font-medium">Not yet rated</span>
             </span>
           </div>
 
-          {/* Count Pill */}
-          {officialTotal > 0 && (
-            <div className="pointer-events-auto !rounded-2xl bg-slate-900/80 px-3 py-1.5 text-white backdrop-blur-md shadow-lg font-medium">
-              {ratedCount}/{officialTotal} rated · {remaining} left
+            {/* Count Pill */}
+            {officialTotal > 0 && (
+              <div className="pointer-events-auto !rounded-2xl bg-slate-900/80 px-3 py-1.5 text-white backdrop-blur-md shadow-lg font-medium">
+                {ratedCount}/{officialTotal} rated · {remaining} left
+              </div>
+            )}
+          </div>
+
+          {/* Selected Course Bottom Sheet */}
+          {selectedCourse && (
+            <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 rounded-t-2xl p-4 space-y-3 shadow-xl">
+              {/* Close Button */}
+              <button
+                onClick={() => setSelectedCourse(null)}
+                className="absolute top-3 right-3 p-1.5 hover:bg-slate-100 !rounded-2xl transition-colors"
+                aria-label="Close"
+              >
+                <X className="h-4 w-4 text-slate-500" />
+              </button>
+
+              {/* Course Info */}
+              <div className="pr-10">
+                <h3 className="font-semibold text-slate-900 text-base mb-0.5 truncate">
+                  {selectedCourse.name}
+                </h3>
+                <p className="text-sm text-slate-500 truncate">
+                  {selectedCourse.sub_country && `${selectedCourse.sub_country}, `}
+                  {selectedCourse.country}
+                  {selectedCourse.region && ` · ${selectedCourse.region}`}
+                </p>
+              </div>
+
+              {/* Rank & Rating */}
+              <div className="flex items-center gap-2 flex-wrap">
+                {typeof selectedCourse.rank === 'number' && (
+                  <div className="inline-flex items-center gap-1 !rounded-2xl bg-amber-50 border border-amber-200 px-2.5 py-1 text-xs">
+                    <span className="font-semibold text-amber-800">
+                      #{selectedCourse.rank}
+                    </span>
+                    <span className="text-amber-600">in this list</span>
+                  </div>
+                )}
+                
+                {selectedCourse.user_has_rated && selectedCourse.user_rating && (
+                  <div className="inline-flex items-center gap-1 !rounded-2xl bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-xs">
+                    <span className="text-emerald-600">Your rating:</span>
+                    <span className="font-semibold text-emerald-800">
+                      {selectedCourse.user_rating.toFixed(1)}
+                    </span>
+                  </div>
+                )}
+
+                {!selectedCourse.user_has_rated && (
+                  <div className="inline-flex items-center !rounded-2xl bg-slate-100 border border-slate-200 px-2.5 py-1 text-xs text-slate-600">
+                    Not yet rated by you
+                  </div>
+                )}
+              </div>
+
+              {/* CTA */}
+              <Button
+                onClick={() => navigate(`/courses/${selectedCourse.id}`)}
+                variant="secondary"
+                className="w-full !rounded-2xl"
+              >
+                Open course
+              </Button>
             </div>
           )}
         </div>
-
-        {/* Selected Course Bottom Sheet */}
-        {selectedCourse && (
-          <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 rounded-t-2xl p-4 space-y-3 shadow-xl">
-            {/* Close Button */}
-            <button
-              onClick={() => setSelectedCourse(null)}
-              className="absolute top-3 right-3 p-1.5 hover:bg-slate-100 !rounded-2xl transition-colors"
-              aria-label="Close"
-            >
-              <X className="h-4 w-4 text-slate-500" />
-            </button>
-
-            {/* Course Info */}
-            <div className="pr-10">
-              <h3 className="font-semibold text-slate-900 text-base mb-0.5 truncate">
-                {selectedCourse.name}
-              </h3>
-              <p className="text-sm text-slate-500 truncate">
-                {selectedCourse.sub_country && `${selectedCourse.sub_country}, `}
-                {selectedCourse.country}
-                {selectedCourse.region && ` · ${selectedCourse.region}`}
-              </p>
-            </div>
-
-            {/* Rank & Rating */}
-            <div className="flex items-center gap-2 flex-wrap">
-              {typeof selectedCourse.rank === 'number' && (
-                <div className="inline-flex items-center gap-1 !rounded-2xl bg-amber-50 border border-amber-200 px-2.5 py-1 text-xs">
-                  <span className="font-semibold text-amber-800">
-                    #{selectedCourse.rank}
-                  </span>
-                  <span className="text-amber-600">in this list</span>
-                </div>
-              )}
-              
-              {selectedCourse.user_has_rated && selectedCourse.user_rating && (
-                <div className="inline-flex items-center gap-1 !rounded-2xl bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-xs">
-                  <span className="text-emerald-600">Your rating:</span>
-                  <span className="font-semibold text-emerald-800">
-                    {selectedCourse.user_rating.toFixed(1)}
-                  </span>
-                </div>
-              )}
-
-              {!selectedCourse.user_has_rated && (
-                <div className="inline-flex items-center !rounded-2xl bg-slate-100 border border-slate-200 px-2.5 py-1 text-xs text-slate-600">
-                  Not yet rated by you
-                </div>
-              )}
-            </div>
-
-            {/* CTA */}
-            <Button
-              onClick={() => navigate(`/courses/${selectedCourse.id}`)}
-              variant="secondary"
-              className="w-full !rounded-2xl"
-            >
-              Open course
-            </Button>
-          </div>
-        )}
       </div>
     </div>
   );
