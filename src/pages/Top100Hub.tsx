@@ -80,13 +80,14 @@ const Top100Hub = () => {
     <div className="min-h-screen bg-background">
       <ClubhouseHeaderNew />
 
-      <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
-        <div className="max-w-6xl mx-auto space-y-6">
+      <main className="px-4 md:container md:mx-auto md:px-0 pb-20">
+        <div className="max-w-6xl mx-auto">
           {/* Back Button */}
-          <div className="px-4 pt-3">
+          <div className="px-4 pt-4 pb-5">
             <Top100BackButton to="/courses?tab=top100" />
           </div>
           
+          <div className="space-y-6">
           {/* Hero Section */}
           <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 pb-2">
             <h1 className="text-center text-3xl font-semibold tracking-tight text-slate-900">
@@ -233,6 +234,7 @@ const Top100Hub = () => {
               <Top100LeaderboardPanel />
             </TabsContent>
           </Tabs>
+          </div>
         </div>
       </main>
     </div>
