@@ -9,7 +9,6 @@ import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { getTop100Club } from '@/lib/top100Club';
 import { getTop100RingDotClass } from '@/lib/top100RingStyles';
 import SquircleImage from '@/components/ui/SquircleImage';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Search, Award, X } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -239,7 +238,7 @@ const Top100CoursesHubPanel = () => {
   return (
     <div className="space-y-6 pb-8">
       {/* 1. Top 100 Club hero */}
-      <section className="rounded-xl border border-border/60 bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)] px-4 py-5">
+      <section className="rounded-3xl border border-border/60 bg-card shadow-[0_4px_28px_rgba(0,0,0,0.14)] px-4 py-5 relative overflow-hidden before:absolute before:inset-0 before:bg-white/[0.02] before:pointer-events-none">
         {/* Title + subtitle */}
         <div className="flex items-center gap-2">
           <span className="text-xl">🏆</span>
@@ -267,18 +266,18 @@ const Top100CoursesHubPanel = () => {
               {/* Club badge with ring-colored dot */}
               {club && (
                 <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
-                  <span className="inline-flex items-center gap-1.5 rounded-xl border border-border/60 bg-card px-2 py-0.5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/80 backdrop-blur-sm px-3 py-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
                     <span className={cn(
-                      "inline-block h-2 w-2 rounded-full",
+                      "inline-block h-2.5 w-2.5 rounded-full",
                       ringDotClass
                     )} />
-                    <span className="font-medium text-foreground">{club.label}</span>
+                    <span className="font-medium text-foreground text-[14px]">{club.label}</span>
                   </span>
                 </div>
               )}
 
               {/* Progress bar */}
-              <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+              <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-slate-100">
                 <div
                   className="h-full rounded-full bg-amber-400 transition-[width] duration-500"
                   style={{ width: `${Math.min(100, (totalRated / 100) * 100)}%` }}
@@ -296,7 +295,7 @@ const Top100CoursesHubPanel = () => {
         <Button
           variant="primary"
           onClick={handleOpenTop100Journey}
-          className="mt-4 w-full"
+          className="mt-4 w-full active:scale-[0.98] transition-transform duration-150"
         >
           {user ? 'Open your Top 100 Journey' : 'Sign in to join the Top 100 Club'}
           <span className="text-[16px]">↗</span>
@@ -305,28 +304,30 @@ const Top100CoursesHubPanel = () => {
 
       {/* 2. Region progress strip */}
       {user && listSummaries.length > 0 && (
-        <section>
-          <h3 className="mb-2 text-[13px] font-semibold text-foreground">
+        <section className="mt-7">
+          <h3 className="mb-3 text-[13px] font-semibold text-foreground">
             Your Top 100 region progress
           </h3>
 
           <div className="flex gap-2 overflow-x-auto pb-1">
             {listSummaries.map((region) => {
               const pct = region.total_courses > 0 ? (region.played_count / region.total_courses) * 100 : 0;
-              const label = region.name.replace(' Top 100', '');
+              const label = region.short_label || region.name.replace(' Top 100', '');
               
               return (
                 <div
                   key={region.id}
-                  className="min-w-[150px] rounded-xl border border-border/60 bg-card px-3 py-2 text-[11px] shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+                  className="min-w-[160px] rounded-2xl border border-border/60 bg-card px-4 py-3 text-[11px] shadow-[0_2px_12px_rgba(0,0,0,0.08)]"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-foreground">{label}</span>
-                    <span className="text-muted-foreground">
+                  <div className="flex items-center justify-between gap-2 min-h-[18px]">
+                    <span className="font-semibold text-foreground whitespace-nowrap overflow-hidden text-ellipsis text-left">
+                      {label}
+                    </span>
+                    <span className="text-muted-foreground flex-shrink-0 text-left">
                       {region.played_count}/{region.total_courses}
                     </span>
                   </div>
-                  <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-muted">
+                  <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-slate-100">
                     <div
                       className="h-full rounded-full bg-amber-400"
                       style={{ width: `${Math.min(100, pct)}%` }}
@@ -341,9 +342,9 @@ const Top100CoursesHubPanel = () => {
 
       {/* 3. Friends on the Top 100 journey - horizontal avatar strip */}
       {user && (
-        <section className="mt-6">
+        <section className="mt-7">
           <div className="mb-3 flex items-center justify-between">
-            <p className="text-[13px] font-medium text-foreground">
+            <p className="text-[13px] font-semibold text-foreground">
               Friends on the Top 100 journey
             </p>
             <button
@@ -360,28 +361,37 @@ const Top100CoursesHubPanel = () => {
               None of your friends have started the Top 100 yet.
             </p>
           ) : (
-            <div className="flex gap-10 overflow-x-auto pb-2">
+            <div className="flex gap-8 overflow-x-auto pb-2">
               {friends.slice(0, 10).map((f) => {
                 const displayName = f.profile.display_name || f.profile.username || '?';
+                const initial = displayName.slice(0, 1).toUpperCase();
                 
                 return (
                   <button
                     key={f.user_id}
                     type="button"
                     onClick={() => navigate(`/profile/${f.profile.username}?tab=top100`)}
-                    className="flex flex-col items-center gap-1.5 flex-shrink-0"
+                    className="flex flex-col items-center gap-2 flex-shrink-0"
                   >
-                    <Avatar className="h-12 w-12 ring-1 ring-border/30">
-                      <AvatarImage src={f.profile.profile_photo_url || undefined} alt={displayName} />
-                      <AvatarFallback className="bg-muted text-[11px] font-medium text-muted-foreground">
-                        {displayName.slice(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="max-w-[96px] truncate text-[12px] font-medium text-foreground">
+                    {f.profile.profile_photo_url ? (
+                      <SquircleImage
+                        src={f.profile.profile_photo_url}
+                        alt={displayName}
+                        size={48}
+                        ringWidth={1.5}
+                        ringColor="rgba(203, 213, 225, 0.4)"
+                        className="flex-shrink-0"
+                      />
+                    ) : (
+                      <div className="h-12 w-12 flex items-center justify-center bg-muted text-muted-foreground text-[14px] font-semibold rounded-[22%] ring-1 ring-border/30">
+                        {initial}
+                      </div>
+                    )}
+                    <span className="max-w-[96px] truncate text-[15px] font-semibold text-foreground">
                       {displayName}
                     </span>
                     {typeof f.top100CoursesPlayed === 'number' && (
-                      <span className="text-[11px] text-muted-foreground">
+                      <span className="text-[13px] text-muted-foreground font-medium">
                         {f.top100CoursesPlayed} course{f.top100CoursesPlayed === 1 ? '' : 's'}
                       </span>
                     )}
@@ -394,7 +404,7 @@ const Top100CoursesHubPanel = () => {
       )}
 
       {/* Divider */}
-      <div className="mt-4 mb-3 h-px w-full bg-slate-200/70" />
+      <div className="mt-7 mb-6 h-px w-full bg-slate-200/70" />
 
       {/* 4. Search */}
       <div className="relative max-w-xl mx-auto">
