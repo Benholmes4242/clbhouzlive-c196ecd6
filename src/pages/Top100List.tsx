@@ -155,15 +155,16 @@ const Top100List = () => {
     <div className="min-h-screen bg-background">
       <ClubhouseHeaderNew />
 
-      <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
-        <div className="max-w-6xl mx-auto space-y-6">
+      <main className="px-4 md:container md:mx-auto md:px-0 pb-20">
+        <div className="max-w-6xl mx-auto">
           {/* Back Button */}
-          <div className="px-4 pt-3">
+          <div className="px-4 pt-4 pb-5">
             <Top100BackButton to="/top100" label="Back to Hub" />
           </div>
           
-          {/* Hero Header */}
-          <div
+          <div className="space-y-6">
+            {/* Hero Header */}
+            <div
             className="relative h-64 rounded-2xl overflow-hidden"
             style={{
               backgroundImage: `url(${getRegionBackground(slug || '')})`,
@@ -268,6 +269,7 @@ const Top100List = () => {
               </div>
             )}
           </div>
+        </div>
         </div>
       </main>
 
