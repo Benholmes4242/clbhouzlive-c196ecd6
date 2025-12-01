@@ -20,6 +20,15 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
   const topRank = hero?.rank_in_list ?? null;
   const listSlug = list.slug as 'global' | 'gb-i' | 'usa' | 'europe';
 
+  // Map short labels to full display names
+  const getDisplayLabel = (shortLabel: string) => {
+    if (shortLabel === 'GB&I') return 'Great Britain & Ireland';
+    if (shortLabel === 'Europe') return 'Continental Europe';
+    return shortLabel;
+  };
+
+  const displayLabel = getDisplayLabel(list.short_label || list.name);
+
   return (
     <div
       className={cn(
@@ -57,7 +66,7 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
       {/* Title */}
       <div className="absolute left-4 right-4 top-4 sm:top-5">
         <h2 className="truncate whitespace-nowrap text-[19px] sm:text-[20px] font-semibold tracking-tight text-white">
-          {list.short_label || list.name}
+          {displayLabel}
         </h2>
       </div>
 
