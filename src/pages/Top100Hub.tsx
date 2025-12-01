@@ -5,7 +5,8 @@ import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useTop100ListSummaries } from '@/hooks/useTop100ListSummaries';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { MapPin, Trophy } from 'lucide-react';
+import { Globe, MapPin, List, Map as MapIcon, Trophy } from 'lucide-react';
+import CountryFlag from '@/components/ui/country-flag';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import Top100LeaderboardPanel from '@/components/courses/Top100LeaderboardPanel';
@@ -38,35 +39,10 @@ const Top100Hub = () => {
   const [activeTab, setActiveTab] = useState<ValidTab>(safeTab);
   
   const [coursesViewMode, setCoursesViewMode] = useState<'list' | 'map'>(
-    viewFromUrl ?? 'map'
+    viewFromUrl ?? 'list'
   );
   
-  // Shared filter state for both List and Map views
-  type RegionFilter = 'GLOBAL' | 'GBI' | 'USA' | 'EUROPE';
-  type RatingFilter = 'ALL' | 'RATED' | 'NOT_RATED';
-  
-  interface Top100Filters {
-    region: RegionFilter;
-    rating: RatingFilter;
-  }
-  
-  const [filters, setFilters] = useState<Top100Filters>({
-    region: 'GLOBAL',
-    rating: 'ALL',
-  });
-  
-  // Map RegionFilter to Top100MapScope
-  const regionToScope = (region: RegionFilter): Top100MapScope => {
-    switch (region) {
-      case 'GBI': return 'gb-i';
-      case 'USA': return 'usa';
-      case 'EUROPE': return 'europe';
-      case 'GLOBAL':
-      default: return 'global';
-    }
-  };
-  
-  const selectedListSlug = regionToScope(filters.region);
+  const [selectedListSlug, setSelectedListSlug] = useState<Top100MapScope>('global');
 
   // Guard against invalid data
   if (!lists && !listsLoading) {
@@ -148,135 +124,74 @@ const Top100Hub = () => {
             </TabsList>
 
             <TabsContent value="courses" className="mt-0">
-              {/* Smart Summary Bar */}
+              {/* Progress Chip */}
               {session && progress && (progress.total_top100_rated ?? progress.total_played_top100 ?? 0) > 0 && (() => {
                 const totalRated = progress.total_top100_rated ?? progress.total_played_top100 ?? 0;
                 const ringDotClass = getTop100RingDotClass(progress.club_ring ?? 'none');
                 return (
-                  <div className="px-4 pt-4 pb-2">
-                    <div className="flex items-center justify-between rounded-2xl bg-white shadow-sm border border-slate-200 px-4 py-3">
-                      {/* Left: rating + club */}
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs text-white">
-                          🏆
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-xs text-slate-500">You've rated</span>
-                          <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-                            <span>{totalRated} Top 100 course{totalRated === 1 ? '' : 's'}</span>
-                            {progress.club_ring && progress.club_ring !== 'none' && progress.club_label && (
-                              <>
-                                <span className="h-1 w-1 rounded-full bg-slate-400" />
-                                <span className="text-xs font-medium text-slate-700">{progress.club_label}</span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Right: List / Map toggle */}
-                      <div className="ml-3 inline-flex rounded-full bg-slate-100 p-1 text-xs font-medium">
-                        <button
-                          type="button"
-                          onClick={() => setCoursesViewMode('list')}
-                          className={[
-                            'px-3 py-1 rounded-full transition',
-                            coursesViewMode === 'list'
-                              ? 'bg-white text-slate-900 shadow-sm'
-                              : 'text-slate-600',
-                          ].join(' ')}
-                        >
-                          List
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setCoursesViewMode('map')}
-                          className={[
-                            'px-3 py-1 rounded-full transition',
-                            coursesViewMode === 'map'
-                              ? 'bg-white text-slate-900 shadow-sm'
-                              : 'text-slate-600',
-                          ].join(' ')}
-                        >
-                          Map
-                        </button>
-                      </div>
-                    </div>
+                   <div className="mt-3 flex justify-center">
+                    <button
+                      onClick={() => setActiveTab('my-progress')}
+                      className="inline-flex items-center gap-2 !rounded-2xl bg-white px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-700 shadow-sm hover:shadow-md transition-shadow border border-slate-200"
+                    >
+                      <span className="inline-flex h-4 w-4 items-center justify-center">
+                        <Trophy className="h-4 w-4" aria-hidden="true" />
+                      </span>
+                      <span>
+                        You've rated{" "}
+                        <span className="font-semibold">{totalRated}</span>{" "}
+                        Top 100 course{totalRated === 1 ? '' : 's'}
+                      </span>
+                      {progress.club_ring && progress.club_ring !== 'none' && progress.club_label && (
+                        <>
+                          <span className="mx-1 text-slate-500">·</span>
+                          <span className="inline-flex items-center gap-1">
+                            <span
+                              className={cn(
+                                'h-2 w-2 rounded-full border border-slate-950/20',
+                                ringDotClass
+                              )}
+                            />
+                            <span>{progress.club_label}</span>
+                          </span>
+                        </>
+                      )}
+                    </button>
                   </div>
                 );
               })()}
+              
+              {/* View Mode Toggle */}
+              <div className="mt-3 flex justify-center mb-6">
+                <div className="inline-flex rounded-lg bg-muted/70 border border-border/60 p-0.5 shadow-sm">
+                  <button
+                    type="button"
+                    onClick={() => setCoursesViewMode('list')}
+                    className={cn(
+                      'inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors',
+                      coursesViewMode === 'list'
+                        ? 'bg-background text-foreground shadow-sm'
+                        : 'bg-transparent text-muted-foreground hover:text-foreground'
+                    )}
+                  >
+                    <List className="h-4 w-4" />
+                    List
+                  </button>
 
-              {/* Inline Region Selector */}
-              <div className="px-4 pt-3">
-                <div className="flex items-center gap-4 text-sm font-medium text-slate-500">
-                  {[
-                    { key: 'GLOBAL' as RegionFilter, label: 'Global', icon: '🌍' },
-                    { key: 'GBI' as RegionFilter, label: 'GB&I', icon: '🇬🇧' },
-                    { key: 'USA' as RegionFilter, label: 'USA', icon: '🇺🇸' },
-                    { key: 'EUROPE' as RegionFilter, label: 'Europe', icon: '🇪🇺' },
-                  ].map((option) => {
-                    const selected = filters.region === option.key;
-                    return (
-                      <button
-                        key={option.key}
-                        type="button"
-                        onClick={() => setFilters(prev => ({ ...prev, region: option.key }))}
-                        className="relative pb-2"
-                      >
-                        <span
-                          className={[
-                            'flex items-center gap-1 transition',
-                            selected ? 'text-slate-900' : 'text-slate-500',
-                          ].join(' ')}
-                        >
-                          <span>{option.icon}</span>
-                          <span>{option.label}</span>
-                        </span>
-                        {selected && (
-                          <span className="absolute inset-x-0 -bottom-0.5 h-[2px] rounded-full bg-slate-900" />
-                        )}
-                      </button>
-                    );
-                  })}
+                  <button
+                    type="button"
+                    onClick={() => setCoursesViewMode('map')}
+                    className={cn(
+                      'inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors',
+                      coursesViewMode === 'map'
+                        ? 'bg-background text-foreground shadow-sm'
+                        : 'bg-transparent text-muted-foreground hover:text-foreground'
+                    )}
+                  >
+                    <MapIcon className="h-4 w-4" />
+                    Map
+                  </button>
                 </div>
-              </div>
-
-              {/* Rating Segmented Control + Reset */}
-              <div className="px-4 pt-3 pb-2 flex items-center justify-between">
-                {/* Segmented control */}
-                <div className="inline-flex rounded-full bg-slate-100 p-1 text-xs font-medium">
-                  {[
-                    { key: 'ALL' as RatingFilter, label: 'All' },
-                    { key: 'RATED' as RatingFilter, label: 'Rated' },
-                    { key: 'NOT_RATED' as RatingFilter, label: 'Not Yet Rated' },
-                  ].map((option) => {
-                    const selected = filters.rating === option.key;
-                    return (
-                      <button
-                        key={option.key}
-                        type="button"
-                        onClick={() => setFilters(prev => ({ ...prev, rating: option.key }))}
-                        className={[
-                          'px-3 py-1 rounded-full transition',
-                          selected
-                            ? 'bg-white text-slate-900 shadow-sm'
-                            : 'text-slate-600',
-                        ].join(' ')}
-                      >
-                        {option.label}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Reset */}
-                <button
-                  type="button"
-                  onClick={() => setFilters({ region: 'GLOBAL', rating: 'ALL' })}
-                  className="ml-3 text-xs font-medium text-slate-500 underline underline-offset-2"
-                >
-                  Reset
-                </button>
               </div>
 
               {coursesViewMode === 'list' ? (
@@ -299,10 +214,46 @@ const Top100Hub = () => {
               ) : (
                 /* Map View */
                 <div className="space-y-0">
-                  <Top100MapView 
-                    scope={selectedListSlug}
-                    ratingFilter={filters.rating}
-                  />
+                  {/* Region Selector */}
+                  <div className="mt-3 flex justify-center">
+                    <div className="flex gap-2">
+                      {(['global', 'gb-i', 'usa', 'europe'] as Top100MapScope[]).map((slug) => {
+                        const isActive = selectedListSlug === slug;
+                        const list = lists?.find(l => l.slug === slug);
+                        
+                        const label = slug === 'global' ? 'Global' 
+                          : slug === 'gb-i' ? 'GB&I'
+                          : slug === 'usa' ? 'USA'
+                          : 'Europe';
+
+                        return (
+                          <button
+                            key={slug}
+                            onClick={() => setSelectedListSlug(slug)}
+                            className={cn(
+                              'inline-flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs sm:text-sm font-medium transition-all',
+                              isActive
+                                ? 'bg-slate-100 border-slate-200 text-slate-900 shadow-sm'
+                                : 'bg-white border-border/60 text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-slate-50'
+                            )}
+                          >
+                            {slug === 'global' ? (
+                              <Globe className="h-4 w-4" />
+                            ) : slug === 'gb-i' ? (
+                              <CountryFlag country="Britain & Ireland" size="sm" />
+                            ) : slug === 'usa' ? (
+                              <CountryFlag country="USA" size="sm" />
+                            ) : (
+                              <CountryFlag country="Continental Europe" size="sm" />
+                            )}
+                            <span>{label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <Top100MapView scope={selectedListSlug} />
                 </div>
               )}
             </TabsContent>

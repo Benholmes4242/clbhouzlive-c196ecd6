@@ -27,28 +27,28 @@ const REGION_CONFIG: Record<Top100MapScope, { center: [number, number]; zoom: nu
   'europe': { center: [10, 50], zoom: 4, label: 'Continental Europe Top 100' },
 };
 
-type RatingFilter = 'ALL' | 'RATED' | 'NOT_RATED';
+type RatedFilter = 'all' | 'rated' | 'unrated';
 
 interface Top100MapViewProps {
   scope: Top100MapScope;
-  ratingFilter: RatingFilter;
 }
 
-const Top100MapView: React.FC<Top100MapViewProps> = ({ scope, ratingFilter }) => {
+const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<Top100MapCourse | null>(null);
+  const [ratedFilter, setRatedFilter] = useState<RatedFilter>('all');
   const { data: courses = [], isLoading } = useTop100MapCourses(scope, session?.user?.id);
 
   // Filter courses by rated status
   const filteredCourses = useMemo(() => {
-    if (ratingFilter === 'RATED') return courses.filter(c => c.user_has_rated);
-    if (ratingFilter === 'NOT_RATED') return courses.filter(c => !c.user_has_rated);
+    if (ratedFilter === 'rated') return courses.filter(c => c.user_has_rated);
+    if (ratedFilter === 'unrated') return courses.filter(c => !c.user_has_rated);
     return courses;
-  }, [courses, ratingFilter]);
+  }, [courses, ratedFilter]);
 
   // Official list size for this map (falls back to what we have, just in case)
   const officialTotal =
@@ -276,6 +276,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope, ratingFilter }) =>
         duration: 800,
       });
       setSelectedCourse(null);
+      setRatedFilter('all');
     }
   };
 
@@ -295,9 +296,42 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope, ratingFilter }) =>
   }
 
   return (
-    <div className="flex flex-col px-4">
+    <div className="flex flex-col">
+      {/* Rated filter toggle: All / Rated / Not yet rated */}
+      <div className="flex items-center justify-between gap-3 mt-5">
+        <div className="inline-flex rounded-lg bg-muted/70 border border-border/60 p-0.5 shadow-sm">
+          {(['all', 'rated', 'unrated'] as RatedFilter[]).map((opt) => (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => setRatedFilter(opt)}
+              className={cn(
+                'rounded-lg px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors',
+                ratedFilter === opt
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'bg-transparent text-muted-foreground hover:text-foreground'
+              )}
+            >
+              {opt === 'all'
+                ? 'All'
+                : opt === 'rated'
+                ? 'Rated'
+                : 'Not yet rated'}
+            </button>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={handleResetView}
+          className="text-sm font-medium text-slate-400 hover:text-slate-600 transition-colors whitespace-nowrap"
+        >
+          Reset view
+        </button>
+      </div>
+
       {/* Map Container */}
-      <div className="top100-map-shell relative rounded-3xl bg-white shadow-md overflow-hidden">
+      <div className="top100-map-shell relative rounded-3xl bg-white shadow-md overflow-hidden mt-3">
         <div
           id="top100-map-container"
           ref={mapContainer}
@@ -334,17 +368,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope, ratingFilter }) =>
               {ratedCount}/{officialTotal} rated · {remaining} left
             </div>
           )}
-        </div>
-        
-        {/* Reset View Button */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center pb-3">
-          <button
-            type="button"
-            onClick={handleResetView}
-            className="pointer-events-auto !rounded-2xl bg-slate-700/90 px-4 py-1.5 text-xs text-white backdrop-blur-md shadow-lg font-medium hover:bg-slate-700 transition-colors"
-          >
-            Reset view
-          </button>
         </div>
 
         {/* Selected Course Bottom Sheet */}
