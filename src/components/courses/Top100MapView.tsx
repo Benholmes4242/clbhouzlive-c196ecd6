@@ -179,7 +179,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         },
       });
 
-      // Unclustered points layer
+      // Unclustered points layer - use Top 100 club colors
       mapInstance.addLayer({
         id: 'unclustered-point',
         type: 'circle',
@@ -189,16 +189,16 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
           'circle-color': [
             'case',
             ['==', ['get', 'user_has_rated'], true],
-            '#16a34a', // rated: green
-            '#020617', // unrated: very dark slate
+            '#10b981', // rated: emerald (matches green club tier)
+            '#475569', // unrated: medium slate
           ],
           'circle-radius': 6,
           'circle-stroke-width': 2,
           'circle-stroke-color': [
             'case',
             ['==', ['get', 'user_has_rated'], true],
-            '#ffffff', // rated pins: white ring
-            '#cbd5e1', // unrated pins: pale slate ring
+            '#6ee7b7', // rated: lighter emerald halo
+            '#cbd5e1', // unrated: light slate ring
           ],
         },
       });
