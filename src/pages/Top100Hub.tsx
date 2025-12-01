@@ -253,7 +253,9 @@ const Top100Hub = () => {
                     </div>
                   </div>
 
-                  <Top100MapView scope={selectedListSlug} />
+                  <div className="mt-5">
+                    <Top100MapView scope={selectedListSlug} />
+                  </div>
                 </div>
               )}
             </TabsContent>
