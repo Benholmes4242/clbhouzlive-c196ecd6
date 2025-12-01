@@ -103,7 +103,7 @@ const Top100Hub = () => {
 
           {/* Tabs: Courses | My Progress | Leaderboard */}
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-muted/70 border border-border/60 px-2 py-[3px] mb-5">
+            <TabsList className="grid w-full grid-cols-3 bg-muted/70 border border-border/60 px-2 py-[3px] mb-3">
               <TabsTrigger 
                 value="courses" 
                 className="text-sm px-3 py-[6px] rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"
@@ -133,7 +133,7 @@ const Top100Hub = () => {
                 if (totalRated === 0) return null;
                 
                 return (
-                  <div className="mt-4">
+                  <div className="mt-0">
                     <Top100ProgressSummary
                       ratedCount={totalRated}
                       listCount={listsCount}
