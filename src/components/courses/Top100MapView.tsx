@@ -13,10 +13,10 @@ const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v11';
 
 // Region center and zoom configurations
 const REGION_CONFIG: Record<Top100MapScope, { center: [number, number]; zoom: number; label: string }> = {
-  'global-top-100': { center: [20, 30], zoom: 2, label: 'Global Top 100' },
-  'gb-i-top-100': { center: [-3, 54], zoom: 5, label: 'Britain & Ireland Top 100' },
-  'usa-top-100': { center: [-98, 39], zoom: 3.5, label: 'USA Top 100' },
-  'europe-top-100': { center: [10, 50], zoom: 4, label: 'Continental Europe Top 100' },
+  'global': { center: [20, 30], zoom: 2, label: 'Global Top 100' },
+  'gb-i': { center: [-3, 54], zoom: 5, label: 'Britain & Ireland Top 100' },
+  'usa': { center: [-98, 39], zoom: 3.5, label: 'USA Top 100' },
+  'europe': { center: [10, 50], zoom: 4, label: 'Continental Europe Top 100' },
 };
 
 type RatedFilter = 'all' | 'rated' | 'unrated';

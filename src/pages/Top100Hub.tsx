@@ -40,7 +40,7 @@ const Top100Hub = () => {
     viewFromUrl ?? 'list'
   );
   
-  const [selectedListSlug, setSelectedListSlug] = useState<Top100MapScope>('global-top-100');
+  const [selectedListSlug, setSelectedListSlug] = useState<Top100MapScope>('global');
 
   // Guard against invalid data
   if (!lists && !listsLoading) {
@@ -204,10 +204,10 @@ const Top100Hub = () => {
                     <div className="inline-flex items-center gap-2 !rounded-2xl bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700 shadow-sm">
                       {lists?.find(l => l.slug === selectedListSlug) && (
                         <>
-                          {selectedListSlug === 'global-top-100' && <span className="text-lg">🌍</span>}
-                          {selectedListSlug === 'gb-i-top-100' && <CountryFlag country="Britain & Ireland" size="sm" />}
-                          {selectedListSlug === 'usa-top-100' && <CountryFlag country="USA" size="sm" />}
-                          {selectedListSlug === 'europe-top-100' && <CountryFlag country="Continental Europe" size="sm" />}
+                          {selectedListSlug === 'global' && <span className="text-lg">🌍</span>}
+                          {selectedListSlug === 'gb-i' && <CountryFlag country="Britain & Ireland" size="sm" />}
+                          {selectedListSlug === 'usa' && <CountryFlag country="USA" size="sm" />}
+                          {selectedListSlug === 'europe' && <CountryFlag country="Continental Europe" size="sm" />}
                           <span>{lists.find(l => l.slug === selectedListSlug)?.short_label}</span>
                         </>
                       )}
@@ -226,10 +226,10 @@ const Top100Hub = () => {
                           }`}
                           title={list.short_label}
                         >
-                          {list.slug === 'global-top-100' && <Globe className="h-3.5 w-3.5" />}
-                          {list.slug === 'gb-i-top-100' && <CountryFlag country="Britain & Ireland" size="sm" />}
-                          {list.slug === 'usa-top-100' && <CountryFlag country="USA" size="sm" />}
-                          {list.slug === 'europe-top-100' && <CountryFlag country="Continental Europe" size="sm" />}
+                          {list.slug === 'global' && <Globe className="h-3.5 w-3.5" />}
+                          {list.slug === 'gb-i' && <CountryFlag country="Britain & Ireland" size="sm" />}
+                          {list.slug === 'usa' && <CountryFlag country="USA" size="sm" />}
+                          {list.slug === 'europe' && <CountryFlag country="Continental Europe" size="sm" />}
                         </button>
                       ))}
                     </div>
