@@ -26,7 +26,7 @@ export function Top100AchievementBadge({ tier }: Top100AchievementBadgeProps) {
     <section className="flex justify-center">
       <div
         className={cn(
-          "inline-flex items-center gap-4 rounded-full bg-white px-7 py-4 shadow-sm",
+          "inline-flex items-center gap-4 rounded-full bg-white px-6 py-2.5 shadow-sm max-w-xs w-full",
           style.ring
         )}
         style={{ borderWidth: '1.5px' }}
