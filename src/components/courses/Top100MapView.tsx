@@ -315,8 +315,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
               {opt === 'all'
                 ? 'All'
                 : opt === 'rated'
-                ? 'Rated'
-                : 'Not yet rated'}
+                ? 'Played'
+                : 'Not played'}
             </button>
           ))}
         </div>
@@ -354,18 +354,18 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
           <div className="pointer-events-auto flex items-center gap-3 !rounded-2xl bg-slate-700/90 px-4 py-1.5 text-white backdrop-blur-md shadow-lg border border-white/10">
             <span className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-full shadow-sm" style={{ backgroundColor: '#F7931E' }} />
-              <span className="font-medium">Rated</span>
+              <span className="font-medium">Played</span>
             </span>
             <span className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-full bg-slate-900 shadow-sm" />
-              <span className="font-medium">Not yet rated</span>
+              <span className="font-medium">Not played</span>
             </span>
           </div>
 
           {/* Count Pill */}
           {officialTotal > 0 && (
             <div className="pointer-events-auto !rounded-2xl bg-slate-700/90 px-3 py-1.5 text-white backdrop-blur-md shadow-lg font-medium">
-              {ratedCount}/{officialTotal} rated · {remaining} left
+              {ratedCount}/{officialTotal} played · {remaining} left
             </div>
           )}
         </div>
@@ -419,7 +419,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
                     </span>
                   ) : (
                     <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-600">
-                      Not yet rated by you
+                      Not played yet
                     </span>
                   )}
                 </div>
