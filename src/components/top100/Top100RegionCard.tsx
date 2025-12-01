@@ -79,7 +79,7 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
             <span className="font-semibold">{rated}</span>{" "}
             of {total} courses
           </span>
-          <span className="font-semibold text-[hsl(var(--primary-accent))]">
+          <span className="font-semibold text-[var(--primary-accent)]">
             {completion}% complete
           </span>
         </div>
@@ -87,7 +87,7 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
         {/* Progress bar */}
         <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/25">
           <div
-            className="h-full rounded-full bg-[hsl(var(--primary-accent))] transition-[width] duration-500 ease-out"
+            className="h-full rounded-full bg-[var(--primary-accent)] transition-[width] duration-500 ease-out"
             style={{ width: `${completion}%` }}
           />
         </div>
