@@ -211,10 +211,10 @@ const Top100Hub = () => {
                             key={slug}
                             onClick={() => setSelectedListSlug(slug)}
                             className={cn(
-                              'flex-1 px-4 py-2 text-sm font-semibold rounded-full transition',
+                              'flex-1 px-4 py-2 text-sm font-semibold rounded-full transition border',
                               isActive
-                                ? 'bg-muted/70 text-foreground shadow-sm'
-                                : 'bg-background text-muted-foreground'
+                                ? 'bg-muted/70 text-foreground shadow-sm border-border/60'
+                                : 'bg-background text-muted-foreground border-transparent'
                             )}
                           >
                             {label}
