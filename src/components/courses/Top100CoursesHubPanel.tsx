@@ -346,7 +346,7 @@ const Top100CoursesHubPanel = () => {
             </p>
             <button
               type="button"
-              className="text-[12px] font-medium text-amber-500 hover:text-amber-600 transition-colors"
+              className="text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors"
               onClick={handleOpenTop100Leaderboard}
             >
               View leaderboard →
