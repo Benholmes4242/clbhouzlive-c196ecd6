@@ -45,36 +45,10 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
 
   // Filter courses by rated status
   const filteredCourses = useMemo(() => {
-    console.log('[Top100MapView] 🔍 AUDIT - Pre-filter stats:', {
-      scope,
-      ratedFilter,
-      totalCourses: courses.length,
-      ratedTrue: courses.filter(c => c.user_has_rated === true).length,
-      ratedFalse: courses.filter(c => c.user_has_rated === false).length,
-      sampleCourse: courses[0] ? {
-        name: courses[0].name,
-        user_has_rated: courses[0].user_has_rated,
-        coords: [courses[0].longitude, courses[0].latitude]
-      } : null
-    });
-    
-    let filtered;
-    if (ratedFilter === 'rated') filtered = courses.filter(c => c.user_has_rated);
-    else if (ratedFilter === 'unrated') filtered = courses.filter(c => !c.user_has_rated);
-    else filtered = courses;
-    
-    console.log('[Top100MapView] 🔍 AUDIT - Post-filter stats:', {
-      scope,
-      ratedFilter,
-      filteredCount: filtered.length,
-      sampleFiltered: filtered[0] ? {
-        name: filtered[0].name,
-        user_has_rated: filtered[0].user_has_rated
-      } : null
-    });
-    
-    return filtered;
-  }, [courses, ratedFilter, scope]);
+    if (ratedFilter === 'rated') return courses.filter(c => c.user_has_rated);
+    if (ratedFilter === 'unrated') return courses.filter(c => !c.user_has_rated);
+    return courses;
+  }, [courses, ratedFilter]);
 
   // Official list size for this map (falls back to what we have, just in case)
   const officialTotal =
@@ -151,17 +125,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         })),
       };
 
-      console.log('[Top100MapView] 🗺️ GeoJSON summary:', {
-        ratedFilter,
-        featureCount: geojson.features.length,
-        ratedFeatures: geojson.features.filter(f => f.properties?.user_has_rated === true).length,
-        unratedFeatures: geojson.features.filter(f => f.properties?.user_has_rated === false).length,
-        sampleFeature: geojson.features[0] ? {
-          name: geojson.features[0].properties?.name,
-          coords: (geojson.features[0].geometry as GeoJSON.Point).coordinates,
-          user_has_rated: geojson.features[0].properties?.user_has_rated
-        } : null
-      });
 
       // Add clustered source
       mapInstance.addSource('courses', {
