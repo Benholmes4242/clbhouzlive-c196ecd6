@@ -339,7 +339,7 @@ const Top100CoursesHubPanel = () => {
 
       {/* 3. Friends on the Top 100 journey - horizontal avatar strip */}
       {user && (
-        <section className="mt-7">
+        <section className="mt-6">
           <div className="mb-3 flex items-center justify-between">
             <p className="text-[13px] font-semibold text-foreground">
               Friends on the Top 100 journey
