@@ -82,11 +82,11 @@ const Top100Hub = () => {
       <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
         <div className="max-w-6xl mx-auto space-y-6">
           {/* Hero Section */}
-          <div className="text-center mb-8">
-            <h1 className="font-display text-4xl font-bold text-foreground mb-3">
+          <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 pt-4 pb-2">
+            <h1 className="text-center text-3xl font-semibold tracking-tight text-slate-900">
               World's Top 100 Golf Courses
             </h1>
-            <p className="text-xl text-muted-foreground">
+            <p className="text-center text-sm text-slate-500">
               Explore the most prestigious golf courses across the globe
             </p>
           </div>
@@ -119,19 +119,22 @@ const Top100Hub = () => {
               {session && progress && (progress.total_top100_rated ?? progress.total_played_top100 ?? 0) > 0 && (() => {
                 const totalRated = progress.total_top100_rated ?? progress.total_played_top100 ?? 0;
                 return (
-                  <div className="flex justify-center mb-6">
+                  <div className="mt-2 flex justify-center">
                     <button
                       onClick={() => setActiveTab('my-progress')}
-                      className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-4 py-2 text-sm hover:border-primary-accent/60 hover:bg-muted/50 transition-all"
+                      className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm hover:shadow-md transition-shadow"
                     >
-                      <Trophy className="h-4 w-4 text-primary-accent" />
-                      <span className="font-medium">
-                        You've rated {totalRated} Top 100 course{totalRated === 1 ? '' : 's'}
+                      <span role="img" aria-hidden>🏆</span>
+                      <span>
+                        You've rated{" "}
+                        <span className="font-semibold">{totalRated}</span>{" "}
+                        Top 100 course{totalRated === 1 ? '' : 's'}
                       </span>
                       {progress.club_ring && progress.club_ring !== 'none' && (
-                        <span className="text-muted-foreground">
-                          · {progress.club_label}
-                        </span>
+                        <>
+                          <span>·</span>
+                          <span>{progress.club_label}</span>
+                        </>
                       )}
                     </button>
                   </div>
@@ -139,13 +142,13 @@ const Top100Hub = () => {
               })()}
               
               {/* View Mode Toggle */}
-              <div className="flex justify-center mb-6">
-                <div className="inline-flex h-10 items-center justify-center rounded-lg bg-muted p-1">
+              <div className="mt-3 flex justify-center mb-6">
+                <div className="inline-flex rounded-full border border-slate-200 bg-white p-1 shadow-sm">
                   <button
                     onClick={() => setCoursesViewMode('list')}
-                    className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all ${
+                    className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
                       coursesViewMode === 'list'
-                        ? 'bg-background text-foreground shadow-sm'
+                        ? 'bg-slate-100 text-foreground shadow-sm'
                         : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
@@ -154,9 +157,9 @@ const Top100Hub = () => {
                   </button>
                   <button
                     onClick={() => setCoursesViewMode('map')}
-                    className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all ${
+                    className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
                       coursesViewMode === 'map'
-                        ? 'bg-background text-foreground shadow-sm'
+                        ? 'bg-slate-100 text-foreground shadow-sm'
                         : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
