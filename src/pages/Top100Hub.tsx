@@ -163,14 +163,14 @@ const Top100Hub = () => {
               
               {/* View Mode Toggle */}
               <div className="mt-3 flex justify-center mb-6">
-                <div className="inline-flex rounded-2xl bg-white shadow-sm">
+                <div className="inline-flex rounded-full bg-slate-100 p-1 shadow-inner">
                   <button
                     onClick={() => setCoursesViewMode('list')}
                     className={cn(
-                      'inline-flex items-center gap-2 px-4 py-1.5 text-sm font-medium rounded-2xl',
+                      'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all',
                       coursesViewMode === 'list'
                         ? 'bg-slate-900 text-white shadow-sm'
-                        : 'text-slate-600'
+                        : 'text-slate-500 hover:text-slate-700'
                     )}
                   >
                     <List className="h-4 w-4" />
@@ -179,10 +179,10 @@ const Top100Hub = () => {
                   <button
                     onClick={() => setCoursesViewMode('map')}
                     className={cn(
-                      'inline-flex items-center gap-2 px-4 py-1.5 text-sm font-medium rounded-2xl',
+                      'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all',
                       coursesViewMode === 'map'
                         ? 'bg-slate-900 text-white shadow-sm'
-                        : 'text-slate-600'
+                        : 'text-slate-500 hover:text-slate-700'
                     )}
                   >
                     <MapIcon className="h-4 w-4" />
@@ -211,41 +211,42 @@ const Top100Hub = () => {
               ) : (
                 /* Map View */
                 <div className="space-y-4">
-                  {/* List Selector for Map */}
-                  <div className="flex items-center justify-between gap-3">
-                    {/* Left: List Selector */}
-                    <div className="inline-flex items-center gap-2 !rounded-2xl bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700 shadow-sm">
-                      {lists?.find(l => l.slug === selectedListSlug) && (
-                        <>
-                          {selectedListSlug === 'global' && <span className="text-lg">🌍</span>}
-                          {selectedListSlug === 'gb-i' && <CountryFlag country="Britain & Ireland" size="sm" />}
-                          {selectedListSlug === 'usa' && <CountryFlag country="USA" size="sm" />}
-                          {selectedListSlug === 'europe' && <CountryFlag country="Continental Europe" size="sm" />}
-                          <span>{lists.find(l => l.slug === selectedListSlug)?.short_label}</span>
-                        </>
-                      )}
-                    </div>
-                    
-                    {/* Right: Quick List Switcher */}
-                    <div className="inline-flex items-center gap-2">
-                      {lists?.map((list) => (
-                        <button
-                          key={list.id}
-                          onClick={() => setSelectedListSlug(list.slug as Top100MapScope)}
-                          className={cn(
-                            'inline-flex items-center gap-2 rounded-2xl bg-white px-3 py-1.5 text-xs font-medium shadow-sm transition-colors',
-                            selectedListSlug === list.slug
-                              ? 'text-slate-900'
-                              : 'text-slate-500 hover:text-slate-900'
-                          )}
-                        >
-                          {list.slug === 'global' && <Globe className="h-4 w-4" />}
-                          {list.slug === 'gb-i' && <span className="text-base">🇬🇧</span>}
-                          {list.slug === 'usa' && <span className="text-base">🇺🇸</span>}
-                          {list.slug === 'europe' && <span className="text-base">🇪🇺</span>}
-                          <span>{list.short_label}</span>
-                        </button>
-                      ))}
+                  {/* Region Selector */}
+                  <div className="mt-4 flex justify-center">
+                    <div className="flex gap-2">
+                      {(['global', 'gb-i', 'usa', 'europe'] as Top100MapScope[]).map((slug) => {
+                        const isActive = selectedListSlug === slug;
+                        const list = lists?.find(l => l.slug === slug);
+                        
+                        const label = slug === 'global' ? 'Global' 
+                          : slug === 'gb-i' ? 'GB&I'
+                          : slug === 'usa' ? 'USA'
+                          : 'Europe';
+
+                        return (
+                          <button
+                            key={slug}
+                            onClick={() => setSelectedListSlug(slug)}
+                            className={cn(
+                              'inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs sm:text-sm font-medium transition-all',
+                              isActive
+                                ? 'bg-slate-900 text-white shadow-sm'
+                                : 'bg-white text-slate-600 shadow-xs hover:text-slate-800'
+                            )}
+                          >
+                            {slug === 'global' ? (
+                              <Globe className="h-4 w-4" />
+                            ) : slug === 'gb-i' ? (
+                              <CountryFlag country="Britain & Ireland" size="sm" />
+                            ) : slug === 'usa' ? (
+                              <CountryFlag country="USA" size="sm" />
+                            ) : (
+                              <CountryFlag country="Continental Europe" size="sm" />
+                            )}
+                            <span>{label}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
