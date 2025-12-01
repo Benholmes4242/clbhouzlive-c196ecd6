@@ -196,8 +196,8 @@ const Top100Hub = () => {
                 /* Map View */
                 <div className="space-y-0">
                   {/* Region Selector - Independent Pills */}
-                  <div className="mt-4 flex justify-center">
-                    <div className="flex gap-3">
+                  <section className="mt-4">
+                    <div className="mx-auto flex w-full max-w-[420px] justify-between gap-3 px-4">
                       {(['global', 'gb-i', 'usa', 'europe'] as Top100MapScope[]).map((slug) => {
                         const isActive = selectedListSlug === slug;
                         
@@ -211,7 +211,7 @@ const Top100Hub = () => {
                             key={slug}
                             onClick={() => setSelectedListSlug(slug)}
                             className={cn(
-                              'px-4 py-2 rounded-full text-xs font-medium transition',
+                              'flex-1 px-4 py-2 text-sm font-semibold rounded-full transition',
                               isActive
                                 ? 'bg-slate-900 text-white shadow-sm'
                                 : 'bg-slate-100 text-slate-600'
@@ -222,7 +222,7 @@ const Top100Hub = () => {
                         );
                       })}
                     </div>
-                  </div>
+                  </section>
 
                   <Top100MapView scope={selectedListSlug} />
                 </div>
