@@ -9,7 +9,7 @@ import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { getTop100Club } from '@/lib/top100Club';
 import { getTop100RingDotClass } from '@/lib/top100RingStyles';
 import SquircleImage from '@/components/ui/SquircleImage';
-import { Search, Award, X } from 'lucide-react';
+import { Search, Award, X, Trophy } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -241,7 +241,7 @@ const Top100CoursesHubPanel = () => {
       <section className="rounded-3xl border border-border/60 bg-card shadow-[0_4px_28px_rgba(0,0,0,0.14)] px-4 py-5 relative overflow-hidden before:absolute before:inset-0 before:bg-white/[0.02] before:pointer-events-none">
         {/* Title + subtitle */}
         <div className="flex items-center gap-2">
-          <span className="text-xl">🏆</span>
+          <Trophy className="h-5 w-5 text-amber-600" />
             <div>
               <h2 className="text-[18px] font-semibold text-foreground">Top 100 Club</h2>
               <p className="text-[12px] text-muted-foreground">
