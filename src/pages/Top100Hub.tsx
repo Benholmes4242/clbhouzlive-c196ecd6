@@ -13,6 +13,7 @@ import Top100LeaderboardPanel from '@/components/courses/Top100LeaderboardPanel'
 import Top100MapView from '@/components/courses/Top100MapView';
 import { Top100MapScope } from '@/hooks/useTop100MapCourses';
 import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
+import Top100BackButton from '@/components/top100/Top100BackButton';
 
 const Top100Hub = () => {
   const navigate = useNavigate();
@@ -81,8 +82,13 @@ const Top100Hub = () => {
 
       <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
         <div className="max-w-6xl mx-auto space-y-6">
+          {/* Back Button */}
+          <div className="px-4 pt-3">
+            <Top100BackButton to="/courses?tab=top100" />
+          </div>
+          
           {/* Hero Section */}
-          <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 pt-4 pb-2">
+          <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 pb-2">
             <h1 className="text-center text-3xl font-semibold tracking-tight text-slate-900">
               World's Top 100 Golf Courses
             </h1>

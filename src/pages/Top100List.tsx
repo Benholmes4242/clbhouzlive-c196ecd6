@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, CheckCircle2, Circle } from 'lucide-react';
+import Top100BackButton from '@/components/top100/Top100BackButton';
 import CountryFlag from '@/components/ui/country-flag';
 import GolfClubView from '@/components/golf-club/GolfClubView';
 import Top100Pills from '@/components/courses/Top100Pills';
@@ -156,6 +157,11 @@ const Top100List = () => {
 
       <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
         <div className="max-w-6xl mx-auto space-y-6">
+          {/* Back Button */}
+          <div className="px-4 pt-3">
+            <Top100BackButton to="/top100" label="Back to Hub" />
+          </div>
+          
           {/* Hero Header */}
           <div
             className="relative h-64 rounded-2xl overflow-hidden"
@@ -167,16 +173,7 @@ const Top100List = () => {
           >
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
             
-            <div className="relative h-full flex flex-col justify-between p-6">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate('/top100')}
-                className="self-start text-foreground hover:bg-white/20"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Hub
-              </Button>
+            <div className="relative h-full flex flex-col justify-end p-6">
 
               <div className="space-y-3">
                 <h1 className="font-display text-4xl font-bold text-foreground">
