@@ -335,7 +335,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         <div
           id="top100-map-container"
           ref={mapContainer}
-          className="h-[420px]"
+          className="h-[360px]"
         />
 
         {/* Loading skeleton */}
