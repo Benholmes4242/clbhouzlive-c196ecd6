@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-export type Top100MapScope = 'global-top-100' | 'gb-i-top-100' | 'usa-top-100' | 'europe-top-100';
+export type Top100MapScope = 'global' | 'gb-i' | 'usa' | 'europe';
 
 export interface Top100MapCourse {
   id: string;
