@@ -299,45 +299,7 @@ const Top100CoursesHubPanel = () => {
         </Button>
       </section>
 
-      {/* 2. Region progress strip */}
-      {user && listSummaries.length > 0 && (
-        <section className="mt-7">
-          <h3 className="mb-3 text-[13px] font-semibold text-foreground">
-            Your Top 100 region progress
-          </h3>
-
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            {listSummaries.map((region) => {
-              const pct = region.total_courses > 0 ? (region.played_count / region.total_courses) * 100 : 0;
-              const label = region.short_label || region.name.replace(' Top 100', '');
-              
-              return (
-                <div
-                  key={region.id}
-                  className="min-w-[160px] rounded-2xl border border-border/60 bg-card px-4 py-3 text-[11px] shadow-[0_2px_12px_rgba(0,0,0,0.08)]"
-                >
-                  <div className="flex items-center justify-between gap-2 min-h-[18px]">
-                    <span className="font-semibold text-foreground whitespace-nowrap overflow-hidden text-ellipsis text-left">
-                      {label}
-                    </span>
-                    <span className="text-muted-foreground flex-shrink-0 text-left">
-                      {region.played_count}/{region.total_courses}
-                    </span>
-                  </div>
-                  <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-slate-100">
-                    <div
-                      className="h-full rounded-full bg-brand-orange"
-                      style={{ width: `${Math.min(100, pct)}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* 3. Friends on the Top 100 journey - horizontal avatar strip */}
+      {/* Friends on the Top 100 journey - horizontal avatar strip */}
       {user && (
         <section className="mt-6">
           <div className="mb-3 flex items-center justify-between">
