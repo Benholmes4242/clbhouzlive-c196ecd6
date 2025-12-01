@@ -303,7 +303,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
   }
 
   return (
-    <div className="flex flex-col gap-4 pb-6">
+    <div className="flex flex-col gap-4 pb-3">
       {/* Filter Row */}
       <div className="mt-4 flex items-center justify-between gap-2">
         <div className="inline-flex gap-2">
@@ -338,9 +338,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         </button>
       </div>
 
-      {/* Map Card */}
-      <div className="mt-4 rounded-3xl bg-white p-3 shadow-md">
-        <div className="relative h-[340px] sm:h-[380px] rounded-3xl overflow-hidden">
+      {/* Map Container */}
+      <div className="relative h-[calc(100vh-380px)] min-h-[480px] rounded-3xl overflow-hidden shadow-md">
           {/* Loading skeleton */}
           {isLoading && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
@@ -437,7 +436,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
               </Button>
             </div>
           )}
-        </div>
       </div>
     </div>
   );
