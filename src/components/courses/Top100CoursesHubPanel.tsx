@@ -241,7 +241,7 @@ const Top100CoursesHubPanel = () => {
       <section className="rounded-3xl border border-border/60 bg-card shadow-[0_4px_28px_rgba(0,0,0,0.14)] px-4 py-5 relative overflow-hidden before:absolute before:inset-0 before:bg-white/[0.02] before:pointer-events-none">
         {/* Title + subtitle */}
         <div className="flex items-center gap-2">
-          <Trophy className="h-5 w-5 text-amber-600" />
+          <Trophy className="h-7 w-7 text-foreground" />
             <div>
               <h2 className="text-[18px] font-semibold text-foreground">Top 100 Club</h2>
               <p className="text-[12px] text-muted-foreground">
