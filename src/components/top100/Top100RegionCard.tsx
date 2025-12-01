@@ -76,7 +76,7 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
         {/* #1 course chip + View courses button */}
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
           {hero && (
-            <div className="inline-flex max-w-[60%] items-center rounded-full bg-black/55 px-3 py-1 text-[11px] font-medium text-white backdrop-blur">
+            <div className="inline-flex max-w-[60%] items-center rounded-2xl bg-black/55 px-3 py-1.5 text-[11px] font-medium text-white backdrop-blur">
               <span className="truncate">
                 #{hero.rank_in_list} {hero.name}
               </span>
@@ -86,7 +86,7 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
           <Button
             variant="secondary"
             size="sm"
-            className="rounded-full px-4 py-1.5 text-xs font-medium bg-white/95 text-slate-900 hover:bg-white border-none"
+            className="rounded-2xl px-4 py-1.5 text-xs font-medium bg-white/95 text-slate-900 hover:bg-white border-none"
             onClick={(e) => {
               e.stopPropagation();
               onClick?.();
