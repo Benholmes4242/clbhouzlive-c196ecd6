@@ -14,6 +14,7 @@ export type Top100ListSummary = {
   id: string;
   name: string;
   slug: string;
+  short_label?: string;
   total_courses: number;
   played_count: number;
   hero_course: HeroCourse | null;
@@ -30,7 +31,7 @@ export function useTop100ListSummaries(userId: string | undefined) {
       // Fetch all active Top 100 lists
       const { data: lists, error: listsError } = await supabase
         .from('top100_lists')
-        .select('id, name, slug')
+        .select('id, name, slug, short_label')
         .eq('is_active', true)
         .order('sort_order');
 
@@ -106,6 +107,7 @@ export function useTop100ListSummaries(userId: string | undefined) {
             id: list.id,
             name: list.name,
             slug: list.slug,
+            short_label: (list as any).short_label,
             total_courses: totalCourses || 0,
             played_count: playedCount,
             hero_course: hero,
