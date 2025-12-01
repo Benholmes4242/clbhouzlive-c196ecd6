@@ -67,6 +67,15 @@ export function useTop100MapCourses(scope: Top100MapScope, userId?: string) {
       });
 
       if (membershipsError) throw membershipsError;
+      
+      // AUDIT: Log membership stats before coordinate filtering
+      const membershipStats = {
+        scope,
+        totalMemberships: memberships?.length || 0,
+        withCoords: memberships?.filter(m => m.golf_courses?.latitude && m.golf_courses?.longitude).length || 0,
+        missingCoords: memberships?.filter(m => !m.golf_courses?.latitude || !m.golf_courses?.longitude).length || 0,
+      };
+      console.log('[Top100Map] 🔍 AUDIT - Membership stats (before user ratings):', membershipStats);
 
       // 3) Get user's rated courses if userId provided
       let ratedCoursesMap = new Map<string, number>();
@@ -119,17 +128,31 @@ export function useTop100MapCourses(scope: Top100MapScope, userId?: string) {
 
       const finalCourses = Array.from(coursesMap.values());
       
+      // AUDIT: Detailed breakdown of final courses by rating status
+      const ratedTrue = finalCourses.filter(c => c.user_has_rated === true).length;
+      const ratedFalse = finalCourses.filter(c => c.user_has_rated === false).length;
+      const totalWithCoords = finalCourses.length;
+      
       console.log('[Top100Map] 📊 Final results:', {
         scope,
         totalMemberships: memberships?.length || 0,
         skippedNoCoords,
-        finalCoursesWithCoords: finalCourses.length,
+        finalCoursesWithCoords: totalWithCoords,
         sampleCourse: finalCourses[0] ? {
           name: finalCourses[0].name,
           coords: [finalCourses[0].longitude, finalCourses[0].latitude],
           rank: finalCourses[0].rank,
           user_has_rated: finalCourses[0].user_has_rated
         } : null
+      });
+      
+      console.log('[Top100Map] 🔍 AUDIT - Final courses breakdown by rating:', {
+        scope,
+        totalWithCoords,
+        ratedTrue,
+        ratedFalse,
+        percentRated: totalWithCoords > 0 ? Math.round((ratedTrue / totalWithCoords) * 100) : 0,
+        percentUnrated: totalWithCoords > 0 ? Math.round((ratedFalse / totalWithCoords) * 100) : 0,
       });
       
       return finalCourses;
