@@ -283,7 +283,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
   // Error state
   if (!MAPBOX_TOKEN) {
     return (
-      <div className="flex items-center justify-center h-[420px] rounded-3xl border border-slate-200 bg-white shadow-md">
+      <div className="flex items-center justify-center h-[400px] rounded-3xl border border-slate-200 bg-white shadow-md">
         <div className="text-center space-y-2 px-4">
           <MapPin className="h-12 w-12 mx-auto text-slate-400" />
           <h3 className="text-lg font-semibold text-slate-900">Map Temporarily Unavailable</h3>
@@ -298,7 +298,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
   return (
     <div className="flex flex-col">
       {/* Rated filter toggle: All / Rated / Not yet rated */}
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-3 mt-5">
         <div className="inline-flex rounded-lg bg-muted/70 border border-border/60 p-0.5 shadow-sm">
           {(['all', 'rated', 'unrated'] as RatedFilter[]).map((opt) => (
             <button
@@ -335,7 +335,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         <div
           id="top100-map-container"
           ref={mapContainer}
-          className="h-[420px]"
+          className="h-[400px]"
         />
 
         {/* Loading skeleton */}
@@ -425,13 +425,13 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
                 </div>
 
                 {/* CTA */}
-                <button
-                  type="button"
+                <Button
+                  variant="secondary"
                   onClick={() => navigate(`/courses/${selectedCourse.id}`)}
-                  className="mt-4 flex w-full items-center justify-center rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 active:bg-slate-900"
+                  className="mt-4 w-full"
                 >
                   Open course
-                </button>
+                </Button>
               </div>
             </div>
           </div>
