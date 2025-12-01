@@ -12,11 +12,9 @@ export default function Top100BackButton({ to, label = 'Back to Top 100' }: Top1
   return (
     <button
       onClick={() => navigate(to)}
-      className="flex items-center gap-1 text-slate-600 dark:text-slate-200 pl-1 pb-2 pt-1
-                 text-[15px] font-medium hover:text-slate-900 dark:hover:text-white 
-                 transition-colors"
+      className="inline-flex items-center text-xs font-medium text-muted-foreground hover:text-foreground transition"
     >
-      <ChevronLeft size={18} strokeWidth={2} />
+      <ChevronLeft className="mr-1 h-3 w-3" />
       {label}
     </button>
   );
