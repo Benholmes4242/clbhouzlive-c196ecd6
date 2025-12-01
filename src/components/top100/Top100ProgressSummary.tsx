@@ -13,7 +13,7 @@ export function Top100ProgressSummary({ ratedCount, listCount }: Props) {
       : 0;
 
   return (
-    <section className="space-y-2 px-4">
+    <section className="mt-4 flex flex-col items-center text-center gap-2 px-4">
       <p className="text-sm text-slate-700">
         You&apos;ve rated {ratedCount} course{ratedCount === 1 ? '' : 's'} across {listCount} Top 100 list{listCount === 1 ? '' : 's'}
       </p>
@@ -22,7 +22,7 @@ export function Top100ProgressSummary({ ratedCount, listCount }: Props) {
         {ratedCount} / {totalCoursesPossible} courses
       </p>
 
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+      <div className="mt-1 h-1.5 w-full max-w-[420px] overflow-hidden rounded-full bg-slate-200">
         <div
           className="h-full rounded-full bg-amber-500 transition-all"
           style={{ width: `${progressPercent}%` }}

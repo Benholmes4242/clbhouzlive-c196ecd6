@@ -9,7 +9,8 @@ import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { getTop100Club } from '@/lib/top100Club';
 import { getTop100RingDotClass } from '@/lib/top100RingStyles';
 import SquircleImage from '@/components/ui/SquircleImage';
-import { Search, Award, X, Trophy } from 'lucide-react';
+import { Search, Award, X } from 'lucide-react';
+import { Top100AchievementBadge } from '@/components/top100/Top100AchievementBadge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -90,6 +91,16 @@ const Top100CoursesHubPanel = () => {
   const club = getTop100Club(totalRated);
   const ringKey = club?.ring ?? 'none';
   const ringDotClass = getTop100RingDotClass(ringKey);
+  
+  // Calculate tier for achievement badge
+  const top100Tier: 20 | 50 | 100 | 200 | 300 | 400 | null =
+    totalRated >= 400 ? 400 :
+    totalRated >= 300 ? 300 :
+    totalRated >= 200 ? 200 :
+    totalRated >= 100 ? 100 :
+    totalRated >= 50  ? 50  :
+    totalRated >= 20  ? 20  :
+    null;
 
   // Calculate lists count from summaries (only lists where user has played at least one course)
   const listsCount = listSummaries.filter(list => list.played_count > 0).length;
@@ -265,9 +276,9 @@ const Top100CoursesHubPanel = () => {
         </div>
 
         {user ? (
-          <div className="space-y-6 mt-5">
+          <div className="flex flex-col items-center text-center gap-6 mt-5">
             {/* 1. Progress summary + bar */}
-            <section className="space-y-2">
+            <section className="w-full max-w-[420px] space-y-2">
               <p className="text-sm text-slate-700">
                 You&apos;ve rated {totalRated} course{totalRated === 1 ? '' : 's'} across {listsCount} Top 100 list{listsCount === 1 ? '' : 's'}
               </p>
@@ -276,42 +287,23 @@ const Top100CoursesHubPanel = () => {
                 {totalRated} / {listsCount * 100} courses
               </p>
 
-              <div className="mt-4">
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
-                  <div
-                    className="h-full rounded-full bg-amber-500 transition-all"
-                    style={{ width: `${listsCount > 0 ? Math.min(100, (totalRated / (listsCount * 100)) * 100) : 0}%` }}
-                  />
-                </div>
+              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-200 mx-auto">
+                <div
+                  className="h-full rounded-full bg-amber-500 transition-all"
+                  style={{ width: `${listsCount > 0 ? Math.min(100, (totalRated / (listsCount * 100)) * 100) : 0}%` }}
+                />
               </div>
             </section>
 
             {/* 2. Hero achievement badge row */}
-            {club && totalRated >= 20 && (
-              <section className="flex justify-center mt-6">
-                <div className="inline-flex items-center gap-4 rounded-full bg-white px-6 py-4 shadow-md border border-sky-500">
-                  {/* Circular blue-ring icon */}
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-sky-500 bg-white">
-                    <Trophy className="h-4 w-4 text-sky-500" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-[11px] uppercase tracking-wide text-slate-500">
-                      Achievement unlocked
-                    </p>
-                    <p className="text-sm font-semibold text-slate-900">
-                      {club.label} – Top 100 Explorer
-                    </p>
-                  </div>
-                </div>
-              </section>
-            )}
+            <Top100AchievementBadge tier={top100Tier} />
 
             {/* 3. CTA */}
-            <section>
+            <section className="w-full max-w-[420px]">
               <Button
                 variant="primary"
                 onClick={handleOpenTop100Journey}
-                className="w-full justify-center rounded-full py-2.5 text-sm font-semibold"
+                className="w-full justify-center"
               >
                 Open your Top 100 Journey →
               </Button>
