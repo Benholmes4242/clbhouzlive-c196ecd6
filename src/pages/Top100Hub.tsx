@@ -199,23 +199,37 @@ const Top100Hub = () => {
                 /* Map View */
                 <div className="space-y-4">
                   {/* List Selector for Map */}
-                  <div className="flex justify-center">
-                    <div className="inline-flex h-10 items-center gap-2 rounded-lg bg-muted p-1">
+                  <div className="flex items-center justify-between gap-3">
+                    {/* Left: List Selector */}
+                    <div className="inline-flex items-center gap-2 !rounded-2xl bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700 shadow-sm">
+                      {lists?.find(l => l.slug === selectedListSlug) && (
+                        <>
+                          {selectedListSlug === 'global-top-100' && <span className="text-lg">🌍</span>}
+                          {selectedListSlug === 'gb-i-top-100' && <CountryFlag country="Britain & Ireland" size="sm" />}
+                          {selectedListSlug === 'usa-top-100' && <CountryFlag country="USA" size="sm" />}
+                          {selectedListSlug === 'europe-top-100' && <CountryFlag country="Continental Europe" size="sm" />}
+                          <span>{lists.find(l => l.slug === selectedListSlug)?.short_label}</span>
+                        </>
+                      )}
+                    </div>
+                    
+                    {/* Right: Quick List Switcher */}
+                    <div className="inline-flex items-center gap-1 !rounded-2xl bg-slate-100 p-0.5">
                       {lists?.map((list) => (
                         <button
                           key={list.id}
                           onClick={() => setSelectedListSlug(list.slug as Top100MapScope)}
-                          className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-all ${
+                          className={`inline-flex items-center gap-1 !rounded-xl px-2 py-1.5 text-xs font-medium transition-all ${
                             selectedListSlug === list.slug
-                              ? 'bg-background text-foreground shadow-sm'
+                              ? 'bg-white text-foreground shadow-sm'
                               : 'text-muted-foreground hover:text-foreground'
                           }`}
+                          title={list.short_label}
                         >
-                          {list.slug === 'global-top-100' && <Globe className="h-4 w-4" />}
+                          {list.slug === 'global-top-100' && <Globe className="h-3.5 w-3.5" />}
                           {list.slug === 'gb-i-top-100' && <CountryFlag country="Britain & Ireland" size="sm" />}
                           {list.slug === 'usa-top-100' && <CountryFlag country="USA" size="sm" />}
                           {list.slug === 'europe-top-100' && <CountryFlag country="Continental Europe" size="sm" />}
-                          <span className="hidden sm:inline">{list.short_label}</span>
                         </button>
                       ))}
                     </div>

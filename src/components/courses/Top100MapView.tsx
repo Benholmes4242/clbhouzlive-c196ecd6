@@ -287,42 +287,16 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
 
   return (
     <div className="flex flex-col gap-4 pb-6">
-      {/* Hero Strip */}
-      <div className="flex items-center gap-3 rounded-2xl bg-slate-50 px-3 py-2 text-xs text-slate-600">
-        <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-2xl bg-slate-900 text-sm">
-          🌍
-        </div>
-        <div className="flex flex-col flex-1 min-w-0">
-          <span className="font-medium text-slate-900 truncate">
-            {regionConfig.label}
-          </span>
-          {totalInList > 0 && (
-            <span className="truncate">
-              You've rated{' '}
-              <span className="font-semibold text-slate-900">
-                {ratedCount}/{totalInList}
-              </span>{' '}
-              Top 100 courses
-              {remaining > 0 && (
-                <span className="text-amber-600">
-                  {' '}· {remaining} left to complete this list
-                </span>
-              )}
-            </span>
-          )}
-        </div>
-      </div>
-
       {/* Filter Row */}
       <div className="flex items-center justify-between gap-2">
-        <div className="inline-flex rounded-full bg-slate-100 p-1 text-xs">
+        <div className="inline-flex !rounded-2xl bg-slate-100 p-0.5 text-xs">
           {(['all', 'rated', 'unrated'] as RatedFilter[]).map((opt) => (
             <button
               key={opt}
               type="button"
               onClick={() => setRatedFilter(opt)}
               className={cn(
-                'rounded-full px-3 py-1 transition-colors font-medium',
+                '!rounded-xl px-3 py-1.5 transition-colors font-medium',
                 ratedFilter === opt
                   ? 'bg-white text-slate-900 shadow-sm'
                   : 'text-slate-500 hover:text-slate-700'
@@ -336,14 +310,14 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         <button
           type="button"
           onClick={handleResetView}
-          className="text-xs text-slate-500 underline-offset-2 hover:text-slate-800 hover:underline transition-colors"
+          className="text-[11px] font-medium text-slate-500 hover:text-slate-700 transition-colors"
         >
           Reset view
         </button>
       </div>
 
       {/* Map Card */}
-      <div className="relative overflow-hidden rounded-[28px] bg-slate-900 shadow-lg">
+      <div className="relative overflow-hidden rounded-3xl bg-slate-900 shadow-md shadow-slate-900/5 border border-slate-200/70">
         {/* Loading skeleton */}
         {isLoading && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
@@ -360,7 +334,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         {/* Legend & Stats Overlays */}
         <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-between items-start p-3 text-xs gap-2">
           {/* Legend */}
-          <div className="pointer-events-auto flex items-center gap-3 rounded-full bg-slate-900/80 px-3 py-1.5 text-white backdrop-blur-md shadow-lg">
+          <div className="pointer-events-auto flex items-center gap-3 !rounded-2xl bg-slate-900/80 px-3 py-1.5 text-white backdrop-blur-md shadow-lg">
             <span className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-sm" />
               <span className="font-medium">Rated</span>
@@ -373,7 +347,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
 
           {/* Count Pill */}
           {totalInList > 0 && (
-            <div className="pointer-events-auto rounded-full bg-slate-900/80 px-3 py-1.5 text-white backdrop-blur-md shadow-lg font-medium">
+            <div className="pointer-events-auto !rounded-2xl bg-slate-900/80 px-3 py-1.5 text-white backdrop-blur-md shadow-lg font-medium">
               {ratedCount}/{totalInList} rated · {remaining} left
             </div>
           )}
@@ -385,7 +359,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
             {/* Close Button */}
             <button
               onClick={() => setSelectedCourse(null)}
-              className="absolute top-3 right-3 p-1.5 hover:bg-slate-100 rounded-full transition-colors"
+              className="absolute top-3 right-3 p-1.5 hover:bg-slate-100 !rounded-2xl transition-colors"
               aria-label="Close"
             >
               <X className="h-4 w-4 text-slate-500" />
@@ -406,7 +380,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
             {/* Rank & Rating */}
             <div className="flex items-center gap-2 flex-wrap">
               {typeof selectedCourse.rank === 'number' && (
-                <div className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-1 text-xs">
+                <div className="inline-flex items-center gap-1 !rounded-2xl bg-amber-50 border border-amber-200 px-2.5 py-1 text-xs">
                   <span className="font-semibold text-amber-800">
                     #{selectedCourse.rank}
                   </span>
@@ -415,7 +389,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
               )}
               
               {selectedCourse.user_has_rated && selectedCourse.user_rating && (
-                <div className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-xs">
+                <div className="inline-flex items-center gap-1 !rounded-2xl bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-xs">
                   <span className="text-emerald-600">Your rating:</span>
                   <span className="font-semibold text-emerald-800">
                     {selectedCourse.user_rating.toFixed(1)}
@@ -424,7 +398,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
               )}
 
               {!selectedCourse.user_has_rated && (
-                <div className="inline-flex items-center rounded-full bg-slate-100 border border-slate-200 px-2.5 py-1 text-xs text-slate-600">
+                <div className="inline-flex items-center !rounded-2xl bg-slate-100 border border-slate-200 px-2.5 py-1 text-xs text-slate-600">
                   Not yet rated by you
                 </div>
               )}
@@ -434,7 +408,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
             <Button
               onClick={() => navigate(`/courses/${selectedCourse.id}`)}
               variant="secondary"
-              className="w-full rounded-full"
+              className="w-full !rounded-2xl"
             >
               Open course
             </Button>
