@@ -45,7 +45,7 @@ export function Top100MilestonesCarousel({
               key={milestone.threshold}
               onClick={() => onMilestoneClick?.(milestone)}
               className={cn(
-                'flex-shrink-0 w-32 p-3 rounded-xl border transition-all snap-center',
+                'flex-shrink-0 w-36 p-3 rounded-xl border transition-all snap-center',
                 'hover:scale-[1.02] active:scale-[0.98]',
                 isUnlocked
                   ? 'bg-gradient-to-br from-primary-accent/10 to-primary-accent/5 border-primary-accent/30'
@@ -54,7 +54,7 @@ export function Top100MilestonesCarousel({
                   : 'bg-card border-border/50'
               )}
             >
-              <div className="flex flex-col items-center text-center space-y-1">
+              <div className="flex flex-col items-center text-center gap-1">
                 <div className="text-2xl mb-1">{getMilestoneEmoji(milestone.tierId)}</div>
                 <p className="text-[11px] font-semibold text-foreground">
                   {milestone.tierName}

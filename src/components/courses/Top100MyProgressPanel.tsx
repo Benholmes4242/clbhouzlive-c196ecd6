@@ -186,6 +186,20 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
             isOwnProfile={isOwnProfile}
           />
 
+          {/* Next Milestone Callout */}
+          {data?.next_milestone && (
+            <div className="flex justify-center">
+              <div className="inline-flex items-center gap-2 rounded-full bg-card/60 px-3 py-1 text-xs text-muted-foreground border border-border/40">
+                <span>Next milestone:</span>
+                <span className="font-medium text-foreground">
+                  {data.next_milestone.remaining} more{' '}
+                  {data.next_milestone.remaining === 1 ? 'course' : 'courses'} to{' '}
+                  {data.next_milestone.tierName}
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* Friends Chasing the Top 100 */}
           {isOwnProfile && friendsSnapshot && friends.length > 0 && (
             <div className="rounded-xl border border-border/60 bg-card/60 p-4">
