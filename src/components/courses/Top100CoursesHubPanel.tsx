@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import CourseCard from './CourseCard';
-import { HudDropdown } from '@/components/hud/HudDropdown';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import { COURSES_PAGE_SIZE } from '@/config/pagination';
 import { FLAGS } from '@/config/flags';
 import {
@@ -60,6 +60,7 @@ const Top100CoursesHubPanel = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
   const [sortOption, setSortOption] = useState<Top100SortOption>('official');
+  const [showSortSheet, setShowSortSheet] = useState(false);
 
   // Fetch user's Top 100 progress
   const { data: progress } = useTop100ProgressForUser(user?.id);
@@ -238,11 +239,16 @@ const Top100CoursesHubPanel = () => {
 
   const currentListLabel = listOptions.find((opt) => opt.value === selectedList)?.label || 'Global Top 100';
 
-  const sortOptions: { label: string; value: Top100SortOption }[] = [
-    { label: 'Official ranking', value: 'official' },
-    { label: 'A–Z', value: 'name_asc' },
-    { label: 'Z–A', value: 'name_desc' },
-  ];
+  const sortLabelMap: Record<Top100SortOption, string> = {
+    official: 'Official ranking',
+    name_asc: 'A–Z',
+    name_desc: 'Z–A',
+  };
+
+  const handleSortSelection = (option: Top100SortOption) => {
+    setSortOption(option);
+    setShowSortSheet(false);
+  };
 
   const handleResetFilters = () => {
     setSelectedList('global');
@@ -473,20 +479,21 @@ const Top100CoursesHubPanel = () => {
         })()}
       </div>
 
-      {/* 6. Context line with sort dropdown */}
+      {/* 6. Context line with sort button */}
       {totalCount > 0 && (
         <div className="flex items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground flex-1">
             Exploring the <span className="font-medium">{currentListLabel}</span>
           </p>
-          <div className="w-auto min-w-[140px]">
-            <HudDropdown
-              value={sortOption}
-              options={sortOptions}
-              onChange={(value) => setSortOption(value as Top100SortOption)}
-              label="Sort"
-            />
-          </div>
+          <Button
+            variant="tertiary"
+            size="tertiary"
+            onClick={() => setShowSortSheet(true)}
+            className="inline-flex items-center gap-1.5 whitespace-nowrap"
+          >
+            <span className="text-muted-foreground">Sort:</span>
+            <span className="text-foreground">{sortLabelMap[sortOption]}</span>
+          </Button>
         </div>
       )}
 
@@ -570,6 +577,34 @@ const Top100CoursesHubPanel = () => {
         </div>
       )}
 
+      {/* Sort Bottom Sheet */}
+      <BottomSheet
+        open={showSortSheet}
+        onClose={() => setShowSortSheet(false)}
+        ariaLabelledBy="sort-options-title"
+      >
+        <div className="px-4 py-3">
+          {(['official', 'name_asc', 'name_desc'] as Top100SortOption[]).map((option, index, arr) => (
+            <React.Fragment key={option}>
+              <button
+                onClick={() => handleSortSelection(option)}
+                className={`
+                  w-full text-left px-4 py-3.5 transition-colors rounded-lg
+                  ${sortOption === option
+                    ? 'bg-slate-100 text-slate-900 font-medium'
+                    : 'text-slate-900 hover:bg-slate-50'
+                  }
+                `}
+              >
+                {sortLabelMap[option]}
+              </button>
+              {index < arr.length - 1 && (
+                <div className="border-t border-slate-200/40 my-0.5" />
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+      </BottomSheet>
     </div>
   );
 };
