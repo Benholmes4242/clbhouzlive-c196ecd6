@@ -179,7 +179,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         },
       });
 
-      // Unclustered points layer - use Top 100 club colors
+      // Unclustered points layer - use brand orange for rated courses
       mapInstance.addLayer({
         id: 'unclustered-point',
         type: 'circle',
@@ -189,17 +189,12 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
           'circle-color': [
             'case',
             ['==', ['get', 'user_has_rated'], true],
-            '#10b981', // rated: emerald (matches green club tier)
-            '#475569', // unrated: medium slate
+            '#F7931E', // rated: brand orange
+            '#0f172a', // unrated: dark slate
           ],
           'circle-radius': 6,
           'circle-stroke-width': 2,
-          'circle-stroke-color': [
-            'case',
-            ['==', ['get', 'user_has_rated'], true],
-            '#6ee7b7', // rated: lighter emerald halo
-            '#cbd5e1', // unrated: light slate ring
-          ],
+          'circle-stroke-color': '#ffffff',
         },
       });
 
@@ -304,35 +299,34 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
 
   return (
     <div className="flex flex-col gap-4 pb-3">
-      {/* Filter Row */}
-      <div className="mt-4 flex items-center justify-between gap-2">
-        <div className="inline-flex gap-2">
-          {(['all', 'rated', 'unrated'] as RatedFilter[]).map((opt) => {
-            const isActive = ratedFilter === opt;
-            const label = opt === 'all' ? 'All' : opt === 'rated' ? 'Rated' : 'Not yet rated';
-
-            return (
-              <button
-                key={opt}
-                type="button"
-                onClick={() => setRatedFilter(opt)}
-                className={cn(
-                  'rounded-xl border px-4 py-1.5 text-xs sm:text-sm font-medium transition-all',
-                  isActive
-                    ? 'bg-slate-100 border-slate-200 text-slate-900 shadow-sm'
-                    : 'bg-white border-border/60 text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-slate-50'
-                )}
-              >
-                {label}
-              </button>
-            );
-          })}
+      {/* Rated filter toggle: All / Rated / Not yet rated */}
+      <div className="mt-4 flex items-center justify-between gap-3">
+        <div className="inline-flex rounded-full bg-slate-100 p-1 shadow-sm">
+          {(['all', 'rated', 'unrated'] as RatedFilter[]).map((opt) => (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => setRatedFilter(opt)}
+              className={cn(
+                'rounded-full px-4 py-1.5 text-sm font-medium transition-colors',
+                ratedFilter === opt
+                  ? 'bg-white text-slate-900 shadow-sm'
+                  : 'bg-transparent text-slate-500 hover:text-slate-700'
+              )}
+            >
+              {opt === 'all'
+                ? 'All'
+                : opt === 'rated'
+                ? 'Rated'
+                : 'Not yet rated'}
+            </button>
+          ))}
         </div>
 
         <button
           type="button"
           onClick={handleResetView}
-          className="text-xs font-medium text-slate-500 hover:text-slate-700"
+          className="text-sm font-medium text-slate-400 hover:text-slate-600 transition-colors"
         >
           Reset view
         </button>
@@ -356,13 +350,13 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
           {/* Legend & Stats Overlays */}
           <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-between items-start p-3 text-xs gap-2">
           {/* Legend */}
-          <div className="pointer-events-auto flex items-center gap-3 !rounded-2xl bg-slate-900/80 px-3 py-1.5 text-white backdrop-blur-md shadow-lg">
+          <div className="pointer-events-auto flex items-center gap-3 !rounded-2xl bg-slate-900/95 px-4 py-1.5 text-white backdrop-blur-md shadow-lg border border-white/10">
             <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-green-500 shadow-sm" />
+              <span className="h-2.5 w-2.5 rounded-full shadow-sm" style={{ backgroundColor: '#F7931E' }} />
               <span className="font-medium">Rated</span>
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full border-2 border-slate-300 bg-slate-900 shadow-sm" />
+              <span className="h-2.5 w-2.5 rounded-full bg-slate-900 border border-white/80 shadow-sm" />
               <span className="font-medium">Not yet rated</span>
             </span>
           </div>
