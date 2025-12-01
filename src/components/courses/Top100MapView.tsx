@@ -8,8 +8,6 @@ import { X, MapPin } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from '@/lib/utils';
 
-export type RatedFilter = 'all' | 'rated' | 'unrated';
-
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v11';
 
@@ -29,18 +27,20 @@ const REGION_CONFIG: Record<Top100MapScope, { center: [number, number]; zoom: nu
   'europe': { center: [10, 50], zoom: 4, label: 'Continental Europe Top 100' },
 };
 
+type RatedFilter = 'all' | 'rated' | 'unrated';
+
 interface Top100MapViewProps {
   scope: Top100MapScope;
-  ratedFilter: RatedFilter;
 }
 
-const Top100MapView: React.FC<Top100MapViewProps> = ({ scope, ratedFilter }) => {
+const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<Top100MapCourse | null>(null);
+  const [ratedFilter, setRatedFilter] = useState<RatedFilter>('all');
   const { data: courses = [], isLoading } = useTop100MapCourses(scope, session?.user?.id);
 
   // Filter courses by rated status
@@ -276,6 +276,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope, ratedFilter }) => 
         duration: 800,
       });
       setSelectedCourse(null);
+      setRatedFilter('all');
     }
   };
 
@@ -296,8 +297,41 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope, ratedFilter }) => 
 
   return (
     <div className="flex flex-col">
+      {/* Rated filter toggle: All / Rated / Not yet rated */}
+      <div className="flex items-center justify-between gap-3 mt-5">
+        <div className="inline-flex rounded-lg bg-muted/70 border border-border/60 p-0.5 shadow-sm">
+          {(['all', 'rated', 'unrated'] as RatedFilter[]).map((opt) => (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => setRatedFilter(opt)}
+              className={cn(
+                'rounded-lg px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors',
+                ratedFilter === opt
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'bg-transparent text-muted-foreground hover:text-foreground'
+              )}
+            >
+              {opt === 'all'
+                ? 'All'
+                : opt === 'rated'
+                ? 'Rated'
+                : 'Not yet rated'}
+            </button>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={handleResetView}
+          className="text-sm font-medium text-slate-400 hover:text-slate-600 transition-colors whitespace-nowrap"
+        >
+          Reset view
+        </button>
+      </div>
+
       {/* Map Container */}
-      <div className="top100-map-shell relative rounded-3xl bg-white shadow-md overflow-hidden">
+      <div className="top100-map-shell relative rounded-3xl bg-white shadow-md overflow-hidden mt-3">
         <div
           id="top100-map-container"
           ref={mapContainer}
