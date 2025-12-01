@@ -306,7 +306,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
     <div className="flex flex-col gap-4 pb-6">
       {/* Filter Row */}
       <div className="mt-4 flex items-center justify-between gap-2">
-        <div className="inline-flex rounded-full bg-slate-100 p-1 shadow-inner">
+        <div className="inline-flex gap-2">
           {(['all', 'rated', 'unrated'] as RatedFilter[]).map((opt) => {
             const isActive = ratedFilter === opt;
             const label = opt === 'all' ? 'All' : opt === 'rated' ? 'Rated' : 'Not yet rated';
@@ -317,10 +317,10 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
                 type="button"
                 onClick={() => setRatedFilter(opt)}
                 className={cn(
-                  'rounded-full px-4 py-1.5 text-xs sm:text-sm font-medium transition-all',
+                  'rounded-xl border px-4 py-1.5 text-xs sm:text-sm font-medium transition-all',
                   isActive
-                    ? 'bg-slate-900 text-white shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-slate-100 border-slate-200 text-slate-900 shadow-sm'
+                    : 'bg-white border-border/60 text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-slate-50'
                 )}
               >
                 {label}

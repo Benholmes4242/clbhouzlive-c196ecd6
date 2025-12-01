@@ -163,14 +163,14 @@ const Top100Hub = () => {
               
               {/* View Mode Toggle */}
               <div className="mt-3 flex justify-center mb-6">
-                <div className="inline-flex rounded-full bg-slate-100 p-1 shadow-inner">
+                <div className="inline-flex gap-2">
                   <button
                     onClick={() => setCoursesViewMode('list')}
                     className={cn(
-                      'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all',
+                      'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl border transition-all',
                       coursesViewMode === 'list'
-                        ? 'bg-slate-900 text-white shadow-sm'
-                        : 'text-slate-500 hover:text-slate-700'
+                        ? 'bg-slate-100 border-slate-200 text-slate-900 shadow-sm'
+                        : 'bg-white border-border/60 text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-slate-50'
                     )}
                   >
                     <List className="h-4 w-4" />
@@ -179,10 +179,10 @@ const Top100Hub = () => {
                   <button
                     onClick={() => setCoursesViewMode('map')}
                     className={cn(
-                      'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all',
+                      'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl border transition-all',
                       coursesViewMode === 'map'
-                        ? 'bg-slate-900 text-white shadow-sm'
-                        : 'text-slate-500 hover:text-slate-700'
+                        ? 'bg-slate-100 border-slate-200 text-slate-900 shadow-sm'
+                        : 'bg-white border-border/60 text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-slate-50'
                     )}
                   >
                     <MapIcon className="h-4 w-4" />
@@ -228,10 +228,10 @@ const Top100Hub = () => {
                             key={slug}
                             onClick={() => setSelectedListSlug(slug)}
                             className={cn(
-                              'inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs sm:text-sm font-medium transition-all',
+                              'inline-flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs sm:text-sm font-medium transition-all',
                               isActive
-                                ? 'bg-slate-900 text-white shadow-sm'
-                                : 'bg-white text-slate-600 shadow-xs hover:text-slate-800'
+                                ? 'bg-slate-100 border-slate-200 text-slate-900 shadow-sm'
+                                : 'bg-white border-border/60 text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-slate-50'
                             )}
                           >
                             {slug === 'global' ? (
