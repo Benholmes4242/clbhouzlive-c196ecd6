@@ -59,11 +59,11 @@ export const Top100AchievementsBlock: React.FC<Top100AchievementsBlockProps> = (
             
             <div className="ml-4 flex-shrink-0">
               {prompt.isUnlocked ? (
-                <span className="px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-medium whitespace-nowrap">
+                <span className="px-3 py-1 rounded-2xl bg-primary/20 text-primary text-xs font-medium whitespace-nowrap">
                   Unlocked
                 </span>
               ) : (
-                <span className="px-3 py-1 rounded-full bg-muted/30 text-muted-foreground text-xs font-medium whitespace-nowrap">
+                <span className="px-3 py-1 rounded-2xl bg-muted/30 text-muted-foreground text-xs font-medium whitespace-nowrap">
                   {prompt.progressLabel}
                 </span>
               )}
