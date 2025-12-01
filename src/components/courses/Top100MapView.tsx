@@ -301,14 +301,14 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
     <div className="flex flex-col gap-4 pb-3">
       {/* Rated filter toggle: All / Rated / Not yet rated */}
       <div className="mt-4 flex items-center justify-between gap-3">
-        <div className="inline-flex flex-1 bg-muted/70 border border-border/60 px-2 py-[3px] rounded-lg">
+        <div className="inline-flex rounded-full bg-muted/70 border border-border/60 p-1 shadow-sm">
           {(['all', 'rated', 'unrated'] as RatedFilter[]).map((opt) => (
             <button
               key={opt}
               type="button"
               onClick={() => setRatedFilter(opt)}
               className={cn(
-                'flex-1 rounded-lg px-3 py-[6px] text-sm font-medium transition-colors',
+                'rounded-full px-4 py-1.5 text-sm font-medium transition-colors',
                 ratedFilter === opt
                   ? 'bg-background text-foreground shadow-sm'
                   : 'bg-transparent text-muted-foreground hover:text-foreground'
