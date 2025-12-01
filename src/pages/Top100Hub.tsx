@@ -129,7 +129,7 @@ const Top100Hub = () => {
                 const totalRated = progress.total_top100_rated ?? progress.total_played_top100 ?? 0;
                 const ringDotClass = getTop100RingDotClass(progress.club_ring ?? 'none');
                 return (
-                   <div className="mt-2 flex justify-center">
+                   <div className="mt-3 flex justify-center">
                     <button
                       onClick={() => setActiveTab('my-progress')}
                       className="inline-flex items-center gap-2 !rounded-2xl bg-white px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-700 shadow-sm hover:shadow-md transition-shadow border border-slate-200"
@@ -215,7 +215,7 @@ const Top100Hub = () => {
                 /* Map View */
                 <div className="space-y-0">
                   {/* Region Selector */}
-                  <div className="mt-4 flex justify-center">
+                  <div className="mt-3 flex justify-center">
                     <div className="flex gap-2">
                       {(['global', 'gb-i', 'usa', 'europe'] as Top100MapScope[]).map((slug) => {
                         const isActive = selectedListSlug === slug;
