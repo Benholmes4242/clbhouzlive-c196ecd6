@@ -264,56 +264,71 @@ const Top100CoursesHubPanel = () => {
           </p>
         </div>
 
-        {/* Big stat row */}
-        <div className="mt-4">
-          {user ? (
-            <>
-              {/* Combined pill with trophy, text, and club badge */}
-              <div className="inline-flex items-center gap-2 rounded-2xl border border-border/60 bg-card/80 backdrop-blur-sm px-3 py-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-                <Trophy className="h-4 w-4 text-foreground" />
-                <span className="font-semibold text-foreground text-[14px]">
-                  You&apos;ve rated {totalRated} course{totalRated === 1 ? '' : 's'} across {listsCount} Top 100 list{listsCount === 1 ? '' : 's'}
-                </span>
-                {club && (
-                  <>
-                    <span className="mx-1 text-slate-500">·</span>
-                    <span className="inline-flex items-center gap-1">
-                      <span
-                        className={cn(
-                          'h-2 w-2 rounded-full border border-slate-950/20',
-                          ringDotClass
-                        )}
-                      />
-                      <span className="font-medium text-foreground text-[14px]">{club.label}</span>
-                    </span>
-                  </>
-                )}
-              </div>
+        {user ? (
+          <div className="space-y-6 mt-5">
+            {/* 1. Progress summary + bar */}
+            <section className="space-y-2">
+              <p className="text-sm text-slate-700">
+                You&apos;ve rated {totalRated} course{totalRated === 1 ? '' : 's'} across {listsCount} Top 100 list{listsCount === 1 ? '' : 's'}
+              </p>
 
-              {/* Progress bar */}
-              <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-slate-100">
-                <div
-                  className="h-full rounded-full bg-brand-orange transition-[width] duration-500"
-                  style={{ width: `${Math.min(100, (totalRated / 100) * 100)}%` }}
-                />
+              <p className="text-xs text-slate-500">
+                {totalRated} / {listsCount * 100} courses
+              </p>
+
+              <div className="mt-4">
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+                  <div
+                    className="h-full rounded-full bg-amber-500 transition-all"
+                    style={{ width: `${listsCount > 0 ? Math.min(100, (totalRated / (listsCount * 100)) * 100) : 0}%` }}
+                  />
+                </div>
               </div>
-            </>
-          ) : (
-            <p className="text-[14px] text-muted-foreground">
+            </section>
+
+            {/* 2. Hero achievement badge row */}
+            {club && totalRated >= 20 && (
+              <section className="flex justify-center">
+                <div className="inline-flex items-center gap-3 rounded-full bg-slate-900 px-5 py-2 shadow-md">
+                  <span className="text-lg">🏆</span>
+                  <div className="text-left">
+                    <p className="text-xs uppercase tracking-wide text-slate-300">
+                      Achievement unlocked
+                    </p>
+                    <p className="text-sm font-semibold text-slate-50">
+                      {club.label} – Top 100 Explorer
+                    </p>
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {/* 3. CTA */}
+            <section>
+              <Button
+                variant="primary"
+                onClick={handleOpenTop100Journey}
+                className="w-full justify-center rounded-full py-2.5 text-sm font-semibold"
+              >
+                Open your Top 100 Journey →
+              </Button>
+            </section>
+          </div>
+        ) : (
+          <>
+            <p className="text-[14px] text-muted-foreground mt-4">
               Sign in to track your progress and see where you rank on the global leaderboard.
             </p>
-          )}
-        </div>
-
-        {/* CTA */}
-        <Button
-          variant="primary"
-          onClick={handleOpenTop100Journey}
-          className="mt-4 w-full active:scale-[0.98] transition-transform duration-150"
-        >
-          {user ? 'Open your Top 100 Journey' : 'Sign in to join the Top 100 Club'}
-          <span className="text-[16px]">↗</span>
-        </Button>
+            <Button
+              variant="primary"
+              onClick={handleOpenTop100Journey}
+              className="mt-4 w-full active:scale-[0.98] transition-transform duration-150"
+            >
+              Sign in to join the Top 100 Club
+              <span className="text-[16px]">↗</span>
+            </Button>
+          </>
+        )}
       </section>
 
       {/* Friends on the Top 100 journey - horizontal avatar strip */}
@@ -337,9 +352,12 @@ const Top100CoursesHubPanel = () => {
               None of your friends have started the Top 100 yet.
             </p>
           ) : (
-            <div className="flex gap-8 overflow-x-auto">
+            <div className="flex gap-6 overflow-x-auto pb-2">
               {friends.slice(0, 10).map((f) => {
                 const displayName = f.profile.display_name || f.profile.username || '?';
+                const nameParts = displayName.split(' ');
+                const firstName = nameParts[0] || displayName;
+                const lastName = nameParts.slice(1).join(' ') || '';
                 const initial = displayName.slice(0, 1).toUpperCase();
                 
                 return (
@@ -347,30 +365,38 @@ const Top100CoursesHubPanel = () => {
                     key={f.user_id}
                     type="button"
                     onClick={() => navigate(`/profile/${f.profile.username}?tab=top100`)}
-                    className="flex flex-col items-center gap-2 flex-shrink-0"
+                    className="flex w-24 flex-col items-center gap-2 flex-shrink-0"
                   >
                     {f.profile.profile_photo_url ? (
                       <SquircleImage
                         src={f.profile.profile_photo_url}
                         alt={displayName}
-                        size={48}
+                        size={56}
                         ringWidth={1.5}
                         ringColor="rgba(203, 213, 225, 0.4)"
                         className="flex-shrink-0"
                       />
                     ) : (
-                      <div className="h-12 w-12 flex items-center justify-center bg-muted text-muted-foreground text-[14px] font-semibold rounded-[22%] ring-1 ring-border/30">
+                      <div className="h-14 w-14 flex items-center justify-center bg-muted text-muted-foreground text-[15px] font-semibold rounded-[22%] ring-1 ring-border/30">
                         {initial}
                       </div>
                     )}
-                    <span className="max-w-[96px] truncate text-[15px] font-semibold text-foreground">
-                      {displayName}
-                    </span>
-                    {typeof f.top100CoursesPlayed === 'number' && (
-                      <span className="text-[13px] text-muted-foreground font-medium">
-                        {f.top100CoursesPlayed} course{f.top100CoursesPlayed === 1 ? '' : 's'}
-                      </span>
-                    )}
+                    <div className="flex flex-col items-center">
+                      <p className="text-xs font-medium text-slate-900 leading-tight text-center whitespace-normal max-w-[80px] break-words">
+                        {firstName}
+                        {lastName && (
+                          <>
+                            <br />
+                            {lastName}
+                          </>
+                        )}
+                      </p>
+                      {typeof f.top100CoursesPlayed === 'number' && (
+                        <p className="mt-1 text-[11px] text-slate-500">
+                          {f.top100CoursesPlayed} course{f.top100CoursesPlayed === 1 ? '' : 's'}
+                        </p>
+                      )}
+                    </div>
                   </button>
                 );
               })}

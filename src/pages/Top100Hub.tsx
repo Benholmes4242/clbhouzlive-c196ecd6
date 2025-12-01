@@ -214,12 +214,11 @@ const Top100Hub = () => {
               ) : (
                 /* Map View */
                 <div className="space-y-0">
-                  {/* Region Selector */}
-                  <div className="mt-3 flex justify-center">
-                    <div className="flex gap-2">
+                  {/* Region Selector - Segmented Control Style */}
+                  <div className="mt-4 flex justify-center">
+                    <div className="inline-flex rounded-full bg-slate-100 px-1.5 py-1 gap-1">
                       {(['global', 'gb-i', 'usa', 'europe'] as Top100MapScope[]).map((slug) => {
                         const isActive = selectedListSlug === slug;
-                        const list = lists?.find(l => l.slug === slug);
                         
                         const label = slug === 'global' ? 'Global' 
                           : slug === 'gb-i' ? 'GB&I'
@@ -231,22 +230,13 @@ const Top100Hub = () => {
                             key={slug}
                             onClick={() => setSelectedListSlug(slug)}
                             className={cn(
-                              'inline-flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs sm:text-sm font-medium transition-all',
+                              'px-4 py-2 text-xs font-medium rounded-full transition',
                               isActive
-                                ? 'bg-slate-100 border-slate-200 text-slate-900 shadow-sm'
-                                : 'bg-white border-border/60 text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-slate-50'
+                                ? 'bg-white shadow-sm text-slate-900'
+                                : 'text-slate-500'
                             )}
                           >
-                            {slug === 'global' ? (
-                              <Globe className="h-4 w-4" />
-                            ) : slug === 'gb-i' ? (
-                              <CountryFlag country="Britain & Ireland" size="sm" />
-                            ) : slug === 'usa' ? (
-                              <CountryFlag country="USA" size="sm" />
-                            ) : (
-                              <CountryFlag country="Continental Europe" size="sm" />
-                            )}
-                            <span>{label}</span>
+                            {label}
                           </button>
                         );
                       })}
