@@ -15,6 +15,7 @@ import { Top100MapScope } from '@/hooks/useTop100MapCourses';
 import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
 import Top100BackButton from '@/components/top100/Top100BackButton';
 import { getTop100RingDotClass } from '@/lib/top100RingStyles';
+import { Top100ProgressSummary } from '@/components/top100/Top100ProgressSummary';
 import { cn } from '@/lib/utils';
 
 const Top100Hub = () => {
@@ -124,39 +125,19 @@ const Top100Hub = () => {
             </TabsList>
 
             <TabsContent value="courses" className="mt-0">
-              {/* Progress Chip */}
-              {session && progress && (progress.total_top100_rated ?? progress.total_played_top100 ?? 0) > 0 && (() => {
+              {/* Progress Summary */}
+              {session && progress && (() => {
                 const totalRated = progress.total_top100_rated ?? progress.total_played_top100 ?? 0;
-                const ringDotClass = getTop100RingDotClass(progress.club_ring ?? 'none');
+                const listsCount = listSummaries?.filter(list => list.played_count > 0).length || 0;
+                
+                if (totalRated === 0) return null;
+                
                 return (
-                   <div className="mt-3 flex justify-center">
-                    <button
-                      onClick={() => setActiveTab('my-progress')}
-                      className="inline-flex items-center gap-2 !rounded-2xl bg-white px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-700 shadow-sm hover:shadow-md transition-shadow border border-slate-200"
-                    >
-                      <span className="inline-flex h-4 w-4 items-center justify-center">
-                        <Trophy className="h-4 w-4" aria-hidden="true" />
-                      </span>
-                      <span>
-                        You've rated{" "}
-                        <span className="font-semibold">{totalRated}</span>{" "}
-                        Top 100 course{totalRated === 1 ? '' : 's'}
-                      </span>
-                      {progress.club_ring && progress.club_ring !== 'none' && progress.club_label && (
-                        <>
-                          <span className="mx-1 text-slate-500">·</span>
-                          <span className="inline-flex items-center gap-1">
-                            <span
-                              className={cn(
-                                'h-2 w-2 rounded-full border border-slate-950/20',
-                                ringDotClass
-                              )}
-                            />
-                            <span>{progress.club_label}</span>
-                          </span>
-                        </>
-                      )}
-                    </button>
+                  <div className="mt-4">
+                    <Top100ProgressSummary
+                      ratedCount={totalRated}
+                      listCount={listsCount}
+                    />
                   </div>
                 );
               })()}
@@ -214,9 +195,9 @@ const Top100Hub = () => {
               ) : (
                 /* Map View */
                 <div className="space-y-0">
-                  {/* Region Selector - Segmented Control Style */}
+                  {/* Region Selector - Independent Pills */}
                   <div className="mt-4 flex justify-center">
-                    <div className="inline-flex rounded-full bg-slate-100 px-1.5 py-1 gap-1">
+                    <div className="flex gap-3">
                       {(['global', 'gb-i', 'usa', 'europe'] as Top100MapScope[]).map((slug) => {
                         const isActive = selectedListSlug === slug;
                         
@@ -230,10 +211,10 @@ const Top100Hub = () => {
                             key={slug}
                             onClick={() => setSelectedListSlug(slug)}
                             className={cn(
-                              'px-4 py-2 text-xs font-medium rounded-full transition',
+                              'px-4 py-2 rounded-full text-xs font-medium transition',
                               isActive
-                                ? 'bg-white shadow-sm text-slate-900'
-                                : 'text-slate-500'
+                                ? 'bg-slate-900 text-white shadow-sm'
+                                : 'bg-slate-100 text-slate-600'
                             )}
                           >
                             {label}

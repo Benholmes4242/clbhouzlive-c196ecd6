@@ -288,14 +288,17 @@ const Top100CoursesHubPanel = () => {
 
             {/* 2. Hero achievement badge row */}
             {club && totalRated >= 20 && (
-              <section className="flex justify-center">
-                <div className="inline-flex items-center gap-3 rounded-full bg-slate-900 px-5 py-2 shadow-md">
-                  <span className="text-lg">🏆</span>
+              <section className="flex justify-center mt-6">
+                <div className="inline-flex items-center gap-4 rounded-full bg-white px-6 py-4 shadow-md border border-sky-500">
+                  {/* Circular blue-ring icon */}
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-sky-500 bg-white">
+                    <Trophy className="h-4 w-4 text-sky-500" />
+                  </div>
                   <div className="text-left">
-                    <p className="text-xs uppercase tracking-wide text-slate-300">
+                    <p className="text-[11px] uppercase tracking-wide text-slate-500">
                       Achievement unlocked
                     </p>
-                    <p className="text-sm font-semibold text-slate-50">
+                    <p className="text-sm font-semibold text-slate-900">
                       {club.label} – Top 100 Explorer
                     </p>
                   </div>
