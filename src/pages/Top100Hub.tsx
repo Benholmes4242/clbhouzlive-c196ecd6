@@ -163,26 +163,29 @@ const Top100Hub = () => {
               
               {/* View Mode Toggle */}
               <div className="mt-3 flex justify-center mb-6">
-                <div className="inline-flex gap-2">
+                <div className="inline-flex rounded-full bg-slate-100 p-1 shadow-sm">
                   <button
+                    type="button"
                     onClick={() => setCoursesViewMode('list')}
                     className={cn(
-                      'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl border transition-all',
+                      'inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-colors',
                       coursesViewMode === 'list'
-                        ? 'bg-slate-100 border-slate-200 text-slate-900 shadow-sm'
-                        : 'bg-white border-border/60 text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-slate-50'
+                        ? 'bg-white text-slate-900 shadow-sm'
+                        : 'bg-transparent text-slate-500 hover:text-slate-700'
                     )}
                   >
                     <List className="h-4 w-4" />
                     List
                   </button>
+
                   <button
+                    type="button"
                     onClick={() => setCoursesViewMode('map')}
                     className={cn(
-                      'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl border transition-all',
+                      'inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-colors',
                       coursesViewMode === 'map'
-                        ? 'bg-slate-100 border-slate-200 text-slate-900 shadow-sm'
-                        : 'bg-white border-border/60 text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-slate-50'
+                        ? 'bg-slate-800 text-white shadow-sm'
+                        : 'bg-transparent text-slate-500 hover:text-slate-700'
                     )}
                   >
                     <MapIcon className="h-4 w-4" />
