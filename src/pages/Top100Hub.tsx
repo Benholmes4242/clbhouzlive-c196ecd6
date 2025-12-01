@@ -82,7 +82,7 @@ const Top100Hub = () => {
     <div className="min-h-screen bg-background">
       <ClubhouseHeaderNew />
 
-      <main className="px-4 md:container md:mx-auto md:px-0 pb-20">
+      <main className="px-4 md:container md:mx-auto md:px-0 pb-3">
         <div className="max-w-6xl mx-auto">
           {/* Back Button */}
           <div className="px-4 pt-4 pb-5">
@@ -213,7 +213,7 @@ const Top100Hub = () => {
                 </div>
               ) : (
                 /* Map View */
-                <div className="space-y-4">
+                <div className="space-y-0">
                   {/* Region Selector */}
                   <div className="mt-4 flex justify-center">
                     <div className="flex gap-2">

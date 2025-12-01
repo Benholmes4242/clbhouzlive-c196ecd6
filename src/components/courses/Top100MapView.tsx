@@ -296,9 +296,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
   }
 
   return (
-    <div className="flex flex-col gap-4 pb-0">
+    <div className="flex flex-col">
       {/* Rated filter toggle: All / Rated / Not yet rated */}
-      <div className="mt-4 flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-3">
         <div className="inline-flex rounded-lg bg-muted/70 border border-border/60 p-0.5 shadow-sm">
           {(['all', 'rated', 'unrated'] as RatedFilter[]).map((opt) => (
             <button
@@ -331,7 +331,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
       </div>
 
       {/* Map Container */}
-      <div className="relative h-[calc(100vh-260px)] min-h-[480px] rounded-3xl overflow-hidden shadow-md">
+      <div className="relative h-[calc(100vh-220px)] min-h-[480px] rounded-3xl overflow-hidden shadow-md">
           {/* Loading skeleton */}
           {isLoading && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
