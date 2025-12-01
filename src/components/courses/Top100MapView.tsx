@@ -21,7 +21,7 @@ const REGION_TOTALS: Record<Top100MapScope, number> = {
 
 // Region center and zoom configurations
 const REGION_CONFIG: Record<Top100MapScope, { center: [number, number]; zoom: number; label: string }> = {
-  'global': { center: [20, 30], zoom: 2, label: 'Global Top 100' },
+  'global': { center: [-30, 40], zoom: 2, label: 'Global Top 100' },
   'gb-i': { center: [-3, 54], zoom: 5, label: 'Britain & Ireland Top 100' },
   'usa': { center: [-98, 39], zoom: 3.5, label: 'USA Top 100' },
   'europe': { center: [10, 50], zoom: 4, label: 'Continental Europe Top 100' },
