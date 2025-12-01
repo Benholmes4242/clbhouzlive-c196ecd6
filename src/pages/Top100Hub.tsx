@@ -163,12 +163,12 @@ const Top100Hub = () => {
               
               {/* View Mode Toggle */}
               <div className="mt-3 flex justify-center mb-6">
-                <div className="inline-flex rounded-lg bg-muted/70 border border-border/60 p-1 shadow-sm">
+                <div className="inline-flex rounded-lg bg-muted/70 border border-border/60 p-0.5 shadow-sm">
                   <button
                     type="button"
                     onClick={() => setCoursesViewMode('list')}
                     className={cn(
-                      'inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
+                      'inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors',
                       coursesViewMode === 'list'
                         ? 'bg-background text-foreground shadow-sm'
                         : 'bg-transparent text-muted-foreground hover:text-foreground'
@@ -182,7 +182,7 @@ const Top100Hub = () => {
                     type="button"
                     onClick={() => setCoursesViewMode('map')}
                     className={cn(
-                      'inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
+                      'inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors',
                       coursesViewMode === 'map'
                         ? 'bg-background text-foreground shadow-sm'
                         : 'bg-transparent text-muted-foreground hover:text-foreground'
