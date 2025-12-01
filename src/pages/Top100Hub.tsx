@@ -10,7 +10,7 @@ import CountryFlag from '@/components/ui/country-flag';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import Top100LeaderboardPanel from '@/components/courses/Top100LeaderboardPanel';
-import Top100MapView from '@/components/courses/Top100MapView';
+import Top100MapView, { RatedFilter } from '@/components/courses/Top100MapView';
 import { Top100MapScope } from '@/hooks/useTop100MapCourses';
 import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
 import Top100BackButton from '@/components/top100/Top100BackButton';
@@ -43,6 +43,18 @@ const Top100Hub = () => {
   );
   
   const [selectedListSlug, setSelectedListSlug] = useState<Top100MapScope>('global');
+  
+  // Map filter state
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [mapRatedFilter, setMapRatedFilter] = useState<RatedFilter>('all');
+  
+  // Count applied filters
+  const appliedFiltersCount = React.useMemo(() => {
+    let count = 0;
+    if (selectedListSlug !== 'global') count++;
+    if (mapRatedFilter !== 'all') count++;
+    return count;
+  }, [selectedListSlug, mapRatedFilter]);
 
   // Guard against invalid data
   if (!lists && !listsLoading) {
@@ -124,8 +136,8 @@ const Top100Hub = () => {
             </TabsList>
 
             <TabsContent value="courses" className="mt-0">
-              {/* Progress Chip */}
-              {session && progress && (progress.total_top100_rated ?? progress.total_played_top100 ?? 0) > 0 && (() => {
+              {/* Progress Chip - only show in list mode */}
+              {coursesViewMode === 'list' && session && progress && (progress.total_top100_rated ?? progress.total_played_top100 ?? 0) > 0 && (() => {
                 const totalRated = progress.total_top100_rated ?? progress.total_played_top100 ?? 0;
                 const ringDotClass = getTop100RingDotClass(progress.club_ring ?? 'none');
                 return (
@@ -161,38 +173,30 @@ const Top100Hub = () => {
                 );
               })()}
               
-              {/* View Mode Toggle */}
-              <div className="mt-3 flex justify-center mb-6">
-                <div className="inline-flex rounded-lg bg-muted/70 border border-border/60 p-0.5 shadow-sm">
-                  <button
-                    type="button"
-                    onClick={() => setCoursesViewMode('list')}
-                    className={cn(
-                      'inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors',
-                      coursesViewMode === 'list'
-                        ? 'bg-background text-foreground shadow-sm'
-                        : 'bg-transparent text-muted-foreground hover:text-foreground'
-                    )}
-                  >
-                    <List className="h-4 w-4" />
-                    List
-                  </button>
+              {/* View Mode Toggle - only show in list mode */}
+              {coursesViewMode === 'list' && (
+                <div className="mt-3 flex justify-center mb-6">
+                  <div className="inline-flex rounded-lg bg-muted/70 border border-border/60 p-0.5 shadow-sm">
+                    <button
+                      type="button"
+                      onClick={() => setCoursesViewMode('list')}
+                      className="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors bg-background text-foreground shadow-sm"
+                    >
+                      <List className="h-4 w-4" />
+                      List
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={() => setCoursesViewMode('map')}
-                    className={cn(
-                      'inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors',
-                      coursesViewMode === 'map'
-                        ? 'bg-background text-foreground shadow-sm'
-                        : 'bg-transparent text-muted-foreground hover:text-foreground'
-                    )}
-                  >
-                    <MapIcon className="h-4 w-4" />
-                    Map
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => setCoursesViewMode('map')}
+                      className="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors bg-transparent text-muted-foreground hover:text-foreground"
+                    >
+                      <MapIcon className="h-4 w-4" />
+                      Map
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {coursesViewMode === 'list' ? (
                 /* Region Cards */
@@ -214,46 +218,157 @@ const Top100Hub = () => {
               ) : (
                 /* Map View */
                 <div className="space-y-0">
-                  {/* Region Selector */}
-                  <div className="mt-3 flex justify-center">
-                    <div className="flex gap-2">
-                      {(['global', 'gb-i', 'usa', 'europe'] as Top100MapScope[]).map((slug) => {
-                        const isActive = selectedListSlug === slug;
-                        const list = lists?.find(l => l.slug === slug);
-                        
-                        const label = slug === 'global' ? 'Global' 
-                          : slug === 'gb-i' ? 'GB&I'
-                          : slug === 'usa' ? 'USA'
-                          : 'Europe';
-
-                        return (
-                          <button
-                            key={slug}
-                            onClick={() => setSelectedListSlug(slug)}
-                            className={cn(
-                              'inline-flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs sm:text-sm font-medium transition-all',
-                              isActive
-                                ? 'bg-slate-100 border-slate-200 text-slate-900 shadow-sm'
-                                : 'bg-white border-border/60 text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-slate-50'
-                            )}
-                          >
-                            {slug === 'global' ? (
-                              <Globe className="h-4 w-4" />
-                            ) : slug === 'gb-i' ? (
-                              <CountryFlag country="Britain & Ireland" size="sm" />
-                            ) : slug === 'usa' ? (
-                              <CountryFlag country="USA" size="sm" />
-                            ) : (
-                              <CountryFlag country="Continental Europe" size="sm" />
-                            )}
-                            <span>{label}</span>
-                          </button>
-                        );
-                      })}
+                  {/* Hero Summary */}
+                  <div className="px-4 pt-2 pb-2">
+                    <p className="text-sm font-medium text-slate-900">
+                      You've rated <span className="font-semibold">{progress?.total_top100_rated ?? progress?.total_played_top100 ?? 0}</span> of the World's Top 100
+                    </p>
+                    <div className="mt-1 flex items-center gap-2 text-xs text-slate-600">
+                      {progress?.club_label && <span>{progress.club_label}</span>}
+                      {progress?.club_label && <span className="h-1 w-1 rounded-full bg-slate-400" />}
+                      <button
+                        type="button"
+                        className="underline underline-offset-2 hover:text-slate-900 transition-colors"
+                        onClick={() => setCoursesViewMode('list')}
+                      >
+                        View List
+                      </button>
                     </div>
                   </div>
 
-                  <Top100MapView scope={selectedListSlug} />
+                  {/* Collapsed Filters Bar */}
+                  <button
+                    type="button"
+                    onClick={() => setIsFiltersOpen((open) => !open)}
+                    className="mx-4 mb-2 flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm active:scale-[0.99] transition"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-xs text-white">
+                        ☰
+                      </span>
+                      <span className="text-sm font-semibold text-slate-900">Filters</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-slate-500">
+                      {appliedFiltersCount > 0 && (
+                        <span>{appliedFiltersCount} applied</span>
+                      )}
+                      <span className={cn('transition-transform', isFiltersOpen && 'rotate-180')}>
+                        ▾
+                      </span>
+                    </div>
+                  </button>
+
+                  {/* Expanded Filters Drawer */}
+                  {isFiltersOpen && (
+                    <div className="mx-4 mb-3 rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm">
+                      <p className="text-sm font-semibold text-slate-900 mb-3">Filters</p>
+
+                      {/* Region group */}
+                      <div className="mb-4">
+                        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          Region
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {(['global', 'gb-i', 'usa', 'europe'] as Top100MapScope[]).map((slug) => {
+                            const selected = selectedListSlug === slug;
+                            const label = slug === 'global' ? 'Global' 
+                              : slug === 'gb-i' ? 'GB&I'
+                              : slug === 'usa' ? 'USA'
+                              : 'Europe';
+                            
+                            return (
+                              <button
+                                key={slug}
+                                type="button"
+                                onClick={() => setSelectedListSlug(slug)}
+                                className={cn(
+                                  'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition',
+                                  selected
+                                    ? 'border-slate-900 bg-slate-900 text-white'
+                                    : 'border-slate-200 bg-slate-50 text-slate-700'
+                                )}
+                              >
+                                {slug === 'global' ? (
+                                  <Globe className="h-3.5 w-3.5" />
+                                ) : slug === 'gb-i' ? (
+                                  <CountryFlag country="Britain & Ireland" size="sm" />
+                                ) : slug === 'usa' ? (
+                                  <CountryFlag country="USA" size="sm" />
+                                ) : (
+                                  <CountryFlag country="Continental Europe" size="sm" />
+                                )}
+                                <span>{label}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Rating status group */}
+                      <div className="mb-4">
+                        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          Rating Status
+                        </p>
+                        <div className="inline-flex rounded-full bg-slate-100 p-1">
+                          {[
+                            { key: 'all' as RatedFilter, label: 'All' },
+                            { key: 'rated' as RatedFilter, label: 'Rated' },
+                            { key: 'unrated' as RatedFilter, label: 'Not Yet Rated' },
+                          ].map((option) => {
+                            const selected = mapRatedFilter === option.key;
+                            return (
+                              <button
+                                key={option.key}
+                                type="button"
+                                onClick={() => setMapRatedFilter(option.key)}
+                                className={cn(
+                                  'px-3 py-1 text-xs font-medium rounded-full transition',
+                                  selected
+                                    ? 'bg-white text-slate-900 shadow-sm'
+                                    : 'text-slate-600'
+                                )}
+                              >
+                                {option.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Bottom row: Reset + Map/List toggle */}
+                      <div className="flex items-center justify-between">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedListSlug('global');
+                            setMapRatedFilter('all');
+                          }}
+                          className="text-xs font-medium text-slate-500 underline underline-offset-2 hover:text-slate-700 transition-colors"
+                        >
+                          Reset
+                        </button>
+
+                        <div className="inline-flex rounded-full bg-slate-100 p-1 text-xs font-medium">
+                          <button
+                            type="button"
+                            onClick={() => setCoursesViewMode('list')}
+                            className="px-3 py-1 rounded-full transition bg-white text-slate-900 shadow-sm"
+                          >
+                            List
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setCoursesViewMode('map')}
+                            className="px-3 py-1 rounded-full transition text-slate-600"
+                          >
+                            Map
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <Top100MapView scope={selectedListSlug} ratedFilter={mapRatedFilter} />
                 </div>
               )}
             </TabsContent>
