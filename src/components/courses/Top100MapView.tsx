@@ -316,7 +316,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
                 ? 'All'
                 : opt === 'rated'
                 ? 'Played'
-                : 'Not played'}
+                : 'Not Played'}
             </button>
           ))}
         </div>
@@ -358,7 +358,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
             </span>
             <span className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-full bg-slate-900 shadow-sm" />
-              <span className="font-medium">Not played</span>
+              <span className="font-medium">Not Played</span>
             </span>
           </div>
 
@@ -419,7 +419,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
                     </span>
                   ) : (
                     <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-600">
-                      Not played yet
+                      Not Played yet
                     </span>
                   )}
                 </div>
