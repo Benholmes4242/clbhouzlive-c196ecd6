@@ -122,7 +122,7 @@ const Top100Hub = () => {
                   <div className="mt-2 flex justify-center">
                     <button
                       onClick={() => setActiveTab('my-progress')}
-                      className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm hover:shadow-md transition-shadow"
+                      className="inline-flex items-center gap-2 rounded-2xl bg-white px-3 py-2 text-xs font-medium text-slate-700 shadow-sm hover:shadow-md transition-shadow"
                     >
                       <span className="inline-flex h-4 w-4 items-center justify-center">
                         <Trophy className="h-4 w-4" aria-hidden="true" />
@@ -145,10 +145,10 @@ const Top100Hub = () => {
               
               {/* View Mode Toggle */}
               <div className="mt-3 flex justify-center mb-6">
-                <div className="inline-flex rounded-full border border-slate-200 bg-white p-1 shadow-sm">
+                <div className="inline-flex rounded-2xl border border-slate-200 bg-white p-0.5 shadow-sm">
                   <button
                     onClick={() => setCoursesViewMode('list')}
-                    className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                    className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all ${
                       coursesViewMode === 'list'
                         ? 'bg-slate-100 text-foreground shadow-sm'
                         : 'text-muted-foreground hover:text-foreground'
@@ -159,7 +159,7 @@ const Top100Hub = () => {
                   </button>
                   <button
                     onClick={() => setCoursesViewMode('map')}
-                    className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                    className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all ${
                       coursesViewMode === 'map'
                         ? 'bg-slate-100 text-foreground shadow-sm'
                         : 'text-muted-foreground hover:text-foreground'
