@@ -163,15 +163,15 @@ const Top100Hub = () => {
               
               {/* View Mode Toggle */}
               <div className="mt-3 flex justify-center mb-6">
-                <div className="inline-flex rounded-full bg-slate-100 p-1 shadow-sm">
+                <div className="inline-flex w-full max-w-xs bg-muted/70 border border-border/60 px-2 py-[3px] rounded-lg">
                   <button
                     type="button"
                     onClick={() => setCoursesViewMode('list')}
                     className={cn(
-                      'inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-colors',
+                      'flex-1 inline-flex items-center justify-center gap-2 rounded-lg px-3 py-[6px] text-sm font-medium transition-colors',
                       coursesViewMode === 'list'
-                        ? 'bg-white text-slate-900 shadow-sm'
-                        : 'bg-transparent text-slate-500 hover:text-slate-700'
+                        ? 'bg-background text-foreground shadow-sm'
+                        : 'bg-transparent text-muted-foreground hover:text-foreground'
                     )}
                   >
                     <List className="h-4 w-4" />
@@ -182,10 +182,10 @@ const Top100Hub = () => {
                     type="button"
                     onClick={() => setCoursesViewMode('map')}
                     className={cn(
-                      'inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-colors',
+                      'flex-1 inline-flex items-center justify-center gap-2 rounded-lg px-3 py-[6px] text-sm font-medium transition-colors',
                       coursesViewMode === 'map'
-                        ? 'bg-slate-800 text-white shadow-sm'
-                        : 'bg-transparent text-slate-500 hover:text-slate-700'
+                        ? 'bg-background text-foreground shadow-sm'
+                        : 'bg-transparent text-muted-foreground hover:text-foreground'
                     )}
                   >
                     <MapIcon className="h-4 w-4" />
