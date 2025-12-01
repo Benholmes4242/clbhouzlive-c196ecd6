@@ -283,7 +283,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
   // Error state
   if (!MAPBOX_TOKEN) {
     return (
-      <div className="flex items-center justify-center h-[420px] rounded-3xl border border-slate-200 bg-white shadow-md">
+      <div className="flex items-center justify-center h-[360px] rounded-3xl border border-slate-200 bg-white shadow-md">
         <div className="text-center space-y-2 px-4">
           <MapPin className="h-12 w-12 mx-auto text-slate-400" />
           <h3 className="text-lg font-semibold text-slate-900">Map Temporarily Unavailable</h3>
@@ -335,7 +335,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         <div
           id="top100-map-container"
           ref={mapContainer}
-          className="h-[360px]"
+          className="h-[320px]"
         />
 
         {/* Loading skeleton */}
