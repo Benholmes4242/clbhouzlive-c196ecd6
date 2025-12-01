@@ -19,7 +19,7 @@ import {
   regionKeyToDbValue,
   subregionKeyToLabel,
 } from '@/constants/courseRegions';
-import { BottomSheet } from '@/components/ui/BottomSheet';
+import { HudDropdown } from '@/components/hud/HudDropdown';
 import { COURSES_PAGE_SIZE } from '@/config/pagination';
 
 type SortOption = 'popular' | 'rating_desc' | 'rating_asc' | 'name_asc' | 'name_desc';
@@ -88,7 +88,6 @@ const CourseExplorer = () => {
   });
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
   const [sortOption, setSortOption] = useState<SortOption>('popular');
-  const [showSortSheet, setShowSortSheet] = useState(false);
 
   // Save filters to sessionStorage whenever they change (only after URL initialization)
   useEffect(() => {
@@ -320,18 +319,13 @@ const CourseExplorer = () => {
     sessionStorage.setItem('explore-scroll', window.scrollY.toString());
   };
 
-  const sortLabelMap: Record<SortOption, string> = {
-    popular: 'Most popular',
-    rating_desc: 'Highest rated',
-    rating_asc: 'Lowest rated',
-    name_asc: 'A–Z',
-    name_desc: 'Z–A',
-  };
-
-  const handleSortSelection = (option: SortOption) => {
-    setSortOption(option);
-    setShowSortSheet(false);
-  };
+  const sortOptions: { label: string; value: SortOption }[] = [
+    { label: 'Most popular', value: 'popular' },
+    { label: 'Highest rated', value: 'rating_desc' },
+    { label: 'Lowest rated', value: 'rating_asc' },
+    { label: 'A–Z', value: 'name_asc' },
+    { label: 'Z–A', value: 'name_desc' },
+  ];
 
   return (
     <div className="w-full space-y-4">
@@ -436,7 +430,7 @@ const CourseExplorer = () => {
         {/* Scroll target for pagination */}
         <div ref={listTopRef} className="h-0" />
         
-        {/* Context line with sort button */}
+        {/* Context line with sort dropdown */}
         {totalCount > 0 && (
           <div className="flex items-center justify-between gap-3">
             <p className="text-xs text-muted-foreground flex-1">
@@ -457,15 +451,14 @@ const CourseExplorer = () => {
                 </>
               )}
             </p>
-            <Button
-              variant="tertiary"
-              size="tertiary"
-              onClick={() => setShowSortSheet(true)}
-              className="inline-flex items-center gap-1.5 whitespace-nowrap"
-            >
-              <span className="text-muted-foreground">Sort:</span>
-              <span className="text-foreground">{sortLabelMap[sortOption]}</span>
-            </Button>
+            <div className="w-auto min-w-[140px]">
+              <HudDropdown
+                value={sortOption}
+                options={sortOptions}
+                onChange={(value) => setSortOption(value as SortOption)}
+                label="Sort"
+              />
+            </div>
           </div>
         )}
 
@@ -508,34 +501,6 @@ const CourseExplorer = () => {
         </div>
       )}
 
-      {/* Sort Bottom Sheet */}
-      <BottomSheet
-        open={showSortSheet}
-        onClose={() => setShowSortSheet(false)}
-        ariaLabelledBy="sort-options-title"
-      >
-        <div className="px-4 py-3">
-          {(['popular', 'rating_desc', 'rating_asc', 'name_asc', 'name_desc'] as SortOption[]).map((option, index, arr) => (
-            <React.Fragment key={option}>
-              <button
-                onClick={() => handleSortSelection(option)}
-                className={`
-                  w-full text-left px-4 py-3.5 transition-colors rounded-lg
-                  ${sortOption === option
-                    ? 'bg-slate-100 text-slate-900 font-medium'
-                    : 'text-slate-900 hover:bg-slate-50'
-                  }
-                `}
-              >
-                {sortLabelMap[option]}
-              </button>
-              {index < arr.length - 1 && (
-                <div className="border-t border-slate-200/40 my-0.5" />
-              )}
-            </React.Fragment>
-          ))}
-        </div>
-      </BottomSheet>
     </div>
   );
 };
