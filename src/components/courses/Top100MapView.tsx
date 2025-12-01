@@ -193,8 +193,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
             '#0f172a', // unrated: dark slate
           ],
           'circle-radius': 6,
-          'circle-stroke-width': 2,
-          'circle-stroke-color': '#ffffff',
+          'circle-stroke-width': 0,
         },
       });
 
@@ -308,7 +307,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
               type="button"
               onClick={() => setRatedFilter(opt)}
               className={cn(
-                'rounded-lg px-4 py-1.5 text-sm font-medium transition-colors',
+                'rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
                 ratedFilter === opt
                   ? 'bg-background text-foreground shadow-sm'
                   : 'bg-transparent text-muted-foreground hover:text-foreground'
@@ -356,7 +355,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
               <span className="font-medium">Rated</span>
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-slate-900 border border-white/80 shadow-sm" />
+              <span className="h-2.5 w-2.5 rounded-full bg-slate-900 shadow-sm" />
               <span className="font-medium">Not yet rated</span>
             </span>
           </div>
