@@ -73,61 +73,188 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
     };
   }, [scope]);
 
-  // Update markers when courses change
+  // Update map data when courses change
   useEffect(() => {
-    if (!map.current || !filteredCourses.length) {
-      markersRef.current.forEach(marker => marker.remove());
-      markersRef.current = [];
-      return;
-    }
+    if (!map.current) return;
 
-    // Clear existing markers
-    markersRef.current.forEach(marker => marker.remove());
-    markersRef.current = [];
+    const mapInstance = map.current;
 
-    // Add new markers with color based on rated status
-    filteredCourses.forEach((course) => {
-      const isRated = course.user_has_rated;
-      
-      // Create marker element
-      const el = document.createElement('div');
-      el.className = 'top100-marker';
-      el.style.cssText = `
-        width: 14px;
-        height: 14px;
-        border-radius: 9999px;
-        background: ${isRated ? '#22c55e' : 'rgba(15, 23, 42, 0.9)'};
-        border: 2px solid ${isRated ? '#22c55e' : 'rgba(148, 163, 184, 0.9)'};
-        box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.5);
-        cursor: pointer;
-        transition: all 0.2s ease;
-      `;
+    // Wait for map to load before adding sources
+    const addClustering = () => {
+      // Remove existing source and layers if they exist
+      if (mapInstance.getLayer('clusters')) mapInstance.removeLayer('clusters');
+      if (mapInstance.getLayer('cluster-count')) mapInstance.removeLayer('cluster-count');
+      if (mapInstance.getLayer('unclustered-point')) mapInstance.removeLayer('unclustered-point');
+      if (mapInstance.getSource('courses')) mapInstance.removeSource('courses');
 
-      el.addEventListener('mouseenter', () => {
-        el.style.transform = 'scale(1.4)';
-        el.style.boxShadow = '0 0 0 3px rgba(15, 23, 42, 0.6)';
+      if (!filteredCourses.length) return;
+
+      // Create GeoJSON from courses
+      const geojson: GeoJSON.FeatureCollection = {
+        type: 'FeatureCollection',
+        features: filteredCourses.map((course) => ({
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [course.longitude, course.latitude],
+          },
+          properties: {
+            id: course.id,
+            name: course.name,
+            country: course.country,
+            sub_country: course.sub_country,
+            region: course.region,
+            rank: course.rank,
+            user_has_rated: course.user_has_rated,
+            user_rating: course.user_rating,
+          },
+        })),
+      };
+
+      // Add clustered source
+      mapInstance.addSource('courses', {
+        type: 'geojson',
+        data: geojson,
+        cluster: true,
+        clusterMaxZoom: 6, // Max zoom to cluster points on
+        clusterRadius: 40, // Radius of each cluster when clustering points
       });
 
-      el.addEventListener('mouseleave', () => {
-        el.style.transform = 'scale(1)';
-        el.style.boxShadow = '0 0 0 2px rgba(15, 23, 42, 0.5)';
+      // Cluster circles layer
+      mapInstance.addLayer({
+        id: 'clusters',
+        type: 'circle',
+        source: 'courses',
+        filter: ['has', 'point_count'],
+        paint: {
+          'circle-color': [
+            'step',
+            ['get', 'point_count'],
+            'rgba(15, 23, 42, 0.90)', // slate-900 for small clusters
+            10,
+            'rgba(37, 99, 235, 0.95)', // blue-600 for medium
+            30,
+            'rgba(22, 163, 74, 0.95)', // emerald-600 for large
+          ],
+          'circle-radius': [
+            'step',
+            ['get', 'point_count'],
+            15, // 30px diameter for small
+            10,
+            17, // 34px for medium
+            30,
+            20, // 40px for large
+          ],
+          'circle-stroke-width': 2,
+          'circle-stroke-color': [
+            'step',
+            ['get', 'point_count'],
+            'rgba(148, 163, 184, 0.90)', // slate-400
+            10,
+            'rgba(30, 64, 175, 0.95)', // blue-800
+            30,
+            'rgba(22, 101, 52, 0.95)', // emerald-800
+          ],
+        },
       });
 
-      el.addEventListener('click', () => {
-        setSelectedCourse(course);
-        map.current?.flyTo({
-          center: [course.longitude, course.latitude],
-          zoom: 8,
-          duration: 800,
+      // Cluster count labels
+      mapInstance.addLayer({
+        id: 'cluster-count',
+        type: 'symbol',
+        source: 'courses',
+        filter: ['has', 'point_count'],
+        layout: {
+          'text-field': '{point_count_abbreviated}',
+          'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+          'text-size': 12,
+        },
+        paint: {
+          'text-color': '#f9fafb',
+        },
+      });
+
+      // Unclustered points layer
+      mapInstance.addLayer({
+        id: 'unclustered-point',
+        type: 'circle',
+        source: 'courses',
+        filter: ['!', ['has', 'point_count']],
+        paint: {
+          'circle-color': [
+            'case',
+            ['get', 'user_has_rated'],
+            '#22c55e', // emerald-500 for rated
+            'rgba(15, 23, 42, 0.9)', // slate-900 for unrated
+          ],
+          'circle-radius': 7,
+          'circle-stroke-width': 2,
+          'circle-stroke-color': [
+            'case',
+            ['get', 'user_has_rated'],
+            '#22c55e', // emerald-500
+            'rgba(148, 163, 184, 0.9)', // slate-400
+          ],
+        },
+      });
+
+      // Click handler for clusters - zoom in
+      mapInstance.on('click', 'clusters', (e) => {
+        const features = mapInstance.queryRenderedFeatures(e.point, {
+          layers: ['clusters'],
+        });
+        const clusterId = features[0]?.properties?.cluster_id;
+        if (!clusterId) return;
+
+        const source = mapInstance.getSource('courses') as mapboxgl.GeoJSONSource;
+        source.getClusterExpansionZoom(clusterId, (err, zoom) => {
+          if (err) return;
+
+          mapInstance.easeTo({
+            center: (features[0].geometry as GeoJSON.Point).coordinates as [number, number],
+            zoom: zoom || mapInstance.getZoom() + 2,
+            duration: 500,
+          });
         });
       });
 
-      const marker = new mapboxgl.Marker(el)
-        .setLngLat([course.longitude, course.latitude])
-        .addTo(map.current!);
+      // Click handler for individual points - show course details
+      mapInstance.on('click', 'unclustered-point', (e) => {
+        const feature = e.features?.[0];
+        if (!feature) return;
 
-      markersRef.current.push(marker);
-    });
+        const courseId = feature.properties?.id;
+        const course = filteredCourses.find((c) => c.id === courseId);
+        if (course) {
+          setSelectedCourse(course);
+          mapInstance.flyTo({
+            center: [course.longitude, course.latitude],
+            zoom: 8,
+            duration: 800,
+          });
+        }
+      });
+
+      // Change cursor on hover
+      mapInstance.on('mouseenter', 'clusters', () => {
+        mapInstance.getCanvas().style.cursor = 'pointer';
+      });
+      mapInstance.on('mouseleave', 'clusters', () => {
+        mapInstance.getCanvas().style.cursor = '';
+      });
+      mapInstance.on('mouseenter', 'unclustered-point', () => {
+        mapInstance.getCanvas().style.cursor = 'pointer';
+      });
+      mapInstance.on('mouseleave', 'unclustered-point', () => {
+        mapInstance.getCanvas().style.cursor = '';
+      });
+    };
+
+    if (mapInstance.isStyleLoaded()) {
+      addClustering();
+    } else {
+      mapInstance.on('load', addClustering);
+    }
   }, [filteredCourses]);
 
   // Handle reset view
