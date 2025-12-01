@@ -2,6 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
+import { Top100RankBadge } from './Top100RankBadge';
 
 type Top100RegionCardProps = {
   list: Top100ListSummary;
@@ -16,6 +17,8 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
   const rated = list.played_count ?? 0;
   const completion = total > 0 ? Math.min(100, Math.round((rated / total) * 100)) : 0;
   const hero = list.hero_course;
+  const topRank = hero?.rank_in_list ?? null;
+  const listSlug = list.slug as 'global' | 'gb-i' | 'usa' | 'europe';
 
   return (
     <div
@@ -42,6 +45,13 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
         </>
       ) : (
         <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900" />
+      )}
+
+      {/* Top-right rank badge */}
+      {topRank && (
+        <div className="absolute right-4 top-4 z-10">
+          <Top100RankBadge listSlug={listSlug} rank={topRank} />
+        </div>
       )}
 
       {/* Title */}
@@ -73,16 +83,8 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
           />
         </div>
 
-        {/* #1 course chip + View courses button */}
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-          {hero && (
-            <div className="inline-flex max-w-[60%] items-center !rounded-2xl bg-black/55 px-3 py-1.5 text-[11px] font-medium text-white backdrop-blur">
-              <span className="truncate">
-                #{hero.rank_in_list} {hero.name}
-              </span>
-            </div>
-          )}
-
+        {/* View courses button */}
+        <div className="mt-3 flex justify-end">
           <Button
             variant="secondary"
             size="sm"
