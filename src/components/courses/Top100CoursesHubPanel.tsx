@@ -272,7 +272,7 @@ const Top100CoursesHubPanel = () => {
               <div className="inline-flex items-center gap-2 rounded-2xl border border-border/60 bg-card/80 backdrop-blur-sm px-3 py-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
                 <Trophy className="h-4 w-4 text-foreground" />
                 <span className="font-semibold text-foreground text-[14px]">
-                  You&apos;ve rated {totalRated} Top 100 course{totalRated === 1 ? '' : 's'}
+                  You&apos;ve rated {totalRated} course{totalRated === 1 ? '' : 's'} across {listsCount} Top 100 list{listsCount === 1 ? '' : 's'}
                 </span>
                 {club && (
                   <>
