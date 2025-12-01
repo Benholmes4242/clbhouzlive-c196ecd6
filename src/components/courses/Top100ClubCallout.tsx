@@ -58,8 +58,12 @@ const Top100ClubCallout: React.FC = () => {
           <>
             {listsStarted > 0 ? (
               <>
+                <p className="mb-2 text-sm font-medium text-slate-900">
+                  You&apos;ve rated {coursesPlayed} course{coursesPlayed === 1 ? '' : 's'} {listsStarted === 1 ? 'in' : 'across'} {listsStarted} Top 100 list{listsStarted === 1 ? '' : 's'}.
+                </p>
+
                 {/* Progress bar */}
-                <div className="mt-3 mb-4 h-2 w-full overflow-hidden rounded-full bg-slate-200">
+                <div className="mt-1 mb-4 h-2 w-full overflow-hidden rounded-full bg-slate-200">
                   <div
                     className="h-full rounded-full bg-primary-accent transition-all"
                     style={{ width: `${progressPercent}%` }}
