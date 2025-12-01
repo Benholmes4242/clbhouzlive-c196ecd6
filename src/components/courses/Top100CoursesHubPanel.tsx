@@ -252,7 +252,7 @@ const Top100CoursesHubPanel = () => {
           {user ? (
             <>
               {/* Combined pill with trophy, text, and club badge */}
-              <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/80 backdrop-blur-sm px-3 py-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+              <div className="inline-flex items-center gap-2 rounded-2xl border border-border/60 bg-card/80 backdrop-blur-sm px-3 py-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
                 <Trophy className="h-4 w-4 text-foreground" />
                 <span className="font-semibold text-foreground text-[14px]">
                   You&apos;ve rated {totalRated} Top 100 course{totalRated === 1 ? '' : 's'}
@@ -272,12 +272,6 @@ const Top100CoursesHubPanel = () => {
                   </>
                 )}
               </div>
-
-              {listsCount > 0 && (
-                <p className="mt-2 text-[14px] text-muted-foreground">
-                  across {listsCount} Top 100 list{listsCount === 1 ? '' : 's'}.
-                </p>
-              )}
 
               {/* Progress bar */}
               <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-slate-100">
