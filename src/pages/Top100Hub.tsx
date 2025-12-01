@@ -14,6 +14,8 @@ import Top100MapView from '@/components/courses/Top100MapView';
 import { Top100MapScope } from '@/hooks/useTop100MapCourses';
 import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
 import Top100BackButton from '@/components/top100/Top100BackButton';
+import { getTop100RingDotClass } from '@/lib/top100RingStyles';
+import { cn } from '@/lib/utils';
 
 const Top100Hub = () => {
   const navigate = useNavigate();
@@ -125,6 +127,7 @@ const Top100Hub = () => {
               {/* Progress Chip */}
               {session && progress && (progress.total_top100_rated ?? progress.total_played_top100 ?? 0) > 0 && (() => {
                 const totalRated = progress.total_top100_rated ?? progress.total_played_top100 ?? 0;
+                const ringDotClass = getTop100RingDotClass(progress.club_ring ?? 'none');
                 return (
                   <div className="mt-2 flex justify-center">
                     <button
@@ -139,10 +142,18 @@ const Top100Hub = () => {
                         <span className="font-semibold">{totalRated}</span>{" "}
                         Top 100 course{totalRated === 1 ? '' : 's'}
                       </span>
-                      {progress.club_ring && progress.club_ring !== 'none' && (
+                      {progress.club_ring && progress.club_ring !== 'none' && progress.club_label && (
                         <>
-                          <span>·</span>
-                          <span>{progress.club_label}</span>
+                          <span className="mx-1 text-slate-500">·</span>
+                          <span className="inline-flex items-center gap-1">
+                            <span
+                              className={cn(
+                                'h-2 w-2 rounded-full border border-slate-950/20',
+                                ringDotClass
+                              )}
+                            />
+                            <span>{progress.club_label}</span>
+                          </span>
                         </>
                       )}
                     </button>
