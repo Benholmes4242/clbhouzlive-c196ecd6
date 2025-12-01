@@ -389,8 +389,8 @@ const Top100LeaderboardPanel = () => {
             <div className="space-y-2">
               {allEntries.map((entry) => {
                 const club = getTop100Club(entry.total_top100_played);
-                const ringDotClass = getTop100RingDotClass(club?.ring ?? 'none');
-                const ringColor = entry.rank <= 3 ? 'ring-primary-accent/60' : getTop100RingBorderClass(club?.ring ?? 'none');
+                const ringDotClass = getTop100RingDotClass(club.tierId);
+                const ringColor = entry.rank <= 3 ? 'ring-primary-accent/60' : getTop100RingBorderClass(club.tierId);
                 
                 return (
                   <button

@@ -37,8 +37,8 @@ export function useTop100Overview(userId?: string | null) {
         total_played: progress.total_played_top100, // kept for compatibility
         total_rated: totalRated,
         regions_count: progress.regions_count,
-        club_label: club?.label ?? null,
-        club_ring: club?.ring ?? 'none',
+        club_label: club.shortLabel,
+        club_ring: club.tierId,
       };
     },
     initialData: progress ? (() => {
@@ -48,8 +48,8 @@ export function useTop100Overview(userId?: string | null) {
         total_played: progress.total_played_top100,
         total_rated: totalRated,
         regions_count: progress.regions_count,
-        club_label: club?.label ?? null,
-        club_ring: club?.ring ?? 'none',
+        club_label: club.shortLabel,
+        club_ring: club.tierId,
       };
     })() : undefined,
     staleTime: 60 * 1000,

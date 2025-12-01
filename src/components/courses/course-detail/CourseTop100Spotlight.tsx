@@ -27,7 +27,7 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
   // Calculate user's club from their progress
   const totalRated = progress?.total_top100_rated ?? progress?.total_played_top100 ?? 0;
   const club = getTop100Club(totalRated);
-  const ringDotClass = getTop100RingDotClass(club?.ring ?? 'none');
+  const ringDotClass = getTop100RingDotClass(club.tierId);
 
   if (isLoading) {
     return (
@@ -149,10 +149,10 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
             </div>
 
             {/* Show club badge if user has a Top 100 club */}
-            {club && (
+            {club.shortLabel && (
               <div className="inline-flex items-center gap-1.5 rounded-full bg-slate-900/70 px-2.5 py-1 text-[11px] text-slate-100">
                 <span className={cn('h-1.5 w-1.5 rounded-full', ringDotClass)} />
-                <span>{club.label}</span>
+                <span>{club.shortLabel}</span>
               </div>
             )}
           </div>

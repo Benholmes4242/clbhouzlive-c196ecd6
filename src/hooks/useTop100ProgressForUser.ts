@@ -2,8 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useTop100Debug } from '@/context/Top100DebugContext';
 import { applyMyJourneyDebug } from '@/lib/top100DebugHelpers';
-import { getTop100Club } from '@/lib/top100Club';
-import type { Top100Ring } from '@/lib/top100Club';
+import { getTop100Club, getNextTop100Club } from '@/lib/top100Club';
+import type { Top100TierId } from '@/lib/top100Club';
 
 export type Top100ListProgress = {
   listId: string;
@@ -25,40 +25,24 @@ export type Top100RecentRound = {
 };
 
 export type Top100NextMilestone = {
-  label: string;
+  threshold: number;
+  tierName: string;
+  shortLabel: string;
   remaining: number;
 };
 
 export type Top100ProgressResponse = {
   total_played_top100: number;
-  total_top100_rated?: number; // NEW: canonical field from RPC
+  total_top100_rated?: number;
+  totalTop100Played: number; // NEW: canonical field
   regions_count: number;
   lists: Top100ListProgress[];
   recent_rounds: Top100RecentRound[];
   next_milestone: Top100NextMilestone | null;
-  club_label?: string | null; // NEW: club tier label
-  club_ring?: Top100Ring; // NEW: ring tier
+  club_label?: string | null;
+  club_tier_name?: string | null; // NEW: user-facing tier name
+  club_ring?: Top100TierId;
 };
-
-function getMilestoneLabel(count: number): Top100NextMilestone | null {
-  if (count < 20) {
-    return {
-      label: '20 Club',
-      remaining: 20 - count,
-    };
-  } else if (count < 50) {
-    return {
-      label: '50 Club',
-      remaining: 50 - count,
-    };
-  } else if (count < 100) {
-    return {
-      label: '100 Century Club',
-      remaining: 100 - count,
-    };
-  }
-  return null;
-}
 
 export function useTop100ProgressForUser(userId: string | undefined | null) {
   const { state: debugState } = useTop100Debug();
@@ -70,10 +54,14 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
       if (!userId) {
         return {
           total_played_top100: 0,
+          totalTop100Played: 0,
           regions_count: 0,
           lists: [],
           recent_rounds: [],
           next_milestone: null,
+          club_label: null,
+          club_tier_name: null,
+          club_ring: 'none',
         };
       }
 
@@ -194,24 +182,35 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
         });
       }
 
-      const totalPlayed = playedTop100Courses.size;
-      const nextMilestone = getMilestoneLabel(totalPlayed);
-      const club = getTop100Club(totalPlayed);
+      // Normalize to canonical field
+      const totalTop100Played = playedTop100Courses.size;
+      
+      // Use new tier helpers
+      const club = getTop100Club(totalTop100Played);
+      const nextClub = getNextTop100Club(totalTop100Played);
 
       return {
-        total_played_top100: totalPlayed,
-        total_top100_rated: totalPlayed, // TODO: will be replaced by RPC field in future
+        total_played_top100: totalTop100Played,
+        total_top100_rated: totalTop100Played,
+        totalTop100Played,
         regions_count: regionsWithProgress.size,
         lists: listProgress,
         recent_rounds: recentRounds,
-        next_milestone: nextMilestone,
-        club_label: club?.label ?? null,
-        club_ring: club?.ring ?? 'none',
+        next_milestone: nextClub
+          ? {
+              threshold: nextClub.threshold,
+              tierName: nextClub.tierName,
+              shortLabel: nextClub.shortLabel,
+              remaining: Math.max(0, nextClub.threshold - totalTop100Played),
+            }
+          : null,
+        club_label: club.shortLabel,
+        club_tier_name: club.tierName,
+        club_ring: club.tierId,
       };
     },
-    // C1: Increased staleTime to 5 minutes for My Progress tab
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000,   // 10 minutes
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
   
   // Apply debug override if enabled

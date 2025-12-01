@@ -13,6 +13,7 @@ export interface Top100HeroSectionProps {
   regionsCount: number;
   clubRing?: Top100Ring;
   clubLabel?: string | null;
+  clubTierName?: string | null;  // NEW: "Trailmaster", "Century Club", etc.
   lastPlayedDate?: string | null;
   isOwnProfile?: boolean;
 }
@@ -24,6 +25,7 @@ export function Top100HeroSection({
   regionsCount,
   clubRing = 'none',
   clubLabel,
+  clubTierName,
   lastPlayedDate,
   isOwnProfile,
 }: Top100HeroSectionProps) {
@@ -51,36 +53,27 @@ export function Top100HeroSection({
             </AvatarFallback>
           </Avatar>
         </div>
-        {clubLabel && (
-          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-background px-3 py-1 rounded-full border border-border shadow-sm">
-            <span className="text-xs font-medium text-muted-foreground">
-              {clubLabel}
-            </span>
+        {clubTierName && (
+          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-slate-900/90 px-3 py-1 text-[11px] font-medium text-slate-50">
+            {clubTierName}
           </div>
         )}
       </div>
 
       {/* Stats */}
       <div className="space-y-1">
-        <p className="text-lg font-semibold text-foreground">
-          {isOwnProfile ? "You've" : "They've"} rated{' '}
-          <span className="text-primary-accent">{totalPlayed}</span> Top 100 course
+        <p className="text-sm text-muted-foreground">
+          {isOwnProfile ? "You've" : "They've"} played {totalPlayed} Top 100 course
           {totalPlayed === 1 ? '' : 's'}
         </p>
-        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-          <span>
-            Across {regionsCount} {regionsCount === 1 ? 'region' : 'regions'}
-          </span>
-          {clubLabel && (
+        <p className="text-xs text-muted-foreground">
+          Across {regionsCount} {regionsCount === 1 ? 'region' : 'regions'}
+          {clubTierName && (
             <>
-              <span>·</span>
-              <span className="inline-flex items-center gap-1 text-primary-accent">
-                <Trophy className="h-3.5 w-3.5" />
-                {clubLabel}
-              </span>
+              {' · '}🏆 {clubTierName}
             </>
           )}
-        </div>
+        </p>
         {lastPlayedDate && (
           <p className="text-xs text-muted-foreground">
             Last Top 100 round: {new Date(lastPlayedDate).toLocaleDateString()}

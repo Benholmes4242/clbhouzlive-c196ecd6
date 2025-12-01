@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { ArrowRight } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
@@ -17,6 +18,7 @@ export function Top100RecentRoundsFeed({
   isOwnProfile,
   maxDisplay = 5,
 }: Top100RecentRoundsFeedProps) {
+  const navigate = useNavigate();
   const displayRounds = rounds.slice(0, maxDisplay);
 
   if (rounds.length === 0) {
@@ -59,9 +61,10 @@ export function Top100RecentRoundsFeed({
           }));
 
           return (
-            <div
+            <button
               key={`${round.course_id}-${index}`}
-              className="p-3 rounded-xl bg-card border border-border/50 hover:border-border transition-colors"
+              onClick={() => navigate(`/courses/${round.course_id}`)}
+              className="w-full p-3 rounded-xl bg-card border border-border/50 hover:border-border transition-colors text-left"
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0 space-y-1">
@@ -106,7 +109,7 @@ export function Top100RecentRoundsFeed({
                   </div>
                 )}
               </div>
-            </div>
+            </button>
           );
         })}
       </div>
