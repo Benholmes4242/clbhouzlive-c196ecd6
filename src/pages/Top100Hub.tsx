@@ -163,14 +163,14 @@ const Top100Hub = () => {
               
               {/* View Mode Toggle */}
               <div className="mt-3 flex justify-center mb-6">
-                <div className="inline-flex h-11 items-center rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div className="inline-flex rounded-2xl bg-white shadow-sm">
                   <button
                     onClick={() => setCoursesViewMode('list')}
                     className={cn(
-                      'flex h-9 items-center gap-2 rounded-xl px-4 text-sm font-medium transition-colors',
+                      'inline-flex items-center gap-2 px-4 py-1.5 text-sm font-medium rounded-2xl',
                       coursesViewMode === 'list'
                         ? 'bg-slate-900 text-white shadow-sm'
-                        : 'text-slate-600 hover:text-slate-900'
+                        : 'text-slate-600'
                     )}
                   >
                     <List className="h-4 w-4" />
@@ -179,10 +179,10 @@ const Top100Hub = () => {
                   <button
                     onClick={() => setCoursesViewMode('map')}
                     className={cn(
-                      'flex h-9 items-center gap-2 rounded-xl px-4 text-sm font-medium transition-colors',
+                      'inline-flex items-center gap-2 px-4 py-1.5 text-sm font-medium rounded-2xl',
                       coursesViewMode === 'map'
                         ? 'bg-slate-900 text-white shadow-sm'
-                        : 'text-slate-600 hover:text-slate-900'
+                        : 'text-slate-600'
                     )}
                   >
                     <MapIcon className="h-4 w-4" />
