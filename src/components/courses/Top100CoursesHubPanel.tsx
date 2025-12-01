@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import CourseCard from './CourseCard';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { COURSES_PAGE_SIZE } from '@/config/pagination';
+import { FLAGS } from '@/config/flags';
 import {
   PRIMARY_REGIONS,
   SUBREGIONS,
@@ -63,7 +64,23 @@ const Top100CoursesHubPanel = () => {
   // Fetch user's Top 100 progress
   const { data: progress } = useTop100ProgressForUser(user?.id);
   const { data: listSummaries = [] } = useTop100ListSummaries(user?.id);
-  const { data: friends = [] } = useFriendsOnTop100Journey(user?.id);
+  const { data: friendsData = [] } = useFriendsOnTop100Journey(user?.id);
+  
+  // Mock friends for testing layout with 15+ friends
+  const mockFriends = FLAGS.TOP100_MOCK_FRIENDS_ENABLED ? [
+    { user_id: 'mock1', profile: { display_name: 'Sarah Mitchell', username: 'sarahm', profile_photo_url: null }, top100CoursesPlayed: 8 },
+    { user_id: 'mock2', profile: { display_name: 'James Anderson', username: 'jamesA', profile_photo_url: null }, top100CoursesPlayed: 12 },
+    { user_id: 'mock3', profile: { display_name: 'Emma Wilson', username: 'emmaw', profile_photo_url: null }, top100CoursesPlayed: 5 },
+    { user_id: 'mock4', profile: { display_name: 'David Chen', username: 'dchen', profile_photo_url: null }, top100CoursesPlayed: 15 },
+    { user_id: 'mock5', profile: { display_name: 'Lisa Thompson', username: 'lisat', profile_photo_url: null }, top100CoursesPlayed: 7 },
+    { user_id: 'mock6', profile: { display_name: 'Michael Brown', username: 'mbrown', profile_photo_url: null }, top100CoursesPlayed: 20 },
+    { user_id: 'mock7', profile: { display_name: 'Sophie Davis', username: 'sophied', profile_photo_url: null }, top100CoursesPlayed: 3 },
+    { user_id: 'mock8', profile: { display_name: 'Robert Taylor', username: 'rtaylor', profile_photo_url: null }, top100CoursesPlayed: 18 },
+    { user_id: 'mock9', profile: { display_name: 'Jessica Lee', username: 'jessicalee', profile_photo_url: null }, top100CoursesPlayed: 9 },
+    { user_id: 'mock10', profile: { display_name: 'Tom Harrison', username: 'tomh', profile_photo_url: null }, top100CoursesPlayed: 11 },
+  ] : [];
+  
+  const friends = [...friendsData, ...mockFriends];
 
   // Extract stats from progress - prefer new field, fallback to old
   const totalRated = progress?.total_top100_rated ?? progress?.total_played_top100 ?? 0;
