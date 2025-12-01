@@ -331,7 +331,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
       </div>
 
       {/* Map Container */}
-      <div className="relative h-[calc(100vh-220px)] min-h-[480px] rounded-3xl overflow-hidden shadow-md">
+      <div className="relative h-[calc(100vh-220px)] min-h-[480px] rounded-3xl overflow-hidden shadow-md mt-3">
           {/* Loading skeleton */}
           {isLoading && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
