@@ -10,6 +10,7 @@ import { DatabaseUrlUpdater } from './DatabaseUrlUpdater';
 import { StreamAccountIdFixer } from './StreamAccountIdFixer';
 import { VideoUrlAnalyzer } from './VideoUrlAnalyzer';
 import Top100DebugPanel from './Top100DebugPanel';
+import { Top100GeocodingBackfill } from './Top100GeocodingBackfill';
 
 const AdminSettings = () => {
   return (
@@ -31,6 +32,15 @@ const AdminSettings = () => {
       <div>
         <h3 className="text-lg font-semibold mb-2">Top 100 Debug (Local Override)</h3>
         <Top100DebugPanel />
+      </div>
+
+      {/* Top 100 Geocoding */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-semibold mb-2">Top 100 Course Data</h3>
+          <p className="text-sm text-muted-foreground">Tools for managing Top 100 course coordinates and data</p>
+        </div>
+        <Top100GeocodingBackfill />
       </div>
 
       {/* Migration Tools Section */}
