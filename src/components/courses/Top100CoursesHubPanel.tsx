@@ -74,7 +74,7 @@ const Top100CoursesHubPanel = () => {
   const ringKey = club?.ring ?? 'none';
   const ringDotClass = getTop100RingDotClass(ringKey);
 
-  // Calculate lists count from summaries (only lists where user has rated at least one course)
+  // Calculate lists count from summaries (only lists where user has played at least one course)
   const listsCount = listSummaries.filter(list => list.played_count > 0).length;
 
   const handleOpenTop100Journey = () => {
@@ -237,137 +237,103 @@ const Top100CoursesHubPanel = () => {
 
   return (
     <div className="space-y-6 pb-8">
-      {/* Hero area - tighter spacing */}
-      <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 pt-4 pb-2">
-        <h1 className="text-center text-3xl font-semibold tracking-tight text-slate-900">
-          World&apos;s Top 100 Golf Courses
-        </h1>
-        <p className="text-center text-sm text-slate-500">
-          Explore the most prestigious golf courses across the globe
-        </p>
-
-        {/* Progress pill */}
-        {user && (
-          <div className="mt-2 flex justify-center">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm border border-slate-200">
-              <span role="img" aria-hidden="true">🏆</span>
-              <span>
-                You&apos;ve rated{" "}
-                <span className="font-semibold">{totalRated}</span>{" "}
-                Top 100 course{totalRated === 1 ? '' : 's'}
-              </span>
-              {club && (
-                <>
-                  <span>·</span>
-                  <span>{club.label}</span>
-                </>
-              )}
+      {/* 1. Top 100 Club hero */}
+      <section className="rounded-3xl border border-border/60 bg-card shadow-[0_4px_28px_rgba(0,0,0,0.14)] px-4 py-5 relative overflow-hidden before:absolute before:inset-0 before:bg-white/[0.02] before:pointer-events-none">
+        {/* Title + subtitle */}
+        <div className="flex items-center gap-2">
+          <span className="text-xl">🏆</span>
+            <div>
+              <h2 className="text-[18px] font-semibold text-foreground">Top 100 Club</h2>
+              <p className="text-[12px] text-muted-foreground">
+                Your journey across the world&apos;s greatest courses.
+              </p>
             </div>
-          </div>
-        )}
-      </div>
+        </div>
 
-      {/* Region cards - Apple-style with images */}
-      {listSummaries.length > 0 && (
-        <section className="mt-6">
-          <h3 className="mb-4 text-center text-sm font-semibold text-slate-700">
-            Explore by region
+        {/* Big stat row */}
+        <div className="mt-4">
+          {user ? (
+            <>
+              <p className="text-[14px]">
+                <span className="font-semibold text-foreground">
+                  You&apos;ve rated {totalRated} Top 100 course{totalRated === 1 ? '' : 's'}
+                </span>
+                {listsCount > 0 && (
+                  <span className="text-muted-foreground"> across {listsCount} Top 100 list{listsCount === 1 ? '' : 's'}.</span>
+                )}
+              </p>
+
+              {/* Club badge with ring-colored dot */}
+              {club && (
+                <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/80 backdrop-blur-sm px-3 py-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+                    <span className={cn(
+                      "inline-block h-2.5 w-2.5 rounded-full",
+                      ringDotClass
+                    )} />
+                    <span className="font-medium text-foreground text-[14px]">{club.label}</span>
+                  </span>
+                </div>
+              )}
+
+              {/* Progress bar */}
+              <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className="h-full rounded-full bg-amber-400 transition-[width] duration-500"
+                  style={{ width: `${Math.min(100, (totalRated / 100) * 100)}%` }}
+                />
+              </div>
+            </>
+          ) : (
+            <p className="text-[14px] text-muted-foreground">
+              Sign in to track your progress and see where you rank on the global leaderboard.
+            </p>
+          )}
+        </div>
+
+        {/* CTA */}
+        <Button
+          variant="primary"
+          onClick={handleOpenTop100Journey}
+          className="mt-4 w-full active:scale-[0.98] transition-transform duration-150"
+        >
+          {user ? 'Open your Top 100 Journey' : 'Sign in to join the Top 100 Club'}
+          <span className="text-[16px]">↗</span>
+        </Button>
+      </section>
+
+      {/* 2. Region progress strip */}
+      {user && listSummaries.length > 0 && (
+        <section className="mt-7">
+          <h3 className="mb-3 text-[13px] font-semibold text-foreground">
+            Your Top 100 region progress
           </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-5xl mx-auto px-4">
+          <div className="flex gap-2 overflow-x-auto pb-1">
             {listSummaries.map((region) => {
-              const total = region.total_courses ?? 0;
-              const rated = region.played_count ?? 0;
-              const completion = total > 0 ? Math.round((rated / total) * 100) : 0;
-              const hero = region.hero_course;
+              const pct = region.total_courses > 0 ? (region.played_count / region.total_courses) * 100 : 0;
               const label = region.short_label || region.name.replace(' Top 100', '');
               
               return (
-                <button
+                <div
                   key={region.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedList(region.slug);
-                    setPage(0);
-                    listTopRef.current?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className="relative overflow-hidden rounded-[28px] bg-slate-900 text-white shadow-md transition-transform duration-200 ease-out hover:scale-[1.02] hover:shadow-xl active:scale-[0.99] h-[230px] text-left"
+                  className="min-w-[160px] rounded-2xl border border-border/60 bg-card px-4 py-3 text-[11px] shadow-[0_2px_12px_rgba(0,0,0,0.08)]"
                 >
-                  {/* Background image */}
-                  {hero?.cover_image_url ? (
-                    <>
-                      <img
-                        src={hero.cover_image_url}
-                        alt={hero.name}
-                        className="absolute inset-0 h-full w-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/0" />
-                    </>
-                  ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900" />
-                  )}
-
-                  {/* Title - top-left, single line */}
-                  <div className="absolute left-4 right-16 top-4">
-                    <h2 className="truncate whitespace-nowrap text-lg font-semibold tracking-tight">
+                  <div className="flex items-center justify-between gap-2 min-h-[18px]">
+                    <span className="font-semibold text-foreground whitespace-nowrap overflow-hidden text-ellipsis text-left">
                       {label}
-                    </h2>
+                    </span>
+                    <span className="text-muted-foreground flex-shrink-0 text-left">
+                      {region.played_count}/{region.total_courses}
+                    </span>
                   </div>
-
-                  {/* Pin button - top-right, squircle glass */}
-                  <button
-                    type="button"
-                    className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-2xl border border-white/25 bg-black/40 text-white backdrop-blur-md shadow-sm hover:bg-black/55 hover:border-white/35 transition-colors"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // Optional: navigate to map view
-                    }}
-                  >
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </button>
-
-                  {/* Bottom content */}
-                  <div className="absolute bottom-0 left-0 right-0 px-4 pb-4 pt-20 space-y-2">
-                    {/* Fraction + % */}
-                    <div className="flex items-center justify-between text-xs">
-                      <span>
-                        Rated{" "}
-                        <span className="font-semibold">{rated}</span>{" "}
-                        of {total} courses
-                      </span>
-                      <span className="font-semibold text-amber-300">
-                        {completion}% complete
-                      </span>
-                    </div>
-
-                    {/* Progress bar */}
-                    <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/25">
-                      <div
-                        className="h-full rounded-full bg-amber-400 transition-[width] duration-500 ease-out"
-                        style={{ width: `${completion}%` }}
-                      />
-                    </div>
-
-                    {/* Hero course chip + View courses button */}
-                    <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                      {hero && (
-                        <div className="inline-flex max-w-[60%] items-center gap-1 rounded-full bg-black/55 px-3 py-1 text-[11px] font-medium backdrop-blur">
-                          <span role="img" aria-hidden="true">👑</span>
-                          <span className="truncate">
-                            #{hero.rank_in_list} {hero.name}
-                          </span>
-                        </div>
-                      )}
-
-                      <div className="rounded-full px-4 py-1.5 text-xs font-medium bg-white/95 text-slate-900">
-                        View courses
-                      </div>
-                    </div>
+                  <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-slate-100">
+                    <div
+                      className="h-full rounded-full bg-amber-400"
+                      style={{ width: `${Math.min(100, pct)}%` }}
+                    />
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>
