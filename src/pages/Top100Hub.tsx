@@ -124,7 +124,9 @@ const Top100Hub = () => {
                       onClick={() => setActiveTab('my-progress')}
                       className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm hover:shadow-md transition-shadow"
                     >
-                      <span role="img" aria-hidden>🏆</span>
+                      <span className="inline-flex h-4 w-4 items-center justify-center">
+                        <Trophy className="h-4 w-4" aria-hidden="true" />
+                      </span>
                       <span>
                         You've rated{" "}
                         <span className="font-semibold">{totalRated}</span>{" "}
