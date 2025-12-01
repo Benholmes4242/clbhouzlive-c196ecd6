@@ -213,8 +213,8 @@ const Top100Hub = () => {
                             className={cn(
                               'flex-1 px-4 py-2 text-sm font-semibold rounded-full transition',
                               isActive
-                                ? 'bg-background text-foreground shadow-sm'
-                                : 'bg-muted/30 text-muted-foreground'
+                                ? 'bg-muted/70 text-foreground shadow-sm'
+                                : 'bg-background text-muted-foreground'
                             )}
                           >
                             {label}
