@@ -11,6 +11,9 @@ export type CourseLeaderboardEntry = {
   list_slug: LeaderboardScope | string;
   times_played: number;
   avg_rating: number | null;
+  global_rank: number | null;
+  regional_rank: number | null;
+  usa_rank: number | null;
 };
 
 type CourseLeaderboardRpcRow = {
@@ -22,6 +25,9 @@ type CourseLeaderboardRpcRow = {
   list_slug: string;
   times_played: number;
   avg_rating: number | null;
+  global_rank: number | null;
+  regional_rank: number | null;
+  usa_rank: number | null;
 };
 
 type UseTop100CourseLeaderboardArgs = {
@@ -62,6 +68,9 @@ export function useTop100CourseLeaderboard(args: UseTop100CourseLeaderboardArgs)
           list_slug: row.list_slug,
           times_played: row.times_played,
           avg_rating: row.avg_rating,
+          global_rank: row.global_rank ?? null,
+          regional_rank: row.regional_rank ?? null,
+          usa_rank: row.usa_rank ?? null,
         })),
       };
     },
