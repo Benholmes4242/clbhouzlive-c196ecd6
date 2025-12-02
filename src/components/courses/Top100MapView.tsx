@@ -500,10 +500,12 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                         type="button"
                         onClick={() => onScopeChange?.(slug)}
                         className={cn(
-                          'flex-1 rounded-full border px-3 py-2 text-xs font-semibold transition',
+                          'flex-1 rounded-full px-3 py-2 text-xs font-semibold transition-colors',
+                          'bg-white border border-border/70',
+                          'shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]',
                           isActive
-                            ? 'bg-white text-slate-900 border-white/70 shadow-sm'
-                            : 'bg-white/10 text-slate-700 border-white/30 hover:bg-white/20'
+                            ? 'text-foreground'
+                            : 'text-muted-foreground hover:text-foreground'
                         )}
                       >
                         {label}
