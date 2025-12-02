@@ -345,20 +345,23 @@ const Top100CoursesHubPanel = () => {
 
           {/* Horizontal carousel */}
           <div className="-mx-4 px-4 flex gap-1 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-none">
-            {friends.slice(0, 10).map((friend) => {
+            {friends.slice(0, 10).map((friend, index) => {
               const nameRaw = friend.profile.display_name || friend.profile.username || 'Golfer';
               const displayName =
                 nameRaw.length > 14 ? `${nameRaw.slice(0, 14)}…` : nameRaw;
 
               const homeClub = friend.profile.home_club?.trim() || null;
               const topCount = friend.top100CoursesPlayed ?? 0;
+              
+              const isFirst = index === 0;
+              const isLast = index === friends.slice(0, 10).length - 1;
 
               return (
                 <button
                   key={friend.user_id}
                   type="button"
                   onClick={() => navigate(`/profile/${friend.profile.username}?tab=top100`)}
-                  className="flex-shrink-0 w-32 snap-start text-center"
+                  className={`flex-shrink-0 w-32 snap-start text-center ${isFirst ? 'pl-4' : ''} ${isLast ? 'pr-4' : ''}`}
                 >
                   {/* Avatar */}
                   {friend.profile.profile_photo_url ? (
