@@ -1,6 +1,5 @@
 import React from 'react';
 import type { Top100Ring } from '@/lib/top100Club';
-import SquircleImage from '@/components/ui/SquircleImage';
 
 // Tier color mapping (hex values for inline styles)
 const TIER_COLORS: Record<Top100Ring, string> = {
@@ -46,59 +45,43 @@ export function Top100HeroSection({
     .slice(0, 2) || '?';
 
   const tierColor = TIER_COLORS[clubRing] || TIER_COLORS.none;
-  const avatarSize = 84;
 
   return (
     <div className="flex flex-col items-center text-center space-y-4 py-4">
       {/* Ring + avatar */}
       <div className="relative">
-        {avatarUrl ? (
-          <SquircleImage
-            size={avatarSize}
-            src={avatarUrl}
-            alt={displayName ?? 'Golfer avatar'}
-            ringColor={tierColor}
-            ringWidth={4}
-          />
-        ) : (
-          <svg
-            width={avatarSize}
-            height={avatarSize}
-            viewBox={`0 0 ${avatarSize} ${avatarSize}`}
-            style={{ display: 'block' }}
-            aria-label={displayName ?? 'Golfer avatar'}
-            role="img"
+        {/* Outer white container with subtle glow */}
+        <div
+          className="flex items-center justify-center rounded-[36px] p-[4px]"
+          style={{
+            backgroundColor: '#ffffff',
+            boxShadow: `0 0 24px rgba(0,0,0,0.06), 0 0 28px ${tierColor}22`,
+          }}
+        >
+          {/* Tier ring */}
+          <div
+            className="rounded-[30px] p-[3px]"
+            style={{ border: `4px solid ${tierColor}` }}
           >
-            <defs>
-              <clipPath id="squircle-fallback" clipPathUnits="userSpaceOnUse">
-                <path d={superellipsePath(avatarSize, avatarSize, 5, 220)} />
-              </clipPath>
-            </defs>
-            <path
-              d={superellipsePath(avatarSize, avatarSize, 5, 220)}
-              fill="none"
-              stroke={tierColor}
-              strokeWidth={4}
-            />
-            <rect
-              width={avatarSize}
-              height={avatarSize}
-              fill="#e2e8f0"
-              clipPath="url(#squircle-fallback)"
-            />
-            <text
-              x="50%"
-              y="50%"
-              dominantBaseline="central"
-              textAnchor="middle"
-              fontSize="20"
-              fontWeight="600"
-              fill="#475569"
-            >
-              {initials}
-            </text>
-          </svg>
-        )}
+            {/* White inner ring */}
+            <div className="rounded-[26px] p-[2px] bg-white">
+              {/* Avatar squircle */}
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={displayName ?? 'Golfer avatar'}
+                  className="h-32 w-24 rounded-[22px] object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <div className="h-32 w-24 rounded-[22px] bg-slate-200 flex items-center justify-center text-xl font-semibold text-slate-700">
+                  {initials}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
 
         {/* Club pill – text only, tier colored */}
         {clubTierName && (
@@ -134,18 +117,4 @@ export function Top100HeroSection({
       </div>
     </div>
   );
-}
-
-// Helper for squircle path (used for fallback initials)
-function superellipsePath(w: number, h: number, n = 5, steps = 200) {
-  const a = w / 2, b = h / 2, m = 2 / n;
-  const pts: string[] = [];
-  for (let i = 0; i < steps; i++) {
-    const t = (i / steps) * Math.PI * 2;
-    const ct = Math.cos(t), st = Math.sin(t);
-    const x = Math.sign(ct) * a * Math.pow(Math.abs(ct), m) + a;
-    const y = Math.sign(st) * b * Math.pow(Math.abs(st), m) + b;
-    pts.push(`${x},${y}`);
-  }
-  return `M ${pts.join(' L ')} Z`;
 }
