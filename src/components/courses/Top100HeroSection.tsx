@@ -49,53 +49,46 @@ export function Top100HeroSection({
     .slice(0, 2) || '?';
 
   const tierColor = TIER_COLORS[clubRing] || TIER_COLORS.none;
+  const pageBg = 'hsl(var(--background))';
+
+  // Temporarily hide club pill
+  const SHOW_CLUB_PILL = false;
 
   return (
     <div className="flex flex-col items-center text-center space-y-4 py-4">
-      {/* Big Ring with Avatar & Halo */}
-      <div className="relative flex items-center justify-center">
-        {/* Outer halo ring */}
+      {/* Squircle + thin achievement ring */}
+      <div className="flex items-center justify-center">
         <div
-          className="absolute inset-[-6px] border border-white/30 shadow-[0_10px_30px_rgba(0,0,0,0.16)] backdrop-blur-sm"
-          style={{ borderRadius: '34%' }}
-        />
-
-        {/* Inner tier ring container */}
-        <div
-          className="relative border-4 overflow-hidden"
-          style={{ 
+          className="inline-flex items-center justify-center rounded-[30px] border-[2px] p-[1px] shadow-[0_0_24px_rgba(15,23,42,0.06)]"
+          style={{
             borderColor: tierColor,
-            borderRadius: '32%',
+            backgroundColor: pageBg,
           }}
         >
-          <Squircle width={144} height={144}>
-            {avatarUrl ? (
-              <img
-                src={avatarUrl}
-                alt={displayName ?? 'Player avatar'}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                loading="lazy"
-                decoding="async"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-2xl font-semibold bg-muted text-foreground">
-                {initials}
-              </div>
-            )}
-          </Squircle>
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt={displayName ?? 'Golfer avatar'}
+              className="h-32 w-24 rounded-[26px] object-cover"
+            />
+          ) : (
+            <div className="h-32 w-24 rounded-[26px] bg-muted flex items-center justify-center text-xl font-semibold text-muted-foreground">
+              {initials}
+            </div>
+          )}
         </div>
-
-        {/* Tier badge - positioned at bottom of ring */}
-        {clubTierName && (
-          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-[#0A0A0A] rounded-full border border-white/10 flex items-center gap-1.5 shadow-md">
-            <Trophy className="w-4 h-4 text-white/80" />
-            <span className="text-white text-sm font-medium">{clubTierName}</span>
-          </div>
-        )}
       </div>
 
-      {/* Stats - tighter spacing (mt-6 = 14px visual gap from ring bottom + badge) */}
-      <div className="text-center mt-6 flex flex-col gap-1.5">
+      {/* Club pill - temporarily hidden */}
+      {SHOW_CLUB_PILL && clubTierName && (
+        <div className="px-4 py-1.5 bg-[#0A0A0A] rounded-full border border-white/10 flex items-center gap-1.5 shadow-md">
+          <Trophy className="w-4 h-4 text-white/80" />
+          <span className="text-white text-sm font-medium">{clubTierName}</span>
+        </div>
+      )}
+
+      {/* Stats */}
+      <div className="text-center flex flex-col gap-1.5">
         <p className="text-lg font-semibold text-foreground">
           {isOwnProfile ? "You've" : `${displayName} has`} played {totalPlayed} Top 100 course
           {totalPlayed === 1 ? '' : 's'}
@@ -103,12 +96,6 @@ export function Top100HeroSection({
 
         <p className="text-sm text-muted-foreground flex items-center justify-center gap-1.5">
           Across {regionsCount} {regionsCount === 1 ? 'region' : 'regions'}
-          {clubTierName && (
-            <>
-              <Trophy className="w-4 h-4 text-primary-accent" />
-              {clubTierName}
-            </>
-          )}
         </p>
 
         {lastPlayedDate && (
