@@ -348,72 +348,74 @@ const Top100CoursesHubPanel = () => {
             </p>
           ) : (
             <div className="space-y-2">
-              {friends.slice(0, 10).map((friend) => {
+              {friends.slice(0, 10).map((friend, index) => {
                 const displayName = friend.profile.display_name || friend.profile.username || '?';
-                
-                const hasHomeClub = !!friend.profile.home_club;
-                const hcpValue =
-                  friend.profile.handicap !== undefined && friend.profile.handicap !== null
-                    ? friend.profile.handicap
-                    : null;
-                const hasHcp = hcpValue !== null;
-                
-                let line2: string | null = null;
-                let line3: string | null = null;
-                
-                if (hasHomeClub && hasHcp) {
-                  // club line then handicap line
-                  line2 = friend.profile.home_club!;
-                  line3 = `HCP ${typeof hcpValue === 'number' ? hcpValue.toFixed(1) : hcpValue}`;
-                } else if (hasHomeClub) {
-                  line2 = friend.profile.home_club!;
-                } else if (hasHcp) {
-                  // no club – handicap sits directly under the name
-                  line2 = `HCP ${typeof hcpValue === 'number' ? hcpValue.toFixed(1) : hcpValue}`;
-                }
+                const homeClub = friend.profile.home_club?.trim() || null;
+                const hasHcp = typeof friend.profile.handicap === 'number' && !Number.isNaN(friend.profile.handicap);
+                const hcpLabel = hasHcp ? `HCP ${friend.profile.handicap!.toFixed(1)}` : null;
                 
                 return (
                   <button
                     key={friend.user_id}
                     type="button"
                     onClick={() => navigate(`/profile/${friend.profile.username}?tab=top100`)}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-muted/60 transition-colors w-full text-left"
+                    className="w-full flex items-center justify-between rounded-lg px-3 py-3 hover:bg-muted/70 transition-colors"
                   >
-                    {/* Avatar */}
-                    <div className="h-10 w-10 rounded-full overflow-hidden flex-shrink-0 bg-muted">
-                      {friend.profile.profile_photo_url ? (
-                        <img
-                          src={friend.profile.profile_photo_url}
-                          alt={displayName}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="h-full w-full flex items-center justify-center text-xs font-semibold">
-                          {displayName?.slice(0, 2).toUpperCase() ?? '?'}
+                    <div className="flex items-center gap-3">
+                      <div className="flex flex-col items-center">
+                        {/* Rank pill (small, above avatar) */}
+                        <span className="text-[11px] font-medium text-muted-foreground mb-1">
+                          #{index + 1}
+                        </span>
+                        
+                        {/* Square avatar */}
+                        {friend.profile.profile_photo_url ? (
+                          <img
+                            src={friend.profile.profile_photo_url}
+                            alt={displayName}
+                            className="h-12 w-12 rounded-xl object-cover"
+                          />
+                        ) : (
+                          <div className="h-12 w-12 rounded-xl bg-muted flex items-center justify-center text-sm font-semibold">
+                            {displayName
+                              .split(' ')
+                              .filter(Boolean)
+                              .slice(0, 2)
+                              .map((n) => n[0])
+                              .join('')
+                              .toUpperCase()}
+                          </div>
+                        )}
+                        
+                        {/* Text stack, centered */}
+                        <div className="mt-2 text-center">
+                          <div className="text-sm font-semibold truncate max-w-[140px]">
+                            {displayName}
+                          </div>
+                          
+                          {homeClub && (
+                            <div className="text-xs text-muted-foreground truncate max-w-[140px]">
+                              {homeClub}
+                            </div>
+                          )}
+                          
+                          {hcpLabel && (
+                            <div className="text-xs text-muted-foreground">
+                              {hcpLabel}
+                            </div>
+                          )}
                         </div>
-                      )}
+                      </div>
                     </div>
                     
-                    {/* Text block */}
-                    <div className="flex-1 min-w-0">
-                      {/* Name – single line, truncated */}
-                      <p className="text-sm font-medium truncate">
-                        {displayName}
-                      </p>
-                      
-                      {/* Line 2 (home club or HCP) */}
-                      {line2 && (
-                        <p className="text-[11px] text-muted-foreground truncate">
-                          {line2}
-                        </p>
-                      )}
-                      
-                      {/* Line 3 (HCP if both club + handicap present) */}
-                      {line3 && (
-                        <p className="text-[11px] text-muted-foreground">
-                          {line3}
-                        </p>
-                      )}
+                    {/* Right-hand metric */}
+                    <div className="flex flex-col items-end text-xs">
+                      <div className="text-sm font-semibold leading-none">
+                        {friend.top100CoursesPlayed}
+                      </div>
+                      <div className="text-[11px] text-muted-foreground leading-none mt-1">
+                        Top 100{friend.top100CoursesPlayed === 1 ? '' : 's'}
+                      </div>
                     </div>
                   </button>
                 );
