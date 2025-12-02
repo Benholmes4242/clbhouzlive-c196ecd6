@@ -37,7 +37,7 @@ export function Top100HeroSection({
     .slice(0, 2) || '?';
 
   return (
-    <div className="flex flex-col items-center text-center space-y-4 py-6">
+    <div className="flex flex-col items-center text-center space-y-6 py-6">
       {/* Big Ring with Avatar & Halo */}
       <div className="relative h-40 w-40 md:h-44 md:w-44 flex items-center justify-center">
         <div
@@ -65,7 +65,7 @@ export function Top100HeroSection({
       </div>
 
       {/* Stats */}
-      <div className="mt-2 text-center space-y-1">
+      <div className="mt-6 text-center space-y-1">
         <p className="text-base md:text-lg font-semibold text-foreground">
           {isOwnProfile ? "You've" : "They've"} played {totalPlayed} Top 100 course
           {totalPlayed === 1 ? '' : 's'}
