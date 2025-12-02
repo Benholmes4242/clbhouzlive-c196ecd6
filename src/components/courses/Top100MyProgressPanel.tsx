@@ -204,11 +204,13 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
             onListClick={(slug) => navigate(`/top100/${slug}`)}
           />
 
-        {/* Recent Top 100 Rounds */}
-        <Top100RecentRoundsFeed
-          rounds={data.recent_rounds}
-          isOwnProfile={isOwnProfile}
-        />
+        {/* Recent Top 100 Rounds - Full-bleed on mobile */}
+        <div className="-mx-4 sm:mx-0">
+          <Top100RecentRoundsFeed
+            rounds={data.recent_rounds}
+            isOwnProfile={isOwnProfile}
+          />
+        </div>
     </div>
   );
 };
