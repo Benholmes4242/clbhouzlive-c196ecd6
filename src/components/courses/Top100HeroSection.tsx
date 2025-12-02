@@ -54,12 +54,13 @@ export function Top100HeroSection({
     <div className="flex flex-col items-center text-center space-y-4 py-4">
       {/* Big Ring with Avatar */}
       <div className="relative flex items-center justify-center">
-        {/* Tier ring container - 4px ring, no white halo */}
+        {/* Outer tier ring - 4px ring with 4px gap to avatar */}
         <div
-          className="relative overflow-hidden"
+          className="relative flex items-center justify-center"
           style={{ 
             border: `4px solid ${tierColor}`,
             borderRadius: '32%',
+            padding: '4px',
           }}
         >
           <Squircle width={144} height={144}>
