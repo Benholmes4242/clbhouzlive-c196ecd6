@@ -81,7 +81,7 @@ export function Top100RegionProgressGrid({
                   {(100 - progressPercent).toFixed(0)}% remaining
                 </span>
 
-                <div className="w-full h-1.5 rounded-full bg-border/60 overflow-hidden">
+                <div className="w-full h-1.5 rounded-full bg-muted overflow-hidden">
                   <div
                     className="h-full rounded-full bg-foreground/70 transition-all"
                     style={{ width: `${progressPercent}%` }}
