@@ -1,9 +1,5 @@
 import React from 'react';
 import type { Top100Ring } from '@/lib/top100Club';
-import { TOP100_TIER_STYLES } from '@/lib/top100RingStyles';
-import { Trophy } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Squircle } from '@/components/ui/squircle';
 
 // Tier color mapping (hex values for inline styles)
 const TIER_COLORS: Record<Top100Ring, string> = {
@@ -52,49 +48,57 @@ export function Top100HeroSection({
 
   return (
     <div className="flex flex-col items-center text-center space-y-4 py-4">
-      {/* Big Ring with Avatar & Halo */}
-      <div className="relative flex items-center justify-center">
-        {/* Outer halo ring */}
+      {/* Ring + avatar */}
+      <div className="relative">
+        {/* Outer white container with subtle glow */}
         <div
-          className="absolute inset-[-6px] border border-white/30 shadow-[0_10px_30px_rgba(0,0,0,0.16)] backdrop-blur-sm"
-          style={{ borderRadius: '34%' }}
-        />
-
-        {/* Inner tier ring container */}
-        <div
-          className="relative border-4 overflow-hidden"
-          style={{ 
-            borderColor: tierColor,
-            borderRadius: '32%',
+          className="flex items-center justify-center rounded-[36px] p-[4px]"
+          style={{
+            backgroundColor: '#ffffff',
+            boxShadow: `0 0 24px rgba(0,0,0,0.06), 0 0 28px ${tierColor}22`,
           }}
         >
-          <Squircle width={144} height={144}>
-            {avatarUrl ? (
-              <img
-                src={avatarUrl}
-                alt={displayName ?? 'Player avatar'}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                loading="lazy"
-                decoding="async"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-2xl font-semibold bg-muted text-foreground">
-                {initials}
-              </div>
-            )}
-          </Squircle>
+          {/* Tier ring */}
+          <div
+            className="rounded-[30px] p-[3px]"
+            style={{ border: `4px solid ${tierColor}` }}
+          >
+            {/* White inner ring */}
+            <div className="rounded-[26px] p-[2px] bg-white">
+              {/* Avatar squircle */}
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={displayName ?? 'Golfer avatar'}
+                  className="h-32 w-24 rounded-[22px] object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <div className="h-32 w-24 rounded-[22px] bg-slate-200 flex items-center justify-center text-xl font-semibold text-slate-700">
+                  {initials}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Tier badge - positioned at bottom of ring */}
+        {/* Club pill – text only, tier colored */}
         {clubTierName && (
-          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-[#0A0A0A] rounded-full border border-white/10 flex items-center gap-1.5 shadow-md">
-            <Trophy className="w-4 h-4 text-white/80" />
-            <span className="text-white text-sm font-medium">{clubTierName}</span>
+          <div
+            className="absolute left-1/2 -translate-x-1/2 translate-y-1/2 bottom-0 px-4 py-1.5 rounded-full border text-xs font-medium whitespace-nowrap"
+            style={{
+              backgroundColor: `${tierColor}12`,
+              borderColor: tierColor,
+              color: tierColor,
+            }}
+          >
+            {clubTierName}
           </div>
         )}
       </div>
 
-      {/* Stats - tighter spacing (mt-6 = 14px visual gap from ring bottom + badge) */}
+      {/* Stats - tighter spacing */}
       <div className="text-center mt-6 flex flex-col gap-1.5">
         <p className="text-lg font-semibold text-foreground">
           {isOwnProfile ? "You've" : `${displayName} has`} played {totalPlayed} Top 100 course
@@ -103,12 +107,6 @@ export function Top100HeroSection({
 
         <p className="text-sm text-muted-foreground flex items-center justify-center gap-1.5">
           Across {regionsCount} {regionsCount === 1 ? 'region' : 'regions'}
-          {clubTierName && (
-            <>
-              <Trophy className="w-4 h-4 text-primary-accent" />
-              {clubTierName}
-            </>
-          )}
         </p>
 
         {lastPlayedDate && (
