@@ -38,35 +38,40 @@ export function Top100HeroSection({
 
   return (
     <div className="flex flex-col items-center text-center space-y-4 py-6">
-      {/* Big Ring with Avatar */}
-      <div className="relative">
+      {/* Big Ring with Avatar & Halo */}
+      <div className="relative h-40 w-40 md:h-44 md:w-44 flex items-center justify-center">
         <div
           className={cn(
-            'h-32 w-32 rounded-full flex items-center justify-center border-4 ring-4 ring-offset-4 ring-offset-background transition-all',
+            'relative rounded-full border-4 ring-4 ring-offset-4 ring-offset-background shadow-lg shadow-slate-900/20',
             getTop100RingBorderClass(clubRing)
           )}
         >
-          <Avatar className="h-28 w-28">
-            <AvatarImage src={avatarUrl || undefined} />
-            <AvatarFallback className="text-2xl bg-surface-slate text-white">
+          {/* Soft halo */}
+          <div className="absolute inset-[-6px] rounded-full bg-sky-500/10 blur-md" />
+
+          <Avatar className="h-28 w-28 md:h-32 md:w-32 border-4 border-white shadow-md overflow-hidden">
+            <AvatarImage src={avatarUrl || undefined} alt={displayName ?? 'Player avatar'} />
+            <AvatarFallback className="text-2xl font-semibold bg-surface-slate text-white">
               {initials}
             </AvatarFallback>
           </Avatar>
         </div>
+
         {clubTierName && (
-          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-slate-900/90 px-3 py-1 text-[11px] font-medium text-slate-50">
+          <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-slate-900 text-slate-50 text-xs px-4 py-1 shadow-md">
             {clubTierName}
           </div>
         )}
       </div>
 
       {/* Stats */}
-      <div className="space-y-1">
-        <p className="text-sm text-muted-foreground">
+      <div className="mt-6 text-center space-y-1">
+        <p className="text-base md:text-lg font-semibold text-foreground">
           {isOwnProfile ? "You've" : "They've"} played {totalPlayed} Top 100 course
           {totalPlayed === 1 ? '' : 's'}
         </p>
-        <p className="text-xs text-muted-foreground">
+
+        <p className="text-sm text-muted-foreground">
           Across {regionsCount} {regionsCount === 1 ? 'region' : 'regions'}
           {clubTierName && (
             <>
@@ -74,6 +79,7 @@ export function Top100HeroSection({
             </>
           )}
         </p>
+
         {lastPlayedDate && (
           <p className="text-xs text-muted-foreground">
             Last Top 100 round: {new Date(lastPlayedDate).toLocaleDateString()}

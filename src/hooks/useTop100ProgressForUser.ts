@@ -22,6 +22,7 @@ export type Top100RecentRound = {
   list_slugs: string[];
   played_at: string;
   rating: number | null;
+  image_url?: string | null;
 };
 
 export type Top100NextMilestone = {
@@ -154,7 +155,8 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
             id,
             name,
             country,
-            sub_country
+            sub_country,
+            thumbnail_image
           )
         `)
         .eq('user_id', userId)
@@ -179,6 +181,7 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
           list_slugs: courseListSlugs,
           played_at: activity.last_played_at || new Date().toISOString(),
           rating: activity.rating_value,
+          image_url: (activity as any).golf_courses.thumbnail_image ?? null,
         });
       }
 

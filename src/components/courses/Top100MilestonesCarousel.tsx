@@ -30,9 +30,9 @@ export function Top100MilestonesCarousel({
   onMilestoneClick,
 }: Top100MilestonesCarouselProps) {
   return (
-    <div className="space-y-3">
-      <h3 className="text-sm font-semibold text-foreground px-4">Milestones</h3>
-      <div className="flex gap-3 overflow-x-auto pb-2 px-4 -mx-4 snap-x snap-mandatory scrollbar-hide">
+    <section className="space-y-3">
+      <h3 className="text-sm font-semibold text-foreground">Milestones</h3>
+      <div className="flex gap-3 overflow-x-auto snap-x scrollbar-hide">
         {MILESTONES.map((milestone) => {
           const isUnlocked = totalPlayed >= milestone.threshold;
           const remaining = Math.max(0, milestone.threshold - totalPlayed);
@@ -40,43 +40,63 @@ export function Top100MilestonesCarousel({
             MILESTONES.findIndex(m => totalPlayed < m.threshold) === MILESTONES.indexOf(milestone)
           );
 
+          const progressPct = Math.min(
+            100,
+            Math.max(0, (totalPlayed / milestone.threshold) * 100)
+          );
+
+          const cardClass = cn(
+            'flex-shrink-0 w-40 p-3 rounded-xl border transition-all snap-center flex flex-col gap-1',
+            'hover:scale-[1.02] active:scale-[0.98]',
+            isUnlocked
+              ? 'bg-gradient-to-br from-primary-accent/12 to-primary-accent/5 border-primary-accent/40 shadow-sm'
+              : isNext
+              ? 'bg-card border-primary-accent/30'
+              : 'bg-card border-border/40 opacity-80'
+          );
+
           return (
             <button
-              key={milestone.threshold}
+              key={milestone.tierId}
+              type="button"
               onClick={() => onMilestoneClick?.(milestone)}
-              className={cn(
-                'flex-shrink-0 w-36 p-3 rounded-xl border transition-all snap-center',
-                'hover:scale-[1.02] active:scale-[0.98]',
-                isUnlocked
-                  ? 'bg-gradient-to-br from-primary-accent/10 to-primary-accent/5 border-primary-accent/30'
-                  : isNext
-                  ? 'bg-card border-primary-accent/20'
-                  : 'bg-card border-border/50'
-              )}
+              className={cardClass}
             >
-              <div className="flex flex-col items-center text-center gap-1">
-                <div className="text-2xl mb-1">{getMilestoneEmoji(milestone.tierId)}</div>
-                <p className="text-[11px] font-semibold text-foreground">
+              <div className="flex items-center justify-between">
+                <span className="text-2xl">{getMilestoneEmoji(milestone.tierId)}</span>
+                {isUnlocked && (
+                  <span className="text-[10px] font-semibold text-primary-accent">
+                    Unlocked
+                  </span>
+                )}
+              </div>
+
+              <div className="mt-1">
+                <p className="text-xs font-semibold text-foreground">
                   {milestone.tierName}
                 </p>
-                <p className="text-[10px] text-muted-foreground">
+                <p className="text-[11px] text-muted-foreground">
                   {milestone.shortLabel}
                 </p>
-                {isUnlocked ? (
-                  <div className="flex items-center gap-1 text-[11px] text-primary-accent mt-1">
-                    <Check className="h-3 w-3" />
-                    Unlocked!
+              </div>
+
+              {!isUnlocked && (
+                <div className="mt-2">
+                  <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+                    <div
+                      className="h-1.5 rounded-full bg-primary-accent transition-all"
+                      style={{ width: `${progressPct}%` }}
+                    />
                   </div>
-                ) : (
                   <p className="mt-1 text-[11px] text-muted-foreground">
                     {remaining} course{remaining === 1 ? '' : 's'} away
                   </p>
-                )}
-              </div>
+                </div>
+              )}
             </button>
           );
         })}
       </div>
-    </div>
+    </section>
   );
 }
