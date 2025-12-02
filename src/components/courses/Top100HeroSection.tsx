@@ -40,18 +40,18 @@ export function Top100HeroSection({
   return (
     <div className="flex flex-col items-center text-center space-y-6 py-6">
       {/* Big Ring with Avatar & Halo */}
-      <div className="relative h-40 w-40 md:h-44 md:w-44 flex items-center justify-center -mt-6">
+      <div className="relative h-48 w-48 md:h-[211px] md:w-[211px] flex items-center justify-center -mt-6">
         <div
           className={cn(
             'relative border-4 ring-4 ring-offset-4 ring-offset-background shadow-lg shadow-slate-900/20 overflow-hidden',
             getTop100RingBorderClass(clubRing)
           )}
-          style={{ borderRadius: '35px' }}
+          style={{ borderRadius: '42px' }}
         >
           {/* Soft halo */}
-          <div className="absolute inset-[-6px] bg-sky-500/10 blur-md" style={{ borderRadius: '41px' }} />
+          <div className="absolute inset-[-6px] bg-sky-500/10 blur-md" style={{ borderRadius: '49px' }} />
 
-          <Squircle width={112} height={112}>
+          <Squircle width={134} height={134}>
             {avatarUrl ? (
               <img
                 src={avatarUrl}
