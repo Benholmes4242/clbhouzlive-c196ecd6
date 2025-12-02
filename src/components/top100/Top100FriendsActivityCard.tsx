@@ -1,7 +1,8 @@
-import React from 'react';
-import { ChevronRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { Card } from '@/components/ui/card';
+import { Squircle } from '@/components/ui/squircle';
+import { ChevronDown, ChevronUp, Trophy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { cn } from '@/lib/utils';
 
 interface Top100FriendEntry {
   friend_id: string;
@@ -22,121 +23,129 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
   friendMessage,
   onViewLeaderboard 
 }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
 
-  // Show top 3 friends sorted by total_top100_played
+  // Show top 10 friends sorted by total_top100_played
   const topFriends = friends
     .slice()
     .sort((a, b) => b.total_top100_played - a.total_top100_played)
-    .slice(0, 3);
+    .slice(0, 10);
+
+  const visibleEntries = isExpanded ? topFriends : topFriends.slice(0, 3);
+
+  const getRankBadge = (index: number) => {
+    const rank = index + 1;
+    
+    // Podium styling for ranks 1-3
+    if (rank === 1) {
+      return (
+        <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2 py-[2px] text-xs font-semibold text-amber-700">
+          #{rank}
+        </span>
+      );
+    }
+    if (rank === 2) {
+      return (
+        <span className="inline-flex items-center rounded-full border border-slate-300 bg-slate-100 px-2 py-[2px] text-xs font-semibold text-slate-700">
+          #{rank}
+        </span>
+      );
+    }
+    if (rank === 3) {
+      return (
+        <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2 py-[2px] text-xs font-semibold text-orange-600">
+          #{rank}
+        </span>
+      );
+    }
+    
+    // Ghost pill for ranks 4-10
+    return (
+      <span className="inline-flex items-center rounded-full border border-border/60 bg-background/40 px-2 py-[2px] text-xs font-medium text-muted-foreground">
+        #{rank}
+      </span>
+    );
+  };
 
   if (topFriends.length === 0) {
     return null;
   }
 
-  const getInitials = (name: string | null) => {
-    if (!name) return '?';
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
   return (
-    <section className="rounded-2xl bg-card border border-border/60 shadow-xs px-4 py-3 space-y-3">
-      {/* Header row */}
-      <div className="flex items-center justify-between gap-3">
-        <div className="space-y-0.5">
-          <h3 className="text-sm font-semibold text-foreground">
-            Friends chasing the Top 100
-          </h3>
-          <p className="text-xs text-muted-foreground">
-            {friendMessage ?? 'Top players this period'}
-          </p>
+    <Card className="bg-card border border-border/60 rounded-xl shadow-sm overflow-hidden">
+      {/* Header - Always visible, clickable */}
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="w-full px-5 py-4 flex items-center justify-between hover:bg-muted/30 transition-colors min-h-[64px]"
+      >
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-9 h-9 rounded-full bg-amber-50 border border-amber-200">
+            <Trophy className="w-4 h-4 text-amber-600" />
+          </div>
+          <div className="text-left">
+            <h3 className="text-base font-semibold text-foreground">Friends chasing the Top 100</h3>
+            <p className="text-xs text-muted-foreground">{friendMessage ?? 'Top players this period'}</p>
+          </div>
         </div>
 
-        <button
-          type="button"
-          onClick={onViewLeaderboard}
-          className="inline-flex items-center gap-1 rounded-full border border-amber-300/80 bg-amber-50/80 px-3 py-1 text-xs font-medium text-amber-700 hover:bg-amber-100 transition-colors"
-        >
-          Top 10
-          <ChevronRight className="w-3 h-3" />
-        </button>
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 py-[2px] text-xs font-semibold text-amber-700">
+            Top 10
+          </span>
+          {isExpanded ? (
+            <ChevronUp className="w-5 h-5 text-muted-foreground transition-transform duration-200" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-muted-foreground transition-transform duration-200" />
+          )}
+        </div>
+      </button>
+
+      {/* Leaderboard List */}
+      <div className="border-t border-border/60">
+        {visibleEntries.map((friend, index) => (
+          <div
+            key={friend.friend_id}
+            onClick={() => navigate(`/profile/${friend.friend_id}?tab=top100`)}
+            className="px-5 py-3 flex items-center justify-between hover:bg-muted/30 transition-colors cursor-pointer border-b last:border-b-0 border-border/40"
+          >
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <Squircle width={40} height={40} className="shrink-0">
+                <img 
+                  src={friend.profile_photo_url || '/placeholder.svg'} 
+                  alt={friend.display_name ?? 'Friend'}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  onError={(e) => {
+                    e.currentTarget.src = '/placeholder.svg';
+                  }}
+                />
+              </Squircle>
+              
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground truncate">
+                  {friend.display_name ?? 'Unknown golfer'}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {friend.total_top100_played} Top 100 course{friend.total_top100_played !== 1 ? 's' : ''} played
+                  {friend.home_club && ` · ${friend.home_club}`}
+                </p>
+              </div>
+            </div>
+
+            {getRankBadge(index)}
+          </div>
+        ))}
       </div>
 
-      {/* Friend rows */}
-      <div className="space-y-1.5">
-        {topFriends.map((friend, index) => {
-          const rank = index + 1;
-          const initials = getInitials(friend.display_name);
-
-          return (
-            <button
-              key={friend.friend_id}
-              type="button"
-              onClick={() => navigate(`/profile/${friend.friend_id}?tab=top100`)}
-              className="w-full flex items-center justify-between rounded-xl px-2.5 py-2 hover:bg-muted/60 transition-colors"
-            >
-              {/* Left: avatar + text */}
-              <div className="flex items-center gap-2.5">
-                {friend.profile_photo_url ? (
-                  <img
-                    src={friend.profile_photo_url}
-                    className="h-8 w-8 rounded-[30%] object-cover"
-                    alt={friend.display_name ?? 'Friend'}
-                    onError={(e) => {
-                      e.currentTarget.src = '/placeholder.svg';
-                    }}
-                  />
-                ) : (
-                  <div className="h-8 w-8 rounded-[30%] bg-slate-200 flex items-center justify-center text-xs font-semibold text-slate-700">
-                    {initials}
-                  </div>
-                )}
-
-                <div className="flex flex-col text-left">
-                  <span className="text-xs font-medium text-foreground">
-                    {friend.display_name ?? 'Unknown golfer'}
-                  </span>
-                  <span className="text-[11px] text-muted-foreground">
-                    {friend.total_top100_played} Top 100 rounds
-                    {friend.home_club && ` · ${friend.home_club}`}
-                  </span>
-                </div>
-              </div>
-
-              {/* Right: rank pill */}
-              <div
-                className={cn(
-                  'px-2 py-0.5 rounded-full text-[11px] font-semibold',
-                  rank === 1
-                    ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                    : rank === 2
-                    ? 'bg-slate-50 text-slate-700 border border-slate-200'
-                    : 'bg-slate-50 text-slate-500 border border-slate-200'
-                )}
-              >
-                #{rank}
-              </div>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Optional footer – link to full friends leaderboard */}
-      {friends.length > 3 && (
-        <button
-          type="button"
-          onClick={onViewLeaderboard}
-          className="w-full text-center text-[11px] text-muted-foreground pt-1 hover:text-foreground transition-colors"
-        >
-          +{friends.length - 3} more players
-        </button>
+      {/* Show more indicator */}
+      {!isExpanded && topFriends.length > 3 && (
+        <div className="px-5 py-2 text-center border-t border-border/60">
+          <p className="text-xs text-muted-foreground">
+            +{topFriends.length - 3} more player{topFriends.length - 3 !== 1 ? 's' : ''}
+          </p>
+        </div>
       )}
-    </section>
+    </Card>
   );
 };
 
