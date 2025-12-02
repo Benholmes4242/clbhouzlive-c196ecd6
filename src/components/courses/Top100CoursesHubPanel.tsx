@@ -326,10 +326,11 @@ const Top100CoursesHubPanel = () => {
         )}
       </section>
 
-      {/* Friends on the Top 100 journey - horizontal avatar strip */}
-      {user && (
+      {/* Friends on their Top 100 journey - horizontal carousel */}
+      {user && hasFriends && (
         <section className="mt-6">
-          <div className="mb-3 flex items-center justify-between">
+          {/* Header row */}
+          <div className="flex items-center justify-between mb-3">
             <p className="text-[13px] font-semibold text-foreground">
               Friends on their Top 100 journey
             </p>
@@ -342,86 +343,86 @@ const Top100CoursesHubPanel = () => {
             </button>
           </div>
 
-          {!hasFriends ? (
-            <p className="text-[12px] text-muted-foreground">
-              None of your friends have started the Top 100 yet.
-            </p>
-          ) : (
-            <div className="space-y-2">
-              {friends.slice(0, 10).map((friend, index) => {
-                const displayName = friend.profile.display_name || friend.profile.username || '?';
-                const homeClub = friend.profile.home_club?.trim() || null;
-                const hasHcp = typeof friend.profile.handicap === 'number' && !Number.isNaN(friend.profile.handicap);
-                const hcpLabel = hasHcp ? `HCP ${friend.profile.handicap!.toFixed(1)}` : null;
-                
-                return (
-                  <button
-                    key={friend.user_id}
-                    type="button"
-                    onClick={() => navigate(`/profile/${friend.profile.username}?tab=top100`)}
-                    className="w-full flex items-center justify-between rounded-lg px-3 py-3 hover:bg-muted/70 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="flex flex-col items-center">
-                        {/* Rank pill (small, above avatar) */}
-                        <span className="text-[11px] font-medium text-muted-foreground mb-1">
-                          #{index + 1}
-                        </span>
-                        
-                        {/* Square avatar */}
-                        {friend.profile.profile_photo_url ? (
-                          <img
-                            src={friend.profile.profile_photo_url}
-                            alt={displayName}
-                            className="h-12 w-12 rounded-xl object-cover"
-                          />
-                        ) : (
-                          <div className="h-12 w-12 rounded-xl bg-muted flex items-center justify-center text-sm font-semibold">
-                            {displayName
-                              .split(' ')
-                              .filter(Boolean)
-                              .slice(0, 2)
-                              .map((n) => n[0])
-                              .join('')
-                              .toUpperCase()}
-                          </div>
-                        )}
-                        
-                        {/* Text stack, centered */}
-                        <div className="mt-2 text-center">
-                          <div className="text-sm font-semibold truncate max-w-[140px]">
-                            {displayName}
-                          </div>
-                          
-                          {homeClub && (
-                            <div className="text-xs text-muted-foreground truncate max-w-[140px]">
-                              {homeClub}
-                            </div>
-                          )}
-                          
-                          {hcpLabel && (
-                            <div className="text-xs text-muted-foreground">
-                              {hcpLabel}
-                            </div>
-                          )}
-                        </div>
-                      </div>
+          {/* Horizontal carousel */}
+          <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4">
+            {friends.slice(0, 10).map((friend, index) => {
+              const displayName = friend.profile.display_name || friend.profile.username || '?';
+              const homeClub = friend.profile.home_club?.trim() || null;
+              const hasHcp = typeof friend.profile.handicap === 'number' && !Number.isNaN(friend.profile.handicap);
+              const hcpLabel = hasHcp ? `HCP ${friend.profile.handicap!.toFixed(1)}` : null;
+              
+              return (
+                <button
+                  key={friend.user_id}
+                  type="button"
+                  onClick={() => navigate(`/profile/${friend.profile.username}?tab=top100`)}
+                  className="flex flex-col items-center gap-2 flex-shrink-0 w-[100px] rounded-xl p-3 hover:bg-muted/60 transition-colors"
+                >
+                  {/* Rank pill */}
+                  <span className="text-[10px] font-medium text-muted-foreground">
+                    #{index + 1}
+                  </span>
+                  
+                  {/* Squircle avatar */}
+                  {friend.profile.profile_photo_url ? (
+                    <SquircleImage
+                      src={friend.profile.profile_photo_url}
+                      alt={displayName}
+                      size={56}
+                      className="flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="h-14 w-14 flex items-center justify-center bg-muted text-muted-foreground text-sm font-semibold rounded-[22%]">
+                      {displayName
+                        .split(' ')
+                        .filter(Boolean)
+                        .slice(0, 2)
+                        .map((n) => n[0])
+                        .join('')
+                        .toUpperCase()}
+                    </div>
+                  )}
+                  
+                  {/* Text stack, centered */}
+                  <div className="text-center w-full">
+                    <div className="text-xs font-semibold truncate">
+                      {displayName}
                     </div>
                     
-                    {/* Right-hand metric */}
-                    <div className="flex flex-col items-end text-xs">
-                      <div className="text-sm font-semibold leading-none">
-                        {friend.top100CoursesPlayed}
+                    {homeClub && (
+                      <div className="text-[10px] text-muted-foreground truncate mt-0.5">
+                        {homeClub}
                       </div>
-                      <div className="text-[11px] text-muted-foreground leading-none mt-1">
-                        Top 100{friend.top100CoursesPlayed === 1 ? '' : 's'}
+                    )}
+                    
+                    {hcpLabel && (
+                      <div className="text-[10px] text-muted-foreground mt-0.5">
+                        {hcpLabel}
                       </div>
+                    )}
+                    
+                    {/* Top 100s count */}
+                    <div className="text-[10px] text-muted-foreground mt-1">
+                      {friend.top100CoursesPlayed} Top 100{friend.top100CoursesPlayed === 1 ? '' : 's'}
                     </div>
-                  </button>
-                );
-              })}
-            </div>
-          )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {user && !hasFriends && (
+        <section className="mt-6">
+          <div className="mb-3">
+            <p className="text-[13px] font-semibold text-foreground">
+              Friends on their Top 100 journey
+            </p>
+          </div>
+          <p className="text-[12px] text-muted-foreground">
+            None of your friends have started the Top 100 yet.
+          </p>
         </section>
       )}
 
