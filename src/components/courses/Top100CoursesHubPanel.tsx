@@ -344,36 +344,34 @@ const Top100CoursesHubPanel = () => {
           </div>
 
           {/* Horizontal carousel */}
-          <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4">
-            {friends.slice(0, 10).map((friend, index) => {
-              const displayName = friend.profile.display_name || friend.profile.username || '?';
+          <div className="-mx-4 px-4 flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-none">
+            {friends.slice(0, 10).map((friend) => {
+              const nameRaw = friend.profile.display_name || friend.profile.username || 'Golfer';
+              const displayName =
+                nameRaw.length > 14 ? `${nameRaw.slice(0, 14)}…` : nameRaw;
+
               const homeClub = friend.profile.home_club?.trim() || null;
-              const hasHcp = typeof friend.profile.handicap === 'number' && !Number.isNaN(friend.profile.handicap);
-              const hcpLabel = hasHcp ? `HCP ${friend.profile.handicap!.toFixed(1)}` : null;
-              
+              const topCount = friend.top100CoursesPlayed ?? 0;
+
               return (
                 <button
                   key={friend.user_id}
                   type="button"
                   onClick={() => navigate(`/profile/${friend.profile.username}?tab=top100`)}
-                  className="flex flex-col items-center gap-2 flex-shrink-0 w-[100px] rounded-xl p-3 hover:bg-muted/60 transition-colors"
+                  className="flex-shrink-0 w-40 rounded-2xl bg-card/95 border border-border/50 px-3 py-3 text-center shadow-xs hover:shadow-md transition-shadow snap-start"
                 >
-                  {/* Rank pill */}
-                  <span className="text-[10px] font-medium text-muted-foreground">
-                    #{index + 1}
-                  </span>
-                  
                   {/* Squircle avatar */}
                   {friend.profile.profile_photo_url ? (
-                    <SquircleImage
-                      src={friend.profile.profile_photo_url}
-                      alt={displayName}
-                      size={56}
-                      className="flex-shrink-0"
-                    />
+                    <div className="mx-auto h-12 w-12">
+                      <SquircleImage
+                        size={48}
+                        src={friend.profile.profile_photo_url}
+                        alt={displayName}
+                      />
+                    </div>
                   ) : (
-                    <div className="h-14 w-14 flex items-center justify-center bg-muted text-muted-foreground text-sm font-semibold rounded-[22%]">
-                      {displayName
+                    <div className="mx-auto h-12 w-12 rounded-xl bg-muted flex items-center justify-center text-sm font-semibold">
+                      {nameRaw
                         .split(' ')
                         .filter(Boolean)
                         .slice(0, 2)
@@ -382,28 +380,24 @@ const Top100CoursesHubPanel = () => {
                         .toUpperCase()}
                     </div>
                   )}
-                  
-                  {/* Text stack, centered */}
-                  <div className="text-center w-full">
-                    <div className="text-xs font-semibold truncate">
+
+                  {/* Text stack */}
+                  <div className="mt-2 space-y-0.5">
+                    {/* Name (manual 14-char truncation) */}
+                    <div className="text-sm font-semibold max-w-[8.5rem] mx-auto">
                       {displayName}
                     </div>
-                    
+
+                    {/* Home club (optional) */}
                     {homeClub && (
-                      <div className="text-[10px] text-muted-foreground truncate mt-0.5">
+                      <div className="text-xs text-muted-foreground max-w-[8.5rem] mx-auto truncate">
                         {homeClub}
                       </div>
                     )}
-                    
-                    {hcpLabel && (
-                      <div className="text-[10px] text-muted-foreground mt-0.5">
-                        {hcpLabel}
-                      </div>
-                    )}
-                    
-                    {/* Top 100s count */}
-                    <div className="text-[10px] text-muted-foreground mt-1">
-                      {friend.top100CoursesPlayed} Top 100{friend.top100CoursesPlayed === 1 ? '' : 's'}
+
+                    {/* Course count (always shown) */}
+                    <div className="text-xs text-muted-foreground">
+                      {topCount} Top 100{topCount === 1 ? '' : 's'}
                     </div>
                   </div>
                 </button>
