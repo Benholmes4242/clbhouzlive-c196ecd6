@@ -65,7 +65,7 @@ export function Top100HeroSection({
       </div>
 
       {/* Stats */}
-      <div className="mt-6 text-center space-y-1">
+      <div className="mt-2 text-center space-y-1">
         <p className="text-base md:text-lg font-semibold text-foreground">
           {isOwnProfile ? "You've" : "They've"} played {totalPlayed} Top 100 course
           {totalPlayed === 1 ? '' : 's'}
