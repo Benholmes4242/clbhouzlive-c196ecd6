@@ -448,7 +448,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             <div className="px-4 pb-4 pt-2">
               {/* Rated filter + reset */}
               <div className="mb-3 flex items-center justify-between gap-2">
-                <div className="inline-flex items-center gap-1 rounded-full bg-white/20 px-1 py-1 backdrop-blur-xl">
+                <div className="inline-flex items-center gap-1.5">
                   {(['all', 'rated', 'unrated'] as RatedFilter[]).map((opt) => (
                     <button
                       key={opt}
@@ -456,9 +456,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                       onClick={() => setRatedFilter(opt)}
                       className={cn(
                         'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
+                        'bg-white border border-border/70',
+                        'shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]',
                         ratedFilter === opt
-                          ? 'bg-white text-slate-900 shadow-sm'
-                          : 'bg-transparent text-slate-600 hover:text-slate-900'
+                          ? 'text-foreground'
+                          : 'text-muted-foreground hover:text-foreground'
                       )}
                     >
                       {opt === 'all'
