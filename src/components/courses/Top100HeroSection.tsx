@@ -1,5 +1,7 @@
 import React from 'react';
 import type { Top100Ring } from '@/lib/top100Club';
+import SquircleImage from '@/components/ui/SquircleImage';
+import { Trophy } from 'lucide-react';
 
 // Tier color mapping (hex values for inline styles)
 const TIER_COLORS: Record<Top100Ring, string> = {
@@ -45,61 +47,51 @@ export function Top100HeroSection({
     .slice(0, 2) || '?';
 
   const tierColor = TIER_COLORS[clubRing] || TIER_COLORS.none;
+  const avatarSize = 160;
 
   return (
     <div className="flex flex-col items-center text-center space-y-4 py-4">
       {/* Ring + avatar */}
       <div className="relative">
-        {/* Outer white container with subtle glow */}
-        <div
-          className="flex items-center justify-center rounded-[36px] p-[4px]"
-          style={{
-            backgroundColor: '#ffffff',
-            boxShadow: `0 0 24px rgba(0,0,0,0.06), 0 0 28px ${tierColor}22`,
-          }}
-        >
-          {/* Tier ring */}
+        {avatarUrl ? (
+          <SquircleImage
+            size={avatarSize}
+            src={avatarUrl}
+            alt={displayName ?? 'Golfer avatar'}
+            ringColor={tierColor}
+            ringWidth={5}
+          />
+        ) : (
           <div
-            className="rounded-[30px] p-[3px]"
-            style={{ border: `4px solid ${tierColor}` }}
-          >
-            {/* White inner ring */}
-            <div className="rounded-[26px] p-[2px] bg-white">
-              {/* Avatar squircle */}
-              {avatarUrl ? (
-                <img
-                  src={avatarUrl}
-                  alt={displayName ?? 'Golfer avatar'}
-                  className="h-32 w-24 rounded-[22px] object-cover"
-                  loading="lazy"
-                  decoding="async"
-                />
-              ) : (
-                <div className="h-32 w-24 rounded-[22px] bg-slate-200 flex items-center justify-center text-xl font-semibold text-slate-700">
-                  {initials}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Club pill – text only, tier colored */}
-        {clubTierName && (
-          <div
-            className="absolute left-1/2 -translate-x-1/2 translate-y-1/2 bottom-0 px-4 py-1.5 rounded-full border text-xs font-medium whitespace-nowrap"
+            className="flex items-center justify-center bg-slate-200"
             style={{
-              backgroundColor: `${tierColor}12`,
-              borderColor: tierColor,
-              color: tierColor,
+              width: avatarSize,
+              height: avatarSize,
+              borderRadius: '30%',
+              border: `5px solid ${tierColor}`,
             }}
           >
-            {clubTierName}
+            <span className="text-3xl font-semibold text-slate-700">
+              {initials}
+            </span>
+          </div>
+        )}
+
+        {/* Club pill – dark background, white text, overlaid at bottom */}
+        {clubTierName && (
+          <div className="absolute left-1/2 -translate-x-1/2 bottom-4 px-4 py-2 rounded-lg bg-slate-800/90 backdrop-blur-sm text-white text-sm font-medium whitespace-nowrap text-center leading-tight">
+            {clubTierName.split(' ').map((word, i) => (
+              <React.Fragment key={i}>
+                {word}
+                {i === 0 && <br />}
+              </React.Fragment>
+            ))}
           </div>
         )}
       </div>
 
-      {/* Stats - tighter spacing */}
-      <div className="text-center mt-6 flex flex-col gap-1.5">
+      {/* Stats */}
+      <div className="text-center flex flex-col gap-1">
         <p className="text-lg font-semibold text-foreground">
           {isOwnProfile ? "You've" : `${displayName} has`} played {totalPlayed} Top 100 course
           {totalPlayed === 1 ? '' : 's'}
@@ -107,6 +99,13 @@ export function Top100HeroSection({
 
         <p className="text-sm text-muted-foreground flex items-center justify-center gap-1.5">
           Across {regionsCount} {regionsCount === 1 ? 'region' : 'regions'}
+          {clubTierName && (
+            <>
+              <span>·</span>
+              <Trophy className="h-4 w-4 text-amber-500" />
+              <span>{clubTierName}</span>
+            </>
+          )}
         </p>
 
         {lastPlayedDate && (
