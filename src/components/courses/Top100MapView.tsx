@@ -2,7 +2,11 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { useTop100MapCourses, Top100MapScope, Top100MapCourse } from '@/hooks/useTop100MapCourses';
+import {
+  useTop100MapCourses,
+  Top100MapScope,
+  Top100MapCourse,
+} from '@/hooks/useTop100MapCourses';
 import { Button } from '@/components/ui/button';
 import { X, MapPin } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -10,6 +14,12 @@ import { cn } from '@/lib/utils';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v11';
+
+type RatedFilter = 'all' | 'rated' | 'unrated';
+
+interface Top100MapViewProps {
+  scope: Top100MapScope;
+}
 
 // Canonical list sizes for the Top 100 maps
 const REGION_TOTALS: Record<Top100MapScope, number> = {
@@ -19,34 +29,60 @@ const REGION_TOTALS: Record<Top100MapScope, number> = {
   europe: 99,
 };
 
-// Region center and zoom configurations
-const REGION_CONFIG: Record<Top100MapScope, { center: [number, number]; zoom: number; label: string }> = {
-  'global': { center: [-30, 40], zoom: 2, label: 'Global Top 100' },
-  'gb-i': { center: [-3, 54], zoom: 5, label: 'Britain & Ireland Top 100' },
-  'usa': { center: [-98, 39], zoom: 3.5, label: 'USA Top 100' },
-  'europe': { center: [10, 50], zoom: 4, label: 'Continental Europe Top 100' },
+// Region centre + zoom configs
+// NOTE: zooms have been nudged OUT one level for GB&I / USA / Europe
+// and the global view is a wider, more "world" centred view.
+const REGION_CONFIG: Record<
+  Top100MapScope,
+  { center: [number, number]; zoom: number; label: string }
+> = {
+  global: {
+    center: [0, 25], // previously [-30, 40] over the Atlantic
+    zoom: 1.7, // slightly more zoomed OUT
+    label: 'Global Top 100',
+  },
+  'gb-i': {
+    center: [-3, 54],
+    zoom: 4, // was 5 → zoomed out one step
+    label: 'Britain & Ireland Top 100',
+  },
+  usa: {
+    center: [-98, 39],
+    zoom: 2.5, // was 3.5 → zoomed out one step
+    label: 'USA Top 100',
+  },
+  europe: {
+    center: [10, 50],
+    zoom: 3, // was 4 → zoomed out one step
+    label: 'Continental Europe Top 100',
+  },
 };
-
-type RatedFilter = 'all' | 'rated' | 'unrated';
-
-interface Top100MapViewProps {
-  scope: Top100MapScope;
-}
 
 const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const markersRef = useRef<mapboxgl.Marker[]>([]);
-  const [selectedCourse, setSelectedCourse] = useState<Top100MapCourse | null>(null);
+
+  const mapContainerRef = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+
+  const [selectedCourse, setSelectedCourse] = useState<Top100MapCourse | null>(
+    null
+  );
   const [ratedFilter, setRatedFilter] = useState<RatedFilter>('all');
-  const { data: courses = [], isLoading } = useTop100MapCourses(scope, session?.user?.id);
+  const [hasInitialFit, setHasInitialFit] = useState(false);
+
+  const {
+    data: courses = [],
+    isLoading,
+  } = useTop100MapCourses(scope, session?.user?.id);
+
+  const regionConfig = REGION_CONFIG[scope];
 
   // Filter courses by rated status
   const filteredCourses = useMemo(() => {
-    if (ratedFilter === 'rated') return courses.filter(c => c.user_has_rated);
-    if (ratedFilter === 'unrated') return courses.filter(c => !c.user_has_rated);
+    if (ratedFilter === 'rated') return courses.filter((c) => c.user_has_rated);
+    if (ratedFilter === 'unrated')
+      return courses.filter((c) => !c.user_has_rated);
     return courses;
   }, [courses, ratedFilter]);
 
@@ -57,53 +93,95 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
   const ratedCount = courses.filter((c) => c.user_has_rated).length;
   const remaining = Math.max(officialTotal - ratedCount, 0);
 
-  const regionConfig = REGION_CONFIG[scope];
-
-  // Initialize map
+  // Reset "initial fit" if the scope changes
   useEffect(() => {
-    if (!mapContainer.current || !MAPBOX_TOKEN || map.current) return;
+    setHasInitialFit(false);
+    setSelectedCourse(null);
+    setRatedFilter('all');
+  }, [scope]);
+
+  // Initialise map once per scope
+  useEffect(() => {
+    if (!mapContainerRef.current || !MAPBOX_TOKEN || mapRef.current) return;
 
     mapboxgl.accessToken = MAPBOX_TOKEN;
 
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
+    mapRef.current = new mapboxgl.Map({
+      container: mapContainerRef.current,
       style: MAPBOX_STYLE,
       center: regionConfig.center,
       zoom: regionConfig.zoom,
       minZoom: 1.5,
       maxZoom: 12,
+      attributionControl: false, // we'll add it manually bottom-left
     });
 
-    map.current.addControl(new mapboxgl.NavigationControl({ visualizePitch: false }), 'bottom-right');
+    const mapInstance = mapRef.current;
+
+    // Controls
+    mapInstance.addControl(
+      new mapboxgl.AttributionControl({ compact: true }),
+      'bottom-left'
+    );
+    mapInstance.addControl(
+      new mapboxgl.NavigationControl({ visualizePitch: false }),
+      'bottom-right'
+    );
 
     return () => {
-      markersRef.current.forEach(marker => marker.remove());
-      markersRef.current = [];
-      map.current?.remove();
-      map.current = null;
+      // Clean up on unmount / scope change
+      if (mapRef.current) {
+        mapRef.current.remove();
+      }
+      mapRef.current = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scope]);
 
-  // Update map data when courses change
+  // Once courses are loaded, fit map to bounds (but never zoom in closer than
+  // the region's configured zoom – this keeps GB&I/USA/Europe slightly zoomed out).
   useEffect(() => {
-    if (!map.current) return;
+    if (!mapRef.current || hasInitialFit || !courses.length || !regionConfig) {
+      return;
+    }
 
-    const mapInstance = map.current;
+    const mapInstance = mapRef.current;
+    const bounds = new mapboxgl.LngLatBounds();
 
-    // Wait for map to load before adding sources
+    courses.forEach((course) => {
+      bounds.extend([course.longitude, course.latitude]);
+    });
+
+    mapInstance.fitBounds(bounds, {
+      padding: 40,
+      maxZoom: regionConfig.zoom, // respect the "one-step-out" zoom per region
+      duration: 0,
+    });
+
+    setHasInitialFit(true);
+  }, [courses, hasInitialFit, regionConfig]);
+
+  // Update map data + clustering whenever filteredCourses change
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    const mapInstance = mapRef.current;
+
     const addClustering = () => {
       // Remove existing source and layers if they exist
       if (mapInstance.getLayer('clusters')) mapInstance.removeLayer('clusters');
-      if (mapInstance.getLayer('cluster-count')) mapInstance.removeLayer('cluster-count');
-      if (mapInstance.getLayer('unclustered-point')) mapInstance.removeLayer('unclustered-point');
-      if (mapInstance.getSource('courses')) mapInstance.removeSource('courses');
+      if (mapInstance.getLayer('cluster-count'))
+        mapInstance.removeLayer('cluster-count');
+      if (mapInstance.getLayer('unclustered-point'))
+        mapInstance.removeLayer('unclustered-point');
+      if (mapInstance.getSource('courses'))
+        mapInstance.removeSource('courses');
 
       if (!filteredCourses.length) {
         console.log('[Top100MapView] ❌ No filtered courses to display');
         return;
       }
 
-      // Create GeoJSON from courses
       const geojson: GeoJSON.FeatureCollection = {
         type: 'FeatureCollection',
         features: filteredCourses.map((course) => ({
@@ -125,23 +203,15 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         })),
       };
 
-
-      // Add clustered source
       mapInstance.addSource('courses', {
         type: 'geojson',
         data: geojson,
         cluster: true,
-        clusterMaxZoom: 6, // Max zoom to cluster points on
-        clusterRadius: 40, // Radius of each cluster when clustering points
+        clusterMaxZoom: 6,
+        clusterRadius: 40,
       });
 
-      console.log('[Top100MapView] ✅ Source "courses" added to map');
-      
-      // Verify source was added
-      const verifySource = mapInstance.getSource('courses');
-      console.log('[Top100MapView] Source verification:', verifySource ? 'EXISTS' : 'MISSING');
-
-      // Cluster circles layer
+      // Cluster circles
       mapInstance.addLayer({
         id: 'clusters',
         type: 'circle',
@@ -157,7 +227,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
             25,
             22,
           ],
-          'circle-color': '#0f172a', // slate-900
+          'circle-color': '#0f172a',
           'circle-stroke-width': 0,
         },
       });
@@ -178,7 +248,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         },
       });
 
-      // Unclustered points layer - use brand orange for rated courses
+      // Unclustered points (single courses)
       mapInstance.addLayer({
         id: 'unclustered-point',
         type: 'circle',
@@ -188,27 +258,15 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
           'circle-color': [
             'case',
             ['==', ['get', 'user_has_rated'], true],
-            '#F7931E', // rated: brand orange
-            '#0f172a', // unrated: dark slate
+            '#F7931E', // Played
+            '#0f172a', // Not Played
           ],
           'circle-radius': 6,
           'circle-stroke-width': 0,
         },
       });
 
-      console.log('[Top100MapView] ✅ All 3 layers added:', {
-        clusters: mapInstance.getLayer('clusters') ? 'EXISTS' : 'MISSING',
-        clusterCount: mapInstance.getLayer('cluster-count') ? 'EXISTS' : 'MISSING',
-        unclusteredPoint: mapInstance.getLayer('unclustered-point') ? 'EXISTS' : 'MISSING'
-      });
-
-      // Log current map viewport
-      console.log('[Top100MapView] 📍 Current map view:', {
-        center: mapInstance.getCenter(),
-        zoom: mapInstance.getZoom()
-      });
-
-      // Click handler for clusters - zoom in
+      // Cluster click → zoom in
       mapInstance.on('click', 'clusters', (e) => {
         const features = mapInstance.queryRenderedFeatures(e.point, {
           layers: ['clusters'],
@@ -216,36 +274,39 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         const clusterId = features[0]?.properties?.cluster_id;
         if (!clusterId) return;
 
-        const source = mapInstance.getSource('courses') as mapboxgl.GeoJSONSource;
+        const source = mapInstance.getSource(
+          'courses'
+        ) as mapboxgl.GeoJSONSource;
         source.getClusterExpansionZoom(clusterId, (err, zoom) => {
           if (err) return;
 
           mapInstance.easeTo({
-            center: (features[0].geometry as GeoJSON.Point).coordinates as [number, number],
+            center: (features[0].geometry as GeoJSON.Point)
+              .coordinates as [number, number],
             zoom: zoom || mapInstance.getZoom() + 2,
             duration: 500,
           });
         });
       });
 
-      // Click handler for individual points - show course details
+      // Single pin click → fly in + open bottom sheet
       mapInstance.on('click', 'unclustered-point', (e) => {
         const feature = e.features?.[0];
         if (!feature) return;
 
         const courseId = feature.properties?.id;
         const course = filteredCourses.find((c) => c.id === courseId);
-        if (course) {
-          setSelectedCourse(course);
-          mapInstance.flyTo({
-            center: [course.longitude, course.latitude],
-            zoom: 8,
-            duration: 800,
-          });
-        }
+        if (!course) return;
+
+        setSelectedCourse(course);
+        mapInstance.flyTo({
+          center: [course.longitude, course.latitude],
+          zoom: 8,
+          duration: 800,
+        });
       });
 
-      // Change cursor on hover
+      // Cursor feedback
       mapInstance.on('mouseenter', 'clusters', () => {
         mapInstance.getCanvas().style.cursor = 'pointer';
       });
@@ -263,50 +324,47 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
     if (mapInstance.isStyleLoaded()) {
       addClustering();
     } else {
-      mapInstance.on('load', addClustering);
+      mapInstance.once('load', addClustering);
     }
   }, [filteredCourses]);
 
-  // Handle reset view
   const handleResetView = () => {
-    if (map.current && regionConfig) {
-      map.current.flyTo({
-        center: regionConfig.center,
-        zoom: regionConfig.zoom,
-        duration: 800,
-      });
-      setSelectedCourse(null);
-      setRatedFilter('all');
-    }
+    if (!mapRef.current || !regionConfig) return;
+
+    mapRef.current.flyTo({
+      center: regionConfig.center,
+      zoom: regionConfig.zoom,
+      duration: 800,
+    });
+
+    setSelectedCourse(null);
+    setRatedFilter('all');
   };
 
-  // Error state
   if (!MAPBOX_TOKEN) {
     return (
-      <div className="flex items-center justify-center h-[400px] rounded-3xl border border-slate-200 bg-white shadow-md">
-        <div className="text-center space-y-2 px-4">
-          <MapPin className="h-12 w-12 mx-auto text-slate-400" />
-          <h3 className="text-lg font-semibold text-slate-900">Map Temporarily Unavailable</h3>
-          <p className="text-sm text-slate-500">
-            The interactive map feature is currently unavailable. Please try again later.
-          </p>
-        </div>
+      <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center text-sm text-slate-600">
+        <p className="font-semibold">Map Temporarily Unavailable</p>
+        <p className="mt-1 text-xs text-slate-500">
+          The interactive map feature is currently unavailable. Please try
+          again later.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col">
-      {/* Rated filter toggle: All / Rated / Not yet rated */}
-      <div className="flex items-end justify-between gap-3 mt-5">
-        <div className="inline-flex rounded-lg bg-muted/70 border border-border/60 p-0.5 shadow-sm">
+    <div className="space-y-3">
+      {/* Filter row: All / Played / Not Played + Reset view */}
+      <div className="flex items-center justify-between gap-2 text-xs">
+        <div className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-1 py-1">
           {(['all', 'rated', 'unrated'] as RatedFilter[]).map((opt) => (
             <button
               key={opt}
               type="button"
               onClick={() => setRatedFilter(opt)}
               className={cn(
-                'rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
+                'rounded-full px-3 py-1 text-[11px] font-medium transition-colors',
                 ratedFilter === opt
                   ? 'bg-background text-foreground shadow-sm'
                   : 'bg-transparent text-muted-foreground hover:text-foreground'
@@ -324,115 +382,108 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         <button
           type="button"
           onClick={handleResetView}
-          className="mb-[2px] text-xs font-medium text-slate-500 underline-offset-2 hover:underline"
+          className="text-[11px] font-medium text-slate-500 underline-offset-2 hover:text-slate-800 hover:underline"
         >
           Reset view
         </button>
       </div>
 
-      {/* Map Container */}
-      <div className="top100-map-shell relative rounded-3xl bg-white shadow-md overflow-hidden mt-3">
+      {/* Map container */}
+      <div className="relative mt-1 rounded-3xl bg-muted/40">
         <div
-          id="top100-map-container"
-          ref={mapContainer}
-          className="h-[400px]"
+          ref={mapContainerRef}
+          className="h-[400px] w-full rounded-3xl"
         />
 
-        {/* Loading skeleton */}
+        {/* Loading overlay */}
         {isLoading && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm">
-            <div className="text-center space-y-2">
-              <div className="animate-spin h-8 w-8 border-3 border-white/30 border-t-white rounded-full mx-auto" />
-              <p className="text-sm text-white/80">Loading map...</p>
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-3xl bg-white/60 text-xs text-slate-500">
+            Loading map...
+          </div>
+        )}
+
+        {/* Legend (top-left) */}
+        <div className="pointer-events-none absolute left-3 top-3 z-10">
+          <div className="flex items-center gap-3 rounded-2xl bg-slate-900/90 px-3 py-1.5 text-[11px] text-white shadow-lg">
+            <div className="flex items-center gap-1">
+              <span className="inline-block h-2 w-2 rounded-full bg-[#F7931E]" />
+              <span>Played</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="inline-block h-2 w-2 rounded-full bg-slate-200" />
+              <span>Not Played</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats pill (top-right) */}
+        {officialTotal > 0 && (
+          <div className="pointer-events-none absolute right-3 top-3 z-10">
+            <div className="rounded-2xl bg-slate-900/90 px-3 py-1.5 text-[11px] font-medium text-white shadow-lg">
+              {ratedCount}/{officialTotal} Played · {remaining} left
             </div>
           </div>
         )}
 
-        {/* Legend & Stats Overlays */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-between items-start p-3 text-xs gap-2">
-          {/* Legend */}
-          <div className="pointer-events-auto flex items-center gap-3 !rounded-2xl bg-slate-700/90 px-4 py-1.5 text-white backdrop-blur-md shadow-lg border border-white/10">
-            <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full shadow-sm" style={{ backgroundColor: '#F7931E' }} />
-              <span className="font-medium">Played</span>
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-slate-900 shadow-sm" />
-              <span className="font-medium">Not Played</span>
-            </span>
-          </div>
-
-          {/* Count Pill */}
-          {officialTotal > 0 && (
-            <div className="pointer-events-auto !rounded-2xl bg-slate-700/90 px-3 py-1.5 text-white backdrop-blur-md shadow-lg font-medium">
-              {ratedCount}/{officialTotal} Played · {remaining} left
-            </div>
-          )}
-        </div>
-
-        {/* Selected Course Bottom Sheet */}
+        {/* Selected Course Bottom Sheet – now full-bleed + anchored */}
         {selectedCourse && (
-          <div className="pointer-events-none absolute inset-x-3 bottom-3 z-20">
-            <div className="pointer-events-auto rounded-3xl bg-white/98 shadow-xl shadow-slate-900/10 border border-slate-100 backdrop-blur-sm">
-              
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20">
+            <div className="pointer-events-auto rounded-t-3xl rounded-b-none bg-white/95 px-4 pb-4 pt-3 shadow-2xl backdrop-blur-sm">
               {/* Drag handle */}
-              <div className="flex justify-center pt-2">
-                <div className="h-1 w-10 rounded-full bg-slate-200" />
-              </div>
+              <div className="mx-auto mb-2 h-1 w-10 rounded-full bg-slate-200" />
 
-              {/* Content */}
-              <div className="px-4 pb-4 pt-2">
-                
-                {/* Title + close */}
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h3 className="text-base font-semibold text-slate-900">
-                      {selectedCourse.name}
-                    </h3>
-                    <p className="mt-0.5 text-xs text-slate-500">
-                      {selectedCourse.sub_country && `${selectedCourse.sub_country}, `}
-                      {selectedCourse.country}
-                      {selectedCourse.region && ` · ${selectedCourse.region}`}
-                    </p>
+              {/* Header row: title + close */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-900">
+                    <MapPin className="h-3 w-3 shrink-0 text-slate-400" />
+                    <span className="truncate">{selectedCourse.name}</span>
                   </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setSelectedCourse(null)}
-                    className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200"
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </button>
+                  <p className="truncate text-[11px] text-slate-500">
+                    {selectedCourse.sub_country &&
+                      `${selectedCourse.sub_country}, `}
+                    {selectedCourse.country}
+                    {selectedCourse.region && ` · ${selectedCourse.region}`}
+                  </p>
                 </div>
 
-                {/* Badges row */}
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  {typeof selectedCourse.rank === 'number' && (
-                    <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
-                      #{selectedCourse.rank} in this list
-                    </span>
-                  )}
-
-                  {selectedCourse.user_has_rated && selectedCourse.user_rating ? (
-                    <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
-                      Your rating: {selectedCourse.user_rating.toFixed(1)}
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-600">
-                      Not Played yet
-                    </span>
-                  )}
-                </div>
-
-                {/* CTA */}
-                <Button
-                  variant="secondary"
-                  onClick={() => navigate(`/courses/${selectedCourse.id}`)}
-                  className="mt-4 w-full"
+                <button
+                  type="button"
+                  onClick={() => setSelectedCourse(null)}
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200"
                 >
-                  Open course
-                </Button>
+                  <X className="h-3.5 w-3.5" />
+                </button>
               </div>
+
+              {/* Badges row */}
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-[10px]">
+                {typeof selectedCourse.rank === 'number' && (
+                  <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 font-medium text-slate-700">
+                    #{selectedCourse.rank} in this list
+                  </span>
+                )}
+
+                {selectedCourse.user_has_rated &&
+                selectedCourse.user_rating ? (
+                  <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-1 font-medium text-emerald-700">
+                    Your rating: {selectedCourse.user_rating.toFixed(1)}
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center rounded-full bg-slate-50 px-2 py-1 font-medium text-slate-600">
+                    Not Played yet
+                  </span>
+                )}
+              </div>
+
+              {/* CTA */}
+              <Button
+                size="sm"
+                className="mt-3 w-full"
+                onClick={() => navigate(`/courses/${selectedCourse.id}`)}
+              >
+                Open course
+              </Button>
             </div>
           </div>
         )}
