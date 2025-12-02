@@ -16,6 +16,7 @@ import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
 import Top100BackButton from '@/components/top100/Top100BackButton';
 import { getTop100RingDotClass } from '@/lib/top100RingStyles';
 import { Top100ProgressSummary } from '@/components/top100/Top100ProgressSummary';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { cn } from '@/lib/utils';
 
 const Top100Hub = () => {
@@ -214,6 +215,9 @@ const Top100Hub = () => {
           </div>
         </div>
       </main>
+
+      {/* Scroll to top button */}
+      <ScrollToTopGlass />
     </div>
   );
 };
