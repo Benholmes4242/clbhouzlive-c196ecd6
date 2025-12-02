@@ -34,7 +34,7 @@ const Top100LeaderboardPanel = () => {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 md:px-6 space-y-6 pb-6">
+    <div className="w-full max-w-6xl mx-auto space-y-6 pb-6">
       {/* Header */}
       <div className="text-center space-y-2 pt-4">
         <div className="flex items-center justify-center gap-2">

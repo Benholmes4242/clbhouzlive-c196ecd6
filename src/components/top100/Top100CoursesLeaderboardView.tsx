@@ -5,6 +5,8 @@ import { LeaderboardScope, LeaderboardTimeRange } from '@/hooks/useTop100Leaderb
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { Top100LeaderboardFilters } from './Top100LeaderboardFilterBar';
+import CourseRankBadges from '@/components/courses/CourseRankBadges';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 
 interface Top100CoursesLeaderboardViewProps {
   filters: Top100LeaderboardFilters;
@@ -82,7 +84,7 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
   return (
     <div className="space-y-4">
       {/* Header */}
-      <h2 className="text-sm font-semibold text-foreground">
+      <h2 className="text-sm font-semibold text-foreground px-1">
         {filters.sortBy === 'member_rating'
           ? 'Highest rated Top 100 courses'
           : filters.sortBy === 'most_played'
@@ -90,78 +92,95 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
           : 'Top 100 courses by official ranking'}
       </h2>
 
-      {/* Course Cards */}
-      <section className="space-y-3">
-        {paginatedCourses.map((course, index) => {
-          const rank = page * PAGE_SIZE + index + 1;
-          const hasImage = !!course.thumbnail_url;
-          const rating = course.avg_rating ?? null;
+      {/* Course Cards - Full bleed on mobile */}
+      <div className="-mx-4 sm:mx-0">
+        <section className="space-y-3">
+          {paginatedCourses.map((course, index) => {
+            const rank = page * PAGE_SIZE + index + 1;
+            const hasImage = !!course.thumbnail_url;
+            const rating = course.avg_rating ?? null;
 
-          return (
-            <button
-              key={course.course_id}
-              type="button"
-              onClick={() => navigate(`/courses/${course.course_id}`)}
-              className="w-full rounded-2xl overflow-hidden bg-card border border-border/60 text-left shadow-sm hover:shadow-md transition-shadow"
-            >
-              {/* Image with overlay */}
-              {hasImage && (
-                <div className="relative h-40 w-full bg-muted">
-                  <img
-                    src={course.thumbnail_url!}
-                    alt={course.course_name}
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).style.display = 'none';
-                    }}
-                  />
-                  {/* Rank pill top-left */}
-                  <div className="absolute top-3 left-3 inline-flex items-center rounded-full bg-black/65 px-2.5 py-1 text-[11px] font-medium text-white shadow-sm">
-                    #{rank}
-                  </div>
-                </div>
-              )}
+            // Determine which lists this course belongs to for badges
+            const ranks = {
+              globalRank: filters.listSlug === 'global' || filters.listSlug === 'all' ? rank : null,
+              regionalRank: filters.listSlug === 'gb-i' ? rank : null,
+              usaRank: filters.listSlug === 'usa' ? rank : null,
+            };
 
-              {/* Meta block */}
-              <div className="flex items-stretch justify-between gap-3 px-4 py-3">
-                {/* Left side text */}
-                <div className="flex flex-col gap-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    {!hasImage && (
-                      <span className="text-[11px] font-semibold text-muted-foreground">
-                        #{rank}
-                      </span>
-                    )}
-                    <div className="text-sm font-semibold truncate">
-                      {course.course_name}
-                    </div>
-                  </div>
-                  <div className="text-xs text-muted-foreground truncate">
-                    {course.sub_country && `${course.sub_country}, `}
-                    {course.country}
-                  </div>
-                  <div className="text-[11px] text-muted-foreground">
-                    Played {course.times_played} time{course.times_played === 1 ? '' : 's'} by members
-                    {rating !== null && ` · Avg rating ${rating.toFixed(1)}`}
-                  </div>
-                </div>
-
-                {/* Right rating panel */}
-                {rating !== null && (
-                  <div className="flex flex-col items-end justify-center shrink-0">
-                    <div className="text-lg font-semibold leading-none">
-                      {rating.toFixed(1)}
-                    </div>
-                    <div className="text-[11px] text-muted-foreground">
-                      Clbhouz rating
-                    </div>
+            return (
+              <button
+                key={course.course_id}
+                type="button"
+                onClick={() => navigate(`/courses/${course.course_id}`)}
+                className="w-full rounded-none sm:rounded-xl overflow-hidden bg-card border-y sm:border border-border/60 text-left shadow-none sm:shadow-sm hover:sm:shadow-md transition-all"
+              >
+                {/* Image with overlay - matching My Progress aspect ratio */}
+                {hasImage && (
+                  <div className="relative w-full aspect-[1.6/1] overflow-hidden">
+                    <img
+                      src={course.thumbnail_url!}
+                      alt={course.course_name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                    
+                    {/* Gradient overlay */}
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
+                    
+                    {/* Rank badges top-left */}
+                    <CourseRankBadges
+                      globalRank={ranks.globalRank}
+                      regionalRank={ranks.regionalRank}
+                      usaRank={ranks.usaRank}
+                      country={course.country || ''}
+                      positioning="top-left"
+                    />
                   </div>
                 )}
-              </div>
-            </button>
-          );
-        })}
-      </section>
+
+                {/* Meta block - matching My Progress structure */}
+                <div className="px-4 py-3 bg-background space-y-1">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        {!hasImage && (
+                          <span className="text-[11px] font-semibold text-muted-foreground">
+                            #{rank}
+                          </span>
+                        )}
+                        <h3 className="text-base font-semibold text-foreground truncate">
+                          {course.course_name}
+                        </h3>
+                      </div>
+                      
+                      <p className="text-sm text-muted-foreground">
+                        {course.sub_country && `${course.sub_country}, `}
+                        {course.country}
+                      </p>
+                      
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        Played {course.times_played} time{course.times_played === 1 ? '' : 's'} by members
+                      </p>
+                    </div>
+
+                    {/* Right: Clbhouz logo and rating */}
+                    {rating !== null && (
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <ClubhouseLogo className="h-5 w-5" />
+                        <span className="text-sm font-semibold text-foreground">
+                          {rating.toFixed(1)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </section>
+      </div>
 
       {/* Empty State */}
       {sortedCourses.length === 0 && !isLoading && (
@@ -174,7 +193,7 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="mt-3 flex items-center justify-between gap-3 text-xs">
+        <div className="mt-3 flex items-center justify-between gap-3 text-xs px-1">
           <button
             type="button"
             onClick={() => hasPrev && setPage((p) => Math.max(0, p - 1))}
