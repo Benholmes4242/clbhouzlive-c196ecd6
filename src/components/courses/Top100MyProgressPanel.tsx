@@ -105,8 +105,11 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
 
   const lastPlayedDate = data.recent_rounds[0]?.played_at || null;
 
-  // For Top 100 hero, always show placeholder avatar (no profile photo)
-  const avatarUrl = null;
+  // Avatar URL - prioritize profile photo over session metadata
+  const avatarUrl = 
+    profile?.profile_photo_url ?? 
+    session?.user?.user_metadata?.avatar_url ?? 
+    null;
 
   const displayName = 
     profile?.display_name ?? 

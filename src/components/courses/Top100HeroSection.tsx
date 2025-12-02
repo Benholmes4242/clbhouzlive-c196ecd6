@@ -29,8 +29,12 @@ export function Top100HeroSection({
   lastPlayedDate,
   isOwnProfile,
 }: Top100HeroSectionProps) {
-  // Always show "?" placeholder for Top 100 hero
-  const initials = '?';
+  const initials = displayName
+    ?.split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2) || '?';
 
   return (
     <div className="flex flex-col items-center text-center space-y-4 py-6">
@@ -54,7 +58,7 @@ export function Top100HeroSection({
         </div>
 
         {clubTierName && (
-          <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-slate-900 text-slate-50 text-xs px-4 py-1 shadow-md">
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-slate-900 text-slate-50 text-xs px-4 py-1 shadow-md">
             {clubTierName}
           </div>
         )}
