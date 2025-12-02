@@ -47,7 +47,7 @@ const REGION_CONFIG: Record<
     label: 'Britain & Ireland Top 100',
   },
   usa: {
-    center: [-100, 40], // slightly further left and up to centre the US
+    center: [-99, 39], // centered USA view
     zoom: 3.5, // was 2.5 → zoomed in one level
     label: 'USA Top 100',
   },
@@ -71,6 +71,10 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
   const [ratedFilter, setRatedFilter] = useState<RatedFilter>('all');
   const [hasInitialFit, setHasInitialFit] = useState(false);
 
+  // Swipe-down drag state for the bottom sheet
+  const [dragStartY, setDragStartY] = useState<number | null>(null);
+  const [dragOffsetY, setDragOffsetY] = useState(0);
+
   const {
     data: courses = [],
     isLoading,
@@ -92,6 +96,32 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
 
   const ratedCount = courses.filter((c) => c.user_has_rated).length;
   const remaining = Math.max(officialTotal - ratedCount, 0);
+
+  // Touch handlers for swipe-down sheet dismissal
+  const handleSheetTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    setDragStartY(e.touches[0].clientY);
+    setDragOffsetY(0);
+  };
+
+  const handleSheetTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (dragStartY === null) return;
+    const currentY = e.touches[0].clientY;
+    const delta = currentY - dragStartY;
+    // Only allow dragging down
+    if (delta > 0) {
+      setDragOffsetY(delta);
+    }
+  };
+
+  const handleSheetTouchEnd = () => {
+    // If the user has dragged down far enough, dismiss the sheet
+    if (dragOffsetY > 60) {
+      setSelectedCourse(null);
+    }
+    // Reset drag state
+    setDragStartY(null);
+    setDragOffsetY(0);
+  };
 
   // Reset "initial fit" if the scope changes
   useEffect(() => {
@@ -159,10 +189,13 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
       duration: 0,
     });
 
-    // For USA only, zoom in one extra step after the fit
+    // For USA only, zoom in one extra step and re-center
     if (scope === 'usa') {
       const currentZoom = mapInstance.getZoom();
+      // Extra zoom-in
       mapInstance.setZoom(currentZoom + 1);
+      // Hard-centre the USA so it doesn't sit on the right edge
+      mapInstance.setCenter(regionConfig.center);
     }
 
     setHasInitialFit(true);
@@ -432,10 +465,23 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
           </div>
         )}
 
-        {/* Selected Course Bottom Sheet – now full-bleed + anchored */}
+        {/* Selected Course Bottom Sheet – dismissible by tap-outside + swipe-down */}
         {selectedCourse && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20">
-            <div className="pointer-events-auto rounded-t-3xl rounded-b-none bg-white/20 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.2)] px-4 pb-4 pt-3">
+          <div
+            className="absolute inset-0 z-20 flex flex-col justify-end"
+            onClick={() => setSelectedCourse(null)}
+          >
+            <div
+              className="pointer-events-auto rounded-t-3xl rounded-b-none bg-white/20 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.2)] px-4 pb-4 pt-3"
+              onClick={(e) => e.stopPropagation()}
+              onTouchStart={handleSheetTouchStart}
+              onTouchMove={handleSheetTouchMove}
+              onTouchEnd={handleSheetTouchEnd}
+              style={{
+                transform: dragOffsetY ? `translateY(${dragOffsetY}px)` : undefined,
+                transition: dragStartY ? 'none' : 'transform 0.2s ease-out',
+              }}
+            >
               {/* Drag handle */}
               <div className="mx-auto mb-2 h-1 w-10 rounded-full bg-slate-200" />
 
