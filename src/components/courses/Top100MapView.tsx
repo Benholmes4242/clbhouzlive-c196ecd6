@@ -445,9 +445,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             </button>
 
             {/* Drawer content */}
-            <div className="px-4 pb-3 pt-1">
+            <div className="px-4 pb-4 pt-2">
               {/* Rated filter + reset */}
-              <div className="mb-2 flex items-center justify-between gap-2">
+              <div className="mb-3 flex items-center justify-between gap-2">
                 <div className="inline-flex items-center gap-1 rounded-full bg-white/20 px-1 py-1 backdrop-blur-xl">
                   {(['all', 'rated', 'unrated'] as RatedFilter[]).map((opt) => (
                     <button
@@ -455,7 +455,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                       type="button"
                       onClick={() => setRatedFilter(opt)}
                       className={cn(
-                        'rounded-full px-3 py-1 text-[11px] font-medium transition-colors',
+                        'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
                         ratedFilter === opt
                           ? 'bg-white text-slate-900 shadow-sm'
                           : 'bg-transparent text-slate-600 hover:text-slate-900'
@@ -473,7 +473,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                 <button
                   type="button"
                   onClick={handleResetView}
-                  className="text-[11px] font-medium text-slate-500 underline-offset-2 hover:text-slate-800 hover:underline"
+                  className="text-xs font-medium text-slate-500 underline-offset-2 hover:text-slate-800 hover:underline"
                 >
                   Reset view
                 </button>
@@ -500,7 +500,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                         type="button"
                         onClick={() => onScopeChange?.(slug)}
                         className={cn(
-                          'flex-1 rounded-full border px-3 py-1.5 text-[11px] font-semibold transition',
+                          'flex-1 rounded-full border px-3 py-2 text-xs font-semibold transition',
                           isActive
                             ? 'bg-white text-slate-900 border-white/70 shadow-sm'
                             : 'bg-white/10 text-slate-700 border-white/30 hover:bg-white/20'
