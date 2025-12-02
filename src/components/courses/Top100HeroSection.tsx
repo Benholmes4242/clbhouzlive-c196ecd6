@@ -2,7 +2,7 @@ import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import type { Top100Ring } from '@/lib/top100Club';
 import { getTop100Club } from '@/lib/top100Club';
-import { getTop100RingBorderClass, TOP100_TIER_STYLES } from '@/lib/top100RingStyles';
+import { getTop100RingBorderClass } from '@/lib/top100RingStyles';
 import { Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Squircle } from '@/components/ui/squircle';
@@ -37,10 +37,6 @@ export function Top100HeroSection({
     .toUpperCase()
     .slice(0, 2) || '?';
 
-  // Get the tier's halo color for the badge
-  const tierStyles = TOP100_TIER_STYLES[clubRing] || TOP100_TIER_STYLES.none;
-  const badgeBgColor = tierStyles.mapStroke;
-
   return (
     <div className="flex flex-col items-center text-center space-y-6 py-6">
       {/* Big Ring with Avatar & Halo */}
@@ -73,10 +69,7 @@ export function Top100HeroSection({
         </div>
 
         {clubTierName && (
-          <div 
-            className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full text-slate-900 text-xs font-medium px-4 py-1 shadow-md"
-            style={{ backgroundColor: badgeBgColor }}
-          >
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-slate-900 text-slate-50 text-xs px-4 py-1 shadow-md">
             {clubTierName}
           </div>
         )}
