@@ -47,8 +47,8 @@ const REGION_CONFIG: Record<
     label: 'Britain & Ireland Top 100',
   },
   usa: {
-    center: [-98, 39],
-    zoom: 2.5, // was 3.5 → zoomed out one step
+    center: [-100, 40], // slightly further left and up to centre the US
+    zoom: 3.5, // was 2.5 → zoomed in one level
     label: 'USA Top 100',
   },
   europe: {
