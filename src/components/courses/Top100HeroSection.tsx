@@ -50,35 +50,68 @@ export function Top100HeroSection({
 
   const tierColor = TIER_COLORS[clubRing] || TIER_COLORS.none;
 
+  // Generate superellipse path for the ring (same formula as Squircle)
+  const generateSuperellipsePath = (w: number, h: number, n = 5, steps = 160): string => {
+    const a = w / 2;
+    const b = h / 2;
+    const m = 2 / n;
+    const pts: [number, number][] = [];
+    
+    for (let i = 0; i < steps; i++) {
+      const t = (i / steps) * Math.PI * 2;
+      const ct = Math.cos(t);
+      const st = Math.sin(t);
+      const x = Math.sign(ct) * a * Math.pow(Math.abs(ct), m);
+      const y = Math.sign(st) * b * Math.pow(Math.abs(st), m);
+      pts.push([x + a, y + b]);
+    }
+    
+    return `M ${pts.map(p => p.join(",")).join(" L ")} Z`;
+  };
+
+  // Avatar: 144px, Gap: 4px, Ring stroke: 4px (centered)
+  // Ring path center: 144 + 4*2 + 4 = 156 (path at center of stroke)
+  // Container: 144 + 4*2 (gap) + 4*2 (ring) = 160
+  const containerSize = 160;
+  const ringPathSize = 156; // Center of 4px stroke, 4px outside avatar edge
+  const ringPath = generateSuperellipsePath(ringPathSize, ringPathSize, 5, 160);
+
   return (
     <div className="flex flex-col items-center text-center space-y-4 py-4">
       {/* Big Ring with Avatar */}
-      <div className="relative flex items-center justify-center">
-        {/* Outer tier ring - 4px ring with 4px gap to avatar */}
-        <div
-          className="relative flex items-center justify-center"
-          style={{ 
-            border: `4px solid ${tierColor}`,
-            borderRadius: '32%',
-            padding: '4px',
-          }}
+      <div className="relative flex items-center justify-center" style={{ width: containerSize, height: containerSize }}>
+        {/* SVG superellipse ring */}
+        <svg
+          width={containerSize}
+          height={containerSize}
+          viewBox={`0 0 ${ringPathSize} ${ringPathSize}`}
+          className="absolute inset-0"
+          preserveAspectRatio="xMidYMid meet"
         >
-          <Squircle width={144} height={144}>
-            {avatarUrl ? (
-              <img
-                src={avatarUrl}
-                alt={displayName ?? 'Player avatar'}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                loading="lazy"
-                decoding="async"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-2xl font-semibold bg-muted text-foreground">
-                {initials}
-              </div>
-            )}
-          </Squircle>
-        </div>
+          <path
+            d={ringPath}
+            fill="none"
+            stroke={tierColor}
+            strokeWidth={4}
+          />
+        </svg>
+        
+        {/* Avatar centered */}
+        <Squircle width={144} height={144}>
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt={displayName ?? 'Player avatar'}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              loading="lazy"
+              decoding="async"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-2xl font-semibold bg-muted text-foreground">
+              {initials}
+            </div>
+          )}
+        </Squircle>
 
         {/* Tier badge - positioned at bottom of ring */}
         {clubTierName && (
