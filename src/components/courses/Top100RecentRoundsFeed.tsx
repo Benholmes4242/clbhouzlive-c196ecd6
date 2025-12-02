@@ -94,11 +94,11 @@ export function Top100RecentRoundsFeed({
               <div className="px-4 py-3 bg-background space-y-1">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-semibold text-foreground">
+                    <h3 className="text-base font-semibold text-foreground">
                       {round.course_name}
                     </h3>
                     
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                       {round.sub_country && `${round.sub_country}, `}
                       {round.country}
                     </p>
