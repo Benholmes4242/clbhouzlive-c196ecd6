@@ -328,7 +328,7 @@ const Top100CoursesHubPanel = () => {
 
       {/* Friends on their Top 100 journey - horizontal carousel */}
       {user && hasFriends && (
-        <section className="mt-6">
+        <section>
           {/* Header row */}
           <div className="flex items-center justify-between mb-3">
             <p className="text-[13px] font-semibold text-foreground">
@@ -408,7 +408,7 @@ const Top100CoursesHubPanel = () => {
       )}
 
       {user && !hasFriends && (
-        <section className="mt-6">
+        <section>
           <div className="mb-3">
             <p className="text-[13px] font-semibold text-foreground">
               Friends on their Top 100 journey
