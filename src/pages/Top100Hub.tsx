@@ -86,7 +86,7 @@ const Top100Hub = () => {
       <main className="px-4 md:container md:mx-auto md:px-0 pb-3">
         <div className="max-w-6xl mx-auto">
           {/* Back Button */}
-          <div className="px-4 pt-4 pb-5">
+          <div className="pt-4 pb-5">
             <Top100BackButton to="/courses?tab=top100" />
           </div>
           
