@@ -398,7 +398,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
         {/* Legend (top-left) */}
         <div className="pointer-events-none absolute left-3 top-3 z-10">
-          <div className="flex items-center gap-3 rounded-2xl bg-white/20 px-3 py-1.5 text-[11px] text-slate-900 shadow-[0_4px_20px_rgba(0,0,0,0.15)] backdrop-blur-xl border border-white/30">
+          <div className="flex items-center gap-3 rounded-2xl bg-white/20 px-3 py-2 text-xs text-slate-900 shadow-[0_4px_20px_rgba(0,0,0,0.15)] backdrop-blur-xl border border-white/30">
             <div className="flex items-center gap-1">
               <span className="inline-block h-2 w-2 rounded-full bg-[#F7931E]" />
               <span>Played</span>
@@ -413,7 +413,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         {/* Stats pill (top-right) */}
         {officialTotal > 0 && (
           <div className="pointer-events-none absolute right-3 top-3 z-10">
-            <div className="rounded-2xl bg-white/20 px-3 py-1.5 text-[11px] font-medium text-slate-900 shadow-[0_4px_20px_rgba(0,0,0,0.15)] backdrop-blur-xl border border-white/30">
+            <div className="rounded-2xl bg-white/20 px-3 py-2 text-xs font-medium text-slate-900 shadow-[0_4px_20px_rgba(0,0,0,0.15)] backdrop-blur-xl border border-white/30">
               {ratedCount}/{officialTotal} Played · {remaining} left
             </div>
           </div>
@@ -423,8 +423,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10">
           <div
             className={cn(
-              'pointer-events-auto rounded-t-3xl rounded-b-none bg-white/20 backdrop-blur-xl border-t border-white/30 shadow-[0_-4px_12px_rgba(15,23,42,0.08)] dark:shadow-[0_-4px_16px_rgba(0,0,0,0.45)] text-[11px] text-slate-900 transition-transform duration-200',
-              filtersOpen ? 'translate-y-0' : 'translate-y-[calc(100%-40px)]'
+              'pointer-events-auto rounded-t-3xl rounded-b-none bg-white/20 backdrop-blur-xl border-t border-white/30 shadow-[0_-4px_12px_rgba(15,23,42,0.08)] dark:shadow-[0_-4px_16px_rgba(0,0,0,0.45)] text-xs text-slate-900 transition-transform duration-200',
+              filtersOpen ? 'translate-y-0' : 'translate-y-[calc(100%-44px)]'
             )}
           >
             {/* Drag handle */}
