@@ -3871,10 +3871,9 @@ html[data-immersive="true"] .app-shell--topSpacer {
   animation: softPulse 1.2s ease-out 0s 2;
 }
 
-/* Top 100 Map: Hide Mapbox logo and attribution controls */
-.top100-map-shell .mapboxgl-ctrl-bottom-left,
-.top100-map-shell .mapboxgl-ctrl-bottom-right {
-  display: none;
+/* Hide Mapbox logo and attribution across all maps (keep zoom controls) */
+.mapboxgl-ctrl-bottom-left {
+  display: none !important;
 }
 
 /* Respect prefers-reduced-motion globally */
