@@ -344,7 +344,7 @@ const Top100CoursesHubPanel = () => {
           </div>
 
           {/* Horizontal carousel */}
-          <div className="-mx-4 px-4 flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-none">
+          <div className="-mx-4 px-4 flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-none">
             {friends.slice(0, 10).map((friend) => {
               const nameRaw = friend.profile.display_name || friend.profile.username || 'Golfer';
               const displayName =
@@ -358,17 +358,15 @@ const Top100CoursesHubPanel = () => {
                   key={friend.user_id}
                   type="button"
                   onClick={() => navigate(`/profile/${friend.profile.username}?tab=top100`)}
-                  className="flex-shrink-0 w-40 rounded-2xl bg-card/95 border border-border/50 px-3 py-3 text-center shadow-xs hover:shadow-md transition-shadow snap-start"
+                  className="flex-shrink-0 w-40 snap-start text-center"
                 >
-                  {/* Squircle avatar */}
+                  {/* Avatar */}
                   {friend.profile.profile_photo_url ? (
-                    <div className="mx-auto h-12 w-12">
-                      <SquircleImage
-                        size={48}
-                        src={friend.profile.profile_photo_url}
-                        alt={displayName}
-                      />
-                    </div>
+                    <img
+                      src={friend.profile.profile_photo_url}
+                      alt={displayName}
+                      className="mx-auto h-12 w-12 rounded-xl object-cover"
+                    />
                   ) : (
                     <div className="mx-auto h-12 w-12 rounded-xl bg-muted flex items-center justify-center text-sm font-semibold">
                       {nameRaw
@@ -381,21 +379,18 @@ const Top100CoursesHubPanel = () => {
                     </div>
                   )}
 
-                  {/* Text stack */}
+                  {/* Text */}
                   <div className="mt-2 space-y-0.5">
-                    {/* Name (manual 14-char truncation) */}
                     <div className="text-sm font-semibold max-w-[8.5rem] mx-auto">
                       {displayName}
                     </div>
 
-                    {/* Home club (optional) */}
                     {homeClub && (
                       <div className="text-xs text-muted-foreground max-w-[8.5rem] mx-auto truncate">
                         {homeClub}
                       </div>
                     )}
 
-                    {/* Course count (always shown) */}
                     <div className="text-xs text-muted-foreground">
                       {topCount} Top 100{topCount === 1 ? '' : 's'}
                     </div>
