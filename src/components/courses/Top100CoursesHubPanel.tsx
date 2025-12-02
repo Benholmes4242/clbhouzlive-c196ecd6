@@ -362,11 +362,13 @@ const Top100CoursesHubPanel = () => {
                 >
                   {/* Avatar */}
                   {friend.profile.profile_photo_url ? (
-                    <img
-                      src={friend.profile.profile_photo_url}
-                      alt={displayName}
-                      className="mx-auto h-12 w-12 rounded-xl object-cover"
-                    />
+                    <div className="mx-auto h-12 w-12">
+                      <SquircleImage
+                        size={48}
+                        src={friend.profile.profile_photo_url}
+                        alt={displayName}
+                      />
+                    </div>
                   ) : (
                     <div className="mx-auto h-12 w-12 rounded-xl bg-muted flex items-center justify-center text-sm font-semibold">
                       {nameRaw
