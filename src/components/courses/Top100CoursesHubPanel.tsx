@@ -358,7 +358,7 @@ const Top100CoursesHubPanel = () => {
                   key={friend.user_id}
                   type="button"
                   onClick={() => navigate(`/profile/${friend.profile.username}?tab=top100`)}
-                  className="flex-shrink-0 w-40 snap-start text-center"
+                  className="flex-shrink-0 w-32 snap-start text-center"
                 >
                   {/* Avatar */}
                   {friend.profile.profile_photo_url ? (
