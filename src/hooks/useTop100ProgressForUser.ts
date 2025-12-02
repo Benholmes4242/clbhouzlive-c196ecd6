@@ -33,6 +33,7 @@ export type Top100NextMilestone = {
   tierName: string;
   shortLabel: string;
   remaining: number;
+  tierId: string;
 };
 
 export type Top100ProgressResponse = {
@@ -218,6 +219,7 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
               tierName: nextClub.tierName,
               shortLabel: nextClub.shortLabel,
               remaining: Math.max(0, nextClub.threshold - totalTop100Played),
+              tierId: nextClub.tierId,
             }
           : null,
         club_label: club.shortLabel,
