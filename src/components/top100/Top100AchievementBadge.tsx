@@ -2,15 +2,17 @@ import React from 'react';
 import { Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-type Top100Tier = 20 | 50 | 100 | 200 | 300 | 400;
+type Top100Tier = 5 | 10 | 20 | 50 | 100 | 200 | 300 | 400;
 
-const tierStyles: Record<Top100Tier, { ring: string; icon: string }> = {
-  20:  { ring: "border-sky-500",     icon: "text-sky-500" },
-  50:  { ring: "border-emerald-500", icon: "text-emerald-500" },
-  100: { ring: "border-amber-500",   icon: "text-amber-500" },
-  200: { ring: "border-violet-500",  icon: "text-violet-500" },
-  300: { ring: "border-slate-500",   icon: "text-slate-500" },
-  400: { ring: "border-slate-900",   icon: "text-slate-900" },
+const tierStyles: Record<Top100Tier, { ring: string; icon: string; name: string }> = {
+  5:   { ring: "border-[#D9C7A3]", icon: "text-[#D9C7A3]", name: "Rookie Club" },
+  10:  { ring: "border-[#8BBF5A]", icon: "text-[#8BBF5A]", name: "Fairway Club" },
+  20:  { ring: "border-[#2E5930]", icon: "text-[#2E5930]", name: "Founders Club" },
+  50:  { ring: "border-[#C8A44B]", icon: "text-[#C8A44B]", name: "Heritage Club" },
+  100: { ring: "border-[#B7BCC6]", icon: "text-[#B7BCC6]", name: "Century Club" },
+  200: { ring: "border-[#D9A441]", icon: "text-[#D9A441]", name: "Elite Club" },
+  300: { ring: "border-[#5A3E8C]", icon: "text-[#5A3E8C]", name: "Legendary Club" },
+  400: { ring: "border-[#0C0F14]", icon: "text-[#0C0F14]", name: "Grand Slam Club" },
 };
 
 interface Top100AchievementBadgeProps {
@@ -45,7 +47,7 @@ export function Top100AchievementBadge({ tier }: Top100AchievementBadgeProps) {
             Achievement unlocked
           </p>
           <p className="text-sm font-semibold text-slate-900">
-            {tier} Club
+            {style.name}
           </p>
         </div>
       </div>

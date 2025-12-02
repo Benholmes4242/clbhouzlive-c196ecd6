@@ -84,6 +84,15 @@ export default {
 				'cta-text-dark': 'var(--cta-text-color-dark)',
 				'border-subtle': 'var(--border-subtle)',
 				'slate-secondary': 'var(--slate-secondary)',
+				// Top 100 Club tier colors
+				rookie: '#D9C7A3',
+				fairway: '#8BBF5A',
+				founders: '#2E5930',
+				heritage: '#C8A44B',
+				century: '#B7BCC6',
+				elite: '#D9A441',
+				legendary: '#5A3E8C',
+				grandslam: '#0C0F14',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
