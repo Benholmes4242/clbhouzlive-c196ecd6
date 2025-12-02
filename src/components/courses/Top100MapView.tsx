@@ -382,7 +382,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 top100-map-shell">
       <div className="relative mt-1 overflow-hidden rounded-3xl bg-muted/40">
         <div
           ref={mapContainerRef}
