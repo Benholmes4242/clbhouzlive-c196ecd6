@@ -1,4 +1,6 @@
 import React from 'react';
+import { Flag, Leaf, BadgeCheck, Archive, Gauge, Crown, Zap, Trophy, Target, Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { CLUB_STEPS, Top100ClubMeta } from '@/lib/top100Club';
 
 // Show all tiers from 5 through 400 in order
@@ -17,6 +19,31 @@ const TIER_COLORS: Record<string, string> = {
   grandslam: '#0C0F14',
 };
 
+// SVG icon mapping per tierId
+function getTierIcon(tierId: string) {
+  const iconClass = "w-4 h-4";
+  switch (tierId) {
+    case 'rookie':
+      return <Flag className={iconClass} />;
+    case 'fairway':
+      return <Leaf className={iconClass} />;
+    case 'founders':
+      return <BadgeCheck className={iconClass} />;
+    case 'heritage':
+      return <Archive className={iconClass} />;
+    case 'century':
+      return <Gauge className={iconClass} />;
+    case 'elite':
+      return <Crown className={iconClass} />;
+    case 'legendary':
+      return <Zap className={iconClass} />;
+    case 'grandslam':
+      return <Trophy className={iconClass} />;
+    default:
+      return <Target className={iconClass} />;
+  }
+}
+
 interface Top100MilestonesCarouselProps {
   totalPlayed: number;
   onMilestoneClick?: (milestone: Top100ClubMeta) => void;
@@ -26,63 +53,81 @@ export function Top100MilestonesCarousel({
   totalPlayed,
   onMilestoneClick,
 }: Top100MilestonesCarouselProps) {
-  const nextIndex = MILESTONES.findIndex(m => totalPlayed < m.threshold);
-
   return (
-    <section className="space-y-2">
-      <h3 className="text-sm font-semibold text-foreground">Milestones</h3>
-
-      <div className="flex gap-4 overflow-x-auto pb-1 -mx-1 px-1">
-        {MILESTONES.map((milestone, index) => {
+    <section className="mt-6 w-full">
+      <h3 className="text-sm font-semibold mb-2 px-1">Milestones</h3>
+      <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory -mx-1 px-1">
+        {MILESTONES.map((milestone) => {
           const isUnlocked = totalPlayed >= milestone.threshold;
           const remaining = Math.max(0, milestone.threshold - totalPlayed);
-          const isNext = !isUnlocked && nextIndex === index;
+
+          const nextIndex = MILESTONES.findIndex(m => totalPlayed < m.threshold);
+          const isNext = !isUnlocked && nextIndex === MILESTONES.indexOf(milestone);
+
+          const progressPct = Math.min(
+            100,
+            Math.max(0, (totalPlayed / milestone.threshold) * 100),
+          );
+
           const tierColor = TIER_COLORS[milestone.tierId] || TIER_COLORS.none;
+
+          const baseClasses =
+            'flex-shrink-0 w-44 md:w-48 rounded-xl border px-3 py-3 snap-center flex flex-col gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]';
+
+          const stateClasses = isUnlocked
+            ? 'bg-gradient-to-br from-[rgba(255,255,255,0.9)] to-[rgba(240,249,255,0.9)] border-border/60 shadow-sm'
+            : isNext
+            ? 'bg-card border-[rgba(148,163,184,0.8)] shadow-sm'
+            : 'bg-card border-border/60 opacity-80';
 
           return (
             <button
-              key={milestone.tierId}
+              key={milestone.threshold}
               type="button"
               onClick={() => onMilestoneClick?.(milestone)}
-              className="flex flex-col items-center min-w-[72px] gap-1 focus:outline-none"
+              className={`${baseClasses} ${stateClasses}`}
             >
-              {/* Ring */}
-              <div className="relative">
+              {/* Icon row */}
+              <div className="flex items-center justify-between">
                 <div
-                  className="h-14 w-14 rounded-full flex items-center justify-center bg-white"
-                  style={{
-                    boxShadow: isUnlocked || isNext
-                      ? `0 0 18px ${tierColor}22`
-                      : '0 0 10px rgba(15,23,42,0.06)',
-                    border: isUnlocked
-                      ? `3px solid ${tierColor}`
-                      : `2px solid ${tierColor}66`,
-                    opacity: isUnlocked ? 1 : 0.45,
-                  }}
+                  className="w-7 h-7 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: `${tierColor}1A` }}
                 >
-                  <span className="text-sm font-semibold" style={{ color: tierColor }}>
-                    {milestone.threshold}
+                  <span style={{ color: tierColor }}>
+                    {getTierIcon(milestone.tierId)}
                   </span>
                 </div>
 
-                {isNext && (
-                  <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-slate-900 text-[9px] font-medium text-white whitespace-nowrap">
-                    Next
+                {isUnlocked && (
+                  <span className="text-[11px] font-medium px-2 py-[3px] rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/40 flex items-center gap-1">
+                    <Check className="w-3 h-3" />
+                    Unlocked
                   </span>
                 )}
               </div>
 
-              {/* Labels */}
-              <div className="flex flex-col items-center">
-                <span className="text-[11px] font-medium text-foreground">
-                  {milestone.tierName}
-                </span>
-                <span className="text-[10px] text-muted-foreground">
-                  {isUnlocked
-                    ? 'Unlocked'
-                    : `${remaining} course${remaining === 1 ? '' : 's'} away`}
+              {/* Text labels */}
+              <div className="flex flex-col items-start gap-0.5">
+                <span className="text-sm font-semibold">{milestone.tierName}</span>
+                <span className="text-xs text-muted-foreground">
+                  {milestone.threshold} courses
                 </span>
               </div>
+
+              {/* Progress */}
+              {!isUnlocked && (
+                <div className="mt-1.5">
+                  <div className="h-1.5 rounded-full bg-border/50 overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all"
+                      style={{ width: `${progressPct}%`, backgroundColor: tierColor }}
+                    />
+                  </div>
+                  <p className="mt-1 text-[11px] text-muted-foreground">
+                    {remaining} course{remaining === 1 ? '' : 's'} away
+                  </p>
+                </div>
+              )}
             </button>
           );
         })}

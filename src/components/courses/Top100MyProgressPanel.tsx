@@ -184,48 +184,28 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
         />
       </div>
 
-      {/* Next Milestone Callout - Apple-style chip with tier-colored progress */}
-      {data?.next_milestone && (() => {
-        const TIER_COLORS: Record<number, string> = {
-          5: '#D9C7A3',    // rookie
-          10: '#8BBF5A',   // fairway
-          20: '#2E5930',   // founders
-          50: '#C8A44B',   // heritage
-          100: '#B7BCC6',  // century
-          200: '#D9A441',  // elite
-          300: '#5A3E8C',  // legendary
-          400: '#0C0F14',  // grandslam
-        };
-        const nextTierColor = TIER_COLORS[data.next_milestone.threshold] || '#94a3b8';
-        
-        return (
-          <div className="flex justify-center">
-            <div className="w-full max-w-sm bg-card border border-border/60 rounded-full py-2.5 px-4 flex flex-col">
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-primary-accent flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-                </svg>
-                <span className="text-sm">
-                  Next milestone:{' '}
-                  <span className="font-semibold">
-                    {data.next_milestone.remaining} more {data.next_milestone.remaining === 1 ? 'course' : 'courses'} to{' '}
-                  </span>
-                  <span className="font-semibold" style={{ color: nextTierColor }}>
-                    {data.next_milestone.tierName}
-                  </span>
-                </span>
-              </div>
-              {/* Micro progress bar - uses next tier color */}
-              <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all"
-                  style={{ width: `${nextMilestoneProgress}%`, backgroundColor: nextTierColor }}
-                />
-              </div>
+      {/* Next Milestone Callout - Apple-style chip */}
+      {data?.next_milestone && (
+        <div className="flex justify-center">
+          <div className="w-full max-w-sm bg-card border border-border/60 rounded-full py-2.5 px-4 flex flex-col">
+            <div className="flex items-center gap-2">
+              <svg className="w-4 h-4 text-primary-accent flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+              </svg>
+              <span className="text-sm">
+                Next milestone: <strong>{data.next_milestone.remaining}</strong> more {data.next_milestone.remaining === 1 ? 'course' : 'courses'} to {data.next_milestone.tierName}
+              </span>
+            </div>
+            {/* Micro progress bar */}
+            <div className="mt-2 h-1 rounded-full bg-border/40 overflow-hidden">
+              <div
+                className="h-full bg-primary-accent transition-all"
+                style={{ width: `${nextMilestoneProgress}%` }}
+              />
             </div>
           </div>
-        );
-      })()}
+        </div>
+      )}
 
       {/* Friends Chasing the Top 100 - Redesigned to match Friends Activity Card */}
       {isOwnProfile && friendsSnapshot && friendsSnapshot.friends.length > 0 && (
