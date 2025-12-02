@@ -80,6 +80,17 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
     };
   }, [data]);
 
+  // Calculate next milestone progress percentage - MUST be before early returns
+  const nextMilestoneProgress = React.useMemo(() => {
+    if (!data?.next_milestone) return 0;
+    const thresholds = [5, 10, 20, 50, 100, 200, 300, 400];
+    const currentThreshold = thresholds.find(t => t > (data?.totalTop100Played ?? 0)) || 400;
+    const prevThreshold = thresholds[thresholds.indexOf(currentThreshold) - 1] || 0;
+    const range = currentThreshold - prevThreshold;
+    const progress = (data?.totalTop100Played ?? 0) - prevThreshold;
+    return Math.min(100, Math.round((progress / range) * 100));
+  }, [data?.next_milestone, data?.totalTop100Played]);
+
   if (!effectiveUserId) {
     return (
       <div className="text-center py-12">
@@ -145,18 +156,6 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   const mainTitle = isOwnProfile
     ? "Your Top 100 Journey"
     : `${possessive} Top 100 Journey`;
-
-  // Calculate next milestone progress percentage
-  const nextMilestoneProgress = React.useMemo(() => {
-    if (!data?.next_milestone) return 0;
-    const currentTier = data.club_tier_name;
-    const thresholds = [5, 10, 20, 50, 100, 200, 300, 400];
-    const currentThreshold = thresholds.find(t => t > data.totalTop100Played) || 400;
-    const prevThreshold = thresholds[thresholds.indexOf(currentThreshold) - 1] || 0;
-    const range = currentThreshold - prevThreshold;
-    const progress = data.totalTop100Played - prevThreshold;
-    return Math.min(100, Math.round((progress / range) * 100));
-  }, [data?.next_milestone, data?.totalTop100Played]);
 
   return (
     <div className="w-full px-4 md:px-6 max-w-full space-y-5 pb-6">
