@@ -435,7 +435,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         {/* Selected Course Bottom Sheet – now full-bleed + anchored */}
         {selectedCourse && (
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20">
-            <div className="pointer-events-auto rounded-t-3xl rounded-b-none bg-white/95 px-4 pb-4 pt-3 shadow-2xl backdrop-blur-sm">
+            <div className="pointer-events-auto rounded-t-3xl rounded-b-none bg-white/20 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.2)] px-4 pb-4 pt-3">
               {/* Drag handle */}
               <div className="mx-auto mb-2 h-1 w-10 rounded-full bg-slate-200" />
 
