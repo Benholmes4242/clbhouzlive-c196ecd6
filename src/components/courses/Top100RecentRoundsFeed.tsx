@@ -1,10 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { Top100RecentRound } from '@/hooks/useTop100ProgressForUser';
 import { cn } from '@/lib/utils';
 import CourseRankBadges from './CourseRankBadges';
-import { extractRanksFromMemberships } from '@/utils/rankingUtils';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 
 interface Top100RecentRoundsFeedProps {
@@ -19,19 +17,24 @@ export function Top100RecentRoundsFeed({
   className,
 }: Top100RecentRoundsFeedProps) {
   const navigate = useNavigate();
-  const pageSize = 8;
+  const pageSize = 4;
   const [page, setPage] = React.useState(0);
+
+  const totalPages = Math.max(1, Math.ceil((rounds?.length || 0) / pageSize));
+  const currentPage = Math.min(page + 1, totalPages);
 
   if (!rounds || rounds.length === 0) {
     return (
-      <section className={cn("space-y-3", className)}>
-        <h3 className="text-sm font-semibold text-foreground px-4 sm:px-0">
-          Recent Top 100 Rounds
-        </h3>
-        <p className="text-sm text-muted-foreground px-4 sm:px-0">
+      <section className={cn("mt-6 w-full", className)}>
+        <div className="flex items-center justify-between mb-2 px-1">
+          <h3 className="text-sm font-semibold">
+            Recent Top 100 rounds
+          </h3>
+        </div>
+        <p className="text-xs text-muted-foreground px-1">
           {isOwnProfile
-            ? "No Top 100 rounds yet. Visit the Courses tab to explore."
-            : "No Top 100 rounds recorded yet."}
+            ? 'No Top 100 rounds recorded yet. Visit the Courses tab to start your journey.'
+            : 'No Top 100 rounds recorded yet.'}
         </p>
       </section>
     );
@@ -43,16 +46,17 @@ export function Top100RecentRoundsFeed({
   const hasPrev = page > 0;
 
   return (
-    <section className={cn("space-y-3", className)}>
-      <h3 className="text-sm font-semibold text-foreground px-4 sm:px-0">
-        Recent Top 100 Rounds
-      </h3>
+    <section className={cn("mt-6 w-full", className)}>
+      <div className="flex items-center justify-between mb-2 px-1">
+        <h3 className="text-sm font-semibold">
+          Recent Top 100 rounds
+        </h3>
+      </div>
 
-      <div className="space-y-3 sm:space-y-3">
+      <div className="space-y-3">
         {current.map((round) => {
-          // Extract rank badges from list memberships
           const ranks = {
-            globalRank: round.list_slugs.includes('global') ? 1 : null, // Would need actual rank data
+            globalRank: round.list_slugs.includes('global') ? 1 : null,
             regionalRank: round.list_slugs.includes('gb-i') ? 1 : null,
             usaRank: round.list_slugs.includes('usa') ? 1 : null,
           };
@@ -64,7 +68,6 @@ export function Top100RecentRoundsFeed({
               onClick={() => navigate(`/courses/${round.course_id}`)}
               className="w-full rounded-none sm:rounded-xl overflow-hidden bg-card border border-border/60 text-left shadow-sm hover:shadow-md transition-all"
             >
-              {/* Full-bleed course image with badges */}
               {round.image_url && (
                 <div className="relative w-full aspect-[1.6/1] overflow-hidden">
                   <img
@@ -76,10 +79,8 @@ export function Top100RecentRoundsFeed({
                     }}
                   />
                   
-                  {/* Gradient overlay at bottom */}
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
                   
-                  {/* Top 100 rank badges - top left */}
                   <CourseRankBadges
                     globalRank={ranks.globalRank}
                     regionalRank={ranks.regionalRank}
@@ -90,7 +91,6 @@ export function Top100RecentRoundsFeed({
                 </div>
               )}
 
-              {/* White metadata area at bottom */}
               <div className="px-4 py-3 bg-background space-y-1">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
@@ -104,7 +104,6 @@ export function Top100RecentRoundsFeed({
                     </p>
                   </div>
 
-                  {/* Clubhouse rating with logo - right side */}
                   {round.rating != null && (
                     <div className="flex items-center gap-1.5 flex-shrink-0">
                       <ClubhouseLogo className="h-5 w-5" />
@@ -121,25 +120,41 @@ export function Top100RecentRoundsFeed({
       </div>
 
       {(hasPrev || hasNext) && (
-        <div className="flex justify-between gap-3 pt-2 px-4 sm:px-0">
-          <Button
-            variant="outline"
-            size="sm"
+        <div className="mt-3 flex items-center justify-between gap-3 px-1">
+          <button
+            type="button"
+            onClick={() => hasPrev && setPage((p) => Math.max(0, p - 1))}
             disabled={!hasPrev}
-            onClick={() => hasPrev && setPage((p) => p - 1)}
-            className="flex-1"
+            className={cn(
+              'flex-1 inline-flex items-center justify-center rounded-full border px-3 py-2 text-sm font-medium transition-colors',
+              hasPrev
+                ? 'bg-card hover:bg-muted/70 border-border text-foreground'
+                : 'bg-muted/40 border-border/60 text-muted-foreground cursor-default'
+            )}
           >
             Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
+          </button>
+
+          <div className="min-w-[90px] text-center text-[11px] text-muted-foreground">
+            Page {currentPage} of {totalPages}
+          </div>
+
+          <button
+            type="button"
+            onClick={() =>
+              hasNext &&
+              setPage((p) => Math.min(totalPages - 1, p + 1))
+            }
             disabled={!hasNext}
-            onClick={() => hasNext && setPage((p) => p + 1)}
-            className="flex-1"
+            className={cn(
+              'flex-1 inline-flex items-center justify-center rounded-full border px-3 py-2 text-sm font-medium transition-colors',
+              hasNext
+                ? 'bg-card hover:bg-muted/70 border-border text-foreground'
+                : 'bg-muted/40 border-border/60 text-muted-foreground cursor-default'
+            )}
           >
             Next
-          </Button>
+          </button>
         </div>
       )}
     </section>
