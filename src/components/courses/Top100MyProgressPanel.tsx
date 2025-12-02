@@ -139,9 +139,9 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 px-4 pb-6">
+    <div className="max-w-2xl mx-auto space-y-6 pb-6">
       {/* Header */}
-      <div className="text-center space-y-3">
+      <div className="text-center space-y-3 px-4">
         <h1 className="text-3xl font-bold text-foreground">
           {isOwnProfile ? 'Your Top 100 Journey' : 'Top 100 Journey'}
         </h1>
@@ -153,7 +153,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
       </div>
 
       {/* Hero Section with Big Ring */}
-      <div className="mt-6">
+      <div className="mt-6 px-4">
         <Top100HeroSection
           avatarUrl={avatarUrl}
           displayName={displayName}
@@ -169,7 +169,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
 
           {/* Next Milestone Callout */}
           {data?.next_milestone && (
-            <div className="flex justify-center">
+            <div className="flex justify-center px-4">
               <div className="inline-flex items-center gap-2 rounded-full bg-card/60 px-3 py-1 text-xs text-muted-foreground border border-border/40">
                 <span>Next milestone:</span>
                 <span className="font-medium text-foreground">
@@ -183,34 +183,38 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
 
           {/* Friends Chasing the Top 100 - Redesigned to match Friends Activity Card */}
           {isOwnProfile && friendsSnapshot && friendsSnapshot.friends.length > 0 && (
-            <Top100FriendsActivityCard
-              friends={topFriends}
-              friendMessage={friendMessage}
-              onViewLeaderboard={() => navigate('/top100?tab=leaderboard&view=players')}
-            />
+            <div className="px-4">
+              <Top100FriendsActivityCard
+                friends={topFriends}
+                friendMessage={friendMessage}
+                onViewLeaderboard={() => navigate('/top100?tab=leaderboard&view=players')}
+              />
+            </div>
           )}
 
           {/* Milestones Carousel */}
-          <Top100MilestonesCarousel
-            totalPlayed={data.totalTop100Played}
-            onMilestoneClick={() => {
-              // Already on My Progress, could open a modal in future
-            }}
-          />
+          <div className="px-4">
+            <Top100MilestonesCarousel
+              totalPlayed={data.totalTop100Played}
+              onMilestoneClick={() => {
+                // Already on My Progress, could open a modal in future
+              }}
+            />
+          </div>
 
           {/* Region Progress Grid */}
-          <Top100RegionProgressGrid
-            lists={data.lists}
-            onListClick={(slug) => navigate(`/top100/${slug}`)}
-          />
+          <div className="px-4">
+            <Top100RegionProgressGrid
+              lists={data.lists}
+              onListClick={(slug) => navigate(`/top100/${slug}`)}
+            />
+          </div>
 
         {/* Recent Top 100 Rounds - Full-bleed on mobile */}
-        <div className="-mx-4 sm:mx-0">
-          <Top100RecentRoundsFeed
-            rounds={data.recent_rounds}
-            isOwnProfile={isOwnProfile}
-          />
-        </div>
+        <Top100RecentRoundsFeed
+          rounds={data.recent_rounds}
+          isOwnProfile={isOwnProfile}
+        />
     </div>
   );
 };
