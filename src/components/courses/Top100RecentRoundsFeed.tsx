@@ -55,11 +55,6 @@ export function Top100RecentRoundsFeed({
 
       <div className="space-y-3">
         {current.map((round) => {
-          const ranks = {
-            globalRank: round.list_slugs.includes('global') ? 1 : null,
-            regionalRank: round.list_slugs.includes('gb-i') ? 1 : null,
-            usaRank: round.list_slugs.includes('usa') ? 1 : null,
-          };
 
           return (
             <button
@@ -82,9 +77,9 @@ export function Top100RecentRoundsFeed({
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
                   
                   <CourseRankBadges
-                    globalRank={ranks.globalRank}
-                    regionalRank={ranks.regionalRank}
-                    usaRank={ranks.usaRank}
+                    globalRank={round.global_rank}
+                    regionalRank={round.regional_rank}
+                    usaRank={round.usa_rank}
                     country={round.country || ''}
                     positioning="top-left"
                   />

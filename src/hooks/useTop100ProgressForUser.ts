@@ -23,6 +23,9 @@ export type Top100RecentRound = {
   played_at: string;
   rating: number | null;
   image_url?: string | null;
+  global_rank: number | null;
+  regional_rank: number | null;
+  usa_rank: number | null;
 };
 
 export type Top100NextMilestone = {
@@ -166,12 +169,19 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
 
       if (recentError) throw recentError;
 
-      // Build recent rounds with all list memberships
+      // Build recent rounds with all list memberships and real ranks
       const recentRounds: Top100RecentRound[] = [];
       for (const activity of recentActivity || []) {
-        const courseListSlugs = (memberships || [])
-          .filter((m: any) => m.course_id === activity.course_id)
-          .map((m: any) => m.top100_lists.slug);
+        const courseMemberships = (memberships || [])
+          .filter((m: any) => m.course_id === activity.course_id);
+        
+        const courseListSlugs = courseMemberships.map((m: any) => m.top100_lists.slug);
+        
+        // Extract real ranks from memberships
+        const globalMembership = courseMemberships.find((m: any) => m.top100_lists.slug === 'global');
+        const gbMembership = courseMemberships.find((m: any) => m.top100_lists.slug === 'gb-i');
+        const usaMembership = courseMemberships.find((m: any) => m.top100_lists.slug === 'usa');
+        const europeMembership = courseMemberships.find((m: any) => m.top100_lists.slug === 'europe');
 
         recentRounds.push({
           course_id: activity.course_id,
@@ -182,6 +192,9 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
           played_at: activity.last_played_at || new Date().toISOString(),
           rating: activity.rating_value,
           image_url: (activity as any).golf_courses.thumbnail_image ?? null,
+          global_rank: globalMembership?.rank ?? null,
+          regional_rank: gbMembership?.rank ?? europeMembership?.rank ?? null,
+          usa_rank: usaMembership?.rank ?? null,
         });
       }
 
