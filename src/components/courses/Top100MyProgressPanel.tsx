@@ -138,22 +138,40 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
     }
   }
 
+  // Dynamic title based on profile ownership
+  const possessive = displayName?.endsWith('s')
+    ? `${displayName}'`
+    : `${displayName}'s`;
+  const mainTitle = isOwnProfile
+    ? "Your Top 100 Journey"
+    : `${possessive} Top 100 Journey`;
+
+  // Calculate next milestone progress percentage
+  const nextMilestoneProgress = React.useMemo(() => {
+    if (!data?.next_milestone) return 0;
+    const currentTier = data.club_tier_name;
+    const thresholds = [5, 10, 20, 50, 100, 200, 300, 400];
+    const currentThreshold = thresholds.find(t => t > data.totalTop100Played) || 400;
+    const prevThreshold = thresholds[thresholds.indexOf(currentThreshold) - 1] || 0;
+    const range = currentThreshold - prevThreshold;
+    const progress = data.totalTop100Played - prevThreshold;
+    return Math.min(100, Math.round((progress / range) * 100));
+  }, [data?.next_milestone, data?.totalTop100Played]);
+
   return (
-    <div className="max-w-2xl mx-auto space-y-6 pb-6">
+    <div className="w-full px-4 md:px-6 max-w-full space-y-5 pb-6">
       {/* Header */}
-      <div className="text-center space-y-3 px-4">
+      <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold text-foreground">
-          {isOwnProfile ? 'Your Top 100 Journey' : 'Top 100 Journey'}
+          {mainTitle}
         </h1>
         <p className="text-muted-foreground">
-          {isOwnProfile 
-            ? 'Track your elite pilgrimage across the world\'s greatest courses'
-            : 'See how far they\'ve come across the world\'s greatest courses'}
+          Track your elite pilgrimage across the world's greatest courses
         </p>
       </div>
 
       {/* Hero Section with Big Ring */}
-      <div className="mt-6 px-4">
+      <div className="mt-4">
         <Top100HeroSection
           avatarUrl={avatarUrl}
           displayName={displayName}
@@ -167,56 +185,59 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
         />
       </div>
 
-          {/* Next Milestone Callout */}
-          {data?.next_milestone && (
-            <div className="flex justify-center px-4">
-              <div className="inline-flex items-center gap-2 rounded-full bg-card/60 px-3 py-1 text-xs text-muted-foreground border border-border/40">
-                <span>Next milestone:</span>
-                <span className="font-medium text-foreground">
-                  {data.next_milestone.remaining} more{' '}
-                  {data.next_milestone.remaining === 1 ? 'course' : 'courses'} to{' '}
-                  {data.next_milestone.tierName}
-                </span>
-              </div>
+      {/* Next Milestone Callout - Apple-style chip */}
+      {data?.next_milestone && (
+        <div className="flex justify-center">
+          <div className="w-full max-w-sm bg-card border border-border/60 rounded-full py-2.5 px-4 flex flex-col">
+            <div className="flex items-center gap-2">
+              <svg className="w-4 h-4 text-primary-accent flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+              </svg>
+              <span className="text-sm">
+                Next milestone: <strong>{data.next_milestone.remaining}</strong> more {data.next_milestone.remaining === 1 ? 'course' : 'courses'} to {data.next_milestone.tierName}
+              </span>
             </div>
-          )}
-
-          {/* Friends Chasing the Top 100 - Redesigned to match Friends Activity Card */}
-          {isOwnProfile && friendsSnapshot && friendsSnapshot.friends.length > 0 && (
-            <div className="px-4">
-              <Top100FriendsActivityCard
-                friends={topFriends}
-                friendMessage={friendMessage}
-                onViewLeaderboard={() => navigate('/top100?tab=leaderboard&view=players')}
+            {/* Micro progress bar */}
+            <div className="mt-2 h-1 rounded-full bg-border/40 overflow-hidden">
+              <div
+                className="h-full bg-primary-accent transition-all"
+                style={{ width: `${nextMilestoneProgress}%` }}
               />
             </div>
-          )}
-
-          {/* Milestones Carousel */}
-          <div className="px-4">
-            <Top100MilestonesCarousel
-              totalPlayed={data.totalTop100Played}
-              onMilestoneClick={() => {
-                // Already on My Progress, could open a modal in future
-              }}
-            />
           </div>
-
-          {/* Region Progress Grid */}
-          <div className="px-4">
-            <Top100RegionProgressGrid
-              lists={data.lists}
-              onListClick={(slug) => navigate(`/top100/${slug}`)}
-            />
-          </div>
-
-        {/* Recent Top 100 Rounds - Full-width breakout */}
-        <div className="-mx-4 sm:mx-0">
-          <Top100RecentRoundsFeed
-            rounds={data.recent_rounds}
-            isOwnProfile={isOwnProfile}
-          />
         </div>
+      )}
+
+      {/* Friends Chasing the Top 100 - Redesigned to match Friends Activity Card */}
+      {isOwnProfile && friendsSnapshot && friendsSnapshot.friends.length > 0 && (
+        <Top100FriendsActivityCard
+          friends={topFriends}
+          friendMessage={friendMessage}
+          onViewLeaderboard={() => navigate('/top100?tab=leaderboard&view=players')}
+        />
+      )}
+
+      {/* Milestones Carousel */}
+      <Top100MilestonesCarousel
+        totalPlayed={data.totalTop100Played}
+        onMilestoneClick={() => {
+          // Already on My Progress, could open a modal in future
+        }}
+      />
+
+      {/* Region Progress Grid */}
+      <Top100RegionProgressGrid
+        lists={data.lists}
+        onListClick={(slug) => navigate(`/top100/${slug}`)}
+      />
+
+      {/* Recent Top 100 Rounds - Full-width breakout */}
+      <div className="-mx-4 sm:mx-0">
+        <Top100RecentRoundsFeed
+          rounds={data.recent_rounds}
+          isOwnProfile={isOwnProfile}
+        />
+      </div>
     </div>
   );
 };
