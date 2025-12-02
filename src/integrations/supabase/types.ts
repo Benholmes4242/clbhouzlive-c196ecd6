@@ -5603,20 +5603,23 @@ export type Database = {
       }
       get_top100_course_leaderboard: {
         Args: {
-          limit_param: number
-          offset_param: number
-          scope_param: string
-          time_range_param: string
+          limit_param?: number
+          offset_param?: number
+          scope_param?: string
+          time_range_param?: string
         }
         Returns: {
           avg_rating: number
           country: string
           course_id: string
           course_name: string
+          global_rank: number
           list_slug: string
+          regional_rank: number
           sub_country: string
           thumbnail_url: string
           times_played: number
+          usa_rank: number
         }[]
       }
       get_top100_discover_recommendations: {
