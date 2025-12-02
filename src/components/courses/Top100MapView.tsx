@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { useSwipeable } from 'react-swipeable';
 import {
   useTop100MapCourses,
   Top100MapScope,
@@ -77,6 +78,15 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   // swipe-down state for course sheet
   const [dragStartY, setDragStartY] = useState<number | null>(null);
   const [dragOffsetY, setDragOffsetY] = useState(0);
+
+  // Swipe handlers for filters drawer
+  const drawerSwipeHandlers = useSwipeable({
+    onSwipedUp: () => setFiltersOpen(true),
+    onSwipedDown: () => setFiltersOpen(false),
+    trackMouse: false,
+    trackTouch: true,
+    delta: 30,
+  });
 
   const {
     data: courses = [],
@@ -422,14 +432,15 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         {/* Filters drawer – full bleed, glass */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10">
           <div
+            {...drawerSwipeHandlers}
             className={cn(
               'pointer-events-auto rounded-t-3xl rounded-b-none bg-white/20 backdrop-blur-xl border-t border-white/30 shadow-[0_-4px_12px_rgba(15,23,42,0.08)] dark:shadow-[0_-4px_16px_rgba(0,0,0,0.45)] text-xs text-slate-900 transition-transform duration-200',
               filtersOpen ? 'translate-y-0' : 'translate-y-[calc(100%-40px)]'
             )}
           >
             {/* Drag handle */}
-            <div className="flex justify-center pt-0.5">
-              <div className="h-1 w-8 rounded-full bg-slate-300/80 dark:bg-slate-500/80" />
+            <div className="flex justify-center pt-1.5">
+              <div className="h-1 w-12 rounded-full bg-slate-400/80 dark:bg-slate-500/80" />
             </div>
 
             {/* Header / handle */}
