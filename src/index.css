@@ -295,12 +295,6 @@ html.lightbox-open {
   z-index: -1;
 }
 
-/* Keep Mapbox controls above the anchored bottom sheet on Top 100 maps */
-.mapboxgl-ctrl-bottom-left,
-.mapboxgl-ctrl-bottom-right {
-  margin-bottom: 72px; /* roughly height of bottom sheet */
-}
-
 
 /* Hide scrollbar utility */
 .no-scrollbar {
