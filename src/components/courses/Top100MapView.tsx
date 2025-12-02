@@ -398,13 +398,13 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
         {/* Legend (top-left) */}
         <div className="pointer-events-none absolute left-3 top-3 z-10">
-          <div className="flex items-center gap-3 rounded-2xl bg-slate-900/90 px-3 py-1.5 text-[11px] text-white shadow-lg">
+          <div className="flex items-center gap-3 rounded-2xl bg-white/20 px-3 py-1.5 text-[11px] text-slate-900 shadow-[0_4px_20px_rgba(0,0,0,0.15)] backdrop-blur-xl border border-white/30">
             <div className="flex items-center gap-1">
               <span className="inline-block h-2 w-2 rounded-full bg-[#F7931E]" />
               <span>Played</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="inline-block h-2 w-2 rounded-full bg-slate-200" />
+              <span className="inline-block h-2 w-2 rounded-full bg-[#0f172a]" />
               <span>Not Played</span>
             </div>
           </div>
@@ -413,37 +413,37 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         {/* Stats pill (top-right) */}
         {officialTotal > 0 && (
           <div className="pointer-events-none absolute right-3 top-3 z-10">
-            <div className="rounded-2xl bg-slate-900/90 px-3 py-1.5 text-[11px] font-medium text-white shadow-lg">
+            <div className="rounded-2xl bg-white/20 px-3 py-1.5 text-[11px] font-medium text-slate-900 shadow-[0_4px_20px_rgba(0,0,0,0.15)] backdrop-blur-xl border border-white/30">
               {ratedCount}/{officialTotal} Played · {remaining} left
             </div>
           </div>
         )}
 
-        {/* Filters drawer */}
+        {/* Filters drawer – full bleed, glass */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10">
           <div
             className={cn(
-              'pointer-events-auto mx-3 mb-3 rounded-2xl bg-slate-900/95 text-[11px] text-white shadow-xl transition-transform duration-200',
-              filtersOpen ? 'translate-y-0' : 'translate-y-[calc(100%-32px)]'
+              'pointer-events-auto rounded-t-3xl rounded-b-none bg-white/20 backdrop-blur-xl border-t border-white/30 shadow-[0_-8px_32px_rgba(0,0,0,0.2)] text-[11px] text-slate-900 transition-transform duration-200',
+              filtersOpen ? 'translate-y-0' : 'translate-y-[calc(100%-40px)]'
             )}
           >
             {/* Header / handle */}
             <button
               type="button"
               onClick={() => setFiltersOpen((v) => !v)}
-              className="flex w-full items-center justify-between px-3 py-2"
+              className="flex w-full items-center justify-between px-4 py-2"
             >
               <span className="font-medium">Map filters</span>
-              <span className="text-xs opacity-80">
+              <span className="text-xs text-slate-500">
                 {filtersOpen ? 'Hide' : 'Show'}
               </span>
             </button>
 
             {/* Drawer content */}
-            <div className="px-3 pb-3 pt-1">
+            <div className="px-4 pb-3 pt-1">
               {/* Rated filter + reset */}
               <div className="mb-2 flex items-center justify-between gap-2">
-                <div className="inline-flex items-center gap-1 rounded-full bg-slate-800/90 px-1 py-1">
+                <div className="inline-flex items-center gap-1 rounded-full bg-white/20 px-1 py-1 backdrop-blur-xl">
                   {(['all', 'rated', 'unrated'] as RatedFilter[]).map((opt) => (
                     <button
                       key={opt}
@@ -453,7 +453,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                         'rounded-full px-3 py-1 text-[11px] font-medium transition-colors',
                         ratedFilter === opt
                           ? 'bg-white text-slate-900 shadow-sm'
-                          : 'bg-transparent text-slate-300 hover:text-white'
+                          : 'bg-transparent text-slate-600 hover:text-slate-900'
                       )}
                     >
                       {opt === 'all'
@@ -468,7 +468,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                 <button
                   type="button"
                   onClick={handleResetView}
-                  className="text-[11px] font-medium text-slate-300 underline-offset-2 hover:text-white hover:underline"
+                  className="text-[11px] font-medium text-slate-500 underline-offset-2 hover:text-slate-800 hover:underline"
                 >
                   Reset view
                 </button>
@@ -498,7 +498,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                           'flex-1 rounded-full border px-3 py-1.5 text-[11px] font-semibold transition',
                           isActive
                             ? 'bg-white text-slate-900 border-white/70 shadow-sm'
-                            : 'bg-slate-900 text-slate-200 border-slate-600'
+                            : 'bg-white/10 text-slate-700 border-white/30 hover:bg-white/20'
                         )}
                       >
                         {label}
