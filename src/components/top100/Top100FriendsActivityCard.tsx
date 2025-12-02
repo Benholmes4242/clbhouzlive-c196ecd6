@@ -89,16 +89,11 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 py-[2px] text-xs font-semibold text-amber-700">
-            Top 10
-          </span>
-          {isExpanded ? (
-            <ChevronUp className="w-5 h-5 text-muted-foreground transition-transform duration-200" />
-          ) : (
-            <ChevronDown className="w-5 h-5 text-muted-foreground transition-transform duration-200" />
-          )}
-        </div>
+        {isExpanded ? (
+          <ChevronUp className="w-5 h-5 text-muted-foreground transition-transform duration-200" />
+        ) : (
+          <ChevronDown className="w-5 h-5 text-muted-foreground transition-transform duration-200" />
+        )}
       </button>
 
       {/* Leaderboard List */}

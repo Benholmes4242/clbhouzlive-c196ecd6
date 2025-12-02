@@ -140,30 +140,14 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
     session?.user?.user_metadata?.full_name ?? 
     null;
 
-  // Friends comparison logic
+  // Friends comparison logic - real data only
   const myCount = data?.totalTop100Played ?? 0;
-  const realFriends = friendsSnapshot?.friends ?? [];
+  const friends = friendsSnapshot?.friends ?? [];
 
-  // Mock users for testing expanded view (remove in production)
-  const mockFriends = [
-    { friend_id: 'mock-1', display_name: 'James Morrison', profile_photo_url: null, home_club: 'Royal Birkdale', total_top100_played: 47 },
-    { friend_id: 'mock-2', display_name: 'Sarah Thompson', profile_photo_url: null, home_club: 'Sunningdale', total_top100_played: 38 },
-    { friend_id: 'mock-3', display_name: 'Michael Chen', profile_photo_url: null, home_club: 'Pebble Beach', total_top100_played: 31 },
-    { friend_id: 'mock-4', display_name: 'Emma Williams', profile_photo_url: null, home_club: 'St Andrews', total_top100_played: 28 },
-    { friend_id: 'mock-5', display_name: 'David Park', profile_photo_url: null, home_club: 'Royal County Down', total_top100_played: 24 },
-    { friend_id: 'mock-6', display_name: 'Lucy Anderson', profile_photo_url: null, home_club: 'Muirfield', total_top100_played: 19 },
-    { friend_id: 'mock-7', display_name: 'Tom Richards', profile_photo_url: null, home_club: 'Carnoustie', total_top100_played: 15 },
-    { friend_id: 'mock-8', display_name: 'Sophie Martin', profile_photo_url: null, home_club: 'Turnberry', total_top100_played: 12 },
-    { friend_id: 'mock-9', display_name: 'Alex Johnson', profile_photo_url: null, home_club: 'Royal Portrush', total_top100_played: 9 },
-    { friend_id: 'mock-10', display_name: 'Rachel Davies', profile_photo_url: null, home_club: 'Wentworth', total_top100_played: 6 },
-  ];
-
-  // Combine real friends with mock friends for testing
-  const friends = [...realFriends, ...mockFriends];
-
+  // Filter to only friends who have played at least 1 Top 100 course, sort by total_top100_played DESC
   const topFriends = friends
-    .slice()
-    .sort((a, b) => b.total_top100_played - a.total_top100_played)
+    .filter(f => (f.total_top100_played ?? 0) > 0)
+    .sort((a, b) => (b.total_top100_played ?? 0) - (a.total_top100_played ?? 0))
     .slice(0, 10);
 
   let friendMessage: string | null = null;
@@ -246,8 +230,8 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
         );
       })()}
 
-      {/* Friends Chasing the Top 100 - Redesigned to match Friends Activity Card */}
-      {isOwnProfile && friendsSnapshot && friendsSnapshot.friends.length > 0 && (
+      {/* Friends Chasing the Top 100 - Only show if there are friends with Top 100 courses played */}
+      {isOwnProfile && topFriends.length > 0 && (
         <Top100FriendsActivityCard
           friends={topFriends}
           friendMessage={friendMessage}
