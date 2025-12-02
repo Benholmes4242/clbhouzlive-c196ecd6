@@ -6,6 +6,7 @@ import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { RatingBar } from '@/components/ui/RatingBar';
 import { RatingBadge } from '@/components/ui/RatingBadge';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 
 interface CommunityScoreCardProps {
   courseId: string;
@@ -132,9 +133,12 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
       <div className="flex items-start justify-between gap-4">
         {/* Left - title + meta */}
         <div className="flex-1 min-w-0">
-          <h3 className="text-xl font-semibold text-slate-900">
-            Community Rating
-          </h3>
+          <div className="flex items-center gap-2">
+            <ClubhouseLogo size="sm" className="opacity-80" />
+            <h3 className="text-xl font-semibold text-slate-900">
+              Community Rating
+            </h3>
+          </div>
           
           <p className="mt-1 text-sm text-slate-500">
             Based on {totalRatings} {totalRatings === 1 ? 'rating' : 'ratings'}
