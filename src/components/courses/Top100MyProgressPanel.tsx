@@ -158,7 +158,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
     : `${possessive} Top 100 Journey`;
 
   return (
-    <div className="w-full px-4 md:px-6 max-w-full space-y-5 pb-6">
+    <div className="w-full max-w-full space-y-5 pb-6">
       {/* Header */}
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold text-foreground">
