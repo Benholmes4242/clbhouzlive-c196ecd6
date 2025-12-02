@@ -210,11 +210,13 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
             />
           </div>
 
-        {/* Recent Top 100 Rounds - Full-bleed on mobile */}
-        <Top100RecentRoundsFeed
-          rounds={data.recent_rounds}
-          isOwnProfile={isOwnProfile}
-        />
+        {/* Recent Top 100 Rounds - Full-width breakout */}
+        <div className="-mx-4 sm:mx-0">
+          <Top100RecentRoundsFeed
+            rounds={data.recent_rounds}
+            isOwnProfile={isOwnProfile}
+          />
+        </div>
     </div>
   );
 };

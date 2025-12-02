@@ -25,10 +25,10 @@ export function Top100RecentRoundsFeed({
   if (!rounds || rounds.length === 0) {
     return (
       <section className={cn("space-y-3", className)}>
-        <h3 className="text-sm font-semibold text-foreground px-4">
+        <h3 className="text-sm font-semibold text-foreground px-4 sm:px-0">
           Recent Top 100 Rounds
         </h3>
-        <p className="text-sm text-muted-foreground px-4">
+        <p className="text-sm text-muted-foreground px-4 sm:px-0">
           {isOwnProfile
             ? "No Top 100 rounds yet. Visit the Courses tab to explore."
             : "No Top 100 rounds recorded yet."}
@@ -44,11 +44,11 @@ export function Top100RecentRoundsFeed({
 
   return (
     <section className={cn("space-y-3", className)}>
-      <h3 className="text-sm font-semibold text-foreground px-4">
+      <h3 className="text-sm font-semibold text-foreground px-4 sm:px-0">
         Recent Top 100 Rounds
       </h3>
 
-      <div className="space-y-3">
+      <div className="space-y-3 sm:space-y-3">
         {current.map((round) => {
           // Extract rank badges from list memberships
           const ranks = {
@@ -117,7 +117,7 @@ export function Top100RecentRoundsFeed({
       </div>
 
       {(hasPrev || hasNext) && (
-        <div className="flex justify-between gap-3 pt-2 px-4">
+        <div className="flex justify-between gap-3 pt-2 px-4 sm:px-0">
           <Button
             variant="outline"
             size="sm"
