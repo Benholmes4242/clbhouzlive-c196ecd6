@@ -5,8 +5,7 @@ import { LeaderboardScope, LeaderboardTimeRange } from '@/hooks/useTop100Leaderb
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { Top100LeaderboardFilters } from './Top100LeaderboardFilterBar';
-import Top100Pills from '@/components/courses/Top100Pills';
-import { useCourseTop100Memberships } from '@/hooks/useCourseTop100Memberships';
+import CourseRankBadges from '@/components/courses/CourseRankBadges';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 
 interface Top100CoursesLeaderboardViewProps {
@@ -14,97 +13,6 @@ interface Top100CoursesLeaderboardViewProps {
 }
 
 const PAGE_SIZE = 10;
-
-// Wrapper component to handle per-course membership fetching
-function CourseCardWithBadges({ 
-  course, 
-  rank, 
-  hasImage, 
-  rating, 
-  onClick 
-}: { 
-  course: any; 
-  rank: number; 
-  hasImage: boolean; 
-  rating: number | null;
-  onClick: () => void;
-}) {
-  const { data: memberships = [] } = useCourseTop100Memberships(course.course_id);
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="w-full rounded-none sm:rounded-xl overflow-hidden bg-card border-y sm:border border-border/60 text-left shadow-none sm:shadow-sm hover:sm:shadow-md transition-all"
-    >
-      {/* Image with overlay */}
-      {hasImage && (
-        <div className="relative w-full aspect-[1.6/1] overflow-hidden">
-          <img
-            src={course.thumbnail_url!}
-            alt={course.course_name}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).style.display = 'none';
-            }}
-          />
-          
-          {/* Gradient overlay */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
-          
-          {/* Top 100 badges - top-left */}
-          {memberships.length > 0 && (
-            <div className="absolute top-2 left-2 z-10">
-              <Top100Pills 
-                memberships={memberships} 
-                variant="overlay" 
-                size="sm"
-                courseId={course.course_id}
-              />
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Meta block */}
-      <div className="px-4 py-3 bg-background space-y-1">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              {!hasImage && (
-                <span className="text-[11px] font-semibold text-muted-foreground">
-                  #{rank}
-                </span>
-              )}
-              <h3 className="text-base font-semibold text-foreground truncate">
-                {course.course_name}
-              </h3>
-            </div>
-            
-            <p className="text-sm text-muted-foreground">
-              {course.sub_country && `${course.sub_country}, `}
-              {course.country}
-            </p>
-            
-            <p className="text-[11px] text-muted-foreground mt-0.5">
-              Played {course.times_played} time{course.times_played === 1 ? '' : 's'} by members
-            </p>
-          </div>
-
-          {/* Right: Clbhouz logo and rating */}
-          {rating !== null && (
-            <div className="flex items-center gap-1.5 flex-shrink-0">
-              <ClubhouseLogo className="h-5 w-5" />
-              <span className="text-sm font-semibold text-foreground">
-                {rating.toFixed(1)}
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
-    </button>
-  );
-}
 
 // Map new filter format to legacy scope
 function mapFiltersToScope(filters: Top100LeaderboardFilters): LeaderboardScope {
@@ -192,15 +100,83 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
             const hasImage = !!course.thumbnail_url;
             const rating = course.avg_rating ?? null;
 
+            // Determine which lists this course belongs to for badges
+            const ranks = {
+              globalRank: filters.listSlug === 'global' || filters.listSlug === 'all' ? rank : null,
+              regionalRank: filters.listSlug === 'gb-i' ? rank : null,
+              usaRank: filters.listSlug === 'usa' ? rank : null,
+            };
+
             return (
-              <CourseCardWithBadges
+              <button
                 key={course.course_id}
-                course={course}
-                rank={rank}
-                hasImage={hasImage}
-                rating={rating}
+                type="button"
                 onClick={() => navigate(`/courses/${course.course_id}`)}
-              />
+                className="w-full rounded-none sm:rounded-xl overflow-hidden bg-card border-y sm:border border-border/60 text-left shadow-none sm:shadow-sm hover:sm:shadow-md transition-all"
+              >
+                {/* Image with overlay - matching My Progress aspect ratio */}
+                {hasImage && (
+                  <div className="relative w-full aspect-[1.6/1] overflow-hidden">
+                    <img
+                      src={course.thumbnail_url!}
+                      alt={course.course_name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                    
+                    {/* Gradient overlay */}
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
+                    
+                    {/* Rank badges top-left */}
+                    <CourseRankBadges
+                      globalRank={ranks.globalRank}
+                      regionalRank={ranks.regionalRank}
+                      usaRank={ranks.usaRank}
+                      country={course.country || ''}
+                      positioning="top-left"
+                    />
+                  </div>
+                )}
+
+                {/* Meta block - matching My Progress structure */}
+                <div className="px-4 py-3 bg-background space-y-1">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        {!hasImage && (
+                          <span className="text-[11px] font-semibold text-muted-foreground">
+                            #{rank}
+                          </span>
+                        )}
+                        <h3 className="text-base font-semibold text-foreground truncate">
+                          {course.course_name}
+                        </h3>
+                      </div>
+                      
+                      <p className="text-sm text-muted-foreground">
+                        {course.sub_country && `${course.sub_country}, `}
+                        {course.country}
+                      </p>
+                      
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        Played {course.times_played} time{course.times_played === 1 ? '' : 's'} by members
+                      </p>
+                    </div>
+
+                    {/* Right: Clbhouz logo and rating */}
+                    {rating !== null && (
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <ClubhouseLogo className="h-5 w-5" />
+                        <span className="text-sm font-semibold text-foreground">
+                          {rating.toFixed(1)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </button>
             );
           })}
         </section>

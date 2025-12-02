@@ -2,85 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Top100RecentRound } from '@/hooks/useTop100ProgressForUser';
 import { cn } from '@/lib/utils';
-import Top100Pills from './Top100Pills';
-import { useCourseTop100Memberships } from '@/hooks/useCourseTop100Memberships';
+import CourseRankBadges from './CourseRankBadges';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
-
-interface Top100RecentRoundsFeedProps {
-  rounds: Top100RecentRound[];
-  isOwnProfile: boolean;
-  className?: string;
-}
-
-// Wrapper component to handle per-course membership fetching
-function RoundCardWithBadges({
-  round,
-  onClick,
-}: {
-  round: Top100RecentRound;
-  onClick: () => void;
-}) {
-  const { data: memberships = [] } = useCourseTop100Memberships(round.course_id);
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="w-full rounded-none sm:rounded-xl overflow-hidden bg-card border-y sm:border border-border/60 text-left shadow-none sm:shadow-sm hover:sm:shadow-md transition-all"
-    >
-      {round.image_url && (
-        <div className="relative w-full aspect-[1.6/1] overflow-hidden">
-          <img
-            src={round.image_url}
-            alt={round.course_name}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              e.currentTarget.src = '/placeholder.svg';
-            }}
-          />
-          
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
-          
-          {/* Top 100 badges - top-left */}
-          {memberships.length > 0 && (
-            <div className="absolute top-2 left-2 z-10">
-              <Top100Pills 
-                memberships={memberships} 
-                variant="overlay" 
-                size="sm"
-                courseId={round.course_id}
-              />
-            </div>
-          )}
-        </div>
-      )}
-
-      <div className="px-4 py-3 bg-background space-y-1">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <h3 className="text-base font-semibold text-foreground">
-              {round.course_name}
-            </h3>
-            
-            <p className="text-sm text-muted-foreground">
-              {round.sub_country && `${round.sub_country}, `}
-              {round.country}
-            </p>
-          </div>
-
-          {round.rating != null && (
-            <div className="flex items-center gap-1.5 flex-shrink-0">
-              <ClubhouseLogo className="h-5 w-5" />
-              <span className="text-sm font-semibold text-foreground">
-                {round.rating.toFixed(1)}
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
-    </button>
-  );
-}
 
 interface Top100RecentRoundsFeedProps {
   rounds: Top100RecentRound[];
@@ -131,13 +54,69 @@ export function Top100RecentRoundsFeed({
       </div>
 
       <div className="space-y-3">
-        {current.map((round) => (
-          <RoundCardWithBadges
-            key={`${round.course_id}-${round.played_at}`}
-            round={round}
-            onClick={() => navigate(`/courses/${round.course_id}`)}
-          />
-        ))}
+        {current.map((round) => {
+          const ranks = {
+            globalRank: round.list_slugs.includes('global') ? 1 : null,
+            regionalRank: round.list_slugs.includes('gb-i') ? 1 : null,
+            usaRank: round.list_slugs.includes('usa') ? 1 : null,
+          };
+
+          return (
+            <button
+              key={`${round.course_id}-${round.played_at}`}
+              type="button"
+              onClick={() => navigate(`/courses/${round.course_id}`)}
+              className="w-full rounded-none sm:rounded-xl overflow-hidden bg-card border-y sm:border border-border/60 text-left shadow-none sm:shadow-sm hover:sm:shadow-md transition-all"
+            >
+              {round.image_url && (
+                <div className="relative w-full aspect-[1.6/1] overflow-hidden">
+                  <img
+                    src={round.image_url}
+                    alt={round.course_name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder.svg';
+                    }}
+                  />
+                  
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
+                  
+                  <CourseRankBadges
+                    globalRank={ranks.globalRank}
+                    regionalRank={ranks.regionalRank}
+                    usaRank={ranks.usaRank}
+                    country={round.country || ''}
+                    positioning="top-left"
+                  />
+                </div>
+              )}
+
+              <div className="px-4 py-3 bg-background space-y-1">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-semibold text-foreground">
+                      {round.course_name}
+                    </h3>
+                    
+                    <p className="text-sm text-muted-foreground">
+                      {round.sub_country && `${round.sub_country}, `}
+                      {round.country}
+                    </p>
+                  </div>
+
+                  {round.rating != null && (
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      <ClubhouseLogo className="h-5 w-5" />
+                      <span className="text-sm font-semibold text-foreground">
+                        {round.rating.toFixed(1)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </button>
+          );
+        })}
       </div>
 
       {(hasPrev || hasNext) && (
