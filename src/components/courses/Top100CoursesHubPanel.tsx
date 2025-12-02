@@ -344,7 +344,7 @@ const Top100CoursesHubPanel = () => {
           </div>
 
           {/* Horizontal carousel */}
-          <div className="-mx-4 px-4 flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-none">
+          <div className="-mx-4 px-4 flex gap-2 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-none">
             {friends.slice(0, 10).map((friend) => {
               const nameRaw = friend.profile.display_name || friend.profile.username || 'Golfer';
               const displayName =
