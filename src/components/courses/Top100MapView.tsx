@@ -424,7 +424,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           <div
             className={cn(
               'pointer-events-auto rounded-t-3xl rounded-b-none bg-white/20 backdrop-blur-xl border-t border-white/30 shadow-[0_-4px_12px_rgba(15,23,42,0.08)] dark:shadow-[0_-4px_16px_rgba(0,0,0,0.45)] text-[11px] text-slate-900 transition-transform duration-200',
-              filtersOpen ? 'translate-y-0' : 'translate-y-[calc(100%-40px)]'
+              filtersOpen ? 'translate-y-0' : 'translate-y-[calc(100%-52px)]'
             )}
           >
             {/* Drag handle */}
