@@ -107,7 +107,7 @@ export function Top100RecentRoundsFeed({
                   {/* Clubhouse rating with logo - right side */}
                   {round.rating != null && (
                     <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <ClubhouseLogo size="sm" className="opacity-80" />
+                      <ClubhouseLogo className="h-5 w-5" />
                       <span className="text-sm font-semibold text-foreground">
                         {round.rating.toFixed(1)}
                       </span>
