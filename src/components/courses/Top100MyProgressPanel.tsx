@@ -228,6 +228,8 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
       <Top100RegionProgressGrid
         lists={data.lists}
         onListClick={(slug) => navigate(`/top100/${slug}`)}
+        isOwnProfile={isOwnProfile}
+        displayName={displayName}
       />
 
       {/* Recent Top 100 Rounds - Full-width breakout */}
