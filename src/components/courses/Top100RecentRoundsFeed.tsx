@@ -92,24 +92,28 @@ export function Top100RecentRoundsFeed({
 
               {/* White metadata area at bottom */}
               <div className="px-4 py-3 bg-background space-y-1">
-                <h3 className="text-sm font-semibold text-foreground">
-                  {round.course_name}
-                </h3>
-                
-                <p className="text-xs text-muted-foreground">
-                  {round.sub_country && `${round.sub_country}, `}
-                  {round.country}
-                </p>
-
-                {/* Clubhouse rating with logo */}
-                {round.rating != null && (
-                  <div className="flex items-center gap-1.5 pt-0.5">
-                    <ClubhouseLogo size="sm" className="opacity-80" />
-                    <span className="text-sm font-semibold text-foreground">
-                      {round.rating.toFixed(1)}
-                    </span>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-semibold text-foreground">
+                      {round.course_name}
+                    </h3>
+                    
+                    <p className="text-xs text-muted-foreground">
+                      {round.sub_country && `${round.sub_country}, `}
+                      {round.country}
+                    </p>
                   </div>
-                )}
+
+                  {/* Clubhouse rating with logo - right side */}
+                  {round.rating != null && (
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      <ClubhouseLogo size="sm" className="opacity-80" />
+                      <span className="text-sm font-semibold text-foreground">
+                        {round.rating.toFixed(1)}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </button>
           );
