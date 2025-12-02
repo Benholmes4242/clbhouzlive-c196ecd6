@@ -40,7 +40,7 @@ export function Top100HeroSection({
   return (
     <div className="flex flex-col items-center text-center space-y-6 py-6">
       {/* Big Ring with Avatar & Halo */}
-      <div className="relative h-48 w-48 md:h-[211px] md:w-[211px] flex items-center justify-center -mt-6">
+      <div className="relative h-48 w-48 md:h-[211px] md:w-[211px] flex items-center justify-center -mt-[18px]">
         <div
           className={cn(
             'relative border-4 ring-4 ring-offset-4 ring-offset-background shadow-lg shadow-slate-900/20 overflow-hidden',
@@ -76,7 +76,7 @@ export function Top100HeroSection({
       </div>
 
       {/* Stats */}
-      <div className="mt-6 text-center space-y-1">
+      <div className="mt-[18px] text-center space-y-1">
         <p className="text-base md:text-lg font-semibold text-foreground">
           {isOwnProfile ? "You've" : "They've"} played {totalPlayed} Top 100 course
           {totalPlayed === 1 ? '' : 's'}
