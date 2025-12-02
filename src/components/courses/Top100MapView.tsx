@@ -428,7 +428,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             )}
           >
             {/* Drag handle */}
-            <div className="flex justify-center pt-0.5 mb-0.5">
+            <div className="flex justify-center pt-0.5">
               <div className="h-1 w-8 rounded-full bg-slate-300/80 dark:bg-slate-500/80" />
             </div>
 
