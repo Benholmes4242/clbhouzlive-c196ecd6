@@ -3876,6 +3876,13 @@ html[data-immersive="true"] .app-shell--topSpacer {
   display: none !important;
 }
 
+/* Center zoom controls vertically on Top 100 Map */
+.top100-map-shell .mapboxgl-ctrl-bottom-right {
+  bottom: auto !important;
+  top: 50% !important;
+  transform: translateY(-50%);
+}
+
 /* Respect prefers-reduced-motion globally */
 @media (prefers-reduced-motion: reduce) {
   *,
