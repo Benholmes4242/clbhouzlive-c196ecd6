@@ -54,15 +54,15 @@ export function Top100HeroSection({
     <div className="flex flex-col items-center text-center space-y-4 py-4">
       {/* Big Ring with Avatar & Halo */}
       <div className="relative flex items-center justify-center">
-        {/* Outer halo ring */}
+        {/* Outer halo ring - 2px white */}
         <div
-          className="absolute inset-[-6px] border border-white/30 shadow-[0_10px_30px_rgba(0,0,0,0.16)] backdrop-blur-sm"
+          className="absolute inset-[-4px] border-2 border-white/30 shadow-[0_10px_30px_rgba(0,0,0,0.16)] backdrop-blur-sm"
           style={{ borderRadius: '34%' }}
         />
 
-        {/* Inner tier ring container */}
+        {/* Inner tier ring container - 2px tier color */}
         <div
-          className="relative border-4 overflow-hidden"
+          className="relative border-2 overflow-hidden"
           style={{ 
             borderColor: tierColor,
             borderRadius: '32%',
