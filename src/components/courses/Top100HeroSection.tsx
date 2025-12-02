@@ -42,14 +42,14 @@ export function Top100HeroSection({
       <div className="relative h-40 w-40 md:h-44 md:w-44 flex items-center justify-center -mt-6">
         <div
           className={cn(
-            'relative rounded-full border-4 ring-4 ring-offset-4 ring-offset-background shadow-lg shadow-slate-900/20',
+            'relative rounded-3xl border-4 ring-4 ring-offset-4 ring-offset-background shadow-lg shadow-slate-900/20',
             getTop100RingBorderClass(clubRing)
           )}
         >
           {/* Soft halo */}
-          <div className="absolute inset-[-6px] rounded-full bg-sky-500/10 blur-md" />
+          <div className="absolute inset-[-6px] rounded-3xl bg-sky-500/10 blur-md" />
 
-          <Avatar className="h-28 w-28 md:h-32 md:w-32 border-4 border-white shadow-md overflow-hidden">
+          <Avatar className="h-28 w-28 md:h-32 md:w-32 border-4 border-white shadow-md overflow-hidden rounded-3xl">
             <AvatarImage src={avatarUrl || undefined} alt={displayName ?? 'Player avatar'} />
             <AvatarFallback className="text-2xl font-semibold bg-surface-slate text-white">
               {initials}
