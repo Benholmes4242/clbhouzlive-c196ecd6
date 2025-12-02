@@ -11,6 +11,7 @@ import ProfileBadgeStrip from '@/components/profile/ProfileBadgeStrip';
 import { useTop100FriendsSnapshot } from '@/hooks/useTop100FriendsSnapshot';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface Top100MyProgressPanelProps {
   userId?: string | null;
@@ -180,66 +181,69 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
             </div>
           )}
 
-          {/* Friends Chasing the Top 100 */}
-          {isOwnProfile && friendsSnapshot && friends.length > 0 && (
-            <div className="rounded-xl border border-border/60 bg-card/60 p-4">
-              <div className="flex items-center justify-between gap-2 mb-2">
+          {/* Friends Chasing the Top 100 - Mini Leaderboard */}
+          {isOwnProfile && friendsSnapshot && friendsSnapshot.friends.length > 0 && (
+            <section className="rounded-xl border border-border/60 bg-card/70 p-4 shadow-sm space-y-3">
+              <div className="flex items-baseline justify-between gap-3">
                 <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                    Friends chasing the Top 100
+                  <h3 className="text-xs font-semibold tracking-wide text-muted-foreground">
+                    FRIENDS CHASING THE TOP 100
+                  </h3>
+                  <p className="text-sm text-foreground mt-1">
+                    {friendMessage}
                   </p>
-                  {friendMessage && (
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {friendMessage}
-                    </p>
-                  )}
                 </div>
+
                 <button
-                  onClick={() => navigate('/top100?tab=leaderboard')}
-                  className="text-xs font-medium text-primary-accent hover:text-primary-accent/80"
+                  type="button"
+                  className="text-xs font-semibold text-primary-accent hover:underline"
+                  onClick={() => navigate('/top100?tab=leaderboard&view=players')}
                 >
                   View full leaderboard →
                 </button>
               </div>
 
-              <div className="flex flex-col gap-2">
-                {topFriends.map((f) => (
+              <div className="mt-3 space-y-2">
+                {topFriends.map((friend, index) => (
                   <button
-                    key={f.friend_id}
-                    onClick={() => navigate(`/profile/${f.friend_id}?tab=top100`)}
-                    className="flex items-center justify-between rounded-lg px-3 py-2 hover:bg-muted/60 text-left transition-colors"
+                    key={friend.friend_id}
+                    type="button"
+                    onClick={() => navigate(`/profile/${friend.friend_id}?tab=top100`)}
+                    className="w-full flex items-center justify-between rounded-lg px-3 py-2 hover:bg-muted/70 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      {f.profile_photo_url ? (
-                        <img
-                          src={f.profile_photo_url}
-                          alt={f.display_name}
-                          className="h-8 w-8 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold">
-                          {f.display_name?.charAt(0).toUpperCase() || '?'}
-                        </div>
-                      )}
-                      <div>
-                        <p className="text-xs font-medium">{f.display_name}</p>
-                        <p className="text-[11px] text-muted-foreground">
-                          {f.home_club || 'No club set'}
+                      <span className="text-sm font-semibold text-primary-accent w-6 text-left">
+                        #{index + 1}
+                      </span>
+                      <Avatar className="h-8 w-8">
+                        {friend.profile_photo_url ? (
+                          <AvatarImage src={friend.profile_photo_url} alt={friend.display_name} />
+                        ) : (
+                          <AvatarFallback>
+                            {friend.display_name?.slice(0, 2).toUpperCase() ?? '?'}
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                      <div className="text-left">
+                        <p className="text-sm font-medium truncate max-w-[140px]">
+                          {friend.display_name}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground truncate max-w-[140px]">
+                          {friend.home_club ?? 'No home club set'}
                         </p>
                       </div>
                     </div>
+
                     <div className="text-right">
-                      <p className="text-xs font-semibold">
-                        {f.total_top100_played}
+                      <p className="text-sm font-semibold">
+                        {friend.total_top100_played}
                       </p>
-                      <p className="text-[11px] text-muted-foreground">
-                        Top 100{f.total_top100_played === 1 ? '' : 's'}
-                      </p>
+                      <p className="text-[11px] text-muted-foreground">Top 100s</p>
                     </div>
                   </button>
                 ))}
               </div>
-            </div>
+            </section>
           )}
 
           {/* Milestones Carousel */}
@@ -260,7 +264,6 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
         <Top100RecentRoundsFeed
           rounds={data.recent_rounds}
           isOwnProfile={isOwnProfile}
-          maxDisplay={5}
         />
     </div>
   );
