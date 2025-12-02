@@ -5,6 +5,7 @@ import { getTop100Club } from '@/lib/top100Club';
 import { getTop100RingBorderClass } from '@/lib/top100RingStyles';
 import { Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Squircle } from '@/components/ui/squircle';
 
 export interface Top100HeroSectionProps {
   avatarUrl?: string | null;
@@ -42,19 +43,29 @@ export function Top100HeroSection({
       <div className="relative h-40 w-40 md:h-44 md:w-44 flex items-center justify-center -mt-6">
         <div
           className={cn(
-            'relative rounded-3xl border-4 ring-4 ring-offset-4 ring-offset-background shadow-lg shadow-slate-900/20',
+            'relative border-4 ring-4 ring-offset-4 ring-offset-background shadow-lg shadow-slate-900/20 overflow-hidden',
             getTop100RingBorderClass(clubRing)
           )}
+          style={{ borderRadius: '35px' }}
         >
           {/* Soft halo */}
-          <div className="absolute inset-[-6px] rounded-3xl bg-sky-500/10 blur-md" />
+          <div className="absolute inset-[-6px] bg-sky-500/10 blur-md" style={{ borderRadius: '41px' }} />
 
-          <Avatar className="h-28 w-28 md:h-32 md:w-32 border-4 border-white shadow-md overflow-hidden rounded-3xl">
-            <AvatarImage src={avatarUrl || undefined} alt={displayName ?? 'Player avatar'} />
-            <AvatarFallback className="text-2xl font-semibold bg-surface-slate text-white">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
+          <Squircle width={112} height={112}>
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={displayName ?? 'Player avatar'}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                loading="lazy"
+                decoding="async"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-2xl font-semibold bg-surface-slate text-white">
+                {initials}
+              </div>
+            )}
+          </Squircle>
         </div>
 
         {clubTierName && (
