@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
@@ -262,6 +262,22 @@ const Top100CoursesHubPanel = () => {
   };
 
   const hasActiveFilters = selectedList !== 'global' || selectedSubregion !== 'all' || searchTerm !== '';
+
+  // Stable pagination handlers for reliable first-tap
+  const hasPrev = page > 0;
+  const handlePrevPage = useCallback(() => {
+    if (!hasPrev || isLoading) return;
+    setPage((prev) => Math.max(prev - 1, 0));
+  }, [hasPrev, isLoading]);
+
+  const handleNextPage = useCallback(() => {
+    if (!hasNextPage || isLoading || isFetchingNextPage) return;
+    if (hasMorePages && endIndex >= totalCount) {
+      fetchNextPage();
+    } else {
+      setPage((prev) => prev + 1);
+    }
+  }, [hasNextPage, isLoading, isFetchingNextPage, hasMorePages, endIndex, totalCount, fetchNextPage]);
 
   return (
     <div className="space-y-6 pb-8">
@@ -562,34 +578,35 @@ const Top100CoursesHubPanel = () => {
           {/* Pagination Footer */}
           <div className="flex flex-col items-center gap-3 mt-8">
             {/* Pagination Buttons */}
-            {(page > 0 || hasNextPage) && (
-              <div className={`flex items-center gap-3 w-full ${page === 0 ? 'justify-center' : 'justify-between'}`}>
-                {page > 0 && (
-                  <Button
-                    variant="secondary"
-                    onClick={() => setPage((p) => p - 1)}
-                    disabled={isLoading}
-                  >
-                    Previous {COURSES_PAGE_SIZE} courses
-                  </Button>
+            <div className="flex items-center justify-center gap-3 w-full px-4">
+              <button
+                type="button"
+                onClick={handlePrevPage}
+                disabled={!hasPrev || isLoading}
+                className={cn(
+                  "flex-1 inline-flex items-center justify-center rounded-full border px-4 py-2 text-sm font-medium transition-colors",
+                  hasPrev && !isLoading
+                    ? "bg-card hover:bg-muted/70 border-border text-foreground"
+                    : "bg-muted/40 border-border/60 text-muted-foreground cursor-default"
                 )}
-                {hasNextPage && (
-                  <Button
-                    variant="secondary"
-                    onClick={() => {
-                      if (hasMorePages && endIndex >= totalCount) {
-                        fetchNextPage();
-                      } else {
-                        setPage((p) => p + 1);
-                      }
-                    }}
-                    disabled={isLoading || isFetchingNextPage}
-                  >
-                    {isFetchingNextPage ? 'Loading...' : `Next ${COURSES_PAGE_SIZE} courses`}
-                  </Button>
+              >
+                Previous {COURSES_PAGE_SIZE} courses
+              </button>
+
+              <button
+                type="button"
+                onClick={handleNextPage}
+                disabled={!hasNextPage || isLoading || isFetchingNextPage}
+                className={cn(
+                  "flex-1 inline-flex items-center justify-center rounded-full border px-4 py-2 text-sm font-medium transition-colors",
+                  hasNextPage && !isLoading && !isFetchingNextPage
+                    ? "bg-card hover:bg-muted/70 border-border text-foreground"
+                    : "bg-muted/40 border-border/60 text-muted-foreground cursor-default"
                 )}
-              </div>
-            )}
+              >
+                {isFetchingNextPage ? 'Loading...' : `Next ${COURSES_PAGE_SIZE} courses`}
+              </button>
+            </div>
             <p className="text-xs text-slate-500">
               Showing {startIndex}–{endIndex} of {totalCount} courses
             </p>
