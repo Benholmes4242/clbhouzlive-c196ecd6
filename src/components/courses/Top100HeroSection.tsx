@@ -37,7 +37,7 @@ export function Top100HeroSection({
     .slice(0, 2) || '?';
 
   return (
-    <div className="flex flex-col items-center text-center space-y-6 py-6">
+    <div className="flex flex-col items-center text-center space-y-0 py-6">
       {/* Big Ring with Avatar & Halo */}
       <div className="relative h-40 w-40 md:h-44 md:w-44 flex items-center justify-center">
         <div
