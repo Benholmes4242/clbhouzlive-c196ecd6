@@ -29,12 +29,8 @@ export function Top100HeroSection({
   lastPlayedDate,
   isOwnProfile,
 }: Top100HeroSectionProps) {
-  const initials = displayName
-    ?.split(' ')
-    .map(n => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2) || '?';
+  // Always show "?" placeholder for Top 100 hero
+  const initials = '?';
 
   return (
     <div className="flex flex-col items-center text-center space-y-4 py-6">
