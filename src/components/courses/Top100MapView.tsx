@@ -19,9 +19,10 @@ type RatedFilter = 'all' | 'rated' | 'unrated';
 
 interface Top100MapViewProps {
   scope: Top100MapScope;
+  onScopeChange?: (scope: Top100MapScope) => void;
 }
 
-// Canonical list sizes for the Top 100 maps
+// Canonical list sizes
 const REGION_TOTALS: Record<Top100MapScope, number> = {
   global: 77,
   'gb-i': 100,
@@ -29,36 +30,37 @@ const REGION_TOTALS: Record<Top100MapScope, number> = {
   europe: 99,
 };
 
-// Region centre + zoom configs
-// NOTE: zooms have been nudged OUT one level for GB&I / USA / Europe
-// and the global view is a wider, more "world" centred view.
+// Region configs (includes the USA zoom+centre tweaks)
 const REGION_CONFIG: Record<
   Top100MapScope,
   { center: [number, number]; zoom: number; label: string }
 > = {
   global: {
-    center: [0, 25], // previously [-30, 40] over the Atlantic
-    zoom: 1.7, // slightly more zoomed OUT
+    center: [0, 25],
+    zoom: 1.7,
     label: 'Global Top 100',
   },
   'gb-i': {
     center: [-3, 54],
-    zoom: 4, // was 5 → zoomed out one step
+    zoom: 4,
     label: 'Britain & Ireland Top 100',
   },
   usa: {
-    center: [-99, 39], // centered USA view
-    zoom: 3.5, // was 2.5 → zoomed in one level
+    center: [-99, 39],
+    zoom: 3.5,
     label: 'USA Top 100',
   },
   europe: {
     center: [10, 50],
-    zoom: 3, // was 4 → zoomed out one step
+    zoom: 3,
     label: 'Continental Europe Top 100',
   },
 };
 
-const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
+const Top100MapView: React.FC<Top100MapViewProps> = ({
+  scope,
+  onScopeChange,
+}) => {
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
 
@@ -70,8 +72,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
   );
   const [ratedFilter, setRatedFilter] = useState<RatedFilter>('all');
   const [hasInitialFit, setHasInitialFit] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
-  // Swipe-down drag state for the bottom sheet
+  // swipe-down state for course sheet
   const [dragStartY, setDragStartY] = useState<number | null>(null);
   const [dragOffsetY, setDragOffsetY] = useState(0);
 
@@ -90,47 +93,21 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
     return courses;
   }, [courses, ratedFilter]);
 
-  // Official list size for this map (falls back to what we have, just in case)
+  // Official list size
   const officialTotal =
     REGION_TOTALS[scope] !== undefined ? REGION_TOTALS[scope] : courses.length;
 
   const ratedCount = courses.filter((c) => c.user_has_rated).length;
   const remaining = Math.max(officialTotal - ratedCount, 0);
 
-  // Touch handlers for swipe-down sheet dismissal
-  const handleSheetTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    setDragStartY(e.touches[0].clientY);
-    setDragOffsetY(0);
-  };
-
-  const handleSheetTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (dragStartY === null) return;
-    const currentY = e.touches[0].clientY;
-    const delta = currentY - dragStartY;
-    // Only allow dragging down
-    if (delta > 0) {
-      setDragOffsetY(delta);
-    }
-  };
-
-  const handleSheetTouchEnd = () => {
-    // If the user has dragged down far enough, dismiss the sheet
-    if (dragOffsetY > 60) {
-      setSelectedCourse(null);
-    }
-    // Reset drag state
-    setDragStartY(null);
-    setDragOffsetY(0);
-  };
-
-  // Reset "initial fit" if the scope changes
+  // Reset some state when scope changes
   useEffect(() => {
     setHasInitialFit(false);
     setSelectedCourse(null);
     setRatedFilter('all');
   }, [scope]);
 
-  // Initialise map once per scope
+  // Initialise map
   useEffect(() => {
     if (!mapContainerRef.current || !MAPBOX_TOKEN || mapRef.current) return;
 
@@ -143,12 +120,12 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
       zoom: regionConfig.zoom,
       minZoom: 1.5,
       maxZoom: 12,
-      attributionControl: false, // we'll add it manually bottom-left
+      attributionControl: false,
     });
 
     const mapInstance = mapRef.current;
 
-    // Controls
+    // controls: attribution bottom-left, zoom bottom-right
     mapInstance.addControl(
       new mapboxgl.AttributionControl({ compact: true }),
       'bottom-left'
@@ -159,7 +136,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
     );
 
     return () => {
-      // Clean up on unmount / scope change
       if (mapRef.current) {
         mapRef.current.remove();
       }
@@ -168,8 +144,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scope]);
 
-  // Once courses are loaded, fit map to bounds (but never zoom in closer than
-  // the region's configured zoom – this keeps GB&I/USA/Europe slightly zoomed out).
+  // Fit to bounds when courses load (with special handling for USA)
   useEffect(() => {
     if (!mapRef.current || hasInitialFit || !courses.length || !regionConfig) {
       return;
@@ -182,33 +157,28 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
       bounds.extend([course.longitude, course.latitude]);
     });
 
-    // Fit to all courses first
     mapInstance.fitBounds(bounds, {
       padding: 40,
       maxZoom: regionConfig.zoom,
       duration: 0,
     });
 
-    // For USA only, zoom in one extra step and re-center
     if (scope === 'usa') {
       const currentZoom = mapInstance.getZoom();
-      // Extra zoom-in
-      mapInstance.setZoom(currentZoom + 1);
-      // Hard-centre the USA so it doesn't sit on the right edge
-      mapInstance.setCenter(regionConfig.center);
+      mapInstance.setZoom(currentZoom + 1); // extra zoom
+      mapInstance.setCenter(regionConfig.center); // re-centre USA
     }
 
     setHasInitialFit(true);
   }, [courses, hasInitialFit, regionConfig, scope]);
 
-  // Update map data + clustering whenever filteredCourses change
+  // Clustering + layers whenever filteredCourses change
   useEffect(() => {
     if (!mapRef.current) return;
 
     const mapInstance = mapRef.current;
 
     const addClustering = () => {
-      // Remove existing source and layers if they exist
       if (mapInstance.getLayer('clusters')) mapInstance.removeLayer('clusters');
       if (mapInstance.getLayer('cluster-count'))
         mapInstance.removeLayer('cluster-count');
@@ -251,7 +221,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         clusterRadius: 40,
       });
 
-      // Cluster circles
       mapInstance.addLayer({
         id: 'clusters',
         type: 'circle',
@@ -272,7 +241,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         },
       });
 
-      // Cluster count labels
       mapInstance.addLayer({
         id: 'cluster-count',
         type: 'symbol',
@@ -288,7 +256,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         },
       });
 
-      // Unclustered points (single courses)
       mapInstance.addLayer({
         id: 'unclustered-point',
         type: 'circle',
@@ -298,15 +265,15 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
           'circle-color': [
             'case',
             ['==', ['get', 'user_has_rated'], true],
-            '#F7931E', // Played
-            '#0f172a', // Not Played
+            '#F7931E',
+            '#0f172a',
           ],
           'circle-radius': 6,
           'circle-stroke-width': 0,
         },
       });
 
-      // Cluster click → zoom in
+      // cluster click
       mapInstance.on('click', 'clusters', (e) => {
         const features = mapInstance.queryRenderedFeatures(e.point, {
           layers: ['clusters'],
@@ -329,7 +296,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         });
       });
 
-      // Single pin click → fly in + open bottom sheet
+      // pin click → sheet
       mapInstance.on('click', 'unclustered-point', (e) => {
         const feature = e.features?.[0];
         if (!feature) return;
@@ -346,7 +313,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
         });
       });
 
-      // Cursor feedback
+      // cursor styles
       mapInstance.on('mouseenter', 'clusters', () => {
         mapInstance.getCanvas().style.cursor = 'pointer';
       });
@@ -381,13 +348,34 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
     setRatedFilter('all');
   };
 
+  // swipe handlers for course sheet
+  const handleSheetTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    setDragStartY(e.touches[0].clientY);
+    setDragOffsetY(0);
+  };
+
+  const handleSheetTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (dragStartY === null) return;
+    const currentY = e.touches[0].clientY;
+    const delta = currentY - dragStartY;
+    if (delta > 0) setDragOffsetY(delta);
+  };
+
+  const handleSheetTouchEnd = () => {
+    if (dragOffsetY > 60) {
+      setSelectedCourse(null);
+    }
+    setDragStartY(null);
+    setDragOffsetY(0);
+  };
+
   if (!MAPBOX_TOKEN) {
     return (
       <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center text-sm text-slate-600">
         <p className="font-semibold">Map Temporarily Unavailable</p>
         <p className="mt-1 text-xs text-slate-500">
-          The interactive map feature is currently unavailable. Please try
-          again later.
+          The interactive map feature is currently unavailable. Please try again
+          later.
         </p>
       </div>
     );
@@ -395,44 +383,10 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
 
   return (
     <div className="space-y-3">
-      {/* Filter row: All / Played / Not Played + Reset view */}
-      <div className="flex items-center justify-between gap-2 text-xs">
-        <div className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-1 py-1">
-          {(['all', 'rated', 'unrated'] as RatedFilter[]).map((opt) => (
-            <button
-              key={opt}
-              type="button"
-              onClick={() => setRatedFilter(opt)}
-              className={cn(
-                'rounded-full px-3 py-1 text-[11px] font-medium transition-colors',
-                ratedFilter === opt
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'bg-transparent text-muted-foreground hover:text-foreground'
-              )}
-            >
-              {opt === 'all'
-                ? 'All'
-                : opt === 'rated'
-                ? 'Played'
-                : 'Not Played'}
-            </button>
-          ))}
-        </div>
-
-        <button
-          type="button"
-          onClick={handleResetView}
-          className="text-[11px] font-medium text-slate-500 underline-offset-2 hover:text-slate-800 hover:underline"
-        >
-          Reset view
-        </button>
-      </div>
-
-      {/* Map container */}
-      <div className="relative mt-1 rounded-3xl bg-muted/40">
+      <div className="relative mt-1 overflow-hidden rounded-3xl bg-muted/40">
         <div
           ref={mapContainerRef}
-          className="h-[400px] w-full rounded-3xl"
+          className="h-[480px] w-full"
         />
 
         {/* Loading overlay */}
@@ -465,27 +419,127 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
           </div>
         )}
 
-        {/* Selected Course Bottom Sheet – dismissible by tap-outside + swipe-down */}
+        {/* Filters drawer */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10">
+          <div
+            className={cn(
+              'pointer-events-auto mx-3 mb-3 rounded-2xl bg-slate-900/95 text-[11px] text-white shadow-xl transition-transform duration-200',
+              filtersOpen ? 'translate-y-0' : 'translate-y-[calc(100%-32px)]'
+            )}
+          >
+            {/* Header / handle */}
+            <button
+              type="button"
+              onClick={() => setFiltersOpen((v) => !v)}
+              className="flex w-full items-center justify-between px-3 py-2"
+            >
+              <span className="font-medium">Map filters</span>
+              <span className="text-xs opacity-80">
+                {filtersOpen ? 'Hide' : 'Show'}
+              </span>
+            </button>
+
+            {/* Drawer content */}
+            <div className="px-3 pb-3 pt-1">
+              {/* Rated filter + reset */}
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <div className="inline-flex items-center gap-1 rounded-full bg-slate-800/90 px-1 py-1">
+                  {(['all', 'rated', 'unrated'] as RatedFilter[]).map((opt) => (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => setRatedFilter(opt)}
+                      className={cn(
+                        'rounded-full px-3 py-1 text-[11px] font-medium transition-colors',
+                        ratedFilter === opt
+                          ? 'bg-white text-slate-900 shadow-sm'
+                          : 'bg-transparent text-slate-300 hover:text-white'
+                      )}
+                    >
+                      {opt === 'all'
+                        ? 'All'
+                        : opt === 'rated'
+                        ? 'Played'
+                        : 'Not Played'}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleResetView}
+                  className="text-[11px] font-medium text-slate-300 underline-offset-2 hover:text-white hover:underline"
+                >
+                  Reset view
+                </button>
+              </div>
+
+              {/* Region chips */}
+              <div className="flex items-center gap-2">
+                {(['global', 'gb-i', 'usa', 'europe'] as Top100MapScope[]).map(
+                  (slug) => {
+                    const label =
+                      slug === 'global'
+                        ? 'Global'
+                        : slug === 'gb-i'
+                        ? 'GB&I'
+                        : slug === 'usa'
+                        ? 'USA'
+                        : 'Europe';
+
+                    const isActive = scope === slug;
+
+                    return (
+                      <button
+                        key={slug}
+                        type="button"
+                        onClick={() => onScopeChange?.(slug)}
+                        className={cn(
+                          'flex-1 rounded-full border px-3 py-1.5 text-[11px] font-semibold transition',
+                          isActive
+                            ? 'bg-white text-slate-900 border-white/70 shadow-sm'
+                            : 'bg-slate-900 text-slate-200 border-slate-600'
+                        )}
+                      >
+                        {label}
+                      </button>
+                    );
+                  }
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Selected course bottom sheet – glass, anchored, swipe-down & tap-outside */}
         {selectedCourse && (
           <div
             className="absolute inset-0 z-20 flex flex-col justify-end"
             onClick={() => setSelectedCourse(null)}
           >
             <div
-              className="pointer-events-auto rounded-t-3xl rounded-b-none bg-white/20 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.2)] px-4 pb-4 pt-3"
+              className="
+                pointer-events-auto
+                rounded-t-3xl rounded-b-none
+                bg-white/20
+                backdrop-blur-xl
+                border border-white/20
+                shadow-[0_8px_32px_rgba(0,0,0,0.2)]
+                px-4 pb-4 pt-3
+              "
               onClick={(e) => e.stopPropagation()}
               onTouchStart={handleSheetTouchStart}
               onTouchMove={handleSheetTouchMove}
               onTouchEnd={handleSheetTouchEnd}
               style={{
-                transform: dragOffsetY ? `translateY(${dragOffsetY}px)` : undefined,
+                transform: dragOffsetY
+                  ? `translateY(${dragOffsetY}px)`
+                  : undefined,
                 transition: dragStartY ? 'none' : 'transform 0.2s ease-out',
               }}
             >
-              {/* Drag handle */}
               <div className="mx-auto mb-2 h-1 w-10 rounded-full bg-slate-200" />
 
-              {/* Header row: title + close */}
               <div className="flex items-start justify-between gap-3">
                 <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                   <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-900">
@@ -509,7 +563,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
                 </button>
               </div>
 
-              {/* Badges row */}
               <div className="mt-2 flex flex-wrap items-center gap-2 text-[10px]">
                 {typeof selectedCourse.rank === 'number' && (
                   <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 font-medium text-slate-700">
@@ -529,7 +582,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
                 )}
               </div>
 
-              {/* CTA */}
               <Button
                 size="sm"
                 className="mt-3 w-full"

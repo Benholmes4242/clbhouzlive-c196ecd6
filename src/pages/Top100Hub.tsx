@@ -195,36 +195,10 @@ const Top100Hub = () => {
               ) : (
                 /* Map View */
                 <div className="space-y-0">
-                  {/* Region Selector - Independent Pills */}
-                  <section className="mt-4">
-                    <div className="mx-auto flex w-full max-w-[420px] justify-between gap-3 px-4">
-                      {(['global', 'gb-i', 'usa', 'europe'] as Top100MapScope[]).map((slug) => {
-                        const isActive = selectedListSlug === slug;
-                        
-                        const label = slug === 'global' ? 'Global' 
-                          : slug === 'gb-i' ? 'GB&I'
-                          : slug === 'usa' ? 'USA'
-                          : 'Europe';
-
-                        return (
-                          <button
-                            key={slug}
-                            onClick={() => setSelectedListSlug(slug)}
-                            className={cn(
-                              'flex-1 px-4 py-2 text-sm font-semibold rounded-full transition border',
-                              isActive
-                                ? 'bg-muted/70 text-foreground shadow-sm border-border/60'
-                                : 'bg-background text-muted-foreground border-transparent'
-                            )}
-                          >
-                            {label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </section>
-
-                  <Top100MapView scope={selectedListSlug} />
+                  <Top100MapView 
+                    scope={selectedListSlug}
+                    onScopeChange={setSelectedListSlug}
+                  />
                 </div>
               )}
             </TabsContent>
