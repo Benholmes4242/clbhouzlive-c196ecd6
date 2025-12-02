@@ -17,7 +17,35 @@ const TIER_COLORS: Record<string, string> = {
   grandslam: '#0C0F14',
 };
 
-const MAX_TOP100 = 400;
+// Thresholds for each milestone
+const THRESHOLDS = [5, 10, 20, 50, 100, 200, 300, 400];
+
+// Maps totalPlayed → percentage across all achievements (evenly spaced circles)
+function getAchievementsProgressPct(totalPlayed: number): number {
+  if (totalPlayed <= 0) return 0;
+  if (totalPlayed >= THRESHOLDS[THRESHOLDS.length - 1]) return 100;
+
+  const lastIndex = THRESHOLDS.length - 1;
+  const segmentSize = 100 / lastIndex; // equal spacing between circles
+
+  // Find which segment we're in
+  let i = 0;
+  for (let idx = 0; idx < lastIndex; idx++) {
+    if (totalPlayed <= THRESHOLDS[idx + 1]) {
+      i = idx;
+      break;
+    }
+  }
+
+  const startThreshold = i === 0 ? 0 : THRESHOLDS[i];
+  const endThreshold = THRESHOLDS[i + 1];
+
+  const base = (i / lastIndex) * 100; // start % of this segment
+  const ratio = (totalPlayed - startThreshold) / (endThreshold - startThreshold);
+  const pct = base + ratio * segmentSize;
+
+  return Math.max(0, Math.min(100, pct));
+}
 
 interface Top100MilestonesCarouselProps {
   totalPlayed: number;
@@ -28,68 +56,71 @@ export function Top100MilestonesCarousel({
   totalPlayed,
   onMilestoneClick,
 }: Top100MilestonesCarouselProps) {
-  // Calculate overall progress percentage (0-400)
-  const clamped = Math.min(MAX_TOP100, Math.max(0, totalPlayed));
-  const overallPct = (clamped / MAX_TOP100) * 100;
+  const progressPct = getAchievementsProgressPct(totalPlayed);
 
   return (
     <section className="space-y-2">
       <h3 className="text-base font-semibold text-foreground">Achievements</h3>
 
-      <div className="flex gap-4 overflow-x-auto pb-1 -mx-1 px-1">
-        {MILESTONES.map((milestone) => {
-          const isUnlocked = totalPlayed >= milestone.threshold;
-          const remaining = Math.max(0, milestone.threshold - totalPlayed);
-          const tierColor = TIER_COLORS[milestone.tierId] || TIER_COLORS.none;
+      {/* Outer scroller */}
+      <div className="overflow-x-auto pb-1 -mx-1 px-1">
+        {/* Inner column that scrolls together */}
+        <div className="inline-flex flex-col gap-3 min-w-full">
+          {/* Row of circles */}
+          <div className="flex gap-4">
+            {MILESTONES.map((milestone) => {
+              const isUnlocked = totalPlayed >= milestone.threshold;
+              const remaining = Math.max(0, milestone.threshold - totalPlayed);
+              const tierColor = TIER_COLORS[milestone.tierId] || TIER_COLORS.none;
 
-          return (
-            <button
-              key={milestone.tierId}
-              type="button"
-              onClick={() => onMilestoneClick?.(milestone)}
-              className="flex flex-col items-center min-w-[72px] gap-1 focus:outline-none"
-            >
-              {/* Ring */}
-              <div className="relative">
-                <div
-                  className="h-14 w-14 rounded-full flex items-center justify-center bg-white"
-                  style={{
-                    boxShadow: isUnlocked
-                      ? `0 0 18px ${tierColor}22`
-                      : '0 0 10px rgba(15,23,42,0.06)',
-                    border: isUnlocked
-                      ? `3px solid ${tierColor}`
-                      : `2px solid ${tierColor}66`,
-                    opacity: isUnlocked ? 1 : 0.45,
-                  }}
+              return (
+                <button
+                  key={milestone.tierId}
+                  type="button"
+                  onClick={() => onMilestoneClick?.(milestone)}
+                  className="flex flex-col items-center min-w-[72px] gap-1 focus:outline-none"
                 >
-                  <span className="text-sm font-semibold" style={{ color: tierColor }}>
-                    {milestone.threshold}
-                  </span>
-                </div>
-              </div>
+                  {/* Ring */}
+                  <div className="relative">
+                    <div
+                      className="h-14 w-14 rounded-full flex items-center justify-center bg-white"
+                      style={{
+                        boxShadow: isUnlocked
+                          ? `0 0 18px ${tierColor}22`
+                          : '0 0 10px rgba(15,23,42,0.06)',
+                        border: isUnlocked
+                          ? `3px solid ${tierColor}`
+                          : `2px solid ${tierColor}66`,
+                        opacity: isUnlocked ? 1 : 0.45,
+                      }}
+                    >
+                      <span className="text-sm font-semibold" style={{ color: tierColor }}>
+                        {milestone.threshold}
+                      </span>
+                    </div>
+                  </div>
 
-              {/* Labels - always two lines */}
-              <div className="mt-2 text-center">
-                <p className="text-xs font-medium text-foreground whitespace-nowrap">
-                  {milestone.tierName}
-                </p>
-                <p className="text-[11px] text-muted-foreground">
-                  {isUnlocked ? 'Unlocked' : `${remaining} away`}
-                </p>
-              </div>
-            </button>
-          );
-        })}
-      </div>
+                  {/* Labels - consistent two lines */}
+                  <div className="mt-2 text-center">
+                    <p className="text-xs font-medium text-foreground whitespace-nowrap">
+                      {milestone.tierName}
+                    </p>
+                    <p className="text-[11px] leading-[1.2] text-muted-foreground">
+                      {isUnlocked ? 'Unlocked' : `${remaining} away`}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
 
-      {/* Overall progress bar (0-400) */}
-      <div className="mt-4 px-2">
-        <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-[#D9C7A3] via-[#2E5930] to-[#0C0F14]"
-            style={{ width: `${overallPct}%` }}
-          />
+          {/* Progress bar - inside the scroller, moves with circles */}
+          <div className="h-1.5 rounded-full bg-muted/80 relative">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-[#D9C7A3] via-[#2E5930] to-[#0C0F14]"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
         </div>
       </div>
     </section>
