@@ -7,6 +7,8 @@ export interface FriendOnTop100 {
     display_name: string;
     username: string;
     profile_photo_url: string | null;
+    home_club: string | null;
+    handicap: number | null;
   };
   top100CoursesPlayed: number;
   lastActivityAt?: string;
@@ -33,7 +35,7 @@ export function useFriendsOnTop100Journey(userId: string | undefined) {
       // Step 2: Get profiles for those users
       const { data: profilesData, error: profilesError } = await supabase
         .from('user_profiles')
-        .select('id, username, display_name, profile_photo_url')
+        .select('id, username, display_name, profile_photo_url, home_club, eg_handicap_index')
         .in('id', followingIds);
 
       if (profilesError) throw profilesError;
@@ -65,6 +67,8 @@ export function useFriendsOnTop100Journey(userId: string | undefined) {
             display_name: friend.display_name || '',
             username: friend.username || '',
             profile_photo_url: friend.profile_photo_url,
+            home_club: (friend as any).home_club || null,
+            handicap: (friend as any).eg_handicap_index ?? null,
           },
           // Flag indicating they're on a Top 100 journey
           top100CoursesPlayed: 1,
