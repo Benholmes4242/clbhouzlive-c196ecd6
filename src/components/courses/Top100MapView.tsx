@@ -152,14 +152,21 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({ scope }) => {
       bounds.extend([course.longitude, course.latitude]);
     });
 
+    // Fit to all courses first
     mapInstance.fitBounds(bounds, {
       padding: 40,
-      maxZoom: regionConfig.zoom, // respect the "one-step-out" zoom per region
+      maxZoom: regionConfig.zoom,
       duration: 0,
     });
 
+    // For USA only, zoom in one extra step after the fit
+    if (scope === 'usa') {
+      const currentZoom = mapInstance.getZoom();
+      mapInstance.setZoom(currentZoom + 1);
+    }
+
     setHasInitialFit(true);
-  }, [courses, hasInitialFit, regionConfig]);
+  }, [courses, hasInitialFit, regionConfig, scope]);
 
   // Update map data + clustering whenever filteredCourses change
   useEffect(() => {
