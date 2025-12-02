@@ -9,13 +9,14 @@ const MILESTONES: Top100ClubMeta[] = CLUB_STEPS;
 // Emoji mapping per tierId
 function getMilestoneEmoji(tierId: string): string {
   const emojiMap: Record<string, string> = {
-    bronze: '🥉',
-    blue: '🔵',
-    green: '🟢',
-    silver: '🥈',
-    gold: '🥇',
-    platinum: '🏆',
-    obsidian: '👑',
+    rookie: '⛳',
+    fairway: '🌱',
+    founders: '🌲',
+    heritage: '🏛️',
+    century: '💯',
+    elite: '👑',
+    legendary: '⚡',
+    grandslam: '🏆',
   };
   return emojiMap[tierId] || '🎯';
 }

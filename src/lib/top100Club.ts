@@ -3,13 +3,14 @@
 
 export type Top100TierId =
   | 'none'
-  | 'bronze'
-  | 'blue'
-  | 'green'
-  | 'silver'
-  | 'gold'
-  | 'platinum'
-  | 'obsidian';
+  | 'rookie'
+  | 'fairway'
+  | 'founders'
+  | 'heritage'
+  | 'century'
+  | 'elite'
+  | 'legendary'
+  | 'grandslam';
 
 export type Top100ClubMeta = {
   threshold: number;
@@ -20,14 +21,14 @@ export type Top100ClubMeta = {
 
 // Ordered lowest → highest
 export const CLUB_STEPS: Top100ClubMeta[] = [
-  { threshold: 5,   shortLabel: '5 Club',   tierName: 'New Member',      tierId: 'bronze'   },
-  { threshold: 10,  shortLabel: '10 Club',  tierName: 'Explorer',        tierId: 'bronze'   },
-  { threshold: 20,  shortLabel: '20 Club',  tierName: 'Voyager',         tierId: 'blue'     },
-  { threshold: 50,  shortLabel: '50 Club',  tierName: 'Trailmaster',     tierId: 'green'    },
-  { threshold: 100, shortLabel: '100 Club', tierName: 'Century Club',    tierId: 'silver'   },
-  { threshold: 200, shortLabel: '200 Club', tierName: 'Clubhouse Elite', tierId: 'gold'     },
-  { threshold: 300, shortLabel: '300 Club', tierName: 'Global Master',   tierId: 'platinum' },
-  { threshold: 400, shortLabel: '400 Club', tierName: 'Clbhouz Legend',  tierId: 'obsidian' },
+  { threshold: 5,   shortLabel: 'Rookie',     tierName: 'Rookie Club',     tierId: 'rookie'    },
+  { threshold: 10,  shortLabel: 'Fairway',    tierName: 'Fairway Club',    tierId: 'fairway'   },
+  { threshold: 20,  shortLabel: 'Founders',   tierName: 'Founders Club',   tierId: 'founders'  },
+  { threshold: 50,  shortLabel: 'Heritage',   tierName: 'Heritage Club',   tierId: 'heritage'  },
+  { threshold: 100, shortLabel: 'Century',    tierName: 'Century Club',    tierId: 'century'   },
+  { threshold: 200, shortLabel: 'Elite',      tierName: 'Elite Club',      tierId: 'elite'     },
+  { threshold: 300, shortLabel: 'Legendary',  tierName: 'Legendary Club',  tierId: 'legendary' },
+  { threshold: 400, shortLabel: 'Grand Slam', tierName: 'Grand Slam Club', tierId: 'grandslam' },
 ];
 
 export type Top100ClubResult = {

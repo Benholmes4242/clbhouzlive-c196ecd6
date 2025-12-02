@@ -22,48 +22,53 @@ export const TOP100_TIER_STYLES: Record<
     mapFill: '#94a3b8',      // neutral slate for non-club users
     mapStroke: '#cbd5e1',
   },
-  bronze: {
-    ringClass: 'ring-amber-600/80',
-    dotClass: 'bg-amber-500',
-    mapFill: '#d97706',      // warm amber/bronze
-    mapStroke: '#fbbf24',
+  rookie: {
+    ringClass: 'ring-[#D9C7A3]/85',
+    dotClass: 'bg-[#D9C7A3]',
+    mapFill: '#D9C7A3',      // Soft Sand
+    mapStroke: '#E8DCC4',
   },
-  blue: {
-    // Muted steel blue (NOT bright sky-500)
-    ringClass: 'ring-[#4682B4]/85',
-    dotClass: 'bg-[#5F9EA0]',
-    mapFill: '#4682B4',      // steel blue
-    mapStroke: '#87CEEB',
+  fairway: {
+    ringClass: 'ring-[#8BBF5A]/85',
+    dotClass: 'bg-[#8BBF5A]',
+    mapFill: '#8BBF5A',      // Fairway Green
+    mapStroke: '#A8D67A',
   },
-  green: {
-    ringClass: 'ring-emerald-500/85',
-    dotClass: 'bg-emerald-400',
-    mapFill: '#10b981',      // emerald
-    mapStroke: '#6ee7b7',
+  founders: {
+    ringClass: 'ring-[#2E5930]/85',
+    dotClass: 'bg-[#2E5930]',
+    mapFill: '#2E5930',      // Deep Pine
+    mapStroke: '#3F7A42',
   },
-  silver: {
-    ringClass: 'ring-slate-200/85',
-    dotClass: 'bg-slate-200',
-    mapFill: '#94a3b8',      // slate
-    mapStroke: '#e2e8f0',
+  heritage: {
+    ringClass: 'ring-[#C8A44B]/85',
+    dotClass: 'bg-[#C8A44B]',
+    mapFill: '#C8A44B',      // Antique Gold
+    mapStroke: '#D7B766',
   },
-  gold: {
-    ringClass: 'ring-yellow-400/90',
-    dotClass: 'bg-yellow-400',
-    mapFill: '#eab308',      // yellow/gold
-    mapStroke: '#fef08a',
+  century: {
+    ringClass: 'ring-[#B7BCC6]/85',
+    dotClass: 'bg-[#B7BCC6]',
+    mapFill: '#B7BCC6',      // Brushed Silver
+    mapStroke: '#D4D5DA',
   },
-  platinum: {
-    ringClass: 'ring-fuchsia-300/90',
-    dotClass: 'bg-fuchsia-300',
-    mapFill: '#c026d3',      // fuchsia/purple
-    mapStroke: '#f0abfc',
+  elite: {
+    ringClass: 'ring-[#D9A441]/90',
+    dotClass: 'bg-[#D9A441]',
+    mapFill: '#D9A441',      // Royal Gold
+    mapStroke: '#E9C06E',
   },
-  obsidian: {
-    ringClass: 'ring-slate-900/90',
-    dotClass: 'bg-slate-900',
-    mapFill: '#0f172a',      // very dark slate/obsidian
-    mapStroke: '#475569',
+  legendary: {
+    ringClass: 'ring-[#5A3E8C]/90',
+    dotClass: 'bg-[#5A3E8C]',
+    mapFill: '#5A3E8C',      // Imperial Purple
+    mapStroke: '#7A5BBC',
+  },
+  grandslam: {
+    ringClass: 'ring-[#0C0F14]/90',
+    dotClass: 'bg-[#0C0F14]',
+    mapFill: '#0C0F14',      // Onyx Black
+    mapStroke: '#2A2D33',
   },
 };
 
