@@ -96,8 +96,16 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
       <div className="-mx-4 sm:mx-0">
         <section className="space-y-3">
           {paginatedCourses.map((course, index) => {
+            const rank = page * PAGE_SIZE + index + 1;
             const hasImage = !!course.thumbnail_url;
             const rating = course.avg_rating ?? null;
+
+            // Determine which lists this course belongs to for badges
+            const ranks = {
+              globalRank: filters.listSlug === 'global' || filters.listSlug === 'all' ? rank : null,
+              regionalRank: filters.listSlug === 'gb-i' ? rank : null,
+              usaRank: filters.listSlug === 'usa' ? rank : null,
+            };
 
             return (
               <button
@@ -121,11 +129,11 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
                     {/* Gradient overlay */}
                     <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
                     
-                    {/* Rank badges top-left - using actual rank data from golf_courses */}
+                    {/* Rank badges top-left */}
                     <CourseRankBadges
-                      globalRank={course.global_rank}
-                      regionalRank={course.regional_rank}
-                      usaRank={course.usa_rank}
+                      globalRank={ranks.globalRank}
+                      regionalRank={ranks.regionalRank}
+                      usaRank={ranks.usaRank}
                       country={course.country || ''}
                       positioning="top-left"
                     />
@@ -137,9 +145,9 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        {!hasImage && (course.global_rank || course.regional_rank || course.usa_rank) && (
+                        {!hasImage && (
                           <span className="text-[11px] font-semibold text-muted-foreground">
-                            #{course.global_rank || course.regional_rank || course.usa_rank}
+                            #{rank}
                           </span>
                         )}
                         <h3 className="text-base font-semibold text-foreground truncate">
