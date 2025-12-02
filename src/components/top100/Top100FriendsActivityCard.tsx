@@ -1,7 +1,6 @@
 import React from 'react';
-import { ChevronRight } from 'lucide-react';
+import { Trophy, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { cn } from '@/lib/utils';
 
 interface Top100FriendEntry {
   friend_id: string;
@@ -45,98 +44,83 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
   };
 
   return (
-    <section className="rounded-2xl bg-card border border-border/60 shadow-xs px-4 py-3 space-y-3">
-      {/* Header row */}
-      <div className="flex items-center justify-between gap-3">
-        <div className="space-y-0.5">
-          <h3 className="text-sm font-semibold text-foreground">
-            Friends chasing the Top 100
-          </h3>
-          {friendMessage && (
-            <p className="text-xs text-muted-foreground">
-              {friendMessage}
-            </p>
-          )}
+    <section className="w-full mt-6">
+      <div className="w-full rounded-2xl bg-card border border-border/70 shadow-sm px-4 py-3 md:px-5 md:py-4">
+        {/* Header row */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Trophy className="w-4 h-4 text-primary-accent flex-shrink-0" />
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold">
+                Friends chasing the Top 100
+              </span>
+              {friendMessage && (
+                <span className="text-xs text-muted-foreground">
+                  {friendMessage}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={onViewLeaderboard}
+            className="inline-flex items-center gap-1 rounded-full border border-primary-accent/40 bg-primary-accent/5 px-3 py-1 text-[11px] font-medium text-primary-accent hover:bg-primary-accent/10 active:bg-primary-accent/15 transition-colors"
+          >
+            <span>Top 10</span>
+            <ChevronRight className="w-3 h-3" />
+          </button>
         </div>
 
-        <button
-          type="button"
-          onClick={onViewLeaderboard}
-          className="inline-flex items-center gap-1 rounded-full border border-amber-300/80 bg-amber-50/80 px-3 py-1 text-xs font-medium text-amber-700 hover:bg-amber-100 transition-colors"
-        >
-          Top 10
-          <ChevronRight className="w-3 h-3" />
-        </button>
-      </div>
-
-      {/* Friend rows */}
-      <div className="space-y-1.5">
-        {topFriends.map((friend, index) => {
-          const rank = index + 1;
-          const initials = getInitials(friend.display_name);
-
-          return (
+        {/* Friend rows (mini leaderboard) */}
+        <div className="mt-3 space-y-2">
+          {topFriends.map((friend, index) => (
             <button
               key={friend.friend_id}
               type="button"
               onClick={() => navigate(`/profile/${friend.friend_id}?tab=top100`)}
-              className="w-full flex items-center justify-between rounded-xl px-2.5 py-2 hover:bg-muted/60 transition-colors"
+              className="w-full flex items-center justify-between rounded-xl px-2.5 py-2 hover:bg-muted/70 transition-colors"
             >
-              {/* Left: avatar + text */}
-              <div className="flex items-center gap-2.5">
+              {/* Left side: avatar + name/club + counts */}
+              <div className="flex items-center gap-3 min-w-0">
+                {/* Avatar squircle */}
                 {friend.profile_photo_url ? (
                   <img
                     src={friend.profile_photo_url}
-                    className="h-8 w-8 rounded-[30%] object-cover"
-                    alt={friend.display_name ?? 'Friend'}
-                    loading="lazy"
-                    decoding="async"
+                    alt={friend.display_name ?? 'Golfer'}
+                    className="w-9 h-9 rounded-[28%] object-cover flex-shrink-0"
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder.svg';
+                    }}
                   />
                 ) : (
-                  <div className="h-8 w-8 rounded-[30%] bg-slate-200 flex items-center justify-center text-xs font-semibold text-slate-700">
-                    {initials}
+                  <div className="w-9 h-9 rounded-[28%] bg-muted flex items-center justify-center text-[11px] font-semibold text-foreground/70 flex-shrink-0">
+                    {getInitials(friend.display_name)}
                   </div>
                 )}
 
-                <div className="flex flex-col text-left">
-                  <span className="text-xs font-medium text-foreground">
+                <div className="flex flex-col min-w-0 text-left">
+                  <span className="text-sm font-medium truncate">
                     {friend.display_name ?? 'Unknown golfer'}
                   </span>
-                  <span className="text-[11px] text-muted-foreground">
-                    {friend.total_top100_played} Top 100 rounds
+                  <span className="text-xs text-muted-foreground truncate">
+                    {friend.total_top100_played} Top 100s
                     {friend.home_club && ` · ${friend.home_club}`}
                   </span>
                 </div>
               </div>
 
-              {/* Right: rank pill */}
-              <div
-                className={cn(
-                  'px-2 py-0.5 rounded-full text-[11px] font-semibold',
-                  rank === 1
-                    ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                    : rank === 2
-                    ? 'bg-slate-50 text-slate-700 border border-slate-200'
-                    : 'bg-slate-50 text-slate-500 border border-slate-200'
-                )}
-              >
-                #{rank}
+              {/* Right side: rank pill */}
+              <div className="flex items-center gap-1 flex-shrink-0">
+                <span className="text-xs text-muted-foreground">#{index + 1}</span>
+                <span className="inline-flex items-center justify-center rounded-full border border-border/70 px-2 py-[3px] text-[11px] text-foreground/80">
+                  View
+                </span>
               </div>
             </button>
-          );
-        })}
+          ))}
+        </div>
       </div>
-
-      {/* Optional footer – link to full friends leaderboard */}
-      {friends.length > 3 && (
-        <button
-          type="button"
-          onClick={onViewLeaderboard}
-          className="w-full text-center text-[11px] text-muted-foreground pt-1 hover:text-foreground transition-colors"
-        >
-          +{friends.length - 3} more players
-        </button>
-      )}
     </section>
   );
 };

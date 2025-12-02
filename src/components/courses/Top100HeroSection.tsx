@@ -1,7 +1,9 @@
 import React from 'react';
 import type { Top100Ring } from '@/lib/top100Club';
-import SquircleImage from '@/components/ui/SquircleImage';
+import { TOP100_TIER_STYLES } from '@/lib/top100RingStyles';
 import { Trophy } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Squircle } from '@/components/ui/squircle';
 
 // Tier color mapping (hex values for inline styles)
 const TIER_COLORS: Record<Top100Ring, string> = {
@@ -47,51 +49,53 @@ export function Top100HeroSection({
     .slice(0, 2) || '?';
 
   const tierColor = TIER_COLORS[clubRing] || TIER_COLORS.none;
-  const avatarSize = 160;
 
   return (
     <div className="flex flex-col items-center text-center space-y-4 py-4">
-      {/* Ring + avatar */}
-      <div className="relative">
-        {avatarUrl ? (
-          <SquircleImage
-            size={avatarSize}
-            src={avatarUrl}
-            alt={displayName ?? 'Golfer avatar'}
-            ringColor={tierColor}
-            ringWidth={5}
-          />
-        ) : (
-          <div
-            className="flex items-center justify-center bg-slate-200"
-            style={{
-              width: avatarSize,
-              height: avatarSize,
-              borderRadius: '30%',
-              border: `5px solid ${tierColor}`,
-            }}
-          >
-            <span className="text-3xl font-semibold text-slate-700">
-              {initials}
-            </span>
-          </div>
-        )}
+      {/* Big Ring with Avatar & Halo */}
+      <div className="relative flex items-center justify-center">
+        {/* Outer halo ring */}
+        <div
+          className="absolute inset-[-6px] border border-white/30 shadow-[0_10px_30px_rgba(0,0,0,0.16)] backdrop-blur-sm"
+          style={{ borderRadius: '34%' }}
+        />
 
-        {/* Club pill – dark background, white text, overlaid at bottom */}
+        {/* Inner tier ring container */}
+        <div
+          className="relative border-4 overflow-hidden"
+          style={{ 
+            borderColor: tierColor,
+            borderRadius: '32%',
+          }}
+        >
+          <Squircle width={144} height={144}>
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={displayName ?? 'Player avatar'}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                loading="lazy"
+                decoding="async"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-2xl font-semibold bg-muted text-foreground">
+                {initials}
+              </div>
+            )}
+          </Squircle>
+        </div>
+
+        {/* Tier badge - positioned at bottom of ring */}
         {clubTierName && (
-          <div className="absolute left-1/2 -translate-x-1/2 bottom-4 px-4 py-2 rounded-lg bg-slate-800/90 backdrop-blur-sm text-white text-sm font-medium whitespace-nowrap text-center leading-tight">
-            {clubTierName.split(' ').map((word, i) => (
-              <React.Fragment key={i}>
-                {word}
-                {i === 0 && <br />}
-              </React.Fragment>
-            ))}
+          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-[#0A0A0A] rounded-full border border-white/10 flex items-center gap-1.5 shadow-md">
+            <Trophy className="w-4 h-4 text-white/80" />
+            <span className="text-white text-sm font-medium">{clubTierName}</span>
           </div>
         )}
       </div>
 
-      {/* Stats */}
-      <div className="text-center flex flex-col gap-1">
+      {/* Stats - tighter spacing (mt-6 = 14px visual gap from ring bottom + badge) */}
+      <div className="text-center mt-6 flex flex-col gap-1.5">
         <p className="text-lg font-semibold text-foreground">
           {isOwnProfile ? "You've" : `${displayName} has`} played {totalPlayed} Top 100 course
           {totalPlayed === 1 ? '' : 's'}
@@ -101,9 +105,8 @@ export function Top100HeroSection({
           Across {regionsCount} {regionsCount === 1 ? 'region' : 'regions'}
           {clubTierName && (
             <>
-              <span>·</span>
-              <Trophy className="h-4 w-4 text-amber-500" />
-              <span>{clubTierName}</span>
+              <Trophy className="w-4 h-4 text-primary-accent" />
+              {clubTierName}
             </>
           )}
         </p>
