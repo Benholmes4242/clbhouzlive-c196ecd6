@@ -141,9 +141,17 @@ export const oceaniaCountries = [
   'Samoa', 'Vanuatu'
 ];
 
+// Asian countries
+export const asianCountries = [
+  'Afghanistan', 'Armenia', 'Azerbaijan', 'Bangladesh', 'Bhutan', 'Brunei', 'Cambodia',
+  'China', 'Georgia', 'Hong Kong', 'India', 'Indonesia', 'Japan', 'Kazakhstan',
+  'Kyrgyzstan', 'Laos', 'Malaysia', 'Mongolia', 'Myanmar', 'Nepal', 'North Korea',
+  'Pakistan', 'Philippines', 'Singapore', 'South Korea', 'Sri Lanka', 'Taiwan',
+  'Thailand', 'Uzbekistan', 'Vietnam'
+];
+
 // Worldwide countries (other regions)
 export const worldwideCountries = [
-  'South Africa', 'Japan', 'South Korea', 'China',
-  'Thailand', 'Singapore', 'Malaysia', 'Philippines', 'India', 'UAE', 'Canada',
-  'Mexico', 'Brazil', 'Argentina', 'Chile', 'Morocco', 'Egypt', 'Kenya'
+  'South Africa', 'UAE', 'Canada', 'Mexico', 'Brazil', 'Argentina', 'Chile', 
+  'Morocco', 'Egypt', 'Kenya'
 ];

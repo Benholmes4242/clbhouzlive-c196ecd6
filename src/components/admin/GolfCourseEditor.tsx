@@ -30,6 +30,7 @@ import { GolfCourse, CourseRating, GolfCourseEditorProps } from './golf-courses/
 // Define the primary countries that have regional Top 100 lists (sorted alphabetically)
 const primaryCountryOptions = [
   'Africa',
+  'Asia',
   'Britain & Ireland',
   'Continental Europe',
   'Oceania',
@@ -68,6 +69,13 @@ const subCountryOptions: Record<string, string[]> = {
     'Latvia', 'Lithuania', 'Luxembourg', 'Malta', 'Moldova', 'Montenegro', 'Netherlands', 
     'Northern Ireland', 'Norway', 'Poland', 'Portugal', 'Romania', 'Russia', 'Scotland', 
     'Serbia', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Switzerland', 'Turkey', 'Ukraine', 'Wales'
+  ],
+  'Asia': [
+    'Afghanistan', 'Armenia', 'Azerbaijan', 'Bangladesh', 'Bhutan', 'Brunei', 'Cambodia',
+    'China', 'Georgia', 'Hong Kong', 'India', 'Indonesia', 'Japan', 'Kazakhstan',
+    'Kyrgyzstan', 'Laos', 'Malaysia', 'Mongolia', 'Myanmar', 'Nepal', 'North Korea',
+    'Pakistan', 'Philippines', 'Singapore', 'South Korea', 'Sri Lanka', 'Taiwan',
+    'Thailand', 'Uzbekistan', 'Vietnam'
   ],
   'Oceania': [
     'Australia', 'Cook Islands', 'Fiji', 'French Polynesia', 'Guam', 'New Caledonia', 
@@ -304,6 +312,8 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         continent = 'North America';
       } else if (selectedCountry === 'Britain & Ireland' || selectedCountry === 'Continental Europe') {
         continent = 'Europe';
+      } else if (selectedCountry === 'Asia') {
+        continent = 'Asia';
       } else if (selectedCountry === 'Africa') {
         continent = 'Africa';
       } else if (selectedCountry === 'Oceania') {
