@@ -9,6 +9,7 @@ import { ReviewBlockFlat } from '../review/ReviewBlockFlat';
 import { CourseReviewsSummary } from '../review/CourseReviewsSummary';
 import { SegmentedTabs, SegmentedTabOption } from '@/components/ui/SegmentedTabs';
 import { Search } from 'lucide-react';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
 import { ReviewMediaItem } from '../review/ReviewMediaStrip';
 import { getScoreTier } from '@/utils/getScoreTier';
@@ -389,10 +390,13 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     <div className="flex flex-col">
       {/* Section 1 – Summary header (flattened on background) */}
       <section className="px-4 pt-3 pb-2 bg-slate-50 sm:pt-5">
-        {/* Section label */}
-        <p className="text-sm font-semibold tracking-[0.14em] text-slate-500 uppercase mb-0.5">
-          Community rating
-        </p>
+        {/* Section label with Clubhouse logo */}
+        <div className="flex items-center justify-center gap-1.5 mb-0.5">
+          <ClubhouseLogo size="xs" className="opacity-70" />
+          <p className="text-sm font-semibold tracking-[0.14em] text-slate-500 uppercase">
+            Community rating
+          </p>
+        </div>
 
         <CourseReviewsSummary
           averageRating={communityScore}
