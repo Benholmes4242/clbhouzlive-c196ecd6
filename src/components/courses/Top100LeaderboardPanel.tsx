@@ -4,6 +4,7 @@ import { Trophy } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Top100PlayersLeaderboardView } from '@/components/top100/Top100PlayersLeaderboardView';
 import { Top100CoursesLeaderboardView } from '@/components/top100/Top100CoursesLeaderboardView';
+import { Top100LeaderboardFilterBar, Top100LeaderboardFilters } from '@/components/top100/Top100LeaderboardFilterBar';
 
 const Top100LeaderboardPanel = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -16,6 +17,14 @@ const Top100LeaderboardPanel = () => {
 
   const [view, setView] = useState<'players' | 'courses'>(initialView);
 
+  // Shared filters state
+  const [filters, setFilters] = useState<Top100LeaderboardFilters>({
+    listSlug: 'all',
+    locationScope: 'worldwide',
+    timeRange: 'all_time',
+    sortBy: 'official_rank',
+  });
+
   const handleViewChange = (next: string) => {
     const nextView = next as 'players' | 'courses';
     setView(nextView);
@@ -25,7 +34,7 @@ const Top100LeaderboardPanel = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 px-4 pb-6">
+    <div className="w-full max-w-6xl mx-auto px-4 md:px-6 space-y-6 pb-6">
       {/* Header */}
       <div className="text-center space-y-2 pt-4">
         <div className="flex items-center justify-center gap-2">
@@ -44,12 +53,22 @@ const Top100LeaderboardPanel = () => {
           <TabsTrigger value="courses">Courses</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="players" className="mt-6">
-          <Top100PlayersLeaderboardView />
+        <TabsContent value="players" className="mt-6 space-y-4">
+          <Top100LeaderboardFilterBar
+            mode="players"
+            value={filters}
+            onChange={setFilters}
+          />
+          <Top100PlayersLeaderboardView filters={filters} />
         </TabsContent>
 
-        <TabsContent value="courses" className="mt-6">
-          <Top100CoursesLeaderboardView />
+        <TabsContent value="courses" className="mt-6 space-y-4">
+          <Top100LeaderboardFilterBar
+            mode="courses"
+            value={filters}
+            onChange={setFilters}
+          />
+          <Top100CoursesLeaderboardView filters={filters} />
         </TabsContent>
       </Tabs>
     </div>
