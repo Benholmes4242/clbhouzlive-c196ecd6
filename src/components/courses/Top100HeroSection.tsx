@@ -69,7 +69,7 @@ export function Top100HeroSection({
         </div>
 
         {clubTierName && (
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-slate-900 text-slate-50 text-xs px-4 py-1 shadow-md">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-slate-900 text-slate-50 text-xs px-4 py-1 shadow-md">
             {clubTierName}
           </div>
         )}
