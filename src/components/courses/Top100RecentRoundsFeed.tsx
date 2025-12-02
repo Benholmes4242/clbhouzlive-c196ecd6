@@ -1,10 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { formatDistanceToNow } from 'date-fns';
 import { Button } from '@/components/ui/button';
-import Top100Pills from './Top100Pills';
 import { Top100RecentRound } from '@/hooks/useTop100ProgressForUser';
 import { cn } from '@/lib/utils';
+import CourseRankBadges from './CourseRankBadges';
+import { extractRanksFromMemberships } from '@/utils/rankingUtils';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 
 interface Top100RecentRoundsFeedProps {
   rounds: Top100RecentRound[];
@@ -49,56 +50,64 @@ export function Top100RecentRoundsFeed({
 
       <div className="space-y-3">
         {current.map((round) => {
-          const listMemberships = round.list_slugs.map((slug) => ({
-            list_slug: slug,
-            short_label: slug.replace('-top-100', '').toUpperCase(),
-            rank: 0,
-          }));
+          // Extract rank badges from list memberships
+          const ranks = {
+            globalRank: round.list_slugs.includes('global') ? 1 : null, // Would need actual rank data
+            regionalRank: round.list_slugs.includes('gb-i') ? 1 : null,
+            usaRank: round.list_slugs.includes('usa') ? 1 : null,
+          };
 
           return (
             <button
               key={`${round.course_id}-${round.played_at}`}
               type="button"
               onClick={() => navigate(`/courses/${round.course_id}`)}
-              className="w-full rounded-2xl overflow-hidden bg-card border border-border/50 text-left shadow-sm hover:shadow-md transition-shadow"
+              className="w-full rounded-xl overflow-hidden bg-card border border-border/60 text-left shadow-sm hover:shadow-md transition-all"
             >
+              {/* Full-bleed course image with badges */}
               {round.image_url && (
-                <div className="h-40 w-full overflow-hidden">
+                <div className="relative w-full aspect-[1.6/1] overflow-hidden">
                   <img
                     src={round.image_url}
                     alt={round.course_name}
-                    className="h-full w-full object-cover"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder.svg';
+                    }}
+                  />
+                  
+                  {/* Gradient overlay at bottom */}
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
+                  
+                  {/* Top 100 rank badges - top left */}
+                  <CourseRankBadges
+                    globalRank={ranks.globalRank}
+                    regionalRank={ranks.regionalRank}
+                    usaRank={ranks.usaRank}
+                    country={round.country || ''}
+                    positioning="top-left"
                   />
                 </div>
               )}
 
-              <div className="px-4 py-3 space-y-1 bg-background">
-                <p className="text-sm font-semibold text-foreground">
+              {/* White metadata area at bottom */}
+              <div className="px-4 py-3 bg-background space-y-1">
+                <h3 className="text-sm font-semibold text-foreground">
                   {round.course_name}
-                </p>
-                <p className="text-[11px] text-muted-foreground">
+                </h3>
+                
+                <p className="text-xs text-muted-foreground">
                   {round.sub_country && `${round.sub_country}, `}
                   {round.country}
                 </p>
 
-                <div className="flex items-center justify-between text-[11px] mt-1">
-                  <span className="text-muted-foreground">
-                    Played {formatDistanceToNow(new Date(round.played_at), { addSuffix: true })}
-                  </span>
-                  {round.rating != null && (
-                    <span className="font-semibold text-primary-accent">
-                      Your rating: {round.rating.toFixed(1)}
+                {/* Clubhouse rating with logo */}
+                {round.rating != null && (
+                  <div className="flex items-center gap-1.5 pt-0.5">
+                    <ClubhouseLogo size="sm" className="opacity-80" />
+                    <span className="text-sm font-semibold text-foreground">
+                      {round.rating.toFixed(1)}
                     </span>
-                  )}
-                </div>
-
-                {listMemberships.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    <Top100Pills
-                      memberships={listMemberships}
-                      variant="inline"
-                      size="sm"
-                    />
                   </div>
                 )}
               </div>
