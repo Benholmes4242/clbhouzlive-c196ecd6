@@ -428,15 +428,15 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             )}
           >
             {/* Drag handle */}
-            <div className="flex justify-center pt-1.5 mb-1">
-              <div className="h-1 w-8 rounded-full bg-slate-300/80 dark:bg-slate-500/80" />
+            <div className="flex justify-center pt-2 mb-2">
+              <div className="h-1.5 w-10 rounded-full bg-slate-300/80 dark:bg-slate-500/80" />
             </div>
 
             {/* Header / handle */}
             <button
               type="button"
               onClick={() => setFiltersOpen((v) => !v)}
-              className="flex w-full items-center justify-between px-4 pb-1.5"
+              className="flex w-full items-center justify-between px-4 pb-2"
             >
               <span className="font-medium">Map filters</span>
               <span className="text-xs text-slate-500">
