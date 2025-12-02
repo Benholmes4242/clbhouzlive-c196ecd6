@@ -123,9 +123,9 @@ const GolfersToFollowPage = () => {
             <button
               type="button"
               onClick={handleBack}
-              className="inline-flex items-center text-xs font-medium text-muted-foreground hover:text-foreground transition"
+              className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition"
             >
-              <ChevronLeft className="mr-1 h-3 w-3" />
+              <ChevronLeft className="mr-1 h-4 w-4" />
               Back to Friends&apos; Courses
             </button>
 
