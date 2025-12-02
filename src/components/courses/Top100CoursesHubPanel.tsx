@@ -69,16 +69,16 @@ const Top100CoursesHubPanel = () => {
   
   // Mock friends for testing layout with 15+ friends
   const mockFriends = FLAGS.TOP100_MOCK_FRIENDS_ENABLED ? [
-    { user_id: 'mock1', profile: { display_name: 'Sarah Mitchell', username: 'sarahm', profile_photo_url: null }, top100CoursesPlayed: 8 },
-    { user_id: 'mock2', profile: { display_name: 'James Anderson', username: 'jamesA', profile_photo_url: null }, top100CoursesPlayed: 12 },
-    { user_id: 'mock3', profile: { display_name: 'Emma Wilson', username: 'emmaw', profile_photo_url: null }, top100CoursesPlayed: 5 },
-    { user_id: 'mock4', profile: { display_name: 'David Chen', username: 'dchen', profile_photo_url: null }, top100CoursesPlayed: 15 },
-    { user_id: 'mock5', profile: { display_name: 'Lisa Thompson', username: 'lisat', profile_photo_url: null }, top100CoursesPlayed: 7 },
-    { user_id: 'mock6', profile: { display_name: 'Michael Brown', username: 'mbrown', profile_photo_url: null }, top100CoursesPlayed: 20 },
-    { user_id: 'mock7', profile: { display_name: 'Sophie Davis', username: 'sophied', profile_photo_url: null }, top100CoursesPlayed: 3 },
-    { user_id: 'mock8', profile: { display_name: 'Robert Taylor', username: 'rtaylor', profile_photo_url: null }, top100CoursesPlayed: 18 },
-    { user_id: 'mock9', profile: { display_name: 'Jessica Lee', username: 'jessicalee', profile_photo_url: null }, top100CoursesPlayed: 9 },
-    { user_id: 'mock10', profile: { display_name: 'Tom Harrison', username: 'tomh', profile_photo_url: null }, top100CoursesPlayed: 11 },
+    { user_id: 'mock1', profile: { display_name: 'Sarah Mitchell', username: 'sarahm', profile_photo_url: null, home_club: 'Augusta National', handicap: 7.2 }, top100CoursesPlayed: 8 },
+    { user_id: 'mock2', profile: { display_name: 'James Anderson', username: 'jamesA', profile_photo_url: null, home_club: 'Pebble Beach', handicap: 12.5 }, top100CoursesPlayed: 12 },
+    { user_id: 'mock3', profile: { display_name: 'Emma Wilson', username: 'emmaw', profile_photo_url: null, home_club: null, handicap: 5.8 }, top100CoursesPlayed: 5 },
+    { user_id: 'mock4', profile: { display_name: 'David Chen', username: 'dchen', profile_photo_url: null, home_club: 'Royal County Down', handicap: null }, top100CoursesPlayed: 15 },
+    { user_id: 'mock5', profile: { display_name: 'Lisa Thompson', username: 'lisat', profile_photo_url: null, home_club: 'Whistling Straits', handicap: 9.3 }, top100CoursesPlayed: 7 },
+    { user_id: 'mock6', profile: { display_name: 'Michael Brown', username: 'mbrown', profile_photo_url: null, home_club: 'Cypress Point', handicap: 2.1 }, top100CoursesPlayed: 20 },
+    { user_id: 'mock7', profile: { display_name: 'Sophie Davis', username: 'sophied', profile_photo_url: null, home_club: null, handicap: null }, top100CoursesPlayed: 3 },
+    { user_id: 'mock8', profile: { display_name: 'Robert Taylor', username: 'rtaylor', profile_photo_url: null, home_club: 'Pinehurst No. 2', handicap: 18.0 }, top100CoursesPlayed: 18 },
+    { user_id: 'mock9', profile: { display_name: 'Jessica Lee', username: 'jessicalee', profile_photo_url: null, home_club: 'Shinnecock Hills', handicap: 4.5 }, top100CoursesPlayed: 9 },
+    { user_id: 'mock10', profile: { display_name: 'Tom Harrison', username: 'tomh', profile_photo_url: null, home_club: 'Oakmont', handicap: 11.7 }, top100CoursesPlayed: 11 },
   ] : [];
   
   const friends = [...friendsData, ...mockFriends];
@@ -331,7 +331,7 @@ const Top100CoursesHubPanel = () => {
         <section className="mt-6">
           <div className="mb-3 flex items-center justify-between">
             <p className="text-[13px] font-semibold text-foreground">
-              Friends on the Top 100 journey
+              Friends on their Top 100 journey
             </p>
             <button
               type="button"
@@ -347,48 +347,71 @@ const Top100CoursesHubPanel = () => {
               None of your friends have started the Top 100 yet.
             </p>
           ) : (
-            <div className="flex gap-6 overflow-x-auto pb-2">
-              {friends.slice(0, 10).map((f) => {
-                const displayName = f.profile.display_name || f.profile.username || '?';
-                const nameParts = displayName.split(' ');
-                const firstName = nameParts[0] || displayName;
-                const lastName = nameParts.slice(1).join(' ') || '';
-                const initial = displayName.slice(0, 1).toUpperCase();
+            <div className="space-y-2">
+              {friends.slice(0, 10).map((friend) => {
+                const displayName = friend.profile.display_name || friend.profile.username || '?';
+                
+                const hasHomeClub = !!friend.profile.home_club;
+                const hcpValue =
+                  friend.profile.handicap !== undefined && friend.profile.handicap !== null
+                    ? friend.profile.handicap
+                    : null;
+                const hasHcp = hcpValue !== null;
+                
+                let line2: string | null = null;
+                let line3: string | null = null;
+                
+                if (hasHomeClub && hasHcp) {
+                  // club line then handicap line
+                  line2 = friend.profile.home_club!;
+                  line3 = `HCP ${typeof hcpValue === 'number' ? hcpValue.toFixed(1) : hcpValue}`;
+                } else if (hasHomeClub) {
+                  line2 = friend.profile.home_club!;
+                } else if (hasHcp) {
+                  // no club – handicap sits directly under the name
+                  line2 = `HCP ${typeof hcpValue === 'number' ? hcpValue.toFixed(1) : hcpValue}`;
+                }
                 
                 return (
                   <button
-                    key={f.user_id}
+                    key={friend.user_id}
                     type="button"
-                    onClick={() => navigate(`/profile/${f.profile.username}?tab=top100`)}
-                    className="flex w-24 flex-col items-center gap-2 flex-shrink-0"
+                    onClick={() => navigate(`/profile/${friend.profile.username}?tab=top100`)}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-muted/60 transition-colors w-full text-left"
                   >
-                    {f.profile.profile_photo_url ? (
-                      <SquircleImage
-                        src={f.profile.profile_photo_url}
-                        alt={displayName}
-                        size={56}
-                        ringWidth={1.5}
-                        ringColor="rgba(203, 213, 225, 0.4)"
-                        className="flex-shrink-0"
-                      />
-                    ) : (
-                      <div className="h-14 w-14 flex items-center justify-center bg-muted text-muted-foreground text-[15px] font-semibold rounded-[22%] ring-1 ring-border/30">
-                        {initial}
-                      </div>
-                    )}
-                    <div className="flex flex-col items-center">
-                      <p className="text-xs font-medium text-slate-900 leading-tight text-center whitespace-normal max-w-[80px] break-words">
-                        {firstName}
-                        {lastName && (
-                          <>
-                            <br />
-                            {lastName}
-                          </>
-                        )}
+                    {/* Avatar */}
+                    <div className="h-10 w-10 rounded-full overflow-hidden flex-shrink-0 bg-muted">
+                      {friend.profile.profile_photo_url ? (
+                        <img
+                          src={friend.profile.profile_photo_url}
+                          alt={displayName}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center text-xs font-semibold">
+                          {displayName?.slice(0, 2).toUpperCase() ?? '?'}
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Text block */}
+                    <div className="flex-1 min-w-0">
+                      {/* Name – single line, truncated */}
+                      <p className="text-sm font-medium truncate">
+                        {displayName}
                       </p>
-                      {typeof f.top100CoursesPlayed === 'number' && (
-                        <p className="mt-1 text-[11px] text-slate-500">
-                          {f.top100CoursesPlayed} course{f.top100CoursesPlayed === 1 ? '' : 's'}
+                      
+                      {/* Line 2 (home club or HCP) */}
+                      {line2 && (
+                        <p className="text-[11px] text-muted-foreground truncate">
+                          {line2}
+                        </p>
+                      )}
+                      
+                      {/* Line 3 (HCP if both club + handicap present) */}
+                      {line3 && (
+                        <p className="text-[11px] text-muted-foreground">
+                          {line3}
                         </p>
                       )}
                     </div>
