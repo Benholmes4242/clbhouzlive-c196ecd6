@@ -14,7 +14,7 @@ import { getTop100Club, getNextTop100Club } from '@/lib/top100Club';
 import {
   Top100ListUserStrip,
   Top100ListFriendsCarousel,
-  Top100ListAchievements,
+  Top100ListAchievementsRow,
   Top100ListFilters,
   Top100ListCourseCard,
   Top100ListFooter,
@@ -147,25 +147,6 @@ const Top100List = () => {
     }));
   }, [friendsProgress]);
 
-  // Build achievements for this list
-  const listAchievements = useMemo(() => {
-    const achievements = [];
-    const thresholds = [10, 20, 50];
-    
-    for (const target of thresholds) {
-      achievements.push({
-        id: `${slug}-${target}`,
-        title: `${target} Club`,
-        subtitle: `Play ${target} courses on this list`,
-        emoji: target === 50 ? '🏆' : target === 20 ? '🥈' : '🥉',
-        current: Math.min(playedCount, target),
-        target,
-      });
-    }
-    
-    return achievements;
-  }, [slug, playedCount]);
-
   // Filter and sort courses
   const filteredAndSortedCourses = useMemo(() => {
     if (!courses) return [];
@@ -260,7 +241,11 @@ const Top100List = () => {
 
         {/* 4. Achievements */}
         {session && (
-          <Top100ListAchievements achievements={listAchievements} />
+          <Top100ListAchievementsRow
+            listName={currentList?.name || 'Top 100'}
+            playedCount={playedCount}
+            totalCount={totalCount}
+          />
         )}
 
         {/* 5. Sort & Filter Bar */}
