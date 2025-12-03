@@ -56,6 +56,20 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
     },
   });
 
+  // Get current user's profile for avatar
+  const { data: currentUserProfile } = useQuery({
+    queryKey: ['current-user-profile', currentUser?.id],
+    enabled: !!currentUser?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('profile_photo_url')
+        .eq('id', currentUser!.id)
+        .single();
+      return data;
+    },
+  });
+
   const scope = mapFiltersToScope(filters);
   const timeRange = mapFiltersToTimeRange(filters);
 
@@ -224,11 +238,11 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
                   {/* White ring (middle) - 1px */}
                   <Squircle width={48} height={48}>
                     <div className="w-full h-full bg-white flex items-center justify-center">
-                      {/* Avatar (inner) */}
+                      {/* Avatar (inner) - use profile photo from separate query */}
                       <Squircle width={46} height={46}>
-                        {me.avatar_url ? (
+                        {(currentUserProfile?.profile_photo_url || me.avatar_url) ? (
                           <img
-                            src={me.avatar_url}
+                            src={currentUserProfile?.profile_photo_url || me.avatar_url!}
                             alt={me.display_name}
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                           />
