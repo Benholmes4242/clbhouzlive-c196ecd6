@@ -304,7 +304,7 @@ const Top100List = () => {
 
         {/* 7. Pagination */}
         {totalFiltered > 0 && (
-          <div className="flex flex-col items-center gap-3 px-4 pb-6">
+          <div className="flex flex-col items-center gap-3 px-4 pb-[24px]">
             <div className="flex flex-wrap justify-center gap-2">
               {hasPrevPage && (
                 <Button
