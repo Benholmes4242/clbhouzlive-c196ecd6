@@ -410,7 +410,6 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
         onNext={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
         onPrev={() => setPage((p) => Math.max(0, p - 1))}
         itemLabel="courses"
-        usePageFormat={true}
       />
     </div>
   );

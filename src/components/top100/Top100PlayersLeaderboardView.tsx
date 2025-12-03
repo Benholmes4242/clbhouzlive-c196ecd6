@@ -579,7 +579,6 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
         onNext={handleNextPage}
         onPrev={handlePrevPage}
         itemLabel="players"
-        usePageFormat={true}
       />
     </div>
   );
