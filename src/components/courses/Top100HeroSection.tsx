@@ -1,7 +1,6 @@
 import React from 'react';
 import type { Top100Ring } from '@/lib/top100Club';
 import { TOP100_TIER_STYLES } from '@/lib/top100RingStyles';
-import { Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Squircle } from '@/components/ui/squircle';
 
@@ -54,13 +53,13 @@ export function Top100HeroSection({
     <div className="flex flex-col items-center text-center space-y-4 py-4">
       {/* Avatar with achievement tier ring */}
       <div className="relative flex items-center justify-center">
-        {/* Outer tier ring using squircle mask */}
-        <Squircle width={148} height={148}>
+        {/* Outer tier ring using squircle mask - 2px */}
+        <Squircle width={150} height={150}>
           <div 
             className="w-full h-full flex items-center justify-center shadow-[0_10px_30px_rgba(0,0,0,0.16)]"
             style={{ backgroundColor: tierColor }}
           >
-            {/* White ring layer */}
+            {/* White ring layer - 1px */}
             <Squircle width={146} height={146}>
               <div className="w-full h-full bg-white flex items-center justify-center">
                 {/* Avatar */}
@@ -86,8 +85,7 @@ export function Top100HeroSection({
 
         {/* Tier badge - positioned at bottom of ring */}
         {clubTierName && (
-          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-[#0A0A0A] rounded-full border border-white/10 flex items-center gap-1.5 shadow-md">
-            <Trophy className="w-4 h-4 text-white/80" />
+          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-slate-800/70 backdrop-blur-md rounded-full border border-white/20 shadow-md">
             <span className="text-white text-sm font-medium">{clubTierName}</span>
           </div>
         )}
@@ -102,12 +100,6 @@ export function Top100HeroSection({
 
         <p className="text-sm text-muted-foreground flex items-center justify-center gap-1.5">
           Across {regionsCount} {regionsCount === 1 ? 'region' : 'regions'}
-          {clubTierName && (
-            <>
-              <Trophy className="w-4 h-4 text-primary-accent" />
-              {clubTierName}
-            </>
-          )}
         </p>
 
         {lastPlayedDate && (
