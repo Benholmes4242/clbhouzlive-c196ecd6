@@ -1,30 +1,8 @@
 import React from 'react';
 import type { Top100Ring } from '@/lib/top100Club';
-import { TOP100_TIER_STYLES } from '@/lib/top100RingStyles';
+import { getRingColorForTier, glassTint, glassIntensity } from '@/lib/top100Club';
 import { cn } from '@/lib/utils';
 import { Squircle } from '@/components/ui/squircle';
-
-// Tier color mapping (hex values for inline styles)
-const TIER_COLORS: Record<Top100Ring, string> = {
-  none: '#94a3b8',
-  rookie: '#D9C7A3',
-  fairway: '#8BBF5A',
-  founders: '#2E5930',
-  heritage: '#C8A44B',
-  century: '#B7BCC6',
-  elite: '#D9A441',
-  legendary: '#5A3E8C',
-  grandslam: '#0C0F14',
-};
-
-// Convert hex to translucent rgba for glass effect
-function glassTint(hex: string, opacity = 0.22): string {
-  const bigint = parseInt(hex.replace('#', ''), 16);
-  const r = (bigint >> 16) & 255;
-  const g = (bigint >> 8) & 255;
-  const b = bigint & 255;
-  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-}
 
 export interface Top100HeroSectionProps {
   avatarUrl?: string | null;
@@ -56,7 +34,8 @@ export function Top100HeroSection({
     .toUpperCase()
     .slice(0, 2) || '?';
 
-  const tierColor = TIER_COLORS[clubRing] || TIER_COLORS.none;
+  // Get ring color from unified tier system
+  const tierColor = getRingColorForTier(clubRing);
 
   return (
     <div className="flex flex-col items-center text-center space-y-4 py-4">
@@ -97,7 +76,7 @@ export function Top100HeroSection({
           <div 
             className="absolute -bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center justify-center px-4 py-1.5 rounded-full text-xs font-medium text-white whitespace-nowrap backdrop-blur-md border border-white/20"
             style={{
-              background: glassTint(tierColor, 0.22),
+              background: glassTint(tierColor, glassIntensity.standard),
               boxShadow: `inset 0 0 0.8px rgba(255,255,255,0.6), 0 4px 10px rgba(0,0,0,0.25)`,
             }}
           >

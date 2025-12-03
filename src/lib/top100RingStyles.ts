@@ -1,7 +1,21 @@
 // src/lib/top100RingStyles.ts
 // Single source of truth for ALL rating colors: profile rings, dots, map pins
+// Now derives colors from the unified CLUB_STEPS in top100Club.ts
 
 import type { Top100Ring } from './top100Club';
+import { TIER_BY_ID } from './top100Club';
+
+// Helper to lighten a hex color for stroke/halo
+function lightenHex(hex: string, percent = 20): string {
+  const num = parseInt(hex.replace('#', ''), 16);
+  const r = Math.min(255, ((num >> 16) & 255) + Math.round(255 * (percent / 100)));
+  const g = Math.min(255, ((num >> 8) & 255) + Math.round(255 * (percent / 100)));
+  const b = Math.min(255, (num & 255) + Math.round(255 * (percent / 100)));
+  return `#${((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1)}`;
+}
+
+// Default color for 'none' tier
+const DEFAULT_COLOR = '#94a3b8';
 
 /**
  * Comprehensive style config for each Top 100 tier
@@ -19,56 +33,56 @@ export const TOP100_TIER_STYLES: Record<
   none: {
     ringClass: 'ring-slate-400/70',
     dotClass: 'bg-slate-400',
-    mapFill: '#94a3b8',      // neutral slate for non-club users
-    mapStroke: '#cbd5e1',
+    mapFill: DEFAULT_COLOR,
+    mapStroke: lightenHex(DEFAULT_COLOR),
   },
   rookie: {
-    ringClass: 'ring-[#D9C7A3]/85',
-    dotClass: 'bg-[#D9C7A3]',
-    mapFill: '#D9C7A3',      // Soft Sand
-    mapStroke: '#E8DCC4',
+    ringClass: `ring-[${TIER_BY_ID.rookie?.ringColor}]/85`,
+    dotClass: `bg-[${TIER_BY_ID.rookie?.ringColor}]`,
+    mapFill: TIER_BY_ID.rookie?.ringColor ?? DEFAULT_COLOR,
+    mapStroke: lightenHex(TIER_BY_ID.rookie?.ringColor ?? DEFAULT_COLOR),
   },
   fairway: {
-    ringClass: 'ring-[#8BBF5A]/85',
-    dotClass: 'bg-[#8BBF5A]',
-    mapFill: '#8BBF5A',      // Fairway Green
-    mapStroke: '#A8D67A',
+    ringClass: `ring-[${TIER_BY_ID.fairway?.ringColor}]/85`,
+    dotClass: `bg-[${TIER_BY_ID.fairway?.ringColor}]`,
+    mapFill: TIER_BY_ID.fairway?.ringColor ?? DEFAULT_COLOR,
+    mapStroke: lightenHex(TIER_BY_ID.fairway?.ringColor ?? DEFAULT_COLOR),
   },
   founders: {
-    ringClass: 'ring-[#2E5930]/85',
-    dotClass: 'bg-[#2E5930]',
-    mapFill: '#2E5930',      // Deep Pine
-    mapStroke: '#3F7A42',
+    ringClass: `ring-[${TIER_BY_ID.founders?.ringColor}]/85`,
+    dotClass: `bg-[${TIER_BY_ID.founders?.ringColor}]`,
+    mapFill: TIER_BY_ID.founders?.ringColor ?? DEFAULT_COLOR,
+    mapStroke: lightenHex(TIER_BY_ID.founders?.ringColor ?? DEFAULT_COLOR),
   },
   heritage: {
-    ringClass: 'ring-[#C8A44B]/85',
-    dotClass: 'bg-[#C8A44B]',
-    mapFill: '#C8A44B',      // Antique Gold
-    mapStroke: '#D7B766',
+    ringClass: `ring-[${TIER_BY_ID.heritage?.ringColor}]/85`,
+    dotClass: `bg-[${TIER_BY_ID.heritage?.ringColor}]`,
+    mapFill: TIER_BY_ID.heritage?.ringColor ?? DEFAULT_COLOR,
+    mapStroke: lightenHex(TIER_BY_ID.heritage?.ringColor ?? DEFAULT_COLOR),
   },
   century: {
-    ringClass: 'ring-[#B7BCC6]/85',
-    dotClass: 'bg-[#B7BCC6]',
-    mapFill: '#B7BCC6',      // Brushed Silver
-    mapStroke: '#D4D5DA',
+    ringClass: `ring-[${TIER_BY_ID.century?.ringColor}]/85`,
+    dotClass: `bg-[${TIER_BY_ID.century?.ringColor}]`,
+    mapFill: TIER_BY_ID.century?.ringColor ?? DEFAULT_COLOR,
+    mapStroke: lightenHex(TIER_BY_ID.century?.ringColor ?? DEFAULT_COLOR),
   },
   elite: {
-    ringClass: 'ring-[#D9A441]/90',
-    dotClass: 'bg-[#D9A441]',
-    mapFill: '#D9A441',      // Royal Gold
-    mapStroke: '#E9C06E',
+    ringClass: `ring-[${TIER_BY_ID.elite?.ringColor}]/90`,
+    dotClass: `bg-[${TIER_BY_ID.elite?.ringColor}]`,
+    mapFill: TIER_BY_ID.elite?.ringColor ?? DEFAULT_COLOR,
+    mapStroke: lightenHex(TIER_BY_ID.elite?.ringColor ?? DEFAULT_COLOR),
   },
   legendary: {
-    ringClass: 'ring-[#5A3E8C]/90',
-    dotClass: 'bg-[#5A3E8C]',
-    mapFill: '#5A3E8C',      // Imperial Purple
-    mapStroke: '#7A5BBC',
+    ringClass: `ring-[${TIER_BY_ID.legendary?.ringColor}]/90`,
+    dotClass: `bg-[${TIER_BY_ID.legendary?.ringColor}]`,
+    mapFill: TIER_BY_ID.legendary?.ringColor ?? DEFAULT_COLOR,
+    mapStroke: lightenHex(TIER_BY_ID.legendary?.ringColor ?? DEFAULT_COLOR),
   },
   grandslam: {
-    ringClass: 'ring-[#0C0F14]/90',
-    dotClass: 'bg-[#0C0F14]',
-    mapFill: '#0C0F14',      // Onyx Black
-    mapStroke: '#2A2D33',
+    ringClass: `ring-[${TIER_BY_ID.grandslam?.ringColor}]/90`,
+    dotClass: `bg-[${TIER_BY_ID.grandslam?.ringColor}]`,
+    mapFill: TIER_BY_ID.grandslam?.ringColor ?? DEFAULT_COLOR,
+    mapStroke: lightenHex(TIER_BY_ID.grandslam?.ringColor ?? DEFAULT_COLOR),
   },
 };
 
