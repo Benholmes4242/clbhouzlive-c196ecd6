@@ -8,7 +8,6 @@ import { useFriendsTop100Progress } from '@/hooks/useFriendsTop100Progress';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import GolfClubView from '@/components/golf-club/GolfClubView';
-import { getTop100Club, getNextTop100Club } from '@/lib/top100Club';
 import {
   Top100ListUserStrip,
   Top100ListFriendsCarousel,
@@ -17,17 +16,16 @@ import {
   Top100ListFooter,
   type SortMode,
   type FilterMode,
-  type ViewMode,
 } from '@/components/top100/list';
 import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
 import { Top100CourseListItem } from '@/components/top100/Top100CourseListItem';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 
-const REGION_EMOJIS: Record<string, string> = {
-  global: '🌍',
-  'gb-i': '🇬🇧',
-  usa: '🇺🇸',
-  europe: '🇪🇺',
+const REGION_DISPLAY_NAMES: Record<string, string> = {
+  global: 'Worldwide',
+  'gb-i': 'Britain & Ireland',
+  usa: 'USA',
+  europe: 'Continental Europe',
 };
 
 const Top100List = () => {
@@ -39,25 +37,9 @@ const Top100List = () => {
   const { data: progressData } = useTop100ProgressForUser(user?.id);
   const { data: userActivity } = useUserCourseActivity(user?.id);
 
-  // Fetch user's profile photo
-  const { data: userProfile } = useQuery({
-    queryKey: ['user-profile-photo', user?.id],
-    enabled: !!user?.id,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from('user_profiles')
-        .select('profile_photo_url, display_name')
-        .eq('id', user!.id)
-        .single();
-      return data;
-    },
-    staleTime: 5 * 60 * 1000,
-  });
-
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
-  const [sortMode, setSortMode] = useState<SortMode>('rank');
+  const [sortMode, setSortMode] = useState<SortMode>('official');
   const [filterMode, setFilterMode] = useState<FilterMode>('all');
-  const [viewMode, setViewMode] = useState<ViewMode>('all');
 
   // Find the current list
   const currentList = lists?.find((l) => l.slug === slug);
@@ -135,19 +117,9 @@ const Top100List = () => {
     };
   }, [currentList, totalCount, playedCount, heroCourse]);
 
-  // Build userProgress for strip
-  const totalTop100 = progressData?.totalTop100Played || 0;
-  const currentClub = getTop100Club(totalTop100);
-  const nextClub = getNextTop100Club(totalTop100);
 
-  const userProgress = useMemo(() => ({
-    rankAmongFriends: 1, // TODO: calculate actual rank
-    totalTop100Courses: totalTop100,
-    currentTierId: currentClub.tierId,
-    currentTierName: currentClub.tierName,
-    nextTierName: nextClub?.tierName || null,
-    nextTierRemaining: nextClub ? Math.max(0, nextClub.threshold - totalTop100) : null,
-  }), [totalTop100, currentClub, nextClub]);
+  // Get display name for this list
+  const listDisplayName = REGION_DISPLAY_NAMES[slug || 'global'] || 'Worldwide';
 
   // Build friends list for carousel
   const friendsSummary = useMemo(() => {
@@ -172,30 +144,28 @@ const Top100List = () => {
     } else if (filterMode === 'not-played') {
       filtered = filtered.filter((c) => !playedCourseIds.has(c.id));
     }
-
-    // Apply view filter
-    if (viewMode === 'friends') {
-      // TODO: implement friends filter with course IDs
-      // For now, show all courses that any friend has played (placeholder)
-    }
-    // TODO: shortlist filter
+    // TODO: shortlisted filter
 
     // Apply sort
     filtered.sort((a, b) => {
       switch (sortMode) {
-        case 'rank':
+        case 'official':
           return a.rank - b.rank;
-        case 'name':
+        case 'rating-desc':
+          return 0; // TODO: implement rating sort when we have ratings
+        case 'rating-asc':
+          return 0;
+        case 'name-asc':
           return a.name.localeCompare(b.name);
-        case 'country':
-          return a.country.localeCompare(b.country);
+        case 'name-desc':
+          return b.name.localeCompare(a.name);
         default:
           return 0;
       }
     });
 
     return filtered;
-  }, [courses, sortMode, filterMode, viewMode, playedCourseIds, friendsProgress]);
+  }, [courses, sortMode, filterMode, playedCourseIds]);
 
   if (isLoading) {
     return (
@@ -229,12 +199,12 @@ const Top100List = () => {
           </section>
         )}
 
-        {/* 2. User Rank Strip */}
+        {/* 2. User Progress Strip */}
         {session && (
           <Top100ListUserStrip
-            userProgress={userProgress}
-            userAvatarUrl={userProfile?.profile_photo_url}
-            userName={userProfile?.display_name || user?.email}
+            playedCount={playedCount}
+            totalCourses={totalCount}
+            listName={listDisplayName}
           />
         )}
 
@@ -243,6 +213,7 @@ const Top100List = () => {
           <Top100ListFriendsCarousel
             friends={friendsSummary}
             totalInList={totalCount}
+            listName={listDisplayName}
           />
         )}
 
@@ -261,8 +232,6 @@ const Top100List = () => {
           onSortChange={setSortMode}
           courseFilter={filterMode}
           onFilterChange={setFilterMode}
-          view={viewMode}
-          onViewChange={setViewMode}
         />
 
         {/* 6. Course List */}
