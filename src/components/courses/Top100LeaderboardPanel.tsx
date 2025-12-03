@@ -55,7 +55,7 @@ const Top100LeaderboardPanel = () => {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-6 pb-6">
+    <div className="w-full max-w-6xl mx-auto space-y-6 pb-6 px-5">
 
       {/* Closest Goal Banner */}
       {showGoalsBanner && (

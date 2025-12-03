@@ -13,15 +13,15 @@ export function Top100FriendCoursesStrip({ items }: Props) {
   if (!items || items.length === 0) return null;
 
   return (
-    <section className="mt-6 px-4 sm:px-0">
+    <section className="mt-6">
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
           Recently played by your circle
         </h3>
       </div>
 
-      <div className="-mx-4 md:mx-0">
-        <div className="flex gap-3 overflow-x-auto px-4 md:px-0 pb-2 scrollbar-hide snap-x snap-mandatory">
+      <div className="-mx-5 md:mx-0">
+        <div className="flex gap-3 overflow-x-auto px-5 md:px-0 pb-2 scrollbar-hide snap-x snap-mandatory">
           {items.map((item) => (
             <button
               key={`${item.course_id}-${item.friend_id}-${item.played_at}`}
