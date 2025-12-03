@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'; // v2 - slim spotlight card
 import { useTop100CourseInsights } from '@/hooks/useTop100CourseInsights';
 import { Trophy } from 'lucide-react';
 
