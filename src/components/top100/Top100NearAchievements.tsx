@@ -29,7 +29,7 @@ export function Top100NearAchievements({ totalTop100Played }: Top100NearAchievem
         </span>
       </div>
 
-      <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 scrollbar-hide">
+      <div className="-mx-5 flex gap-3 overflow-x-auto px-5 pb-1 scrollbar-hide">
         {candidates.map(m => (
           <button
             key={m.id}

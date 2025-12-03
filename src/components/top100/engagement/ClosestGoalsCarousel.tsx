@@ -97,7 +97,7 @@ export function ClosestGoalsCarousel({
         </span>
       </div>
       
-      <div className="flex gap-2.5 overflow-x-auto pb-2 -mx-4 px-4 snap-x snap-mandatory scrollbar-hide">
+      <div className="flex gap-2.5 overflow-x-auto pb-2 -mx-5 px-5 snap-x snap-mandatory scrollbar-hide">
         {goals.slice(0, 4).map((goal, index) => {
           const Icon = goal.icon;
           

@@ -123,7 +123,7 @@ export function WeeklyHighlightsCarousel({ currentUserId }: WeeklyHighlightsCaro
         </span>
       </div>
       
-      <div className="flex gap-2.5 overflow-x-auto pb-2 -mx-4 px-4 snap-x snap-mandatory scrollbar-hide">
+      <div className="flex gap-2.5 overflow-x-auto pb-2 -mx-5 px-5 snap-x snap-mandatory scrollbar-hide">
         {highlights.map((highlight, index) => {
           const Icon = HIGHLIGHT_ICONS[highlight.type];
           const isCurrentUser = highlight.user_id === currentUserId;
