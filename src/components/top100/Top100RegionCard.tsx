@@ -89,8 +89,8 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
         </button>
       )}
 
-      {/* Top-right rank badge - only for default variant */}
-      {!isHero && topRank && (
+      {/* Top-right rank badge */}
+      {topRank && (
         <div className="absolute right-4 top-4 z-10">
           <Top100RankBadge listSlug={listSlug} rank={topRank} />
         </div>
