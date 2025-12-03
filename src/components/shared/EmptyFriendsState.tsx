@@ -22,7 +22,7 @@ export function EmptyFriendsState({ title }: EmptyFriendsStateProps) {
 
       {/* Subtext – SAME on all screens */}
       <p className="text-sm text-muted-foreground mb-6 max-w-sm">
-        Follow other golfers to see where they've been playing and discover new courses.
+        Find other golfers to see where they've been playing and discover new courses.
       </p>
 
       {/* Button – SAME on all screens */}
@@ -31,7 +31,7 @@ export function EmptyFriendsState({ title }: EmptyFriendsStateProps) {
         onClick={() => navigate('/golferstofollow')}
         className="w-full max-w-[320px]"
       >
-        Find golfers to follow
+        Find your friends
       </Button>
     </div>
   );
