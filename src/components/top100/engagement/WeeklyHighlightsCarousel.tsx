@@ -117,7 +117,7 @@ export function WeeklyHighlightsCarousel({ currentUserId }: WeeklyHighlightsCaro
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between px-1">
+      <div className="flex items-center justify-between px-5">
         <span className="text-[13px] font-medium text-muted-foreground uppercase tracking-[0.5px]">
           Weekly highlights
         </span>
