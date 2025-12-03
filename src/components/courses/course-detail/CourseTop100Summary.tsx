@@ -31,11 +31,7 @@ export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
   }
 
   if (!data) {
-    return (
-      <section className="px-4 pt-4 pb-5 bg-slate-50 text-center">
-        <p className="text-sm text-muted-foreground">No Top 100 progress data available.</p>
-      </section>
-    );
+    return null;
   }
 
   // TOOD: skeletons for missing data
