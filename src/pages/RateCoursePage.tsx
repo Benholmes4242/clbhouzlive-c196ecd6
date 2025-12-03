@@ -51,8 +51,8 @@ const RateCoursePage = () => {
     if (courseId) {
       sessionStorage.setItem(`highlight-review-${courseId}`, 'true');
     }
-    // Navigate directly to course details About tab
-    navigate(`/courses/${courseId}`);
+    // Replace current history entry so back button doesn't return to rate page
+    navigate(`/courses/${courseId}`, { replace: true });
   };
 
   // Debug logging
