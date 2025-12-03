@@ -27,9 +27,9 @@ export function Top100CourseMoversStrip({ items, timeRange }: Props) {
       : 'Courses on the move';
 
   return (
-    <section className="mt-1 md:mt-2 px-4 sm:px-0">
+    <section className="mt-6 px-4 sm:px-0">
       <div className="flex items-center justify-between mb-2">
-        <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+        <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
           {label}
         </h3>
       </div>

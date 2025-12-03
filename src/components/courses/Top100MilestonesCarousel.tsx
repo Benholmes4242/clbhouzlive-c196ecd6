@@ -59,8 +59,10 @@ export function Top100MilestonesCarousel({
   const progressPct = getAchievementsProgressPct(totalPlayed);
 
   return (
-    <section className="space-y-2">
-      <h3 className="text-base font-semibold text-foreground">Achievements</h3>
+    <section className="space-y-2 mt-6">
+      <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground mb-2">
+        Achievements
+      </h3>
 
       {/* Outer scroller */}
       <div className="overflow-x-auto pb-1 -mx-1 px-1">

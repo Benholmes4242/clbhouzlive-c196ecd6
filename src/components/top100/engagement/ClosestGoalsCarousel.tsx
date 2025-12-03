@@ -92,7 +92,7 @@ export function ClosestGoalsCarousel({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between px-1">
-        <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">
+        <span className="text-[13px] font-medium text-muted-foreground uppercase tracking-[0.5px]">
           Closest goals
         </span>
       </div>
