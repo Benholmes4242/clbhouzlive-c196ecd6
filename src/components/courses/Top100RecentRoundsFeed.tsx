@@ -26,12 +26,12 @@ export function Top100RecentRoundsFeed({
   if (!rounds || rounds.length === 0) {
     return (
       <section className={cn("mt-6 w-full", className)}>
-        <div className="flex items-center justify-between mb-2 pl-5 pr-4 sm:px-1">
+        <div className="flex items-center justify-between mb-2 px-5 sm:px-0">
           <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
             Recent Top 100 rounds
           </h3>
         </div>
-        <p className="text-xs text-muted-foreground px-1">
+        <p className="text-xs text-muted-foreground px-5 sm:px-0">
           {isOwnProfile
             ? 'No Top 100 rounds recorded yet. Visit the Courses tab to start your journey.'
             : 'No Top 100 rounds recorded yet.'}
@@ -47,7 +47,7 @@ export function Top100RecentRoundsFeed({
 
   return (
     <section className={cn("mt-6 w-full", className)}>
-      <div className="flex items-center justify-between mb-2 pl-5 pr-4 sm:px-1">
+      <div className="flex items-center justify-between mb-2 px-5 sm:px-0">
         <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
           Recent Top 100 rounds
         </h3>
@@ -115,7 +115,7 @@ export function Top100RecentRoundsFeed({
       </div>
 
       {(hasPrev || hasNext) && (
-        <div className="mt-3 flex items-center justify-between gap-3 px-1">
+        <div className="mt-3 flex items-center justify-between gap-3 px-5 sm:px-0">
           <button
             type="button"
             onClick={() => hasPrev && setPage((p) => Math.max(0, p - 1))}
