@@ -54,33 +54,35 @@ export function Top100HeroSection({
     <div className="flex flex-col items-center text-center space-y-4 py-4">
       {/* Avatar with achievement tier ring */}
       <div className="relative flex items-center justify-center">
-        {/* Tier ring container - 2px tier color */}
-        <div
-          className="relative border-2 overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.16)]"
-          style={{ 
-            borderColor: tierColor,
-            borderRadius: '32%',
-          }}
-        >
-          {/* Inner white ring - 1px between avatar and tier ring */}
-          <div className="border border-white" style={{ borderRadius: '32%' }}>
-            <Squircle width={144} height={144}>
-              {avatarUrl ? (
-                <img
-                  src={avatarUrl}
-                  alt={displayName ?? 'Player avatar'}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  loading="lazy"
-                  decoding="async"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-2xl font-semibold bg-muted text-foreground">
-                  {initials}
-                </div>
-              )}
+        {/* Outer tier ring using squircle mask */}
+        <Squircle width={152} height={152}>
+          <div 
+            className="w-full h-full flex items-center justify-center shadow-[0_10px_30px_rgba(0,0,0,0.16)]"
+            style={{ backgroundColor: tierColor }}
+          >
+            {/* White ring layer */}
+            <Squircle width={148} height={148}>
+              <div className="w-full h-full bg-white flex items-center justify-center">
+                {/* Avatar */}
+                <Squircle width={144} height={144}>
+                  {avatarUrl ? (
+                    <img
+                      src={avatarUrl}
+                      alt={displayName ?? 'Player avatar'}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-2xl font-semibold bg-muted text-foreground">
+                      {initials}
+                    </div>
+                  )}
+                </Squircle>
+              </div>
             </Squircle>
           </div>
-        </div>
+        </Squircle>
 
         {/* Tier badge - positioned at bottom of ring */}
         {clubTierName && (
