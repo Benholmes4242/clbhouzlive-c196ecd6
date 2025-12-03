@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -8,7 +7,6 @@ import { useUserCourseActivity } from '@/hooks/useUserCourseActivity';
 import { useFriendsTop100Progress } from '@/hooks/useFriendsTop100Progress';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import Top100BackButton from '@/components/top100/Top100BackButton';
 import GolfClubView from '@/components/golf-club/GolfClubView';
 import { getTop100Club, getNextTop100Club } from '@/lib/top100Club';
 import {
@@ -202,14 +200,13 @@ const Top100List = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <ClubhouseHeaderNew />
         <main className="pb-20">
-          <div className="animate-pulse space-y-4 px-4 pt-4">
-            <div className="h-[220px] bg-muted rounded-3xl" />
-            <div className="h-20 bg-muted rounded-2xl" />
-            <div className="h-32 bg-muted rounded-2xl" />
+          <div className="animate-pulse space-y-4 pt-4">
+            <div className="h-[260px] bg-muted" />
+            <div className="h-20 bg-muted rounded-2xl mx-4" />
+            <div className="h-32 bg-muted rounded-2xl mx-4" />
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-24 bg-muted rounded-3xl" />
+              <div key={i} className="h-24 bg-muted rounded-3xl mx-4" />
             ))}
           </div>
         </main>
@@ -219,21 +216,15 @@ const Top100List = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <ClubhouseHeaderNew />
-
       <main className="pb-20">
-        {/* Back Button */}
-        <div className="pt-4 pb-2 px-4">
-          <Top100BackButton to="/top100" label="Back to Hub" />
-        </div>
-
-        {/* 1. Hero Section - Full-width with straight edges */}
+        {/* 1. Hero Section - Full-width with back button */}
         {listSummary && (
           <section className="px-4">
             <Top100RegionCard
               list={listSummary}
               showCta={false}
               variant="hero"
+              onBack={() => navigate('/top100')}
             />
           </section>
         )}
