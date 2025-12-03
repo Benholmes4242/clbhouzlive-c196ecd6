@@ -93,6 +93,13 @@ export default {
 				elite: '#D9A441',
 				legendary: '#5A3E8C',
 				grandslam: '#0C0F14',
+				// Top 100 Region colors
+				region: {
+					global: 'rgb(var(--region-global) / <alpha-value>)',
+					gbi: 'rgb(var(--region-gbi) / <alpha-value>)',
+					usa: 'rgb(var(--region-usa) / <alpha-value>)',
+					europe: 'rgb(var(--region-europe) / <alpha-value>)',
+				},
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'

@@ -1,16 +1,36 @@
 import React from 'react';
 import { TOP100_LIST_MILESTONES } from '@/config/top100ListMilestones';
 
-// Tier colors matching My Progress
-const TIER_COLORS: Record<number, string> = {
-  5: '#D9C7A3',
-  10: '#8BBF5A',
-  20: '#2E5930',
-  25: '#2E5930',
-  50: '#C8A44B',
-  75: '#B7BCC6',
-  100: '#0C0F14',
+// Region-specific primary colors
+const REGION_COLORS: Record<string, string> = {
+  global: '#1f9f9b',
+  'gb-i': '#1f7a3a',
+  usa: '#c5443b',
+  europe: '#6554c0',
 };
+
+// Get color based on region and threshold position
+function getTierColor(threshold: number, listSlug?: string): string {
+  const regionColor = listSlug ? REGION_COLORS[listSlug] : null;
+  
+  // For list-specific achievements, use the region color with varying intensity
+  if (regionColor) {
+    // All milestones use the region color, final milestone is darkest
+    return regionColor;
+  }
+  
+  // Fallback tier colors (legacy, for non-region-specific use)
+  const TIER_COLORS: Record<number, string> = {
+    5: '#D9C7A3',
+    10: '#8BBF5A',
+    20: '#2E5930',
+    25: '#2E5930',
+    50: '#C8A44B',
+    75: '#B7BCC6',
+    100: '#0C0F14',
+  };
+  return TIER_COLORS[threshold] || '#94a3b8';
+}
 
 interface Top100ListAchievementsRowProps {
   listName: string;
@@ -92,12 +112,19 @@ export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps>
   const maxThreshold = Math.min(milestones[milestones.length - 1]?.threshold ?? 100, totalCount);
   const progressPct = getAchievementsProgressPct(playedCount, milestones, maxThreshold);
 
+  const regionColor = listSlug ? REGION_COLORS[listSlug] : '#94a3b8';
+
   return (
     <section className="space-y-2 mt-6">
-      <div className="flex items-baseline justify-between px-5">
+      <div className="flex flex-col gap-0.5 px-5">
         <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
           {getAchievementsTitleForList(listSlug)}
         </h3>
+        <p className="text-[11px] text-muted-foreground/70">
+          Milestones on this list only
+        </p>
+      </div>
+      <div className="flex items-baseline justify-end px-5">
         <p className="text-xs text-muted-foreground">
           {playedCount} / {totalCount} courses played
         </p>
@@ -113,7 +140,7 @@ export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps>
               const unlocked = playedCount >= m.threshold;
               const remaining = Math.max(0, m.threshold - playedCount);
               const isListComplete = m.threshold >= totalCount;
-              const tierColor = TIER_COLORS[m.threshold] || '#94a3b8';
+              const tierColor = getTierColor(m.threshold, listSlug);
 
               // Badge label
               const badgeLabel = isListComplete 
@@ -157,11 +184,14 @@ export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps>
             })}
           </div>
 
-          {/* Progress bar - inside the scroller, moves with circles */}
+          {/* Progress bar - inside the scroller, uses region color */}
           <div className="h-1 rounded-full bg-muted/80 relative">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-[#D9C7A3] via-[#2E5930] to-[#0C0F14]"
-              style={{ width: `${progressPct}%` }}
+              className="h-full rounded-full transition-all"
+              style={{ 
+                width: `${progressPct}%`,
+                backgroundColor: regionColor,
+              }}
             />
           </div>
         </div>
