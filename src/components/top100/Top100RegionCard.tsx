@@ -8,12 +8,14 @@ type Top100RegionCardProps = {
   list: Top100ListSummary;
   onClick?: () => void;
   showCta?: boolean;
+  variant?: 'default' | 'hero';
 };
 
 export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
   list,
   onClick,
   showCta = true,
+  variant = 'default',
 }) => {
   const total = list.total_courses ?? 0;
   const rated = list.played_count ?? 0;
@@ -31,15 +33,25 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
 
   const displayLabel = getDisplayLabel(list.short_label || list.name);
 
+  const isHero = variant === 'hero';
+
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-[28px]',
-        'bg-slate-900 text-white shadow-md',
-        'transition-transform duration-200 ease-out',
-        'hover:scale-[1.02] hover:shadow-xl',
-        'active:scale-[0.99]',
-        'h-[280px] sm:h-[300px] cursor-pointer'
+        'relative overflow-hidden',
+        'bg-slate-900 text-white',
+        isHero ? [
+          // Full-width hero: no rounded corners, negative margins to break out of gutters
+          'rounded-none -mx-4',
+          'h-[260px] sm:h-[280px]'
+        ] : [
+          // Default card style with rounded corners
+          'rounded-[28px] shadow-md',
+          'transition-transform duration-200 ease-out',
+          'hover:scale-[1.02] hover:shadow-xl',
+          'active:scale-[0.99]',
+          'h-[280px] sm:h-[300px] cursor-pointer'
+        ]
       )}
       onClick={onClick}
     >

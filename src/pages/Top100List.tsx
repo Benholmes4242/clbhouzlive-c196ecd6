@@ -212,12 +212,13 @@ const Top100List = () => {
           <Top100BackButton to="/top100" label="Back to Hub" />
         </div>
 
-        {/* 1. Hero Section - Reusing region card from Courses tab */}
+        {/* 1. Hero Section - Full-width with straight edges */}
         {listSummary && (
           <section className="px-4">
             <Top100RegionCard
               list={listSummary}
               showCta={false}
+              variant="hero"
             />
           </section>
         )}
