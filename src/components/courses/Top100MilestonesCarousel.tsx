@@ -60,7 +60,7 @@ export function Top100MilestonesCarousel({
 
   return (
     <section className="space-y-2 mt-6">
-      <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground mb-2">
+      <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground mb-2 px-5">
         Achievements
       </h3>
 
