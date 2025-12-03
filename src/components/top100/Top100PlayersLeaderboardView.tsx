@@ -12,6 +12,7 @@ import { ChevronRight } from 'lucide-react';
 import { Squircle } from '@/components/ui/squircle';
 import { ENABLE_TOP100_MOCK_PLAYERS } from '@/config/featureFlags';
 import { TOP100_MOCK_PLAYERS } from '@/mocks/top100MockPlayers';
+import { EmptyFriendsState } from '@/components/common/EmptyFriendsState';
 import {
   WeeklyHighlightsCarousel,
   StreakBadge,
@@ -533,20 +534,7 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
       {/* Empty State - different for friends vs all */}
       {displayedEntries.length === 0 && !isLoading && (
         viewScope === 'friends' ? (
-          <div className="rounded-2xl border border-border/60 bg-card/95 px-6 py-8 text-center">
-            <p className="text-sm font-semibold text-foreground mb-1">
-              No friends chasing the Top 100 yet
-            </p>
-            <p className="text-xs text-muted-foreground mb-4">
-              Invite your golf buddies to join Clbhouz and track their Top 100 journey.
-            </p>
-            <button
-              type="button"
-              className="inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-600 px-4 py-2 text-xs font-medium border border-slate-200 shadow-sm hover:bg-slate-200 transition-colors"
-            >
-              Invite friends to join Clbhouz
-            </button>
-          </div>
+          <EmptyFriendsState title="No friends chasing the Top 100 yet" />
         ) : (
           <div className="text-center py-12">
             <p className="text-sm text-muted-foreground">
