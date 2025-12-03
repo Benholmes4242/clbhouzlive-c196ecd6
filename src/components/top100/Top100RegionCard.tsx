@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 import { Top100RankBadge } from './Top100RankBadge';
 
@@ -9,6 +10,7 @@ type Top100RegionCardProps = {
   onClick?: () => void;
   showCta?: boolean;
   variant?: 'default' | 'hero';
+  onBack?: () => void;
 };
 
 export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
@@ -16,6 +18,7 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
   onClick,
   showCta = true,
   variant = 'default',
+  onBack,
 }) => {
   const total = list.total_courses ?? 0;
   const rated = list.played_count ?? 0;
@@ -70,6 +73,20 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
         <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900" />
       )}
 
+      {/* Back button - only in hero variant */}
+      {isHero && onBack && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onBack();
+          }}
+          className="absolute top-3 left-3 z-20 h-9 w-9 bg-black/20 backdrop-blur-sm rounded-md flex items-center justify-center hover:bg-black/40 transition-colors focus:outline-none"
+          aria-label="Go back"
+        >
+          <ArrowLeft className="h-5 w-5 text-white" />
+        </button>
+      )}
+
       {/* Top-right rank badge */}
       {topRank && (
         <div className="absolute right-4 top-4 z-10">
@@ -77,8 +94,11 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
         </div>
       )}
 
-      {/* Title */}
-      <div className="absolute left-4 right-4 top-4 sm:top-5">
+      {/* Title - offset when back button present */}
+      <div className={cn(
+        "absolute right-4 top-4 sm:top-5",
+        isHero && onBack ? "left-14" : "left-4"
+      )}>
         <h2 className="truncate whitespace-nowrap text-[19px] sm:text-[20px] font-semibold tracking-tight text-white">
           {displayLabel}
         </h2>
