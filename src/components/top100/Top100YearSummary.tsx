@@ -37,8 +37,8 @@ export function Top100YearSummary({ summary, regionsCount }: Top100YearSummaryPr
         {/* Divider */}
         <div className="h-6 w-px bg-border" />
 
-        {/* Avg rating - right aligned */}
-        <div className="flex flex-col items-end text-xs">
+        {/* Avg rating */}
+        <div className="flex flex-col items-center text-xs">
           <span className="font-semibold text-foreground">
             {summary.avgRating?.toFixed(1) ?? '—'}
           </span>
