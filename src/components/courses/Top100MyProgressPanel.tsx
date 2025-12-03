@@ -7,13 +7,13 @@ import { Top100ProgressHero } from '@/components/top100/Top100ProgressHero';
 import { Top100MilestonesCarousel } from '@/components/courses/Top100MilestonesCarousel';
 import { Top100NearAchievements } from '@/components/top100/Top100NearAchievements';
 import { Top100YearSummary } from '@/components/top100/Top100YearSummary';
-import { Top100RegionInsight } from '@/components/top100/Top100RegionInsight';
-import { Top100ShareMomentTeaser } from '@/components/top100/Top100ShareMomentTeaser';
+
+
 import { Top100RegionProgressGrid } from './Top100RegionProgressGrid';
 import { Top100RecentRoundsFeed } from './Top100RecentRoundsFeed';
 import { useTop100FriendsSnapshot } from '@/hooks/useTop100FriendsSnapshot';
 import Top100FriendsActivityCard from '@/components/top100/Top100FriendsActivityCard';
-import { buildYearSummary, buildStrongRegionInsight, pickShareMoment } from '@/lib/top100ProgressSelectors';
+import { buildYearSummary } from '@/lib/top100ProgressSelectors';
 
 // Tier colors for next milestone chip
 const TIER_COLORS: Record<string, string> = {
@@ -140,15 +140,6 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
 
   // Derive Group B insights
   const yearSummary = buildYearSummary(data.recent_rounds);
-  const regionInsight = buildStrongRegionInsight(data.lists);
-  const shareMoment = pickShareMoment(data.recent_rounds);
-
-  const handleShareMoment = () => {
-    // Navigate to create moment flow with pre-filled course
-    if (shareMoment?.courseId) {
-      navigate(`/courses/${shareMoment.courseId}?action=moment`);
-    }
-  };
 
   return (
     <div className="w-full max-w-full space-y-5 pb-6">
@@ -212,22 +203,13 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
       {/* Badges You're Close To */}
       <Top100NearAchievements totalTop100Played={data.totalTop100Played} />
 
-      {/* B2: Region insight header + Grid */}
-      <Top100RegionInsight insight={regionInsight} />
+      {/* Region Progress Grid */}
       <Top100RegionProgressGrid
         lists={data.lists}
         onListClick={(slug) => navigate(`/top100/${slug}`)}
         isOwnProfile={isOwnProfile}
         displayName={displayName}
       />
-
-      {/* B3: Share moment teaser */}
-      {isOwnProfile && (
-        <Top100ShareMomentTeaser
-          moment={shareMoment}
-          onShareClick={handleShareMoment}
-        />
-      )}
 
       {/* Recent Top 100 Rounds - Full-width breakout */}
       <div className="-mx-4 sm:mx-0">
