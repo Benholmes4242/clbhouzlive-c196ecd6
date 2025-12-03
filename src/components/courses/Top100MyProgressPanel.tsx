@@ -12,7 +12,6 @@ import { useTop100FriendsSnapshot } from '@/hooks/useTop100FriendsSnapshot';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import Top100FriendsActivityCard from '@/components/top100/Top100FriendsActivityCard';
-import { SectionLabel, StandingsIcon } from '@/components/top100/SectionLabel';
 
 // Tier colors for next milestone chip
 const TIER_COLORS: Record<string, string> = {
@@ -166,10 +165,6 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
 
   return (
     <div className="w-full max-w-full space-y-5 pb-6">
-      {/* Section Label */}
-      <div className="mt-4 sm:mt-6 px-1">
-        <SectionLabel icon={<StandingsIcon />} label="Your standings" />
-      </div>
 
       {/* Hero Section with Big Ring */}
       <div className="mt-4">

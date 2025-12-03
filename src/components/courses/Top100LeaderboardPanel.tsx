@@ -7,7 +7,6 @@ import { Top100CoursesLeaderboardView } from '@/components/top100/Top100CoursesL
 import { Top100LeaderboardFilterBar, Top100LeaderboardFilters } from '@/components/top100/Top100LeaderboardFilterBar';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { SectionLabel, StandingsIcon } from '@/components/top100/SectionLabel';
 
 const Top100LeaderboardPanel = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -57,10 +56,6 @@ const Top100LeaderboardPanel = () => {
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6 pb-6">
-      {/* Section Label */}
-      <div className="mt-4 sm:mt-6 px-1">
-        <SectionLabel icon={<StandingsIcon />} label="Your standings" />
-      </div>
 
       {/* Closest Goal Banner */}
       {showGoalsBanner && (
