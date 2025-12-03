@@ -428,7 +428,7 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
                     {entry.home_club || 'No club set'}
                   </span>
                   <span className="text-[11px] text-muted-foreground mt-0.5">
-                    {entry.total_top100_played} Top 100s · {club.tierName || 'No tier'}
+                    {entry.total_top100_played} Top 100s · {club.tierName || 'No club'}
                   </span>
                 </div>
               </div>
