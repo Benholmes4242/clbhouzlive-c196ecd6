@@ -8,18 +8,10 @@ interface Top100RegionInsightProps {
 
 export function Top100RegionInsight({ insight, title = 'Your journey by region' }: Top100RegionInsightProps) {
   return (
-    <div className="mt-6 mb-1 flex items-center justify-between">
-      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+    <div className="mt-6 mb-3">
+      <h3 className="text-base font-semibold text-foreground">
         {title}
-      </div>
-      {insight && (
-        <div className="text-xs text-muted-foreground">
-          Strongest in{' '}
-          <span className="font-semibold text-foreground">
-            {insight.region.label}
-          </span>
-        </div>
-      )}
+      </h3>
     </div>
   );
 }

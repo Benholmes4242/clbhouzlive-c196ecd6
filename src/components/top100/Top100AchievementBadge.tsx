@@ -44,7 +44,7 @@ export function Top100AchievementBadge({
   return (
     <div
       className={cn(
-        'inline-flex items-center rounded-full border bg-white shadow-sm',
+        'inline-flex items-center justify-center rounded-full border bg-white shadow-sm whitespace-nowrap',
         colors.border,
         isCompact ? 'px-3 py-1.5 gap-2' : 'px-4 py-2 gap-3',
         className
@@ -68,15 +68,15 @@ export function Top100AchievementBadge({
       </div>
 
       {/* Text content */}
-      <div className="flex flex-col leading-tight">
+      <div className="flex flex-col items-center leading-tight">
         {showSubtitle && (
-          <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-500">
+          <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-500 text-center">
             Achievement unlocked
           </span>
         )}
         <span
           className={cn(
-            'font-semibold text-slate-900',
+            'font-semibold text-slate-900 text-center',
             isCompact ? 'text-xs' : 'text-sm'
           )}
         >
