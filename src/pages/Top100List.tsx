@@ -258,6 +258,7 @@ const Top100List = () => {
         {session && (
           <Top100ListAchievementsRow
             listName={currentList?.name || 'Top 100'}
+            listSlug={slug}
             playedCount={playedCount}
             totalCount={totalCount}
           />
@@ -276,6 +277,7 @@ const Top100List = () => {
           {paginatedCourses.map((course) => (
             <Top100ListCourseCard
               key={course.id}
+              listSlug={slug}
               course={{
                 id: course.id,
                 name: course.name,
