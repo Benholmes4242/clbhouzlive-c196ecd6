@@ -5641,14 +5641,16 @@ export type Database = {
         Args: {
           limit_param?: number
           offset_param?: number
-          scope_param?: string
-          time_range_param?: string
+          scope_param: string
+          time_range_param: string
         }
         Returns: {
           avg_rating: number
           country: string
           course_id: string
           course_name: string
+          friends_avg_rating: number
+          friends_count: number
           global_rank: number
           list_slug: string
           regional_rank: number
