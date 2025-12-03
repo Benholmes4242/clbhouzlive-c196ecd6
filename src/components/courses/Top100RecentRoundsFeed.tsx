@@ -26,7 +26,7 @@ export function Top100RecentRoundsFeed({
   if (!rounds || rounds.length === 0) {
     return (
       <section className={cn("mt-6 w-full", className)}>
-        <div className="flex items-center justify-between mb-2 px-1">
+        <div className="flex items-center justify-between mb-2 px-4 sm:px-1">
           <h3 className="text-sm font-semibold">
             Recent Top 100 rounds
           </h3>
@@ -47,7 +47,7 @@ export function Top100RecentRoundsFeed({
 
   return (
     <section className={cn("mt-6 w-full", className)}>
-      <div className="flex items-center justify-between mb-2 px-1">
+      <div className="flex items-center justify-between mb-2 px-4 sm:px-1">
         <h3 className="text-sm font-semibold">
           Recent Top 100 rounds
         </h3>
