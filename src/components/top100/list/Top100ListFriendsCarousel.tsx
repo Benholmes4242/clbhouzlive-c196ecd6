@@ -89,8 +89,8 @@ export const Top100ListFriendsCarousel: React.FC<Top100ListFriendsCarouselProps>
               className={`flex-shrink-0 w-32 snap-start text-center ${isFirst ? 'ml-4' : ''} ${isLast ? 'mr-4' : ''}`}
             >
               {/* Avatar */}
-              <div className="flex justify-center">
-                {friend.avatarUrl ? (
+              {friend.avatarUrl ? (
+                <div className="mx-auto h-12 w-12">
                   <Squircle width={48} height={48}>
                     <img
                       src={friend.avatarUrl}
@@ -98,23 +98,22 @@ export const Top100ListFriendsCarousel: React.FC<Top100ListFriendsCarouselProps>
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                   </Squircle>
-                ) : (
-                  <Squircle width={48} height={48}>
-                    <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-600 text-sm font-medium">
-                      {friend.name[0]?.toUpperCase() || '?'}
-                    </div>
-                  </Squircle>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="mx-auto h-12 w-12 rounded-xl bg-muted flex items-center justify-center text-sm font-semibold">
+                  {friend.name[0]?.toUpperCase() || '?'}
+                </div>
+              )}
 
-              {/* Name */}
-              <div className="mt-1.5 text-[12px] font-semibold leading-tight text-slate-900 truncate max-w-full px-1">
-                {friend.name}
-              </div>
+              {/* Text */}
+              <div className="mt-2 space-y-0.5 w-full">
+                <div className="text-sm font-semibold truncate max-w-full px-1">
+                  {friend.name}
+                </div>
 
-              {/* Progress */}
-              <div className="text-[11px] text-slate-500 truncate max-w-full px-1">
-                {friend.playedOnList}/{totalInList} played
+                <div className="text-xs text-muted-foreground">
+                  {friend.playedOnList}/{totalInList} played
+                </div>
               </div>
             </button>
           );
