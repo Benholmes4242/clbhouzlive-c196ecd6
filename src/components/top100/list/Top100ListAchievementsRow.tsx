@@ -59,15 +59,15 @@ const getAchievementsTitleForList = (listSlug?: string): string => {
 const getCompleteLabel = (listSlug?: string): string => {
   switch (listSlug) {
     case 'global':
-      return 'Worldwide Top 100 complete';
+      return 'Worldwide 100';
     case 'gb-i':
-      return 'GB&I Top 100 complete';
+      return 'GB&I 100';
     case 'usa':
-      return 'USA Top 100 complete';
+      return 'USA 100';
     case 'europe':
-      return 'Europe Top 100 complete';
+      return 'Europe 100';
     default:
-      return 'Top 100 complete';
+      return 'Top 100';
   }
 };
 
