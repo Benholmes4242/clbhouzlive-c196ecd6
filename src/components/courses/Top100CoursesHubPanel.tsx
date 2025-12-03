@@ -91,16 +91,6 @@ const Top100CoursesHubPanel = () => {
   const club = getTop100Club(totalRated);
   const ringKey = club.tierId;
   const ringDotClass = getTop100RingDotClass(ringKey);
-  
-  // Calculate tier for achievement badge
-  const top100Tier: 20 | 50 | 100 | 200 | 300 | 400 | null =
-    totalRated >= 400 ? 400 :
-    totalRated >= 300 ? 300 :
-    totalRated >= 200 ? 200 :
-    totalRated >= 100 ? 100 :
-    totalRated >= 50  ? 50  :
-    totalRated >= 20  ? 20  :
-    null;
 
   // Calculate lists count from summaries (only lists where user has played at least one course)
   const listsCount = listSummaries.filter(list => list.played_count > 0).length;
@@ -312,7 +302,7 @@ const Top100CoursesHubPanel = () => {
             </section>
 
             {/* 2. Hero achievement badge row */}
-            <Top100AchievementBadge tier={top100Tier} />
+            <Top100AchievementBadge tier={club.tierId} />
 
             {/* 3. CTA */}
             <section className="w-full max-w-[420px]">

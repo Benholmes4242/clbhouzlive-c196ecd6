@@ -1,56 +1,89 @@
 import React from 'react';
 import { Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-type Top100Tier = 5 | 10 | 20 | 50 | 100 | 200 | 300 | 400;
-
-const tierStyles: Record<Top100Tier, { ring: string; icon: string; name: string }> = {
-  5:   { ring: "border-[#D9C7A3]", icon: "text-[#D9C7A3]", name: "Rookie Club" },
-  10:  { ring: "border-[#8BBF5A]", icon: "text-[#8BBF5A]", name: "Fairway Club" },
-  20:  { ring: "border-[#2E5930]", icon: "text-[#2E5930]", name: "Founders Club" },
-  50:  { ring: "border-[#C8A44B]", icon: "text-[#C8A44B]", name: "Heritage Club" },
-  100: { ring: "border-[#B7BCC6]", icon: "text-[#B7BCC6]", name: "Century Club" },
-  200: { ring: "border-[#D9A441]", icon: "text-[#D9A441]", name: "Elite Club" },
-  300: { ring: "border-[#5A3E8C]", icon: "text-[#5A3E8C]", name: "Legendary Club" },
-  400: { ring: "border-[#0C0F14]", icon: "text-[#0C0F14]", name: "Grand Slam Club" },
-};
+import type { Top100TierId } from '@/lib/top100Club';
+import { TIER_BY_ID } from '@/lib/top100Club';
 
 interface Top100AchievementBadgeProps {
-  tier: Top100Tier | null;
+  tier: Top100TierId | null;
+  showSubtitle?: boolean;
+  size?: 'default' | 'compact';
+  className?: string;
 }
 
-export function Top100AchievementBadge({ tier }: Top100AchievementBadgeProps) {
-  if (!tier) return null;
+// Map tier ring colors to Tailwind color classes for border/bg/icon
+function getTierColorClasses(ringColor: string) {
+  // Map hex colors to approximate Tailwind classes
+  const colorMap: Record<string, { border: string; bg: string; icon: string }> = {
+    '#C9B27A': { border: 'border-[#C9B27A]', bg: 'bg-[#C9B27A]/10', icon: 'text-[#C9B27A]' },
+    '#7CC66B': { border: 'border-[#7CC66B]', bg: 'bg-[#7CC66B]/10', icon: 'text-[#7CC66B]' },
+    '#2F7D32': { border: 'border-[#2F7D32]', bg: 'bg-[#2F7D32]/10', icon: 'text-[#2F7D32]' },
+    '#D8A546': { border: 'border-[#D8A546]', bg: 'bg-[#D8A546]/10', icon: 'text-[#D8A546]' },
+    '#4A4A4A': { border: 'border-[#4A4A4A]', bg: 'bg-[#4A4A4A]/10', icon: 'text-[#4A4A4A]' },
+    '#6F5BD5': { border: 'border-[#6F5BD5]', bg: 'bg-[#6F5BD5]/10', icon: 'text-[#6F5BD5]' },
+    '#B153CE': { border: 'border-[#B153CE]', bg: 'bg-[#B153CE]/10', icon: 'text-[#B153CE]' },
+    '#111111': { border: 'border-[#111111]', bg: 'bg-[#111111]/10', icon: 'text-[#111111]' },
+  };
+  return colorMap[ringColor] ?? { border: 'border-slate-400', bg: 'bg-slate-100', icon: 'text-slate-500' };
+}
+
+export function Top100AchievementBadge({ 
+  tier, 
+  showSubtitle = true, 
+  size = 'default',
+  className 
+}: Top100AchievementBadgeProps) {
+  if (!tier || tier === 'none') return null;
   
-  const style = tierStyles[tier];
+  const tierMeta = TIER_BY_ID[tier];
+  if (!tierMeta) return null;
+
+  const colors = getTierColorClasses(tierMeta.ringColor);
+  const isCompact = size === 'compact';
 
   return (
-    <section className="flex justify-center">
+    <div
+      className={cn(
+        'inline-flex items-center rounded-full border bg-white shadow-sm backdrop-blur-sm',
+        colors.border,
+        colors.bg,
+        isCompact ? 'px-3 py-1.5 gap-2' : 'px-4 py-2 gap-3',
+        className
+      )}
+    >
+      {/* Trophy icon circle */}
       <div
         className={cn(
-          "inline-flex items-center gap-4 rounded-full bg-white px-6 py-2.5 shadow-sm max-w-xs w-full",
-          style.ring
+          'flex items-center justify-center rounded-full border bg-white/70',
+          colors.border,
+          isCompact ? 'h-7 w-7' : 'h-8 w-8'
         )}
-        style={{ borderWidth: '1.5px' }}
       >
-        <div
+        <Trophy
           className={cn(
-            "flex h-9 w-9 items-center justify-center rounded-full border-2 bg-white",
-            style.ring
+            'shrink-0',
+            isCompact ? 'h-3.5 w-3.5' : 'h-4 w-4',
+            colors.icon
+          )}
+        />
+      </div>
+
+      {/* Text content */}
+      <div className="flex flex-col leading-tight">
+        {showSubtitle && (
+          <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-500">
+            Achievement unlocked
+          </span>
+        )}
+        <span
+          className={cn(
+            'font-semibold text-slate-900',
+            isCompact ? 'text-xs' : 'text-sm'
           )}
         >
-          <Trophy className={cn("h-4 w-4", style.icon)} />
-        </div>
-
-        <div className="text-center">
-          <p className="text-[11px] uppercase tracking-[0.12em] text-slate-500">
-            Achievement unlocked
-          </p>
-          <p className="text-sm font-semibold text-slate-900">
-            {style.name}
-          </p>
-        </div>
+          {tierMeta.tierName}
+        </span>
       </div>
-    </section>
+    </div>
   );
 }
