@@ -74,10 +74,10 @@ export function Top100LeaderboardFilterBar({
           </select>
         </div>
 
-        {/* Golfer region selector */}
+        {/* Golfer/Course region selector */}
         <div className="flex flex-col gap-1.5">
           <span className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
-            Showing golfers from
+            {mode === 'courses' ? 'Showing course ratings from golfers in' : 'Showing golfers from'}
           </span>
           <div className="inline-flex items-center gap-1.5 rounded-xl border border-border/60 bg-background px-3 h-9">
             <Globe2 className="w-4 h-4 text-muted-foreground" />
@@ -126,8 +126,8 @@ export function Top100LeaderboardFilterBar({
         )}
       </div>
 
-      {/* Right block: time range segmented control */}
-      <div className="inline-flex rounded-full bg-muted/60 p-0.5">
+      {/* Right block: time range segmented control - centered */}
+      <div className="inline-flex items-center justify-center rounded-full bg-muted/60 p-0.5">
         {TIME_RANGE_OPTIONS.map((opt) => (
           <button
             key={opt.value}
