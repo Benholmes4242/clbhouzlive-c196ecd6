@@ -14,7 +14,7 @@ export function Top100FriendCoursesStrip({ items }: Props) {
 
   return (
     <section className="mt-2 md:mt-3">
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between mb-2 px-4 sm:px-0">
         <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
           Recently played by your circle
         </h3>
