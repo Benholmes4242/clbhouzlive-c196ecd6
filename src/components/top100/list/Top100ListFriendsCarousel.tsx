@@ -66,34 +66,49 @@ export const Top100ListFriendsCarousel: React.FC<Top100ListFriendsCarouselProps>
         )}
       </div>
 
-      <div className="mt-3 pl-4 pr-2 flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-        {friends.slice(0, 10).map((friend) => (
-          <button
-            key={friend.id}
-            onClick={() => navigate(`/profile/${friend.username}`)}
-            className="min-w-[100px] rounded-2xl bg-white shadow-sm px-2 py-2 flex flex-col items-center border border-slate-100 hover:border-slate-200 transition-colors"
-          >
-            <Squircle width={36} height={36}>
-              {friend.avatarUrl ? (
-                <img
-                  src={friend.avatarUrl}
-                  alt={friend.name}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-              ) : (
-                <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-600 text-xs font-medium">
-                  {friend.name[0]?.toUpperCase() || '?'}
-                </div>
-              )}
-            </Squircle>
-            <div className="mt-1.5 text-[12px] font-semibold leading-tight text-slate-900 text-center truncate max-w-full">
-              {friend.name}
-            </div>
-            <div className="text-[11px] text-slate-500">
-              {friend.playedOnList}/{totalInList} played
-            </div>
-          </button>
-        ))}
+      <div className="-mx-4 flex gap-1 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-none mt-3">
+        {friends.slice(0, 10).map((friend, index) => {
+          const isFirst = index === 0;
+          const isLast = index === friends.slice(0, 10).length - 1;
+
+          return (
+            <button
+              key={friend.id}
+              type="button"
+              onClick={() => navigate(`/profile/${friend.username}`)}
+              className={`flex-shrink-0 w-32 snap-start text-center ${isFirst ? 'ml-4' : ''} ${isLast ? 'mr-4' : ''}`}
+            >
+              {/* Avatar */}
+              <div className="flex justify-center">
+                {friend.avatarUrl ? (
+                  <Squircle width={48} height={48}>
+                    <img
+                      src={friend.avatarUrl}
+                      alt={friend.name}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  </Squircle>
+                ) : (
+                  <Squircle width={48} height={48}>
+                    <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-600 text-sm font-medium">
+                      {friend.name[0]?.toUpperCase() || '?'}
+                    </div>
+                  </Squircle>
+                )}
+              </div>
+
+              {/* Name */}
+              <div className="mt-1.5 text-[12px] font-semibold leading-tight text-slate-900 truncate max-w-full px-1">
+                {friend.name}
+              </div>
+
+              {/* Progress */}
+              <div className="text-[11px] text-slate-500 truncate max-w-full px-1">
+                {friend.playedOnList}/{totalInList} played
+              </div>
+            </button>
+          );
+        })}
       </div>
     </section>
   );
