@@ -16,13 +16,13 @@ import {
   Top100ListFriendsCarousel,
   Top100ListAchievementsRow,
   Top100ListFilters,
-  Top100ListCourseCard,
   Top100ListFooter,
   type SortMode,
   type FilterMode,
   type ViewMode,
 } from '@/components/top100/list';
 import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
+import { Top100CourseListItem } from '@/components/top100/Top100CourseListItem';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 
 const REGION_EMOJIS: Record<string, string> = {
@@ -260,21 +260,28 @@ const Top100List = () => {
 
         {/* 6. Course List */}
         <section className="mt-4 pb-6">
-          {filteredAndSortedCourses.map((course) => (
-            <Top100ListCourseCard
-              key={course.id}
-              course={{
-                id: course.id,
-                name: course.name,
-                rank: course.rank,
-                imageUrl: course.thumbnail_image,
-                country: course.country,
-                subCountry: course.sub_country,
-                played: playedCourseIds.has(course.id),
-              }}
-              onClick={() => setSelectedCourseId(course.id)}
-            />
-          ))}
+          {filteredAndSortedCourses.map((course) => {
+            const countryLabel = course.sub_country 
+              ? `${course.country}, ${course.sub_country}` 
+              : course.country;
+            
+            return (
+              <Top100CourseListItem
+                key={course.id}
+                position={course.rank}
+                courseName={course.name}
+                countryLabel={countryLabel}
+                country={course.country}
+                thumbnailUrl={course.thumbnail_image}
+                isPlayed={playedCourseIds.has(course.id)}
+                onClick={() => setSelectedCourseId(course.id)}
+                onTogglePlayed={() => {
+                  // TODO: implement toggle played
+                  console.log('Toggle played:', course.id);
+                }}
+              />
+            );
+          })}
 
           {filteredAndSortedCourses.length === 0 && (
             <div className="text-center py-12 mx-4">
