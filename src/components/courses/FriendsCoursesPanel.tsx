@@ -25,7 +25,7 @@ import { extractRanksFromMemberships } from '@/utils/rankingUtils';
 import type { CourseWithFriends, FriendCourseHit, Top100Membership } from '@/hooks/useFriendsCourses';
 
 // Temporary: toggle to use high-activity mock data for Friends' Courses
-const USE_FRIENDS_COURSES_MOCK = true; // flip to false to use real data
+const USE_FRIENDS_COURSES_MOCK = false; // flip to false to use real data
 
 type Timeframe = '7d' | '30d' | '90d' | '12m' | 'all';
 type CourseFilter = 'all' | 'new' | 'most_played' | 'highest_rated';
