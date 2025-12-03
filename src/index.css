@@ -503,6 +503,12 @@ html, body, #root {
   /* Bottom nav height for consistent spacing */
   --bottom-nav-height: 64px;
   
+  /* Top 100 Region Colors */
+  --region-global: 31 159 155;      /* teal / blue-green */
+  --region-gbi: 31 122 58;          /* deep green */
+  --region-usa: 197 68 59;          /* warm red */
+  --region-europe: 101 84 192;      /* violet / indigo */
+  
   /* Create Moment composer tokens */
   --composer-height: 440px;
 }

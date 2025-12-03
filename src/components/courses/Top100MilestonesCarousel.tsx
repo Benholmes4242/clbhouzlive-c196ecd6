@@ -63,6 +63,9 @@ export function Top100MilestonesCarousel({
       <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground mb-2 px-5">
         Achievements
       </h3>
+      <p className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground/70 mb-3 px-5">
+        Milestone achievements (all lists)
+      </p>
 
       {/* Outer scroller */}
       <div className="overflow-x-auto pb-1 -mx-1 px-1">

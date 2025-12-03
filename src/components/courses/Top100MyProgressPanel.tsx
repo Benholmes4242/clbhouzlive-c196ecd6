@@ -8,6 +8,7 @@ import { Top100MilestonesCarousel } from '@/components/courses/Top100MilestonesC
 import { Top100NearAchievements } from '@/components/top100/Top100NearAchievements';
 import { Top100YearSummary } from '@/components/top100/Top100YearSummary';
 import { Top100CompletedListsRow } from '@/components/top100/Top100CompletedListsRow';
+import { Top100ListCompletionsRow } from '@/components/top100/Top100ListCompletionsRow';
 import type { Top100ListId } from '@/config/top100ListMilestones';
 
 
@@ -199,8 +200,11 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
         />
       )}
 
-      {/* Achievements Carousel */}
+      {/* Achievements Section */}
       <Top100MilestonesCarousel totalPlayed={data.totalTop100Played} />
+      
+      {/* Top 100 List Completions Row - new section */}
+      <Top100ListCompletionsRow lists={data.lists} />
 
       {/* Completed Lists Row - show when any list is fully completed */}
       {(() => {
