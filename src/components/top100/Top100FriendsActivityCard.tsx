@@ -122,7 +122,6 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {friend.total_top100_played} Top 100 course{friend.total_top100_played !== 1 ? 's' : ''} played
-                  {friend.home_club && ` · ${friend.home_club}`}
                 </p>
               </div>
             </div>
