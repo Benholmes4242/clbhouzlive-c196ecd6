@@ -51,8 +51,17 @@ const RateCoursePage = () => {
     if (courseId) {
       sessionStorage.setItem(`highlight-review-${courseId}`, 'true');
     }
-    // Replace current history entry so back button doesn't return to rate page
-    navigate(`/courses/${courseId}`, { replace: true });
+    
+    // Pop the Rate Course page off the history stack
+    // Check if there's history to go back to (handles direct URL access edge case)
+    const hasHistory = window.history.state && window.history.state.idx > 0;
+    
+    if (hasHistory) {
+      navigate(-1);
+    } else {
+      // Fallback if user landed here directly via URL
+      navigate(`/courses/${courseId}`, { replace: true });
+    }
   };
 
   // Debug logging
