@@ -19,6 +19,7 @@ import {
   type FilterMode,
 } from '@/components/top100/list';
 import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
+import { Button } from '@/components/ui/button';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 
 const REGION_DISPLAY_NAMES: Record<string, string> = {
@@ -27,6 +28,8 @@ const REGION_DISPLAY_NAMES: Record<string, string> = {
   usa: 'USA',
   europe: 'Continental Europe',
 };
+
+const PAGE_SIZE = 25;
 
 const Top100List = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -40,6 +43,7 @@ const Top100List = () => {
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>('official');
   const [filterMode, setFilterMode] = useState<FilterMode>('all');
+  const [page, setPage] = useState(0);
 
   // Find the current list
   const currentList = lists?.find((l) => l.slug === slug);
@@ -149,6 +153,11 @@ const Top100List = () => {
     }));
   }, [friendsProgress]);
 
+  // Reset page when filter or sort changes
+  React.useEffect(() => {
+    setPage(0);
+  }, [filterMode, sortMode]);
+
   // Filter and sort courses
   const filteredAndSortedCourses = useMemo(() => {
     if (!courses) return [];
@@ -183,6 +192,18 @@ const Top100List = () => {
 
     return filtered;
   }, [courses, sortMode, filterMode, playedCourseIds]);
+
+  // Pagination calculations
+  const totalFiltered = filteredAndSortedCourses.length;
+  const startIndex = page * PAGE_SIZE + 1;
+  const endIndex = Math.min((page + 1) * PAGE_SIZE, totalFiltered);
+  const hasNextPage = endIndex < totalFiltered;
+  const hasPrevPage = page > 0;
+
+  // Paginated courses for current page
+  const paginatedCourses = useMemo(() => {
+    return filteredAndSortedCourses.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  }, [filteredAndSortedCourses, page]);
 
   if (isLoading) {
     return (
@@ -253,7 +274,7 @@ const Top100List = () => {
 
         {/* 6. Course List */}
         <section className="mt-4 pb-6 space-y-3">
-          {filteredAndSortedCourses.map((course) => (
+          {paginatedCourses.map((course) => (
             <Top100ListCourseCard
               key={course.id}
               course={{
@@ -273,7 +294,7 @@ const Top100List = () => {
             />
           ))}
 
-          {filteredAndSortedCourses.length === 0 && (
+          {paginatedCourses.length === 0 && (
             <div className="text-center py-12 mx-4">
               <p className="text-muted-foreground text-lg">
                 No courses match your current filter
@@ -282,7 +303,34 @@ const Top100List = () => {
           )}
         </section>
 
-        {/* 7. Footer Engagement */}
+        {/* 7. Pagination */}
+        {totalFiltered > 0 && (
+          <div className="flex flex-col items-center gap-3 px-4 pb-6">
+            <div className="flex flex-wrap justify-center gap-2">
+              {hasPrevPage && (
+                <Button
+                  variant="outline"
+                  onClick={() => setPage((p) => p - 1)}
+                >
+                  Previous {PAGE_SIZE} courses
+                </Button>
+              )}
+              {hasNextPage && (
+                <Button
+                  variant="outline"
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  Next {PAGE_SIZE} courses
+                </Button>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Showing {startIndex}–{endIndex} of {totalFiltered} courses
+            </p>
+          </div>
+        )}
+
+        {/* 8. Footer Engagement */}
         <Top100ListFooter
           onOpenPlanner={() => {
             // TODO: implement course planner
