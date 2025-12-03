@@ -12,7 +12,7 @@ export const Top100ListUserStrip: React.FC<Top100ListUserStripProps> = ({
   listName,
 }) => {
   return (
-    <div className="mx-4 mt-4 rounded-2xl bg-white shadow-sm px-4 py-3 border border-slate-100">
+    <div className="mx-4 mt-4 rounded-2xl bg-white shadow-sm px-4 py-3 border border-slate-100 text-center">
       <div className="text-[15px] font-semibold text-slate-900">
         You've played {playedCount} of {totalCourses} courses on this list
       </div>
