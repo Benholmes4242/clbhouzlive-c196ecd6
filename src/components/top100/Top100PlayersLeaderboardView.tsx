@@ -379,18 +379,18 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
             >
               {/* Left: avatar + text (no rank badge) */}
               <div className="flex items-center gap-3 min-w-0">
-                {/* Avatar with Squircle + white ring + achievement ring - 20% bigger (44px) */}
+                {/* Avatar with Squircle + white ring + achievement ring - same size as Your Position */}
                 <div className="relative flex-shrink-0">
                   {/* Achievement ring (outer) - 2px */}
-                  <Squircle width={48} height={48}>
+                  <Squircle width={52} height={52}>
                     <div className="w-full h-full flex items-center justify-center" style={{
                       background: TOP100_TIER_STYLES[club.tierId as keyof typeof TOP100_TIER_STYLES]?.mapFill || '#94a3b8'
                     }}>
                       {/* White ring (middle) - 1px */}
-                      <Squircle width={44} height={44}>
+                      <Squircle width={48} height={48}>
                         <div className="w-full h-full bg-white flex items-center justify-center">
                           {/* Avatar (inner) */}
-                          <Squircle width={42} height={42}>
+                          <Squircle width={46} height={46}>
                             {entry.avatar_url ? (
                               <img
                                 src={entry.avatar_url}
@@ -398,7 +398,7 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                               />
                             ) : (
-                              <div className="w-full h-full bg-muted flex items-center justify-center text-[10px] font-semibold">
+                              <div className="w-full h-full bg-muted flex items-center justify-center text-[11px] font-semibold">
                                 {initials}
                               </div>
                             )}
