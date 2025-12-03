@@ -6,7 +6,6 @@ import type { Top100RecentRound, Top100ListProgress } from '@/hooks/useTop100Pro
 // B1: Year Summary
 export type YearSummary = {
   year: number;
-  rounds: number;
   newCourses: number;
   avgRating: number | null;
 };
@@ -31,7 +30,6 @@ export function buildYearSummary(rounds: Top100RecentRound[]): YearSummary | nul
 
   return {
     year: currentYear,
-    rounds: yearRounds.length,
     newCourses: uniqueCourses.size,
     avgRating: avgRating !== null ? Number(avgRating.toFixed(1)) : null,
   };

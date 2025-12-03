@@ -159,7 +159,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
       </div>
 
       {/* B1: This year so far strip */}
-      <Top100YearSummary summary={yearSummary} />
+      <Top100YearSummary summary={yearSummary} regionsCount={data.regions_count} />
 
       {/* Next Achievement Callout - centered text, no icon */}
       {data?.next_milestone && (() => {

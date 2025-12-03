@@ -46,43 +46,25 @@ export function Top100AchievementBadge({
       className={cn(
         'inline-flex items-center justify-center rounded-full border bg-white shadow-sm whitespace-nowrap',
         colors.border,
-        isCompact ? 'px-3 py-1.5 gap-2' : 'px-4 py-2 gap-3',
+        isCompact ? 'px-3.5 py-1.5 gap-1.5' : 'px-4 py-2 gap-2',
         className
       )}
     >
-      {/* Trophy icon circle */}
-      <div
+      <Trophy
         className={cn(
-          'flex items-center justify-center rounded-full border bg-white/70',
-          colors.border,
-          isCompact ? 'h-7 w-7' : 'h-8 w-8'
+          'shrink-0',
+          colors.icon,
+          isCompact ? 'h-4 w-4' : 'h-4 w-4'
+        )}
+      />
+      <span
+        className={cn(
+          'font-medium text-slate-900 leading-tight',
+          isCompact ? 'text-[13px]' : 'text-sm'
         )}
       >
-        <Trophy
-          className={cn(
-            'shrink-0',
-            isCompact ? 'h-3.5 w-3.5' : 'h-4 w-4',
-            colors.icon
-          )}
-        />
-      </div>
-
-      {/* Text content */}
-      <div className="flex flex-col items-center leading-tight">
-        {showSubtitle && (
-          <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-slate-500 text-center">
-            Achievement unlocked
-          </span>
-        )}
-        <span
-          className={cn(
-            'font-semibold text-slate-900 text-center',
-            isCompact ? 'text-xs' : 'text-sm'
-          )}
-        >
-          {tierMeta.tierName}
-        </span>
-      </div>
+        {tierMeta.tierName}
+      </span>
     </div>
   );
 }
