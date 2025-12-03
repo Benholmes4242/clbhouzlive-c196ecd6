@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
@@ -43,6 +43,38 @@ const Top100List = () => {
   const [sortMode, setSortMode] = useState<SortMode>('official');
   const [filterMode, setFilterMode] = useState<FilterMode>('all');
   const [page, setPage] = useState(0);
+
+  // Ref for scroll-to-top after pagination
+  const listTopRef = useRef<HTMLDivElement | null>(null);
+
+  // G1/M1: Scroll to top on mount / slug change
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [slug]);
+
+  // M12: Restore page + scroll from sessionStorage on mount
+  useEffect(() => {
+    const savedPage = sessionStorage.getItem('top100:list:page');
+    const savedScrollY = sessionStorage.getItem('top100:list:scrollY');
+
+    if (savedPage) {
+      setPage(Number(savedPage));
+    }
+    if (savedScrollY) {
+      // Delay scroll restore until after render
+      requestAnimationFrame(() => {
+        window.scrollTo({
+          top: Number(savedScrollY),
+          left: 0,
+          behavior: 'auto',
+        });
+      });
+    }
+
+    // Clear after restoring
+    sessionStorage.removeItem('top100:list:page');
+    sessionStorage.removeItem('top100:list:scrollY');
+  }, []);
 
   // Find the current list
   const currentList = lists?.find((l) => l.slug === slug);
@@ -204,6 +236,36 @@ const Top100List = () => {
     return filteredAndSortedCourses.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
   }, [filteredAndSortedCourses, page]);
 
+  // G2/M2: Scroll to list top after pagination
+  const scrollToListTop = useCallback(() => {
+    if (listTopRef.current) {
+      window.scrollTo({
+        top: listTopRef.current.offsetTop - 16,
+        left: 0,
+        behavior: 'auto',
+      });
+    }
+  }, []);
+
+  const handlePrevPage = useCallback(() => {
+    if (!hasPrevPage) return;
+    setPage((p) => p - 1);
+    scrollToListTop();
+  }, [hasPrevPage, scrollToListTop]);
+
+  const handleNextPage = useCallback(() => {
+    if (!hasNextPage) return;
+    setPage((p) => p + 1);
+    scrollToListTop();
+  }, [hasNextPage, scrollToListTop]);
+
+  // M12: Save page + scroll before navigating to course detail
+  const handleOpenCourse = useCallback((courseId: string) => {
+    sessionStorage.setItem('top100:list:page', String(page));
+    sessionStorage.setItem('top100:list:scrollY', String(window.scrollY));
+    navigate(`/courses/${courseId}`);
+  }, [page, navigate]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -264,6 +326,9 @@ const Top100List = () => {
           />
         )}
 
+        {/* Ref target for scroll-to-top after pagination */}
+        <div ref={listTopRef} />
+
         {/* 5. Sort & Filter Bar */}
         <Top100ListFilters
           sortBy={sortMode}
@@ -291,7 +356,7 @@ const Top100List = () => {
                 regionalRank: course.regional_rank,
                 usaRank: course.usa_rank,
               }}
-              onClick={() => setSelectedCourseId(course.id)}
+              onClick={() => handleOpenCourse(course.id)}
             />
           ))}
 
@@ -310,7 +375,7 @@ const Top100List = () => {
             <div className="flex items-center justify-center gap-3 w-full">
               <button
                 type="button"
-                onClick={() => setPage((p) => p - 1)}
+                onClick={handlePrevPage}
                 disabled={!hasPrevPage}
                 className={cn(
                   "flex-1 inline-flex items-center justify-center rounded-full border px-4 py-2 text-sm font-medium transition-colors",
@@ -323,7 +388,7 @@ const Top100List = () => {
               </button>
               <button
                 type="button"
-                onClick={() => setPage((p) => p + 1)}
+                onClick={handleNextPage}
                 disabled={!hasNextPage}
                 className={cn(
                   "flex-1 inline-flex items-center justify-center rounded-full border px-4 py-2 text-sm font-medium transition-colors",
@@ -347,6 +412,7 @@ const Top100List = () => {
       {selectedCourseId && (
         <GolfClubView
           courseId={selectedCourseId}
+          isInModal={true}
           onClose={() => setSelectedCourseId(null)}
         />
       )}

@@ -36,10 +36,20 @@ export const Top100ListFriendsCarousel: React.FC<Top100ListFriendsCarouselProps>
             See how your friends are progressing on the {listName} Top 100.
           </p>
         </div>
-        <div className="mt-3 mx-4 p-4 rounded-2xl bg-white shadow-sm border border-slate-100">
-          <p className="text-sm text-slate-500 text-center">
-            None of your friends have started this list yet.
+        <div className="mt-3 mx-4 px-4 py-4 rounded-2xl bg-slate-50 border border-slate-100">
+          <p className="text-sm font-semibold text-slate-700">
+            No friends on this list yet
           </p>
+          <p className="mt-1 text-sm text-slate-500">
+            Follow other golfers to see how they're progressing on this Top 100 list.
+          </p>
+          <button
+            type="button"
+            className="mt-3 inline-flex items-center justify-center rounded-[var(--radius-squircle)] bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+            onClick={() => navigate('/golferstofollow')}
+          >
+            Find golfers to follow
+          </button>
         </div>
       </section>
     );
