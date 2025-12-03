@@ -19,10 +19,10 @@ const LIST_LABELS: Record<string, string> = {
 };
 
 const COMPLETE_LABELS: Record<string, string> = {
-  global: 'Worldwide complete',
-  'gb-i': 'GB&I complete',
-  usa: 'USA complete',
-  europe: 'Europe complete',
+  global: 'Worldwide 100',
+  'gb-i': 'GB&I 100',
+  usa: 'USA 100',
+  europe: 'Europe 100',
 };
 
 const COMPLETION_LIST_SLUGS = ['global', 'gb-i', 'usa', 'europe'] as const;
