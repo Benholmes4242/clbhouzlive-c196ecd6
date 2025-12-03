@@ -18,7 +18,6 @@ import {
   RivalryCard,
   ClosestGoalsCarousel,
   TrophyIcons,
-  RivalryButton,
   parseBadgesFromJson,
 } from './engagement';
 
@@ -504,15 +503,6 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
                   </span>
                 </div>
               </div>
-
-              {/* MODULE 3: Add Rival Button (between left content and right pills) */}
-              {currentUser?.id && entry.user_id !== currentUser.id && (
-                <RivalryButton
-                  userId={currentUser.id}
-                  targetUserId={entry.user_id}
-                  className="mr-2"
-                />
-              )}
 
               {/* Right: rank pill + movement pill */}
               <div className="flex items-center gap-2 shrink-0">
