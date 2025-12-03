@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Squircle } from '@/components/ui/squircle';
 
 interface FriendSummary {
   id: string;
@@ -13,12 +13,14 @@ interface FriendSummary {
 interface Top100ListFriendsCarouselProps {
   friends: FriendSummary[];
   totalInList: number;
+  listName: string; // e.g., "Worldwide", "USA", "Britain & Ireland", "Continental Europe"
   onViewAll?: () => void;
 }
 
 export const Top100ListFriendsCarousel: React.FC<Top100ListFriendsCarouselProps> = ({
   friends,
   totalInList,
+  listName,
   onViewAll,
 }) => {
   const navigate = useNavigate();
@@ -28,8 +30,11 @@ export const Top100ListFriendsCarousel: React.FC<Top100ListFriendsCarouselProps>
       <section className="mt-6">
         <div className="px-5">
           <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
-            Your friends on this list
+            Friends on this journey
           </h2>
+          <p className="text-[13px] text-slate-500 mt-1">
+            See how your friends are progressing on the {listName} Top 100.
+          </p>
         </div>
         <div className="mt-3 mx-4 p-4 rounded-2xl bg-white shadow-sm border border-slate-100">
           <p className="text-sm text-slate-500 text-center">
@@ -42,10 +47,15 @@ export const Top100ListFriendsCarousel: React.FC<Top100ListFriendsCarouselProps>
 
   return (
     <section className="mt-6">
-      <div className="px-5 flex items-center justify-between">
-        <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
-          Your friends on this list
-        </h2>
+      <div className="px-5 flex items-start justify-between">
+        <div>
+          <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
+            Friends on this journey
+          </h2>
+          <p className="text-[13px] text-slate-500 mt-1">
+            See how your friends are progressing on the {listName} Top 100.
+          </p>
+        </div>
         {friends.length > 8 && (
           <button
             onClick={onViewAll}
@@ -63,12 +73,19 @@ export const Top100ListFriendsCarousel: React.FC<Top100ListFriendsCarouselProps>
             onClick={() => navigate(`/profile/${friend.username}`)}
             className="min-w-[120px] rounded-2xl bg-white shadow-sm px-3 py-3 flex flex-col items-center border border-slate-100 hover:border-slate-200 transition-colors"
           >
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={friend.avatarUrl || undefined} alt={friend.name} />
-              <AvatarFallback className="bg-slate-100 text-slate-600 text-sm font-medium">
-                {friend.name[0]?.toUpperCase() || '?'}
-              </AvatarFallback>
-            </Avatar>
+            <Squircle width={40} height={40}>
+              {friend.avatarUrl ? (
+                <img
+                  src={friend.avatarUrl}
+                  alt={friend.name}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : (
+                <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-600 text-sm font-medium">
+                  {friend.name[0]?.toUpperCase() || '?'}
+                </div>
+              )}
+            </Squircle>
             <div className="mt-2 text-[13px] font-semibold leading-tight text-slate-900 text-center truncate max-w-full">
               {friend.name}
             </div>
