@@ -9,8 +9,6 @@ import { Top100RegionProgressGrid } from './Top100RegionProgressGrid';
 import { Top100RecentRoundsFeed } from './Top100RecentRoundsFeed';
 import ProfileBadgeStrip from '@/components/profile/ProfileBadgeStrip';
 import { useTop100FriendsSnapshot } from '@/hooks/useTop100FriendsSnapshot';
-import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
 import Top100FriendsActivityCard from '@/components/top100/Top100FriendsActivityCard';
 
 // Tier colors for next milestone chip
@@ -38,40 +36,13 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   const { data: friendsSnapshot } = useTop100FriendsSnapshot();
   const navigate = useNavigate();
   const isOwnProfile = !userId || userId === session?.user?.id;
-  const { toast } = useToast();
   const prevTotalRef = useRef<number | null>(null);
 
-  // Milestone "Share to Clubhouse" logic - MUST be before early returns
+  // Milestone tracking - keeping ref update for future use, toast disabled
   useEffect(() => {
     if (!data || !isOwnProfile) return;
-
-    const current = data.totalTop100Played;
-    const prev = prevTotalRef.current ?? 0;
-
-    const thresholds = [5, 10, 20, 50, 100, 200, 300, 400];
-    const justHit = thresholds.find((t) => prev < t && current >= t);
-
-    if (justHit) {
-      const club = data.club_tier_name;
-      toast({
-        title: club 
-          ? `You've just unlocked ${club} (${justHit} Top 100 courses). Share to Clubhouse?`
-          : `Top 100 milestone unlocked – ${justHit} Club 🎉`,
-        description: 'Share your journey with the Clubhouse community?',
-        action: (
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => navigate('/create-moment')}
-          >
-            Share to Clubhouse
-          </Button>
-        ),
-      });
-    }
-
-    prevTotalRef.current = current;
-  }, [data?.totalTop100Played, data?.club_tier_name, isOwnProfile, toast, navigate]);
+    prevTotalRef.current = data.totalTop100Played;
+  }, [data?.totalTop100Played, isOwnProfile]);
 
   // Calculate badge props for ProfileBadgeStrip
   const badgeProps = React.useMemo(() => {
@@ -191,10 +162,10 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
                 <svg className="w-4 h-4 text-primary-accent flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
                 </svg>
-                <span className="text-sm">
-                  Next milestone:{' '}
+                <span className="text-xs sm:text-sm whitespace-nowrap">
+                  Next achievement:{' '}
                   <span className="font-semibold">
-                    {data.next_milestone.remaining} more {data.next_milestone.remaining === 1 ? 'course' : 'courses'} to{' '}
+                    {data.next_milestone.remaining} more to{' '}
                   </span>
                   <span className="font-semibold" style={{ color: nextTierColor }}>
                     {data.next_milestone.tierName}

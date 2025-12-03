@@ -80,10 +80,10 @@ export function Top100MilestonesCarousel({
                   onClick={() => onMilestoneClick?.(milestone)}
                   className="flex flex-col items-center min-w-[72px] gap-1 focus:outline-none"
                 >
-                  {/* Ring */}
+                  {/* Squircle ring */}
                   <div className="relative">
                     <div
-                      className="h-14 w-14 rounded-full flex items-center justify-center bg-white"
+                      className="h-14 w-14 rounded-[18px] flex items-center justify-center bg-white"
                       style={{
                         boxShadow: isUnlocked
                           ? `0 0 18px ${tierColor}22`
