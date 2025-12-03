@@ -21,6 +21,7 @@ import {
 import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
 import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 const REGION_DISPLAY_NAMES: Record<string, string> = {
   global: 'Worldwide',
@@ -393,6 +394,9 @@ const Top100List = () => {
           onClose={() => setSelectedCourseId(null)}
         />
       )}
+
+      {/* Scroll to top button */}
+      <ScrollToTopGlass />
     </div>
   );
 };
