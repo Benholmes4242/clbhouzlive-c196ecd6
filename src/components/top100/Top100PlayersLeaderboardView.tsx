@@ -13,6 +13,7 @@ import { ChevronRight } from 'lucide-react';
 import { Squircle } from '@/components/ui/squircle';
 import { ENABLE_TOP100_MOCK_PLAYERS } from '@/config/featureFlags';
 import { TOP100_MOCK_PLAYERS } from '@/mocks/top100MockPlayers';
+import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 import {
   WeeklyHighlightsCarousel,
   StreakBadge,
@@ -570,41 +571,16 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
       )}
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-4 flex items-center gap-3">
-          <button
-            type="button"
-            onClick={handlePrevPage}
-            disabled={!hasPrev}
-            className={cn(
-              'flex-1 inline-flex items-center justify-center rounded-full border px-3 py-2 font-medium transition-colors',
-              hasPrev
-                ? 'bg-card hover:bg-muted/70 border-border text-foreground'
-                : 'bg-muted/40 border-border/60 text-muted-foreground cursor-default'
-            )}
-          >
-            Previous
-          </button>
-
-          <span className="text-xs text-muted-foreground min-w-[90px] text-center">
-            Page {currentPage} of {totalPages}
-          </span>
-
-          <button
-            type="button"
-            onClick={handleNextPage}
-            disabled={!hasNext}
-            className={cn(
-              'flex-1 inline-flex items-center justify-center rounded-full border px-3 py-2 font-medium transition-colors',
-              hasNext
-                ? 'bg-card hover:bg-muted/70 border-border text-foreground'
-                : 'bg-muted/40 border-border/60 text-muted-foreground cursor-default'
-            )}
-          >
-            Next
-          </button>
-        </div>
-      )}
+      <UnifiedPagination
+        page={page}
+        total={displayedEntries.length}
+        pageSize={PAGE_SIZE}
+        hasNextPage={hasNext}
+        onNext={handleNextPage}
+        onPrev={handlePrevPage}
+        itemLabel="players"
+        usePageFormat={true}
+      />
     </div>
   );
 }

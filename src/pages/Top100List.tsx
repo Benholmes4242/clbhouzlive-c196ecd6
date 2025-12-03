@@ -19,6 +19,7 @@ import {
   type FilterMode,
 } from '@/components/top100/list';
 import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
+import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 
 const REGION_DISPLAY_NAMES: Record<string, string> = {
@@ -370,41 +371,17 @@ const Top100List = () => {
         </section>
 
         {/* 7. Pagination */}
-        {totalFiltered > 0 && (
-          <div className="flex flex-col items-center gap-3 px-4 pb-[24px]">
-            <div className="flex items-center justify-center gap-3 w-full">
-              <button
-                type="button"
-                onClick={handlePrevPage}
-                disabled={!hasPrevPage}
-                className={cn(
-                  "flex-1 inline-flex items-center justify-center rounded-full border px-4 py-2 text-sm font-medium transition-colors",
-                  hasPrevPage
-                    ? "bg-card hover:bg-muted/70 border-border text-foreground"
-                    : "bg-muted/40 border-border/60 text-muted-foreground cursor-default"
-                )}
-              >
-                Previous {PAGE_SIZE} courses
-              </button>
-              <button
-                type="button"
-                onClick={handleNextPage}
-                disabled={!hasNextPage}
-                className={cn(
-                  "flex-1 inline-flex items-center justify-center rounded-full border px-4 py-2 text-sm font-medium transition-colors",
-                  hasNextPage
-                    ? "bg-card hover:bg-muted/70 border-border text-foreground"
-                    : "bg-muted/40 border-border/60 text-muted-foreground cursor-default"
-                )}
-              >
-                Next {PAGE_SIZE} courses
-              </button>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Showing {startIndex}–{endIndex} of {totalFiltered} courses
-            </p>
-          </div>
-        )}
+        <div className="px-4 pb-[24px]">
+          <UnifiedPagination
+            page={page}
+            total={totalFiltered}
+            pageSize={PAGE_SIZE}
+            hasNextPage={hasNextPage}
+            onNext={handleNextPage}
+            onPrev={handlePrevPage}
+            scrollTargetRef={listTopRef as React.RefObject<HTMLElement>}
+          />
+        </div>
 
       </main>
 

@@ -20,6 +20,7 @@ import CourseCard from './CourseCard';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { COURSES_PAGE_SIZE } from '@/config/pagination';
 import { FLAGS } from '@/config/flags';
+import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 import {
   PRIMARY_REGIONS,
   SUBREGIONS,
@@ -575,41 +576,15 @@ const Top100CoursesHubPanel = () => {
           </div>
           
           {/* Pagination Footer */}
-          <div className="flex flex-col items-center gap-3 mt-8">
-            {/* Pagination Buttons */}
-            <div className="flex items-center justify-center gap-3 w-full px-4">
-              <button
-                type="button"
-                onClick={handlePrevPage}
-                disabled={!hasPrev || isLoading}
-                className={cn(
-                  "flex-1 inline-flex items-center justify-center rounded-full border px-4 py-2 text-sm font-medium transition-colors",
-                  hasPrev && !isLoading
-                    ? "bg-card hover:bg-muted/70 border-border text-foreground"
-                    : "bg-muted/40 border-border/60 text-muted-foreground cursor-default"
-                )}
-              >
-                Previous {COURSES_PAGE_SIZE} courses
-              </button>
-
-              <button
-                type="button"
-                onClick={handleNextPage}
-                disabled={!hasNextPage || isLoading || isFetchingNextPage}
-                className={cn(
-                  "flex-1 inline-flex items-center justify-center rounded-full border px-4 py-2 text-sm font-medium transition-colors",
-                  hasNextPage && !isLoading && !isFetchingNextPage
-                    ? "bg-card hover:bg-muted/70 border-border text-foreground"
-                    : "bg-muted/40 border-border/60 text-muted-foreground cursor-default"
-                )}
-              >
-                {isFetchingNextPage ? 'Loading...' : `Next ${COURSES_PAGE_SIZE} courses`}
-              </button>
-            </div>
-            <p className="text-xs text-slate-500">
-              Showing {startIndex}–{endIndex} of {totalCount} courses
-            </p>
-          </div>
+          <UnifiedPagination
+            page={page}
+            total={totalCount}
+            hasNextPage={hasNextPage}
+            onNext={handleNextPage}
+            onPrev={handlePrevPage}
+            disabled={isLoading || isFetchingNextPage}
+            scrollTargetRef={listTopRef as React.RefObject<HTMLElement>}
+          />
         </div>
       )}
 

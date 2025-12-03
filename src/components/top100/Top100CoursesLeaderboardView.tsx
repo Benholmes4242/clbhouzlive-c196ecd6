@@ -15,6 +15,7 @@ import { getCourseTrophies } from './getCourseTrophies';
 import CourseRankBadges from '@/components/courses/CourseRankBadges';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { Bookmark } from 'lucide-react';
+import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 
 interface Top100CoursesLeaderboardViewProps {
   filters: Top100LeaderboardFilters;
@@ -401,41 +402,16 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
       )}
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-3 flex items-center justify-between gap-3 text-xs px-1">
-          <button
-            type="button"
-            onClick={() => hasPrev && setPage((p) => Math.max(0, p - 1))}
-            disabled={!hasPrev}
-            className={cn(
-              'flex-1 inline-flex items-center justify-center rounded-full border px-3 py-2 font-medium transition-colors',
-              hasPrev
-                ? 'bg-card hover:bg-muted/70 border-border text-foreground'
-                : 'bg-muted/40 border-border/60 text-muted-foreground cursor-default'
-            )}
-          >
-            Previous
-          </button>
-
-          <span className="min-w-[90px] text-center text-muted-foreground">
-            Page {currentPage} of {totalPages}
-          </span>
-
-          <button
-            type="button"
-            onClick={() => hasNext && setPage((p) => Math.min(totalPages - 1, p + 1))}
-            disabled={!hasNext}
-            className={cn(
-              'flex-1 inline-flex items-center justify-center rounded-full border px-3 py-2 font-medium transition-colors',
-              hasNext
-                ? 'bg-card hover:bg-muted/70 border-border text-foreground'
-                : 'bg-muted/40 border-border/60 text-muted-foreground cursor-default'
-            )}
-          >
-            Next
-          </button>
-        </div>
-      )}
+      <UnifiedPagination
+        page={page}
+        total={visibleCourses.length}
+        pageSize={PAGE_SIZE}
+        hasNextPage={hasNext}
+        onNext={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+        onPrev={() => setPage((p) => Math.max(0, p - 1))}
+        itemLabel="courses"
+        usePageFormat={true}
+      />
     </div>
   );
 }
