@@ -28,13 +28,15 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
   const listSlug = list.slug as 'global' | 'gb-i' | 'usa' | 'europe';
 
   // Map short labels to full display names
-  const getDisplayLabel = (shortLabel: string) => {
-    if (shortLabel === 'GB&I') return 'Great Britain & Ireland';
-    if (shortLabel === 'Europe') return 'Continental Europe';
-    return shortLabel;
+  const getDisplayLabel = (shortLabel: string, slug: string) => {
+    if (slug === 'global' || shortLabel === 'Global') return 'Worldwide Top 100';
+    if (shortLabel === 'GB&I') return 'Great Britain & Ireland Top 100';
+    if (shortLabel === 'Europe') return 'Continental Europe Top 100';
+    if (shortLabel === 'USA') return 'USA Top 100';
+    return `${shortLabel} Top 100`;
   };
 
-  const displayLabel = getDisplayLabel(list.short_label || list.name);
+  const displayLabel = getDisplayLabel(list.short_label || list.name, list.slug);
 
   const isHero = variant === 'hero';
 
@@ -67,7 +69,7 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
             className="absolute inset-0 h-full w-full object-cover"
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/0" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         </>
       ) : (
         <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900" />
@@ -87,62 +89,70 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
         </button>
       )}
 
-      {/* Top-right rank badge */}
-      {topRank && (
+      {/* Top-right rank badge - only for default variant */}
+      {!isHero && topRank && (
         <div className="absolute right-4 top-4 z-10">
           <Top100RankBadge listSlug={listSlug} rank={topRank} />
         </div>
       )}
 
-      {/* Title - offset when back button present */}
-      <div className={cn(
-        "absolute right-4 top-4 sm:top-5",
-        isHero && onBack ? "left-14" : "left-4"
-      )}>
-        <h2 className="truncate whitespace-nowrap text-[19px] sm:text-[20px] font-semibold tracking-tight text-white">
-          {displayLabel}
-        </h2>
-      </div>
-
-      {/* Bottom content */}
-      <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col gap-2 px-4 pb-4 pt-20">
-        {/* Fraction + % */}
-        <div className="flex items-center justify-between text-xs">
-          <span>
-            Rated{" "}
-            <span className="font-semibold">{rated}</span>{" "}
-            of {total} courses
-          </span>
-          <span className="font-semibold text-white">
-            {completion}% complete
-          </span>
+      {/* Hero variant: Title at bottom like Course Details */}
+      {isHero ? (
+        <div className="absolute bottom-8 left-6 text-white z-10">
+          <h1 className="text-4xl md:text-5xl font-semibold mb-1.5 drop-shadow-2xl">
+            {displayLabel}
+          </h1>
         </div>
-
-        {/* Progress bar */}
-        <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/25">
-          <div
-            className="h-full rounded-full bg-white transition-[width] duration-500 ease-out"
-            style={{ width: `${completion}%` }}
-          />
-        </div>
-
-        {/* View courses button */}
-        {showCta && (
-          <div className="mt-3 flex justify-end">
-            <Button
-              variant="secondary"
-              size="sm"
-              className="rounded-2xl px-4 py-1.5 text-xs font-medium bg-white/95 text-slate-900 hover:bg-white border-none"
-              onClick={(e) => {
-                e.stopPropagation();
-                onClick?.();
-              }}
-            >
-              View courses
-            </Button>
+      ) : (
+        <>
+          {/* Default variant: Title at top */}
+          <div className="absolute left-4 right-4 top-4 sm:top-5">
+            <h2 className="truncate whitespace-nowrap text-[19px] sm:text-[20px] font-semibold tracking-tight text-white">
+              {displayLabel}
+            </h2>
           </div>
-        )}
-      </div>
+
+          {/* Bottom content for default variant */}
+          <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col gap-2 px-4 pb-4 pt-20">
+            {/* Fraction + % */}
+            <div className="flex items-center justify-between text-xs">
+              <span>
+                Rated{" "}
+                <span className="font-semibold">{rated}</span>{" "}
+                of {total} courses
+              </span>
+              <span className="font-semibold text-white">
+                {completion}% complete
+              </span>
+            </div>
+
+            {/* Progress bar */}
+            <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/25">
+              <div
+                className="h-full rounded-full bg-white transition-[width] duration-500 ease-out"
+                style={{ width: `${completion}%` }}
+              />
+            </div>
+
+            {/* View courses button */}
+            {showCta && (
+              <div className="mt-3 flex justify-end">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="rounded-2xl px-4 py-1.5 text-xs font-medium bg-white/95 text-slate-900 hover:bg-white border-none"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClick?.();
+                  }}
+                >
+                  View courses
+                </Button>
+              </div>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 };
