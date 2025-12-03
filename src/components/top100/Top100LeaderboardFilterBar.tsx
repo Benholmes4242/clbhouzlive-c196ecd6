@@ -31,7 +31,7 @@ const LIST_OPTIONS = [
 ] as const;
 
 const LOCATION_OPTIONS = [
-  { value: 'worldwide', label: 'Worldwide players' },
+  { value: 'worldwide', label: 'All regions (worldwide)' },
   { value: 'my-country', label: 'Players in my country' },
   { value: 'gb-i', label: 'GB&I players only' },
   { value: 'usa', label: 'USA players only' },
