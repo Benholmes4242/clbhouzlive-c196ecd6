@@ -31,11 +31,11 @@ const LIST_OPTIONS = [
 ] as const;
 
 const LOCATION_OPTIONS = [
-  { value: 'worldwide', label: 'Worldwide' },
-  { value: 'my-country', label: 'My country' },
-  { value: 'gb-i', label: 'GB&I only' },
-  { value: 'usa', label: 'USA only' },
-  { value: 'europe', label: 'Europe only' },
+  { value: 'worldwide', label: 'Worldwide players' },
+  { value: 'my-country', label: 'Players in my country' },
+  { value: 'gb-i', label: 'GB&I players only' },
+  { value: 'usa', label: 'USA players only' },
+  { value: 'europe', label: 'Europe players only' },
 ] as const;
 
 const SORT_OPTIONS = [
