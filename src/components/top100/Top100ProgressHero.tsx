@@ -93,15 +93,11 @@ export function Top100ProgressHero({
       </p>
 
       {/* Secondary summary line */}
-      <p className="text-sm text-muted-foreground">
-        Across {regionsCount} {regionsCount === 1 ? 'region' : 'regions'}
-        {formattedDate && (
-          <>
-            {' · '}
-            Last Top 100 round: {formattedDate}
-          </>
-        )}
-      </p>
+      {formattedDate && (
+        <p className="text-sm text-muted-foreground">
+          Last Top 100 round: {formattedDate}
+        </p>
+      )}
     </section>
   );
 }
