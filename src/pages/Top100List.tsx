@@ -223,7 +223,7 @@ const Top100List = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <main className="pb-20">
+      <main>
         {/* 1. Hero Section - Full-width with back button */}
         {listSummary && (
           <section className="px-4">
