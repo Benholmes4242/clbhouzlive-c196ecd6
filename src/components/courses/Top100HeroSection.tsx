@@ -63,7 +63,7 @@ export function Top100HeroSection({
           }}
         >
           {/* Inner white ring - 1px between avatar and tier ring */}
-          <div className="border border-white" style={{ borderRadius: '30%' }}>
+          <div className="border border-white" style={{ borderRadius: '32%' }}>
             <Squircle width={144} height={144}>
               {avatarUrl ? (
                 <img
