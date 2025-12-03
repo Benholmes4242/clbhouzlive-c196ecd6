@@ -19,6 +19,7 @@ import {
 } from '@/constants/courseRegions';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { COURSES_PAGE_SIZE } from '@/config/pagination';
+import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 
 type Top100SortOption = 'official' | 'name_asc' | 'name_desc';
 
@@ -459,45 +460,21 @@ const GlobalTop100 = () => {
           </div>
           
           {/* Pagination Footer */}
-          <div className="flex flex-col items-center gap-3 mt-8">
-            {/* Pagination Buttons */}
-            {(page > 0 || hasNextPage) && (
-              <div className={`flex flex-col items-center gap-3 w-full`}>
-                {/* Load More or Next Page */}
-                {hasNextPage && (
-                  <Button
-                    variant="secondary"
-                    onClick={() => {
-                      if (hasMorePages && endIndex >= totalCount) {
-                        // Need to load more from server
-                        fetchNextPage();
-                      } else {
-                        // Just advance to next page of already-loaded data
-                        setPage((p) => p + 1);
-                      }
-                    }}
-                    disabled={isLoading || isFetchingNextPage}
-                  >
-                    {isFetchingNextPage ? 'Loading...' : `Next ${COURSES_PAGE_SIZE} courses`}
-                  </Button>
-                )}
-                
-                {/* Previous Button */}
-                {page > 0 && (
-                  <Button
-                    variant="outline"
-                    onClick={() => setPage((p) => p - 1)}
-                    disabled={isLoading}
-                  >
-                    Previous {COURSES_PAGE_SIZE} courses
-                  </Button>
-                )}
-              </div>
-            )}
-            <p className="text-xs text-slate-500">
-              Showing {startIndex}–{endIndex} of {totalCount} courses
-            </p>
-          </div>
+          <UnifiedPagination
+            page={page}
+            total={totalCount}
+            hasNextPage={hasNextPage}
+            onNext={() => {
+              if (hasMorePages && endIndex >= totalCount) {
+                fetchNextPage();
+              } else {
+                setPage((p) => p + 1);
+              }
+            }}
+            onPrev={() => setPage((p) => p - 1)}
+            disabled={isLoading || isFetchingNextPage}
+            scrollTargetRef={listTopRef as React.RefObject<HTMLElement>}
+          />
         </div>
       )}
 

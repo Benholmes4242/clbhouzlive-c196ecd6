@@ -21,6 +21,7 @@ import {
 } from '@/constants/courseRegions';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { COURSES_PAGE_SIZE } from '@/config/pagination';
+import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 
 type SortOption = 'popular' | 'rating_desc' | 'rating_asc' | 'name_asc' | 'name_desc';
 
@@ -477,34 +478,15 @@ const CourseExplorer = () => {
         />
           
           {/* Pagination Footer */}
-          <div className="flex flex-col items-center gap-3 mt-8">
-            {/* Pagination Buttons */}
-            {(page > 0 || hasNextPage) && (
-              <div className={`flex items-center gap-3 w-full ${page === 0 ? 'justify-center' : 'justify-between'}`}>
-                {page > 0 && (
-                  <Button
-                    variant="secondary"
-                    onClick={() => setPage((p) => p - 1)}
-                    disabled={isLoading}
-                  >
-                    Previous {COURSES_PAGE_SIZE} courses
-                  </Button>
-                )}
-                {hasNextPage && (
-                  <Button
-                    variant="secondary"
-                    onClick={() => setPage((p) => p + 1)}
-                    disabled={isLoading}
-                  >
-                    Next {COURSES_PAGE_SIZE} courses
-                  </Button>
-                )}
-              </div>
-            )}
-            <p className="text-xs text-slate-500">
-              Showing {startIndex}–{endIndex} of {totalCount.toLocaleString()} courses
-            </p>
-          </div>
+          <UnifiedPagination
+            page={page}
+            total={totalCount}
+            hasNextPage={hasNextPage}
+            onNext={() => setPage((p) => p + 1)}
+            onPrev={() => setPage((p) => p - 1)}
+            disabled={isLoading}
+            scrollTargetRef={listTopRef as React.RefObject<HTMLElement>}
+          />
         </div>
       )}
 

@@ -22,6 +22,7 @@ import FriendsCoursesEmpty from './friends/FriendsCoursesEmpty';
 import CourseRankBadges from './CourseRankBadges';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { extractRanksFromMemberships } from '@/utils/rankingUtils';
+import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 import type { CourseWithFriends, FriendCourseHit, Top100Membership } from '@/hooks/useFriendsCourses';
 
 // Temporary: toggle to use high-activity mock data for Friends' Courses
@@ -725,31 +726,14 @@ const FriendsCoursesPanel: React.FC = () => {
           </motion.div>
 
           {/* Pagination Footer */}
-          {totalPages > 1 && (
-            <div className="flex flex-col items-center gap-3 mt-4">
-              <div className="flex items-center gap-3">
-                <Button
-                  variant="secondary"
-                  disabled={page === 1}
-                  onClick={() => handleChangeCoursesPage('prev')}
-                >
-                  Previous courses
-                </Button>
-
-                <Button
-                  variant="secondary"
-                  disabled={page >= totalPages}
-                  onClick={() => handleChangeCoursesPage('next')}
-                >
-                  Next courses
-                </Button>
-              </div>
-
-              <p className="text-xs text-muted-foreground">
-                Showing {((page - 1) * PAGE_SIZE) + 1}–{Math.min(page * PAGE_SIZE, regularCourses.length)} of {regularCourses.length} courses
-              </p>
-            </div>
-          )}
+          <UnifiedPagination
+            page={page - 1}
+            total={regularCourses.length}
+            pageSize={PAGE_SIZE}
+            hasNextPage={page < totalPages}
+            onNext={() => handleChangeCoursesPage('next')}
+            onPrev={() => handleChangeCoursesPage('prev')}
+          />
         </div>
       )}
 
@@ -802,31 +786,15 @@ const FriendsCoursesPanel: React.FC = () => {
           </motion.div>
 
           {/* Recent rounds pagination */}
-          {totalRecentPages > 1 && (
-            <div className="mt-8 pb-8 flex items-center justify-between gap-3">
-              <Button
-                variant="outline"
-                disabled={recentPage === 0}
-                onClick={() => setRecentPage((p) => Math.max(0, p - 1))}
-                className="px-3 py-1.5 rounded-lg h-9 text-xs shadow-[0_2px_6px_rgba(15,23,42,0.06)] disabled:shadow-none"
-              >
-                Previous rounds
-              </Button>
-
-              <p className="text-xs text-muted-foreground">
-                Page {recentPage + 1} of {totalRecentPages}
-              </p>
-
-              <Button
-                variant="outline"
-                disabled={recentPage === totalRecentPages - 1}
-                onClick={() => setRecentPage((p) => Math.min(totalRecentPages - 1, p + 1))}
-                className="px-3 py-1.5 rounded-lg h-9 text-xs shadow-[0_2px_6px_rgba(15,23,42,0.06)] disabled:shadow-none"
-              >
-                Next rounds
-              </Button>
-            </div>
-          )}
+          <UnifiedPagination
+            page={recentPage}
+            total={sortedRecent.length}
+            pageSize={RECENT_PAGE_SIZE}
+            hasNextPage={recentPage < totalRecentPages - 1}
+            onNext={() => setRecentPage((p) => Math.min(totalRecentPages - 1, p + 1))}
+            onPrev={() => setRecentPage((p) => Math.max(0, p - 1))}
+            itemLabel="rounds"
+          />
         </div>
       )}
     </div>
