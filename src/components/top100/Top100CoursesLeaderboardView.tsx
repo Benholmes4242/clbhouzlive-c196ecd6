@@ -15,7 +15,6 @@ import { getCourseTrophies } from './getCourseTrophies';
 import CourseRankBadges from '@/components/courses/CourseRankBadges';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { Bookmark } from 'lucide-react';
-import { SectionLabel, CourseRankingsIcon } from './SectionLabel';
 
 interface Top100CoursesLeaderboardViewProps {
   filters: Top100LeaderboardFilters;
@@ -169,14 +168,18 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
 
       {/* Section Label + scope toggle */}
       <div className="px-4 sm:px-0">
-        <SectionLabel icon={<CourseRankingsIcon />} label="Course rankings" />
+        <p className="text-xs font-semibold tracking-[0.08em] text-muted-foreground uppercase">
+          Course rankings
+        </p>
         <p className="mt-1 text-xs text-muted-foreground">
           {viewScope === 'shortlist'
             ? 'Your trip shortlist'
             : filters.sortBy === 'member_rating'
-            ? 'Highest rated Top 100 courses for your filters'
+            ? 'Top 100 courses by community rating'
             : filters.sortBy === 'most_played'
-            ? 'Most played Top 100 courses for your filters'
+            ? "Top 100 courses by how often they're played"
+            : filters.sortBy === 'recently_popular'
+            ? 'Top 100 courses trending this month'
             : 'Top 100 courses by official ranking'}
         </p>
       </div>

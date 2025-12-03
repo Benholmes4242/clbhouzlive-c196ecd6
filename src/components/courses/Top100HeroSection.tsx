@@ -1,7 +1,6 @@
 import React from 'react';
 import type { Top100Ring } from '@/lib/top100Club';
-import { getRingColorForTier, glassTint, glassIntensity } from '@/lib/top100Club';
-import { cn } from '@/lib/utils';
+import { getRingColorForTier } from '@/lib/top100Club';
 import { Squircle } from '@/components/ui/squircle';
 
 export interface Top100HeroSectionProps {
@@ -71,13 +70,13 @@ export function Top100HeroSection({
           </div>
         </Squircle>
 
-        {/* Tier badge - tinted glass effect */}
+        {/* Tier badge - stronger tinted glass effect */}
         {clubTierName && (
           <div 
-            className="absolute -bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center justify-center px-4 py-1.5 rounded-full text-xs font-medium text-white whitespace-nowrap backdrop-blur-md border border-white/20"
+            className="absolute -bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center justify-center px-4 py-1.5 rounded-full text-xs font-medium text-white whitespace-nowrap backdrop-blur-md border border-white/20 shadow-md"
             style={{
-              background: glassTint(tierColor, glassIntensity.standard),
-              boxShadow: `inset 0 0 0.8px rgba(255,255,255,0.6), 0 4px 10px rgba(0,0,0,0.25)`,
+              background: `linear-gradient(135deg, ${tierColor}CC, ${tierColor}E6)`,
+              boxShadow: `0 8px 24px ${tierColor}66`,
             }}
           >
             {clubTierName}

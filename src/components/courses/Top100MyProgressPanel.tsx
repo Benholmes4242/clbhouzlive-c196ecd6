@@ -152,28 +152,23 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
         />
       </div>
 
-      {/* Next Milestone Callout - Apple-style chip */}
+      {/* Next Achievement Callout - centered text, no icon */}
       {data?.next_milestone && (() => {
         const nextTierColor = TIER_COLORS[data.next_milestone.tierId] || TIER_COLORS.none;
         return (
           <div className="flex justify-center">
-            <div className="w-full max-w-sm bg-card border border-border/60 rounded-full py-2.5 px-4 flex flex-col">
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-primary-accent flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-                </svg>
-                <span className="text-xs sm:text-sm whitespace-nowrap">
-                  Next achievement:{' '}
-                  <span className="font-semibold">
-                    {data.next_milestone.remaining} more to{' '}
-                  </span>
-                  <span className="font-semibold" style={{ color: nextTierColor }}>
-                    {data.next_milestone.tierName}
-                  </span>
+            <div className="w-full max-w-sm bg-card border border-border/60 rounded-full py-2.5 px-4 flex flex-col gap-2">
+              <p className="text-xs sm:text-sm font-medium text-center text-foreground whitespace-nowrap">
+                Next achievement:{' '}
+                <span className="font-semibold">
+                  {data.next_milestone.remaining} more to{' '}
                 </span>
-              </div>
+                <span className="font-semibold" style={{ color: nextTierColor }}>
+                  {data.next_milestone.tierName}
+                </span>
+              </p>
               {/* Micro progress bar */}
-              <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
+              <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all"
                   style={{ width: `${nextMilestoneProgress}%`, backgroundColor: nextTierColor }}
