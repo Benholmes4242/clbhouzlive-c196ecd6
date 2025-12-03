@@ -2,13 +2,14 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTop100Leaderboard, LeaderboardScope, LeaderboardTimeRange } from '@/hooks/useTop100Leaderboard';
 import { getTop100Club, getNextTop100Club } from '@/lib/top100Club';
-import { getTop100RingBorderClass } from '@/lib/top100RingStyles';
+import { TOP100_TIER_STYLES } from '@/lib/top100RingStyles';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { Top100LeaderboardFilters } from './Top100LeaderboardFilterBar';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronRight } from 'lucide-react';
+import { Squircle } from '@/components/ui/squircle';
 
 interface Top100PlayersLeaderboardViewProps {
   filters: Top100LeaderboardFilters;
@@ -213,31 +214,39 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
           className="w-full rounded-2xl border border-border/70 bg-card/95 px-4 py-3 flex items-center justify-between gap-3 shadow-xs active:scale-[0.99] transition-all hover:bg-muted/30"
         >
           <div className="flex items-center gap-3">
-            {/* Avatar with achievement ring */}
+            {/* Avatar with Squircle + white ring + achievement ring */}
             <div className="relative">
-              <div
-                className={cn(
-                  'relative h-12 w-12 rounded-[1.25rem] border-2 overflow-hidden',
-                  meClub ? getTop100RingBorderClass(meClub.tierId as any) : 'border-border'
-                )}
-              >
-                {me.avatar_url ? (
-                  <img
-                    src={me.avatar_url}
-                    alt={me.display_name}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="h-full w-full bg-muted flex items-center justify-center text-[11px] font-semibold">
-                    {me.display_name
-                      .split(' ')
-                      .map((n: string) => n[0])
-                      .join('')
-                      .toUpperCase()
-                      .slice(0, 2)}
-                  </div>
-                )}
-              </div>
+              {/* Achievement ring (outer) - 2px */}
+              <Squircle width={52} height={52}>
+                <div className="w-full h-full flex items-center justify-center" style={{
+                  background: meClub ? TOP100_TIER_STYLES[meClub.tierId as keyof typeof TOP100_TIER_STYLES]?.mapFill || '#94a3b8' : '#94a3b8'
+                }}>
+                  {/* White ring (middle) - 1px */}
+                  <Squircle width={48} height={48}>
+                    <div className="w-full h-full bg-white flex items-center justify-center">
+                      {/* Avatar (inner) */}
+                      <Squircle width={46} height={46}>
+                        {me.avatar_url ? (
+                          <img
+                            src={me.avatar_url}
+                            alt={me.display_name}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-muted flex items-center justify-center text-[11px] font-semibold">
+                            {me.display_name
+                              .split(' ')
+                              .map((n: string) => n[0])
+                              .join('')
+                              .toUpperCase()
+                              .slice(0, 2)}
+                          </div>
+                        )}
+                      </Squircle>
+                    </div>
+                  </Squircle>
+                </div>
+              </Squircle>
             </div>
 
             <div className="flex flex-col text-left">
@@ -338,7 +347,6 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
       >
         {paginatedEntries.map((entry: any) => {
           const club = getTop100Club(entry.total_top100_played);
-          const ringClass = getTop100RingBorderClass(club.tierId as any);
           const movement = getMovementLabel(entry.delta_rank);
 
           const initials = entry.display_name
@@ -348,16 +356,6 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
             .toUpperCase()
             .slice(0, 2);
 
-          // Rank badge colors for top 3
-          const rankClass =
-            entry.rank === 1
-              ? 'bg-amber-500 text-white border-amber-500'
-              : entry.rank === 2
-              ? 'bg-slate-300 text-slate-900 border-slate-300'
-              : entry.rank === 3
-              ? 'bg-orange-300 text-slate-900 border-orange-300'
-              : 'bg-muted text-muted-foreground border-border/60';
-
           return (
             <button
               key={entry.user_id}
@@ -365,42 +363,42 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
               onClick={() => navigate(`/profile/${entry.user_id}?tab=top100`)}
               className="w-full rounded-2xl border border-border/60 bg-card/95 px-3.5 py-2.5 flex items-center justify-between gap-3 hover:bg-muted/50 hover:shadow-sm transition-colors"
             >
-              {/* Left: rank + avatar + text */}
+              {/* Left: avatar + text (no rank badge) */}
               <div className="flex items-center gap-3 min-w-0">
-                {/* Rank badge */}
-                <div className={cn(
-                  'w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-semibold border',
-                  rankClass
-                )}>
-                  #{entry.rank}
-                </div>
-
-                {/* Avatar with achievement ring */}
-                <div className="relative">
-                  <div
-                    className={cn(
-                      'relative h-9 w-9 rounded-[1.1rem] border-2 overflow-hidden',
-                      ringClass
-                    )}
-                  >
-                    {entry.avatar_url ? (
-                      <img
-                        src={entry.avatar_url}
-                        alt={entry.display_name}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="h-full w-full bg-muted flex items-center justify-center text-[10px] font-semibold">
-                        {initials}
-                      </div>
-                    )}
-                  </div>
+                {/* Avatar with Squircle + white ring + achievement ring - 20% bigger (44px) */}
+                <div className="relative flex-shrink-0">
+                  {/* Achievement ring (outer) - 2px */}
+                  <Squircle width={48} height={48}>
+                    <div className="w-full h-full flex items-center justify-center" style={{
+                      background: TOP100_TIER_STYLES[club.tierId as keyof typeof TOP100_TIER_STYLES]?.mapFill || '#94a3b8'
+                    }}>
+                      {/* White ring (middle) - 1px */}
+                      <Squircle width={44} height={44}>
+                        <div className="w-full h-full bg-white flex items-center justify-center">
+                          {/* Avatar (inner) */}
+                          <Squircle width={42} height={42}>
+                            {entry.avatar_url ? (
+                              <img
+                                src={entry.avatar_url}
+                                alt={entry.display_name}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-muted flex items-center justify-center text-[10px] font-semibold">
+                                {initials}
+                              </div>
+                            )}
+                          </Squircle>
+                        </div>
+                      </Squircle>
+                    </div>
+                  </Squircle>
                 </div>
 
                 {/* Name + club + tier */}
                 <div className="flex flex-col min-w-0 text-left">
                   <span className="text-sm font-semibold leading-tight truncate">
-                    {entry.display_name}
+                    #{entry.rank} {entry.display_name}
                   </span>
                   <span className="text-xs text-muted-foreground truncate">
                     {entry.home_club || 'No club set'}
@@ -411,8 +409,8 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
                 </div>
               </div>
 
-              {/* Right: numbers + movement */}
-              <div className="flex flex-col items-end gap-1 min-w-[72px] shrink-0">
+              {/* Right: numbers + movement - centered */}
+              <div className="flex flex-col items-center gap-1 min-w-[72px] shrink-0">
                 <span className="text-base font-semibold">{entry.total_top100_played}</span>
                 <span className="text-[11px] text-muted-foreground">Top 100s</span>
                 <span

@@ -153,7 +153,7 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
                       </p>
                       
                       <p className="text-[11px] text-muted-foreground mt-0.5">
-                        Played {course.times_played} time{course.times_played === 1 ? '' : 's'} by members
+                        Rated by {course.times_played} member{course.times_played === 1 ? '' : 's'}
                       </p>
                     </div>
 
