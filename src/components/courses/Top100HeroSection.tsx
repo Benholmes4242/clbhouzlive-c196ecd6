@@ -17,6 +17,15 @@ const TIER_COLORS: Record<Top100Ring, string> = {
   grandslam: '#0C0F14',
 };
 
+// Convert hex to translucent rgba for glass effect
+function glassTint(hex: string, opacity = 0.22): string {
+  const bigint = parseInt(hex.replace('#', ''), 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+}
+
 export interface Top100HeroSectionProps {
   avatarUrl?: string | null;
   displayName?: string | null;
@@ -83,13 +92,16 @@ export function Top100HeroSection({
           </div>
         </Squircle>
 
-        {/* Tier badge - positioned at bottom of ring, uses tier color */}
+        {/* Tier badge - tinted glass effect */}
         {clubTierName && (
           <div 
-            className="absolute -bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center justify-center px-4 py-1.5 rounded-full shadow-md whitespace-nowrap"
-            style={{ backgroundColor: tierColor }}
+            className="absolute -bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center justify-center px-4 py-1.5 rounded-full text-xs font-medium text-white whitespace-nowrap backdrop-blur-md border border-white/20"
+            style={{
+              background: glassTint(tierColor, 0.22),
+              boxShadow: `inset 0 0 0.8px rgba(255,255,255,0.6), 0 4px 10px rgba(0,0,0,0.25)`,
+            }}
           >
-            <span className="text-white text-xs font-medium">{clubTierName}</span>
+            {clubTierName}
           </div>
         )}
       </div>
