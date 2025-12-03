@@ -55,13 +55,13 @@ export function Top100HeroSection({
       {/* Avatar with achievement tier ring */}
       <div className="relative flex items-center justify-center">
         {/* Outer tier ring using squircle mask */}
-        <Squircle width={152} height={152}>
+        <Squircle width={148} height={148}>
           <div 
             className="w-full h-full flex items-center justify-center shadow-[0_10px_30px_rgba(0,0,0,0.16)]"
             style={{ backgroundColor: tierColor }}
           >
             {/* White ring layer */}
-            <Squircle width={148} height={148}>
+            <Squircle width={146} height={146}>
               <div className="w-full h-full bg-white flex items-center justify-center">
                 {/* Avatar */}
                 <Squircle width={144} height={144}>
