@@ -1047,6 +1047,38 @@ export type Database = {
           },
         ]
       }
+      course_shortlists: {
+        Row: {
+          course_id: string
+          created_at: string
+          id: string
+          list_key: string | null
+          user_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          id?: string
+          list_key?: string | null
+          user_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          id?: string
+          list_key?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_shortlists_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_top100_memberships: {
         Row: {
           added_at: string | null
@@ -5641,8 +5673,8 @@ export type Database = {
         Args: {
           limit_param?: number
           offset_param?: number
-          scope_param: string
-          time_range_param: string
+          scope_param?: string
+          time_range_param?: string
         }
         Returns: {
           avg_rating: number
@@ -5654,6 +5686,8 @@ export type Database = {
           global_rank: number
           list_slug: string
           regional_rank: number
+          shortlisted_by_me: boolean
+          shortlisted_count: number
           sub_country: string
           thumbnail_url: string
           times_played: number
