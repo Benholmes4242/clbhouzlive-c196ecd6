@@ -4,6 +4,14 @@ import { usePublicProfileByUsername } from '@/hooks/usePublicProfileByUsername';
 import { useUserCourseReviews } from '@/hooks/useUserCourseReviews';
 import { ArrowLeft, Star, ThumbsUp } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AppSelect, AppSelectOption } from '@/components/ui/AppSelect';
+
+const SORT_OPTIONS: AppSelectOption<'recent' | 'highest' | 'lowest' | 'helpful'>[] = [
+  { value: 'recent', label: 'Most recent' },
+  { value: 'highest', label: 'Highest rating' },
+  { value: 'lowest', label: 'Lowest rating' },
+  { value: 'helpful', label: 'Most liked' },
+];
 
 const UserReviewsPage: React.FC = () => {
   const { username = '' } = useParams<{ username: string }>();
@@ -49,16 +57,13 @@ const UserReviewsPage: React.FC = () => {
         </div>
 
         {/* Sort */}
-        <select
+        <AppSelect
           value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as any)}
-          className="rounded-full border border-border bg-card/80 px-2 py-1 text-[11px] text-muted-foreground"
-        >
-          <option value="recent">Most recent</option>
-          <option value="highest">Highest rating</option>
-          <option value="lowest">Lowest rating</option>
-          <option value="helpful">Most liked</option>
-        </select>
+          onChange={(v) => setSortBy(v as typeof sortBy)}
+          options={SORT_OPTIONS}
+          ariaLabel="Sort reviews"
+          triggerClassName="h-8 rounded-full text-[11px]"
+        />
       </div>
 
       {/* Loading */}
