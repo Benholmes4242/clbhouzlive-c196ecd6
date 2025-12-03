@@ -65,7 +65,7 @@ export function Top100MilestonesCarousel({
       </h3>
 
       {/* Outer scroller */}
-      <div className="overflow-x-auto pb-1 -mx-1 px-1">
+      <div className="overflow-x-auto pb-1 -mx-5 px-5">
         {/* Inner column that scrolls together */}
         <div className="inline-flex flex-col gap-3 min-w-full">
           {/* Row of circles */}
