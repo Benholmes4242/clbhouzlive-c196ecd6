@@ -1,5 +1,6 @@
 import React from 'react';
-import CountryFlag from '@/components/ui/country-flag';
+import CourseRankBadges from '@/components/courses/CourseRankBadges';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 
 interface CourseData {
   id: string;
@@ -12,6 +13,10 @@ interface CourseData {
   regionShort?: string;
   played: boolean;
   rankingBadges?: Array<{ id: string; label: string }>;
+  communityRating?: number | null;
+  globalRank?: number | null;
+  regionalRank?: number | null;
+  usaRank?: number | null;
 }
 
 interface Top100ListCourseCardProps {
@@ -25,71 +30,56 @@ export const Top100ListCourseCard: React.FC<Top100ListCourseCardProps> = ({
 }) => {
   return (
     <button
+      type="button"
       onClick={onClick}
-      className="mx-4 mb-3 rounded-3xl bg-white shadow-sm flex overflow-hidden border border-slate-100 hover:border-slate-200 hover:shadow-md transition-all w-[calc(100%-2rem)] text-left"
+      className="w-full rounded-none sm:rounded-xl overflow-hidden bg-card border-y sm:border border-border/60 text-left shadow-none sm:shadow-sm hover:sm:shadow-md transition-all"
     >
-      {/* Rank column */}
-      <div className="w-12 flex items-center justify-center flex-shrink-0">
-        <span className="text-[17px] font-semibold text-[#F3B13E]">
-          #{course.rank}
-        </span>
+      {/* Hero image with rank badges */}
+      <div className="relative w-full aspect-[1.6/1] overflow-hidden">
+        <img
+          src={course.imageUrl || '/placeholder.svg'}
+          alt={course.name}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            e.currentTarget.src = '/placeholder.svg';
+          }}
+        />
+        
+        {/* Gradient overlay */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
+        
+        {/* Rank badges top-left */}
+        <CourseRankBadges
+          globalRank={course.globalRank ?? (course.rank <= 100 ? course.rank : null)}
+          regionalRank={course.regionalRank}
+          usaRank={course.usaRank}
+          country={course.country || ''}
+          positioning="top-left"
+        />
       </div>
 
-      {/* Thumbnail + meta */}
-      <div className="flex-1 flex gap-3 py-3 pr-4">
-        <div className="w-24 h-16 rounded-2xl overflow-hidden relative flex-shrink-0">
-          <img
-            src={course.imageUrl || '/placeholder.svg'}
-            alt={course.name}
-            className="w-full h-full object-cover"
-          />
-          {/* Ranking bubbles */}
-          {course.rankingBadges && course.rankingBadges.length > 0 && (
-            <div className="absolute top-1 left-1 flex gap-1 flex-wrap">
-              {course.rankingBadges.slice(0, 2).map((badge) => (
-                <div
-                  key={badge.id}
-                  className="px-2 py-[2px] rounded-full bg-black/55 text-[10px] text-white"
-                >
-                  {badge.label}
-                </div>
-              ))}
+      {/* Meta area */}
+      <div className="px-4 py-3 bg-background space-y-1">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-base font-semibold text-foreground">
+              {course.name}
+            </h3>
+            
+            <p className="text-sm text-muted-foreground">
+              {course.subCountry && `${course.subCountry}, `}
+              {course.country}
+            </p>
+          </div>
+
+          {course.communityRating != null && (
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              <ClubhouseLogo className="h-5 w-5" />
+              <span className="text-sm font-semibold text-foreground">
+                {course.communityRating.toFixed(1)}
+              </span>
             </div>
           )}
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <div className="text-[14px] font-semibold leading-snug line-clamp-2 text-slate-900">
-            {course.name}
-          </div>
-          <div className="mt-0.5 text-[12px] text-slate-500 flex items-center gap-1.5">
-            <CountryFlag country={course.country} size="sm" />
-            <span className="truncate">
-              {course.country}
-              {course.subCountry && `, ${course.subCountry}`}
-            </span>
-          </div>
-
-          <div className="mt-1 flex items-center justify-between">
-            {/* Region short */}
-            {course.regionShort && (
-              <div className="flex items-center gap-1 text-[12px] text-slate-500">
-                {course.flagEmoji && <span className="text-base">{course.flagEmoji}</span>}
-                <span>{course.regionShort}</span>
-              </div>
-            )}
-
-            {/* Played pill */}
-            {course.played ? (
-              <span className="px-2 py-[3px] rounded-full bg-[#FFEFD5] text-[11px] font-semibold text-[#F3B13E]">
-                Played
-              </span>
-            ) : (
-              <span className="px-2 py-[3px] rounded-full bg-slate-100 text-[11px] text-slate-500">
-                Not played yet
-              </span>
-            )}
-          </div>
         </div>
       </div>
     </button>
