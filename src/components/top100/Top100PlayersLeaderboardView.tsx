@@ -1,19 +1,20 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTop100Leaderboard, LeaderboardScope, LeaderboardTimeRange } from '@/hooks/useTop100Leaderboard';
-import { getTop100Club } from '@/lib/top100Club';
+import { getTop100Club, getNextTop100Club } from '@/lib/top100Club';
 import { getTop100RingBorderClass } from '@/lib/top100RingStyles';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { Top100LeaderboardFilters } from './Top100LeaderboardFilterBar';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import { ChevronRight } from 'lucide-react';
 
 interface Top100PlayersLeaderboardViewProps {
   filters: Top100LeaderboardFilters;
 }
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 15;
 
 // Map new filter format to legacy scope
 function mapFiltersToScope(filters: Top100LeaderboardFilters): LeaderboardScope {
@@ -32,10 +33,18 @@ function mapFiltersToTimeRange(filters: Top100LeaderboardFilters): LeaderboardTi
   return 'all_time';
 }
 
+// Movement helper
+function getMovementLabel(deltaRank?: number | null) {
+  if (!deltaRank || deltaRank === 0) return { label: '—', direction: 'none' as const };
+  if (deltaRank > 0) return { label: `▲ ${deltaRank}`, direction: 'up' as const };
+  return { label: `▼ ${Math.abs(deltaRank)}`, direction: 'down' as const };
+}
+
 export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboardViewProps) {
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [viewScope, setViewScope] = useState<'all' | 'friends'>('all');
+  const [slideDir, setSlideDir] = useState<'none' | 'next' | 'prev'>('none');
 
   // Get current user
   const { data: currentUser } = useQuery({
@@ -65,30 +74,75 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
     // Apply location scope filter
     if (filters.locationScope !== 'worldwide') {
       // TODO: Implement location filtering based on user country
-      // For now, just return all entries
     }
 
     return entries;
   }, [allEntries, filters.locationScope]);
 
+  // Compute counts for toggle
+  const totalPlayers = filteredEntries.length;
+  const totalFriends = filteredEntries.filter((e: any) => e.is_friend).length;
+
+  // Apply friends filter
+  const displayedEntries = useMemo(() => {
+    if (viewScope === 'friends') {
+      return filteredEntries.filter((e: any) => e.is_friend);
+    }
+    return filteredEntries;
+  }, [filteredEntries, viewScope]);
+
   // Pagination
-  const totalPages = Math.max(1, Math.ceil(filteredEntries.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(displayedEntries.length / PAGE_SIZE));
   const currentPage = Math.min(page + 1, totalPages);
-  const paginatedEntries = filteredEntries.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
-  const hasNext = (page + 1) * PAGE_SIZE < filteredEntries.length;
+  const paginatedEntries = displayedEntries.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  const hasNext = (page + 1) * PAGE_SIZE < displayedEntries.length;
   const hasPrev = page > 0;
 
   // Current user's position
   const me = currentUserEntry;
   const meClub = me ? getTop100Club(me.total_top100_played) : null;
-  const nextMilestone = meClub ? (() => {
-    const MILESTONES = [5, 10, 20, 50, 100, 200, 300, 400];
-    const nextThreshold = MILESTONES.find(t => t > (me?.total_top100_played ?? 0));
-    if (!nextThreshold) return null;
-    const nextClub = getTop100Club(nextThreshold);
-    const progressPct = Math.min(100, ((me?.total_top100_played ?? 0) / nextThreshold) * 100);
-    return { tierName: nextClub.tierName, progressPct };
+  const nextMilestone = me ? (() => {
+    const next = getNextTop100Club(me.total_top100_played);
+    if (!next) return null;
+    const progressPct = Math.min(100, ((me.total_top100_played) / next.threshold) * 100);
+    return { tierName: next.tierName, progressPct };
   })() : null;
+
+  // Jump to my position
+  const myIndex = me
+    ? displayedEntries.findIndex((e: any) => e.user_id === me.user_id)
+    : -1;
+  const myPage = myIndex >= 0 ? Math.floor(myIndex / PAGE_SIZE) : null;
+
+  // Spotlight golfer (highest recent_top100s or is_spotlight flag)
+  const spotlight = filteredEntries.find((e: any) => e.is_spotlight) ?? null;
+
+  // Challenge: friend just ahead
+  const friendsEntries = filteredEntries.filter((e: any) => e.is_friend);
+  const aheadFriend = me
+    ? friendsEntries
+        .filter((f: any) => f.total_top100_played > me.total_top100_played)
+        .sort((a: any, b: any) => a.total_top100_played - b.total_top100_played)[0]
+    : null;
+
+  // Pagination handlers with slide animation
+  const handleNextPage = () => {
+    if (!hasNext) return;
+    setSlideDir('next');
+    setTimeout(() => {
+      setPage(p => Math.min(totalPages - 1, p + 1));
+      setSlideDir('none');
+    }, 120);
+  };
+
+  const handlePrevPage = () => {
+    if (!hasPrev) return;
+    setSlideDir('prev');
+    setTimeout(() => {
+      setPage(p => Math.max(0, p - 1));
+      setSlideDir('none');
+    }, 120);
+  };
 
   if (isLoading) {
     return (
@@ -105,17 +159,66 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
 
   return (
     <div className="space-y-4">
-      {/* Your Position Card */}
-      {me && (
-        <section className="rounded-2xl border border-border/70 bg-card/90 px-4 py-3 flex items-center justify-between gap-3">
+      {/* Optional B: Golfer of the Week Spotlight */}
+      {spotlight && (
+        <div className="w-full rounded-2xl border border-amber-200 bg-amber-50/80 px-3.5 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            {/* Avatar with ring */}
+            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center overflow-hidden border border-amber-200">
+              {spotlight.avatar_url ? (
+                <img
+                  src={spotlight.avatar_url}
+                  alt={spotlight.display_name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-xs font-semibold text-amber-800">
+                  {spotlight.display_name
+                    .split(' ')
+                    .map((n: string) => n[0])
+                    .join('')
+                    .toUpperCase()
+                    .slice(0, 2)}
+                </span>
+              )}
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[11px] font-semibold text-amber-700 uppercase tracking-wide">
+                Golfer of the week
+              </span>
+              <span className="text-sm font-semibold text-amber-900">
+                {spotlight.display_name}
+              </span>
+              {(spotlight as any).recent_top100s != null && (
+              <span className="text-[11px] text-amber-800">
+                  +{(spotlight as any).recent_top100s ?? 0} Top 100s this period
+                </span>
+              )}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate(`/profile/${spotlight.user_id}?tab=top100`)}
+            className="text-[11px] font-medium px-3 py-1.5 rounded-full bg-amber-600 text-white shadow-sm hover:bg-amber-700 transition-colors"
+          >
+            View profile
+          </button>
+        </div>
+      )}
+
+      {/* Your Position Card - Tappable */}
+      {me && (
+        <button
+          type="button"
+          onClick={() => navigate('/top100?tab=my-progress')}
+          className="w-full rounded-2xl border border-border/70 bg-card/95 px-4 py-3 flex items-center justify-between gap-3 shadow-xs active:scale-[0.99] transition-all hover:bg-muted/30"
+        >
+          <div className="flex items-center gap-3">
+            {/* Avatar with achievement ring */}
             <div className="relative">
-              <div className="absolute inset-0 rounded-[1.25rem] bg-foreground/5 blur-sm" />
               <div
                 className={cn(
                   'relative h-12 w-12 rounded-[1.25rem] border-2 overflow-hidden',
-                  meClub ? getTop100RingBorderClass(meClub.tierId as any) : ''
+                  meClub ? getTop100RingBorderClass(meClub.tierId as any) : 'border-border'
                 )}
               >
                 {me.avatar_url ? (
@@ -128,7 +231,7 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
                   <div className="h-full w-full bg-muted flex items-center justify-center text-[11px] font-semibold">
                     {me.display_name
                       .split(' ')
-                      .map(n => n[0])
+                      .map((n: string) => n[0])
                       .join('')
                       .toUpperCase()
                       .slice(0, 2)}
@@ -137,8 +240,8 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
               </div>
             </div>
 
-            <div className="flex flex-col">
-              <span className="text-xs font-medium text-muted-foreground">
+            <div className="flex flex-col text-left">
+              <span className="text-[11px] font-medium text-muted-foreground">
                 Your position
               </span>
               <span className="text-sm font-semibold">
@@ -153,79 +256,126 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
           </div>
 
           {/* Progress to next tier */}
-          {nextMilestone && (
-            <div className="flex flex-col items-end gap-1">
-              <span className="text-xs text-muted-foreground">
-                Next: {nextMilestone.tierName}
-              </span>
-              <div className="w-24 h-1.5 rounded-full bg-border/70 overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-primary-accent"
-                  style={{ width: `${nextMilestone.progressPct}%` }}
-                />
+          <div className="flex items-center gap-2">
+            {nextMilestone && (
+              <div className="flex flex-col items-end gap-1 min-w-[100px]">
+                <span className="text-[11px] text-muted-foreground">
+                  Next: <span className="font-medium">{nextMilestone.tierName}</span>
+                </span>
+                <div className="w-24 h-1.5 rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-amber-500 transition-[width]"
+                    style={{ width: `${nextMilestone.progressPct}%` }}
+                  />
+                </div>
               </div>
-            </div>
-          )}
-        </section>
+            )}
+            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+          </div>
+        </button>
       )}
 
-      {/* Friends-only Toggle */}
+      {/* Optional A: Challenge Card */}
+      {me && (aheadFriend || friendsEntries.length > 0) && (
+        <div className="rounded-2xl bg-card/90 border border-border/60 px-3.5 py-2.5 text-xs flex flex-col gap-1">
+          {aheadFriend ? (
+            <>
+              <span className="font-semibold text-foreground">
+                Challenge: catch {aheadFriend.display_name}
+              </span>
+              <span className="text-muted-foreground">
+                They're {aheadFriend.total_top100_played - me.total_top100_played} Top 100s ahead of you.
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="font-semibold text-foreground">You're leading your friends</span>
+              <span className="text-muted-foreground">
+                Set the pace by adding another Top 100 round this month.
+              </span>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* All/Friends Toggle with counts */}
       <div className="flex items-center justify-end">
-        <div className="inline-flex rounded-full bg-muted/60 p-0.5 text-xs">
+        <div className="inline-flex rounded-full bg-muted/60 p-1 text-xs font-medium">
           <button
             type="button"
             className={cn(
-              'px-2.5 py-0.5 rounded-full transition-colors',
+              'px-3 py-1 rounded-full transition-colors',
               viewScope === 'all'
-                ? 'bg-background shadow-sm font-medium'
+                ? 'bg-background shadow-sm text-foreground'
                 : 'text-muted-foreground'
             )}
             onClick={() => setViewScope('all')}
           >
-            All players
+            All players ({totalPlayers})
           </button>
           <button
             type="button"
             className={cn(
-              'px-2.5 py-0.5 rounded-full transition-colors',
+              'px-3 py-1 rounded-full transition-colors',
               viewScope === 'friends'
-                ? 'bg-background shadow-sm font-medium'
+                ? 'bg-background shadow-sm text-foreground'
                 : 'text-muted-foreground'
             )}
             onClick={() => setViewScope('friends')}
           >
-            Friends only
+            Friends only ({totalFriends})
           </button>
         </div>
       </div>
 
-      {/* Player Rows */}
-      <section className="space-y-2">
-        {paginatedEntries.map((entry) => {
+      {/* Player Rows with slide animation */}
+      <div
+        className={cn(
+          'space-y-2 transition-all duration-150 ease-out',
+          slideDir === 'next' && '-translate-x-3 opacity-90',
+          slideDir === 'prev' && 'translate-x-3 opacity-90'
+        )}
+      >
+        {paginatedEntries.map((entry: any) => {
           const club = getTop100Club(entry.total_top100_played);
           const ringClass = getTop100RingBorderClass(club.tierId as any);
+          const movement = getMovementLabel(entry.delta_rank);
 
           const initials = entry.display_name
             .split(' ')
-            .map(n => n[0])
+            .map((n: string) => n[0])
             .join('')
             .toUpperCase()
             .slice(0, 2);
+
+          // Rank badge colors for top 3
+          const rankClass =
+            entry.rank === 1
+              ? 'bg-amber-500 text-white border-amber-500'
+              : entry.rank === 2
+              ? 'bg-slate-300 text-slate-900 border-slate-300'
+              : entry.rank === 3
+              ? 'bg-orange-300 text-slate-900 border-orange-300'
+              : 'bg-muted text-muted-foreground border-border/60';
 
           return (
             <button
               key={entry.user_id}
               type="button"
               onClick={() => navigate(`/profile/${entry.user_id}?tab=top100`)}
-              className="w-full rounded-2xl border border-border/60 bg-card/90 px-3.5 py-2.5 flex items-center justify-between gap-3 hover:bg-muted/50 hover:shadow-sm transition-colors"
+              className="w-full rounded-2xl border border-border/60 bg-card/95 px-3.5 py-2.5 flex items-center justify-between gap-3 hover:bg-muted/50 hover:shadow-sm transition-colors"
             >
-              {/* Left: rank + avatar */}
+              {/* Left: rank + avatar + text */}
               <div className="flex items-center gap-3 min-w-0">
-                <div className="inline-flex items-center justify-center rounded-full border border-border/60 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                {/* Rank badge */}
+                <div className={cn(
+                  'w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-semibold border',
+                  rankClass
+                )}>
                   #{entry.rank}
                 </div>
 
-                {/* Avatar + ring */}
+                {/* Avatar with achievement ring */}
                 <div className="relative">
                   <div
                     className={cn(
@@ -248,37 +398,41 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
                 </div>
 
                 {/* Name + club + tier */}
-                <div className="flex flex-col min-w-0">
-                  <span className="text-sm font-medium truncate">
+                <div className="flex flex-col min-w-0 text-left">
+                  <span className="text-sm font-semibold leading-tight truncate">
                     {entry.display_name}
                   </span>
                   <span className="text-xs text-muted-foreground truncate">
                     {entry.home_club || 'No club set'}
                   </span>
-                  {club.tierName && (
-                    <span className="text-[11px] text-muted-foreground">
-                      {entry.total_top100_played} Top 100s · {club.tierName}
-                    </span>
-                  )}
+                  <span className="text-[11px] text-muted-foreground mt-0.5">
+                    {entry.total_top100_played} Top 100s · {club.tierName || 'No tier'}
+                  </span>
                 </div>
               </div>
 
-              {/* Right: numbers */}
-              <div className="flex flex-col items-end gap-0.5 text-right shrink-0">
-                <span className="text-sm font-semibold">
-                  {entry.total_top100_played}
-                </span>
-                <span className="text-[11px] text-muted-foreground">
-                  Top 100s
+              {/* Right: numbers + movement */}
+              <div className="flex flex-col items-end gap-1 min-w-[72px] shrink-0">
+                <span className="text-base font-semibold">{entry.total_top100_played}</span>
+                <span className="text-[11px] text-muted-foreground">Top 100s</span>
+                <span
+                  className={cn(
+                    'text-[10px] font-medium px-1.5 py-0.5 rounded-full border',
+                    movement.direction === 'up' && 'border-emerald-500 text-emerald-600',
+                    movement.direction === 'down' && 'border-red-500 text-red-600',
+                    movement.direction === 'none' && 'border-border text-muted-foreground'
+                  )}
+                >
+                  {movement.label}
                 </span>
               </div>
             </button>
           );
         })}
-      </section>
+      </div>
 
       {/* Empty State */}
-      {filteredEntries.length === 0 && !isLoading && (
+      {displayedEntries.length === 0 && !isLoading && (
         <div className="text-center py-12">
           <p className="text-sm text-muted-foreground">
             No players found with the selected filters.
@@ -286,12 +440,25 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
         </div>
       )}
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-3 flex items-center justify-between gap-3 text-xs">
+      {/* Jump to my position */}
+      {myPage !== null && myPage !== page && (
+        <div className="flex justify-center">
           <button
             type="button"
-            onClick={() => hasPrev && setPage((p) => Math.max(0, p - 1))}
+            onClick={() => setPage(myPage)}
+            className="inline-flex items-center gap-1 rounded-full bg-amber-50 text-amber-800 px-3 py-1.5 text-xs font-medium border border-amber-200 hover:bg-amber-100 transition-colors"
+          >
+            Jump to my position (#{me?.rank})
+          </button>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-4 flex items-center gap-3">
+          <button
+            type="button"
+            onClick={handlePrevPage}
             disabled={!hasPrev}
             className={cn(
               'flex-1 inline-flex items-center justify-center rounded-full border px-3 py-2 font-medium transition-colors',
@@ -303,13 +470,13 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
             Previous
           </button>
 
-          <span className="min-w-[90px] text-center text-muted-foreground">
+          <span className="text-xs text-muted-foreground min-w-[90px] text-center">
             Page {currentPage} of {totalPages}
           </span>
 
           <button
             type="button"
-            onClick={() => hasNext && setPage((p) => Math.min(totalPages - 1, p + 1))}
+            onClick={handleNextPage}
             disabled={!hasNext}
             className={cn(
               'flex-1 inline-flex items-center justify-center rounded-full border px-3 py-2 font-medium transition-colors',

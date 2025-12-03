@@ -1,4 +1,5 @@
 import React from 'react';
+import { Globe2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface Top100LeaderboardFilters {
@@ -50,60 +51,78 @@ export function Top100LeaderboardFilterBar({
   onChange,
 }: Top100LeaderboardFilterBarProps) {
   return (
-    <div className="w-full rounded-2xl border border-border/70 bg-card/80 px-3 py-3 md:px-4 md:py-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-      {/* Left block: list + location */}
-      <div className="flex flex-wrap items-center gap-2">
+    <div className="w-full rounded-2xl border border-border/70 bg-card/80 px-4 py-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      {/* Left block: list + region */}
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:gap-4">
         {/* List selector */}
-        <select
-          className="text-xs rounded-lg border border-border/60 bg-background px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/20"
-          value={value.listSlug}
-          onChange={(e) =>
-            onChange({ ...value, listSlug: e.target.value as Top100LeaderboardFilters['listSlug'] })
-          }
-        >
-          {LIST_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-
-        {/* Location selector */}
-        <select
-          className="text-xs rounded-lg border border-border/60 bg-background px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/20"
-          value={value.locationScope}
-          onChange={(e) =>
-            onChange({
-              ...value,
-              locationScope: e.target.value as Top100LeaderboardFilters['locationScope'],
-            })
-          }
-        >
-          {LOCATION_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-
-        {/* Sort (courses mode only) */}
-        {mode === 'courses' && (
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
+            Top 100 list
+          </span>
           <select
-            className="text-xs rounded-lg border border-border/60 bg-background px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/20"
-            value={value.sortBy ?? 'official_rank'}
+            className="h-9 rounded-xl border border-border/60 bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            value={value.listSlug}
             onChange={(e) =>
-              onChange({
-                ...value,
-                sortBy: e.target.value as Top100LeaderboardFilters['sortBy'],
-              })
+              onChange({ ...value, listSlug: e.target.value as Top100LeaderboardFilters['listSlug'] })
             }
           >
-            {SORT_OPTIONS.map((opt) => (
+            {LIST_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>
             ))}
           </select>
+        </div>
+
+        {/* Golfer region selector */}
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
+            Showing golfers from
+          </span>
+          <div className="inline-flex items-center gap-1.5 rounded-xl border border-border/60 bg-background px-3 h-9">
+            <Globe2 className="w-4 h-4 text-muted-foreground" />
+            <select
+              className="bg-transparent text-sm focus:outline-none flex-1"
+              value={value.locationScope}
+              onChange={(e) =>
+                onChange({
+                  ...value,
+                  locationScope: e.target.value as Top100LeaderboardFilters['locationScope'],
+                })
+              }
+            >
+              {LOCATION_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Sort (courses mode only) */}
+        {mode === 'courses' && (
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
+              Sort courses by
+            </span>
+            <select
+              className="h-9 rounded-xl border border-border/60 bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              value={value.sortBy ?? 'official_rank'}
+              onChange={(e) =>
+                onChange({
+                  ...value,
+                  sortBy: e.target.value as Top100LeaderboardFilters['sortBy'],
+                })
+              }
+            >
+              {SORT_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
         )}
       </div>
 
