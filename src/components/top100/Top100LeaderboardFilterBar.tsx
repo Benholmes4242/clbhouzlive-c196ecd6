@@ -40,7 +40,7 @@ const LOCATION_OPTIONS = [
 
 const SORT_OPTIONS = [
   { value: 'official_rank', label: 'Official ranking' },
-  { value: 'member_rating', label: 'Member rating' },
+  { value: 'member_rating', label: 'Community rating' },
   { value: 'most_played', label: 'Most played' },
   { value: 'recently_popular', label: 'Recently popular' },
 ] as const;
