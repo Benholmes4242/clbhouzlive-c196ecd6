@@ -85,8 +85,12 @@ export function Top100HeroSection({
 
         {/* Tier badge - positioned at bottom of ring */}
         {clubTierName && (
-          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-slate-800/70 backdrop-blur-md rounded-xl border border-white/20 shadow-md">
-            <span className="text-white text-sm font-medium">{clubTierName}</span>
+          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2">
+            <Squircle width={120} height={32}>
+              <div className="w-full h-full bg-slate-800/70 backdrop-blur-md border border-white/20 shadow-md flex items-center justify-center">
+                <span className="text-white text-sm font-medium">{clubTierName}</span>
+              </div>
+            </Squircle>
           </div>
         )}
       </div>
