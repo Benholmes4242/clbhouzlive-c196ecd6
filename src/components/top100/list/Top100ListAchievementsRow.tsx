@@ -35,6 +35,22 @@ const getAchievementsTitleForList = (listSlug?: string): string => {
   }
 };
 
+// Short name for "complete" badge label
+const getCompleteLabel = (listSlug?: string): string => {
+  switch (listSlug) {
+    case 'global':
+      return 'Worldwide Top 100 complete';
+    case 'gb-i':
+      return 'GB&I Top 100 complete';
+    case 'usa':
+      return 'USA Top 100 complete';
+    case 'europe':
+      return 'Europe Top 100 complete';
+    default:
+      return 'Top 100 complete';
+  }
+};
+
 // Maps playedCount → percentage across achievements (evenly spaced circles)
 function getAchievementsProgressPct(playedCount: number, milestones: { threshold: number }[], maxThreshold: number): number {
   if (playedCount <= 0) return 0;
@@ -101,7 +117,7 @@ export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps>
 
               // Badge label
               const badgeLabel = isListComplete 
-                ? `${listName} complete` 
+                ? getCompleteLabel(listSlug)
                 : `${m.threshold} Club`;
 
               return (
