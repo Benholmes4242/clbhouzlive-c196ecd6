@@ -31,7 +31,7 @@ export function EmptyFriendsState({ title }: EmptyFriendsStateProps) {
         onClick={() => navigate('/golferstofollow')}
         className="w-full max-w-[320px]"
       >
-        Find your friends
+        Find golfers to follow
       </Button>
     </div>
   );

@@ -106,7 +106,7 @@ const GolfersToFollowPage = () => {
   ];
 
   const handleBack = () => {
-    navigate('/courses?tab=friends');
+    navigate('/courses?tab=friends-courses');
   };
 
   const startIndex = (page - 1) * pageSize + 1;
@@ -119,7 +119,7 @@ const GolfersToFollowPage = () => {
       <FadeInContent>
         <main className="max-w-3xl mx-auto pb-[30px]">
           {/* Header - Centered */}
-          <header className="px-4 pt-4 pb-5">
+          <header className="px-5 pt-4 pb-5">
             <button
               type="button"
               onClick={handleBack}

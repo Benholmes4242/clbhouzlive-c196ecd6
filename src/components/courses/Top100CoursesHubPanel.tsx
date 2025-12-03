@@ -420,9 +420,18 @@ const Top100CoursesHubPanel = () => {
               Friends on their Top 100 journey
             </p>
           </div>
-          <p className="text-[12px] text-muted-foreground">
-            None of your friends have started the Top 100 yet.
-          </p>
+          <div className="px-4 py-4 rounded-2xl bg-slate-50 border border-slate-100">
+            <p className="text-sm text-slate-500">
+              Follow other golfers to see their Top 100 progress.
+            </p>
+            <button
+              type="button"
+              className="mt-3 inline-flex items-center justify-center rounded-[var(--radius-squircle)] bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
+              onClick={() => navigate('/golferstofollow')}
+            >
+              Find golfers to follow
+            </button>
+          </div>
         </section>
       )}
 

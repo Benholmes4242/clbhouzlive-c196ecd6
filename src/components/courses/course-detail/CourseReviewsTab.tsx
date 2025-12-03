@@ -389,12 +389,12 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   return (
     <div className="flex flex-col">
       {/* Section 1 – Summary header (flattened on background) */}
-      <section className="px-4 pt-3 pb-2 bg-slate-50 sm:pt-5">
+      <section className="px-5 pt-3 pb-2 bg-slate-50 sm:pt-5">
         {/* Section label with Clubhouse logo */}
         <div className="flex items-center justify-center gap-1.5 mb-0.5">
           <ClubhouseLogo size="xs" className="opacity-70" />
-          <p className="text-sm font-semibold tracking-[0.14em] text-slate-500 uppercase">
-            Community rating
+          <p className="text-sm font-semibold tracking-[0.14em] text-slate-500">
+            Community Rating
           </p>
         </div>
 
@@ -425,8 +425,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       </section>
 
       {/* Section 3 – Sort pills */}
-      <div className="px-4 pt-3 pb-3 bg-slate-100">
-        <p className="mb-2 text-xs font-semibold tracking-[0.08em] uppercase text-slate-500">
+      <div className="px-5 pt-3 pb-3 bg-slate-100">
+        <p className="mb-2 text-xs font-semibold tracking-[0.08em] text-slate-500">
           Sort &amp; filter
         </p>
         <SegmentedTabs

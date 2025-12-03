@@ -158,9 +158,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* 3. About Section */}
       {course.description && (
-        <section className="px-4 pt-6 pb-5 bg-slate-50 space-y-3 md:pt-8">
-          <h2 className="text-lg md:text-xl font-semibold">About</h2>
-          <div className="text-base md:text-lg leading-relaxed text-foreground">
+        <section className="pt-6 pb-5 bg-slate-50 space-y-3 md:pt-8">
+          <h2 className="px-5 text-lg md:text-xl font-semibold">About</h2>
+          <div className="px-5 text-base md:text-lg leading-relaxed text-foreground">
             {formatDescription(displayDescription)}
             {shouldShowReadMore && (
               <button
@@ -189,7 +189,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* Location Section - Seamless */}
       <section className="pt-6 pb-5 bg-slate-100 md:pt-8">
-        <div className="px-4 space-y-3 mb-4">
+        <div className="px-5 space-y-3 mb-4">
           <h2 className="text-lg md:text-xl font-semibold">Location</h2>
           <p className="text-base md:text-lg text-foreground">
             {formatCourseLocation(course)}
