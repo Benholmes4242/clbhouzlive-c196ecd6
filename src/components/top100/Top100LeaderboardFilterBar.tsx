@@ -1,6 +1,7 @@
 import React from 'react';
 import { Globe2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { AppSelect, AppSelectOption } from '@/components/ui/AppSelect';
 
 export interface Top100LeaderboardFilters {
   listSlug: 'all' | 'global' | 'gb-i' | 'usa' | 'europe';
@@ -22,28 +23,28 @@ const TIME_RANGE_OPTIONS = [
   { value: 'week', label: 'This week' },
 ] as const;
 
-const LIST_OPTIONS = [
+const LIST_OPTIONS: AppSelectOption<Top100LeaderboardFilters['listSlug']>[] = [
   { value: 'all', label: 'All lists' },
   { value: 'global', label: 'Global Top 100' },
   { value: 'gb-i', label: 'GB&I Top 100' },
   { value: 'usa', label: 'USA Top 100' },
   { value: 'europe', label: 'Europe Top 100' },
-] as const;
+];
 
-const LOCATION_OPTIONS = [
+const LOCATION_OPTIONS: AppSelectOption<Top100LeaderboardFilters['locationScope']>[] = [
   { value: 'worldwide', label: 'All regions (worldwide)' },
   { value: 'my-country', label: 'Players in my country' },
   { value: 'gb-i', label: 'GB&I players only' },
   { value: 'usa', label: 'USA players only' },
   { value: 'europe', label: 'Europe players only' },
-] as const;
+];
 
-const SORT_OPTIONS = [
+const SORT_OPTIONS: AppSelectOption<NonNullable<Top100LeaderboardFilters['sortBy']>>[] = [
   { value: 'official_rank', label: 'Official ranking' },
   { value: 'member_rating', label: 'Community rating' },
   { value: 'most_played', label: 'Most played' },
   { value: 'recently_popular', label: 'Recently popular' },
-] as const;
+];
 
 export function Top100LeaderboardFilterBar({
   mode,
@@ -59,19 +60,12 @@ export function Top100LeaderboardFilterBar({
           <span className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
             Top 100 list
           </span>
-          <select
-            className="h-9 rounded-xl border border-border/60 bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+          <AppSelect
             value={value.listSlug}
-            onChange={(e) =>
-              onChange({ ...value, listSlug: e.target.value as Top100LeaderboardFilters['listSlug'] })
-            }
-          >
-            {LIST_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+            onChange={(v) => onChange({ ...value, listSlug: v })}
+            options={LIST_OPTIONS}
+            ariaLabel="Filter by Top 100 list"
+          />
         </div>
 
         {/* Golfer/Course region selector */}
@@ -79,25 +73,13 @@ export function Top100LeaderboardFilterBar({
           <span className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
             {mode === 'courses' ? 'Showing course ratings from golfers in' : 'Showing golfers from'}
           </span>
-          <div className="inline-flex items-center gap-1.5 rounded-xl border border-border/60 bg-background px-3 h-9">
-            <Globe2 className="w-4 h-4 text-muted-foreground" />
-            <select
-              className="bg-transparent text-sm focus:outline-none flex-1"
-              value={value.locationScope}
-              onChange={(e) =>
-                onChange({
-                  ...value,
-                  locationScope: e.target.value as Top100LeaderboardFilters['locationScope'],
-                })
-              }
-            >
-              {LOCATION_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <AppSelect
+            value={value.locationScope}
+            onChange={(v) => onChange({ ...value, locationScope: v })}
+            options={LOCATION_OPTIONS}
+            ariaLabel="Show golfers from"
+            icon={<Globe2 className="w-4 h-4" />}
+          />
         </div>
 
         {/* Sort (courses mode only) */}
@@ -106,22 +88,12 @@ export function Top100LeaderboardFilterBar({
             <span className="text-[11px] uppercase tracking-wide text-muted-foreground font-medium">
               Sort courses by
             </span>
-            <select
-              className="h-9 rounded-xl border border-border/60 bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            <AppSelect
               value={value.sortBy ?? 'official_rank'}
-              onChange={(e) =>
-                onChange({
-                  ...value,
-                  sortBy: e.target.value as Top100LeaderboardFilters['sortBy'],
-                })
-              }
-            >
-              {SORT_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
+              onChange={(v) => onChange({ ...value, sortBy: v })}
+              options={SORT_OPTIONS}
+              ariaLabel="Sort courses by"
+            />
           </div>
         )}
       </div>
