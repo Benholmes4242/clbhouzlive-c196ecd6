@@ -733,6 +733,8 @@ const FriendsCoursesPanel: React.FC = () => {
             hasNextPage={page < totalPages}
             onNext={() => handleChangeCoursesPage('next')}
             onPrev={() => handleChangeCoursesPage('prev')}
+            itemLabel="courses"
+            scrollTargetRef={coursesListAnchorRef as React.RefObject<HTMLElement>}
           />
         </div>
       )}
