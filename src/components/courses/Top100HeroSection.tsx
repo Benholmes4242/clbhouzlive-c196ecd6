@@ -70,21 +70,20 @@ export function Top100HeroSection({
             </Squircle>
           </div>
         </Squircle>
+        {/* Achievement badge pill - overlaying bottom of avatar */}
+        {clubRing && clubRing !== 'none' && (
+          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2">
+            <Top100AchievementBadge
+              tier={clubRing}
+              showSubtitle={false}
+              size="compact"
+            />
+          </div>
+        )}
       </div>
 
-      {/* Achievement badge pill - below avatar */}
-      {clubRing && clubRing !== 'none' && (
-        <div className="mt-3">
-          <Top100AchievementBadge
-            tier={clubRing}
-            showSubtitle={false}
-            size="compact"
-          />
-        </div>
-      )}
-
-      {/* Stats */}
-      <div className="text-center flex flex-col gap-1.5">
+      {/* Stats - extra top margin to account for badge overlay */}
+      <div className="text-center mt-6 flex flex-col gap-1.5">
         <p className="text-lg font-semibold text-foreground">
           {isOwnProfile ? "You've" : `${displayName} has`} played {totalPlayed} Top 100 course
           {totalPlayed === 1 ? '' : 's'}
