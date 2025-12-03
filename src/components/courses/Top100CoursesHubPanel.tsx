@@ -309,7 +309,7 @@ const Top100CoursesHubPanel = () => {
               <Button
                 variant="primary"
                 onClick={handleOpenTop100Journey}
-                className="w-full justify-center"
+                className="w-full justify-center rounded-2xl"
               >
                 Open your Top 100 Journey →
               </Button>
