@@ -21,10 +21,13 @@ const HUB_ENABLED = true;
  * Top 100 Mock Players Flag
  * 
  * When enabled, adds 30 mock players to the leaderboard for design/testing
- * Set via VITE_ENABLE_TOP100_MOCK_PLAYERS env variable or hardcode to true
+ * Set via VITE_ENABLE_TOP100_MOCK_PLAYERS env variable
+ * 
+ * AUDIT COMPLETED 2025-12-03: Mock players disabled for production use.
+ * All leaderboard data now comes from real Supabase tables/RPCs only.
  */
 export const ENABLE_TOP100_MOCK_PLAYERS = 
-  import.meta.env.VITE_ENABLE_TOP100_MOCK_PLAYERS === 'true' || true; // Set to true for testing
+  import.meta.env.VITE_ENABLE_TOP100_MOCK_PLAYERS === 'true'; // Production: disabled
 
 export const FEATURE_FLAGS = {
   CLUBHOUSE_VERTICAL_ONLY,
