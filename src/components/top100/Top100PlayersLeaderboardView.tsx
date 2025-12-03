@@ -10,6 +10,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronRight } from 'lucide-react';
 import { Squircle } from '@/components/ui/squircle';
+import { ENABLE_TOP100_MOCK_PLAYERS } from '@/config/featureFlags';
+import { TOP100_MOCK_PLAYERS } from '@/mocks/top100MockPlayers';
 
 interface Top100PlayersLeaderboardViewProps {
   filters: Top100LeaderboardFilters;
@@ -34,11 +36,27 @@ function mapFiltersToTimeRange(filters: Top100LeaderboardFilters): LeaderboardTi
   return 'all_time';
 }
 
-// Movement helper
-function getMovementLabel(deltaRank?: number | null) {
-  if (!deltaRank || deltaRank === 0) return { label: '—', direction: 'none' as const };
-  if (deltaRank > 0) return { label: `▲ ${deltaRank}`, direction: 'up' as const };
-  return { label: `▼ ${Math.abs(deltaRank)}`, direction: 'down' as const };
+// Movement helper - supports both delta_rank (real data) and previous_rank (mock data)
+function getMovementLabel(entry: any) {
+  // First check delta_rank from real RPC data
+  if (entry.delta_rank != null && entry.delta_rank !== 0) {
+    if (entry.delta_rank > 0) return { label: `▲ ${entry.delta_rank}`, direction: 'up' as const };
+    return { label: `▼ ${Math.abs(entry.delta_rank)}`, direction: 'down' as const };
+  }
+  
+  // Fallback to previous_rank for mock data
+  if (entry.previous_rank != null && entry.rank != null) {
+    if (entry.rank < entry.previous_rank) {
+      const diff = entry.previous_rank - entry.rank;
+      return { label: `▲ ${diff}`, direction: 'up' as const };
+    }
+    if (entry.rank > entry.previous_rank) {
+      const diff = entry.rank - entry.previous_rank;
+      return { label: `▼ ${diff}`, direction: 'down' as const };
+    }
+  }
+  
+  return { label: '—', direction: 'none' as const };
 }
 
 export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboardViewProps) {
@@ -79,8 +97,24 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
     pageSize: 100,
   });
 
-  const allEntries = data?.pages.flatMap(page => page.entries) || [];
+  const rawEntries = data?.pages.flatMap(page => page.entries) || [];
   const currentUserEntry = data?.pages[0]?.current_user_entry;
+
+  // Merge mock players if flag is enabled
+  const allEntries = useMemo(() => {
+    if (!ENABLE_TOP100_MOCK_PLAYERS) return rawEntries;
+    
+    // Avoid colliding with real users
+    const realIds = new Set(rawEntries.map((e: any) => e.user_id));
+    const mockPlayers = TOP100_MOCK_PLAYERS.filter(
+      mock => !realIds.has(mock.user_id)
+    );
+    
+    // Merge and re-sort by rank
+    return [...rawEntries, ...mockPlayers].sort(
+      (a: any, b: any) => (a.rank ?? 9999) - (b.rank ?? 9999)
+    );
+  }, [rawEntries]);
 
   // Apply location filter client-side
   const filteredEntries = useMemo(() => {
@@ -361,7 +395,7 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
       >
         {paginatedEntries.map((entry: any) => {
           const club = getTop100Club(entry.total_top100_played);
-          const movement = getMovementLabel(entry.delta_rank);
+          const movement = getMovementLabel(entry);
 
           const initials = entry.display_name
             .split(' ')

@@ -17,11 +17,21 @@ export const USE_VIDEO_PROGRESS_SYNC_V1 = true;
  */
 const HUB_ENABLED = true;
 
+/**
+ * Top 100 Mock Players Flag
+ * 
+ * When enabled, adds 30 mock players to the leaderboard for design/testing
+ * Set via VITE_ENABLE_TOP100_MOCK_PLAYERS env variable or hardcode to true
+ */
+export const ENABLE_TOP100_MOCK_PLAYERS = 
+  import.meta.env.VITE_ENABLE_TOP100_MOCK_PLAYERS === 'true' || true; // Set to true for testing
+
 export const FEATURE_FLAGS = {
   CLUBHOUSE_VERTICAL_ONLY,
   SAFE_AUTOPLAY_V2: USE_SAFE_AUTOPLAY_V2,
   VIDEO_PROGRESS_SYNC_V1: USE_VIDEO_PROGRESS_SYNC_V1,
   HUB: HUB_ENABLED, // Always enabled - no longer feature flagged
+  ENABLE_TOP100_MOCK_PLAYERS,
 } as const;
 
 // Vertical aspect ratio band (9:16 ± 7%) - width/height
