@@ -62,21 +62,24 @@ export function Top100HeroSection({
             borderRadius: '32%',
           }}
         >
-          <Squircle width={144} height={144}>
-            {avatarUrl ? (
-              <img
-                src={avatarUrl}
-                alt={displayName ?? 'Player avatar'}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                loading="lazy"
-                decoding="async"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-2xl font-semibold bg-muted text-foreground">
-                {initials}
-              </div>
-            )}
-          </Squircle>
+          {/* Inner white ring - 1px between avatar and tier ring */}
+          <div className="border border-white" style={{ borderRadius: '30%' }}>
+            <Squircle width={144} height={144}>
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={displayName ?? 'Player avatar'}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-2xl font-semibold bg-muted text-foreground">
+                  {initials}
+                </div>
+              )}
+            </Squircle>
+          </div>
         </div>
 
         {/* Tier badge - positioned at bottom of ring */}
