@@ -1,6 +1,16 @@
 import React from 'react';
 import { TOP100_LIST_MILESTONES } from '@/config/top100ListMilestones';
-import { cn } from '@/lib/utils';
+
+// Tier colors matching My Progress
+const TIER_COLORS: Record<number, string> = {
+  5: '#D9C7A3',
+  10: '#8BBF5A',
+  20: '#2E5930',
+  25: '#2E5930',
+  50: '#C8A44B',
+  75: '#B7BCC6',
+  100: '#0C0F14',
+};
 
 interface Top100ListAchievementsRowProps {
   listName: string;
@@ -8,91 +18,119 @@ interface Top100ListAchievementsRowProps {
   totalCount: number;
 }
 
+// Maps playedCount → percentage across achievements (evenly spaced circles)
+function getAchievementsProgressPct(playedCount: number, milestones: { threshold: number }[], maxThreshold: number): number {
+  if (playedCount <= 0) return 0;
+  if (playedCount >= maxThreshold) return 100;
+
+  const validMilestones = milestones.filter(m => m.threshold <= maxThreshold);
+  const thresholds = validMilestones.map(m => m.threshold);
+  
+  if (thresholds.length <= 1) return playedCount >= maxThreshold ? 100 : 0;
+
+  const lastIndex = thresholds.length - 1;
+  const segmentSize = 100 / lastIndex;
+
+  let i = 0;
+  for (let idx = 0; idx < lastIndex; idx++) {
+    if (playedCount <= thresholds[idx + 1]) {
+      i = idx;
+      break;
+    }
+  }
+
+  const startThreshold = i === 0 ? 0 : thresholds[i];
+  const endThreshold = thresholds[i + 1];
+
+  const base = (i / lastIndex) * 100;
+  const ratio = (playedCount - startThreshold) / (endThreshold - startThreshold);
+  const pct = base + ratio * segmentSize;
+
+  return Math.max(0, Math.min(100, pct));
+}
+
 export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps> = ({
   listName,
   playedCount,
   totalCount,
 }) => {
-  const milestones = TOP100_LIST_MILESTONES;
-  const nextIndex = milestones.findIndex(m => playedCount < m.threshold);
+  const milestones = TOP100_LIST_MILESTONES.filter(m => m.threshold <= totalCount || m.threshold === 100);
   const maxThreshold = Math.min(milestones[milestones.length - 1]?.threshold ?? 100, totalCount);
+  const progressPct = getAchievementsProgressPct(playedCount, milestones, maxThreshold);
 
   return (
-    <section className="px-5 pt-4">
-      {/* Section title */}
-      <div className="mb-3 flex items-baseline justify-between">
-        <h2 className="text-xs font-semibold tracking-[0.08em] text-muted-foreground uppercase">
+    <section className="space-y-2 mt-6">
+      <div className="flex items-baseline justify-between px-5">
+        <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
           Achievements tied to this list
-        </h2>
+        </h3>
         <p className="text-xs text-muted-foreground">
           {playedCount} / {totalCount} courses played
         </p>
       </div>
 
-      {/* Horizontal scroll row */}
-      <div className="-mx-1 flex overflow-x-auto pb-2 scrollbar-hide">
-        {milestones.map((m, index) => {
-          // Skip milestones that exceed this list's total
-          if (m.threshold > totalCount && m.threshold !== 100) return null;
-          
-          const unlocked = playedCount >= m.threshold;
-          const isNext = !unlocked && index === nextIndex;
-          const isListComplete = m.threshold >= totalCount;
-          const completed = unlocked && isListComplete;
+      {/* Outer scroller */}
+      <div className="overflow-x-auto pb-1 -mx-1 px-1">
+        {/* Inner column that scrolls together */}
+        <div className="inline-flex flex-col gap-3 min-w-full px-4">
+          {/* Row of circles */}
+          <div className="flex gap-4">
+            {milestones.map((m) => {
+              const unlocked = playedCount >= m.threshold;
+              const remaining = Math.max(0, m.threshold - playedCount);
+              const isListComplete = m.threshold >= totalCount;
+              const tierColor = TIER_COLORS[m.threshold] || '#94a3b8';
 
-          let status: string;
-          if (completed) status = 'List completed';
-          else if (unlocked) status = 'Unlocked';
-          else if (isNext) status = `${m.threshold - playedCount} away`;
-          else status = `${m.threshold} courses`;
+              // Badge label
+              const badgeLabel = isListComplete 
+                ? `${listName} complete` 
+                : `${m.threshold} Club`;
 
-          // Badge label
-          const badgeLabel = isListComplete 
-            ? `${listName} complete` 
-            : `${m.threshold} Club`;
+              return (
+                <div
+                  key={m.threshold}
+                  className="flex flex-col items-center min-w-[72px] gap-1"
+                >
+                  {/* Squircle ring */}
+                  <div className="relative">
+                    <div
+                      className="h-14 w-14 rounded-[18px] flex items-center justify-center bg-white"
+                      style={{
+                        boxShadow: unlocked
+                          ? `0 0 18px ${tierColor}22`
+                          : '0 0 10px rgba(15,23,42,0.06)',
+                        border: `2px solid ${unlocked ? tierColor : `${tierColor}66`}`,
+                        opacity: unlocked ? 1 : 0.45,
+                      }}
+                    >
+                      <span className="text-sm font-semibold" style={{ color: tierColor }}>
+                        {m.threshold}
+                      </span>
+                    </div>
+                  </div>
 
-          return (
-            <div key={m.threshold} className="mx-1.5 w-[88px] flex-shrink-0 flex flex-col items-center">
-              {/* Squircle badge */}
-              <div
-                className={cn(
-                  'flex h-16 w-16 items-center justify-center rounded-[18px] border-2 text-lg font-bold transition-all',
-                  completed && 'border-amber-500 text-amber-600 bg-amber-50',
-                  unlocked && !completed && 'border-emerald-500 text-emerald-600 bg-emerald-50',
-                  !unlocked && 'border-slate-200 text-slate-400 bg-white'
-                )}
-              >
-                <span>{m.threshold}</span>
-              </div>
+                  {/* Labels - consistent two lines */}
+                  <div className="mt-2 text-center">
+                    <p className="text-xs font-medium text-foreground whitespace-nowrap">
+                      {badgeLabel}
+                    </p>
+                    <p className="text-[11px] leading-[1.2] text-muted-foreground">
+                      {unlocked ? 'Unlocked' : `${remaining} away`}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
-              {/* Label */}
-              <div className="mt-2 text-[11px] font-medium text-foreground leading-tight text-center line-clamp-2">
-                {badgeLabel}
-              </div>
-
-              {/* Caption */}
-              <div className={cn(
-                'text-[10px] text-center',
-                completed && 'text-amber-600 font-medium',
-                unlocked && !completed && 'text-emerald-600 font-medium',
-                !unlocked && isNext && 'text-primary font-medium',
-                !unlocked && !isNext && 'text-muted-foreground'
-              )}>
-                {status}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Underline progress bar */}
-      <div className="mt-2 h-1 w-full rounded-full bg-slate-100 overflow-hidden">
-        <div
-          className="h-full rounded-full bg-emerald-500 transition-all"
-          style={{
-            width: `${Math.min((playedCount / maxThreshold) * 100, 100)}%`,
-          }}
-        />
+          {/* Progress bar - inside the scroller, moves with circles */}
+          <div className="h-1 rounded-full bg-muted/80 relative">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-[#D9C7A3] via-[#2E5930] to-[#0C0F14]"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
+        </div>
       </div>
     </section>
   );
