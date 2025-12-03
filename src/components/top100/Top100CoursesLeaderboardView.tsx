@@ -167,7 +167,7 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
       <Top100CourseMoversStrip items={movers ?? []} timeRange={filters.timeRange} />
 
       {/* Section Label + scope toggle */}
-      <div>
+      <div className="px-4 sm:px-0">
         <p className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
           Course rankings
         </p>
@@ -226,7 +226,7 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
       </div>
 
       {/* Course Cards - Full bleed on mobile */}
-      <div className="-mx-5 sm:mx-0">
+      <div className="-mx-4 sm:mx-0">
         <section className="space-y-3">
           {paginatedCourses.map((course, index) => {
             const hasImage = !!course.thumbnail_url;

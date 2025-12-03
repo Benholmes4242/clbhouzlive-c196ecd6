@@ -117,13 +117,13 @@ export function WeeklyHighlightsCarousel({ currentUserId }: WeeklyHighlightsCaro
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between px-1">
         <span className="text-[13px] font-medium text-muted-foreground uppercase tracking-[0.5px]">
           Weekly highlights
         </span>
       </div>
       
-      <div className="flex gap-2.5 overflow-x-auto pb-2 -mx-5 px-5 snap-x snap-mandatory scrollbar-hide">
+      <div className="flex gap-2.5 overflow-x-auto pb-2 -mx-4 px-4 snap-x snap-mandatory scrollbar-hide">
         {highlights.map((highlight, index) => {
           const Icon = HIGHLIGHT_ICONS[highlight.type];
           const isCurrentUser = highlight.user_id === currentUserId;

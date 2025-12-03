@@ -142,7 +142,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   const yearSummary = buildYearSummary(data.recent_rounds);
 
   return (
-    <div className="w-full max-w-full space-y-5 pb-6 px-5">
+    <div className="w-full max-w-full space-y-5 pb-6">
 
       {/* Progress Hero Strip */}
       <div className="mt-4">
@@ -212,7 +212,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
       />
 
       {/* Recent Top 100 Rounds - Full-width breakout */}
-      <div className="-mx-5 sm:mx-0">
+      <div className="-mx-4 sm:mx-0">
         <Top100RecentRoundsFeed
           rounds={data.recent_rounds}
           isOwnProfile={isOwnProfile}
