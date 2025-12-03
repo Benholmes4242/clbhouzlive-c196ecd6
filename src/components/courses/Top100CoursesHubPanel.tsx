@@ -350,7 +350,7 @@ const Top100CoursesHubPanel = () => {
           </div>
 
           {/* Horizontal carousel */}
-          <div className="-mx-4 px-4 flex gap-1 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-none">
+          <div className="-mx-4 flex gap-1 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-none">
             {friends.slice(0, 10).map((friend, index) => {
               const nameRaw = friend.profile.display_name || friend.profile.username || 'Golfer';
               const displayName =
@@ -367,7 +367,7 @@ const Top100CoursesHubPanel = () => {
                   key={friend.user_id}
                   type="button"
                   onClick={() => navigate(`/profile/${friend.profile.username}?tab=top100`)}
-                  className={`flex-shrink-0 w-32 snap-start text-center ${isFirst ? 'pl-4' : ''} ${isLast ? 'pr-4' : ''}`}
+                  className={`flex-shrink-0 w-32 snap-start text-center ${isFirst ? 'ml-4' : ''} ${isLast ? 'mr-4' : ''}`}
                 >
                   {/* Avatar */}
                   {friend.profile.profile_photo_url ? (
