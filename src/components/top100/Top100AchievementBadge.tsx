@@ -44,9 +44,9 @@ export function Top100AchievementBadge({
   return (
     <div
       className={cn(
-        'inline-flex items-center rounded-full border bg-background shadow-sm',
+        'inline-flex items-center rounded-2xl border bg-white shadow-sm',
         colors.border,
-        isCompact ? 'px-3 py-1.5 gap-2' : 'px-4 py-2 gap-3',
+        isCompact ? 'px-3 py-1.5 gap-2' : 'px-4 py-2.5 gap-3',
         className
       )}
     >
