@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
@@ -8,61 +8,58 @@ import { useFriendsTop100Progress } from '@/hooks/useFriendsTop100Progress';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import GolfClubView from '@/components/golf-club/GolfClubView';
-import { getTop100Club, getNextTop100Club } from '@/lib/top100Club';
 import {
   Top100ListUserStrip,
   Top100ListFriendsCarousel,
   Top100ListAchievementsRow,
   Top100ListFilters,
-  Top100ListFooter,
+  Top100ListCourseCard,
   type SortMode,
   type FilterMode,
   type ViewMode,
 } from '@/components/top100/list';
 import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
-import { Top100CourseListItem } from '@/components/top100/Top100CourseListItem';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 
-const REGION_EMOJIS: Record<string, string> = {
-  global: '🌍',
-  'gb-i': '🇬🇧',
-  usa: '🇺🇸',
-  europe: '🇪🇺',
-};
+const PAGE_SIZE = 25;
+
+// Helper to get display name for list
+function getListDisplayName(slug: string): string {
+  switch (slug) {
+    case 'global':
+      return 'Worldwide Top 100';
+    case 'gb-i':
+      return 'Britain & Ireland Top 100';
+    case 'usa':
+      return 'USA Top 100';
+    case 'europe':
+      return 'Continental Europe Top 100';
+    default:
+      return 'Top 100';
+  }
+}
 
 const Top100List = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { session, user } = useSupabaseSession();
+  const listContainerRef = useRef<HTMLDivElement>(null);
 
   const { data: lists } = useTop100Lists();
   const { data: progressData } = useTop100ProgressForUser(user?.id);
   const { data: userActivity } = useUserCourseActivity(user?.id);
 
-  // Fetch user's profile photo
-  const { data: userProfile } = useQuery({
-    queryKey: ['user-profile-photo', user?.id],
-    enabled: !!user?.id,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from('user_profiles')
-        .select('profile_photo_url, display_name')
-        .eq('id', user!.id)
-        .single();
-      return data;
-    },
-    staleTime: 5 * 60 * 1000,
-  });
-
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>('rank');
   const [filterMode, setFilterMode] = useState<FilterMode>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('all');
+  const [page, setPage] = useState(0);
 
   // Find the current list
   const currentList = lists?.find((l) => l.slug === slug);
+  const listDisplayName = slug ? getListDisplayName(slug) : 'Top 100';
 
-  // Fetch courses for this list (including #1 hero course)
+  // Fetch courses for this list
   const { data: courses, isLoading } = useQuery({
     queryKey: ['top100-list-courses', currentList?.id],
     enabled: !!currentList?.id,
@@ -112,9 +109,8 @@ const Top100List = () => {
 
   // Build hero course for region card
   const heroCourse = courses?.[0];
-  const firstUnplayedCourse = courses?.find((c) => !playedCourseIds.has(c.id));
 
-  // Build list summary for the region card (same format as Courses tab)
+  // Build list summary for the region card
   const listSummary: Top100ListSummary | null = useMemo(() => {
     if (!currentList) return null;
     return {
@@ -135,20 +131,6 @@ const Top100List = () => {
     };
   }, [currentList, totalCount, playedCount, heroCourse]);
 
-  // Build userProgress for strip
-  const totalTop100 = progressData?.totalTop100Played || 0;
-  const currentClub = getTop100Club(totalTop100);
-  const nextClub = getNextTop100Club(totalTop100);
-
-  const userProgress = useMemo(() => ({
-    rankAmongFriends: 1, // TODO: calculate actual rank
-    totalTop100Courses: totalTop100,
-    currentTierId: currentClub.tierId,
-    currentTierName: currentClub.tierName,
-    nextTierName: nextClub?.tierName || null,
-    nextTierRemaining: nextClub ? Math.max(0, nextClub.threshold - totalTop100) : null,
-  }), [totalTop100, currentClub, nextClub]);
-
   // Build friends list for carousel
   const friendsSummary = useMemo(() => {
     return friendsProgress.map((f) => ({
@@ -166,29 +148,33 @@ const Top100List = () => {
 
     let filtered = [...courses];
 
-    // Apply filter
+    // Apply status filter
     if (filterMode === 'played') {
       filtered = filtered.filter((c) => playedCourseIds.has(c.id));
     } else if (filterMode === 'not-played') {
       filtered = filtered.filter((c) => !playedCourseIds.has(c.id));
     }
+    // TODO: shortlisted filter when shortlist data is available
 
     // Apply view filter
-    if (viewMode === 'friends') {
-      // TODO: implement friends filter with course IDs
-      // For now, show all courses that any friend has played (placeholder)
-    }
-    // TODO: shortlist filter
+    // TODO: friends view filter - requires extending useFriendsTop100Progress to return course_ids
+    // TODO: shortlist view filter - requires shortlist data
 
     // Apply sort
     filtered.sort((a, b) => {
       switch (sortMode) {
         case 'rank':
           return a.rank - b.rank;
-        case 'name':
+        case 'rating-high':
+          // TODO: implement when rating data is available
+          return 0;
+        case 'rating-low':
+          // TODO: implement when rating data is available
+          return 0;
+        case 'name-asc':
           return a.name.localeCompare(b.name);
-        case 'country':
-          return a.country.localeCompare(b.country);
+        case 'name-desc':
+          return b.name.localeCompare(a.name);
         default:
           return 0;
       }
@@ -196,6 +182,21 @@ const Top100List = () => {
 
     return filtered;
   }, [courses, sortMode, filterMode, viewMode, playedCourseIds, friendsProgress]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredAndSortedCourses.length / PAGE_SIZE);
+  const visibleCourses = filteredAndSortedCourses.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(0);
+  }, [sortMode, filterMode, viewMode]);
+
+  // Scroll to top of list on page change
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    listContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   if (isLoading) {
     return (
@@ -217,7 +218,7 @@ const Top100List = () => {
   return (
     <div className="min-h-screen bg-background">
       <main className="pb-20">
-        {/* 1. Hero Section - Full-width with back button */}
+        {/* 1. Hero Section */}
         {listSummary && (
           <section className="px-4">
             <Top100RegionCard
@@ -229,12 +230,12 @@ const Top100List = () => {
           </section>
         )}
 
-        {/* 2. User Rank Strip */}
+        {/* 2. Progress Strip */}
         {session && (
           <Top100ListUserStrip
-            userProgress={userProgress}
-            userAvatarUrl={userProfile?.profile_photo_url}
-            userName={userProfile?.display_name || user?.email}
+            playedCount={playedCount}
+            totalCourses={totalCount}
+            listName={listDisplayName}
           />
         )}
 
@@ -243,19 +244,20 @@ const Top100List = () => {
           <Top100ListFriendsCarousel
             friends={friendsSummary}
             totalInList={totalCount}
+            listName={listDisplayName}
           />
         )}
 
         {/* 4. Achievements */}
         {session && (
           <Top100ListAchievementsRow
-            listName={currentList?.name || 'Top 100'}
+            listName={listDisplayName}
             playedCount={playedCount}
             totalCount={totalCount}
           />
         )}
 
-        {/* 5. Sort & Filter Bar */}
+        {/* 5. Sort & Filter Bar with Pagination */}
         <Top100ListFilters
           sortBy={sortMode}
           onSortChange={setSortMode}
@@ -263,32 +265,27 @@ const Top100List = () => {
           onFilterChange={setFilterMode}
           view={viewMode}
           onViewChange={setViewMode}
+          currentPage={page}
+          totalPages={totalPages}
+          totalCourses={filteredAndSortedCourses.length}
+          pageSize={PAGE_SIZE}
+          onPageChange={handlePageChange}
         />
 
         {/* 6. Course List */}
-        <section className="mt-4 pb-6">
-          {filteredAndSortedCourses.map((course) => {
-            const countryLabel = course.sub_country 
-              ? `${course.country}, ${course.sub_country}` 
-              : course.country;
-            
-            return (
-              <Top100CourseListItem
-                key={course.id}
-                position={course.rank}
-                courseName={course.name}
-                countryLabel={countryLabel}
-                country={course.country}
-                thumbnailUrl={course.thumbnail_image}
-                isPlayed={playedCourseIds.has(course.id)}
-                onClick={() => setSelectedCourseId(course.id)}
-                onTogglePlayed={() => {
-                  // TODO: implement toggle played
-                  console.log('Toggle played:', course.id);
-                }}
-              />
-            );
-          })}
+        <section ref={listContainerRef} className="mt-4 pb-6">
+          {visibleCourses.map((course) => (
+            <Top100ListCourseCard
+              key={course.id}
+              rank={course.rank}
+              courseName={course.name}
+              country={course.country}
+              subCountry={course.sub_country}
+              thumbnailUrl={course.thumbnail_image}
+              isPlayed={playedCourseIds.has(course.id)}
+              onClick={() => setSelectedCourseId(course.id)}
+            />
+          ))}
 
           {filteredAndSortedCourses.length === 0 && (
             <div className="text-center py-12 mx-4">
@@ -299,13 +296,7 @@ const Top100List = () => {
           )}
         </section>
 
-        {/* 7. Footer Engagement */}
-        <Top100ListFooter
-          onOpenPlanner={() => {
-            // TODO: implement course planner
-            console.log('Open course planner');
-          }}
-        />
+        {/* No footer CTA - page ends after course cards */}
       </main>
 
       {/* Course Detail Modal */}
