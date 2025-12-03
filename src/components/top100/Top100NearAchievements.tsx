@@ -19,10 +19,10 @@ export function Top100NearAchievements({ totalTop100Played }: Top100NearAchievem
   if (candidates.length === 0) return null;
 
   return (
-    <section className="mt-4">
+    <section className="mt-6">
       <div className="mb-2 flex items-center justify-between px-1">
-        <h2 className="text-sm font-semibold text-foreground">
-          Badges you&apos;re close to
+        <h2 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
+          Badges you're close to
         </h2>
         <span className="text-xs text-muted-foreground">
           {totalTop100Played} courses logged

@@ -13,9 +13,9 @@ export function Top100FriendCoursesStrip({ items }: Props) {
   if (!items || items.length === 0) return null;
 
   return (
-    <section className="mt-2 md:mt-3 px-4 sm:px-0">
+    <section className="mt-6 px-4 sm:px-0">
       <div className="flex items-center justify-between mb-2">
-        <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+        <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
           Recently played by your circle
         </h3>
       </div>

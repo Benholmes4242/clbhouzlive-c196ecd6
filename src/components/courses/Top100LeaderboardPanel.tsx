@@ -65,7 +65,7 @@ const Top100LeaderboardPanel = () => {
               <Target className="h-3.5 w-3.5 text-emerald-500" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              <span className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
                 Closest goal
               </span>
               <span className="text-sm md:text-[15px] font-medium">

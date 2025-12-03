@@ -84,7 +84,7 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
             <Trophy className="w-4 h-4 text-amber-600" />
           </div>
           <div className="text-left">
-            <h3 className="text-base font-semibold text-foreground">Friends chasing the Top 100</h3>
+            <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">Friends chasing the Top 100</h3>
             <p className="text-xs text-muted-foreground">{friendMessage ?? 'Top players this period'}</p>
           </div>
         </div>

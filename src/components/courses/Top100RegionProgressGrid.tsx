@@ -38,12 +38,12 @@ export function Top100RegionProgressGrid({
   displayName,
 }: Top100RegionProgressGridProps) {
   const label = isOwnProfile
-    ? 'Your journey by region'
-    : `${displayName ?? 'Their'} journey by region`;
+    ? 'YOUR JOURNEY BY REGION'
+    : `${displayName?.toUpperCase() ?? 'THEIR'} JOURNEY BY REGION`;
 
   return (
     <section className="mt-6 w-full">
-      <h3 className="text-sm font-semibold mb-2 px-1">
+      <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground mb-2 px-1">
         {label}
       </h3>
 
