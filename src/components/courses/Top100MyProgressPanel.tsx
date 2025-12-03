@@ -12,6 +12,7 @@ import { useTop100FriendsSnapshot } from '@/hooks/useTop100FriendsSnapshot';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import Top100FriendsActivityCard from '@/components/top100/Top100FriendsActivityCard';
+import { SectionLabel, StandingsIcon } from '@/components/top100/SectionLabel';
 
 // Tier colors for next milestone chip
 const TIER_COLORS: Record<string, string> = {
@@ -163,24 +164,11 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
     }
   }
 
-  // Dynamic title based on profile ownership
-  const possessive = displayName?.endsWith('s')
-    ? `${displayName}'`
-    : `${displayName}'s`;
-  const mainTitle = isOwnProfile
-    ? "Your Top 100 Journey"
-    : `${possessive} Top 100 Journey`;
-
   return (
     <div className="w-full max-w-full space-y-5 pb-6">
-      {/* Header */}
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold text-foreground">
-          {mainTitle}
-        </h1>
-        <p className="text-muted-foreground">
-          Track your elite pilgrimage across the world's greatest courses
-        </p>
+      {/* Section Label */}
+      <div className="mt-4 sm:mt-6 px-1">
+        <SectionLabel icon={<StandingsIcon />} label="Your standings" />
       </div>
 
       {/* Hero Section with Big Ring */}
