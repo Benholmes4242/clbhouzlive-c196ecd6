@@ -15,6 +15,7 @@ import { getCourseTrophies } from './getCourseTrophies';
 import CourseRankBadges from '@/components/courses/CourseRankBadges';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { Bookmark } from 'lucide-react';
+import { SectionLabel, CourseRankingsIcon } from './SectionLabel';
 
 interface Top100CoursesLeaderboardViewProps {
   filters: Top100LeaderboardFilters;
@@ -166,17 +167,20 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
       {/* Phase 2B: Course movers strip */}
       <Top100CourseMoversStrip items={movers ?? []} timeRange={filters.timeRange} />
 
-      {/* Header with scope toggle */}
-      <div className="flex items-center justify-between gap-3 mb-3">
-        <h2 className="text-sm font-semibold text-foreground px-1">
+      {/* Section Label + scope toggle */}
+      <div className="px-4 sm:px-0">
+        <SectionLabel icon={<CourseRankingsIcon />} label="Course rankings" />
+        <p className="mt-1 text-xs text-muted-foreground">
           {viewScope === 'shortlist'
-            ? 'My trip shortlist'
+            ? 'Your trip shortlist'
             : filters.sortBy === 'member_rating'
-            ? 'Highest rated Top 100 courses'
+            ? 'Highest rated Top 100 courses for your filters'
             : filters.sortBy === 'most_played'
-            ? 'Most played Top 100 courses'
+            ? 'Most played Top 100 courses for your filters'
             : 'Top 100 courses by official ranking'}
-        </h2>
+        </p>
+      </div>
+      <div className="flex items-center justify-end gap-3 mb-3">
 
         <div className="inline-flex items-center rounded-full bg-muted/60 p-1 text-xs">
           <button

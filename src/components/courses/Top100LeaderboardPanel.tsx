@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Trophy, Target } from 'lucide-react';
+import { Target } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Top100PlayersLeaderboardView } from '@/components/top100/Top100PlayersLeaderboardView';
 import { Top100CoursesLeaderboardView } from '@/components/top100/Top100CoursesLeaderboardView';
 import { Top100LeaderboardFilterBar, Top100LeaderboardFilters } from '@/components/top100/Top100LeaderboardFilterBar';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { SectionLabel, StandingsIcon } from '@/components/top100/SectionLabel';
 
 const Top100LeaderboardPanel = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -56,15 +57,9 @@ const Top100LeaderboardPanel = () => {
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6 pb-6">
-      {/* Header */}
-      <div className="text-center space-y-2 pt-4">
-        <div className="flex items-center justify-center gap-2">
-          <Trophy className="w-6 h-6 text-amber-500" />
-          <h1 className="text-2xl font-bold text-foreground">Top 100 Club – Leaderboard</h1>
-        </div>
-        <p className="text-sm text-muted-foreground">
-          See how you rank against the best golfers chasing the Top 100
-        </p>
+      {/* Section Label */}
+      <div className="mt-4 sm:mt-6 px-1">
+        <SectionLabel icon={<StandingsIcon />} label="Your standings" />
       </div>
 
       {/* Closest Goal Banner */}
