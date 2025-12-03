@@ -14,9 +14,26 @@ const TIER_COLORS: Record<number, string> = {
 
 interface Top100ListAchievementsRowProps {
   listName: string;
+  listSlug?: string;
   playedCount: number;
   totalCount: number;
 }
+
+// Dynamic achievement title based on list
+const getAchievementsTitleForList = (listSlug?: string): string => {
+  switch (listSlug) {
+    case 'global':
+      return 'Worldwide achievements';
+    case 'gb-i':
+      return 'GB&I achievements';
+    case 'usa':
+      return 'USA achievements';
+    case 'europe':
+      return 'Europe achievements';
+    default:
+      return 'List achievements';
+  }
+};
 
 // Maps playedCount → percentage across achievements (evenly spaced circles)
 function getAchievementsProgressPct(playedCount: number, milestones: { threshold: number }[], maxThreshold: number): number {
@@ -51,6 +68,7 @@ function getAchievementsProgressPct(playedCount: number, milestones: { threshold
 
 export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps> = ({
   listName,
+  listSlug,
   playedCount,
   totalCount,
 }) => {
@@ -62,7 +80,7 @@ export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps>
     <section className="space-y-2 mt-6">
       <div className="flex items-baseline justify-between px-5">
         <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
-          Achievements tied to this list
+          {getAchievementsTitleForList(listSlug)}
         </h3>
         <p className="text-xs text-muted-foreground">
           {playedCount} / {totalCount} courses played

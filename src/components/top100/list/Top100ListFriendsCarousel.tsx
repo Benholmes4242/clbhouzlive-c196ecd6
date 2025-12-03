@@ -66,14 +66,14 @@ export const Top100ListFriendsCarousel: React.FC<Top100ListFriendsCarouselProps>
         )}
       </div>
 
-      <div className="mt-3 pl-4 pr-2 flex gap-3 overflow-x-auto scrollbar-hide pb-1">
+      <div className="mt-3 pl-4 pr-2 flex gap-2 overflow-x-auto scrollbar-hide pb-1">
         {friends.slice(0, 10).map((friend) => (
           <button
             key={friend.id}
             onClick={() => navigate(`/profile/${friend.username}`)}
-            className="min-w-[120px] rounded-2xl bg-white shadow-sm px-3 py-3 flex flex-col items-center border border-slate-100 hover:border-slate-200 transition-colors"
+            className="min-w-[100px] rounded-2xl bg-white shadow-sm px-2 py-2 flex flex-col items-center border border-slate-100 hover:border-slate-200 transition-colors"
           >
-            <Squircle width={40} height={40}>
+            <Squircle width={36} height={36}>
               {friend.avatarUrl ? (
                 <img
                   src={friend.avatarUrl}
@@ -81,15 +81,15 @@ export const Top100ListFriendsCarousel: React.FC<Top100ListFriendsCarouselProps>
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
               ) : (
-                <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-600 text-sm font-medium">
+                <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-600 text-xs font-medium">
                   {friend.name[0]?.toUpperCase() || '?'}
                 </div>
               )}
             </Squircle>
-            <div className="mt-2 text-[13px] font-semibold leading-tight text-slate-900 text-center truncate max-w-full">
+            <div className="mt-1.5 text-[12px] font-semibold leading-tight text-slate-900 text-center truncate max-w-full">
               {friend.name}
             </div>
-            <div className="text-[12px] text-slate-500">
+            <div className="text-[11px] text-slate-500">
               {friend.playedOnList}/{totalInList} played
             </div>
           </button>

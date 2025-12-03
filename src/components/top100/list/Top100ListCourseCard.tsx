@@ -1,5 +1,5 @@
 import React from 'react';
-import CourseRankBadges from '@/components/courses/CourseRankBadges';
+import { Top100RankBadge } from '@/components/top100/Top100RankBadge';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 
 interface CourseData {
@@ -21,20 +21,41 @@ interface CourseData {
 
 interface Top100ListCourseCardProps {
   course: CourseData;
+  listSlug?: string;
   onClick: () => void;
 }
 
 export const Top100ListCourseCard: React.FC<Top100ListCourseCardProps> = ({
   course,
+  listSlug,
   onClick,
 }) => {
+  // Determine which rank to show based on current list
+  const getRankForList = () => {
+    switch (listSlug) {
+      case 'global':
+        return course.globalRank ?? course.rank;
+      case 'usa':
+        return course.usaRank ?? course.rank;
+      case 'gb-i':
+        return course.regionalRank ?? course.rank;
+      case 'europe':
+        return course.regionalRank ?? course.rank;
+      default:
+        return course.rank;
+    }
+  };
+
+  const rankToShow = getRankForList();
+  const badgeSlug = (listSlug || 'global') as 'global' | 'gb-i' | 'usa' | 'europe';
+
   return (
     <button
       type="button"
       onClick={onClick}
       className="w-full rounded-none sm:rounded-xl overflow-hidden bg-card border-y sm:border border-border/60 text-left shadow-none sm:shadow-sm hover:sm:shadow-md transition-all"
     >
-      {/* Hero image with rank badges */}
+      {/* Hero image with rank badge */}
       <div className="relative w-full aspect-[1.6/1] overflow-hidden">
         <img
           src={course.imageUrl || '/placeholder.svg'}
@@ -48,14 +69,10 @@ export const Top100ListCourseCard: React.FC<Top100ListCourseCardProps> = ({
         {/* Gradient overlay */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
         
-        {/* Rank badges top-left */}
-        <CourseRankBadges
-          globalRank={course.globalRank ?? (course.rank <= 100 ? course.rank : null)}
-          regionalRank={course.regionalRank}
-          usaRank={course.usaRank}
-          country={course.country || ''}
-          positioning="top-left"
-        />
+        {/* Single rank badge for current list - top-left */}
+        <div className="absolute top-3 left-3">
+          <Top100RankBadge listSlug={badgeSlug} rank={rankToShow} />
+        </div>
       </div>
 
       {/* Meta area */}
