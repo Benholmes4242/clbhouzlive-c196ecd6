@@ -20,6 +20,7 @@ export type Top100LeaderboardEntry = {
   total_top100_played: number;
   lists_completed: string[];
   milestone_label: string | null;
+  is_friend: boolean;
 };
 
 export type Top100LeaderboardResponse = {
@@ -37,6 +38,7 @@ type LeaderboardRpcEntry = {
   home_club: string | null;
   total_top100_played: number;
   milestone_label: string | null;
+  is_friend: boolean;
 };
 
 type LeaderboardRpcPayload = {
@@ -81,6 +83,7 @@ export function useTop100Leaderboard(args: UseTop100LeaderboardArgs) {
         total_top100_played: e.total_top100_played,
         lists_completed: [],
         milestone_label: e.milestone_label || null,
+        is_friend: e.is_friend ?? false,
       });
 
       return {
