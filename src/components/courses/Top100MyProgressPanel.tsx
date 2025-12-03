@@ -4,7 +4,7 @@ import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Top100ProgressHero } from '@/components/top100/Top100ProgressHero';
-import { Top100MilestoneTimeline } from '@/components/top100/Top100MilestoneTimeline';
+import { Top100MilestonesCarousel } from '@/components/courses/Top100MilestonesCarousel';
 import { Top100NearAchievements } from '@/components/top100/Top100NearAchievements';
 import { Top100YearSummary } from '@/components/top100/Top100YearSummary';
 import { Top100RegionInsight } from '@/components/top100/Top100RegionInsight';
@@ -206,8 +206,8 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
         />
       )}
 
-      {/* Milestone Timeline */}
-      <Top100MilestoneTimeline totalTop100Played={data.totalTop100Played} />
+      {/* Achievements Carousel */}
+      <Top100MilestonesCarousel totalPlayed={data.totalTop100Played} />
 
       {/* Badges You're Close To */}
       <Top100NearAchievements totalTop100Played={data.totalTop100Played} />
