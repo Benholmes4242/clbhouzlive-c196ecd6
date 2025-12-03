@@ -13,7 +13,6 @@ import {
   Top100ListFriendsCarousel,
   Top100ListAchievementsRow,
   Top100ListFilters,
-  Top100ListFooter,
   Top100ListCourseCard,
   type SortMode,
   type FilterMode,
@@ -330,13 +329,6 @@ const Top100List = () => {
           </div>
         )}
 
-        {/* 8. Footer Engagement */}
-        <Top100ListFooter
-          onOpenPlanner={() => {
-            // TODO: implement course planner
-            console.log('Open course planner');
-          }}
-        />
       </main>
 
       {/* Course Detail Modal */}
