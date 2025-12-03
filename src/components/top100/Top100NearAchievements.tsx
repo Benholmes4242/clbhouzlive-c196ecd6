@@ -20,7 +20,7 @@ export function Top100NearAchievements({ totalTop100Played }: Top100NearAchievem
 
   return (
     <section className="mt-6">
-      <div className="mb-2 flex items-center justify-between px-5">
+      <div className="mb-2 flex items-center justify-between px-1">
         <h2 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
           Badges you're close to
         </h2>
@@ -29,7 +29,7 @@ export function Top100NearAchievements({ totalTop100Played }: Top100NearAchievem
         </span>
       </div>
 
-      <div className="-mx-5 flex gap-3 overflow-x-auto px-5 pb-1 scrollbar-hide">
+      <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 scrollbar-hide">
         {candidates.map(m => (
           <button
             key={m.id}

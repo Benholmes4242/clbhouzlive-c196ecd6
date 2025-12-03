@@ -51,7 +51,7 @@ const Top100Hub = () => {
     return (
       <div className="min-h-screen bg-background">
         <ClubhouseHeaderNew />
-        <main className="px-5 md:container md:mx-auto md:px-0 py-6 pb-20">
+        <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
           <div className="text-center py-12">
             <h2 className="text-xl font-semibold text-foreground mb-2">Unable to load Top 100 lists</h2>
             <p className="text-muted-foreground">Please try refreshing the page.</p>
@@ -70,7 +70,7 @@ const Top100Hub = () => {
     return (
       <div className="min-h-screen bg-background">
         <ClubhouseHeaderNew />
-        <main className="px-5 md:container md:mx-auto md:px-0 py-6 pb-20">
+        <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
           <div className="animate-pulse space-y-4">
             <div className="h-64 bg-muted rounded-xl" />
             <div className="h-64 bg-muted rounded-xl" />
@@ -84,16 +84,16 @@ const Top100Hub = () => {
     <div className="min-h-screen bg-background">
       <ClubhouseHeaderNew />
 
-      <main className="md:container md:mx-auto md:px-0 pb-3">
+      <main className="px-4 md:container md:mx-auto md:px-0 pb-3">
         <div className="max-w-6xl mx-auto">
           {/* Back Button */}
-          <div className="pt-4 pb-5 px-5">
+          <div className="pt-4 pb-5">
             <Top100BackButton to="/courses?tab=top100" />
           </div>
           
           <div className="space-y-6">
           {/* Hero Section */}
-          <div className="mx-auto flex max-w-5xl flex-col gap-3 px-5 pb-2">
+          <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 pb-2">
             <h1 className="text-center text-3xl font-semibold tracking-tight text-slate-900">
               World's Top 100 Golf Courses
             </h1>

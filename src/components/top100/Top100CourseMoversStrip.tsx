@@ -27,15 +27,15 @@ export function Top100CourseMoversStrip({ items, timeRange }: Props) {
       : 'Courses on the move';
 
   return (
-    <section className="mt-6">
-      <div className="flex items-center justify-between mb-2 px-5">
+    <section className="mt-6 px-4 sm:px-0">
+      <div className="flex items-center justify-between mb-2">
         <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
           {label}
         </h3>
       </div>
 
-      <div className="-mx-5 md:mx-0">
-        <div className="flex gap-3 overflow-x-auto px-5 md:px-0 pb-2 scrollbar-hide snap-x snap-mandatory">
+      <div className="-mx-4 md:mx-0">
+        <div className="flex gap-3 overflow-x-auto px-4 md:px-0 pb-2 scrollbar-hide snap-x snap-mandatory">
           {movers.map((c) => {
             const showRating = c.rating_delta >= 0.1;
             const showPlays = c.plays_delta >= 3;

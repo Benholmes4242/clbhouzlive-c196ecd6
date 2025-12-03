@@ -60,12 +60,12 @@ export function Top100MilestonesCarousel({
 
   return (
     <section className="space-y-2 mt-6">
-      <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground mb-2 px-5">
+      <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground mb-2">
         Achievements
       </h3>
 
       {/* Outer scroller */}
-      <div className="overflow-x-auto pb-1 -mx-5 px-5">
+      <div className="overflow-x-auto pb-1 -mx-1 px-1">
         {/* Inner column that scrolls together */}
         <div className="inline-flex flex-col gap-3 min-w-full">
           {/* Row of circles */}
