@@ -370,6 +370,16 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
             .toUpperCase()
             .slice(0, 2);
 
+          // Rank pill styling based on position
+          const rankPillClass =
+            entry.rank === 1
+              ? 'border-amber-400 text-amber-600 bg-amber-50'
+              : entry.rank === 2
+              ? 'border-slate-300 text-slate-500 bg-slate-50'
+              : entry.rank === 3
+              ? 'border-orange-300 text-orange-500 bg-orange-50'
+              : 'border-border text-muted-foreground bg-background';
+
           return (
             <button
               key={entry.user_id}
@@ -377,7 +387,7 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
               onClick={() => navigate(`/profile/${entry.user_id}?tab=top100`)}
               className="w-full rounded-2xl border border-border/60 bg-card/95 px-3.5 py-2.5 flex items-center justify-between gap-3 hover:bg-muted/50 hover:shadow-sm transition-colors"
             >
-              {/* Left: avatar + text (no rank badge) */}
+              {/* Left: avatar + text */}
               <div className="flex items-center gap-3 min-w-0">
                 {/* Avatar with Squircle + white ring + achievement ring - same size as Your Position */}
                 <div className="relative flex-shrink-0">
@@ -412,7 +422,7 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
                 {/* Name + club + tier */}
                 <div className="flex flex-col min-w-0 text-left">
                   <span className="text-sm font-semibold leading-tight truncate">
-                    #{entry.rank} {entry.display_name}
+                    {entry.display_name}
                   </span>
                   <span className="text-xs text-muted-foreground truncate">
                     {entry.home_club || 'No club set'}
@@ -423,10 +433,16 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
                 </div>
               </div>
 
-              {/* Right: numbers + movement - centered */}
-              <div className="flex flex-col items-center gap-1 min-w-[72px] shrink-0">
-                <span className="text-base font-semibold">{entry.total_top100_played}</span>
-                <span className="text-[11px] text-muted-foreground">Top 100s</span>
+              {/* Right: rank pill + movement pill */}
+              <div className="flex items-center gap-2 shrink-0">
+                {/* Rank pill */}
+                <span className={cn(
+                  'text-[11px] font-semibold px-2.5 py-1 rounded-full border',
+                  rankPillClass
+                )}>
+                  #{entry.rank}
+                </span>
+                {/* Movement pill */}
                 <span
                   className={cn(
                     'text-[10px] font-medium px-1.5 py-0.5 rounded-full border',
