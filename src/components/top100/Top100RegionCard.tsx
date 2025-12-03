@@ -46,7 +46,7 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
         isHero ? [
           // Full-width hero: no rounded corners, negative margins to break out of gutters
           'rounded-none -mx-4',
-          'h-[260px] sm:h-[280px]'
+          'h-[17.5rem]' // Match course-hero-container height (280px)
         ] : [
           // Default card style with rounded corners
           'rounded-[28px] shadow-md',
