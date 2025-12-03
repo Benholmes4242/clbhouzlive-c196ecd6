@@ -115,20 +115,10 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
   return (
     <div>
-      {/* Location Breadcrumb & Quick Filters - now handles its own padding */}
+      {/* 1. Location Breadcrumb & Quick Filters (Explore more + See Top 100 in) */}
       <CourseLocationBreadcrumb course={course} />
       
-      {/* Top 100 Spotlight (only shows if course is in any Top 100 list) */}
-      {course.id && (
-        <section className="px-4 pt-5 bg-slate-50 md:px-6">
-          <CourseTop100Spotlight
-            courseId={course.id}
-            courseName={course.name}
-          />
-        </section>
-      )}
-      
-      {/* Community Score Section - Card-based design */}
+      {/* 2. Community Score Section - Card-based design */}
       <section className="px-4 pt-7 pb-5 bg-slate-100 md:px-6 md:pt-9 space-y-6">
         <CommunityScoreCard
           courseId={course.id}
@@ -166,7 +156,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </section>
       )}
 
-      {/* About Section - Seamless */}
+      {/* 3. About Section */}
       {course.description && (
         <section className="px-4 pt-6 pb-5 bg-slate-50 space-y-3 md:pt-8">
           <h2 className="text-lg md:text-xl font-semibold">About</h2>
@@ -184,7 +174,17 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </section>
       )}
 
-      {/* Top 100 mini-journey summary (replaces milestones) */}
+      {/* 4. Top 100 Spotlight (new slim version - only shows if course is in any Top 100 list) */}
+      {course.id && (
+        <section className="px-4 pt-5 pb-5 bg-slate-50 md:px-6">
+          <CourseTop100Spotlight
+            courseId={course.id}
+            courseName={course.name}
+          />
+        </section>
+      )}
+
+      {/* 5. Top 100 mini-journey summary ("No Top 100 progress data available." if needed) */}
       <CourseTop100Summary />
 
       {/* Location Section - Seamless */}
