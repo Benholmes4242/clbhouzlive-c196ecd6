@@ -7,6 +7,8 @@ import { Top100ProgressHero } from '@/components/top100/Top100ProgressHero';
 import { Top100MilestonesCarousel } from '@/components/courses/Top100MilestonesCarousel';
 import { Top100NearAchievements } from '@/components/top100/Top100NearAchievements';
 import { Top100YearSummary } from '@/components/top100/Top100YearSummary';
+import { Top100CompletedListsRow } from '@/components/top100/Top100CompletedListsRow';
+import type { Top100ListId } from '@/config/top100ListMilestones';
 
 
 import { Top100RegionProgressGrid } from './Top100RegionProgressGrid';
@@ -199,6 +201,21 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
 
       {/* Achievements Carousel */}
       <Top100MilestonesCarousel totalPlayed={data.totalTop100Played} />
+
+      {/* Completed Lists Row - show when any list is fully completed */}
+      {(() => {
+        const statsByList: Partial<Record<Top100ListId, { playedCount: number; totalCount: number }>> = {};
+        for (const list of data.lists) {
+          const slug = list.listSlug as Top100ListId;
+          if (slug) {
+            statsByList[slug] = {
+              playedCount: list.played,
+              totalCount: list.total,
+            };
+          }
+        }
+        return <Top100CompletedListsRow statsByList={statsByList} />;
+      })()}
 
       {/* Badges You're Close To */}
       <Top100NearAchievements totalTop100Played={data.totalTop100Played} />
