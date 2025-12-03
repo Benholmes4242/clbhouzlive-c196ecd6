@@ -14,6 +14,8 @@ export type CourseLeaderboardEntry = {
   global_rank: number | null;
   regional_rank: number | null;
   usa_rank: number | null;
+  friends_count: number;
+  friends_avg_rating: number | null;
 };
 
 type CourseLeaderboardRpcRow = {
@@ -28,6 +30,8 @@ type CourseLeaderboardRpcRow = {
   global_rank: number | null;
   regional_rank: number | null;
   usa_rank: number | null;
+  friends_count: number;
+  friends_avg_rating: number | null;
 };
 
 type UseTop100CourseLeaderboardArgs = {
@@ -71,6 +75,8 @@ export function useTop100CourseLeaderboard(args: UseTop100CourseLeaderboardArgs)
           global_rank: row.global_rank ?? null,
           regional_rank: row.regional_rank ?? null,
           usa_rank: row.usa_rank ?? null,
+          friends_count: row.friends_count ?? 0,
+          friends_avg_rating: row.friends_avg_rating ?? null,
         })),
       };
     },

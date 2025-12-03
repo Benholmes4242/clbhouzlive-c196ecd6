@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTop100CourseLeaderboard } from '@/hooks/useTop100CourseLeaderboard';
+import { useTop100CourseLeaderboard, CourseLeaderboardEntry } from '@/hooks/useTop100CourseLeaderboard';
 import { LeaderboardScope, LeaderboardTimeRange } from '@/hooks/useTop100Leaderboard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
@@ -13,6 +13,48 @@ interface Top100CoursesLeaderboardViewProps {
 }
 
 const PAGE_SIZE = 10;
+
+// Smart tag types and helper
+type CourseTag =
+  | { id: 'trending'; label: string }
+  | { id: 'friends_fav'; label: string }
+  | { id: 'hidden_gem'; label: string }
+  | { id: 'bucket_list'; label: string };
+
+function getCourseTags(
+  course: CourseLeaderboardEntry,
+  filters: Top100LeaderboardFilters
+): CourseTag[] {
+  const tags: CourseTag[] = [];
+  const rating = course.avg_rating ?? 0;
+  const friendsRating = course.friends_avg_rating ?? 0;
+  const friendsCount = course.friends_count ?? 0;
+
+  // Hidden gem: very high rating, low plays
+  if (rating >= 9.0 && course.times_played < 20) {
+    tags.push({ id: 'hidden_gem', label: 'Hidden gem' });
+  }
+
+  // Friends' favourite: strong friend signal
+  if (friendsCount >= 3 && friendsRating >= 9.0) {
+    tags.push({ id: 'friends_fav', label: "Friends' favourite" });
+  }
+
+  // Bucket-list classic: lots of plays & high rating
+  if (course.times_played >= 100 && rating >= 8.5) {
+    tags.push({ id: 'bucket_list', label: 'Bucket-list classic' });
+  }
+
+  // Trending if in a short time window and well-played
+  if (
+    (filters.timeRange === 'month' || filters.timeRange === 'week') &&
+    course.times_played >= 10
+  ) {
+    tags.push({ id: 'trending', label: 'Trending this period' });
+  }
+
+  return tags.slice(0, 2); // cap at 2 tags
+}
 
 // Map new filter format to legacy scope
 function mapFiltersToScope(filters: Top100LeaderboardFilters): LeaderboardScope {
@@ -33,6 +75,7 @@ function mapFiltersToTimeRange(filters: Top100LeaderboardFilters): LeaderboardTi
 export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboardViewProps) {
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
+  const [viewScope, setViewScope] = useState<'all' | 'friends'>('all');
 
   const scope = mapFiltersToScope(filters);
   const timeRange = mapFiltersToTimeRange(filters);
@@ -64,12 +107,25 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
     }
   }, [allCourseEntries, filters.sortBy]);
 
+  // Filter by viewScope (Everyone vs Friends' picks)
+  const visibleCourses = useMemo(() => {
+    if (viewScope === 'friends') {
+      return sortedCourses.filter((c) => (c.friends_count ?? 0) > 0);
+    }
+    return sortedCourses;
+  }, [sortedCourses, viewScope]);
+
   // Pagination
-  const totalPages = Math.max(1, Math.ceil(sortedCourses.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(visibleCourses.length / PAGE_SIZE));
   const currentPage = Math.min(page + 1, totalPages);
-  const paginatedCourses = sortedCourses.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
-  const hasNext = (page + 1) * PAGE_SIZE < sortedCourses.length;
+  const paginatedCourses = visibleCourses.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  const hasNext = (page + 1) * PAGE_SIZE < visibleCourses.length;
   const hasPrev = page > 0;
+
+  // Reset page when viewScope changes
+  React.useEffect(() => {
+    setPage(0);
+  }, [viewScope]);
 
   if (isLoading) {
     return (
@@ -82,22 +138,52 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
   }
 
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <h2 className="text-sm font-semibold text-foreground px-1">
-        {filters.sortBy === 'member_rating'
-          ? 'Highest rated Top 100 courses'
-          : filters.sortBy === 'most_played'
-          ? 'Most played Top 100 courses'
-          : 'Top 100 courses by official ranking'}
-      </h2>
+    <div id="top100-courses-list" className="space-y-4">
+      {/* Header with scope toggle */}
+      <div className="flex items-center justify-between gap-3 mb-3">
+        <h2 className="text-sm font-semibold text-foreground px-1">
+          {filters.sortBy === 'member_rating'
+            ? 'Highest rated Top 100 courses'
+            : filters.sortBy === 'most_played'
+            ? 'Most played Top 100 courses'
+            : 'Top 100 courses by official ranking'}
+        </h2>
+
+        <div className="inline-flex items-center rounded-full bg-muted/60 p-1 text-xs">
+          <button
+            type="button"
+            onClick={() => setViewScope('all')}
+            className={cn(
+              'px-2.5 py-1 rounded-full transition-colors',
+              viewScope === 'all'
+                ? 'bg-background shadow-sm font-medium text-foreground'
+                : 'text-muted-foreground'
+            )}
+          >
+            Everyone
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewScope('friends')}
+            className={cn(
+              'px-2.5 py-1 rounded-full transition-colors',
+              viewScope === 'friends'
+                ? 'bg-background shadow-sm font-medium text-foreground'
+                : 'text-muted-foreground'
+            )}
+          >
+            Friends' picks
+          </button>
+        </div>
+      </div>
 
       {/* Course Cards - Full bleed on mobile */}
       <div className="-mx-4 sm:mx-0">
         <section className="space-y-3">
-          {paginatedCourses.map((course, index) => {
+          {paginatedCourses.map((course) => {
             const hasImage = !!course.thumbnail_url;
             const rating = course.avg_rating ?? null;
+            const tags = getCourseTags(course, filters);
 
             return (
               <button
@@ -155,6 +241,38 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
                       <p className="text-[11px] text-muted-foreground mt-0.5">
                         Rated by {course.times_played} member{course.times_played === 1 ? '' : 's'}
                       </p>
+
+                      {/* Friends line */}
+                      {course.friends_count > 0 ? (
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Rated by {course.friends_count}{' '}
+                          {course.friends_count === 1 ? 'friend' : 'friends'}
+                          {course.friends_avg_rating != null && (
+                            <>
+                              {' · '}
+                              Friends' avg {course.friends_avg_rating.toFixed(1)}
+                            </>
+                          )}
+                        </p>
+                      ) : (
+                        <p className="text-xs text-muted-foreground/60 mt-0.5">
+                          No friends have rated this course yet
+                        </p>
+                      )}
+
+                      {/* Smart Tags */}
+                      {tags.length > 0 && (
+                        <div className="mt-1.5 flex flex-wrap gap-1">
+                          {tags.map((tag) => (
+                            <span
+                              key={tag.id}
+                              className="inline-flex items-center rounded-full border border-border/70 px-2 py-0.5 text-[11px] font-medium text-muted-foreground bg-background/80"
+                            >
+                              {tag.label}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     {/* Right: Clbhouz logo and rating */}
@@ -175,10 +293,12 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
       </div>
 
       {/* Empty State */}
-      {sortedCourses.length === 0 && !isLoading && (
+      {visibleCourses.length === 0 && !isLoading && (
         <div className="text-center py-12">
           <p className="text-sm text-muted-foreground">
-            No courses found with the selected filters.
+            {viewScope === 'friends'
+              ? 'None of your friends have rated Top 100 courses yet.'
+              : 'No courses found with the selected filters.'}
           </p>
         </div>
       )}
