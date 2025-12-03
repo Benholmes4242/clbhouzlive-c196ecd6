@@ -1838,6 +1838,36 @@ export type Database = {
           },
         ]
       }
+      leaderboard_highlights: {
+        Row: {
+          created_at: string
+          details: Json | null
+          expires_at: string
+          id: string
+          type: string
+          user_id: string
+          value: number | null
+        }
+        Insert: {
+          created_at?: string
+          details?: Json | null
+          expires_at?: string
+          id?: string
+          type: string
+          user_id: string
+          value?: number | null
+        }
+        Update: {
+          created_at?: string
+          details?: Json | null
+          expires_at?: string
+          id?: string
+          type?: string
+          user_id?: string
+          value?: number | null
+        }
+        Relationships: []
+      }
       logos: {
         Row: {
           category: string
@@ -3949,6 +3979,7 @@ export type Database = {
           home_club_id: string | null
           id: string
           is_public: boolean | null
+          last_rating_at: string | null
           location: string | null
           logo_url: string | null
           mini_card_crop_height: number | null
@@ -3967,6 +3998,7 @@ export type Database = {
           profile_video_thumbnail_url: string | null
           profile_video_url: string | null
           profile_video_visibility: string | null
+          recent_activity_badges: Json | null
           show_achievements_public: boolean | null
           show_handicap: boolean | null
           social_links: Json | null
@@ -4006,6 +4038,7 @@ export type Database = {
           home_club_id?: string | null
           id: string
           is_public?: boolean | null
+          last_rating_at?: string | null
           location?: string | null
           logo_url?: string | null
           mini_card_crop_height?: number | null
@@ -4024,6 +4057,7 @@ export type Database = {
           profile_video_thumbnail_url?: string | null
           profile_video_url?: string | null
           profile_video_visibility?: string | null
+          recent_activity_badges?: Json | null
           show_achievements_public?: boolean | null
           show_handicap?: boolean | null
           social_links?: Json | null
@@ -4063,6 +4097,7 @@ export type Database = {
           home_club_id?: string | null
           id?: string
           is_public?: boolean | null
+          last_rating_at?: string | null
           location?: string | null
           logo_url?: string | null
           mini_card_crop_height?: number | null
@@ -4081,6 +4116,7 @@ export type Database = {
           profile_video_thumbnail_url?: string | null
           profile_video_url?: string | null
           profile_video_visibility?: string | null
+          recent_activity_badges?: Json | null
           show_achievements_public?: boolean | null
           show_handicap?: boolean | null
           social_links?: Json | null

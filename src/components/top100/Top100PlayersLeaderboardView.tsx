@@ -12,6 +12,15 @@ import { ChevronRight } from 'lucide-react';
 import { Squircle } from '@/components/ui/squircle';
 import { ENABLE_TOP100_MOCK_PLAYERS } from '@/config/featureFlags';
 import { TOP100_MOCK_PLAYERS } from '@/mocks/top100MockPlayers';
+import {
+  WeeklyHighlightsCarousel,
+  StreakBadge,
+  RivalryCard,
+  ClosestGoalsCarousel,
+  TrophyIcons,
+  RivalryButton,
+  parseBadgesFromJson,
+} from './engagement';
 
 interface Top100PlayersLeaderboardViewProps {
   filters: Top100LeaderboardFilters;
@@ -208,6 +217,9 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
 
   return (
     <div className="space-y-4">
+      {/* MODULE 1: Weekly Highlights Carousel */}
+      <WeeklyHighlightsCarousel currentUserId={currentUser?.id} />
+
       {/* Optional B: Golfer of the Week Spotlight */}
       {spotlight && (
         <div className="w-full rounded-2xl border border-amber-200 bg-amber-50/80 px-3.5 py-3 flex items-center justify-between gap-3">
@@ -332,6 +344,21 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
         </button>
       )}
 
+      {/* MODULE 2: Streak Badge */}
+      {me && <StreakBadge userId={currentUser?.id} />}
+
+      {/* MODULE 3: Rivalry Card */}
+      {me && <RivalryCard userId={currentUser?.id} userTop100Count={me.total_top100_played} />}
+
+      {/* MODULE 4: Closest Goals Carousel */}
+      {me && (
+        <ClosestGoalsCarousel
+          totalPlayed={me.total_top100_played}
+          rivalName={aheadFriend?.display_name}
+          rivalDifference={aheadFriend ? aheadFriend.total_top100_played - me.total_top100_played : undefined}
+        />
+      )}
+
       {/* Optional A: Challenge Card */}
       {me && (aheadFriend || friendsEntries.length > 0) && (
         <div className="rounded-2xl bg-card/90 border border-border/60 px-3.5 py-2.5 text-xs flex flex-col gap-1">
@@ -454,11 +481,18 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
                   </Squircle>
                 </div>
 
-                {/* Name + club + tier */}
+                {/* Name + club + tier + trophy icons */}
                 <div className="flex flex-col min-w-0 text-left">
-                  <span className="text-sm font-semibold leading-tight truncate">
-                    {entry.display_name}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm font-semibold leading-tight truncate">
+                      {entry.display_name}
+                    </span>
+                    {/* MODULE 5: Mini Trophy Icons */}
+                    <TrophyIcons 
+                      badges={parseBadgesFromJson((entry as any).recent_activity_badges)} 
+                      maxIcons={2}
+                    />
+                  </div>
                   <span className="text-xs text-muted-foreground truncate">
                     {entry.home_club || 'No club set'}
                   </span>
@@ -470,6 +504,15 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
                   </span>
                 </div>
               </div>
+
+              {/* MODULE 3: Add Rival Button (between left content and right pills) */}
+              {currentUser?.id && entry.user_id !== currentUser.id && (
+                <RivalryButton
+                  userId={currentUser.id}
+                  targetUserId={entry.user_id}
+                  className="mr-2"
+                />
+              )}
 
               {/* Right: rank pill + movement pill */}
               <div className="flex items-center gap-2 shrink-0">
