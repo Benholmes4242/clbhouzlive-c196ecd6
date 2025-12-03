@@ -23,7 +23,7 @@ import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 
 const REGION_DISPLAY_NAMES: Record<string, string> = {
   global: 'Worldwide',
-  'gb-i': 'Britain & Ireland',
+  'gb-i': 'Great Britain & Ireland',
   usa: 'USA',
   europe: 'Continental Europe',
 };
