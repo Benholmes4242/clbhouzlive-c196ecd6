@@ -1,96 +1,76 @@
 import React from 'react';
 import CountryFlag from '@/components/ui/country-flag';
 
-interface CourseData {
-  id: string;
-  name: string;
+interface Top100ListCourseCardProps {
   rank: number;
-  imageUrl: string | null;
+  courseName: string;
   country: string;
   subCountry?: string | null;
-  flagEmoji?: string;
-  regionShort?: string;
-  played: boolean;
-  rankingBadges?: Array<{ id: string; label: string }>;
-}
-
-interface Top100ListCourseCardProps {
-  course: CourseData;
+  thumbnailUrl: string | null;
+  isPlayed: boolean;
+  isShortlisted?: boolean;
   onClick: () => void;
 }
 
 export const Top100ListCourseCard: React.FC<Top100ListCourseCardProps> = ({
-  course,
+  rank,
+  courseName,
+  country,
+  subCountry,
+  thumbnailUrl,
+  isPlayed,
+  isShortlisted,
   onClick,
 }) => {
+  const locationLabel = subCountry ? `${country}, ${subCountry}` : country;
+
   return (
     <button
       onClick={onClick}
       className="mx-4 mb-3 rounded-3xl bg-white shadow-sm flex overflow-hidden border border-slate-100 hover:border-slate-200 hover:shadow-md transition-all w-[calc(100%-2rem)] text-left"
     >
-      {/* Rank column */}
-      <div className="w-12 flex items-center justify-center flex-shrink-0">
-        <span className="text-[17px] font-semibold text-[#F3B13E]">
-          #{course.rank}
-        </span>
+      {/* Thumbnail with rank badge */}
+      <div className="relative w-24 h-20 flex-shrink-0">
+        <img
+          src={thumbnailUrl || '/placeholder.svg'}
+          alt={courseName}
+          className="w-full h-full object-cover"
+        />
+        {/* Rank badge overlay */}
+        <div className="absolute top-2 left-2 px-2 py-0.5 rounded-lg bg-[#F3B13E] text-white text-[12px] font-bold shadow-sm">
+          #{rank}
+        </div>
       </div>
 
-      {/* Thumbnail + meta */}
-      <div className="flex-1 flex gap-3 py-3 pr-4">
-        <div className="w-24 h-16 rounded-2xl overflow-hidden relative flex-shrink-0">
-          <img
-            src={course.imageUrl || '/placeholder.svg'}
-            alt={course.name}
-            className="w-full h-full object-cover"
-          />
-          {/* Ranking bubbles */}
-          {course.rankingBadges && course.rankingBadges.length > 0 && (
-            <div className="absolute top-1 left-1 flex gap-1 flex-wrap">
-              {course.rankingBadges.slice(0, 2).map((badge) => (
-                <div
-                  key={badge.id}
-                  className="px-2 py-[2px] rounded-full bg-black/55 text-[10px] text-white"
-                >
-                  {badge.label}
-                </div>
-              ))}
-            </div>
-          )}
+      {/* Content */}
+      <div className="flex-1 flex flex-col justify-center py-3 px-3 min-w-0">
+        {/* Course name */}
+        <div className="text-[14px] font-semibold leading-snug line-clamp-2 text-slate-900">
+          {courseName}
         </div>
-
-        <div className="flex-1 min-w-0">
-          <div className="text-[14px] font-semibold leading-snug line-clamp-2 text-slate-900">
-            {course.name}
-          </div>
-          <div className="mt-0.5 text-[12px] text-slate-500 flex items-center gap-1.5">
-            <CountryFlag country={course.country} size="sm" />
-            <span className="truncate">
-              {course.country}
-              {course.subCountry && `, ${course.subCountry}`}
-            </span>
-          </div>
-
-          <div className="mt-1 flex items-center justify-between">
-            {/* Region short */}
-            {course.regionShort && (
-              <div className="flex items-center gap-1 text-[12px] text-slate-500">
-                {course.flagEmoji && <span className="text-base">{course.flagEmoji}</span>}
-                <span>{course.regionShort}</span>
-              </div>
-            )}
-
-            {/* Played pill */}
-            {course.played ? (
-              <span className="px-2 py-[3px] rounded-full bg-[#FFEFD5] text-[11px] font-semibold text-[#F3B13E]">
-                Played
-              </span>
-            ) : (
-              <span className="px-2 py-[3px] rounded-full bg-slate-100 text-[11px] text-slate-500">
-                Not played yet
-              </span>
-            )}
-          </div>
+        
+        {/* Location */}
+        <div className="mt-1 text-[12px] text-slate-500 flex items-center gap-1.5">
+          <CountryFlag country={country} size="sm" />
+          <span className="truncate">{locationLabel}</span>
         </div>
+      </div>
+
+      {/* Status pill */}
+      <div className="flex items-center pr-4">
+        {isPlayed ? (
+          <span className="px-2.5 py-1 rounded-full bg-[#FFEFD5] text-[11px] font-semibold text-[#F3B13E]">
+            Played
+          </span>
+        ) : isShortlisted ? (
+          <span className="px-2.5 py-1 rounded-full bg-blue-50 text-[11px] font-semibold text-blue-600 border border-blue-200">
+            Shortlisted
+          </span>
+        ) : (
+          <span className="px-2.5 py-1 rounded-full bg-slate-50 text-[11px] text-slate-500 border border-slate-200">
+            Not played
+          </span>
+        )}
       </div>
     </button>
   );
