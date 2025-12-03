@@ -2,6 +2,7 @@ import React from 'react';
 import type { Top100Ring } from '@/lib/top100Club';
 import { getRingColorForTier } from '@/lib/top100Club';
 import { Squircle } from '@/components/ui/squircle';
+import { Top100AchievementBadge } from '@/components/top100/Top100AchievementBadge';
 
 export interface Top100HeroSectionProps {
   avatarUrl?: string | null;
@@ -69,23 +70,21 @@ export function Top100HeroSection({
             </Squircle>
           </div>
         </Squircle>
-
-        {/* Tier badge - stronger tinted glass effect */}
-        {clubTierName && (
-          <div 
-            className="absolute -bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center justify-center px-4 py-1.5 rounded-full text-xs font-medium text-white whitespace-nowrap backdrop-blur-md border border-white/20 shadow-md"
-            style={{
-              background: `linear-gradient(135deg, ${tierColor}CC, ${tierColor}E6)`,
-              boxShadow: `0 8px 24px ${tierColor}66`,
-            }}
-          >
-            {clubTierName}
-          </div>
-        )}
       </div>
 
-      {/* Stats - tighter spacing (mt-6 = 14px visual gap from ring bottom + badge) */}
-      <div className="text-center mt-6 flex flex-col gap-1.5">
+      {/* Achievement badge pill - below avatar */}
+      {clubRing && clubRing !== 'none' && (
+        <div className="mt-3">
+          <Top100AchievementBadge
+            tier={clubRing}
+            showSubtitle={false}
+            size="compact"
+          />
+        </div>
+      )}
+
+      {/* Stats */}
+      <div className="text-center flex flex-col gap-1.5">
         <p className="text-lg font-semibold text-foreground">
           {isOwnProfile ? "You've" : `${displayName} has`} played {totalPlayed} Top 100 course
           {totalPlayed === 1 ? '' : 's'}
