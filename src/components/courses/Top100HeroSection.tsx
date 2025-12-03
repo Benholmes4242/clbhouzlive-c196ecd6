@@ -83,10 +83,13 @@ export function Top100HeroSection({
           </div>
         </Squircle>
 
-        {/* Tier badge - positioned at bottom of ring */}
+        {/* Tier badge - positioned at bottom of ring, uses tier color */}
         {clubTierName && (
-          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-slate-800/70 backdrop-blur-md rounded-full border border-white/20 shadow-md">
-            <span className="text-white text-sm font-medium">{clubTierName}</span>
+          <div 
+            className="absolute -bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center justify-center px-4 py-1.5 rounded-full shadow-md whitespace-nowrap"
+            style={{ backgroundColor: tierColor }}
+          >
+            <span className="text-white text-xs font-medium">{clubTierName}</span>
           </div>
         )}
       </div>
