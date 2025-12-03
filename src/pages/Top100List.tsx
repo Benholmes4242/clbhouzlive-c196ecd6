@@ -41,6 +41,21 @@ const Top100List = () => {
   const { data: progressData } = useTop100ProgressForUser(user?.id);
   const { data: userActivity } = useUserCourseActivity(user?.id);
 
+  // Fetch user's profile photo
+  const { data: userProfile } = useQuery({
+    queryKey: ['user-profile-photo', user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('profile_photo_url, display_name')
+        .eq('id', user!.id)
+        .single();
+      return data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>('rank');
   const [filterMode, setFilterMode] = useState<FilterMode>('all');
@@ -227,8 +242,8 @@ const Top100List = () => {
         {session && (
           <Top100ListUserStrip
             userProgress={userProgress}
-            userAvatarUrl={user?.user_metadata?.avatar_url}
-            userName={user?.user_metadata?.display_name || user?.email}
+            userAvatarUrl={userProfile?.profile_photo_url}
+            userName={userProfile?.display_name || user?.email}
           />
         )}
 
