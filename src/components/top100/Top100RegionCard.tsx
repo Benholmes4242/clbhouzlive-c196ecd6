@@ -7,11 +7,13 @@ import { Top100RankBadge } from './Top100RankBadge';
 type Top100RegionCardProps = {
   list: Top100ListSummary;
   onClick?: () => void;
+  showCta?: boolean;
 };
 
 export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
   list,
   onClick,
+  showCta = true,
 }) => {
   const total = list.total_courses ?? 0;
   const rated = list.played_count ?? 0;
@@ -93,19 +95,21 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
         </div>
 
         {/* View courses button */}
-        <div className="mt-3 flex justify-end">
-          <Button
-            variant="secondary"
-            size="sm"
-            className="rounded-2xl px-4 py-1.5 text-xs font-medium bg-white/95 text-slate-900 hover:bg-white border-none"
-            onClick={(e) => {
-              e.stopPropagation();
-              onClick?.();
-            }}
-          >
-            View courses
-          </Button>
-        </div>
+        {showCta && (
+          <div className="mt-3 flex justify-end">
+            <Button
+              variant="secondary"
+              size="sm"
+              className="rounded-2xl px-4 py-1.5 text-xs font-medium bg-white/95 text-slate-900 hover:bg-white border-none"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClick?.();
+              }}
+            >
+              View courses
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
