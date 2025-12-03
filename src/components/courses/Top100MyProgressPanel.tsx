@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { Top100HeroSection } from './Top100HeroSection';
-import { Top100MilestonesCarousel } from './Top100MilestonesCarousel';
+import { Top100ProgressHero } from '@/components/top100/Top100ProgressHero';
+import { Top100MilestoneTimeline } from '@/components/top100/Top100MilestoneTimeline';
+import { Top100NearAchievements } from '@/components/top100/Top100NearAchievements';
 import { Top100RegionProgressGrid } from './Top100RegionProgressGrid';
 import { Top100RecentRoundsFeed } from './Top100RecentRoundsFeed';
-import ProfileBadgeStrip from '@/components/profile/ProfileBadgeStrip';
 import { useTop100FriendsSnapshot } from '@/hooks/useTop100FriendsSnapshot';
 import Top100FriendsActivityCard from '@/components/top100/Top100FriendsActivityCard';
 
@@ -137,17 +137,16 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   return (
     <div className="w-full max-w-full space-y-5 pb-6">
 
-      {/* Hero Section with Big Ring */}
+      {/* Progress Hero Strip */}
       <div className="mt-4">
-        <Top100HeroSection
-          avatarUrl={avatarUrl}
+        <Top100ProgressHero
           displayName={displayName}
-          totalPlayed={data.totalTop100Played}
+          avatarUrl={avatarUrl}
+          tierId={data.club_ring || 'none'}
+          tierLabel={data.club_tier_name || null}
+          totalTop100Played={data.totalTop100Played}
           regionsCount={data.regions_count}
-          clubRing={data.club_ring || 'none'}
-          clubLabel={data.club_label || null}
-          clubTierName={data.club_tier_name || null}
-          lastPlayedDate={lastPlayedDate}
+          lastRoundAt={lastPlayedDate}
           isOwnProfile={isOwnProfile}
         />
       </div>
@@ -188,13 +187,11 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
         />
       )}
 
-      {/* Milestones Carousel */}
-      <Top100MilestonesCarousel
-        totalPlayed={data.totalTop100Played}
-        onMilestoneClick={() => {
-          // Already on My Progress, could open a modal in future
-        }}
-      />
+      {/* Milestone Timeline */}
+      <Top100MilestoneTimeline totalTop100Played={data.totalTop100Played} />
+
+      {/* Badges You're Close To */}
+      <Top100NearAchievements totalTop100Played={data.totalTop100Played} />
 
       {/* Region Progress Grid */}
       <Top100RegionProgressGrid
