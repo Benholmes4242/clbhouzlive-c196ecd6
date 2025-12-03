@@ -417,6 +417,7 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
           return (
             <button
               key={entry.user_id}
+              data-user-id={entry.user_id}
               type="button"
               onClick={() => navigate(`/profile/${entry.user_id}?tab=top100`)}
               className="w-full rounded-2xl border border-border/60 bg-card/95 px-3.5 py-2.5 flex items-center justify-between gap-3 hover:bg-muted/50 hover:shadow-sm transition-colors"
@@ -461,8 +462,11 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
                   <span className="text-xs text-muted-foreground truncate">
                     {entry.home_club || 'No club set'}
                   </span>
-                  <span className="text-[11px] text-muted-foreground mt-0.5">
-                    {entry.total_top100_played} Top 100s · {club.tierName || 'No club'}
+                  <span className="text-[11px] mt-0.5">
+                    <span className="text-base font-semibold text-foreground">{entry.total_top100_played}</span>
+                    <span className="text-muted-foreground/70 ml-1">Top 100s</span>
+                    <span className="text-muted-foreground/50 mx-1">·</span>
+                    <span className="text-muted-foreground/70">{club.tierName || 'No club'}</span>
                   </span>
                 </div>
               </div>
@@ -476,13 +480,13 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
                 )}>
                   #{entry.rank}
                 </span>
-                {/* Movement pill */}
+                {/* Movement pill with fade-in animation */}
                 <span
                   className={cn(
-                    'text-[10px] font-medium px-1.5 py-0.5 rounded-full border',
+                    'text-[10px] font-medium px-1.5 py-0.5 rounded-full border animate-in fade-in duration-150',
                     movement.direction === 'up' && 'border-emerald-500 text-emerald-600',
                     movement.direction === 'down' && 'border-red-500 text-red-600',
-                    movement.direction === 'none' && 'border-border text-muted-foreground'
+                    movement.direction === 'none' && 'border-slate-200 bg-slate-50 text-slate-400'
                   )}
                 >
                   {movement.label}
@@ -493,22 +497,51 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
         })}
       </div>
 
-      {/* Empty State */}
+      {/* Empty State - different for friends vs all */}
       {displayedEntries.length === 0 && !isLoading && (
-        <div className="text-center py-12">
-          <p className="text-sm text-muted-foreground">
-            No players found with the selected filters.
-          </p>
-        </div>
+        viewScope === 'friends' ? (
+          <div className="rounded-2xl border border-border/60 bg-card/95 px-6 py-8 text-center">
+            <p className="text-sm font-semibold text-foreground mb-1">
+              No friends chasing the Top 100 yet
+            </p>
+            <p className="text-xs text-muted-foreground mb-4">
+              Invite your golf buddies to join Clbhouz and track their Top 100 journey.
+            </p>
+            <button
+              type="button"
+              className="inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-600 px-4 py-2 text-xs font-medium border border-slate-200 shadow-sm hover:bg-slate-200 transition-colors"
+            >
+              Invite friends to join Clbhouz
+            </button>
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-sm text-muted-foreground">
+              No players found with the selected filters.
+            </p>
+          </div>
+        )
       )}
 
-      {/* Jump to my position */}
+      {/* Jump to my position - grey styling with highlight on scroll */}
       {myPage !== null && myPage !== page && (
         <div className="flex justify-center">
           <button
             type="button"
-            onClick={() => setPage(myPage)}
-            className="inline-flex items-center gap-1 rounded-full bg-amber-50 text-amber-800 px-3 py-1.5 text-xs font-medium border border-amber-200 hover:bg-amber-100 transition-colors"
+            onClick={() => {
+              setPage(myPage);
+              // Add highlight effect after page change
+              setTimeout(() => {
+                const myRow = document.querySelector(`[data-user-id="${me?.user_id}"]`);
+                if (myRow) {
+                  myRow.classList.add('ring-2', 'ring-slate-300', 'bg-slate-50/50');
+                  setTimeout(() => {
+                    myRow.classList.remove('ring-2', 'ring-slate-300', 'bg-slate-50/50');
+                  }, 400);
+                }
+              }, 200);
+            }}
+            className="inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-600 px-3 py-1.5 text-xs font-medium border border-slate-200 shadow-sm hover:bg-slate-200 transition-colors"
           >
             Jump to my position (#{me?.rank})
           </button>
