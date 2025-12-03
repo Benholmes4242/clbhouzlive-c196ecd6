@@ -5,41 +5,50 @@ import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserCourseActivity } from '@/hooks/useUserCourseActivity';
+import { useFriendsTop100Progress } from '@/hooks/useFriendsTop100Progress';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { ArrowLeft, CheckCircle2, Circle } from 'lucide-react';
 import Top100BackButton from '@/components/top100/Top100BackButton';
-import CountryFlag from '@/components/ui/country-flag';
 import GolfClubView from '@/components/golf-club/GolfClubView';
-import Top100Pills from '@/components/courses/Top100Pills';
-import { useCourseTop100Memberships } from '@/hooks/useCourseTop100Memberships';
-import { FriendsTop100Panel } from '@/components/top100/FriendsTop100Panel';
-import { Top100AchievementsBlock } from '@/components/top100/Top100AchievementsBlock';
+import { getTop100Club, getNextTop100Club } from '@/lib/top100Club';
+import {
+  Top100ListHero,
+  Top100ListUserStrip,
+  Top100ListFriendsCarousel,
+  Top100ListAchievements,
+  Top100ListFilters,
+  Top100ListCourseCard,
+  Top100ListFooter,
+  type SortMode,
+  type FilterMode,
+  type ViewMode,
+} from '@/components/top100/list';
 
-type SortMode = 'rank' | 'alphabetical' | 'country';
-type FilterMode = 'all' | 'played' | 'unplayed';
+const REGION_EMOJIS: Record<string, string> = {
+  global: '🌍',
+  'gb-i': '🇬🇧',
+  usa: '🇺🇸',
+  europe: '🇪🇺',
+};
 
 const Top100List = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const { session } = useSupabaseSession();
+  const { session, user } = useSupabaseSession();
+
   const { data: lists } = useTop100Lists();
-  const { data: progressData } = useTop100ProgressForUser(session?.user?.id);
-  const { data: userActivity } = useUserCourseActivity(session?.user?.id);
+  const { data: progressData } = useTop100ProgressForUser(user?.id);
+  const { data: userActivity } = useUserCourseActivity(user?.id);
 
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>('rank');
   const [filterMode, setFilterMode] = useState<FilterMode>('all');
-  const [showFriends, setShowFriends] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('all');
 
   // Find the current list
   const currentList = lists?.find((l) => l.slug === slug);
 
-  // Fetch courses for this list
+  // Fetch courses for this list (including #1 hero course)
   const { data: courses, isLoading } = useQuery({
     queryKey: ['top100-list-courses', currentList?.id],
     enabled: !!currentList?.id,
@@ -74,10 +83,80 @@ const Top100List = () => {
     staleTime: 5 * 60 * 1000,
   });
 
+  // Fetch friends progress on this list
+  const { data: friendsProgress = [] } = useFriendsTop100Progress(user?.id, currentList?.id);
+
   // Get user's played courses
   const playedCourseIds = useMemo(() => {
     return new Set((userActivity || []).map((a) => a.course_id));
   }, [userActivity]);
+
+  // Get list progress
+  const listProgress = progressData?.lists?.find((p) => p.listId === currentList?.id);
+  const playedCount = listProgress?.played || 0;
+  const totalCount = listProgress?.total || courses?.length || 100;
+
+  // Build listMeta for hero
+  const heroCourse = courses?.[0];
+  const firstUnplayedCourse = courses?.find((c) => !playedCourseIds.has(c.id));
+
+  const listMeta = useMemo(() => ({
+    name: currentList?.name || 'Top 100',
+    regionEmoji: REGION_EMOJIS[slug || ''] || '🌍',
+    playedCount,
+    totalCount,
+    completionPercent: totalCount > 0 ? playedCount / totalCount : 0,
+    heroCourse: heroCourse ? {
+      id: heroCourse.id,
+      name: heroCourse.name,
+      imageUrl: heroCourse.thumbnail_image,
+    } : null,
+    nextMustPlay: firstUnplayedCourse ? { name: firstUnplayedCourse.name } : null,
+  }), [currentList, slug, playedCount, totalCount, heroCourse, firstUnplayedCourse]);
+
+  // Build userProgress for strip
+  const totalTop100 = progressData?.totalTop100Played || 0;
+  const currentClub = getTop100Club(totalTop100);
+  const nextClub = getNextTop100Club(totalTop100);
+
+  const userProgress = useMemo(() => ({
+    rankAmongFriends: 1, // TODO: calculate actual rank
+    totalTop100Courses: totalTop100,
+    currentTierId: currentClub.tierId,
+    currentTierName: currentClub.tierName,
+    nextTierName: nextClub?.tierName || null,
+    nextTierRemaining: nextClub ? Math.max(0, nextClub.threshold - totalTop100) : null,
+  }), [totalTop100, currentClub, nextClub]);
+
+  // Build friends list for carousel
+  const friendsSummary = useMemo(() => {
+    return friendsProgress.map((f) => ({
+      id: f.user_id,
+      name: f.profile.display_name || f.profile.username || 'Unknown',
+      username: f.profile.username || '',
+      avatarUrl: f.profile.profile_photo_url,
+      playedOnList: f.courses_played_in_list,
+    }));
+  }, [friendsProgress]);
+
+  // Build achievements for this list
+  const listAchievements = useMemo(() => {
+    const achievements = [];
+    const thresholds = [10, 20, 50];
+    
+    for (const target of thresholds) {
+      achievements.push({
+        id: `${slug}-${target}`,
+        title: `${target} Club`,
+        subtitle: `Play ${target} courses on this list`,
+        emoji: target === 50 ? '🏆' : target === 20 ? '🥈' : '🥉',
+        current: Math.min(playedCount, target),
+        target,
+      });
+    }
+    
+    return achievements;
+  }, [slug, playedCount]);
 
   // Filter and sort courses
   const filteredAndSortedCourses = useMemo(() => {
@@ -88,22 +167,23 @@ const Top100List = () => {
     // Apply filter
     if (filterMode === 'played') {
       filtered = filtered.filter((c) => playedCourseIds.has(c.id));
-    } else if (filterMode === 'unplayed') {
+    } else if (filterMode === 'not-played') {
       filtered = filtered.filter((c) => !playedCourseIds.has(c.id));
     }
 
-    // Apply friends filter (placeholder for now)
-    if (showFriends) {
-      // TODO: filter by friends who have played these courses
-      // For now, just return all courses
+    // Apply view filter
+    if (viewMode === 'friends') {
+      // TODO: implement friends filter with course IDs
+      // For now, show all courses that any friend has played (placeholder)
     }
+    // TODO: shortlist filter
 
     // Apply sort
     filtered.sort((a, b) => {
       switch (sortMode) {
         case 'rank':
           return a.rank - b.rank;
-        case 'alphabetical':
+        case 'name':
           return a.name.localeCompare(b.name);
         case 'country':
           return a.country.localeCompare(b.country);
@@ -113,37 +193,19 @@ const Top100List = () => {
     });
 
     return filtered;
-  }, [courses, sortMode, filterMode, playedCourseIds, showFriends]);
-
-  const getRegionBackground = (slug: string) => {
-    switch (slug) {
-      case 'global-top-100':
-        return '/lovable-uploads/bd96819b-505e-4a35-b242-d106babe5179.png';
-      case 'gb-i-top-100':
-        return 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=400&fit=crop';
-      case 'usa-top-100':
-        return 'https://images.unsplash.com/photo-1629048821995-e30a7ba7f063?w=1200&h=400&fit=crop';
-      case 'europe-top-100':
-        return 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=1200&h=400&fit=crop';
-      default:
-        return '';
-    }
-  };
-
-  const listProgress = progressData?.lists?.find((p) => p.listId === currentList?.id);
-  const playedCount = listProgress?.played || 0;
-  const totalCount = listProgress?.total || 100;
+  }, [courses, sortMode, filterMode, viewMode, playedCourseIds, friendsProgress]);
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
         <ClubhouseHeaderNew />
-        <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
-          <div className="animate-pulse space-y-4">
-            <div className="h-64 bg-muted rounded-xl" />
-            <div className="h-12 bg-muted rounded-lg w-1/3" />
-            {[...Array(10)].map((_, i) => (
-              <div key={i} className="h-24 bg-muted rounded-lg" />
+        <main className="pb-20">
+          <div className="animate-pulse space-y-4 px-4 pt-4">
+            <div className="h-[220px] bg-muted rounded-3xl" />
+            <div className="h-20 bg-muted rounded-2xl" />
+            <div className="h-32 bg-muted rounded-2xl" />
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-24 bg-muted rounded-3xl" />
             ))}
           </div>
         </main>
@@ -155,122 +217,88 @@ const Top100List = () => {
     <div className="min-h-screen bg-background">
       <ClubhouseHeaderNew />
 
-      <main className="px-4 md:container md:mx-auto md:px-0 pb-20">
-        <div className="max-w-6xl mx-auto">
-          {/* Back Button */}
-          <div className="pt-4 pb-5">
-            <Top100BackButton to="/top100" label="Back to Hub" />
-          </div>
-          
-          <div className="space-y-6">
-            {/* Hero Header */}
-            <div
-            className="relative h-64 rounded-2xl overflow-hidden"
-            style={{
-              backgroundImage: `url(${getRegionBackground(slug || '')})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
-            
-            <div className="relative h-full flex flex-col justify-end p-6">
-
-              <div className="space-y-3">
-                <h1 className="font-display text-4xl font-bold text-foreground">
-                  {currentList?.name}
-                </h1>
-                {currentList?.description && (
-                  <p className="text-foreground/90 text-lg">{currentList.description}</p>
-                )}
-                {session && (
-                  <>
-                    <p className="text-foreground/90 text-sm font-medium">
-                      You've played {playedCount} of {totalCount} courses in this list.
-                    </p>
-                    <div className="h-2 w-full max-w-md rounded-full bg-white/20 backdrop-blur-sm overflow-hidden">
-                      <div
-                        className="h-full bg-primary-accent transition-all duration-300"
-                        style={{ width: `${(playedCount / totalCount) * 100}%` }}
-                      />
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Friends on this list */}
-          {currentList && session && (
-            <FriendsTop100Panel listId={currentList.id} listName={currentList.name} />
-          )}
-
-          {/* Achievements tied to this list */}
-          {currentList && session && (
-            <Top100AchievementsBlock listId={currentList.id} />
-          )}
-
-          {/* Controls */}
-          <div className="space-y-4">
-            {/* Sort & Filter */}
-            <div className="flex flex-wrap gap-3">
-              <Select value={sortMode} onValueChange={(v) => setSortMode(v as SortMode)}>
-                <SelectTrigger className="w-[180px] bg-card border-border/50">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="rank">Rank</SelectItem>
-                  <SelectItem value="alphabetical">A → Z</SelectItem>
-                  <SelectItem value="country">Country</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={filterMode} onValueChange={(v) => setFilterMode(v as FilterMode)}>
-                <SelectTrigger className="w-[180px] bg-card border-border/50">
-                  <SelectValue placeholder="Filter" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Courses</SelectItem>
-                  <SelectItem value="played">Played</SelectItem>
-                  <SelectItem value="unplayed">Unplayed</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Show Friends Only Toggle */}
-            <div className="flex items-center gap-3 p-4 rounded-lg bg-card border border-border/50">
-              <Switch
-                id="show-friends"
-                checked={showFriends}
-                onCheckedChange={setShowFriends}
-              />
-              <Label htmlFor="show-friends" className="text-sm font-medium cursor-pointer">
-                Show Friends Only
-              </Label>
-            </div>
-          </div>
-
-          {/* Course List */}
-          <div className="space-y-3">
-            {filteredAndSortedCourses.map((course) => (
-              <CourseListItem
-                key={course.id}
-                course={course}
-                isPlayed={playedCourseIds.has(course.id)}
-                onClick={() => setSelectedCourseId(course.id)}
-              />
-            ))}
-
-            {filteredAndSortedCourses.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground text-lg">
-                  No courses match your current filter
-                </p>
-              </div>
-            )}
-          </div>
+      <main className="pb-20">
+        {/* Back Button */}
+        <div className="pt-4 pb-2 px-4">
+          <Top100BackButton to="/top100" label="Back to Hub" />
         </div>
-        </div>
+
+        {/* 1. Hero Section */}
+        <Top100ListHero
+          listMeta={listMeta}
+          onContinueJourney={() => {
+            if (firstUnplayedCourse) {
+              setSelectedCourseId(firstUnplayedCourse.id);
+            }
+          }}
+        />
+
+        {/* 2. User Rank Strip */}
+        {session && (
+          <Top100ListUserStrip
+            userProgress={userProgress}
+            userAvatarUrl={user?.user_metadata?.avatar_url}
+            userName={user?.user_metadata?.display_name || user?.email}
+          />
+        )}
+
+        {/* 3. Friends Carousel */}
+        {session && (
+          <Top100ListFriendsCarousel
+            friends={friendsSummary}
+            totalInList={totalCount}
+          />
+        )}
+
+        {/* 4. Achievements */}
+        {session && (
+          <Top100ListAchievements achievements={listAchievements} />
+        )}
+
+        {/* 5. Sort & Filter Bar */}
+        <Top100ListFilters
+          sortBy={sortMode}
+          onSortChange={setSortMode}
+          courseFilter={filterMode}
+          onFilterChange={setFilterMode}
+          view={viewMode}
+          onViewChange={setViewMode}
+        />
+
+        {/* 6. Course List */}
+        <section className="mt-4 pb-6">
+          {filteredAndSortedCourses.map((course) => (
+            <Top100ListCourseCard
+              key={course.id}
+              course={{
+                id: course.id,
+                name: course.name,
+                rank: course.rank,
+                imageUrl: course.thumbnail_image,
+                country: course.country,
+                subCountry: course.sub_country,
+                played: playedCourseIds.has(course.id),
+              }}
+              onClick={() => setSelectedCourseId(course.id)}
+            />
+          ))}
+
+          {filteredAndSortedCourses.length === 0 && (
+            <div className="text-center py-12 mx-4">
+              <p className="text-muted-foreground text-lg">
+                No courses match your current filter
+              </p>
+            </div>
+          )}
+        </section>
+
+        {/* 7. Footer Engagement */}
+        <Top100ListFooter
+          onOpenPlanner={() => {
+            // TODO: implement course planner
+            console.log('Open course planner');
+          }}
+        />
       </main>
 
       {/* Course Detail Modal */}
@@ -283,70 +311,5 @@ const Top100List = () => {
     </div>
   );
 };
-
-// Course List Item Component
-interface CourseListItemProps {
-  course: any;
-  isPlayed: boolean;
-  onClick: () => void;
-}
-
-const CourseListItem: React.FC<CourseListItemProps> = React.memo(({ course, isPlayed, onClick }) => {
-  const { data: memberships } = useCourseTop100Memberships(course.id);
-
-  return (
-    <div
-      onClick={onClick}
-      className="group flex items-center gap-4 p-4 rounded-xl bg-card border border-border/50 hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer"
-    >
-      {/* Rank */}
-      <div className="flex-shrink-0 w-12 text-center">
-        <span className="text-2xl font-bold text-primary">#{course.rank}</span>
-      </div>
-
-      {/* Thumbnail */}
-      <div className="relative flex-shrink-0 w-24 h-16 rounded-lg overflow-hidden">
-        <img
-          src={course.thumbnail_image || '/placeholder.svg'}
-          alt={course.name}
-          className="w-full h-full object-cover"
-        />
-        {memberships && memberships.length > 0 && (
-          <div className="absolute top-1 left-1">
-            <Top100Pills memberships={memberships} variant="overlay" size="sm" />
-          </div>
-        )}
-      </div>
-
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <h3 className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">
-          {course.name}
-        </h3>
-        <div className="flex items-center gap-2 mt-1">
-          <CountryFlag country={course.country} size="sm" />
-          <span className="text-sm text-muted-foreground truncate">
-            {course.country}
-            {course.sub_country && `, ${course.sub_country}`}
-          </span>
-        </div>
-      </div>
-
-      {/* Status Indicators */}
-      <div className="flex items-center gap-3 flex-shrink-0">
-        {isPlayed ? (
-          <div className="flex items-center gap-1 text-primary">
-            <CheckCircle2 className="w-5 h-5" />
-            <span className="text-sm font-medium">Played</span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-1 text-muted-foreground">
-            <Circle className="w-5 h-5" />
-          </div>
-        )}
-      </div>
-    </div>
-  );
-});
 
 export default Top100List;
