@@ -391,13 +391,13 @@ const Top100CoursesHubPanel = () => {
                   )}
 
                   {/* Text */}
-                  <div className="mt-2 space-y-0.5">
-                    <div className="text-sm font-semibold max-w-[8.5rem] mx-auto">
+                  <div className="mt-2 space-y-0.5 w-full">
+                    <div className="text-sm font-semibold truncate max-w-full px-1">
                       {displayName}
                     </div>
 
                     {homeClub && (
-                      <div className="text-xs text-muted-foreground max-w-[8.5rem] mx-auto truncate">
+                      <div className="text-xs text-muted-foreground truncate max-w-full px-1">
                         {homeClub}
                       </div>
                     )}
