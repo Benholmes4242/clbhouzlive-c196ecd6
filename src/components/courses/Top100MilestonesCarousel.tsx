@@ -88,9 +88,7 @@ export function Top100MilestonesCarousel({
                         boxShadow: isUnlocked
                           ? `0 0 18px ${tierColor}22`
                           : '0 0 10px rgba(15,23,42,0.06)',
-                        border: isUnlocked
-                          ? `3px solid ${tierColor}`
-                          : `2px solid ${tierColor}66`,
+                        border: `2px solid ${isUnlocked ? tierColor : `${tierColor}66`}`,
                         opacity: isUnlocked ? 1 : 0.45,
                       }}
                     >
@@ -115,7 +113,7 @@ export function Top100MilestonesCarousel({
           </div>
 
           {/* Progress bar - inside the scroller, moves with circles */}
-          <div className="h-1.5 rounded-full bg-muted/80 relative">
+          <div className="h-1 rounded-full bg-muted/80 relative">
             <div
               className="h-full rounded-full bg-gradient-to-r from-[#D9C7A3] via-[#2E5930] to-[#0C0F14]"
               style={{ width: `${progressPct}%` }}
