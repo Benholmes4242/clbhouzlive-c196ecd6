@@ -1,10 +1,15 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTop100CourseLeaderboard, CourseLeaderboardEntry } from '@/hooks/useTop100CourseLeaderboard';
+import { useTop100FriendRecentActivity } from '@/hooks/useTop100FriendRecentActivity';
+import { useTop100CourseMovers } from '@/hooks/useTop100CourseMovers';
 import { LeaderboardScope, LeaderboardTimeRange } from '@/hooks/useTop100Leaderboard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { Top100LeaderboardFilters } from './Top100LeaderboardFilterBar';
+import { Top100FriendCoursesStrip } from './Top100FriendCoursesStrip';
+import { Top100CourseMoversStrip } from './Top100CourseMoversStrip';
+import { getCourseTrophies } from './getCourseTrophies';
 import CourseRankBadges from '@/components/courses/CourseRankBadges';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 
@@ -86,6 +91,12 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
     pageSize: 100,
   });
 
+  // Phase 2A: Friend recent activity
+  const { data: friendActivity } = useTop100FriendRecentActivity(scope, timeRange);
+
+  // Phase 2B: Course movers
+  const { data: movers } = useTop100CourseMovers(scope, timeRange);
+
   const allCourseEntries = data?.pages.flatMap(page => page.entries) || [];
 
   // Sort based on filter
@@ -98,11 +109,9 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
       case 'most_played':
         return courses.sort((a, b) => b.times_played - a.times_played);
       case 'recently_popular':
-        // TODO: Implement recently popular sorting
         return courses.sort((a, b) => b.times_played - a.times_played);
       case 'official_rank':
       default:
-        // Keep original order (by official rank)
         return courses;
     }
   }, [allCourseEntries, filters.sortBy]);
@@ -139,6 +148,12 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
 
   return (
     <div id="top100-courses-list" className="space-y-4">
+      {/* Phase 2A: Friend activity strip */}
+      <Top100FriendCoursesStrip items={friendActivity ?? []} />
+
+      {/* Phase 2B: Course movers strip */}
+      <Top100CourseMoversStrip items={movers ?? []} timeRange={filters.timeRange} />
+
       {/* Header with scope toggle */}
       <div className="flex items-center justify-between gap-3 mb-3">
         <h2 className="text-sm font-semibold text-foreground px-1">
@@ -180,10 +195,11 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
       {/* Course Cards - Full bleed on mobile */}
       <div className="-mx-4 sm:mx-0">
         <section className="space-y-3">
-          {paginatedCourses.map((course) => {
+          {paginatedCourses.map((course, index) => {
             const hasImage = !!course.thumbnail_url;
             const rating = course.avg_rating ?? null;
             const tags = getCourseTags(course, filters);
+            const trophies = getCourseTrophies(course, index);
 
             return (
               <button
@@ -207,7 +223,7 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
                     {/* Gradient overlay */}
                     <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
                     
-                    {/* Rank badges top-left - using actual rank data from golf_courses */}
+                    {/* Rank badges top-left */}
                     <CourseRankBadges
                       globalRank={course.global_rank}
                       regionalRank={course.regional_rank}
@@ -215,6 +231,15 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
                       country={course.country || ''}
                       positioning="top-left"
                     />
+
+                    {/* Phase 2C: Trophy badge top-right */}
+                    {trophies.length > 0 && (
+                      <div className="absolute top-2 right-2">
+                        <span className="inline-flex items-center rounded-full bg-background/95 border border-border/70 px-2 py-0.5 text-[11px] font-medium">
+                          {trophies[0].label}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 )}
 

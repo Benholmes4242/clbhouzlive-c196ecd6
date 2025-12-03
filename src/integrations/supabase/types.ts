@@ -5660,6 +5660,23 @@ export type Database = {
           usa_rank: number
         }[]
       }
+      get_top100_course_movers: {
+        Args: {
+          limit_param?: number
+          scope_param?: string
+          time_range_param?: string
+        }
+        Returns: {
+          country: string
+          course_id: string
+          course_name: string
+          list_slug: string
+          plays_delta: number
+          rating_delta: number
+          sub_country: string
+          thumbnail_url: string
+        }[]
+      }
       get_top100_discover_recommendations: {
         Args: { limit_param?: number; target_user_id: string }
         Returns: {
@@ -5672,6 +5689,26 @@ export type Database = {
           list_short_label: string
           list_slug: string
           post_id: string
+          thumbnail_url: string
+        }[]
+      }
+      get_top100_friend_recent_activity: {
+        Args: {
+          limit_param?: number
+          scope_param?: string
+          time_range_param?: string
+        }
+        Returns: {
+          country: string
+          course_id: string
+          course_name: string
+          friend_avatar_url: string
+          friend_id: string
+          friend_name: string
+          list_slug: string
+          played_at: string
+          rating: number
+          sub_country: string
           thumbnail_url: string
         }[]
       }
