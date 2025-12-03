@@ -5,4 +5,3 @@ export { Top100ListAchievements } from './Top100ListAchievements';
 export { Top100ListAchievementsRow } from './Top100ListAchievementsRow';
 export { Top100ListFilters, type SortMode, type FilterMode } from './Top100ListFilters';
 export { Top100ListCourseCard } from './Top100ListCourseCard';
-export { Top100ListFooter } from './Top100ListFooter';
