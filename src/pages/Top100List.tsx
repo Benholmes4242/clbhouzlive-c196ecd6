@@ -12,7 +12,6 @@ import Top100BackButton from '@/components/top100/Top100BackButton';
 import GolfClubView from '@/components/golf-club/GolfClubView';
 import { getTop100Club, getNextTop100Club } from '@/lib/top100Club';
 import {
-  Top100ListHero,
   Top100ListUserStrip,
   Top100ListFriendsCarousel,
   Top100ListAchievements,
@@ -23,6 +22,8 @@ import {
   type FilterMode,
   type ViewMode,
 } from '@/components/top100/list';
+import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
+import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 
 const REGION_EMOJIS: Record<string, string> = {
   global: '🌍',
@@ -96,23 +97,30 @@ const Top100List = () => {
   const playedCount = listProgress?.played || 0;
   const totalCount = listProgress?.total || courses?.length || 100;
 
-  // Build listMeta for hero
+  // Build hero course for region card
   const heroCourse = courses?.[0];
   const firstUnplayedCourse = courses?.find((c) => !playedCourseIds.has(c.id));
 
-  const listMeta = useMemo(() => ({
-    name: currentList?.name || 'Top 100',
-    regionEmoji: REGION_EMOJIS[slug || ''] || '🌍',
-    playedCount,
-    totalCount,
-    completionPercent: totalCount > 0 ? playedCount / totalCount : 0,
-    heroCourse: heroCourse ? {
-      id: heroCourse.id,
-      name: heroCourse.name,
-      imageUrl: heroCourse.thumbnail_image,
-    } : null,
-    nextMustPlay: firstUnplayedCourse ? { name: firstUnplayedCourse.name } : null,
-  }), [currentList, slug, playedCount, totalCount, heroCourse, firstUnplayedCourse]);
+  // Build list summary for the region card (same format as Courses tab)
+  const listSummary: Top100ListSummary | null = useMemo(() => {
+    if (!currentList) return null;
+    return {
+      id: currentList.id,
+      slug: currentList.slug,
+      name: currentList.name,
+      short_label: currentList.short_label,
+      total_courses: totalCount,
+      played_count: playedCount,
+      hero_course: heroCourse ? {
+        id: heroCourse.id,
+        name: heroCourse.name,
+        country: heroCourse.country,
+        region: heroCourse.region,
+        cover_image_url: heroCourse.thumbnail_image,
+        rank_in_list: heroCourse.rank,
+      } : null,
+    };
+  }, [currentList, totalCount, playedCount, heroCourse]);
 
   // Build userProgress for strip
   const totalTop100 = progressData?.totalTop100Played || 0;
@@ -223,15 +231,15 @@ const Top100List = () => {
           <Top100BackButton to="/top100" label="Back to Hub" />
         </div>
 
-        {/* 1. Hero Section */}
-        <Top100ListHero
-          listMeta={listMeta}
-          onContinueJourney={() => {
-            if (firstUnplayedCourse) {
-              setSelectedCourseId(firstUnplayedCourse.id);
-            }
-          }}
-        />
+        {/* 1. Hero Section - Reusing region card from Courses tab */}
+        {listSummary && (
+          <section className="px-4">
+            <Top100RegionCard
+              list={listSummary}
+              showCta={false}
+            />
+          </section>
+        )}
 
         {/* 2. User Rank Strip */}
         {session && (
