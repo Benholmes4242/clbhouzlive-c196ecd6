@@ -61,13 +61,13 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
           'flex items-center gap-3',
           'px-4 py-3 md:px-5 md:py-3.5',
           'rounded-2xl',
-          // Background & border (Premium Golf plaque)
-          'bg-gradient-to-r from-emerald-500/14 via-emerald-500/6 to-emerald-500/14',
-          'border border-white/40 shadow-[0_18px_45px_rgba(0,0,0,0.30)]',
-          'backdrop-blur-lg',
+          // Background & border (Green glass plaque)
+          'bg-emerald-500/20',
+          'border border-emerald-400/40 shadow-[0_18px_45px_rgba(16,185,129,0.25)]',
+          'backdrop-blur-xl',
           // Interaction
           'transition-all duration-200 ease-out',
-          'hover:bg-emerald-500/18 hover:border-white/60 hover:shadow-[0_22px_55px_rgba(0,0,0,0.38)]',
+          'hover:bg-emerald-500/28 hover:border-emerald-400/60 hover:shadow-[0_22px_55px_rgba(16,185,129,0.35)]',
           'active:scale-[0.98]'
         )}
       >
