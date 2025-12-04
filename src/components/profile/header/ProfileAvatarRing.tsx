@@ -24,7 +24,7 @@ interface ProfileAvatarRingProps {
 const SIZES = {
   sm: { outer: 68, white: 64, avatar: 62 },
   md: { outer: 92, white: 88, avatar: 86 },
-  lg: { outer: 164, white: 158, avatar: 156 },
+  lg: { outer: 180, white: 174, avatar: 172 },
 };
 
 const RING_ANIMATED_KEY = 'clbhouz:ringAnimated:v1';
