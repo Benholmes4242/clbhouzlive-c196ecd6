@@ -363,15 +363,15 @@ const HeroProfileHeader = ({
           
           {/* Top vignette for header readability */}
           <div 
-            className="absolute top-0 left-0 right-0 h-20 pointer-events-none"
+            className="absolute top-0 left-0 right-0 h-16 pointer-events-none"
             style={{
-              background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 100%)',
+              background: 'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 100%)',
             }}
           />
           
           {/* Bottom fade into page */}
           <div
-            className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background via-background/80 to-transparent"
+            className="pointer-events-none absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background via-background/60 to-transparent"
           />
         </div>
 
