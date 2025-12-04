@@ -4005,6 +4005,7 @@ export type Database = {
           email_change_count: number | null
           email_change_requested_at: string | null
           email_change_token: string | null
+          has_completed_onboarding: boolean | null
           has_profile_video: boolean | null
           header_photo_url: string | null
           home_club: string | null
@@ -4065,6 +4066,7 @@ export type Database = {
           email_change_count?: number | null
           email_change_requested_at?: string | null
           email_change_token?: string | null
+          has_completed_onboarding?: boolean | null
           has_profile_video?: boolean | null
           header_photo_url?: string | null
           home_club?: string | null
@@ -4125,6 +4127,7 @@ export type Database = {
           email_change_count?: number | null
           email_change_requested_at?: string | null
           email_change_token?: string | null
+          has_completed_onboarding?: boolean | null
           has_profile_video?: boolean | null
           header_photo_url?: string | null
           home_club?: string | null

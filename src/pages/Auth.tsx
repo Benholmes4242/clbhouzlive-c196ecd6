@@ -30,23 +30,39 @@ const Auth: React.FC = () => {
   useHideBottomNav();
   useHideHeader();
 
-  // Helper to check if a profile exists for a user
-  async function checkProfileExists(userId: string): Promise<boolean> {
-    const { data } = await supabase.from('user_profiles').select('id').eq('id', userId).maybeSingle();
-    return !!data;
+  // Helper to check profile and onboarding status
+  async function checkProfileAndOnboarding(userId: string): Promise<{
+    hasProfile: boolean;
+    hasCompletedOnboarding: boolean;
+  }> {
+    const { data } = await supabase
+      .from('user_profiles')
+      .select('id, has_completed_onboarding')
+      .eq('id', userId)
+      .maybeSingle();
+    
+    return {
+      hasProfile: !!data,
+      hasCompletedOnboarding: data?.has_completed_onboarding ?? false,
+    };
   }
 
   useEffect(() => {
     // Only redirect if user is already authenticated when component mounts
     if (user) {
       const redirectUser = async () => {
-        const hasProfile = await checkProfileExists(user.id);
+        const { hasProfile, hasCompletedOnboarding } = await checkProfileAndOnboarding(user.id);
         const redirectPath = searchParams.get('redirect');
         
-        if (hasProfile) {
-          navigate(redirectPath || "/", { replace: true });
-        } else {
+        if (!hasProfile) {
+          // Profile doesn't exist yet (shouldn't happen with trigger, but fallback)
           navigate("/create-profile", { replace: true });
+        } else if (!hasCompletedOnboarding) {
+          // Profile exists but hasn't completed onboarding
+          navigate("/onboarding/account-type", { replace: true });
+        } else {
+          // Fully onboarded - go to requested page or home
+          navigate(redirectPath || "/", { replace: true });
         }
       };
       
