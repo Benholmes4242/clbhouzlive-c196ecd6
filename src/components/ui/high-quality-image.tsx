@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { getDirectImageUrl } from '@/utils/r2ImageUtils';
-import { devlog, devwarn } from '@/utils/log';
 
 interface HighQualityImageProps {
   src: string;
@@ -11,7 +10,7 @@ interface HighQualityImageProps {
   onError?: (e: React.SyntheticEvent<HTMLImageElement>) => void;
   onLoad?: () => void;
   onClick?: () => void;
-  isAboveTheFold?: boolean; // default false - suppresses overlay for first screenful
+  isAboveTheFold?: boolean;
 }
 
 const HighQualityImage: React.FC<HighQualityImageProps> = ({
@@ -31,79 +30,43 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
-    // Reset states when src changes
-    devlog('[HighQualityImage] Source changed', {
-      src,
-      previousSrc: imageSrc,
-      isAboveTheFold
-    });
     setImageSrc(src);
     setLoaded(false);
     setHasError(false);
   }, [src]);
 
-  // ✅ Handle cached images that don't fire onLoad
   useEffect(() => {
     const el = imgRef.current;
     if (el && el.complete && el.naturalWidth > 0 && !loaded && !hasError) {
-      devlog('[HighQualityImage] Cached image detected, marking as loaded', {
-        src: imageSrc,
-        naturalWidth: el.naturalWidth,
-        naturalHeight: el.naturalHeight
-      });
-      // Use microtask to ensure handlers are attached
       queueMicrotask(() => handleImageLoad());
     }
   }, [imageSrc, loaded, hasError]);
 
   const handleImageLoad = () => {
-    devlog('[HighQualityImage] Image loaded successfully', {
-      src: imageSrc,
-      optimizedSrc: getOptimizedImageUrl(imageSrc)
-    });
     setLoaded(true);
     onLoad?.();
   };
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    // Check if this is actually a video file being passed to an image component
     const isVideoFile = imageSrc.includes('.mp4') || imageSrc.includes('.mov') || 
                        imageSrc.includes('.webm') || imageSrc.includes('cloudflarestream.com');
     
     if (isVideoFile) {
-      devwarn('🚨 VIDEO FILE PASSED TO IMAGE COMPONENT:', {
-        src: imageSrc,
-        optimizedSrc: getOptimizedImageUrl(imageSrc),
-        message: 'Video files should be handled by video components, not image components'
-      });
       setHasError(true);
-      setLoaded(true); // Clear overlay even on error
-      if (onError) {
-        onError(e);
-      }
+      setLoaded(true);
+      onError?.(e);
       return;
     }
     
-    devlog('🔴 IMAGE ERROR - Failed to load:', {
-      src: imageSrc,
-      optimizedSrc: getOptimizedImageUrl(imageSrc),
-      width,
-      height,
-      error: e
-    });
-    
     // Try fallback to original URL if optimization failed
     if (imageSrc !== src && !hasError) {
-      devlog('🔄 IMAGE ERROR - Trying fallback to original URL:', src);
       setImageSrc(src);
       return;
     }
     
     setHasError(true);
-    setLoaded(true); // Clear overlay even on error
-    if (onError) {
-      onError(e);
-    }
+    setLoaded(true);
+    onError?.(e);
   };
 
   // Generate optimized image URL using the centralized utility
@@ -157,7 +120,8 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
         width={width}
         height={height}
         loading={isAboveTheFold ? "eager" : "lazy"}
-        fetchPriority={isAboveTheFold ? "high" : "auto"}
+        // @ts-expect-error fetchpriority is valid HTML but not in React types yet
+        fetchpriority={isAboveTheFold ? "high" : "auto"}
         decoding="async"
       />
       

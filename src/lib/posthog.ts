@@ -1,7 +1,10 @@
 import posthog from 'posthog-js';
 
-// Initialize PostHog
-if (typeof window !== 'undefined') {
+// Disable PostHog entirely for now to reduce console noise
+const POSTHOG_ENABLED = false;
+
+// Initialize PostHog only if enabled
+if (typeof window !== 'undefined' && POSTHOG_ENABLED) {
   posthog.init(
     import.meta.env.VITE_POSTHOG_KEY || 'phc_placeholder', 
     {
@@ -15,4 +18,11 @@ if (typeof window !== 'undefined') {
   );
 }
 
-export { posthog };
+// Export a guarded capture function
+export const captureEvent = (event: string, props?: Record<string, unknown>) => {
+  if (POSTHOG_ENABLED && typeof window !== 'undefined') {
+    posthog.capture(event, props);
+  }
+};
+
+export { posthog, POSTHOG_ENABLED };

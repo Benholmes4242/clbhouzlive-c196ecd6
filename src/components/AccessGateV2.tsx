@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { posthog } from "@/lib/posthog";
-
-const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+import { captureEvent } from "@/lib/posthog";
+import { AppLog } from "@/lib/logger";
 
 interface AccessGateV2Props {
   children: React.ReactNode;
@@ -15,7 +13,7 @@ type GateSession = { token: string; expiresAt: string };
 
 // ===== Validation Cache Utils =====
 const VALIDATION_CACHE_KEY = 'clubhouz_gate_validation_cache';
-const VALIDATION_CACHE_TTL_MS = 60_000; // 60 seconds
+const VALIDATION_CACHE_TTL_MS = 60_000;
 
 type ValidationCache = {
   timestamp: number;
@@ -73,18 +71,17 @@ const getSession = (): GateSession | null => {
 const setSession = (s: GateSession | null) => {
   if (!s) {
     localStorage.removeItem(KEY);
-    clearValidationCache(); // Clear validation cache when session is removed
+    clearValidationCache();
   } else {
     localStorage.setItem(KEY, JSON.stringify(s));
   }
-  // Notify other tabs
   window.dispatchEvent(new StorageEvent('storage', { key: KEY }));
 };
 
 // ===== Single-flight + Retry Utils =====
 let inflight: Promise<void> | null = null;
-let renewTimer: any;
-const SAFETY_MS = 60_000; // Renew 60s before expiry
+let renewTimer: ReturnType<typeof setTimeout>;
+const SAFETY_MS = 60_000;
 
 async function singleFlight(fn: () => Promise<void>) {
   if (inflight) return inflight;
@@ -113,9 +110,8 @@ function scheduleRenew(expiresAtIso: string, checkFn: (skipCache?: boolean) => P
   const t = new Date(expiresAtIso).getTime() - Date.now() - SAFETY_MS;
   clearTimeout(renewTimer);
   renewTimer = setTimeout(() => {
-    // Force fresh validation on renewal, skip cache
     singleFlight(() => checkFn(true));
-  }, Math.max(15_000, t)); // Never less than 15s
+  }, Math.max(15_000, t));
 }
 
 // ===== Check/Refresh Token =====
@@ -123,23 +119,20 @@ async function checkOrRefresh(skipCache = false): Promise<void> {
   const sess = getSession();
   if (!sess?.token) throw new Error('NO_SESSION');
 
-  // Check validation cache first (unless explicitly skipped)
   if (!skipCache) {
     const cached = getValidationCache();
     if (cached) {
-      console.log('[AccessGate] Using cached validation result (age: ' + (Date.now() - cached.timestamp) + 'ms)');
+      AppLog.debug('AccessGate', 'Using cached validation result');
       if (cached.status === 'valid') {
-        // Token was recently validated, skip the network call
         scheduleRenew(sess.expiresAt, checkOrRefresh);
         return;
       } else {
-        // Cached as invalid, throw immediately
         throw new Error('EXPIRED');
       }
     }
   }
 
-  console.log('[AccessGate] Performing fresh validation check');
+  AppLog.debug('AccessGate', 'Performing fresh validation check');
   const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/secure-site-access-check`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -155,7 +148,6 @@ async function checkOrRefresh(skipCache = false): Promise<void> {
       setValidationCache('invalid');
       throw new Error('EXPIRED');
     }
-    // Transient edge/network error - retry
     throw new Error('TRANSIENT');
   }
 
@@ -165,7 +157,7 @@ async function checkOrRefresh(skipCache = false): Promise<void> {
   };
   
   setSession(next);
-  setValidationCache('valid'); // Cache the successful validation
+  setValidationCache('valid');
   scheduleRenew(next.expiresAt, checkOrRefresh);
 }
 
@@ -178,7 +170,7 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
   const cancelledRef = useRef(false);
 
   useEffect(() => {
-    posthog.capture('gate_view');
+    captureEvent('gate_view');
   }, []);
 
   // ===== Boot Sequence =====
@@ -189,32 +181,31 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
       const sess = getSession();
       
       if (!sess) {
-        console.log('[AccessGate] No session found - showing gate');
+        AppLog.debug('AccessGate', 'No session found - showing gate');
         setLoading(false);
         setHasAccess(false);
         return;
       }
 
       try {
-        console.log('[AccessGate] Session found, validating...');
+        AppLog.debug('AccessGate', 'Session found, validating...');
         await retry(() => singleFlight(checkOrRefresh), 3);
         
         if (!cancelledRef.current) {
-          console.log('[AccessGate] Session valid - granting access');
+          AppLog.debug('AccessGate', 'Session valid - granting access');
           setHasAccess(true);
         }
       } catch (e: any) {
         if (cancelledRef.current) return;
         
         if (e?.message === 'EXPIRED') {
-          console.log('[AccessGate] Session expired - showing gate');
+          AppLog.debug('AccessGate', 'Session expired - showing gate');
           setSession(null);
           setHasAccess(false);
         } else {
-          console.warn('[AccessGate] Transient error, staying in last-known-good state:', e);
-          // Keep user in, schedule another check
+          AppLog.warn('AccessGate', 'Transient error, staying in last-known-good state:', e);
           setTimeout(() => singleFlight(checkOrRefresh).catch(() => {}), 10_000);
-          setHasAccess(true); // Optimistic: stay in
+          setHasAccess(true);
         }
       } finally {
         if (!cancelledRef.current) {
@@ -226,7 +217,7 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
     boot();
 
     // ===== Visibility Change Handler =====
-    let visTimer: any;
+    let visTimer: ReturnType<typeof setTimeout>;
     const onVis = () => {
       if (document.visibilityState !== 'visible') return;
       clearTimeout(visTimer);
@@ -234,7 +225,7 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
         if (getSession()) {
           singleFlight(checkOrRefresh).catch(() => {});
         }
-      }, 800); // Debounce
+      }, 800);
     };
     document.addEventListener('visibilitychange', onVis);
 
@@ -244,13 +235,12 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
       
       const sess = getSession();
       if (!sess) {
-        console.log('[AccessGate] Other tab logged out - showing gate');
+        AppLog.debug('AccessGate', 'Other tab logged out - showing gate');
         setHasAccess(false);
         return;
       }
       
       scheduleRenew(sess.expiresAt, checkOrRefresh);
-      // Don't refetch immediately; let renew timer manage cadence
     };
     window.addEventListener('storage', onStorage);
 
@@ -292,28 +282,27 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
         setErrorMessage(msg);
         toast.error(msg);
         setAccessCode("");
-        posthog.capture('gate_submit', { success: false, error: msg });
+        captureEvent('gate_submit', { success: false, error: msg });
       } else {
-        // Success - store session and schedule renewal
         const { sessionToken, expiresAt } = data;
         
         setSession({ token: sessionToken, expiresAt });
-        setValidationCache('valid'); // Cache the successful validation
+        setValidationCache('valid');
         scheduleRenew(expiresAt, checkOrRefresh);
         
         toast.success("Access Granted - Welcome to clubhouz!");
-        posthog.capture('gate_submit', { success: true });
-        posthog.capture('gate_access_granted');
+        captureEvent('gate_submit', { success: true });
+        captureEvent('gate_access_granted');
         
         setHasAccess(true);
         setErrorMessage("");
       }
     } catch (error: any) {
-      console.error('[AccessGate] Unexpected error validating access code:', error);
+      AppLog.error('AccessGate', 'Unexpected error validating access code:', error);
       const msg = "Failed to validate access code. Please try again.";
       setErrorMessage(msg);
       toast.error(msg);
-      posthog.capture('gate_submit', { success: false, error: error.message });
+      captureEvent('gate_submit', { success: false, error: error.message });
     } finally {
       setSubmitting(false);
     }
@@ -333,18 +322,14 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
 
   return (
     <main className="min-h-screen relative flex items-center justify-center px-4">
-      {/* Background Image */}
       <div 
         className="fixed inset-0 bg-cover bg-center"
         style={{ backgroundImage: "url(/images/gate/course-blur.jpg)" }}
       />
       
-      {/* Overlay with blur */}
       <div className="fixed inset-0 bg-black/60 backdrop-blur-md" />
       
-      {/* Content Card */}
       <section className="relative z-10 w-[90%] max-w-[360px] rounded-[18px] bg-surface-card border border-border shadow-shadow-medium p-8 text-center">
-        {/* Logo */}
         <div className="flex justify-center items-center mb-6">
           <img
             src="/images/brand/clubhouz-mark-dark.svg"
@@ -353,17 +338,14 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
           />
         </div>
 
-        {/* Headline */}
         <h1 className="font-display text-foreground text-display-xl font-bold leading-tight mb-3">
           YOUR HOME<br/>OF GOLF
         </h1>
 
-        {/* Subtitle */}
         <p className="text-muted-foreground text-body-md mb-6">
           Enter access code to continue
         </p>
 
-        {/* Error message */}
         {errorMessage && (
           <div 
             role="alert" 
@@ -374,7 +356,6 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
           </div>
         )}
 
-        {/* Form */}
         <form className="space-y-3" onSubmit={handleSubmit}>
           <label htmlFor="gate-code" className="sr-only">
             Access code
@@ -404,7 +385,6 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
           </button>
         </form>
 
-        {/* Footer */}
         <p className="mt-6 text-meta text-text-tertiary">
           © 2025 clubhouz
         </p>
