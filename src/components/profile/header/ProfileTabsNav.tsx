@@ -1,7 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { getProfileTabs } from '@/hooks/useProfileType';
 import { cn } from '@/lib/utils';
-import { LayoutGrid, MapPin, Trophy, TrendingUp } from 'lucide-react';
 
 interface ProfileTabsNavProps {
   userType: string | null | undefined;
@@ -11,18 +10,9 @@ interface ProfileTabsNavProps {
   disabled?: boolean;
 }
 
-// Icon mapping for tabs
-const TAB_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  activity: LayoutGrid,
-  courses: MapPin,
-  top100: Trophy,
-  stats: TrendingUp,
-};
-
 /**
- * ProfileTabsNav - Icon + Label tabs with sliding underline
- * Personal: Activity, Courses, Top 100 Journey, Handicap
- * Business: Activity only
+ * ProfileTabsNav - Premium Golf underline-only tabs with emerald glow
+ * Clean, Apple-like design with subtle top border
  */
 const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   userType,
@@ -51,16 +41,15 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   }, [activeSection, tabs]);
 
   return (
-    <div className="w-full mt-5 pt-2">
+    <div className="px-4 pt-4 pb-1">
       <div 
         ref={containerRef}
-        className="relative flex justify-center" 
-        role="tablist" 
+        className="relative flex justify-between border-t border-white/10 pt-3"
+        role="tablist"
         aria-label="Profile sections"
       >
         {tabs.map((tab, index) => {
-          const Icon = TAB_ICONS[tab.id];
-          const isActive = activeSection === tab.id;
+          const isActive = tab.id === activeSection;
           
           return (
             <button
@@ -73,38 +62,28 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
               tabIndex={isActive ? 0 : -1}
               disabled={disabled}
               className={cn(
-                "relative flex flex-col items-center gap-1 py-3 px-4 transition-colors duration-200",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-sm",
-                isActive 
-                  ? "text-foreground" 
-                  : "text-foreground/40 hover:text-foreground/70",
-                disabled && "pointer-events-none opacity-50",
-                isMobile ? "flex-1" : "min-w-[80px]"
+                'relative flex-1 text-center text-[13px] font-medium',
+                'pb-2 transition-colors duration-200',
+                isActive
+                  ? 'text-foreground'
+                  : 'text-foreground/55 hover:text-foreground/85',
+                disabled && 'pointer-events-none opacity-50'
               )}
             >
-              {Icon && <Icon className={cn("w-[16px] h-[16px]", isActive ? "text-foreground" : "text-foreground/40")} />}
-              <span className={cn(
-                "text-[11px] font-medium",
-                isActive ? "text-foreground" : "text-foreground/50"
-              )}>
-                {tab.label}
-              </span>
+              {tab.label}
+              {/* Glowing emerald underline for active tab */}
+              {isActive && (
+                <span 
+                  className={cn(
+                    'pointer-events-none absolute left-1/2 -bottom-[1px]',
+                    'h-[2px] w-9 -translate-x-1/2 rounded-full',
+                    'bg-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.65)]'
+                  )}
+                />
+              )}
             </button>
           );
         })}
-        
-        {/* Animated underline */}
-        <div 
-          className={cn(
-            "absolute bottom-0 h-[2px] rounded-full",
-            "bg-current",
-            "transition-all duration-300 ease-out"
-          )}
-          style={{
-            left: underlineStyle.left,
-            width: underlineStyle.width,
-          }}
-        />
       </div>
     </div>
   );
