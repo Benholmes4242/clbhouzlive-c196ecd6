@@ -78,7 +78,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   const getSubtitleLine = () => {
     if (isPersonal) {
       const parts = [];
-      if (homeClub) parts.push(`Plays at ${homeClub}`);
+      if (homeClub) parts.push(homeClub);
       if (handicap !== null && handicap !== undefined) parts.push(`HCP ${handicap.toFixed(1)}`);
       return parts.length > 0 ? parts.join(' · ') : null;
     } else {
