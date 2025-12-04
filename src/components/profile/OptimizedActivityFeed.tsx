@@ -47,7 +47,7 @@ const OptimizedActivityFeed: React.FC<OptimizedActivityFeedProps> = ({
               </p>
             )}
 
-            {/* Post Media - Optimized for fast loading */}
+            {/* Post Media - Straight edge corners */}
             {post.post_media && post.post_media.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-1 mb-4">
                 {post.post_media.slice(0, 4).map((media) => (

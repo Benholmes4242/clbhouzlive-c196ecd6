@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { getProfileTabs } from '@/hooks/useProfileType';
 import { cn } from '@/lib/utils';
+import { LayoutGrid, MapPin, Trophy, TrendingUp } from 'lucide-react';
 
 interface ProfileTabsNavProps {
   userType: string | null | undefined;
@@ -10,9 +11,17 @@ interface ProfileTabsNavProps {
   disabled?: boolean;
 }
 
+// Icon mapping for tabs
+const TAB_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  activity: LayoutGrid,
+  courses: MapPin,
+  top100: Trophy,
+  stats: TrendingUp,
+};
+
 /**
- * ProfileTabsNav - Premium floating tab bar with glassy effect and glowing underline
- * Personal: Activity, Courses, Top 100 Journey, Achievements, Handicap
+ * ProfileTabsNav - Icon + Label tabs with sliding underline
+ * Personal: Activity, Courses, Top 100 Journey, Handicap
  * Business: Activity only
  */
 const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
@@ -41,96 +50,54 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
     }
   }, [activeSection, tabs]);
 
-  // Mobile: Floating pill tabs
-  if (isMobile) {
-    return (
-      <nav className="mt-5 px-3">
-        <div
-          ref={containerRef}
-          className={cn(
-            "flex items-center justify-between",
-            "rounded-full p-1",
-            "bg-black/22 border border-white/16",
-            "backdrop-blur-xl"
-          )}
-        >
-          {tabs.map((tab, index) => {
-            const active = tab.id === activeSection;
-            return (
-              <button
-                key={tab.id}
-                ref={el => tabsRef.current[index] = el}
-                onClick={() => !disabled && onTabChange(tab.id)}
-                className={cn(
-                  "relative flex-1 py-1.5 text-center text-[13px] rounded-full",
-                  "transition-all duration-150",
-                  active 
-                    ? "text-foreground" 
-                    : "text-foreground/60 hover:text-foreground/80",
-                  disabled && "pointer-events-none opacity-50"
-                )}
-                aria-selected={active}
-                disabled={disabled}
-              >
-                {tab.label}
-                {/* Glowing underline for active tab */}
-                {active && (
-                  <span
-                    className={cn(
-                      "absolute left-1/2 -bottom-[2px] -translate-x-1/2",
-                      "h-[2px] w-9 rounded-full",
-                      "bg-primary/90",
-                      "shadow-[0_0_6px_hsl(var(--primary)/0.9)]"
-                    )}
-                  />
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </nav>
-    );
-  }
-
-  // Desktop: Sliding underline tabs
   return (
-    <div className="w-full border-t border-border/50 mt-6 pt-2">
+    <div className="w-full mt-5 pt-2">
       <div 
         ref={containerRef}
-        className="relative flex" 
+        className="relative flex justify-center" 
         role="tablist" 
         aria-label="Profile sections"
       >
-        {tabs.map((tab, index) => (
-          <button
-            key={tab.id}
-            ref={el => tabsRef.current[index] = el}
-            onClick={() => !disabled && onTabChange(tab.id)}
-            role="tab"
-            aria-selected={activeSection === tab.id}
-            aria-controls={`tabpanel-${tab.id}`}
-            tabIndex={activeSection === tab.id ? 0 : -1}
-            disabled={disabled}
-            className={cn(
-              "relative py-4 px-4 text-sm font-medium transition-colors duration-200",
-              "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-sm",
-              activeSection === tab.id 
-                ? "text-foreground" 
-                : "text-muted-foreground hover:text-foreground",
-              disabled && "pointer-events-none opacity-50",
-              "flex-1 text-center"
-            )}
-          >
-            {tab.label}
-          </button>
-        ))}
+        {tabs.map((tab, index) => {
+          const Icon = TAB_ICONS[tab.id];
+          const isActive = activeSection === tab.id;
+          
+          return (
+            <button
+              key={tab.id}
+              ref={el => tabsRef.current[index] = el}
+              onClick={() => !disabled && onTabChange(tab.id)}
+              role="tab"
+              aria-selected={isActive}
+              aria-controls={`tabpanel-${tab.id}`}
+              tabIndex={isActive ? 0 : -1}
+              disabled={disabled}
+              className={cn(
+                "relative flex flex-col items-center gap-1 py-3 px-4 transition-colors duration-200",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-sm",
+                isActive 
+                  ? "text-foreground" 
+                  : "text-foreground/40 hover:text-foreground/70",
+                disabled && "pointer-events-none opacity-50",
+                isMobile ? "flex-1" : "min-w-[80px]"
+              )}
+            >
+              {Icon && <Icon className={cn("w-[16px] h-[16px]", isActive ? "text-foreground" : "text-foreground/40")} />}
+              <span className={cn(
+                "text-[11px] font-medium",
+                isActive ? "text-foreground" : "text-foreground/50"
+              )}>
+                {tab.label}
+              </span>
+            </button>
+          );
+        })}
         
-        {/* Animated underline with glow */}
+        {/* Animated underline */}
         <div 
           className={cn(
-            "absolute bottom-0 h-0.5 rounded-full",
-            "bg-primary",
-            "shadow-[0_0_8px_hsl(var(--primary)/0.8)]",
+            "absolute bottom-0 h-[2px] rounded-full",
+            "bg-current",
             "transition-all duration-300 ease-out"
           )}
           style={{
