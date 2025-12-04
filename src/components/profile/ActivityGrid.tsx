@@ -119,7 +119,7 @@ const ActivityGrid: React.FC<ActivityGridProps> = ({
   return (
     <div 
       className={cn(
-        "grid grid-cols-3 gap-[2px] pb-24 px-4",
+        "grid grid-cols-3 gap-[2px] pb-24 px-[2px]",
         className
       )}
     >
