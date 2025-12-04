@@ -1,4 +1,6 @@
 import React from 'react';
+import { FileText, Users, UserPlus, Heart } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface ProfileStatsRowProps {
   postsCount: number;
@@ -12,8 +14,52 @@ interface ProfileStatsRowProps {
   onFriendsClick: () => void;
 }
 
+interface StatItemProps {
+  value: number;
+  label: string;
+  icon?: React.ReactNode;
+  onClick?: () => void;
+  isClickable?: boolean;
+  showBorder?: boolean;
+}
+
+const StatItem: React.FC<StatItemProps> = ({ 
+  value, 
+  label, 
+  icon,
+  onClick, 
+  isClickable = false,
+  showBorder = false 
+}) => {
+  const content = (
+    <>
+      <span className="text-lg font-semibold text-foreground tabular-nums">{value}</span>
+      <span className="text-sm font-normal text-muted-foreground flex items-center gap-1">
+        {icon}
+        {label}
+      </span>
+    </>
+  );
+
+  const baseClasses = cn(
+    "flex flex-col items-center py-1 transition-all duration-150",
+    showBorder && "border-l border-border/50 pl-4",
+    isClickable && "cursor-pointer hover:scale-105 hover:opacity-90 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-lg"
+  );
+
+  if (isClickable && onClick) {
+    return (
+      <button type="button" onClick={onClick} className={baseClasses}>
+        {content}
+      </button>
+    );
+  }
+
+  return <div className={baseClasses}>{content}</div>;
+};
+
 /**
- * ProfileStatsRow - Displays profile stats
+ * ProfileStatsRow - Displays profile stats with micro-interactions
  * Personal: Posts, Friends, Following, Followers (4 columns)
  * Business: Posts, Following, Followers (3 columns)
  */
@@ -30,82 +76,77 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
 }) => {
   if (isMobile) {
     return (
-      <div className="stats">
-        <div className="stat">
-          <div className="stat-value">{postsCount}</div>
-          <div className="stat-label">Posts</div>
-        </div>
+      <div className="flex items-center justify-center gap-6 py-3">
+        <StatItem value={postsCount} label="Posts" />
         
-        {/* Friends - Personal profiles only */}
         {isPersonal && (
-          <button
-            type="button"
+          <StatItem 
+            value={friendsCount} 
+            label="Friends" 
             onClick={onFriendsClick}
-            className="stat cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
-          >
-            <div className="stat-value">{friendsCount}</div>
-            <div className="stat-label">Friends</div>
-          </button>
+            isClickable
+          />
         )}
         
-        <button
-          type="button"
+        <StatItem 
+          value={followingCount} 
+          label="Following" 
           onClick={onFollowingClick}
-          className="stat cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
-        >
-          <div className="stat-value">{followingCount}</div>
-          <div className="stat-label">Following</div>
-        </button>
+          isClickable
+        />
         
-        <button
-          type="button"
+        <StatItem 
+          value={followersCount} 
+          label="Followers" 
           onClick={onFollowersClick}
-          className="stat cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
-        >
-          <div className="stat-value">{followersCount}</div>
-          <div className="stat-label">Followers</div>
-        </button>
+          isClickable
+        />
       </div>
     );
   }
 
-  // Desktop layout
+  // Desktop layout with subtle icons and borders
   return (
-    <div className={`w-full grid ${isPersonal ? 'grid-cols-4' : 'grid-cols-3'} gap-3 text-center mt-5`}>
-      <div className="flex flex-col">
-        <span className="text-lg font-semibold text-foreground">{postsCount}</span>
-        <span className="text-base font-normal text-muted-foreground">Posts</span>
-      </div>
+    <div 
+      className={cn(
+        "w-full grid gap-4 py-4 mt-4",
+        isPersonal ? "grid-cols-4" : "grid-cols-3"
+      )}
+      style={{
+        width: 'calc(100% - var(--mini-w) - 8px)',
+        marginRight: 'calc(var(--mini-w) + 8px)'
+      }}
+    >
+      <StatItem 
+        value={postsCount} 
+        label="Posts"
+      />
       
-      {/* Friends - Personal profiles only */}
       {isPersonal && (
-        <button
-          type="button"
+        <StatItem 
+          value={friendsCount} 
+          label="Friends"
           onClick={onFriendsClick}
-          className="flex flex-col border-l border-border pl-3 cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
-        >
-          <span className="text-lg font-semibold text-foreground">{friendsCount}</span>
-          <span className="text-base font-normal text-muted-foreground">Friends</span>
-        </button>
+          isClickable
+          showBorder
+        />
       )}
       
-      <button
-        type="button"
+      <StatItem 
+        value={followingCount} 
+        label="Following"
         onClick={onFollowingClick}
-        className="flex flex-col border-l border-border pl-3 cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
-      >
-        <span className="text-lg font-semibold text-foreground">{followingCount}</span>
-        <span className="text-base font-normal text-muted-foreground">Following</span>
-      </button>
+        isClickable
+        showBorder
+      />
       
-      <button
-        type="button"
+      <StatItem 
+        value={followersCount} 
+        label="Followers"
         onClick={onFollowersClick}
-        className="flex flex-col border-l border-border pl-3 cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
-      >
-        <span className="text-lg font-semibold text-foreground">{followersCount}</span>
-        <span className="text-base font-normal text-muted-foreground">Followers</span>
-      </button>
+        isClickable
+        showBorder
+      />
     </div>
   );
 };

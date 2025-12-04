@@ -379,19 +379,23 @@ const HeroProfileHeader = ({
               })
             }}
           >
-            {/* Header Card (Avatar, Name, Bio, etc.) */}
+            {/* Header Card (Avatar with ring, Name, Bio, etc.) */}
             <ProfileHeaderCard
               displayName={displayName}
               username={username}
               bio={profile?.bio}
               profilePhotoUrl={profile?.profile_photo_url}
               homeClub={isPersonal ? homeClub : undefined}
+              handicap={isPersonal ? profile?.eg_handicap_index : undefined}
               websiteUrl={profile?.website}
               location={profile?.location}
+              userType={profile?.user_type}
+              totalTop100Played={isPersonal ? (top100Overview?.total_rated ?? top100Overview?.total_played ?? 0) : 0}
               isPersonal={isPersonal}
               isOwnProfile={isOwnProfile}
               isMobile={isMobile}
               onAvatarClick={() => openImmersive?.(0)}
+              onCustomiseClick={isOwnProfile ? () => setEditDialogOpen(true) : undefined}
             />
 
             {/* Social Actions - Only for other users' profiles */}
@@ -418,10 +422,14 @@ const HeroProfileHeader = ({
               onFriendsClick={handleOpenFriends}
             />
 
-            {/* Top 100 Chip - Personal profiles only */}
+            {/* Top 100 Chip with completion stamps - Personal profiles only */}
             <ProfileTop100Chip
-              top100Overview={top100Overview}
+              top100Overview={{
+                ...top100Overview,
+                lists: undefined // Will be populated when we extend the hook
+              }}
               isPersonal={isPersonal}
+              isMobile={isMobile}
             />
 
             {/* Tab Navigation */}
