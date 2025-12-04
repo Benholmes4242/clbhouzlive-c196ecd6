@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getTop100Club } from '@/lib/top100Club';
+import { getTop100Club, glassTint } from '@/lib/top100Club';
 import ProfileCompletionStamps from './ProfileCompletionStamps';
 import { getCompletionStamps } from '@/lib/top100Helpers';
 import type { Top100ListProgress } from '@/lib/top100Helpers';
@@ -41,6 +41,13 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
   const completionStamps = getCompletionStamps(top100Overview.lists);
   const regionsCount = top100Overview.regions_count ?? 0;
   
+  // Get tier-specific glass color
+  const glassBackground = glassTint(club.ringColor, 0.18);
+  const glassBorder = glassTint(club.ringColor, 0.45);
+  const glassHover = glassTint(club.ringColor, 0.28);
+  const glassShadow = glassTint(club.ringColor, 0.25);
+  const glassShadowHover = glassTint(club.ringColor, 0.35);
+  
   // Build subtitle parts
   const subtitleParts: string[] = [];
   if (club.shortLabel) {
@@ -61,20 +68,33 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
           'flex items-center gap-3',
           'px-4 py-3 md:px-5 md:py-3.5',
           'rounded-2xl',
-          // Background & border (Green glass plaque)
-          'bg-emerald-500/20',
-          'border border-emerald-400/40 shadow-[0_18px_45px_rgba(16,185,129,0.25)]',
+          // Glass effect
           'backdrop-blur-xl',
           // Interaction
           'transition-all duration-200 ease-out',
-          'hover:bg-emerald-500/28 hover:border-emerald-400/60 hover:shadow-[0_22px_55px_rgba(16,185,129,0.35)]',
           'active:scale-[0.98]'
         )}
+        style={{
+          background: glassBackground,
+          border: `1px solid ${glassBorder}`,
+          boxShadow: `0 18px 45px ${glassShadow}`,
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = glassHover;
+          e.currentTarget.style.boxShadow = `0 22px 55px ${glassShadowHover}`;
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = glassBackground;
+          e.currentTarget.style.boxShadow = `0 18px 45px ${glassShadow}`;
+        }}
       >
         {/* Left icon disc */}
-        <div className="relative flex items-center justify-center w-10 h-10 rounded-full bg-emerald-500/90 shadow-[0_8px_20px_rgba(0,0,0,0.35)]">
-          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white text-emerald-600">
-            <Trophy className="h-4 w-4" />
+        <div 
+          className="relative flex items-center justify-center w-10 h-10 rounded-full shadow-[0_8px_20px_rgba(0,0,0,0.35)]"
+          style={{ backgroundColor: club.ringColor }}
+        >
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white">
+            <Trophy className="h-4 w-4" style={{ color: club.ringColor }} />
           </span>
         </div>
 
@@ -84,7 +104,10 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
             {totalPlayed} Top 100
           </span>
           {subtitleParts.length > 0 && (
-            <span className="mt-0.5 text-[12px] text-emerald-400/90">
+            <span 
+              className="mt-0.5 text-[12px] opacity-90"
+              style={{ color: club.ringColor }}
+            >
               {subtitleParts.join(' · ')}
             </span>
           )}
