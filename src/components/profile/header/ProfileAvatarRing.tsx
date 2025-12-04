@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react';
 import { Squircle } from '@/components/ui/squircle';
 import { cn } from '@/lib/utils';
-import { getTop100Club, type Top100TierId } from '@/lib/top100Club';
-import { getRingGradientStyle } from '@/lib/top100Helpers';
+import { getTop100Club, getRingColorForTier, type Top100TierId } from '@/lib/top100Club';
 import {
   Tooltip,
   TooltipContent,
@@ -20,14 +19,15 @@ interface ProfileAvatarRingProps {
   onClick?: () => void;
 }
 
+// Size configurations - outer size, then 2px ring, 1px white gap, then avatar
 const SIZES = {
-  sm: { avatar: 64, ring: 72, strokeWidth: 3 },
-  md: { avatar: 88, ring: 100, strokeWidth: 4 },
-  lg: { avatar: 120, ring: 136, strokeWidth: 5 },
+  sm: { outer: 68, white: 64, avatar: 62 },   // 2px ring + 1px white
+  md: { outer: 92, white: 88, avatar: 86 },   // 2px ring + 1px white  
+  lg: { outer: 124, white: 120, avatar: 118 }, // 2px ring + 1px white
 };
 
 /**
- * ProfileAvatarRing - Avatar with Top 100 exploration ring
+ * ProfileAvatarRing - Avatar with Top 100 exploration ring using global squircle shape
  * Personal profiles show colored ring based on tier (5-400 courses)
  * Business profiles show avatar without ring
  */
@@ -47,12 +47,12 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
     return getTop100Club(totalTop100Played);
   }, [totalTop100Played]);
   
-  const ringStyle = useMemo(() => {
-    if (!isPersonal) return {};
-    return getRingGradientStyle(tierInfo.tierId, totalTop100Played);
+  const tierColor = useMemo(() => {
+    if (!isPersonal || totalTop100Played < 5) return null;
+    return getRingColorForTier(tierInfo.tierId);
   }, [isPersonal, tierInfo.tierId, totalTop100Played]);
   
-  const showRing = isPersonal && totalTop100Played >= 5;
+  const showRing = isPersonal && totalTop100Played >= 5 && tierColor;
   
   // Tooltip content for personal profiles
   const tooltipContent = useMemo(() => {
@@ -66,6 +66,13 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
     return `${tierInfo.tierName} · ${totalTop100Played} courses`;
   }, [isPersonal, totalTop100Played, tierInfo.tierName]);
 
+  const initials = displayName
+    ?.split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2) || '?';
+
   const avatarElement = (
     <div
       className={cn(
@@ -73,44 +80,39 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
         onClick && 'cursor-pointer hover:scale-[1.02] active:scale-[0.98]'
       )}
       onClick={onClick}
-      style={{
-        width: showRing ? dimensions.ring : dimensions.avatar,
-        height: showRing ? dimensions.ring : dimensions.avatar,
-      }}
     >
-      {/* Ring layer - only for personal profiles with milestone */}
-      {showRing && (
-        <div
-          className="absolute inset-0 rounded-full animate-pulse-slow"
-          style={{
-            ...ringStyle,
-            padding: dimensions.strokeWidth,
-          }}
-        >
-          <div className="w-full h-full rounded-full bg-background" />
-        </div>
-      )}
-      
-      {/* Ring gradient overlay for premium effect */}
-      {showRing && (
-        <div
-          className="absolute inset-0 rounded-full"
-          style={{
-            ...ringStyle,
-            mask: `radial-gradient(circle at center, transparent ${dimensions.avatar / 2}px, black ${dimensions.avatar / 2}px)`,
-            WebkitMask: `radial-gradient(circle at center, transparent ${dimensions.avatar / 2}px, black ${dimensions.avatar / 2}px)`,
-          }}
-        />
-      )}
-      
-      {/* Avatar container */}
-      <div
-        className="relative z-10 overflow-hidden"
-        style={{
-          width: dimensions.avatar,
-          height: dimensions.avatar,
-        }}
-      >
+      {showRing ? (
+        // Nested squircles for ring effect - matches My Progress page exactly
+        <Squircle width={dimensions.outer} height={dimensions.outer}>
+          <div 
+            className="w-full h-full flex items-center justify-center"
+            style={{ backgroundColor: tierColor }}
+          >
+            {/* White ring layer - 1px */}
+            <Squircle width={dimensions.white} height={dimensions.white}>
+              <div className="w-full h-full bg-background flex items-center justify-center">
+                {/* Avatar */}
+                <Squircle width={dimensions.avatar} height={dimensions.avatar}>
+                  {photoUrl ? (
+                    <img
+                      src={photoUrl}
+                      alt={displayName}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      loading="eager"
+                      decoding="async"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground text-xl font-semibold">
+                      {initials}
+                    </div>
+                  )}
+                </Squircle>
+              </div>
+            </Squircle>
+          </div>
+        </Squircle>
+      ) : (
+        // No ring - just avatar (business profiles or no milestone)
         <Squircle width={dimensions.avatar} height={dimensions.avatar}>
           {photoUrl ? (
             <img
@@ -121,15 +123,12 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
               decoding="async"
             />
           ) : (
-            <div
-              className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground"
-              style={{ fontSize: dimensions.avatar * 0.4 }}
-            >
-              {displayName.charAt(0).toUpperCase()}
+            <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground text-xl font-semibold">
+              {initials}
             </div>
           )}
         </Squircle>
-      </div>
+      )}
     </div>
   );
 
