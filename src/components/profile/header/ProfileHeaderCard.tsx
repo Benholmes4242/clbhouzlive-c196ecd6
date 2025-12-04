@@ -120,8 +120,8 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
           />
         </div>
 
-        {/* Name & handle block - tighter spacing */}
-        <div className="flex flex-col items-center gap-1.5 mb-2">
+        {/* Name & handle block - restored spacing from avatar */}
+        <div className="flex flex-col items-center gap-1.5 mb-2 mt-4">
           <h1 className="text-2xl font-semibold text-foreground leading-tight">
             {displayName}
           </h1>
