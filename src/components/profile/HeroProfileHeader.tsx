@@ -369,9 +369,12 @@ const HeroProfileHeader = ({
             }}
           />
           
-          {/* Bottom fade into page */}
+          {/* Bottom fade into page - seamless blend */}
           <div
-            className="pointer-events-none absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-background via-background/40 to-transparent"
+            className="pointer-events-none absolute bottom-0 left-0 right-0 h-32"
+            style={{
+              background: 'linear-gradient(to top, hsl(var(--background)) 0%, hsl(var(--background) / 0.85) 25%, hsl(var(--background) / 0.4) 50%, hsl(var(--background) / 0.1) 75%, transparent 100%)',
+            }}
           />
         </div>
 
