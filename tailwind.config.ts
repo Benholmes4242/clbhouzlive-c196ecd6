@@ -353,6 +353,20 @@ export default {
 						opacity: '1',
 						transform: 'translateX(0)'
 					}
+				},
+				'ring-pulse': {
+					'0%': {
+						transform: 'scale(0.9)',
+						boxShadow: '0 0 0 0 rgba(110,146,119,0.5)'
+					},
+					'60%': {
+						transform: 'scale(1)',
+						boxShadow: '0 0 0 18px rgba(110,146,119,0)'
+					},
+					'100%': {
+						transform: 'scale(1)',
+						boxShadow: '0 0 0 0 rgba(110,146,119,0)'
+					}
 				}
 			},
 			transitionDuration: {
@@ -386,7 +400,8 @@ export default {
 				'slide-in-from-right-modal': 'slide-in-from-right-modal 250ms ease-out',
 				'slide-out-to-right-modal': 'slide-out-to-right-modal 250ms ease-out',
 				'echo-typing-dot': 'echo-typing-dot 1.4s ease-in-out infinite',
-				'slide-in-left': 'slide-in-left 220ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+				'slide-in-left': 'slide-in-left 220ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+				'ring-pulse': 'ring-pulse 900ms ease-out 1'
 			}
 		}
 	},

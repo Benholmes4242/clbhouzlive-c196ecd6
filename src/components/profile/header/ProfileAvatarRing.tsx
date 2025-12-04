@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useEffect, useState } from 'react';
 import { Squircle } from '@/components/ui/squircle';
 import { cn } from '@/lib/utils';
 import { getTop100Club, getRingColorForTier, type Top100TierId } from '@/lib/top100Club';
@@ -17,19 +17,23 @@ interface ProfileAvatarRingProps {
   isOwnProfile: boolean;
   size?: 'sm' | 'md' | 'lg';
   onClick?: () => void;
+  animateOnFirstView?: boolean;
 }
 
 // Size configurations - outer size, then 2px ring, 1px white gap, then avatar
 const SIZES = {
-  sm: { outer: 68, white: 64, avatar: 62 },   // 2px ring + 1px white
-  md: { outer: 92, white: 88, avatar: 86 },   // 2px ring + 1px white  
-  lg: { outer: 124, white: 120, avatar: 118 }, // 2px ring + 1px white
+  sm: { outer: 68, white: 64, avatar: 62 },
+  md: { outer: 92, white: 88, avatar: 86 },
+  lg: { outer: 124, white: 120, avatar: 118 },
 };
+
+const RING_ANIMATED_KEY = 'clbhouz:ringAnimated:v1';
 
 /**
  * ProfileAvatarRing - Avatar with Top 100 exploration ring using global squircle shape
  * Personal profiles show colored ring based on tier (5-400 courses)
  * Business profiles show avatar without ring
+ * Includes optional one-time animation on first view
  */
 const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
   photoUrl,
@@ -39,8 +43,17 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
   isOwnProfile,
   size = 'lg',
   onClick,
+  animateOnFirstView = true,
 }) => {
   const dimensions = SIZES[size];
+  const ref = useRef<HTMLDivElement>(null);
+  
+  // Session-based animation flag
+  const [hasAnimated, setHasAnimated] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return sessionStorage.getItem(RING_ANIMATED_KEY) === '1';
+  });
+  const [shouldAnimate, setShouldAnimate] = useState(false);
   
   // Get tier info from total played
   const tierInfo = useMemo(() => {
@@ -53,6 +66,23 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
   }, [isPersonal, tierInfo.tierId, totalTop100Played]);
   
   const showRing = isPersonal && totalTop100Played >= 5 && tierColor;
+  
+  // Trigger animation when first visible
+  useEffect(() => {
+    if (!animateOnFirstView || hasAnimated || !showRing) return;
+    
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setShouldAnimate(true);
+        setHasAnimated(true);
+        sessionStorage.setItem(RING_ANIMATED_KEY, '1');
+        observer.disconnect();
+      }
+    }, { threshold: 0.6 });
+    
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [animateOnFirstView, hasAnimated, showRing]);
   
   // Tooltip content for personal profiles
   const tooltipContent = useMemo(() => {
@@ -75,11 +105,17 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
 
   const avatarElement = (
     <div
+      ref={ref}
       className={cn(
         'relative flex items-center justify-center transition-transform duration-200',
-        onClick && 'cursor-pointer hover:scale-[1.02] active:scale-[0.98]'
+        onClick && 'cursor-pointer hover:scale-[1.02] active:scale-[0.98]',
+        shouldAnimate && 'animate-ring-pulse'
       )}
       onClick={onClick}
+      style={{
+        // Premium shadow for depth
+        filter: showRing ? 'drop-shadow(0 8px 20px rgba(0,0,0,0.35))' : undefined,
+      }}
     >
       {showRing ? (
         // Nested squircles for ring effect - matches My Progress page exactly

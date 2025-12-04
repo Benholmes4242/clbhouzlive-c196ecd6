@@ -1,23 +1,10 @@
-
 import React, { useState, useCallback, useMemo } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
-import { Video, Image, MapPin, Trophy } from 'lucide-react';
 import { IoFilter } from 'react-icons/io5';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 import { useActivityPosts } from './hooks/useActivityPosts';
-import ExploreGrid from '@/components/explore/ExploreGrid';
+import ActivityGrid, { ActivityGridItem } from './ActivityGrid';
+import ActivityFiltersSheet, { ActivityFilters, ActivityFilterType } from './ActivityFiltersSheet';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
-import { ExploreContentItem } from '@/components/explore/types';
-import { ActivityPost } from './types/ActivityTypes';
-
-type FilterType = 'all' | 'videos' | 'photos' | 'golf-courses';
 
 interface ActivityFeedProps {
   userId: string;
@@ -25,7 +12,7 @@ interface ActivityFeedProps {
   profileDisplayName?: string;
   userHandicap?: number;
   userProfilePhotoUrl?: string;
-  onAchievementsClick?: () => void; // New prop for tab switching
+  onAchievementsClick?: () => void;
 }
 
 const ActivityFeed: React.FC<ActivityFeedProps> = ({
@@ -36,15 +23,16 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   userProfilePhotoUrl,
   onAchievementsClick
 }) => {
-  const { posts, loading, fetchUserPosts } = useActivityPosts(userId);
+  const { posts, loading } = useActivityPosts(userId);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalStartIndex, setModalStartIndex] = useState(0);
-  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [filters, setFilters] = useState<ActivityFilters>({ type: 'all' });
   const [achievementsModalOpen, setAchievementsModalOpen] = useState(false);
 
   // Filter posts based on active filter
   const filteredPosts = useMemo(() => {
-    switch (activeFilter) {
+    switch (filters.type) {
       case 'videos':
         return posts.filter(post => 
           post.post_media.some(media => media.media_type === 'video')
@@ -53,80 +41,57 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
         return posts.filter(post => 
           post.post_media.some(media => media.media_type === 'image')
         );
-      case 'golf-courses':
+      case 'courses':
         return posts.filter(post => 
           post.post_tags.some(tag => tag.entity_type === 'golf_club')
+        );
+      case 'swings':
+        return posts.filter(post => 
+          post.post_tags.some(tag => tag.name?.toLowerCase().includes('swing'))
+        );
+      case 'milestones':
+        // Milestones could be detected by specific tags or post content
+        return posts.filter(post => 
+          post.content?.toLowerCase().includes('milestone') ||
+          post.post_tags.some(tag => tag.name?.toLowerCase().includes('achievement'))
         );
       default:
         return posts;
     }
-  }, [posts, activeFilter]);
+  }, [posts, filters.type]);
 
-  // Convert filtered activity posts to ExploreContentItem format - only include posts with media
-  const exploreContent: ExploreContentItem[] = useMemo(() => 
+  // Convert to grid items - only posts with media
+  const gridItems: ActivityGridItem[] = useMemo(() => 
     filteredPosts
-      .filter(post => post.post_media && post.post_media.length > 0) // Only include posts with media
+      .filter(post => post.post_media && post.post_media.length > 0)
       .map(post => {
-        // Extract golf course information from post tags
         const golfCourseTag = post.post_tags.find(tag => tag.entity_type === 'golf_club');
-        const golfCourse = golfCourseTag ? {
-          id: golfCourseTag.entity_id,
-          name: golfCourseTag.name,
-          country: 'Unknown' // Post tags don't include country, so we use a default
-        } : undefined;
-
         return {
           id: post.id,
           type: post.post_media[0].media_type === 'video' ? 'video' : 'image',
-          src: post.post_media[0].media_url,
-          title: post.content || '',
-          likes: 0,
-          comments: 0,
-          shares: 0,
-          user: {
-            id: post.user.id,
-            name: post.user.display_name || post.user.username || 'Anonymous',
-            username: post.user.username || undefined,
-            avatar: post.user.profile_photo_url || '/placeholder.svg',
-            verified: false
-          },
-          // Add golf course information if available
-          golfCourse,
-          // Add the full media array for multiple media navigation
-          media: post.post_media.map(media => ({
-            id: media.id,
-            media_type: media.media_type,
-            media_url: media.media_url
-          }))
+          thumbnailUrl: post.post_media[0].media_url,
+          previewUrl: post.post_media[0].media_url,
+          courseName: golfCourseTag?.name,
+          roundDate: post.created_at,
         };
       }), [filteredPosts]);
 
-  const handleLike = useCallback((contentId: string) => {
-    console.log('Like:', contentId);
-  }, []);
+  // For lightbox
+  const allMediaUrls = useMemo(() => gridItems.map(item => item.thumbnailUrl), [gridItems]);
+  const allMediaTypes = useMemo(() => gridItems.map(item => item.type), [gridItems]);
 
-  const handleFollow = useCallback((contentId: string) => {
-    console.log('Follow:', contentId);
-  }, []);
-
-  const handleMediaClick = useCallback((item: ExploreContentItem) => {
-    // Find the index in exploreContent
-    const clickedIndex = exploreContent.findIndex(content => content.id === item.id);
-    if (clickedIndex !== -1) {
-      setModalStartIndex(clickedIndex);
-      setModalOpen(true);
-    }
-  }, [exploreContent]);
-
-  const handleLoadMore = useCallback(() => {
-    // No pagination for profile posts currently
+  const handleItemClick = useCallback((item: ActivityGridItem, index: number) => {
+    setModalStartIndex(index);
+    setModalOpen(true);
   }, []);
 
   if (loading) {
     return (
-      <div className="p-4">
-        <div className="text-center py-8">
-          <p className="text-muted-foreground">Loading posts...</p>
+      <div className="px-4 py-8">
+        <div className="grid grid-cols-3 gap-[2px]">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <div key={i} className="aspect-square rounded-[18px] bg-muted animate-pulse" />
+          ))}
         </div>
       </div>
     );
@@ -134,87 +99,53 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
 
   return (
     <>
-      <div className="px-4 md:px-0">
-          {/* Filter Dropdown */}
-          <div className="flex justify-end mt-0 mb-4">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button 
-                  className="p-2 hover:bg-muted/50 transition-colors rounded-md"
-                >
-                  <IoFilter className="w-5 h-5 text-foreground" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                align="end" 
-                className="bg-background border border-border"
-              >
-                <DropdownMenuItem 
-                  onClick={() => setActiveFilter('all')}
-                  className={`cursor-pointer ${activeFilter === 'all' ? 'bg-accent' : ''}`}
-                >
-                  <span className="mr-2">📱</span>
-                  All Posts
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setActiveFilter('videos')}
-                  className={`cursor-pointer ${activeFilter === 'videos' ? 'bg-accent' : ''}`}
-                >
-                  <Video className="mr-2 h-4 w-4" />
-                  Videos only
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setActiveFilter('photos')}
-                  className={`cursor-pointer ${activeFilter === 'photos' ? 'bg-accent' : ''}`}
-                >
-                  <Image className="mr-2 h-4 w-4" />
-                  Photos only
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setActiveFilter('golf-courses')}
-                  className={`cursor-pointer ${activeFilter === 'golf-courses' ? 'bg-accent' : ''}`}
-                >
-                  <MapPin className="mr-2 h-4 w-4" />
-                  Posts tagged with golf course
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-
-        {posts.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">No posts yet.</p>
-          </div>
-        ) : filteredPosts.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">
-              No posts found for the selected filter.
-            </p>
-          </div>
-        ) : null}
+      {/* Filter button row */}
+      <div className="px-4 mt-0 mb-2">
+        <div className="flex justify-end">
+          <button 
+            onClick={() => setFiltersOpen(true)}
+            className="p-2 hover:bg-muted/50 transition-colors rounded-md"
+          >
+            <IoFilter className="w-5 h-5 text-foreground" />
+          </button>
+        </div>
       </div>
 
-      {/* Activity cards with edge-to-edge layout on mobile like discover page */}
-      {posts.length > 0 && filteredPosts.length > 0 && (
-        <ExploreGrid
-          content={exploreContent}
-          onLike={handleLike}
-          onFollow={handleFollow}
-          onMediaClick={handleMediaClick}
-          isLoading={false}
-          hasMore={false}
-          onLoadMore={handleLoadMore}
-          isDiscoverPage={true}
-          hideBadges={true}
+      {/* Empty states */}
+      {posts.length === 0 ? (
+        <div className="text-center py-16 px-4">
+          <div className="text-4xl mb-4">📷</div>
+          <h3 className="text-lg font-semibold text-foreground mb-2">No posts yet</h3>
+          <p className="text-muted-foreground text-sm">
+            {isOwnProfile ? 'Share your golf moments to see them here' : 'No posts to show'}
+          </p>
+        </div>
+      ) : filteredPosts.length === 0 ? (
+        <div className="text-center py-16 px-4">
+          <p className="text-muted-foreground">No posts found for this filter</p>
+        </div>
+      ) : (
+        /* Activity Grid - 3 col, 2px gaps, rounded squares */
+        <ActivityGrid
+          items={gridItems}
+          onItemClick={handleItemClick}
         />
       )}
+
+      {/* Filter Sheet */}
+      <ActivityFiltersSheet
+        open={filtersOpen}
+        onOpenChange={setFiltersOpen}
+        value={filters}
+        onChange={setFilters}
+      />
 
       {/* Fullscreen Media Modal */}
       <FullscreenMediaModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        mediaUrl={exploreContent.map(item => item.src)}
-        mediaType={exploreContent.map(item => item.type === 'cta' ? 'image' : item.type)}
+        mediaUrl={allMediaUrls}
+        mediaType={allMediaTypes}
         initialIndex={modalStartIndex}
       />
 

@@ -96,8 +96,8 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   if (isMobile) {
     return (
       <div className="relative">
-        {/* Avatar with ring */}
-        <div className="flex justify-center mb-4">
+        {/* Avatar with ring - centered */}
+        <div className="flex justify-center mb-3">
           <ProfileAvatarRing
             photoUrl={profilePhotoUrl}
             displayName={displayName}
@@ -106,16 +106,17 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
             isOwnProfile={isOwnProfile}
             size="lg"
             onClick={onAvatarClick}
+            animateOnFirstView={true}
           />
         </div>
 
-        {/* Name & handle block */}
-        <div className="text-center mb-3">
+        {/* Name & handle block - tighter spacing */}
+        <div className="flex flex-col items-center gap-1.5 mb-2">
           <h1 className="text-2xl font-semibold text-foreground leading-tight">
             {displayName}
           </h1>
-          <div className="flex items-center justify-center gap-2 mt-1">
-            <span className="text-muted-foreground">@{username}</span>
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-muted-foreground text-sm">@{username}</span>
             <span className={cn(
               "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide",
               isPersonal 
@@ -129,16 +130,16 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
           {isOwnProfile && <ProfileOpenToPlayStatus />}
         </div>
 
-        {/* Subtitle line */}
+        {/* Subtitle line - tighter */}
         {subtitleLine && (
-          <div className="text-center text-sm text-muted-foreground mb-3">
+          <div className="text-center text-sm text-muted-foreground mb-2">
             {subtitleLine}
           </div>
         )}
         
         {/* Website - Business profiles */}
         {!isPersonal && websiteUrl && (
-          <div className="flex items-center justify-center gap-1.5 text-sm mb-3">
+          <div className="flex items-center justify-center gap-1.5 text-sm mb-2">
             <Globe className="w-3.5 h-3.5 text-muted-foreground" />
             <a 
               href={getWebsiteHref(websiteUrl)}
@@ -151,10 +152,10 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
           </div>
         )}
 
-        {/* Bio with show more */}
+        {/* Bio with show more - tighter, max width */}
         {bio && (
-          <div className="text-center px-4 mb-3">
-            <p className="text-sm text-muted-foreground leading-relaxed">
+          <div className="text-center px-4 mb-2">
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-[280px] mx-auto">
               {displayBio}
             </p>
             {shouldTruncateBio && (
@@ -172,9 +173,9 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
           </div>
         )}
         
-        {/* Customise profile button - own profile only */}
+        {/* Customise profile button - soft styling */}
         {isOwnProfile && onCustomiseClick && (
-          <div className="flex justify-center mt-3">
+          <div className="flex justify-center mt-2">
             <Button
               variant="ghost"
               size="sm"
