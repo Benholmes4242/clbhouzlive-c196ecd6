@@ -93,11 +93,18 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   const shouldTruncateBio = bio && bio.length > 120;
   const displayBio = shouldTruncateBio && !bioExpanded ? `${bio.slice(0, 120)}...` : bio;
 
+  // Avatar size for overlap calculation (lg = 104px on mobile)
+  const avatarSize = 104;
+  const overlapAmount = avatarSize * 0.1; // 10% overlap
+
   if (isMobile) {
     return (
-      <div className="relative">
-        {/* Avatar with ring - centered */}
-        <div className="flex justify-center mb-3">
+      <div className="relative pt-[70px]">
+        {/* Avatar with ring - positioned to overlap hero by 10% */}
+        <div 
+          className="absolute left-1/2 -translate-x-1/2 z-20"
+          style={{ top: `-${overlapAmount}px` }}
+        >
           <ProfileAvatarRing
             photoUrl={profilePhotoUrl}
             displayName={displayName}
@@ -191,15 +198,18 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
     );
   }
 
-  // Desktop layout
+  // Desktop layout - avatar overlaps hero by 10%
+  const desktopAvatarSize = 104; // lg size
+  const desktopOverlapAmount = desktopAvatarSize * 0.1;
+  
   return (
-    <div className="flex flex-col items-center relative">
-      {/* Overhanging avatar with ring */}
+    <div className="flex flex-col items-center relative pt-14">
+      {/* Overhanging avatar with ring - 10% overlap with hero */}
       <div
-        className="absolute z-10"
+        className="absolute z-20"
         style={{
           right: '80px',
-          top: '-48px',
+          top: `-${desktopOverlapAmount}px`,
         }}
       >
         <ProfileAvatarRing
