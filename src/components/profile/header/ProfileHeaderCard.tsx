@@ -85,79 +85,79 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   const displayBio = shouldTruncateBio && !bioExpanded ? `${bio.slice(0, 120)}...` : bio;
 
   return (
-    <div className="px-6 pt-3 pb-4 text-center">
-      <div className="space-y-1.5">
-        {/* NAME */}
-        <h1 className="text-[22px] font-semibold leading-tight text-foreground">
-          {displayName}
-        </h1>
+    <div className="flex flex-col items-center text-center mt-2 space-y-2">
+      {/* NAME */}
+      <h1 className="text-[22px] font-semibold text-foreground">
+        {displayName}
+      </h1>
 
-        {/* HANDLE + BADGE */}
-        <div className="flex items-center justify-center gap-2 text-[13px] text-muted-foreground">
-          <span>@{username}</span>
-          <span className={cn(
-            "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium",
-            isPersonal 
-              ? "bg-emerald-500/10 text-emerald-600"
-              : "bg-blue-500/10 text-blue-600"
-          )}>
-            {isPersonal ? <User className="h-3 w-3" /> : <Building2 className="h-3 w-3" />}
-            {getUserTypeBadge()}
-          </span>
-        </div>
-
-        {/* CLUB + HCP LINE */}
-        {subtitleLine && (
-          <p className="text-[13px] text-muted-foreground leading-snug">
-            {subtitleLine}
-          </p>
-        )}
-        
-        {/* Website - Business profiles */}
-        {!isPersonal && websiteUrl && (
-          <div className="flex items-center justify-center gap-1.5 text-[13px]">
-            <Globe className="h-3.5 w-3.5 text-muted-foreground" />
-            <a 
-              href={getWebsiteHref(websiteUrl)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:text-primary/80 transition-colors"
-            >
-              {formatWebsiteUrl(websiteUrl)}
-            </a>
-          </div>
-        )}
-
-        {/* BIO */}
-        {bio && (
-          <p className="text-[13px] leading-snug text-muted-foreground max-w-[320px] mx-auto">
-            {displayBio}
-            {shouldTruncateBio && (
-              <button
-                onClick={() => setBioExpanded(!bioExpanded)}
-                className="inline-flex items-center gap-0.5 text-xs text-primary ml-1 hover:text-primary/80"
-              >
-                {bioExpanded ? (
-                  <>less <ChevronUp className="w-3 h-3" /></>
-                ) : (
-                  <>more <ChevronDown className="w-3 h-3" /></>
-                )}
-              </button>
-            )}
-          </p>
-        )}
-
-        {/* CUSTOMISE PROFILE (OWN PROFILE ONLY) */}
-        {isOwnProfile && onCustomiseClick && (
-          <button
-            className="inline-flex items-center gap-1 text-[12px] text-muted-foreground hover:text-foreground transition-colors"
-            onClick={onCustomiseClick}
-          >
-            <Brush className="h-[13px] w-[13px]" />
-            Customise profile
-          </button>
-        )}
+      {/* HANDLE + BADGE */}
+      <div className="flex items-center gap-2 text-[14px] text-muted-foreground">
+        @{username}
+        <span className={cn(
+          "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide",
+          isPersonal 
+            ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+            : "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+        )}>
+          {isPersonal ? <User className="w-2.5 h-2.5" /> : <Building2 className="w-2.5 h-2.5" />}
+          {getUserTypeBadge()}
+        </span>
       </div>
+
+      {/* CLUB + HCP LINE */}
+      {subtitleLine && (
+        <div className="text-[14px] text-muted-foreground">
+          {subtitleLine}
+        </div>
+      )}
+      
+      {/* Website - Business profiles */}
+      {!isPersonal && websiteUrl && (
+        <div className="flex items-center justify-center gap-1.5 text-[14px]">
+          <Globe className="w-3.5 h-3.5 text-muted-foreground" />
+          <a 
+            href={getWebsiteHref(websiteUrl)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:text-primary/80 transition-colors"
+          >
+            {formatWebsiteUrl(websiteUrl)}
+          </a>
+        </div>
+      )}
+
+      {/* BIO */}
+      {bio && (
+        <div className="max-w-[320px]">
+          <p className="text-[14px] text-muted-foreground leading-[1.35]">
+            {displayBio}
+          </p>
+          {shouldTruncateBio && (
+            <button
+              onClick={() => setBioExpanded(!bioExpanded)}
+              className="inline-flex items-center gap-0.5 text-xs text-primary mt-1 hover:text-primary/80"
+            >
+              {bioExpanded ? (
+                <>Show less <ChevronUp className="w-3 h-3" /></>
+              ) : (
+                <>Show more <ChevronDown className="w-3 h-3" /></>
+              )}
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* CUSTOMISE PROFILE (OWN PROFILE ONLY) */}
+      {isOwnProfile && onCustomiseClick && (
+        <button
+          className="flex items-center gap-1 text-[13px] mt-1 text-muted-foreground hover:text-foreground transition-colors"
+          onClick={onCustomiseClick}
+        >
+          <Brush className="w-3.5 h-3.5" />
+          Customise profile
+        </button>
+      )}
     </div>
   );
 };

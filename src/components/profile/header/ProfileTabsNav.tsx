@@ -11,8 +11,8 @@ interface ProfileTabsNavProps {
 }
 
 /**
- * ProfileTabsNav - Apple-style pill segmented control
- * Clean iOS-style tabs with raised active pill
+ * ProfileTabsNav - Premium Golf underline-only tabs with emerald glow
+ * Clean, Apple-like design with subtle top border
  */
 const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   userType,
@@ -26,7 +26,7 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [underlineStyle, setUnderlineStyle] = useState({ left: 0, width: 0 });
   
-  // Update underline position when active tab changes (for desktop)
+  // Update underline position when active tab changes
   useEffect(() => {
     const activeIndex = tabs.findIndex(tab => tab.id === activeSection);
     const activeTab = tabsRef.current[activeIndex];
@@ -40,41 +40,6 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
     }
   }, [activeSection, tabs]);
 
-  // Mobile: Apple-style pill segmented control
-  if (isMobile) {
-    return (
-      <div className="px-4 mt-4 mb-2">
-        <div className="flex rounded-full bg-black/4 dark:bg-white/6 p-1 backdrop-blur-md border border-white/15">
-          {tabs.map((tab, index) => {
-            const isActive = tab.id === activeSection;
-            return (
-              <button
-                key={tab.id}
-                ref={el => tabsRef.current[index] = el}
-                onClick={() => !disabled && onTabChange(tab.id)}
-                role="tab"
-                aria-selected={isActive}
-                aria-controls={`tabpanel-${tab.id}`}
-                tabIndex={isActive ? 0 : -1}
-                disabled={disabled}
-                className={cn(
-                  'flex-1 rounded-full py-1.5 text-[13px] font-medium transition-all duration-150',
-                  isActive
-                    ? 'bg-background shadow-[0_4px_12px_rgba(0,0,0,0.18)] text-foreground'
-                    : 'text-muted-foreground hover:text-foreground/90',
-                  disabled && 'pointer-events-none opacity-50'
-                )}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    );
-  }
-
-  // Desktop: Underline tabs with emerald glow
   return (
     <div className="mt-4 border-t border-white/10">
       <div 

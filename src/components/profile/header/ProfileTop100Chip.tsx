@@ -7,60 +7,6 @@ import ProfileCompletionStamps from './ProfileCompletionStamps';
 import { getCompletionStamps } from '@/lib/top100Helpers';
 import type { Top100ListProgress } from '@/lib/top100Helpers';
 
-// Tier-specific glass plaque styles
-const TIER_STYLES: Record<string, {
-  bg: string;
-  border: string;
-  accent: string;
-}> = {
-  founders: {
-    bg: 'from-emerald-500/22 via-emerald-500/12 to-emerald-500/6',
-    border: 'border-emerald-400/55',
-    accent: 'text-emerald-600',
-  },
-  rookie: {
-    bg: 'from-amber-500/20 via-amber-500/10 to-amber-500/5',
-    border: 'border-amber-400/50',
-    accent: 'text-amber-600',
-  },
-  fairway: {
-    bg: 'from-lime-500/20 via-lime-500/10 to-lime-500/5',
-    border: 'border-lime-400/50',
-    accent: 'text-lime-600',
-  },
-  heritage: {
-    bg: 'from-yellow-500/20 via-yellow-500/10 to-yellow-500/5',
-    border: 'border-yellow-400/50',
-    accent: 'text-yellow-600',
-  },
-  century: {
-    bg: 'from-slate-400/20 via-slate-400/10 to-slate-400/5',
-    border: 'border-slate-300/50',
-    accent: 'text-slate-600',
-  },
-  elite: {
-    bg: 'from-orange-500/20 via-orange-500/10 to-orange-500/5',
-    border: 'border-orange-400/50',
-    accent: 'text-orange-600',
-  },
-  legendary: {
-    bg: 'from-purple-500/20 via-purple-500/10 to-purple-500/5',
-    border: 'border-purple-400/50',
-    accent: 'text-purple-600',
-  },
-  grandslam: {
-    bg: 'from-slate-800/30 via-slate-800/15 to-slate-800/5',
-    border: 'border-slate-600/50',
-    accent: 'text-slate-800',
-  },
-};
-
-const DEFAULT_TIER_STYLE = {
-  bg: 'from-emerald-500/22 via-emerald-500/12 to-emerald-500/6',
-  border: 'border-emerald-400/55',
-  accent: 'text-emerald-600',
-};
-
 interface Top100Overview {
   total_rated?: number;
   total_played?: number;
@@ -75,7 +21,7 @@ interface ProfileTop100ChipProps {
 }
 
 /**
- * ProfileTop100Chip - Premium Golf glass plaque with tier-specific styling
+ * ProfileTop100Chip - Premium Golf plaque with emerald gradient
  * Hero item between stats and tabs
  */
 const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
@@ -95,9 +41,14 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
   const completionStamps = getCompletionStamps(top100Overview.lists);
   const regionsCount = top100Overview.regions_count ?? 0;
   
-  // Get tier-specific styling
-  const tierId = club.tierId ?? '';
-  const style = TIER_STYLES[tierId] ?? DEFAULT_TIER_STYLE;
+  // Build subtitle parts
+  const subtitleParts: string[] = [];
+  if (club.shortLabel) {
+    subtitleParts.push(club.shortLabel);
+  }
+  if (regionsCount > 0) {
+    subtitleParts.push(`${regionsCount} ${regionsCount === 1 ? 'region' : 'regions'}`);
+  }
 
   return (
     <div className="px-4 mt-6">
@@ -106,36 +57,42 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
         onClick={() => navigate('/top100?tab=my-progress')}
         className={cn(
           // Size & layout
-          'group flex w-full max-w-[360px] mx-auto items-center justify-between gap-3',
-          // Shape
-          'rounded-[26px] px-4 py-3',
-          // Glass effect with tier-specific gradient
-          'bg-gradient-to-br backdrop-blur-xl',
-          style.bg,
-          style.border,
-          'border shadow-[0_18px_45px_rgba(0,0,0,0.30)]',
+          'w-full max-w-[360px] mx-auto',
+          'flex items-center gap-3',
+          'px-4 py-3 md:px-5 md:py-3.5',
+          'rounded-2xl',
+          // Background & border (Premium Golf plaque)
+          'bg-gradient-to-r from-emerald-500/14 via-emerald-500/6 to-emerald-500/14',
+          'border border-white/40 shadow-[0_18px_45px_rgba(0,0,0,0.30)]',
+          'backdrop-blur-lg',
           // Interaction
-          'transition-transform duration-150 active:scale-[0.98]'
+          'transition-all duration-200 ease-out',
+          'hover:bg-emerald-500/18 hover:border-white/60 hover:shadow-[0_22px_55px_rgba(0,0,0,0.38)]',
+          'active:scale-[0.98]'
         )}
       >
-        {/* Left: white icon squircle */}
-        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/95 text-emerald-500 shadow-sm">
-          <Trophy className="h-5 w-5" />
+        {/* Left icon disc */}
+        <div className="relative flex items-center justify-center w-10 h-10 rounded-full bg-emerald-500/90 shadow-[0_8px_20px_rgba(0,0,0,0.35)]">
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white text-emerald-600">
+            <Trophy className="h-4 w-4" />
+          </span>
         </div>
 
-        {/* Center text */}
-        <div className="flex min-w-0 flex-1 flex-col text-left">
-          <span className="truncate text-[15px] font-semibold text-slate-900">
+        {/* Text block */}
+        <div className="flex flex-col text-left flex-1 min-w-0">
+          <span className="text-[15px] md:text-[16px] font-semibold text-foreground truncate">
             {totalPlayed} Top 100
           </span>
-          <span className={cn('truncate text-[12px] font-medium', style.accent)}>
-            {club.shortLabel || 'Founders'}{regionsCount > 0 ? ` · ${regionsCount} regions` : ''}
-          </span>
+          {subtitleParts.length > 0 && (
+            <span className="mt-0.5 text-[12px] text-emerald-400/90">
+              {subtitleParts.join(' · ')}
+            </span>
+          )}
         </div>
 
-        {/* Arrow */}
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/70 text-slate-700 group-hover:bg-white/90 transition-colors">
-          <ChevronRight className="h-4 w-4" />
+        {/* Chevron */}
+        <div className="flex items-center justify-center">
+          <ChevronRight className="h-4 w-4 text-foreground/60" />
         </div>
       </button>
       
