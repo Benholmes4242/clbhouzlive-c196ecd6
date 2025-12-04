@@ -345,10 +345,10 @@ const HeroProfileHeader = ({
 
   return (
     <SwipeToReturnZone onSwipeDown={reopenImmersive}>
-      {/* Premium Golf Profile Layout */}
-      <div className="w-full relative -mt-16">
+      {/* Premium Golf Profile Layout - No white card, gradient fade */}
+      <section className="relative w-full bg-background -mt-16">
         
-        {/* HERO IMAGE - 240px height */}
+        {/* HERO IMAGE + FADE */}
         <div className="relative w-full h-[240px] overflow-hidden">
           {heroSrc ? (
             <img 
@@ -361,33 +361,26 @@ const HeroProfileHeader = ({
             <div className="w-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
           )}
           
-          {/* Top vignette */}
+          {/* Top vignette for header readability */}
           <div 
             className="absolute top-0 left-0 right-0 h-20 pointer-events-none"
             style={{
               background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 100%)',
             }}
           />
+          
+          {/* Fade hero into background (no card) */}
+          <div
+            className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/0 via-black/0 to-background"
+          />
         </div>
 
-        {/* META CARD (glassy) */}
+        {/* META BLOCK (no white card, just padding on background) */}
         <div
           ref={profileCardRef}
-          className={cn(
-            "relative mx-auto w-full",
-            isMobile ? "max-w-full" : "max-w-[540px]",
-            "rounded-t-3xl",
-            "bg-background/95",
-            "shadow-[0_-18px_55px_rgba(0,0,0,0.45)]",
-            "border border-white/10 border-b-0",
-            "backdrop-blur-xl",
-            "pt-20 pb-6 px-5"
-          )}
-          style={{
-            marginTop: '-24px',
-          }}
+          className="relative mx-auto max-w-[540px] px-5 pt-20 pb-8"
         >
-          {/* AVATAR — overlaps hero by ~10% */}
+          {/* AVATAR – OVERLAPS HERO BY ~10% */}
           <div className="absolute left-1/2 -top-[60px] -translate-x-1/2 z-20">
             <ProfileAvatarRing
               photoUrl={profile?.profile_photo_url}
@@ -401,7 +394,7 @@ const HeroProfileHeader = ({
             />
           </div>
 
-          {/* NAME / HANDLE / CLUB / BIO BLOCK */}
+          {/* TEXT META (name, @handle, club, bio, customise) */}
           <ProfileHeaderCard
             displayName={displayName}
             username={username}
@@ -463,7 +456,7 @@ const HeroProfileHeader = ({
             disabled={transitionState !== 'idle'}
           />
         </div>
-      </div>
+      </section>
 
       {/* Content sections with slide transitions */}
       <div className="relative overflow-hidden">
