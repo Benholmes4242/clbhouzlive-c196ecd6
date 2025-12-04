@@ -73,6 +73,7 @@ import { useModalContext } from '@/contexts/ModalContext';
 const Auth = lazy(() => import("./pages/Auth"));
 const Clubhouse = lazy(() => import("./pages/Clubhouse"));
 const CreateProfile = lazy(() => import("./pages/CreateProfile"));
+const AccountTypeOnboarding = lazy(() => import("./pages/onboarding/AccountTypeOnboarding"));
 const ProfileTestPage = lazy(() => import("./pages/ProfileTestPage"));
 const AdminBackfill = lazy(() => import("./pages/AdminBackfill"));
 const UserProfilePage = lazy(() => import("./pages/UserProfilePage"));
@@ -187,6 +188,7 @@ function AppRoutes() {
         <Route path="/" element={<ClubhouseWrapped />} />
         <Route path="/auth" element={<AuthWrapped />} />
         <Route path="/create-profile" element={<CreateProfile />} />
+        <Route path="/onboarding/account-type" element={<Suspense fallback={<GenericPageSkeleton />}><AccountTypeOnboarding /></Suspense>} />
         <Route path="/profile" element={<ProfileWrapped />} />
         <Route path="/profile-test" element={<ProfileTestPage />} />
         <Route path="/profile/:username" element={<Suspense fallback={<ProfileSkeleton />}><UserProfilePage /></Suspense>} />

@@ -9,12 +9,15 @@ export interface UserProfile {
   profile_photo_url: string | null;
   header_photo_url?: string | null;
   home_club: string | null;
+  home_club_id?: string | null;
   eg_handicap_index: number | null;
   show_handicap?: boolean;
   bio?: string | null;
   website?: string | null;
   user_type?: string | null;
   is_public?: boolean | null;
+  is_official_club?: boolean | null;
+  has_completed_onboarding?: boolean | null;
   mini_card_crop_x?: number | null;
   mini_card_crop_y?: number | null;
   mini_card_crop_width?: number | null;

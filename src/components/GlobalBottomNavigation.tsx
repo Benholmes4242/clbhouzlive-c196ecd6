@@ -19,6 +19,7 @@ const HIDDEN_ROUTES = [
   '/auth',
   '/create-profile',
   '/admin-setup',
+  '/onboarding',
   // Add more full-screen routes as needed
 ];
 
