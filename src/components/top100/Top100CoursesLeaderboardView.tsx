@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTop100CourseLeaderboard, CourseLeaderboardEntry } from '@/hooks/useTop100CourseLeaderboard';
 import { useTop100FriendRecentActivity } from '@/hooks/useTop100FriendRecentActivity';
 import { useTop100CourseMovers } from '@/hooks/useTop100CourseMovers';
-import { useMyCourseShortlist } from '@/hooks/useMyCourseShortlist';
-import { useToggleCourseShortlist } from '@/hooks/useToggleCourseShortlist';
 import { LeaderboardScope, LeaderboardTimeRange } from '@/hooks/useTop100Leaderboard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
@@ -14,7 +12,6 @@ import { Top100CourseMoversStrip } from './Top100CourseMoversStrip';
 import { getCourseTrophies } from './getCourseTrophies';
 import CourseRankBadges from '@/components/courses/CourseRankBadges';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
-import { Bookmark } from 'lucide-react';
 import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 
 interface Top100CoursesLeaderboardViewProps {
@@ -84,7 +81,7 @@ function mapFiltersToTimeRange(filters: Top100LeaderboardFilters): LeaderboardTi
 export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboardViewProps) {
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
-  const [viewScope, setViewScope] = useState<'all' | 'friends' | 'shortlist'>('all');
+  const [viewScope, setViewScope] = useState<'all' | 'friends'>('all');
 
   const scope = mapFiltersToScope(filters);
   const timeRange = mapFiltersToTimeRange(filters);
@@ -100,10 +97,6 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
 
   // Phase 2B: Course movers
   const { data: movers } = useTop100CourseMovers(scope, timeRange);
-
-  // Phase 3: Shortlist
-  const { data: myShortlistSet } = useMyCourseShortlist();
-  const toggleShortlist = useToggleCourseShortlist();
 
   const allCourseEntries = data?.pages.flatMap(page => page.entries) || [];
 
@@ -124,18 +117,13 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
     }
   }, [allCourseEntries, filters.sortBy]);
 
-  // Filter by viewScope (Everyone vs Friends' picks vs My shortlist)
+  // Filter by viewScope (Everyone vs Friends' picks)
   const visibleCourses = useMemo(() => {
     if (viewScope === 'friends') {
       return sortedCourses.filter((c) => (c.friends_count ?? 0) > 0);
     }
-    if (viewScope === 'shortlist') {
-      return sortedCourses.filter((c) => 
-        c.shortlisted_by_me || (myShortlistSet?.has(c.course_id) ?? false)
-      );
-    }
     return sortedCourses;
-  }, [sortedCourses, viewScope, myShortlistSet]);
+  }, [sortedCourses, viewScope]);
 
   // Pagination
   const totalPages = Math.max(1, Math.ceil(visibleCourses.length / PAGE_SIZE));
@@ -167,62 +155,52 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
       {/* Phase 2B: Course movers strip */}
       <Top100CourseMoversStrip items={movers ?? []} timeRange={filters.timeRange} />
 
-      {/* Section Label + scope toggle */}
-      <div className="px-2.5">
-        <p className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
-          Course rankings
-        </p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          {viewScope === 'shortlist'
-            ? 'Your trip shortlist'
-            : filters.sortBy === 'member_rating'
-            ? 'Top 100 courses by community rating'
-            : filters.sortBy === 'most_played'
-            ? "Top 100 courses by how often they're played"
-            : filters.sortBy === 'recently_popular'
-            ? 'Top 100 courses trending this month'
-            : 'Top 100 courses by official ranking'}
-        </p>
-      </div>
-      <div className="flex items-center justify-end gap-3 mb-3">
+      {/* Section Label + scope toggle - single row */}
+      <div className="flex items-center justify-between px-2.5 gap-3 mb-3">
+        {/* Left: title + subtitle */}
+        <div className="flex flex-col">
+          <p className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
+            Course rankings
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {filters.sortBy === 'member_rating'
+              ? 'Top 100 courses by community rating'
+              : filters.sortBy === 'most_played'
+              ? "Top 100 courses by how often they're played"
+              : filters.sortBy === 'recently_popular'
+              ? 'Top 100 courses trending this month'
+              : 'Top 100 courses by official ranking'}
+          </p>
+        </div>
 
-        <div className="inline-flex items-center rounded-full bg-muted/60 p-1 text-xs">
-          <button
-            type="button"
-            onClick={() => setViewScope('all')}
-            className={cn(
-              'px-2.5 py-1 rounded-full transition-colors',
-              viewScope === 'all'
-                ? 'bg-background shadow-sm font-medium text-foreground'
-                : 'text-muted-foreground'
-            )}
-          >
-            All
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewScope('friends')}
-            className={cn(
-              'px-2.5 py-1 rounded-full transition-colors',
-              viewScope === 'friends'
-                ? 'bg-background shadow-sm font-medium text-foreground'
-                : 'text-muted-foreground'
-            )}
-          >
-            Friends
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewScope('shortlist')}
-            className={cn(
-              'px-2.5 py-1 rounded-full transition-colors',
-              viewScope === 'shortlist'
-                ? 'bg-background shadow-sm font-medium text-foreground'
-                : 'text-muted-foreground'
-            )}
-          >
-            Shortlist
-          </button>
+        {/* Right: pill toggle */}
+        <div className="flex-shrink-0">
+          <div className="inline-flex items-center rounded-full bg-muted/60 p-1 text-xs">
+            <button
+              type="button"
+              onClick={() => setViewScope('all')}
+              className={cn(
+                'px-2.5 py-1 rounded-full transition-colors',
+                viewScope === 'all'
+                  ? 'bg-background shadow-sm font-medium text-foreground'
+                  : 'text-muted-foreground'
+              )}
+            >
+              All
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewScope('friends')}
+              className={cn(
+                'px-2.5 py-1 rounded-full transition-colors',
+                viewScope === 'friends'
+                  ? 'bg-background shadow-sm font-medium text-foreground'
+                  : 'text-muted-foreground'
+              )}
+            >
+              Friends
+            </button>
+          </div>
         </div>
       </div>
 
@@ -234,7 +212,6 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
             const rating = course.avg_rating ?? null;
             const tags = getCourseTags(course, filters);
             const trophies = getCourseTrophies(course, index);
-            const isShortlisted = course.shortlisted_by_me || (myShortlistSet?.has(course.course_id) ?? false);
 
             return (
               <button
@@ -267,7 +244,7 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
                       positioning="top-left"
                     />
 
-                    {/* Phase 2C: Trophy badge top-right */}
+                    {/* Trophy badge top-right */}
                     {trophies.length > 0 && (
                       <div className="absolute top-2 right-2">
                         <span className="inline-flex items-center rounded-full bg-background/95 border border-border/70 px-2 py-0.5 text-[11px] font-medium">
@@ -275,34 +252,6 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
                         </span>
                       </div>
                     )}
-
-                    {/* Phase 3: Trip shortlist button bottom-right */}
-                    <div className="absolute bottom-2 right-2">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleShortlist.mutate({
-                            courseId: course.course_id,
-                            currentlyShortlisted: isShortlisted,
-                          });
-                        }}
-                        aria-pressed={isShortlisted}
-                        className={cn(
-                          'inline-flex h-7 w-7 items-center justify-center rounded-full border text-[11px] shadow-xs backdrop-blur-sm transition-colors',
-                          isShortlisted
-                            ? 'bg-foreground text-background border-foreground'
-                            : 'bg-background/90 text-foreground border-border/70 hover:bg-muted/80'
-                        )}
-                      >
-                        <Bookmark
-                          className={cn(
-                            'h-3.5 w-3.5',
-                            isShortlisted && 'fill-background'
-                          )}
-                        />
-                      </button>
-                    </div>
                   </div>
                 )}
 
@@ -348,14 +297,6 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
                         </p>
                       )}
 
-                      {/* Shortlist social proof */}
-                      {course.shortlisted_count > 0 && (
-                        <p className="text-[11px] text-muted-foreground mt-0.5">
-                          {course.shortlisted_count} member
-                          {course.shortlisted_count === 1 ? '' : 's'} have this on their trip shortlist
-                        </p>
-                      )}
-
                       {/* Smart Tags */}
                       {tags.length > 0 && (
                         <div className="mt-1.5 flex flex-wrap gap-1">
@@ -392,9 +333,7 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
       {visibleCourses.length === 0 && !isLoading && (
         <div className="text-center py-12">
           <p className="text-sm text-muted-foreground">
-            {viewScope === 'shortlist'
-              ? 'Your shortlist is empty. Tap the bookmark icon on any course to build your dream trip.'
-              : viewScope === 'friends'
+            {viewScope === 'friends'
               ? 'None of your friends have rated Top 100 courses yet.'
               : 'No courses found with the selected filters.'}
           </p>
