@@ -345,10 +345,10 @@ const HeroProfileHeader = ({
 
   return (
     <SwipeToReturnZone onSwipeDown={reopenImmersive}>
-      {/* Premium Golf Profile Layout - No white card, gradient fade */}
-      <section className="relative w-full bg-background -mt-16">
+      {/* Premium Golf Profile Layout - No card, seamless gradient */}
+      <section className="relative w-full -mt-16">
         
-        {/* HERO IMAGE + FADE */}
+        {/* HERO IMAGE */}
         <div className="relative w-full h-[240px] overflow-hidden">
           {heroSrc ? (
             <img 
@@ -369,16 +369,16 @@ const HeroProfileHeader = ({
             }}
           />
           
-          {/* Fade hero into background (no card) */}
+          {/* Bottom fade into page */}
           <div
-            className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/0 via-black/0 to-background"
+            className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background via-background/80 to-transparent"
           />
         </div>
 
-        {/* META BLOCK (no white card, just padding on background) */}
+        {/* META BLOCK - no card, transparent, sits on page background */}
         <div
           ref={profileCardRef}
-          className="relative mx-auto max-w-[540px] px-5 pt-20 pb-8"
+          className="relative mx-auto max-w-[540px] px-5 pt-16 pb-8 bg-background"
         >
           {/* AVATAR – OVERLAPS HERO BY ~10% */}
           <div className="absolute left-1/2 -top-[60px] -translate-x-1/2 z-20">
