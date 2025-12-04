@@ -21,8 +21,8 @@ interface ProfileTop100ChipProps {
 }
 
 /**
- * ProfileTop100Chip - Compact Top 100 summary with progress and completion stamps
- * Shows total courses played, regions count, club tier, and any completion stamps
+ * ProfileTop100Chip - Glassy Top 100 summary card with tier halo
+ * Shows total courses played, regions count, club tier, and completion stamps
  */
 const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
   top100Overview,
@@ -42,36 +42,44 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
 
   return (
     <div className={cn("flex flex-col items-center gap-2", isMobile ? "mt-3" : "mt-4")}>
-      {/* Main Top 100 chip */}
+      {/* Glassy Top 100 chip */}
       <button
         type="button"
         onClick={() => navigate('/top100?tab=my-progress')}
         className={cn(
           "group inline-flex items-center gap-3 rounded-2xl",
-          "border border-white/10 bg-slate-900/80 backdrop-blur-sm",
-          "px-4 py-2.5",
-          "hover:border-white/20 hover:bg-slate-800/80",
+          "border border-white/25 backdrop-blur-md",
+          "px-4 py-3",
+          "bg-white/10",
+          "shadow-[0_10px_30px_rgba(0,0,0,0.35)]",
+          "hover:border-white/35 hover:bg-white/15",
           "transition-all duration-200 ease-out",
-          "shadow-lg shadow-black/20"
+          "active:scale-[0.98]"
         )}
       >
-        {/* Trophy icon with tier color glow */}
-        <div 
-          className="relative flex items-center justify-center w-8 h-8 rounded-full"
-          style={{ 
-            backgroundColor: `${club.ringColor}20`,
-            boxShadow: `0 0 12px ${club.ringColor}30`
-          }}
-        >
-          <Trophy className="h-4 w-4" style={{ color: club.ringColor }} />
-        </div>
+        {/* Trophy icon with tier color halo */}
+        <span className="relative inline-flex items-center justify-center">
+          {/* Conic gradient halo effect */}
+          <span
+            className="absolute inset-0 rounded-full opacity-70 blur-[4px]"
+            style={{
+              background: `conic-gradient(from 0deg, ${club.ringColor}b3, rgba(255,255,255,0.2), ${club.ringColor}b3)`,
+            }}
+          />
+          <span 
+            className="relative inline-flex items-center justify-center rounded-full w-7 h-7"
+            style={{ backgroundColor: `${club.ringColor}20` }}
+          >
+            <Trophy className="w-4 h-4" style={{ color: club.ringColor }} />
+          </span>
+        </span>
         
         {/* Content */}
         <div className="flex flex-col items-start leading-tight">
-          <span className="font-semibold text-sm text-white">
+          <span className="font-semibold text-sm text-foreground">
             {totalPlayed} Top 100
           </span>
-          <span className="text-[11px] text-slate-400 flex items-center gap-1.5">
+          <span className="text-[11px] text-muted-foreground flex items-center gap-1.5">
             {top100Overview.regions_count > 0 && (
               <>
                 <MapPin className="w-2.5 h-2.5" />
@@ -80,7 +88,7 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
             )}
             {club.shortLabel && (
               <>
-                {top100Overview.regions_count > 0 && <span className="text-slate-600">·</span>}
+                {top100Overview.regions_count > 0 && <span className="opacity-50">·</span>}
                 <span 
                   className="font-medium"
                   style={{ color: club.ringColor }}
@@ -93,7 +101,7 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
         </div>
         
         {/* Arrow indicator */}
-        <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-slate-300 group-hover:translate-x-0.5 transition-all" />
+        <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground group-hover:translate-x-0.5 transition-all" />
       </button>
       
       {/* Completion stamps row */}

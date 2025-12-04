@@ -11,7 +11,7 @@ interface ProfileTabsNavProps {
 }
 
 /**
- * ProfileTabsNav - Premium tab navigation with animated underline
+ * ProfileTabsNav - Premium floating tab bar with glassy effect and glowing underline
  * Personal: Activity, Courses, Top 100 Journey, Achievements, Handicap
  * Business: Activity only
  */
@@ -24,51 +24,83 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
 }) => {
   const tabs = getProfileTabs(userType);
   const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [underlineStyle, setUnderlineStyle] = useState({ left: 0, width: 0 });
   
   // Update underline position when active tab changes
   useEffect(() => {
     const activeIndex = tabs.findIndex(tab => tab.id === activeSection);
     const activeTab = tabsRef.current[activeIndex];
+    const container = containerRef.current;
     
-    if (activeTab) {
-      const { offsetLeft, offsetWidth } = activeTab;
-      setUnderlineStyle({ left: offsetLeft, width: offsetWidth });
+    if (activeTab && container) {
+      const containerRect = container.getBoundingClientRect();
+      const tabRect = activeTab.getBoundingClientRect();
+      const left = tabRect.left - containerRect.left;
+      setUnderlineStyle({ left, width: tabRect.width });
     }
   }, [activeSection, tabs]);
 
+  // Mobile: Floating pill tabs
   if (isMobile) {
     return (
-      <nav className="mt-4 -mx-4 px-4 overflow-x-auto scrollbar-none">
-        <div className="flex gap-1 min-w-max pb-2">
-          {tabs.map((tab, index) => (
-            <button
-              key={tab.id}
-              ref={el => tabsRef.current[index] = el}
-              onClick={() => !disabled && onTabChange(tab.id)}
-              className={cn(
-                "px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap",
-                "transition-all duration-200 ease-out",
-                activeSection === tab.id 
-                  ? "bg-primary text-primary-foreground shadow-sm" 
-                  : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground",
-                disabled && "pointer-events-none opacity-50"
-              )}
-              aria-selected={activeSection === tab.id}
-              disabled={disabled}
-            >
-              {tab.label}
-            </button>
-          ))}
+      <nav className="mt-5 px-3">
+        <div
+          ref={containerRef}
+          className={cn(
+            "flex items-center justify-between",
+            "rounded-full p-1",
+            "bg-black/22 border border-white/16",
+            "backdrop-blur-xl"
+          )}
+        >
+          {tabs.map((tab, index) => {
+            const active = tab.id === activeSection;
+            return (
+              <button
+                key={tab.id}
+                ref={el => tabsRef.current[index] = el}
+                onClick={() => !disabled && onTabChange(tab.id)}
+                className={cn(
+                  "relative flex-1 py-1.5 text-center text-[13px] rounded-full",
+                  "transition-all duration-150",
+                  active 
+                    ? "text-foreground" 
+                    : "text-foreground/60 hover:text-foreground/80",
+                  disabled && "pointer-events-none opacity-50"
+                )}
+                aria-selected={active}
+                disabled={disabled}
+              >
+                {tab.label}
+                {/* Glowing underline for active tab */}
+                {active && (
+                  <span
+                    className={cn(
+                      "absolute left-1/2 -bottom-[2px] -translate-x-1/2",
+                      "h-[2px] w-9 rounded-full",
+                      "bg-primary/90",
+                      "shadow-[0_0_6px_hsl(var(--primary)/0.9)]"
+                    )}
+                  />
+                )}
+              </button>
+            );
+          })}
         </div>
       </nav>
     );
   }
 
-  // Desktop layout with sliding underline
+  // Desktop: Sliding underline tabs
   return (
     <div className="w-full border-t border-border/50 mt-6 pt-2">
-      <div className="relative flex" role="tablist" aria-label="Profile sections">
+      <div 
+        ref={containerRef}
+        className="relative flex" 
+        role="tablist" 
+        aria-label="Profile sections"
+      >
         {tabs.map((tab, index) => (
           <button
             key={tab.id}
@@ -93,9 +125,14 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
           </button>
         ))}
         
-        {/* Animated underline indicator */}
+        {/* Animated underline with glow */}
         <div 
-          className="absolute bottom-0 h-0.5 bg-primary rounded-full transition-all duration-300 ease-out"
+          className={cn(
+            "absolute bottom-0 h-0.5 rounded-full",
+            "bg-primary",
+            "shadow-[0_0_8px_hsl(var(--primary)/0.8)]",
+            "transition-all duration-300 ease-out"
+          )}
           style={{
             left: underlineStyle.left,
             width: underlineStyle.width,
