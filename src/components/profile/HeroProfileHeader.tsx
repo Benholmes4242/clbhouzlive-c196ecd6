@@ -349,7 +349,7 @@ const HeroProfileHeader = ({
       <section className="relative w-full -mt-16">
         
         {/* HERO IMAGE */}
-        <div className="relative w-full h-[300px] overflow-hidden">
+        <div className="relative w-full h-[270px] overflow-hidden">
           {heroSrc ? (
             <img 
               src={heroSrc}
