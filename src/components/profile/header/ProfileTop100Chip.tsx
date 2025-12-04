@@ -21,8 +21,8 @@ interface ProfileTop100ChipProps {
 }
 
 /**
- * ProfileTop100Chip - Glassy Top 100 summary card with tier halo
- * Shows total courses played, regions count, club tier, and completion stamps
+ * ProfileTop100Chip - Premium Golf plaque with emerald gradient
+ * Hero item between stats and tabs
  */
 const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
   top100Overview,
@@ -39,76 +39,68 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
   
   const club = getTop100Club(totalPlayed);
   const completionStamps = getCompletionStamps(top100Overview.lists);
+  const regionsCount = top100Overview.regions_count ?? 0;
+  
+  // Build subtitle parts
+  const subtitleParts: string[] = [];
+  if (club.shortLabel) {
+    subtitleParts.push(club.shortLabel);
+  }
+  if (regionsCount > 0) {
+    subtitleParts.push(`${regionsCount} ${regionsCount === 1 ? 'region' : 'regions'}`);
+  }
 
   return (
-    <div className={cn("flex flex-col items-center gap-2 w-full", isMobile ? "mt-3 px-4" : "mt-4 px-6")}>
-      {/* Premium Plaque Card */}
+    <div className="px-4 mt-4">
       <button
         type="button"
         onClick={() => navigate('/top100?tab=my-progress')}
         className={cn(
-          "group inline-flex items-center justify-between w-full rounded-2xl",
-          "border border-white/25 backdrop-blur-md",
-          "px-4 py-3",
-          "bg-white/10",
-          "shadow-[0_10px_30px_rgba(0,0,0,0.30)]",
-          "hover:border-white/35 hover:bg-white/15",
-          "transition-all duration-200 ease-out",
-          "active:scale-[0.98]"
+          // Size & layout
+          'w-full max-w-[360px] mx-auto',
+          'flex items-center gap-3',
+          'px-4 py-3 md:px-5 md:py-3.5',
+          'rounded-2xl',
+          // Background & border (Premium Golf plaque)
+          'bg-gradient-to-r from-emerald-500/14 via-emerald-500/6 to-emerald-500/14',
+          'border border-white/40 shadow-[0_18px_45px_rgba(0,0,0,0.30)]',
+          'backdrop-blur-lg',
+          // Interaction
+          'transition-all duration-200 ease-out',
+          'hover:bg-emerald-500/18 hover:border-white/60 hover:shadow-[0_22px_55px_rgba(0,0,0,0.38)]',
+          'active:scale-[0.98]'
         )}
       >
-        {/* Left Section: Trophy + Text */}
-        <div className="flex items-center gap-3">
-          {/* Trophy icon with tier color halo */}
-          <span className="relative inline-flex items-center justify-center">
-            {/* Conic gradient halo effect using CSS mask */}
-            <span
-              className="absolute inset-[-4px] rounded-full opacity-70 blur-[6px]"
-              style={{
-                background: `conic-gradient(from 0deg, ${club.ringColor}b3, rgba(255,255,255,0.15), ${club.ringColor}b3)`,
-              }}
-            />
-            <span 
-              className="relative inline-flex items-center justify-center rounded-full w-8 h-8"
-              style={{ backgroundColor: `${club.ringColor}20` }}
-            >
-              <Trophy className="w-4 h-4" style={{ color: club.ringColor }} />
-            </span>
+        {/* Left icon disc */}
+        <div className="relative flex items-center justify-center w-10 h-10 rounded-full bg-emerald-500/90 shadow-[0_8px_20px_rgba(0,0,0,0.35)]">
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white text-emerald-600">
+            <Trophy className="h-4 w-4" />
           </span>
-          
-          {/* Text group */}
-          <div className="flex flex-col items-start leading-tight">
-            <span className="font-medium text-sm text-foreground tracking-tight">
-              {totalPlayed} Top 100
-            </span>
-            <span className="text-[11px] text-muted-foreground flex items-center gap-1.5">
-              {top100Overview.regions_count > 0 && (
-                <>
-                  {top100Overview.regions_count} {top100Overview.regions_count === 1 ? 'region' : 'regions'}
-                </>
-              )}
-              {club.shortLabel && (
-                <>
-                  {top100Overview.regions_count > 0 && <span className="opacity-50">·</span>}
-                  <span 
-                    className="font-medium"
-                    style={{ color: club.ringColor }}
-                  >
-                    {club.shortLabel}
-                  </span>
-                </>
-              )}
-            </span>
-          </div>
         </div>
-        
-        {/* Right Section: Chevron */}
-        <ChevronRight className="w-4 h-4 text-muted-foreground/70 group-hover:text-foreground group-hover:translate-x-0.5 transition-all" />
+
+        {/* Text block */}
+        <div className="flex flex-col text-left flex-1 min-w-0">
+          <span className="text-[15px] md:text-[16px] font-semibold text-foreground truncate">
+            {totalPlayed} Top 100
+          </span>
+          {subtitleParts.length > 0 && (
+            <span className="mt-0.5 text-[12px] text-emerald-100/90">
+              {subtitleParts.join(' · ')}
+            </span>
+          )}
+        </div>
+
+        {/* Chevron */}
+        <div className="flex items-center justify-center">
+          <ChevronRight className="h-4 w-4 text-white/80" />
+        </div>
       </button>
       
       {/* Completion stamps row */}
       {completionStamps.length > 0 && (
-        <ProfileCompletionStamps stamps={completionStamps} />
+        <div className="mt-2">
+          <ProfileCompletionStamps stamps={completionStamps} />
+        </div>
       )}
     </div>
   );

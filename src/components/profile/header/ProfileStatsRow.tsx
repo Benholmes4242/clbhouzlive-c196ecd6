@@ -1,5 +1,4 @@
 import React from 'react';
-import { FileText, Users, UserPlus, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ProfileStatsRowProps {
@@ -17,33 +16,29 @@ interface ProfileStatsRowProps {
 interface StatItemProps {
   value: number;
   label: string;
-  icon?: React.ReactNode;
   onClick?: () => void;
   isClickable?: boolean;
-  showBorder?: boolean;
 }
 
 const StatItem: React.FC<StatItemProps> = ({ 
   value, 
   label, 
-  icon,
   onClick, 
-  isClickable = false,
-  showBorder = false 
+  isClickable = false
 }) => {
   const content = (
     <>
-      <span className="text-lg font-semibold text-foreground tabular-nums">{value}</span>
-      <span className="text-sm font-normal text-muted-foreground flex items-center gap-1">
-        {icon}
+      <div className="text-[16px] font-semibold text-foreground tabular-nums">
+        {value}
+      </div>
+      <div className="mt-0.5 text-[11px] tracking-wide text-foreground/55 uppercase">
         {label}
-      </span>
+      </div>
     </>
   );
 
   const baseClasses = cn(
-    "flex flex-col items-center py-1 transition-all duration-150",
-    showBorder && "border-l border-border/50 pl-4",
+    "flex flex-col items-center transition-all duration-150",
     isClickable && "cursor-pointer hover:scale-105 hover:opacity-90 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-lg"
   );
 
@@ -59,7 +54,7 @@ const StatItem: React.FC<StatItemProps> = ({
 };
 
 /**
- * ProfileStatsRow - Displays profile stats with micro-interactions
+ * ProfileStatsRow - Premium Golf stats display
  * Personal: Posts, Friends, Following, Followers (4 columns)
  * Business: Posts, Following, Followers (3 columns)
  */
@@ -74,9 +69,13 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
   onFollowingClick,
   onFriendsClick
 }) => {
+  // Mobile layout - clean grid
   if (isMobile) {
     return (
-      <div className="flex items-center justify-center gap-6 py-3">
+      <div className={cn(
+        "mt-4 grid gap-4 text-center",
+        isPersonal ? "grid-cols-4" : "grid-cols-3"
+      )}>
         <StatItem value={postsCount} label="Posts" />
         
         {isPersonal && (
@@ -105,11 +104,11 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
     );
   }
 
-  // Desktop layout with subtle icons and borders
+  // Desktop layout
   return (
     <div 
       className={cn(
-        "w-full grid gap-4 py-4 mt-4",
+        "w-full grid gap-4 py-4 mt-4 text-center",
         isPersonal ? "grid-cols-4" : "grid-cols-3"
       )}
       style={{
@@ -128,7 +127,6 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
           label="Friends"
           onClick={onFriendsClick}
           isClickable
-          showBorder
         />
       )}
       
@@ -137,7 +135,6 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
         label="Following"
         onClick={onFollowingClick}
         isClickable
-        showBorder
       />
       
       <StatItem 
@@ -145,7 +142,6 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
         label="Followers"
         onClick={onFollowersClick}
         isClickable
-        showBorder
       />
     </div>
   );
