@@ -1,5 +1,5 @@
 // Web Vitals collection for performance monitoring
-import { onCLS, onFCP, onLCP, onINP, onTTFB } from 'web-vitals';
+import { AppLog } from '@/lib/logger';
 
 export interface WebVitalsMetric {
   name: string;
@@ -9,7 +9,12 @@ export interface WebVitalsMetric {
   navigationType?: string;
 }
 
+// Disable web vitals logging entirely for cleaner console
+const WEB_VITALS_ENABLED = false;
+
 export const initWebVitals = (sendMetric: (name: string, value: number, metric: WebVitalsMetric) => void) => {
+  if (!WEB_VITALS_ENABLED) return;
+  
   // Lazy-load to avoid blank-screen on early failure
   import('web-vitals').then(({ onCLS, onFCP, onLCP, onINP, onTTFB }) => {
     onCLS((metric) => {
@@ -33,30 +38,25 @@ export const initWebVitals = (sendMetric: (name: string, value: number, metric: 
     });
   }).catch(() => {
     // no-op: metrics collection is non-critical
-    console.warn('Web Vitals failed to load');
   });
 };
 
-// Basic analytics sender (can be enhanced with your analytics provider)
+// Basic analytics sender (disabled for now)
 export const sendToAnalytics = (name: string, value: number, metric: WebVitalsMetric) => {
-  // Log to console in development
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`[Web Vitals] ${name}:`, {
-      value: Math.round(value),
-      rating: getRating(name, value),
-      ...metric,
-    });
-  }
+  if (!WEB_VITALS_ENABLED) return;
   
-  // Send to your analytics service here
-  // Example: analytics.track('web_vital', { name, value, ...metric });
+  AppLog.debug('WebVitals', name, {
+    value: Math.round(value),
+    rating: getRating(name, value),
+    ...metric,
+  });
 };
 
 // Get performance rating based on web vitals thresholds
 const getRating = (name: string, value: number): 'good' | 'needs-improvement' | 'poor' => {
   const thresholds = {
     CLS: [0.1, 0.25],
-    FCP: [1800, 3000], // First Contentful Paint thresholds
+    FCP: [1800, 3000],
     LCP: [2500, 4000],
     INP: [200, 500],
     TTFB: [800, 1800],
@@ -69,47 +69,8 @@ const getRating = (name: string, value: number): 'good' | 'needs-improvement' | 
   return 'poor';
 };
 
-// Performance observer for additional metrics
+// Performance observer (disabled for cleaner console)
 export const initPerformanceObserver = () => {
-  if (typeof window === 'undefined' || !('PerformanceObserver' in window)) {
-    return;
-  }
-  
-  try {
-    // Observe navigation timing
-    const navObserver = new PerformanceObserver((list) => {
-      list.getEntries().forEach((entry) => {
-        if (entry.entryType === 'navigation') {
-          const navEntry = entry as PerformanceNavigationTiming;
-          console.log('[Performance] Navigation timing:', {
-            domContentLoaded: navEntry.domContentLoadedEventEnd - navEntry.domContentLoadedEventStart,
-            loadComplete: navEntry.loadEventEnd - navEntry.loadEventStart,
-            totalPageLoad: navEntry.loadEventEnd - navEntry.fetchStart,
-          });
-        }
-      });
-    });
-    
-    navObserver.observe({ entryTypes: ['navigation'] });
-    
-    // Observe resource timing for large resources
-    const resourceObserver = new PerformanceObserver((list) => {
-      list.getEntries().forEach((entry) => {
-        const resource = entry as PerformanceResourceTiming;
-        // Log slow resources (>1s load time)
-        if (resource.duration > 1000) {
-          console.warn('[Performance] Slow resource:', {
-            name: resource.name,
-            duration: Math.round(resource.duration),
-            size: resource.transferSize,
-          });
-        }
-      });
-    });
-    
-    resourceObserver.observe({ entryTypes: ['resource'] });
-    
-  } catch (error) {
-    console.warn('Performance Observer not supported:', error);
-  }
+  // Disabled to reduce console noise
+  return;
 };
