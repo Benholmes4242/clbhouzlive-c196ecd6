@@ -53,6 +53,8 @@ import GlassmorphicProfileCard from './GlassmorphicProfileCard';
 import SwipeToReturnZone from './SwipeToReturnZone';
 import { getTop100Club } from '@/lib/top100Club';
 import { getTop100RingBorderClass, getTop100RingDotClass } from '@/lib/top100RingStyles';
+import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
+import { BusinessProfileActions } from './actions/BusinessProfileActions';
 
 import ResponsiveStatsDisplay from './ResponsiveStatsDisplay';
 import ProfileModalRouter from './ProfileModalRouter';
@@ -101,8 +103,10 @@ interface UserProfile {
   website?: string;
   eg_handicap_index?: number;
   eg_app_connected?: boolean;
-  user_type?: string;
+  user_type?: string | null;
   is_public?: boolean;
+  // Business profile fields
+  location?: string;
 }
 
 interface AchievementRing {
@@ -176,13 +180,12 @@ const HeroProfileHeader = ({
     duration: 300
   });
 
-  const tabs = [
-    { id: 'activity', label: 'Activity' },
-    { id: 'courses', label: 'Courses' },
-    { id: 'top100', label: 'Top 100 Journey' },
-    { id: 'achievements', label: 'Achievements' },
-    { id: 'stats', label: 'Handicap' }
-  ];
+  // Profile type detection - determines personal vs business profile layout
+  const profileTypeInfo = getProfileType(profile?.user_type);
+  const { isPersonal, isBusiness } = profileTypeInfo;
+  
+  // Get appropriate tabs based on profile type
+  const tabs = getProfileTabs(profile?.user_type);
 
   
   const handleTabChange = useCallback((newTab: string) => {
@@ -464,17 +467,22 @@ const HeroProfileHeader = ({
           setFollowingCount(followingCount || 0);
         }
 
-        // Fetch friends count
-        const { count: friendsCount, error: friendsError } = await supabase
-          .from('user_friends')
-          .select('*', { count: 'exact', head: true })
-          .eq('status', 'accepted')
-          .or(`user_id.eq.${profile.id},friend_id.eq.${profile.id}`);
+        // Fetch friends count - only for personal profiles
+        const profileType = getProfileType(profile?.user_type);
+        if (profileType.isPersonal) {
+          const { count: friendsCount, error: friendsError } = await supabase
+            .from('user_friends')
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'accepted')
+            .or(`user_id.eq.${profile.id},friend_id.eq.${profile.id}`);
 
-        if (friendsError) {
-          console.error('Error fetching friends:', friendsError);
+          if (friendsError) {
+            console.error('Error fetching friends:', friendsError);
+          } else {
+            setFriendsCount(friendsCount || 0);
+          }
         } else {
-          setFriendsCount(friendsCount || 0);
+          setFriendsCount(0); // Business profiles don't have friends
         }
 
         // Fetch progress data for course counts
@@ -907,15 +915,36 @@ const HeroProfileHeader = ({
                   })()}
                 </div>
 
-                {/* Home Club */}
-                <div className="meta-row relative top-8 md:top-0">
-                  <div className="meta meta-club">
-                    <div className="meta-label">Home Club</div>
-                    <div className="meta-value">
-                      {homeClub}
+                {/* Home Club - Personal profiles only */}
+                {isPersonal && (
+                  <div className="meta-row relative top-8 md:top-0">
+                    <div className="meta meta-club">
+                      <div className="meta-label">Home Club</div>
+                      <div className="meta-value">
+                        {homeClub}
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
+                
+                {/* Website/Location - Business profiles only */}
+                {isBusiness && profile?.website && (
+                  <div className="meta-row relative top-8 md:top-0">
+                    <div className="meta meta-club">
+                      <div className="meta-label">Website</div>
+                      <div className="meta-value">
+                        <a 
+                          href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          {profile.website.replace(/^https?:\/\//, '')}
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Bio */}
                 {profile?.bio && (
@@ -927,28 +956,40 @@ const HeroProfileHeader = ({
                 {/* Social Actions - Only for other users' profiles */}
                 {!isOwnProfile && user?.id && profile?.id && (
                   <div className="mt-4 flex justify-center">
-                    <ProfileSocialButtons
-                      currentUserId={user.id}
-                      profileUserId={profile.id}
-                      isMobile={true}
-                    />
+                    {isBusiness ? (
+                      <BusinessProfileActions
+                        currentUserId={user.id}
+                        profileUserId={profile.id}
+                        websiteUrl={profile.website}
+                        isMobile={true}
+                      />
+                    ) : (
+                      <ProfileSocialButtons
+                        currentUserId={user.id}
+                        profileUserId={profile.id}
+                        isMobile={true}
+                      />
+                    )}
                   </div>
                 )}
 
-                {/* Stats row */}
+                {/* Stats row - Different layout for personal vs business */}
                 <div className="stats">
                   <div className="stat">
                     <div className="stat-value">{postsCount}</div>
                     <div className="stat-label">Posts</div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleOpenFriends}
-                    className="stat cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
-                  >
-                    <div className="stat-value">{friendsCount}</div>
-                    <div className="stat-label">Friends</div>
-                  </button>
+                  {/* Friends - Personal profiles only */}
+                  {isPersonal && (
+                    <button
+                      type="button"
+                      onClick={handleOpenFriends}
+                      className="stat cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
+                    >
+                      <div className="stat-value">{friendsCount}</div>
+                      <div className="stat-label">Friends</div>
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={handleOpenFollowing}
@@ -967,8 +1008,8 @@ const HeroProfileHeader = ({
                   </button>
                 </div>
 
-                {/* Top 100 Prestige Chip */}
-                {top100Overview && (top100Overview.total_rated ?? top100Overview.total_played ?? 0) > 0 && (() => {
+                {/* Top 100 Prestige Chip - Personal profiles only */}
+                {isPersonal && top100Overview && (top100Overview.total_rated ?? top100Overview.total_played ?? 0) > 0 && (() => {
                   const totalRated = top100Overview.total_rated ?? top100Overview.total_played ?? 0;
                   const club = getTop100Club(totalRated);
                   const ringDotClass = getTop100RingDotClass(club.tierId);
@@ -1141,18 +1182,20 @@ const HeroProfileHeader = ({
                       </div>
                    </div>
 
-                    {/* Home Club centered (desktop/tablet only) */}
-                    <div className="mt-10 flex justify-center items-start"
-                        style={{
-                          width: 'calc(100% - var(--mini-w) - 8px)',
-                          marginRight: 'calc(var(--mini-w) + 8px)'
-                        }}>
-                     {/* Home Club */}
-                     <div className="text-center">
-                       <div className="text-base font-semibold">Home Club</div>
-                       <div className="text-base text-gray-700">{homeClub}</div>
+                    {/* Home Club centered (desktop/tablet only) - Personal profiles only */}
+                    {isPersonal && (
+                      <div className="mt-10 flex justify-center items-start"
+                          style={{
+                            width: 'calc(100% - var(--mini-w) - 8px)',
+                            marginRight: 'calc(var(--mini-w) + 8px)'
+                          }}>
+                       {/* Home Club */}
+                       <div className="text-center">
+                         <div className="text-base font-semibold">Home Club</div>
+                         <div className="text-base text-gray-700">{homeClub}</div>
+                       </div>
                      </div>
-                   </div>
+                    )}
 
                    {/* Bio section - centered with user name */}
                    <div className="mt-6"
@@ -1188,28 +1231,40 @@ const HeroProfileHeader = ({
                             width: 'calc(100% - var(--mini-w) - 8px)',
                             marginRight: 'calc(var(--mini-w) + 8px)'
                           }}>
-                       <ProfileSocialButtons
-                         currentUserId={user.id}
-                         profileUserId={profile.id}
-                         isMobile={false}
-                       />
+                       {isBusiness ? (
+                         <BusinessProfileActions
+                           currentUserId={user.id}
+                           profileUserId={profile.id}
+                           websiteUrl={profile.website}
+                           isMobile={false}
+                         />
+                       ) : (
+                         <ProfileSocialButtons
+                           currentUserId={user.id}
+                           profileUserId={profile.id}
+                           isMobile={false}
+                         />
+                       )}
                      </div>
                    )}
 
-                   {/* Slim Stats Row */}
-                   <div className="w-full grid grid-cols-4 gap-3 text-center mt-5">
+                   {/* Slim Stats Row - Different layout for personal vs business */}
+                   <div className={`w-full grid ${isPersonal ? 'grid-cols-4' : 'grid-cols-3'} gap-3 text-center mt-5`}>
                      <div className="flex flex-col">
                        <span className="text-lg font-semibold text-gray-900">{postsCount}</span>
                        <span className="text-base font-normal text-neutral-800">Posts</span>
                      </div>
-                     <button
-                       type="button"
-                       onClick={handleOpenFriends}
-                       className="flex flex-col border-l border-gray-300 pl-3 cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
-                     >
-                       <span className="text-lg font-semibold text-gray-900">{friendsCount}</span>
-                       <span className="text-base font-normal text-neutral-800">Friends</span>
-                     </button>
+                     {/* Friends - Personal profiles only */}
+                     {isPersonal && (
+                       <button
+                         type="button"
+                         onClick={handleOpenFriends}
+                         className="flex flex-col border-l border-gray-300 pl-3 cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
+                       >
+                         <span className="text-lg font-semibold text-gray-900">{friendsCount}</span>
+                         <span className="text-base font-normal text-neutral-800">Friends</span>
+                       </button>
+                     )}
                      <button
                        type="button"
                        onClick={handleOpenFollowing}
@@ -1228,8 +1283,8 @@ const HeroProfileHeader = ({
                      </button>
                    </div>
 
-                   {/* Top 100 Prestige Chip */}
-                   {top100Overview && top100Overview.total_played > 0 && (() => {
+                   {/* Top 100 Prestige Chip - Personal profiles only */}
+                   {isPersonal && top100Overview && top100Overview.total_played > 0 && (() => {
                      const totalRated = top100Overview.total_played;
                      const club = getTop100Club(totalRated);
                      const ringDotClass = getTop100RingDotClass(club.tierId);

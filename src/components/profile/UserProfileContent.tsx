@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import HeroProfileHeader from './HeroProfileHeader';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import ProfileReviewsStrip from './ProfileReviewsStrip';
+import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 
 
 interface UserProfileContentProps {
@@ -26,9 +27,13 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
                        (user && profile?.username && user.user_metadata?.username === profile.username) ||
                        (user && profile?.username === user.email?.split('@')[0]);
   
+  // Get profile type and valid tabs based on user_type
+  const profileTypeInfo = getProfileType(profile?.user_type);
+  const profileTabs = getProfileTabs(profile?.user_type);
+  const validTabs = profileTabs.map(t => t.id);
+  
   // Get tab from URL query params, default to 'activity'
   const tabFromUrl = searchParams.get('tab');
-  const validTabs = ['activity', 'courses', 'top100', 'achievements', 'stats'];
   const initialSection = validTabs.includes(tabFromUrl || '') ? tabFromUrl : 'activity';
   
   const [activeSection, setActiveSection] = useState(initialSection || 'activity');
@@ -57,14 +62,16 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
         onSectionChange={handleSectionChange}
       />
       
-      {/* Reviews strip - shown below the profile header */}
-      <div className="px-4 md:px-6 max-w-[1150px] mx-auto">
-        <ProfileReviewsStrip
-          userId={profile.id}
-          username={profile.username}
-          displayName={profile.display_name}
-        />
-      </div>
+      {/* Reviews strip - shown below the profile header (personal profiles only) */}
+      {profileTypeInfo.isPersonal && (
+        <div className="px-4 md:px-6 max-w-[1150px] mx-auto">
+          <ProfileReviewsStrip
+            userId={profile.id}
+            username={profile.username}
+            displayName={profile.display_name}
+          />
+        </div>
+      )}
     </>
   );
 };

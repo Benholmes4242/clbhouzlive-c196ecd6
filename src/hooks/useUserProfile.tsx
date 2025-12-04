@@ -33,6 +33,8 @@ export interface UserProfile {
   cover_photo_url?: string | null;
   eg_app_connected?: boolean | null;
   updated_at?: string | null;
+  // Business profile fields
+  location?: string | null;
 }
 
 /**
