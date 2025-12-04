@@ -51,7 +51,7 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
   }
 
   return (
-    <div className="px-4 mt-4">
+    <div className="px-4 mt-6">
       <button
         type="button"
         onClick={() => navigate('/top100?tab=my-progress')}
@@ -84,7 +84,7 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
             {totalPlayed} Top 100
           </span>
           {subtitleParts.length > 0 && (
-            <span className="mt-0.5 text-[12px] text-emerald-100/90">
+            <span className="mt-0.5 text-[12px] text-emerald-400/90">
               {subtitleParts.join(' · ')}
             </span>
           )}
@@ -92,7 +92,7 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
 
         {/* Chevron */}
         <div className="flex items-center justify-center">
-          <ChevronRight className="h-4 w-4 text-white/80" />
+          <ChevronRight className="h-4 w-4 text-foreground/60" />
         </div>
       </button>
       

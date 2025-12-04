@@ -28,12 +28,12 @@ const StatItem: React.FC<StatItemProps> = ({
 }) => {
   const content = (
     <>
-      <div className="text-[16px] font-semibold text-foreground tabular-nums">
+      <span className="text-[17px] font-semibold text-foreground tabular-nums">
         {value}
-      </div>
-      <div className="mt-0.5 text-[11px] tracking-wide text-foreground/55 uppercase">
+      </span>
+      <span className="mt-0.5 text-[11px] tracking-[0.12em] uppercase text-foreground/55">
         {label}
-      </div>
+      </span>
     </>
   );
 
@@ -69,13 +69,10 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
   onFollowingClick,
   onFriendsClick
 }) => {
-  // Mobile layout - clean grid
+  // Mobile layout - Premium Golf style
   if (isMobile) {
     return (
-      <div className={cn(
-        "mt-4 grid gap-4 text-center",
-        isPersonal ? "grid-cols-4" : "grid-cols-3"
-      )}>
+      <div className="mt-6 flex items-center justify-between max-w-[320px] mx-auto text-center">
         <StatItem value={postsCount} label="Posts" />
         
         {isPersonal && (

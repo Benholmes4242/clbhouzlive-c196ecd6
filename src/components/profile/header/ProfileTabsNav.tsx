@@ -41,10 +41,10 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   }, [activeSection, tabs]);
 
   return (
-    <div className="px-4 pt-4 pb-1">
+    <div className="mt-4 border-t border-white/10">
       <div 
         ref={containerRef}
-        className="relative flex justify-between border-t border-white/10 pt-3"
+        className="relative flex items-center justify-between max-w-[360px] mx-auto"
         role="tablist"
         aria-label="Profile sections"
       >
@@ -62,28 +62,27 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
               tabIndex={isActive ? 0 : -1}
               disabled={disabled}
               className={cn(
-                'relative flex-1 text-center text-[13px] font-medium',
-                'pb-2 transition-colors duration-200',
+                'relative flex-1 py-3 text-center text-[13px] font-medium',
+                'transition-colors duration-200',
                 isActive
                   ? 'text-foreground'
-                  : 'text-foreground/55 hover:text-foreground/85',
+                  : 'text-foreground/60 hover:text-foreground/85',
                 disabled && 'pointer-events-none opacity-50'
               )}
             >
               {tab.label}
-              {/* Glowing emerald underline for active tab */}
-              {isActive && (
-                <span 
-                  className={cn(
-                    'pointer-events-none absolute left-1/2 -bottom-[1px]',
-                    'h-[2px] w-9 -translate-x-1/2 rounded-full',
-                    'bg-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.65)]'
-                  )}
-                />
-              )}
             </button>
           );
         })}
+        
+        {/* Animated underline */}
+        <div
+          className="pointer-events-none absolute bottom-0 h-[3px] rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(74,222,128,0.85)] transition-all duration-200"
+          style={{
+            transform: `translateX(${underlineStyle.left}px)`,
+            width: underlineStyle.width || 0,
+          }}
+        />
       </div>
     </div>
   );
