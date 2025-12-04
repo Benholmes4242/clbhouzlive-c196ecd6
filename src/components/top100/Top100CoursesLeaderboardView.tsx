@@ -168,7 +168,7 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
       <Top100CourseMoversStrip items={movers ?? []} timeRange={filters.timeRange} />
 
       {/* Section Label + scope toggle */}
-      <div className="px-5">
+      <div className="px-2.5">
         <p className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
           Course rankings
         </p>
