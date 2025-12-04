@@ -349,7 +349,7 @@ const HeroProfileHeader = ({
       <section className="relative w-full -mt-16">
         
         {/* HERO IMAGE */}
-        <div className="relative w-full h-[270px] overflow-hidden">
+        <div className="relative w-full h-[350px] overflow-hidden">
           {heroSrc ? (
             <img 
               src={heroSrc}
@@ -384,7 +384,7 @@ const HeroProfileHeader = ({
           className="relative mx-auto max-w-[540px] px-5 pt-16 pb-8 bg-background"
         >
           {/* AVATAR – OVERLAPS HERO BY ~10% */}
-          <div className="absolute left-1/2 -top-[75px] -translate-x-1/2 z-20">
+          <div className="absolute left-1/2 -top-[98px] -translate-x-1/2 z-20">
             <ProfileAvatarRing
               photoUrl={profile?.profile_photo_url}
               displayName={displayName}
