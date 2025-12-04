@@ -361,18 +361,11 @@ const HeroProfileHeader = ({
             <div className="w-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
           )}
           
-          {/* Top vignette for header readability */}
-          <div 
-            className="absolute top-0 left-0 right-0 h-20 pointer-events-none"
-            style={{
-              background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 100%)',
-            }}
-          />
+          {/* Top vignette for nav readability */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/28 via-black/10 to-transparent" />
           
-          {/* Bottom fade into page */}
-          <div
-            className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background via-background/80 to-transparent"
-          />
+          {/* Bottom fade into page - softer for clearer hero */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[120px] bg-gradient-to-b from-transparent via-background/40 to-background" />
         </div>
 
         {/* META BLOCK - no card, transparent, sits on page background */}
