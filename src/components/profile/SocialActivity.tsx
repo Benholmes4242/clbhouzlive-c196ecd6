@@ -147,22 +147,24 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
       />
 
 
-      {/* Grid layout for square posts - increased rounded corners */}
-      <div className="grid grid-cols-3 gap-2 mt-4">
-        {posts.map((post, index) => {
-          // Check if this is the first video post
-          const isFirstVideo = index === 0 && post.post_media?.[0]?.media_type === 'video';
-          
-          return (
-            <ActivityPostCard
-              key={post.id}
-              post={post}
-              attributionText={getPostAttribution()}
-              isFirstVideo={isFirstVideo}
-              onClick={handlePostClick}
-            />
-          );
-        })}
+      {/* Grid layout for square posts - straight edge corners with thin border gutter */}
+      <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] px-1 mt-4">
+        <div className="grid grid-cols-3 gap-[2px]">
+          {posts.map((post, index) => {
+            // Check if this is the first video post
+            const isFirstVideo = index === 0 && post.post_media?.[0]?.media_type === 'video';
+            
+            return (
+              <ActivityPostCard
+                key={post.id}
+                post={post}
+                attributionText={getPostAttribution()}
+                isFirstVideo={isFirstVideo}
+                onClick={handlePostClick}
+              />
+            );
+          })}
+        </div>
       </div>
 
       {posts.length === 0 && (
