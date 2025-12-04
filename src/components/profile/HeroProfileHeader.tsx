@@ -409,7 +409,17 @@ const HeroProfileHeader = ({
               />
             )}
 
-            {/* Stats Row */}
+            {/* Top 100 Chip - ABOVE stats per Premium Golf design */}
+            <ProfileTop100Chip
+              top100Overview={{
+                ...top100Overview,
+                lists: undefined // Will be populated when we extend the hook
+              }}
+              isPersonal={isPersonal}
+              isMobile={isMobile}
+            />
+
+            {/* Stats Row - 3 items: Posts, Following, Followers */}
             <ProfileStatsRow
               postsCount={postsCount}
               followersCount={followersCount}
@@ -420,16 +430,6 @@ const HeroProfileHeader = ({
               onFollowersClick={handleOpenFollowers}
               onFollowingClick={handleOpenFollowing}
               onFriendsClick={handleOpenFriends}
-            />
-
-            {/* Top 100 Chip with completion stamps - Personal profiles only */}
-            <ProfileTop100Chip
-              top100Overview={{
-                ...top100Overview,
-                lists: undefined // Will be populated when we extend the hook
-              }}
-              isPersonal={isPersonal}
-              isMobile={isMobile}
             />
 
             {/* Tab Navigation */}

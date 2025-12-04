@@ -55,37 +55,21 @@ const StatItem: React.FC<StatItemProps> = ({
 
 /**
  * ProfileStatsRow - Premium Golf stats display
- * Personal: Posts, Friends, Following, Followers (4 columns)
- * Business: Posts, Following, Followers (3 columns)
+ * Shows 3 columns: Posts, Following, Followers
  */
 const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
   postsCount,
   followersCount,
   followingCount,
-  friendsCount,
-  isPersonal,
   isMobile,
   onFollowersClick,
   onFollowingClick,
-  onFriendsClick
 }) => {
-  // Mobile layout - clean grid
+  // Mobile layout - 3 column grid
   if (isMobile) {
     return (
-      <div className={cn(
-        "mt-4 grid gap-4 text-center",
-        isPersonal ? "grid-cols-4" : "grid-cols-3"
-      )}>
+      <div className="mt-4 grid grid-cols-3 gap-4 text-center">
         <StatItem value={postsCount} label="Posts" />
-        
-        {isPersonal && (
-          <StatItem 
-            value={friendsCount} 
-            label="Friends" 
-            onClick={onFriendsClick}
-            isClickable
-          />
-        )}
         
         <StatItem 
           value={followingCount} 
@@ -104,13 +88,10 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
     );
   }
 
-  // Desktop layout
+  // Desktop layout - 3 columns
   return (
     <div 
-      className={cn(
-        "w-full grid gap-4 py-4 mt-4 text-center",
-        isPersonal ? "grid-cols-4" : "grid-cols-3"
-      )}
+      className="w-full grid grid-cols-3 gap-4 py-4 mt-4 text-center"
       style={{
         width: 'calc(100% - var(--mini-w) - 8px)',
         marginRight: 'calc(var(--mini-w) + 8px)'
@@ -120,15 +101,6 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
         value={postsCount} 
         label="Posts"
       />
-      
-      {isPersonal && (
-        <StatItem 
-          value={friendsCount} 
-          label="Friends"
-          onClick={onFriendsClick}
-          isClickable
-        />
-      )}
       
       <StatItem 
         value={followingCount} 
