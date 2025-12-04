@@ -25,6 +25,7 @@ import {
   ProfileTabsNav,
   ProfileTop100Chip
 } from './header';
+import ProfileAvatarRing from './header/ProfileAvatarRing';
 
 // Tab content components
 import ActivityFeed from './ActivityFeed';
@@ -138,6 +139,7 @@ const HeroProfileHeader = ({
   const username = useMemo(() => profile?.username || 'user', [profile?.username]);
   const homeClub = useMemo(() => profile?.home_club || 'Home Club', [profile?.home_club]);
   const postsCount = posts.length;
+  const totalTop100Played = isPersonal ? (top100Overview?.total_rated ?? top100Overview?.total_played ?? 0) : 0;
 
   // Navigation handlers
   const handleOpenFollowers = useCallback(() => {
@@ -336,115 +338,131 @@ const HeroProfileHeader = ({
     }
   };
 
+  // Hero image URL
+  const heroUrl = profile?.header_photo_url || profile?.profile_photo_url || '';
+  const ver = profile?.updated_at ? new Date(profile.updated_at).getTime() : 0;
+  const heroSrc = heroUrl ? `${heroUrl}${heroUrl.includes('?') ? '&' : '?'}v=${ver}` : '';
+
   return (
     <SwipeToReturnZone onSwipeDown={reopenImmersive}>
-      {/* Profile Layout */}
-      <div className="relative -mt-16 bg-background">
-        <section className="relative w-full overflow-visible">
-          {/* Hero Image */}
-          <ProfileHeroShell
-            headerPhotoUrl={profile?.header_photo_url}
-            profilePhotoUrl={profile?.profile_photo_url}
-            displayName={profile?.display_name}
-            updatedAt={profile?.updated_at}
-            isOwnProfile={isOwnProfile}
-            isMobile={isMobile}
-            desktopCropX={profile?.desktop_crop_x}
-            desktopCropY={profile?.desktop_crop_y}
-            desktopCropWidth={profile?.desktop_crop_width}
-            desktopCropHeight={profile?.desktop_crop_height}
-            mobileCropX={profile?.mini_card_crop_x}
-            mobileCropY={profile?.mini_card_crop_y}
-            mobileCropWidth={profile?.mini_card_crop_width}
-            mobileCropHeight={profile?.mini_card_crop_height}
-          />
-
-          {/* Glass Panel */}
-          <section
-            ref={profileCardRef}
-            className={cn(
-              "relative z-20 border border-white/35 backdrop-blur-xl",
-              isMobile 
-                ? "glass-panel mx-0 rounded-none" 
-                : "mx-0 sm:mx-0 md:mx-0 lg:mx-4 rounded-none lg:rounded-2xl bg-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
-            )}
+      {/* Premium Golf Profile Layout */}
+      <div className="w-full relative -mt-16">
+        
+        {/* HERO IMAGE - 240px height */}
+        <div className="relative w-full h-[240px] overflow-hidden">
+          {heroSrc ? (
+            <img 
+              src={heroSrc}
+              className="w-full h-full object-cover"
+              alt={displayName}
+              loading="eager"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
+          )}
+          
+          {/* Top vignette */}
+          <div 
+            className="absolute top-0 left-0 right-0 h-20 pointer-events-none"
             style={{
-              marginTop: 'calc(var(--panel-overlap) * -1)',
-              padding: 'var(--panel-pad-y) var(--panel-pad-x)',
-              ...(isMobile && {
-                paddingTop: 'calc(var(--panel-pad-y) + var(--safe-top))',
-                paddingBottom: 'calc(var(--panel-pad-y) + var(--safe-bottom))',
-                backgroundColor: 'rgba(255, 255, 255, 0.16)',
-                boxShadow: 'var(--panel-shadow)'
-              })
+              background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 100%)',
             }}
-          >
-            {/* Header Card (Avatar with ring, Name, Bio, etc.) */}
-            <ProfileHeaderCard
+          />
+        </div>
+
+        {/* META CARD (glassy) */}
+        <div
+          ref={profileCardRef}
+          className={cn(
+            "relative mx-auto w-full",
+            isMobile ? "max-w-full" : "max-w-[540px]",
+            "rounded-t-3xl",
+            "bg-background/95",
+            "shadow-[0_-18px_55px_rgba(0,0,0,0.45)]",
+            "border border-white/10 border-b-0",
+            "backdrop-blur-xl",
+            "pt-20 pb-6 px-5"
+          )}
+          style={{
+            marginTop: '-24px',
+          }}
+        >
+          {/* AVATAR — overlaps hero by ~10% */}
+          <div className="absolute left-1/2 -top-[60px] -translate-x-1/2 z-20">
+            <ProfileAvatarRing
+              photoUrl={profile?.profile_photo_url}
               displayName={displayName}
-              username={username}
-              bio={profile?.bio}
-              profilePhotoUrl={profile?.profile_photo_url}
-              homeClub={isPersonal ? homeClub : undefined}
-              handicap={isPersonal ? profile?.eg_handicap_index : undefined}
-              websiteUrl={profile?.website}
-              location={profile?.location}
-              userType={profile?.user_type}
-              totalTop100Played={isPersonal ? (top100Overview?.total_rated ?? top100Overview?.total_played ?? 0) : 0}
+              totalTop100Played={totalTop100Played}
               isPersonal={isPersonal}
               isOwnProfile={isOwnProfile}
-              isMobile={isMobile}
-              onAvatarClick={() => openImmersive?.(0)}
-              onCustomiseClick={isOwnProfile ? () => setEditDialogOpen(true) : undefined}
+              size="lg"
+              onClick={() => openImmersive?.(0)}
+              animateOnFirstView={true}
             />
+          </div>
 
-            {/* Social Actions - Only for other users' profiles */}
-            {!isOwnProfile && user?.id && profile?.id && (
-              <ProfileActionsRow
-                currentUserId={user.id}
-                profileUserId={profile.id}
-                isPersonal={isPersonal}
-                isMobile={isMobile}
-                websiteUrl={profile?.website}
-              />
-            )}
+          {/* NAME / HANDLE / CLUB / BIO BLOCK */}
+          <ProfileHeaderCard
+            displayName={displayName}
+            username={username}
+            bio={profile?.bio}
+            profilePhotoUrl={profile?.profile_photo_url}
+            homeClub={isPersonal ? homeClub : undefined}
+            handicap={isPersonal ? profile?.eg_handicap_index : undefined}
+            websiteUrl={profile?.website}
+            location={profile?.location}
+            userType={profile?.user_type}
+            totalTop100Played={totalTop100Played}
+            isPersonal={isPersonal}
+            isOwnProfile={isOwnProfile}
+            isMobile={isMobile}
+            onAvatarClick={() => openImmersive?.(0)}
+            onCustomiseClick={isOwnProfile ? () => setEditDialogOpen(true) : undefined}
+          />
 
-            {/* Stats Row */}
-            <ProfileStatsRow
-              postsCount={postsCount}
-              followersCount={followersCount}
-              followingCount={followingCount}
-              friendsCount={friendsCount}
+          {/* Social Actions - Only for other users' profiles */}
+          {!isOwnProfile && user?.id && profile?.id && (
+            <ProfileActionsRow
+              currentUserId={user.id}
+              profileUserId={profile.id}
               isPersonal={isPersonal}
               isMobile={isMobile}
-              onFollowersClick={handleOpenFollowers}
-              onFollowingClick={handleOpenFollowing}
-              onFriendsClick={handleOpenFriends}
+              websiteUrl={profile?.website}
             />
+          )}
 
-            {/* Top 100 Chip with completion stamps - Personal profiles only */}
-            <ProfileTop100Chip
-              top100Overview={{
-                ...top100Overview,
-                lists: undefined // Will be populated when we extend the hook
-              }}
-              isPersonal={isPersonal}
-              isMobile={isMobile}
-            />
+          {/* Stats Row */}
+          <ProfileStatsRow
+            postsCount={postsCount}
+            followersCount={followersCount}
+            followingCount={followingCount}
+            friendsCount={friendsCount}
+            isPersonal={isPersonal}
+            isMobile={isMobile}
+            onFollowersClick={handleOpenFollowers}
+            onFollowingClick={handleOpenFollowing}
+            onFriendsClick={handleOpenFriends}
+          />
 
-            {/* Tab Navigation */}
-            <ProfileTabsNav
-              userType={profile?.user_type}
-              activeSection={activeSection}
-              onTabChange={handleTabChange}
-              isMobile={isMobile}
-              disabled={transitionState !== 'idle'}
-            />
-          </section>
-           
-          {/* Spacer */}
-          <div className="h-4" />
-        </section>
+          {/* Top 100 Chip with completion stamps - Personal profiles only */}
+          <ProfileTop100Chip
+            top100Overview={{
+              ...top100Overview,
+              lists: undefined
+            }}
+            isPersonal={isPersonal}
+            isMobile={isMobile}
+          />
+
+          {/* Tab Navigation */}
+          <ProfileTabsNav
+            userType={profile?.user_type}
+            activeSection={activeSection}
+            onTabChange={handleTabChange}
+            isMobile={isMobile}
+            disabled={transitionState !== 'idle'}
+          />
+        </div>
       </div>
 
       {/* Content sections with slide transitions */}
@@ -472,49 +490,33 @@ const HeroProfileHeader = ({
             ${isMobile && activeSection !== 'activity' && activeSection !== 'courses' && activeSection !== 'top100' ? 'py-4' : ''}
           `}>
             <div className={activeSection === 'activity' ? 'w-full' : 'md:max-w-[1150px] md:mx-auto'}>
-              <div role="tabpanel" id={`tabpanel-${activeSection}`} aria-labelledby={`tab-${activeSection}`}>
+              <div role="tabpanel" id={`tabpanel-${activeSection}`}>
                 {getCurrentContent()}
               </div>
             </div>
           </div>
         )}
       </div>
-      
-      {/* Edit Profile Trigger */}
-      <button 
-        data-edit-profile-trigger 
-        className="hidden" 
-        onClick={() => setEditDialogOpen(true)}
-        aria-hidden="true"
-      />
-      
-      {/* Edit Profile Modal */}
+
+      {/* Profile Edit Dialog */}
       <ProfileEditDialog
-        profile={profile}
-        userId={user?.id || ''}
-        onProfileUpdate={() => {
-          onProfileUpdate();
-          setEditDialogOpen(false);
-        }}
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
+        userId={profile?.id || ''}
+        profile={profile}
+        onProfileUpdate={onProfileUpdate}
       />
 
       {/* Immersive Profile Modal */}
-      <ImmersiveProfileModal
-        isOpen={isImmersiveOpen}
-        onClose={closeImmersive}
-        onMorphToHeader={handleMorphTransition}
-        mediaItems={mediaItems.map(item => ({
-          ...item,
-          media_type: item.media_type as 'video' | 'image'
-        }))}
-        userId={profile?.id || ''}
-        initialIndex={currentMediaIndex}
-        onCurrentIndexChange={setCurrentMediaIndex}
-        uploadMode={isOwnProfile}
-        onUploadComplete={() => refetchMedia()}
-      />
+      {hasImmersiveMedia && (
+        <ImmersiveProfileModal
+          isOpen={isImmersiveOpen}
+          onClose={closeImmersive}
+          userId={profile?.id || ''}
+          mediaItems={mediaItems}
+          initialIndex={currentMediaIndex}
+        />
+      )}
 
       {/* Profile Modal Router */}
       <ProfileModalRouter />

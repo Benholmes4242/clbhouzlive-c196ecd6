@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, MapPin, Globe, Building2, User, Brush } from 'lucide-react';
+import { ChevronDown, ChevronUp, Globe, Building2, User, Brush } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { splitName } from '@/utils/name';
-import { ProfileOpenToPlayStatus } from '@/features/nearby/components/ProfileOpenToPlayStatus';
-import ProfileAvatarRing from './ProfileAvatarRing';
-import { Button } from '@/components/ui/button';
 
 interface ProfileHeaderCardProps {
   displayName: string;
@@ -29,29 +25,24 @@ interface ProfileHeaderCardProps {
 }
 
 /**
- * ProfileHeaderCard - Glass card with avatar, name, handle, bio
- * Personal: Shows home club, handicap, Top 100 ring on avatar
- * Business: Shows location, website, no ring on avatar
+ * ProfileHeaderCard - Centered typography for name, handle, club, bio
+ * Premium Golf style - clean, centered, Apple-like
  */
 const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   displayName,
   username,
   bio,
-  profilePhotoUrl,
   homeClub,
   handicap,
   websiteUrl,
   location,
   userType,
-  totalTop100Played = 0,
   isPersonal,
   isOwnProfile,
   isMobile,
-  onAvatarClick,
   onCustomiseClick,
 }) => {
   const [bioExpanded, setBioExpanded] = useState(false);
-  const { first, last } = splitName(displayName);
   
   // Format website URL for display
   const formatWebsiteUrl = (url: string) => {
@@ -74,7 +65,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
     }
   };
   
-  // Build the subtitle line (e.g., "Plays at Sunningdale · HCP 4.3")
+  // Build the subtitle line (e.g., "Sunningdale · HCP 4.3")
   const getSubtitleLine = () => {
     if (isPersonal) {
       const parts = [];
@@ -82,7 +73,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
       if (handicap !== null && handicap !== undefined) parts.push(`HCP ${handicap.toFixed(1)}`);
       return parts.length > 0 ? parts.join(' · ') : null;
     } else {
-      // Business subtitle: type + location
+      // Business subtitle: location
       const parts = [];
       if (location) parts.push(location);
       return parts.length > 0 ? parts.join(' · ') : null;
@@ -93,249 +84,80 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   const shouldTruncateBio = bio && bio.length > 120;
   const displayBio = shouldTruncateBio && !bioExpanded ? `${bio.slice(0, 120)}...` : bio;
 
-  // Avatar size for overlap calculation (lg = 104px on mobile)
-  const avatarSize = 104;
-  const overlapAmount = avatarSize * 0.1; // 10% overlap
-  // Avatar center point should be at the boundary, with 10% above
-  // pt-[52px] creates space for 90% of avatar (93.6px ≈ 94px, using 52px as breathing room for content below)
-  // Avatar positioned at top: -52px to sit at top of padding, then additional overlap pulls it into hero
-
-  if (isMobile) {
-    return (
-      <div className="relative pt-[52px]">
-        {/* Avatar with ring - positioned to overlap hero by 10% */}
-        <div 
-          className="absolute left-1/2 -translate-x-1/2 z-20"
-          style={{ top: `-${52 + overlapAmount}px` }}
-        >
-          <ProfileAvatarRing
-            photoUrl={profilePhotoUrl}
-            displayName={displayName}
-            totalTop100Played={isPersonal ? totalTop100Played : 0}
-            isPersonal={isPersonal}
-            isOwnProfile={isOwnProfile}
-            size="lg"
-            onClick={onAvatarClick}
-            animateOnFirstView={true}
-          />
-        </div>
-
-        {/* Name & handle block - restored spacing from avatar */}
-        <div className="flex flex-col items-center gap-1.5 mb-2 mt-4">
-          <h1 className="text-2xl font-semibold text-foreground leading-tight">
-            {displayName}
-          </h1>
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-muted-foreground text-sm">@{username}</span>
-            <span className={cn(
-              "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide",
-              isPersonal 
-                ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                : "bg-blue-500/20 text-blue-300 border border-blue-500/30"
-            )}>
-              {isPersonal ? <User className="w-2.5 h-2.5" /> : <Building2 className="w-2.5 h-2.5" />}
-              {getUserTypeBadge()}
-            </span>
-          </div>
-          {isOwnProfile && <ProfileOpenToPlayStatus />}
-        </div>
-
-        {/* Subtitle line - tighter */}
-        {subtitleLine && (
-          <div className="text-center text-sm text-muted-foreground mb-2">
-            {subtitleLine}
-          </div>
-        )}
-        
-        {/* Website - Business profiles */}
-        {!isPersonal && websiteUrl && (
-          <div className="flex items-center justify-center gap-1.5 text-sm mb-2">
-            <Globe className="w-3.5 h-3.5 text-muted-foreground" />
-            <a 
-              href={getWebsiteHref(websiteUrl)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:text-primary/80 transition-colors"
-            >
-              {formatWebsiteUrl(websiteUrl)}
-            </a>
-          </div>
-        )}
-
-        {/* Bio with show more - tighter, max width */}
-        {bio && (
-          <div className="text-center px-4 mb-2">
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-[280px] mx-auto">
-              {displayBio}
-            </p>
-            {shouldTruncateBio && (
-              <button
-                onClick={() => setBioExpanded(!bioExpanded)}
-                className="inline-flex items-center gap-0.5 text-xs text-primary mt-1 hover:text-primary/80"
-              >
-                {bioExpanded ? (
-                  <>Show less <ChevronUp className="w-3 h-3" /></>
-                ) : (
-                  <>Show more <ChevronDown className="w-3 h-3" /></>
-                )}
-              </button>
-            )}
-          </div>
-        )}
-        
-        {/* Customise profile button - soft styling */}
-        {isOwnProfile && onCustomiseClick && (
-          <div className="flex justify-center mt-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onCustomiseClick}
-              className="text-muted-foreground hover:text-foreground text-xs gap-1.5"
-            >
-              <Brush className="w-3.5 h-3.5" />
-              Customise profile
-            </Button>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // Desktop layout - avatar overlaps hero by 10%
-  const desktopAvatarSize = 104; // lg size
-  const desktopOverlapAmount = desktopAvatarSize * 0.1;
-  // pt-14 = 56px padding, avatar needs to escape this + overlap
-  
   return (
-    <div className="flex flex-col items-center relative pt-14">
-      {/* Overhanging avatar with ring - 10% overlap with hero */}
-      <div
-        className="absolute z-20"
-        style={{
-          right: '80px',
-          top: `-${56 + desktopOverlapAmount}px`,
-        }}
-      >
-        <ProfileAvatarRing
-          photoUrl={profilePhotoUrl}
-          displayName={displayName}
-          totalTop100Played={isPersonal ? totalTop100Played : 0}
-          isPersonal={isPersonal}
-          isOwnProfile={isOwnProfile}
-          size="lg"
-          onClick={onAvatarClick}
-        />
+    <div className="flex flex-col items-center text-center mt-2 space-y-2">
+      {/* NAME */}
+      <h1 className="text-[22px] font-semibold text-foreground">
+        {displayName}
+      </h1>
+
+      {/* HANDLE + BADGE */}
+      <div className="flex items-center gap-2 text-[14px] text-muted-foreground">
+        @{username}
+        <span className={cn(
+          "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide",
+          isPersonal 
+            ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+            : "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+        )}>
+          {isPersonal ? <User className="w-2.5 h-2.5" /> : <Building2 className="w-2.5 h-2.5" />}
+          {getUserTypeBadge()}
+        </span>
       </div>
 
-      {/* Name + handle + badge block */}
-      <div
-        className="text-center"
-        style={{
-          width: 'calc(100% - var(--mini-w) - 8px)',
-          marginLeft: '0',
-          marginRight: 'calc(var(--mini-w) + 8px)',
-          marginTop: '24px'
-        }}
-      >
-        <h1 className="font-semibold leading-tight text-foreground" style={{ fontSize: 'var(--fs-display)' }}>
-          {displayName}
-        </h1>
-        <div className="flex items-center justify-center gap-2 mt-1">
-          <span className="text-base text-muted-foreground">@{username}</span>
-          <span className={cn(
-            "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium uppercase tracking-wide",
-            isPersonal 
-              ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-              : "bg-blue-500/20 text-blue-300 border border-blue-500/30"
-          )}>
-            {isPersonal ? <User className="w-3 h-3" /> : <Building2 className="w-3 h-3" />}
-            {getUserTypeBadge()}
-          </span>
-        </div>
-      </div>
-
-      {/* Subtitle line */}
+      {/* CLUB + HCP LINE */}
       {subtitleLine && (
-        <div 
-          className="mt-2 text-base text-muted-foreground"
-          style={{
-            width: 'calc(100% - var(--mini-w) - 8px)',
-            marginRight: 'calc(var(--mini-w) + 8px)',
-            textAlign: 'center'
-          }}
-        >
+        <div className="text-[14px] text-muted-foreground">
           {subtitleLine}
         </div>
       )}
+      
+      {/* Website - Business profiles */}
+      {!isPersonal && websiteUrl && (
+        <div className="flex items-center justify-center gap-1.5 text-[14px]">
+          <Globe className="w-3.5 h-3.5 text-muted-foreground" />
+          <a 
+            href={getWebsiteHref(websiteUrl)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:text-primary/80 transition-colors"
+          >
+            {formatWebsiteUrl(websiteUrl)}
+          </a>
+        </div>
+      )}
 
-      {/* Bio section */}
-      <div 
-        className="mt-4"
-        style={{
-          width: 'calc(100% - var(--mini-w) - 8px)',
-          marginRight: 'calc(var(--mini-w) + 8px)'
-        }}
-      >
-        <div className="text-center">
-          {bio && (
-            <div className="mb-3">
-              <p className="text-base text-muted-foreground line-clamp-2 leading-relaxed">
-                {displayBio}
-              </p>
-              {shouldTruncateBio && (
-                <button
-                  onClick={() => setBioExpanded(!bioExpanded)}
-                  className="inline-flex items-center gap-0.5 text-sm text-primary mt-1 hover:text-primary/80"
-                >
-                  {bioExpanded ? (
-                    <>Show less <ChevronUp className="w-3.5 h-3.5" /></>
-                  ) : (
-                    <>Show more <ChevronDown className="w-3.5 h-3.5" /></>
-                  )}
-                </button>
+      {/* BIO */}
+      {bio && (
+        <div className="max-w-[320px]">
+          <p className="text-[14px] text-muted-foreground leading-[1.35]">
+            {displayBio}
+          </p>
+          {shouldTruncateBio && (
+            <button
+              onClick={() => setBioExpanded(!bioExpanded)}
+              className="inline-flex items-center gap-0.5 text-xs text-primary mt-1 hover:text-primary/80"
+            >
+              {bioExpanded ? (
+                <>Show less <ChevronUp className="w-3 h-3" /></>
+              ) : (
+                <>Show more <ChevronDown className="w-3 h-3" /></>
               )}
-            </div>
-          )}
-          
-          {/* Website - Business profiles */}
-          {!isPersonal && websiteUrl && (
-            <div className="flex items-center justify-center gap-1.5 text-base">
-              <Globe className="w-4 h-4 text-muted-foreground" />
-              <a 
-                href={getWebsiteHref(websiteUrl)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:text-primary/80 transition-colors"
-              >
-                {formatWebsiteUrl(websiteUrl)}
-              </a>
-            </div>
-          )}
-          
-          {/* Location - Business profiles (if not in subtitle) */}
-          {!isPersonal && location && !subtitleLine?.includes(location) && (
-            <div className="flex items-center justify-center gap-1.5 text-sm text-muted-foreground mt-2">
-              <MapPin className="w-3.5 h-3.5" />
-              {location}
-            </div>
-          )}
-          
-          {/* Customise profile button - own profile only */}
-          {isOwnProfile && onCustomiseClick && (
-            <div className="mt-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onCustomiseClick}
-                className="text-muted-foreground hover:text-foreground text-sm gap-1.5"
-              >
-                <Brush className="w-4 h-4" />
-                Customise profile
-              </Button>
-            </div>
+            </button>
           )}
         </div>
-      </div>
+      )}
+
+      {/* CUSTOMISE PROFILE (OWN PROFILE ONLY) */}
+      {isOwnProfile && onCustomiseClick && (
+        <button
+          className="flex items-center gap-1 text-[13px] mt-1 text-muted-foreground hover:text-foreground transition-colors"
+          onClick={onCustomiseClick}
+        >
+          <Brush className="w-3.5 h-3.5" />
+          Customise profile
+        </button>
+      )}
     </div>
   );
 };
