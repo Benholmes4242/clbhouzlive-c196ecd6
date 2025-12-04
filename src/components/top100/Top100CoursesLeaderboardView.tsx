@@ -156,7 +156,7 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
       <Top100CourseMoversStrip items={movers ?? []} timeRange={filters.timeRange} />
 
       {/* Section Label + scope toggle - single row */}
-      <div className="flex items-center justify-between px-2.5 gap-3 mb-3">
+      <div className="flex items-end justify-between px-2.5 gap-3 mb-3">
         {/* Left: title + subtitle */}
         <div className="flex flex-col">
           <p className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
