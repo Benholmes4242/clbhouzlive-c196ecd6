@@ -22,9 +22,9 @@ interface ProfileAvatarRingProps {
 
 // Size configurations - outer size, then 2px ring, 1px white gap, then avatar
 const SIZES = {
-  sm: { outer: 68, white: 64, avatar: 62 },
-  md: { outer: 92, white: 88, avatar: 86 },
-  lg: { outer: 124, white: 120, avatar: 118 },
+  sm: { outer: 82, white: 77, avatar: 74 },
+  md: { outer: 110, white: 106, avatar: 103 },
+  lg: { outer: 149, white: 144, avatar: 142 },
 };
 
 const RING_ANIMATED_KEY = 'clbhouz:ringAnimated:v1';
