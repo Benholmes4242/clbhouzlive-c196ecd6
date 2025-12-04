@@ -4010,6 +4010,7 @@ export type Database = {
           home_club: string | null
           home_club_id: string | null
           id: string
+          is_official_club: boolean | null
           is_public: boolean | null
           last_rating_at: string | null
           location: string | null
@@ -4069,6 +4070,7 @@ export type Database = {
           home_club?: string | null
           home_club_id?: string | null
           id: string
+          is_official_club?: boolean | null
           is_public?: boolean | null
           last_rating_at?: string | null
           location?: string | null
@@ -4128,6 +4130,7 @@ export type Database = {
           home_club?: string | null
           home_club_id?: string | null
           id?: string
+          is_official_club?: boolean | null
           is_public?: boolean | null
           last_rating_at?: string | null
           location?: string | null
@@ -6622,6 +6625,9 @@ export type Database = {
         | "academy"
         | "tour_event"
         | "other"
+        | "brand"
+        | "creator"
+        | "personal"
     }
     CompositeTypes: {
       geometry_dump: {
@@ -6787,6 +6793,9 @@ export const Constants = {
         "academy",
         "tour_event",
         "other",
+        "brand",
+        "creator",
+        "personal",
       ],
     },
   },
