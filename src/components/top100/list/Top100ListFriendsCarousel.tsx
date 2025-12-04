@@ -28,7 +28,7 @@ export const Top100ListFriendsCarousel: React.FC<Top100ListFriendsCarouselProps>
   if (friends.length === 0) {
     return (
       <section className="mt-6">
-        <div className="px-5">
+        <div className="px-2.5">
           <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
             Friends on this journey
           </h2>
@@ -57,7 +57,7 @@ export const Top100ListFriendsCarousel: React.FC<Top100ListFriendsCarouselProps>
 
   return (
     <section className="mt-6">
-      <div className="px-5 flex items-start justify-between">
+      <div className="px-2.5 flex items-start justify-between">
         <div>
           <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
             Friends on this journey

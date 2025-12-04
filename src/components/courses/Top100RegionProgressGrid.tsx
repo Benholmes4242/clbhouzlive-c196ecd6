@@ -43,7 +43,7 @@ export function Top100RegionProgressGrid({
 
   return (
     <section className="mt-6 w-full">
-      <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground mb-2 px-5">
+      <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground mb-2 px-2.5">
         {label}
       </h3>
 

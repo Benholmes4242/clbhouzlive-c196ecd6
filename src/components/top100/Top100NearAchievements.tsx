@@ -20,7 +20,7 @@ export function Top100NearAchievements({ totalTop100Played }: Top100NearAchievem
 
   return (
     <section className="mt-6">
-      <div className="mb-2 flex items-center justify-between px-5">
+      <div className="mb-2 flex items-center justify-between px-2.5">
         <h2 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
           Badges you're close to
         </h2>
