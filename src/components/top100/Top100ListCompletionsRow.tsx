@@ -53,11 +53,11 @@ export const Top100ListCompletionsRow: React.FC<Top100ListCompletionsRowProps> =
 
   return (
     <div className="mt-4">
-      <p className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground mb-3 px-5">
+      <p className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground mb-3 px-2.5">
         Top 100 list completions
       </p>
 
-      <div className="flex gap-3 overflow-x-auto pb-1 px-5 scrollbar-hide">
+      <div className="flex gap-3 overflow-x-auto pb-1 px-2.5 scrollbar-hide">
         {ordered.map((progress, idx) => {
           const slug = COMPLETION_LIST_SLUGS[idx];
           if (!progress) {

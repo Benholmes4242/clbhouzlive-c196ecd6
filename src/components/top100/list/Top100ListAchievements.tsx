@@ -23,7 +23,7 @@ export const Top100ListAchievements: React.FC<Top100ListAchievementsProps> = ({
 
   return (
     <section className="mt-6">
-      <div className="px-5 flex items-center justify-between">
+      <div className="px-2.5 flex items-center justify-between">
         <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
           Achievements tied to this list
         </h2>

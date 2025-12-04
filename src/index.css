@@ -317,6 +317,14 @@ html.lightbox-open {
   background: transparent; 
 }
 
+/* ========================================
+   SECTION HEADER - GLOBAL UTILITY
+   Used for all section titles across Golf Courses pages
+   ======================================== */
+.section-header {
+  @apply text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground px-2.5;
+}
+
 /* Fade mask utility for horizontal scroll rails */
 .mask-fade-right {
   -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
