@@ -133,7 +133,7 @@ const ActivityGrid: React.FC<ActivityGridProps> = ({
           <div
             key={item.id}
             className={cn(
-              "relative overflow-hidden rounded-[18px] aspect-square",
+              "relative overflow-hidden aspect-square",
               "bg-muted/30 cursor-pointer",
               "transition-transform duration-200",
               "active:scale-[0.98]"
@@ -175,8 +175,8 @@ const ActivityGrid: React.FC<ActivityGridProps> = ({
             {stackCount && stackCount > 1 && (
               <>
                 {/* Stacked frame effect */}
-                <div className="absolute inset-0 rounded-[18px] border border-white/25 pointer-events-none" />
-                <div className="absolute inset-1 rounded-[16px] border border-white/15 pointer-events-none" />
+                <div className="absolute inset-0 border border-white/25 pointer-events-none" />
+                <div className="absolute inset-1 border border-white/15 pointer-events-none" />
                 
                 {/* Stack label */}
                 <div className="absolute left-1.5 bottom-1.5 rounded-full bg-black/60 px-2 py-0.5 text-[10px] text-white flex items-center gap-1">
