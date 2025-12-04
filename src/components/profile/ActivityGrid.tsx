@@ -38,7 +38,15 @@ const ActivityGrid: React.FC<ActivityGridProps> = ({
   const [supportsHover, setSupportsHover] = useState(false);
   
   useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
     setSupportsHover(window.matchMedia('(pointer:fine)').matches);
+  }, []);
+
+  // Cleanup video refs on unmount
+  useEffect(() => {
+    return () => {
+      videoRefs.current.clear();
+    };
   }, []);
 
   // Handle hover preview for videos on desktop

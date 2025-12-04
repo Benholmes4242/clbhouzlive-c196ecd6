@@ -30,47 +30,53 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   const [filters, setFilters] = useState<ActivityFilters>({ type: 'all' });
   const [achievementsModalOpen, setAchievementsModalOpen] = useState(false);
 
-  // Filter posts based on active filter
+  // Filter posts based on active filter (with null-safety)
   const filteredPosts = useMemo(() => {
     switch (filters.type) {
       case 'videos':
-        return posts.filter(post => 
-          post.post_media.some(media => media.media_type === 'video')
-        );
+        return posts.filter(post => {
+          const media = post.post_media ?? [];
+          return media.some(m => m.media_type === 'video');
+        });
       case 'photos':
-        return posts.filter(post => 
-          post.post_media.some(media => media.media_type === 'image')
-        );
+        return posts.filter(post => {
+          const media = post.post_media ?? [];
+          return media.some(m => m.media_type === 'image');
+        });
       case 'courses':
-        return posts.filter(post => 
-          post.post_tags.some(tag => tag.entity_type === 'golf_club')
-        );
+        return posts.filter(post => {
+          const tags = post.post_tags ?? [];
+          return tags.some(tag => tag.entity_type === 'golf_club');
+        });
       case 'swings':
-        return posts.filter(post => 
-          post.post_tags.some(tag => tag.name?.toLowerCase().includes('swing'))
-        );
+        return posts.filter(post => {
+          const tags = post.post_tags ?? [];
+          return tags.some(tag => tag.name?.toLowerCase().includes('swing'));
+        });
       case 'milestones':
-        // Milestones could be detected by specific tags or post content
-        return posts.filter(post => 
-          post.content?.toLowerCase().includes('milestone') ||
-          post.post_tags.some(tag => tag.name?.toLowerCase().includes('achievement'))
-        );
+        return posts.filter(post => {
+          const tags = post.post_tags ?? [];
+          return post.content?.toLowerCase().includes('milestone') ||
+            tags.some(tag => tag.name?.toLowerCase().includes('achievement'));
+        });
       default:
         return posts;
     }
   }, [posts, filters.type]);
 
-  // Convert to grid items - only posts with media
+  // Convert to grid items - only posts with media (with null-safety)
   const gridItems: ActivityGridItem[] = useMemo(() => 
     filteredPosts
-      .filter(post => post.post_media && post.post_media.length > 0)
+      .filter(post => (post.post_media?.length ?? 0) > 0)
       .map(post => {
-        const golfCourseTag = post.post_tags.find(tag => tag.entity_type === 'golf_club');
+        const media = post.post_media!;
+        const tags = post.post_tags ?? [];
+        const golfCourseTag = tags.find(tag => tag.entity_type === 'golf_club');
         return {
           id: post.id,
-          type: post.post_media[0].media_type === 'video' ? 'video' : 'image',
-          thumbnailUrl: post.post_media[0].media_url,
-          previewUrl: post.post_media[0].media_url,
+          type: media[0].media_type === 'video' ? 'video' : 'image',
+          thumbnailUrl: media[0].media_url,
+          previewUrl: media[0].media_url,
           courseName: golfCourseTag?.name,
           roundDate: post.created_at,
         };
