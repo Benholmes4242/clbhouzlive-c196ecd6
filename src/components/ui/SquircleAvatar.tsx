@@ -157,12 +157,12 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
         )}
         onClick={onClick}
       >
-        {/* Outer achievement ring - 2.5px larger to accommodate grey ring */}
+        {/* Outer achievement ring - 2.5px larger on all sides to accommodate grey ring */}
         <div
           className="relative overflow-hidden"
           style={{
             width: `${pixelSize + 5}px`,
-            aspectRatio: '1 / 1.05',
+            height: `${(pixelSize * 1.05) + 5}px`,
             borderRadius: '30%',
             border: `2.5px solid ${ringColor}`,
             boxShadow: `0 0 6px ${ringColor}88`,
