@@ -31,8 +31,8 @@ const RING_ANIMATED_KEY = 'clbhouz:ringAnimated:v1';
 /**
  * ProfileAvatarRing - Avatar with Top 100 exploration ring using new squircle spec
  * Uses 1/1.05 aspect ratio, 34% border radius
- * Achievement state: outer colored ring (1.5px) + inner grey ring (1px) + avatar
- * Normal state: grey ring (1px) + avatar
+ * Achievement state: outer colored ring (2px) + inner grey ring (1.5px) + avatar
+ * Normal state: grey ring (1.5px) + avatar
  */
 const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
   photoUrl,
@@ -141,14 +141,14 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
             width: `${width}px`,
             aspectRatio: '1 / 1.05',
             borderRadius: '34%',
-            border: `1.5px solid ${tierColor}`,
+            border: `2px solid ${tierColor}`,
             boxShadow: `0 0 6px ${tierColor}88, 0 8px 20px rgba(0,0,0,0.35)`,
           }}
         >
           {/* Inner grey ring + avatar */}
           <div
-            className="w-full h-full overflow-hidden border border-gray-300 dark:border-gray-600"
-            style={{ borderRadius: '32%' }}
+            className="w-full h-full overflow-hidden"
+            style={{ borderRadius: '32%', border: '1.5px solid #D1D5DB' }}
           >
             {avatarInner}
           </div>
@@ -156,11 +156,12 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
       ) : (
         // Normal state: single grey ring around avatar
         <div
-          className="relative overflow-hidden border border-gray-300 dark:border-gray-600"
+          className="relative overflow-hidden"
           style={{
             width: `${width}px`,
             aspectRatio: '1 / 1.05',
             borderRadius: '34%',
+            border: '1.5px solid #D1D5DB',
             boxShadow: '0 8px 20px rgba(0,0,0,0.35)',
           }}
         >
