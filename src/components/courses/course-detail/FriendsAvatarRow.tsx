@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Squircle } from '@/components/ui/squircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Check } from 'lucide-react';
 
 interface FriendWithMedia {
@@ -39,22 +39,13 @@ export function FriendsAvatarRow({ friends, focusedFriendId, onFriendClick }: Fr
               }`}
             >
               {/* Squircle avatar with optional active ring */}
-              <div className={`relative ${isActive ? 'ring-2 ring-slate-900 ring-offset-2 rounded-[14px]' : ''}`}>
-                <Squircle width={56} height={56}>
-                  {friend.avatarUrl ? (
-                    <img
-                      src={friend.avatarUrl}
-                      alt={friend.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-slate-200 flex items-center justify-center">
-                      <span className="text-lg font-semibold text-slate-600">
-                        {firstName.charAt(0)}
-                      </span>
-                    </div>
-                  )}
-                </Squircle>
+              <div className={`relative ${isActive ? 'ring-2 ring-slate-900 ring-offset-2 rounded-[34%]' : ''}`}>
+                <SquircleAvatar 
+                  size={56} 
+                  src={friend.avatarUrl}
+                  alt={friend.name}
+                  fallback={firstName.charAt(0)}
+                />
 
                 {/* Active checkmark overlay */}
                 {isActive && (

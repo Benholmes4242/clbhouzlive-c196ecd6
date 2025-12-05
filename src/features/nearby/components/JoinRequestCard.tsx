@@ -2,7 +2,7 @@ import React from 'react';
 import { MapPin } from 'lucide-react';
 import { GameJoinRequest } from '../hooks/useGameJoinRequests';
 import HcpBadge from '@/components/HcpBadge';
-import { Squircle } from '@/components/ui/squircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface JoinRequestCardProps {
   request: GameJoinRequest;
@@ -28,13 +28,12 @@ export function JoinRequestCard({ request, onAccept, onDecline }: JoinRequestCar
     <div className="rounded-lg bg-white/5 border border-white/10 p-3">
       <div className="flex items-start gap-3 mb-3">
         {/* Avatar */}
-        <Squircle width={48} height={48}>
-          <img
-            src={profile.profile_photo_url || '/placeholder.svg'}
-            alt={profile.display_name}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        </Squircle>
+        <SquircleAvatar 
+          size={48} 
+          src={profile.profile_photo_url}
+          alt={profile.display_name}
+          fallback={getInitials(profile.display_name)}
+        />
 
         {/* Profile Info */}
         <div className="flex-1 min-w-0">

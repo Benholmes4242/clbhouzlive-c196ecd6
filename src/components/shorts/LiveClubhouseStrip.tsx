@@ -4,7 +4,7 @@ import { useActiveGolfers } from '@/hooks/useActiveGolfers';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
 import AvatarSquircle from '@/components/ui/AvatarSquircle';
-import SquircleImage from '@/components/ui/SquircleImage';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import '@/styles/shorts_live_clubhouse.css';
 
 const SEEN_KEY = 'seenCreatorImmersiveIds';
@@ -146,11 +146,10 @@ function LiveTile({ creator, index }: { creator: any; index: number }) {
         onClick={onAvatarClick} 
         aria-label={creator.display_name}
       >
-        <SquircleImage
+        <SquircleAvatar
           size={84}
-          src={creator.profile_photo_url || '/placeholder.svg'}
+          src={creator.profile_photo_url}
           alt={creator.display_name}
-          ringWidth={0}
         />
       </button>
 

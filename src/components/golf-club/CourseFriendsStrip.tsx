@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import SquircleImage from '@/components/ui/SquircleImage';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useFriendsWhoPlayedCourse } from '@/hooks/useFriendsWhoPlayedCourse';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { ChevronRight } from 'lucide-react';
@@ -49,12 +49,12 @@ export const CourseFriendsStrip: React.FC<CourseFriendsStripProps> = ({ courseId
           const initial = displayName[0]?.toUpperCase() || '?';
           
           return friend.profile.profile_photo_url ? (
-            <SquircleImage
+            <SquircleAvatar
               key={friend.user_id}
               src={friend.profile.profile_photo_url}
               alt={displayName}
               size={36}
-              className={`shrink-0 ${index > 0 ? '-ml-2' : ''}`}
+              className={index > 0 ? '-ml-2' : ''}
             />
           ) : (
             <div

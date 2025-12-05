@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { Globe, Zap, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import SquircleImage from '@/components/ui/SquircleImage';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import EchoAvatar from './EchoAvatar';
 import { HighlightedText } from '@/features/echo/components/HighlightedText';
 
@@ -92,12 +92,10 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
               </span>
               {isUser ? (
                 userProfilePhoto ? (
-                  <SquircleImage
+                  <SquircleAvatar
                     size={28}
                     src={userProfilePhoto}
                     alt={userDisplayName || 'User'}
-                    ringColor="rgba(255,255,255,0.2)"
-                    ringWidth={1}
                   />
                 ) : (
                   <div 

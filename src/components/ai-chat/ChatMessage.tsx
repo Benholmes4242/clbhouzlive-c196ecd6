@@ -9,7 +9,7 @@ import { CoachPrompt } from '@/components/swing-review/CoachPrompt';
 import { parseSwingAnalysis } from '@/utils/swingAnalysisParser';
 import { cn } from '@/lib/utils';
 import EchoAvatar from './EchoAvatar';
-import SquircleImage from '@/components/ui/SquircleImage';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface ChatMessage {
   id: string;
@@ -123,12 +123,10 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                 User
               </span>
               {userProfilePhoto ? (
-                <SquircleImage
+                <SquircleAvatar
                   size={28}
                   src={userProfilePhoto}
                   alt={userDisplayName || 'User'}
-                  ringColor="rgba(255,255,255,0.2)"
-                  ringWidth={1}
                 />
               ) : (
                 <div 

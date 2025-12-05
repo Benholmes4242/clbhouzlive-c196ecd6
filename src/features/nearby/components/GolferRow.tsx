@@ -3,7 +3,7 @@ import { TapButton } from '@/components/ui/TapButton';
 import { haptic } from '@/utils/haptics';
 import { useGolferActions } from '../hooks/useGolferActions';
 import { formatDistance } from '../distance';
-import { Squircle } from '@/components/ui/squircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface GolferRowProps {
   golfer: {
@@ -73,12 +73,15 @@ export function GolferRow({ golfer, index }: GolferRowProps) {
         {/* Avatar with optional open-to-play ring */}
         <div 
           className={`relative shrink-0 ${
-            golfer.isOpenToPlay ? 'shadow-[0_0_0_3px_rgba(110,146,119,0.5)] rounded-[14px]' : ''
+            golfer.isOpenToPlay ? 'shadow-[0_0_0_3px_rgba(110,146,119,0.5)] rounded-[34%]' : ''
           }`}
         >
-          <Squircle width={44} height={44}>
-            <img src={golfer.avatar_url || '/placeholder.svg'} alt={golfer.display_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          </Squircle>
+          <SquircleAvatar 
+            size={44} 
+            src={golfer.avatar_url}
+            alt={golfer.display_name}
+            ringColor={golfer.isOpenToPlay ? '#6e9277' : undefined}
+          />
         </div>
 
         {/* Name, club, badges */}

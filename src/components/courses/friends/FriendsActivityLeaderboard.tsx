@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Squircle } from '@/components/ui/squircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatDistanceToNow } from 'date-fns';
 import { extractRanksFromMemberships } from '@/utils/rankingUtils';
 import type { FriendCourseHit } from '@/hooks/useFriendsCourses';
@@ -126,16 +126,11 @@ export const FriendsActivityLeaderboard: React.FC<FriendsActivityLeaderboardProp
               }`}
             >
               <div className="flex items-center gap-3">
-                <Squircle width={32} height={32} className="shrink-0">
-                  <img 
-                    src={stats.profile_photo_url || '/placeholder.svg'} 
-                    alt={stats.display_name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    onError={(e) => {
-                      e.currentTarget.src = '/placeholder.svg';
-                    }}
-                  />
-                </Squircle>
+                <SquircleAvatar 
+                  size={32} 
+                  src={stats.profile_photo_url}
+                  alt={stats.display_name}
+                />
 
                 <div className="text-xs">
                   <p className="font-medium text-foreground">
