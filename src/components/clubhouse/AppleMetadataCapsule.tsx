@@ -3,7 +3,7 @@
  * Sits bottom-left, ~70% width on phones
  * 
  * Layout:
- * - 52px squircle avatar (no ring)
+ * - 52px squircle avatar (new spec: 1/1.05 aspect, 34% radius)
  * - Text column: name, caption (2-line), course pill
  * - Overall height: 80-90px depending on content
  */
@@ -11,7 +11,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { relativeTime } from '@/utils/relativeTime';
-import SquircleImage from '@/components/ui/SquircleImage';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface AppleMetadataCapsuleProps {
   user: {
@@ -43,6 +43,14 @@ const AppleMetadataCapsuleBase = ({
 }: AppleMetadataCapsuleProps) => {
   const timeLabel = createdAt ? relativeTime(createdAt) : null;
 
+  // Get initials for fallback
+  const initials = user?.name
+    ?.split(' ')
+    .slice(0, 2)
+    .map(part => part[0])
+    .join('')
+    .toUpperCase() || '?';
+
   return (
     <div
       className={cn(
@@ -50,21 +58,19 @@ const AppleMetadataCapsuleBase = ({
         className
       )}
     >
-      {/* Avatar – 52px squircle, no ring */}
+      {/* Avatar – 52px squircle, new spec */}
       <button
         type="button"
         onClick={onProfileSheetOpen}
         className="flex-shrink-0"
         aria-label={user?.name ? `View profile for ${user.name}` : 'View profile'}
       >
-        <div className="h-[52px] w-[52px] overflow-hidden">
-          <SquircleImage
-            size={52}
-            src={user?.avatar || '/placeholder.svg'}
-            alt={user?.name ?? 'Golfer'}
-            ringWidth={0}
-          />
-        </div>
+        <SquircleAvatar
+          size={52}
+          src={user?.avatar}
+          alt={user?.name ?? 'Golfer'}
+          fallback={initials}
+        />
       </button>
 
       {/* Text column - centered within remaining space */}

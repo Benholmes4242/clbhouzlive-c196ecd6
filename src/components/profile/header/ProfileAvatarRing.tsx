@@ -29,10 +29,10 @@ const SIZES = {
 const RING_ANIMATED_KEY = 'clbhouz:ringAnimated:v1';
 
 /**
- * ProfileAvatarRing - Avatar with Top 100 exploration ring using CSS squircle
- * Uses 1/1.05 aspect ratio, 34% border radius, 4px colored border with glow
- * Personal profiles show colored ring based on tier (5-400 courses)
- * Business profiles show avatar without ring
+ * ProfileAvatarRing - Avatar with Top 100 exploration ring using new squircle spec
+ * Uses 1/1.05 aspect ratio, 34% border radius
+ * Achievement state: outer colored ring (1.5px) + inner grey ring (1px) + avatar
+ * Normal state: grey ring (1px) + avatar
  */
 const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
   photoUrl,
@@ -102,6 +102,27 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
     .toUpperCase()
     .slice(0, 2) || '?';
 
+  // Calculate fallback font size
+  const fallbackFontSize = Math.round(width * 0.22);
+
+  // Inner avatar content
+  const avatarInner = photoUrl ? (
+    <img
+      src={photoUrl}
+      alt={displayName}
+      className="w-full h-full object-cover"
+      loading="eager"
+      decoding="async"
+    />
+  ) : (
+    <div 
+      className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground font-semibold"
+      style={{ fontSize: `${fallbackFontSize}px` }}
+    >
+      {initials}
+    </div>
+  );
+
   const avatarElement = (
     <div
       ref={ref}
@@ -112,32 +133,40 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
       )}
       onClick={onClick}
     >
-      <div
-        className="relative overflow-hidden"
-        style={{
-          width: `${width}px`,
-          aspectRatio: '1 / 1.05',
-          borderRadius: '34%',
-          border: showRing ? `1.5px solid ${tierColor}` : '1.5px solid hsl(var(--muted))',
-          boxShadow: showRing 
-            ? `0 0 6px ${tierColor}88, 0 8px 20px rgba(0,0,0,0.35)` 
-            : '0 8px 20px rgba(0,0,0,0.35)',
-        }}
-      >
-        {photoUrl ? (
-          <img
-            src={photoUrl}
-            alt={displayName}
-            className="w-full h-full object-cover"
-            loading="eager"
-            decoding="async"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground text-xl font-semibold">
-            {initials}
+      {showRing ? (
+        // Achievement state: outer colored ring → inner grey ring → avatar
+        <div
+          className="relative overflow-hidden p-[2px]"
+          style={{
+            width: `${width}px`,
+            aspectRatio: '1 / 1.05',
+            borderRadius: '34%',
+            border: `1.5px solid ${tierColor}`,
+            boxShadow: `0 0 6px ${tierColor}88, 0 8px 20px rgba(0,0,0,0.35)`,
+          }}
+        >
+          {/* Inner grey ring + avatar */}
+          <div
+            className="w-full h-full overflow-hidden border border-gray-300 dark:border-gray-600"
+            style={{ borderRadius: '32%' }}
+          >
+            {avatarInner}
           </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        // Normal state: single grey ring around avatar
+        <div
+          className="relative overflow-hidden border border-gray-300 dark:border-gray-600"
+          style={{
+            width: `${width}px`,
+            aspectRatio: '1 / 1.05',
+            borderRadius: '34%',
+            boxShadow: '0 8px 20px rgba(0,0,0,0.35)',
+          }}
+        >
+          {avatarInner}
+        </div>
+      )}
     </div>
   );
 

@@ -5,16 +5,42 @@
 **ALL user avatars across the entire application MUST use:**
 
 ```tsx
-import { Squircle } from '@/components/ui/squircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
-<Squircle width={48} height={48}>
-  <img 
-    src={user.avatar} 
-    alt={user.name} 
-    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-  />
-</Squircle>
+// Normal avatar (1px grey ring)
+<SquircleAvatar 
+  src={user.avatar} 
+  alt={user.name} 
+  size={56} 
+/>
+
+// Achievement avatar (colored outer ring + grey inner ring)
+<SquircleAvatar 
+  src={user.avatar} 
+  alt={user.name} 
+  size={56} 
+  ringColor="#8CE06A" 
+/>
 ```
+
+## 🎨 Global Squircle Spec
+
+All avatars use this shape:
+
+- **Aspect ratio**: `1 / 1.05` (slightly taller than wide)
+- **Border radius**: `34%` (continuous soft squircle)
+- **Overflow**: `hidden`
+- **Image fit**: `object-fit: cover`
+
+### Normal State (no achievement)
+- **Ring**: 1px grey (`gray-300` / `#D1D5DB`)
+- **Shape**: Same squircle (1/1.05, 34%)
+
+### Achievement State (with ring color)
+- **Outer ring**: 1.5px colored (achievement tier color)
+- **Inner ring**: 1px grey
+- **Gap**: 2px padding between outer and inner rings
+- **Glow**: Subtle box-shadow with ring color at 53% opacity
 
 ## 🚫 FORBIDDEN Components for User Avatars
 
@@ -23,68 +49,70 @@ The following components are **FORBIDDEN** for user avatars:
 - ❌ `<Avatar>` from `@/components/ui/avatar`
 - ❌ `<OptimizedAvatar>` from `@/components/ui/optimized-avatar`
 - ❌ `<AvatarSquircle>` from `@/components/ui/AvatarSquircle`
+- ❌ `<Squircle>` for avatars (use for non-avatar content only)
+- ❌ `<SquircleImage>` (deprecated)
 - ❌ Any `<img>` with `rounded-full` className
-- ❌ Any custom `border-radius` styles
+- ❌ Any custom `border-radius` styles for avatars
 
 ## Why?
 
-All user avatars must use the **superellipse squircle shape (n=5)** for visual consistency with Apple's design language. This is a non-negotiable design requirement.
+All user avatars must use the **new squircle shape (1/1.05 aspect ratio, 34% border radius)** for visual consistency. This creates a premium, soft-rounded square appearance.
 
-The `<Squircle>` component is the **single source of truth** for this geometry.
+The `<SquircleAvatar>` component is the **single source of truth** for this geometry.
 
-## Common Sizes
+## Size Variants
 
 ```tsx
 // Extra small (28px) - for inline mentions, small lists
-<Squircle width={28} height={28}>...</Squircle>
+<SquircleAvatar size="xs" ... />
+// or
+<SquircleAvatar size={28} ... />
 
 // Small (40px) - for compact lists, comments
-<Squircle width={40} height={40}>...</Squircle>
+<SquircleAvatar size="sm" ... />
 
 // Medium (56px) - default for most user avatars
-<Squircle width={56} height={56}>...</Squircle>
+<SquircleAvatar size="md" ... />
 
 // Large (80px) - for profile headers, featured users
-<Squircle width={80} height={80}>...</Squircle>
+<SquircleAvatar size="lg" ... />
 
 // Extra large (112px) - for large profile views
-<Squircle width={112} height={112}>...</Squircle>
+<SquircleAvatar size="xl" ... />
+
+// 2XL (144px) - for main profile page
+<SquircleAvatar size="2xl" ... />
 ```
 
-## With Fallback Content
+## With Fallback (Initials)
 
 ```tsx
-<Squircle width={48} height={48}>
-  {user.avatar ? (
-    <img 
-      src={user.avatar} 
-      alt={user.name}
-      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-    />
-  ) : (
-    <div style={{
-      width: '100%',
-      height: '100%',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'var(--primary)',
-      color: 'white',
-      fontSize: '20px',
-      fontWeight: 600
-    }}>
-      {user.name[0].toUpperCase()}
-    </div>
-  )}
-</Squircle>
+<SquircleAvatar 
+  src={user.avatar} 
+  alt={user.name}
+  fallback="JD" // Shows "JD" if image fails to load
+  size={56} 
+/>
+```
+
+## Achievement Ring Colors
+
+Pass the achievement tier color to `ringColor` prop:
+
+```tsx
+// Founder green
+<SquircleAvatar ringColor="#8CE06A" ... />
+
+// Other tier colors from Top 100 system
+<SquircleAvatar ringColor={getRingColorForTier(tierInfo.tierId)} ... />
 ```
 
 ## Enforcement
 
 - All deprecated components will log **console.error** warnings in development
-- Code reviews should reject any new user avatars not using `<Squircle>`
-- Visual QA should flag any circular or non-squircle user avatars
+- Code reviews should reject any new user avatars not using `<SquircleAvatar>`
+- Visual QA should flag any circular or non-standard avatars
 
 ## Questions?
 
-See `src/components/ui/squircle.tsx` for the implementation details.
+See `src/components/ui/SquircleAvatar.tsx` for the implementation details.

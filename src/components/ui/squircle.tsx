@@ -33,25 +33,20 @@ interface SquircleProps {
 }
 
 /**
- * 🎯 SINGLE SOURCE OF TRUTH FOR USER AVATARS 🎯
+ * SVG-based squircle container with continuous corner smoothing (superellipse n=5)
  * 
- * iOS-style squircle container with continuous corner smoothing (superellipse n=5)
+ * ⚠️ FOR USER AVATARS: Use <SquircleAvatar> from @/components/ui/SquircleAvatar.tsx instead
+ * This SVG-based component should only be used for non-avatar content.
  * 
- * ✅ THIS IS THE ONLY ALLOWED COMPONENT FOR USER AVATARS
- * ❌ DO NOT use Avatar, OptimizedAvatar, AvatarSquircle, or any other avatar components
- * ❌ DO NOT use rounded-full, rounded-lg, or custom border-radius for user photos
- * 
- * ALL user avatars across the entire application MUST use this component directly
- * for visual consistency with Apple's design language.
- * 
- * @example User avatar
- * <Squircle width={48} height={48}>
- *   <img src={user.avatar} alt={user.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
- * </Squircle>
+ * User avatars must use the new CSS-based SquircleAvatar which has:
+ * - Aspect ratio: 1 / 1.05 (slightly taller than wide)
+ * - Border radius: 34% (continuous soft squircle)
+ * - Normal state: 1px grey ring
+ * - Achievement state: 1.5px colored outer ring + 1px grey inner ring
  * 
  * @param width - Width in pixels
  * @param height - Height in pixels  
- * @param children - Content to display (typically an img element)
+ * @param children - Content to display
  * @param className - Optional additional CSS classes
  */
 export const Squircle: React.FC<SquircleProps> = ({ 
