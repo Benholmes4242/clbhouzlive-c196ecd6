@@ -24,10 +24,10 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   const tabs = getProfileTabs(userType);
 
   return (
-    <section className="mt-8 flex justify-center">
+    <section className="mt-8 px-4">
       <div 
         className={cn(
-          "inline-grid rounded-sq-md bg-muted/70 border border-border/60 px-2 py-[3px]",
+          "grid w-full rounded-sq-md bg-muted/70 border border-border/60 px-2 py-[3px]",
           tabs.length === 4 && "grid-cols-4",
           tabs.length === 3 && "grid-cols-3",
           tabs.length === 2 && "grid-cols-2",
