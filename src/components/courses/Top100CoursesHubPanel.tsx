@@ -10,7 +10,7 @@ import { getTop100Club } from '@/lib/top100Club';
 import { getTop100RingDotClass } from '@/lib/top100RingStyles';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Search, Award, X } from 'lucide-react';
-import { Top100AchievementBadge } from '@/components/top100/Top100AchievementBadge';
+import { AchievementBadge } from '@/components/achievements/AchievementBadge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -303,7 +303,15 @@ const Top100CoursesHubPanel = () => {
             </section>
 
             {/* 2. Hero achievement badge row */}
-            <Top100AchievementBadge tier={club.tierId} />
+            {totalRated >= 5 && (
+              <AchievementBadge
+                count={totalRated}
+                title="Top 100"
+                tierLabel={club.tierName || 'Top 100 Club'}
+                ringColor={club.ringColor}
+                size="md"
+              />
+            )}
 
             {/* 3. CTA */}
             <section className="w-full max-w-[420px]">
