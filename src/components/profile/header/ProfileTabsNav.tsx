@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React from 'react';
 import { getProfileTabs } from '@/hooks/useProfileType';
 import { cn } from '@/lib/utils';
 
@@ -11,8 +11,8 @@ interface ProfileTabsNavProps {
 }
 
 /**
- * ProfileTabsNav - White pill with short centered black underline on active tab
- * Premium Golf style - clean, Apple-like
+ * ProfileTabsNav - Matches Explore page tabs styling
+ * Segmented control with muted background
  */
 const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   userType,
@@ -22,65 +22,44 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   disabled = false
 }) => {
   const tabs = getProfileTabs(userType);
-  const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [underlineStyle, setUnderlineStyle] = useState({ left: 0, width: 0 });
-  
-  // Update underline position when active tab changes
-  useEffect(() => {
-    const activeIndex = tabs.findIndex(tab => tab.id === activeSection);
-    const activeTab = tabsRef.current[activeIndex];
-    const container = containerRef.current;
-    
-    if (activeTab && container) {
-      const containerRect = container.getBoundingClientRect();
-      const tabRect = activeTab.getBoundingClientRect();
-      const left = tabRect.left - containerRect.left;
-      setUnderlineStyle({ left, width: tabRect.width });
-    }
-  }, [activeSection, tabs]);
 
   return (
     <section className="mt-5 flex justify-center">
       <div 
-        ref={containerRef}
-        className="inline-flex max-w-full overflow-x-auto rounded-[20px] bg-white shadow-[0_4px_16px_rgba(15,23,42,0.08)] px-3 py-1"
+        className={cn(
+          "inline-grid rounded-sq-md bg-muted/70 border border-border/60 px-2 py-[3px]",
+          tabs.length === 4 && "grid-cols-4",
+          tabs.length === 3 && "grid-cols-3",
+          tabs.length === 2 && "grid-cols-2",
+          tabs.length === 1 && "grid-cols-1"
+        )}
         role="tablist"
         aria-label="Profile sections"
       >
-        <div className="flex gap-2 md:gap-4">
-          {tabs.map((tab, index) => {
-            const isActive = tab.id === activeSection;
-            
-            return (
-              <button
-                key={tab.id}
-                ref={el => tabsRef.current[index] = el}
-                onClick={() => !disabled && onTabChange(tab.id)}
-                role="tab"
-                aria-selected={isActive}
-                aria-controls={`tabpanel-${tab.id}`}
-                tabIndex={isActive ? 0 : -1}
-                disabled={disabled}
-                className={cn(
-                  'relative px-3 md:px-4 py-1.5 text-xs md:text-sm font-medium',
-                  'transition-colors duration-200',
-                  isActive
-                    ? 'text-slate-900'
-                    : 'text-slate-500 hover:text-slate-700',
-                  disabled && 'pointer-events-none opacity-50'
-                )}
-              >
-                <span>{tab.label}</span>
-                {isActive && (
-                  <span 
-                    className="absolute left-1/2 -bottom-[4px] h-[2px] w-6 md:w-8 -translate-x-1/2 rounded-full bg-black"
-                  />
-                )}
-              </button>
-            );
-          })}
-        </div>
+        {tabs.map((tab) => {
+          const isActive = tab.id === activeSection;
+          
+          return (
+            <button
+              key={tab.id}
+              onClick={() => !disabled && onTabChange(tab.id)}
+              role="tab"
+              aria-selected={isActive}
+              aria-controls={`tabpanel-${tab.id}`}
+              tabIndex={isActive ? 0 : -1}
+              disabled={disabled}
+              className={cn(
+                'rounded-sq-pill text-sm px-3 py-[6px] font-medium transition-all duration-150 ease-out',
+                isActive
+                  ? 'bg-background shadow-sm text-foreground'
+                  : 'text-muted-foreground hover:text-foreground',
+                disabled && 'pointer-events-none opacity-50'
+              )}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
     </section>
   );
