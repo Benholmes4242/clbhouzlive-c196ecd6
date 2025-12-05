@@ -27,7 +27,7 @@ export function UnifiedControlBar({
       className={`
         mt-3 mb-3
         flex items-center justify-between
-        rounded-2xl
+        rounded-sq-md
         px-3 py-2.5
         bg-card/80
         border border-border/60

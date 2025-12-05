@@ -149,7 +149,7 @@ export function HistoryPanel({
           <h3 className="font-display text-heading-lg font-semibold leading-snug text-foreground">Conversations</h3>
           <TapButton
             onClick={onNew}
-            className="bg-primary text-primary-foreground p-2 rounded-lg hover:opacity-90 transition-opacity"
+            className="bg-primary text-primary-foreground p-2 rounded-sq-sm hover:opacity-90 transition-opacity"
             aria-label="New conversation"
           >
             <Plus className="w-4 h-4" />
@@ -161,7 +161,7 @@ export function HistoryPanel({
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search conversations..."
-          className="w-full bg-secondary text-foreground rounded-lg px-4 py-2 text-body-md focus:outline-none focus:ring-2 focus:ring-primary"
+          className="w-full bg-secondary text-foreground rounded-sq-sm px-4 py-2 text-body-md focus:outline-none focus:ring-2 focus:ring-primary"
           aria-label="Search conversations"
         />
       </div>

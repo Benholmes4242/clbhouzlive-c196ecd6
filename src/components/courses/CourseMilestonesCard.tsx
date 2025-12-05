@@ -28,7 +28,7 @@ export const CourseMilestonesCard: React.FC<CourseMilestonesCardProps> = ({ cour
   };
 
   return (
-    <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 shadow-lg">
+    <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-sq-lg p-6 shadow-lg">
       <h3 className="text-lg font-semibold mb-4 text-foreground">
         Milestones you're working toward
       </h3>
@@ -38,7 +38,7 @@ export const CourseMilestonesCard: React.FC<CourseMilestonesCardProps> = ({ cour
           <button
             key={prompt.code}
             onClick={handlePromptClick}
-            className="w-full flex items-center justify-between p-3 rounded-xl bg-background/30 hover:bg-background/50 transition-all duration-200 hover:scale-[1.01] group"
+            className="w-full flex items-center justify-between p-3 rounded-sq-sm bg-background/30 hover:bg-background/50 transition-all duration-200 hover:scale-[1.01] group"
           >
             <div className="flex items-center gap-3 flex-1 text-left">
               <span className="text-2xl">{getCategoryEmoji(prompt.category)}</span>
