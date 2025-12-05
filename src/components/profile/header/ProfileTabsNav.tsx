@@ -24,7 +24,7 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   const tabs = getProfileTabs(userType);
 
   return (
-    <section className="mt-5 flex justify-center">
+    <section className="mt-7 flex justify-center">
       <div 
         className={cn(
           "inline-grid rounded-sq-md bg-muted/70 border border-border/60 px-2 py-[3px]",
@@ -49,7 +49,7 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
               tabIndex={isActive ? 0 : -1}
               disabled={disabled}
               className={cn(
-                'rounded-sq-pill text-sm px-3 py-[6px] font-medium transition-all duration-150 ease-out',
+                'rounded-sq-pill text-base px-4 py-2 font-medium transition-all duration-150 ease-out',
                 isActive
                   ? 'bg-background shadow-sm text-foreground'
                   : 'text-muted-foreground hover:text-foreground',

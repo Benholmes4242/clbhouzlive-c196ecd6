@@ -28,10 +28,10 @@ const StatItem: React.FC<StatItemProps> = ({
 }) => {
   const content = (
     <div className="flex flex-col leading-tight">
-      <span className="text-base md:text-lg font-semibold text-slate-900 tabular-nums">
+      <span className="text-lg md:text-xl font-semibold text-slate-900 tabular-nums">
         {value}
       </span>
-      <span className="mt-0.5 text-xs md:text-sm font-medium text-slate-600">
+      <span className="mt-1 text-sm md:text-base font-medium text-slate-600">
         {label}
       </span>
     </div>
@@ -69,8 +69,8 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
   onFriendsClick
 }) => {
   return (
-    <section className="mt-5 flex justify-center">
-      <div className="flex items-center gap-6 md:gap-10 text-center">
+    <section className="mt-7 flex justify-center">
+      <div className="flex items-center gap-8 md:gap-12 text-center">
         <StatItem value={postsCount} label="Posts" />
         
         {isPersonal && (
