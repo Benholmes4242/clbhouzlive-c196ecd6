@@ -1,6 +1,6 @@
 import React from 'react';
-import { Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Top100TrophyIcon from '@/components/icons/Top100TrophyIcon';
 import type { Top100TierId } from '@/lib/top100Club';
 import { TIER_BY_ID } from '@/lib/top100Club';
 
@@ -54,10 +54,11 @@ export function Top100AchievementBadge({
           boxShadow: `0 2px 6px color-mix(in srgb, ${ringColor} 30%, rgba(0,0,0,0.15))`,
         }}
       >
-        <Trophy
-          className="text-white"
-          size={isCompact ? 12 : 14}
-          strokeWidth={2.5}
+        <Top100TrophyIcon
+          className={cn(
+            'text-white',
+            isCompact ? 'h-3 w-3' : 'h-3.5 w-3.5'
+          )}
         />
       </div>
       <span
