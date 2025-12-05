@@ -381,10 +381,10 @@ const HeroProfileHeader = ({
         {/* META BLOCK - no card, transparent, sits on page background */}
         <div
           ref={profileCardRef}
-          className="relative mx-auto max-w-[540px] px-5 pb-8"
+          className="relative mx-auto max-w-[540px] px-5 pb-8 bg-background"
         >
           {/* AVATAR – OVERLAPS HERO */}
-          <div className="absolute left-1/2 -top-[170px] -translate-x-1/2 z-20">
+          <div className="absolute left-1/2 -top-[151px] -translate-x-1/2 z-20">
             <ProfileAvatarRing
               photoUrl={profile?.profile_photo_url}
               displayName={displayName}
@@ -396,6 +396,9 @@ const HeroProfileHeader = ({
               animateOnFirstView={true}
             />
           </div>
+
+          {/* Spacer for avatar overlap - creates 24px gap below avatar */}
+          <div className="h-6" />
 
           {/* TEXT META (name, @handle, club, bio, customise) */}
           <ProfileHeaderCard
@@ -427,16 +430,6 @@ const HeroProfileHeader = ({
             />
           )}
 
-          {/* Achievement Badge - Above stats row */}
-          <ProfileTop100Chip
-            top100Overview={{
-              ...top100Overview,
-              lists: undefined
-            }}
-            isPersonal={isPersonal}
-            isMobile={isMobile}
-          />
-
           {/* Stats Row */}
           <ProfileStatsRow
             postsCount={postsCount}
@@ -448,6 +441,16 @@ const HeroProfileHeader = ({
             onFollowersClick={handleOpenFollowers}
             onFollowingClick={handleOpenFollowing}
             onFriendsClick={handleOpenFriends}
+          />
+
+          {/* Top 100 Chip with completion stamps - Personal profiles only */}
+          <ProfileTop100Chip
+            top100Overview={{
+              ...top100Overview,
+              lists: undefined
+            }}
+            isPersonal={isPersonal}
+            isMobile={isMobile}
           />
 
           {/* Tab Navigation */}
