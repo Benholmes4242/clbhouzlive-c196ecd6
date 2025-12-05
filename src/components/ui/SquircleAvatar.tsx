@@ -12,7 +12,7 @@ import { getDirectImageUrl } from '@/utils/r2ImageUtils';
  * - object-fit: cover for images
  * 
  * Normal state: 1px grey ring (gray-300)
- * Achievement state: 1.5px colored outer ring + 1px grey inner ring
+ * Achievement state: 2px colored outer ring + 1px grey inner ring
  */
 
 // Size variants mapping
@@ -164,7 +164,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
             width: `${pixelSize}px`,
             aspectRatio: '1 / 1.05',
             borderRadius: '34%',
-            border: `1.5px solid ${ringColor}`,
+            border: `2px solid ${ringColor}`,
             boxShadow: `0 0 6px ${ringColor}88`,
           }}
         >
