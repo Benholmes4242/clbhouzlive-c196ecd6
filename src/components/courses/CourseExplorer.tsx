@@ -19,7 +19,7 @@ import {
   regionKeyToDbValue,
   subregionKeyToLabel,
 } from '@/constants/courseRegions';
-import { BottomSheet } from '@/components/ui/BottomSheet';
+import { AppSelect, AppSelectOption } from '@/components/ui/AppSelect';
 import { COURSES_PAGE_SIZE } from '@/config/pagination';
 import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 
@@ -89,7 +89,6 @@ const CourseExplorer = () => {
   });
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
   const [sortOption, setSortOption] = useState<SortOption>('popular');
-  const [showSortSheet, setShowSortSheet] = useState(false);
 
   // Save filters to sessionStorage whenever they change (only after URL initialization)
   useEffect(() => {
@@ -322,18 +321,13 @@ const CourseExplorer = () => {
     sessionStorage.setItem('explore-scroll', window.scrollY.toString());
   };
 
-  const sortLabelMap: Record<SortOption, string> = {
-    popular: 'Most popular',
-    rating_desc: 'Highest rated',
-    rating_asc: 'Lowest rated',
-    name_asc: 'A–Z',
-    name_desc: 'Z–A',
-  };
-
-  const handleSortSelection = (option: SortOption) => {
-    setSortOption(option);
-    setShowSortSheet(false);
-  };
+  const sortOptions: AppSelectOption<SortOption>[] = [
+    { value: 'popular', label: 'Most popular' },
+    { value: 'rating_desc', label: 'Highest rated' },
+    { value: 'rating_asc', label: 'Lowest rated' },
+    { value: 'name_asc', label: 'A–Z' },
+    { value: 'name_desc', label: 'Z–A' },
+  ];
 
   return (
     <div className="w-full space-y-4">
@@ -458,15 +452,13 @@ const CourseExplorer = () => {
                 </>
               )}
             </p>
-            <Button
-              variant="tertiary"
-              size="tertiary"
-              onClick={() => setShowSortSheet(true)}
-              className="inline-flex items-center gap-1.5 whitespace-nowrap"
-            >
-              <span className="text-muted-foreground">Sort:</span>
-              <span className="text-foreground">{sortLabelMap[sortOption]}</span>
-            </Button>
+            <AppSelect
+              value={sortOption}
+              onChange={(v) => setSortOption(v as SortOption)}
+              options={sortOptions}
+              ariaLabel="Sort courses"
+              triggerClassName="h-9"
+            />
           </div>
         )}
 
@@ -489,35 +481,6 @@ const CourseExplorer = () => {
           />
         </div>
       )}
-
-      {/* Sort Bottom Sheet */}
-      <BottomSheet
-        open={showSortSheet}
-        onClose={() => setShowSortSheet(false)}
-        ariaLabelledBy="sort-options-title"
-      >
-        <div className="px-4 py-3">
-          {(['popular', 'rating_desc', 'rating_asc', 'name_asc', 'name_desc'] as SortOption[]).map((option, index, arr) => (
-            <React.Fragment key={option}>
-              <button
-                onClick={() => handleSortSelection(option)}
-                className={`
-                  w-full text-left px-4 py-3.5 transition-colors rounded-sq-sm
-                  ${sortOption === option
-                    ? 'bg-slate-100 text-slate-900 font-medium'
-                    : 'text-slate-900 hover:bg-slate-50'
-                  }
-                `}
-              >
-                {sortLabelMap[option]}
-              </button>
-              {index < arr.length - 1 && (
-                <div className="border-t border-slate-200/40 my-0.5" />
-              )}
-            </React.Fragment>
-          ))}
-        </div>
-      </BottomSheet>
     </div>
   );
 };
