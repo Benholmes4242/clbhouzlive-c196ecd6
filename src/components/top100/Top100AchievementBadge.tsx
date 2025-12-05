@@ -11,22 +11,11 @@ interface Top100AchievementBadgeProps {
   className?: string;
 }
 
-// Map tier ring colors to Tailwind color classes for border/bg/icon
-function getTierColorClasses(ringColor: string) {
-  // Map hex colors to approximate Tailwind classes
-  const colorMap: Record<string, { border: string; bg: string; icon: string }> = {
-    '#C9B27A': { border: 'border-[#C9B27A]', bg: 'bg-[#C9B27A]/10', icon: 'text-[#C9B27A]' },
-    '#7CC66B': { border: 'border-[#7CC66B]', bg: 'bg-[#7CC66B]/10', icon: 'text-[#7CC66B]' },
-    '#2F7D32': { border: 'border-[#2F7D32]', bg: 'bg-[#2F7D32]/10', icon: 'text-[#2F7D32]' },
-    '#D8A546': { border: 'border-[#D8A546]', bg: 'bg-[#D8A546]/10', icon: 'text-[#D8A546]' },
-    '#4A4A4A': { border: 'border-[#4A4A4A]', bg: 'bg-[#4A4A4A]/10', icon: 'text-[#4A4A4A]' },
-    '#6F5BD5': { border: 'border-[#6F5BD5]', bg: 'bg-[#6F5BD5]/10', icon: 'text-[#6F5BD5]' },
-    '#B153CE': { border: 'border-[#B153CE]', bg: 'bg-[#B153CE]/10', icon: 'text-[#B153CE]' },
-    '#111111': { border: 'border-[#111111]', bg: 'bg-[#111111]/10', icon: 'text-[#111111]' },
-  };
-  return colorMap[ringColor] ?? { border: 'border-slate-400', bg: 'bg-slate-100', icon: 'text-slate-500' };
-}
-
+/**
+ * Top100AchievementBadge - SDS Squircle Glass style
+ * 
+ * A premium frosted glass squircle badge with tier-colored glass effect.
+ */
 export function Top100AchievementBadge({ 
   tier, 
   showSubtitle = true, 
@@ -38,30 +27,45 @@ export function Top100AchievementBadge({
   const tierMeta = TIER_BY_ID[tier];
   if (!tierMeta) return null;
 
-  const colors = getTierColorClasses(tierMeta.ringColor);
+  const ringColor = tierMeta.ringColor;
   const isCompact = size === 'compact';
 
   return (
     <div
       className={cn(
-        'inline-flex items-center justify-center rounded-full border bg-white shadow-sm whitespace-nowrap',
-        colors.border,
+        'inline-flex items-center justify-center rounded-sq-sm border whitespace-nowrap',
+        'backdrop-blur-xl',
         isCompact ? 'px-3.5 py-1.5 gap-1.5' : 'px-4 py-2 gap-2',
         className
       )}
+      style={{
+        background: `linear-gradient(135deg, color-mix(in srgb, ${ringColor} 15%, rgba(255,255,255,0.9)), color-mix(in srgb, ${ringColor} 20%, rgba(255,255,255,0.75)))`,
+        borderColor: `color-mix(in srgb, ${ringColor} 35%, rgba(255,255,255,0.6))`,
+        boxShadow: `0 4px 16px color-mix(in srgb, ${ringColor} 15%, rgba(0,0,0,0.08)), inset 0 1px 0 rgba(255,255,255,0.5)`,
+      }}
     >
-      <Trophy
+      <div
         className={cn(
-          'shrink-0',
-          colors.icon,
-          isCompact ? 'h-4 w-4' : 'h-4 w-4'
+          'flex items-center justify-center rounded-sq-xs shrink-0',
+          isCompact ? 'h-5 w-5' : 'h-6 w-6'
         )}
-      />
+        style={{
+          background: `linear-gradient(135deg, color-mix(in srgb, ${ringColor} 60%, #ffffff), ${ringColor})`,
+          boxShadow: `0 2px 6px color-mix(in srgb, ${ringColor} 30%, rgba(0,0,0,0.15))`,
+        }}
+      >
+        <Trophy
+          className="text-white"
+          size={isCompact ? 12 : 14}
+          strokeWidth={2.5}
+        />
+      </div>
       <span
         className={cn(
-          'font-medium text-slate-900 leading-tight',
+          'font-semibold leading-tight',
           isCompact ? 'text-[13px]' : 'text-sm'
         )}
+        style={{ color: ringColor }}
       >
         {tierMeta.tierName}
       </span>

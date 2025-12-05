@@ -131,7 +131,7 @@ const AchievementBadge: React.FC<AchievementBadgeProps> = ({
             ${colors.bg} 
             ${colors.border} 
             ${colors.glow}
-            border-2 rounded-full p-2
+            border-2 rounded-sq-md p-2
             transition-all duration-300 ease-in-out
             hover:scale-110 active:scale-95
             ${badge.isUnlocked ? 'cursor-pointer animate-subtle-bounce' : 'cursor-default'}
@@ -164,7 +164,7 @@ const AchievementBadge: React.FC<AchievementBadgeProps> = ({
             <DialogHeader>
               <DialogTitle className="flex items-center gap-3">
                 <div className={`
-                  w-12 h-12 rounded-full p-2 flex items-center justify-center
+                  w-12 h-12 rounded-sq-md p-2 flex items-center justify-center
                   ${colors.bg} ${colors.border} ${colors.glow} border-2
                 `}>
                   <div className={colors.icon}>
