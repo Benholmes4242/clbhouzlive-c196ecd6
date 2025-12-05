@@ -11,8 +11,8 @@ import { getDirectImageUrl } from '@/utils/r2ImageUtils';
  * - overflow: hidden
  * - object-fit: cover for images
  * 
- * Normal state: 1px grey ring (#D1D5DB)
- * Achievement state: 2.5px colored outer ring + 1px grey inner ring (no gap)
+ * Normal state (no achievement): 1px grey ring (#D1D5DB)
+ * Achievement state: 1px colored ring directly on avatar (no grey ring)
  */
 
 // Size variants mapping
@@ -146,7 +146,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
     </>
   );
 
-  // Achievement state: outer colored ring → inner grey ring → avatar
+  // Achievement state: colored ring directly on avatar (no grey ring)
   if (hasAchievementRing) {
     return (
       <div
@@ -157,27 +157,16 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
         )}
         onClick={onClick}
       >
-        {/* Outer achievement ring */}
         <div
           className="relative overflow-hidden"
           style={{
             width: `${pixelSize}px`,
             aspectRatio: '1 / 1.05',
             borderRadius: '34%',
-            border: `2.5px solid ${ringColor}`,
-            boxShadow: `0 0 6px ${ringColor}88`,
+            border: `1px solid ${ringColor}`,
           }}
         >
-          {/* Inner grey ring + avatar */}
-          <div
-            className="w-full h-full overflow-hidden"
-            style={{
-              borderRadius: '33%',
-              border: '1px solid #D1D5DB',
-            }}
-          >
-            {avatarContent}
-          </div>
+          {avatarContent}
         </div>
         {children}
       </div>
