@@ -116,7 +116,8 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   // Calculate fallback font size based on avatar size
   const fallbackFontSize = Math.round(pixelSize * 0.38);
 
-  const hasAchievementRing = Boolean(ringColor);
+  // TEMPORARY: Disabled achievement rings for testing
+  const hasAchievementRing = false; // Boolean(ringColor);
 
   // Inner avatar content (image or fallback)
   const avatarContent = (
@@ -157,13 +158,13 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
         )}
         onClick={onClick}
       >
-        {/* Outer achievement ring - 2.5px larger on all sides to accommodate grey ring */}
+        {/* Outer achievement ring */}
         <div
           className="relative overflow-hidden"
           style={{
-            width: `${pixelSize + 5}px`,
-            height: `${(pixelSize * 1.05) + 5}px`,
-            borderRadius: '30%',
+            width: `${pixelSize}px`,
+            aspectRatio: '1 / 1.05',
+            borderRadius: '34%',
             border: `2.5px solid ${ringColor}`,
             boxShadow: `0 0 6px ${ringColor}88`,
           }}
@@ -172,7 +173,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
           <div
             className="w-full h-full overflow-hidden"
             style={{
-              borderRadius: '30%',
+              borderRadius: '32%',
               border: '2.5px solid #D1D5DB',
             }}
           >
@@ -199,7 +200,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
         style={{
           width: `${pixelSize}px`,
           aspectRatio: '1 / 1.05',
-          borderRadius: '30%',
+          borderRadius: '34%',
           border: '2.5px solid #D1D5DB',
         }}
       >
