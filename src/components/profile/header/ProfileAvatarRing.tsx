@@ -140,7 +140,7 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
           style={{
             width: `${width}px`,
             aspectRatio: '1 / 1.05',
-            borderRadius: '34%',
+            borderRadius: '30%',
             border: `2.5px solid ${tierColor}`,
             boxShadow: `0 0 6px ${tierColor}88, 0 8px 20px rgba(0,0,0,0.35)`,
           }}
