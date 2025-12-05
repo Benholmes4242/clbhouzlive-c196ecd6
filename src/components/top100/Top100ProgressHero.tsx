@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Top100TierId } from '@/lib/top100Club';
-import { getRingColorForTier } from '@/lib/top100Club';
-import { Top100AchievementBadge } from './Top100AchievementBadge';
+import { getRingColorForTier, getTop100Club } from '@/lib/top100Club';
+import { AchievementBadge } from '@/components/achievements/AchievementBadge';
 
 export interface Top100ProgressHeroProps {
   displayName: string | null;
@@ -105,6 +105,8 @@ export function Top100ProgressHero({
     .slice(0, 2) || '?';
 
   const tierColor = tierId && tierId !== 'none' ? getRingColorForTier(tierId) : null;
+  const club = getTop100Club(totalTop100Played);
+  const hasAchievement = totalTop100Played >= 5;
   
   const formattedDate = lastRoundAt
     ? new Date(lastRoundAt).toLocaleDateString()
@@ -112,8 +114,8 @@ export function Top100ProgressHero({
 
   return (
     <section className="flex flex-col items-center gap-3 pb-4">
-      {/* Profile + achievement pill */}
-      <div className="flex flex-col items-center gap-3">
+      {/* Profile + achievement badge */}
+      <div className="flex flex-col items-center">
         <div className="relative">
           {/* Large avatar with custom ring sizes */}
           <LargeProgressAvatar
@@ -122,22 +124,24 @@ export function Top100ProgressHero({
             fallback={initials}
             ringColor={tierColor}
           />
-
-          {/* Achievement badge pill - overlaying bottom of avatar */}
-          {tierId && tierId !== 'none' && (
-            <div className="absolute -bottom-4 left-1/2 -translate-x-1/2">
-              <Top100AchievementBadge
-                tier={tierId}
-                showSubtitle={false}
-                size="compact"
-              />
-            </div>
-          )}
         </div>
+
+        {/* Achievement badge below avatar - only if user has first achievement */}
+        {hasAchievement && (
+          <div className="mt-4">
+            <AchievementBadge
+              count={totalTop100Played}
+              title="Top 100"
+              tierLabel={club.tierName || 'Top 100 Club'}
+              ringColor={club.ringColor}
+              size="md"
+            />
+          </div>
+        )}
       </div>
 
       {/* Primary summary line */}
-      <p className="mt-4 text-center text-lg font-semibold text-foreground">
+      <p className="mt-2 text-center text-lg font-semibold text-foreground">
         {isOwnProfile ? "You've" : `${displayName} has`} played{' '}
         <span className="font-bold">{totalTop100Played} Top 100 course{totalTop100Played === 1 ? '' : 's'}</span>
       </p>
