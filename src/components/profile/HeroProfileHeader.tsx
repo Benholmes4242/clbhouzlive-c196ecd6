@@ -384,7 +384,7 @@ const HeroProfileHeader = ({
           className="relative mx-auto max-w-[540px] px-5 pb-8 bg-background"
         >
           {/* AVATAR – OVERLAPS HERO */}
-          <div className="absolute left-1/2 -top-[151px] -translate-x-1/2 z-20">
+          <div className="absolute left-1/2 -top-[200px] -translate-x-1/2 z-20">
             <ProfileAvatarRing
               photoUrl={profile?.profile_photo_url}
               displayName={displayName}
@@ -396,9 +396,6 @@ const HeroProfileHeader = ({
               animateOnFirstView={true}
             />
           </div>
-
-          {/* Spacer for avatar overlap - creates 24px gap below avatar */}
-          <div className="h-6" />
 
           {/* TEXT META (name, @handle, club, bio, customise) */}
           <ProfileHeaderCard
