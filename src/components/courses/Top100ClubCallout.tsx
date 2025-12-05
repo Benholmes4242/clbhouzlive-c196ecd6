@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { Trophy, ChevronRight } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Top100FriendsStrip } from './Top100FriendsStrip';
+import { AchievementBadge } from '@/components/achievements/AchievementBadge';
+import { getTop100Club } from '@/lib/top100Club';
 
 const Top100ClubCallout: React.FC = () => {
   const { session } = useSupabaseSession();
@@ -31,6 +32,10 @@ const Top100ClubCallout: React.FC = () => {
   const progressPercent = totalCoursesInStartedLists > 0
     ? Math.min((coursesPlayed / totalCoursesInStartedLists) * 100, 100)
     : 0;
+
+  // Achievement badge data
+  const hasAchievement = coursesPlayed >= 5;
+  const club = getTop100Club(coursesPlayed);
 
   return (
     <section 
@@ -58,9 +63,25 @@ const Top100ClubCallout: React.FC = () => {
           <>
             {listsStarted > 0 ? (
               <>
-                <p className="mb-2 text-sm font-medium text-slate-900">
-                  You&apos;ve rated {coursesPlayed} course{coursesPlayed === 1 ? '' : 's'} {listsStarted === 1 ? 'in' : 'across'} {listsStarted} Top 100 list{listsStarted === 1 ? '' : 's'}.
-                </p>
+                {/* Achievement Badge - only show if user has 5+ courses */}
+                {hasAchievement && (
+                  <div className="mb-4">
+                    <AchievementBadge
+                      count={coursesPlayed}
+                      title="Top 100"
+                      tierLabel={club.tierName || 'Top 100 Club'}
+                      ringColor={club.ringColor}
+                      size="md"
+                    />
+                  </div>
+                )}
+
+                {/* Progress text - only show if no badge yet */}
+                {!hasAchievement && (
+                  <p className="mb-2 text-sm font-medium text-slate-900">
+                    You&apos;ve rated {coursesPlayed} course{coursesPlayed === 1 ? '' : 's'} {listsStarted === 1 ? 'in' : 'across'} {listsStarted} Top 100 list{listsStarted === 1 ? '' : 's'}.
+                  </p>
+                )}
 
                 {/* Progress bar */}
                 <div className="mt-1 mb-4 h-2 w-full overflow-hidden rounded-full bg-slate-200">
