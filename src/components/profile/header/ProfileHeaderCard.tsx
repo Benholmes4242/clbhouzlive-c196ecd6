@@ -85,17 +85,17 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   const displayBio = shouldTruncateBio && !bioExpanded ? `${bio.slice(0, 120)}...` : bio;
 
   return (
-    <div className="flex flex-col items-center text-center mt-2 space-y-2">
-      {/* NAME */}
-      <h1 className="text-[22px] font-semibold text-foreground">
+    <section className="mt-4 flex flex-col items-center text-center gap-1.5">
+      {/* NAME - Larger and bolder */}
+      <h1 className="text-2xl md:text-3xl font-semibold text-foreground">
         {displayName}
       </h1>
 
       {/* HANDLE + BADGE */}
-      <div className="flex items-center gap-2 text-[14px] text-muted-foreground">
-        @{username}
+      <div className="flex items-center gap-2 text-sm md:text-base text-muted-foreground">
+        <span>@{username}</span>
         <span className={cn(
-          "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide",
+          "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs md:text-[13px] font-medium uppercase tracking-wide",
           isPersonal 
             ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
             : "bg-blue-500/20 text-blue-400 border border-blue-500/30"
@@ -107,14 +107,14 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
 
       {/* CLUB + HCP LINE */}
       {subtitleLine && (
-        <div className="text-[14px] text-muted-foreground">
+        <p className="text-sm md:text-[15px] text-muted-foreground">
           {subtitleLine}
-        </div>
+        </p>
       )}
       
       {/* Website - Business profiles */}
       {!isPersonal && websiteUrl && (
-        <div className="flex items-center justify-center gap-1.5 text-[14px]">
+        <div className="flex items-center justify-center gap-1.5 text-sm md:text-[15px]">
           <Globe className="w-3.5 h-3.5 text-muted-foreground" />
           <a 
             href={getWebsiteHref(websiteUrl)}
@@ -129,8 +129,8 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
 
       {/* BIO */}
       {bio && (
-        <div className="max-w-[320px]">
-          <p className="text-[14px] text-muted-foreground leading-[1.35]">
+        <div className="mt-1 max-w-[320px] md:max-w-[420px]">
+          <p className="text-sm md:text-[15px] leading-snug text-muted-foreground">
             {displayBio}
           </p>
           {shouldTruncateBio && (
@@ -151,14 +151,13 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
       {/* CUSTOMISE PROFILE (OWN PROFILE ONLY) */}
       {isOwnProfile && onCustomiseClick && (
         <button
-          className="flex items-center gap-1 text-[13px] mt-1 text-muted-foreground hover:text-foreground transition-colors"
+          className="mt-1 text-xs md:text-sm text-muted-foreground hover:text-foreground underline-offset-2 hover:underline transition-colors"
           onClick={onCustomiseClick}
         >
-          <Brush className="w-3.5 h-3.5" />
           Customise profile
         </button>
       )}
-    </div>
+    </section>
   );
 };
 

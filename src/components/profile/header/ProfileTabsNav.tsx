@@ -11,8 +11,8 @@ interface ProfileTabsNavProps {
 }
 
 /**
- * ProfileTabsNav - Premium Golf underline-only tabs with emerald glow
- * Clean, Apple-like design with subtle top border
+ * ProfileTabsNav - White pill with black underline on active tab
+ * Premium Golf style - clean, Apple-like
  */
 const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   userType,
@@ -41,50 +41,46 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   }, [activeSection, tabs]);
 
   return (
-    <div className="mt-4 border-t border-white/10">
+    <section className="mt-5 flex justify-center">
       <div 
         ref={containerRef}
-        className="relative flex items-center justify-between max-w-[360px] mx-auto"
+        className="inline-flex max-w-full overflow-x-auto rounded-[20px] bg-background shadow-[0_4px_16px_rgba(15,23,42,0.08)] px-3 py-1"
         role="tablist"
         aria-label="Profile sections"
       >
-        {tabs.map((tab, index) => {
-          const isActive = tab.id === activeSection;
-          
-          return (
-            <button
-              key={tab.id}
-              ref={el => tabsRef.current[index] = el}
-              onClick={() => !disabled && onTabChange(tab.id)}
-              role="tab"
-              aria-selected={isActive}
-              aria-controls={`tabpanel-${tab.id}`}
-              tabIndex={isActive ? 0 : -1}
-              disabled={disabled}
-              className={cn(
-                'relative flex-1 py-3 text-center text-[13px] font-medium',
-                'transition-colors duration-200',
-                isActive
-                  ? 'text-foreground'
-                  : 'text-foreground/60 hover:text-foreground/85',
-                disabled && 'pointer-events-none opacity-50'
-              )}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
-        
-        {/* Animated underline */}
-        <div
-          className="pointer-events-none absolute bottom-0 h-[3px] rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(74,222,128,0.85)] transition-all duration-200"
-          style={{
-            transform: `translateX(${underlineStyle.left}px)`,
-            width: underlineStyle.width || 0,
-          }}
-        />
+        <div className="flex gap-2 md:gap-4">
+          {tabs.map((tab, index) => {
+            const isActive = tab.id === activeSection;
+            
+            return (
+              <button
+                key={tab.id}
+                ref={el => tabsRef.current[index] = el}
+                onClick={() => !disabled && onTabChange(tab.id)}
+                role="tab"
+                aria-selected={isActive}
+                aria-controls={`tabpanel-${tab.id}`}
+                tabIndex={isActive ? 0 : -1}
+                disabled={disabled}
+                className={cn(
+                  'relative px-3 md:px-4 py-1.5 text-xs md:text-sm font-medium',
+                  'transition-colors duration-200',
+                  isActive
+                    ? 'text-foreground'
+                    : 'text-muted-foreground hover:text-foreground/80',
+                  disabled && 'pointer-events-none opacity-50'
+                )}
+              >
+                <span>{tab.label}</span>
+                {isActive && (
+                  <span className="absolute left-0 right-0 -bottom-[4px] mx-auto h-[2px] rounded-full bg-foreground" />
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 
