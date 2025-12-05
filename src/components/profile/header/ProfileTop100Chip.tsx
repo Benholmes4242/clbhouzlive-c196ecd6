@@ -61,7 +61,7 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
           title="Top 100"
           tierLabel={club.tierName || 'Top 100 Club'}
           ringColor={club.ringColor}
-          size="lg"
+          size="md"
           className="flex-1"
         />
         <ChevronRight className="h-5 w-5 text-muted-foreground" />
