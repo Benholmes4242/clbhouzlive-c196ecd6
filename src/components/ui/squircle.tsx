@@ -61,7 +61,7 @@ export const Squircle: React.FC<SquircleProps> = ({
   className = ""
 }) => {
   const id = React.useId();
-  const d = superellipsePath(width, height, 5, 160);
+  const d = superellipsePath(width, height, 5, 220);
   
   return (
     <svg 
