@@ -279,7 +279,7 @@ const Discover = () => {
                         {[...Array(4)].map((_, i) => (
                           <div
                             key={i}
-                            className="h-40 w-32 rounded-xl bg-card/60 border border-border/60 flex-shrink-0 animate-pulse"
+                            className="h-40 w-32 rounded-sq-md bg-card/60 border border-border/60 flex-shrink-0 animate-pulse"
                           />
                         ))}
                       </div>
@@ -289,7 +289,7 @@ const Discover = () => {
                           <button
                             key={moment.post_id}
                             onClick={() => navigate(`/clubhouse/post/${moment.post_id}`)}
-                            className="relative flex-shrink-0 w-32 rounded-xl overflow-hidden bg-card border border-border/60 hover:border-primary-accent/50 hover:shadow-md transition-all text-left"
+                            className="relative flex-shrink-0 w-32 rounded-sq-md overflow-hidden bg-card border border-border/60 hover:border-primary-accent/50 hover:shadow-md transition-all text-left"
                           >
                             {/* Thumbnail */}
                             {moment.thumbnail_url ? (
@@ -360,7 +360,7 @@ const Discover = () => {
                       {[...Array(4)].map((_, i) => (
                         <div
                           key={i}
-                          className="h-40 w-32 rounded-xl bg-card/60 border border-border/60 flex-shrink-0 animate-pulse"
+                          className="h-40 w-32 rounded-sq-md bg-card/60 border border-border/60 flex-shrink-0 animate-pulse"
                         />
                       ))}
                     </div>
@@ -374,7 +374,7 @@ const Discover = () => {
                         <button
                           key={moment.post_id}
                           onClick={() => navigate(`/clubhouse/post/${moment.post_id}`)}
-                          className="relative flex-shrink-0 w-32 rounded-xl overflow-hidden bg-card border border-border/60 hover:border-primary-accent/50 hover:shadow-md transition-all text-left"
+                          className="relative flex-shrink-0 w-32 rounded-sq-md overflow-hidden bg-card border border-border/60 hover:border-primary-accent/50 hover:shadow-md transition-all text-left"
                         >
                           {/* Thumbnail */}
                           {moment.thumbnail_url ? (

@@ -59,7 +59,7 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
 
   return (
     <div
-      className="px-4 pt-4 pb-5 rounded-2xl backdrop-blur-sm border"
+      className="px-4 pt-4 pb-5 rounded-sq-lg backdrop-blur-sm border"
       style={{
         background: 'var(--hub-glass-bg-card)',
         borderColor: 'var(--hub-stroke)',

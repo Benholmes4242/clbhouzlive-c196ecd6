@@ -3,7 +3,7 @@ import React from 'react';
 
 const TroubleshootingInfo = () => {
   return (
-    <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+    <div className="bg-gray-50 border border-gray-200 rounded-sq-sm p-3">
       <div className="text-sm text-gray-700">
         <strong>Troubleshooting Tips:</strong>
         <ul className="mt-1 list-disc list-inside space-y-1">

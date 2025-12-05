@@ -34,7 +34,7 @@ export default function StudioPanelFilter({ edits, updateEdits, onApply, onReset
             <button
               key={filter.id}
               onClick={() => handleSelectFilter(filter.id)}
-              className={`aspect-square rounded-lg border-2 transition-all overflow-hidden ${
+              className={`aspect-square rounded-sq-sm border-2 transition-all overflow-hidden ${
                 selectedFilter === filter.id
                   ? 'border-zinc-900 shadow-lg'
                   : 'border-zinc-200 hover:border-zinc-300'
@@ -58,13 +58,13 @@ export default function StudioPanelFilter({ edits, updateEdits, onApply, onReset
       <div className="p-4 border-t border-zinc-200 flex gap-3">
         <button
           onClick={onReset}
-          className="flex-1 py-2.5 rounded-lg border border-zinc-300 text-zinc-700 font-medium hover:bg-zinc-50 transition-colors"
+          className="flex-1 py-2.5 rounded-sq-sm border border-zinc-300 text-zinc-700 font-medium hover:bg-zinc-50 transition-colors"
         >
           Reset
         </button>
         <button
           onClick={onApply}
-          className="flex-1 py-2.5 rounded-lg bg-zinc-900 text-white font-medium hover:bg-zinc-800 transition-colors"
+          className="flex-1 py-2.5 rounded-sq-sm bg-zinc-900 text-white font-medium hover:bg-zinc-800 transition-colors"
         >
           Apply
         </button>

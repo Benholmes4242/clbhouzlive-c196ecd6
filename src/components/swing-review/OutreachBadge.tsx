@@ -23,7 +23,7 @@ export const OutreachBadge: React.FC<OutreachBadgeProps> = ({
 
   return (
     <div 
-      className={`inline-flex items-center gap-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg ${
+      className={`inline-flex items-center gap-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-sq-sm ${
         onClick ? 'cursor-pointer hover:bg-blue-100 transition-colors' : ''
       }`}
       onClick={onClick}

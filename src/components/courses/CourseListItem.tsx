@@ -43,7 +43,7 @@ const CourseListItem: React.FC<CourseListItemProps> = ({
 
   return (
     <div
-      className="relative h-24 rounded-lg overflow-hidden cursor-pointer group transition-all duration-300 hover:shadow-lg"
+      className="relative h-24 rounded-sq-sm overflow-hidden cursor-pointer group transition-all duration-300 hover:shadow-lg"
       onClick={handleClick}
     >
       {/* Full background image with lazy loading */}

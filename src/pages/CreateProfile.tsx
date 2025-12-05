@@ -144,7 +144,7 @@ const CreateProfile = () => {
             <BasicInfoForm formData={formData} onChange={handleInputChange} />
             {/* Show selected username as read-only */}
             {formData.username && (
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
+              <div className="mt-4 p-4 bg-gray-50 rounded-sq-sm border">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">Username (selected during sign-up)</label>
                   <div className="text-gray-600 font-medium">@{formData.username}</div>

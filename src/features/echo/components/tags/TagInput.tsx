@@ -135,7 +135,7 @@ export function TagInput({
 
   return (
     <div className={cn("relative", className)}>
-      <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-border bg-background px-2 py-1.5 min-h-[38px] focus-within:ring-2 focus-within:ring-primary">
+      <div className="flex flex-wrap items-center gap-1.5 rounded-sq-sm border border-border bg-background px-2 py-1.5 min-h-[38px] focus-within:ring-2 focus-within:ring-primary">
         {value.map((tag, index) => (
           <TagChip key={index} label={tag} onRemove={() => removeTag(index)} variant="solid" />
         ))}
@@ -167,7 +167,7 @@ export function TagInput({
           ref={suggestionsRef}
           role="listbox"
           aria-label="Tag suggestions"
-          className="absolute z-50 mt-1 w-full max-h-60 overflow-y-auto rounded-lg border border-border bg-popover shadow-lg"
+          className="absolute z-50 mt-1 w-full max-h-60 overflow-y-auto rounded-sq-sm border border-border bg-popover shadow-lg"
         >
           {suggestions.map((suggestion, index) => (
             <button

@@ -63,7 +63,7 @@ const Top100Interactive: React.FC<Top100InteractiveProps> = ({
 
         {/* Goals Section */}
         {(nextGoalCourse || yearlyTarget) && (
-          <div className="mb-6 p-4 bg-gradient-to-r from-[#b66b41]/10 to-orange-50 rounded-lg border border-[#b66b41]/20">
+          <div className="mb-6 p-4 bg-gradient-to-r from-[#b66b41]/10 to-orange-50 rounded-sq-sm border border-[#b66b41]/20">
             <div className="flex items-center gap-2 mb-2">
               <Target className="h-4 w-4 text-[#b66b41]" />
               <span className="font-medium text-[#b66b41]">Goals</span>

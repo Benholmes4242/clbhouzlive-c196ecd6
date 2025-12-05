@@ -56,7 +56,7 @@ const RecentSearches: React.FC<RecentSearchesProps> = ({
           <button
             key={search.id}
             onClick={() => onRecentSearchClick(search.query)}
-            className="w-full flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg transition-colors text-left"
+            className="w-full flex items-center justify-between p-2 hover:bg-gray-50 rounded-sq-sm transition-colors text-left"
           >
             <div className="flex items-center gap-3">
               <Clock className="w-4 h-4 text-gray-400 flex-shrink-0" />

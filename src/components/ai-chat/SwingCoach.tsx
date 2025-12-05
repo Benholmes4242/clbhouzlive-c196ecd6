@@ -1510,7 +1510,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                         />
                         
                         {/* Coach Review CTA */}
-                        <div className="p-4 bg-muted/20 rounded-lg border">
+                        <div className="p-4 bg-muted/20 rounded-sq-sm border">
                           <div className="flex items-center justify-between">
                             <div>
                               <h4 className="font-medium text-sm">Want a pro&apos;s perspective?</h4>

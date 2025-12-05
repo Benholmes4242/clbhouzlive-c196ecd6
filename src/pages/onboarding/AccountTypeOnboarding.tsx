@@ -116,7 +116,7 @@ const AccountTypeOnboarding: React.FC = () => {
                 onClick={() => setSelectedType(option.type)}
                 disabled={submitting}
                 className={`
-                  w-full p-4 rounded-2xl border-2 transition-all duration-200
+                  w-full p-4 rounded-sq-lg border-2 transition-all duration-200
                   flex items-start gap-4 text-left
                   ${selectedType === option.type
                     ? 'border-primary bg-primary/5 shadow-sm'
@@ -126,7 +126,7 @@ const AccountTypeOnboarding: React.FC = () => {
                 `}
               >
                 <div className={`
-                  p-3 rounded-xl transition-colors
+                  p-3 rounded-sq-md transition-colors
                   ${selectedType === option.type
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-muted text-muted-foreground'
