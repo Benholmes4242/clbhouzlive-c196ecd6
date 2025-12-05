@@ -347,8 +347,7 @@ const CourseExplorer = () => {
           onChange={(e) => {
             setSearchTerm(e.target.value);
           }}
-          className="pl-10 pr-10 h-11 bg-card border border-border/60 shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--slate-secondary)]/70 focus-visible:border-[color:var(--slate-secondary)] transition-shadow text-base placeholder:text-[15px]"
-          style={{ borderRadius: 'var(--radius)' }}
+          className="pl-10 pr-10 h-11 rounded-sq-sm bg-card border border-border/60 shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--slate-secondary)]/70 focus-visible:border-[color:var(--slate-secondary)] transition-shadow text-base placeholder:text-[15px]"
         />
         {searchTerm && (
           <button
@@ -368,13 +367,13 @@ const CourseExplorer = () => {
             setSelectedRegion(value as PrimaryRegionKey);
             setSelectedSubregion('all');
           }}>
-            <SelectTrigger className="h-11 w-full bg-card border border-border/60 justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
+            <SelectTrigger className="h-11 w-full rounded-sq-sm bg-card border border-border/60 justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
               <div className="flex items-center">
                 <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
                 <SelectValue placeholder="Select region" />
               </div>
             </SelectTrigger>
-            <SelectContent className="bg-card border-border z-50">
+            <SelectContent className="bg-card border-border z-50 rounded-sq-sm">
               {regionOptions.map((option) => (
                 <SelectItem 
                   key={option.value} 
@@ -394,10 +393,10 @@ const CourseExplorer = () => {
             onValueChange={setSelectedSubregion}
             disabled={selectedRegion === PRIMARY_REGIONS.ALL || !SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length}
           >
-            <SelectTrigger className="h-11 w-full bg-card border border-border/60 justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
+            <SelectTrigger className="h-11 w-full rounded-sq-sm bg-card border border-border/60 justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
               <SelectValue placeholder="All sub-regions" />
             </SelectTrigger>
-            <SelectContent className="bg-card border-border z-50">
+            <SelectContent className="bg-card border-border z-50 rounded-sq-sm">
               <SelectItem value="all">All sub-regions</SelectItem>
               {selectedRegion !== PRIMARY_REGIONS.ALL && SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.map((s) => (
                 <SelectItem key={s} value={normalizeLabel(s)}>
