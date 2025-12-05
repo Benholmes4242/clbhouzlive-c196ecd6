@@ -62,18 +62,18 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
                 aria-controls={`tabpanel-${tab.id}`}
                 tabIndex={isActive ? 0 : -1}
                 disabled={disabled}
-                className={cn(
+              className={cn(
                   'relative px-3 md:px-4 py-1.5 text-xs md:text-sm font-medium',
                   'transition-colors duration-200',
                   isActive
-                    ? 'text-foreground'
-                    : 'text-muted-foreground hover:text-foreground/80',
+                    ? 'text-slate-900'
+                    : 'text-slate-400 hover:text-slate-600',
                   disabled && 'pointer-events-none opacity-50'
                 )}
               >
                 <span>{tab.label}</span>
                 {isActive && (
-                  <span className="absolute left-0 right-0 -bottom-[4px] mx-auto h-[2px] rounded-full bg-foreground" />
+                  <span className="absolute left-0 right-0 -bottom-[4px] mx-auto h-[2px] rounded-full bg-slate-900" />
                 )}
               </button>
             );

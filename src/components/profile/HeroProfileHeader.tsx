@@ -381,7 +381,7 @@ const HeroProfileHeader = ({
         {/* META BLOCK - no card, transparent, sits on page background */}
         <div
           ref={profileCardRef}
-          className="relative mx-auto max-w-[540px] px-5 pt-16 pb-8 bg-background"
+          className="relative mx-auto max-w-[540px] px-5 pt-6 pb-8 bg-background"
         >
           {/* AVATAR – OVERLAPS HERO */}
           <div className="absolute left-1/2 -top-[200px] -translate-x-1/2 z-20">
