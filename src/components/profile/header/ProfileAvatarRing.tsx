@@ -118,7 +118,7 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
           width: `${width}px`,
           aspectRatio: '1 / 1.05',
           borderRadius: '34%',
-          border: showRing ? `4px solid ${tierColor}` : '4px solid hsl(var(--muted))',
+          border: showRing ? `1.5px solid ${tierColor}` : '1.5px solid hsl(var(--muted))',
           boxShadow: showRing 
             ? `0 0 6px ${tierColor}88, 0 8px 20px rgba(0,0,0,0.35)` 
             : '0 8px 20px rgba(0,0,0,0.35)',
