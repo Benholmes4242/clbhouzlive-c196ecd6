@@ -172,7 +172,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
           <div
             className="w-full h-full overflow-hidden"
             style={{
-              borderRadius: '32%',
+              borderRadius: '34%',
               border: '2.5px solid #D1D5DB',
             }}
           >
