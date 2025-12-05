@@ -49,7 +49,7 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
         type="button"
         onClick={() => navigate('/top100?tab=my-progress')}
         className={cn(
-          'flex items-center justify-center gap-2',
+          'flex items-center justify-center gap-2 mt-4',
           'transition-all duration-200 ease-out',
           'active:scale-[0.98]',
           'hover:scale-[1.01]'

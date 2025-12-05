@@ -27,18 +27,18 @@ const StatItem: React.FC<StatItemProps> = ({
   isClickable = false
 }) => {
   const content = (
-    <>
-      <span className="text-[17px] font-semibold text-foreground tabular-nums">
+    <div className="flex flex-col leading-tight">
+      <span className="text-base md:text-lg font-semibold text-foreground tabular-nums">
         {value}
       </span>
-      <span className="mt-0.5 text-[11px] tracking-[0.12em] uppercase text-foreground/55">
+      <span className="text-[11px] md:text-xs tracking-[0.08em] uppercase text-muted-foreground">
         {label}
       </span>
-    </>
+    </div>
   );
 
   const baseClasses = cn(
-    "flex flex-col items-center transition-all duration-150",
+    "transition-all duration-150",
     isClickable && "cursor-pointer hover:scale-105 hover:opacity-90 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-lg"
   );
 
@@ -55,8 +55,7 @@ const StatItem: React.FC<StatItemProps> = ({
 
 /**
  * ProfileStatsRow - Premium Golf stats display
- * Personal: Posts, Friends, Following, Followers (4 columns)
- * Business: Posts, Following, Followers (3 columns)
+ * Numbers bold, labels small caps / light grey, even spacing
  */
 const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
   postsCount,
@@ -69,10 +68,9 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
   onFollowingClick,
   onFriendsClick
 }) => {
-  // Mobile layout - Premium Golf style
-  if (isMobile) {
-    return (
-      <div className="mt-6 flex items-center justify-between max-w-[320px] mx-auto text-center">
+  return (
+    <section className="mt-4 flex justify-center">
+      <div className="flex items-center gap-6 md:gap-10 text-center">
         <StatItem value={postsCount} label="Posts" />
         
         {isPersonal && (
@@ -98,49 +96,7 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
           isClickable
         />
       </div>
-    );
-  }
-
-  // Desktop layout
-  return (
-    <div 
-      className={cn(
-        "w-full grid gap-4 py-4 mt-4 text-center",
-        isPersonal ? "grid-cols-4" : "grid-cols-3"
-      )}
-      style={{
-        width: 'calc(100% - var(--mini-w) - 8px)',
-        marginRight: 'calc(var(--mini-w) + 8px)'
-      }}
-    >
-      <StatItem 
-        value={postsCount} 
-        label="Posts"
-      />
-      
-      {isPersonal && (
-        <StatItem 
-          value={friendsCount} 
-          label="Friends"
-          onClick={onFriendsClick}
-          isClickable
-        />
-      )}
-      
-      <StatItem 
-        value={followingCount} 
-        label="Following"
-        onClick={onFollowingClick}
-        isClickable
-      />
-      
-      <StatItem 
-        value={followersCount} 
-        label="Followers"
-        onClick={onFollowersClick}
-        isClickable
-      />
-    </div>
+    </section>
   );
 };
 
