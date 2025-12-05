@@ -86,28 +86,28 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   const displayBio = shouldTruncateBio && !bioExpanded ? `${bio.slice(0, 120)}...` : bio;
 
   return (
-    <section className="-mt-[45px] flex flex-col items-center text-center space-y-1.5 md:space-y-2">
+    <section className="-mt-[45px] flex flex-col items-center text-center space-y-2.5 md:space-y-3">
       {/* NAME – boldest */}
-      <h1 className="text-2xl md:text-3xl font-semibold text-slate-900">
+      <h1 className="text-3xl md:text-4xl font-semibold text-slate-900">
         {displayName}
       </h1>
 
       {/* USERNAME – same size family, not bold */}
-      <div className="text-sm md:text-base text-slate-600">
+      <div className="text-base md:text-lg text-slate-600">
         @{username}
       </div>
 
       {/* CLUB + HCP LINE – slightly less bold than name */}
       {subtitleLine && (
-        <p className="text-sm md:text-[15px] font-medium text-slate-800">
+        <p className="text-base md:text-lg font-medium text-slate-800">
           {subtitleLine}
         </p>
       )}
       
       {/* Website - Business profiles */}
       {!isPersonal && websiteUrl && (
-        <div className="flex items-center justify-center gap-1.5 text-sm md:text-[15px] font-medium">
-          <Globe className="w-4 h-4 text-slate-700" />
+        <div className="flex items-center justify-center gap-1.5 text-base md:text-lg font-medium">
+          <Globe className="w-5 h-5 text-slate-700" />
           <a 
             href={getWebsiteHref(websiteUrl)}
             target="_blank"
@@ -122,18 +122,18 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
       {/* BIO – lighter again */}
       {bio && (
         <div className="max-w-[420px]">
-          <p className="text-sm md:text-[15px] font-normal leading-snug text-slate-700">
+          <p className="text-base md:text-lg font-normal leading-snug text-slate-700">
             {displayBio}
           </p>
           {shouldTruncateBio && (
             <button
               onClick={() => setBioExpanded(!bioExpanded)}
-              className="inline-flex items-center gap-0.5 text-xs font-normal text-slate-500 mt-1 hover:text-slate-700"
+              className="inline-flex items-center gap-0.5 text-sm font-normal text-slate-500 mt-1.5 hover:text-slate-700"
             >
               {bioExpanded ? (
-                <>Show less <ChevronUp className="w-3 h-3" /></>
+                <>Show less <ChevronUp className="w-3.5 h-3.5" /></>
               ) : (
-                <>Show more <ChevronDown className="w-3 h-3" /></>
+                <>Show more <ChevronDown className="w-3.5 h-3.5" /></>
               )}
             </button>
           )}
@@ -143,7 +143,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
       {/* CUSTOMISE PROFILE – lightest */}
       {isOwnProfile && onCustomiseClick && (
         <button
-          className="text-xs md:text-sm font-normal text-slate-500 hover:text-slate-700 underline-offset-2 hover:underline transition-colors"
+          className="text-sm md:text-base font-normal text-slate-500 hover:text-slate-700 underline-offset-2 hover:underline transition-colors"
           onClick={onCustomiseClick}
         >
           Customise profile
