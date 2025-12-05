@@ -17,7 +17,7 @@ export interface Top100ProgressHeroProps {
 /**
  * Large avatar component for My Progress page
  * Uses 1/1.05 aspect ratio, 34% border radius
- * LARGE AVATAR: 3px achievement ring + 2.5px grey inner ring
+ * LARGE AVATAR: 2.5px achievement ring + 2.5px grey inner ring
  */
 function LargeProgressAvatar({ 
   src, 
@@ -58,7 +58,7 @@ function LargeProgressAvatar({
           width: `${size}px`,
           aspectRatio: '1 / 1.05',
           borderRadius: '34%',
-          border: `3px solid ${ringColor}`,
+          border: `2.5px solid ${ringColor}`,
           boxShadow: `0 0 6px ${ringColor}88`,
         }}
       >
