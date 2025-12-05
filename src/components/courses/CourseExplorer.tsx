@@ -502,7 +502,7 @@ const CourseExplorer = () => {
               <button
                 onClick={() => handleSortSelection(option)}
                 className={`
-                  w-full text-left px-4 py-3.5 transition-colors rounded-lg
+                  w-full text-left px-4 py-3.5 transition-colors rounded-sq-sm
                   ${sortOption === option
                     ? 'bg-slate-100 text-slate-900 font-medium'
                     : 'text-slate-900 hover:bg-slate-50'
