@@ -18,9 +18,9 @@ export interface AchievementBadgeProps {
 }
 
 /**
- * AchievementBadge - Apple Glass Ultra Right Medallion style
+ * AchievementBadge - Apple Glass Ultra Capsule style
  * 
- * A frosted glass badge with the user's Top 100 achievement info.
+ * A premium frosted glass capsule badge with the user's Top 100 achievement info.
  * Uses the exact same color as the achievement ring around the avatar.
  * 
  * @example
@@ -42,20 +42,30 @@ export function AchievementBadge({
 }: AchievementBadgeProps) {
   const isLarge = size === 'lg';
 
+  const basePadding = isLarge ? 'px-5 py-3' : 'px-4 py-2';
+  const maxWidth = isLarge ? 'max-w-[420px]' : 'max-w-[340px]';
+  const baseGap = isLarge ? 'gap-4' : 'gap-3';
+  const baseTextCount = isLarge ? 'text-xl' : 'text-lg';
+  const baseTextTitle = isLarge ? 'text-base' : 'text-sm';
+  const baseTextTier = isLarge ? 'text-sm' : 'text-xs';
+  const medallionSize = isLarge ? 'w-10 h-10' : 'w-9 h-9';
+
   return (
     <div
       className={cn(
         'inline-flex items-center justify-between',
-        'rounded-[20px]',
+        basePadding,
+        maxWidth,
+        baseGap,
+        'rounded-[999px]',
         'backdrop-blur-xl',
         'border',
-        isLarge ? 'px-5 py-3 gap-4 min-h-[56px]' : 'px-4 py-2.5 gap-3 min-h-[48px]',
         className
       )}
       style={{
-        background: `linear-gradient(135deg, color-mix(in srgb, ${ringColor} 15%, rgba(255,255,255,0.65)), color-mix(in srgb, ${ringColor} 25%, rgba(255,255,255,0.20)))`,
-        borderColor: ringColor,
-        boxShadow: `0 4px 20px rgba(0, 0, 0, 0.12), 0 0 0 1.5px ${ringColor}66`,
+        background: `radial-gradient(circle at 0% 0%, color-mix(in srgb, ${ringColor} 12%, rgba(255,255,255,0.78)), color-mix(in srgb, ${ringColor} 22%, rgba(255,255,255,0.22)))`,
+        borderColor: 'rgba(255,255,255,0.65)',
+        boxShadow: `0 10px 30px rgba(0,0,0,0.18), 0 0 0 1px ${ringColor}33`,
       }}
     >
       {/* Text block (left) */}
@@ -64,7 +74,7 @@ export function AchievementBadge({
           <span
             className={cn(
               'font-bold text-gray-900',
-              isLarge ? 'text-xl' : 'text-lg'
+              baseTextCount
             )}
           >
             {count}
@@ -72,7 +82,7 @@ export function AchievementBadge({
           <span
             className={cn(
               'font-medium text-gray-800',
-              isLarge ? 'text-base' : 'text-sm'
+              baseTextTitle
             )}
           >
             {title}
@@ -80,8 +90,8 @@ export function AchievementBadge({
         </div>
         <span
           className={cn(
-            'font-semibold',
-            isLarge ? 'text-sm' : 'text-xs'
+            'font-semibold tracking-tight',
+            baseTextTier
           )}
           style={{ color: ringColor }}
         >
@@ -93,28 +103,27 @@ export function AchievementBadge({
       <div
         className={cn(
           'relative flex items-center justify-center rounded-full',
-          isLarge ? 'w-10 h-10' : 'w-9 h-9'
+          medallionSize
         )}
         style={{
-          background: `radial-gradient(circle at 30% 20%, rgba(255,255,255,0.9), ${ringColor})`,
-          boxShadow: `0 2px 8px rgba(0,0,0,0.15), 0 0 16px ${ringColor}66`,
+          background: `radial-gradient(circle at 30% 0%, #ffffff, ${ringColor})`,
+          boxShadow: `0 6px 14px rgba(0,0,0,0.20), 0 0 18px ${ringColor}80`,
         }}
       >
-        {/* Inner glow ring */}
+        {/* Inner jewel ring */}
         <div
-          className="absolute inset-0 rounded-full"
+          className="relative flex items-center justify-center rounded-full w-[70%] h-[70%]"
           style={{
-            boxShadow: `inset 0 0 8px ${ringColor}44`,
+            background: 'rgba(255,255,255,0.10)',
+            boxShadow: '0 0 0 1px rgba(255,255,255,0.35)',
           }}
-        />
-        {/* Trophy icon */}
-        <Trophy
-          className={cn(
-            'relative text-white drop-shadow-sm',
-            isLarge ? 'w-5 h-5' : 'w-4 h-4'
-          )}
-          strokeWidth={2.5}
-        />
+        >
+          <Trophy
+            className="text-white drop-shadow-sm"
+            size={isLarge ? 16 : 14}
+            strokeWidth={2.5}
+          />
+        </div>
       </div>
     </div>
   );
