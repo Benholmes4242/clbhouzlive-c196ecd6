@@ -48,7 +48,7 @@ export function AchievementBadge({
   const baseTextCount = isLarge ? 'text-xl' : 'text-lg';
   const baseTextTitle = isLarge ? 'text-base' : 'text-sm';
   const baseTextTier = isLarge ? 'text-sm' : 'text-xs';
-  const medallionSize = isLarge ? 'w-10 h-10' : 'w-9 h-9';
+  const trophySize = isLarge ? 'h-8 w-8' : 'h-7 w-7';
 
   return (
     <div
@@ -100,10 +100,7 @@ export function AchievementBadge({
       </div>
 
       <Top100TrophyIcon
-        className={cn(
-          'shrink-0',
-          isLarge ? 'h-8 w-8' : 'h-7 w-7'
-        )}
+        className={cn('shrink-0', trophySize)}
         style={{ color: ringColor }}
       />
     </div>
