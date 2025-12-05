@@ -1,7 +1,6 @@
 import React, { useMemo, useRef, useEffect, useState } from 'react';
-import { Squircle } from '@/components/ui/squircle';
 import { cn } from '@/lib/utils';
-import { getTop100Club, getRingColorForTier, type Top100TierId } from '@/lib/top100Club';
+import { getTop100Club, getRingColorForTier } from '@/lib/top100Club';
 import {
   Tooltip,
   TooltipContent,
@@ -20,20 +19,20 @@ interface ProfileAvatarRingProps {
   animateOnFirstView?: boolean;
 }
 
-// Size configurations - outer size, then 1.5px ring, 1px white gap, then avatar (lg is 20% smaller)
+// Width configurations for each size
 const SIZES = {
-  sm: { outer: 54, white: 51, avatar: 49 },
-  md: { outer: 74, white: 71, avatar: 69 },
-  lg: { outer: 144, white: 141, avatar: 139 },
+  sm: 54,
+  md: 74,
+  lg: 144,
 };
 
 const RING_ANIMATED_KEY = 'clbhouz:ringAnimated:v1';
 
 /**
- * ProfileAvatarRing - Avatar with Top 100 exploration ring using global squircle shape
+ * ProfileAvatarRing - Avatar with Top 100 exploration ring using CSS squircle
+ * Uses 1/1.05 aspect ratio, 34% border radius, 4px colored border with glow
  * Personal profiles show colored ring based on tier (5-400 courses)
  * Business profiles show avatar without ring
- * Includes optional one-time animation on first view
  */
 const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
   photoUrl,
@@ -45,7 +44,7 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
   onClick,
   animateOnFirstView = true,
 }) => {
-  const dimensions = SIZES[size];
+  const width = SIZES[size];
   const ref = useRef<HTMLDivElement>(null);
   
   // Session-based animation flag
@@ -112,59 +111,33 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
         shouldAnimate && 'animate-ring-pulse'
       )}
       onClick={onClick}
-      style={{
-        // Premium shadow for depth
-        filter: showRing ? 'drop-shadow(0 8px 20px rgba(0,0,0,0.35))' : undefined,
-      }}
     >
-      {showRing ? (
-        // Nested squircles for ring effect - matches My Progress page exactly
-        <Squircle width={dimensions.outer} height={dimensions.outer}>
-          <div 
-            className="w-full h-full flex items-center justify-center"
-            style={{ backgroundColor: tierColor }}
-          >
-            {/* White ring layer - 1px */}
-            <Squircle width={dimensions.white} height={dimensions.white}>
-              <div className="w-full h-full bg-background flex items-center justify-center">
-                {/* Avatar */}
-                <Squircle width={dimensions.avatar} height={dimensions.avatar}>
-                  {photoUrl ? (
-                    <img
-                      src={photoUrl}
-                      alt={displayName}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      loading="eager"
-                      decoding="async"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground text-xl font-semibold">
-                      {initials}
-                    </div>
-                  )}
-                </Squircle>
-              </div>
-            </Squircle>
+      <div
+        className="relative overflow-hidden"
+        style={{
+          width: `${width}px`,
+          aspectRatio: '1 / 1.05',
+          borderRadius: '34%',
+          border: showRing ? `4px solid ${tierColor}` : '4px solid hsl(var(--muted))',
+          boxShadow: showRing 
+            ? `0 0 6px ${tierColor}88, 0 8px 20px rgba(0,0,0,0.35)` 
+            : '0 8px 20px rgba(0,0,0,0.35)',
+        }}
+      >
+        {photoUrl ? (
+          <img
+            src={photoUrl}
+            alt={displayName}
+            className="w-full h-full object-cover"
+            loading="eager"
+            decoding="async"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground text-xl font-semibold">
+            {initials}
           </div>
-        </Squircle>
-      ) : (
-        // No ring - just avatar (business profiles or no milestone)
-        <Squircle width={dimensions.avatar} height={dimensions.avatar}>
-          {photoUrl ? (
-            <img
-              src={photoUrl}
-              alt={displayName}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              loading="eager"
-              decoding="async"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground text-xl font-semibold">
-              {initials}
-            </div>
-          )}
-        </Squircle>
-      )}
+        )}
+      </div>
     </div>
   );
 
