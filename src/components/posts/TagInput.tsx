@@ -116,7 +116,7 @@ const TagInput = ({ onTagsChange, selectedTags }: TagInputProps) => {
             setShowSuggestions(e.target.value.length >= 2);
           }}
           placeholder="Type to search people, golf clubs, or businesses..."
-          className="w-full p-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full p-2 border rounded-sq-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         
         {showSuggestions && (

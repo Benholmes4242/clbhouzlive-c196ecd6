@@ -381,7 +381,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
   if (!MAPBOX_TOKEN) {
     return (
-      <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center text-sm text-slate-600">
+      <div className="rounded-sq-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center text-sm text-slate-600">
         <p className="font-semibold">Map Temporarily Unavailable</p>
         <p className="mt-1 text-xs text-slate-500">
           The interactive map feature is currently unavailable. Please try again
@@ -393,7 +393,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
   return (
     <div className="space-y-3 top100-map-shell">
-      <div className="relative mt-1 overflow-hidden rounded-3xl bg-muted/40">
+      <div className="relative mt-1 overflow-hidden rounded-sq-lg bg-muted/40">
         <div
           ref={mapContainerRef}
           className="h-[480px] w-full"
@@ -401,14 +401,14 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
         {/* Loading overlay */}
         {isLoading && (
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-3xl bg-white/60 text-xs text-slate-500">
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-sq-lg bg-white/60 text-xs text-slate-500">
             Loading map...
           </div>
         )}
 
         {/* Legend (top-left) */}
         <div className="pointer-events-none absolute left-3 top-3 z-10">
-          <div className="flex items-center gap-3 rounded-2xl bg-white/20 px-3 py-2 text-xs text-slate-900 shadow-[0_4px_20px_rgba(0,0,0,0.15)] backdrop-blur-xl border border-white/30">
+          <div className="flex items-center gap-3 rounded-sq-md bg-white/20 px-3 py-2 text-xs text-slate-900 shadow-[0_4px_20px_rgba(0,0,0,0.15)] backdrop-blur-xl border border-white/30">
             <div className="flex items-center gap-1">
               <span className="inline-block h-2 w-2 rounded-full bg-[#F7931E]" />
               <span>Played</span>
@@ -423,7 +423,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         {/* Stats pill (top-right) */}
         {officialTotal > 0 && (
           <div className="pointer-events-none absolute right-3 top-3 z-10">
-            <div className="rounded-2xl bg-white/20 px-3 py-2 text-xs font-medium text-slate-900 shadow-[0_4px_20px_rgba(0,0,0,0.15)] backdrop-blur-xl border border-white/30">
+            <div className="rounded-sq-md bg-white/20 px-3 py-2 text-xs font-medium text-slate-900 shadow-[0_4px_20px_rgba(0,0,0,0.15)] backdrop-blur-xl border border-white/30">
               {ratedCount}/{officialTotal} Played · {remaining} left
             </div>
           </div>

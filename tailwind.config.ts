@@ -153,12 +153,28 @@ export default {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)',
-				// Squircle radius system - global design language
-				'sq-xs': '10px',   // small pills, chips, tiny inputs
-				'sq-sm': '14px',   // tabs, buttons, medium inputs
-				'sq-md': '18px',   // standard cards, larger inputs
-				'sq-lg': '24px',   // hero cards, large elements
-				'sq-pill': '999px' // full capsule for segmented controls & pills
+				/**
+				 * SQUIRCLE DESIGN SYSTEM (SDS) - Global border radius tokens
+				 * ============================================================
+				 * These tokens create a unified, premium visual language across the app.
+				 * Based on ≈34% corner curvature matching our global squircle avatar.
+				 * 
+				 * USAGE GUIDE:
+				 * - sq-xs (10px): Small pills, chips, tiny inputs, small badges
+				 * - sq-sm (14px): Tabs, buttons, medium inputs, search bars
+				 * - sq-md (18px): Standard cards, larger inputs, modals
+				 * - sq-lg (24px): Hero cards, large panels, feature sections
+				 * - sq-pill (999px): Full capsule for segmented controls & pills
+				 * 
+				 * DO NOT USE: rounded-lg, rounded-xl, rounded-2xl, rounded-3xl
+				 * INSTEAD USE: rounded-sq-xs, rounded-sq-sm, rounded-sq-md, rounded-sq-lg, rounded-sq-pill
+				 * EXCEPTION: rounded-full for truly circular elements (dots, avatar rings)
+				 */
+				'sq-xs': '10px',
+				'sq-sm': '14px',
+				'sq-md': '18px',
+				'sq-lg': '24px',
+				'sq-pill': '999px'
 			},
 			spacing: {
 				'header-mobile': 'var(--header-h-mobile)',

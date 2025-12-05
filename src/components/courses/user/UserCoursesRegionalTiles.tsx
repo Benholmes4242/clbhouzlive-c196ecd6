@@ -147,12 +147,11 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                        className={`flex items-center gap-2 text-base font-medium whitespace-nowrap px-6 py-2 transition-colors ${
+                        className={`flex items-center gap-2 text-base font-medium whitespace-nowrap px-6 py-2 transition-colors rounded-sq-xs ${
                           activeFilter === tile.key 
                             ? 'bg-primary text-white shadow-md' 
                             : 'bg-muted border border-border text-foreground hover:bg-muted/80'
                         }`}
-                        style={{ borderRadius: '8px' }}
                       >
                         {tile.flag === 'earth' ? (
                           <Earth className="w-5 h-5 flex-shrink-0" />
@@ -180,12 +179,11 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                        className={`flex items-center gap-2 text-base font-medium whitespace-nowrap px-4 py-2 transition-colors ${
+                        className={`flex items-center gap-2 text-base font-medium whitespace-nowrap px-4 py-2 transition-colors rounded-sq-xs ${
                           activeFilter === tile.key 
                             ? 'bg-primary text-white shadow-md' 
                             : 'bg-muted border border-border text-foreground hover:bg-muted/80'
                         }`}
-                        style={{ borderRadius: '8px' }}
                       >
                         {tile.flag === 'earth' ? (
                           <Earth className="w-5 h-5 flex-shrink-0" />
@@ -211,8 +209,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
         <div className="flex justify-center gap-3">
           <button
             onClick={() => setIsSortViewModalOpen(true)}
-            className="flex items-center gap-2 text-base font-medium whitespace-nowrap px-6 py-2 transition-colors bg-muted border border-border text-foreground hover:bg-muted/80"
-            style={{ borderRadius: '8px' }}
+            className="flex items-center gap-2 text-base font-medium whitespace-nowrap px-6 py-2 transition-colors rounded-sq-xs bg-muted border border-border text-foreground hover:bg-muted/80"
           >
             <div className="flex items-center gap-2">
               Sort & View
@@ -224,8 +221,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
           {isOwnProfile && onAddCoursesClick && (
             <button
               onClick={onAddCoursesClick}
-              className="flex items-center gap-2 text-base font-medium whitespace-nowrap px-6 py-2 transition-colors bg-muted border border-border text-foreground hover:bg-muted/80"
-              style={{ borderRadius: '8px' }}
+              className="flex items-center gap-2 text-base font-medium whitespace-nowrap px-6 py-2 transition-colors rounded-sq-xs bg-muted border border-border text-foreground hover:bg-muted/80"
             >
               <div className="flex items-center gap-2">
                 📍 <Plus className="h-4 w-4" />

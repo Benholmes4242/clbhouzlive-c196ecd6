@@ -127,7 +127,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
           <div
             key={`${result.type}-${result.id}`}
             data-search-result
-            className="flex items-center p-3 hover:bg-gray-50 cursor-pointer rounded-lg border-b border-gray-100 last:border-b-0 transition-colors"
+            className="flex items-center p-3 hover:bg-gray-50 cursor-pointer rounded-sq-sm border-b border-gray-100 last:border-b-0 transition-colors"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -150,7 +150,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                   )}
                 </Squircle>
               ) : (
-                <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
+                <div className="w-12 h-12 rounded-sq-sm bg-gray-100 flex items-center justify-center overflow-hidden">
                   {result.image ? (
                     <img
                       src={result.image}

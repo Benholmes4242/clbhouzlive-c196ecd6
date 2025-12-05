@@ -115,7 +115,7 @@ export default function SlideInModal({
             : 'w-full h-screen max-w-none sm:w-[92vw] sm:max-w-[920px] sm:max-h-[98vh] sm:h-auto'
           }
           bg-background border border-border ${
-            mobileConstrained ? 'rounded-none' : 'rounded-none sm:rounded-lg'
+            mobileConstrained ? 'rounded-none' : 'rounded-none sm:rounded-sq-md'
           } shadow-lg overflow-hidden
           transform transition-transform
           ${animateIn ? "translate-x-0" : "translate-x-full"}
@@ -134,7 +134,7 @@ export default function SlideInModal({
             <button
               ref={closeBtnRef}
               onClick={onClose}
-              className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-muted focus:outline-none focus:ring-0 border-0"
+              className="h-8 w-8 rounded-sq-xs flex items-center justify-center hover:bg-muted focus:outline-none focus:ring-0 border-0"
               aria-label="Close modal"
             >
               ✕
