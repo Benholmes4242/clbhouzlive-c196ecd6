@@ -136,11 +136,11 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
       {showRing ? (
         // Achievement state: outer colored ring → inner grey ring → avatar
         <div
-          className="relative"
+          className="relative overflow-hidden"
           style={{
             width: `${width}px`,
             aspectRatio: '1 / 1.05',
-            borderRadius: '30%',
+            borderRadius: '34%',
             border: `2.5px solid ${tierColor}`,
             boxShadow: `0 0 6px ${tierColor}88, 0 8px 20px rgba(0,0,0,0.35)`,
           }}
@@ -148,7 +148,7 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
           {/* Inner grey ring + avatar */}
           <div
             className="w-full h-full overflow-hidden"
-            style={{ borderRadius: '30%', border: '2.5px solid #D1D5DB' }}
+            style={{ borderRadius: '32%', border: '2.5px solid #D1D5DB' }}
           >
             {avatarInner}
           </div>

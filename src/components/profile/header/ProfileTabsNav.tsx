@@ -1,7 +1,6 @@
 import React from 'react';
 import { getProfileTabs } from '@/hooks/useProfileType';
 import { cn } from '@/lib/utils';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface ProfileTabsNavProps {
   userType: string | null | undefined;
@@ -12,8 +11,8 @@ interface ProfileTabsNavProps {
 }
 
 /**
- * ProfileTabsNav - Matches Explore page tabs styling exactly
- * Uses same Radix Tabs components as CoursesContent
+ * ProfileTabsNav - Matches Explore page tabs styling
+ * Segmented control with muted background
  */
 const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   userType,
@@ -26,29 +25,42 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
 
   return (
     <section className="mt-5 flex justify-center">
-      <Tabs value={activeSection} onValueChange={onTabChange} className="w-full max-w-md">
-        <TabsList 
-          className={cn(
-            "grid w-full rounded-sq-md bg-muted/70 border border-border/60 px-2 py-[3px]",
-            tabs.length === 4 && "grid-cols-4",
-            tabs.length === 3 && "grid-cols-3",
-            tabs.length === 2 && "grid-cols-2",
-            tabs.length === 1 && "grid-cols-1",
-            disabled && "pointer-events-none opacity-50"
-          )}
-        >
-          {tabs.map((tab) => (
-            <TabsTrigger
+      <div 
+        className={cn(
+          "inline-grid rounded-sq-md bg-muted/70 border border-border/60 px-2 py-[3px]",
+          tabs.length === 4 && "grid-cols-4",
+          tabs.length === 3 && "grid-cols-3",
+          tabs.length === 2 && "grid-cols-2",
+          tabs.length === 1 && "grid-cols-1"
+        )}
+        role="tablist"
+        aria-label="Profile sections"
+      >
+        {tabs.map((tab) => {
+          const isActive = tab.id === activeSection;
+          
+          return (
+            <button
               key={tab.id}
-              value={tab.id}
+              onClick={() => !disabled && onTabChange(tab.id)}
+              role="tab"
+              aria-selected={isActive}
+              aria-controls={`tabpanel-${tab.id}`}
+              tabIndex={isActive ? 0 : -1}
               disabled={disabled}
-              className="rounded-sq-pill text-sm px-3 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-150 ease-out"
+              className={cn(
+                'rounded-sq-pill text-sm px-3 py-[6px] font-medium transition-all duration-150 ease-out',
+                isActive
+                  ? 'bg-background shadow-sm text-foreground'
+                  : 'text-muted-foreground hover:text-foreground',
+                disabled && 'pointer-events-none opacity-50'
+              )}
             >
               {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
+            </button>
+          );
+        })}
+      </div>
     </section>
   );
 };
