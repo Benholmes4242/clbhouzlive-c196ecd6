@@ -148,7 +148,7 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
           {/* Inner grey ring + avatar */}
           <div
             className="w-full h-full overflow-hidden"
-            style={{ borderRadius: '32%', border: '2.5px solid #D1D5DB' }}
+            style={{ borderRadius: '34%', border: '2.5px solid #D1D5DB' }}
           >
             {avatarInner}
           </div>
