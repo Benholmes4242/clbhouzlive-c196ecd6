@@ -49,7 +49,7 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
         type="button"
         onClick={() => navigate('/top100?tab=my-progress')}
         className={cn(
-          'flex items-center justify-center gap-2',
+          'relative flex items-center justify-center',
           'transition-all duration-200 ease-out',
           'active:scale-[0.98]',
           'hover:scale-[1.01]'
@@ -62,7 +62,7 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
           ringColor={club.ringColor}
           size="md"
         />
-        <ChevronRight className="h-5 w-5 text-muted-foreground" />
+        <ChevronRight className="absolute -right-7 h-5 w-5 text-slate-400" />
       </button>
       
       {/* Completion stamps row */}

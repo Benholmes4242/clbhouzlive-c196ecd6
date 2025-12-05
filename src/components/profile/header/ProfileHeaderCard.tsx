@@ -85,20 +85,20 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   const displayBio = shouldTruncateBio && !bioExpanded ? `${bio.slice(0, 120)}...` : bio;
 
   return (
-    <section className="mt-1 flex flex-col items-center text-center gap-1.5">
+    <section className="flex flex-col items-center text-center gap-1.5">
       {/* NAME - Larger and bolder */}
-      <h1 className="text-3xl md:text-4xl font-semibold text-foreground">
+      <h1 className="text-3xl md:text-4xl font-semibold text-slate-900">
         {displayName}
       </h1>
 
       {/* HANDLE + BADGE */}
-      <div className="flex items-center gap-2 text-base md:text-lg font-semibold text-muted-foreground">
+      <div className="flex items-center gap-2 text-base md:text-lg font-semibold text-slate-900">
         <span>@{username}</span>
         <span className={cn(
           "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm md:text-base font-semibold uppercase tracking-wide",
           isPersonal 
-            ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-            : "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+            ? "bg-emerald-500/20 text-emerald-600 border border-emerald-500/30"
+            : "bg-blue-500/20 text-blue-600 border border-blue-500/30"
         )}>
           {isPersonal ? <User className="w-3 h-3" /> : <Building2 className="w-3 h-3" />}
           {getUserTypeBadge()}
@@ -107,7 +107,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
 
       {/* CLUB + HCP LINE */}
       {subtitleLine && (
-        <p className="text-base md:text-lg font-semibold text-muted-foreground">
+        <p className="text-base md:text-lg font-semibold text-slate-900">
           {subtitleLine}
         </p>
       )}
@@ -115,12 +115,12 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
       {/* Website - Business profiles */}
       {!isPersonal && websiteUrl && (
         <div className="flex items-center justify-center gap-1.5 text-base md:text-lg font-semibold">
-          <Globe className="w-4 h-4 text-muted-foreground" />
+          <Globe className="w-4 h-4 text-slate-900" />
           <a 
             href={getWebsiteHref(websiteUrl)}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary hover:text-primary/80 transition-colors"
+            className="text-slate-900 hover:text-slate-700 transition-colors"
           >
             {formatWebsiteUrl(websiteUrl)}
           </a>
@@ -130,13 +130,13 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
       {/* BIO */}
       {bio && (
         <div className="mt-1 max-w-[320px] md:max-w-[420px]">
-          <p className="text-base md:text-lg font-semibold leading-snug text-muted-foreground">
+          <p className="text-base md:text-lg font-semibold leading-snug text-slate-900">
             {displayBio}
           </p>
           {shouldTruncateBio && (
             <button
               onClick={() => setBioExpanded(!bioExpanded)}
-              className="inline-flex items-center gap-0.5 text-sm font-semibold text-primary mt-1 hover:text-primary/80"
+              className="inline-flex items-center gap-0.5 text-sm font-semibold text-slate-900 mt-1 hover:text-slate-700"
             >
               {bioExpanded ? (
                 <>Show less <ChevronUp className="w-4 h-4" /></>
@@ -151,7 +151,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
       {/* CUSTOMISE PROFILE (OWN PROFILE ONLY) */}
       {isOwnProfile && onCustomiseClick && (
         <button
-          className="mt-1 text-sm md:text-base font-semibold text-muted-foreground hover:text-foreground underline-offset-2 hover:underline transition-colors"
+          className="mt-1 text-sm md:text-base font-semibold text-slate-900 hover:text-slate-700 underline-offset-2 hover:underline transition-colors"
           onClick={onCustomiseClick}
         >
           Customise profile
