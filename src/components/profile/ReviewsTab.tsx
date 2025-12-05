@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Squircle } from "@/components/ui/squircle";
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import ClubhouseLogo from "@/components/ui/clubhouse-logo";
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -205,15 +205,12 @@ function ReviewCard({
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <Squircle width={48} height={48}>
-              {review.user.avatarUrl ? (
-                <img src={review.user.avatarUrl} alt={`${review.user.name} avatar`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              ) : (
-                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.1)', fontSize: '18px', fontWeight: 600 }}>
-                  {getInitials(review.user.name)}
-                </div>
-              )}
-            </Squircle>
+            <SquircleAvatar 
+              size={48} 
+              src={review.user.avatarUrl}
+              alt={`${review.user.name} avatar`}
+              fallback={getInitials(review.user.name)}
+            />
             <div className="min-w-0">
               <div className="flex items-center flex-wrap gap-2">
                 <span className="font-medium">{review.user.name}</span>

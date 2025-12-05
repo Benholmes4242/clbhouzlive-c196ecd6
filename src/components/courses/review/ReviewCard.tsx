@@ -1,6 +1,6 @@
 import React from 'react';
 import { clsx } from 'clsx';
-import SquircleImage from '@/components/ui/SquircleImage';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ScorePill } from '../common/ScorePill';
 import { ThumbButton } from '@/components/common/ThumbButton';
 import { ExpandableText } from '@/components/common/ExpandableText';
@@ -69,10 +69,11 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
       <div className="flex items-start justify-between gap-3 mb-2">
         <div className="flex items-center gap-3">
           {user.avatarUrl ? (
-            <SquircleImage
+            <SquircleAvatar
               src={user.avatarUrl}
               alt={user.name}
               size={40}
+              fallback={user.initials}
             />
           ) : (
             <div className="w-10 h-10 rounded-lg bg-slate-200 flex items-center justify-center text-sm font-semibold text-slate-700">

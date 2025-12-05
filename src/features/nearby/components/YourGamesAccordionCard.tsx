@@ -7,7 +7,7 @@ import { formatHcp } from '@/lib/formatHcp';
 import { formatExpires } from '@/lib/formatExpires';
 import { useMinuteTick } from '@/hooks/useMinuteTick';
 import { useNavigate } from 'react-router-dom';
-import { Squircle } from '@/components/ui/squircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import type { GameParticipant as Participant } from '@/features/game/hooks/useGameParticipants';
@@ -139,28 +139,12 @@ export function YourGamesAccordionCard({ game, isHosting, onCancel, onLeave }: Y
         }}
         className="w-full flex items-center gap-3 p-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all text-left"
       >
-        <Squircle width={48} height={48}>
-          {p.profile_photo_url ? (
-            <img 
-              src={p.profile_photo_url} 
-              alt={p.display_name || 'User'} 
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-            />
-          ) : (
-            <div style={{
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'rgba(255,255,255,0.1)',
-              fontSize: '18px',
-              fontWeight: 600
-            }}>
-              {p.display_name?.[0]?.toUpperCase() || '?'}
-            </div>
-          )}
-        </Squircle>
+        <SquircleAvatar 
+          size={48} 
+          src={p.profile_photo_url}
+          alt={p.display_name || 'User'}
+          fallback={p.display_name?.[0]?.toUpperCase() || '?'}
+        />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className="text-[13px] text-white/90 font-medium truncate">

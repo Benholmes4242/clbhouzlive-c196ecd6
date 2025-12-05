@@ -7,7 +7,7 @@
 import React from 'react';
 import { Heart, MessageCircle, Share, Bookmark } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import SquircleImage from '@/components/ui/SquircleImage';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface ClubhouseGlassTileProps {
   post: {
@@ -143,12 +143,10 @@ export const ClubhouseGlassTile: React.FC<ClubhouseGlassTileProps> = ({
           }}
           className="shrink-0"
         >
-          <SquircleImage
-            src={post.user.avatar || '/placeholder.svg'}
+          <SquircleAvatar
+            src={post.user.avatar}
             alt={post.user.name}
             size={44}
-            ringWidth={0}
-            className="w-11 h-11"
           />
         </button>
 

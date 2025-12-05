@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import SquircleImage from '@/components/ui/SquircleImage';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useFriendsOnTop100Journey } from '@/hooks/useFriendsOnTop100Journey';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { ChevronRight } from 'lucide-react';
@@ -57,12 +57,11 @@ export const Top100FriendsStrip: React.FC = () => {
             const initial = displayName[0]?.toUpperCase() || '?';
             
             return friend.profile.profile_photo_url ? (
-              <SquircleImage
+              <SquircleAvatar
                 key={friend.user_id}
                 src={friend.profile.profile_photo_url}
                 alt={displayName}
                 size={36}
-                className="shrink-0 h-9 w-9 rounded-[22%]"
               />
             ) : (
               <div

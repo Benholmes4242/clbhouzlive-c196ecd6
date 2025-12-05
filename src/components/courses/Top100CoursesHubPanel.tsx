@@ -8,7 +8,7 @@ import { useGolfCoursesInfinite } from '@/hooks/useGolfCoursesInfinite';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { getTop100Club } from '@/lib/top100Club';
 import { getTop100RingDotClass } from '@/lib/top100RingStyles';
-import SquircleImage from '@/components/ui/SquircleImage';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Search, Award, X } from 'lucide-react';
 import { Top100AchievementBadge } from '@/components/top100/Top100AchievementBadge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -372,8 +372,8 @@ const Top100CoursesHubPanel = () => {
                 >
                   {/* Avatar */}
                   {friend.profile.profile_photo_url ? (
-                    <div className="mx-auto h-12 w-12">
-                      <SquircleImage
+                    <div className="mx-auto">
+                      <SquircleAvatar
                         size={48}
                         src={friend.profile.profile_photo_url}
                         alt={displayName}

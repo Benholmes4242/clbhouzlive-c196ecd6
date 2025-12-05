@@ -15,7 +15,7 @@ import SwingCoach from './SwingCoach';
 import EchoAvatar from './EchoAvatar';
 import { OverlayFooter } from './OverlayFooter';
 import ThreadDivider from '@/features/echo/components/ThreadDivider';
-import SquircleImage from '@/components/ui/SquircleImage';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MarkdownMessage } from './MarkdownMessage';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -551,12 +551,10 @@ const AIChatOverlay: React.FC<AIChatOverlayProps> = ({ isOpen, onClose, onHistor
                           {isUser ? (
                             <div className="eh-line__avatar">
                               {userProfile?.profile_photo_url ? (
-                                <SquircleImage
+                                <SquircleAvatar
                                   size={28}
                                   src={userProfile.profile_photo_url}
                                   alt={userProfile?.display_name || userProfile?.username || 'User'}
-                                  ringColor="rgba(255,255,255,0.2)"
-                                  ringWidth={1}
                                 />
                               ) : (
                                  <div 
