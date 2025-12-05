@@ -118,17 +118,6 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
 
   const hasAchievementRing = Boolean(ringColor);
 
-  // Ring thicknesses
-  const outerRingWidth = 2.5;
-  const innerRingWidth = 2.5;
-  const totalRingSpace = outerRingWidth + innerRingWidth;
-
-  // Calculate inner sizes for proper centering
-  // Inner grey ring size = outer size - 2 * outer ring width
-  const innerRingSize = pixelSize - (outerRingWidth * 2);
-  // Avatar size = inner ring size - 2 * inner ring width
-  const avatarSize = innerRingSize - (innerRingWidth * 2);
-
   // Inner avatar content (image or fallback)
   const avatarContent = (
     <>
@@ -158,7 +147,6 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   );
 
   // Achievement state: outer colored ring → inner grey ring → avatar
-  // Uses absolute positioning for perfect centering
   if (hasAchievementRing) {
     return (
       <div
@@ -169,38 +157,26 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
         )}
         onClick={onClick}
       >
-        {/* Outer achievement ring container */}
+        {/* Outer achievement ring */}
         <div
-          className="relative flex items-center justify-center"
+          className="relative overflow-hidden"
           style={{
             width: `${pixelSize}px`,
             aspectRatio: '1 / 1.05',
             borderRadius: '34%',
-            backgroundColor: ringColor || undefined,
+            border: `2.5px solid ${ringColor}`,
             boxShadow: `0 0 6px ${ringColor}88`,
           }}
         >
-          {/* Inner grey ring */}
+          {/* Inner grey ring + avatar */}
           <div
-            className="absolute flex items-center justify-center"
+            className="w-full h-full overflow-hidden"
             style={{
-              width: `${innerRingSize}px`,
-              aspectRatio: '1 / 1.05',
-              borderRadius: '34%',
-              backgroundColor: '#D1D5DB',
+              borderRadius: '32%',
+              border: '2.5px solid #D1D5DB',
             }}
           >
-            {/* Avatar container */}
-            <div
-              className="overflow-hidden"
-              style={{
-                width: `${avatarSize}px`,
-                aspectRatio: '1 / 1.05',
-                borderRadius: '34%',
-              }}
-            >
-              {avatarContent}
-            </div>
+            {avatarContent}
           </div>
         </div>
         {children}
@@ -209,9 +185,6 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   }
 
   // Normal state: single grey ring around avatar
-  // For non-achievement, calculate avatar size
-  const normalAvatarSize = pixelSize - (outerRingWidth * 2);
-
   return (
     <div
       className={cn(
@@ -222,25 +195,15 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
       onClick={onClick}
     >
       <div
-        className="relative flex items-center justify-center"
+        className="relative overflow-hidden"
         style={{
           width: `${pixelSize}px`,
           aspectRatio: '1 / 1.05',
           borderRadius: '34%',
-          backgroundColor: '#D1D5DB',
+          border: '2.5px solid #D1D5DB',
         }}
       >
-        {/* Avatar container */}
-        <div
-          className="overflow-hidden"
-          style={{
-            width: `${normalAvatarSize}px`,
-            aspectRatio: '1 / 1.05',
-            borderRadius: '34%',
-          }}
-        >
-          {avatarContent}
-        </div>
+        {avatarContent}
       </div>
       {children}
     </div>
