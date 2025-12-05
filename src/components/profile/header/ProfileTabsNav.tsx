@@ -1,6 +1,7 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React from 'react';
 import { getProfileTabs } from '@/hooks/useProfileType';
 import { cn } from '@/lib/utils';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface ProfileTabsNavProps {
   userType: string | null | undefined;
@@ -11,8 +12,8 @@ interface ProfileTabsNavProps {
 }
 
 /**
- * ProfileTabsNav - White pill with black underline on active tab
- * Premium Golf style - clean, Apple-like
+ * ProfileTabsNav - Matches Explore page tabs styling exactly
+ * Uses same Radix Tabs components as CoursesContent
  */
 const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   userType,
@@ -22,64 +23,32 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   disabled = false
 }) => {
   const tabs = getProfileTabs(userType);
-  const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [underlineStyle, setUnderlineStyle] = useState({ left: 0, width: 0 });
-  
-  // Update underline position when active tab changes
-  useEffect(() => {
-    const activeIndex = tabs.findIndex(tab => tab.id === activeSection);
-    const activeTab = tabsRef.current[activeIndex];
-    const container = containerRef.current;
-    
-    if (activeTab && container) {
-      const containerRect = container.getBoundingClientRect();
-      const tabRect = activeTab.getBoundingClientRect();
-      const left = tabRect.left - containerRect.left;
-      setUnderlineStyle({ left, width: tabRect.width });
-    }
-  }, [activeSection, tabs]);
 
   return (
     <section className="mt-5 flex justify-center">
-      <div 
-        ref={containerRef}
-        className="inline-flex max-w-full overflow-x-auto rounded-[20px] bg-background shadow-[0_4px_16px_rgba(15,23,42,0.08)] px-3 py-1"
-        role="tablist"
-        aria-label="Profile sections"
-      >
-        <div className="flex gap-2 md:gap-4">
-          {tabs.map((tab, index) => {
-            const isActive = tab.id === activeSection;
-            
-            return (
-              <button
-                key={tab.id}
-                ref={el => tabsRef.current[index] = el}
-                onClick={() => !disabled && onTabChange(tab.id)}
-                role="tab"
-                aria-selected={isActive}
-                aria-controls={`tabpanel-${tab.id}`}
-                tabIndex={isActive ? 0 : -1}
-                disabled={disabled}
-              className={cn(
-                  'relative px-3 md:px-4 py-1.5 text-xs md:text-sm font-medium',
-                  'transition-colors duration-200',
-                  isActive
-                    ? 'text-slate-900'
-                    : 'text-slate-400 hover:text-slate-600',
-                  disabled && 'pointer-events-none opacity-50'
-                )}
-              >
-                <span>{tab.label}</span>
-                {isActive && (
-                  <span className="absolute left-0 right-0 -bottom-[4px] mx-auto h-[2px] rounded-full bg-slate-900" />
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <Tabs value={activeSection} onValueChange={onTabChange} className="w-full max-w-md">
+        <TabsList 
+          className={cn(
+            "grid w-full rounded-sq-md bg-muted/70 border border-border/60 px-2 py-[3px]",
+            tabs.length === 4 && "grid-cols-4",
+            tabs.length === 3 && "grid-cols-3",
+            tabs.length === 2 && "grid-cols-2",
+            tabs.length === 1 && "grid-cols-1",
+            disabled && "pointer-events-none opacity-50"
+          )}
+        >
+          {tabs.map((tab) => (
+            <TabsTrigger
+              key={tab.id}
+              value={tab.id}
+              disabled={disabled}
+              className="rounded-sq-pill text-sm px-3 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-150 ease-out"
+            >
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
     </section>
   );
 };
