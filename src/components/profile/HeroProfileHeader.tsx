@@ -427,6 +427,16 @@ const HeroProfileHeader = ({
             />
           )}
 
+          {/* Achievement Badge - Above stats row */}
+          <ProfileTop100Chip
+            top100Overview={{
+              ...top100Overview,
+              lists: undefined
+            }}
+            isPersonal={isPersonal}
+            isMobile={isMobile}
+          />
+
           {/* Stats Row */}
           <ProfileStatsRow
             postsCount={postsCount}
@@ -438,16 +448,6 @@ const HeroProfileHeader = ({
             onFollowersClick={handleOpenFollowers}
             onFollowingClick={handleOpenFollowing}
             onFriendsClick={handleOpenFriends}
-          />
-
-          {/* Top 100 Chip with completion stamps - Personal profiles only */}
-          <ProfileTop100Chip
-            top100Overview={{
-              ...top100Overview,
-              lists: undefined
-            }}
-            isPersonal={isPersonal}
-            isMobile={isMobile}
           />
 
           {/* Tab Navigation */}
