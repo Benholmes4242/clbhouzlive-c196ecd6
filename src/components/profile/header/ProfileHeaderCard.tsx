@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Globe, Building2, User, Brush } from 'lucide-react';
+import { ChevronDown, ChevronUp, Globe, Building2, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ProfileHeaderCardProps {
@@ -27,6 +27,7 @@ interface ProfileHeaderCardProps {
 /**
  * ProfileHeaderCard - Centered typography for name, handle, club, bio
  * Premium Golf style - clean, centered, Apple-like
+ * Font weight hierarchy: name (semibold) → club/HCP (medium) → bio + customise (normal)
  */
 const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   displayName,
@@ -85,73 +86,64 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   const displayBio = shouldTruncateBio && !bioExpanded ? `${bio.slice(0, 120)}...` : bio;
 
   return (
-    <section className="flex flex-col items-center text-center gap-1.5">
-      {/* NAME - Larger and bolder */}
-      <h1 className="text-3xl md:text-4xl font-semibold text-slate-900">
+    <section className="-mt-[45px] flex flex-col items-center text-center space-y-1.5 md:space-y-2">
+      {/* NAME – boldest */}
+      <h1 className="text-2xl md:text-3xl font-semibold text-slate-900">
         {displayName}
       </h1>
 
-      {/* HANDLE + BADGE */}
-      <div className="flex items-center gap-2 text-base md:text-lg font-semibold text-slate-900">
-        <span>@{username}</span>
-        <span className={cn(
-          "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm md:text-base font-semibold uppercase tracking-wide",
-          isPersonal 
-            ? "bg-emerald-500/20 text-emerald-600 border border-emerald-500/30"
-            : "bg-blue-500/20 text-blue-600 border border-blue-500/30"
-        )}>
-          {isPersonal ? <User className="w-3 h-3" /> : <Building2 className="w-3 h-3" />}
-          {getUserTypeBadge()}
-        </span>
+      {/* USERNAME – same size family, not bold */}
+      <div className="text-sm md:text-base text-slate-600">
+        @{username}
       </div>
 
-      {/* CLUB + HCP LINE */}
+      {/* CLUB + HCP LINE – slightly less bold than name */}
       {subtitleLine && (
-        <p className="text-base md:text-lg font-semibold text-slate-900">
+        <p className="text-sm md:text-[15px] font-medium text-slate-800">
           {subtitleLine}
         </p>
       )}
       
       {/* Website - Business profiles */}
       {!isPersonal && websiteUrl && (
-        <div className="flex items-center justify-center gap-1.5 text-base md:text-lg font-semibold">
-          <Globe className="w-4 h-4 text-slate-900" />
+        <div className="flex items-center justify-center gap-1.5 text-sm md:text-[15px] font-medium">
+          <Globe className="w-4 h-4 text-slate-700" />
           <a 
             href={getWebsiteHref(websiteUrl)}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-slate-900 hover:text-slate-700 transition-colors"
+            className="text-slate-800 hover:text-slate-600 transition-colors"
           >
             {formatWebsiteUrl(websiteUrl)}
           </a>
         </div>
       )}
 
-      {/* BIO */}
+      {/* BIO – lighter again */}
       {bio && (
-        <div className="mt-1 max-w-[320px] md:max-w-[420px]">
-          <p className="text-base md:text-lg font-semibold leading-snug text-slate-900">
+        <div className="max-w-[420px]">
+          <p className="text-sm md:text-[15px] font-normal leading-snug text-slate-700">
             {displayBio}
           </p>
           {shouldTruncateBio && (
             <button
               onClick={() => setBioExpanded(!bioExpanded)}
-              className="inline-flex items-center gap-0.5 text-sm font-semibold text-slate-900 mt-1 hover:text-slate-700"
+              className="inline-flex items-center gap-0.5 text-xs font-normal text-slate-500 mt-1 hover:text-slate-700"
             >
               {bioExpanded ? (
-                <>Show less <ChevronUp className="w-4 h-4" /></>
+                <>Show less <ChevronUp className="w-3 h-3" /></>
               ) : (
-                <>Show more <ChevronDown className="w-4 h-4" /></>
+                <>Show more <ChevronDown className="w-3 h-3" /></>
               )}
             </button>
           )}
         </div>
       )}
 
-      {/* CUSTOMISE PROFILE (OWN PROFILE ONLY) */}
+      {/* CUSTOMISE PROFILE – lightest */}
       {isOwnProfile && onCustomiseClick && (
         <button
-          className="mt-1 text-sm md:text-base font-semibold text-slate-900 hover:text-slate-700 underline-offset-2 hover:underline transition-colors"
+          className="text-xs md:text-sm font-normal text-slate-500 hover:text-slate-700 underline-offset-2 hover:underline transition-colors"
           onClick={onCustomiseClick}
         >
           Customise profile
