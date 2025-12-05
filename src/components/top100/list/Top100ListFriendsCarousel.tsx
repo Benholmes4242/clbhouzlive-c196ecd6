@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Squircle } from '@/components/ui/squircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface FriendSummary {
   id: string;
@@ -89,21 +89,14 @@ export const Top100ListFriendsCarousel: React.FC<Top100ListFriendsCarouselProps>
               className={`flex-shrink-0 w-32 snap-start text-center ${isFirst ? 'ml-4' : ''} ${isLast ? 'mr-4' : ''}`}
             >
               {/* Avatar */}
-              {friend.avatarUrl ? (
-                <div className="mx-auto h-12 w-12">
-                  <Squircle width={48} height={48}>
-                    <img
-                      src={friend.avatarUrl}
-                      alt={friend.name}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                  </Squircle>
-                </div>
-              ) : (
-                <div className="mx-auto h-12 w-12 rounded-xl bg-muted flex items-center justify-center text-sm font-semibold">
-                  {friend.name[0]?.toUpperCase() || '?'}
-                </div>
-              )}
+              <div className="mx-auto">
+                <SquircleAvatar
+                  size={48}
+                  src={friend.avatarUrl}
+                  alt={friend.name}
+                  fallback={friend.name[0]?.toUpperCase() || '?'}
+                />
+              </div>
 
               {/* Text */}
               <div className="mt-2 space-y-0.5 w-full">

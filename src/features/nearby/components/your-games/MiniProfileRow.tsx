@@ -2,7 +2,7 @@
  * MiniProfileRow - Profile row for game details
  */
 import React from 'react';
-import { Squircle } from '@/components/ui/squircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface MiniProfileRowProps {
   avatarUrl?: string | null;
@@ -12,27 +12,17 @@ interface MiniProfileRowProps {
 }
 
 export function MiniProfileRow({ avatarUrl, name, subtitle, badgeLabel }: MiniProfileRowProps) {
+  const initials = name.charAt(0).toUpperCase();
+  
   return (
     <div className="miniProfileRow">
       <div className="miniProfileRow__avatar">
-        <Squircle width={42} height={42}>
-          {avatarUrl ? (
-            <img src={avatarUrl} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          ) : (
-            <div style={{ 
-              width: '100%', 
-              height: '100%', 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              background: 'rgba(255,255,255,0.1)',
-              fontSize: '16px',
-              fontWeight: 600
-            }}>
-              {name.charAt(0).toUpperCase()}
-            </div>
-          )}
-        </Squircle>
+        <SquircleAvatar
+          size={42}
+          src={avatarUrl}
+          alt={name}
+          fallback={initials}
+        />
       </div>
       <div className="miniProfileRow__info">
         <div className="miniProfileRow__name">

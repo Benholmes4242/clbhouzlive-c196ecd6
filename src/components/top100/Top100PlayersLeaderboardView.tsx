@@ -10,8 +10,9 @@ import { EmptyFriendsState } from '@/components/shared/EmptyFriendsState';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronRight } from 'lucide-react';
-import { Squircle } from '@/components/ui/squircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ENABLE_TOP100_MOCK_PLAYERS } from '@/config/featureFlags';
+import { getRingColorForTier } from '@/lib/top100Club';
 import { TOP100_MOCK_PLAYERS } from '@/mocks/top100MockPlayers';
 import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 import {
@@ -275,40 +276,19 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
           className="w-full rounded-2xl border border-border/70 bg-card/95 px-4 py-3 flex items-center justify-between gap-3 shadow-xs active:scale-[0.99] transition-all hover:bg-muted/30"
         >
           <div className="flex items-center gap-3">
-            {/* Avatar with Squircle + white ring + achievement ring */}
-            <div className="relative">
-              {/* Achievement ring (outer) - 2px */}
-              <Squircle width={52} height={52}>
-                <div className="w-full h-full flex items-center justify-center" style={{
-                  background: meClub ? TOP100_TIER_STYLES[meClub.tierId as keyof typeof TOP100_TIER_STYLES]?.mapFill || '#94a3b8' : '#94a3b8'
-                }}>
-                  {/* White ring (middle) - 1px */}
-                  <Squircle width={48} height={48}>
-                    <div className="w-full h-full bg-white flex items-center justify-center">
-                      {/* Avatar (inner) - use profile photo from separate query */}
-                      <Squircle width={46} height={46}>
-                        {(currentUserProfile?.profile_photo_url || me.avatar_url) ? (
-                          <img
-                            src={currentUserProfile?.profile_photo_url || me.avatar_url!}
-                            alt={me.display_name}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-muted flex items-center justify-center text-[11px] font-semibold">
-                            {me.display_name
-                              .split(' ')
-                              .map((n: string) => n[0])
-                              .join('')
-                              .toUpperCase()
-                              .slice(0, 2)}
-                          </div>
-                        )}
-                      </Squircle>
-                    </div>
-                  </Squircle>
-                </div>
-              </Squircle>
-            </div>
+            {/* Avatar with new squircle spec */}
+            <SquircleAvatar
+              size={52}
+              src={currentUserProfile?.profile_photo_url || me.avatar_url}
+              alt={me.display_name}
+              fallback={me.display_name
+                .split(' ')
+                .map((n: string) => n[0])
+                .join('')
+                .toUpperCase()
+                .slice(0, 2)}
+              ringColor={meClub ? getRingColorForTier(meClub.tierId) : null}
+            />
 
             <div className="flex flex-col text-left">
               <span className="text-[11px] font-medium text-muted-foreground">
@@ -452,35 +432,15 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
             >
               {/* Left: avatar + text */}
               <div className="flex items-center gap-3 min-w-0">
-                {/* Avatar with Squircle + white ring + achievement ring - same size as Your Position */}
-                <div className="relative flex-shrink-0">
-                  {/* Achievement ring (outer) - 2px */}
-                  <Squircle width={52} height={52}>
-                    <div className="w-full h-full flex items-center justify-center" style={{
-                      background: TOP100_TIER_STYLES[club.tierId as keyof typeof TOP100_TIER_STYLES]?.mapFill || '#94a3b8'
-                    }}>
-                      {/* White ring (middle) - 1px */}
-                      <Squircle width={48} height={48}>
-                        <div className="w-full h-full bg-white flex items-center justify-center">
-                          {/* Avatar (inner) */}
-                          <Squircle width={46} height={46}>
-                            {entry.avatar_url ? (
-                              <img
-                                src={entry.avatar_url}
-                                alt={entry.display_name}
-                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                              />
-                            ) : (
-                              <div className="w-full h-full bg-muted flex items-center justify-center text-[11px] font-semibold">
-                                {initials}
-                              </div>
-                            )}
-                          </Squircle>
-                        </div>
-                      </Squircle>
-                    </div>
-                  </Squircle>
-                </div>
+                {/* Avatar with new squircle spec */}
+                <SquircleAvatar
+                  size={52}
+                  src={entry.avatar_url}
+                  alt={entry.display_name}
+                  fallback={initials}
+                  ringColor={getRingColorForTier(club.tierId)}
+                  className="flex-shrink-0"
+                />
 
                 {/* Name + club + tier + trophy icons */}
                 <div className="flex flex-col min-w-0 text-left">

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { Squircle } from '@/components/ui/squircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ChevronDown, ChevronUp, Trophy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -105,16 +105,12 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
             className="px-5 py-3 flex items-center justify-between hover:bg-muted/30 transition-colors cursor-pointer border-b last:border-b-0 border-border/40"
           >
             <div className="flex items-center gap-3 flex-1 min-w-0">
-              <Squircle width={40} height={40} className="shrink-0">
-                <img 
-                  src={friend.profile_photo_url || '/placeholder.svg'} 
-                  alt={friend.display_name ?? 'Friend'}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  onError={(e) => {
-                    e.currentTarget.src = '/placeholder.svg';
-                  }}
-                />
-              </Squircle>
+              <SquircleAvatar
+                size={40}
+                src={friend.profile_photo_url}
+                alt={friend.display_name ?? 'Friend'}
+                fallback={(friend.display_name ?? 'F').charAt(0).toUpperCase()}
+              />
               
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-foreground truncate">
