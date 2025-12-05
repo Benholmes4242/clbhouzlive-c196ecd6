@@ -157,7 +157,7 @@ export function HostApprovalSheet({ gameId, open, onOpenChange }: HostApprovalSh
             {requests.map((r) => (
               <div
                 key={r.id}
-                className="flex items-center gap-3 p-3 bg-neutral-800 rounded-xl border border-neutral-700"
+                className="flex items-center gap-3 p-3 bg-neutral-800 rounded-sq-sm border border-neutral-700"
               >
                 <Squircle width={40} height={40}>
                   <img src={r.requester?.profile_photo_url || '/placeholder.svg'} alt={r.requester?.display_name || 'User'} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
@@ -181,21 +181,21 @@ export function HostApprovalSheet({ gameId, open, onOpenChange }: HostApprovalSh
                       <TapButton
                         onClick={() => handleAction(r.id, false)}
                         disabled={processing === r.id}
-                        className="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg text-sm font-medium"
+                        className="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded-sq-xs text-sm font-medium"
                       >
                         {processing === r.id ? '...' : 'Reject'}
                       </TapButton>
                       <TapButton
                         onClick={() => handleAction(r.id, true)}
                         disabled={processing === r.id}
-                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium"
+                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-sq-xs text-sm font-medium"
                       >
                         {processing === r.id ? '...' : 'Approve'}
                       </TapButton>
                     </>
                   ) : (
                     <span
-                      className={`px-3 py-1 rounded-lg text-xs font-medium ${
+                      className={`px-3 py-1 rounded-sq-xs text-xs font-medium ${
                         r.state === 'approved'
                           ? 'bg-green-900/30 text-green-400'
                           : 'bg-red-900/30 text-red-400'

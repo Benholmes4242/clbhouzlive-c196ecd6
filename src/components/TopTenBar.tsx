@@ -82,7 +82,7 @@ export const TopTenBar: React.FC = () => {
   };
 
   return (
-    <div className="mb-4 p-4 bg-muted/30 rounded-lg border border-border">
+    <div className="mb-4 p-4 bg-muted/30 rounded-sq-sm border border-border">
       <div className="flex items-center justify-between mb-3">
         <div className="text-body-md font-semibold text-foreground">Your Top 10</div>
         <div className="text-meta text-muted-foreground">Drag to reorder • Tap ✕ to remove</div>
@@ -138,7 +138,7 @@ const TopTenSlot: React.FC<{
         style={style}
         {...attributes}
         {...listeners}
-        className="relative h-24 rounded-xl border-2 border-dashed border-muted-foreground/30 bg-muted/20 flex items-center justify-center text-body-md text-muted-foreground hover:border-muted-foreground/50 hover:bg-muted/30 transition-all duration-motion-fast ease-standard cursor-pointer"
+        className="relative h-24 rounded-sq-sm border-2 border-dashed border-muted-foreground/30 bg-muted/20 flex items-center justify-center text-body-md text-muted-foreground hover:border-muted-foreground/50 hover:bg-muted/30 transition-all duration-motion-fast ease-standard cursor-pointer"
       >
         {index + 1}
       </li>
@@ -151,7 +151,7 @@ const TopTenSlot: React.FC<{
       style={style}
       {...attributes}
       {...listeners}
-      className="relative h-24 rounded-xl overflow-hidden shadow-sm ring-1 ring-border bg-card flex flex-col cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow"
+      className="relative h-24 rounded-sq-sm overflow-hidden shadow-sm ring-1 ring-border bg-card flex flex-col cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow"
     >
       <div className="w-full h-12 shrink-0 bg-muted">
         {course.thumbnail_image ? (
@@ -182,7 +182,7 @@ const TopTenSlot: React.FC<{
 };
 
 const GhostCard: React.FC<{ course: Course; index: number }> = ({ course, index }) => (
-  <div className="h-24 w-38 rounded-xl shadow-lg bg-card border border-border flex flex-col opacity-90">
+  <div className="h-24 w-38 rounded-sq-sm shadow-lg bg-card border border-border flex flex-col opacity-90">
     <div className="w-full h-12 bg-muted">
       {course.thumbnail_image ? (
         <img src={course.thumbnail_image} alt="" className="w-full h-12 object-cover" />

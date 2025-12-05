@@ -186,7 +186,7 @@ const CreateMomentModal = ({
         {isVideo ? (
           <video
             src={currentUrl}
-            className="w-full max-h-80 object-contain rounded-lg"
+            className="w-full max-h-80 object-contain rounded-sq-sm"
             controls
             muted
           />
@@ -194,7 +194,7 @@ const CreateMomentModal = ({
           <img
             src={currentUrl}
             alt={`Preview ${currentMediaIndex + 1}`}
-            className="w-full max-h-80 object-contain rounded-lg"
+            className="w-full max-h-80 object-contain rounded-sq-sm"
           />
         )}
         

@@ -204,7 +204,7 @@ const CoursePickerModal: React.FC<CoursePickerModalProps> = ({
               return (
                 <div
                   key={course.id}
-                  className={`flex items-center space-x-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                  className={`flex items-center space-x-3 p-3 rounded-sq-sm border cursor-pointer transition-colors ${
                     isSelected ? 'bg-primary/10 border-primary' : 'hover:bg-muted/50'
                   }`}
                   onClick={() => handleCourseToggle(course.id)}

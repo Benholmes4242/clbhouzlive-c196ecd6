@@ -15,7 +15,7 @@ export function Top100ShareMomentTeaser({ moment, onShareClick }: Top100ShareMom
       <button
         type="button"
         onClick={onShareClick}
-        className="w-full rounded-2xl border border-border/60 bg-card px-4 py-3 text-left shadow-[0_8px_20px_rgba(15,23,42,0.04)] flex items-center justify-between gap-3 hover:bg-accent/30 transition-colors"
+        className="w-full rounded-sq-md border border-border/60 bg-card px-4 py-3 text-left shadow-[0_8px_20px_rgba(15,23,42,0.04)] flex items-center justify-between gap-3 hover:bg-accent/30 transition-colors"
       >
         <div>
           <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">

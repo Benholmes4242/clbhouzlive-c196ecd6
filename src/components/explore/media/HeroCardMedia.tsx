@@ -152,7 +152,7 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
       
       {/* Hero badge indicator */}
       {showFeaturedBadge && (
-        <div className="absolute top-3 left-3 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-lg">
+        <div className="absolute top-3 left-3 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-sq-xs">
           <span className="text-base font-medium text-white">Featured</span>
         </div>
       )}

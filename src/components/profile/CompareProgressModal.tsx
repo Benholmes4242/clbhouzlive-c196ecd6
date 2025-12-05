@@ -65,7 +65,7 @@ const CompareProgressModal: React.FC<CompareProgressModalProps> = ({
         {/* Header Comparison */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Current User */}
-          <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-lg p-6">
+          <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-sq-sm p-6">
             <div className="text-center">
               <h3 className="text-lg font-semibold mb-2">{currentUser.name}</h3>
               <Badge 
@@ -82,7 +82,7 @@ const CompareProgressModal: React.FC<CompareProgressModalProps> = ({
           </div>
 
           {/* Other User */}
-          <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-lg p-6">
+          <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-sq-sm p-6">
             <div className="text-center">
               <h3 className="text-lg font-semibold mb-2">{otherUser.name}</h3>
               <Badge 
@@ -100,7 +100,7 @@ const CompareProgressModal: React.FC<CompareProgressModalProps> = ({
         </div>
 
         {/* Comparison Summary */}
-        <div className="bg-muted/50 rounded-lg p-4 text-center">
+        <div className="bg-muted/50 rounded-sq-sm p-4 text-center">
           <div className="flex items-center justify-center gap-4 text-sm">
             <div className="flex items-center gap-2">
               <Target className="h-4 w-4" />
@@ -158,7 +158,7 @@ const CompareProgressModal: React.FC<CompareProgressModalProps> = ({
             <h4 className="font-medium">Regional Lists Progress</h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {/* Great Britain & Ireland */}
-              <div className="text-center p-4 bg-muted/50 rounded-lg">
+              <div className="text-center p-4 bg-muted/50 rounded-sq-sm">
                 <div className="text-sm font-medium mb-3">🇬🇧 GB&I</div>
                 <div className="space-y-3">
                   <div>
@@ -187,7 +187,7 @@ const CompareProgressModal: React.FC<CompareProgressModalProps> = ({
               </div>
 
               {/* Europe */}
-              <div className="text-center p-4 bg-muted/50 rounded-lg">
+              <div className="text-center p-4 bg-muted/50 rounded-sq-sm">
                 <div className="text-sm font-medium mb-3">🇪🇺 Europe</div>
                 <div className="space-y-3">
                   <div>
@@ -216,7 +216,7 @@ const CompareProgressModal: React.FC<CompareProgressModalProps> = ({
               </div>
 
               {/* USA */}
-              <div className="text-center p-4 bg-muted/50 rounded-lg">
+              <div className="text-center p-4 bg-muted/50 rounded-sq-sm">
                 <div className="text-sm font-medium mb-3">🇺🇸 USA</div>
                 <div className="space-y-3">
                   <div>
@@ -245,7 +245,7 @@ const CompareProgressModal: React.FC<CompareProgressModalProps> = ({
               </div>
 
               {/* Worldwide */}
-              <div className="text-center p-4 bg-muted/50 rounded-lg">
+              <div className="text-center p-4 bg-muted/50 rounded-sq-sm">
                 <div className="text-sm font-medium mb-3">🌍 World</div>
                 <div className="space-y-3">
                   <div>

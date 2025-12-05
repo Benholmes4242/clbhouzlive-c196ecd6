@@ -295,7 +295,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         {/* Mobile: Taller profile photo that flows under header, Desktop: Circular element */}
         <div 
           className={`group relative overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:scale-105 ${
-            window.innerWidth < 768 ? 'w-full mx-0 rounded-lg' : 'clbhouz-squircle'
+            window.innerWidth < 768 ? 'w-full mx-0 rounded-sq-sm' : 'clbhouz-squircle'
           }`}
           style={{
             width: window.innerWidth < 768 ? '100%' : '400px',

@@ -16,7 +16,7 @@ const CourseRatingStats = ({ courseId }: CourseRatingStatsProps) => {
 
   if (isLoading) {
     return (
-      <div className="border rounded-lg p-4">
+      <div className="border rounded-sq-sm p-4">
         <h3 className="font-semibold mb-3">Community Rating</h3>
         <div className="text-muted-foreground">Loading...</div>
       </div>
@@ -24,7 +24,7 @@ const CourseRatingStats = ({ courseId }: CourseRatingStatsProps) => {
   }
 
   return (
-    <div className="border rounded-lg p-4">
+    <div className="border rounded-sq-sm p-4">
       <h3 className="font-semibold mb-3">Community Rating</h3>
       
       {aggregates && aggregates.review_count > 0 ? (

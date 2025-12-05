@@ -23,7 +23,7 @@ export function AdminLanding() {
     return (
       <div className="min-h-screen overflow-x-hidden flex items-center justify-center p-4">
         <div className="max-w-md text-center space-y-4">
-          <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20">
+          <div className="p-4 rounded-sq-xs bg-destructive/10 border border-destructive/20">
             <p className="text-sm font-medium">Can't verify admin access</p>
             <p className="text-xs text-muted-foreground mt-2">Network or CORS error. Please refresh and try again.</p>
           </div>

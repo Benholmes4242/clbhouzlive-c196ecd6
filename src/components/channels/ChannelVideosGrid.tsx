@@ -8,7 +8,7 @@ export default function ChannelVideosGrid({ videos }: { videos: Vid[] }) {
     <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
       {videos.map(v => (
         <article key={v.id} className="group">
-          <div className="relative aspect-video overflow-hidden rounded-lg bg-muted/30">
+          <div className="relative aspect-video overflow-hidden rounded-sq-sm bg-muted/30">
             <img src={v.thumbnailUrl} alt="" className="h-full w-full object-cover group-hover:scale-[1.02] transition" />
             <span className="absolute bottom-2 right-2 text-[11px] font-semibold px-1.5 py-0.5 rounded bg-black/80 text-white">
               {formatDuration(v.duration_seconds)}

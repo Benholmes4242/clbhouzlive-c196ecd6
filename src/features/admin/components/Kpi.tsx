@@ -10,7 +10,7 @@ export function Kpi({
   delta?: number;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card/50 backdrop-blur-sm px-4 py-3">
+    <div className="rounded-sq-sm border border-border bg-card/50 backdrop-blur-sm px-4 py-3">
       <div className="text-xs text-muted-foreground">{label}</div>
       <div className="flex items-baseline gap-2 mt-1">
         <div className="text-2xl font-semibold">{value}</div>

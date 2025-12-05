@@ -72,8 +72,8 @@ const Top100Hub = () => {
         <ClubhouseHeaderNew />
         <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
           <div className="animate-pulse space-y-4">
-            <div className="h-64 bg-muted rounded-xl" />
-            <div className="h-64 bg-muted rounded-xl" />
+            <div className="h-64 bg-muted rounded-sq-md" />
+            <div className="h-64 bg-muted rounded-sq-md" />
           </div>
         </main>
       </div>
@@ -107,19 +107,19 @@ const Top100Hub = () => {
             <TabsList className="grid w-full grid-cols-3 bg-muted/70 border border-border/60 px-2 py-[3px] mb-5">
               <TabsTrigger 
                 value="courses" 
-                className="text-sm px-3 py-[6px] rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm px-3 py-[6px] rounded-sq-xs font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"
               >
                 Courses
               </TabsTrigger>
               <TabsTrigger 
                 value="my-progress" 
-                className="text-sm px-3 py-[6px] rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm px-3 py-[6px] rounded-sq-xs font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"
               >
                 My Progress
               </TabsTrigger>
               <TabsTrigger 
                 value="leaderboard" 
-                className="text-sm px-3 py-[6px] rounded-lg font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm px-3 py-[6px] rounded-sq-xs font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"
               >
                 Leaderboard
               </TabsTrigger>
@@ -145,12 +145,12 @@ const Top100Hub = () => {
               
               {/* View Mode Toggle */}
               <div className="mt-3 flex justify-center mb-6">
-                <div className="inline-flex rounded-lg bg-muted/70 border border-border/60 p-0.5 shadow-sm">
+                <div className="inline-flex rounded-sq-xs bg-muted/70 border border-border/60 p-0.5 shadow-sm">
                   <button
                     type="button"
                     onClick={() => setCoursesViewMode('list')}
                     className={cn(
-                      'inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors',
+                      'inline-flex items-center gap-2 rounded-sq-xs px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors',
                       coursesViewMode === 'list'
                         ? 'bg-background text-foreground shadow-sm'
                         : 'bg-transparent text-muted-foreground hover:text-foreground'
@@ -164,7 +164,7 @@ const Top100Hub = () => {
                     type="button"
                     onClick={() => setCoursesViewMode('map')}
                     className={cn(
-                      'inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors',
+                      'inline-flex items-center gap-2 rounded-sq-xs px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors',
                       coursesViewMode === 'map'
                         ? 'bg-background text-foreground shadow-sm'
                         : 'bg-transparent text-muted-foreground hover:text-foreground'

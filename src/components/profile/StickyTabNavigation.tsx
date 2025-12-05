@@ -71,7 +71,7 @@ const StickyTabNavigation: React.FC<StickyTabNavigationProps> = ({
                   key={tab.id}
                   ref={(el) => tabsRef.current[index] = el}
                   onClick={() => onTabChange(tab.id)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all duration-300 ${
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-sq-sm font-medium transition-all duration-300 ${
                     isActive
                       ? 'text-primary bg-primary/10'
                       : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'

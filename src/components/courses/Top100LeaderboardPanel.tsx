@@ -59,7 +59,7 @@ const Top100LeaderboardPanel = () => {
 
       {/* Closest Goal Banner */}
       {showGoalsBanner && (
-        <div className="w-full rounded-2xl border border-border/70 bg-card/90 px-4 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-3">
+        <div className="w-full rounded-sq-md border border-border/70 bg-card/90 px-4 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-3">
           <div className="flex items-center gap-2">
             <div className="h-7 w-7 rounded-full bg-emerald-500/10 flex items-center justify-center">
               <Target className="h-3.5 w-3.5 text-emerald-500" />
