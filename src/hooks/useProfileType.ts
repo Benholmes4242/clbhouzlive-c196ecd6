@@ -40,7 +40,7 @@ const HIDE_ACHIEVEMENTS_TAB = true;
 export const PERSONAL_TABS = [
   { id: 'activity', label: 'Activity' },
   { id: 'courses', label: 'Courses' },
-  { id: 'top100', label: 'Top 100' },
+  { id: 'top100', label: 'Top 100 Journey' },
   // { id: 'achievements', label: 'Achievements' }, // Hidden via HIDE_ACHIEVEMENTS_TAB flag
   { id: 'stats', label: 'Handicap' }
 ];
@@ -51,7 +51,7 @@ export const PERSONAL_TABS = [
 export const PERSONAL_TABS_WITH_ACHIEVEMENTS = [
   { id: 'activity', label: 'Activity' },
   { id: 'courses', label: 'Courses' },
-  { id: 'top100', label: 'Top 100' },
+  { id: 'top100', label: 'Top 100 Journey' },
   { id: 'achievements', label: 'Achievements' },
   { id: 'stats', label: 'Handicap' }
 ];

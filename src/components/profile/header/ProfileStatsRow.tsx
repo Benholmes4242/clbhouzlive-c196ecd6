@@ -31,7 +31,7 @@ const StatItem: React.FC<StatItemProps> = ({
       <span className="text-base md:text-lg font-semibold text-slate-900 tabular-nums">
         {value}
       </span>
-      <span className="mt-0.5 text-xs md:text-sm font-medium text-slate-600">
+      <span className="text-[11px] md:text-xs tracking-[0.08em] uppercase text-slate-900">
         {label}
       </span>
     </div>
@@ -55,7 +55,7 @@ const StatItem: React.FC<StatItemProps> = ({
 
 /**
  * ProfileStatsRow - Premium Golf stats display
- * Numbers bold, labels regular casing with font-medium
+ * Numbers bold, labels small caps / light grey, even spacing
  */
 const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
   postsCount,
@@ -69,7 +69,7 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
   onFriendsClick
 }) => {
   return (
-    <section className="mt-5 flex justify-center">
+    <section className="mt-4 flex justify-center">
       <div className="flex items-center gap-6 md:gap-10 text-center">
         <StatItem value={postsCount} label="Posts" />
         
