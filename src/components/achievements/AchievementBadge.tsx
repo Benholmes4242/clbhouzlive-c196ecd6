@@ -53,9 +53,9 @@ export function AchievementBadge({
         className
       )}
       style={{
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.82) 100%)',
+        background: 'radial-gradient(circle at top left, rgba(255,255,255,0.70), rgba(255,255,255,0.28))',
         borderColor: ringColor,
-        boxShadow: `0 4px 20px rgba(0, 0, 0, 0.08), 0 0 0 1px ${ringColor}22`,
+        boxShadow: `0 4px 20px rgba(0, 0, 0, 0.12), 0 0 0 1px ${ringColor}33`,
       }}
     >
       {/* Text block (left) */}
