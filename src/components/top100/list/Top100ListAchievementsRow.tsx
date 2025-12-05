@@ -152,15 +152,20 @@ export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps>
                   key={m.threshold}
                   className="flex flex-col items-center min-w-[72px] gap-1"
                 >
-                  {/* Squircle ring */}
+                  {/* Squircle ring - new spec: 1/1.05 aspect ratio, 34% border radius */}
                   <div className="relative">
                     <div
-                      className="h-14 w-14 rounded-[18px] flex items-center justify-center bg-white"
+                      className="flex items-center justify-center bg-white"
                       style={{
+                        width: '56px',
+                        aspectRatio: '1 / 1.05',
+                        borderRadius: '34%',
                         boxShadow: unlocked
                           ? `0 0 18px ${tierColor}22`
                           : '0 0 10px rgba(15,23,42,0.06)',
-                        border: `2px solid ${unlocked ? tierColor : `${tierColor}66`}`,
+                        border: unlocked 
+                          ? `2px solid ${tierColor}` 
+                          : `1px solid ${tierColor}66`,
                         opacity: unlocked ? 1 : 0.45,
                       }}
                     >

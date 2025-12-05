@@ -30,23 +30,30 @@ export function Top100MilestoneTimeline({ totalTop100Played }: Top100MilestoneTi
               key={m.id}
               className="flex min-w-[80px] flex-col items-center gap-1"
             >
-              {/* Squircle badge */}
+              {/* Squircle badge - new spec: 1/1.05 aspect ratio, 34% border radius */}
               <div
                 className={`
-                  flex h-16 w-16 items-center justify-center rounded-[22px] border-2 text-sm font-semibold
+                  flex items-center justify-center text-sm font-semibold
                   transition-all duration-200
                   ${
                     unlocked
                       ? 'text-white'
                       : isNext
-                      ? 'border-amber-400 text-amber-600 bg-amber-50'
-                      : 'border-slate-200 text-slate-400 bg-slate-50'
+                      ? 'text-amber-600 bg-amber-50'
+                      : 'text-slate-400 bg-slate-50'
                   }
                 `}
-                style={unlocked ? { 
-                  backgroundColor: m.ringColor, 
-                  borderColor: m.ringColor 
-                } : undefined}
+                style={{
+                  width: '64px',
+                  aspectRatio: '1 / 1.05',
+                  borderRadius: '34%',
+                  border: unlocked 
+                    ? `2px solid ${m.ringColor}` 
+                    : isNext 
+                    ? '2px solid #FBBF24' 
+                    : '1px solid #D1D5DB',
+                  backgroundColor: unlocked ? m.ringColor : undefined,
+                }}
               >
                 {m.threshold}
               </div>
