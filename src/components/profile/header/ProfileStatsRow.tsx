@@ -28,10 +28,10 @@ const StatItem: React.FC<StatItemProps> = ({
 }) => {
   const content = (
     <div className="flex flex-col leading-tight">
-      <span className="text-xl md:text-2xl font-semibold text-slate-900 tabular-nums">
+      <span className="text-lg md:text-xl font-semibold text-slate-900 tabular-nums">
         {value}
       </span>
-      <span className="mt-1.5 text-base md:text-lg font-medium text-slate-600">
+      <span className="mt-1.5 text-sm md:text-base font-medium text-slate-600">
         {label}
       </span>
     </div>
