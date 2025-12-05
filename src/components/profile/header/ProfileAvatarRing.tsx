@@ -112,8 +112,9 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
       )}
       onClick={onClick}
     >
+      {/* Outer achievement ring */}
       <div
-        className="relative overflow-hidden"
+        className="relative"
         style={{
           width: `${width}px`,
           aspectRatio: '1 / 1.05',
@@ -122,21 +123,36 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
           boxShadow: showRing 
             ? `0 0 6px ${tierColor}88, 0 8px 20px rgba(0,0,0,0.35)` 
             : '0 8px 20px rgba(0,0,0,0.35)',
+          padding: '1.5px',
         }}
       >
-        {photoUrl ? (
-          <img
-            src={photoUrl}
-            alt={displayName}
-            className="w-full h-full object-cover"
-            loading="eager"
-            decoding="async"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground text-xl font-semibold">
-            {initials}
-          </div>
-        )}
+        {/* White inner ring */}
+        <div
+          className="w-full h-full"
+          style={{
+            borderRadius: '32%',
+            border: '1.5px solid white',
+            overflow: 'hidden',
+          }}
+        >
+          {photoUrl ? (
+            <img
+              src={photoUrl}
+              alt={displayName}
+              className="w-full h-full object-cover"
+              style={{ borderRadius: '30%' }}
+              loading="eager"
+              decoding="async"
+            />
+          ) : (
+            <div 
+              className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground text-xl font-semibold"
+              style={{ borderRadius: '30%' }}
+            >
+              {initials}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
