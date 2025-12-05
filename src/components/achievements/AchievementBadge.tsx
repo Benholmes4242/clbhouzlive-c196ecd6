@@ -110,21 +110,12 @@ export function AchievementBadge({
           boxShadow: `0 4px 12px color-mix(in srgb, ${ringColor} 40%, rgba(0,0,0,0.2)), inset 0 1px 0 rgba(255,255,255,0.4)`,
         }}
       >
-        {/* Inner jewel ring */}
-        <div
-          className="relative flex items-center justify-center rounded-sq-xs w-[70%] h-[70%]"
-          style={{
-            background: 'rgba(255,255,255,0.15)',
-            boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.35)',
-          }}
-        >
-          <Top100TrophyIcon
-            className={cn(
-              'text-white drop-shadow-sm',
-              isLarge ? 'h-4 w-4' : 'h-3.5 w-3.5'
-            )}
-          />
-        </div>
+        <Top100TrophyIcon
+          className={cn(
+            'text-white drop-shadow-sm',
+            isLarge ? 'h-5 w-5' : 'h-4.5 w-4.5'
+          )}
+        />
       </div>
     </div>
   );
