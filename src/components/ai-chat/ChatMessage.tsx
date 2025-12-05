@@ -180,7 +180,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                 {isUser ? (
                   <div className="break-words [&>*:first-child]:mt-0 [&>*:last-child]:mb-0" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{message.content}</div>
                 ) : swingAnalysisData ? (
-                <div className="mt-2 rounded-2xl overflow-hidden bg-white/06 backdrop-blur border border-white/08 shadow-[0_10px_30px_rgba(0,0,0,0.4)]" data-swing-card>
+                <div className="mt-2 rounded-sq-md overflow-hidden bg-white/06 backdrop-blur border border-white/08 shadow-[0_10px_30px_rgba(0,0,0,0.4)]" data-swing-card>
                   <SwingReview
                     videoUrl={message.metadata!.videoUrl!}
                     summary={swingAnalysisData.summary}
@@ -249,7 +249,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                         </div>
                       ),
                       img: (props) => (
-                        <div className="mt-3 overflow-hidden rounded-xl border border-white/08 bg-white/06 backdrop-blur shadow-[0_4px_16px_rgba(0,0,0,0.3)]">
+                        <div className="mt-3 overflow-hidden rounded-sq-sm border border-white/08 bg-white/06 backdrop-blur shadow-[0_4px_16px_rgba(0,0,0,0.3)]">
                           <img {...props} className="block w-full h-auto" />
                         </div>
                       ),

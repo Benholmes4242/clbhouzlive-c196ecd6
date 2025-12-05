@@ -72,7 +72,7 @@ export const LevelUpToast: React.FC<LevelUpToastProps> = ({
           exit={{ opacity: 0, y: 50, scale: 0.9 }}
           className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-md"
         >
-          <div className="bg-card/95 backdrop-blur-xl border border-border/50 rounded-2xl shadow-2xl p-6">
+          <div className="bg-card/95 backdrop-blur-xl border border-border/50 rounded-sq-md shadow-2xl p-6">
             {/* Ring animation */}
             <div className="flex justify-center mb-4">
               <motion.div

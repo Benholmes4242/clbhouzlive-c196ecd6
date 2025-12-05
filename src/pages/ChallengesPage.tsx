@@ -22,7 +22,7 @@ const ChallengesPage: React.FC = () => {
           
           <div className="grid gap-4 md:grid-cols-2">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-48 bg-surface-alt animate-pulse rounded-2xl"></div>
+              <div key={i} className="h-48 bg-surface-alt animate-pulse rounded-sq-md"></div>
             ))}
           </div>
         </div>
@@ -186,7 +186,7 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({ challenge, userId }) => {
         </div>
 
         {progress?.isCompleted && (
-          <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-center">
+          <div className="bg-green-500/10 border border-green-500/20 rounded-sq-xs p-3 text-center">
             <p className="text-sm font-medium text-green-600 dark:text-green-400">
               ✅ Completed!
             </p>

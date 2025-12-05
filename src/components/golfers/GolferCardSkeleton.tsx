@@ -2,7 +2,7 @@ import React from 'react';
 
 export function GolferCardSkeleton() {
   return (
-    <div className="flex items-center justify-between p-4 bg-card border border-border/60 rounded-2xl animate-pulse">
+    <div className="flex items-center justify-between p-4 bg-card border border-border/60 rounded-sq-md animate-pulse">
       {/* Left side: Avatar + text */}
       <div className="flex items-center gap-3 flex-1 min-w-0">
         {/* Squircle avatar skeleton - new spec: 1/1.05 aspect ratio, 34% border radius */}
@@ -20,8 +20,8 @@ export function GolferCardSkeleton() {
 
       {/* Right side: Stacked buttons skeleton */}
       <div className="flex flex-col gap-2 ml-3 shrink-0 w-[110px]">
-        <div className="h-9 w-full bg-slate-200 rounded-lg" />
-        <div className="h-9 w-full bg-slate-200 rounded-lg" />
+        <div className="h-9 w-full bg-slate-200 rounded-sq-xs" />
+        <div className="h-9 w-full bg-slate-200 rounded-sq-xs" />
       </div>
     </div>
   );

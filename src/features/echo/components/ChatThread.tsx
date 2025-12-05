@@ -56,7 +56,7 @@ export function ChatThread({ messages, isStreaming }: ChatThreadProps) {
       className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
     >
       <div
-        className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+        className={`max-w-[80%] rounded-sq-md px-4 py-3 ${
           message.role === 'user'
             ? 'bg-primary text-primary-foreground'
             : 'bg-secondary text-secondary-foreground'
@@ -82,7 +82,7 @@ export function ChatThread({ messages, isStreaming }: ChatThreadProps) {
 
   const streamingIndicator = isStreaming && (
     <div className="flex justify-start" aria-live="polite" aria-label="AI is responding">
-      <div className="bg-secondary text-secondary-foreground rounded-2xl px-4 py-3">
+      <div className="bg-secondary text-secondary-foreground rounded-sq-md px-4 py-3">
         <div className="flex items-center gap-2">
           <div className="flex gap-1">
             <span className="animate-bounce" style={{ animationDelay: '0ms' }}>●</span>

@@ -35,20 +35,20 @@ export function HubSkeleton() {
           <div className="pt-6 space-y-3.5">
             {/* Hero tile skeleton */}
             <Skeleton 
-              className="w-full rounded-2xl bg-white/8" 
+              className="w-full rounded-sq-md bg-white/8" 
               style={{ height: 'var(--hub-tile-fixed-h, 180px)' }}
             />
             
             {/* Secondary tile skeleton */}
             <Skeleton 
-              className="w-full rounded-2xl bg-white/8" 
+              className="w-full rounded-sq-md bg-white/8" 
               style={{ height: '200px' }}
             />
             
             {/* Grid of square tiles */}
             <div className="grid grid-cols-2 gap-3.5">
-              <Skeleton className="w-full rounded-2xl bg-white/8" style={{ aspectRatio: '1' }} />
-              <Skeleton className="w-full rounded-2xl bg-white/8" style={{ aspectRatio: '1' }} />
+              <Skeleton className="w-full rounded-sq-md bg-white/8" style={{ aspectRatio: '1' }} />
+              <Skeleton className="w-full rounded-sq-md bg-white/8" style={{ aspectRatio: '1' }} />
             </div>
           </div>
         </main>

@@ -19,7 +19,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
   
   return (
   <div className="min-h-screen flex items-center justify-center bg-background px-4">
-    <div className="bg-muted rounded-lg shadow-md p-6 w-full max-w-md mx-auto flex flex-col items-center">
+    <div className="bg-muted rounded-sq-md shadow-md p-6 w-full max-w-md mx-auto flex flex-col items-center">
       <div className="flex justify-center items-center gap-4 mb-6">
         <img
           src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"

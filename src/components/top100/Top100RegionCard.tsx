@@ -140,7 +140,7 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="rounded-2xl px-4 py-1.5 text-xs font-medium bg-white/95 text-slate-900 hover:bg-white border-none"
+                  className="rounded-sq-md px-4 py-1.5 text-xs font-medium bg-white/95 text-slate-900 hover:bg-white border-none"
                   onClick={(e) => {
                     e.stopPropagation();
                     onClick?.();

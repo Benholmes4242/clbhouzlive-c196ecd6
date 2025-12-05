@@ -64,7 +64,7 @@ const TeamManagement = () => {
           ) : (
             <div className="space-y-4">
               {adminProfiles.map((profile) => (
-                <div key={profile.id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div key={profile.id} className="flex items-center justify-between p-4 border rounded-sq-sm">
                   <div className="flex items-center space-x-4">
                     <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
                       <span className="text-sm font-medium text-primary">
@@ -112,7 +112,7 @@ const TeamManagement = () => {
           <CardContent>
             <div className="space-y-4">
               {invitations.map((invitation) => (
-                <div key={invitation.id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div key={invitation.id} className="flex items-center justify-between p-4 border rounded-sq-sm">
                   <div className="flex items-center space-x-4">
                     <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
                       <UserPlus className="h-4 w-4 text-muted-foreground" />

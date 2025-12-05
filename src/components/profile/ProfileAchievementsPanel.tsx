@@ -55,13 +55,13 @@ export const ProfileAchievementsPanel: React.FC<ProfileAchievementsPanelProps> =
 
   if (isLoading) {
     return (
-      <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6">
+      <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-sq-md p-6">
         <div className="space-y-4">
           <div className="h-6 bg-muted/20 rounded w-48 animate-pulse" />
           <div className="h-4 bg-muted/20 rounded w-full max-w-md animate-pulse" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
             {[1, 2, 3, 4].map(i => (
-              <div key={i} className="h-32 bg-muted/20 rounded-xl animate-pulse" />
+              <div key={i} className="h-32 bg-muted/20 rounded-sq-sm animate-pulse" />
             ))}
           </div>
         </div>
@@ -72,7 +72,7 @@ export const ProfileAchievementsPanel: React.FC<ProfileAchievementsPanelProps> =
   const hasUnlockedAchievements = unlockedCount > 0;
 
   return (
-    <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 space-y-6">
+    <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-sq-md p-6 space-y-6">
       {/* Header */}
       <div>
         <div className="flex items-center justify-between mb-2">

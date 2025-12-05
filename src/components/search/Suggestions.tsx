@@ -93,7 +93,7 @@ const Suggestions: React.FC<SuggestionsProps> = ({ onCreatorClick }) => {
                   fallback={item.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                 />
               ) : (
-                <div className="w-12 h-12 rounded-lg bg-gray-200 overflow-hidden">
+                <div className="w-12 h-12 rounded-sq-xs bg-gray-200 overflow-hidden">
                   <img
                     src={item.profileImage}
                     alt={item.name}

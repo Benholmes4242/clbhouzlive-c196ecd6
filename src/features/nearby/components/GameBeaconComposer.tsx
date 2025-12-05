@@ -70,7 +70,7 @@ export function GameBeaconComposer({ onSubmit, onCancel, initialDraft }: GameBea
               <button
                 key={opt}
                 onClick={() => setDraft({ ...draft, when: opt as any })}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-sq-xs text-sm font-medium transition-colors ${
                   draft.when === opt
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-muted hover:bg-muted/80'
@@ -93,7 +93,7 @@ export function GameBeaconComposer({ onSubmit, onCancel, initialDraft }: GameBea
             placeholder="Select club..."
             value={draft.whereClubId}
             onChange={(e) => setDraft({ ...draft, whereClubId: e.target.value })}
-            className="w-full px-3 py-2 rounded-lg border bg-background"
+            className="w-full px-3 py-2 rounded-sq-xs border bg-background"
           />
         </div>
 
@@ -108,7 +108,7 @@ export function GameBeaconComposer({ onSubmit, onCancel, initialDraft }: GameBea
               <button
                 key={n}
                 onClick={() => setDraft({ ...draft, playersNeeded: n as any })}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-sq-xs text-sm font-medium transition-colors ${
                   draft.playersNeeded === n
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-muted hover:bg-muted/80'
@@ -156,7 +156,7 @@ export function GameBeaconComposer({ onSubmit, onCancel, initialDraft }: GameBea
             placeholder="Add details about the game..."
             value={draft.notes || ''}
             onChange={(e) => setDraft({ ...draft, notes: e.target.value })}
-            className="w-full px-3 py-2 rounded-lg border bg-background min-h-[80px]"
+            className="w-full px-3 py-2 rounded-sq-xs border bg-background min-h-[80px]"
           />
         </div>
 
@@ -168,7 +168,7 @@ export function GameBeaconComposer({ onSubmit, onCancel, initialDraft }: GameBea
               <button
                 key={aud.value}
                 onClick={() => setDraft({ ...draft, audience: aud.value })}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded-sq-xs text-sm font-medium transition-colors ${
                   draft.audience === aud.value
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-muted hover:bg-muted/80'

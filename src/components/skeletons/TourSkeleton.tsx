@@ -13,7 +13,7 @@ export const TourSkeleton = () => {
       {/* Stats grid */}
       <div className="grid grid-cols-2 gap-4 p-4">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="bg-surface-card rounded-2xl p-4 space-y-2">
+          <div key={i} className="bg-surface-card rounded-sq-md p-4 space-y-2">
             <Skeleton className="h-8 w-16" />
             <Skeleton className="h-4 w-20" />
           </div>

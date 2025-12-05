@@ -52,7 +52,7 @@ export function Top100LeaderboardFilterBar({
   onChange,
 }: Top100LeaderboardFilterBarProps) {
   return (
-    <div className="w-full rounded-2xl border border-border/70 bg-card/80 px-4 py-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <div className="w-full rounded-sq-md border border-border/70 bg-card/80 px-4 py-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       {/* Left block: list + region */}
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:gap-4">
         {/* List selector */}

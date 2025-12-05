@@ -93,7 +93,7 @@ const FriendsListPage = () => {
               <button
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
-                className="px-4 py-2 rounded-lg bg-background border border-border text-sm font-medium disabled:opacity-50 transition-opacity"
+                className="px-4 py-2 rounded-sq-xs bg-background border border-border text-sm font-medium disabled:opacity-50 transition-opacity"
               >
                 {isFetchingNextPage ? 'Loading more…' : 'Load more'}
               </button>
