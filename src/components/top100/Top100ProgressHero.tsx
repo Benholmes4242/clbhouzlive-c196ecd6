@@ -1,7 +1,6 @@
 import React from 'react';
 import type { Top100TierId } from '@/lib/top100Club';
 import { getRingColorForTier } from '@/lib/top100Club';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Top100AchievementBadge } from './Top100AchievementBadge';
 
 export interface Top100ProgressHeroProps {
@@ -13,6 +12,79 @@ export interface Top100ProgressHeroProps {
   regionsCount: number;
   lastRoundAt: string | null;
   isOwnProfile?: boolean;
+}
+
+/**
+ * Large avatar component for My Progress page
+ * Uses 1/1.05 aspect ratio, 34% border radius
+ * LARGE AVATAR: 3px achievement ring + 1.5px grey inner ring
+ */
+function LargeProgressAvatar({ 
+  src, 
+  alt, 
+  fallback, 
+  ringColor 
+}: { 
+  src: string | null; 
+  alt: string; 
+  fallback: string;
+  ringColor: string | null;
+}) {
+  const size = 150;
+  const fallbackFontSize = Math.round(size * 0.22);
+  const hasRing = Boolean(ringColor);
+
+  const avatarContent = src ? (
+    <img
+      src={src}
+      alt={alt}
+      className="w-full h-full object-cover"
+      loading="eager"
+    />
+  ) : (
+    <div 
+      className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground font-semibold"
+      style={{ fontSize: `${fallbackFontSize}px` }}
+    >
+      {fallback}
+    </div>
+  );
+
+  if (hasRing) {
+    return (
+      <div
+        className="relative overflow-hidden"
+        style={{
+          width: `${size}px`,
+          aspectRatio: '1 / 1.05',
+          borderRadius: '34%',
+          border: `3px solid ${ringColor}`,
+          boxShadow: `0 0 6px ${ringColor}88`,
+        }}
+      >
+        <div
+          className="w-full h-full overflow-hidden"
+          style={{ borderRadius: '32%', border: '1.5px solid #D1D5DB' }}
+        >
+          {avatarContent}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="relative overflow-hidden"
+      style={{
+        width: `${size}px`,
+        aspectRatio: '1 / 1.05',
+        borderRadius: '34%',
+        border: '1.5px solid #D1D5DB',
+      }}
+    >
+      {avatarContent}
+    </div>
+  );
 }
 
 export function Top100ProgressHero({
@@ -43,14 +115,12 @@ export function Top100ProgressHero({
       {/* Profile + achievement pill */}
       <div className="flex flex-col items-center gap-3">
         <div className="relative">
-          {/* Avatar with new squircle spec */}
-          <SquircleAvatar
-            size={150}
+          {/* Large avatar with custom ring sizes */}
+          <LargeProgressAvatar
             src={avatarUrl}
             alt={displayName ?? 'Player avatar'}
             fallback={initials}
             ringColor={tierColor}
-            priority
           />
 
           {/* Achievement badge pill - overlaying bottom of avatar */}
