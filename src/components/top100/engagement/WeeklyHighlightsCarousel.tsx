@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
-import { Squircle } from '@/components/ui/squircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { TrendingUp, TrendingDown, Star, Trophy } from 'lucide-react';
 
 interface Highlight {
@@ -127,6 +127,7 @@ export function WeeklyHighlightsCarousel({ currentUserId }: WeeklyHighlightsCaro
         {highlights.map((highlight, index) => {
           const Icon = HIGHLIGHT_ICONS[highlight.type];
           const isCurrentUser = highlight.user_id === currentUserId;
+          const initials = (highlight.details.display_name || 'G').charAt(0).toUpperCase();
           
           return (
             <div
@@ -142,13 +143,12 @@ export function WeeklyHighlightsCarousel({ currentUserId }: WeeklyHighlightsCaro
               <div className="flex items-start gap-2.5">
                 <div className="flex-shrink-0">
                   {highlight.details.avatar_url ? (
-                    <Squircle width={32} height={32}>
-                      <img
-                        src={highlight.details.avatar_url}
-                        alt=""
-                        className="w-full h-full object-cover"
-                      />
-                    </Squircle>
+                    <SquircleAvatar
+                      size={32}
+                      src={highlight.details.avatar_url}
+                      alt={highlight.details.display_name || ''}
+                      fallback={initials}
+                    />
                   ) : (
                     <div className="w-8 h-8 rounded-lg bg-current/10 flex items-center justify-center">
                       <Icon className="w-4 h-4" />

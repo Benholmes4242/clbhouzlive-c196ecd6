@@ -5,7 +5,7 @@ import { useNearbyGolfers } from '@/features/nearby/useNearbyGolfers';
 import { useLocationPermission } from '@/features/nearby/hooks/useLocationPermission';
 import { useHub } from '@/features/hub/useHub';
 import { formatDistanceHcpClub } from '@/features/golfers/format';
-import { Squircle } from '@/components/ui/squircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface NearbyGolfersTileProps {
   limit?: number;
@@ -65,9 +65,12 @@ export function NearbyGolfersTile({ limit = 20 }: NearbyGolfersTileProps) {
           {!isLoading && golfers.slice(0, 5).map(g => (
             <button key={g.id} className="ng-row py-[10px]" onClick={() => nav(`/profile/${g.id}`)}>
               <div className="shrink-0">
-                <Squircle width={42} height={42}>
-                  <img src={g.avatar_url || '/placeholder.svg'} alt={g.display_name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-                </Squircle>
+                <SquircleAvatar
+                  size={42}
+                  src={g.avatar_url}
+                  alt={g.display_name}
+                  fallback={g.display_name?.charAt(0).toUpperCase() || '?'}
+                />
               </div>
               <div className="ng-main">
                 <div className="hub-ellipsis-fade ng-name text-white/90 font-semibold">{g.display_name}</div>

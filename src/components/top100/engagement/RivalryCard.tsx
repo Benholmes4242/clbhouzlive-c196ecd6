@@ -1,7 +1,7 @@
 import React from 'react';
 import { useRivals } from '@/hooks/useRivals';
 import { cn } from '@/lib/utils';
-import { Squircle } from '@/components/ui/squircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Flame, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -25,6 +25,13 @@ export function RivalryCard({ userId, userTop100Count }: RivalryCardProps) {
   const difference = Math.abs(userTop100Count - rivalTop100);
   const isAhead = userTop100Count > rivalTop100;
 
+  const initials = closestRival.profile.display_name
+    ?.split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2) || '?';
+
   return (
     <button
       type="button"
@@ -37,24 +44,12 @@ export function RivalryCard({ userId, userTop100Count }: RivalryCardProps) {
     >
       <div className="flex items-center gap-3">
         <div className="relative">
-          <Squircle width={40} height={40}>
-            {closestRival.profile.profile_photo_url ? (
-              <img
-                src={closestRival.profile.profile_photo_url}
-                alt=""
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-rose-100 flex items-center justify-center text-rose-600 text-xs font-semibold">
-                {closestRival.profile.display_name
-                  ?.split(' ')
-                  .map(n => n[0])
-                  .join('')
-                  .toUpperCase()
-                  .slice(0, 2) || '?'}
-              </div>
-            )}
-          </Squircle>
+          <SquircleAvatar
+            size={40}
+            src={closestRival.profile.profile_photo_url}
+            alt={closestRival.profile.display_name || ''}
+            fallback={initials}
+          />
           <div className="absolute -top-1 -right-1 w-5 h-5 bg-rose-500 rounded-full flex items-center justify-center">
             <Flame className="w-3 h-3 text-white" />
           </div>

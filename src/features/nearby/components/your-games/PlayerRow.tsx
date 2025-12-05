@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Squircle } from '@/components/ui/squircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Participant } from './types';
 import { formatHcp } from '@/lib/formatHcp';
 
@@ -11,6 +11,7 @@ interface PlayerRowProps {
 export const PlayerRow: React.FC<PlayerRowProps> = ({ p, isHost }) => {
   const name = p.username ? `@${p.username}` : (p.display_name ?? 'Unknown');
   const hcpLabel = p.eg_handicap_index != null ? `HCP ${formatHcp(p.eg_handicap_index)}` : '';
+  const initials = (p.display_name || 'U').charAt(0).toUpperCase();
   
   return (
     <div
@@ -18,14 +19,13 @@ export const PlayerRow: React.FC<PlayerRowProps> = ({ p, isHost }) => {
       role="listitem"
     >
       {/* Avatar */}
-      <Squircle width={42} height={42}>
-        <img
-          src={p.profile_photo_url || '/placeholder.svg'}
-          alt=""
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          loading="lazy"
-        />
-      </Squircle>
+      <SquircleAvatar
+        size={42}
+        src={p.profile_photo_url}
+        alt={name}
+        fallback={initials}
+        priority={false}
+      />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <span className="truncate text-[15px] font-medium text-white/90">{name}</span>
