@@ -11,7 +11,7 @@ interface ProfileTabsNavProps {
 }
 
 /**
- * ProfileTabsNav - White pill with black underline on active tab
+ * ProfileTabsNav - White pill with short centered black underline on active tab
  * Premium Golf style - clean, Apple-like
  */
 const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
@@ -44,7 +44,7 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
     <section className="mt-5 flex justify-center">
       <div 
         ref={containerRef}
-        className="inline-flex max-w-full overflow-x-auto rounded-[20px] bg-background shadow-[0_4px_16px_rgba(15,23,42,0.08)] px-3 py-1"
+        className="inline-flex max-w-full overflow-x-auto rounded-[20px] bg-white shadow-[0_4px_16px_rgba(15,23,42,0.08)] px-3 py-1"
         role="tablist"
         aria-label="Profile sections"
       >
@@ -62,18 +62,20 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
                 aria-controls={`tabpanel-${tab.id}`}
                 tabIndex={isActive ? 0 : -1}
                 disabled={disabled}
-              className={cn(
+                className={cn(
                   'relative px-3 md:px-4 py-1.5 text-xs md:text-sm font-medium',
                   'transition-colors duration-200',
                   isActive
                     ? 'text-slate-900'
-                    : 'text-slate-400 hover:text-slate-600',
+                    : 'text-slate-500 hover:text-slate-700',
                   disabled && 'pointer-events-none opacity-50'
                 )}
               >
                 <span>{tab.label}</span>
                 {isActive && (
-                  <span className="absolute left-0 right-0 -bottom-[4px] mx-auto h-[2px] rounded-full bg-slate-900" />
+                  <span 
+                    className="absolute left-1/2 -bottom-[4px] h-[2px] w-6 md:w-8 -translate-x-1/2 rounded-full bg-black"
+                  />
                 )}
               </button>
             );
