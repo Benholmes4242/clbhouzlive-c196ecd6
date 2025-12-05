@@ -11,8 +11,8 @@ import { getDirectImageUrl } from '@/utils/r2ImageUtils';
  * - overflow: hidden
  * - object-fit: cover for images
  * 
- * Normal state: 2.5px grey ring (#D1D5DB)
- * Achievement state: 2.5px colored outer ring + 2.5px grey inner ring (no gap)
+ * Normal state: 1px grey ring (#D1D5DB)
+ * Achievement state: 1px colored outer ring + 1px grey inner ring (no gap)
  */
 
 // Size variants mapping
@@ -164,7 +164,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
             width: `${pixelSize}px`,
             aspectRatio: '1 / 1.05',
             borderRadius: '34%',
-            border: `2.5px solid ${ringColor}`,
+            border: `1px solid ${ringColor}`,
             boxShadow: `0 0 6px ${ringColor}88`,
           }}
         >
@@ -172,8 +172,8 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
           <div
             className="w-full h-full overflow-hidden"
             style={{
-              borderRadius: '32%',
-              border: '2.5px solid #D1D5DB',
+              borderRadius: '33%',
+              border: '1px solid #D1D5DB',
             }}
           >
             {avatarContent}
@@ -200,7 +200,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
           width: `${pixelSize}px`,
           aspectRatio: '1 / 1.05',
           borderRadius: '34%',
-          border: '2.5px solid #D1D5DB',
+          border: '1px solid #D1D5DB',
         }}
       >
         {avatarContent}
