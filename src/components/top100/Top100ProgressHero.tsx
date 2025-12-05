@@ -2,6 +2,7 @@ import React from 'react';
 import type { Top100TierId } from '@/lib/top100Club';
 import { getRingColorForTier, getTop100Club } from '@/lib/top100Club';
 import { AchievementBadge } from '@/components/achievements/AchievementBadge';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 export interface Top100ProgressHeroProps {
   displayName: string | null;
@@ -12,79 +13,6 @@ export interface Top100ProgressHeroProps {
   regionsCount: number;
   lastRoundAt: string | null;
   isOwnProfile?: boolean;
-}
-
-/**
- * Large avatar component for My Progress page
- * Uses 1/1.05 aspect ratio, 34% border radius
- * LARGE AVATAR: 2.5px achievement ring + 2.5px grey inner ring
- */
-function LargeProgressAvatar({ 
-  src, 
-  alt, 
-  fallback, 
-  ringColor 
-}: { 
-  src: string | null; 
-  alt: string; 
-  fallback: string;
-  ringColor: string | null;
-}) {
-  const size = 150;
-  const fallbackFontSize = Math.round(size * 0.22);
-  const hasRing = Boolean(ringColor);
-
-  const avatarContent = src ? (
-    <img
-      src={src}
-      alt={alt}
-      className="w-full h-full object-cover"
-      loading="eager"
-    />
-  ) : (
-    <div 
-      className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground font-semibold"
-      style={{ fontSize: `${fallbackFontSize}px` }}
-    >
-      {fallback}
-    </div>
-  );
-
-  if (hasRing) {
-    return (
-      <div
-        className="relative overflow-hidden"
-        style={{
-          width: `${size}px`,
-          aspectRatio: '1 / 1.05',
-          borderRadius: '34%',
-          border: `2.5px solid ${ringColor}`,
-          boxShadow: `0 0 6px ${ringColor}88`,
-        }}
-      >
-        <div
-          className="w-full h-full overflow-hidden"
-          style={{ borderRadius: '33%', border: '1px solid #D1D5DB' }}
-        >
-          {avatarContent}
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div
-      className="relative overflow-hidden"
-      style={{
-        width: `${size}px`,
-        aspectRatio: '1 / 1.05',
-        borderRadius: '34%',
-        border: '1px solid #D1D5DB',
-      }}
-    >
-      {avatarContent}
-    </div>
-  );
 }
 
 export function Top100ProgressHero({
@@ -104,7 +32,9 @@ export function Top100ProgressHero({
     .toUpperCase()
     .slice(0, 2) || '?';
 
-  const tierColor = tierId && tierId !== 'none' ? getRingColorForTier(tierId) : null;
+  // Only show achievement ring if user has earned one (tierId !== 'none')
+  const hasAchievementRing = tierId && tierId !== 'none';
+  const tierColor = hasAchievementRing ? getRingColorForTier(tierId) : null;
   const club = getTop100Club(totalTop100Played);
   const hasAchievement = totalTop100Played >= 5;
   
@@ -117,8 +47,9 @@ export function Top100ProgressHero({
       {/* Profile + achievement badge */}
       <div className="flex flex-col items-center">
         <div className="relative">
-          {/* Large avatar with custom ring sizes */}
-          <LargeProgressAvatar
+          {/* Large avatar - follows global avatar ring rule */}
+          <SquircleAvatar
+            size={150}
             src={avatarUrl}
             alt={displayName ?? 'Player avatar'}
             fallback={initials}

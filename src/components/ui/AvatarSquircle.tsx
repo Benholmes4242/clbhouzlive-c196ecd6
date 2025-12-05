@@ -20,11 +20,9 @@ type Props = {
  * ❌ DO NOT use AvatarSquircle - it is deprecated
  * ✅ MUST use <SquircleAvatar> from @/components/ui/SquircleAvatar.tsx
  * 
- * This wrapper component now delegates to SquircleAvatar for the new squircle spec:
- * - Aspect ratio: 1 / 1.05
- * - Border radius: 34%
- * - Normal state: 1px grey ring
- * - Achievement state: 1.5px colored outer ring + 1px grey inner ring
+ * GLOBAL AVATAR RING RULE:
+ * - Users WITH achievement ring: 1px colored ring directly on avatar (no grey ring)
+ * - Users WITHOUT achievement ring: 1px grey ring
  * 
  * @deprecated Use <SquircleAvatar> from @/components/ui/SquircleAvatar.tsx instead
  */
