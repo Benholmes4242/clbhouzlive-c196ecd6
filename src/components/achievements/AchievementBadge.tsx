@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import Top100TrophyIcon from '@/components/icons/Top100TrophyIcon';
+import { Trophy } from 'lucide-react';
 
 export interface AchievementBadgeProps {
   /** Number of Top 100 courses played */
@@ -99,7 +99,7 @@ export function AchievementBadge({
         </span>
       </div>
 
-      <Top100TrophyIcon
+      <Trophy
         className={cn('shrink-0', trophySize)}
         style={{ color: ringColor }}
       />
