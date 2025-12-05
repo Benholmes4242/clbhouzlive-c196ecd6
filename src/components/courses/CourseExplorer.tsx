@@ -289,6 +289,7 @@ const CourseExplorer = () => {
     { value: PRIMARY_REGIONS.GB_I, label: PRIMARY_REGION_LABELS['gb-i'] },
     { value: PRIMARY_REGIONS.USA, label: PRIMARY_REGION_LABELS['usa'] },
     { value: PRIMARY_REGIONS.EUROPE, label: PRIMARY_REGION_LABELS['europe'] },
+    { value: PRIMARY_REGIONS.AFRICA, label: PRIMARY_REGION_LABELS['africa'] },
     { value: PRIMARY_REGIONS.REST, label: PRIMARY_REGION_LABELS['rest'] },
   ];
 
