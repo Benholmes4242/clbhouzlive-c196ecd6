@@ -152,7 +152,13 @@ export default {
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				sm: 'calc(var(--radius) - 4px)',
+				// Squircle radius system - global design language
+				'sq-xs': '10px',   // small pills, chips, tiny inputs
+				'sq-sm': '14px',   // tabs, buttons, medium inputs
+				'sq-md': '18px',   // standard cards, larger inputs
+				'sq-lg': '24px',   // hero cards, large elements
+				'sq-pill': '999px' // full capsule for segmented controls & pills
 			},
 			spacing: {
 				'header-mobile': 'var(--header-h-mobile)',

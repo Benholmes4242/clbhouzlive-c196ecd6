@@ -273,7 +273,7 @@ const Top100CoursesHubPanel = () => {
   return (
     <div className="space-y-6 pb-8">
       {/* 1. Top 100 Club hero */}
-      <section className="rounded-3xl border border-border/60 bg-card shadow-[0_4px_28px_rgba(0,0,0,0.14)] px-4 py-5 relative overflow-hidden before:absolute before:inset-0 before:bg-white/[0.02] before:pointer-events-none">
+      <section className="rounded-sq-lg border border-border/60 bg-card shadow-[0_4px_28px_rgba(0,0,0,0.14)] px-4 py-5 relative overflow-hidden before:absolute before:inset-0 before:bg-white/[0.02] before:pointer-events-none">
         {/* Title + subtitle */}
         <div className="items-center text-center">
           <h2 className="text-[18px] font-semibold text-foreground">Top 100 Club</h2>
