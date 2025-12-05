@@ -238,7 +238,7 @@ const CourseLeaderboardTab = ({ courseId }: CourseLeaderboardTabProps) => {
       </div>
 
       {/* Legend */}
-      <div className="bg-muted/50 rounded-lg p-4">
+      <div className="bg-muted/50 rounded-sq-sm p-4">
         <h4 className="font-medium mb-2">Scoring System</h4>
         <div className="text-sm text-muted-foreground space-y-1">
           <p>• Review with text: 10 points</p>

@@ -54,7 +54,7 @@ export const ProfileTabsSkeleton = () => {
                 <SkeletonText lines={2} />
               </div>
             </div>
-            <Skeleton className="h-40 w-full rounded-lg" />
+            <Skeleton className="h-40 w-full rounded-sq-sm" />
           </div>
         ))}
       </div>
@@ -73,7 +73,7 @@ export const ActivityFeedSkeleton = () => {
               <SkeletonText lines={2} />
             </div>
           </div>
-          <Skeleton className="h-64 w-full rounded-lg" />
+          <Skeleton className="h-64 w-full rounded-sq-sm" />
           <div className="flex gap-4">
             <Skeleton className="h-8 w-16" />
             <Skeleton className="h-8 w-20" />

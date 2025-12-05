@@ -89,7 +89,7 @@ const MessagesPage = () => {
                     {conversationsLoading ? (
                       <div className="space-y-2">
                         {[...Array(3)].map((_, i) => (
-                          <div key={i} className="p-3 bg-muted rounded-lg animate-pulse">
+                          <div key={i} className="p-3 bg-muted rounded-sq-sm animate-pulse">
                             <div className="h-4 bg-muted-foreground/20 rounded w-3/4 mb-2"></div>
                             <div className="h-3 bg-muted-foreground/20 rounded w-1/2"></div>
                           </div>
@@ -104,7 +104,7 @@ const MessagesPage = () => {
                       filteredConversations.map((conversation) => (
                         <div
                           key={conversation.friend_id}
-                          className={`p-3 rounded-lg cursor-pointer transition-colors hover:bg-muted/60 ${
+                          className={`p-3 rounded-sq-sm cursor-pointer transition-colors hover:bg-muted/60 ${
                             selectedFriendId === conversation.friend_id ? 'bg-muted' : ''
                           }`}
                           onClick={() => handleConversationSelect(conversation.friend_id)}

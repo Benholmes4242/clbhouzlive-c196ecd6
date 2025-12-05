@@ -61,7 +61,7 @@ export function Top100RecentRoundsFeed({
               key={`${round.course_id}-${round.played_at}`}
               type="button"
               onClick={() => navigate(`/courses/${round.course_id}`)}
-              className="w-full rounded-none sm:rounded-xl overflow-hidden bg-card border-y sm:border border-border/60 text-left shadow-none sm:shadow-sm hover:sm:shadow-md transition-all"
+              className="w-full rounded-none sm:rounded-sq-md overflow-hidden bg-card border-y sm:border border-border/60 text-left shadow-none sm:shadow-sm hover:sm:shadow-md transition-all"
             >
               {round.image_url && (
                 <div className="relative w-full aspect-[1.6/1] overflow-hidden">

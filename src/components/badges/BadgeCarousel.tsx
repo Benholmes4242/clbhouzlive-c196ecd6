@@ -83,17 +83,17 @@ const BadgeCarousel: React.FC<BadgeCarouselProps> = ({
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="engagement" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-muted/30 p-1 h-12 rounded-xl">
+          <TabsList className="grid w-full grid-cols-2 bg-muted/30 p-1 h-12 rounded-sq-md">
             <TabsTrigger 
               value="engagement" 
-              className="text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200"
+              className="text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-sq-sm transition-all duration-200"
             >
               <Trophy className="h-4 w-4 mr-2" />
               Activity
             </TabsTrigger>
             <TabsTrigger 
               value="top100" 
-              className="text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200"
+              className="text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-sq-sm transition-all duration-200"
             >
               <Target className="h-4 w-4 mr-2" />
               Top 100

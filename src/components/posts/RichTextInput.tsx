@@ -111,7 +111,7 @@ const RichTextInput: React.FC<RichTextInputProps> = ({
         onChange={handleInputChange}
         placeholder={placeholder}
         disabled={disabled}
-        className="w-full min-h-[100px] p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-primary focus:border-transparent bg-transparent relative z-10"
+        className="w-full min-h-[100px] p-3 border border-gray-300 rounded-sq-sm resize-none focus:ring-2 focus:ring-primary focus:border-transparent bg-transparent relative z-10"
         style={{ 
           color: 'transparent',
           caretColor: '#000',

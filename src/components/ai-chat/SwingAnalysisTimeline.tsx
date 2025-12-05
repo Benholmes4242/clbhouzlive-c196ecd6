@@ -90,7 +90,7 @@ export const SwingAnalysisTimeline: React.FC<SwingAnalysisTimelineProps> = ({
                 aria-pressed={isSelected}
                 onClick={() => onSelect(analysis.id)}
                 className={`
-                  flex-1 rounded-xl bg-white/92 border border-black/[0.06] shadow-sm hover:shadow-md 
+                  flex-1 rounded-sq-md bg-white/92 border border-black/[0.06] shadow-sm hover:shadow-md 
                   transition overflow-hidden text-left
                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2A9D8F]
                   ${isSelected ? 'ring-1 ring-[#2A9D8F]/35 shadow-[0_6px_20px_rgba(42,157,143,0.25)]' : ''}

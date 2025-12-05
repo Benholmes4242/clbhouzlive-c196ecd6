@@ -117,7 +117,7 @@ export function HudDropdown({
                     handleClose();
                   }}
                   className={`
-                    w-full text-left px-3 py-2.5 rounded-lg
+                    w-full text-left px-3 py-2.5 rounded-sq-sm
                     text-sm transition
                     ${isSelected ? 'bg-white/18 text-white font-medium' : 'text-white/85 hover:bg-white/10'}
                   `}

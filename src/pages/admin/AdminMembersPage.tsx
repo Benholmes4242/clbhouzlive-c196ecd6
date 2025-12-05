@@ -521,7 +521,7 @@ export function AdminMembersPage() {
                 {/* Mobile card view */}
                 <div className="sm:hidden space-y-3">
                   {rows.map(r => (
-                    <div key={r.user_id} className="rounded-lg border p-4 space-y-3">
+                    <div key={r.user_id} className="rounded-sq-sm border p-4 space-y-3">
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">

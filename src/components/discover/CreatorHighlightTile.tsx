@@ -26,7 +26,7 @@ const CreatorHighlightTile: React.FC<CreatorHighlightTileProps> = ({
     <div className={`px-4 md:container md:mx-auto md:px-0 ${className}`}>
       <div
         onClick={() => onCreatorClick(creator)}
-        className="bg-white rounded-xl border border-border overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300"
+        className="bg-white rounded-sq-md border border-border overflow-hidden cursor-pointer group hover:shadow-lg transition-all duration-300"
       >
         {/* Hero Image */}
         <div className="relative h-40 bg-muted overflow-hidden">

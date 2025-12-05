@@ -75,7 +75,7 @@ const PhotoEditor: React.FC<PhotoEditorProps> = ({
         <div className="space-y-6">
           {/* Editor Canvas */}
           <div className="flex justify-center">
-            <div className="border rounded-lg overflow-hidden">
+            <div className="border rounded-sq-sm overflow-hidden">
               <AvatarEditor
                 ref={editorRef}
                 image={imageFile}

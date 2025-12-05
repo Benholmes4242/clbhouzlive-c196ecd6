@@ -36,7 +36,7 @@ export const Top100ListFriendsCarousel: React.FC<Top100ListFriendsCarouselProps>
             See how your friends are progressing on the {listName} Top 100.
           </p>
         </div>
-        <div className="mt-3 mx-4 px-4 py-4 rounded-2xl bg-slate-50 border border-slate-100">
+        <div className="mt-3 mx-4 px-4 py-4 rounded-sq-lg bg-slate-50 border border-slate-100">
           <p className="text-sm font-semibold text-slate-700">
             No friends on this list yet
           </p>

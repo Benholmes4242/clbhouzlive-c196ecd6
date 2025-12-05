@@ -81,15 +81,15 @@ const OptimizedProfileTabs: React.FC<OptimizedProfileTabsProps> = ({
           <div className="space-y-6">
             <h2 className="text-2xl font-bold">Progress Overview</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-card rounded-lg border p-6">
+              <div className="bg-card rounded-sq-sm border p-6">
                 <h3 className="text-lg font-semibold mb-2">Courses Played</h3>
                 <p className="text-3xl font-bold text-primary">{profileData.coursesPlayed}</p>
               </div>
-              <div className="bg-card rounded-lg border p-6">
+              <div className="bg-card rounded-sq-sm border p-6">
                 <h3 className="text-lg font-semibold mb-2">Courses Rated</h3>
                 <p className="text-3xl font-bold text-primary">{profileData.coursesRated}</p>
               </div>
-              <div className="bg-card rounded-lg border p-6">
+              <div className="bg-card rounded-sq-sm border p-6">
                 <h3 className="text-lg font-semibold mb-2">Average Rating</h3>
                 <p className="text-3xl font-bold text-primary">
                   {profileData.averageRating ? profileData.averageRating : 'N/A'}

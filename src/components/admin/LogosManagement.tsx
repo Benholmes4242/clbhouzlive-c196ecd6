@@ -212,7 +212,7 @@ const LogosManagement = () => {
               <span className="text-sm text-muted-foreground">Current Active Logo</span>
               {theme === 'dark' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
             </div>
-            <div className="mx-auto w-48 h-32 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center overflow-hidden">
+            <div className="mx-auto w-48 h-32 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-sq-sm border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center overflow-hidden">
               {currentLogo ? (
                 <img
                   src={currentLogo.file_url}
@@ -234,7 +234,7 @@ const LogosManagement = () => {
                 <span className="font-medium">Light Mode Logo</span>
                 <span className="text-xs text-muted-foreground">({lightLogos.length})</span>
               </div>
-              <div className="bg-white border rounded-lg p-4 min-h-[120px] flex items-center justify-center">
+              <div className="bg-white border rounded-sq-sm p-4 min-h-[120px] flex items-center justify-center">
                 {lightLogos.length > 0 ? (
                   <div className="text-center space-y-2">
                     <img
@@ -257,7 +257,7 @@ const LogosManagement = () => {
                 <span className="font-medium">Dark Mode Logo</span>
                 <span className="text-xs text-muted-foreground">({darkLogos.length})</span>
               </div>
-              <div className="bg-gray-900 border rounded-lg p-4 min-h-[120px] flex items-center justify-center">
+              <div className="bg-gray-900 border rounded-sq-sm p-4 min-h-[120px] flex items-center justify-center">
                 {darkLogos.length > 0 ? (
                   <div className="text-center space-y-2">
                     <img
@@ -285,7 +285,7 @@ const LogosManagement = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
         {categoryLogos.map((logo) => (
           <Card key={logo.id} className="p-3">
-            <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden mb-2">
+            <div className="aspect-square bg-gray-50 rounded-sq-sm overflow-hidden mb-2">
               <img
                 src={logo.file_url}
                 alt={logo.file_name}
@@ -381,13 +381,13 @@ const LogosManagement = () => {
           
           {/* Preview and Save Section */}
           {pendingUpload && (
-            <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
+            <div className="space-y-4 p-4 border rounded-sq-sm bg-muted/50">
               <div className="flex items-center gap-2 mb-2">
                 <span className="font-medium">Preview:</span>
                 <span className="text-sm text-muted-foreground">{pendingUpload.name}</span>
               </div>
               <div className="flex justify-center">
-                <div className="w-32 h-24 border rounded-lg overflow-hidden bg-white flex items-center justify-center">
+                <div className="w-32 h-24 border rounded-sq-sm overflow-hidden bg-white flex items-center justify-center">
                   <img
                     src={URL.createObjectURL(pendingUpload)}
                     alt="Logo preview"

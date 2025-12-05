@@ -31,7 +31,7 @@ const EngagementPrompts: React.FC<EngagementPromptsProps> = ({
     prompts.push(
       <div
         key="first-post"
-        className="bg-gradient-to-br from-background to-muted/50 border border-border rounded-xl p-5 shadow-sm"
+        className="bg-gradient-to-br from-background to-muted/50 border border-border rounded-sq-md p-5 shadow-sm"
       >
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
@@ -61,7 +61,7 @@ const EngagementPrompts: React.FC<EngagementPromptsProps> = ({
     prompts.push(
       <div
         key="course-engagement"
-        className="bg-gradient-to-br from-background to-emerald-50/50 border border-border rounded-xl p-5 shadow-sm"
+        className="bg-gradient-to-br from-background to-emerald-50/50 border border-border rounded-sq-md p-5 shadow-sm"
       >
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -121,7 +121,7 @@ const EngagementPrompts: React.FC<EngagementPromptsProps> = ({
     prompts.push(
       <div
         key={randomPrompt.key}
-        className={`bg-gradient-to-br from-background to-${randomPrompt.bgColor.split('-')[1]}-50/50 border ${randomPrompt.borderColor} rounded-xl p-5 shadow-sm`}
+        className={`bg-gradient-to-br from-background to-${randomPrompt.bgColor.split('-')[1]}-50/50 border ${randomPrompt.borderColor} rounded-sq-md p-5 shadow-sm`}
       >
         <div className="flex items-start gap-4">
           <div className={`w-12 h-12 ${randomPrompt.bgColor} rounded-full flex items-center justify-center flex-shrink-0`}>

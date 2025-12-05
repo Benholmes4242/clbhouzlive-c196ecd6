@@ -91,7 +91,7 @@ const AchievementsSection: React.FC<AchievementsSectionProps> = ({
               {inProgressAchievements.map((achievement) => (
                 <div
                   key={achievement.id}
-                  className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border"
+                  className="flex items-center gap-3 p-3 bg-gray-50 rounded-sq-sm border"
                 >
                   <div className="text-gray-400">
                     {getAchievementIcon(achievement.type)}

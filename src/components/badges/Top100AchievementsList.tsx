@@ -169,7 +169,7 @@ const Top100AchievementsList: React.FC<Top100AchievementsListProps> = ({
       <div className="space-y-4">
         {[1, 2, 3, 4].map(i => (
           <div key={i} className="animate-pulse">
-            <div className="flex items-center gap-4 p-4 rounded-2xl border">
+            <div className="flex items-center gap-4 p-4 rounded-sq-lg border">
               <div className="w-12 h-12 bg-muted rounded-full"></div>
               <div className="flex-1">
                 <div className="h-5 bg-muted rounded mb-2"></div>
