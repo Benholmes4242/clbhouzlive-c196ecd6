@@ -383,8 +383,8 @@ const HeroProfileHeader = ({
           ref={profileCardRef}
           className="relative mx-auto max-w-[540px] px-5 pt-16 pb-8 bg-background"
         >
-          {/* AVATAR – OVERLAPS HERO BY ~10% */}
-          <div className="absolute left-1/2 -top-[135px] -translate-x-1/2 z-20">
+          {/* AVATAR – OVERLAPS HERO */}
+          <div className="absolute left-1/2 -top-[200px] -translate-x-1/2 z-20">
             <ProfileAvatarRing
               photoUrl={profile?.profile_photo_url}
               displayName={displayName}
