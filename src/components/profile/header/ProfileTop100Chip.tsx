@@ -44,12 +44,12 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
   const completionStamps = getCompletionStamps(top100Overview.lists);
 
   return (
-    <div className="px-4 mt-6">
+    <section className="mt-4 flex flex-col items-center">
       <button
         type="button"
         onClick={() => navigate('/top100?tab=my-progress')}
         className={cn(
-          'flex items-center justify-center gap-2 mt-4',
+          'flex items-center justify-center gap-2',
           'transition-all duration-200 ease-out',
           'active:scale-[0.98]',
           'hover:scale-[1.01]'
@@ -71,7 +71,7 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
           <ProfileCompletionStamps stamps={completionStamps} />
         </div>
       )}
-    </div>
+    </section>
   );
 };
 
