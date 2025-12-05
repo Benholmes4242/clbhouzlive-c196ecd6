@@ -20,7 +20,7 @@ export function ShortsCarousel({ videos, onVideoClick }: ShortsCarouselProps) {
   };
 
   return (
-    <div className="bg-[#111] rounded-xl p-6 shadow-[0_8px_24px_rgba(0,0,0,0.35)]">
+    <div className="bg-[#111] rounded-sq-md p-6 shadow-[0_8px_24px_rgba(0,0,0,0.35)]">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-white font-semibold text-lg">Shorts</h3>
         <span className="text-sm text-gray-400">Quick highlights</span>
@@ -38,7 +38,7 @@ export function ShortsCarousel({ videos, onVideoClick }: ShortsCarouselProps) {
             whileHover={{ y: -2 }}
           >
             {/* Thumbnail/Video */}
-            <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-gray-900 shadow-lg">
+            <div className="relative aspect-[2/3] rounded-sq-md overflow-hidden bg-gray-900 shadow-lg">
               <HLSVideo
                 hlsUrl={video.hlsUrl}
                 src={video.src}

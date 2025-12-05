@@ -109,7 +109,7 @@ export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
           return (
             <div
               key={list.listId}
-              className="bg-card rounded-2xl border border-border/60 p-4 text-left space-y-2"
+              className="bg-card rounded-sq-md border border-border/60 p-4 text-left space-y-2"
             >
               {/* Title */}
               <h3 className="font-semibold text-sm text-foreground">{list.listName}</h3>

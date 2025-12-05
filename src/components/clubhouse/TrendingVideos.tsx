@@ -153,7 +153,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
             return (
               <div
                 key={`${video.id}-${actualIndex}`}
-                className={`relative bg-muted rounded-lg overflow-hidden cursor-pointer group ${
+                className={`relative bg-muted rounded-sq-sm overflow-hidden cursor-pointer group ${
                   isMobile ? 'h-[60vh]' : 'aspect-[9/8]'
                 }`}
                 onClick={() => handleVideoClick(actualIndex)}

@@ -219,7 +219,7 @@ const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia, show
                 key={key}
                 type="button"
                 onClick={onClick}
-                className="flex w-full items-center gap-3 rounded-2xl bg-background/90 px-4 py-3 shadow-sm active:scale-[0.99] transition-transform"
+                className="flex w-full items-center gap-3 rounded-sq-md bg-background/90 px-4 py-3 shadow-sm active:scale-[0.99] transition-transform"
               >
                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-foreground/5">
                   <Icon className="w-5 h-5 text-foreground/80" />

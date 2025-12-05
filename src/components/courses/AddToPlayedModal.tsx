@@ -225,7 +225,7 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
           <div className="space-y-3">
             <Label className="text-base font-medium">Photos & Videos (Optional)</Label>
             <div className="space-y-3">
-              <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4">
+              <div className="border-2 border-dashed border-muted-foreground/25 rounded-sq-sm p-4">
                 <label htmlFor="media-upload" className="cursor-pointer block text-center">
                   <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">

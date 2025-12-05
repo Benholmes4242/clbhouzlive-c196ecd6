@@ -133,7 +133,7 @@ export function WeeklyHighlightsCarousel({ currentUserId }: WeeklyHighlightsCaro
             <div
               key={highlight.id}
               className={cn(
-                'flex-shrink-0 w-[200px] rounded-2xl border px-3 py-2.5 snap-start',
+                'flex-shrink-0 w-[200px] rounded-sq-md border px-3 py-2.5 snap-start',
                 'transition-all duration-300 animate-in fade-in slide-in-from-right-4',
                 HIGHLIGHT_COLORS[highlight.type],
                 isCurrentUser && 'ring-2 ring-amber-400/50'

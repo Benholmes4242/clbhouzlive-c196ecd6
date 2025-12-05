@@ -11,7 +11,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
   onAddVoiceNote
 }) => {
   return (
-    <div className="rounded-2xl bg-white/95 border border-black/[0.06] shadow-[0_8px_30px_rgba(0,0,0,0.06)] overflow-hidden">
+    <div className="rounded-sq-md bg-white/95 border border-black/[0.06] shadow-[0_8px_30px_rgba(0,0,0,0.06)] overflow-hidden">
       <div className="px-4 sm:px-5 py-3 flex items-center gap-2">
         {onShare && (
           <button

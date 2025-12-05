@@ -28,7 +28,7 @@ export function SwingHistoryList({ onSelect }: SwingHistoryListProps) {
         <button
           key={analysis.id}
           onClick={() => onSelect(analysis.id)}
-          className="w-full text-left p-4 bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+          className="w-full text-left p-4 bg-white/5 hover:bg-white/10 rounded-sq-sm transition-colors"
         >
           <div className="font-medium text-white mb-1">{analysis.title}</div>
           <div className="text-sm text-white/60">{analysis.date}</div>

@@ -81,7 +81,7 @@ export const ReviewsHeaderCard: React.FC<ReviewsHeaderCardProps> = ({
   }
 
   return (
-    <div className="rounded-2xl bg-white shadow-sm px-4 py-4">
+    <div className="rounded-sq-md bg-white shadow-sm px-4 py-4">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
@@ -111,7 +111,7 @@ export const ReviewsHeaderCard: React.FC<ReviewsHeaderCardProps> = ({
         <div className="mt-4">
           <Button
             type="button"
-            className="w-full h-11 rounded-lg"
+            className="w-full h-11 rounded-sq-sm"
             variant="outline"
             onClick={onRateCourse}
           >

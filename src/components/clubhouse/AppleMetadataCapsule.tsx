@@ -54,7 +54,7 @@ const AppleMetadataCapsuleBase = ({
   return (
     <div
       className={cn(
-        'glass-dark flex min-w-0 items-center gap-3 px-4 py-3 rounded-2xl min-w-[240px] max-w-[300px]',
+        'glass-dark flex min-w-0 items-center gap-3 px-4 py-3 rounded-sq-md min-w-[240px] max-w-[300px]',
         className
       )}
     >

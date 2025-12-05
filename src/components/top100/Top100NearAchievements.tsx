@@ -34,7 +34,7 @@ export function Top100NearAchievements({ totalTop100Played }: Top100NearAchievem
           <button
             key={m.id}
             type="button"
-            className="flex min-w-[180px] items-center gap-3 rounded-2xl bg-card border border-border/60 px-3 py-2.5 text-left shadow-[0_1px_4px_rgba(15,23,42,0.06)] hover:bg-accent/50 transition-colors"
+            className="flex min-w-[180px] items-center gap-3 rounded-sq-md bg-card border border-border/60 px-3 py-2.5 text-left shadow-[0_1px_4px_rgba(15,23,42,0.06)] hover:bg-accent/50 transition-colors"
           >
             {/* Mini squircle - new spec: 1/1.05 aspect ratio, 34% border radius */}
             <div 

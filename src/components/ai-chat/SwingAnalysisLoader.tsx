@@ -61,7 +61,7 @@ export const SwingAnalysisLoader = ({ isAnalyzing }: SwingAnalysisLoaderProps) =
       : "Almost done...";
 
   return (
-    <div className="rounded-2xl overflow-hidden border border-black/[0.06] bg-white animate-pulse">
+    <div className="rounded-sq-md overflow-hidden border border-black/[0.06] bg-white animate-pulse">
       {/* Video skeleton */}
       <div className="h-40 bg-black/10" />
       

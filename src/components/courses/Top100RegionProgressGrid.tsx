@@ -57,11 +57,11 @@ export function Top100RegionProgressGrid({
               key={list.listSlug}
               type="button"
               onClick={() => onListClick(list.listSlug)}
-              className="w-full rounded-2xl border border-border/70 bg-card/90 px-4 py-3 text-left shadow-xs hover:shadow-md hover:bg-muted/40 transition-shadow transition-colors flex items-center justify-between gap-3"
+              className="w-full rounded-sq-md border border-border/70 bg-card/90 px-4 py-3 text-left shadow-xs hover:shadow-md hover:bg-muted/40 transition-shadow transition-colors flex items-center justify-between gap-3"
             >
               {/* Left side: icon + names */}
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center flex-shrink-0">
+                <div className="w-9 h-9 rounded-sq-md bg-muted flex items-center justify-center flex-shrink-0">
                   {getRegionIcon(list.listSlug)}
                 </div>
 

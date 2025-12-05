@@ -24,16 +24,16 @@ function Calendar({
         caption_label: "text-sm font-medium",
         nav: "space-x-1 flex items-center",
         nav_button: cn(
-          "h-7 w-7 bg-white/10 hover:bg-white/20 text-white p-0 border border-white/20 rounded-md transition-colors"
+          "h-7 w-7 bg-white/10 hover:bg-white/20 text-white p-0 border border-white/20 rounded-sq-xs transition-colors"
         ),
         nav_button_previous: "absolute left-1",
         nav_button_next: "absolute right-1",
         table: "w-full border-collapse space-y-1",
         head_row: "flex",
         head_cell:
-          "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
+          "text-muted-foreground rounded-sq-xs w-9 font-normal text-[0.8rem]",
         row: "flex w-full mt-2",
-        cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-white/10 [&:has([aria-selected])]:bg-white/10 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+        cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-sq-xs [&:has([aria-selected].day-outside)]:bg-white/10 [&:has([aria-selected])]:bg-white/10 first:[&:has([aria-selected])]:rounded-l-sq-xs last:[&:has([aria-selected])]:rounded-r-sq-xs focus-within:relative focus-within:z-20",
         day: cn(
           buttonVariants({ variant: "ghost" }),
           "h-9 w-9 p-0 font-normal aria-selected:opacity-100"
