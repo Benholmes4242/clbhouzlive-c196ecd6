@@ -52,7 +52,7 @@ export function BottomSheet({
         aria-hidden="true"
       />
       <div
-        className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-[28px] shadow-[0_-4px_24px_rgba(0,0,0,0.12)] transform transition-transform duration-300 ${className}`}
+        className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-sq-lg shadow-[0_-4px_24px_rgba(0,0,0,0.12)] transform transition-transform duration-300 ${className}`}
         style={{ 
           zIndex: zIndexBase + 1,
           maxHeight: '90vh',
