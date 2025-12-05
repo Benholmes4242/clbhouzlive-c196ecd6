@@ -44,13 +44,23 @@ export function Top100AchievementBadge({
         boxShadow: `0 4px 16px color-mix(in srgb, ${ringColor} 15%, rgba(0,0,0,0.08)), inset 0 1px 0 rgba(255,255,255,0.5)`,
       }}
     >
-      <Top100TrophyIcon
+      <div
         className={cn(
-          'shrink-0',
-          isCompact ? 'h-4 w-4' : 'h-5 w-5'
+          'flex items-center justify-center rounded-sq-xs shrink-0',
+          isCompact ? 'h-5 w-5' : 'h-6 w-6'
         )}
-        style={{ color: ringColor }}
-      />
+        style={{
+          background: `linear-gradient(135deg, color-mix(in srgb, ${ringColor} 60%, #ffffff), ${ringColor})`,
+          boxShadow: `0 2px 6px color-mix(in srgb, ${ringColor} 30%, rgba(0,0,0,0.15))`,
+        }}
+      >
+        <Top100TrophyIcon
+          className={cn(
+            'text-white',
+            isCompact ? 'h-3 w-3' : 'h-3.5 w-3.5'
+          )}
+        />
+      </div>
       <span
         className={cn(
           'font-semibold leading-tight',
