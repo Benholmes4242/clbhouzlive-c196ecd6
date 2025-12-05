@@ -36,10 +36,16 @@ export function Top100NearAchievements({ totalTop100Played }: Top100NearAchievem
             type="button"
             className="flex min-w-[180px] items-center gap-3 rounded-2xl bg-card border border-border/60 px-3 py-2.5 text-left shadow-[0_1px_4px_rgba(15,23,42,0.06)] hover:bg-accent/50 transition-colors"
           >
-            {/* Mini squircle */}
+            {/* Mini squircle - new spec: 1/1.05 aspect ratio, 34% border radius */}
             <div 
-              className="flex h-10 w-10 items-center justify-center rounded-[14px] border-2 bg-white text-xs font-semibold"
-              style={{ borderColor: m.ringColor, color: m.ringColor }}
+              className="flex items-center justify-center bg-white text-xs font-semibold"
+              style={{ 
+                width: '40px',
+                aspectRatio: '1 / 1.05',
+                borderRadius: '34%',
+                border: `2px solid ${m.ringColor}`,
+                color: m.ringColor,
+              }}
             >
               {m.threshold}
             </div>
