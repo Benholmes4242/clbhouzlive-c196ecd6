@@ -85,7 +85,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   const displayBio = shouldTruncateBio && !bioExpanded ? `${bio.slice(0, 120)}...` : bio;
 
   return (
-    <section className="-mt-[25px] flex flex-col items-center text-center gap-1.5">
+    <section className="-mt-[45px] flex flex-col items-center text-center gap-1.5">
       {/* NAME - Larger and bolder */}
       <h1 className="text-3xl md:text-4xl font-semibold text-slate-900">
         {displayName}
