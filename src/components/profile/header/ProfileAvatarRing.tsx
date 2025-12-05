@@ -64,7 +64,8 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
     return getRingColorForTier(tierInfo.tierId);
   }, [isPersonal, tierInfo.tierId, totalTop100Played]);
   
-  const showRing = isPersonal && totalTop100Played >= 5 && tierColor;
+  // TEMPORARY: Disabled achievement rings for testing
+  const showRing = false; // isPersonal && totalTop100Played >= 5 && tierColor;
   
   // Trigger animation when first visible
   useEffect(() => {
