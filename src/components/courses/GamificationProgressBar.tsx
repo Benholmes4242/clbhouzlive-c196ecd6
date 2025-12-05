@@ -948,7 +948,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                         ) : selectedTrophy.id === 'course-collector' ? (
                           <img src="/lovable-uploads/3c517cb5-203d-4ad8-b3b5-e5e7c33a24b0.png" alt="Trophy" className="h-16 w-auto" />
                         ) : (
-                          <div className={cn('h-16 w-16 rounded-full flex items-center justify-center bg-gradient-to-br', selectedTrophy.color)}>
+                          <div className={cn('h-16 w-16 rounded-sq-md flex items-center justify-center bg-gradient-to-br', selectedTrophy.color)}>
                             <Trophy className="w-8 h-8 text-foreground" />
                           </div>
                         )

@@ -18,9 +18,9 @@ export interface AchievementBadgeProps {
 }
 
 /**
- * AchievementBadge - Apple Glass Ultra Capsule style
+ * AchievementBadge - SDS Squircle Glass style
  * 
- * A premium frosted glass capsule badge with the user's Top 100 achievement info.
+ * A premium frosted glass squircle badge with the user's Top 100 achievement info.
  * Uses the exact same color as the achievement ring around the avatar.
  * 
  * @example
@@ -57,15 +57,15 @@ export function AchievementBadge({
         basePadding,
         maxWidth,
         baseGap,
-        'rounded-[999px]',
+        'rounded-sq-md', // SDS squircle
         'backdrop-blur-xl',
         'border',
         className
       )}
       style={{
-        background: `radial-gradient(circle at 0% 0%, color-mix(in srgb, ${ringColor} 12%, rgba(255,255,255,0.78)), color-mix(in srgb, ${ringColor} 22%, rgba(255,255,255,0.22)))`,
-        borderColor: 'rgba(255,255,255,0.65)',
-        boxShadow: `0 10px 30px rgba(0,0,0,0.18), 0 0 0 1px ${ringColor}33`,
+        background: `linear-gradient(135deg, color-mix(in srgb, ${ringColor} 15%, rgba(255,255,255,0.85)), color-mix(in srgb, ${ringColor} 25%, rgba(255,255,255,0.65)))`,
+        borderColor: `color-mix(in srgb, ${ringColor} 30%, rgba(255,255,255,0.7))`,
+        boxShadow: `0 8px 32px color-mix(in srgb, ${ringColor} 20%, rgba(0,0,0,0.12)), inset 0 1px 0 rgba(255,255,255,0.5)`,
       }}
     >
       {/* Text block (left) */}
@@ -99,23 +99,23 @@ export function AchievementBadge({
         </span>
       </div>
 
-      {/* Medallion (right) */}
+      {/* Medallion (right) - also squircle */}
       <div
         className={cn(
-          'relative flex items-center justify-center rounded-full',
+          'relative flex items-center justify-center rounded-sq-sm',
           medallionSize
         )}
         style={{
-          background: `radial-gradient(circle at 30% 0%, #ffffff, ${ringColor})`,
-          boxShadow: `0 6px 14px rgba(0,0,0,0.20), 0 0 18px ${ringColor}80`,
+          background: `linear-gradient(135deg, color-mix(in srgb, ${ringColor} 70%, #ffffff), ${ringColor})`,
+          boxShadow: `0 4px 12px color-mix(in srgb, ${ringColor} 40%, rgba(0,0,0,0.2)), inset 0 1px 0 rgba(255,255,255,0.4)`,
         }}
       >
         {/* Inner jewel ring */}
         <div
-          className="relative flex items-center justify-center rounded-full w-[70%] h-[70%]"
+          className="relative flex items-center justify-center rounded-sq-xs w-[70%] h-[70%]"
           style={{
-            background: 'rgba(255,255,255,0.10)',
-            boxShadow: '0 0 0 1px rgba(255,255,255,0.35)',
+            background: 'rgba(255,255,255,0.15)',
+            boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.35)',
           }}
         >
           <Trophy
