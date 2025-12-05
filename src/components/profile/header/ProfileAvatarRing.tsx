@@ -20,11 +20,11 @@ interface ProfileAvatarRingProps {
   animateOnFirstView?: boolean;
 }
 
-// Size configurations - outer size, then 1px ring, 1px white gap, then avatar
+// Size configurations - outer size, then 1.5px ring, 1px white gap, then avatar
 const SIZES = {
-  sm: { outer: 68, white: 66, avatar: 64 },
-  md: { outer: 92, white: 90, avatar: 88 },
-  lg: { outer: 180, white: 178, avatar: 176 },
+  sm: { outer: 68, white: 65, avatar: 63 },
+  md: { outer: 92, white: 89, avatar: 87 },
+  lg: { outer: 180, white: 177, avatar: 175 },
 };
 
 const RING_ANIMATED_KEY = 'clbhouz:ringAnimated:v1';
