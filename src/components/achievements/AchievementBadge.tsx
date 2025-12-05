@@ -45,9 +45,9 @@ export function AchievementBadge({
   const basePadding = isLarge ? 'px-5 py-3' : 'px-4 py-2';
   const maxWidth = isLarge ? 'max-w-[420px]' : 'max-w-[340px]';
   const baseGap = isLarge ? 'gap-4' : 'gap-3';
-  const baseTextCount = isLarge ? 'text-xl' : 'text-lg';
-  const baseTextTitle = isLarge ? 'text-base' : 'text-sm';
-  const baseTextTier = isLarge ? 'text-sm' : 'text-xs';
+  const baseTextCount = isLarge ? 'text-2xl' : 'text-xl';
+  const baseTextTitle = isLarge ? 'text-lg' : 'text-base';
+  const baseTextTier = isLarge ? 'text-base' : 'text-sm';
   const trophySize = isLarge ? 'h-8 w-8' : 'h-7 w-7';
 
   return (
