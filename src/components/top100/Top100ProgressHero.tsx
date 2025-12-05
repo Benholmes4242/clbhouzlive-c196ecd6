@@ -64,7 +64,7 @@ function LargeProgressAvatar({
       >
         <div
           className="w-full h-full overflow-hidden"
-          style={{ borderRadius: '32%', border: '2.5px solid #D1D5DB' }}
+          style={{ borderRadius: '33%', border: '1px solid #D1D5DB' }}
         >
           {avatarContent}
         </div>
@@ -79,7 +79,7 @@ function LargeProgressAvatar({
         width: `${size}px`,
         aspectRatio: '1 / 1.05',
         borderRadius: '34%',
-        border: '2.5px solid #D1D5DB',
+        border: '1px solid #D1D5DB',
       }}
     >
       {avatarContent}
