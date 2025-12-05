@@ -49,7 +49,7 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
               tabIndex={isActive ? 0 : -1}
               disabled={disabled}
               className={cn(
-                'rounded-sq-pill text-sm px-3 py-[6px] font-medium transition-all duration-motion-fast ease-standard',
+                'rounded-sq-pill text-base px-3 py-[6px] font-medium transition-all duration-motion-fast ease-standard',
                 isActive
                   ? 'bg-background shadow-sm text-foreground'
                   : 'text-muted-foreground hover:text-foreground',
