@@ -1,5 +1,16 @@
 import React from "react";
 
+/**
+ * @deprecated Use <SquircleAvatar> from @/components/ui/SquircleAvatar.tsx instead
+ * 
+ * This SVG-based component is deprecated in favor of the CSS-based SquircleAvatar
+ * which uses the new global squircle spec:
+ * - Aspect ratio: 1 / 1.05
+ * - Border radius: 34%
+ * - Normal state: 1px grey ring
+ * - Achievement state: 1.5px colored outer ring + 1px grey inner ring
+ */
+
 function superellipsePath(w: number, h: number, n = 5, steps = 200) {
   const a = w / 2, b = h / 2, m = 2 / n;
   const pts: string[] = [];
@@ -14,14 +25,17 @@ function superellipsePath(w: number, h: number, n = 5, steps = 200) {
 }
 
 type Props = {
-  size: number;              // e.g. 84
+  size: number;
   src: string;
   alt?: string;
-  ringColor?: string;        // e.g. '#6e9277'
-  ringWidth?: number;        // e.g. 2
+  ringColor?: string;
+  ringWidth?: number;
   className?: string;
 };
 
+/**
+ * @deprecated Use <SquircleAvatar> from @/components/ui/SquircleAvatar.tsx instead
+ */
 export default function SquircleImage({
   size,
   src,
@@ -30,6 +44,14 @@ export default function SquircleImage({
   ringWidth = 0,
   className
 }: Props) {
+  // DEPRECATED warning in development
+  if (process.env.NODE_ENV === 'development') {
+    console.warn(
+      '⚠️ DEPRECATED: SquircleImage is deprecated!\n' +
+      '✅ Use <SquircleAvatar> from @/components/ui/SquircleAvatar.tsx instead.'
+    );
+  }
+  
   const id = React.useId();
   const d = superellipsePath(size, size, 5, 220);
 
@@ -53,7 +75,6 @@ export default function SquircleImage({
         <path d={d} fill="none" stroke={ringColor} strokeWidth={ringWidth} />
       )}
 
-      {/* Safari-safe: use <image> + clipPath (avoid foreignObject) */}
       <image
         href={src}
         width={size}

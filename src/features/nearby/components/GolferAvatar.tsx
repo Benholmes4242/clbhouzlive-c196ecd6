@@ -1,25 +1,40 @@
 import React from 'react';
-import { Squircle } from '@/components/ui/squircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import './nearby.css';
 
 interface GolferAvatarProps {
   avatarUrl?: string;
   displayName: string;
   size?: number;
+  /** Achievement ring color (optional) */
+  ringColor?: string | null;
 }
 
+/**
+ * GolferAvatar - Uses the global SquircleAvatar component
+ * New squircle spec: 1/1.05 aspect ratio, 34% border radius
+ */
 export function GolferAvatar({ 
   avatarUrl, 
   displayName, 
-  size = 52 
+  size = 52,
+  ringColor
 }: GolferAvatarProps) {
+  const initials = displayName
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map(part => part[0])
+    .join('')
+    .toUpperCase() || '?';
+
   return (
-    <Squircle width={size} height={size}>
-      <img
-        src={avatarUrl || '/placeholder.svg'}
-        alt={displayName}
-        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-      />
-    </Squircle>
+    <SquircleAvatar
+      src={avatarUrl}
+      alt={displayName}
+      size={size}
+      fallback={initials}
+      ringColor={ringColor}
+    />
   );
 }
