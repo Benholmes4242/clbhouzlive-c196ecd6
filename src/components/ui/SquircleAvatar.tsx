@@ -160,10 +160,10 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
         {/* Outer achievement ring */}
         <div
           className="relative overflow-hidden"
-          style={{
+        style={{
             width: `${pixelSize}px`,
             aspectRatio: '1 / 1.05',
-            borderRadius: '34%',
+            borderRadius: '30%',
             border: `2.5px solid ${ringColor}`,
             boxShadow: `0 0 6px ${ringColor}88`,
           }}
@@ -172,7 +172,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
           <div
             className="w-full h-full overflow-hidden"
             style={{
-              borderRadius: '34%',
+              borderRadius: '30%',
               border: '2.5px solid #D1D5DB',
             }}
           >
@@ -199,7 +199,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
         style={{
           width: `${pixelSize}px`,
           aspectRatio: '1 / 1.05',
-          borderRadius: '34%',
+          borderRadius: '30%',
           border: '2.5px solid #D1D5DB',
         }}
       >
