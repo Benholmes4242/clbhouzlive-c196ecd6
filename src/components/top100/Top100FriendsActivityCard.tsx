@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ChevronDown, ChevronUp, Trophy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { getTop100Club } from '@/lib/top100Club';
 
 interface Top100FriendEntry {
   friend_id: string;
@@ -110,6 +111,7 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
                 src={friend.profile_photo_url}
                 alt={friend.display_name ?? 'Friend'}
                 fallback={(friend.display_name ?? 'F').charAt(0).toUpperCase()}
+                ringColor={friend.total_top100_played >= 5 ? getTop100Club(friend.total_top100_played).ringColor : null}
               />
               
               <div className="flex-1 min-w-0">
