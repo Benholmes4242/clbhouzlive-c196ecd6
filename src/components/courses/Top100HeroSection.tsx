@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Top100Ring } from '@/lib/top100Club';
 import { getRingColorForTier } from '@/lib/top100Club';
-import { Squircle } from '@/components/ui/squircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Top100AchievementBadge } from '@/components/top100/Top100AchievementBadge';
 
 export interface Top100HeroSectionProps {
@@ -34,44 +34,24 @@ export function Top100HeroSection({
     .toUpperCase()
     .slice(0, 2) || '?';
 
-  // Get ring color from unified tier system
-  const tierColor = getRingColorForTier(clubRing);
+  // Get ring color from unified tier system - only show if user has earned a ring
+  const hasAchievementRing = clubRing && clubRing !== 'none';
+  const tierColor = hasAchievementRing ? getRingColorForTier(clubRing) : null;
 
   return (
     <div className="flex flex-col items-center text-center space-y-4 py-4">
-      {/* Avatar with achievement tier ring */}
+      {/* Avatar with achievement tier ring - follows global avatar ring rule */}
       <div className="relative flex items-center justify-center">
-        {/* Outer tier ring using squircle mask - 2px */}
-        <Squircle width={150} height={150}>
-          <div 
-            className="w-full h-full flex items-center justify-center shadow-[0_10px_30px_rgba(0,0,0,0.16)]"
-            style={{ backgroundColor: tierColor }}
-          >
-            {/* White ring layer - 1px */}
-            <Squircle width={146} height={146}>
-              <div className="w-full h-full bg-white flex items-center justify-center">
-                {/* Avatar */}
-                <Squircle width={144} height={144}>
-                  {avatarUrl ? (
-                    <img
-                      src={avatarUrl}
-                      alt={displayName ?? 'Player avatar'}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-2xl font-semibold bg-muted text-foreground">
-                      {initials}
-                    </div>
-                  )}
-                </Squircle>
-              </div>
-            </Squircle>
-          </div>
-        </Squircle>
+        <SquircleAvatar
+          size={144}
+          src={avatarUrl}
+          alt={displayName ?? 'Player avatar'}
+          fallback={initials}
+          ringColor={tierColor}
+          className="shadow-[0_10px_30px_rgba(0,0,0,0.16)]"
+        />
         {/* Achievement badge pill - overlaying bottom of avatar */}
-        {clubRing && clubRing !== 'none' && (
+        {hasAchievementRing && (
           <div className="absolute -bottom-4 left-1/2 -translate-x-1/2">
             <Top100AchievementBadge
               tier={clubRing}
