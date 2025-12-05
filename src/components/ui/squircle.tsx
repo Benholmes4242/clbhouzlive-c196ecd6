@@ -41,8 +41,8 @@ interface SquircleProps {
  * User avatars must use the new CSS-based SquircleAvatar which has:
  * - Aspect ratio: 1 / 1.05 (slightly taller than wide)
  * - Border radius: 34% (continuous soft squircle)
- * - Normal state: 1px grey ring
- * - Achievement state: 1.5px colored outer ring + 1px grey inner ring
+ * - Normal state (no achievement): 1px grey ring
+ * - Achievement state: 1px colored ring directly on avatar (no grey ring)
  * 
  * @param width - Width in pixels
  * @param height - Height in pixels  
