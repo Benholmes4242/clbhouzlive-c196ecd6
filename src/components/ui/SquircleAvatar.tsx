@@ -116,7 +116,8 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   // Calculate fallback font size based on avatar size
   const fallbackFontSize = Math.round(pixelSize * 0.38);
 
-  const hasAchievementRing = Boolean(ringColor);
+  // TEMPORARY: Disabled achievement rings for testing
+  const hasAchievementRing = false; // Boolean(ringColor);
 
   // Inner avatar content (image or fallback)
   const avatarContent = (
