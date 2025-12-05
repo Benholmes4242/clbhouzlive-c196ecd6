@@ -99,33 +99,13 @@ export function AchievementBadge({
         </span>
       </div>
 
-      {/* Medallion (right) - also squircle */}
-      <div
+      <Top100TrophyIcon
         className={cn(
-          'relative flex items-center justify-center rounded-sq-sm',
-          medallionSize
+          'shrink-0',
+          isLarge ? 'h-8 w-8' : 'h-7 w-7'
         )}
-        style={{
-          background: `linear-gradient(135deg, color-mix(in srgb, ${ringColor} 70%, #ffffff), ${ringColor})`,
-          boxShadow: `0 4px 12px color-mix(in srgb, ${ringColor} 40%, rgba(0,0,0,0.2)), inset 0 1px 0 rgba(255,255,255,0.4)`,
-        }}
-      >
-        {/* Inner jewel ring */}
-        <div
-          className="relative flex items-center justify-center rounded-sq-xs w-[70%] h-[70%]"
-          style={{
-            background: 'rgba(255,255,255,0.15)',
-            boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.35)',
-          }}
-        >
-          <Top100TrophyIcon
-            className={cn(
-              'text-white drop-shadow-sm',
-              isLarge ? 'h-4 w-4' : 'h-3.5 w-3.5'
-            )}
-          />
-        </div>
-      </div>
+        style={{ color: ringColor }}
+      />
     </div>
   );
 }
