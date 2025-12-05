@@ -44,7 +44,7 @@ export default function VideoSearchOverlay({ open, onClose, onPick }: VideoSearc
           >
             <X size={24} />
           </button>
-          <div className="flex-1 bg-white/70 rounded-xl px-4 py-2.5 flex items-center gap-3">
+          <div className="flex-1 bg-white/70 rounded-sq-md px-4 py-2.5 flex items-center gap-3">
             <Search size={20} className="text-gray-500" />
             <input
               ref={inputRef}
@@ -73,7 +73,7 @@ export default function VideoSearchOverlay({ open, onClose, onPick }: VideoSearc
             {recent.map(r => (
               <button
                 key={r}
-                className="rounded-lg px-4 py-2.5 bg-white/60 hover:bg-white/80 transition-colors text-left"
+                className="rounded-sq-sm px-4 py-2.5 bg-white/60 hover:bg-white/80 transition-colors text-left"
                 onClick={() => commit(r)}
               >
                 {r}

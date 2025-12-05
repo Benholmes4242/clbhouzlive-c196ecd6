@@ -71,7 +71,7 @@ export const SeasonRecapModal: React.FC<SeasonRecapModalProps> = ({
             </p>
           </div>
 
-          <div className="w-full space-y-3 bg-muted/20 rounded-lg p-4">
+          <div className="w-full space-y-3 bg-muted/20 rounded-sq-sm p-4">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Final Rank</span>
               <span className="font-bold text-lg">#{finalRank}</span>

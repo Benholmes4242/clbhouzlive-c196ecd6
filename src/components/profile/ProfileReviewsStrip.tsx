@@ -22,7 +22,7 @@ const ProfileReviewsStrip: React.FC<Props> = ({ userId, username, displayName })
 
   if (isLoading) {
     return (
-      <section className="mt-4 rounded-2xl border border-border/60 bg-card/80 px-4 py-3">
+      <section className="mt-4 rounded-sq-md border border-border/60 bg-card/80 px-4 py-3">
         <div className="flex items-center justify-between mb-2">
           <div className="text-xs font-medium text-foreground">
             Latest reviews by {name}
@@ -31,7 +31,7 @@ const ProfileReviewsStrip: React.FC<Props> = ({ userId, username, displayName })
         </div>
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-10 w-full rounded-xl" />
+            <Skeleton key={i} className="h-10 w-full rounded-sq-md" />
           ))}
         </div>
       </section>
@@ -41,7 +41,7 @@ const ProfileReviewsStrip: React.FC<Props> = ({ userId, username, displayName })
   // No reviews – show a very light touch block or nothing
   if (!reviews.length) {
     return (
-      <section className="mt-4 rounded-2xl border border-border/60 bg-card/80 px-4 py-3">
+      <section className="mt-4 rounded-sq-md border border-border/60 bg-card/80 px-4 py-3">
         <div className="text-body-sm font-medium text-foreground">
           Latest reviews by {name}
         </div>
@@ -57,7 +57,7 @@ const ProfileReviewsStrip: React.FC<Props> = ({ userId, username, displayName })
   };
 
   return (
-    <section className="mt-4 rounded-2xl border border-border/60 bg-card/80 px-4 py-3">
+    <section className="mt-4 rounded-sq-md border border-border/60 bg-card/80 px-4 py-3">
       {/* Header */}
       <div className="mb-2 flex items-center justify-between gap-2">
         <div className="text-body-sm font-medium text-foreground">
@@ -96,7 +96,7 @@ const ProfileReviewsStrip: React.FC<Props> = ({ userId, username, displayName })
               key={r.id}
               type="button"
               onClick={() => navigate(`/courses/${r.course_id}`)}
-              className="w-full rounded-xl border border-border/50 bg-background/40 px-3 py-2 text-left hover:bg-background/70 transition-colors"
+              className="w-full rounded-sq-md border border-border/50 bg-background/40 px-3 py-2 text-left hover:bg-background/70 transition-colors"
             >
               <div className="flex items-center justify-between gap-2">
                 <div className="min-w-0">

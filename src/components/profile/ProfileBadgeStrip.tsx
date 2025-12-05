@@ -156,7 +156,7 @@ const ProfileBadgeStrip: React.FC<ProfileBadgeStripProps> = ({
             </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content
-                className="bg-popover text-popover-foreground text-sm px-3 py-2 rounded-lg max-w-xs z-50"
+                className="bg-popover text-popover-foreground text-sm px-3 py-2 rounded-sq-sm max-w-xs z-50"
                 sideOffset={4}
               >
                 {badge.tooltip}

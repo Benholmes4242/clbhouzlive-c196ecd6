@@ -28,7 +28,7 @@ export function ClubSearchInput({ onClubSelect, onClear, selectedClub }: ClubSea
 
   if (selectedClub) {
     return (
-      <div className="max-w-md mx-auto rounded-xl bg-white/5 backdrop-blur-md border border-white/10 px-4 py-3">
+      <div className="max-w-md mx-auto rounded-sq-md bg-white/5 backdrop-blur-md border border-white/10 px-4 py-3">
         <div className="flex items-center justify-between">
           <div>
             <div className="text-xs text-white/50 mb-1">Viewing games at</div>

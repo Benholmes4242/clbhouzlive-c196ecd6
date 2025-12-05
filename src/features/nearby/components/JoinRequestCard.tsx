@@ -25,7 +25,7 @@ export function JoinRequestCard({ request, onAccept, onDecline }: JoinRequestCar
   };
 
   return (
-    <div className="rounded-lg bg-white/5 border border-white/10 p-3">
+    <div className="rounded-sq-sm bg-white/5 border border-white/10 p-3">
       <div className="flex items-start gap-3 mb-3">
         {/* Avatar */}
         <SquircleAvatar 

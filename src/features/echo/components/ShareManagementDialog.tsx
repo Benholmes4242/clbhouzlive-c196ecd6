@@ -138,7 +138,7 @@ export const ShareManagementDialog: React.FC<ShareManagementDialogProps> = ({
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[10000]" onClick={onClose}>
-        <div className="bg-background rounded-xl p-6 max-w-2xl w-full mx-4" onClick={e => e.stopPropagation()}>
+        <div className="bg-background rounded-sq-md p-6 max-w-2xl w-full mx-4" onClick={e => e.stopPropagation()}>
           <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
@@ -147,7 +147,7 @@ export const ShareManagementDialog: React.FC<ShareManagementDialogProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[10000]" onClick={onClose}>
-      <div className="bg-background rounded-xl p-6 max-w-2xl w-full max-h-[90vh] mx-4 flex flex-col" onClick={e => e.stopPropagation()}>
+      <div className="bg-background rounded-sq-md p-6 max-w-2xl w-full max-h-[90vh] mx-4 flex flex-col" onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div>
@@ -156,7 +156,7 @@ export const ShareManagementDialog: React.FC<ShareManagementDialogProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-muted rounded-lg transition-colors"
+            className="p-2 hover:bg-muted rounded-sq-sm transition-colors"
             aria-label="Close"
           >
             <X size={20} />
@@ -168,7 +168,7 @@ export const ShareManagementDialog: React.FC<ShareManagementDialogProps> = ({
           <button
             onClick={handleRotate}
             disabled={saving}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-sq-sm hover:bg-primary/90 disabled:opacity-50 transition-colors"
           >
             <RefreshCw size={16} />
             Rotate Link
@@ -176,7 +176,7 @@ export const ShareManagementDialog: React.FC<ShareManagementDialogProps> = ({
           <button
             onClick={handlePreview}
             disabled={!shareToken}
-            className="flex items-center gap-2 px-4 py-2 border border-border rounded-lg hover:bg-muted disabled:opacity-50 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 border border-border rounded-sq-sm hover:bg-muted disabled:opacity-50 transition-colors"
           >
             Preview
           </button>
@@ -193,7 +193,7 @@ export const ShareManagementDialog: React.FC<ShareManagementDialogProps> = ({
               <button
                 key={msg.id}
                 onClick={() => toggleRedaction(msg.id)}
-                className="w-full text-left p-3 rounded-lg border transition-all hover:border-primary"
+                className="w-full text-left p-3 rounded-sq-sm border transition-all hover:border-primary"
                 style={{
                   borderColor: state === 'none' ? 'var(--border)' : state === 'hide' ? 'hsl(var(--destructive))' : 'hsl(var(--warning))',
                   opacity: state === 'hide' ? 0.5 : 1,
@@ -234,13 +234,13 @@ export const ShareManagementDialog: React.FC<ShareManagementDialogProps> = ({
           <button
             onClick={handleSaveRedactions}
             disabled={saving || !shareToken}
-            className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
+            className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-sq-sm hover:bg-primary/90 disabled:opacity-50 transition-colors"
           >
             {saving ? 'Saving...' : 'Save Redactions'}
           </button>
           <button
             onClick={onClose}
-            className="px-4 py-2 border border-border rounded-lg hover:bg-muted transition-colors"
+            className="px-4 py-2 border border-border rounded-sq-sm hover:bg-muted transition-colors"
           >
             Close
           </button>

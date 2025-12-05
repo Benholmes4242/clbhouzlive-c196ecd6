@@ -66,7 +66,7 @@ export function EchoHistoryTile({
               {chatLoading && (
                 <>
                   {[0, 1, 2].map(i => (
-                    <div key={i} className="h-[68px] rounded-xl mb-2 animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
+                    <div key={i} className="h-[68px] rounded-sq-md mb-2 animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
                   ))}
                 </>
               )}
@@ -79,7 +79,7 @@ export function EchoHistoryTile({
                 <button
                   key={item.id}
                   onClick={comingSoon}
-                  className="w-full text-left rounded-xl bg-white/5 hover:bg-white/7 transition px-3 py-2.5 mb-2 flex items-start gap-2 border border-white/6"
+                  className="w-full text-left rounded-sq-md bg-white/5 hover:bg-white/7 transition px-3 py-2.5 mb-2 flex items-start gap-2 border border-white/6"
                 >
                   <span className="inline-flex h-[22px] w-[22px] rounded-full items-center justify-center bg-white/10 mr-1">
                     🗨️
@@ -112,7 +112,7 @@ export function EchoHistoryTile({
               {swingLoading && (
                 <>
                   {[0, 1].map(i => (
-                    <div key={i} className="h-[140px] rounded-2xl mb-3 animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
+                    <div key={i} className="h-[140px] rounded-sq-md mb-3 animate-pulse" style={{ background: 'var(--hub-glass-bg-subtle)' }} />
                   ))}
                 </>
               )}
@@ -125,7 +125,7 @@ export function EchoHistoryTile({
                 <button
                   key={item.id}
                   onClick={comingSoon}
-                  className="w-full mb-3 rounded-2xl overflow-hidden relative border border-white/6 bg-white/5 hover:bg-white/7 transition"
+                  className="w-full mb-3 rounded-sq-md overflow-hidden relative border border-white/6 bg-white/5 hover:bg-white/7 transition"
                 >
                   {/* Title above thumb */}
                   <div className="px-3 pt-3 pb-2 text-[14px] leading-tight">
@@ -134,7 +134,7 @@ export function EchoHistoryTile({
 
                   {/* Thumbnail with overlay */}
                   <div className="relative px-3 pb-3">
-                    <div className="rounded-xl overflow-hidden relative h-[92px]">
+                    <div className="rounded-sq-md overflow-hidden relative h-[92px]">
                       {item.thumbnail_url ? (
                         <video
                           src={item.thumbnail_url}

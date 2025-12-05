@@ -133,7 +133,7 @@ export function Top100PilgrimageView({ userId }: Top100PilgrimageViewProps) {
         </p>
         <button
           onClick={() => navigate('/auth')}
-          className="px-4 py-2 rounded-lg bg-primary-accent text-white text-sm font-medium"
+          className="px-4 py-2 rounded-sq-sm bg-primary-accent text-white text-sm font-medium"
         >
           Sign in
         </button>

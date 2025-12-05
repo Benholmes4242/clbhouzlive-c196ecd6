@@ -53,7 +53,7 @@ export function VideoCardPair({ video, autoRegister, onVideoClick, onEchoToggle 
     >
       {/* Thumbnail/Video */}
       <div
-        className="relative aspect-[1.2/1] rounded-xl overflow-hidden bg-gray-900 shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
+        className="relative aspect-[1.2/1] rounded-sq-md overflow-hidden bg-gray-900 shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
         onMouseEnter={() => setIsPreviewing(true)}
         onMouseLeave={() => setIsPreviewing(false)}
       >
