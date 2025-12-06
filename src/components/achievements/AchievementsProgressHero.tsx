@@ -44,10 +44,10 @@ export const AchievementsProgressHero: React.FC<AchievementsProgressHeroProps> =
             ringColor={club.ringColor}
           />
           <div className="flex-1 min-w-0">
-            <p className="text-xs md:text-sm text-slate-500 truncate">
+            <p className="text-xs md:text-sm text-muted-foreground truncate">
               @{username} • {totalTop100Played} Top 100 courses played
             </p>
-            <p className="text-sm md:text-base font-semibold text-slate-900">
+            <p className="text-sm md:text-base font-semibold">
               {unlockedMilestonesCount} milestone{unlockedMilestonesCount === 1 ? '' : 's'} unlocked · {completedListsCount} list{completedListsCount === 1 ? '' : 's'} completed
             </p>
           </div>
@@ -56,7 +56,7 @@ export const AchievementsProgressHero: React.FC<AchievementsProgressHeroProps> =
         {/* Progress bar to next milestone */}
         {nextMilestone && (
           <div className="space-y-1">
-            <div className="flex justify-between text-[11px] md:text-xs text-slate-500">
+            <div className="flex justify-between text-[11px] md:text-xs text-muted-foreground">
               <span>Progress to next milestone</span>
               <span>{totalTop100Played} / {nextMilestone} courses</span>
             </div>
@@ -76,7 +76,7 @@ export const AchievementsProgressHero: React.FC<AchievementsProgressHeroProps> =
             <span className="font-medium text-emerald-700">
               Next: {nextMilestone} Club
             </span>
-            <span className="text-slate-500">
+            <span className="text-muted-foreground">
               {remaining} more to go
             </span>
           </div>

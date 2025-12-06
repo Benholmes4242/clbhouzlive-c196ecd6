@@ -21,18 +21,6 @@ const MilestonesAndAchievementsPage: React.FC = () => {
 
   const isLoading = sessionLoading || profileLoading || progressLoading;
 
-  // Debug logging to track data state on navigation
-  console.log('[MilestonesPage] Render state:', { 
-    isLoading, 
-    sessionLoading, 
-    profileLoading, 
-    progressLoading,
-    hasUser: !!user,
-    hasProfile: !!profile,
-    hasProgress: !!progressData,
-    totalTop100Played: progressData?.totalTop100Played 
-  });
-
   const handleBack = () => {
     navigate(-1);
   };
@@ -53,11 +41,8 @@ const MilestonesAndAchievementsPage: React.FC = () => {
   const avatarUrl = profile?.profile_photo_url;
 
   return (
-    <div 
-      className="min-h-screen text-foreground" 
-      style={{ backgroundColor: 'hsl(210 40% 96.1%)', color: 'hsl(222.2 84% 4.9%)' }}
-    >
-      <div className="max-w-4xl mx-auto px-4 pt-4 pb-24 md:px-8 md:pt-8 text-slate-900">
+    <div className="min-h-screen bg-background">
+      <div className="max-w-4xl mx-auto px-4 pt-4 pb-24 md:px-8 md:pt-8">
         {/* Top Bar */}
         <header className="flex items-center justify-between mb-4 md:mb-6">
           <button

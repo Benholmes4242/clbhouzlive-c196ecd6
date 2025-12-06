@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
@@ -452,18 +451,6 @@ const HeroProfileHeader = ({
           onFollowingClick={handleOpenFollowing}
           onFriendsClick={handleOpenFriends}
         />
-
-        {/* See all achievements CTA */}
-        <div className="flex justify-center mb-3">
-          <button
-            type="button"
-            onClick={() => navigate('/milestonesandachievements')}
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
-          >
-            See all achievements
-            <ChevronRight className="h-3.5 w-3.5" />
-          </button>
-        </div>
 
         {/* Tab Navigation - outside constrained container for full width */}
         <ProfileTabsNav

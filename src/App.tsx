@@ -103,6 +103,7 @@ const FriendsListPage = lazy(() => import("./pages/FriendsListPage"));
 const Top100Hub = lazy(() => import("./pages/Top100Hub"));
 const Top100List = lazy(() => import("./pages/Top100List"));
 
+const AchievementsHubPage = lazy(() => import("./pages/AchievementsHubPage"));
 const MilestonesAndAchievementsPage = lazy(() => import("./pages/MilestonesAndAchievementsPage"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
@@ -223,6 +224,7 @@ function AppRoutes() {
         
         <Route path="/top100" element={<Top100Hub />} />
         <Route path="/top100/:slug" element={<Top100List />} />
+        <Route path="/achievementshub" element={<Suspense fallback={<GenericPageSkeleton />}><AchievementsHubPage /></Suspense>} />
         <Route path="/milestonesandachievements" element={<Suspense fallback={<GenericPageSkeleton />}><MilestonesAndAchievementsPage /></Suspense>} />
         <Route path="/admin-setup" element={<AdminSetupPage />} />
         
