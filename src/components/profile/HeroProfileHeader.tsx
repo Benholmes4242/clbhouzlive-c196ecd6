@@ -428,15 +428,6 @@ const HeroProfileHeader = ({
             />
           )}
 
-          {/* Achievements Rail - Strava-style trophy strip */}
-          {isPersonal && profile?.id && username && (
-            <ProfileAchievementsRail
-              userId={profile.id}
-              username={username}
-              className="mt-6"
-            />
-          )}
-
           {/* Stats Row */}
           <ProfileStatsRow
             postsCount={postsCount}
@@ -451,6 +442,15 @@ const HeroProfileHeader = ({
           />
 
         </div>
+
+        {/* Achievements Rail - outside constrained container for full width */}
+        {isPersonal && profile?.id && username && (
+          <ProfileAchievementsRail
+            userId={profile.id}
+            username={username}
+            className="mt-6"
+          />
+        )}
 
         {/* Tab Navigation - outside constrained container for full width */}
         <ProfileTabsNav
