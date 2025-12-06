@@ -52,7 +52,7 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
         </h2>
         <button
           type="button"
-          onClick={() => navigate('/achievementshub')}
+          onClick={() => navigate('/milestonesandachievements')}
           className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80"
         >
           View all
