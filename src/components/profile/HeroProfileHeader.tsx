@@ -28,9 +28,10 @@ import {
   ProfileTabsNavV2,
 } from './header';
 
-// Tab content components
-import ActivityFeed from './ActivityFeed';
-import { ProfileCoursesTab } from './ProfileCoursesTab';
+// Tab content components - V2 for Profile 2.0
+import ActivityFeedV2 from './ActivityFeedV2';
+import ProfileCoursesTabV2 from './ProfileCoursesTabV2';
+import ProfileTop100TabV2 from './ProfileTop100TabV2';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import Top100PublicJourneyPanel from '@/components/top100/Top100PublicJourneyPanel';
 import AchievementsPane from './AchievementsPane';
@@ -265,7 +266,7 @@ const HeroProfileHeader = ({
       switch (activeSection) {
         case 'activity':
           return (
-            <ActivityFeed
+            <ActivityFeedV2
               userId={profile?.id || ''}
               isOwnProfile={isOwnProfile}
               profileDisplayName={profile?.display_name}
@@ -276,18 +277,17 @@ const HeroProfileHeader = ({
           );
         case 'courses':
           return (
-            <ProfileCoursesTab 
+            <ProfileCoursesTabV2 
               userId={profile?.id || ''}
               isOwnProfile={isOwnProfile}
             />
           );
         case 'top100':
-          return isOwnProfile ? (
-            <Top100MyProgressPanel userId={profile?.id} />
-          ) : (
-            <Top100PublicJourneyPanel 
-              profileUserId={profile?.id || ''}
-              profileName={profile?.display_name}
+          return (
+            <ProfileTop100TabV2
+              userId={profile?.id || ''}
+              isOwnProfile={isOwnProfile}
+              displayName={profile?.display_name}
             />
           );
         case 'achievements':
