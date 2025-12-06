@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Globe, Building2, User } from 'lucide-react';
+import { ChevronDown, ChevronUp, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ProfileHeaderCardProps {
@@ -25,9 +25,9 @@ interface ProfileHeaderCardProps {
 }
 
 /**
- * ProfileHeaderCard - Centered typography for name, handle, club, bio
- * Premium Golf style - clean, centered, Apple-like
- * Font weight hierarchy: name (semibold) → club/HCP (medium) → bio + customise (normal)
+ * ProfileHeaderCard - Modern social app style (Strava/TikTok/LinkedIn)
+ * Mobile: centered, Desktop: left-aligned
+ * Tight vertical spacing for more room for achievements
  */
 const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   displayName,
@@ -55,98 +55,84 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
     return url.startsWith('http') ? url : `https://${url}`;
   };
   
-  // Get user type badge label
-  const getUserTypeBadge = () => {
-    if (isPersonal) return 'Golfer';
-    switch (userType) {
-      case 'club': return 'Golf Club';
-      case 'brand': return 'Brand';
-      case 'creator': return 'Creator';
-      default: return 'Business';
-    }
-  };
-  
-  // Build the subtitle line (e.g., "Sunningdale · HCP 4.3")
-  const getSubtitleLine = () => {
-    if (isPersonal) {
-      const parts = [];
-      if (homeClub) parts.push(homeClub);
-      if (handicap !== null && handicap !== undefined) parts.push(`HCP ${handicap.toFixed(1)}`);
-      return parts.length > 0 ? parts.join(' · ') : null;
-    } else {
-      // Business subtitle: location
-      const parts = [];
-      if (location) parts.push(location);
-      return parts.length > 0 ? parts.join(' · ') : null;
-    }
-  };
-  
-  const subtitleLine = getSubtitleLine();
   const shouldTruncateBio = bio && bio.length > 120;
   const displayBio = shouldTruncateBio && !bioExpanded ? `${bio.slice(0, 120)}...` : bio;
 
   return (
-    <section className="-mt-[45px] flex flex-col items-center text-center space-y-3 md:space-y-4">
-      {/* NAME – boldest */}
-      <h1 className="text-3xl md:text-4xl font-semibold text-slate-900">
+    <section className="mt-3 flex flex-col items-center px-4 text-center md:items-start md:text-left">
+      {/* Name */}
+      <h1 className="text-xl font-semibold text-foreground">
         {displayName}
       </h1>
 
-      {/* USERNAME – same size family, not bold */}
-      <div className="text-base md:text-lg text-slate-600">
-        @{username}
+      {/* Username + Handicap pill on one line */}
+      <div className="mt-1 flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground md:justify-start">
+        <span>@{username}</span>
+
+        {isPersonal && handicap != null && (
+          <span className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-xs font-medium text-foreground/80">
+            HCP {handicap.toFixed(1)}
+          </span>
+        )}
       </div>
 
-      {/* CLUB + HCP LINE – slightly less bold than name */}
-      {subtitleLine && (
-        <p className="text-base md:text-lg font-medium text-slate-800">
-          {subtitleLine}
+      {/* Club name on its own line (personal) or Location (business) */}
+      {isPersonal && homeClub && (
+        <p className="mt-1 text-sm text-foreground/80">
+          {homeClub}
+        </p>
+      )}
+      
+      {!isPersonal && location && (
+        <p className="mt-1 text-sm text-foreground/80">
+          {location}
         </p>
       )}
       
       {/* Website - Business profiles */}
       {!isPersonal && websiteUrl && (
-        <div className="flex items-center justify-center gap-2 text-base md:text-lg font-medium">
-          <Globe className="w-4 h-4 text-slate-700" />
+        <div className="mt-1 flex items-center gap-1.5 text-sm">
+          <Globe className="w-3.5 h-3.5 text-muted-foreground" />
           <a 
             href={getWebsiteHref(websiteUrl)}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-slate-800 hover:text-slate-600 transition-colors"
+            className="text-primary hover:text-primary/80 transition-colors"
           >
             {formatWebsiteUrl(websiteUrl)}
           </a>
         </div>
       )}
 
-      {/* BIO – lighter again */}
+      {/* Bio – max 2 lines + "Show more" toggle */}
       {bio && (
-        <div className="max-w-[440px]">
-          <p className="text-base md:text-lg font-normal leading-relaxed text-slate-700">
+        <div className="mt-2 max-w-[320px] text-sm text-muted-foreground">
+          <p className="leading-relaxed">
             {displayBio}
           </p>
           {shouldTruncateBio && (
             <button
               onClick={() => setBioExpanded(!bioExpanded)}
-              className="inline-flex items-center gap-1 text-sm font-normal text-slate-500 mt-2 hover:text-slate-700"
+              className="inline-flex items-center gap-0.5 text-xs font-medium text-primary hover:text-primary/80 mt-1"
             >
               {bioExpanded ? (
-                <>Show less <ChevronUp className="w-4 h-4" /></>
+                <>Show less <ChevronUp className="w-3 h-3" /></>
               ) : (
-                <>Show more <ChevronDown className="w-4 h-4" /></>
+                <>Show more <ChevronDown className="w-3 h-3" /></>
               )}
             </button>
           )}
         </div>
       )}
 
-      {/* CUSTOMISE PROFILE – lightest */}
+      {/* Customise profile link */}
       {isOwnProfile && onCustomiseClick && (
         <button
-          className="text-sm md:text-base font-normal text-slate-500 hover:text-slate-700 underline-offset-2 hover:underline transition-colors"
+          type="button"
           onClick={onCustomiseClick}
+          className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80"
         >
-          Customise profile
+          <span className="underline">Customise profile</span>
         </button>
       )}
     </section>

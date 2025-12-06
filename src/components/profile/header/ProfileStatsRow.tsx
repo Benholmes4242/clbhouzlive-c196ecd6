@@ -27,11 +27,11 @@ const StatItem: React.FC<StatItemProps> = ({
   isClickable = false
 }) => {
   const content = (
-    <div className="flex flex-col leading-tight">
-      <span className="text-lg md:text-xl font-semibold text-slate-900 tabular-nums">
+    <div className="flex flex-col items-center">
+      <span className="text-base font-semibold text-foreground tabular-nums">
         {value}
       </span>
-      <span className="mt-1.5 text-sm md:text-base font-medium text-slate-600">
+      <span className="mt-1 text-[11px] uppercase tracking-[0.06em] text-muted-foreground">
         {label}
       </span>
     </div>
@@ -39,7 +39,7 @@ const StatItem: React.FC<StatItemProps> = ({
 
   const baseClasses = cn(
     "transition-all duration-150",
-    isClickable && "cursor-pointer hover:scale-105 hover:opacity-90 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-lg"
+    isClickable && "cursor-pointer hover:opacity-80 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-lg"
   );
 
   if (isClickable && onClick) {
@@ -54,8 +54,8 @@ const StatItem: React.FC<StatItemProps> = ({
 };
 
 /**
- * ProfileStatsRow - Premium Golf stats display
- * Numbers bold, labels regular casing with font-medium
+ * ProfileStatsRow - TikTok/Tinder style compact stats
+ * One row, horizontally centered, small uppercase labels
  */
 const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
   postsCount,
@@ -69,33 +69,31 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
   onFriendsClick
 }) => {
   return (
-    <section className="mt-8 flex justify-center">
-      <div className="flex items-center gap-10 md:gap-14 text-center">
-        <StatItem value={postsCount} label="Posts" />
-        
-        {isPersonal && (
-          <StatItem 
-            value={friendsCount} 
-            label="Friends" 
-            onClick={onFriendsClick}
-            isClickable
-          />
-        )}
-        
+    <section className="mt-5 flex items-center justify-center gap-8 px-4">
+      <StatItem value={postsCount} label="Posts" />
+      
+      {isPersonal && (
         <StatItem 
-          value={followingCount} 
-          label="Following" 
-          onClick={onFollowingClick}
+          value={friendsCount} 
+          label="Friends" 
+          onClick={onFriendsClick}
           isClickable
         />
-        
-        <StatItem 
-          value={followersCount} 
-          label="Followers" 
-          onClick={onFollowersClick}
-          isClickable
-        />
-      </div>
+      )}
+      
+      <StatItem 
+        value={followingCount} 
+        label="Following" 
+        onClick={onFollowingClick}
+        isClickable
+      />
+      
+      <StatItem 
+        value={followersCount} 
+        label="Followers" 
+        onClick={onFollowersClick}
+        isClickable
+      />
     </section>
   );
 };
