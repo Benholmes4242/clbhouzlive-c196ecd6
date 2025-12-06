@@ -1,6 +1,6 @@
 import React from 'react';
 import { getProfileTabs } from '@/hooks/useProfileType';
-import { cn } from '@/lib/utils';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface ProfileTabsNavProps {
   userType: string | null | undefined;
@@ -11,8 +11,7 @@ interface ProfileTabsNavProps {
 }
 
 /**
- * ProfileTabsNav - Apple/TikTok style segment control
- * Pill-shaped with rounded-full container
+ * ProfileTabsNav - Matches SegmentedTabs styling from Explore page
  */
 const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   userType,
@@ -26,39 +25,25 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   return (
     <section className="mt-6 px-4">
       <div className="flex items-center justify-center">
-        <div 
-          className={cn(
-            "inline-flex rounded-full bg-muted p-1 text-xs shadow-inner",
-          )}
-          role="tablist"
-          aria-label="Profile sections"
-        >
-          {tabs.map((tab) => {
-            const isActive = tab.id === activeSection;
-            
-            return (
-              <button
+        <Tabs value={activeSection} onValueChange={onTabChange}>
+          <TabsList 
+            className="grid w-full rounded-sq-md bg-muted/70 border border-border/60 px-2 py-[3px]"
+            style={{ 
+              gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`
+            }}
+          >
+            {tabs.map((tab) => (
+              <TabsTrigger 
                 key={tab.id}
-                onClick={() => !disabled && onTabChange(tab.id)}
-                role="tab"
-                aria-selected={isActive}
-                aria-controls={`tabpanel-${tab.id}`}
-                tabIndex={isActive ? 0 : -1}
+                value={tab.id}
                 disabled={disabled}
-                className={cn(
-                  'relative rounded-full px-4 py-2 transition-all',
-                  'text-xs font-medium',
-                  isActive
-                    ? 'bg-background text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground',
-                  disabled && 'pointer-events-none opacity-50'
-                )}
+                className="rounded-sq-pill text-sm px-3 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard disabled:pointer-events-none disabled:opacity-50"
               >
                 {tab.label}
-              </button>
-            );
-          })}
-        </div>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
       </div>
     </section>
   );
