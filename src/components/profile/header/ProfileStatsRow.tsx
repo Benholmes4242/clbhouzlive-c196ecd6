@@ -1,4 +1,5 @@
 import React from 'react';
+import { Camera, Users, UserPlus, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ProfileStatsRowProps {
@@ -16,6 +17,7 @@ interface ProfileStatsRowProps {
 interface StatItemProps {
   value: number;
   label: string;
+  icon: React.ElementType;
   onClick?: () => void;
   isClickable?: boolean;
 }
@@ -23,15 +25,17 @@ interface StatItemProps {
 const StatItem: React.FC<StatItemProps> = ({ 
   value, 
   label, 
+  icon: Icon,
   onClick, 
   isClickable = false
 }) => {
   const content = (
-    <div className="flex flex-col leading-tight">
-      <span className="text-lg md:text-xl font-semibold text-slate-900 tabular-nums">
+    <div className="flex flex-col items-center gap-1">
+      <Icon className="mb-0.5 h-3.5 w-3.5 text-foreground/60" />
+      <span className="text-[15px] font-semibold text-slate-900 tabular-nums">
         {value}
       </span>
-      <span className="mt-1.5 text-sm md:text-base font-medium text-slate-600">
+      <span className="text-[11px] tracking-[0.04em] text-foreground/60 uppercase">
         {label}
       </span>
     </div>
@@ -54,8 +58,8 @@ const StatItem: React.FC<StatItemProps> = ({
 };
 
 /**
- * ProfileStatsRow - Premium Golf stats display
- * Numbers bold, labels regular casing with font-medium
+ * ProfileStatsRow - Premium stats with icons
+ * 4-column grid with icons above numbers
  */
 const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
   postsCount,
@@ -68,33 +72,29 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
   onFollowingClick,
   onFriendsClick
 }) => {
+  const stats = [
+    { id: 'posts', label: 'Posts', value: postsCount, icon: Camera, isClickable: false },
+    ...(isPersonal ? [{ id: 'friends', label: 'Friends', value: friendsCount, icon: Users, isClickable: true, onClick: onFriendsClick }] : []),
+    { id: 'following', label: 'Following', value: followingCount, icon: UserPlus, isClickable: true, onClick: onFollowingClick },
+    { id: 'followers', label: 'Followers', value: followersCount, icon: Star, isClickable: true, onClick: onFollowersClick },
+  ];
+
   return (
-    <section className="mt-8 flex justify-center">
-      <div className="flex items-center gap-10 md:gap-14 text-center">
-        <StatItem value={postsCount} label="Posts" />
-        
-        {isPersonal && (
+    <section className="mt-6">
+      <div className={cn(
+        "grid gap-4 px-6 text-center",
+        isPersonal ? "grid-cols-4" : "grid-cols-3"
+      )}>
+        {stats.map(({ id, label, value, icon, isClickable, onClick }) => (
           <StatItem 
-            value={friendsCount} 
-            label="Friends" 
-            onClick={onFriendsClick}
-            isClickable
+            key={id}
+            value={value} 
+            label={label} 
+            icon={icon}
+            onClick={onClick}
+            isClickable={isClickable}
           />
-        )}
-        
-        <StatItem 
-          value={followingCount} 
-          label="Following" 
-          onClick={onFollowingClick}
-          isClickable
-        />
-        
-        <StatItem 
-          value={followersCount} 
-          label="Followers" 
-          onClick={onFollowersClick}
-          isClickable
-        />
+        ))}
       </div>
     </section>
   );

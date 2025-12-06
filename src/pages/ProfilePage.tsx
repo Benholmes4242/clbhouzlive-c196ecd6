@@ -82,8 +82,15 @@ const ProfilePage = () => {
     return null;
   }
 
+  // Dynamic background tint style
+  const backgroundStyle = {
+    background:
+      'radial-gradient(circle at top, rgba(46, 120, 70, 0.10), transparent 55%), ' +
+      'linear-gradient(to bottom, #f9fafb, #f3f4f6)',
+  };
+
   return (
-    <div className="min-h-screen bg-background page-with-header relative">
+    <div className="min-h-screen page-with-header relative" style={backgroundStyle}>
       <ClubhouseHeaderNew />
       
       {/* Add spacing for fixed header */}
