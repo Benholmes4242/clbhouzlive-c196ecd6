@@ -14,7 +14,7 @@ import { FEATURE_FLAGS } from '@/config/featureFlags';
 const baseTabs = [
   { id: 'clubhouse', label: 'Clubhouse', icon: HomeIcon, path: '/clubhouse' },
   { id: 'discover', label: 'Explore', icon: IoCompassOutline, path: '/discover' },
-  { id: 'tour', label: 'Tour Central', icon: TrophyIcon, path: '/tour-central' },
+  { id: 'tour', label: 'Tour Hub', icon: TrophyIcon, path: '/tour' },
   { id: 'post', label: 'Post', icon: CameraIcon, path: null, isAction: true },
   { id: 'courses', label: 'Courses', icon: MapPinIcon, path: '/courses' },
 ];

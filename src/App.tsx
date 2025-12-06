@@ -204,7 +204,7 @@ function AppRoutes() {
         <Route path="/user/:username/courses" element={<UserCoursesPage />} />
         <Route path="/my-ratings" element={<MyRatings />} />
         <Route path="/news" element={<News />} />
-        <Route path="/tour-central" element={<Suspense fallback={<TourSkeleton />}><TourCentral /></Suspense>} />
+        <Route path="/tour" element={<Suspense fallback={<TourSkeleton />}><TourCentral /></Suspense>} />
         <Route path="/videos" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><VideosPage /></Suspense>} />
           <Route path="/season-shop" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><SeasonShop /></Suspense>} />
           <Route path="/challenges" element={<Suspense fallback={<GenericPageSkeleton />}><ChallengesPage /></Suspense>} />
