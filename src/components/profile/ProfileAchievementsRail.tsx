@@ -1,6 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ChevronRight, Trophy } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
 import { achievementGlassTint } from '@/lib/achievementDefinitions';
@@ -23,7 +22,6 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
   username,
   className,
 }) => {
-  const navigate = useNavigate();
   const { data: achievements, isLoading } = useProfileAchievements(userId);
 
   // Sort by newest first: higher milestones first (descending by threshold), then list completions
@@ -46,29 +44,18 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
       aria-label="Achievements"
     >
       {/* Title row */}
-      <div className="mb-2 flex items-center justify-between">
+      <div className="mb-2">
         <h2 className="text-sm font-semibold text-foreground">
           Achievements
         </h2>
-
-        <button
-          type="button"
-          onClick={() => navigate(`/profile/${username}/achievements`)}
-          className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80"
-        >
-          View all
-          <ChevronRight className="h-3 w-3" />
-        </button>
       </div>
 
       {/* Horizontal scroll strip */}
       <div className="flex gap-3 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] scrollbar-hide -mx-4 px-4">
         {visible.map(ach => (
-          <button
+          <div
             key={ach.id}
-            type="button"
-            onClick={() => navigate(`/profile/${username}/achievements#${ach.id}`)}
-            className="flex min-w-[120px] max-w-[140px] flex-col items-center rounded-sq-md px-3 py-2 shadow-sm ring-1 ring-black/5 backdrop-blur-md hover:scale-[1.02] transition-all"
+            className="flex min-w-[120px] max-w-[140px] flex-col items-center rounded-sq-md px-3 py-2 shadow-sm ring-1 ring-black/5 backdrop-blur-md"
             style={{
               background: achievementGlassTint(ach.ringColor, ach.glassIntensity),
             }}
@@ -97,7 +84,7 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
             <span className="truncate w-full text-center text-[10px] text-foreground/60">
               {ach.type === 'milestone' ? 'Milestone' : 'Completed'}
             </span>
-          </button>
+          </div>
         ))}
       </div>
     </section>
