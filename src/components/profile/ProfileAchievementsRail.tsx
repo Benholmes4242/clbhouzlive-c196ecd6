@@ -26,14 +26,23 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
   const navigate = useNavigate();
   const { data: achievements, isLoading } = useProfileAchievements(userId);
 
+  // Sort by newest first: higher milestones first (descending by threshold), then list completions
+  // This shows most recently earned achievements on the left
+  const sortedAchievements = [...achievements].sort((a, b) => {
+    // Higher thresholds (bigger milestones) first
+    const aVal = a.threshold ?? 0;
+    const bVal = b.threshold ?? 0;
+    return bVal - aVal;
+  });
+
   // Cap visible to MAX_VISIBLE
-  const visible = achievements.slice(0, MAX_VISIBLE);
+  const visible = sortedAchievements.slice(0, MAX_VISIBLE);
 
   if (isLoading || visible.length === 0) return null;
 
   return (
     <section
-      className={cn("mt-4 px-4", className)}
+      className={cn("px-4", className)}
       aria-label="Achievements"
     >
       {/* Title row */}

@@ -428,21 +428,12 @@ const HeroProfileHeader = ({
             />
           )}
 
-          {/* Achievement Badge - Above achievements rail */}
-          <ProfileTop100Chip
-            top100Overview={{
-              ...top100Overview,
-              lists: undefined
-            }}
-            isPersonal={isPersonal}
-            isMobile={isMobile}
-          />
-
           {/* Achievements Rail - Strava-style trophy strip */}
           {isPersonal && profile?.id && username && (
             <ProfileAchievementsRail
               userId={profile.id}
               username={username}
+              className="mt-6"
             />
           )}
 
