@@ -14,7 +14,10 @@ export interface UnlockedAchievement extends AchievementDefinition {
  * Computes milestone achievements from Top 100 count and list completions from progress
  */
 export function useProfileAchievements(userId: string | undefined | null) {
-  const { data: progressData, isLoading, error } = useTop100ProgressForUser(userId);
+  const { data: progressData, isLoading: queryLoading, error } = useTop100ProgressForUser(userId);
+
+  // Consider loading if userId is falsy (waiting for user data) or if query is loading
+  const isLoading = !userId || queryLoading;
 
   const achievements = useMemo((): UnlockedAchievement[] => {
     if (!progressData) return [];
