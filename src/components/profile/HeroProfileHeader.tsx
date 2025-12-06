@@ -428,19 +428,6 @@ const HeroProfileHeader = ({
             />
           )}
 
-          {/* Stats Row */}
-          <ProfileStatsRow
-            postsCount={postsCount}
-            followersCount={followersCount}
-            followingCount={followingCount}
-            friendsCount={friendsCount}
-            isPersonal={isPersonal}
-            isMobile={isMobile}
-            onFollowersClick={handleOpenFollowers}
-            onFollowingClick={handleOpenFollowing}
-            onFriendsClick={handleOpenFriends}
-          />
-
         </div>
 
         {/* Achievements Rail - outside constrained container for full width */}
@@ -451,6 +438,19 @@ const HeroProfileHeader = ({
             className="mt-6"
           />
         )}
+
+        {/* Stats Row - outside constrained container */}
+        <ProfileStatsRow
+          postsCount={postsCount}
+          followersCount={followersCount}
+          followingCount={followingCount}
+          friendsCount={friendsCount}
+          isPersonal={isPersonal}
+          isMobile={isMobile}
+          onFollowersClick={handleOpenFollowers}
+          onFollowingClick={handleOpenFollowing}
+          onFriendsClick={handleOpenFriends}
+        />
 
         {/* Tab Navigation - outside constrained container for full width */}
         <ProfileTabsNav
