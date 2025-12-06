@@ -92,7 +92,7 @@ const AchievementsHubPage: React.FC = () => {
 
         {/* Progress Hero */}
         <section className="mb-6 md:mb-8">
-          <div className="rounded-sq-lg bg-[radial-gradient(circle_at_top,_hsl(var(--muted)/0.3),_hsl(var(--background)))] border border-border/60 shadow-lg px-4 py-4 md:px-6 md:py-5 flex flex-col gap-3">
+          <div className="rounded-sq-lg bg-gradient-to-b from-muted/30 to-background border border-border/60 shadow-lg px-4 py-4 md:px-6 md:py-5 flex flex-col gap-3">
             {/* Top row: Avatar + text summary */}
             <div className="flex items-center gap-3 md:gap-4">
               <SquircleAvatar 
