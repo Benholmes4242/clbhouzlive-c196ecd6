@@ -24,7 +24,7 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   const tabs = getProfileTabs(userType);
 
   return (
-    <section className="mt-8 px-4">
+    <section className="mt-8">
       <div 
         className={cn(
           "grid w-full rounded-sq-md bg-muted/70 border border-border/60 px-2 py-[3px]",
