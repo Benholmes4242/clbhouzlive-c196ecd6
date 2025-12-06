@@ -29,7 +29,7 @@ export const ListsCompletedSection: React.FC<ListsCompletedSectionProps> = ({
   return (
     <section className="mb-6 md:mb-8">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-base md:text-lg font-semibold">Top 100 Lists Completed</h2>
+        <h2 className="text-base md:text-lg font-semibold text-slate-900">Top 100 Lists Completed</h2>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">

@@ -12,7 +12,7 @@ export const MilestonesSection: React.FC<MilestonesSectionProps> = ({
   return (
     <section className="mb-6 md:mb-8">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-base md:text-lg font-semibold">Top 100 Milestones</h2>
+        <h2 className="text-base md:text-lg font-semibold text-slate-900">Top 100 Milestones</h2>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">

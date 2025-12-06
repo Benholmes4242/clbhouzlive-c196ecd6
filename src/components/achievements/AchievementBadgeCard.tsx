@@ -35,7 +35,7 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         'rounded-sq-lg p-4 md:p-5 flex flex-col justify-between min-h-[120px] md:min-h-[140px] transition-all',
         isUnlocked
           ? 'bg-white shadow-[0_18px_40px_rgba(15,118,110,0.12)] border border-slate-100'
-          : 'bg-muted/60 border border-dashed border-muted-foreground/20 opacity-75'
+          : 'bg-slate-100/60 border border-dashed border-slate-300/40 opacity-75'
       )}
     >
       {/* Icon + Title */}
@@ -46,7 +46,7 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
               'inline-flex items-center justify-center rounded-sq-md w-10 h-10 md:w-11 md:h-11',
               isUnlocked
                 ? 'bg-gradient-to-br from-white to-slate-50'
-                : 'bg-muted'
+                : 'bg-slate-200/60'
             )}
             style={isUnlocked ? { 
               background: `linear-gradient(135deg, rgba(255,255,255,0.95), color-mix(in srgb, ${accentColor} 12%, white))` 
@@ -55,15 +55,15 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
             {icon || (
               <Top100TrophyIcon
                 className="h-5 w-5 md:h-6 md:w-6"
-                style={{ color: isUnlocked ? accentColor : 'currentColor' }}
+                style={{ color: isUnlocked ? accentColor : '#64748b' }}
               />
             )}
           </div>
         </div>
-        <p className="text-sm md:text-base font-semibold leading-snug text-foreground">
+        <p className="text-sm md:text-base font-semibold leading-snug text-slate-900">
           {title}
         </p>
-        <p className="text-[11px] md:text-xs text-muted-foreground mt-0.5">
+        <p className="text-[11px] md:text-xs text-slate-500 mt-0.5">
           {subtitle}
         </p>
       </div>
@@ -72,7 +72,7 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
       <p
         className={cn(
           'mt-3 text-[11px] md:text-xs font-medium',
-          isUnlocked ? 'text-emerald-600' : 'text-muted-foreground'
+          isUnlocked ? 'text-emerald-600' : 'text-slate-400'
         )}
       >
         {isUnlocked
