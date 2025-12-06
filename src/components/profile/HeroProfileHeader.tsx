@@ -450,15 +450,16 @@ const HeroProfileHeader = ({
             onFriendsClick={handleOpenFriends}
           />
 
-          {/* Tab Navigation */}
-          <ProfileTabsNav
-            userType={profile?.user_type}
-            activeSection={activeSection}
-            onTabChange={handleTabChange}
-            isMobile={isMobile}
-            disabled={transitionState !== 'idle'}
-          />
         </div>
+
+        {/* Tab Navigation - outside constrained container for full width */}
+        <ProfileTabsNav
+          userType={profile?.user_type}
+          activeSection={activeSection}
+          onTabChange={handleTabChange}
+          isMobile={isMobile}
+          disabled={transitionState !== 'idle'}
+        />
       </section>
 
       {/* Content sections with slide transitions */}
