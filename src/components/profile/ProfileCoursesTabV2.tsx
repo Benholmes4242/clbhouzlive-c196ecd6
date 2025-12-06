@@ -93,8 +93,47 @@ const ProfileCoursesTabV2: React.FC<ProfileCoursesTabV2Props> = ({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-muted-foreground">Loading...</div>
+      <div className="space-y-6 pb-8 px-4">
+        {/* Skeleton for stats row */}
+        <div className="grid grid-cols-3 gap-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="h-20 rounded-sq-md bg-muted/30 animate-pulse" />
+          ))}
+        </div>
+        {/* Skeleton for controls */}
+        <div className="h-10 rounded-sq-sm bg-muted/30 animate-pulse" />
+        {/* Skeleton for grid */}
+        <div className="grid grid-cols-2 gap-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="aspect-[4/3] rounded-sq-md bg-muted/30 animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Empty state - no courses
+  if (totalCoursesPlayed === 0 && mockCourses.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+        <div className="w-16 h-16 rounded-full bg-muted/30 flex items-center justify-center mb-4">
+          <MapPin className="w-8 h-8 text-muted-foreground/50" />
+        </div>
+        <h3 className="text-lg font-semibold text-foreground mb-2">No courses played yet</h3>
+        <p className="text-muted-foreground text-sm max-w-[280px] mb-6">
+          {isOwnProfile 
+            ? 'Log your rounds and rate courses to build your golf portfolio'
+            : 'No courses to show'
+          }
+        </p>
+        {isOwnProfile && (
+          <button
+            onClick={() => navigate('/courses')}
+            className="px-6 py-2.5 bg-primary text-primary-foreground rounded-full font-medium text-sm hover:bg-primary/90 transition-colors"
+          >
+            Explore Courses
+          </button>
+        )}
       </div>
     );
   }
