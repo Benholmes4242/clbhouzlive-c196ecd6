@@ -32,10 +32,10 @@ import {
 import ActivityFeedV2 from './ActivityFeedV2';
 import ProfileCoursesTabV2 from './ProfileCoursesTabV2';
 import ProfileTop100TabV2 from './ProfileTop100TabV2';
-import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
-import Top100PublicJourneyPanel from '@/components/top100/Top100PublicJourneyPanel';
-import AchievementsPane from './AchievementsPane';
 import HandicapSection from './HandicapSection';
+
+// Achievement components V2
+import { AchievementsGridV2, type AchievementV2 } from './achievements';
 
 // Other profile components
 import ProfileEditDialog from "./ProfileEditDialog";
@@ -291,14 +291,22 @@ const HeroProfileHeader = ({
             />
           );
         case 'achievements':
+          // Convert mock achievements to AchievementV2 format
+          const achievementsData: AchievementV2[] = [
+            { id: 'single-hcp', name: 'Single Figure HCP', description: 'Achieved a single-digit handicap index', category: 'skill', iconKey: 'target', isUnlocked: profile?.eg_handicap_index !== undefined && profile.eg_handicap_index < 10 },
+            { id: 'hole-in-one', name: 'Hole-in-One', description: 'Made a hole-in-one', category: 'skill', iconKey: 'star', isUnlocked: false },
+            { id: 'pb-round', name: 'Personal Best', description: 'Set a new personal best round', category: 'skill', iconKey: 'trophy', isUnlocked: false },
+            { id: '20-club', name: '20 Club', description: 'Played 20 Top 100 courses', category: 'exploration', iconKey: 'flag', isUnlocked: totalTop100Played >= 20, progress: totalTop100Played, maxProgress: 20 },
+            { id: '50-club', name: '50 Club', description: 'Played 50 Top 100 courses', category: 'exploration', iconKey: 'flag', isUnlocked: totalTop100Played >= 50, progress: totalTop100Played, maxProgress: 50 },
+            { id: '100-club', name: '100 Club', description: 'Played 100 Top 100 courses', category: 'exploration', iconKey: 'mountain', isUnlocked: totalTop100Played >= 100, progress: totalTop100Played, maxProgress: 100 },
+            { id: '200-club', name: '200 Club', description: 'Played 200 Top 100 courses', category: 'exploration', iconKey: 'crown', isUnlocked: totalTop100Played >= 200, progress: totalTop100Played, maxProgress: 200 },
+            { id: '300-club', name: '300 Club', description: 'Played 300 Top 100 courses', category: 'exploration', iconKey: 'award', isUnlocked: totalTop100Played >= 300, progress: totalTop100Played, maxProgress: 300 },
+            { id: 'founders', name: 'Founders Club', description: 'Early supporter of Clbhouz', category: 'skill', iconKey: 'zap', isUnlocked: true },
+          ];
           return (
-            <AchievementsPane 
-              userId={profile?.id}
-              userDisplayName={profile?.display_name || 'User'}
-              userHandicap={profile?.eg_handicap_index}
-              userProfilePhotoUrl={profile?.profile_photo_url}
-              isCurrentUser={isOwnProfile}
-            />
+            <div className="px-4 pb-24">
+              <AchievementsGridV2 achievements={achievementsData} />
+            </div>
           );
         case 'stats':
           return (
