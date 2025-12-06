@@ -11,8 +11,8 @@ interface ProfileTabsNavProps {
 }
 
 /**
- * ProfileTabsNav - Matches Explore page tabs styling
- * Segmented control with muted background
+ * ProfileTabsNav - Apple/TikTok style segment control
+ * Pill-shaped with rounded-full container
  */
 const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   userType,
@@ -24,42 +24,41 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   const tabs = getProfileTabs(userType);
 
   return (
-    <section className="mt-8">
-      <div 
-        className={cn(
-          "grid w-full rounded-sq-md bg-muted/70 border border-border/60 px-2 py-[3px]",
-          tabs.length === 4 && "grid-cols-4",
-          tabs.length === 3 && "grid-cols-3",
-          tabs.length === 2 && "grid-cols-2",
-          tabs.length === 1 && "grid-cols-1"
-        )}
-        role="tablist"
-        aria-label="Profile sections"
-      >
-        {tabs.map((tab) => {
-          const isActive = tab.id === activeSection;
-          
-          return (
-            <button
-              key={tab.id}
-              onClick={() => !disabled && onTabChange(tab.id)}
-              role="tab"
-              aria-selected={isActive}
-              aria-controls={`tabpanel-${tab.id}`}
-              tabIndex={isActive ? 0 : -1}
-              disabled={disabled}
-              className={cn(
-                'rounded-sq-pill text-sm px-3 py-[6px] font-medium transition-all duration-motion-fast ease-standard',
-                isActive
-                  ? 'bg-background shadow-sm text-foreground'
-                  : 'text-muted-foreground hover:text-foreground',
-                disabled && 'pointer-events-none opacity-50'
-              )}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
+    <section className="mt-6 px-4">
+      <div className="flex items-center justify-center">
+        <div 
+          className={cn(
+            "inline-flex rounded-full bg-muted p-1 text-xs shadow-inner",
+          )}
+          role="tablist"
+          aria-label="Profile sections"
+        >
+          {tabs.map((tab) => {
+            const isActive = tab.id === activeSection;
+            
+            return (
+              <button
+                key={tab.id}
+                onClick={() => !disabled && onTabChange(tab.id)}
+                role="tab"
+                aria-selected={isActive}
+                aria-controls={`tabpanel-${tab.id}`}
+                tabIndex={isActive ? 0 : -1}
+                disabled={disabled}
+                className={cn(
+                  'relative rounded-full px-4 py-2 transition-all',
+                  'text-xs font-medium',
+                  isActive
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground',
+                  disabled && 'pointer-events-none opacity-50'
+                )}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

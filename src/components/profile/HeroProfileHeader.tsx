@@ -37,6 +37,7 @@ import HandicapSection from './HandicapSection';
 
 // Other profile components
 import ProfileEditDialog from "./ProfileEditDialog";
+import ProfileAchievementsRail from './ProfileAchievementsRail';
 import ImmersiveProfileModal from './immersive/ImmersiveProfileModal';
 import SwipeToReturnZone from './SwipeToReturnZone';
 import ProfileModalRouter from './ProfileModalRouter';
@@ -427,7 +428,7 @@ const HeroProfileHeader = ({
             />
           )}
 
-          {/* Achievement Badge - Above stats row */}
+          {/* Achievement Badge - Above achievements rail */}
           <ProfileTop100Chip
             top100Overview={{
               ...top100Overview,
@@ -436,6 +437,14 @@ const HeroProfileHeader = ({
             isPersonal={isPersonal}
             isMobile={isMobile}
           />
+
+          {/* Achievements Rail - Strava-style trophy strip */}
+          {isPersonal && profile?.id && username && (
+            <ProfileAchievementsRail
+              userId={profile.id}
+              username={username}
+            />
+          )}
 
           {/* Stats Row */}
           <ProfileStatsRow
