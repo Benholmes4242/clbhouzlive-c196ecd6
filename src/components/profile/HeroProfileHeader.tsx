@@ -345,43 +345,46 @@ const HeroProfileHeader = ({
 
   return (
     <SwipeToReturnZone onSwipeDown={reopenImmersive}>
-      {/* Premium Golf Profile Layout - Less blur, subtle gradients */}
+      {/* Premium Golf Profile Layout - No card, seamless gradient */}
       <section className="relative w-full -mt-16">
         
-        {/* HERO IMAGE - less blur, subtle fade */}
-        <div className="relative w-full h-[260px] overflow-hidden">
+        {/* HERO IMAGE */}
+        <div className="relative w-full h-[350px] overflow-hidden">
           {heroSrc ? (
             <img 
               src={heroSrc}
-              className="w-full h-full object-cover scale-[1.03]"
-              alt={`${displayName} cover`}
+              className="w-full h-full object-cover"
+              alt={displayName}
               loading="eager"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
           )}
           
-          {/* Top vignette for nav contrast */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/35 via-black/10 to-transparent" />
+          {/* Top vignette for header readability */}
+          <div 
+            className="absolute top-0 left-0 right-0 h-12 pointer-events-none"
+            style={{
+              background: 'linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, transparent 100%)',
+            }}
+          />
           
-          {/* Bottom fade into page background */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[120px] bg-gradient-to-b from-transparent via-background/60 to-background" />
-          
-          {/* Weather chip - top right */}
-          <div className="absolute right-4 top-4 rounded-full bg-black/35 px-3 py-1.5 text-[11px] text-white backdrop-blur-md flex items-center gap-1.5">
-            <span>☀️</span>
-            <span>18°C</span>
-            <span className="text-white/70">Clear</span>
-          </div>
+          {/* Bottom fade into page - seamless blend */}
+          <div
+            className="pointer-events-none absolute bottom-0 left-0 right-0 h-32"
+            style={{
+              background: 'linear-gradient(to top, hsl(var(--background)) 0%, hsl(var(--background) / 0.85) 25%, hsl(var(--background) / 0.4) 50%, hsl(var(--background) / 0.1) 75%, transparent 100%)',
+            }}
+          />
         </div>
 
-        {/* META BLOCK - transparent, sits on page background */}
+        {/* META BLOCK - no card, transparent, sits on page background */}
         <div
           ref={profileCardRef}
-          className="relative mx-auto max-w-[540px] px-6 pt-[80px] pb-4"
+          className="relative mx-auto max-w-[540px] px-5 pb-2"
         >
           {/* AVATAR – OVERLAPS HERO */}
-          <div className="absolute left-1/2 -top-[64px] -translate-x-1/2 z-20">
+          <div className="absolute left-1/2 -top-[170px] -translate-x-1/2 z-20">
             <ProfileAvatarRing
               photoUrl={profile?.profile_photo_url}
               displayName={displayName}

@@ -11,8 +11,8 @@ interface ProfileTabsNavProps {
 }
 
 /**
- * ProfileTabsNav - iOS-style segmented control
- * Pill-shaped container with rounded pill tabs
+ * ProfileTabsNav - Matches Explore page tabs styling
+ * Segmented control with muted background
  */
 const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   userType,
@@ -23,38 +23,6 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
 }) => {
   const tabs = getProfileTabs(userType);
 
-  // Mobile: iOS segmented control style
-  if (isMobile) {
-    return (
-      <section className="mt-5 px-4">
-        <div className="flex items-center rounded-full bg-black/[0.03] p-2 backdrop-blur-md">
-          {tabs.map((tab) => {
-            const isActive = tab.id === activeSection;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => !disabled && onTabChange(tab.id)}
-                disabled={disabled}
-                className={cn(
-                  "flex-1 rounded-full px-3 py-1.5 text-[13px] font-medium transition-all",
-                  "flex items-center justify-center gap-1.5",
-                  isActive
-                    ? "bg-background shadow-[0_8px_20px_rgba(0,0,0,0.18)] text-foreground"
-                    : "text-foreground/60",
-                  disabled && "pointer-events-none opacity-50"
-                )}
-              >
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-    );
-  }
-
-  // Desktop: Standard segmented control matching Explore
   return (
     <section className="mt-8">
       <div 

@@ -1,8 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getTop100Club } from '@/lib/top100Club';
+import { AchievementBadge } from '@/components/achievements/AchievementBadge';
 import ProfileCompletionStamps from './ProfileCompletionStamps';
 import { getCompletionStamps } from '@/lib/top100Helpers';
 import type { Top100ListProgress } from '@/lib/top100Helpers';
@@ -21,8 +22,8 @@ interface ProfileTop100ChipProps {
 }
 
 /**
- * ProfileTop100Chip - Premium glass badge with tier-colored medallion
- * Only renders if user has at least 5 Top 100 courses
+ * ProfileTop100Chip - Uses the Apple Glass Ultra AchievementBadge
+ * Only renders if user has at least 5 Top 100 courses (first achievement)
  */
 const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
   top100Overview,
@@ -40,48 +41,28 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
   if (totalPlayed < 5) return null;
   
   const club = getTop100Club(totalPlayed);
-  const tierColor = club.ringColor || '#22c55e';
   const completionStamps = getCompletionStamps(top100Overview.lists);
 
   return (
-    <section className="mt-6 flex flex-col items-center">
+    <section className="mt-8 flex flex-col items-center">
       <button
         type="button"
         onClick={() => navigate('/top100?tab=my-progress')}
         className={cn(
-          'mx-auto flex w-[82%] max-w-[360px] items-center justify-between',
-          'rounded-[24px] bg-white/70 px-4 py-3',
-          'shadow-[0_18px_55px_rgba(0,0,0,0.18)] backdrop-blur-md',
+          'relative flex items-center justify-center',
           'transition-all duration-200 ease-out',
-          'active:scale-[0.98] hover:scale-[1.01]'
+          'active:scale-[0.98]',
+          'hover:scale-[1.01]'
         )}
       >
-        {/* Left side: count + label */}
-        <div className="flex flex-col text-left">
-          <div className="flex items-baseline gap-1 text-[15px]">
-            <span className="font-semibold text-slate-900">{totalPlayed}</span>
-            <span className="text-foreground/80">Top 100</span>
-          </div>
-          <span 
-            className="mt-0.5 text-[12px] font-medium"
-            style={{ color: tierColor }}
-          >
-            {club.tierName} Club
-          </span>
-        </div>
-
-        {/* Glass medallion with tier color */}
-        <div
-          className="relative flex h-11 w-11 items-center justify-center rounded-[16px] shadow-[0_12px_32px_rgba(0,0,0,0.32)]"
-          style={{
-            background:
-              `radial-gradient(circle at 20% 0, rgba(255,255,255,0.90), transparent 52%),` +
-              `linear-gradient(135deg, ${tierColor}, ${tierColor}CC)`,
-          }}
-        >
-          <div className="absolute inset-[1.5px] rounded-[14px] border border-white/55" />
-          <Trophy className="relative h-5 w-5 text-white" />
-        </div>
+        <AchievementBadge
+          count={totalPlayed}
+          title="Top 100"
+          tierLabel={club.tierName || 'Top 100 Club'}
+          ringColor={club.ringColor}
+          size="md"
+        />
+        <ChevronRight className="absolute -right-7 h-5 w-5 text-slate-400" />
       </button>
       
       {/* Completion stamps row */}
