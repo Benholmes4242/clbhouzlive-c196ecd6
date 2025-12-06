@@ -18,24 +18,22 @@ import { toast } from 'sonner';
 
 // Modular header components
 import {
+  ProfileHeroShell,
+  ProfileHeaderCard,
+  ProfileStatsRow,
   ProfileActionsRow,
-  // V2 Components - Profile 2.0 redesign
-  ProfileAvatarSquare,
-  ProfileUserInfoBlock,
-  MiniAchievementStrip,
-  HeroTop100Card,
-  ProfileStatsRowV2,
-  ProfileTabsNavV2,
+  ProfileTabsNav,
+  ProfileTop100Chip
 } from './header';
+import ProfileAvatarRing from './header/ProfileAvatarRing';
 
-// Tab content components - V2 for Profile 2.0
-import ActivityFeedV2 from './ActivityFeedV2';
-import ProfileCoursesTabV2 from './ProfileCoursesTabV2';
-import ProfileTop100TabV2 from './ProfileTop100TabV2';
+// Tab content components
+import ActivityFeed from './ActivityFeed';
+import { ProfileCoursesTab } from './ProfileCoursesTab';
+import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
+import Top100PublicJourneyPanel from '@/components/top100/Top100PublicJourneyPanel';
+import AchievementsPane from './AchievementsPane';
 import HandicapSection from './HandicapSection';
-
-// Achievement components V2
-import { AchievementsGridV2, type AchievementV2 } from './achievements';
 
 // Other profile components
 import ProfileEditDialog from "./ProfileEditDialog";
@@ -266,7 +264,7 @@ const HeroProfileHeader = ({
       switch (activeSection) {
         case 'activity':
           return (
-            <ActivityFeedV2
+            <ActivityFeed
               userId={profile?.id || ''}
               isOwnProfile={isOwnProfile}
               profileDisplayName={profile?.display_name}
@@ -277,36 +275,29 @@ const HeroProfileHeader = ({
           );
         case 'courses':
           return (
-            <ProfileCoursesTabV2 
+            <ProfileCoursesTab 
               userId={profile?.id || ''}
               isOwnProfile={isOwnProfile}
             />
           );
         case 'top100':
-          return (
-            <ProfileTop100TabV2
-              userId={profile?.id || ''}
-              isOwnProfile={isOwnProfile}
-              displayName={profile?.display_name}
+          return isOwnProfile ? (
+            <Top100MyProgressPanel userId={profile?.id} />
+          ) : (
+            <Top100PublicJourneyPanel 
+              profileUserId={profile?.id || ''}
+              profileName={profile?.display_name}
             />
           );
         case 'achievements':
-          // Convert mock achievements to AchievementV2 format
-          const achievementsData: AchievementV2[] = [
-            { id: 'single-hcp', name: 'Single Figure HCP', description: 'Achieved a single-digit handicap index', category: 'skill', iconKey: 'target', isUnlocked: profile?.eg_handicap_index !== undefined && profile.eg_handicap_index < 10 },
-            { id: 'hole-in-one', name: 'Hole-in-One', description: 'Made a hole-in-one', category: 'skill', iconKey: 'star', isUnlocked: false },
-            { id: 'pb-round', name: 'Personal Best', description: 'Set a new personal best round', category: 'skill', iconKey: 'trophy', isUnlocked: false },
-            { id: '20-club', name: '20 Club', description: 'Played 20 Top 100 courses', category: 'exploration', iconKey: 'flag', isUnlocked: totalTop100Played >= 20, progress: totalTop100Played, maxProgress: 20 },
-            { id: '50-club', name: '50 Club', description: 'Played 50 Top 100 courses', category: 'exploration', iconKey: 'flag', isUnlocked: totalTop100Played >= 50, progress: totalTop100Played, maxProgress: 50 },
-            { id: '100-club', name: '100 Club', description: 'Played 100 Top 100 courses', category: 'exploration', iconKey: 'mountain', isUnlocked: totalTop100Played >= 100, progress: totalTop100Played, maxProgress: 100 },
-            { id: '200-club', name: '200 Club', description: 'Played 200 Top 100 courses', category: 'exploration', iconKey: 'crown', isUnlocked: totalTop100Played >= 200, progress: totalTop100Played, maxProgress: 200 },
-            { id: '300-club', name: '300 Club', description: 'Played 300 Top 100 courses', category: 'exploration', iconKey: 'award', isUnlocked: totalTop100Played >= 300, progress: totalTop100Played, maxProgress: 300 },
-            { id: 'founders', name: 'Founders Club', description: 'Early supporter of Clbhouz', category: 'skill', iconKey: 'zap', isUnlocked: true },
-          ];
           return (
-            <div className="px-4 pb-24">
-              <AchievementsGridV2 achievements={achievementsData} />
-            </div>
+            <AchievementsPane 
+              userId={profile?.id}
+              userDisplayName={profile?.display_name || 'User'}
+              userHandicap={profile?.eg_handicap_index}
+              userProfilePhotoUrl={profile?.profile_photo_url}
+              isCurrentUser={isOwnProfile}
+            />
           );
         case 'stats':
           return (
@@ -352,37 +343,17 @@ const HeroProfileHeader = ({
   const ver = profile?.updated_at ? new Date(profile.updated_at).getTime() : 0;
   const heroSrc = heroUrl ? `${heroUrl}${heroUrl.includes('?') ? '&' : '?'}v=${ver}` : '';
 
-  // Mock achievements for the strip - will be replaced with real data
-  const mockAchievements = useMemo(() => {
-    const achievements: Array<{ id: string; type: 'single-hcp' | 'hole-in-one' | 'pb-round' | '20-club' | '50-club' | '100-club' | '200-club' | '300-club' | 'founders'; label: string }> = [];
-    
-    if (profile?.eg_handicap_index !== undefined && profile.eg_handicap_index < 10) {
-      achievements.push({ id: 'single-hcp', type: 'single-hcp', label: 'Single HCP' });
-    }
-    if (totalTop100Played >= 20) {
-      achievements.push({ id: '20-club', type: '20-club', label: '20 Club' });
-    }
-    if (totalTop100Played >= 50) {
-      achievements.push({ id: '50-club', type: '50-club', label: '50 Club' });
-    }
-    if (totalTop100Played >= 100) {
-      achievements.push({ id: '100-club', type: '100-club', label: '100 Club' });
-    }
-    
-    return achievements;
-  }, [profile?.eg_handicap_index, totalTop100Played]);
-
   return (
     <SwipeToReturnZone onSwipeDown={reopenImmersive}>
-      {/* Profile 2.0 Layout */}
+      {/* Premium Golf Profile Layout - No card, seamless gradient */}
       <section className="relative w-full -mt-16">
         
-        {/* HEADER IMAGE - 220-260px height per spec */}
-        <div className="relative w-full h-[240px] overflow-hidden">
+        {/* HERO IMAGE */}
+        <div className="relative w-full h-[350px] overflow-hidden">
           {heroSrc ? (
             <img 
               src={heroSrc}
-              className="w-full h-full object-cover object-top"
+              className="w-full h-full object-cover"
               alt={displayName}
               loading="eager"
             />
@@ -390,42 +361,58 @@ const HeroProfileHeader = ({
             <div className="w-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
           )}
           
-          {/* Dark overlay - rgba(0,0,0,0.25) per spec */}
+          {/* Top vignette for header readability */}
           <div 
-            className="absolute inset-0 pointer-events-none"
-            style={{ background: 'rgba(0,0,0,0.25)' }}
+            className="absolute top-0 left-0 right-0 h-12 pointer-events-none"
+            style={{
+              background: 'linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, transparent 100%)',
+            }}
+          />
+          
+          {/* Bottom fade into page - seamless blend */}
+          <div
+            className="pointer-events-none absolute bottom-0 left-0 right-0 h-32"
+            style={{
+              background: 'linear-gradient(to top, hsl(var(--background)) 0%, hsl(var(--background) / 0.85) 25%, hsl(var(--background) / 0.4) 50%, hsl(var(--background) / 0.1) 75%, transparent 100%)',
+            }}
           />
         </div>
 
-        {/* META BLOCK - avatar overlaps header by ~40px */}
+        {/* META BLOCK - no card, transparent, sits on page background */}
         <div
           ref={profileCardRef}
-          className="relative mx-auto max-w-[540px] px-4"
+          className="relative mx-auto max-w-[540px] px-5 pb-2"
         >
-          {/* AVATAR – Centered, overlaps header by ~40px (positioned -55px from top of meta block which starts at end of 240px header) */}
-          <div className="absolute left-1/2 -top-[55px] -translate-x-1/2 z-20">
-            <ProfileAvatarSquare
+          {/* AVATAR – OVERLAPS HERO */}
+          <div className="absolute left-1/2 -top-[170px] -translate-x-1/2 z-20">
+            <ProfileAvatarRing
               photoUrl={profile?.profile_photo_url}
               displayName={displayName}
-              size={110}
+              totalTop100Played={totalTop100Played}
+              isPersonal={isPersonal}
+              isOwnProfile={isOwnProfile}
+              size="lg"
               onClick={() => openImmersive?.(0)}
+              animateOnFirstView={true}
             />
           </div>
 
-          {/* Spacer for avatar overlap */}
-          <div className="h-[70px]" />
-
-          {/* User Info Block (name, handle, club tiles, bio) */}
-          <ProfileUserInfoBlock
+          {/* TEXT META (name, @handle, club, bio, customise) */}
+          <ProfileHeaderCard
             displayName={displayName}
             username={username}
             bio={profile?.bio}
+            profilePhotoUrl={profile?.profile_photo_url}
             homeClub={isPersonal ? homeClub : undefined}
             handicap={isPersonal ? profile?.eg_handicap_index : undefined}
             websiteUrl={profile?.website}
             location={profile?.location}
+            userType={profile?.user_type}
+            totalTop100Played={totalTop100Played}
             isPersonal={isPersonal}
             isOwnProfile={isOwnProfile}
+            isMobile={isMobile}
+            onAvatarClick={() => openImmersive?.(0)}
             onCustomiseClick={isOwnProfile ? () => setEditDialogOpen(true) : undefined}
           />
 
@@ -440,39 +427,35 @@ const HeroProfileHeader = ({
             />
           )}
 
-          {/* Mini Achievement Strip */}
-          {isPersonal && mockAchievements.length > 0 && (
-            <MiniAchievementStrip
-              achievements={mockAchievements}
-              onAchievementClick={() => onSectionChange?.('achievements')}
-            />
-          )}
-        </div>
+          {/* Achievement Badge - Above stats row */}
+          <ProfileTop100Chip
+            top100Overview={{
+              ...top100Overview,
+              lists: undefined
+            }}
+            isPersonal={isPersonal}
+            isMobile={isMobile}
+          />
 
-        {/* Hero Top 100 Card - Full width with margin */}
-        <HeroTop100Card
-          totalPlayed={totalTop100Played}
-          isPersonal={isPersonal}
-        />
-
-        {/* Stats Row with expandable drawer */}
-        <div className="mx-auto max-w-[540px] px-4">
-          <ProfileStatsRowV2
+          {/* Stats Row */}
+          <ProfileStatsRow
             postsCount={postsCount}
             followersCount={followersCount}
             followingCount={followingCount}
             friendsCount={friendsCount}
             isPersonal={isPersonal}
+            isMobile={isMobile}
             onFollowersClick={handleOpenFollowers}
             onFollowingClick={handleOpenFollowing}
             onFriendsClick={handleOpenFriends}
           />
 
-          {/* Tab Navigation with icons */}
-          <ProfileTabsNavV2
+          {/* Tab Navigation */}
+          <ProfileTabsNav
             userType={profile?.user_type}
             activeSection={activeSection}
             onTabChange={handleTabChange}
+            isMobile={isMobile}
             disabled={transitionState !== 'idle'}
           />
         </div>
