@@ -1,5 +1,6 @@
 import React from 'react';
-import { Trophy } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ChevronRight, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
 import { achievementGlassTint } from '@/lib/achievementDefinitions';
@@ -22,6 +23,7 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
   username,
   className,
 }) => {
+  const navigate = useNavigate();
   const { data: achievements, isLoading } = useProfileAchievements(userId);
 
   // Sort by newest first: higher milestones first (descending by threshold), then list completions
@@ -44,10 +46,18 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
       aria-label="Achievements"
     >
       {/* Title row */}
-      <div className="mb-2">
+      <div className="mb-2 flex items-center justify-between">
         <h2 className="text-sm font-semibold text-foreground">
           Achievements
         </h2>
+        <button
+          type="button"
+          onClick={() => navigate('/achievementshub')}
+          className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80"
+        >
+          View all
+          <ChevronRight className="h-3 w-3" />
+        </button>
       </div>
 
       {/* Horizontal scroll strip */}
