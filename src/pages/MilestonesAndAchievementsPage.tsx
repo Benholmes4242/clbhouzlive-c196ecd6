@@ -41,7 +41,7 @@ const MilestonesAndAchievementsPage: React.FC = () => {
   const avatarUrl = profile?.profile_photo_url;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-muted">
       <div className="max-w-4xl mx-auto px-4 pt-4 pb-24 md:px-8 md:pt-8">
         {/* Top Bar */}
         <header className="flex items-center justify-between mb-4 md:mb-6">
