@@ -66,8 +66,47 @@ const ProfileTop100TabV2: React.FC<ProfileTop100TabV2Props> = ({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-muted-foreground">Loading...</div>
+      <div className="space-y-6 pb-8 px-4">
+        {/* Skeleton for region selector */}
+        <div className="flex gap-2 overflow-hidden">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-9 w-24 rounded-sq-pill bg-muted/30 animate-pulse flex-shrink-0" />
+          ))}
+        </div>
+        {/* Skeleton for progress card */}
+        <div className="h-32 rounded-sq-lg bg-muted/30 animate-pulse" />
+        {/* Skeleton for courses */}
+        <div className="space-y-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="h-24 rounded-sq-md bg-muted/30 animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Empty state - no Top 100 progress
+  if (totalPlayed === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+        <div className="w-16 h-16 rounded-full bg-muted/30 flex items-center justify-center mb-4">
+          <Trophy className="w-8 h-8 text-muted-foreground/50" />
+        </div>
+        <h3 className="text-lg font-semibold text-foreground mb-2">No Top 100 courses yet</h3>
+        <p className="text-muted-foreground text-sm max-w-[280px] mb-6">
+          {isOwnProfile 
+            ? 'Start your journey by playing and rating Top 100 courses around the world'
+            : `${displayName || 'This user'} hasn't played any Top 100 courses yet`
+          }
+        </p>
+        {isOwnProfile && (
+          <button
+            onClick={() => navigate('/courses?tab=top100')}
+            className="px-6 py-2.5 bg-primary text-primary-foreground rounded-full font-medium text-sm hover:bg-primary/90 transition-colors"
+          >
+            Explore Top 100
+          </button>
+        )}
       </div>
     );
   }
