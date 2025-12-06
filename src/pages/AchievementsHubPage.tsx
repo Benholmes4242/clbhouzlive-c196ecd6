@@ -92,7 +92,7 @@ const AchievementsHubPage: React.FC = () => {
 
         {/* Progress Hero */}
         <section className="mb-6 md:mb-8">
-          <div className="rounded-sq-lg bg-gradient-to-b from-muted/30 to-background border border-border/60 shadow-lg px-4 py-4 md:px-6 md:py-5 flex flex-col gap-3">
+          <div className="rounded-sq-lg bg-card border border-border/60 shadow-lg px-4 py-4 md:px-6 md:py-5 flex flex-col gap-3">
             {/* Top row: Avatar + text summary */}
             <div className="flex items-center gap-3 md:gap-4">
               <SquircleAvatar 
@@ -129,7 +129,7 @@ const AchievementsHubPage: React.FC = () => {
 
             {/* Next badge pill */}
             {nextClub && (
-              <div className="inline-flex items-center gap-2 self-start rounded-full bg-background/80 px-3 py-1 text-[11px] md:text-xs shadow-sm border border-border/40">
+              <div className="inline-flex items-center gap-2 self-start rounded-full bg-card px-3 py-1 text-[11px] md:text-xs shadow-sm border border-border/40">
                 <Trophy className="h-3.5 w-3.5 text-emerald-600" />
                 <span className="font-medium text-emerald-700">
                   Next: {nextClub.threshold} Club

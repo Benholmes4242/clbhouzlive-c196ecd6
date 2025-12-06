@@ -44,7 +44,7 @@ const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
       className={cn(
         "rounded-sq-lg p-4 md:p-5 flex flex-col justify-between min-h-[120px] md:min-h-[140px] transition-all",
         isUnlocked
-          ? "bg-white shadow-[0_18px_40px_rgba(15,118,110,0.12)] border border-emerald-50"
+          ? "bg-card shadow-[0_18px_40px_rgba(15,118,110,0.12)] border border-emerald-100"
           : "bg-muted/60 border border-dashed border-muted-foreground/20 opacity-80"
       )}
     >
@@ -55,7 +55,7 @@ const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
             className={cn(
               "inline-flex items-center justify-center rounded-sq-md w-10 h-10 md:w-11 md:h-11",
               isUnlocked
-                ? "bg-gradient-to-br from-white to-emerald-50"
+                ? "bg-gradient-to-br from-background to-emerald-50"
                 : "bg-muted"
             )}
             style={{
