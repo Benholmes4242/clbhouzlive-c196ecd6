@@ -18,14 +18,15 @@ import { toast } from 'sonner';
 
 // Modular header components
 import {
-  ProfileHeroShell,
-  ProfileHeaderCard,
-  ProfileStatsRow,
   ProfileActionsRow,
-  ProfileTabsNav,
-  ProfileTop100Chip
+  // V2 Components - Profile 2.0 redesign
+  ProfileAvatarSquare,
+  ProfileUserInfoBlock,
+  MiniAchievementStrip,
+  HeroTop100Card,
+  ProfileStatsRowV2,
+  ProfileTabsNavV2,
 } from './header';
-import ProfileAvatarRing from './header/ProfileAvatarRing';
 
 // Tab content components
 import ActivityFeed from './ActivityFeed';
@@ -343,17 +344,37 @@ const HeroProfileHeader = ({
   const ver = profile?.updated_at ? new Date(profile.updated_at).getTime() : 0;
   const heroSrc = heroUrl ? `${heroUrl}${heroUrl.includes('?') ? '&' : '?'}v=${ver}` : '';
 
+  // Mock achievements for the strip - will be replaced with real data
+  const mockAchievements = useMemo(() => {
+    const achievements: Array<{ id: string; type: 'single-hcp' | 'hole-in-one' | 'pb-round' | '20-club' | '50-club' | '100-club' | '200-club' | '300-club' | 'founders'; label: string }> = [];
+    
+    if (profile?.eg_handicap_index !== undefined && profile.eg_handicap_index < 10) {
+      achievements.push({ id: 'single-hcp', type: 'single-hcp', label: 'Single HCP' });
+    }
+    if (totalTop100Played >= 20) {
+      achievements.push({ id: '20-club', type: '20-club', label: '20 Club' });
+    }
+    if (totalTop100Played >= 50) {
+      achievements.push({ id: '50-club', type: '50-club', label: '50 Club' });
+    }
+    if (totalTop100Played >= 100) {
+      achievements.push({ id: '100-club', type: '100-club', label: '100 Club' });
+    }
+    
+    return achievements;
+  }, [profile?.eg_handicap_index, totalTop100Played]);
+
   return (
     <SwipeToReturnZone onSwipeDown={reopenImmersive}>
-      {/* Premium Golf Profile Layout - No card, seamless gradient */}
+      {/* Profile 2.0 Layout */}
       <section className="relative w-full -mt-16">
         
-        {/* HERO IMAGE */}
-        <div className="relative w-full h-[350px] overflow-hidden">
+        {/* HEADER IMAGE - 220-260px height per spec */}
+        <div className="relative w-full h-[240px] overflow-hidden">
           {heroSrc ? (
             <img 
               src={heroSrc}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover object-top"
               alt={displayName}
               loading="eager"
             />
@@ -361,58 +382,42 @@ const HeroProfileHeader = ({
             <div className="w-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
           )}
           
-          {/* Top vignette for header readability */}
+          {/* Dark overlay - rgba(0,0,0,0.25) per spec */}
           <div 
-            className="absolute top-0 left-0 right-0 h-12 pointer-events-none"
-            style={{
-              background: 'linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, transparent 100%)',
-            }}
-          />
-          
-          {/* Bottom fade into page - seamless blend */}
-          <div
-            className="pointer-events-none absolute bottom-0 left-0 right-0 h-32"
-            style={{
-              background: 'linear-gradient(to top, hsl(var(--background)) 0%, hsl(var(--background) / 0.85) 25%, hsl(var(--background) / 0.4) 50%, hsl(var(--background) / 0.1) 75%, transparent 100%)',
-            }}
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: 'rgba(0,0,0,0.25)' }}
           />
         </div>
 
-        {/* META BLOCK - no card, transparent, sits on page background */}
+        {/* META BLOCK - avatar overlaps header by ~40px */}
         <div
           ref={profileCardRef}
-          className="relative mx-auto max-w-[540px] px-5 pb-2"
+          className="relative mx-auto max-w-[540px] px-4"
         >
-          {/* AVATAR – OVERLAPS HERO */}
-          <div className="absolute left-1/2 -top-[170px] -translate-x-1/2 z-20">
-            <ProfileAvatarRing
+          {/* AVATAR – Centered, overlaps header by ~40px (positioned -55px from top of meta block which starts at end of 240px header) */}
+          <div className="absolute left-1/2 -top-[55px] -translate-x-1/2 z-20">
+            <ProfileAvatarSquare
               photoUrl={profile?.profile_photo_url}
               displayName={displayName}
-              totalTop100Played={totalTop100Played}
-              isPersonal={isPersonal}
-              isOwnProfile={isOwnProfile}
-              size="lg"
+              size={110}
               onClick={() => openImmersive?.(0)}
-              animateOnFirstView={true}
             />
           </div>
 
-          {/* TEXT META (name, @handle, club, bio, customise) */}
-          <ProfileHeaderCard
+          {/* Spacer for avatar overlap */}
+          <div className="h-[70px]" />
+
+          {/* User Info Block (name, handle, club tiles, bio) */}
+          <ProfileUserInfoBlock
             displayName={displayName}
             username={username}
             bio={profile?.bio}
-            profilePhotoUrl={profile?.profile_photo_url}
             homeClub={isPersonal ? homeClub : undefined}
             handicap={isPersonal ? profile?.eg_handicap_index : undefined}
             websiteUrl={profile?.website}
             location={profile?.location}
-            userType={profile?.user_type}
-            totalTop100Played={totalTop100Played}
             isPersonal={isPersonal}
             isOwnProfile={isOwnProfile}
-            isMobile={isMobile}
-            onAvatarClick={() => openImmersive?.(0)}
             onCustomiseClick={isOwnProfile ? () => setEditDialogOpen(true) : undefined}
           />
 
@@ -427,35 +432,39 @@ const HeroProfileHeader = ({
             />
           )}
 
-          {/* Achievement Badge - Above stats row */}
-          <ProfileTop100Chip
-            top100Overview={{
-              ...top100Overview,
-              lists: undefined
-            }}
-            isPersonal={isPersonal}
-            isMobile={isMobile}
-          />
+          {/* Mini Achievement Strip */}
+          {isPersonal && mockAchievements.length > 0 && (
+            <MiniAchievementStrip
+              achievements={mockAchievements}
+              onAchievementClick={() => onSectionChange?.('achievements')}
+            />
+          )}
+        </div>
 
-          {/* Stats Row */}
-          <ProfileStatsRow
+        {/* Hero Top 100 Card - Full width with margin */}
+        <HeroTop100Card
+          totalPlayed={totalTop100Played}
+          isPersonal={isPersonal}
+        />
+
+        {/* Stats Row with expandable drawer */}
+        <div className="mx-auto max-w-[540px] px-4">
+          <ProfileStatsRowV2
             postsCount={postsCount}
             followersCount={followersCount}
             followingCount={followingCount}
             friendsCount={friendsCount}
             isPersonal={isPersonal}
-            isMobile={isMobile}
             onFollowersClick={handleOpenFollowers}
             onFollowingClick={handleOpenFollowing}
             onFriendsClick={handleOpenFriends}
           />
 
-          {/* Tab Navigation */}
-          <ProfileTabsNav
+          {/* Tab Navigation with icons */}
+          <ProfileTabsNavV2
             userType={profile?.user_type}
             activeSection={activeSection}
             onTabChange={handleTabChange}
-            isMobile={isMobile}
             disabled={transitionState !== 'idle'}
           />
         </div>
