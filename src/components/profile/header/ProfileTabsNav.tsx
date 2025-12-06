@@ -24,27 +24,25 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
 
   return (
     <section className="mt-6 px-4">
-      <div className="flex items-center justify-center">
-        <Tabs value={activeSection} onValueChange={onTabChange}>
-          <TabsList 
-            className="grid w-full rounded-sq-md bg-muted/70 border border-border/60 px-2 py-[3px]"
-            style={{ 
-              gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`
-            }}
-          >
-            {tabs.map((tab) => (
-              <TabsTrigger 
-                key={tab.id}
-                value={tab.id}
-                disabled={disabled}
-                className="rounded-sq-pill text-sm px-3 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard disabled:pointer-events-none disabled:opacity-50"
-              >
-                {tab.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
-      </div>
+      <Tabs value={activeSection} onValueChange={onTabChange} className="w-full">
+        <TabsList 
+          className="grid w-full rounded-sq-md bg-muted/70 border border-border/60 px-2 py-[3px]"
+          style={{ 
+            gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`
+          }}
+        >
+          {tabs.map((tab) => (
+            <TabsTrigger 
+              key={tab.id}
+              value={tab.id}
+              disabled={disabled}
+              className="rounded-sq-pill text-sm px-3 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard disabled:pointer-events-none disabled:opacity-50"
+            >
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
     </section>
   );
 };
