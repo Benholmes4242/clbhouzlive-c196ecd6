@@ -20,6 +20,8 @@ interface RatingBarProps {
   mode?: RatingBarMode;
   /** Required when mode === 'banded' */
   band?: RatingBand;
+  /** Hide the track background, only show fill */
+  hideTrack?: boolean;
   /** Extra classes for width/margins etc. */
   className?: string;
 }
@@ -38,6 +40,7 @@ export function RatingBar({
   max = 10,
   mode = 'neutral',
   band = 'veryGood',
+  hideTrack = false,
   className,
 }: RatingBarProps) {
   const pct = Math.max(0, Math.min(100, (value / max) * 100));
@@ -54,7 +57,7 @@ export function RatingBar({
       )}
       style={{
         height: 'var(--rating-bar-height-sm)',
-        backgroundColor: 'var(--rating-bar-track)',
+        backgroundColor: hideTrack ? 'transparent' : 'var(--rating-bar-track)',
         borderRadius: 'var(--rating-bar-radius)',
       }}
     >
