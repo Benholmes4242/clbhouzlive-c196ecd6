@@ -1,0 +1,74 @@
+import React, { useState, useCallback } from 'react';
+import { cn } from '@/lib/utils';
+import { Play } from 'lucide-react';
+
+interface PostMediaProps {
+  thumbnailUrl: string;
+  title?: string;
+  isVideo?: boolean;
+  className?: string;
+}
+
+/**
+ * Shared media component with skeleton loading, lazy loading, and error handling
+ * Uses the global .clb-skeleton shimmer utility
+ */
+const PostMedia: React.FC<PostMediaProps> = ({
+  thumbnailUrl,
+  title,
+  isVideo = false,
+  className
+}) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
+
+  const handleLoad = useCallback(() => {
+    setIsLoaded(true);
+  }, []);
+
+  const handleError = useCallback(() => {
+    setHasError(true);
+    setIsLoaded(true);
+  }, []);
+
+  return (
+    <div className={cn("relative w-full h-full overflow-hidden bg-muted/30", className)}>
+      {/* Skeleton shimmer (shows until image loads or errors) */}
+      {!isLoaded && !hasError && (
+        <div className="absolute inset-0 clb-skeleton" />
+      )}
+
+      {/* Thumbnail image with lazy loading */}
+      {!hasError && (
+        <img
+          src={thumbnailUrl}
+          alt={title ?? "Post thumbnail"}
+          loading="lazy"
+          onLoad={handleLoad}
+          onError={handleError}
+          className={cn(
+            "w-full h-full object-cover",
+            "transition-opacity duration-300",
+            isLoaded ? "opacity-100" : "opacity-0"
+          )}
+        />
+      )}
+
+      {/* Fallback if image completely fails */}
+      {hasError && (
+        <div className="absolute inset-0 flex items-center justify-center text-[11px] text-muted-foreground">
+          Failed to load
+        </div>
+      )}
+
+      {/* Video badge */}
+      {isVideo && !hasError && (
+        <div className="absolute bottom-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/60">
+          <Play className="h-3 w-3 text-white fill-white" />
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default PostMedia;
