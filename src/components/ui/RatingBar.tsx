@@ -24,14 +24,19 @@ interface RatingBarProps {
   className?: string;
 }
 
-// Map band names to Global Colour System themes (bgLight + bgDark for gradient)
-const bandToGradient: Record<RatingBand, { bgLight: string; bgDark: string }> = {
+// Map band names to Global Colour System themes
+const bandColors: Record<RatingBand, { bgLight: string; bgDark: string }> = {
   outstanding: { bgLight: COURSE_RATING_THEMES.OUTSTANDING.bgLight, bgDark: COURSE_RATING_THEMES.OUTSTANDING.bgDark },
   excellent: { bgLight: COURSE_RATING_THEMES.EXCELLENT.bgLight, bgDark: COURSE_RATING_THEMES.EXCELLENT.bgDark },
   veryGood: { bgLight: COURSE_RATING_THEMES.VERY_GOOD.bgLight, bgDark: COURSE_RATING_THEMES.VERY_GOOD.bgDark },
   good: { bgLight: COURSE_RATING_THEMES.GOOD.bgLight, bgDark: COURSE_RATING_THEMES.GOOD.bgDark },
   fair: { bgLight: COURSE_RATING_THEMES.FAIR.bgLight, bgDark: COURSE_RATING_THEMES.FAIR.bgDark },
 };
+
+// Track color - grey unfilled portion
+const TRACK_COLOR = '#D7DDE3';
+// Neutral fill - dark slate for non-banded bars
+const NEUTRAL_FILL = '#1e293b';
 
 export function RatingBar({
   value,
@@ -41,19 +46,24 @@ export function RatingBar({
   className,
 }: RatingBarProps) {
   const pct = Math.max(0, Math.min(100, (value / max) * 100));
-  const gradientColors = bandToGradient[band];
+  const colors = bandColors[band];
 
+  // Build background as a single linear-gradient:
+  // - Fill segment: 0% → pct%
+  // - Track segment: pct% → 100%
+  let background: string;
 
-  // Single gradient: solid fill (0→pct%) then track (pct%→100%)
-  // Use bgDark as solid fill to match rating badge colors exactly
-  const trackColor = '#D7DDE3';
-  const background = mode === 'neutral'
-    ? `linear-gradient(90deg, var(--rating-bar-fill-neutral) 0%, var(--rating-bar-fill-neutral) ${pct}%, ${trackColor} ${pct}%, ${trackColor} 100%)`
-    : `linear-gradient(90deg, ${gradientColors.bgDark} 0%, ${gradientColors.bgDark} ${pct}%, ${trackColor} ${pct}%, ${trackColor} 100%)`;
+  if (mode === 'neutral') {
+    // Solid dark slate fill
+    background = `linear-gradient(90deg, ${NEUTRAL_FILL} 0%, ${NEUTRAL_FILL} ${pct}%, ${TRACK_COLOR} ${pct}%, ${TRACK_COLOR} 100%)`;
+  } else {
+    // Banded: Use pastel gradient matching RatingBadge (bgLight → bgDark across fill)
+    background = `linear-gradient(90deg, ${colors.bgLight} 0%, ${colors.bgDark} ${pct}%, ${TRACK_COLOR} ${pct}%, ${TRACK_COLOR} 100%)`;
+  }
 
   return (
     <div
-      className={cn('h-2 w-full rounded-sq-full', className)}
+      className={cn('h-2 w-full rounded-full', className)}
       style={{ background }}
     />
   );
