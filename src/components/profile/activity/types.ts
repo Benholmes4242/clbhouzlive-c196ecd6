@@ -10,11 +10,13 @@ export interface ActivityMediaItem {
   type: string; // 'image' | 'video'
   url: string;
   thumbnailUrl?: string;
+  playbackUrl?: string;
   aspectRatio?: AspectRatio;
   courseName?: string;
   roundDate?: string;
   additionalMediaCount?: number;
   isMilestone?: boolean;
+  canAutoplay?: boolean;
 }
 
 export interface ActivityMediaGridProps {
