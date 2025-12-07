@@ -42,9 +42,9 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col gap-1.5 md:gap-2 justify-center">
+    <div className="flex-1 flex flex-col items-center justify-center gap-1.5 md:gap-2">
       {/* Row 1: Name + edit icon */}
-      <div className="flex items-center gap-2 md:gap-3">
+      <div className="flex items-center justify-center gap-2 md:gap-3">
         <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-foreground">
           {displayName}
         </h1>

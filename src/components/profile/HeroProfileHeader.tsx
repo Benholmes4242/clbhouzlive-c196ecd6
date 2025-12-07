@@ -370,13 +370,6 @@ const HeroProfileHeader = ({
             }}
           />
           
-          {/* Bottom blur/fade for header content - subtle */}
-          <div
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-16 backdrop-blur-[5px]"
-            style={{
-              background: 'linear-gradient(to top, hsl(var(--background) / 0.7) 0%, rgba(15,23,42,0.22) 40%, transparent 100%)',
-            }}
-          />
         </div>
 
         {/* META BLOCK - Glass panel with avatar + text */}
