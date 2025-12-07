@@ -1,8 +1,9 @@
 import React from 'react';
 import type { Top100TierId } from '@/lib/top100Club';
-import { getRingColorForTier, getTop100Club } from '@/lib/top100Club';
-import { AchievementBadge } from '@/components/achievements/AchievementBadge';
+import { getTop100Club } from '@/lib/top100Club';
+import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { getRingColorForTotalPlayed } from '@/lib/achievementThemes';
 
 export interface Top100ProgressHeroProps {
   displayName: string | null;
@@ -32,11 +33,13 @@ export function Top100ProgressHero({
     .toUpperCase()
     .slice(0, 2) || '?';
 
-  // Only show achievement ring if user has earned one (tierId !== 'none')
-  const hasAchievementRing = tierId && tierId !== 'none';
-  const tierColor = hasAchievementRing ? getRingColorForTier(tierId) : null;
+  // Ring color from unified theme system
+  const tierColor = getRingColorForTotalPlayed(totalTop100Played);
   const club = getTop100Club(totalTop100Played);
   const hasAchievement = totalTop100Played >= 5;
+  
+  // Map threshold to AchievementTier
+  const achievementTier = club.threshold?.toString() as AchievementTier || '5';
   
   const formattedDate = lastRoundAt
     ? new Date(lastRoundAt).toLocaleDateString()
@@ -47,7 +50,7 @@ export function Top100ProgressHero({
       {/* Profile + achievement badge */}
       <div className="flex flex-col items-center">
         <div className="relative">
-          {/* Large avatar - follows global avatar ring rule */}
+          {/* Large avatar - uses unified ring color */}
           <SquircleAvatar
             size={150}
             src={avatarUrl}
@@ -57,15 +60,15 @@ export function Top100ProgressHero({
           />
         </div>
 
-        {/* Achievement badge below avatar - only if user has first achievement */}
+        {/* Achievement badge below avatar - uses unified AchievementBadgeCard */}
         {hasAchievement && (
           <div className="mt-4">
-            <AchievementBadge
-              count={totalTop100Played}
-              title="Top 100"
-              tierLabel={club.tierName || 'Top 100 Club'}
-              ringColor={club.ringColor}
-              size="md"
+            <AchievementBadgeCard
+              tier={achievementTier}
+              title={`${totalTop100Played} Top 100`}
+              subtitle={club.tierName || 'Top 100 Club'}
+              unlocked={true}
+              compact={true}
             />
           </div>
         )}

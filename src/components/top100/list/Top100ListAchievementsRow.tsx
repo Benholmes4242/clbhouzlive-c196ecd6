@@ -1,15 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TOP100_LIST_MILESTONES } from '@/config/top100ListMilestones';
-import { getRegionTheme } from '@/lib/achievementThemes';
+import { REGION_SLUG_THEMES } from '@/lib/achievementThemes';
 
-// Region-specific primary colors from theme
-const REGION_ACCENTS: Record<string, string> = {
-  global: '#0D9488',
-  'gb-i': '#1E3A5F',
-  usa: '#B91C1C',
-  europe: '#7C3AED',
-};
+// Get region accent color from unified theme
+function getRegionAccent(listSlug: string | undefined): string {
+  if (!listSlug) return '#94a3b8';
+  return REGION_SLUG_THEMES[listSlug]?.accent ?? '#94a3b8';
+}
 
 interface Top100ListAchievementsRowProps {
   listName: string;
@@ -92,8 +90,8 @@ export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps>
   const maxThreshold = Math.min(milestones[milestones.length - 1]?.threshold ?? 100, totalCount);
   const progressPct = getAchievementsProgressPct(playedCount, milestones, maxThreshold);
 
-  const regionColor = listSlug ? REGION_ACCENTS[listSlug] ?? '#94a3b8' : '#94a3b8';
-  const theme = listSlug ? getRegionTheme(listSlug) : null;
+  // Use unified theme system for region colors
+  const regionColor = getRegionAccent(listSlug);
 
   return (
     <section className="space-y-2 mt-6">
