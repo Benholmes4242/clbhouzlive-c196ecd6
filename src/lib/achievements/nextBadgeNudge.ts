@@ -9,10 +9,10 @@
 
 import {
   MILESTONE_THEMES,
-  REGION_THEMES,
   MilestoneTier,
   type TierPalette,
   getTierPalette,
+  getRegionTheme,
 } from '@/lib/globalAchievementMilestoneSystem';
 
 // ============= Types =============
@@ -183,7 +183,7 @@ export function getNextBadgeNudge(progress: UserTop100Progress): BadgeNudge | nu
     if (!isClose || remaining <= 0) continue;
 
     const themeId = REGION_ID_TO_THEME[regionId];
-    const regionTheme = REGION_THEMES[themeId];
+    const regionTheme = getRegionTheme(themeId);
 
     candidates.push({
       type: 'regional',
