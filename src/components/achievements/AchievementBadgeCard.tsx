@@ -159,9 +159,9 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
     <div
       className={cn(
         // Horizontal rectangle with SDS rounded corners - GLOBAL SIZE for all badges
-        'rounded-sq-md flex flex-row items-center gap-3 transition-all duration-150 relative',
-        // Fixed global size for ALL achievement badges site-wide
-        'min-w-[180px] h-[84px] px-3',
+        'rounded-sq-md flex flex-row items-center gap-2.5 transition-all duration-150 relative overflow-hidden',
+        // Fixed global size for ALL achievement badges site-wide (10% taller = 92px)
+        'min-w-[180px] h-[92px] px-3 py-2',
         unlocked && !isGhost
           ? 'shadow-[0_6px_20px_rgba(15,23,42,0.10)]' 
           : 'shadow-sm',
@@ -186,30 +186,30 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
 
       {/* Left: Trophy icon */}
       <div 
-        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+        className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
         style={{ 
           backgroundColor: unlocked ? `${palette.accent}1F` : 'rgba(148,163,184,0.12)' 
         }}
       >
         <Trophy 
-          className="w-5 h-5"
+          className="w-4 h-4"
           style={{ color: unlocked ? palette.accent : '#94a3b8' }} 
         />
       </div>
 
       {/* Center: Title and subtitle */}
-      <div className="flex-1 min-w-0">
-        <div className="font-semibold leading-tight text-slate-900 truncate text-sm">
+      <div className="flex-1 min-w-0 overflow-hidden">
+        <div className="font-semibold leading-tight text-slate-900 truncate text-[13px]">
           {isMilestone ? `${threshold} Club` : title}
         </div>
-        <div className="text-xs text-slate-800/70 truncate">
+        <div className="text-[11px] text-slate-800/70 truncate">
           {isMilestone ? clubName : subtitle}
         </div>
       </div>
 
       {/* Right: Status chip */}
       <div className={cn(
-        "inline-flex items-center px-2 py-1 rounded-sq-xs text-[11px] font-medium flex-shrink-0",
+        "inline-flex items-center px-1.5 py-0.5 rounded-sq-xs text-[10px] font-medium flex-shrink-0",
         unlocked && !isGhost
           ? "bg-white/75 text-slate-800"
           : "bg-white/60 text-slate-500"
