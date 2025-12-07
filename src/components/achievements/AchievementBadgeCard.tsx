@@ -36,8 +36,9 @@ export interface AchievementBadgeCardProps {
  * 
  * The canonical shared card component for ALL achievement displays across the app.
  * Colors derived from globalAchievementMilestoneSystem.ts:
- * - Trophy icon: pure accent color (same as avatar rings)
+ * - Trophy icon: pure accent color (bold, stands out on card)
  * - Background: soft gradient from bgLight → bgDark
+ * - Avatar rings use bgDark (softer pastel that matches card gradient end)
  * 
  * Usage: Profile rail, Milestones Modal, Top 100 Hub, My Progress, regional lists
  */
