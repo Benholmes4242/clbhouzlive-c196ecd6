@@ -1,9 +1,9 @@
 import React from 'react';
 import type { Top100Ring } from '@/lib/top100Club';
-import { TIER_BY_ID } from '@/lib/top100Club';
-import { getRingColorForTotalPlayed, MILESTONE_THEMES } from '@/lib/globalAchievementMilestoneSystem';
+import { getTop100Club } from '@/lib/top100Club';
+import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { Top100AchievementBadge } from '@/components/top100/Top100AchievementBadge';
+import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
 
 export interface Top100HeroSectionProps {
   avatarUrl?: string | null;
@@ -19,7 +19,7 @@ export interface Top100HeroSectionProps {
 
 /**
  * Top100HeroSection - Part of Global Achievement & Milestone System
- * Uses unified colors from globalAchievementMilestoneSystem.ts
+ * Uses unified AchievementBadgeCard and colors from globalAchievementMilestoneSystem.ts
  */
 export function Top100HeroSection({
   avatarUrl,
@@ -42,6 +42,11 @@ export function Top100HeroSection({
   // Get ring color from Global Achievement & Milestone System
   const hasAchievementRing = clubRing && clubRing !== 'none';
   const tierColor = hasAchievementRing ? getRingColorForTotalPlayed(totalPlayed) : null;
+  
+  // Get achievement tier for the badge
+  const club = getTop100Club(totalPlayed);
+  const achievementTier = club.threshold?.toString() as AchievementTier || '5';
+  const hasAchievement = totalPlayed >= 5;
 
   return (
     <div className="flex flex-col items-center text-center space-y-4 py-4">
@@ -55,20 +60,23 @@ export function Top100HeroSection({
           ringColor={tierColor}
           className="shadow-[0_10px_30px_rgba(0,0,0,0.16)]"
         />
-        {/* Achievement badge pill - overlaying bottom of avatar */}
-        {hasAchievementRing && (
-          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2">
-            <Top100AchievementBadge
-              tier={clubRing}
-              showSubtitle={false}
-              size="compact"
-            />
-          </div>
-        )}
       </div>
 
-      {/* Stats - extra top margin to account for badge overlay */}
-      <div className="text-center mt-6 flex flex-col gap-1.5">
+      {/* Achievement badge - using unified AchievementBadgeCard */}
+      {hasAchievement && (
+        <div className="mt-2">
+          <AchievementBadgeCard
+            tier={achievementTier}
+            title={`${totalPlayed} Top 100`}
+            subtitle={club.tierName || 'Top 100 Club'}
+            unlocked={true}
+            totalTop100Played={totalPlayed}
+          />
+        </div>
+      )}
+
+      {/* Stats */}
+      <div className="text-center flex flex-col gap-1.5">
         <p className="text-lg font-semibold text-foreground">
           {isOwnProfile ? "You've" : `${displayName} has`} played {totalPlayed} Top 100 course
           {totalPlayed === 1 ? '' : 's'}
