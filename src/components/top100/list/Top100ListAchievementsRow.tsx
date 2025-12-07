@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TOP100_LIST_MILESTONES } from '@/config/top100ListMilestones';
-import { REGION_SLUG_THEMES } from '@/lib/achievementThemes';
+import { REGION_SLUG_THEMES } from '@/lib/globalAchievementMilestoneSystem';
 
 // Get region accent color from unified theme
 function getRegionAccent(listSlug: string | undefined): string {

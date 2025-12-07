@@ -3,7 +3,7 @@ import type { Top100TierId } from '@/lib/top100Club';
 import { getTop100Club } from '@/lib/top100Club';
 import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getRingColorForTotalPlayed } from '@/lib/achievementThemes';
+import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 
 export interface Top100ProgressHeroProps {
   displayName: string | null;

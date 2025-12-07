@@ -1,7 +1,7 @@
 import React from 'react';
 import { Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getTierPalette } from '@/lib/achievementThemes';
+import { getTierPalette } from '@/lib/globalAchievementMilestoneSystem';
 
 export type AchievementStatus = 'UNLOCKED' | 'LOCKED';
 export type AchievementType = 'MILESTONE' | 'LIST' | 'SKILL' | 'SEASONAL';
@@ -32,8 +32,12 @@ export interface AchievementBadgeCardProps {
 }
 
 /**
- * Shared achievement badge card for Profile rail and Top 100 Milestones Modal
- * Premium Apple-level design with tier-based gradients from achievementThemes
+ * AchievementBadgeCard - Global Achievement & Milestone System
+ * 
+ * The canonical shared card component for ALL achievement displays across the app.
+ * Uses tier-based gradients from globalAchievementMilestoneSystem.ts
+ * 
+ * Usage: Profile rail, Milestones Modal, Top 100 Hub, My Progress, regional lists
  */
 export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   tier,
