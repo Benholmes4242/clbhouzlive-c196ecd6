@@ -66,15 +66,14 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
         @{username}
       </div>
 
+      {/* Row 3: Club (personal) or Location (business) */}
       {isPersonal && homeClub && (
         <div className="text-sm text-center">
-          <span className="font-semibold text-slate-800">{homeClub}</span>
           <span className="font-semibold text-slate-800">{homeClub}</span>
         </div>
       )}
       {!isPersonal && location && (
         <div className="text-sm text-center">
-          <span className="font-semibold text-slate-800">{location}</span>
           <span className="font-semibold text-slate-800">{location}</span>
         </div>
       )}
