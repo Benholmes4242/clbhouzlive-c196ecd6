@@ -43,14 +43,14 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   };
 
   return (
-    <section className="flex-1 flex flex-col items-center">
+    <section className="flex-1 flex flex-col items-center space-y-1.5">
       {/* Name */}
       <h1 className="text-2xl font-semibold text-foreground text-center">
         {displayName}
       </h1>
 
       {/* Username + Handicap pill on one line */}
-      <p className="mt-1 text-xs text-muted-foreground text-center flex items-center gap-2">
+      <p className="text-xs text-muted-foreground text-center flex items-center gap-2">
         <span>@{username}</span>
         {isPersonal && handicap != null && (
           <span className="inline-flex items-center rounded-full bg-muted px-2 py-1 text-[11px] font-medium text-foreground">
@@ -61,20 +61,20 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
 
       {/* Club name (personal) or Location (business) */}
       {isPersonal && homeClub && (
-        <p className="mt-1 text-sm text-muted-foreground text-center">
+        <p className="text-sm text-muted-foreground text-center">
           {homeClub}
         </p>
       )}
       
       {!isPersonal && location && (
-        <p className="mt-1 text-sm text-muted-foreground text-center">
+        <p className="text-sm text-muted-foreground text-center">
           {location}
         </p>
       )}
       
       {/* Website - Business profiles */}
       {!isPersonal && websiteUrl && (
-        <div className="mt-1 flex items-center justify-center gap-1.5 text-sm">
+        <div className="flex items-center justify-center gap-1.5 text-sm">
           <Globe className="w-3.5 h-3.5 text-muted-foreground" />
           <a 
             href={getWebsiteHref(websiteUrl)}
