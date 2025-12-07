@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { ChevronRight, Trophy } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
-import { achievementGlassTint } from '@/lib/achievementDefinitions';
+import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
 import MilestonesAndAchievementsModal from '@/components/achievements/MilestonesAndAchievementsModal';
 
 interface ProfileAchievementsRailProps {
@@ -12,6 +12,21 @@ interface ProfileAchievementsRailProps {
 }
 
 const MAX_VISIBLE = 10;
+
+// Map achievement IDs to AchievementTier
+function getAchievementTier(achievement: { id: string; threshold?: number; type: string }): AchievementTier {
+  // Milestones
+  if (achievement.type === 'milestone' && achievement.threshold) {
+    return achievement.threshold.toString() as AchievementTier;
+  }
+  // List completions
+  if (achievement.id === 'list_gb_ireland') return 'GBI';
+  if (achievement.id === 'list_europe') return 'EU';
+  if (achievement.id === 'list_usa') return 'USA';
+  if (achievement.id === 'list_worldwide') return 'WORLD';
+  // Default fallback
+  return '5';
+}
 
 /**
  * ProfileAchievementsRail - Strava-style horizontal trophy strip
@@ -66,46 +81,22 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
           </button>
         </div>
 
-        {/* Horizontal scroll strip */}
-        <div className="flex gap-3 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] scrollbar-hide -mx-4 px-4">
-          {visible.map(ach => (
-            <div
+        {/* Horizontal scroll strip with shared AchievementBadgeCard */}
+        <div className="flex gap-3 overflow-x-auto pb-1 pt-2 [-webkit-overflow-scrolling:touch] scrollbar-hide -mx-4 px-4">
+          {visible.map((ach, index) => (
+            <AchievementBadgeCard
               key={ach.id}
-              className="flex min-w-[120px] max-w-[140px] flex-col items-center rounded-sq-md px-3 py-2 shadow-sm ring-1 ring-black/5 backdrop-blur-md"
-              style={{
-                background: achievementGlassTint(ach.ringColor, ach.glassIntensity),
-              }}
-            >
-              {/* Badge icon */}
-              <div 
-                className="mb-1.5 flex h-10 w-10 items-center justify-center rounded-full"
-                style={{ 
-                  backgroundColor: `${ach.ringColor}30`,
-                  border: `2px solid ${ach.ringColor}`,
-                }}
-              >
-                <Trophy 
-                  className="h-5 w-5" 
-                  style={{ color: ach.ringColor }}
-                />
-              </div>
-              
-              {/* Achievement label */}
-              <span 
-                className="truncate w-full text-center text-[11px] font-semibold"
-                style={{ color: ach.ringColor }}
-              >
-                {ach.shortLabel}
-              </span>
-              <span className="truncate w-full text-center text-[10px] text-foreground/60">
-                {ach.type === 'milestone' ? 'Milestone' : 'Completed'}
-              </span>
-            </div>
+              tier={getAchievementTier(ach)}
+              title={ach.shortLabel}
+              subtitle={ach.type === 'milestone' ? 'Milestone' : 'Completed'}
+              unlocked={true}
+              isPrimary={index === 0}
+            />
           ))}
         </div>
       </section>
 
-      {/* Achievements Modal */}
+      {/* Top 100 Milestones Modal */}
       <MilestonesAndAchievementsModal 
         open={modalOpen} 
         onOpenChange={setModalOpen} 

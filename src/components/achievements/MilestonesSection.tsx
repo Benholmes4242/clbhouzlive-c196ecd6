@@ -1,14 +1,22 @@
 import React from 'react';
-import { AchievementBadgeCard } from './AchievementBadgeCard';
+import { AchievementBadgeCard, AchievementTier } from './AchievementBadgeCard';
 import { MILESTONE_ACHIEVEMENTS } from '@/lib/achievementDefinitions';
+import { getTop100Club } from '@/lib/top100Club';
 
 interface MilestonesSectionProps {
   totalTop100Played: number;
 }
 
+// Map milestone threshold to AchievementTier
+function getMilestoneTier(threshold: number): AchievementTier {
+  return threshold.toString() as AchievementTier;
+}
+
 export const MilestonesSection: React.FC<MilestonesSectionProps> = ({
   totalTop100Played,
 }) => {
+  const currentClub = getTop100Club(totalTop100Played);
+
   return (
     <section className="mb-6 md:mb-8">
       <div className="flex items-center justify-between mb-3">
@@ -19,15 +27,16 @@ export const MilestonesSection: React.FC<MilestonesSectionProps> = ({
         {MILESTONE_ACHIEVEMENTS.map((milestone) => {
           const threshold = milestone.threshold ?? 0;
           const isUnlocked = totalTop100Played >= threshold;
+          const isCurrent = currentClub.threshold === threshold;
 
           return (
             <AchievementBadgeCard
               key={milestone.id}
+              tier={getMilestoneTier(threshold)}
               title={milestone.shortLabel}
               subtitle={milestone.label}
-              status={isUnlocked ? 'UNLOCKED' : 'LOCKED'}
-              type="MILESTONE"
-              accentColor={milestone.ringColor}
+              unlocked={isUnlocked}
+              isPrimary={isCurrent}
             />
           );
         })}

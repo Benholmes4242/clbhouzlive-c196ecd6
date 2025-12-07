@@ -1,5 +1,5 @@
 import React from 'react';
-import { AchievementBadgeCard } from './AchievementBadgeCard';
+import { AchievementBadgeCard, AchievementTier } from './AchievementBadgeCard';
 
 // Future-proofed skill achievements - currently empty
 // Will be populated with handicap, PB rounds, hole-in-one, longest drive, etc.
@@ -8,7 +8,7 @@ interface SkillAchievement {
   title: string;
   subtitle: string;
   unlocked: boolean;
-  accentColor: string;
+  tier: AchievementTier;
 }
 
 interface SkillAchievementsSectionProps {
@@ -33,11 +33,10 @@ export const SkillAchievementsSection: React.FC<SkillAchievementsSectionProps> =
         {skillAchievements.map((achievement) => (
           <div className="min-w-[140px] max-w-[160px] flex-shrink-0" key={achievement.id}>
             <AchievementBadgeCard
+              tier={achievement.tier}
               title={achievement.title}
               subtitle={achievement.subtitle}
-              status={achievement.unlocked ? 'UNLOCKED' : 'LOCKED'}
-              type="SKILL"
-              accentColor={achievement.accentColor}
+              unlocked={achievement.unlocked}
             />
           </div>
         ))}
