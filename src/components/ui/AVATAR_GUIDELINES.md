@@ -103,8 +103,9 @@ Pass the achievement tier color to `ringColor` prop:
 // Founder green
 <SquircleAvatar ringColor="#8CE06A" ... />
 
-// Other tier colors from Top 100 system
-<SquircleAvatar ringColor={getRingColorForTier(tierInfo.tierId)} ... />
+// Ring colors from Global Achievement & Milestone System
+import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
+<SquircleAvatar ringColor={getRingColorForTotalPlayed(totalPlayed)} ... />
 ```
 
 ## Enforcement

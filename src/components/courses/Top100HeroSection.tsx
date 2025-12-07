@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Top100Ring } from '@/lib/top100Club';
-import { getRingColorForTier } from '@/lib/top100Club';
+import { TIER_BY_ID } from '@/lib/top100Club';
+import { getRingColorForTotalPlayed, MILESTONE_THEMES } from '@/lib/globalAchievementMilestoneSystem';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Top100AchievementBadge } from '@/components/top100/Top100AchievementBadge';
 
@@ -16,6 +17,10 @@ export interface Top100HeroSectionProps {
   isOwnProfile?: boolean;
 }
 
+/**
+ * Top100HeroSection - Part of Global Achievement & Milestone System
+ * Uses unified colors from globalAchievementMilestoneSystem.ts
+ */
 export function Top100HeroSection({
   avatarUrl,
   displayName,
@@ -34,13 +39,13 @@ export function Top100HeroSection({
     .toUpperCase()
     .slice(0, 2) || '?';
 
-  // Get ring color from unified tier system - only show if user has earned a ring
+  // Get ring color from Global Achievement & Milestone System
   const hasAchievementRing = clubRing && clubRing !== 'none';
-  const tierColor = hasAchievementRing ? getRingColorForTier(clubRing) : null;
+  const tierColor = hasAchievementRing ? getRingColorForTotalPlayed(totalPlayed) : null;
 
   return (
     <div className="flex flex-col items-center text-center space-y-4 py-4">
-      {/* Avatar with achievement tier ring - follows global avatar ring rule */}
+      {/* Avatar with achievement tier ring - uses unified system colors */}
       <div className="relative flex items-center justify-center">
         <SquircleAvatar
           size={144}

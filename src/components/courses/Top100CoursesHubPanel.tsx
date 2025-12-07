@@ -10,7 +10,7 @@ import { getTop100Club } from '@/lib/top100Club';
 import { getTop100RingDotClass } from '@/lib/top100RingStyles';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Search, Award, X } from 'lucide-react';
-import { AchievementBadge } from '@/components/achievements/AchievementBadge';
+import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -296,14 +296,14 @@ const Top100CoursesHubPanel = () => {
               </div>
             </section>
 
-            {/* 2. Hero achievement badge row */}
+            {/* 2. Hero achievement badge row - using unified AchievementBadgeCard */}
             {totalRated >= 5 && (
-              <AchievementBadge
-                count={totalRated}
-                title="Top 100"
-                tierLabel={club.tierName || 'Top 100 Club'}
-                ringColor={club.ringColor}
-                size="md"
+              <AchievementBadgeCard
+                tier={club.threshold?.toString() as AchievementTier || '5'}
+                title={`${totalRated} Top 100`}
+                subtitle={club.tierName || 'Top 100 Club'}
+                unlocked={true}
+                compact={true}
               />
             )}
 

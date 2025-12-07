@@ -12,7 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ChevronRight } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ENABLE_TOP100_MOCK_PLAYERS } from '@/config/featureFlags';
-import { getRingColorForTier } from '@/lib/top100Club';
+import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { TOP100_MOCK_PLAYERS } from '@/mocks/top100MockPlayers';
 import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 import {
@@ -287,7 +287,7 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
                 .join('')
                 .toUpperCase()
                 .slice(0, 2)}
-              ringColor={meClub ? getRingColorForTier(meClub.tierId) : null}
+              ringColor={meClub ? getRingColorForTotalPlayed(me.total_top100_played || 0) : null}
             />
 
             <div className="flex flex-col text-left">
@@ -438,7 +438,7 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
                   src={entry.avatar_url}
                   alt={entry.display_name}
                   fallback={initials}
-                  ringColor={getRingColorForTier(club.tierId)}
+                  ringColor={getRingColorForTotalPlayed(entry.total_top100_played || 0)}
                   className="flex-shrink-0"
                 />
 

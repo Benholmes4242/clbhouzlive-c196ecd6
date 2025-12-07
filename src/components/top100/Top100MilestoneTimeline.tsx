@@ -1,10 +1,16 @@
 import React from 'react';
 import { TOP100_MILESTONES } from '@/config/top100Milestones';
+import { MILESTONE_THEMES } from '@/lib/globalAchievementMilestoneSystem';
 
 interface Top100MilestoneTimelineProps {
   totalTop100Played: number;
 }
 
+/**
+ * Top100MilestoneTimeline - Part of Global Achievement & Milestone System
+ * 
+ * Uses SDS squircle shapes and colors from globalAchievementMilestoneSystem.ts
+ */
 export function Top100MilestoneTimeline({ totalTop100Played }: Top100MilestoneTimelineProps) {
   const milestones = TOP100_MILESTONES;
   const nextIndex = milestones.findIndex(m => totalTop100Played < m.threshold);
@@ -24,17 +30,20 @@ export function Top100MilestoneTimeline({ totalTop100Played }: Top100MilestoneTi
         {milestones.map((m, index) => {
           const unlocked = totalTop100Played >= m.threshold;
           const isNext = !unlocked && index === nextIndex;
+          
+          // Get color from Global Achievement & Milestone System
+          const themeColor = MILESTONE_THEMES[m.threshold]?.accent ?? '#94a3b8';
 
           return (
             <div
               key={m.id}
               className="flex min-w-[80px] flex-col items-center gap-1"
             >
-              {/* Squircle badge - new spec: 1/1.05 aspect ratio, 34% border radius */}
+              {/* SDS Squircle badge - 34% border radius */}
               <div
                 className={`
                   flex items-center justify-center text-sm font-semibold
-                  transition-all duration-200
+                  transition-all duration-200 rounded-sq-md
                   ${
                     unlocked
                       ? 'text-white'
@@ -45,14 +54,13 @@ export function Top100MilestoneTimeline({ totalTop100Played }: Top100MilestoneTi
                 `}
                 style={{
                   width: '64px',
-                  aspectRatio: '1 / 1.05',
-                  borderRadius: '34%',
+                  height: '67px', // Maintain 1/1.05 aspect ratio
                   border: unlocked 
-                    ? `2px solid ${m.ringColor}` 
+                    ? `2px solid ${themeColor}` 
                     : isNext 
                     ? '2px solid #FBBF24' 
                     : '2px solid #D1D5DB',
-                  backgroundColor: unlocked ? m.ringColor : undefined,
+                  backgroundColor: unlocked ? themeColor : undefined,
                 }}
               >
                 {m.threshold}
