@@ -20,11 +20,10 @@ export const ScorePill: React.FC<ScorePillProps> = ({ score, size = 'md' }) => {
 
   return (
     <span
-      className={`inline-flex items-center rounded-sq-xs border ${baseClasses}`}
+      className={`inline-flex items-center rounded-sq-xs border text-slate-800 ${baseClasses}`}
       style={{
         background: `linear-gradient(145deg, ${tierData.bgLight}, ${tierData.bgDark})`,
-        borderColor: tierData.accent,
-        color: tierData.accent,
+        borderColor: tierData.bgDark,
       }}
     >
       {score === 10 ? '10' : score.toFixed(1)}

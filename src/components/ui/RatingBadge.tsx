@@ -30,11 +30,11 @@ export function RatingBadge({ tierData, label, className }: RatingBadgeProps) {
       className={cn(
         'inline-flex items-center justify-center',
         'rounded-full px-3 py-[6px] text-xs font-semibold uppercase tracking-[0.08em]',
+        'text-slate-800',
         className
       )}
       style={{
         background: `linear-gradient(145deg, ${tierData.bgLight}, ${tierData.bgDark})`,
-        color: tierData.accent,
       }}
     >
       {label ?? tierData.label}

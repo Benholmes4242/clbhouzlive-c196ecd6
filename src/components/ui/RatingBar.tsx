@@ -24,13 +24,13 @@ interface RatingBarProps {
   className?: string;
 }
 
-// Map band names to Global Colour System themes
-const bandToAccent: Record<RatingBand, string> = {
-  outstanding: COURSE_RATING_THEMES.OUTSTANDING.accent,
-  excellent: COURSE_RATING_THEMES.EXCELLENT.accent,
-  veryGood: COURSE_RATING_THEMES.VERY_GOOD.accent,
-  good: COURSE_RATING_THEMES.GOOD.accent,
-  fair: COURSE_RATING_THEMES.FAIR.accent,
+// Map band names to Global Colour System themes (using bgDark for pastel consistency)
+const bandToBgDark: Record<RatingBand, string> = {
+  outstanding: COURSE_RATING_THEMES.OUTSTANDING.bgDark,
+  excellent: COURSE_RATING_THEMES.EXCELLENT.bgDark,
+  veryGood: COURSE_RATING_THEMES.VERY_GOOD.bgDark,
+  good: COURSE_RATING_THEMES.GOOD.bgDark,
+  fair: COURSE_RATING_THEMES.FAIR.bgDark,
 };
 
 export function RatingBar({
@@ -44,7 +44,7 @@ export function RatingBar({
   const fillColor =
     mode === 'neutral'
       ? 'var(--rating-bar-fill-neutral)'
-      : bandToAccent[band];
+      : bandToBgDark[band];
 
   return (
     <div
