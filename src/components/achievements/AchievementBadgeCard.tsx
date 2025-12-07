@@ -57,10 +57,9 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
     <div
       className={cn(
         'rounded-3xl flex flex-col justify-between transition-all duration-150',
-        'border',
         unlocked 
-          ? 'border-transparent shadow-[0_10px_30px_rgba(15,23,42,0.12)]' 
-          : 'border-slate-200/70 shadow-sm',
+          ? 'shadow-[0_10px_30px_rgba(15,23,42,0.12)]' 
+          : 'shadow-sm',
         // Micro-interactions
         'active:scale-[0.97]',
         unlocked && 'hover:shadow-[0_16px_40px_rgba(16,185,129,0.18)]',
