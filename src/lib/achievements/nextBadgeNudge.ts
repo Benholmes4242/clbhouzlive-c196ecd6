@@ -184,7 +184,14 @@ export function getNextBadgeNudge(progress: UserTop100Progress): BadgeNudge | nu
 
     const themeId = REGION_ID_TO_THEME[regionId];
     const regionTheme = getRegionTheme(themeId);
+    
+    // Null-safe fallback - skip this nudge if theme resolution fails
+    if (!regionTheme) {
+      console.warn(`[nextBadgeNudge] Unknown region theme for: ${themeId}`);
+      continue;
+    }
 
+    // All colors sourced exclusively from globalAchievementMilestoneSystem
     candidates.push({
       type: 'regional',
       regionId,
