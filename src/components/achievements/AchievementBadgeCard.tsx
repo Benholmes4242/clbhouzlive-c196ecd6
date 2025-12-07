@@ -67,7 +67,7 @@ export interface AchievementBadgeCardProps {
   isPrimary?: boolean;
   unlockedAt?: string;
   remaining?: number;
-  compact?: boolean;
+  compact?: boolean; // Deprecated - kept for backwards compatibility, ignored
   isGhost?: boolean;
   status?: AchievementStatus;
   // For progress to next tier (milestone cards)
@@ -158,18 +158,16 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   return (
     <div
       className={cn(
-        // Horizontal rectangle with SDS rounded corners
+        // Horizontal rectangle with SDS rounded corners - GLOBAL SIZE for all badges
         'rounded-sq-md flex flex-row items-center gap-3 transition-all duration-150 relative',
+        // Fixed global size for ALL achievement badges site-wide
+        'min-w-[180px] h-[84px] px-3',
         unlocked && !isGhost
           ? 'shadow-[0_6px_20px_rgba(15,23,42,0.10)]' 
           : 'shadow-sm',
         // Micro-interactions
         'active:scale-[0.98]',
         unlocked && !isGhost && 'hover:shadow-[0_10px_28px_rgba(16,185,129,0.15)]',
-        // Size variants - horizontal layout (50% taller)
-        compact 
-          ? 'min-w-[180px] h-[84px] px-3' 
-          : 'min-w-[220px] h-[108px] px-4',
         // Ghost styling
         isGhost && 'border border-dashed border-white/60'
       )}
@@ -188,32 +186,23 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
 
       {/* Left: Trophy icon */}
       <div 
-        className={cn(
-          "rounded-full flex items-center justify-center flex-shrink-0",
-          compact ? "w-8 h-8" : "w-10 h-10"
-        )}
+        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
         style={{ 
           backgroundColor: unlocked ? `${palette.accent}1F` : 'rgba(148,163,184,0.12)' 
         }}
       >
         <Trophy 
-          className={compact ? "w-4 h-4" : "w-5 h-5"}
+          className="w-5 h-5"
           style={{ color: unlocked ? palette.accent : '#94a3b8' }} 
         />
       </div>
 
       {/* Center: Title and subtitle */}
       <div className="flex-1 min-w-0">
-        <div className={cn(
-          "font-semibold leading-tight text-slate-900 truncate",
-          compact ? "text-sm" : "text-base"
-        )}>
+        <div className="font-semibold leading-tight text-slate-900 truncate text-sm">
           {isMilestone ? `${threshold} Club` : title}
         </div>
-        <div className={cn(
-          "text-slate-800/70 truncate",
-          compact ? "text-[11px]" : "text-xs"
-        )}>
+        <div className="text-xs text-slate-800/70 truncate">
           {isMilestone ? clubName : subtitle}
         </div>
       </div>
