@@ -39,7 +39,7 @@
   border-radius: 9999px;
 }
 
-/* Avatar now uses Squircle via AvatarSquircle; no local rounding here */
+/* Avatar now uses SquircleAvatar; no local rounding here */
 
 .scm__avatar.ring { 
   box-shadow: 0 0 0 1px var(--clb-green); 
