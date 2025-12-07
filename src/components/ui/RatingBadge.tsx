@@ -29,7 +29,7 @@ export function RatingBadge({ tierData, label, className }: RatingBadgeProps) {
     <span
       className={cn(
         'inline-flex items-center justify-center',
-        'rounded-full px-3 py-[6px] text-xs font-semibold uppercase tracking-[0.08em]',
+        'rounded-sq-sm px-3 py-[6px] text-xs font-semibold uppercase tracking-[0.08em]',
         className
       )}
       style={{
