@@ -25,18 +25,13 @@ interface RatingBarProps {
 }
 
 // Map band names to Global Colour System themes
-const bandColors: Record<RatingBand, { bgLight: string; bgDark: string }> = {
-  outstanding: { bgLight: COURSE_RATING_THEMES.OUTSTANDING.bgLight, bgDark: COURSE_RATING_THEMES.OUTSTANDING.bgDark },
-  excellent: { bgLight: COURSE_RATING_THEMES.EXCELLENT.bgLight, bgDark: COURSE_RATING_THEMES.EXCELLENT.bgDark },
-  veryGood: { bgLight: COURSE_RATING_THEMES.VERY_GOOD.bgLight, bgDark: COURSE_RATING_THEMES.VERY_GOOD.bgDark },
-  good: { bgLight: COURSE_RATING_THEMES.GOOD.bgLight, bgDark: COURSE_RATING_THEMES.GOOD.bgDark },
-  fair: { bgLight: COURSE_RATING_THEMES.FAIR.bgLight, bgDark: COURSE_RATING_THEMES.FAIR.bgDark },
+const bandToAccent: Record<RatingBand, string> = {
+  outstanding: COURSE_RATING_THEMES.OUTSTANDING.accent,
+  excellent: COURSE_RATING_THEMES.EXCELLENT.accent,
+  veryGood: COURSE_RATING_THEMES.VERY_GOOD.accent,
+  good: COURSE_RATING_THEMES.GOOD.accent,
+  fair: COURSE_RATING_THEMES.FAIR.accent,
 };
-
-// Track color - grey unfilled portion
-const TRACK_COLOR = '#D7DDE3';
-// Neutral fill - dark slate for non-banded bars
-const NEUTRAL_FILL = '#1e293b';
 
 export function RatingBar({
   value,
@@ -46,16 +41,31 @@ export function RatingBar({
   className,
 }: RatingBarProps) {
   const pct = Math.max(0, Math.min(100, (value / max) * 100));
-  const colors = bandColors[band];
-
-  // TEST: All bars use Outstanding badge color
-  const outstandingColor = COURSE_RATING_THEMES.OUTSTANDING.bgDark;
-  const background = `linear-gradient(90deg, ${outstandingColor} 0%, ${outstandingColor} ${pct}%, ${TRACK_COLOR} ${pct}%, ${TRACK_COLOR} 100%)`;
+  const fillColor =
+    mode === 'neutral'
+      ? 'var(--rating-bar-fill-neutral)'
+      : bandToAccent[band];
 
   return (
     <div
-      className={cn('h-2 w-full rounded-full', className)}
-      style={{ background }}
-    />
+      className={cn(
+        'relative w-full overflow-hidden',
+        className
+      )}
+      style={{
+        height: 'var(--rating-bar-height-sm)',
+        backgroundColor: 'var(--rating-bar-track)',
+        borderRadius: 'var(--rating-bar-radius)',
+      }}
+    >
+      <div
+        className="absolute inset-y-0 left-0 transition-all duration-300"
+        style={{
+          width: `${pct}%`,
+          backgroundColor: fillColor,
+          borderRadius: 'var(--rating-bar-radius)',
+        }}
+      />
+    </div>
   );
 }
