@@ -379,13 +379,13 @@ const HeroProfileHeader = ({
           />
         </div>
 
-        {/* META BLOCK - Two-column layout: avatar left, text right */}
+        {/* META BLOCK - Avatar left, centered text right */}
         <div
           ref={profileCardRef}
-          className="relative px-4 mt-[-52px] flex flex-row items-center md:mx-auto md:max-w-[600px]"
+          className="relative px-4 pt-4 pb-2 mt-[-52px] flex flex-row items-center gap-4 md:mx-auto md:max-w-[600px]"
         >
           {/* AVATAR – Left column */}
-          <div className="flex-shrink-0 mr-5 md:mr-7 z-20">
+          <div className="flex-shrink-0 z-20">
             <ProfileAvatarRing
               photoUrl={profile?.profile_photo_url}
               displayName={displayName}
@@ -398,25 +398,29 @@ const HeroProfileHeader = ({
             />
           </div>
 
-          {/* TEXT META (name, @handle, club, bio, customise) - Right column */}
+          {/* TEXT META (name, @handle, HCP, club, customise) - Centered in remaining space */}
           <ProfileHeaderCard
             displayName={displayName}
             username={username}
-            bio={profile?.bio}
-            profilePhotoUrl={profile?.profile_photo_url}
             homeClub={isPersonal ? homeClub : undefined}
             handicap={isPersonal ? profile?.eg_handicap_index : undefined}
             websiteUrl={profile?.website}
             location={profile?.location}
             userType={profile?.user_type}
-            totalTop100Played={totalTop100Played}
             isPersonal={isPersonal}
             isOwnProfile={isOwnProfile}
-            isMobile={isMobile}
-            onAvatarClick={() => openImmersive?.(0)}
             onCustomiseClick={isOwnProfile ? () => setEditDialogOpen(true) : undefined}
           />
         </div>
+
+        {/* BIO - Full width row below header */}
+        {profile?.bio && (
+          <div className="px-6 pb-3 md:mx-auto md:max-w-[600px]">
+            <p className="text-sm text-muted-foreground text-center leading-relaxed">
+              {profile.bio}
+            </p>
+          </div>
+        )}
 
         {/* Social Actions - Only for other users' profiles */}
         {!isOwnProfile && user?.id && profile?.id && (
