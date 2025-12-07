@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getTop100Club } from '@/lib/top100Club';
-import { AchievementBadge } from '@/components/achievements/AchievementBadge';
+import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
 import ProfileCompletionStamps from './ProfileCompletionStamps';
 import { getCompletionStamps } from '@/lib/top100Helpers';
 import type { Top100ListProgress } from '@/lib/top100Helpers';
@@ -22,8 +22,10 @@ interface ProfileTop100ChipProps {
 }
 
 /**
- * ProfileTop100Chip - Uses the Apple Glass Ultra AchievementBadge
- * Only renders if user has at least 5 Top 100 courses (first achievement)
+ * ProfileTop100Chip - Part of Global Achievement & Milestone System
+ * 
+ * Uses the unified AchievementBadgeCard component with colors from
+ * globalAchievementMilestoneSystem.ts to match all other achievement displays.
  */
 const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
   top100Overview,
@@ -42,6 +44,9 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
   
   const club = getTop100Club(totalPlayed);
   const completionStamps = getCompletionStamps(top100Overview.lists);
+  
+  // Map threshold to AchievementTier
+  const achievementTier = club.threshold?.toString() as AchievementTier || '5';
 
   return (
     <section className="mt-8 flex flex-col items-center">
@@ -55,12 +60,12 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
           'hover:scale-[1.01]'
         )}
       >
-        <AchievementBadge
-          count={totalPlayed}
-          title="Top 100"
-          tierLabel={club.tierName || 'Top 100 Club'}
-          ringColor={club.ringColor}
-          size="md"
+        <AchievementBadgeCard
+          tier={achievementTier}
+          title={`${totalPlayed} Top 100`}
+          subtitle={club.tierName || 'Top 100 Club'}
+          unlocked={true}
+          compact={true}
         />
         <ChevronRight className="absolute -right-7 h-5 w-5 text-slate-400" />
       </button>

@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { getTop100Club, getRingColorForTier } from '@/lib/top100Club';
+import { getTop100Club } from '@/lib/top100Club';
+import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import {
   Tooltip,
   TooltipContent,
@@ -29,10 +30,10 @@ const SIZES = {
 const RING_ANIMATED_KEY = 'clbhouz:ringAnimated:v1';
 
 /**
- * ProfileAvatarRing - Avatar with Top 100 exploration ring using new squircle spec
- * Uses 1/1.05 aspect ratio, 34% border radius
- * ACHIEVEMENT STATE: 1px colored ring directly on avatar (no grey ring)
- * NORMAL STATE: 1px grey ring on avatar
+ * ProfileAvatarRing - Part of Global Achievement & Milestone System
+ * 
+ * Avatar with Top 100 exploration ring using squircle spec (1/1.05 aspect, 34% radius).
+ * Ring colors are sourced from globalAchievementMilestoneSystem.ts to match milestone cards.
  */
 const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
   photoUrl,
@@ -59,10 +60,11 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
     return getTop100Club(totalTop100Played);
   }, [totalTop100Played]);
   
+  // Ring color from Global Achievement & Milestone System (matches milestone cards)
   const tierColor = useMemo(() => {
     if (!isPersonal || totalTop100Played < 5) return null;
-    return getRingColorForTier(tierInfo.tierId);
-  }, [isPersonal, tierInfo.tierId, totalTop100Played]);
+    return getRingColorForTotalPlayed(totalTop100Played);
+  }, [isPersonal, totalTop100Played]);
   
   const showRing = isPersonal && totalTop100Played >= 5 && tierColor;
   
