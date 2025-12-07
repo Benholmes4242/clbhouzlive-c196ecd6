@@ -32,6 +32,7 @@ const FILTER_OPTIONS: { id: ActivityFilterType; label: string; icon: React.Eleme
 
 /**
  * ActivityFiltersSheet - Bottom sheet for filtering activity feed
+ * Uses slate color palette for premium, consistent styling
  */
 const ActivityFiltersSheet: React.FC<ActivityFiltersSheetProps> = ({
   open,
@@ -47,8 +48,11 @@ const ActivityFiltersSheet: React.FC<ActivityFiltersSheetProps> = ({
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="bg-background border-t border-border">
-        <DrawerHeader className="text-left pb-2">
-          <DrawerTitle className="text-lg font-semibold">Filter posts</DrawerTitle>
+        {/* Slate handle bar */}
+        <div className="mx-auto mt-3 mb-1 h-1 w-10 rounded-full bg-slate-200" />
+        
+        <DrawerHeader className="text-left pb-2 pt-1">
+          <DrawerTitle className="text-lg font-semibold text-foreground">Filter posts</DrawerTitle>
         </DrawerHeader>
         
         <div className="px-4 pb-8 space-y-1">
@@ -61,25 +65,41 @@ const ActivityFiltersSheet: React.FC<ActivityFiltersSheetProps> = ({
                 key={option.id}
                 onClick={() => handleSelect(option.id)}
                 className={cn(
-                  "w-full flex items-center gap-3 px-4 py-3 rounded-xl",
+                  "w-full flex items-center gap-3 px-4 py-3 rounded-sq-md",
                   "transition-all duration-200",
                   isActive 
-                    ? "bg-primary/10 text-foreground" 
-                    : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
+                    ? "bg-slate-100 text-slate-800" 
+                    : "hover:bg-slate-50 text-muted-foreground hover:text-foreground"
                 )}
               >
+                {/* Icon container with slate styling */}
                 <div className={cn(
                   "w-10 h-10 rounded-full flex items-center justify-center",
-                  isActive ? "bg-primary/20" : "bg-muted"
+                  "transition-colors duration-200",
+                  isActive 
+                    ? "bg-slate-200" 
+                    : "bg-muted/50"
                 )}>
-                  <Icon className={cn("w-5 h-5", isActive && "text-primary")} />
+                  <Icon className={cn(
+                    "w-5 h-5 transition-colors duration-200",
+                    isActive ? "text-slate-700" : "text-muted-foreground"
+                  )} />
                 </div>
+                
+                {/* Label and description */}
                 <div className="flex-1 text-left">
-                  <div className="font-medium text-sm">{option.label}</div>
+                  <div className={cn(
+                    "font-medium text-sm",
+                    isActive ? "text-slate-800" : "text-foreground"
+                  )}>
+                    {option.label}
+                  </div>
                   <div className="text-xs text-muted-foreground">{option.description}</div>
                 </div>
+                
+                {/* Active indicator dot */}
                 {isActive && (
-                  <div className="w-2 h-2 rounded-full bg-primary" />
+                  <div className="w-2 h-2 rounded-full bg-slate-600" />
                 )}
               </button>
             );
