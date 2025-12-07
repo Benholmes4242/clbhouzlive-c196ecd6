@@ -48,18 +48,9 @@ export function RatingBar({
   const pct = Math.max(0, Math.min(100, (value / max) * 100));
   const colors = bandColors[band];
 
-  // Build background as a single linear-gradient:
-  // - Fill segment: 0% → pct%
-  // - Track segment: pct% → 100%
-  let background: string;
-
-  if (mode === 'neutral') {
-    // Solid dark slate fill
-    background = `linear-gradient(90deg, ${NEUTRAL_FILL} 0%, ${NEUTRAL_FILL} ${pct}%, ${TRACK_COLOR} ${pct}%, ${TRACK_COLOR} 100%)`;
-  } else {
-    // Banded: Use pastel gradient matching RatingBadge (bgLight → bgDark across fill)
-    background = `linear-gradient(90deg, ${colors.bgLight} 0%, ${colors.bgDark} ${pct}%, ${TRACK_COLOR} ${pct}%, ${TRACK_COLOR} 100%)`;
-  }
+  // TEST: All bars use the same dark slate fill to check if rendering is correct
+  // Both neutral and banded modes use NEUTRAL_FILL
+  const background = `linear-gradient(90deg, ${NEUTRAL_FILL} 0%, ${NEUTRAL_FILL} ${pct}%, ${TRACK_COLOR} ${pct}%, ${TRACK_COLOR} 100%)`;
 
   return (
     <div
