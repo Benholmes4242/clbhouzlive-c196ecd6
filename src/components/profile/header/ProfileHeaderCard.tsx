@@ -25,9 +25,8 @@ interface ProfileHeaderCardProps {
 }
 
 /**
- * ProfileHeaderCard - Modern social app style (Strava/TikTok/LinkedIn)
- * Mobile: centered, Desktop: left-aligned
- * Tight vertical spacing for more room for achievements
+ * ProfileHeaderCard - Two-column layout meta block
+ * Left-aligned text to sit beside avatar
  */
 const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   displayName,
@@ -59,18 +58,18 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   const displayBio = shouldTruncateBio && !bioExpanded ? `${bio.slice(0, 120)}...` : bio;
 
   return (
-    <section className="mt-3 flex flex-col items-center px-4 text-center md:items-start md:text-left">
+    <section className="flex flex-col justify-center items-start">
       {/* Name */}
-      <h1 className="text-xl font-semibold text-foreground">
+      <h1 className="text-2xl font-semibold leading-tight text-foreground">
         {displayName}
       </h1>
 
       {/* Username + Handicap pill on one line */}
-      <div className="mt-1 flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground md:justify-start">
+      <div className="mt-0.5 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
         <span>@{username}</span>
 
         {isPersonal && handicap != null && (
-          <span className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-xs font-medium text-foreground/80">
+          <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-foreground/80">
             HCP {handicap.toFixed(1)}
           </span>
         )}
@@ -78,13 +77,13 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
 
       {/* Club name on its own line (personal) or Location (business) */}
       {isPersonal && homeClub && (
-        <p className="mt-1 text-sm text-foreground/80">
+        <p className="mt-1 text-sm text-muted-foreground">
           {homeClub}
         </p>
       )}
       
       {!isPersonal && location && (
-        <p className="mt-1 text-sm text-foreground/80">
+        <p className="mt-1 text-sm text-muted-foreground">
           {location}
         </p>
       )}
@@ -106,9 +105,9 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
 
       {/* Bio – max 2 lines + "Show more" toggle */}
       {bio && (
-        <div className="mt-2 max-w-[320px] text-sm text-muted-foreground">
-          <p className="leading-relaxed">
-            {displayBio}
+        <div className="mt-2 max-w-[260px] text-sm text-foreground/80">
+          <p className="leading-relaxed line-clamp-2">
+            {bioExpanded ? bio : displayBio}
           </p>
           {shouldTruncateBio && (
             <button
@@ -130,9 +129,9 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
         <button
           type="button"
           onClick={onCustomiseClick}
-          className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80"
+          className="mt-2 text-sm text-primary underline hover:text-primary/80"
         >
-          <span className="underline">Customise profile</span>
+          Customise profile
         </button>
       )}
     </section>
