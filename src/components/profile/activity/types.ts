@@ -17,6 +17,7 @@ export interface ActivityMediaItem {
   additionalMediaCount?: number;
   isMilestone?: boolean;
   canAutoplay?: boolean;
+  durationSeconds?: number | null;
 }
 
 export interface ActivityMediaGridProps {
@@ -51,6 +52,7 @@ export interface ActivityPost {
     studio_edits?: any | null;
     aspect_ratio?: number | null;
     poster_url?: string | null;
+    duration_seconds?: number | null;
   }>;
   post_tags: Array<{
     id: string;

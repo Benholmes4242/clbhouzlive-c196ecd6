@@ -50,7 +50,8 @@ function postToMediaItem(post: ActivityPost, index: number): ActivityMediaItem |
     additionalMediaCount: media.length > 1 ? media.length - 1 : undefined,
     isMilestone,
     aspectRatio,
-    canAutoplay
+    canAutoplay,
+    durationSeconds: primaryMedia.duration_seconds
   };
 }
 
@@ -101,7 +102,7 @@ const ActivityMediaGrid: React.FC<ActivityMediaGridProps> = ({
   }, [mediaItems]);
 
   // Wire up autoplay behavior
-  useGridVideoAutoplay(videoEntries);
+  const { playingIds } = useGridVideoAutoplay(videoEntries);
 
   // Loading state with shimmer skeletons
   if (isLoading) {
@@ -146,6 +147,7 @@ const ActivityMediaGrid: React.FC<ActivityMediaGridProps> = ({
                 key={`hero-${row.post.id}-${index}`}
                 item={row.post}
                 onPress={onPostPress}
+                isPlaying={playingIds.has(row.post.postId)}
               />
             );
           }
@@ -156,12 +158,14 @@ const ActivityMediaGrid: React.FC<ActivityMediaGridProps> = ({
                 item={row.left} 
                 onPress={onPostPress}
                 videoRef={row.left.canAutoplay ? registerVideoRef(row.left.postId) : undefined}
+                isPlaying={playingIds.has(row.left.postId)}
               />
               {row.right ? (
                 <StandardPostTile 
                   item={row.right} 
                   onPress={onPostPress}
                   videoRef={row.right.canAutoplay ? registerVideoRef(row.right.postId) : undefined}
+                  isPlaying={playingIds.has(row.right.postId)}
                 />
               ) : (
                 <div className="aspect-square" /> // empty spacer if odd

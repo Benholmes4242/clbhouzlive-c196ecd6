@@ -31,6 +31,7 @@ export const useActivityPosts = (userId?: string) => {
             media_url,
             poster_url,
             aspect_ratio,
+            duration_seconds,
             filter_id,
             studio_edits
           ),
@@ -117,6 +118,7 @@ export const useActivityPosts = (userId?: string) => {
             media_url: media.media_url,
             poster_url: media.poster_url,
             aspect_ratio: media.aspect_ratio,
+            duration_seconds: media.duration_seconds,
             filter_id: media.filter_id,
             studio_edits: media.studio_edits
           })),

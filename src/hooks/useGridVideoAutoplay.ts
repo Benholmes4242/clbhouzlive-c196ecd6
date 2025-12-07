@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 export interface VideoEntry {
   id: string;
@@ -11,9 +11,15 @@ export interface VideoEntry {
  * - Max 2 videos playing at once
  * - Only eligible videos (canAutoplay=true) will autoplay
  * - Videos pause when scrolled out of view
+ * - Returns playingIds set for UI state
  */
 export function useGridVideoAutoplay(videos: VideoEntry[]) {
   const playingIdsRef = useRef<Set<string>>(new Set());
+  const [playingIds, setPlayingIds] = useState<Set<string>>(new Set());
+
+  const updatePlayingState = useCallback(() => {
+    setPlayingIds(new Set(playingIdsRef.current));
+  }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -22,6 +28,8 @@ export function useGridVideoAutoplay(videos: VideoEntry[]) {
 
     const observer = new IntersectionObserver(
       (entries) => {
+        let stateChanged = false;
+
         for (const entry of entries) {
           const video = entry.target as HTMLVideoElement;
           const id = video.dataset.postId;
@@ -46,12 +54,14 @@ export function useGridVideoAutoplay(videos: VideoEntry[]) {
                   oldVideo.currentTime = 0;
                 }
                 currentlyPlaying.delete(first);
+                stateChanged = true;
               }
 
               video
                 .play()
                 .then(() => {
                   currentlyPlaying.add(id);
+                  updatePlayingState();
                 })
                 .catch(() => {
                   // autoplay blocked – leave it paused
@@ -62,8 +72,13 @@ export function useGridVideoAutoplay(videos: VideoEntry[]) {
             if (currentlyPlaying.has(id)) {
               video.pause();
               currentlyPlaying.delete(id);
+              stateChanged = true;
             }
           }
+        }
+
+        if (stateChanged) {
+          updatePlayingState();
         }
       },
       {
@@ -82,6 +97,10 @@ export function useGridVideoAutoplay(videos: VideoEntry[]) {
     return () => {
       observer.disconnect();
       playingIdsRef.current.clear();
+      setPlayingIds(new Set());
     };
-  }, [videos]);
+  }, [videos, updatePlayingState]);
+
+  return { playingIds };
 }
+
