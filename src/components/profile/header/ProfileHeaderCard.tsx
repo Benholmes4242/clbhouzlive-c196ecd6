@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Globe } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React from 'react';
+import { Globe } from 'lucide-react';
 
 interface ProfileHeaderCardProps {
   displayName: string;
@@ -36,14 +35,10 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   handicap,
   websiteUrl,
   location,
-  userType,
   isPersonal,
   isOwnProfile,
-  isMobile,
   onCustomiseClick,
 }) => {
-  const [bioExpanded, setBioExpanded] = useState(false);
-  
   // Format website URL for display
   const formatWebsiteUrl = (url: string) => {
     return url.replace(/^https?:\/\//, '').replace(/\/$/, '');
@@ -53,9 +48,6 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   const getWebsiteHref = (url: string) => {
     return url.startsWith('http') ? url : `https://${url}`;
   };
-  
-  const shouldTruncateBio = bio && bio.length > 120;
-  const displayBio = shouldTruncateBio && !bioExpanded ? `${bio.slice(0, 120)}...` : bio;
 
   return (
     <section className="flex flex-col justify-center items-start">
@@ -65,11 +57,11 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
       </h1>
 
       {/* Username + Handicap pill on one line */}
-      <div className="mt-0.5 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+      <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
         <span>@{username}</span>
 
         {isPersonal && handicap != null && (
-          <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-foreground/80">
+          <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-foreground/70">
             HCP {handicap.toFixed(1)}
           </span>
         )}
@@ -103,25 +95,11 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
         </div>
       )}
 
-      {/* Bio – max 2 lines + "Show more" toggle */}
+      {/* Bio – max 2 lines with ellipsis */}
       {bio && (
-        <div className="mt-2 max-w-[260px] text-sm text-foreground/80">
-          <p className="leading-relaxed line-clamp-2">
-            {bioExpanded ? bio : displayBio}
-          </p>
-          {shouldTruncateBio && (
-            <button
-              onClick={() => setBioExpanded(!bioExpanded)}
-              className="inline-flex items-center gap-0.5 text-xs font-medium text-primary hover:text-primary/80 mt-1"
-            >
-              {bioExpanded ? (
-                <>Show less <ChevronUp className="w-3 h-3" /></>
-              ) : (
-                <>Show more <ChevronDown className="w-3 h-3" /></>
-              )}
-            </button>
-          )}
-        </div>
+        <p className="mt-1.5 max-w-[260px] text-sm text-muted-foreground leading-snug line-clamp-2">
+          {bio}
+        </p>
       )}
 
       {/* Customise profile link */}
