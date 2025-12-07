@@ -16,8 +16,9 @@ export interface ActivityMediaItem {
   roundDate?: string;
   additionalMediaCount?: number;
   isMilestone?: boolean;
-  canAutoplay?: boolean;
+  isAutoplayCandidate?: boolean; // Every 3rd video is a candidate
   durationSeconds?: number | null;
+  sortIndex?: number; // Used for stable ordering in autoplay logic
 }
 
 export interface ActivityMediaGridProps {

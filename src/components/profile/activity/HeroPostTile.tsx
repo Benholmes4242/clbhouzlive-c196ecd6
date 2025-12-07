@@ -1,13 +1,15 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { ActivityMediaItem } from './types';
 import PostMedia from './PostMedia';
 import VideoOverlay from './VideoOverlay';
 import { Images, Trophy } from 'lucide-react';
+import { RegisterVideoFn } from '@/hooks/useGridAutoplay';
 
 interface HeroPostTileProps {
   item: ActivityMediaItem;
   onPress?: (postId: string) => void;
+  registerVideo?: RegisterVideoFn;
   isPlaying?: boolean;
 }
 
@@ -15,12 +17,69 @@ interface HeroPostTileProps {
  * Full-width hero tile for standout posts
  * Cinematic 16:9 aspect, spans both columns
  */
-const HeroPostTile: React.FC<HeroPostTileProps> = ({ item, onPress, isPlaying = false }) => {
+const HeroPostTile: React.FC<HeroPostTileProps> = ({ 
+  item, 
+  onPress, 
+  registerVideo,
+  isPlaying = false 
+}) => {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  
   const handleClick = useCallback(() => {
     onPress?.(item.postId);
   }, [item.postId, onPress]);
 
   const isVideo = item.type === 'video';
+  const isAutoplayCandidate = item.isAutoplayCandidate ?? false;
+
+  // Register video with autoplay hook
+  useEffect(() => {
+    if (!isVideo || !registerVideo) return;
+
+    registerVideo({
+      id: item.postId,
+      element: videoRef.current,
+      isCandidate: isAutoplayCandidate,
+      sortIndex: item.sortIndex ?? 0,
+    });
+
+    // Clean up on unmount
+    return () => {
+      registerVideo({
+        id: item.postId,
+        element: null,
+        isCandidate: isAutoplayCandidate,
+        sortIndex: item.sortIndex ?? 0,
+      });
+    };
+  }, [item.postId, isVideo, isAutoplayCandidate, item.sortIndex, registerVideo]);
+
+  // Render video element for autoplay candidates
+  const renderMedia = () => {
+    if (isVideo && isAutoplayCandidate && item.playbackUrl) {
+      return (
+        <video
+          ref={videoRef}
+          src={item.playbackUrl}
+          poster={item.thumbnailUrl}
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          className="w-full h-full object-cover"
+        />
+      );
+    }
+
+    // Default: use PostMedia for images and non-autoplay videos
+    return (
+      <PostMedia
+        thumbnailUrl={item.thumbnailUrl || item.url}
+        title={item.courseName}
+        isVideo={isVideo}
+      />
+    );
+  };
 
   return (
     <button
@@ -34,11 +93,7 @@ const HeroPostTile: React.FC<HeroPostTileProps> = ({ item, onPress, isPlaying = 
       onClick={handleClick}
     >
       {/* Media with skeleton loading */}
-      <PostMedia
-        thumbnailUrl={item.thumbnailUrl || item.url}
-        title={item.courseName}
-        isVideo={isVideo}
-      />
+      {renderMedia()}
 
       {/* Bottom gradient overlay - only for non-video since VideoOverlay handles it */}
       {!isVideo && (
@@ -49,7 +104,7 @@ const HeroPostTile: React.FC<HeroPostTileProps> = ({ item, onPress, isPlaying = 
       {isVideo && (
         <VideoOverlay
           durationSeconds={item.durationSeconds}
-          isPlaying={item.canAutoplay && isPlaying}
+          isPlaying={isAutoplayCandidate && isPlaying}
         />
       )}
 

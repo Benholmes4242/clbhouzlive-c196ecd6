@@ -1,39 +1,68 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { ActivityMediaItem } from './types';
 import PostMedia from './PostMedia';
 import VideoOverlay from './VideoOverlay';
 import { Images, Trophy } from 'lucide-react';
+import { RegisterVideoFn } from '@/hooks/useGridAutoplay';
 
 interface StandardPostTileProps {
   item: ActivityMediaItem;
   onPress?: (postId: string) => void;
-  videoRef?: (el: HTMLVideoElement | null) => void;
+  registerVideo?: RegisterVideoFn;
   isPlaying?: boolean;
 }
 
 /**
  * Standard tile for two-column waterfall grid
- * Square aspect with pointed corners
+ * Consistent 3:4 aspect ratio with pointed corners
  */
-const StandardPostTile: React.FC<StandardPostTileProps> = ({ item, onPress, videoRef, isPlaying = false }) => {
+const StandardPostTile: React.FC<StandardPostTileProps> = ({ 
+  item, 
+  onPress, 
+  registerVideo,
+  isPlaying = false 
+}) => {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  
   const handleClick = useCallback(() => {
     onPress?.(item.postId);
   }, [item.postId, onPress]);
 
   const isVideo = item.type === 'video';
+  const isAutoplayCandidate = item.isAutoplayCandidate ?? false;
   
   // Force consistent aspect ratio for all grid tiles to prevent gaps
   const aspectClass = 'aspect-[3/4]';
 
+  // Register video with autoplay hook
+  useEffect(() => {
+    if (!isVideo || !registerVideo) return;
+
+    registerVideo({
+      id: item.postId,
+      element: videoRef.current,
+      isCandidate: isAutoplayCandidate,
+      sortIndex: item.sortIndex ?? 0,
+    });
+
+    // Clean up on unmount
+    return () => {
+      registerVideo({
+        id: item.postId,
+        element: null,
+        isCandidate: isAutoplayCandidate,
+        sortIndex: item.sortIndex ?? 0,
+      });
+    };
+  }, [item.postId, isVideo, isAutoplayCandidate, item.sortIndex, registerVideo]);
+
   // Render video element for autoplay candidates
   const renderMedia = () => {
-    if (isVideo && item.canAutoplay && item.playbackUrl) {
+    if (isVideo && isAutoplayCandidate && item.playbackUrl) {
       return (
         <video
           ref={videoRef}
-          data-post-id={item.postId}
-          data-can-autoplay="true"
           src={item.playbackUrl}
           poster={item.thumbnailUrl}
           muted
@@ -72,7 +101,7 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({ item, onPress, vide
       {isVideo && (
         <VideoOverlay
           durationSeconds={item.durationSeconds}
-          isPlaying={item.canAutoplay && isPlaying}
+          isPlaying={isAutoplayCandidate && isPlaying}
         />
       )}
 
