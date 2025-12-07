@@ -1,28 +1,66 @@
 /**
- * ╔══════════════════════════════════════════════════════════════════════════╗
- * ║           GLOBAL ACHIEVEMENT & MILESTONE SYSTEM                          ║
- * ║                   Single Source of Truth                                 ║
- * ╚══════════════════════════════════════════════════════════════════════════╝
+ * ╔══════════════════════════════════════════════════════════════════════════════════════════╗
+ * ║                      GLOBAL ACHIEVEMENT & MILESTONE SYSTEM                               ║
+ * ║                            SINGLE SOURCE OF TRUTH                                        ║
+ * ╠══════════════════════════════════════════════════════════════════════════════════════════╣
+ * ║                                                                                          ║
+ * ║  This file is the ONLY place where achievement/milestone colors are defined.             ║
+ * ║  ALL other files MUST reference this system - no local color definitions allowed.        ║
+ * ║                                                                                          ║
+ * ╚══════════════════════════════════════════════════════════════════════════════════════════╝
  * 
- * This file defines the unified color palette and theme tokens for ALL
- * achievement-related UI across the entire application.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════
+ * DESIGN RULES (MUST BE FOLLOWED BY ALL COMPONENTS)
+ * ═══════════════════════════════════════════════════════════════════════════════════════════
  * 
- * DESIGN RULES:
- * 1. Single source of truth - all colors come from this file
- * 2. Rings & icons = pure accent at 100% opacity (no opacity tricks)
- * 3. Cards can use soft gradients derived from the same palette
+ * 1. RINGS & ICONS = PURE ACCENT (100% opacity, no modifiers)
+ *    - Avatar rings: MILESTONE_THEMES[threshold].accent
+ *    - Badge borders: MILESTONE_THEMES[threshold].accent  
+ *    - Trophy icons: MILESTONE_THEMES[threshold].accent
+ *    - Small pills/chips: MILESTONE_THEMES[threshold].accent
+ *    - NO opacity modifiers (/85, /90, etc.)
+ *    - NO color-mix for accents
  * 
- * SURFACES THAT MUST USE THIS SYSTEM:
- * - Profile Achievements rail
- * - Top 100 Milestones Modal (/achievementshub)
- * - Top 100 hub (list completions, badges you're close to)
- * - /top100/[region] pages (USA / GB&I / Europe / World achievements strips)
- * - /courses → Top 100 Club card
- * - /top100?tab=my-progress hero card
- * - Profile avatar ring
- * - All achievement badge cards (AchievementBadgeCard component)
- * - Top100AchievementBadge (glass pill)
- * - All avatar rings (SquircleAvatar ringColor prop)
+ * 2. CARD BACKGROUNDS = SOFT GRADIENTS (derived from same palette)
+ *    - background: linear-gradient(145deg, bgLight, bgDark)
+ *    - Icon color inside cards = accent (same as ring)
+ * 
+ * 3. LOCKED STATE = Universal muted palette
+ *    - Background: hsl(210 15% 96%)
+ *    - Icon: hsl(215 15% 65%)
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════════════════
+ * SURFACES THAT MUST USE THIS SYSTEM
+ * ═══════════════════════════════════════════════════════════════════════════════════════════
+ * 
+ * Avatar Rings:
+ *   - Profile header avatar → getRingColorForTotalPlayed()
+ *   - /top100?tab=my-progress hero avatar → getRingColorForTotalPlayed()
+ *   - Top 100 Hub hero avatar → getRingColorForTotalPlayed()
+ *   - Top 100 leaderboard avatars → getRingColorForTotalPlayed()
+ *   - Friends on this journey avatars → getRingColorForTotalPlayed()
+ *   - All SquircleAvatar ringColor props → getRingColorForTotalPlayed()
+ * 
+ * Achievement Cards:
+ *   - Profile Achievements rail → getTierPalette()
+ *   - Top 100 Milestones Modal (/achievementshub) → getTierPalette()
+ *   - Top 100 hub list completions → getTierPalette()
+ *   - "Badges you're close to" sections → getTierPalette()
+ *   - /top100/[region] pages achievement strips → getTierPalette()
+ *   - AchievementBadgeCard component → getTierPalette()
+ * 
+ * Badge Pills:
+ *   - Top100AchievementBadge (glass pill) → getMilestoneAccent()
+ *   - Milestone chips in Top 100 pages → getMilestoneAccent()
+ *   - Map pins → TOP100_TIER_STYLES from top100RingStyles.ts
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════════════════
+ * EXTENSION POLICY
+ * ═══════════════════════════════════════════════════════════════════════════════════════════
+ * 
+ * If additional achievement types are added in the future (e.g., Skill-Based
+ * Achievements, XP Tiers, Seasonal Badges), they MUST extend this system
+ * rather than creating new independent styles.
  * 
  * @module GlobalAchievementMilestoneSystem
  */
