@@ -311,22 +311,24 @@ function AppRoutes() {
 
       {/* Hub Overlays - rendered over origin page when background location exists */}
       {showHubOverlay && FEATURE_FLAGS.HUB && (
-        <Routes>
-          <Route path="/hub" element={<HubHomePage />} />
-          <Route path="/hub/golfers" element={<HubGolfersPage />} />
-          <Route path="/hub/echo" element={<HubEchoChatPage />} />
-          <Route path="/hub/create-game" element={<HubCreateGamePage />} />
-          <Route path="/hub/games" element={<HubGamesPage />} />
-          <Route path="/hub/your-games" element={<HubYourGamesPage />} />
-          <Route path="/hub/swing" element={<HubSwingPage />} />
-          <Route path="/hub/swing/history" element={<HubSwingHistoryPage />} />
-          <Route path="/hub/swing/history/:id" element={<HubSwingDetailPage />} />
-          <Route path="/hub/echo/history" element={<HubEchoHistoryPage />} />
-          <Route path="/hub/echo/history/chat/:id" element={<HubEchoHistoryDetailPage />} />
-          <Route path="/hub/echo/tags" element={<HubEchoTagsPage />} />
-          <Route path="/echo/share/:token" element={<HubEchoSharePage />} />
-          <Route path="/hub/new" element={<Navigate to="/hub/echo/history" replace />} />
-        </Routes>
+        <Suspense fallback={null}>
+          <Routes>
+            <Route path="/hub" element={<HubHomePage />} />
+            <Route path="/hub/golfers" element={<HubGolfersPage />} />
+            <Route path="/hub/echo" element={<HubEchoChatPage />} />
+            <Route path="/hub/create-game" element={<HubCreateGamePage />} />
+            <Route path="/hub/games" element={<HubGamesPage />} />
+            <Route path="/hub/your-games" element={<HubYourGamesPage />} />
+            <Route path="/hub/swing" element={<HubSwingPage />} />
+            <Route path="/hub/swing/history" element={<HubSwingHistoryPage />} />
+            <Route path="/hub/swing/history/:id" element={<HubSwingDetailPage />} />
+            <Route path="/hub/echo/history" element={<HubEchoHistoryPage />} />
+            <Route path="/hub/echo/history/chat/:id" element={<HubEchoHistoryDetailPage />} />
+            <Route path="/hub/echo/tags" element={<HubEchoTagsPage />} />
+            <Route path="/echo/share/:token" element={<HubEchoSharePage />} />
+            <Route path="/hub/new" element={<Navigate to="/hub/echo/history" replace />} />
+          </Routes>
+        </Suspense>
       )}
     </>
   );
