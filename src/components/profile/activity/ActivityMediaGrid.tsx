@@ -108,7 +108,7 @@ const ActivityMediaGrid: React.FC<ActivityMediaGridProps> = ({
   if (isLoading) {
     return (
       <div className="px-0 pb-16">
-        <div className="grid grid-cols-2 gap-1">
+        <div className="grid grid-cols-2 gap-[2px]">
           {/* Hero skeleton */}
           <div className="col-span-2 aspect-[16/9] bg-muted/30 animate-pulse" />
           {/* Standard skeletons */}
@@ -139,7 +139,7 @@ const ActivityMediaGrid: React.FC<ActivityMediaGridProps> = ({
 
   return (
     <div className="px-0 pb-16">
-      <div className="grid grid-cols-2 gap-1">
+      <div className="grid grid-cols-2 gap-[2px]" style={{ gridAutoFlow: 'row dense' }}>
         {layoutRows.map((row, index) => {
           if (row.type === 'hero') {
             return (

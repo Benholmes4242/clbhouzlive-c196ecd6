@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import { Play } from 'lucide-react';
 
 interface PostMediaProps {
   thumbnailUrl: string;
@@ -61,12 +60,7 @@ const PostMedia: React.FC<PostMediaProps> = ({
         </div>
       )}
 
-      {/* Video badge */}
-      {isVideo && !hasError && (
-        <div className="absolute bottom-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/60">
-          <Play className="h-3 w-3 text-white fill-white" />
-        </div>
-      )}
+      {/* Video overlay handled by parent tile component - no icon here */}
     </div>
   );
 };
