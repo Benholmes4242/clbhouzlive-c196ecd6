@@ -87,15 +87,14 @@ export function Top100ProgressHero({
           />
         </div>
 
-        {/* Achievement badge below avatar - uses unified AchievementBadgeCard */}
+        {/* Achievement badge below avatar - uses SDS-compliant AchievementBadgeCard */}
         {hasAchievement && (
-          <div className="mt-4">
+          <div className="mt-4" style={{ width: '192px' }}>
             <AchievementBadgeCard
               tier={achievementTier}
               title={`${totalTop100Played} Top 100`}
               subtitle={club.tierName || 'Top 100 Club'}
               unlocked={true}
-              compact={true}
               totalTop100Played={totalTop100Played}
             />
           </div>
