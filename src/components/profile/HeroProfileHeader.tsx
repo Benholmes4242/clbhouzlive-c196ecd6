@@ -376,7 +376,7 @@ const HeroProfileHeader = ({
         <div
           ref={profileCardRef}
           className="relative px-2 md:px-4"
-          style={{ marginTop: '-56px' }}
+          style={{ marginTop: '-50px' }}
         >
           <div className="mx-auto max-w-3xl">
             {/* Glass panel */}
