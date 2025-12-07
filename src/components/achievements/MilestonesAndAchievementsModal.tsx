@@ -182,6 +182,7 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
                     // In debug mode, all are unlocked
                     const isUnlocked = isDebugUser ? true : totalTop100Played >= threshold;
                     const isCurrent = currentClub.threshold === threshold;
+                    const remaining = Math.max(0, threshold - totalTop100Played);
 
                     return (
                       <AchievementBadgeCard
@@ -191,6 +192,7 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
                         subtitle={milestone.label}
                         unlocked={isUnlocked}
                         isPrimary={isCurrent}
+                        remaining={isUnlocked ? undefined : remaining}
                       />
                     );
                   })}
@@ -205,16 +207,30 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                   {LIST_ACHIEVEMENTS.map((list) => {
+                    // Get list progress for this region
+                    const listSlugMap: Record<string, string> = {
+                      'list_gb_ireland': 'gb-i',
+                      'list_europe': 'europe',
+                      'list_usa': 'usa',
+                      'list_worldwide': 'global',
+                    };
+                    const slug = listSlugMap[list.id];
+                    const listProgress = progressData?.lists?.find(l => l.listSlug === slug);
+                    const played = listProgress?.played ?? 0;
+                    const total = listProgress?.total ?? 100;
+                    const remaining = Math.max(0, total - played);
+                    
                     // In debug mode, all are unlocked
-                    const isUnlocked = isDebugUser ? true : false; // Real logic would check actual list completions
+                    const isUnlocked = isDebugUser ? true : (played >= total && total > 0);
 
                     return (
                       <AchievementBadgeCard
                         key={list.id}
                         tier={getListTier(list.id)}
                         title={list.shortLabel}
-                        subtitle={list.label}
+                        subtitle={`${played} / ${total} courses`}
                         unlocked={isUnlocked}
+                        remaining={isUnlocked ? undefined : remaining}
                       />
                     );
                   })}

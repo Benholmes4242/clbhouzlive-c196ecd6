@@ -1,36 +1,15 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TOP100_LIST_MILESTONES } from '@/config/top100ListMilestones';
+import { getRegionTheme } from '@/lib/achievementThemes';
 
-// Region-specific primary colors
-const REGION_COLORS: Record<string, string> = {
-  global: '#1f9f9b',
-  'gb-i': '#1f7a3a',
-  usa: '#c5443b',
-  europe: '#6554c0',
+// Region-specific primary colors from theme
+const REGION_ACCENTS: Record<string, string> = {
+  global: '#0D9488',
+  'gb-i': '#1E3A5F',
+  usa: '#B91C1C',
+  europe: '#7C3AED',
 };
-
-// Get color based on region and threshold position
-function getTierColor(threshold: number, listSlug?: string): string {
-  const regionColor = listSlug ? REGION_COLORS[listSlug] : null;
-  
-  // For list-specific achievements, use the region color with varying intensity
-  if (regionColor) {
-    // All milestones use the region color, final milestone is darkest
-    return regionColor;
-  }
-  
-  // Fallback tier colors (legacy, for non-region-specific use)
-  const TIER_COLORS: Record<number, string> = {
-    5: '#D9C7A3',
-    10: '#8BBF5A',
-    20: '#2E5930',
-    25: '#2E5930',
-    50: '#C8A44B',
-    75: '#B7BCC6',
-    100: '#0C0F14',
-  };
-  return TIER_COLORS[threshold] || '#94a3b8';
-}
 
 interface Top100ListAchievementsRowProps {
   listName: string;
@@ -108,11 +87,13 @@ export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps>
   playedCount,
   totalCount,
 }) => {
+  const navigate = useNavigate();
   const milestones = TOP100_LIST_MILESTONES.filter(m => m.threshold <= totalCount || m.threshold === 100);
   const maxThreshold = Math.min(milestones[milestones.length - 1]?.threshold ?? 100, totalCount);
   const progressPct = getAchievementsProgressPct(playedCount, milestones, maxThreshold);
 
-  const regionColor = listSlug ? REGION_COLORS[listSlug] : '#94a3b8';
+  const regionColor = listSlug ? REGION_ACCENTS[listSlug] ?? '#94a3b8' : '#94a3b8';
+  const theme = listSlug ? getRegionTheme(listSlug) : null;
 
   return (
     <section className="space-y-2 mt-6">
@@ -124,7 +105,13 @@ export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps>
           Milestones on this list only
         </p>
       </div>
-      <div className="flex items-baseline justify-end px-5">
+      <div className="flex items-baseline justify-between px-5">
+        <button
+          onClick={() => navigate('/achievementshub')}
+          className="text-xs text-primary hover:text-primary/80 font-medium"
+        >
+          View all milestones →
+        </button>
         <p className="text-xs text-muted-foreground">
           {playedCount} / {totalCount} courses played
         </p>
@@ -134,13 +121,12 @@ export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps>
       <div className="overflow-x-auto pb-1 -mx-1 px-1">
         {/* Inner column that scrolls together */}
         <div className="inline-flex flex-col gap-3 min-w-full px-4">
-          {/* Row of circles */}
-          <div className="flex gap-4">
+          {/* Row of circles - pill style with region accent */}
+          <div className="flex gap-3">
             {milestones.map((m) => {
               const unlocked = playedCount >= m.threshold;
               const remaining = Math.max(0, m.threshold - playedCount);
               const isListComplete = m.threshold >= totalCount;
-              const tierColor = getTierColor(m.threshold, listSlug);
 
               // Badge label
               const badgeLabel = isListComplete 
@@ -152,36 +138,30 @@ export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps>
                   key={m.threshold}
                   className="flex flex-col items-center min-w-[72px] gap-1"
                 >
-                  {/* Squircle ring - new spec: 1/1.05 aspect ratio, 34% border radius */}
-                  <div className="relative">
-                    <div
-                      className="flex items-center justify-center bg-white"
-                      style={{
-                        width: '56px',
-                        aspectRatio: '1 / 1.05',
-                        borderRadius: '34%',
-                        boxShadow: unlocked
-                          ? `0 0 18px ${tierColor}22`
-                          : '0 0 10px rgba(15,23,42,0.06)',
-                        border: unlocked 
-                          ? `2px solid ${tierColor}` 
-                          : `2px solid ${tierColor}66`,
-                        opacity: unlocked ? 1 : 0.45,
-                      }}
-                    >
-                      <span className="text-sm font-semibold" style={{ color: tierColor }}>
-                        {m.threshold}
-                      </span>
-                    </div>
+                  {/* Pill-style badge with region color */}
+                  <div 
+                    className="flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold transition-all"
+                    style={{
+                      backgroundColor: unlocked ? `${regionColor}18` : 'white',
+                      border: `2px solid ${unlocked ? regionColor : `${regionColor}55`}`,
+                      color: unlocked ? regionColor : `${regionColor}88`,
+                      opacity: unlocked ? 1 : 0.6,
+                    }}
+                  >
+                    {m.threshold}
                   </div>
 
-                  {/* Labels - consistent two lines */}
-                  <div className="mt-2 text-center">
+                  {/* Labels */}
+                  <div className="mt-1 text-center">
                     <p className="text-xs font-medium text-foreground whitespace-nowrap">
                       {badgeLabel}
                     </p>
                     <p className="text-[11px] leading-[1.2] text-muted-foreground">
-                      {unlocked ? 'Unlocked' : `${remaining} away`}
+                      {unlocked ? (
+                        <span style={{ color: regionColor }}>Unlocked</span>
+                      ) : (
+                        `${remaining} away`
+                      )}
                     </p>
                   </div>
                 </div>
@@ -189,8 +169,8 @@ export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps>
             })}
           </div>
 
-          {/* Progress bar - inside the scroller, uses region color */}
-          <div className="h-1 rounded-full bg-muted/80 relative">
+          {/* Progress bar - uses region color */}
+          <div className="h-1.5 rounded-full bg-muted/80 relative overflow-hidden">
             <div
               className="h-full rounded-full transition-all"
               style={{ 

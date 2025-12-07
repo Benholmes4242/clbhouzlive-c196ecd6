@@ -1,5 +1,6 @@
 import React from 'react';
 import { TOP100_MILESTONES } from '@/config/top100Milestones';
+import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
 
 interface Top100NearAchievementsProps {
   totalTop100Played: number;
@@ -31,38 +32,15 @@ export function Top100NearAchievements({ totalTop100Played }: Top100NearAchievem
 
       <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 scrollbar-hide">
         {candidates.map(m => (
-          <button
+          <AchievementBadgeCard
             key={m.id}
-            type="button"
-            className="flex min-w-[180px] items-center gap-3 rounded-sq-md bg-card border border-border/60 px-3 py-2.5 text-left shadow-[0_1px_4px_rgba(15,23,42,0.06)] hover:bg-accent/50 transition-colors"
-          >
-            {/* Mini squircle - new spec: 1/1.05 aspect ratio, 34% border radius */}
-            <div 
-              className="flex items-center justify-center bg-white text-xs font-semibold"
-              style={{ 
-                width: '40px',
-                aspectRatio: '1 / 1.05',
-                borderRadius: '34%',
-                border: `2px solid ${m.ringColor}`,
-                color: m.ringColor,
-              }}
-            >
-              {m.threshold}
-            </div>
-
-            <div className="flex flex-1 flex-col">
-              <span className="text-xs font-semibold text-foreground">
-                {m.label}
-              </span>
-              <span className="text-[11px] text-muted-foreground">
-                Only{' '}
-                <span className="font-semibold" style={{ color: m.ringColor }}>
-                  {m.remaining} more
-                </span>{' '}
-                Top 100 courses
-              </span>
-            </div>
-          </button>
+            tier={m.threshold.toString() as AchievementTier}
+            title={`${m.threshold} Club`}
+            subtitle={`Only ${m.remaining} more`}
+            unlocked={false}
+            remaining={m.remaining}
+            compact
+          />
         ))}
       </div>
     </section>
