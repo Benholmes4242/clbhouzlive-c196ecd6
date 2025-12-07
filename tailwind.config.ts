@@ -84,15 +84,18 @@ export default {
 				'cta-text-dark': 'var(--cta-text-color-dark)',
 				'border-subtle': 'var(--border-subtle)',
 				'slate-secondary': 'var(--slate-secondary)',
-				// Top 100 Club tier colors
-				rookie: '#D9C7A3',
-				fairway: '#8BBF5A',
-				founders: '#2E5930',
-				heritage: '#C8A44B',
-				century: '#B7BCC6',
-				elite: '#D9A441',
-				legendary: '#5A3E8C',
-				grandslam: '#0C0F14',
+				// Achievement colour system (8-tier green ladder)
+				achievement: {
+					1: 'var(--achv-1-bg)',
+					2: 'var(--achv-2-bg)',
+					3: 'var(--achv-3-bg)',
+					4: 'var(--achv-4-bg)',
+					5: 'var(--achv-5-bg)',
+					6: 'var(--achv-6-bg)',
+					7: 'var(--achv-7-bg)',
+					8: 'var(--achv-8-bg)',
+					gold: 'var(--achv-gold)',
+				},
 				// Top 100 Region colors
 				region: {
 					global: 'rgb(var(--region-global) / <alpha-value>)',
