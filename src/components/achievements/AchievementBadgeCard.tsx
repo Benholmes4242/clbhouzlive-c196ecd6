@@ -79,13 +79,9 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
       <div className="flex justify-between items-start mb-2">
         <div
           className={cn(
-            "rounded-full flex items-center justify-center shadow-sm",
+            "rounded-full flex items-center justify-center bg-white/80 shadow-sm",
             compact ? "h-8 w-8" : "h-9 w-9"
           )}
-          style={{
-            // Use accent color at 15% opacity for subtle background that matches ring color
-            backgroundColor: unlocked ? `${palette.accent}26` : 'rgba(255,255,255,0.8)',
-          }}
         >
           {/* Trophy icon uses pure accent color - same as avatar rings */}
           <Trophy 
