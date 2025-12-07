@@ -165,7 +165,7 @@ export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps>
                           : '0 0 10px rgba(15,23,42,0.06)',
                         border: unlocked 
                           ? `2px solid ${tierColor}` 
-                          : `1px solid ${tierColor}66`,
+                          : `2px solid ${tierColor}66`,
                         opacity: unlocked ? 1 : 0.45,
                       }}
                     >
