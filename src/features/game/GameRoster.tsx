@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GameParticipant } from '@/features/nearby/types';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import HcpBadge from '@/components/HcpBadge';
 
 interface GameRosterProps {
@@ -42,14 +42,12 @@ export function GameRoster({ participants, hostUserId }: GameRosterProps) {
               className="relative group"
               style={{ zIndex: sortedParticipants.length - index }}
             >
-              <AvatarSquircle
+              <SquircleAvatar
                 src={profile?.profile_photo_url || undefined}
                 alt={profile?.display_name || 'Player'}
                 size={40}
                 fallback={profile?.display_name?.[0] || '?'}
-                ringColor="rgba(var(--primary-rgb), 0.2)"
-                ringWidth={2}
-                className="border-2 border-background hover:ring-[rgba(var(--primary-rgb),0.4)] transition-all"
+                className="border-2 border-background"
               />
               {isHost && (
                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center text-[10px] font-bold text-primary-foreground border border-background">

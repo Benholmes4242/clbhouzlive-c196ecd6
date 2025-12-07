@@ -1,13 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TOP100_LIST_MILESTONES } from '@/config/top100ListMilestones';
-import { REGION_SLUG_THEMES } from '@/lib/globalAchievementMilestoneSystem';
-
-// Get region accent color from unified theme
-function getRegionAccent(listSlug: string | undefined): string {
-  if (!listSlug) return '#94a3b8';
-  return REGION_SLUG_THEMES[listSlug]?.accent ?? '#94a3b8';
-}
+import { REGION_SLUG_THEMES, getRegionTheme } from '@/lib/globalAchievementMilestoneSystem';
+import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
 
 interface Top100ListAchievementsRowProps {
   listName: string;
@@ -32,19 +27,25 @@ const getAchievementsTitleForList = (listSlug?: string): string => {
   }
 };
 
-// Short name for "complete" badge label
-const getCompleteLabel = (listSlug?: string): string => {
+// Map list slug to AchievementBadgeCard tier
+const getListTier = (listSlug?: string): AchievementTier => {
   switch (listSlug) {
-    case 'global':
-      return 'Worldwide 100';
-    case 'gb-i':
-      return 'GB&I 100';
-    case 'usa':
-      return 'USA 100';
-    case 'europe':
-      return 'Europe 100';
-    default:
-      return 'Top 100';
+    case 'global': return 'WORLD';
+    case 'gb-i': return 'GBI';
+    case 'usa': return 'USA';
+    case 'europe': return 'EU';
+    default: return 'WORLD';
+  }
+};
+
+// Short name for badge subtitle
+const getListSubtitle = (listSlug?: string): string => {
+  switch (listSlug) {
+    case 'global': return 'Worldwide Top 100';
+    case 'gb-i': return 'GB&I Top 100';
+    case 'usa': return 'USA Top 100';
+    case 'europe': return 'Europe Top 100';
+    default: return 'Top 100';
   }
 };
 
@@ -91,7 +92,8 @@ export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps>
   const progressPct = getAchievementsProgressPct(playedCount, milestones, maxThreshold);
 
   // Use unified theme system for region colors
-  const regionColor = getRegionAccent(listSlug);
+  const regionTheme = getRegionTheme(listSlug ?? 'global');
+  const listTier = getListTier(listSlug);
 
   return (
     <section className="space-y-2 mt-6">
@@ -119,61 +121,44 @@ export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps>
       <div className="overflow-x-auto pb-1 -mx-1 px-1">
         {/* Inner column that scrolls together */}
         <div className="inline-flex flex-col gap-3 min-w-full px-4">
-          {/* Row of circles - pill style with region accent */}
+          {/* Row of AchievementBadgeCards */}
           <div className="flex gap-3">
             {milestones.map((m) => {
               const unlocked = playedCount >= m.threshold;
               const remaining = Math.max(0, m.threshold - playedCount);
               const isListComplete = m.threshold >= totalCount;
 
-              // Badge label
-              const badgeLabel = isListComplete 
-                ? getCompleteLabel(listSlug)
+              // Badge title - use list name for complete badge, threshold for milestones
+              const badgeTitle = isListComplete 
+                ? `${getListSubtitle(listSlug)} Complete`
                 : `${m.threshold} Club`;
 
-              return (
-                <div
-                  key={m.threshold}
-                  className="flex flex-col items-center min-w-[72px] gap-1"
-                >
-                  {/* SDS Squircle badge with region color */}
-                  <div 
-                    className="flex items-center justify-center rounded-sq-md w-14 h-14 text-sm font-semibold transition-all"
-                    style={{
-                      backgroundColor: unlocked ? `${regionColor}18` : 'white',
-                      border: `2px solid ${unlocked ? regionColor : `${regionColor}55`}`,
-                      color: unlocked ? regionColor : `${regionColor}88`,
-                      opacity: unlocked ? 1 : 0.6,
-                    }}
-                  >
-                    {m.threshold}
-                  </div>
+              // Use region tier for list completion, threshold for milestones
+              const tier: AchievementTier = isListComplete 
+                ? listTier 
+                : String(m.threshold) as AchievementTier;
 
-                  {/* Labels */}
-                  <div className="mt-1 text-center">
-                    <p className="text-xs font-medium text-foreground whitespace-nowrap">
-                      {badgeLabel}
-                    </p>
-                    <p className="text-[11px] leading-[1.2] text-muted-foreground">
-                      {unlocked ? (
-                        <span style={{ color: regionColor }}>Unlocked</span>
-                      ) : (
-                        `${remaining} away`
-                      )}
-                    </p>
-                  </div>
-                </div>
+              return (
+                <AchievementBadgeCard
+                  key={m.threshold}
+                  tier={tier}
+                  title={badgeTitle}
+                  subtitle={isListComplete ? 'List Complete' : 'Milestone'}
+                  unlocked={unlocked}
+                  remaining={unlocked ? undefined : remaining}
+                  compact
+                />
               );
             })}
           </div>
 
-          {/* Progress bar - uses region color */}
+          {/* Progress bar - uses region color from global system */}
           <div className="h-1.5 rounded-full bg-muted/80 relative overflow-hidden">
             <div
               className="h-full rounded-full transition-all"
               style={{ 
                 width: `${progressPct}%`,
-                backgroundColor: regionColor,
+                backgroundColor: regionTheme.accent,
               }}
             />
           </div>

@@ -3,7 +3,6 @@ import { useLiveClubhouseProfiles } from '@/hooks/useLiveClubhouseProfiles';
 import { useActiveGolfers } from '@/hooks/useActiveGolfers';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import '@/styles/shorts_live_clubhouse.css';
 

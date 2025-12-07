@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Trophy, Calendar, TrendingUp, UserPlus } from 'lucide-react';
 import { useFriendsLeaderboard } from '@/hooks/useFriendsLeaderboard';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -158,7 +158,7 @@ const FriendsLeaderboard: React.FC<FriendsLeaderboardProps> = ({
               </div>
 
               {/* Avatar */}
-              <AvatarSquircle
+              <SquircleAvatar
                 src={friend.profile_photo_url || ''}
                 alt={getDisplayName(friend)}
                 size="md"
