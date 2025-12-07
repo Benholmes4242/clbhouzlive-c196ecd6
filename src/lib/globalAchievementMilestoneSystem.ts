@@ -60,9 +60,9 @@ const MASTERS_GREEN_LADDER = {
   20:  { accent: '#95D3AA' }, // G3 – Fresh Green (Founders)
   50:  { accent: '#71C18A' }, // G4 – Strong Green (Heritage)
   100: { accent: '#4AA266' }, // G5 – Masters Green (Century)
-  200: { accent: '#357F4F' }, // G6 – Tour Green (Elite)
-  300: { accent: '#28613E' }, // G7 – Major Green (Legendary)
-  400: { accent: '#1C4530' }, // G8 – Grand Slam Green
+  200: { accent: '#4A9563' }, // G6 – Tour Green (Elite) – 12% lighter
+  300: { accent: '#3A7751' }, // G7 – Major Green (Legendary) – 12% lighter
+  400: { accent: '#2D5A42' }, // G8 – Grand Slam Green – 12% lighter
 } as const;
 
 // Helper to lighten a hex color by percentage
@@ -288,9 +288,9 @@ export const REGION_THEMES: Record<RegionKey, RegionalTheme> = {
     id: 'list_europe',
     label: 'Europe',
     shortLabel: 'Europe',
-    accent: '#7D8EEB',                 // slightly richer blue-violet
-    bgLight: '#CBD3FA',
-    bgDark: '#B8C2F5',
+    accent: '#1F3A93',                 // Navy Blue
+    bgLight: '#D6DDF2',                // Light navy mist
+    bgDark: '#C4CEE9',
     bgLocked: 'hsl(225 30% 96%)',
   },
 };
