@@ -44,28 +44,20 @@ export function RatingBar({
   const gradientColors = bandToGradient[band];
 
 
+  // Single gradient: fill (0→pct%) then track (pct%→100%)
+  const trackColor = '#D7DDE3';
+  const background = mode === 'neutral'
+    ? `linear-gradient(90deg, var(--rating-bar-fill-neutral) 0%, var(--rating-bar-fill-neutral) ${pct}%, ${trackColor} ${pct}%, ${trackColor} 100%)`
+    : `linear-gradient(90deg, ${gradientColors.bgLight} 0%, ${gradientColors.bgDark} ${pct}%, ${trackColor} ${pct}%, ${trackColor} 100%)`;
+
   return (
     <div
-      className={cn(
-        'relative w-full overflow-hidden',
-        className
-      )}
+      className={cn('w-full', className)}
       style={{
         height: 'var(--rating-bar-height-sm)',
-        backgroundColor: 'var(--rating-bar-track)',
         borderRadius: 'var(--rating-bar-radius)',
+        background,
       }}
-    >
-      <div
-        className="absolute inset-y-0 left-0 transition-all duration-300"
-        style={{
-          width: `${pct}%`,
-          background: mode === 'neutral'
-            ? 'var(--rating-bar-fill-neutral)'
-            : `linear-gradient(90deg, ${gradientColors.bgLight} 0%, ${gradientColors.bgDark} 100%)`,
-          borderRadius: 'var(--rating-bar-radius)',
-        }}
-      />
-    </div>
+    />
   );
 }
