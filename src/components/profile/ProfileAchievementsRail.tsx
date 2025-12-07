@@ -26,10 +26,15 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
   const [modalOpen, setModalOpen] = useState(false);
   const { data: achievements, isLoading } = useProfileAchievements(userId);
 
-  // Sort by newest first: higher milestones first (descending by threshold), then list completions
+  // Sort by newest first: use unlockedAt date if available, else higher thresholds first
   // This shows most recently earned achievements on the left
   const sortedAchievements = [...achievements].sort((a, b) => {
-    // Higher thresholds (bigger milestones) first
+    // First, sort by unlock date (newest first) if available
+    const aDate = a.unlockedAt ? new Date(a.unlockedAt).getTime() : 0;
+    const bDate = b.unlockedAt ? new Date(b.unlockedAt).getTime() : 0;
+    if (aDate !== bDate) return bDate - aDate;
+    
+    // Fallback: higher thresholds (bigger milestones) first
     const aVal = a.threshold ?? 0;
     const bVal = b.threshold ?? 0;
     return bVal - aVal;

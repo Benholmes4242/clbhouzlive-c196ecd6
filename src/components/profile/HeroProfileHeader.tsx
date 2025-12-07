@@ -382,10 +382,10 @@ const HeroProfileHeader = ({
         {/* META BLOCK - Two-column layout: avatar left, text right */}
         <div
           ref={profileCardRef}
-          className="relative px-4 mt-[-40px] flex flex-row items-center md:mx-auto md:max-w-[600px]"
+          className="relative px-4 mt-[-52px] flex flex-row items-center md:mx-auto md:max-w-[600px]"
         >
           {/* AVATAR – Left column */}
-          <div className="flex-shrink-0 mr-4 md:mr-6 z-20">
+          <div className="flex-shrink-0 mr-5 md:mr-7 z-20">
             <ProfileAvatarRing
               photoUrl={profile?.profile_photo_url}
               displayName={displayName}
@@ -431,12 +431,20 @@ const HeroProfileHeader = ({
           </div>
         )}
 
+        {/* Faint divider between header and achievements */}
+        <div 
+          className="mt-4 h-px w-full"
+          style={{
+            background: 'linear-gradient(90deg, transparent 0%, hsl(var(--foreground) / 0.05) 20%, hsl(var(--foreground) / 0.05) 80%, transparent 100%)',
+          }}
+        />
+
         {/* Achievements Rail - outside constrained container for full width */}
         {isPersonal && profile?.id && username && (
           <ProfileAchievementsRail
             userId={profile.id}
             username={username}
-            className="mt-6"
+            className="mt-4"
           />
         )}
 
