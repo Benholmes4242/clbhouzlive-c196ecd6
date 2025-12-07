@@ -2,7 +2,7 @@ import React from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { X, Trophy, Target, Users, CheckCircle } from 'lucide-react';
 import { useFriendsLeaderboard } from '@/hooks/useFriendsLeaderboard';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -160,7 +160,7 @@ const CompareWithFriendsModal: React.FC<CompareWithFriendsModalProps> = ({
                       >
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-3">
-                            <AvatarSquircle
+                            <SquircleAvatar
                               src={friend.profile_photo_url || ''}
                               alt={getDisplayName(friend)}
                               size="md"

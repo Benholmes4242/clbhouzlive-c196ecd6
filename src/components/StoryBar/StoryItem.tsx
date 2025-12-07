@@ -1,7 +1,7 @@
 import React from 'react';
 import { Plus, User } from 'lucide-react';
 import { StoryUser } from './types';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface StoryItemProps {
   story: StoryUser;
@@ -33,12 +33,11 @@ const StoryItem: React.FC<StoryItemProps> = ({
             {hasProfile && story.avatar ? (
               // User has a profile photo - show with subtle ring
               <div className="hover:opacity-80 transition-opacity">
-                <AvatarSquircle
+                <SquircleAvatar
                   size={80}
                   src={story.avatar}
                   alt={story.user}
                   ringColor="rgb(229, 231, 235)"
-                  ringWidth={2}
                 />
               </div>
             ) : (
@@ -60,12 +59,11 @@ const StoryItem: React.FC<StoryItemProps> = ({
           >
             <div className="hover:opacity-80 transition-opacity">
               {story.avatar ? (
-                <AvatarSquircle
+                <SquircleAvatar
                   size={80}
                   src={story.avatar}
                   alt={story.user}
                   ringColor="rgb(209, 213, 219)"
-                  ringWidth={2}
                 />
               ) : (
                 <div className="w-20 h-20 rounded-full p-0.5 bg-gradient-to-tr from-gray-400 to-gray-300">

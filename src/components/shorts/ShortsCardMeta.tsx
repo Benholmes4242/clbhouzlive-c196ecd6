@@ -1,7 +1,6 @@
 import React from 'react';
-import AvatarSquircle from '../ui/AvatarSquircle';
-import { Heart } from 'lucide-react';
-import { BadgeCheck } from 'lucide-react';
+import { SquircleAvatar } from '../ui/SquircleAvatar';
+import { Heart, BadgeCheck } from 'lucide-react';
 
 // Creator-First metadata block
 type Props = {
@@ -40,12 +39,11 @@ export default function ShortsCardMeta({
         }}
         aria-label={`Open ${author.name}'s profile`}
       >
-        <AvatarSquircle 
+        <SquircleAvatar 
           size={36} 
           src={author.avatar} 
           alt={author.name}
           ringColor={author.isSelf ? 'hsl(var(--primary))' : undefined}
-          ringWidth={author.isSelf ? 1 : 0}
         />
       </button>
 

@@ -1,7 +1,8 @@
 // src/lib/top100Helpers.ts
 // Helpers for Top 100 ring tiers and region completion stamps
 
-import { getTop100Club, type Top100TierId, type Top100ClubResult } from './top100Club';
+import { type Top100TierId } from './top100Club';
+import { getRingColorForThreshold, getRingColorForTotalPlayed } from './globalAchievementMilestoneSystem';
 
 /**
  * Region completion stamps for profile header
@@ -71,10 +72,11 @@ export function hasSignificantProgress(lists: Top100ListProgress[] | undefined):
 
 /**
  * Get tier ring color as CSS variable or hex
+ * Uses the global achievement milestone system for colors
  */
 export function getTierRingColor(tierId: Top100TierId): string {
-  const club = getTop100Club(getTierThreshold(tierId));
-  return club.ringColor;
+  const threshold = getTierThreshold(tierId);
+  return getRingColorForThreshold(threshold);
 }
 
 /**
@@ -97,17 +99,16 @@ function getTierThreshold(tierId: Top100TierId): number {
 
 /**
  * Get ring gradient CSS for avatar border
+ * Uses the global achievement milestone system for colors
  */
 export function getRingGradientStyle(tierId: Top100TierId, totalPlayed: number): React.CSSProperties {
-  const club = getTop100Club(totalPlayed);
-  
   if (tierId === 'none' || totalPlayed < 5) {
     return {
       background: 'linear-gradient(180deg, hsl(var(--muted)) 0%, hsl(var(--muted-foreground) / 0.3) 100%)',
     };
   }
   
-  const color = club.ringColor;
+  const color = getRingColorForTotalPlayed(totalPlayed);
   
   // Create gradient based on tier level
   switch (tierId) {
