@@ -519,6 +519,20 @@ html, body, #root {
   
   /* Create Moment composer tokens */
   --composer-height: 440px;
+  
+  /* ========================================
+     SDS ACHIEVEMENT CARD TOKENS
+     Canonical shape for all achievement/milestone badges
+     ======================================== */
+  --sds-achievement-min-h: 132px;
+  --sds-achievement-radius: var(--radius-sq-xl, 18px);
+  --sds-achievement-padding-x: 16px;
+  --sds-achievement-padding-y: 14px;
+  --sds-achievement-compact-padding-x: 12px;
+  --sds-achievement-compact-padding-y: 10px;
+  --sds-achievement-pill-padding-x: 10px;
+  --sds-achievement-pill-padding-y: 4px;
+  --sds-achievement-pill-radius: 999px;
 }
 
 /* Sheet animations */

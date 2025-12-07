@@ -24,8 +24,8 @@ interface ProfileTop100ChipProps {
 /**
  * ProfileTop100Chip - Part of Global Achievement & Milestone System
  * 
- * Uses the unified AchievementBadgeCard component with colors from
- * globalAchievementMilestoneSystem.ts to match all other achievement displays.
+ * Uses the unified AchievementBadgeCard component with SDS tokens
+ * and colors from globalAchievementMilestoneSystem.ts
  */
 const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
   top100Overview,
@@ -60,13 +60,15 @@ const ProfileTop100Chip: React.FC<ProfileTop100ChipProps> = ({
           'hover:scale-[1.01]'
         )}
       >
-        <AchievementBadgeCard
-          tier={achievementTier}
-          title={`${totalPlayed} Top 100`}
-          subtitle={club.tierName || 'Top 100 Club'}
-          unlocked={true}
-          compact={true}
-        />
+        {/* SDS-compliant card with fixed width for consistency */}
+        <div style={{ width: '192px' }}>
+          <AchievementBadgeCard
+            tier={achievementTier}
+            title={`${totalPlayed} Top 100`}
+            subtitle={club.tierName || 'Top 100 Club'}
+            unlocked={true}
+          />
+        </div>
         <ChevronRight className="absolute -right-7 h-5 w-5 text-slate-400" />
       </button>
       
