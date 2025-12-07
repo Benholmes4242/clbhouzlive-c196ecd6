@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { useFollow } from '@/hooks/useFollow';
 import { usePrefetchImmersiveProfile } from '@/hooks/usePrefetchImmersiveProfile';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Check, UserPlus } from 'lucide-react';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { toast } from 'sonner';
@@ -120,19 +120,14 @@ export default function Squircle({ creator, index, onAvatarClick, onLabelClick, 
             onContextMenu={(e) => { e.preventDefault(); setMenuOpen(true); }}
             aria-label={`View ${name}'s profile`}
           >
-            <AvatarSquircle
+            <SquircleAvatar
               size={AVATAR.size}
               src={creator.profile_photo_url || ''}
               alt={name}
               className={`sq-img ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
               onLoad={onImageLoad}
-            >
-              {!imageLoaded && !creator.profile_photo_url && (
-                <div className="absolute inset-0 flex items-center justify-center bg-muted text-lg font-semibold">
-                  {initials}
-                </div>
-              )}
-            </AvatarSquircle>
+              fallback={initials}
+            />
           </button>
         </div>
 

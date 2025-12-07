@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ChevronDown, ChevronUp, Star, Edit } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import EditRatingModal from './EditRatingModal';
 import ReviewMediaDisplay from './ReviewMediaDisplay';
 
@@ -153,7 +153,7 @@ const CourseReviews = ({ courseId, courseName, currentUser }: CourseReviewsProps
                     <div key={review.id} className="border-b pb-4 last:border-b-0">
                       <div className="flex items-start gap-3">
                         {/* User Avatar with Profile Photo */}
-                        <AvatarSquircle
+                        <SquircleAvatar
                           src={review.profile_photo_url}
                           alt={getUserDisplayName(review)}
                           size="md"

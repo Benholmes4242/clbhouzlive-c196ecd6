@@ -1,5 +1,14 @@
 // src/lib/top100Club.ts
 // New unified Top 100 club tier system based on total_top100_rated
+// 
+// IMPORTANT: All colors are sourced from globalAchievementMilestoneSystem.ts
+// This file references the global system for ring colors.
+
+import { 
+  MILESTONE_THEMES, 
+  getRingColorForTotalPlayed,
+  getRingColorForThreshold 
+} from './globalAchievementMilestoneSystem';
 
 export type Top100TierId =
   | 'none'
@@ -24,20 +33,20 @@ export type Top100ClubMeta = {
   shortLabel: string;   // numeric label e.g. "50 Club"
   tierName: string;     // user-facing name e.g. "Trailmaster"
   tierId: Top100TierId;
-  ringColor: string;    // hex colour for ring and badge
   glassIntensity: number; // opacity for glass badge effect
 };
 
 // Ordered lowest → highest
+// NOTE: ringColor removed - use getRingColorForThreshold(step.threshold) from globalAchievementMilestoneSystem.ts
 export const CLUB_STEPS: Top100ClubMeta[] = [
-  { threshold: 5,   shortLabel: 'Rookie',     tierName: 'Rookie Club',     tierId: 'rookie',    ringColor: '#C9B27A', glassIntensity: glassIntensity.subtle },
-  { threshold: 10,  shortLabel: 'Fairway',    tierName: 'Fairway Club',    tierId: 'fairway',   ringColor: '#7CC66B', glassIntensity: glassIntensity.standard },
-  { threshold: 20,  shortLabel: 'Founders',   tierName: 'Founders Club',   tierId: 'founders',  ringColor: '#2F7D32', glassIntensity: glassIntensity.standard },
-  { threshold: 50,  shortLabel: 'Heritage',   tierName: 'Heritage Club',   tierId: 'heritage',  ringColor: '#D8A546', glassIntensity: glassIntensity.vivid },
-  { threshold: 100, shortLabel: 'Century',    tierName: 'Century Club',    tierId: 'century',   ringColor: '#4A4A4A', glassIntensity: glassIntensity.standard },
-  { threshold: 200, shortLabel: 'Elite',      tierName: 'Elite Club',      tierId: 'elite',     ringColor: '#6F5BD5', glassIntensity: glassIntensity.vivid },
-  { threshold: 300, shortLabel: 'Legendary',  tierName: 'Legendary Club',  tierId: 'legendary', ringColor: '#B153CE', glassIntensity: glassIntensity.vivid },
-  { threshold: 400, shortLabel: 'Grand Slam', tierName: 'Grand Slam Club', tierId: 'grandslam', ringColor: '#111111', glassIntensity: glassIntensity.standard },
+  { threshold: 5,   shortLabel: 'Rookie',     tierName: 'Rookie Club',     tierId: 'rookie',    glassIntensity: glassIntensity.subtle },
+  { threshold: 10,  shortLabel: 'Fairway',    tierName: 'Fairway Club',    tierId: 'fairway',   glassIntensity: glassIntensity.standard },
+  { threshold: 20,  shortLabel: 'Founders',   tierName: 'Founders Club',   tierId: 'founders',  glassIntensity: glassIntensity.standard },
+  { threshold: 50,  shortLabel: 'Heritage',   tierName: 'Heritage Club',   tierId: 'heritage',  glassIntensity: glassIntensity.vivid },
+  { threshold: 100, shortLabel: 'Century',    tierName: 'Century Club',    tierId: 'century',   glassIntensity: glassIntensity.standard },
+  { threshold: 200, shortLabel: 'Elite',      tierName: 'Elite Club',      tierId: 'elite',     glassIntensity: glassIntensity.vivid },
+  { threshold: 300, shortLabel: 'Legendary',  tierName: 'Legendary Club',  tierId: 'legendary', glassIntensity: glassIntensity.vivid },
+  { threshold: 400, shortLabel: 'Grand Slam', tierName: 'Grand Slam Club', tierId: 'grandslam', glassIntensity: glassIntensity.standard },
 ];
 
 // Lookup map for quick access by tierId
@@ -59,7 +68,7 @@ export type Top100ClubResult = {
   tierName: string | null;
   shortLabel: string | null;
   threshold: number | null;
-  ringColor: string;
+  ringColor: string;        // Derived from global system
   glassIntensity: number;
 };
 
@@ -102,13 +111,16 @@ export function getTop100Club(totalPlayed: number): Top100ClubResult {
     };
   }
 
+  // Get ring color from global system
+  const ringColor = getRingColorForThreshold(current.threshold);
+
   return {
     meta: current,
     tierId: current.tierId,
     tierName: current.tierName,
     shortLabel: current.shortLabel,
     threshold: current.threshold,
-    ringColor: current.ringColor,
+    ringColor,
     glassIntensity: current.glassIntensity,
   };
 }
@@ -135,7 +147,8 @@ export function glassTint(hex: string, opacity = glassIntensity.standard): strin
  */
 export function getRingColorForTier(tierId: Top100TierId): string {
   const tier = TIER_BY_ID[tierId];
-  return tier?.ringColor ?? DEFAULT_RING_COLOR;
+  if (!tier) return DEFAULT_RING_COLOR;
+  return getRingColorForThreshold(tier.threshold);
 }
 
 // Backwards compatibility export (deprecated)

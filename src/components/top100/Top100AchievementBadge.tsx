@@ -30,7 +30,7 @@ export function Top100AchievementBadge({
   if (!tierMeta) return null;
 
   // Get color from unified Global Achievement & Milestone System
-  const ringColor = MILESTONE_THEMES[tierMeta.threshold]?.accent ?? tierMeta.ringColor;
+  const ringColor = MILESTONE_THEMES[tierMeta.threshold]?.accent ?? '#94a3b8';
   const isCompact = size === 'compact';
 
   return (

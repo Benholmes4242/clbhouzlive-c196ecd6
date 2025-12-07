@@ -1,7 +1,7 @@
 import React from 'react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import Top100TrophyIcon from '@/components/icons/Top100TrophyIcon';
-import { getTop100Club } from '@/lib/top100Club';
+import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 
 interface AchievementsProgressHeroProps {
   username: string;
@@ -20,7 +20,8 @@ export const AchievementsProgressHero: React.FC<AchievementsProgressHeroProps> =
   completedListsCount,
   nextMilestone,
 }) => {
-  const club = getTop100Club(totalTop100Played);
+  // Get ring color directly from global achievement system
+  const ringColor = getRingColorForTotalPlayed(totalTop100Played);
   const progress = nextMilestone 
     ? Math.min(100, (totalTop100Played / nextMilestone) * 100)
     : 100;
@@ -41,7 +42,7 @@ export const AchievementsProgressHero: React.FC<AchievementsProgressHeroProps> =
             size="sm" 
             alt={username}
             fallback={username.charAt(0).toUpperCase()}
-            ringColor={club.ringColor}
+            ringColor={ringColor}
           />
           <div className="flex-1 min-w-0">
             <p className="text-xs md:text-sm text-muted-foreground truncate">
