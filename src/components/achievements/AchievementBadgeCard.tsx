@@ -35,7 +35,9 @@ export interface AchievementBadgeCardProps {
  * AchievementBadgeCard - Global Achievement & Milestone System
  * 
  * The canonical shared card component for ALL achievement displays across the app.
- * Uses tier-based gradients from globalAchievementMilestoneSystem.ts
+ * Colors derived from globalAchievementMilestoneSystem.ts:
+ * - Trophy icon: pure accent color (same as avatar rings)
+ * - Background: soft gradient from bgLight → bgDark
  * 
  * Usage: Profile rail, Milestones Modal, Top 100 Hub, My Progress, regional lists
  */
@@ -81,9 +83,10 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
             compact ? "h-8 w-8" : "h-9 w-9"
           )}
         >
+          {/* Trophy icon uses pure accent color - same as avatar rings */}
           <Trophy 
             className={compact ? "h-3.5 w-3.5" : "h-4 w-4"}
-            style={{ color: palette.icon }} 
+            style={{ color: palette.accent }} 
           />
         </div>
         {unlocked ? (
