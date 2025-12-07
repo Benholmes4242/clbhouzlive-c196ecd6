@@ -43,23 +43,10 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-1.5 md:gap-2">
-      {/* Row 1: Name + edit icon */}
-      <div className="flex items-center justify-center gap-2 md:gap-3">
-        <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-foreground">
-          {displayName}
-        </h1>
-
-        {isOwnProfile && onCustomiseClick && (
-          <button
-            type="button"
-            onClick={onCustomiseClick}
-            aria-label="Edit profile"
-            className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-white/80 text-slate-600 hover:bg-white shadow-sm transition"
-          >
-            <Pencil className="h-4 w-4" />
-          </button>
-        )}
-      </div>
+      {/* Row 1: Name */}
+      <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-foreground text-center">
+        {displayName}
+      </h1>
 
       {/* Row 2: Username */}
       <div className="text-sm text-slate-500 text-center">
@@ -78,12 +65,23 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
         </div>
       )}
 
-      {/* Row 4: HCP pill (own line - personal only) */}
+      {/* Row 4: HCP pill centered + edit button on right */}
       {isPersonal && handicap != null && (
-        <div className="flex justify-center">
+        <div className="relative w-full flex justify-center items-center">
           <span className="inline-flex items-center px-3 py-1 rounded-full bg-slate-800 text-[11px] md:text-xs font-semibold uppercase tracking-wide text-white">
             HCP {handicap.toFixed(1)}
           </span>
+          
+          {isOwnProfile && onCustomiseClick && (
+            <button
+              type="button"
+              onClick={onCustomiseClick}
+              aria-label="Edit profile"
+              className="absolute right-0 inline-flex items-center justify-center h-7 w-7 rounded-full bg-white/80 text-slate-600 hover:bg-white shadow-sm transition"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </button>
+          )}
         </div>
       )}
       
