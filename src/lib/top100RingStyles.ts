@@ -1,14 +1,16 @@
 /**
  * Top 100 Ring Styles - Part of Global Achievement & Milestone System
  * 
- * Derives all ring colors from the unified MILESTONE_THEMES.
+ * All ring colors derived from MILESTONE_THEMES.accent at 100% opacity.
+ * NO opacity modifiers (/85, /90, etc.) - pure solid accent colors only.
+ * 
  * Used for: profile avatar rings, club dots/pills, map pins.
  */
 
 import type { Top100Ring } from './top100Club';
-import { MILESTONE_THEMES } from './globalAchievementMilestoneSystem';
+import { MILESTONE_THEMES, type MilestoneTier } from './globalAchievementMilestoneSystem';
 
-// Helper to lighten a hex color for stroke/halo
+// Helper to lighten a hex color for stroke/halo effects
 function lightenHex(hex: string, percent = 20): string {
   const num = parseInt(hex.replace('#', ''), 16);
   const r = Math.min(255, ((num >> 16) & 255) + Math.round(255 * (percent / 100)));
@@ -21,7 +23,7 @@ function lightenHex(hex: string, percent = 20): string {
 const DEFAULT_COLOR = '#94a3b8';
 
 // Map tier ID to threshold for theme lookup
-const TIER_TO_THRESHOLD: Record<Top100Ring, number | null> = {
+const TIER_TO_THRESHOLD: Record<Top100Ring, MilestoneTier | null> = {
   none: null,
   rookie: 5,
   fairway: 10,
@@ -34,92 +36,114 @@ const TIER_TO_THRESHOLD: Record<Top100Ring, number | null> = {
 };
 
 /**
+ * Get the pure accent color for a tier (no opacity modifiers)
+ */
+function getTierAccent(tier: Top100Ring): string {
+  const threshold = TIER_TO_THRESHOLD[tier];
+  if (threshold === null) return DEFAULT_COLOR;
+  return MILESTONE_THEMES[threshold]?.accent ?? DEFAULT_COLOR;
+}
+
+/**
  * Comprehensive style config for each Top 100 tier
  * Used across: profile rings, club dots/pills, map pins
- * Colors now pulled from MILESTONE_THEMES for unified styling
+ * 
+ * IMPORTANT: All colors are pure accent at 100% opacity
+ * For Tailwind classes, we use inline styles where dynamic colors are needed
  */
 export const TOP100_TIER_STYLES: Record<
   Top100Ring,
   {
-    ringClass: string;    // Profile ring border
-    dotClass: string;     // Tiny dot / pill dot
+    accent: string;       // Pure accent color
     mapFill: string;      // Map pin fill (hex)
     mapStroke: string;    // Map pin stroke/halo (hex)
   }
 > = {
   none: {
-    ringClass: 'ring-slate-400/70',
-    dotClass: 'bg-slate-400',
+    accent: DEFAULT_COLOR,
     mapFill: DEFAULT_COLOR,
     mapStroke: lightenHex(DEFAULT_COLOR),
   },
   rookie: {
-    ringClass: `ring-[${MILESTONE_THEMES[5].accent}]/85`,
-    dotClass: `bg-[${MILESTONE_THEMES[5].accent}]`,
+    accent: MILESTONE_THEMES[5].accent,
     mapFill: MILESTONE_THEMES[5].accent,
     mapStroke: lightenHex(MILESTONE_THEMES[5].accent),
   },
   fairway: {
-    ringClass: `ring-[${MILESTONE_THEMES[10].accent}]/85`,
-    dotClass: `bg-[${MILESTONE_THEMES[10].accent}]`,
+    accent: MILESTONE_THEMES[10].accent,
     mapFill: MILESTONE_THEMES[10].accent,
     mapStroke: lightenHex(MILESTONE_THEMES[10].accent),
   },
   founders: {
-    ringClass: `ring-[${MILESTONE_THEMES[20].accent}]/85`,
-    dotClass: `bg-[${MILESTONE_THEMES[20].accent}]`,
+    accent: MILESTONE_THEMES[20].accent,
     mapFill: MILESTONE_THEMES[20].accent,
     mapStroke: lightenHex(MILESTONE_THEMES[20].accent),
   },
   heritage: {
-    ringClass: `ring-[${MILESTONE_THEMES[50].accent}]/85`,
-    dotClass: `bg-[${MILESTONE_THEMES[50].accent}]`,
+    accent: MILESTONE_THEMES[50].accent,
     mapFill: MILESTONE_THEMES[50].accent,
     mapStroke: lightenHex(MILESTONE_THEMES[50].accent),
   },
   century: {
-    ringClass: `ring-[${MILESTONE_THEMES[100].accent}]/85`,
-    dotClass: `bg-[${MILESTONE_THEMES[100].accent}]`,
+    accent: MILESTONE_THEMES[100].accent,
     mapFill: MILESTONE_THEMES[100].accent,
     mapStroke: lightenHex(MILESTONE_THEMES[100].accent),
   },
   elite: {
-    ringClass: `ring-[${MILESTONE_THEMES[200].accent}]/90`,
-    dotClass: `bg-[${MILESTONE_THEMES[200].accent}]`,
+    accent: MILESTONE_THEMES[200].accent,
     mapFill: MILESTONE_THEMES[200].accent,
     mapStroke: lightenHex(MILESTONE_THEMES[200].accent),
   },
   legendary: {
-    ringClass: `ring-[${MILESTONE_THEMES[300].accent}]/90`,
-    dotClass: `bg-[${MILESTONE_THEMES[300].accent}]`,
+    accent: MILESTONE_THEMES[300].accent,
     mapFill: MILESTONE_THEMES[300].accent,
     mapStroke: lightenHex(MILESTONE_THEMES[300].accent),
   },
   grandslam: {
-    ringClass: `ring-[${MILESTONE_THEMES[400].accent}]/90`,
-    dotClass: `bg-[${MILESTONE_THEMES[400].accent}]`,
+    accent: MILESTONE_THEMES[400].accent,
     mapFill: MILESTONE_THEMES[400].accent,
     mapStroke: lightenHex(MILESTONE_THEMES[400].accent),
   },
 };
 
-// Backward-compatible helpers (use TOP100_TIER_STYLES directly where possible)
-export function getTop100RingBorderClass(ring: Top100Ring | null | undefined): string {
+/**
+ * Get ring border style object for inline styling
+ * Use this instead of Tailwind classes for dynamic ring colors
+ */
+export function getTop100RingStyle(ring: Top100Ring | null | undefined): React.CSSProperties {
   const tier = ring || 'none';
-  return TOP100_TIER_STYLES[tier].ringClass;
-}
-
-export function getTop100RingDotClass(ring: Top100Ring | null | undefined): string {
-  const tier = ring || 'none';
-  return TOP100_TIER_STYLES[tier].dotClass;
+  const accent = TOP100_TIER_STYLES[tier].accent;
+  return {
+    border: `2px solid ${accent}`,
+  };
 }
 
 /**
- * Get ring color hex value for a tier
+ * Get the pure accent color for a ring
+ */
+export function getTop100RingAccent(ring: Top100Ring | null | undefined): string {
+  const tier = ring || 'none';
+  return TOP100_TIER_STYLES[tier].accent;
+}
+
+/**
+ * Get ring color hex value for a tier (backwards compatible)
  */
 export function getRingColorForTier(tier: Top100Ring | null | undefined): string {
   if (!tier || tier === 'none') return DEFAULT_COLOR;
   const threshold = TIER_TO_THRESHOLD[tier];
   if (threshold === null) return DEFAULT_COLOR;
   return MILESTONE_THEMES[threshold]?.accent ?? DEFAULT_COLOR;
+}
+
+// Deprecated: Use inline styles with getTop100RingStyle() instead
+export function getTop100RingBorderClass(ring: Top100Ring | null | undefined): string {
+  console.warn('getTop100RingBorderClass is deprecated. Use getTop100RingStyle() for inline styles instead.');
+  return '';
+}
+
+// Deprecated: Use inline styles instead
+export function getTop100RingDotClass(ring: Top100Ring | null | undefined): string {
+  console.warn('getTop100RingDotClass is deprecated. Use inline styles with TOP100_TIER_STYLES[tier].accent instead.');
+  return '';
 }

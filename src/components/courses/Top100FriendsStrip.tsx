@@ -4,6 +4,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useFriendsOnTop100Journey } from '@/hooks/useFriendsOnTop100Journey';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { ChevronRight } from 'lucide-react';
+import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 
 export const Top100FriendsStrip: React.FC = () => {
   const { user } = useSupabaseSession();
@@ -35,7 +36,6 @@ export const Top100FriendsStrip: React.FC = () => {
   }
 
   const handleClick = () => {
-    // Placeholder: navigate to Friends' Top 100 Progress page when implemented
     navigate('/top100?tab=friends-progress');
   };
 
@@ -52,9 +52,14 @@ export const Top100FriendsStrip: React.FC = () => {
 
       <div className="flex items-center space-x-3 shrink-0">
         <div className="flex -space-x-2">
-          {visibleFriends.map((friend, index) => {
+          {visibleFriends.map((friend) => {
             const displayName = friend.profile.display_name || friend.profile.username || '?';
             const initial = displayName[0]?.toUpperCase() || '?';
+            
+            // Get achievement ring color based on friend's Top 100 progress
+            const ringColor = friend.top100CoursesPlayed 
+              ? getRingColorForTotalPlayed(friend.top100CoursesPlayed)
+              : undefined;
             
             return friend.profile.profile_photo_url ? (
               <SquircleAvatar
@@ -62,11 +67,16 @@ export const Top100FriendsStrip: React.FC = () => {
                 src={friend.profile.profile_photo_url}
                 alt={displayName}
                 size={36}
+                ringColor={ringColor}
               />
             ) : (
               <div
                 key={friend.user_id}
-                className="w-9 h-9 flex items-center justify-center bg-slate-100 text-slate-600 text-[11px] font-semibold shrink-0 rounded-[22%]"
+                className="w-9 h-9 flex items-center justify-center bg-slate-100 text-slate-600 text-[11px] font-semibold shrink-0"
+                style={{
+                  borderRadius: '34%',
+                  border: ringColor ? `2px solid ${ringColor}` : '2px solid #D1D5DB',
+                }}
               >
                 {initial}
               </div>
@@ -75,7 +85,8 @@ export const Top100FriendsStrip: React.FC = () => {
 
           {overflowCount > 0 && (
             <div 
-              className="flex h-9 w-9 items-center justify-center rounded-[22%] bg-slate-100 text-[11px] font-semibold text-slate-600 shrink-0"
+              className="flex h-9 w-9 items-center justify-center bg-slate-100 text-[11px] font-semibold text-slate-600 shrink-0"
+              style={{ borderRadius: '34%', border: '2px solid #D1D5DB' }}
             >
               +{overflowCount}
             </div>

@@ -7,6 +7,11 @@
  * This file defines the unified color palette and theme tokens for ALL
  * achievement-related UI across the entire application.
  * 
+ * DESIGN RULES:
+ * 1. Single source of truth - all colors come from this file
+ * 2. Rings & icons = pure accent at 100% opacity (no opacity tricks)
+ * 3. Cards can use soft gradients derived from the same palette
+ * 
  * SURFACES THAT MUST USE THIS SYSTEM:
  * - Profile Achievements rail
  * - Top 100 Milestones Modal (/achievementshub)
@@ -16,85 +21,61 @@
  * - /top100?tab=my-progress hero card
  * - Profile avatar ring
  * - All achievement badge cards (AchievementBadgeCard component)
- * 
- * EXTENSION POLICY:
- * If additional achievement types are added in the future (e.g., Skill-Based
- * Achievements, XP Tiers, Seasonal Badges), they MUST extend this system
- * rather than creating new independent styles.
+ * - Top100AchievementBadge (glass pill)
+ * - All avatar rings (SquircleAvatar ringColor prop)
  * 
  * @module GlobalAchievementMilestoneSystem
  */
 
-export interface AchievementTheme {
-  bg: string;       // Light pastel background (HSL)
-  bgLocked: string; // Locked/dimmed background
-  accent: string;   // Strong accent color for icons, borders, rings
+export type MilestoneTier = 5 | 10 | 20 | 50 | 100 | 200 | 300 | 400;
+
+export interface MilestoneTheme {
+  id: string;
+  name: string;
+  accent: string;    // PRIMARY: rings, icons, borders - pure color, no opacity
+  bgLight: string;   // Card gradient start
+  bgDark: string;    // Card gradient end
 }
 
 // Milestone achievements (5, 10, 20, 50, 100, 200, 300, 400)
-// Ring colors match the accent colors exactly
-export const MILESTONE_THEMES: Record<number, AchievementTheme> = {
-  5: { 
-    bg: 'hsl(43 45% 95%)',           // Warm beige / Rookie
-    bgLocked: 'hsl(43 30% 96%)', 
-    accent: '#C9B27A' 
-  },
-  10: { 
-    bg: 'hsl(115 40% 95%)',          // Light soft green / Fairway
-    bgLocked: 'hsl(115 30% 96%)', 
-    accent: '#7CC66B' 
-  },
-  20: { 
-    bg: 'hsl(122 35% 93%)',          // Mint / Founders
-    bgLocked: 'hsl(122 30% 96%)', 
-    accent: '#2F7D32' 
-  },
-  50: { 
-    bg: 'hsl(42 60% 94%)',           // Sand / Heritage
-    bgLocked: 'hsl(42 40% 96%)', 
-    accent: '#D8A546' 
-  },
-  100: { 
-    bg: 'hsl(0 0% 96%)',             // Soft grey / Century
-    bgLocked: 'hsl(0 0% 96%)', 
-    accent: '#4A4A4A' 
-  },
-  200: { 
-    bg: 'hsl(250 50% 96%)',          // Lilac / Elite
-    bgLocked: 'hsl(250 30% 96%)', 
-    accent: '#6F5BD5' 
-  },
-  300: { 
-    bg: 'hsl(290 45% 95%)',          // Pink / Legendary
-    bgLocked: 'hsl(290 30% 96%)', 
-    accent: '#B153CE' 
-  },
-  400: { 
-    bg: 'hsl(0 0% 94%)',             // Steel / Grand Slam
-    bgLocked: 'hsl(0 0% 96%)', 
-    accent: '#111111' 
-  },
+// Ring colors = accent at 100% opacity
+export const MILESTONE_THEMES: Record<MilestoneTier, MilestoneTheme> = {
+  5:   { id: 'rookie',     name: 'Rookie Club',     accent: '#C9B27A', bgLight: '#F8F1DE', bgDark: '#F0E0BB' },
+  10:  { id: 'fairway',    name: 'Fairway Club',    accent: '#7CC66B', bgLight: '#E5F7E2', bgDark: '#C6EBBE' },
+  20:  { id: 'founders',   name: 'Founders Club',   accent: '#2F7D32', bgLight: '#E0F2E0', bgDark: '#B8E0BB' },
+  50:  { id: 'heritage',   name: 'Heritage Club',   accent: '#D8A546', bgLight: '#FFF3D8', bgDark: '#F6DEAA' },
+  100: { id: 'century',    name: 'Century Club',    accent: '#4A4A4A', bgLight: '#F3F3F3', bgDark: '#E1E1E1' },
+  200: { id: 'elite',      name: 'Elite Club',      accent: '#6F5BD5', bgLight: '#ECE9FF', bgDark: '#D2CBFF' },
+  300: { id: 'legendary',  name: 'Legendary Club',  accent: '#B153CE', bgLight: '#F7E6FF', bgDark: '#E6C3FA' },
+  400: { id: 'grandslam',  name: 'Grand Slam Club', accent: '#111111', bgLight: '#F0F0F0', bgDark: '#D9D9D9' },
 };
+
+// Legacy interface for backwards compatibility
+export interface AchievementTheme {
+  bg: string;
+  bgLocked: string;
+  accent: string;
+}
 
 // Regional list completion achievements
 export const REGION_THEMES: Record<string, AchievementTheme> = {
   'list_gb_ireland': { 
-    bg: 'hsl(210 50% 95%)',          // Light blue / GB&I
+    bg: 'hsl(210 50% 95%)',
     bgLocked: 'hsl(210 30% 96%)', 
     accent: '#1E3A5F' 
   },
   'list_europe': { 
-    bg: 'hsl(263 50% 96%)',          // Purple / Europe
+    bg: 'hsl(263 50% 96%)',
     bgLocked: 'hsl(263 30% 96%)', 
     accent: '#7C3AED' 
   },
   'list_usa': { 
-    bg: 'hsl(0 55% 96%)',            // Red / USA
+    bg: 'hsl(0 55% 96%)',
     bgLocked: 'hsl(0 30% 96%)', 
     accent: '#B91C1C' 
   },
   'list_worldwide': { 
-    bg: 'hsl(175 50% 94%)',          // Teal / World
+    bg: 'hsl(175 50% 94%)',
     bgLocked: 'hsl(175 30% 96%)', 
     accent: '#0D9488' 
   },
@@ -109,10 +90,26 @@ export const REGION_SLUG_THEMES: Record<string, AchievementTheme> = {
 };
 
 /**
+ * Get the pure accent color for a milestone tier
+ * Used for: avatar rings, badge borders, trophy icons
+ */
+export function getMilestoneAccent(threshold: MilestoneTier): string {
+  return MILESTONE_THEMES[threshold]?.accent ?? '#94a3b8';
+}
+
+/**
  * Get theme for a milestone by threshold
  */
 export function getMilestoneTheme(threshold: number): AchievementTheme {
-  return MILESTONE_THEMES[threshold] ?? MILESTONE_THEMES[5];
+  const theme = MILESTONE_THEMES[threshold as MilestoneTier];
+  if (theme) {
+    return {
+      bg: theme.bgLight,
+      bgLocked: 'hsl(210 15% 96%)',
+      accent: theme.accent,
+    };
+  }
+  return { bg: 'hsl(43 45% 95%)', bgLocked: 'hsl(210 15% 96%)', accent: '#94a3b8' };
 }
 
 /**
@@ -137,17 +134,18 @@ export function getAchievementTheme(
 
 /**
  * Get ring color for a milestone threshold
- * Used for avatar rings, badge rings, etc.
+ * Returns pure accent color at 100% opacity
  */
 export function getRingColorForThreshold(threshold: number): string {
-  return MILESTONE_THEMES[threshold]?.accent ?? '#94a3b8';
+  return MILESTONE_THEMES[threshold as MilestoneTier]?.accent ?? '#94a3b8';
 }
 
 /**
  * Get ring color for user's highest global milestone
+ * Returns pure accent color at 100% opacity
  */
 export function getRingColorForTotalPlayed(totalPlayed: number): string {
-  const thresholds = [400, 300, 200, 100, 50, 20, 10, 5];
+  const thresholds: MilestoneTier[] = [400, 300, 200, 100, 50, 20, 10, 5];
   for (const t of thresholds) {
     if (totalPlayed >= t) {
       return MILESTONE_THEMES[t].accent;
@@ -158,13 +156,14 @@ export function getRingColorForTotalPlayed(totalPlayed: number): string {
 
 /**
  * Tier palette getter for AchievementBadgeCard component
- * Returns bg gradients and icon color
+ * Returns explicit bg gradients and icon color from the unified system
  */
 export interface TierPalette {
-  bgLight: string;
-  bgDark: string;
-  bgLocked: string;
-  icon: string;
+  accent: string;     // Pure color for rings/icons
+  bgLight: string;    // Gradient start
+  bgDark: string;     // Gradient end
+  bgLocked: string;   // Locked state background
+  icon: string;       // Icon color (same as accent when unlocked)
 }
 
 export function getTierPalette(
@@ -173,6 +172,7 @@ export function getTierPalette(
 ): TierPalette {
   // Locked palette is the same for all
   const lockedPalette: TierPalette = {
+    accent: '#94a3b8',
     bgLight: 'hsl(210 20% 98%)',
     bgDark: 'hsl(210 15% 94%)',
     bgLocked: 'hsl(210 15% 96%)',
@@ -182,14 +182,15 @@ export function getTierPalette(
   if (!unlocked) return lockedPalette;
 
   // Check if it's a milestone (numeric)
-  const threshold = parseInt(tier, 10);
+  const threshold = parseInt(tier, 10) as MilestoneTier;
   if (!isNaN(threshold) && MILESTONE_THEMES[threshold]) {
     const theme = MILESTONE_THEMES[threshold];
     return {
-      bgLight: theme.bg,
-      bgDark: theme.bg.replace('95%', '88%').replace('96%', '88%').replace('94%', '86%').replace('93%', '82%'),
-      bgLocked: theme.bgLocked,
-      icon: theme.accent,
+      accent: theme.accent,
+      bgLight: theme.bgLight,
+      bgDark: theme.bgDark,
+      bgLocked: 'hsl(210 15% 96%)',
+      icon: theme.accent, // Icon uses pure accent
     };
   }
 
@@ -204,11 +205,13 @@ export function getTierPalette(
   const regionId = regionMap[tier];
   if (regionId && REGION_THEMES[regionId]) {
     const theme = REGION_THEMES[regionId];
+    // Convert HSL bg to hex-friendly gradient endpoints
     return {
+      accent: theme.accent,
       bgLight: theme.bg,
       bgDark: theme.bg.replace('95%', '88%').replace('96%', '88%').replace('94%', '86%'),
       bgLocked: theme.bgLocked,
-      icon: theme.accent,
+      icon: theme.accent, // Icon uses pure accent
     };
   }
 
