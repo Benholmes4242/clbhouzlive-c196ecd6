@@ -1,7 +1,7 @@
 import React from 'react';
 import { User, MapPin, Star, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import AvatarSquircle from '@/components/ui/AvatarSquircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface SuggestedCreator {
   id: string;
@@ -86,7 +86,7 @@ const Suggestions: React.FC<SuggestionsProps> = ({ onCreatorClick }) => {
             {/* Profile Image */}
             <div className="relative flex-shrink-0">
               {item.type === 'creator' ? (
-                <AvatarSquircle
+                <SquircleAvatar
                   src={item.profileImage}
                   alt={item.name}
                   size={48}
