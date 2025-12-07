@@ -60,7 +60,6 @@ hasAchievementRing
 ## Deprecated Components
 
 Do NOT use:
-- `AvatarSquircle` (deprecated wrapper)
 - Custom border/ring implementations
 - The SVG-based `Squircle` component for avatars
 

@@ -48,7 +48,6 @@ The following components are **FORBIDDEN** for user avatars:
 
 - ❌ `<Avatar>` from `@/components/ui/avatar`
 - ❌ `<OptimizedAvatar>` from `@/components/ui/optimized-avatar`
-- ❌ `<AvatarSquircle>` from `@/components/ui/AvatarSquircle`
 - ❌ `<Squircle>` for avatars (use for non-avatar content only)
 - ❌ `<SquircleImage>` (deprecated)
 - ❌ Any `<img>` with `rounded-full` className
