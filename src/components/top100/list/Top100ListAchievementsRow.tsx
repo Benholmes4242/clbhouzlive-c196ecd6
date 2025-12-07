@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TOP100_LIST_MILESTONES } from '@/config/top100ListMilestones';
-import { getRegionTheme } from '@/lib/globalAchievementMilestoneSystem';
+import { REGION_SLUG_THEMES, getRegionTheme } from '@/lib/globalAchievementMilestoneSystem';
 import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
 
 interface Top100ListAchievementsRowProps {
@@ -49,7 +49,7 @@ const getListSubtitle = (listSlug?: string): string => {
   }
 };
 
-// Maps playedCount → percentage across achievements
+// Maps playedCount → percentage across achievements (evenly spaced circles)
 function getAchievementsProgressPct(playedCount: number, milestones: { threshold: number }[], maxThreshold: number): number {
   if (playedCount <= 0) return 0;
   if (playedCount >= maxThreshold) return 100;
@@ -119,7 +119,7 @@ export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps>
 
       {/* Outer scroller */}
       <div className="overflow-x-auto pb-1 -mx-1 px-1">
-        {/* Inner column - cards use SDS tokens */}
+        {/* Inner column that scrolls together */}
         <div className="inline-flex flex-col gap-3 min-w-full px-4">
           {/* Row of AchievementBadgeCards */}
           <div className="flex gap-3">
@@ -128,29 +128,30 @@ export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps>
               const remaining = Math.max(0, m.threshold - playedCount);
               const isListComplete = m.threshold >= totalCount;
 
+              // Badge title - use list name for complete badge, threshold for milestones
               const badgeTitle = isListComplete 
                 ? `${getListSubtitle(listSlug)} Complete`
                 : `${m.threshold} Club`;
 
               // Use regional tier for ALL badges on regional list pages
+              // This ensures milestones (10/25/50/75 Club) use regional colors too
               const tier: AchievementTier = listTier;
 
               return (
-                <div key={m.threshold} className="shrink-0" style={{ width: '160px' }}>
-                  <AchievementBadgeCard
-                    tier={tier}
-                    title={badgeTitle}
-                    subtitle={isListComplete ? 'List Complete' : 'Milestone'}
-                    unlocked={unlocked}
-                    remaining={unlocked ? undefined : remaining}
-                    compact
-                  />
-                </div>
+                <AchievementBadgeCard
+                  key={m.threshold}
+                  tier={tier}
+                  title={badgeTitle}
+                  subtitle={isListComplete ? 'List Complete' : 'Milestone'}
+                  unlocked={unlocked}
+                  remaining={unlocked ? undefined : remaining}
+                  compact
+                />
               );
             })}
           </div>
 
-          {/* Progress bar */}
+          {/* Progress bar - uses region bgDark for soft pastel consistency with cards */}
           <div className="h-1.5 rounded-full bg-muted/80 relative overflow-hidden">
             <div
               className="h-full rounded-full transition-all"

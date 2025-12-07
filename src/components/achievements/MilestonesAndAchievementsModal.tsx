@@ -37,8 +37,6 @@ function getListTier(id: string): AchievementTier {
  * Top 100 Milestones Modal
  * Premium Apple-level layout with hero progress card and unified badge grid
  * Accessed via "View all" from the Profile Achievements rail
- * 
- * All badge cards use SDS tokens for consistent sizing
  */
 const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalProps> = ({
   open,
@@ -62,7 +60,7 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
   
   // In debug mode, all are unlocked
   const unlockedMilestoneCount = isDebugUser ? totalMilestones : MILESTONE_ACHIEVEMENTS.filter(m => totalTop100Played >= (m.threshold ?? 0)).length;
-  const unlockedListCount = isDebugUser ? totalLists : 0;
+  const unlockedListCount = isDebugUser ? totalLists : 0; // Real list completion logic would go here
   const unlockedCount = unlockedMilestoneCount + unlockedListCount;
 
   const currentClub = getTop100Club(totalTop100Played);
@@ -113,7 +111,7 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
               Top 100 milestones
             </h1>
 
-            <div className="w-8" />
+            <div className="w-8" /> {/* spacer to balance back button */}
           </header>
 
           {isLoading ? (
@@ -138,7 +136,7 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
               <section className="px-4 md:px-8 mb-5">
                 <div
                   className="
-                    rounded-sq-xl
+                    rounded-[28px]
                     bg-white/90
                     shadow-[0_18px_45px_rgba(15,23,42,0.18)]
                     px-4 py-4 md:px-6 md:py-5
@@ -148,7 +146,7 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
                   {/* Row 1: title + unlocked count */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="h-9 w-9 rounded-sq-md bg-emerald-500/10 flex items-center justify-center">
+                      <div className="h-9 w-9 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
                         <Trophy className="h-4 w-4 text-emerald-600" />
                       </div>
                       <div>
@@ -199,7 +197,7 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
                 </div>
               </section>
 
-              {/* Milestone badges grid - SDS consistent sizing */}
+              {/* Milestone badges grid */}
               <section className="px-4 md:px-8 pb-6">
                 <h2 className="text-sm font-semibold text-slate-800 mb-3">
                   Milestone badges
@@ -208,6 +206,7 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                   {MILESTONE_ACHIEVEMENTS.map((milestone) => {
                     const threshold = milestone.threshold ?? 0;
+                    // In debug mode, all are unlocked
                     const isUnlocked = isDebugUser ? true : totalTop100Played >= threshold;
                     const isCurrent = currentClub.threshold === threshold;
                     const remaining = Math.max(0, threshold - totalTop100Played);
@@ -236,6 +235,7 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                   {LIST_ACHIEVEMENTS.map((list) => {
+                    // Get list progress for this region
                     const listSlugMap: Record<string, string> = {
                       'list_gb_ireland': 'gb-i',
                       'list_europe': 'europe',
@@ -248,6 +248,7 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
                     const total = listProgress?.total ?? 100;
                     const remaining = Math.max(0, total - played);
                     
+                    // In debug mode, all are unlocked
                     const isUnlocked = isDebugUser ? true : (played >= total && total > 0);
 
                     return (
