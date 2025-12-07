@@ -65,7 +65,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
       <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
         <span>@{username}</span>
         {isPersonal && handicap != null && (
-          <span className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-[11px] font-semibold text-foreground">
+          <span className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-sm font-semibold text-foreground">
             HCP {handicap.toFixed(1)}
           </span>
         )}
