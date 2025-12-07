@@ -44,11 +44,12 @@ export function RatingBar({
   const gradientColors = bandToGradient[band];
 
 
-  // Single gradient: fill (0→pct%) then track (pct%→100%)
+  // Single gradient: solid fill (0→pct%) then track (pct%→100%)
+  // Use bgDark as solid fill to match rating badge colors exactly
   const trackColor = '#D7DDE3';
   const background = mode === 'neutral'
     ? `linear-gradient(90deg, var(--rating-bar-fill-neutral) 0%, var(--rating-bar-fill-neutral) ${pct}%, ${trackColor} ${pct}%, ${trackColor} 100%)`
-    : `linear-gradient(90deg, ${gradientColors.bgLight} 0%, ${gradientColors.bgDark} ${pct}%, ${trackColor} ${pct}%, ${trackColor} 100%)`;
+    : `linear-gradient(90deg, ${gradientColors.bgDark} 0%, ${gradientColors.bgDark} ${pct}%, ${trackColor} ${pct}%, ${trackColor} 100%)`;
 
   return (
     <div
