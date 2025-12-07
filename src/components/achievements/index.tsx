@@ -1,4 +1,4 @@
-export { AchievementBadgeCard } from './AchievementBadgeCard';
+export { AchievementCard } from './AchievementCard';
 export { AchievementToast } from './AchievementToast';
 export { AchievementToastContainer } from './AchievementToastContainer';
 export { LevelUpToast } from './LevelUpToast';

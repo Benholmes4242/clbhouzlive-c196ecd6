@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import PostMediaPreview from '../posts/PostMediaPreview';
 import CourseTagInput from '../posts/CourseTagInput';
-import { AchievementBadgeCard, AchievementTier } from '../achievements/AchievementBadgeCard';
+import { AchievementCard } from '../achievements/AchievementCard';
 
 interface TaggableEntity {
   id: string;
@@ -49,16 +49,6 @@ interface SnapComposerModalWithAchievementProps {
   achievementData?: AchievementData | null;
 }
 
-// Map category to tier for display
-function getCategoryTier(category?: string): AchievementTier {
-  switch (category) {
-    case 'skill': return '20';
-    case 'exploration': return '50';
-    case 'social': return '10';
-    default: return '5';
-  }
-}
-
 const SnapComposerModalWithAchievement = ({
   isOpen,
   onClose,
@@ -87,7 +77,7 @@ const SnapComposerModalWithAchievement = ({
           {achievementData && (
             <div className="mb-4">
               {achievementData.type === 'level_up' ? (
-                <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-sq-lg p-4 mb-3">
+                <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-4 mb-3">
                   <div className="flex items-center gap-4">
                     <div
                       className="w-16 h-16 rounded-full flex items-center justify-center shrink-0"
@@ -114,11 +104,12 @@ const SnapComposerModalWithAchievement = ({
                   </div>
                 </div>
               ) : (
-                <AchievementBadgeCard
-                  tier={getCategoryTier(achievementData.category)}
-                  title={achievementData.name}
-                  subtitle={achievementData.description}
-                  unlocked={true}
+                <AchievementCard
+                  name={achievementData.name}
+                  description={achievementData.description}
+                  category={achievementData.category || ''}
+                  points={achievementData.points}
+                  compact
                 />
               )}
             </div>
@@ -134,11 +125,11 @@ const SnapComposerModalWithAchievement = ({
               ref={captionInputRef}
               contentEditable
               onInput={onCaptionInput}
-              className="min-h-[100px] p-3 rounded-sq-sm bg-background border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 text-foreground"
+              className="min-h-[100px] p-3 rounded-lg bg-background border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 text-foreground"
               data-placeholder="Share your moment..."
             />
             {showSuggestions && mentionSuggestions.length > 0 && (
-              <div className="mt-2 bg-card border border-border rounded-sq-sm shadow-lg">
+              <div className="mt-2 bg-card border border-border rounded-lg shadow-lg">
                 {mentionSuggestions.map((entity) => (
                   <button
                     key={entity.id}

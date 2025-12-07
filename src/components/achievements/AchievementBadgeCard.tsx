@@ -81,10 +81,11 @@ export interface AchievementBadgeCardProps {
 /**
  * AchievementBadgeCard - Global Achievement & Milestone System
  * 
- * Canonical three-row card layout:
- * - Row 1: Tier band pill (left) + Status chip (right)
- * - Row 2: Hero stat block - large threshold number with "Club" label
- * - Row 3: Trophy icon + named club label
+ * World-class premium badge card with:
+ * - Top row: tier band + status chip
+ * - Hero value block (threshold number)
+ * - Label row: trophy + named club
+ * - Bottom micro-progress to next tier
  * 
  * All colors sourced from globalAchievementMilestoneSystem.ts
  */
@@ -120,26 +121,53 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
       : unlocked 
         ? 'Unlocked' 
         : remaining !== undefined 
-          ? `${remaining} to go` 
+          ? `${remaining} away` 
           : 'Locked';
 
-  // For regional cards, show the region-specific content
-  const heroValue = isMilestone ? threshold.toString() : tierLabel;
-  const heroLabel = isMilestone ? 'Club' : 'Top 100';
+  // Calculate next tier progress for milestone cards
+  let nextTier: number | null = null;
+  let progressToNext = 0;
+  let remainingToNext = 0;
+  let nextPalette: typeof palette | null = null;
+  let nextTierLabel: string | null = null;
+  
+  if (isMilestone && unlocked && !isGhost && totalTop100Played !== undefined) {
+    const currentIndex = MILESTONE_THRESHOLDS.indexOf(threshold);
+    if (currentIndex >= 0 && currentIndex < MILESTONE_THRESHOLDS.length - 1) {
+      nextTier = MILESTONE_THRESHOLDS[currentIndex + 1];
+      remainingToNext = nextTier - totalTop100Played;
+      
+      if (remainingToNext > 0) {
+        const gapSize = nextTier - threshold;
+        const progressInGap = totalTop100Played - threshold;
+        progressToNext = gapSize > 0 ? Math.min(100, (progressInGap / gapSize) * 100) : 0;
+        nextPalette = getTierPalette(nextTier.toString(), true);
+        nextTierLabel = TIER_LABELS[nextTier.toString()] || `${nextTier} Club`;
+      } else {
+        nextTier = null;
+      }
+    }
+  }
+
+  // For regional cards, calculate progress
+  let regionalProgress = 0;
+  if (isRegional && playedOnList !== undefined && totalOnList !== undefined && totalOnList > 0) {
+    regionalProgress = Math.min(100, (playedOnList / totalOnList) * 100);
+  }
 
   return (
     <div
       className={cn(
-        // Canonical global card shape with SDS rounded corners
-        'rounded-sq-lg flex flex-col justify-between transition-all duration-150 relative overflow-hidden',
+        // Horizontal rectangle with SDS rounded corners - GLOBAL SIZE for all badges
+        'rounded-sq-md flex flex-col justify-between transition-all duration-150 relative overflow-hidden',
         // Fixed global size for ALL achievement badges site-wide
-        'min-w-[160px] w-[160px] h-[140px] px-3.5 py-3',
+        'min-w-[180px] h-[92px] px-3 py-2.5',
         unlocked && !isGhost
-          ? 'shadow-[0_8px_24px_rgba(15,23,42,0.12)]' 
+          ? 'shadow-[0_6px_20px_rgba(15,23,42,0.10)]' 
           : 'shadow-sm',
         // Micro-interactions
         'active:scale-[0.98]',
-        unlocked && !isGhost && 'hover:shadow-[0_12px_32px_rgba(16,185,129,0.18)]',
+        unlocked && !isGhost && 'hover:shadow-[0_10px_28px_rgba(16,185,129,0.15)]',
         // Ghost styling
         isGhost && 'border border-dashed border-white/60'
       )}
@@ -148,7 +176,7 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
           ? `linear-gradient(135deg, ${palette.bgLight}, ${palette.bgDark})`
           : palette.bgLocked,
         transform: isPrimary ? 'translateY(-2px)' : undefined,
-        opacity: isGhost ? 0.7 : (!unlocked ? 0.75 : 1),
+        opacity: isGhost ? 0.7 : (!unlocked ? 0.85 : 1),
       }}
     >
       {/* Ghost overlay */}
@@ -156,59 +184,39 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         <div className="absolute inset-0 rounded-[inherit] bg-white/40 pointer-events-none" />
       )}
 
-      {/* Row 1: Tier band pill + Status chip */}
-      <div className="flex items-center justify-between">
-        {/* Tier band pill */}
+      {/* Top left: Trophy icon + Title/Subtitle */}
+      <div className="flex items-start gap-2">
         <div 
-          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide"
+          className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
           style={{ 
-            backgroundColor: unlocked ? `${palette.accent}20` : 'rgba(148,163,184,0.15)',
-            color: unlocked ? palette.accent : '#64748b',
-          }}
-        >
-          {tierLabel}
-        </div>
-        
-        {/* Status chip */}
-        <div className={cn(
-          "inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-medium",
-          unlocked && !isGhost
-            ? "bg-white/80 text-slate-700"
-            : "bg-white/50 text-slate-500"
-        )}>
-          {statusLabel}
-        </div>
-      </div>
-
-      {/* Row 2: Hero stat block - large number */}
-      <div className="flex flex-col items-center justify-center flex-1 -mt-1">
-        <span 
-          className="text-[32px] font-bold leading-none tracking-tight"
-          style={{ color: unlocked ? palette.accent : '#94a3b8' }}
-        >
-          {heroValue}
-        </span>
-        <span className="text-[11px] font-medium text-slate-600/80 mt-0.5">
-          {heroLabel}
-        </span>
-      </div>
-
-      {/* Row 3: Trophy icon + Club name */}
-      <div className="flex items-center gap-1.5">
-        <div 
-          className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-          style={{ 
-            backgroundColor: unlocked ? `${palette.accent}18` : 'rgba(148,163,184,0.10)' 
+            backgroundColor: unlocked ? `${palette.accent}1F` : 'rgba(148,163,184,0.12)' 
           }}
         >
           <Trophy 
-            className="w-2.5 h-2.5"
+            className="w-3.5 h-3.5"
             style={{ color: unlocked ? palette.accent : '#94a3b8' }} 
           />
         </div>
-        <span className="text-[11px] font-medium text-slate-700 truncate">
-          {clubName}
-        </span>
+        <div className="flex-1 min-w-0 overflow-hidden">
+          <div className="font-semibold leading-tight text-slate-900 truncate text-[13px]">
+            {isMilestone ? `${threshold} Club` : title}
+          </div>
+          <div className="text-[11px] text-slate-800/70 truncate">
+            {isMilestone ? clubName : subtitle}
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom right: Status chip */}
+      <div className="flex justify-end">
+        <div className={cn(
+          "inline-flex items-center px-2 py-0.5 rounded-sq-xs text-[10px] font-medium",
+          unlocked && !isGhost
+            ? "bg-white/75 text-slate-800"
+            : "bg-white/60 text-slate-500"
+        )}>
+          {statusLabel}
+        </div>
       </div>
     </div>
   );
