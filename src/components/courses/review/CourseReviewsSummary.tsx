@@ -135,9 +135,9 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
               <RatingBadge tierData={tierData} />
             </div>
 
-            {/* Based on X reviews */}
+            {/* Rating count */}
             <p className="text-xs text-slate-500">
-              Based on {reviewCount} review{reviewCount === 1 ? '' : 's'}
+              {reviewCount} {reviewCount === 1 ? 'rating' : 'ratings'}
             </p>
           </div>
 
