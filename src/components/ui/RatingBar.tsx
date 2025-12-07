@@ -42,10 +42,7 @@ export function RatingBar({
 }: RatingBarProps) {
   const pct = Math.max(0, Math.min(100, (value / max) * 100));
   const gradientColors = bandToGradient[band];
-  const fillStyle =
-    mode === 'neutral'
-      ? { backgroundColor: 'var(--rating-bar-fill-neutral)' }
-      : { background: `linear-gradient(90deg, ${gradientColors.bgLight}, ${gradientColors.bgDark})` };
+
 
   return (
     <div
@@ -63,7 +60,9 @@ export function RatingBar({
         className="absolute inset-y-0 left-0 transition-all duration-300"
         style={{
           width: `${pct}%`,
-          ...fillStyle,
+          background: mode === 'neutral'
+            ? 'var(--rating-bar-fill-neutral)'
+            : `linear-gradient(90deg, ${gradientColors.bgLight} 0%, ${gradientColors.bgDark} 100%)`,
           borderRadius: 'var(--rating-bar-radius)',
         }}
       />
