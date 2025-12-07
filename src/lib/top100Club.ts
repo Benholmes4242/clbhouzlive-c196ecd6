@@ -129,7 +129,10 @@ export function glassTint(hex: string, opacity = glassIntensity.standard): strin
   return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 }
 
-// Get ring color for a tier ID (useful when you only have the ID)
+/**
+ * @deprecated Use getRingColorForTotalPlayed from globalAchievementMilestoneSystem.ts
+ * This function is kept for backwards compatibility only.
+ */
 export function getRingColorForTier(tierId: Top100TierId): string {
   const tier = TIER_BY_ID[tierId];
   return tier?.ringColor ?? DEFAULT_RING_COLOR;

@@ -66,9 +66,9 @@ Do NOT use:
 
 ## Ring Colors
 
-Achievement ring colors come from the Top 100 tier system:
+Achievement ring colors come from the **Global Achievement & Milestone System**:
 ```tsx
-import { getRingColorForTier } from '@/lib/top100Club';
+import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 
-const tierColor = getRingColorForTier(tierId);
+const tierColor = getRingColorForTotalPlayed(totalPlayed);
 ```

@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import Top100TrophyIcon from '@/components/icons/Top100TrophyIcon';
 import type { Top100TierId } from '@/lib/top100Club';
 import { TIER_BY_ID } from '@/lib/top100Club';
+import { getRingColorForTotalPlayed, MILESTONE_THEMES } from '@/lib/globalAchievementMilestoneSystem';
 
 interface Top100AchievementBadgeProps {
   tier: Top100TierId | null;
@@ -12,9 +13,10 @@ interface Top100AchievementBadgeProps {
 }
 
 /**
- * Top100AchievementBadge - SDS Squircle Glass style
+ * Top100AchievementBadge - Part of Global Achievement & Milestone System
  * 
  * A premium frosted glass squircle badge with tier-colored glass effect.
+ * Colors sourced from globalAchievementMilestoneSystem.ts
  */
 export function Top100AchievementBadge({ 
   tier, 
@@ -27,7 +29,8 @@ export function Top100AchievementBadge({
   const tierMeta = TIER_BY_ID[tier];
   if (!tierMeta) return null;
 
-  const ringColor = tierMeta.ringColor;
+  // Get color from unified Global Achievement & Milestone System
+  const ringColor = MILESTONE_THEMES[tierMeta.threshold]?.accent ?? tierMeta.ringColor;
   const isCompact = size === 'compact';
 
   return (

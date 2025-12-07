@@ -5,9 +5,13 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { Button } from '@/components/ui/button';
 import { Top100FriendsStrip } from './Top100FriendsStrip';
-import { AchievementBadge } from '@/components/achievements/AchievementBadge';
+import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
 import { getTop100Club } from '@/lib/top100Club';
 
+/**
+ * Top100ClubCallout - Part of Global Achievement & Milestone System
+ * Uses unified AchievementBadgeCard with colors from globalAchievementMilestoneSystem.ts
+ */
 const Top100ClubCallout: React.FC = () => {
   const { session } = useSupabaseSession();
   const navigate = useNavigate();
@@ -36,6 +40,7 @@ const Top100ClubCallout: React.FC = () => {
   // Achievement badge data
   const hasAchievement = coursesPlayed >= 5;
   const club = getTop100Club(coursesPlayed);
+  const achievementTier = club.threshold?.toString() as AchievementTier || '5';
 
   return (
     <section 
@@ -63,15 +68,15 @@ const Top100ClubCallout: React.FC = () => {
           <>
             {listsStarted > 0 ? (
               <>
-                {/* Achievement Badge - only show if user has 5+ courses */}
+                {/* Achievement Badge - using unified AchievementBadgeCard */}
                 {hasAchievement && (
                   <div className="mb-4">
-                    <AchievementBadge
-                      count={coursesPlayed}
-                      title="Top 100"
-                      tierLabel={club.tierName || 'Top 100 Club'}
-                      ringColor={club.ringColor}
-                      size="md"
+                    <AchievementBadgeCard
+                      tier={achievementTier}
+                      title={`${coursesPlayed} Top 100`}
+                      subtitle={club.tierName || 'Top 100 Club'}
+                      unlocked={true}
+                      compact={true}
                     />
                   </div>
                 )}
