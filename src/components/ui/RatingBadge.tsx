@@ -22,8 +22,7 @@ interface RatingBadgeProps {
  * Reusable rating badge component that uses tier data from getScoreTier()
  * for consistent badge styling across the app.
  * 
- * Colors are sourced from the Masters Green Ladder via getScoreTier().
- * Uses gradient background from bgLight → bgDark with accent text.
+ * Colors are sourced from the Global Colour System via getScoreTier().
  */
 export function RatingBadge({ tierData, label, className }: RatingBadgeProps) {
   return (

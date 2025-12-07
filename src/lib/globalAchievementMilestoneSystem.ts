@@ -1,21 +1,17 @@
 /**
  * ╔══════════════════════════════════════════════════════════════════════════════════════════╗
  * ║                      GLOBAL COLOUR SYSTEM - SINGLE SOURCE OF TRUTH                       ║
- * ║                            "Masters Green Ladder System"                                 ║
+ * ║                                   "System 1"                                             ║
  * ╠══════════════════════════════════════════════════════════════════════════════════════════╣
  * ║                                                                                          ║
  * ║  This file is the ONLY place where achievement, rating, and regional colors are defined. ║
  * ║  ALL other files MUST reference this system - no local color definitions allowed.        ║
  * ║                                                                                          ║
- * ║  The Masters Green Ladder:                                                               ║
- * ║    • 8-step green progression from Soft Mint (G1) to Grand Slam Green (G8)              ║
- * ║    • SHARED by milestone achievements AND course ratings                                 ║
- * ║                                                                                          ║
  * ║  Three key maps:                                                                          ║
- * ║    • MILESTONE_THEMES – tiers 5, 10, 20, 50, 100, 200, 300, 400 (G1-G8)                  ║
- * ║    • COURSE_RATING_THEMES – FAIR (G1), GOOD (G2), VERY_GOOD (G3),                        ║
- * ║                             EXCELLENT (G4), OUTSTANDING (G5)                             ║
- * ║    • REGION_THEMES – WORLD (teal), GB&I (racing green), USA (red), EUROPE (violet)      ║
+ * ║    • MILESTONE_THEMES – tiers 5, 10, 20, 50, 100, 200, 300, 400                          ║
+ * ║    • COURSE_RATING_THEMES – FAIR, GOOD, VERY_GOOD, EXCELLENT, OUTSTANDING                ║
+ * ║    • REGION_THEMES – WORLD (deep coastal blue), GB&I (racing green),                     ║
+ * ║                      USA (red), EUROPE (EU blue)                                          ║
  * ║                                                                                          ║
  * ║  Components should only use these helpers:                                                ║
  * ║    • getTierPalette() / MILESTONE_THEMES[...]                                            ║
@@ -32,74 +28,50 @@
  *    - Use pastel gradients: bgLight → bgDark from the theme
  * 
  * 2. RINGS & SMALL ICONS (avatar rings, trophy icons, dots, small chips)
- *    - Use bgDark from the same theme for visual harmony with cards
+ *    - Use the accent color from the same theme
  * 
  * 3. LOCKED STATE = Universal muted palette
  *    - Background: hsl(210 15% 96%)
  *    - Icon: hsl(215 15% 65%)
  * 
  * ═══════════════════════════════════════════════════════════════════════════════════════════
- * MASTERS GREEN LADDER (SHARED BETWEEN ACHIEVEMENTS & RATINGS)
+ * PERFORMANCE SCALE (SHARED BETWEEN ACHIEVEMENTS & RATINGS)
  * ═══════════════════════════════════════════════════════════════════════════════════════════
  * 
- * Users learn ONE colour language (low → high performance, plus four regional colours):
- *   • Achievements & milestones (5-400 Club)
- *   • Course/community ratings (Fair → Outstanding)
- *   • Top 100 regional journeys (keep national colours)
+ * When users learn our colour language once (low → high performance, plus four regional
+ * colours), it is consistent everywhere:
+ *   • Achievements & milestones
+ *   • Course/community ratings
+ *   • Top 100 regional journeys
  * 
  * @module GlobalAchievementMilestoneSystem
  */
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
-// MASTERS GREEN LADDER – 8-STEP PROGRESSION
+// SYSTEM 1 – PERFORMANCE SCALE (LOW → HIGH)
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
-const MASTERS_GREEN_LADDER = {
-  5:   { accent: '#CFEBDD' }, // G1 – Soft Mint (Rookie)
-  10:  { accent: '#B5E0C6' }, // G2 – Gentle Green (Fairway)
-  20:  { accent: '#95D3AA' }, // G3 – Fresh Green (Founders)
-  50:  { accent: '#71C18A' }, // G4 – Strong Green (Heritage)
-  100: { accent: '#4AA266' }, // G5 – Masters Green (Century)
-  200: { accent: '#4A9563' }, // G6 – Tour Green (Elite) – 12% lighter
-  300: { accent: '#3A7751' }, // G7 – Major Green (Legendary) – 12% lighter
-  400: { accent: '#2D5A42' }, // G8 – Grand Slam Green – 12% lighter
+export const PERFORMANCE_STOPS = {
+  S1: '#FBE4E4', // soft clay red      – lowest
+  S2: '#F7E3C2', // sand / peach
+  S3: '#E8F3C5', // yellow-green
+  S4: '#CBEAD5', // light fresh green
+  S5: '#B3DFC9', // richer green
+  S6: '#C6E7F2', // aqua / teal-blue
+  S7: '#C2D3F7', // sky / slate blue
+  S8: '#D4CFDF', // soft ink/charcoal – highest card bg
 } as const;
 
-// Helper to lighten a hex color by percentage
-function lightenColor(hex: string, percent: number): string {
-  const num = parseInt(hex.replace('#', ''), 16);
-  const r = Math.min(255, Math.floor((num >> 16) + (255 - (num >> 16)) * (percent / 100)));
-  const g = Math.min(255, Math.floor(((num >> 8) & 0x00FF) + (255 - ((num >> 8) & 0x00FF)) * (percent / 100)));
-  const b = Math.min(255, Math.floor((num & 0x0000FF) + (255 - (num & 0x0000FF)) * (percent / 100)));
-  return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
-}
-
-// Helper to darken a hex color by percentage
-function darkenColor(hex: string, percent: number): string {
-  const num = parseInt(hex.replace('#', ''), 16);
-  const r = Math.max(0, Math.floor((num >> 16) * (1 - percent / 100)));
-  const g = Math.max(0, Math.floor(((num >> 8) & 0x00FF) * (1 - percent / 100)));
-  const b = Math.max(0, Math.floor((num & 0x0000FF) * (1 - percent / 100)));
-  return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
-}
-
-// Build theme from accent color
-interface ThemeColors {
-  accent: string;
-  bgLight: string;
-  bgDark: string;
-}
-
-function buildThemeFromAccent(accent: string): ThemeColors {
+// Helper to create gradient objects
+function asGradient(light: string, dark: string) {
   return {
-    accent,
-    bgLight: lightenColor(accent, 35), // ~35% lighter for soft gradient start
-    bgDark: lightenColor(accent, 18),  // ~18% lighter for gradient end
+    bgLight: light,
+    bgDark: dark,
   };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
-// MILESTONE THEMES (5 → 400 Club) – Built from Masters Green Ladder
+// MILESTONE THEMES (5 → 400 Club)
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
 export type MilestoneTier = 5 | 10 | 20 | 50 | 100 | 200 | 300 | 400;
@@ -113,38 +85,20 @@ export interface MilestoneTheme {
   bgDark: string;    // Card gradient end
 }
 
-const milestoneColors = {
-  5:   buildThemeFromAccent(MASTERS_GREEN_LADDER[5].accent),
-  10:  buildThemeFromAccent(MASTERS_GREEN_LADDER[10].accent),
-  20:  buildThemeFromAccent(MASTERS_GREEN_LADDER[20].accent),
-  50:  buildThemeFromAccent(MASTERS_GREEN_LADDER[50].accent),
-  100: buildThemeFromAccent(MASTERS_GREEN_LADDER[100].accent),
-  200: buildThemeFromAccent(MASTERS_GREEN_LADDER[200].accent),
-  300: buildThemeFromAccent(MASTERS_GREEN_LADDER[300].accent),
-  400: buildThemeFromAccent(MASTERS_GREEN_LADDER[400].accent),
-};
-
 export const MILESTONE_THEMES: Record<MilestoneTier, MilestoneTheme> = {
-  5:   { id: 'rookie',     name: 'Rookie Club',     tier: 'ROOKIE',     ...milestoneColors[5] },
-  10:  { id: 'fairway',    name: 'Fairway Club',    tier: 'FAIRWAY',    ...milestoneColors[10] },
-  20:  { id: 'founders',   name: 'Founders Club',   tier: 'FOUNDERS',   ...milestoneColors[20] },
-  50:  { id: 'heritage',   name: 'Heritage Club',   tier: 'HERITAGE',   ...milestoneColors[50] },
-  100: { id: 'century',    name: 'Century Club',    tier: 'CENTURY',    ...milestoneColors[100] },
-  200: { id: 'elite',      name: 'Elite Club',      tier: 'ELITE',      ...milestoneColors[200] },
-  300: { id: 'legendary',  name: 'Legendary Club',  tier: 'LEGENDARY',  ...milestoneColors[300] },
-  400: { id: 'grandslam',  name: 'Grand Slam Club', tier: 'GRAND_SLAM', ...milestoneColors[400] },
+  5:   { id: 'rookie',     name: 'Rookie Club',     tier: 'ROOKIE',     ...asGradient(PERFORMANCE_STOPS.S2, PERFORMANCE_STOPS.S1), accent: '#C9B27A' },
+  10:  { id: 'fairway',    name: 'Fairway Club',    tier: 'FAIRWAY',    ...asGradient(PERFORMANCE_STOPS.S3, PERFORMANCE_STOPS.S4), accent: '#7CC66B' },
+  20:  { id: 'founders',   name: 'Founders Club',   tier: 'FOUNDERS',   ...asGradient(PERFORMANCE_STOPS.S4, PERFORMANCE_STOPS.S5), accent: '#2F7D32' },
+  50:  { id: 'heritage',   name: 'Heritage Club',   tier: 'HERITAGE',   ...asGradient(PERFORMANCE_STOPS.S2, '#E8D4A0'),             accent: '#D8A546' },
+  100: { id: 'century',    name: 'Century Club',    tier: 'CENTURY',    ...asGradient('#E4E4E9', '#D3D3D8'),                        accent: '#4A4A4A' },
+  200: { id: 'elite',      name: 'Elite Club',      tier: 'ELITE',      ...asGradient('#E0D8FB', '#C5B6F5'),                        accent: '#6F5BD5' },
+  300: { id: 'legendary',  name: 'Legendary Club',  tier: 'LEGENDARY',  ...asGradient('#F3D7FF', '#E4B4F0'),                        accent: '#B153CE' },
+  400: { id: 'grandslam',  name: 'Grand Slam Club', tier: 'GRAND_SLAM', ...asGradient('#E0E3EB', '#C2C7D2'),                        accent: '#111111' },
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
-// COURSE RATING THEMES (Fair → Outstanding) – SHARES Masters Green Ladder
+// COURSE RATING THEMES (Fair → Outstanding)
 // ═══════════════════════════════════════════════════════════════════════════════════════════
-// 
-// Rating tiers map to milestone themes:
-//   • Fair        → 5-Club theme (G1)
-//   • Good        → 10-Club theme (G2)
-//   • Very Good   → 20-Club theme (G3)
-//   • Excellent   → 50-Club theme (G4)
-//   • Outstanding → 100-Club theme (G5)
 
 export type RatingTier = 'FAIR' | 'GOOD' | 'VERY_GOOD' | 'EXCELLENT' | 'OUTSTANDING';
 
@@ -161,62 +115,56 @@ export interface RatingTheme {
   barFillClass: string;
 }
 
-// Build rating themes from milestone themes (shared ladder)
 export const COURSE_RATING_THEMES: Record<RatingTier, RatingTheme> = {
   FAIR: {
     key: 'FAIR',
     label: 'Fair',
-    accent: milestoneColors[5].accent,
-    bgLight: milestoneColors[5].bgLight,
-    bgDark: milestoneColors[5].bgDark,
-    bgClass: `bg-[${milestoneColors[5].bgLight}]`,
-    borderClass: `border-[${milestoneColors[5].accent}]`,
-    textClass: `text-[${darkenColor(milestoneColors[5].accent, 30)}]`,
-    barFillClass: `bg-[${milestoneColors[5].accent}]`,
+    ...asGradient(PERFORMANCE_STOPS.S1, PERFORMANCE_STOPS.S2),
+    accent: '#C05B5B',
+    bgClass: `bg-[${PERFORMANCE_STOPS.S1}]`,
+    borderClass: 'border-[#C05B5B]',
+    textClass: 'text-[#8B3D3D]',
+    barFillClass: 'bg-[#C05B5B]',
   },
   GOOD: {
     key: 'GOOD',
     label: 'Good',
-    accent: milestoneColors[10].accent,
-    bgLight: milestoneColors[10].bgLight,
-    bgDark: milestoneColors[10].bgDark,
-    bgClass: `bg-[${milestoneColors[10].bgLight}]`,
-    borderClass: `border-[${milestoneColors[10].accent}]`,
-    textClass: `text-[${darkenColor(milestoneColors[10].accent, 30)}]`,
-    barFillClass: `bg-[${milestoneColors[10].accent}]`,
+    ...asGradient(PERFORMANCE_STOPS.S3, PERFORMANCE_STOPS.S4),
+    accent: '#4B8C4F',
+    bgClass: `bg-[${PERFORMANCE_STOPS.S3}]`,
+    borderClass: 'border-[#4B8C4F]',
+    textClass: 'text-[#2D5430]',
+    barFillClass: 'bg-[#4B8C4F]',
   },
   VERY_GOOD: {
     key: 'VERY_GOOD',
     label: 'Very Good',
-    accent: milestoneColors[20].accent,
-    bgLight: milestoneColors[20].bgLight,
-    bgDark: milestoneColors[20].bgDark,
-    bgClass: `bg-[${milestoneColors[20].bgLight}]`,
-    borderClass: `border-[${milestoneColors[20].accent}]`,
-    textClass: `text-[${darkenColor(milestoneColors[20].accent, 30)}]`,
-    barFillClass: `bg-[${milestoneColors[20].accent}]`,
+    ...asGradient(PERFORMANCE_STOPS.S4, PERFORMANCE_STOPS.S5),
+    accent: '#2F7D32',
+    bgClass: `bg-[${PERFORMANCE_STOPS.S4}]`,
+    borderClass: 'border-[#2F7D32]',
+    textClass: 'text-[#1E4D20]',
+    barFillClass: 'bg-[#2F7D32]',
   },
   EXCELLENT: {
     key: 'EXCELLENT',
     label: 'Excellent',
-    accent: milestoneColors[50].accent,
-    bgLight: milestoneColors[50].bgLight,
-    bgDark: milestoneColors[50].bgDark,
-    bgClass: `bg-[${milestoneColors[50].bgLight}]`,
-    borderClass: `border-[${milestoneColors[50].accent}]`,
-    textClass: `text-[${darkenColor(milestoneColors[50].accent, 30)}]`,
-    barFillClass: `bg-[${milestoneColors[50].accent}]`,
+    ...asGradient(PERFORMANCE_STOPS.S6, PERFORMANCE_STOPS.S7),
+    accent: '#205D89',
+    bgClass: `bg-[${PERFORMANCE_STOPS.S6}]`,
+    borderClass: 'border-[#205D89]',
+    textClass: 'text-[#163A55]',
+    barFillClass: 'bg-[#205D89]',
   },
   OUTSTANDING: {
     key: 'OUTSTANDING',
     label: 'Outstanding',
-    accent: milestoneColors[100].accent,
-    bgLight: milestoneColors[100].bgLight,
-    bgDark: milestoneColors[100].bgDark,
-    bgClass: `bg-[${milestoneColors[100].bgLight}]`,
-    borderClass: `border-[${milestoneColors[100].accent}]`,
-    textClass: `text-[${darkenColor(milestoneColors[100].accent, 30)}]`,
-    barFillClass: `bg-[${milestoneColors[100].accent}]`,
+    ...asGradient(PERFORMANCE_STOPS.S7, '#B2C2FA'),
+    accent: '#163A73',
+    bgClass: `bg-[${PERFORMANCE_STOPS.S7}]`,
+    borderClass: 'border-[#163A73]',
+    textClass: 'text-[#0F254A]',
+    barFillClass: 'bg-[#163A73]',
   },
 };
 
@@ -262,35 +210,31 @@ export const REGION_THEMES: Record<RegionKey, RegionalTheme> = {
     label: 'World',
     shortLabel: 'World',
     accent: '#124A80',                 // deep coastal blue
-    bgLight: '#D7E5F7',
-    bgDark: '#C3D5F0',
+    ...asGradient('#D7E5F7', '#C3D5F0'),
     bgLocked: 'hsl(210 30% 96%)',
   },
   GBI: {
     id: 'list_gb_ireland',
     label: 'GB & Ireland',
     shortLabel: 'GB&I',
-    accent: '#2E6B4A',                 // slightly deeper racing green
-    bgLight: '#C0D9CB',
-    bgDark: '#A8CBBA',
+    accent: '#145437',                 // racing green
+    ...asGradient('#CFE6D6', '#B9D8C4'),
     bgLocked: 'hsl(140 30% 96%)',
   },
   USA: {
     id: 'list_usa',
     label: 'USA',
     shortLabel: 'USA',
-    accent: '#B02424',                 // bold red (unchanged)
-    bgLight: '#F8D9D9',
-    bgDark: '#F2B9B9',
+    accent: '#B02424',                 // bold red
+    ...asGradient('#F8D9D9', '#F2B9B9'),
     bgLocked: 'hsl(0 30% 96%)',
   },
   EUROPE: {
     id: 'list_europe',
     label: 'Europe',
     shortLabel: 'Europe',
-    accent: '#1F3A93',                 // Navy Blue
-    bgLight: '#D6DDF2',                // Light navy mist
-    bgDark: '#C4CEE9',
+    accent: '#2752B8',                 // EU blue
+    ...asGradient('#D8E0F7', '#C5CFF2'),
     bgLocked: 'hsl(225 30% 96%)',
   },
 };
@@ -367,7 +311,7 @@ export function getMilestoneTheme(threshold: number): AchievementTheme {
 
 /**
  * Get ring color for a milestone threshold
- * Returns pastel color (bgDark) to match card appearance
+ * Returns softer pastel color (bgDark) to match card appearance
  */
 export function getRingColorForThreshold(threshold: number): string {
   return MILESTONE_THEMES[threshold as MilestoneTier]?.bgDark ?? '#D1D5DB';
@@ -375,7 +319,7 @@ export function getRingColorForThreshold(threshold: number): string {
 
 /**
  * Get ring color for user's highest global milestone
- * Returns pastel color (bgDark) to match card appearance
+ * Returns softer pastel color (bgDark) to match card appearance
  */
 export function getRingColorForTotalPlayed(totalPlayed: number): string {
   const thresholds: MilestoneTier[] = [400, 300, 200, 100, 50, 20, 10, 5];
@@ -512,12 +456,3 @@ export const RATING_CSS_VARS = {
   '--rating-band-good': COURSE_RATING_THEMES.GOOD.accent,
   '--rating-band-fair': COURSE_RATING_THEMES.FAIR.accent,
 } as const;
-
-// ═══════════════════════════════════════════════════════════════════════════════════════════
-// RATING BAR TRACK COLOR
-// ═══════════════════════════════════════════════════════════════════════════════════════════
-
-export const RATING_BAR_TRACK = '#E2E7EC'; // Neutral grey track for all rating bars
-
-// Export the ladder for reference
-export { MASTERS_GREEN_LADDER };
