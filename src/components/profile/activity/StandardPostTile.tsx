@@ -1,19 +1,20 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 import { ActivityMediaItem } from './types';
 import PostMedia from './PostMedia';
-import { Images, Trophy } from 'lucide-react';
+import { Images, Trophy, Play } from 'lucide-react';
 
 interface StandardPostTileProps {
   item: ActivityMediaItem;
   onPress?: (postId: string) => void;
+  videoRef?: (el: HTMLVideoElement | null) => void;
 }
 
 /**
  * Standard tile for two-column waterfall grid
  * Square aspect with pointed corners
  */
-const StandardPostTile: React.FC<StandardPostTileProps> = ({ item, onPress }) => {
+const StandardPostTile: React.FC<StandardPostTileProps> = ({ item, onPress, videoRef }) => {
   const handleClick = useCallback(() => {
     onPress?.(item.postId);
   }, [item.postId, onPress]);
@@ -24,6 +25,35 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({ item, onPress }) =>
   const aspectClass = item.aspectRatio === 'portrait' 
     ? 'aspect-[3/4]' 
     : 'aspect-square';
+
+  // Render video element for autoplay candidates
+  const renderMedia = () => {
+    if (isVideo && item.canAutoplay && item.playbackUrl) {
+      return (
+        <video
+          ref={videoRef}
+          data-post-id={item.postId}
+          data-can-autoplay="true"
+          src={item.playbackUrl}
+          poster={item.thumbnailUrl}
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          className="w-full h-full object-cover"
+        />
+      );
+    }
+
+    // Default: use PostMedia for images and non-autoplay videos
+    return (
+      <PostMedia
+        thumbnailUrl={item.thumbnailUrl || item.url}
+        title={item.courseName}
+        isVideo={isVideo}
+      />
+    );
+  };
 
   return (
     <button
@@ -36,11 +66,7 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({ item, onPress }) =>
       onClick={handleClick}
     >
       {/* Media with skeleton loading */}
-      <PostMedia
-        thumbnailUrl={item.thumbnailUrl || item.url}
-        title={item.courseName}
-        isVideo={isVideo}
-      />
+      {renderMedia()}
 
       {/* Multi-media indicator */}
       {item.additionalMediaCount && item.additionalMediaCount > 0 && (

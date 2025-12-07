@@ -1,15 +1,17 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import MediaSkeleton from './MediaSkeleton';
 import HeroPostTile from './HeroPostTile';
 import StandardPostTile from './StandardPostTile';
 import { ActivityMediaGridProps, ActivityMediaItem, AspectRatio, ActivityPost } from './types';
 import { buildActivityLayout, LayoutRow } from './layoutEngine';
+import { streamPosterFrom } from '@/utils/mediaThumbs';
+import { useGridVideoAutoplay, VideoEntry } from '@/hooks/useGridVideoAutoplay';
 
 /**
  * Convert ActivityPost to ActivityMediaItem
  */
-function postToMediaItem(post: ActivityPost): ActivityMediaItem | null {
+function postToMediaItem(post: ActivityPost, index: number): ActivityMediaItem | null {
   const media = post.post_media;
   if (!media || media.length === 0) return null;
 
@@ -25,17 +27,30 @@ function postToMediaItem(post: ActivityPost): ActivityMediaItem | null {
     else if (primaryMedia.aspect_ratio > 1.1) aspectRatio = 'landscape';
   }
 
+  const isVideo = primaryMedia.media_type === 'video';
+  
+  // For videos: use poster_url, fallback to streamPosterFrom helper
+  // For images: use media_url directly
+  const thumbnailUrl = isVideo
+    ? (primaryMedia.poster_url || streamPosterFrom(primaryMedia.media_url) || primaryMedia.media_url)
+    : primaryMedia.media_url;
+
+  // One in every 4 videos can autoplay
+  const canAutoplay = isVideo && index % 4 === 0;
+
   return {
     id: primaryMedia.id,
     postId: post.id,
     type: primaryMedia.media_type,
     url: primaryMedia.media_url,
-    thumbnailUrl: primaryMedia.poster_url || primaryMedia.media_url,
+    thumbnailUrl,
+    playbackUrl: primaryMedia.media_url,
     courseName: golfCourseTag?.name,
     roundDate: post.created_at,
     additionalMediaCount: media.length > 1 ? media.length - 1 : undefined,
     isMilestone,
-    aspectRatio
+    aspectRatio,
+    canAutoplay
   };
 }
 
@@ -47,6 +62,7 @@ function postToMediaItem(post: ActivityPost): ActivityMediaItem | null {
  * - Pointed corners (no rounding)
  * - Shimmer skeleton loading states
  * - Premium metadata overlays
+ * - Smart autoplay for videos (1 in every 4, max 2 at once)
  */
 const ActivityMediaGrid: React.FC<ActivityMediaGridProps> = ({
   posts,
@@ -54,10 +70,17 @@ const ActivityMediaGrid: React.FC<ActivityMediaGridProps> = ({
   onPostPress,
   viewMode = 'compact'
 }) => {
+  // Video refs for autoplay management
+  const videoRefsMap = useRef<Record<string, HTMLVideoElement | null>>({});
+  
+  const registerVideoRef = useCallback((postId: string) => (el: HTMLVideoElement | null) => {
+    videoRefsMap.current[postId] = el;
+  }, []);
+
   // Convert posts to media items
   const mediaItems = useMemo(() => {
     return posts
-      .map(postToMediaItem)
+      .map((post, index) => postToMediaItem(post, index))
       .filter((item): item is ActivityMediaItem => item !== null);
   }, [posts]);
 
@@ -65,6 +88,20 @@ const ActivityMediaGrid: React.FC<ActivityMediaGridProps> = ({
   const layoutRows = useMemo(() => {
     return buildActivityLayout(mediaItems);
   }, [mediaItems]);
+
+  // Build video entries for autoplay hook
+  const videoEntries = useMemo((): VideoEntry[] => {
+    return mediaItems
+      .filter(item => item.type === 'video' && item.canAutoplay)
+      .map(item => ({
+        id: item.postId,
+        element: videoRefsMap.current[item.postId] || null,
+        canAutoplay: true
+      }));
+  }, [mediaItems]);
+
+  // Wire up autoplay behavior
+  useGridVideoAutoplay(videoEntries);
 
   // Loading state with shimmer skeletons
   if (isLoading) {
@@ -118,11 +155,13 @@ const ActivityMediaGrid: React.FC<ActivityMediaGridProps> = ({
               <StandardPostTile 
                 item={row.left} 
                 onPress={onPostPress}
+                videoRef={row.left.canAutoplay ? registerVideoRef(row.left.postId) : undefined}
               />
               {row.right ? (
                 <StandardPostTile 
                   item={row.right} 
                   onPress={onPostPress}
+                  videoRef={row.right.canAutoplay ? registerVideoRef(row.right.postId) : undefined}
                 />
               ) : (
                 <div className="aspect-square" /> // empty spacer if odd
