@@ -8,15 +8,17 @@
  * - /top100/[region] pages (USA / GB&I / Europe / World achievements strips)
  * - /courses → Top 100 Club card
  * - /top100?tab=my-progress hero card
+ * - Profile avatar ring
  */
 
 export interface AchievementTheme {
-  bg: string;       // Light pastel background
-  bgLocked: string; // Locked/dimmed background (25-30% opacity of main)
-  accent: string;   // Strong accent color for icons, borders
+  bg: string;       // Light pastel background (HSL)
+  bgLocked: string; // Locked/dimmed background
+  accent: string;   // Strong accent color for icons, borders, rings
 }
 
 // Milestone achievements (5, 10, 20, 50, 100, 200, 300, 400)
+// Ring colors match the accent colors exactly
 export const MILESTONE_THEMES: Record<number, AchievementTheme> = {
   5: { 
     bg: 'hsl(43 45% 95%)',           // Warm beige / Rookie
@@ -84,7 +86,7 @@ export const REGION_THEMES: Record<string, AchievementTheme> = {
   },
 };
 
-// Aliases for slug-based lookups
+// Aliases for slug-based lookups (used in list pages)
 export const REGION_SLUG_THEMES: Record<string, AchievementTheme> = {
   'global': REGION_THEMES['list_worldwide'],
   'gb-i': REGION_THEMES['list_gb_ireland'],
@@ -117,6 +119,27 @@ export function getAchievementTheme(
     return getMilestoneTheme(typeof idOrThreshold === 'number' ? idOrThreshold : parseInt(idOrThreshold, 10));
   }
   return getRegionTheme(String(idOrThreshold));
+}
+
+/**
+ * Get ring color for a milestone threshold
+ * Used for avatar rings, badge rings, etc.
+ */
+export function getRingColorForThreshold(threshold: number): string {
+  return MILESTONE_THEMES[threshold]?.accent ?? '#94a3b8';
+}
+
+/**
+ * Get ring color for user's highest global milestone
+ */
+export function getRingColorForTotalPlayed(totalPlayed: number): string {
+  const thresholds = [400, 300, 200, 100, 50, 20, 10, 5];
+  for (const t of thresholds) {
+    if (totalPlayed >= t) {
+      return MILESTONE_THEMES[t].accent;
+    }
+  }
+  return '#94a3b8'; // Default slate for < 5
 }
 
 /**
@@ -177,4 +200,21 @@ export function getTierPalette(
 
   // Fallback
   return lockedPalette;
+}
+
+/**
+ * Map threshold to tier ID for backwards compatibility with top100Club
+ */
+export function getThresholdTierId(threshold: number): string {
+  const tierMap: Record<number, string> = {
+    5: 'rookie',
+    10: 'fairway',
+    20: 'founders',
+    50: 'heritage',
+    100: 'century',
+    200: 'elite',
+    300: 'legendary',
+    400: 'grandslam',
+  };
+  return tierMap[threshold] ?? 'none';
 }
