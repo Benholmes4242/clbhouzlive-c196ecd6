@@ -34,7 +34,7 @@ import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleto
 import { CoursesListSkeleton } from '@/components/skeletons/CoursesListSkeleton';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { DiscoverSkeleton } from '@/components/skeletons/DiscoverSkeleton';
-import { TourSkeleton } from '@/components/skeletons/TourSkeleton';
+
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 import { HubSkeleton } from '@/components/skeletons/HubSkeleton';
 import { RateCoursePageSkeleton } from '@/components/skeletons/RateCoursePageSkeleton';
@@ -86,7 +86,7 @@ const RateCoursePage = lazy(() => import("./pages/RateCoursePage"));
 const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
 const MyRatings = lazy(() => import("./pages/MyRatings"));
 const News = lazy(() => import("./pages/News"));
-const TourCentral = lazy(() => import("./pages/TourCentral"));
+
 
 const MessagesPage = lazy(() => import("./pages/MessagesPage"));
 const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
@@ -204,7 +204,7 @@ function AppRoutes() {
         <Route path="/user/:username/courses" element={<UserCoursesPage />} />
         <Route path="/my-ratings" element={<MyRatings />} />
         <Route path="/news" element={<News />} />
-        <Route path="/tour" element={<Suspense fallback={<TourSkeleton />}><TourCentral /></Suspense>} />
+        
         <Route path="/videos" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><VideosPage /></Suspense>} />
           <Route path="/season-shop" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><SeasonShop /></Suspense>} />
           <Route path="/challenges" element={<Suspense fallback={<GenericPageSkeleton />}><ChallengesPage /></Suspense>} />
