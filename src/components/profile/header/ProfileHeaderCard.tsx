@@ -42,8 +42,8 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col gap-1.5 md:gap-2">
-      {/* Top row: Name + edit icon */}
+    <div className="flex-1 flex flex-col gap-1.5 md:gap-2 justify-center">
+      {/* Row 1: Name + edit icon */}
       <div className="flex items-center gap-2 md:gap-3">
         <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-foreground">
           {displayName}
@@ -54,34 +54,37 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
             type="button"
             onClick={onCustomiseClick}
             aria-label="Edit profile"
-            className="ml-1 inline-flex items-center justify-center h-8 w-8 rounded-full bg-white/70 text-slate-600 hover:bg-white shadow-sm transition"
+            className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-white/80 text-slate-600 hover:bg-white shadow-sm transition"
           >
             <Pencil className="h-4 w-4" />
           </button>
         )}
       </div>
 
-      {/* Second row: username + HCP pill */}
-      <div className="flex flex-wrap items-center gap-2 text-sm">
-        <span className="text-slate-500">@{username}</span>
-        {isPersonal && handicap != null && (
-          <span className="inline-flex items-center px-3 py-1 rounded-full bg-slate-900/90 text-xs font-semibold uppercase tracking-wide text-white">
-            HCP {handicap.toFixed(1)}
-          </span>
-        )}
+      {/* Row 2: Username */}
+      <div className="text-sm text-slate-500">
+        @{username}
       </div>
 
-      {/* Club line (personal) or Location (business) */}
+      {/* Row 3: Club (personal) or Location (business) */}
       {isPersonal && homeClub && (
         <div className="text-sm">
           <span className="font-semibold text-slate-800">{homeClub}</span>
-          <span className="text-slate-500"> · Home Club</span>
         </div>
       )}
       
       {!isPersonal && location && (
         <div className="text-sm">
           <span className="font-semibold text-slate-800">{location}</span>
+        </div>
+      )}
+
+      {/* Row 4: HCP pill (own line - personal only) */}
+      {isPersonal && handicap != null && (
+        <div>
+          <span className="inline-flex items-center px-3 py-1 rounded-full bg-slate-900/90 text-[11px] md:text-xs font-semibold uppercase tracking-wide text-white">
+            HCP {handicap.toFixed(1)}
+          </span>
         </div>
       )}
       

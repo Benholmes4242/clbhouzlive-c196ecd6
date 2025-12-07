@@ -370,11 +370,11 @@ const HeroProfileHeader = ({
             }}
           />
           
-          {/* Bottom blur/fade for header content */}
+          {/* Bottom blur/fade for header content - subtle */}
           <div
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-28 backdrop-blur-[9px]"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-16 backdrop-blur-[5px]"
             style={{
-              background: 'linear-gradient(to top, hsl(var(--background)) 0%, hsl(var(--background) / 0.9) 30%, rgba(15,23,42,0.35) 60%, transparent 100%)',
+              background: 'linear-gradient(to top, hsl(var(--background) / 0.7) 0%, rgba(15,23,42,0.22) 40%, transparent 100%)',
             }}
           />
         </div>
