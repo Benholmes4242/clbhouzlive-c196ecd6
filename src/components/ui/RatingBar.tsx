@@ -16,7 +16,7 @@ interface RatingBarProps {
   value: number;
   /** Max value (default 10) */
   max?: number;
-  /** neutral = dark slate, banded = gradient from theme */
+  /** neutral = dark slate, banded = uses tier accent color */
   mode?: RatingBarMode;
   /** Required when mode === 'banded' */
   band?: RatingBand;
@@ -48,11 +48,12 @@ export function RatingBar({
       return { backgroundColor: 'var(--rating-bar-fill-neutral)' };
     }
     
-    // Banded mode: use gradient from Masters Green Ladder
+    // Banded mode: use accent color from Unified Color Scale
+    // NO opacity, NO blending - solid accent color
     const tierKey = bandToTierKey[band];
     const theme = COURSE_RATING_THEMES[tierKey];
     return {
-      background: `linear-gradient(90deg, ${theme.bgLight} 0%, ${theme.bgDark} 100%)`,
+      backgroundColor: theme.accent,
     };
   };
 
