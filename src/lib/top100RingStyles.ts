@@ -1,9 +1,12 @@
-// src/lib/top100RingStyles.ts
-// Single source of truth for ALL ring colors: profile rings, dots, map pins
-// Now derives colors from the unified ACHIEVEMENT_THEMES
+/**
+ * Top 100 Ring Styles - Part of Global Achievement & Milestone System
+ * 
+ * Derives all ring colors from the unified MILESTONE_THEMES.
+ * Used for: profile avatar rings, club dots/pills, map pins.
+ */
 
 import type { Top100Ring } from './top100Club';
-import { MILESTONE_THEMES } from './achievementThemes';
+import { MILESTONE_THEMES } from './globalAchievementMilestoneSystem';
 
 // Helper to lighten a hex color for stroke/halo
 function lightenHex(hex: string, percent = 20): string {

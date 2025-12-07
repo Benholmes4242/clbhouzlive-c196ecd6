@@ -1,7 +1,13 @@
 /**
- * ACHIEVEMENT_THEMES - Single Source of Truth for all achievement colors
+ * ╔══════════════════════════════════════════════════════════════════════════╗
+ * ║           GLOBAL ACHIEVEMENT & MILESTONE SYSTEM                          ║
+ * ║                   Single Source of Truth                                 ║
+ * ╚══════════════════════════════════════════════════════════════════════════╝
  * 
- * Every achievement UI across the app must read its bg/accent from this config:
+ * This file defines the unified color palette and theme tokens for ALL
+ * achievement-related UI across the entire application.
+ * 
+ * SURFACES THAT MUST USE THIS SYSTEM:
  * - Profile Achievements rail
  * - Top 100 Milestones Modal (/achievementshub)
  * - Top 100 hub (list completions, badges you're close to)
@@ -9,6 +15,14 @@
  * - /courses → Top 100 Club card
  * - /top100?tab=my-progress hero card
  * - Profile avatar ring
+ * - All achievement badge cards (AchievementBadgeCard component)
+ * 
+ * EXTENSION POLICY:
+ * If additional achievement types are added in the future (e.g., Skill-Based
+ * Achievements, XP Tiers, Seasonal Badges), they MUST extend this system
+ * rather than creating new independent styles.
+ * 
+ * @module GlobalAchievementMilestoneSystem
  */
 
 export interface AchievementTheme {
