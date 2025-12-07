@@ -20,5 +20,4 @@
  * 
  * Similar pattern to: isMockNearby in src/features/nearby/config.ts
  */
-export const SHOW_MOCK_REVIEWS = true;
-
+export const SHOW_MOCK_REVIEWS = false;

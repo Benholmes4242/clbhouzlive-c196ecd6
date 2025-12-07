@@ -17,7 +17,7 @@ async function fetchNearbySquircleData(
 ): Promise<NearbySquircleData> {
   try {
     // Check if mock mode is enabled
-    const useMockData = true;
+    const useMockData = false;
     
     if (useMockData) {
       // Return mock data: 2 golfers (Andrew Yetzes + Gary Martyn)
