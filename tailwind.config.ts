@@ -1,23 +1,6 @@
 import type { Config } from "tailwindcss";
 
 export default {
-	safelist: [
-		// Achievement background classes (static, NOT dynamic template strings)
-		'bg-achv-1',
-		'bg-achv-2',
-		'bg-achv-3',
-		'bg-achv-4',
-		'bg-achv-5',
-		'bg-achv-6',
-		'bg-achv-7',
-		'bg-achv-8',
-		'achv-grand-slam-bg',
-		'achv-grand-slam-border',
-		// Other dynamic classes
-		'w-1.5', 'w-5',
-		'bg-white', 'bg-white/60', 'dark:bg-white', 'dark:bg-white/50',
-		'h-1.5', 'rounded-full', 'transition-all', 'duration-200', 'ease-out',
-	],
 	darkMode: ["class"],
 	content: [
 		"./pages/**/*.{ts,tsx}",
@@ -101,16 +84,15 @@ export default {
 				'cta-text-dark': 'var(--cta-text-color-dark)',
 				'border-subtle': 'var(--border-subtle)',
 				'slate-secondary': 'var(--slate-secondary)',
-				// Achievement colour system - use bg-achv-{1-8} classes
-				'achv-1': 'var(--achv-1-bg)',
-				'achv-2': 'var(--achv-2-bg)',
-				'achv-3': 'var(--achv-3-bg)',
-				'achv-4': 'var(--achv-4-bg)',
-				'achv-5': 'var(--achv-5-bg)',
-				'achv-6': 'var(--achv-6-bg)',
-				'achv-7': 'var(--achv-7-bg)',
-				'achv-8': 'var(--achv-8-bg)',
-				'achv-gold': 'var(--achv-gold)',
+				// Top 100 Club tier colors
+				rookie: '#D9C7A3',
+				fairway: '#8BBF5A',
+				founders: '#2E5930',
+				heritage: '#C8A44B',
+				century: '#B7BCC6',
+				elite: '#D9A441',
+				legendary: '#5A3E8C',
+				grandslam: '#0C0F14',
 				// Top 100 Region colors
 				region: {
 					global: 'rgb(var(--region-global) / <alpha-value>)',
@@ -445,5 +427,10 @@ export default {
 			}
 		}
 	},
+	safelist: [
+		'w-1.5', 'w-5',
+		'bg-white', 'bg-white/60', 'dark:bg-white', 'dark:bg-white/50',
+		'h-1.5', 'rounded-full', 'transition-all', 'duration-200', 'ease-out',
+	],
 	plugins: [require("tailwindcss-animate")],
 } satisfies Config;

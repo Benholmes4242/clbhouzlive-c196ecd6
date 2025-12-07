@@ -5,7 +5,6 @@ import {
   getTierPalette, 
   MILESTONE_THEMES,
   MilestoneTier,
-  COLOR_SCALE,
 } from '@/lib/globalAchievementMilestoneSystem';
 
 export type AchievementStatus = 'UNLOCKED' | 'LOCKED' | 'NEW';
@@ -57,30 +56,6 @@ const CLUB_NAMES: Record<string, string> = {
   'WORLD': 'World Complete',
 };
 
-// Achievement tier to CSS token mapping (1-8)
-const TIER_TO_CSS_TOKEN: Record<string, number> = {
-  '5': 1,
-  '10': 2,
-  '20': 3,
-  '50': 4,
-  '100': 5,
-  '200': 6,
-  '300': 7,
-  '400': 8,
-};
-
-// Static class map - Tailwind needs concrete strings, NOT template literals
-const TIER_BG_CLASS: Record<number, string> = {
-  1: 'bg-achv-1',
-  2: 'bg-achv-2',
-  3: 'bg-achv-3',
-  4: 'bg-achv-4',
-  5: 'bg-achv-5',
-  6: 'bg-achv-6',
-  7: 'bg-achv-7',
-  8: 'bg-achv-8',
-};
-
 // Milestone thresholds for next tier calculation
 const MILESTONE_THRESHOLDS: number[] = [5, 10, 20, 50, 100, 200, 300, 400];
 
@@ -107,9 +82,10 @@ export interface AchievementBadgeCardProps {
  * AchievementBadgeCard - Global Achievement & Milestone System
  * 
  * World-class premium badge card with:
- * - CSS token-based backgrounds from --achv-1-bg to --achv-8-bg
- * - Grand Slam (400) gets special Masters gradient + gold accent
- * - Consistent text colors (dark on 1-5, light on 6-8)
+ * - Top row: tier band + status chip
+ * - Hero value block (threshold number)
+ * - Label row: trophy + named club
+ * - Bottom micro-progress to next tier
  * 
  * All colors sourced from globalAchievementMilestoneSystem.ts
  */
@@ -136,11 +112,6 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   const threshold = parseInt(tier, 10);
   const isMilestone = !isNaN(threshold);
   const isRegional = !isMilestone;
-  const isGrandSlam = tier === '400' && unlocked && !isGhost;
-  
-  // Get CSS token number for background
-  const cssToken = TIER_TO_CSS_TOKEN[tier];
-  const useCssTokenBg = isMilestone && cssToken && unlocked && !isGhost && !isGrandSlam;
   
   // Derive status label
   const statusLabel = status 
@@ -184,18 +155,6 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
     regionalProgress = Math.min(100, (playedOnList / totalOnList) * 100);
   }
 
-  // Text color logic: tiers 1-5 get dark text, 6-8 get light text
-  const useWhiteText = cssToken && cssToken >= 6;
-  const textMainColor = isGrandSlam ? '#F9FAFB' : useWhiteText ? '#F9FAFB' : 'var(--achv-text-main)';
-  const textSubtleColor = isGrandSlam ? 'rgba(249,250,251,0.8)' : useWhiteText ? 'rgba(249,250,251,0.7)' : 'var(--achv-text-subtle)';
-  
-  // Icon color - gold for Grand Slam, accent color for others
-  const iconColor = isGrandSlam 
-    ? 'var(--achv-gold)' 
-    : unlocked 
-      ? palette.accent 
-      : '#94a3b8';
-
   return (
     <div
       className={cn(
@@ -203,47 +162,23 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         'rounded-sq-md flex flex-col justify-between transition-all duration-150 relative overflow-hidden',
         // Fixed global size for ALL achievement badges site-wide
         'min-w-[180px] h-[92px] px-3 py-2.5',
+        unlocked && !isGhost
+          ? 'shadow-[0_6px_20px_rgba(15,23,42,0.10)]' 
+          : 'shadow-sm',
         // Micro-interactions
         'active:scale-[0.98]',
+        unlocked && !isGhost && 'hover:shadow-[0_10px_28px_rgba(16,185,129,0.15)]',
         // Ghost styling
-        isGhost && 'border border-dashed border-white/60',
-        // CSS token background using static class map (Tailwind-safe)
-        useCssTokenBg && cssToken && TIER_BG_CLASS[cssToken],
-        // Grand Slam special class
-        isGrandSlam && 'achv-grand-slam-bg achv-grand-slam-border',
+        isGhost && 'border border-dashed border-white/60'
       )}
       style={{
-        // Use inline style for Grand Slam gradient, regional cards, or locked states
-        ...(!useCssTokenBg && !isGrandSlam ? {
-          background: unlocked && !isGhost
-            ? `linear-gradient(135deg, ${palette.bgLight}, ${palette.bgDark})`
-            : palette.bgLocked,
-        } : {}),
-        // Grand Slam uses CSS class, but we set colors here for consistency
-        ...(isGrandSlam ? {
-          color: '#F9FAFB',
-        } : {}),
+        background: unlocked && !isGhost
+          ? `linear-gradient(135deg, ${palette.bgLight}, ${palette.bgDark})`
+          : palette.bgLocked,
         transform: isPrimary ? 'translateY(-2px)' : undefined,
         opacity: isGhost ? 0.7 : (!unlocked ? 0.85 : 1),
-        // Shadows
-        boxShadow: isGrandSlam 
-          ? '0 14px 40px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.15)'
-          : unlocked && !isGhost 
-            ? '0 6px 20px rgba(15,23,42,0.10)' 
-            : '0 1px 3px rgba(0,0,0,0.06)',
       }}
     >
-      {/* Grand Slam gold border overlay */}
-      {isGrandSlam && (
-        <div 
-          className="absolute inset-0 rounded-[inherit] pointer-events-none"
-          style={{
-            border: '1.5px solid var(--achv-gold)',
-            opacity: 0.75,
-          }}
-        />
-      )}
-
       {/* Ghost overlay */}
       {isGhost && (
         <div className="absolute inset-0 rounded-[inherit] bg-white/40 pointer-events-none" />
@@ -254,29 +189,19 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         <div 
           className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
           style={{ 
-            backgroundColor: isGrandSlam 
-              ? 'rgba(212,168,87,0.22)' 
-              : unlocked 
-                ? `${palette.accent}1F` 
-                : 'rgba(148,163,184,0.12)' 
+            backgroundColor: unlocked ? `${palette.accent}1F` : 'rgba(148,163,184,0.12)' 
           }}
         >
           <Trophy 
-            className={cn("w-3.5 h-3.5", isGrandSlam && "grand-slam-icon")}
-            style={{ color: iconColor }} 
+            className="w-3.5 h-3.5"
+            style={{ color: unlocked ? palette.accent : '#94a3b8' }} 
           />
         </div>
         <div className="flex-1 min-w-0 overflow-hidden text-left">
-          <div 
-            className="font-semibold leading-tight truncate text-[13px]"
-            style={{ color: textMainColor }}
-          >
+          <div className="font-semibold leading-tight text-slate-900 truncate text-[13px]">
             {isMilestone ? `${threshold} Club` : title}
           </div>
-          <div 
-            className="text-[11px] truncate"
-            style={{ color: textSubtleColor }}
-          >
+          <div className="text-[11px] text-slate-800/70 truncate">
             {isMilestone ? clubName : subtitle}
           </div>
         </div>
@@ -284,19 +209,12 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
 
       {/* Bottom right: Status chip */}
       <div className="flex justify-end">
-        <div 
-          className={cn(
-            "inline-flex items-center px-2 py-0.5 rounded-sq-xs text-[10px] font-medium",
-          )}
-          style={{
-            backgroundColor: isGrandSlam 
-              ? 'rgba(212,168,87,0.25)' 
-              : 'var(--achv-pill-bg)',
-            color: isGrandSlam 
-              ? '#F9FAFB' 
-              : 'var(--achv-pill-text)',
-          }}
-        >
+        <div className={cn(
+          "inline-flex items-center px-2 py-0.5 rounded-sq-xs text-[10px] font-medium",
+          unlocked && !isGhost
+            ? "bg-white/75 text-slate-800"
+            : "bg-white/60 text-slate-500"
+        )}>
           {statusLabel}
         </div>
       </div>

@@ -207,8 +207,6 @@ export function getNextBadgeNudge(progress: UserTop100Progress): BadgeNudge | nu
         bgDark: regionTheme.bgDark,
         bgLocked: regionTheme.bgLocked,
         icon: regionTheme.accent,
-        textOnLight: '#111827',
-        textOnDark: '#FFFFFF',
       },
     });
   }

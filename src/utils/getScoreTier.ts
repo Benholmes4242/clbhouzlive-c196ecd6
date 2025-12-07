@@ -1,7 +1,7 @@
 /**
  * Score Tier Utility
  * 
- * IMPORTANT: This file uses the Unified Color Scale from globalAchievementMilestoneSystem.ts
+ * IMPORTANT: This file uses the Masters Green Ladder from globalAchievementMilestoneSystem.ts
  * All rating colors come from COURSE_RATING_THEMES - do not define colors locally.
  */
 
@@ -16,13 +16,10 @@ export interface ScoreTierData {
   border: string;
   text: string;
   barFill: string;
-  // Raw hex values from Unified Color Scale
+  // Raw hex values from Masters Green Ladder
   accent: string;
   bgLight: string;
   bgDark: string;
-  // Text colors for proper contrast
-  textOnLight: string;
-  textOnDark: string;
 }
 
 // Map RatingTheme key to ScoreTier
@@ -38,7 +35,7 @@ const tierKeyMap: Record<string, ScoreTier> = {
  * Get the score tier data for a given rating score.
  * Returns consistent badge styling tokens used across Community Score and Review Cards.
  * 
- * All colors are sourced from the Unified Color Scale (COURSE_RATING_THEMES).
+ * All colors are sourced from the Masters Green Ladder (COURSE_RATING_THEMES).
  */
 export function getScoreTier(score: number): ScoreTierData {
   const theme = getRatingTheme(score);
@@ -55,8 +52,6 @@ export function getScoreTier(score: number): ScoreTierData {
     accent: theme.accent,
     bgLight: theme.bgLight,
     bgDark: theme.bgDark,
-    textOnLight: theme.textOnLight,
-    textOnDark: theme.textOnDark,
   };
 }
 
