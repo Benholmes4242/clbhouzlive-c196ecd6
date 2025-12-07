@@ -375,7 +375,7 @@ const HeroProfileHeader = ({
         {/* META BLOCK - Glass panel with avatar + text */}
         <div
           ref={profileCardRef}
-          className="relative px-4 md:px-8"
+          className="relative px-2 md:px-4"
           style={{ marginTop: '-40px' }}
         >
           <div className="mx-auto max-w-3xl">
