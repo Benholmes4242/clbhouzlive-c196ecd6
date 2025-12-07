@@ -42,10 +42,10 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   };
 
   return (
-    <section className="flex-1 flex flex-col items-center space-y-1.5">
-      {/* Top row: name + optional edit icon */}
-      <div className="flex items-center gap-2">
-        <h1 className="text-2xl font-semibold text-foreground text-center">
+    <div className="flex-1 flex flex-col gap-1.5 md:gap-2">
+      {/* Top row: Name + edit icon */}
+      <div className="flex items-center gap-2 md:gap-3">
+        <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-foreground">
           {displayName}
         </h1>
 
@@ -54,40 +54,41 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
             type="button"
             onClick={onCustomiseClick}
             aria-label="Edit profile"
-            className="inline-flex items-center justify-center rounded-full bg-muted border border-border/60 p-1.5 hover:bg-muted/80 transition"
+            className="ml-1 inline-flex items-center justify-center h-8 w-8 rounded-full bg-white/70 text-slate-600 hover:bg-white shadow-sm transition"
           >
-            <Pencil className="w-4 h-4 text-muted-foreground" />
+            <Pencil className="h-4 w-4" />
           </button>
         )}
       </div>
 
-      {/* Username + Handicap pill */}
-      <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
-        <span>@{username}</span>
+      {/* Second row: username + HCP pill */}
+      <div className="flex flex-wrap items-center gap-2 text-sm">
+        <span className="text-slate-500">@{username}</span>
         {isPersonal && handicap != null && (
-          <span className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-[11px] font-semibold text-foreground">
+          <span className="inline-flex items-center px-3 py-1 rounded-full bg-slate-900/90 text-xs font-semibold uppercase tracking-wide text-white">
             HCP {handicap.toFixed(1)}
           </span>
         )}
       </div>
 
-      {/* Club name (personal) or Location (business) */}
+      {/* Club line (personal) or Location (business) */}
       {isPersonal && homeClub && (
-        <p className="text-sm text-muted-foreground text-center">
-          <span className="font-semibold text-foreground">{homeClub}</span>
-        </p>
+        <div className="text-sm">
+          <span className="font-semibold text-slate-800">{homeClub}</span>
+          <span className="text-slate-500"> · Home Club</span>
+        </div>
       )}
       
       {!isPersonal && location && (
-        <p className="text-sm text-muted-foreground text-center">
-          <span className="font-semibold text-foreground">{location}</span>
-        </p>
+        <div className="text-sm">
+          <span className="font-semibold text-slate-800">{location}</span>
+        </div>
       )}
       
       {/* Website - Business profiles */}
       {!isPersonal && websiteUrl && (
-        <div className="flex items-center justify-center gap-1.5 text-sm">
-          <Globe className="w-3.5 h-3.5 text-muted-foreground" />
+        <div className="flex items-center gap-1.5 text-sm">
+          <Globe className="w-3.5 h-3.5 text-slate-500" />
           <a 
             href={getWebsiteHref(websiteUrl)}
             target="_blank"
@@ -98,7 +99,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
           </a>
         </div>
       )}
-    </section>
+    </div>
   );
 };
 
