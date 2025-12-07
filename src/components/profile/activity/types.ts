@@ -7,7 +7,7 @@ export type ViewMode = 'compact' | 'immersive';
 export interface ActivityMediaItem {
   id: string;
   postId: string;
-  type: 'image' | 'video';
+  type: string; // 'image' | 'video'
   url: string;
   thumbnailUrl?: string;
   aspectRatio?: AspectRatio;
@@ -47,6 +47,8 @@ export interface ActivityPost {
     media_url: string;
     filter_id?: string | null;
     studio_edits?: any | null;
+    aspect_ratio?: number | null;
+    poster_url?: string | null;
   }>;
   post_tags: Array<{
     id: string;
