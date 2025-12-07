@@ -1,6 +1,23 @@
 import type { Config } from "tailwindcss";
 
 export default {
+	safelist: [
+		// Achievement background classes (static, NOT dynamic template strings)
+		'bg-achv-1',
+		'bg-achv-2',
+		'bg-achv-3',
+		'bg-achv-4',
+		'bg-achv-5',
+		'bg-achv-6',
+		'bg-achv-7',
+		'bg-achv-8',
+		'achv-grand-slam-bg',
+		'achv-grand-slam-border',
+		// Other dynamic classes
+		'w-1.5', 'w-5',
+		'bg-white', 'bg-white/60', 'dark:bg-white', 'dark:bg-white/50',
+		'h-1.5', 'rounded-full', 'transition-all', 'duration-200', 'ease-out',
+	],
 	darkMode: ["class"],
 	content: [
 		"./pages/**/*.{ts,tsx}",
@@ -84,18 +101,16 @@ export default {
 				'cta-text-dark': 'var(--cta-text-color-dark)',
 				'border-subtle': 'var(--border-subtle)',
 				'slate-secondary': 'var(--slate-secondary)',
-				// Achievement colour system (8-tier green ladder)
-				achievement: {
-					1: 'var(--achv-1-bg)',
-					2: 'var(--achv-2-bg)',
-					3: 'var(--achv-3-bg)',
-					4: 'var(--achv-4-bg)',
-					5: 'var(--achv-5-bg)',
-					6: 'var(--achv-6-bg)',
-					7: 'var(--achv-7-bg)',
-					8: 'var(--achv-8-bg)',
-					gold: 'var(--achv-gold)',
-				},
+				// Achievement colour system - use bg-achv-{1-8} classes
+				'achv-1': 'var(--achv-1-bg)',
+				'achv-2': 'var(--achv-2-bg)',
+				'achv-3': 'var(--achv-3-bg)',
+				'achv-4': 'var(--achv-4-bg)',
+				'achv-5': 'var(--achv-5-bg)',
+				'achv-6': 'var(--achv-6-bg)',
+				'achv-7': 'var(--achv-7-bg)',
+				'achv-8': 'var(--achv-8-bg)',
+				'achv-gold': 'var(--achv-gold)',
 				// Top 100 Region colors
 				region: {
 					global: 'rgb(var(--region-global) / <alpha-value>)',
@@ -430,10 +445,5 @@ export default {
 			}
 		}
 	},
-	safelist: [
-		'w-1.5', 'w-5',
-		'bg-white', 'bg-white/60', 'dark:bg-white', 'dark:bg-white/50',
-		'h-1.5', 'rounded-full', 'transition-all', 'duration-200', 'ease-out',
-	],
 	plugins: [require("tailwindcss-animate")],
 } satisfies Config;
