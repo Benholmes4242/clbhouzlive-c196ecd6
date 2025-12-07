@@ -133,10 +133,9 @@ export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps>
                 ? `${getListSubtitle(listSlug)} Complete`
                 : `${m.threshold} Club`;
 
-              // Use region tier for list completion, threshold for milestones
-              const tier: AchievementTier = isListComplete 
-                ? listTier 
-                : String(m.threshold) as AchievementTier;
+              // Use regional tier for ALL badges on regional list pages
+              // This ensures milestones (10/25/50/75 Club) use regional colors too
+              const tier: AchievementTier = listTier;
 
               return (
                 <AchievementBadgeCard
