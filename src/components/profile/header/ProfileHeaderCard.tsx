@@ -68,7 +68,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
       {/* Row 4: HCP pill centered + edit button on right */}
       {isPersonal && handicap != null && (
         <div className="relative w-full flex justify-center items-center">
-          <span className="inline-flex items-center px-3 py-1 rounded-full bg-slate-800 text-[11px] md:text-xs font-semibold uppercase tracking-wide text-white">
+          <span className="inline-flex items-center px-3 py-1 rounded-full bg-muted text-[11px] md:text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             HCP {handicap.toFixed(1)}
           </span>
           

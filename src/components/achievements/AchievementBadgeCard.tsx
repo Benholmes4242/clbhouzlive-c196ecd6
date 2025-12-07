@@ -197,7 +197,7 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
             style={{ color: unlocked ? palette.accent : '#94a3b8' }} 
           />
         </div>
-        <div className="flex-1 min-w-0 overflow-hidden">
+        <div className="flex-1 min-w-0 overflow-hidden text-left">
           <div className="font-semibold leading-tight text-slate-900 truncate text-[13px]">
             {isMilestone ? `${threshold} Club` : title}
           </div>
