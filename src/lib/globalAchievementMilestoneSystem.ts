@@ -76,16 +76,17 @@ export interface MilestoneTheme {
 }
 
 // Milestone achievements (5, 10, 20, 50, 100, 200, 300, 400)
-// Ring colors = accent at 100% opacity
+// Ring colors = bgDark (softer pastel, matching card appearance)
+// Icon/accent colors = accent (pure color for trophy icons inside cards)
 export const MILESTONE_THEMES: Record<MilestoneTier, MilestoneTheme> = {
-  5:   { id: 'rookie',     name: 'Rookie Club',     accent: '#C9B27A', bgLight: '#F8F1DE', bgDark: '#F0E0BB' },
-  10:  { id: 'fairway',    name: 'Fairway Club',    accent: '#7CC66B', bgLight: '#E5F7E2', bgDark: '#C6EBBE' },
-  20:  { id: 'founders',   name: 'Founders Club',   accent: '#2F7D32', bgLight: '#E0F2E0', bgDark: '#B8E0BB' },
-  50:  { id: 'heritage',   name: 'Heritage Club',   accent: '#D8A546', bgLight: '#FFF3D8', bgDark: '#F6DEAA' },
-  100: { id: 'century',    name: 'Century Club',    accent: '#4A4A4A', bgLight: '#F3F3F3', bgDark: '#E1E1E1' },
-  200: { id: 'elite',      name: 'Elite Club',      accent: '#6F5BD5', bgLight: '#ECE9FF', bgDark: '#D2CBFF' },
-  300: { id: 'legendary',  name: 'Legendary Club',  accent: '#B153CE', bgLight: '#F7E6FF', bgDark: '#E6C3FA' },
-  400: { id: 'grandslam',  name: 'Grand Slam Club', accent: '#111111', bgLight: '#F0F0F0', bgDark: '#D9D9D9' },
+  5:   { id: 'rookie',     name: 'Rookie Club',     accent: '#C9B27A', bgLight: '#F8F1DE', bgDark: '#E8D9A8' },
+  10:  { id: 'fairway',    name: 'Fairway Club',    accent: '#7CC66B', bgLight: '#E5F7E2', bgDark: '#9ED88F' },
+  20:  { id: 'founders',   name: 'Founders Club',   accent: '#2F7D32', bgLight: '#E0F2E0', bgDark: '#7CB97F' },
+  50:  { id: 'heritage',   name: 'Heritage Club',   accent: '#D8A546', bgLight: '#FFF3D8', bgDark: '#E8C577' },
+  100: { id: 'century',    name: 'Century Club',    accent: '#4A4A4A', bgLight: '#F3F3F3', bgDark: '#B8B8B8' },
+  200: { id: 'elite',      name: 'Elite Club',      accent: '#6F5BD5', bgLight: '#ECE9FF', bgDark: '#A99BE8' },
+  300: { id: 'legendary',  name: 'Legendary Club',  accent: '#B153CE', bgLight: '#F7E6FF', bgDark: '#D08DE3' },
+  400: { id: 'grandslam',  name: 'Grand Slam Club', accent: '#111111', bgLight: '#F0F0F0', bgDark: '#A0A0A0' },
 };
 
 // Legacy interface for backwards compatibility
@@ -172,24 +173,24 @@ export function getAchievementTheme(
 
 /**
  * Get ring color for a milestone threshold
- * Returns pure accent color at 100% opacity
+ * Returns softer pastel color (bgDark) to match card appearance
  */
 export function getRingColorForThreshold(threshold: number): string {
-  return MILESTONE_THEMES[threshold as MilestoneTier]?.accent ?? '#94a3b8';
+  return MILESTONE_THEMES[threshold as MilestoneTier]?.bgDark ?? '#D1D5DB';
 }
 
 /**
  * Get ring color for user's highest global milestone
- * Returns pure accent color at 100% opacity
+ * Returns softer pastel color (bgDark) to match card appearance
  */
 export function getRingColorForTotalPlayed(totalPlayed: number): string {
   const thresholds: MilestoneTier[] = [400, 300, 200, 100, 50, 20, 10, 5];
   for (const t of thresholds) {
     if (totalPlayed >= t) {
-      return MILESTONE_THEMES[t].accent;
+      return MILESTONE_THEMES[t].bgDark; // Use softer pastel color for rings
     }
   }
-  return '#94a3b8'; // Default slate for < 5
+  return '#D1D5DB'; // Default grey for < 5
 }
 
 /**
