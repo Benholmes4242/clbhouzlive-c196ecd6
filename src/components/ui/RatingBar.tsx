@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { COURSE_RATING_THEMES } from '@/lib/globalAchievementMilestoneSystem';
 
 export type RatingBand =
   | 'outstanding'
@@ -23,12 +24,13 @@ interface RatingBarProps {
   className?: string;
 }
 
-const bandToVar: Record<RatingBand, string> = {
-  outstanding: 'var(--rating-band-outstanding)',
-  excellent: 'var(--rating-band-excellent)',
-  veryGood: 'var(--rating-band-very-good)',
-  good: 'var(--rating-band-good)',
-  fair: 'var(--rating-band-fair)',
+// Map band names to Global Colour System themes
+const bandToAccent: Record<RatingBand, string> = {
+  outstanding: COURSE_RATING_THEMES.OUTSTANDING.accent,
+  excellent: COURSE_RATING_THEMES.EXCELLENT.accent,
+  veryGood: COURSE_RATING_THEMES.VERY_GOOD.accent,
+  good: COURSE_RATING_THEMES.GOOD.accent,
+  fair: COURSE_RATING_THEMES.FAIR.accent,
 };
 
 export function RatingBar({
@@ -42,7 +44,7 @@ export function RatingBar({
   const fillColor =
     mode === 'neutral'
       ? 'var(--rating-bar-fill-neutral)'
-      : bandToVar[band];
+      : bandToAccent[band];
 
   return (
     <div

@@ -4,6 +4,7 @@ import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon } from
 import { getScoreTier } from '@/utils/getScoreTier';
 import { RatingBar } from '@/components/ui/RatingBar';
 import { RatingBadge } from '@/components/ui/RatingBadge';
+import { COURSE_RATING_THEMES } from '@/lib/globalAchievementMilestoneSystem';
 
 interface DistributionData {
   outstanding: number;
@@ -45,6 +46,10 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
   const tierData = getScoreTier(averageRating);
   const onlyUserHasRated = reviewCount === 1 && userHasRating;
 
+  // Colors from Global Colour System for comparison messages
+  const positiveColor = COURSE_RATING_THEMES.VERY_GOOD.accent;
+  const negativeColor = COURSE_RATING_THEMES.FAIR.accent;
+
   // Calculate comparison message
   let comparisonMessage: React.ReactNode = null;
   if (!onlyUserHasRated && userHasRating && userScore && averageRating) {
@@ -56,10 +61,13 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
       // On par
       comparisonMessage = (
         <div className="flex items-start gap-2">
-          <span className="mt-[2px] inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-50">
-            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+          <span 
+            className="mt-[2px] inline-flex h-5 w-5 items-center justify-center rounded-full"
+            style={{ backgroundColor: `${positiveColor}20` }}
+          >
+            <CheckCircle2 className="h-3.5 w-3.5" style={{ color: positiveColor }} />
           </span>
-          <p className="text-sm text-emerald-600">
+          <p className="text-sm" style={{ color: positiveColor }}>
             Your score matches the community consensus.
           </p>
         </div>
@@ -68,10 +76,13 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
       // Higher
       comparisonMessage = (
         <div className="flex items-start gap-2">
-          <span className="mt-[2px] inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-50">
-            <ArrowUpIcon className="h-3.5 w-3.5 text-emerald-600" />
+          <span 
+            className="mt-[2px] inline-flex h-5 w-5 items-center justify-center rounded-full"
+            style={{ backgroundColor: `${positiveColor}20` }}
+          >
+            <ArrowUpIcon className="h-3.5 w-3.5" style={{ color: positiveColor }} />
           </span>
-          <p className="text-sm text-emerald-600">
+          <p className="text-sm" style={{ color: positiveColor }}>
             You rated this course {absDiff.toFixed(1)} point{absDiff === 1.0 ? '' : 's'} higher than
             the community.
           </p>
@@ -81,10 +92,13 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
       // Lower
       comparisonMessage = (
         <div className="flex items-start gap-2">
-          <span className="mt-[2px] inline-flex h-5 w-5 items-center justify-center rounded-full bg-rose-50">
-            <ArrowDownIcon className="h-3.5 w-3.5 text-rose-500" />
+          <span 
+            className="mt-[2px] inline-flex h-5 w-5 items-center justify-center rounded-full"
+            style={{ backgroundColor: `${negativeColor}20` }}
+          >
+            <ArrowDownIcon className="h-3.5 w-3.5" style={{ color: negativeColor }} />
           </span>
-          <p className="text-sm text-rose-600">
+          <p className="text-sm" style={{ color: negativeColor }}>
             You rated this course {absDiff.toFixed(1)} point{absDiff === 1.0 ? '' : 's'} lower than
             the community.
           </p>
@@ -93,7 +107,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
     }
   }
 
-  // Map distribution directly from System-2 tier buckets
+  // Map distribution directly from Global Colour System tier buckets
   const distributionItems = [
     { count: distribution.outstanding, tier: getScoreTier(9.5) },
     { count: distribution.excellent, tier: getScoreTier(8.5) },

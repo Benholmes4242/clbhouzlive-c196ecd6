@@ -6,17 +6,26 @@ interface ScorePillProps {
   size?: 'sm' | 'md';
 }
 
+/**
+ * Score pill component using Global Colour System
+ * Colors sourced from getScoreTier() → COURSE_RATING_THEMES
+ */
 export const ScorePill: React.FC<ScorePillProps> = ({ score, size = 'md' }) => {
   const tierData = getScoreTier(score);
   
   const baseClasses =
     size === 'sm'
-      ? 'px-3 py-1 text-xs font-semibold border uppercase'
-      : 'px-4 py-1.5 text-sm font-semibold border uppercase';
+      ? 'px-3 py-1 text-xs font-semibold uppercase'
+      : 'px-4 py-1.5 text-sm font-semibold uppercase';
 
   return (
     <span
-      className={`inline-flex items-center rounded-sq-xs ${baseClasses} ${tierData.bg} ${tierData.border} ${tierData.text}`}
+      className={`inline-flex items-center rounded-sq-xs border ${baseClasses}`}
+      style={{
+        background: `linear-gradient(145deg, ${tierData.bgLight}, ${tierData.bgDark})`,
+        borderColor: tierData.accent,
+        color: tierData.accent,
+      }}
     >
       {score === 10 ? '10' : score.toFixed(1)}
     </span>
