@@ -1,11 +1,22 @@
 /**
  * ╔══════════════════════════════════════════════════════════════════════════════════════════╗
- * ║                      GLOBAL ACHIEVEMENT & MILESTONE SYSTEM                               ║
- * ║                            SINGLE SOURCE OF TRUTH                                        ║
+ * ║                      GLOBAL COLOUR SYSTEM - SINGLE SOURCE OF TRUTH                       ║
+ * ║                                   "System 1"                                             ║
  * ╠══════════════════════════════════════════════════════════════════════════════════════════╣
  * ║                                                                                          ║
- * ║  This file is the ONLY place where achievement/milestone colors are defined.             ║
+ * ║  This file is the ONLY place where achievement, rating, and regional colors are defined. ║
  * ║  ALL other files MUST reference this system - no local color definitions allowed.        ║
+ * ║                                                                                          ║
+ * ║  Three key maps:                                                                          ║
+ * ║    • MILESTONE_THEMES – tiers 5, 10, 20, 50, 100, 200, 300, 400                          ║
+ * ║    • COURSE_RATING_THEMES – FAIR, GOOD, VERY_GOOD, EXCELLENT, OUTSTANDING                ║
+ * ║    • REGION_THEMES – WORLD (deep coastal blue), GB&I (racing green),                     ║
+ * ║                      USA (red), EUROPE (EU blue)                                          ║
+ * ║                                                                                          ║
+ * ║  Components should only use these helpers:                                                ║
+ * ║    • getTierPalette() / MILESTONE_THEMES[...]                                            ║
+ * ║    • getRatingTheme(...)                                                                  ║
+ * ║    • getRegionTheme(...)                                                                  ║
  * ║                                                                                          ║
  * ╚══════════════════════════════════════════════════════════════════════════════════════════╝
  * 
@@ -13,82 +24,260 @@
  * DESIGN RULES (MUST BE FOLLOWED BY ALL COMPONENTS)
  * ═══════════════════════════════════════════════════════════════════════════════════════════
  * 
- * 1. RINGS = SOFT PASTEL (bgDark - softer color matching card appearance)
- *    - Avatar rings: use bgDark for soft pastel appearance
- *    - Map pins: use bgDark for consistency
- *    - NO pure accent for rings - they should match card appearance
+ * 1. CARDS & BADGES (achievement cards, rating badges, regional completion cards)
+ *    - Use pastel gradients: bgLight → bgDark from the theme
  * 
- * 2. ICONS = PURE ACCENT (100% opacity, bold color)
- *    - Trophy icons inside cards: accent color
- *    - Badge icons: accent color
+ * 2. RINGS & SMALL ICONS (avatar rings, trophy icons, dots, small chips)
+ *    - Use the accent color from the same theme
  * 
- * 3. CARD BACKGROUNDS = SOFT GRADIENTS (derived from same palette)
- *    - background: linear-gradient(145deg, bgLight, bgDark)
- *    - Icon color inside cards = accent (pure color)
- * 
- * 4. LOCKED STATE = Universal muted palette
+ * 3. LOCKED STATE = Universal muted palette
  *    - Background: hsl(210 15% 96%)
  *    - Icon: hsl(215 15% 65%)
  * 
  * ═══════════════════════════════════════════════════════════════════════════════════════════
- * SURFACES THAT MUST USE THIS SYSTEM
+ * PERFORMANCE SCALE (SHARED BETWEEN ACHIEVEMENTS & RATINGS)
  * ═══════════════════════════════════════════════════════════════════════════════════════════
  * 
- * Avatar Rings:
- *   - Profile header avatar → getRingColorForTotalPlayed()
- *   - /top100?tab=my-progress hero avatar → getRingColorForTotalPlayed()
- *   - Top 100 Hub hero avatar → getRingColorForTotalPlayed()
- *   - Top 100 leaderboard avatars → getRingColorForTotalPlayed()
- *   - Friends on this journey avatars → getRingColorForTotalPlayed()
- *   - All SquircleAvatar ringColor props → getRingColorForTotalPlayed()
- * 
- * Achievement Cards:
- *   - Profile Achievements rail → getTierPalette()
- *   - Top 100 Milestones Modal (/achievementshub) → getTierPalette()
- *   - Top 100 hub list completions → getTierPalette()
- *   - "Badges you're close to" sections → getTierPalette()
- *   - /top100/[region] pages achievement strips → getTierPalette()
- *   - AchievementBadgeCard component → getTierPalette()
- * 
- * Badge Pills:
- *   - Top100AchievementBadge (glass pill) → getMilestoneAccent()
- *   - Milestone chips in Top 100 pages → getMilestoneAccent()
- *   - Map pins → TOP100_TIER_STYLES from top100RingStyles.ts
- * 
- * ═══════════════════════════════════════════════════════════════════════════════════════════
- * EXTENSION POLICY
- * ═══════════════════════════════════════════════════════════════════════════════════════════
- * 
- * If additional achievement types are added in the future (e.g., Skill-Based
- * Achievements, XP Tiers, Seasonal Badges), they MUST extend this system
- * rather than creating new independent styles.
+ * When users learn our colour language once (low → high performance, plus four regional
+ * colours), it is consistent everywhere:
+ *   • Achievements & milestones
+ *   • Course/community ratings
+ *   • Top 100 regional journeys
  * 
  * @module GlobalAchievementMilestoneSystem
  */
+
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+// SYSTEM 1 – PERFORMANCE SCALE (LOW → HIGH)
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+
+export const PERFORMANCE_STOPS = {
+  S1: '#FBE4E4', // soft clay red      – lowest
+  S2: '#F7E3C2', // sand / peach
+  S3: '#E8F3C5', // yellow-green
+  S4: '#CBEAD5', // light fresh green
+  S5: '#B3DFC9', // richer green
+  S6: '#C6E7F2', // aqua / teal-blue
+  S7: '#C2D3F7', // sky / slate blue
+  S8: '#D4CFDF', // soft ink/charcoal – highest card bg
+} as const;
+
+// Helper to create gradient objects
+function asGradient(light: string, dark: string) {
+  return {
+    bgLight: light,
+    bgDark: dark,
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+// MILESTONE THEMES (5 → 400 Club)
+// ═══════════════════════════════════════════════════════════════════════════════════════════
 
 export type MilestoneTier = 5 | 10 | 20 | 50 | 100 | 200 | 300 | 400;
 
 export interface MilestoneTheme {
   id: string;
   name: string;
-  accent: string;    // PRIMARY: rings, icons, borders - pure color, no opacity
+  tier: string;
+  accent: string;    // Pure color for rings/icons
   bgLight: string;   // Card gradient start
   bgDark: string;    // Card gradient end
 }
 
-// Milestone achievements (5, 10, 20, 50, 100, 200, 300, 400)
-// Ring colors = bgDark (softer pastel, matching card appearance)
-// Icon/accent colors = accent (pure color for trophy icons inside cards)
 export const MILESTONE_THEMES: Record<MilestoneTier, MilestoneTheme> = {
-  5:   { id: 'rookie',     name: 'Rookie Club',     accent: '#C9B27A', bgLight: '#F8F1DE', bgDark: '#E8D9A8' },
-  10:  { id: 'fairway',    name: 'Fairway Club',    accent: '#7CC66B', bgLight: '#E5F7E2', bgDark: '#9ED88F' },
-  20:  { id: 'founders',   name: 'Founders Club',   accent: '#2F7D32', bgLight: '#E0F2E0', bgDark: '#7CB97F' },
-  50:  { id: 'heritage',   name: 'Heritage Club',   accent: '#D8A546', bgLight: '#FFF3D8', bgDark: '#E8C577' },
-  100: { id: 'century',    name: 'Century Club',    accent: '#4A4A4A', bgLight: '#F3F3F3', bgDark: '#B8B8B8' },
-  200: { id: 'elite',      name: 'Elite Club',      accent: '#6F5BD5', bgLight: '#ECE9FF', bgDark: '#A99BE8' },
-  300: { id: 'legendary',  name: 'Legendary Club',  accent: '#B153CE', bgLight: '#F7E6FF', bgDark: '#D08DE3' },
-  400: { id: 'grandslam',  name: 'Grand Slam Club', accent: '#111111', bgLight: '#F0F0F0', bgDark: '#A0A0A0' },
+  5:   { id: 'rookie',     name: 'Rookie Club',     tier: 'ROOKIE',     ...asGradient(PERFORMANCE_STOPS.S2, PERFORMANCE_STOPS.S1), accent: '#C9B27A' },
+  10:  { id: 'fairway',    name: 'Fairway Club',    tier: 'FAIRWAY',    ...asGradient(PERFORMANCE_STOPS.S3, PERFORMANCE_STOPS.S4), accent: '#7CC66B' },
+  20:  { id: 'founders',   name: 'Founders Club',   tier: 'FOUNDERS',   ...asGradient(PERFORMANCE_STOPS.S4, PERFORMANCE_STOPS.S5), accent: '#2F7D32' },
+  50:  { id: 'heritage',   name: 'Heritage Club',   tier: 'HERITAGE',   ...asGradient(PERFORMANCE_STOPS.S2, '#E8D4A0'),             accent: '#D8A546' },
+  100: { id: 'century',    name: 'Century Club',    tier: 'CENTURY',    ...asGradient('#E4E4E9', '#D3D3D8'),                        accent: '#4A4A4A' },
+  200: { id: 'elite',      name: 'Elite Club',      tier: 'ELITE',      ...asGradient('#E0D8FB', '#C5B6F5'),                        accent: '#6F5BD5' },
+  300: { id: 'legendary',  name: 'Legendary Club',  tier: 'LEGENDARY',  ...asGradient('#F3D7FF', '#E4B4F0'),                        accent: '#B153CE' },
+  400: { id: 'grandslam',  name: 'Grand Slam Club', tier: 'GRAND_SLAM', ...asGradient('#E0E3EB', '#C2C7D2'),                        accent: '#111111' },
 };
+
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+// COURSE RATING THEMES (Fair → Outstanding)
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+
+export type RatingTier = 'FAIR' | 'GOOD' | 'VERY_GOOD' | 'EXCELLENT' | 'OUTSTANDING';
+
+export interface RatingTheme {
+  key: RatingTier;
+  label: string;
+  accent: string;    // Pure color for small elements
+  bgLight: string;   // Card/badge gradient start
+  bgDark: string;    // Card/badge gradient end
+  // CSS class equivalents for Tailwind usage
+  bgClass: string;
+  borderClass: string;
+  textClass: string;
+  barFillClass: string;
+}
+
+export const COURSE_RATING_THEMES: Record<RatingTier, RatingTheme> = {
+  FAIR: {
+    key: 'FAIR',
+    label: 'Fair',
+    ...asGradient(PERFORMANCE_STOPS.S1, PERFORMANCE_STOPS.S2),
+    accent: '#C05B5B',
+    bgClass: `bg-[${PERFORMANCE_STOPS.S1}]`,
+    borderClass: 'border-[#C05B5B]',
+    textClass: 'text-[#8B3D3D]',
+    barFillClass: 'bg-[#C05B5B]',
+  },
+  GOOD: {
+    key: 'GOOD',
+    label: 'Good',
+    ...asGradient(PERFORMANCE_STOPS.S3, PERFORMANCE_STOPS.S4),
+    accent: '#4B8C4F',
+    bgClass: `bg-[${PERFORMANCE_STOPS.S3}]`,
+    borderClass: 'border-[#4B8C4F]',
+    textClass: 'text-[#2D5430]',
+    barFillClass: 'bg-[#4B8C4F]',
+  },
+  VERY_GOOD: {
+    key: 'VERY_GOOD',
+    label: 'Very Good',
+    ...asGradient(PERFORMANCE_STOPS.S4, PERFORMANCE_STOPS.S5),
+    accent: '#2F7D32',
+    bgClass: `bg-[${PERFORMANCE_STOPS.S4}]`,
+    borderClass: 'border-[#2F7D32]',
+    textClass: 'text-[#1E4D20]',
+    barFillClass: 'bg-[#2F7D32]',
+  },
+  EXCELLENT: {
+    key: 'EXCELLENT',
+    label: 'Excellent',
+    ...asGradient(PERFORMANCE_STOPS.S6, PERFORMANCE_STOPS.S7),
+    accent: '#205D89',
+    bgClass: `bg-[${PERFORMANCE_STOPS.S6}]`,
+    borderClass: 'border-[#205D89]',
+    textClass: 'text-[#163A55]',
+    barFillClass: 'bg-[#205D89]',
+  },
+  OUTSTANDING: {
+    key: 'OUTSTANDING',
+    label: 'Outstanding',
+    ...asGradient(PERFORMANCE_STOPS.S7, '#B2C2FA'),
+    accent: '#163A73',
+    bgClass: `bg-[${PERFORMANCE_STOPS.S7}]`,
+    borderClass: 'border-[#163A73]',
+    textClass: 'text-[#0F254A]',
+    barFillClass: 'bg-[#163A73]',
+  },
+};
+
+/**
+ * Get rating theme for a score value
+ * @param score - The rating score (0-10)
+ * @returns RatingTheme with all color values
+ */
+export function getRatingTheme(score: number): RatingTheme {
+  if (score >= 9.0) return COURSE_RATING_THEMES.OUTSTANDING;
+  if (score >= 8.0) return COURSE_RATING_THEMES.EXCELLENT;
+  if (score >= 7.0) return COURSE_RATING_THEMES.VERY_GOOD;
+  if (score >= 6.5) return COURSE_RATING_THEMES.GOOD;
+  return COURSE_RATING_THEMES.FAIR;
+}
+
+/**
+ * Get rating theme by tier key
+ */
+export function getRatingThemeByKey(key: RatingTier): RatingTheme {
+  return COURSE_RATING_THEMES[key];
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+// REGION THEMES (Top 100 Regional Lists)
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+
+export type RegionKey = 'WORLD' | 'GBI' | 'USA' | 'EUROPE';
+
+export interface RegionalTheme {
+  id: string;
+  label: string;
+  shortLabel: string;
+  accent: string;    // Pure color for icons
+  bgLight: string;   // Card gradient start
+  bgDark: string;    // Card gradient end
+  bgLocked: string;  // Locked state background
+}
+
+export const REGION_THEMES: Record<RegionKey, RegionalTheme> = {
+  WORLD: {
+    id: 'list_worldwide',
+    label: 'World',
+    shortLabel: 'World',
+    accent: '#124A80',                 // deep coastal blue
+    ...asGradient('#D7E5F7', '#C3D5F0'),
+    bgLocked: 'hsl(210 30% 96%)',
+  },
+  GBI: {
+    id: 'list_gb_ireland',
+    label: 'GB & Ireland',
+    shortLabel: 'GB&I',
+    accent: '#145437',                 // racing green
+    ...asGradient('#CFE6D6', '#B9D8C4'),
+    bgLocked: 'hsl(140 30% 96%)',
+  },
+  USA: {
+    id: 'list_usa',
+    label: 'USA',
+    shortLabel: 'USA',
+    accent: '#B02424',                 // bold red
+    ...asGradient('#F8D9D9', '#F2B9B9'),
+    bgLocked: 'hsl(0 30% 96%)',
+  },
+  EUROPE: {
+    id: 'list_europe',
+    label: 'Europe',
+    shortLabel: 'Europe',
+    accent: '#2752B8',                 // EU blue
+    ...asGradient('#D8E0F7', '#C5CFF2'),
+    bgLocked: 'hsl(225 30% 96%)',
+  },
+};
+
+// Legacy ID-based lookup for backwards compatibility
+export const REGION_THEMES_BY_ID: Record<string, RegionalTheme> = {
+  'list_worldwide': REGION_THEMES.WORLD,
+  'list_gb_ireland': REGION_THEMES.GBI,
+  'list_usa': REGION_THEMES.USA,
+  'list_europe': REGION_THEMES.EUROPE,
+};
+
+// Slug-based lookup for list pages
+export const REGION_SLUG_THEMES: Record<string, RegionalTheme> = {
+  'global': REGION_THEMES.WORLD,
+  'gb-i': REGION_THEMES.GBI,
+  'usa': REGION_THEMES.USA,
+  'europe': REGION_THEMES.EUROPE,
+};
+
+/**
+ * Get region theme by ID, slug, or key
+ */
+export function getRegionTheme(idOrSlug: string): RegionalTheme {
+  // Check direct key first (WORLD, GBI, USA, EUROPE)
+  if (idOrSlug in REGION_THEMES) {
+    return REGION_THEMES[idOrSlug as RegionKey];
+  }
+  // Check by ID (list_worldwide, list_gb_ireland, etc.)
+  if (idOrSlug in REGION_THEMES_BY_ID) {
+    return REGION_THEMES_BY_ID[idOrSlug];
+  }
+  // Check by slug (global, gb-i, usa, europe)
+  if (idOrSlug in REGION_SLUG_THEMES) {
+    return REGION_SLUG_THEMES[idOrSlug];
+  }
+  // Default to WORLD
+  return REGION_THEMES.WORLD;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+// UNIFIED PALETTE HELPERS
+// ═══════════════════════════════════════════════════════════════════════════════════════════
 
 // Legacy interface for backwards compatibility
 export interface AchievementTheme {
@@ -96,50 +285,6 @@ export interface AchievementTheme {
   bgLocked: string;
   accent: string;
 }
-
-// Regional list completion achievements
-// Each has: accent (for icons), bgLight/bgDark (for card gradients and rings)
-export interface RegionalTheme {
-  accent: string;    // Pure color for trophy icons
-  bgLight: string;   // Card gradient start (lightest)
-  bgDark: string;    // Card gradient end & ring color (softer pastel)
-  bgLocked: string;  // Locked state background
-}
-
-export const REGION_THEMES: Record<string, RegionalTheme> = {
-  'list_gb_ireland': { 
-    accent: '#1E3A5F',
-    bgLight: '#E8F0F8',
-    bgDark: '#7FA3C7',
-    bgLocked: 'hsl(210 30% 96%)',
-  },
-  'list_europe': { 
-    accent: '#7C3AED',
-    bgLight: '#F3EEFF',
-    bgDark: '#B794F4',
-    bgLocked: 'hsl(263 30% 96%)',
-  },
-  'list_usa': { 
-    accent: '#B91C1C',
-    bgLight: '#FEEAEA',
-    bgDark: '#F28B8B',
-    bgLocked: 'hsl(0 30% 96%)',
-  },
-  'list_worldwide': { 
-    accent: '#0D9488',
-    bgLight: '#E6FAF8',
-    bgDark: '#5ECED3',
-    bgLocked: 'hsl(175 30% 96%)',
-  },
-};
-
-// Aliases for slug-based lookups (used in list pages)
-export const REGION_SLUG_THEMES: Record<string, RegionalTheme> = {
-  'global': REGION_THEMES['list_worldwide'],
-  'gb-i': REGION_THEMES['list_gb_ireland'],
-  'usa': REGION_THEMES['list_usa'],
-  'europe': REGION_THEMES['list_europe'],
-};
 
 /**
  * Get the pure accent color for a milestone tier
@@ -165,40 +310,6 @@ export function getMilestoneTheme(threshold: number): AchievementTheme {
 }
 
 /**
- * Get theme for a regional list by achievement ID or slug
- */
-export function getRegionTheme(idOrSlug: string): RegionalTheme {
-  return REGION_THEMES[idOrSlug] ?? REGION_SLUG_THEMES[idOrSlug] ?? REGION_THEMES['list_worldwide'];
-}
-
-/**
- * Get theme for any achievement type
- * Returns a unified theme with accent color
- */
-export function getAchievementTheme(
-  type: 'milestone' | 'list_completion',
-  idOrThreshold: string | number
-): { accent: string; bgLight: string; bgDark: string; bgLocked: string } {
-  if (type === 'milestone') {
-    const theme = getMilestoneTheme(typeof idOrThreshold === 'number' ? idOrThreshold : parseInt(idOrThreshold, 10));
-    // Convert legacy format to new format
-    return {
-      accent: theme.accent,
-      bgLight: theme.bg,
-      bgDark: theme.bg, // For legacy, use same bg
-      bgLocked: theme.bgLocked,
-    };
-  }
-  const regionTheme = getRegionTheme(String(idOrThreshold));
-  return {
-    accent: regionTheme.accent,
-    bgLight: regionTheme.bgLight,
-    bgDark: regionTheme.bgDark,
-    bgLocked: regionTheme.bgLocked,
-  };
-}
-
-/**
  * Get ring color for a milestone threshold
  * Returns softer pastel color (bgDark) to match card appearance
  */
@@ -214,10 +325,39 @@ export function getRingColorForTotalPlayed(totalPlayed: number): string {
   const thresholds: MilestoneTier[] = [400, 300, 200, 100, 50, 20, 10, 5];
   for (const t of thresholds) {
     if (totalPlayed >= t) {
-      return MILESTONE_THEMES[t].bgDark; // Use softer pastel color for rings
+      return MILESTONE_THEMES[t].bgDark;
     }
   }
   return '#D1D5DB'; // Default grey for < 5
+}
+
+/**
+ * Get theme for any achievement type
+ * Returns a unified theme with accent color
+ */
+export function getAchievementTheme(
+  type: 'milestone' | 'list_completion',
+  idOrThreshold: string | number
+): { accent: string; bgLight: string; bgDark: string; bgLocked: string } {
+  if (type === 'milestone') {
+    const threshold = typeof idOrThreshold === 'number' ? idOrThreshold : parseInt(String(idOrThreshold), 10);
+    const theme = MILESTONE_THEMES[threshold as MilestoneTier];
+    if (theme) {
+      return {
+        accent: theme.accent,
+        bgLight: theme.bgLight,
+        bgDark: theme.bgDark,
+        bgLocked: 'hsl(210 15% 96%)',
+      };
+    }
+  }
+  const regionTheme = getRegionTheme(String(idOrThreshold));
+  return {
+    accent: regionTheme.accent,
+    bgLight: regionTheme.bgLight,
+    bgDark: regionTheme.bgDark,
+    bgLocked: regionTheme.bgLocked,
+  };
 }
 
 /**
@@ -256,27 +396,27 @@ export function getTierPalette(
       bgLight: theme.bgLight,
       bgDark: theme.bgDark,
       bgLocked: 'hsl(210 15% 96%)',
-      icon: theme.accent, // Icon uses pure accent
+      icon: theme.accent,
     };
   }
 
   // Regional list completions
-  const regionMap: Record<string, string> = {
-    'GBI': 'list_gb_ireland',
-    'EU': 'list_europe',
-    'USA': 'list_usa',
-    'WORLD': 'list_worldwide',
+  const regionMap: Record<string, RegionKey> = {
+    'GBI': 'GBI',
+    'EU': 'EUROPE',
+    'USA': 'USA',
+    'WORLD': 'WORLD',
   };
 
-  const regionId = regionMap[tier];
-  if (regionId && REGION_THEMES[regionId]) {
-    const theme = REGION_THEMES[regionId];
+  const regionKey = regionMap[tier];
+  if (regionKey && REGION_THEMES[regionKey]) {
+    const theme = REGION_THEMES[regionKey];
     return {
       accent: theme.accent,
       bgLight: theme.bgLight,
       bgDark: theme.bgDark,
       bgLocked: theme.bgLocked,
-      icon: theme.accent, // Icon uses pure accent
+      icon: theme.accent,
     };
   }
 
@@ -300,3 +440,19 @@ export function getThresholdTierId(threshold: number): string {
   };
   return tierMap[threshold] ?? 'none';
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+// CSS VARIABLE EXPORTS (for index.css synchronization)
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Get CSS custom properties for rating bands
+ * Use this to sync with index.css --rating-band-* variables
+ */
+export const RATING_CSS_VARS = {
+  '--rating-band-outstanding': COURSE_RATING_THEMES.OUTSTANDING.accent,
+  '--rating-band-excellent': COURSE_RATING_THEMES.EXCELLENT.accent,
+  '--rating-band-very-good': COURSE_RATING_THEMES.VERY_GOOD.accent,
+  '--rating-band-good': COURSE_RATING_THEMES.GOOD.accent,
+  '--rating-band-fair': COURSE_RATING_THEMES.FAIR.accent,
+} as const;

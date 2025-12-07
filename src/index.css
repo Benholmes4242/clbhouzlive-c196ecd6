@@ -121,12 +121,13 @@ html.lightbox-open {
   /* Neutral fill - dark slate for non-banded bars */
   --rating-bar-fill-neutral: #1e293b; /* slate-800 */
   
-  /* Rating band colors - Modern Links palette */
-  --rating-band-outstanding: #D8A265; /* Sunset Bronze */
-  --rating-band-excellent: #37546B;   /* Slate Blue-Grey */
-  --rating-band-very-good: #2F604A;   /* Pine Green */
-  --rating-band-good: #8FBCA8;        /* Sea Mist Green */
-  --rating-band-fair: #D2C6B2;        /* Sand Dune */
+  /* Rating band colors - From Global Colour System (COURSE_RATING_THEMES)
+     These must match src/lib/globalAchievementMilestoneSystem.ts */
+  --rating-band-outstanding: #163A73; /* Deep coastal blue - highest */
+  --rating-band-excellent: #205D89;   /* Sky blue */
+  --rating-band-very-good: #2F7D32;   /* Pine Green */
+  --rating-band-good: #4B8C4F;        /* Fresh Green */
+  --rating-band-fair: #C05B5B;        /* Soft clay red - lowest */
   
   /* ========================================
      TOP 100 CARDS DESIGN TOKENS
