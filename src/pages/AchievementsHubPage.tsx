@@ -10,6 +10,8 @@ import {
 } from '@/lib/achievementDefinitions';
 import { getTop100Club, getNextTop100Club } from '@/lib/top100Club';
 import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
+import NudgeBanner from '@/components/achievements/NudgeBanner';
+import { getNextBadgeNudge } from '@/lib/achievements/nextBadgeNudge';
 import { DEBUG_UNLOCK_ALL_ACHIEVEMENTS, DEBUG_ACHIEVEMENTS_USER_EMAIL } from '@/utils/featureFlags';
 
 // Map milestone threshold to AchievementTier
@@ -62,6 +64,24 @@ const AchievementsHubPage: React.FC = () => {
     ? Math.min(100, (totalTop100Played / nextClub.threshold) * 100) 
     : 100;
 
+  // Calculate nudge
+  const nudge = progressData?.lists ? getNextBadgeNudge({
+    totalTop100Played,
+    lists: progressData.lists.map(l => {
+      const regionMap: Record<string, 'GBI' | 'USA' | 'EU' | 'WORLD'> = {
+        'gb-i': 'GBI',
+        'usa': 'USA',
+        'europe': 'EU',
+        'global': 'WORLD',
+      };
+      return {
+        regionId: regionMap[l.listSlug] || 'WORLD',
+        played: l.played,
+        total: l.total,
+      };
+    }),
+  }) : null;
+
   return (
     <div className="min-h-screen bg-background">
       {/* Page header */}
@@ -91,6 +111,13 @@ const AchievementsHubPage: React.FC = () => {
           <p className="px-4 md:px-8 text-xs md:text-sm text-slate-500 mb-3">
             @{username} · {totalTop100Played} Top 100 courses · {unlockedCount} milestones unlocked
           </p>
+
+          {/* Nudge banner */}
+          {nudge && !isDebugUser && (
+            <div className="px-4 md:px-8">
+              <NudgeBanner nudge={nudge} variant="compact" />
+            </div>
+          )}
 
           {/* Hero "Progress" card */}
           <section className="px-4 md:px-8 mb-5">
@@ -179,6 +206,7 @@ const AchievementsHubPage: React.FC = () => {
                     unlocked={isUnlocked}
                     isPrimary={isCurrent}
                     remaining={isUnlocked ? undefined : remaining}
+                    totalTop100Played={isUnlocked ? totalTop100Played : undefined}
                   />
                 );
               })}
@@ -215,6 +243,8 @@ const AchievementsHubPage: React.FC = () => {
                     subtitle={`${played} / ${total} courses`}
                     unlocked={isUnlocked}
                     remaining={isUnlocked ? undefined : remaining}
+                    playedOnList={played}
+                    totalOnList={total}
                   />
                 );
               })}

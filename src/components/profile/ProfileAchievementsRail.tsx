@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
+import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
 import MilestonesAndAchievementsModal from '@/components/achievements/MilestonesAndAchievementsModal';
+import { getNextBadgeNudge, type BadgeNudge } from '@/lib/achievements/nextBadgeNudge';
 
 interface ProfileAchievementsRailProps {
   userId: string;
@@ -28,10 +30,19 @@ function getAchievementTier(achievement: { id: string; threshold?: number; type:
   return '5';
 }
 
+// Get ghost card tier from nudge
+function getGhostTier(nudge: BadgeNudge): AchievementTier {
+  if (nudge.type === 'global') {
+    return nudge.nextThreshold.toString() as AchievementTier;
+  }
+  return nudge.regionId;
+}
+
 /**
  * ProfileAchievementsRail - Strava-style horizontal trophy strip
  * Shows all unlocked milestone and list completion achievements
  * Business rule: Users keep and display ALL earned badges, not just highest
+ * Now includes ghost card for "next badge" nudge system
  */
 const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
   userId,
@@ -40,6 +51,25 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const { data: achievements, isLoading } = useProfileAchievements(userId);
+  const { data: progressData } = useTop100ProgressForUser(userId);
+
+  // Calculate nudge for ghost card
+  const nudge = progressData?.lists ? getNextBadgeNudge({
+    totalTop100Played: progressData.totalTop100Played,
+    lists: progressData.lists.map(l => {
+      const regionMap: Record<string, 'GBI' | 'USA' | 'EU' | 'WORLD'> = {
+        'gb-i': 'GBI',
+        'usa': 'USA',
+        'europe': 'EU',
+        'global': 'WORLD',
+      };
+      return {
+        regionId: regionMap[l.listSlug] || 'WORLD',
+        played: l.played,
+        total: l.total,
+      };
+    }),
+  }) : null;
 
   // Sort by newest first: use unlockedAt date if available, else higher thresholds first
   // This shows most recently earned achievements on the left
@@ -58,7 +88,10 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
   // Cap visible to MAX_VISIBLE
   const visible = sortedAchievements.slice(0, MAX_VISIBLE);
 
-  if (isLoading || visible.length === 0) return null;
+  // Show ghost card only if nudge exists and there are already some achievements
+  const showGhostCard = nudge && visible.length > 0;
+
+  if (isLoading || (visible.length === 0 && !nudge)) return null;
 
   return (
     <>
@@ -91,8 +124,30 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
               subtitle={ach.type === 'milestone' ? 'Milestone' : 'Completed'}
               unlocked={true}
               isPrimary={index === 0}
+              totalTop100Played={progressData?.totalTop100Played}
+              compact
             />
           ))}
+
+          {/* Ghost card for next badge */}
+          {showGhostCard && (
+            <button
+              type="button"
+              onClick={() => setModalOpen(true)}
+              className="shrink-0"
+            >
+              <AchievementBadgeCard
+                tier={getGhostTier(nudge)}
+                title={nudge.type === 'global' 
+                  ? `${nudge.nextThreshold} Club` 
+                  : `${nudge.regionLabel}`}
+                subtitle={`${nudge.remaining} away`}
+                unlocked={false}
+                isGhost={true}
+                compact
+              />
+            </button>
+          )}
         </div>
       </section>
 
