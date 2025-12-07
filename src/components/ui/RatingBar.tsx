@@ -52,12 +52,8 @@ export function RatingBar({
 
   return (
     <div
-      className={cn('w-full', className)}
-      style={{
-        height: 'var(--rating-bar-height-sm)',
-        borderRadius: 'var(--rating-bar-radius)',
-        background,
-      }}
+      className={cn('h-2 w-full rounded-sq-full', className)}
+      style={{ background }}
     />
   );
 }
