@@ -362,61 +362,69 @@ const HeroProfileHeader = ({
             <div className="w-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
           )}
           
-          {/* Top vignette for header readability */}
-          <div 
-            className="absolute top-0 left-0 right-0 h-12 pointer-events-none"
+          {/* Global vignette - subtle top + bottom darkening */}
+          <div
+            className="pointer-events-none absolute inset-0 mix-blend-multiply opacity-70"
             style={{
-              background: 'linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, transparent 100%)',
+              background: 'radial-gradient(circle at top, rgba(0,0,0,0.22), transparent 55%), radial-gradient(circle at bottom, rgba(0,0,0,0.18), transparent 55%)',
             }}
           />
           
-          {/* Bottom fade into page - seamless blend */}
+          {/* Bottom blur/fade for header content */}
           <div
-            className="pointer-events-none absolute bottom-0 left-0 right-0 h-32"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-28 backdrop-blur-[9px]"
             style={{
-              background: 'linear-gradient(to top, hsl(var(--background)) 0%, hsl(var(--background) / 0.85) 25%, hsl(var(--background) / 0.4) 50%, hsl(var(--background) / 0.1) 75%, transparent 100%)',
+              background: 'linear-gradient(to top, hsl(var(--background)) 0%, hsl(var(--background) / 0.9) 30%, rgba(15,23,42,0.35) 60%, transparent 100%)',
             }}
           />
         </div>
 
-        {/* META BLOCK - Avatar left, centered text right */}
+        {/* META BLOCK - Glass panel with avatar + text */}
         <div
           ref={profileCardRef}
-          className="relative px-4 pt-4 pb-1 -mt-20 sm:-mt-24 flex flex-row items-center gap-4 md:mx-auto md:max-w-[600px]"
+          className="relative px-4 md:px-8"
+          style={{ marginTop: '-40px' }}
         >
-          {/* AVATAR – Left column */}
-          <div className="flex-shrink-0 z-20">
-            <ProfileAvatarRing
-              photoUrl={profile?.profile_photo_url}
-              displayName={displayName}
-              totalTop100Played={totalTop100Played}
-              isPersonal={isPersonal}
-              isOwnProfile={isOwnProfile}
-              size="lg"
-              onClick={() => openImmersive?.(0)}
-              animateOnFirstView={true}
-            />
-          </div>
+          <div className="mx-auto max-w-3xl">
+            {/* Glass panel */}
+            <div
+              className="relative flex items-center gap-4 md:gap-6 rounded-3xl bg-white/10 backdrop-blur-md shadow-[0_18px_45px_rgba(0,0,0,0.18)] px-4 md:px-6 py-4 md:py-5"
+            >
+              {/* AVATAR – Left column */}
+              <div className="flex-shrink-0 z-20">
+                <ProfileAvatarRing
+                  photoUrl={profile?.profile_photo_url}
+                  displayName={displayName}
+                  totalTop100Played={totalTop100Played}
+                  isPersonal={isPersonal}
+                  isOwnProfile={isOwnProfile}
+                  size="lg"
+                  onClick={() => openImmersive?.(0)}
+                  animateOnFirstView={true}
+                />
+              </div>
 
-          {/* TEXT META (name, @handle, HCP, club, customise) - Centered in remaining space */}
-          <ProfileHeaderCard
-            displayName={displayName}
-            username={username}
-            homeClub={isPersonal ? homeClub : undefined}
-            handicap={isPersonal ? profile?.eg_handicap_index : undefined}
-            websiteUrl={profile?.website}
-            location={profile?.location}
-            userType={profile?.user_type}
-            isPersonal={isPersonal}
-            isOwnProfile={isOwnProfile}
-            onCustomiseClick={isOwnProfile ? () => setEditDialogOpen(true) : undefined}
-          />
+              {/* TEXT META (name, @handle, HCP, club) */}
+              <ProfileHeaderCard
+                displayName={displayName}
+                username={username}
+                homeClub={isPersonal ? homeClub : undefined}
+                handicap={isPersonal ? profile?.eg_handicap_index : undefined}
+                websiteUrl={profile?.website}
+                location={profile?.location}
+                userType={profile?.user_type}
+                isPersonal={isPersonal}
+                isOwnProfile={isOwnProfile}
+                onCustomiseClick={isOwnProfile ? () => setEditDialogOpen(true) : undefined}
+              />
+            </div>
+          </div>
         </div>
 
-        {/* BIO - Full width row below header */}
+        {/* BIO - Full width below glass panel */}
         {profile?.bio && (
-          <div className="px-6 mt-3 pb-3 md:mx-auto md:max-w-[600px]">
-            <p className="text-sm text-muted-foreground text-center leading-relaxed">
+          <div className="mt-4 md:mt-5 px-6 md:px-8">
+            <p className="mx-auto max-w-3xl text-center text-sm md:text-[15px] leading-relaxed text-muted-foreground">
               {profile.bio}
             </p>
           </div>
