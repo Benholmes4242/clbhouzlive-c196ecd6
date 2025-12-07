@@ -51,8 +51,8 @@ export const COLOR_SCALE = {
     tier: 5,
     accent: "#A3ACBA",        // Soft Slate Grey
     bgLight: "#F5F6F8",
-    bgDark: "#D4D9E2",
-    textOnLight: "#111827",
+    bgDark: "#D7E1DF",        // Updated to new palette
+    textOnLight: "#04110A",   // Very dark green/black
     textOnDark: "#FFFFFF",
     iconBg: "rgba(255,255,255,0.22)"
   },
@@ -60,8 +60,8 @@ export const COLOR_SCALE = {
     tier: 10,
     accent: "#7C9485",        // Slate → Mint transition
     bgLight: "#E7F0EC",
-    bgDark: "#C4D6CB",
-    textOnLight: "#111827",
+    bgDark: "#C0D8CC",        // Updated to new palette
+    textOnLight: "#04110A",
     textOnDark: "#FFFFFF",
     iconBg: "rgba(255,255,255,0.22)"
   },
@@ -69,8 +69,8 @@ export const COLOR_SCALE = {
     tier: 20,
     accent: "#78B093",        // Light Mint → Soft Green
     bgLight: "#E2F4EC",
-    bgDark: "#B8E3CD",
-    textOnLight: "#111827",
+    bgDark: "#AED1BE",        // Updated to new palette
+    textOnLight: "#04110A",
     textOnDark: "#FFFFFF",
     iconBg: "rgba(255,255,255,0.22)"
   },
@@ -78,8 +78,8 @@ export const COLOR_SCALE = {
     tier: 50,
     accent: "#65A87C",        // Mid Fresh Green
     bgLight: "#D8F0E2",
-    bgDark: "#A4D7BD",
-    textOnLight: "#111827",
+    bgDark: "#99C7A9",        // Updated to new palette
+    textOnLight: "#04110A",
     textOnDark: "#FFFFFF",
     iconBg: "rgba(255,255,255,0.22)"
   },
@@ -87,8 +87,8 @@ export const COLOR_SCALE = {
     tier: 100,
     accent: "#4EA46D",        // Fresh Green (energetic but readable)
     bgLight: "#D1EEDD",
-    bgDark: "#9CD4B6",
-    textOnLight: "#FFFFFF",   // Switch to white at tier 100+
+    bgDark: "#7FBF92",        // Updated to new palette
+    textOnLight: "#04110A",
     textOnDark: "#FFFFFF",
     iconBg: "rgba(255,255,255,0.22)"
   },
@@ -96,8 +96,8 @@ export const COLOR_SCALE = {
     tier: 200,
     accent: "#0F7A33",        // Masters Green (signature hero)
     bgLight: "#C7EAD2",
-    bgDark: "#72C48C",
-    textOnLight: "#FFFFFF",
+    bgDark: "#5EAF74",        // Updated to new palette
+    textOnLight: "#FFFFFF",   // Switch to white at tier 200+
     textOnDark: "#FFFFFF",
     iconBg: "rgba(255,255,255,0.22)"
   },
@@ -105,19 +105,20 @@ export const COLOR_SCALE = {
     tier: 300,
     accent: "#0D6C2C",        // Slightly deeper Masters Green
     bgLight: "#BEE3CA",
-    bgDark: "#66B981",
+    bgDark: "#3D9F55",        // Updated to new palette
     textOnLight: "#FFFFFF",
     textOnDark: "#FFFFFF",
     iconBg: "rgba(255,255,255,0.22)"
   },
   grandSlam: {
     tier: 400,
-    accent: "#0B5E25",        // Richest green (final tier)
-    bgLight: "#B2DDBF",
-    bgDark: "#5EAF77",
-    textOnLight: "#FFFFFF",
-    textOnDark: "#FFFFFF",
-    iconBg: "rgba(255,255,255,0.22)"
+    accent: "#0B6B30",        // Masters Digital Green (final tier)
+    bgLight: "#0B6B30",       // Grand Slam uses gradient from accent
+    bgDark: "#0A5E2B",        // Gradient darker stop
+    gold: "#D4A857",          // Gold accent for icons/borders
+    textOnLight: "#F9FAFB",   // Light text on dark bg
+    textOnDark: "#F9FAFB",
+    iconBg: "rgba(212,168,87,0.22)" // Gold-tinted icon bg
   }
 } as const;
 

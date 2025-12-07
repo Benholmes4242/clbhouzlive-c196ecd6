@@ -121,13 +121,37 @@ html.lightbox-open {
   /* Neutral fill - dark slate for non-banded bars */
   --rating-bar-fill-neutral: #1e293b; /* slate-800 */
   
-  /* Rating band colors - From Global Colour System (COURSE_RATING_THEMES)
+/* Rating band colors - From Global Colour System (COURSE_RATING_THEMES)
      These must match src/lib/globalAchievementMilestoneSystem.ts */
   --rating-band-outstanding: #163A73; /* Deep coastal blue - highest */
   --rating-band-excellent: #205D89;   /* Sky blue */
   --rating-band-very-good: #2F7D32;   /* Pine Green */
   --rating-band-good: #4B8C4F;        /* Fresh Green */
   --rating-band-fair: #C05B5B;        /* Soft clay red - lowest */
+  
+  /* ========================================
+     ACHIEVEMENT COLOUR SYSTEM
+     8-tier green ladder from neutral to Masters Green
+     ======================================== */
+  --achv-1-bg: #D7E1DF;  /* Rookie 5 - Soft sage */
+  --achv-2-bg: #C0D8CC;  /* Fairway 10 - Light mint */
+  --achv-3-bg: #AED1BE;  /* Founders 20 - Soft green */
+  --achv-4-bg: #99C7A9;  /* Heritage 50 - Mid green */
+  --achv-5-bg: #7FBF92;  /* Century 100 - Fresh green */
+  --achv-6-bg: #5EAF74;  /* Elite 200 - Strong green */
+  --achv-7-bg: #3D9F55;  /* Legendary 300 - Masters approach */
+  --achv-8-bg: #0B6B30;  /* Grand Slam 400 - Masters Digital Green */
+  
+  /* Grand Slam gradient + gold accent */
+  --achv-8-gradient-from: #0B6B30;
+  --achv-8-gradient-to: #0A5E2B;
+  --achv-gold: #D4A857;
+  
+  /* Achievement text colours */
+  --achv-text-main: #04110A;      /* Very dark green/black */
+  --achv-text-subtle: #274133;    /* Muted label text */
+  --achv-pill-bg: rgba(255,255,255,0.85);
+  --achv-pill-text: #111827;
   
   /* ========================================
      TOP 100 CARDS DESIGN TOKENS
@@ -283,6 +307,24 @@ html.lightbox-open {
 
 /* Nuke solid Tailwind black backgrounds to new page tone - REMOVED in Phase 1 */
   /* .bg-black was forcing dark backgrounds - now removed to allow global pastel base */
+}
+
+/* ========================================
+   GRAND SLAM CARD - Masters Level Styling
+   Special gradient + gold accent for 400 Club
+   ======================================== */
+.grand-slam-card {
+  background: linear-gradient(
+    135deg,
+    var(--achv-8-gradient-from),
+    var(--achv-8-gradient-to)
+  );
+  color: #f9fafb;
+}
+
+/* Trophy/icon override for Grand Slam */
+.grand-slam-card .grand-slam-icon {
+  color: var(--achv-gold);
 }
 
 /* Optional depth wash behind pages - lightened for seamless footer flow */
