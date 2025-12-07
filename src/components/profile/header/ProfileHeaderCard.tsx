@@ -62,27 +62,27 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
       </div>
 
       {/* Row 2: Username */}
-      <div className="text-sm text-slate-500">
+      <div className="text-sm text-slate-500 text-center">
         @{username}
       </div>
 
-      {/* Row 3: Club (personal) or Location (business) */}
       {isPersonal && homeClub && (
-        <div className="text-sm">
+        <div className="text-sm text-center">
+          <span className="font-semibold text-slate-800">{homeClub}</span>
           <span className="font-semibold text-slate-800">{homeClub}</span>
         </div>
       )}
-      
       {!isPersonal && location && (
-        <div className="text-sm">
+        <div className="text-sm text-center">
+          <span className="font-semibold text-slate-800">{location}</span>
           <span className="font-semibold text-slate-800">{location}</span>
         </div>
       )}
 
       {/* Row 4: HCP pill (own line - personal only) */}
       {isPersonal && handicap != null && (
-        <div>
-          <span className="inline-flex items-center px-3 py-1 rounded-full bg-slate-900/90 text-[11px] md:text-xs font-semibold uppercase tracking-wide text-white">
+        <div className="flex justify-center">
+          <span className="inline-flex items-center px-3 py-1 rounded-full bg-slate-800 text-[11px] md:text-xs font-semibold uppercase tracking-wide text-white">
             HCP {handicap.toFixed(1)}
           </span>
         </div>
