@@ -1,17 +1,22 @@
-import React, { useMemo, useRef, useCallback } from 'react';
+import React, { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import MediaSkeleton from './MediaSkeleton';
 import HeroPostTile from './HeroPostTile';
 import StandardPostTile from './StandardPostTile';
 import { ActivityMediaGridProps, ActivityMediaItem, AspectRatio, ActivityPost } from './types';
-import { buildActivityLayout, LayoutRow } from './layoutEngine';
+import { buildActivityLayout } from './layoutEngine';
 import { streamPosterFrom } from '@/utils/mediaThumbs';
-import { useGridVideoAutoplay, VideoEntry } from '@/hooks/useGridVideoAutoplay';
+import { useGridAutoplay } from '@/hooks/useGridAutoplay';
 
 /**
  * Convert ActivityPost to ActivityMediaItem
+ * Marks every 3rd video as an autoplay candidate
  */
-function postToMediaItem(post: ActivityPost, index: number): ActivityMediaItem | null {
+function postToMediaItem(
+  post: ActivityPost, 
+  overallIndex: number, 
+  videoCounter: { count: number }
+): ActivityMediaItem | null {
   const media = post.post_media;
   if (!media || media.length === 0) return null;
 
@@ -35,8 +40,14 @@ function postToMediaItem(post: ActivityPost, index: number): ActivityMediaItem |
     ? (primaryMedia.poster_url || streamPosterFrom(primaryMedia.media_url) || primaryMedia.media_url)
     : primaryMedia.media_url;
 
-  // One in every 4 videos can autoplay
-  const canAutoplay = isVideo && index % 4 === 0;
+  // Every 3rd video is an autoplay candidate
+  let isAutoplayCandidate = false;
+  if (isVideo) {
+    if (videoCounter.count % 3 === 0) {
+      isAutoplayCandidate = true;
+    }
+    videoCounter.count += 1;
+  }
 
   return {
     id: primaryMedia.id,
@@ -50,8 +61,9 @@ function postToMediaItem(post: ActivityPost, index: number): ActivityMediaItem |
     additionalMediaCount: media.length > 1 ? media.length - 1 : undefined,
     isMilestone,
     aspectRatio,
-    canAutoplay,
-    durationSeconds: primaryMedia.duration_seconds
+    isAutoplayCandidate,
+    durationSeconds: primaryMedia.duration_seconds,
+    sortIndex: overallIndex
   };
 }
 
@@ -63,7 +75,7 @@ function postToMediaItem(post: ActivityPost, index: number): ActivityMediaItem |
  * - Pointed corners (no rounding)
  * - Shimmer skeleton loading states
  * - Premium metadata overlays
- * - Smart autoplay for videos (1 in every 4, max 2 at once)
+ * - Smart autoplay for videos (1 in every 3, max 2 at once)
  */
 const ActivityMediaGrid: React.FC<ActivityMediaGridProps> = ({
   posts,
@@ -71,17 +83,17 @@ const ActivityMediaGrid: React.FC<ActivityMediaGridProps> = ({
   onPostPress,
   viewMode = 'compact'
 }) => {
-  // Video refs for autoplay management
-  const videoRefsMap = useRef<Record<string, HTMLVideoElement | null>>({});
-  
-  const registerVideoRef = useCallback((postId: string) => (el: HTMLVideoElement | null) => {
-    videoRefsMap.current[postId] = el;
-  }, []);
+  // Set up autoplay hook
+  const { registerVideo, playingIds } = useGridAutoplay({
+    maxPlaying: 2,
+    visibilityThreshold: 0.6,
+  });
 
-  // Convert posts to media items
+  // Convert posts to media items with video counter for candidate marking
   const mediaItems = useMemo(() => {
+    const videoCounter = { count: 0 };
     return posts
-      .map((post, index) => postToMediaItem(post, index))
+      .map((post, index) => postToMediaItem(post, index, videoCounter))
       .filter((item): item is ActivityMediaItem => item !== null);
   }, [posts]);
 
@@ -89,20 +101,6 @@ const ActivityMediaGrid: React.FC<ActivityMediaGridProps> = ({
   const layoutRows = useMemo(() => {
     return buildActivityLayout(mediaItems);
   }, [mediaItems]);
-
-  // Build video entries for autoplay hook
-  const videoEntries = useMemo((): VideoEntry[] => {
-    return mediaItems
-      .filter(item => item.type === 'video' && item.canAutoplay)
-      .map(item => ({
-        id: item.postId,
-        element: videoRefsMap.current[item.postId] || null,
-        canAutoplay: true
-      }));
-  }, [mediaItems]);
-
-  // Wire up autoplay behavior
-  const { playingIds } = useGridVideoAutoplay(videoEntries);
 
   // Loading state with shimmer skeletons
   if (isLoading) {
@@ -147,6 +145,7 @@ const ActivityMediaGrid: React.FC<ActivityMediaGridProps> = ({
                 key={`hero-${row.post.id}-${index}`}
                 item={row.post}
                 onPress={onPostPress}
+                registerVideo={registerVideo}
                 isPlaying={playingIds.has(row.post.postId)}
               />
             );
@@ -157,18 +156,18 @@ const ActivityMediaGrid: React.FC<ActivityMediaGridProps> = ({
               <StandardPostTile 
                 item={row.left} 
                 onPress={onPostPress}
-                videoRef={row.left.canAutoplay ? registerVideoRef(row.left.postId) : undefined}
+                registerVideo={registerVideo}
                 isPlaying={playingIds.has(row.left.postId)}
               />
               {row.right ? (
                 <StandardPostTile 
                   item={row.right} 
                   onPress={onPostPress}
-                  videoRef={row.right.canAutoplay ? registerVideoRef(row.right.postId) : undefined}
+                  registerVideo={registerVideo}
                   isPlaying={playingIds.has(row.right.postId)}
                 />
               ) : (
-                <div className="aspect-square" /> // empty spacer if odd
+                <div className="aspect-[3/4]" /> // empty spacer if odd
               )}
             </React.Fragment>
           );
