@@ -7,8 +7,9 @@ interface ScorePillProps {
 }
 
 /**
- * Score pill component using Global Colour System
+ * Score pill component using Unified Color Scale
  * Colors sourced from getScoreTier() → COURSE_RATING_THEMES
+ * Text color automatically switches based on tier brightness
  */
 export const ScorePill: React.FC<ScorePillProps> = ({ score, size = 'md' }) => {
   const tierData = getScoreTier(score);
@@ -23,7 +24,7 @@ export const ScorePill: React.FC<ScorePillProps> = ({ score, size = 'md' }) => {
       className={`inline-flex items-center rounded-sq-sm ${baseClasses}`}
       style={{
         background: `linear-gradient(145deg, ${tierData.bgLight}, ${tierData.bgDark})`,
-        color: tierData.accent,
+        color: tierData.textOnLight,
       }}
     >
       {score === 10 ? '10' : score.toFixed(1)}
