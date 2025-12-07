@@ -69,8 +69,7 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({
       type="button"
       className={cn(
         aspectClass,
-        "relative overflow-hidden bg-muted/30",
-        "active:scale-[0.97] transition-transform duration-150"
+        "relative overflow-hidden bg-muted/30"
       )}
       onClick={handleClick}
     >

@@ -70,8 +70,7 @@ const HeroPostTile: React.FC<HeroPostTileProps> = ({
       className={cn(
         "col-span-2",
         "aspect-[16/9]",
-        "relative overflow-hidden bg-muted/30",
-        "active:scale-[0.98] transition-transform duration-150"
+        "relative overflow-hidden bg-muted/30"
       )}
       onClick={handleClick}
     >
