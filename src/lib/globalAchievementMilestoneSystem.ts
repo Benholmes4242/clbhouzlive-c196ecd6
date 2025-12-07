@@ -28,60 +28,51 @@
 export interface AchievementTheme {
   bg: string;       // Light pastel background (HSL)
   bgLocked: string; // Locked/dimmed background
-  accent: string;   // Strong accent color for icons, text
-  ring: string;     // Softer ring color for avatar borders (harmonizes with bg)
+  accent: string;   // Strong accent color for icons, borders, rings
 }
 
 // Milestone achievements (5, 10, 20, 50, 100, 200, 300, 400)
-// Ring colors are softer versions that harmonize with the card backgrounds
+// Ring colors match the accent colors exactly
 export const MILESTONE_THEMES: Record<number, AchievementTheme> = {
   5: { 
     bg: 'hsl(43 45% 95%)',           // Warm beige / Rookie
     bgLocked: 'hsl(43 30% 96%)', 
-    accent: '#C9B27A',
-    ring: '#D4C49A'                   // Softer beige ring
+    accent: '#C9B27A' 
   },
   10: { 
     bg: 'hsl(115 40% 95%)',          // Light soft green / Fairway
     bgLocked: 'hsl(115 30% 96%)', 
-    accent: '#7CC66B',
-    ring: '#9DD68F'                   // Softer green ring
+    accent: '#7CC66B' 
   },
   20: { 
     bg: 'hsl(122 35% 93%)',          // Mint / Founders
     bgLocked: 'hsl(122 30% 96%)', 
-    accent: '#2F7D32',
-    ring: '#5FA463'                   // Softer mint ring (was dark #2F7D32)
+    accent: '#2F7D32' 
   },
   50: { 
     bg: 'hsl(42 60% 94%)',           // Sand / Heritage
     bgLocked: 'hsl(42 40% 96%)', 
-    accent: '#D8A546',
-    ring: '#E4BE6E'                   // Softer sand ring
+    accent: '#D8A546' 
   },
   100: { 
     bg: 'hsl(0 0% 96%)',             // Soft grey / Century
     bgLocked: 'hsl(0 0% 96%)', 
-    accent: '#4A4A4A',
-    ring: '#7A7A7A'                   // Softer grey ring
+    accent: '#4A4A4A' 
   },
   200: { 
     bg: 'hsl(250 50% 96%)',          // Lilac / Elite
     bgLocked: 'hsl(250 30% 96%)', 
-    accent: '#6F5BD5',
-    ring: '#9588E0'                   // Softer lilac ring
+    accent: '#6F5BD5' 
   },
   300: { 
     bg: 'hsl(290 45% 95%)',          // Pink / Legendary
     bgLocked: 'hsl(290 30% 96%)', 
-    accent: '#B153CE',
-    ring: '#C87DD8'                   // Softer pink ring
+    accent: '#B153CE' 
   },
   400: { 
     bg: 'hsl(0 0% 94%)',             // Steel / Grand Slam
     bgLocked: 'hsl(0 0% 96%)', 
-    accent: '#111111',
-    ring: '#4A4A4A'                   // Softer steel ring
+    accent: '#111111' 
   },
 };
 
@@ -90,26 +81,22 @@ export const REGION_THEMES: Record<string, AchievementTheme> = {
   'list_gb_ireland': { 
     bg: 'hsl(210 50% 95%)',          // Light blue / GB&I
     bgLocked: 'hsl(210 30% 96%)', 
-    accent: '#1E3A5F',
-    ring: '#4A6A8F'                   // Softer blue ring
+    accent: '#1E3A5F' 
   },
   'list_europe': { 
     bg: 'hsl(263 50% 96%)',          // Purple / Europe
     bgLocked: 'hsl(263 30% 96%)', 
-    accent: '#7C3AED',
-    ring: '#A278F0'                   // Softer purple ring
+    accent: '#7C3AED' 
   },
   'list_usa': { 
     bg: 'hsl(0 55% 96%)',            // Red / USA
     bgLocked: 'hsl(0 30% 96%)', 
-    accent: '#B91C1C',
-    ring: '#D45858'                   // Softer red ring
+    accent: '#B91C1C' 
   },
   'list_worldwide': { 
     bg: 'hsl(175 50% 94%)',          // Teal / World
     bgLocked: 'hsl(175 30% 96%)', 
-    accent: '#0D9488',
-    ring: '#3DB8AB'                   // Softer teal ring
+    accent: '#0D9488' 
   },
 };
 
@@ -150,21 +137,20 @@ export function getAchievementTheme(
 
 /**
  * Get ring color for a milestone threshold
- * Uses the softer 'ring' color that harmonizes with achievement card backgrounds
+ * Used for avatar rings, badge rings, etc.
  */
 export function getRingColorForThreshold(threshold: number): string {
-  return MILESTONE_THEMES[threshold]?.ring ?? '#94a3b8';
+  return MILESTONE_THEMES[threshold]?.accent ?? '#94a3b8';
 }
 
 /**
  * Get ring color for user's highest global milestone
- * Uses the softer 'ring' color that harmonizes with achievement card backgrounds
  */
 export function getRingColorForTotalPlayed(totalPlayed: number): string {
   const thresholds = [400, 300, 200, 100, 50, 20, 10, 5];
   for (const t of thresholds) {
     if (totalPlayed >= t) {
-      return MILESTONE_THEMES[t].ring;
+      return MILESTONE_THEMES[t].accent;
     }
   }
   return '#94a3b8'; // Default slate for < 5
