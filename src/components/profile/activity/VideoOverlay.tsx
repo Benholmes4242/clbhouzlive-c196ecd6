@@ -20,10 +20,19 @@ const VideoOverlay: React.FC<VideoOverlayProps> = ({ durationSeconds, isPlaying 
       {/* Bottom gradient strip for readability */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-slate-900/45 to-transparent" />
 
-      {/* Play/pause icon chip - bottom left */}
+      {/* Duration pill - bottom left */}
+      {durationLabel && (
+        <div className="pointer-events-none absolute bottom-1.5 left-1.5 flex items-center gap-1 rounded-full bg-slate-900/85 px-2 py-1 shadow-sm">
+          <span className="text-[10px] leading-none font-medium text-white">
+            {durationLabel}
+          </span>
+        </div>
+      )}
+
+      {/* Play/pause icon chip - bottom right */}
       <div 
         className={cn(
-          "pointer-events-none absolute bottom-1.5 left-1.5 flex items-center justify-center",
+          "pointer-events-none absolute bottom-1.5 right-1.5 flex items-center justify-center",
           "h-6 w-6 rounded-full bg-slate-900/85 shadow-sm",
           isPlaying && "ring-2 ring-white/30"
         )}
@@ -34,15 +43,6 @@ const VideoOverlay: React.FC<VideoOverlayProps> = ({ durationSeconds, isPlaying 
           <Play className="h-3 w-3 text-white fill-white ml-0.5" />
         )}
       </div>
-
-      {/* Duration pill - bottom right */}
-      {durationLabel && (
-        <div className="pointer-events-none absolute bottom-1.5 right-1.5 flex items-center gap-1 rounded-full bg-slate-900/85 px-2 py-1 shadow-sm">
-          <span className="text-[10px] leading-none font-medium text-white">
-            {durationLabel}
-          </span>
-        </div>
-      )}
     </>
   );
 };

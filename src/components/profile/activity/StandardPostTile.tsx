@@ -23,10 +23,8 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({ item, onPress, vide
 
   const isVideo = item.type === 'video';
   
-  // Determine aspect ratio based on media type
-  const aspectClass = item.aspectRatio === 'portrait' 
-    ? 'aspect-[3/4]' 
-    : 'aspect-square';
+  // Force consistent aspect ratio for all grid tiles to prevent gaps
+  const aspectClass = 'aspect-[3/4]';
 
   // Render video element for autoplay candidates
   const renderMedia = () => {
