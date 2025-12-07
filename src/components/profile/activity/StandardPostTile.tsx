@@ -1,8 +1,8 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { ActivityMediaItem } from './types';
-import { useMediaStatus } from './useMediaStatus';
-import { Play, Images, Trophy } from 'lucide-react';
+import PostMedia from './PostMedia';
+import { Images, Trophy } from 'lucide-react';
 
 interface StandardPostTileProps {
   item: ActivityMediaItem;
@@ -14,18 +14,12 @@ interface StandardPostTileProps {
  * Square aspect with pointed corners
  */
 const StandardPostTile: React.FC<StandardPostTileProps> = ({ item, onPress }) => {
-  const [imageError, setImageError] = useState(false);
-  const { status, onLoad, onError } = useMediaStatus(item.url);
-  
   const handleClick = useCallback(() => {
     onPress?.(item.postId);
   }, [item.postId, onPress]);
 
-  const handleError = useCallback(() => {
-    setImageError(true);
-    onError();
-  }, [onError]);
-
+  const isVideo = item.type === 'video';
+  
   // Determine aspect ratio based on media type
   const aspectClass = item.aspectRatio === 'portrait' 
     ? 'aspect-[3/4]' 
@@ -37,33 +31,16 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({ item, onPress }) =>
       className={cn(
         aspectClass,
         "relative overflow-hidden",
-        "active:scale-[0.97] transition-transform duration-150",
-        "bg-muted/20"
+        "active:scale-[0.97] transition-transform duration-150"
       )}
       onClick={handleClick}
     >
-      {/* Media */}
-      {!imageError ? (
-        <img
-          src={item.thumbnailUrl || item.url}
-          alt=""
-          className="w-full h-full object-cover"
-          loading="lazy"
-          onLoad={onLoad}
-          onError={handleError}
-        />
-      ) : (
-        <div className="w-full h-full flex items-center justify-center bg-muted/30">
-          <span className="text-muted-foreground text-xs">Unable to load</span>
-        </div>
-      )}
-
-      {/* Video indicator */}
-      {item.type === 'video' && (
-        <div className="absolute bottom-2 right-2 flex items-center justify-center h-6 w-6 rounded-full bg-black/60">
-          <Play className="h-3 w-3 text-white fill-white" />
-        </div>
-      )}
+      {/* Media with skeleton loading */}
+      <PostMedia
+        thumbnailUrl={item.thumbnailUrl || item.url}
+        title={item.courseName}
+        isVideo={isVideo}
+      />
 
       {/* Multi-media indicator */}
       {item.additionalMediaCount && item.additionalMediaCount > 0 && (
