@@ -158,23 +158,24 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   return (
     <div
       className={cn(
-        'rounded-3xl flex flex-col justify-between transition-all duration-150 relative',
+        // Horizontal rectangle with SDS rounded corners
+        'rounded-sq-md flex flex-row items-center gap-3 transition-all duration-150 relative',
         unlocked && !isGhost
-          ? 'shadow-[0_10px_30px_rgba(15,23,42,0.12)]' 
+          ? 'shadow-[0_6px_20px_rgba(15,23,42,0.10)]' 
           : 'shadow-sm',
         // Micro-interactions
-        'active:scale-[0.97]',
-        unlocked && !isGhost && 'hover:shadow-[0_16px_40px_rgba(16,185,129,0.18)]',
-        // Size variants
+        'active:scale-[0.98]',
+        unlocked && !isGhost && 'hover:shadow-[0_10px_28px_rgba(16,185,129,0.15)]',
+        // Size variants - horizontal layout
         compact 
-          ? 'min-w-[140px] px-3 py-2.5' 
-          : 'min-w-[160px] px-4 py-3',
+          ? 'min-w-[180px] h-[56px] px-3' 
+          : 'min-w-[220px] h-[72px] px-4',
         // Ghost styling
         isGhost && 'border border-dashed border-white/60'
       )}
       style={{
         background: unlocked && !isGhost
-          ? `linear-gradient(145deg, ${palette.bgLight}, ${palette.bgDark})`
+          ? `linear-gradient(135deg, ${palette.bgLight}, ${palette.bgDark})`
           : palette.bgLocked,
         transform: isPrimary ? 'translateY(-2px)' : undefined,
         opacity: isGhost ? 0.7 : (!unlocked ? 0.85 : 1),
@@ -185,127 +186,47 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         <div className="absolute inset-0 rounded-[inherit] bg-white/40 pointer-events-none" />
       )}
 
-      {/* Top row: tier band + status */}
-      <div className="flex items-start justify-between mb-1">
-        {/* Tier band */}
-        <div 
-          className="inline-flex items-center gap-1 px-2 py-[2px] rounded-full text-[11px] font-medium"
-          style={{
-            backgroundColor: unlocked ? `${palette.accent}22` : 'rgba(148,163,184,0.15)',
-            color: unlocked ? palette.accent : '#94a3b8',
-          }}
-        >
-          {isRegional && regionGlyph && (
-            <span className="inline-flex w-3.5 h-3.5 rounded-full overflow-hidden items-center justify-center">
-              {regionGlyph}
-            </span>
-          )}
-          <span>
-            {isMilestone ? `${tierLabel} · ${threshold} CLUB` : tierLabel}
-          </span>
-        </div>
-
-        {/* Status chip */}
-        <div className={cn(
-          "inline-flex items-center px-2 py-[2px] rounded-full text-[11px] font-medium",
-          unlocked && !isGhost
-            ? "bg-white/75 text-slate-800"
-            : "bg-white/60 text-slate-500"
-        )}>
-          {statusLabel}
-        </div>
-      </div>
-
-      {/* Hero value block */}
-      <div className={cn("mt-1", compact ? "mb-0.5" : "mb-1")}>
-        {isMilestone ? (
-          <>
-            <div className={cn(
-              "font-semibold leading-tight text-slate-900",
-              compact ? "text-lg" : "text-[22px]"
-            )}>
-              {threshold}
-            </div>
-            <div className="text-xs text-slate-800/80">
-              Club
-            </div>
-          </>
-        ) : (
-          <>
-            <div className={cn(
-              "font-semibold leading-tight text-slate-900",
-              compact ? "text-xs" : "text-sm"
-            )}>
-              {title}
-            </div>
-            <div className="text-xs text-slate-800/80">
-              {subtitle}
-            </div>
-          </>
+      {/* Left: Trophy icon */}
+      <div 
+        className={cn(
+          "rounded-full flex items-center justify-center flex-shrink-0",
+          compact ? "w-8 h-8" : "w-10 h-10"
         )}
+        style={{ 
+          backgroundColor: unlocked ? `${palette.accent}1F` : 'rgba(148,163,184,0.12)' 
+        }}
+      >
+        <Trophy 
+          className={compact ? "w-4 h-4" : "w-5 h-5"}
+          style={{ color: unlocked ? palette.accent : '#94a3b8' }} 
+        />
       </div>
 
-      {/* Label row: trophy + named club */}
-      <div className="flex items-center gap-1 mt-1">
-        <div 
-          className={cn(
-            "rounded-full flex items-center justify-center",
-            compact ? "w-5 h-5" : "w-6 h-6"
-          )}
-          style={{ 
-            backgroundColor: unlocked ? `${palette.accent}1F` : 'rgba(148,163,184,0.12)' 
-          }}
-        >
-          <Trophy 
-            className={compact ? "w-2.5 h-2.5" : "w-3.5 h-3.5"}
-            style={{ color: unlocked ? palette.accent : '#94a3b8' }} 
-          />
+      {/* Center: Title and subtitle */}
+      <div className="flex-1 min-w-0">
+        <div className={cn(
+          "font-semibold leading-tight text-slate-900 truncate",
+          compact ? "text-sm" : "text-base"
+        )}>
+          {isMilestone ? `${threshold} Club` : title}
         </div>
         <div className={cn(
-          "font-medium",
-          compact ? "text-[10px]" : "text-xs",
-          unlocked ? "text-slate-900/90" : "text-slate-600/80"
+          "text-slate-800/70 truncate",
+          compact ? "text-[11px]" : "text-xs"
         )}>
-          {clubName}
+          {isMilestone ? clubName : subtitle}
         </div>
       </div>
 
-      {/* Bottom micro-progress to next tier (milestone cards only) */}
-      {nextTier && nextPalette && remainingToNext > 0 && !compact && (
-        <div className="mt-2">
-          <div className="flex items-center justify-between text-[11px] text-slate-800/70 mb-[2px]">
-            <span>Next: {nextTierLabel}</span>
-            <span>{remainingToNext} to go</span>
-          </div>
-          <div className="h-[3px] rounded-full overflow-hidden bg-white/35">
-            <div
-              className="h-full rounded-full"
-              style={{
-                width: `${progressToNext}%`,
-                background: `linear-gradient(90deg, ${nextPalette.bgLight}, ${nextPalette.bgDark})`,
-              }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Progress row for regional cards */}
-      {isRegional && playedOnList !== undefined && totalOnList !== undefined && !compact && (
-        <div className="mt-2">
-          <div className="flex items-center justify-between text-[11px] text-slate-800/75 mb-[2px]">
-            <span>{playedOnList} / {totalOnList} courses</span>
-          </div>
-          <div className="h-[3px] rounded-full overflow-hidden bg-white/35">
-            <div
-              className="h-full rounded-full"
-              style={{
-                width: `${regionalProgress}%`,
-                background: `linear-gradient(90deg, ${palette.bgLight}, ${palette.bgDark})`,
-              }}
-            />
-          </div>
-        </div>
-      )}
+      {/* Right: Status chip */}
+      <div className={cn(
+        "inline-flex items-center px-2 py-1 rounded-sq-xs text-[11px] font-medium flex-shrink-0",
+        unlocked && !isGhost
+          ? "bg-white/75 text-slate-800"
+          : "bg-white/60 text-slate-500"
+      )}>
+        {statusLabel}
+      </div>
     </div>
   );
 };
