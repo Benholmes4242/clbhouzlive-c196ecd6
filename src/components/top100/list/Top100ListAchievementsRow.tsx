@@ -136,9 +136,9 @@ export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps>
                   key={m.threshold}
                   className="flex flex-col items-center min-w-[72px] gap-1"
                 >
-                  {/* Pill-style badge with region color */}
+                  {/* SDS Squircle badge with region color */}
                   <div 
-                    className="flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold transition-all"
+                    className="flex items-center justify-center rounded-sq-md w-14 h-14 text-sm font-semibold transition-all"
                     style={{
                       backgroundColor: unlocked ? `${regionColor}18` : 'white',
                       border: `2px solid ${unlocked ? regionColor : `${regionColor}55`}`,
