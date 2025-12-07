@@ -29,8 +29,8 @@ export function Top100AchievementBadge({
   const tierMeta = TIER_BY_ID[tier];
   if (!tierMeta) return null;
 
-  // Get color from unified Global Achievement & Milestone System
-  const ringColor = MILESTONE_THEMES[tierMeta.threshold]?.accent ?? '#94a3b8';
+  // Get color from unified Global Achievement & Milestone System (using softer ring color)
+  const ringColor = MILESTONE_THEMES[tierMeta.threshold]?.ring ?? '#94a3b8';
   const isCompact = size === 'compact';
 
   return (
