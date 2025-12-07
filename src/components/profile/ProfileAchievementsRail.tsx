@@ -11,7 +11,7 @@ interface ProfileAchievementsRailProps {
   className?: string;
 }
 
-const MAX_VISIBLE = 10;
+const MAX_VISIBLE = 12;
 
 // Map achievement IDs to AchievementTier
 function getAchievementTier(achievement: { id: string; threshold?: number; type: string }): AchievementTier {
