@@ -1,5 +1,5 @@
 import React from 'react';
-import { AchievementBadgeCard } from './AchievementBadgeCard';
+import { AchievementBadgeCard, AchievementTier } from './AchievementBadgeCard';
 
 // Future-proofed seasonal/limited achievements
 interface SeasonalAchievement {
@@ -7,7 +7,7 @@ interface SeasonalAchievement {
   title: string;
   seasonLabel: string;
   unlocked: boolean;
-  accentColor: string;
+  tier: AchievementTier;
 }
 
 interface SeasonalAchievementsSectionProps {
@@ -32,11 +32,10 @@ export const SeasonalAchievementsSection: React.FC<SeasonalAchievementsSectionPr
         {seasonalAchievements.map((achievement) => (
           <AchievementBadgeCard
             key={achievement.id}
+            tier={achievement.tier}
             title={achievement.title}
             subtitle={achievement.seasonLabel}
-            status={achievement.unlocked ? 'UNLOCKED' : 'LOCKED'}
-            type="SEASONAL"
-            accentColor={achievement.accentColor}
+            unlocked={achievement.unlocked}
           />
         ))}
       </div>

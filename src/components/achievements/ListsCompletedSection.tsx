@@ -1,5 +1,5 @@
 import React from 'react';
-import { AchievementBadgeCard } from './AchievementBadgeCard';
+import { AchievementBadgeCard, AchievementTier } from './AchievementBadgeCard';
 import { LIST_ACHIEVEMENTS, LIST_SLUG_TO_ACHIEVEMENT_ID } from '@/lib/achievementDefinitions';
 
 interface ListProgress {
@@ -10,6 +10,15 @@ interface ListProgress {
 
 interface ListsCompletedSectionProps {
   lists: ListProgress[];
+}
+
+// Map list ID to AchievementTier
+function getListTier(id: string): AchievementTier {
+  if (id === 'list_gb_ireland') return 'GBI';
+  if (id === 'list_europe') return 'EU';
+  if (id === 'list_usa') return 'USA';
+  if (id === 'list_worldwide') return 'WORLD';
+  return 'WORLD';
 }
 
 export const ListsCompletedSection: React.FC<ListsCompletedSectionProps> = ({
@@ -39,11 +48,10 @@ export const ListsCompletedSection: React.FC<ListsCompletedSectionProps> = ({
           return (
             <AchievementBadgeCard
               key={listAchievement.id}
+              tier={getListTier(listAchievement.id)}
               title={listAchievement.shortLabel}
               subtitle={listAchievement.label}
-              status={isUnlocked ? 'UNLOCKED' : 'LOCKED'}
-              type="LIST"
-              accentColor={listAchievement.ringColor}
+              unlocked={isUnlocked}
             />
           );
         })}
