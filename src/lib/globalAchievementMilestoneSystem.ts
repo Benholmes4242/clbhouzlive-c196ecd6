@@ -13,19 +13,20 @@
  * DESIGN RULES (MUST BE FOLLOWED BY ALL COMPONENTS)
  * ═══════════════════════════════════════════════════════════════════════════════════════════
  * 
- * 1. RINGS & ICONS = PURE ACCENT (100% opacity, no modifiers)
- *    - Avatar rings: MILESTONE_THEMES[threshold].accent
- *    - Badge borders: MILESTONE_THEMES[threshold].accent  
- *    - Trophy icons: MILESTONE_THEMES[threshold].accent
- *    - Small pills/chips: MILESTONE_THEMES[threshold].accent
- *    - NO opacity modifiers (/85, /90, etc.)
- *    - NO color-mix for accents
+ * 1. RINGS = SOFT PASTEL (bgDark - softer color matching card appearance)
+ *    - Avatar rings: use bgDark for soft pastel appearance
+ *    - Map pins: use bgDark for consistency
+ *    - NO pure accent for rings - they should match card appearance
  * 
- * 2. CARD BACKGROUNDS = SOFT GRADIENTS (derived from same palette)
+ * 2. ICONS = PURE ACCENT (100% opacity, bold color)
+ *    - Trophy icons inside cards: accent color
+ *    - Badge icons: accent color
+ * 
+ * 3. CARD BACKGROUNDS = SOFT GRADIENTS (derived from same palette)
  *    - background: linear-gradient(145deg, bgLight, bgDark)
- *    - Icon color inside cards = accent (same as ring)
+ *    - Icon color inside cards = accent (pure color)
  * 
- * 3. LOCKED STATE = Universal muted palette
+ * 4. LOCKED STATE = Universal muted palette
  *    - Background: hsl(210 15% 96%)
  *    - Icon: hsl(215 15% 65%)
  * 
@@ -97,31 +98,43 @@ export interface AchievementTheme {
 }
 
 // Regional list completion achievements
-export const REGION_THEMES: Record<string, AchievementTheme> = {
+// Each has: accent (for icons), bgLight/bgDark (for card gradients and rings)
+export interface RegionalTheme {
+  accent: string;    // Pure color for trophy icons
+  bgLight: string;   // Card gradient start (lightest)
+  bgDark: string;    // Card gradient end & ring color (softer pastel)
+  bgLocked: string;  // Locked state background
+}
+
+export const REGION_THEMES: Record<string, RegionalTheme> = {
   'list_gb_ireland': { 
-    bg: 'hsl(210 50% 95%)',
-    bgLocked: 'hsl(210 30% 96%)', 
-    accent: '#1E3A5F' 
+    accent: '#1E3A5F',
+    bgLight: '#E8F0F8',
+    bgDark: '#7FA3C7',
+    bgLocked: 'hsl(210 30% 96%)',
   },
   'list_europe': { 
-    bg: 'hsl(263 50% 96%)',
-    bgLocked: 'hsl(263 30% 96%)', 
-    accent: '#7C3AED' 
+    accent: '#7C3AED',
+    bgLight: '#F3EEFF',
+    bgDark: '#B794F4',
+    bgLocked: 'hsl(263 30% 96%)',
   },
   'list_usa': { 
-    bg: 'hsl(0 55% 96%)',
-    bgLocked: 'hsl(0 30% 96%)', 
-    accent: '#B91C1C' 
+    accent: '#B91C1C',
+    bgLight: '#FEEAEA',
+    bgDark: '#F28B8B',
+    bgLocked: 'hsl(0 30% 96%)',
   },
   'list_worldwide': { 
-    bg: 'hsl(175 50% 94%)',
-    bgLocked: 'hsl(175 30% 96%)', 
-    accent: '#0D9488' 
+    accent: '#0D9488',
+    bgLight: '#E6FAF8',
+    bgDark: '#5ECED3',
+    bgLocked: 'hsl(175 30% 96%)',
   },
 };
 
 // Aliases for slug-based lookups (used in list pages)
-export const REGION_SLUG_THEMES: Record<string, AchievementTheme> = {
+export const REGION_SLUG_THEMES: Record<string, RegionalTheme> = {
   'global': REGION_THEMES['list_worldwide'],
   'gb-i': REGION_THEMES['list_gb_ireland'],
   'usa': REGION_THEMES['list_usa'],
@@ -154,21 +167,35 @@ export function getMilestoneTheme(threshold: number): AchievementTheme {
 /**
  * Get theme for a regional list by achievement ID or slug
  */
-export function getRegionTheme(idOrSlug: string): AchievementTheme {
+export function getRegionTheme(idOrSlug: string): RegionalTheme {
   return REGION_THEMES[idOrSlug] ?? REGION_SLUG_THEMES[idOrSlug] ?? REGION_THEMES['list_worldwide'];
 }
 
 /**
  * Get theme for any achievement type
+ * Returns a unified theme with accent color
  */
 export function getAchievementTheme(
   type: 'milestone' | 'list_completion',
   idOrThreshold: string | number
-): AchievementTheme {
+): { accent: string; bgLight: string; bgDark: string; bgLocked: string } {
   if (type === 'milestone') {
-    return getMilestoneTheme(typeof idOrThreshold === 'number' ? idOrThreshold : parseInt(idOrThreshold, 10));
+    const theme = getMilestoneTheme(typeof idOrThreshold === 'number' ? idOrThreshold : parseInt(idOrThreshold, 10));
+    // Convert legacy format to new format
+    return {
+      accent: theme.accent,
+      bgLight: theme.bg,
+      bgDark: theme.bg, // For legacy, use same bg
+      bgLocked: theme.bgLocked,
+    };
   }
-  return getRegionTheme(String(idOrThreshold));
+  const regionTheme = getRegionTheme(String(idOrThreshold));
+  return {
+    accent: regionTheme.accent,
+    bgLight: regionTheme.bgLight,
+    bgDark: regionTheme.bgDark,
+    bgLocked: regionTheme.bgLocked,
+  };
 }
 
 /**
@@ -244,11 +271,10 @@ export function getTierPalette(
   const regionId = regionMap[tier];
   if (regionId && REGION_THEMES[regionId]) {
     const theme = REGION_THEMES[regionId];
-    // Convert HSL bg to hex-friendly gradient endpoints
     return {
       accent: theme.accent,
-      bgLight: theme.bg,
-      bgDark: theme.bg.replace('95%', '88%').replace('96%', '88%').replace('94%', '86%'),
+      bgLight: theme.bgLight,
+      bgDark: theme.bgDark,
       bgLocked: theme.bgLocked,
       icon: theme.accent, // Icon uses pure accent
     };

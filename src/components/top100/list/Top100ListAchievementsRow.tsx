@@ -152,13 +152,13 @@ export const Top100ListAchievementsRow: React.FC<Top100ListAchievementsRowProps>
             })}
           </div>
 
-          {/* Progress bar - uses region color from global system */}
+          {/* Progress bar - uses region bgDark for soft pastel consistency with cards */}
           <div className="h-1.5 rounded-full bg-muted/80 relative overflow-hidden">
             <div
               className="h-full rounded-full transition-all"
               style={{ 
                 width: `${progressPct}%`,
-                backgroundColor: regionTheme.accent,
+                backgroundColor: regionTheme.bgDark,
               }}
             />
           </div>

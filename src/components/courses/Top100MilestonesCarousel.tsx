@@ -1,21 +1,21 @@
 import React from 'react';
 import { CLUB_STEPS, Top100ClubMeta } from '@/lib/top100Club';
+import { MILESTONE_THEMES, type MilestoneTier } from '@/lib/globalAchievementMilestoneSystem';
 
 // Show all tiers from 5 through 400 in order
 const MILESTONES: Top100ClubMeta[] = CLUB_STEPS;
 
-// Tier colors
-const TIER_COLORS: Record<string, string> = {
-  none: '#94a3b8',
-  rookie: '#D9C7A3',
-  fairway: '#8BBF5A',
-  founders: '#2E5930',
-  heritage: '#C8A44B',
-  century: '#B7BCC6',
-  elite: '#D9A441',
-  legendary: '#5A3E8C',
-  grandslam: '#0C0F14',
-};
+// Get ring color from global system (bgDark for softer pastel)
+function getTierRingColor(threshold: number): string {
+  const theme = MILESTONE_THEMES[threshold as MilestoneTier];
+  return theme?.bgDark ?? '#94a3b8';
+}
+
+// Get accent color from global system (for text/icons)
+function getTierAccentColor(threshold: number): string {
+  const theme = MILESTONE_THEMES[threshold as MilestoneTier];
+  return theme?.accent ?? '#94a3b8';
+}
 
 // Thresholds for each milestone
 const THRESHOLDS = [5, 10, 20, 50, 100, 200, 300, 400];
@@ -76,7 +76,8 @@ export function Top100MilestonesCarousel({
             {MILESTONES.map((milestone) => {
               const isUnlocked = totalPlayed >= milestone.threshold;
               const remaining = Math.max(0, milestone.threshold - totalPlayed);
-              const tierColor = TIER_COLORS[milestone.tierId] || TIER_COLORS.none;
+              const ringColor = getTierRingColor(milestone.threshold);
+              const accentColor = getTierAccentColor(milestone.threshold);
 
               return (
                 <button
@@ -85,19 +86,19 @@ export function Top100MilestonesCarousel({
                   onClick={() => onMilestoneClick?.(milestone)}
                   className="flex flex-col items-center min-w-[72px] gap-1 focus:outline-none"
                 >
-                  {/* Squircle ring */}
+                  {/* Squircle ring - uses bgDark for softer pastel matching cards */}
                   <div className="relative">
                     <div
                       className="h-14 w-14 rounded-[18px] flex items-center justify-center bg-white"
                       style={{
                         boxShadow: isUnlocked
-                          ? `0 0 18px ${tierColor}22`
+                          ? `0 0 18px ${ringColor}22`
                           : '0 0 10px rgba(15,23,42,0.06)',
-                        border: `2px solid ${isUnlocked ? tierColor : `${tierColor}66`}`,
+                        border: `2px solid ${isUnlocked ? ringColor : `${ringColor}66`}`,
                         opacity: isUnlocked ? 1 : 0.45,
                       }}
                     >
-                      <span className="text-sm font-semibold" style={{ color: tierColor }}>
+                      <span className="text-sm font-semibold" style={{ color: accentColor }}>
                         {milestone.threshold}
                       </span>
                     </div>
@@ -117,11 +118,14 @@ export function Top100MilestonesCarousel({
             })}
           </div>
 
-          {/* Progress bar - inside the scroller, moves with circles */}
+          {/* Progress bar - uses bgDark colors from global system */}
           <div className="h-1 rounded-full bg-muted/80 relative">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-[#D9C7A3] via-[#2E5930] to-[#0C0F14]"
-              style={{ width: `${progressPct}%` }}
+              className="h-full rounded-full"
+              style={{ 
+                width: `${progressPct}%`,
+                background: `linear-gradient(to right, ${MILESTONE_THEMES[5].bgDark}, ${MILESTONE_THEMES[20].bgDark}, ${MILESTONE_THEMES[400].bgDark})`,
+              }}
             />
           </div>
         </div>
