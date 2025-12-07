@@ -2,18 +2,20 @@ import React, { useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { ActivityMediaItem } from './types';
 import PostMedia from './PostMedia';
+import VideoOverlay from './VideoOverlay';
 import { Images, Trophy } from 'lucide-react';
 
 interface HeroPostTileProps {
   item: ActivityMediaItem;
   onPress?: (postId: string) => void;
+  isPlaying?: boolean;
 }
 
 /**
  * Full-width hero tile for standout posts
  * Cinematic 16:9 aspect, spans both columns
  */
-const HeroPostTile: React.FC<HeroPostTileProps> = ({ item, onPress }) => {
+const HeroPostTile: React.FC<HeroPostTileProps> = ({ item, onPress, isPlaying = false }) => {
   const handleClick = useCallback(() => {
     onPress?.(item.postId);
   }, [item.postId, onPress]);
@@ -38,12 +40,22 @@ const HeroPostTile: React.FC<HeroPostTileProps> = ({ item, onPress }) => {
         isVideo={isVideo}
       />
 
-      {/* Bottom gradient overlay */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/55 via-black/20 to-transparent" />
+      {/* Bottom gradient overlay - only for non-video since VideoOverlay handles it */}
+      {!isVideo && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/55 via-black/20 to-transparent" />
+      )}
+
+      {/* Video overlay with play/pause icon and duration */}
+      {isVideo && (
+        <VideoOverlay
+          durationSeconds={item.durationSeconds}
+          isPlaying={item.canAutoplay && isPlaying}
+        />
+      )}
 
       {/* Multi-media indicator */}
       {item.additionalMediaCount && item.additionalMediaCount > 0 && (
-        <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 rounded-full bg-black/55 text-white text-xs font-medium">
+        <div className="absolute top-3 right-3 z-20 flex items-center gap-1 px-2 py-1 rounded-full bg-black/55 text-white text-xs font-medium">
           <Images className="h-3 w-3" />
           <span>+{item.additionalMediaCount}</span>
         </div>
@@ -51,14 +63,14 @@ const HeroPostTile: React.FC<HeroPostTileProps> = ({ item, onPress }) => {
 
       {/* Milestone indicator */}
       {item.isMilestone && (
-        <div className="absolute top-3 left-3 flex items-center justify-center h-6 w-6 rounded-full bg-black/50">
+        <div className="absolute top-3 left-3 z-20 flex items-center justify-center h-6 w-6 rounded-full bg-black/50">
           <Trophy className="h-3 w-3 text-amber-400" />
         </div>
       )}
 
       {/* Course name label */}
       {item.courseName && (
-        <div className="absolute inset-x-3 bottom-3 flex justify-start">
+        <div className="absolute inset-x-3 bottom-8 z-10 flex justify-start">
           <span className="inline-flex max-w-[75%] items-center px-3 py-1 text-xs font-medium text-white bg-black/55 backdrop-blur-sm rounded-full truncate">
             {item.courseName}
           </span>
