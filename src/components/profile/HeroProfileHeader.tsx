@@ -379,13 +379,13 @@ const HeroProfileHeader = ({
           />
         </div>
 
-        {/* META BLOCK - no card, transparent, sits on page background */}
+        {/* META BLOCK - Two-column layout: avatar left, text right */}
         <div
           ref={profileCardRef}
-          className="relative mx-auto max-w-[540px] px-5 pb-2"
+          className="relative px-4 mt-[-40px] flex flex-row items-center md:mx-auto md:max-w-[600px]"
         >
-          {/* AVATAR – OVERLAPS HERO */}
-          <div className="absolute left-1/2 -top-[170px] -translate-x-1/2 z-20">
+          {/* AVATAR – Left column */}
+          <div className="flex-shrink-0 mr-4 md:mr-6 z-20">
             <ProfileAvatarRing
               photoUrl={profile?.profile_photo_url}
               displayName={displayName}
@@ -398,7 +398,7 @@ const HeroProfileHeader = ({
             />
           </div>
 
-          {/* TEXT META (name, @handle, club, bio, customise) */}
+          {/* TEXT META (name, @handle, club, bio, customise) - Right column */}
           <ProfileHeaderCard
             displayName={displayName}
             username={username}
@@ -416,9 +416,11 @@ const HeroProfileHeader = ({
             onAvatarClick={() => openImmersive?.(0)}
             onCustomiseClick={isOwnProfile ? () => setEditDialogOpen(true) : undefined}
           />
+        </div>
 
-          {/* Social Actions - Only for other users' profiles */}
-          {!isOwnProfile && user?.id && profile?.id && (
+        {/* Social Actions - Only for other users' profiles */}
+        {!isOwnProfile && user?.id && profile?.id && (
+          <div className="px-4 mt-3 md:mx-auto md:max-w-[600px]">
             <ProfileActionsRow
               currentUserId={user.id}
               profileUserId={profile.id}
@@ -426,9 +428,8 @@ const HeroProfileHeader = ({
               isMobile={isMobile}
               websiteUrl={profile?.website}
             />
-          )}
-
-        </div>
+          </div>
+        )}
 
         {/* Achievements Rail - outside constrained container for full width */}
         {isPersonal && profile?.id && username && (
