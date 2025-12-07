@@ -2,6 +2,6 @@
 export const NEARBY_RADIUS_METERS = 1000;
 
 // Mock mode for testing with 2 specific golfers
-export const isMockNearby = true;
+export const isMockNearby = false;
 
 // Note: LIVE_CLUBHOUSE_DATA flag removed - now controlled by isMockLiveEnabled() in src/mocks/mockSwitch.ts
