@@ -190,7 +190,7 @@ export function HubHomePage() {
 
   return (
     <div className="fixed inset-0 z-[9999]">
-      {/* Glass Sheet - slides up from bottom */}
+      {/* Glass Sheet - unified background and backdrop */}
       <div 
         ref={sheetRef}
         className="hub-glass-page fixed inset-0"
