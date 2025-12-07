@@ -148,10 +148,13 @@ html.lightbox-open {
   --achv-gold: #D4A857;
   
   /* Achievement text colours */
-  --achv-text-main: #04110A;      /* Very dark green/black */
-  --achv-text-subtle: #274133;    /* Muted label text */
+  --achv-text-main: #0f172a;        /* Dark slate */
+  --achv-text-subtle: #64748b;      /* Muted slate */
   --achv-pill-bg: rgba(255,255,255,0.85);
   --achv-pill-text: #111827;
+  
+  /* Grand Slam gradient */
+  --achv-grand-slam-gradient: linear-gradient(135deg, #0b6b30 0%, #0a5e2b 100%);
   
   /* ========================================
      TOP 100 CARDS DESIGN TOKENS
@@ -171,6 +174,33 @@ html.lightbox-open {
   /* Progress bar styling */
   --top100-progress-height: 6px;
   --top100-progress-radius: 999px;
+}
+
+/* ========================================
+   ACHIEVEMENT UTILITY CLASSES
+   ======================================== */
+
+/* Grand Slam gradient background */
+.achv-grand-slam-bg {
+  background-image: var(--achv-grand-slam-gradient);
+}
+
+/* Grand Slam gold border glow */
+.achv-grand-slam-border {
+  box-shadow:
+    0 0 0 1px rgba(212, 168, 87, 0.7),
+    0 12px 30px rgba(0, 0, 0, 0.7);
+}
+
+/* Grand Slam icon override */
+.grand-slam-icon {
+  color: var(--achv-gold);
+}
+
+/* Dark mode achievement text adjustments */
+.dark {
+  --achv-text-main: #e5e7eb;
+  --achv-text-subtle: #9ca3af;
 }
 
 /* Rating slider improvements - larger touch areas, smooth mobile interaction */

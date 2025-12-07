@@ -69,6 +69,18 @@ const TIER_TO_CSS_TOKEN: Record<string, number> = {
   '400': 8,
 };
 
+// Static class map - Tailwind needs concrete strings, NOT template literals
+const TIER_BG_CLASS: Record<number, string> = {
+  1: 'bg-achv-1',
+  2: 'bg-achv-2',
+  3: 'bg-achv-3',
+  4: 'bg-achv-4',
+  5: 'bg-achv-5',
+  6: 'bg-achv-6',
+  7: 'bg-achv-7',
+  8: 'bg-achv-8',
+};
+
 // Milestone thresholds for next tier calculation
 const MILESTONE_THRESHOLDS: number[] = [5, 10, 20, 50, 100, 200, 300, 400];
 
@@ -195,10 +207,10 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         'active:scale-[0.98]',
         // Ghost styling
         isGhost && 'border border-dashed border-white/60',
-        // CSS token background for non-Grand Slam milestones
-        useCssTokenBg && `bg-achievement-${cssToken}`,
+        // CSS token background using static class map (Tailwind-safe)
+        useCssTokenBg && cssToken && TIER_BG_CLASS[cssToken],
         // Grand Slam special class
-        isGrandSlam && 'grand-slam-card',
+        isGrandSlam && 'achv-grand-slam-bg achv-grand-slam-border',
       )}
       style={{
         // Use inline style for Grand Slam gradient, regional cards, or locked states
