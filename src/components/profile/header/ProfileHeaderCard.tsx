@@ -1,5 +1,5 @@
 import React from 'react';
-import { Globe } from 'lucide-react';
+import { Globe, Pencil } from 'lucide-react';
 
 interface ProfileHeaderCardProps {
   displayName: string;
@@ -18,8 +18,7 @@ interface ProfileHeaderCardProps {
 }
 
 /**
- * ProfileHeaderCard - Two-column layout meta block
- * Left-aligned text to sit beside avatar
+ * ProfileHeaderCard - Centered meta block beside avatar
  */
 const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   displayName,
@@ -44,31 +43,44 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
 
   return (
     <section className="flex-1 flex flex-col items-center space-y-1.5">
-      {/* Name */}
-      <h1 className="text-2xl font-semibold text-foreground text-center">
-        {displayName}
-      </h1>
+      {/* Top row: name + optional edit icon */}
+      <div className="flex items-center gap-2">
+        <h1 className="text-2xl font-semibold text-foreground text-center">
+          {displayName}
+        </h1>
 
-      {/* Username + Handicap pill on one line */}
-      <p className="text-xs text-muted-foreground text-center flex items-center gap-2">
+        {isOwnProfile && onCustomiseClick && (
+          <button
+            type="button"
+            onClick={onCustomiseClick}
+            aria-label="Edit profile"
+            className="inline-flex items-center justify-center rounded-full bg-muted border border-border/60 p-1.5 hover:bg-muted/80 transition"
+          >
+            <Pencil className="w-4 h-4 text-muted-foreground" />
+          </button>
+        )}
+      </div>
+
+      {/* Username + Handicap pill */}
+      <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
         <span>@{username}</span>
         {isPersonal && handicap != null && (
-          <span className="inline-flex items-center rounded-full bg-muted px-2 py-1 text-[11px] font-medium text-foreground">
+          <span className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-[11px] font-semibold text-foreground">
             HCP {handicap.toFixed(1)}
           </span>
         )}
-      </p>
+      </div>
 
       {/* Club name (personal) or Location (business) */}
       {isPersonal && homeClub && (
         <p className="text-sm text-muted-foreground text-center">
-          {homeClub}
+          <span className="font-semibold text-foreground">{homeClub}</span>
         </p>
       )}
       
       {!isPersonal && location && (
         <p className="text-sm text-muted-foreground text-center">
-          {location}
+          <span className="font-semibold text-foreground">{location}</span>
         </p>
       )}
       
@@ -85,17 +97,6 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
             {formatWebsiteUrl(websiteUrl)}
           </a>
         </div>
-      )}
-
-      {/* Customise profile link */}
-      {isOwnProfile && onCustomiseClick && (
-        <button
-          type="button"
-          onClick={onCustomiseClick}
-          className="mt-2 text-sm font-medium text-primary underline text-center"
-        >
-          Customise profile
-        </button>
       )}
     </section>
   );
