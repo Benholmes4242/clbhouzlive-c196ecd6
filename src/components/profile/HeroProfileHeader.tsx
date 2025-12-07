@@ -382,7 +382,7 @@ const HeroProfileHeader = ({
         {/* META BLOCK - Avatar left, centered text right */}
         <div
           ref={profileCardRef}
-          className="relative px-4 pt-4 pb-2 mt-[-52px] flex flex-row items-center gap-4 md:mx-auto md:max-w-[600px]"
+          className="relative px-4 pt-4 pb-2 -mt-16 sm:-mt-20 flex flex-row items-center gap-4 md:mx-auto md:max-w-[600px]"
         >
           {/* AVATAR – Left column */}
           <div className="flex-shrink-0 z-20">
@@ -415,7 +415,7 @@ const HeroProfileHeader = ({
 
         {/* BIO - Full width row below header */}
         {profile?.bio && (
-          <div className="px-6 pb-3 md:mx-auto md:max-w-[600px]">
+          <div className="px-6 mt-3 pb-3 md:mx-auto md:max-w-[600px]">
             <p className="text-sm text-muted-foreground text-center leading-relaxed">
               {profile.bio}
             </p>
