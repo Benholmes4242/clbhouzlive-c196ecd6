@@ -4,6 +4,8 @@ import { getTop100Club } from '@/lib/top100Club';
 import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
+import { getNextBadgeNudge, type UserTop100Progress } from '@/lib/achievements/nextBadgeNudge';
+import NudgeBanner from '@/components/achievements/NudgeBanner';
 
 export interface Top100ProgressHeroProps {
   displayName: string | null;
@@ -14,6 +16,12 @@ export interface Top100ProgressHeroProps {
   regionsCount: number;
   lastRoundAt: string | null;
   isOwnProfile?: boolean;
+  // Optional list progress for nudge calculation
+  listsProgress?: Array<{
+    listSlug: string;
+    played: number;
+    total: number;
+  }>;
 }
 
 export function Top100ProgressHero({
@@ -25,6 +33,7 @@ export function Top100ProgressHero({
   regionsCount,
   lastRoundAt,
   isOwnProfile = true,
+  listsProgress,
 }: Top100ProgressHeroProps) {
   const initials = displayName
     ?.split(' ')
@@ -44,6 +53,24 @@ export function Top100ProgressHero({
   const formattedDate = lastRoundAt
     ? new Date(lastRoundAt).toLocaleDateString()
     : null;
+
+  // Calculate nudge if we have list progress data
+  const nudge = listsProgress ? getNextBadgeNudge({
+    totalTop100Played,
+    lists: listsProgress.map(l => {
+      const regionMap: Record<string, 'GBI' | 'USA' | 'EU' | 'WORLD'> = {
+        'gb-i': 'GBI',
+        'usa': 'USA',
+        'europe': 'EU',
+        'global': 'WORLD',
+      };
+      return {
+        regionId: regionMap[l.listSlug] || 'WORLD',
+        played: l.played,
+        total: l.total,
+      };
+    }),
+  }) : null;
 
   return (
     <section className="flex flex-col items-center gap-3 pb-4">
@@ -69,6 +96,7 @@ export function Top100ProgressHero({
               subtitle={club.tierName || 'Top 100 Club'}
               unlocked={true}
               compact={true}
+              totalTop100Played={totalTop100Played}
             />
           </div>
         )}
@@ -85,6 +113,13 @@ export function Top100ProgressHero({
         <p className="text-sm text-muted-foreground">
           Last Top 100 round: {formattedDate}
         </p>
+      )}
+
+      {/* Nudge banner */}
+      {nudge && isOwnProfile && (
+        <div className="w-full max-w-sm px-4">
+          <NudgeBanner nudge={nudge} variant="hero" />
+        </div>
       )}
     </section>
   );

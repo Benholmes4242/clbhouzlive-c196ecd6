@@ -10,6 +10,8 @@ import {
 } from '@/lib/achievementDefinitions';
 import { getTop100Club, getNextTop100Club } from '@/lib/top100Club';
 import { AchievementBadgeCard, AchievementTier } from './AchievementBadgeCard';
+import NudgeBanner from './NudgeBanner';
+import { getNextBadgeNudge } from '@/lib/achievements/nextBadgeNudge';
 import { DEBUG_UNLOCK_ALL_ACHIEVEMENTS, DEBUG_ACHIEVEMENTS_USER_EMAIL } from '@/utils/featureFlags';
 
 interface MilestonesAndAchievementsModalProps {
@@ -70,6 +72,24 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
     ? Math.min(100, (totalTop100Played / nextClub.threshold) * 100) 
     : 100;
 
+  // Calculate nudge
+  const nudge = progressData?.lists ? getNextBadgeNudge({
+    totalTop100Played,
+    lists: progressData.lists.map(l => {
+      const regionMap: Record<string, 'GBI' | 'USA' | 'EU' | 'WORLD'> = {
+        'gb-i': 'GBI',
+        'usa': 'USA',
+        'europe': 'EU',
+        'global': 'WORLD',
+      };
+      return {
+        regionId: regionMap[l.listSlug] || 'WORLD',
+        played: l.played,
+        total: l.total,
+      };
+    }),
+  }) : null;
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent 
@@ -104,6 +124,13 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
               <p className="px-4 md:px-8 text-xs md:text-sm text-slate-500 mb-3">
                 @{username} · {totalTop100Played} Top 100 courses · {unlockedCount} milestones unlocked
               </p>
+
+              {/* Nudge banner */}
+              {nudge && !isDebugUser && (
+                <div className="px-4 md:px-8">
+                  <NudgeBanner nudge={nudge} variant="compact" />
+                </div>
+              )}
 
               {/* Hero "Progress" card */}
               <section className="px-4 md:px-8 mb-5">
@@ -193,6 +220,7 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
                         unlocked={isUnlocked}
                         isPrimary={isCurrent}
                         remaining={isUnlocked ? undefined : remaining}
+                        totalTop100Played={isUnlocked ? totalTop100Played : undefined}
                       />
                     );
                   })}
@@ -231,6 +259,8 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
                         subtitle={`${played} / ${total} courses`}
                         unlocked={isUnlocked}
                         remaining={isUnlocked ? undefined : remaining}
+                        playedOnList={played}
+                        totalOnList={total}
                       />
                     );
                   })}
