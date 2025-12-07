@@ -21,8 +21,8 @@ type Props = {
  * ✅ MUST use <SquircleAvatar> from @/components/ui/SquircleAvatar.tsx
  * 
  * GLOBAL AVATAR RING RULE:
- * - Users WITH achievement ring: 1px colored ring directly on avatar (no grey ring)
- * - Users WITHOUT achievement ring: 1px grey ring
+ * - Users WITH achievement ring: 2px colored ring directly on avatar (no grey ring)
+ * - Users WITHOUT achievement ring: 2px grey ring
  * 
  * @deprecated Use <SquircleAvatar> from @/components/ui/SquircleAvatar.tsx instead
  */

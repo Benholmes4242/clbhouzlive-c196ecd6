@@ -11,8 +11,8 @@ import { getDirectImageUrl } from '@/utils/r2ImageUtils';
  * - overflow: hidden
  * - object-fit: cover for images
  * 
- * Normal state (no achievement): 1px grey ring (#D1D5DB)
- * Achievement state: 1px colored ring directly on avatar (no grey ring)
+ * Normal state (no achievement): 2px grey ring (#D1D5DB)
+ * Achievement state: 2px colored ring directly on avatar (no grey ring)
  */
 
 // Size variants mapping

@@ -51,7 +51,7 @@ export function Top100MilestoneTimeline({ totalTop100Played }: Top100MilestoneTi
                     ? `2px solid ${m.ringColor}` 
                     : isNext 
                     ? '2px solid #FBBF24' 
-                    : '1px solid #D1D5DB',
+                    : '2px solid #D1D5DB',
                   backgroundColor: unlocked ? m.ringColor : undefined,
                 }}
               >
