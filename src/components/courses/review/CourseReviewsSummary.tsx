@@ -46,9 +46,10 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
   const tierData = getScoreTier(averageRating);
   const onlyUserHasRated = reviewCount === 1 && userHasRating;
 
-  // Colors from Global Colour System for comparison messages
-  const positiveColor = COURSE_RATING_THEMES.VERY_GOOD.accent;
-  const negativeColor = COURSE_RATING_THEMES.FAIR.accent;
+  // Colors from Masters Green Ladder for comparison messages
+  // Use Outstanding (G5) for positive, Fair (G1) for negative
+  const positiveColor = COURSE_RATING_THEMES.OUTSTANDING.accent;
+  const negativeColor = '#94a3b8'; // Neutral slate for "lower" messages
 
   // Calculate comparison message
   let comparisonMessage: React.ReactNode = null;

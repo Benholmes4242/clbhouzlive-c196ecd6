@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { COURSE_RATING_THEMES } from '@/lib/globalAchievementMilestoneSystem';
+import { COURSE_RATING_THEMES, RATING_BAR_TRACK, type RatingTier } from '@/lib/globalAchievementMilestoneSystem';
 
 export type RatingBand =
   | 'outstanding'
@@ -16,7 +16,7 @@ interface RatingBarProps {
   value: number;
   /** Max value (default 10) */
   max?: number;
-  /** neutral = dark slate, banded = band colour */
+  /** neutral = dark slate, banded = gradient from theme */
   mode?: RatingBarMode;
   /** Required when mode === 'banded' */
   band?: RatingBand;
@@ -24,13 +24,13 @@ interface RatingBarProps {
   className?: string;
 }
 
-// Map band names to Global Colour System themes
-const bandToAccent: Record<RatingBand, string> = {
-  outstanding: COURSE_RATING_THEMES.OUTSTANDING.accent,
-  excellent: COURSE_RATING_THEMES.EXCELLENT.accent,
-  veryGood: COURSE_RATING_THEMES.VERY_GOOD.accent,
-  good: COURSE_RATING_THEMES.GOOD.accent,
-  fair: COURSE_RATING_THEMES.FAIR.accent,
+// Map band names to rating tier keys
+const bandToTierKey: Record<RatingBand, RatingTier> = {
+  outstanding: 'OUTSTANDING',
+  excellent: 'EXCELLENT',
+  veryGood: 'VERY_GOOD',
+  good: 'GOOD',
+  fair: 'FAIR',
 };
 
 export function RatingBar({
@@ -41,10 +41,20 @@ export function RatingBar({
   className,
 }: RatingBarProps) {
   const pct = Math.max(0, Math.min(100, (value / max) * 100));
-  const fillColor =
-    mode === 'neutral'
-      ? 'var(--rating-bar-fill-neutral)'
-      : bandToAccent[band];
+  
+  // Get fill styling based on mode
+  const getFillStyle = () => {
+    if (mode === 'neutral') {
+      return { backgroundColor: 'var(--rating-bar-fill-neutral)' };
+    }
+    
+    // Banded mode: use gradient from Masters Green Ladder
+    const tierKey = bandToTierKey[band];
+    const theme = COURSE_RATING_THEMES[tierKey];
+    return {
+      background: `linear-gradient(90deg, ${theme.bgLight} 0%, ${theme.bgDark} 100%)`,
+    };
+  };
 
   return (
     <div
@@ -54,7 +64,7 @@ export function RatingBar({
       )}
       style={{
         height: 'var(--rating-bar-height-sm)',
-        backgroundColor: 'var(--rating-bar-track)',
+        backgroundColor: RATING_BAR_TRACK,
         borderRadius: 'var(--rating-bar-radius)',
       }}
     >
@@ -62,7 +72,7 @@ export function RatingBar({
         className="absolute inset-y-0 left-0 transition-all duration-300"
         style={{
           width: `${pct}%`,
-          backgroundColor: fillColor,
+          ...getFillStyle(),
           borderRadius: 'var(--rating-bar-radius)',
         }}
       />
