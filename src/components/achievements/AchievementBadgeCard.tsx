@@ -166,10 +166,10 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         // Micro-interactions
         'active:scale-[0.98]',
         unlocked && !isGhost && 'hover:shadow-[0_10px_28px_rgba(16,185,129,0.15)]',
-        // Size variants - horizontal layout
+        // Size variants - horizontal layout (50% taller)
         compact 
-          ? 'min-w-[180px] h-[56px] px-3' 
-          : 'min-w-[220px] h-[72px] px-4',
+          ? 'min-w-[180px] h-[84px] px-3' 
+          : 'min-w-[220px] h-[108px] px-4',
         // Ghost styling
         isGhost && 'border border-dashed border-white/60'
       )}
