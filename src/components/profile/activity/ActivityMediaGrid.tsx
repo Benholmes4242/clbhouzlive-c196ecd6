@@ -1,11 +1,10 @@
 import React, { useMemo } from 'react';
 import { cn } from '@/lib/utils';
-import ActivityMediaCard from './ActivityMediaCard';
 import MediaSkeleton from './MediaSkeleton';
+import HeroPostTile from './HeroPostTile';
+import StandardPostTile from './StandardPostTile';
 import { ActivityMediaGridProps, ActivityMediaItem, AspectRatio, ActivityPost } from './types';
-
-// Skeleton aspect ratios for realistic loading state
-const SKELETON_ASPECTS: AspectRatio[] = ['square', 'portrait', 'square', 'landscape', 'square', 'square', 'portrait', 'square', 'landscape'];
+import { buildActivityLayout, LayoutRow } from './layoutEngine';
 
 /**
  * Convert ActivityPost to ActivityMediaItem
@@ -19,47 +18,35 @@ function postToMediaItem(post: ActivityPost): ActivityMediaItem | null {
   const isMilestone = post.content?.toLowerCase().includes('milestone') || 
     post.post_tags?.some(tag => tag.name?.toLowerCase().includes('achievement'));
 
+  // Determine aspect ratio from media dimensions if available
+  let aspectRatio: AspectRatio = 'square';
+  if (primaryMedia.aspect_ratio) {
+    if (primaryMedia.aspect_ratio < 0.9) aspectRatio = 'portrait';
+    else if (primaryMedia.aspect_ratio > 1.1) aspectRatio = 'landscape';
+  }
+
   return {
     id: primaryMedia.id,
     postId: post.id,
     type: primaryMedia.media_type,
     url: primaryMedia.media_url,
-    thumbnailUrl: primaryMedia.media_url,
+    thumbnailUrl: primaryMedia.poster_url || primaryMedia.media_url,
     courseName: golfCourseTag?.name,
     roundDate: post.created_at,
     additionalMediaCount: media.length > 1 ? media.length - 1 : undefined,
     isMilestone,
-    // Aspect ratio determined dynamically or default to square
-    aspectRatio: 'square' as AspectRatio
+    aspectRatio
   };
-}
-
-/**
- * Assign varied aspect ratios for visual interest
- * Creates a natural, gallery-like feel
- */
-function assignAspectRatios(items: ActivityMediaItem[]): ActivityMediaItem[] {
-  return items.map((item, index) => {
-    // Pattern: mostly square, with occasional variety
-    // Portrait every 4th item, landscape every 7th
-    let aspectRatio: AspectRatio = 'square';
-    
-    if (index % 7 === 3) aspectRatio = 'landscape';
-    else if (index % 5 === 2) aspectRatio = 'portrait';
-    
-    return { ...item, aspectRatio };
-  });
 }
 
 /**
  * Premium Activity Media Grid
  * 
  * Features:
- * - Aspect-ratio based layout (portrait/square/landscape)
+ * - Hero + two-column waterfall layout
+ * - Pointed corners (no rounding)
  * - Shimmer skeleton loading states
- * - Premium error handling with retry
- * - Hover/press micro-interactions
- * - Desktop video preview on hover
+ * - Premium metadata overlays
  */
 const ActivityMediaGrid: React.FC<ActivityMediaGridProps> = ({
   posts,
@@ -69,22 +56,28 @@ const ActivityMediaGrid: React.FC<ActivityMediaGridProps> = ({
 }) => {
   // Convert posts to media items
   const mediaItems = useMemo(() => {
-    const items = posts
+    return posts
       .map(postToMediaItem)
       .filter((item): item is ActivityMediaItem => item !== null);
-    
-    return assignAspectRatios(items);
   }, [posts]);
 
-  const gridCols = viewMode === 'immersive' ? 'grid-cols-2' : 'grid-cols-3';
+  // Build layout rows (hero + pairs)
+  const layoutRows = useMemo(() => {
+    return buildActivityLayout(mediaItems);
+  }, [mediaItems]);
 
   // Loading state with shimmer skeletons
   if (isLoading) {
     return (
-      <div className={cn("grid gap-1 pb-24 px-0.5", gridCols)}>
-        {SKELETON_ASPECTS.map((aspect, i) => (
-          <MediaSkeleton key={i} aspectRatio={aspect} />
-        ))}
+      <div className="px-0 pb-16">
+        <div className="grid grid-cols-2 gap-1">
+          {/* Hero skeleton */}
+          <div className="col-span-2 aspect-[16/9] bg-muted/30 animate-pulse" />
+          {/* Standard skeletons */}
+          {[...Array(6)].map((_, i) => (
+            <MediaSkeleton key={i} aspectRatio="square" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -107,15 +100,37 @@ const ActivityMediaGrid: React.FC<ActivityMediaGridProps> = ({
   }
 
   return (
-    <div className={cn("grid gap-1 pb-24 px-0.5", gridCols)}>
-      {mediaItems.map((item) => (
-        <ActivityMediaCard
-          key={item.id}
-          item={item}
-          onPress={onPostPress}
-          aspectRatio={item.aspectRatio || 'square'}
-        />
-      ))}
+    <div className="px-0 pb-16">
+      <div className="grid grid-cols-2 gap-1">
+        {layoutRows.map((row, index) => {
+          if (row.type === 'hero') {
+            return (
+              <HeroPostTile
+                key={`hero-${row.post.id}-${index}`}
+                item={row.post}
+                onPress={onPostPress}
+              />
+            );
+          }
+
+          return (
+            <React.Fragment key={`pair-${index}`}>
+              <StandardPostTile 
+                item={row.left} 
+                onPress={onPostPress}
+              />
+              {row.right ? (
+                <StandardPostTile 
+                  item={row.right} 
+                  onPress={onPostPress}
+                />
+              ) : (
+                <div className="aspect-square" /> // empty spacer if odd
+              )}
+            </React.Fragment>
+          );
+        })}
+      </div>
     </div>
   );
 };
