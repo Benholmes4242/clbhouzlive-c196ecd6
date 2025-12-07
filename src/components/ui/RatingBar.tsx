@@ -48,9 +48,9 @@ export function RatingBar({
   const pct = Math.max(0, Math.min(100, (value / max) * 100));
   const colors = bandColors[band];
 
-  // TEST: All bars use the same dark slate fill to check if rendering is correct
-  // Both neutral and banded modes use NEUTRAL_FILL
-  const background = `linear-gradient(90deg, ${NEUTRAL_FILL} 0%, ${NEUTRAL_FILL} ${pct}%, ${TRACK_COLOR} ${pct}%, ${TRACK_COLOR} 100%)`;
+  // TEST: All bars use Outstanding badge color
+  const outstandingColor = COURSE_RATING_THEMES.OUTSTANDING.bgDark;
+  const background = `linear-gradient(90deg, ${outstandingColor} 0%, ${outstandingColor} ${pct}%, ${TRACK_COLOR} ${pct}%, ${TRACK_COLOR} 100%)`;
 
   return (
     <div
