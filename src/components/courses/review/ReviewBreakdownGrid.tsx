@@ -1,6 +1,5 @@
 import React from 'react';
 import { RatingBar } from '@/components/ui/RatingBar';
-import { getScoreTier } from '@/utils/getScoreTier';
 
 interface BreakdownScores {
   design_score?: number | null;
@@ -37,22 +36,19 @@ export const ReviewBreakdownGrid: React.FC<ReviewBreakdownGridProps> = ({ scores
   return (
     <div className="mt-3 pt-3 border-t border-slate-100">
       <div className="grid grid-cols-2 gap-x-4 gap-y-4">
-        {categories.map((cat) => {
-          const tier = getScoreTier(cat.value || 0);
-          return (
-            <div key={cat.label} className="flex flex-col">
-              <span className="text-[11px] font-medium tracking-wide text-slate-600 mb-1">
-                {cat.label}
+        {categories.map((cat) => (
+          <div key={cat.label} className="flex flex-col">
+            <span className="text-[11px] font-medium tracking-wide text-slate-600 mb-1">
+              {cat.label}
+            </span>
+            <div className="flex items-center gap-2">
+              <RatingBar value={cat.value || 0} mode="neutral" />
+              <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
+                {formatScore(cat.value)}
               </span>
-              <div className="flex items-center gap-2">
-                <RatingBar value={cat.value || 0} mode="banded" band={tier.tier} hideTrack />
-                <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
-                  {formatScore(cat.value)}
-                </span>
-              </div>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
     </div>
   );

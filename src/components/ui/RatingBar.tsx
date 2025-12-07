@@ -20,19 +20,17 @@ interface RatingBarProps {
   mode?: RatingBarMode;
   /** Required when mode === 'banded' */
   band?: RatingBand;
-  /** Hide the track background, only show fill */
-  hideTrack?: boolean;
   /** Extra classes for width/margins etc. */
   className?: string;
 }
 
-// Map band names to Global Colour System themes - use bgDark for bar fill (matches badge background)
-const bandToFill: Record<RatingBand, string> = {
-  outstanding: COURSE_RATING_THEMES.OUTSTANDING.bgDark,
-  excellent: COURSE_RATING_THEMES.EXCELLENT.bgDark,
-  veryGood: COURSE_RATING_THEMES.VERY_GOOD.bgDark,
-  good: COURSE_RATING_THEMES.GOOD.bgDark,
-  fair: COURSE_RATING_THEMES.FAIR.bgDark,
+// Map band names to Global Colour System themes
+const bandToAccent: Record<RatingBand, string> = {
+  outstanding: COURSE_RATING_THEMES.OUTSTANDING.accent,
+  excellent: COURSE_RATING_THEMES.EXCELLENT.accent,
+  veryGood: COURSE_RATING_THEMES.VERY_GOOD.accent,
+  good: COURSE_RATING_THEMES.GOOD.accent,
+  fair: COURSE_RATING_THEMES.FAIR.accent,
 };
 
 export function RatingBar({
@@ -40,14 +38,13 @@ export function RatingBar({
   max = 10,
   mode = 'neutral',
   band = 'veryGood',
-  hideTrack = false,
   className,
 }: RatingBarProps) {
   const pct = Math.max(0, Math.min(100, (value / max) * 100));
   const fillColor =
     mode === 'neutral'
       ? 'var(--rating-bar-fill-neutral)'
-      : bandToFill[band];
+      : bandToAccent[band];
 
   return (
     <div
@@ -57,7 +54,7 @@ export function RatingBar({
       )}
       style={{
         height: 'var(--rating-bar-height-sm)',
-        backgroundColor: hideTrack ? 'transparent' : 'var(--rating-bar-track)',
+        backgroundColor: 'var(--rating-bar-track)',
         borderRadius: 'var(--rating-bar-radius)',
       }}
     >

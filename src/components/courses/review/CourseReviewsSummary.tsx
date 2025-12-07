@@ -159,7 +159,6 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                       max={100}
                       mode="banded"
                       band={item.tier.tier}
-                      hideTrack
                     />
                   </div>
 
@@ -185,7 +184,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   Design
                 </span>
                 <div className="flex items-center gap-2">
-                  <RatingBar value={categoryAverages.design} mode="banded" band={getScoreTier(categoryAverages.design).tier} hideTrack />
+                  <RatingBar value={categoryAverages.design} mode="neutral" />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
                     {formatScore(categoryAverages.design)}
                   </span>
@@ -200,7 +199,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   Condition
                 </span>
                 <div className="flex items-center gap-2">
-                  <RatingBar value={categoryAverages.condition} mode="banded" band={getScoreTier(categoryAverages.condition).tier} hideTrack />
+                  <RatingBar value={categoryAverages.condition} mode="neutral" />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
                     {formatScore(categoryAverages.condition)}
                   </span>
@@ -215,7 +214,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   Clubhouse
                 </span>
                 <div className="flex items-center gap-2">
-                  <RatingBar value={categoryAverages.clubhouse} mode="banded" band={getScoreTier(categoryAverages.clubhouse).tier} hideTrack />
+                  <RatingBar value={categoryAverages.clubhouse} mode="neutral" />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
                     {formatScore(categoryAverages.clubhouse)}
                   </span>
@@ -230,7 +229,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                   Facilities
                 </span>
                 <div className="flex items-center gap-2">
-                  <RatingBar value={categoryAverages.facilities} mode="banded" band={getScoreTier(categoryAverages.facilities).tier} hideTrack />
+                  <RatingBar value={categoryAverages.facilities} mode="neutral" />
                   <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
                     {formatScore(categoryAverages.facilities)}
                   </span>
