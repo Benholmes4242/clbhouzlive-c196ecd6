@@ -91,7 +91,7 @@ function SummaryBar({
             <div className="text-lg md:text-xl font-semibold">{sentimentLabel}</div>
           </div>
           <div className="text-sm text-muted-foreground">
-            Based on {toLocale(totalReviews)} reviews
+            {toLocale(totalReviews)} {totalReviews === 1 ? 'rating' : 'ratings'}
           </div>
         </div>
       </CardContent>
