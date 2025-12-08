@@ -259,7 +259,7 @@ const HeroProfileHeader = ({
 
   // Get current content based on active section
   const getCurrentContent = () => {
-    const containerClasses = activeSection === 'activity' ? 'w-full' : 'md:max-w-[1150px] md:mx-auto';
+    // All tabs use standard container now - Activity breaks out via negative margins internally
     
     const content = (() => {
       switch (activeSection) {
@@ -312,21 +312,15 @@ const HeroProfileHeader = ({
       }
     })();
 
-    return <div className={containerClasses}>{content}</div>;
+    return content;
   };
 
   // Get transition classes
   const getContentTransitionClass = (isOutgoing: boolean = false) => {
     if (transitionState === 'idle') return '';
     
-    const baseClasses = activeSection === 'activity' ? 'px-0 md:px-0 pt-0 pb-8' : 'px-4 md:px-0';
-    const sectionClasses = `
-      ${activeSection === 'courses' ? 'pt-0 pb-8' : ''}
-      ${activeSection === 'top100' ? 'pt-0 pb-8' : ''}
-      ${activeSection === 'achievements' || activeSection === 'stats' ? 'pt-0 py-8' : ''}
-      ${isMobile && activeSection === 'activity' ? 'pb-4' : ''}
-      ${isMobile && activeSection !== 'activity' && activeSection !== 'courses' && activeSection !== 'top100' ? 'py-4' : ''}
-    `;
+    const baseClasses = 'px-4 sm:px-6 lg:px-8 pb-6';
+    const sectionClasses = '';
     
     if (isOutgoing) {
       return `${baseClasses} ${sectionClasses} ${transitionDirection === 'right' 
@@ -490,15 +484,8 @@ const HeroProfileHeader = ({
             </div>
           </>
         ) : (
-          <div className={`
-            ${activeSection === 'activity' ? 'px-0 md:px-0 pt-0 pb-8' : 'px-0 md:px-4'}
-            ${activeSection === 'courses' ? 'pt-0 pb-8' : ''}
-            ${activeSection === 'top100' ? 'pt-0 pb-8' : ''}
-            ${activeSection === 'achievements' || activeSection === 'stats' ? 'pt-0 py-8' : ''}
-            ${isMobile && activeSection === 'activity' ? 'pb-4' : ''}
-            ${isMobile && activeSection !== 'activity' && activeSection !== 'courses' && activeSection !== 'top100' ? 'py-4' : ''}
-          `}>
-            <div className={activeSection === 'activity' ? 'w-full' : 'md:max-w-[1150px] md:mx-auto'}>
+          <div className="px-4 sm:px-6 lg:px-8 pb-6">
+            <div className="md:max-w-[1150px] md:mx-auto">
               <div role="tabpanel" id={`tabpanel-${activeSection}`}>
                 {getCurrentContent()}
               </div>

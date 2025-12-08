@@ -161,13 +161,15 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
           <p className="text-muted-foreground">No posts found for this filter</p>
         </div>
       ) : (
-        /* Premium Activity Media Grid */
-        <ActivityMediaGrid
-          posts={postsWithMedia}
-          isLoading={loading}
-          onPostPress={handlePostPress}
-          viewMode="compact"
-        />
+        /* Premium Activity Media Grid - full-bleed via negative margins */
+        <div className="-mx-4 sm:-mx-6 lg:-mx-8">
+          <ActivityMediaGrid
+            posts={postsWithMedia}
+            isLoading={loading}
+            onPostPress={handlePostPress}
+            viewMode="compact"
+          />
+        </div>
       )}
 
       {/* Filter Sheet */}
