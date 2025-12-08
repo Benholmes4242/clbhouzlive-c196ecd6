@@ -110,7 +110,7 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({
 
       {/* Multi-media indicator - top-right */}
       {item.additionalMediaCount && item.additionalMediaCount > 0 && (
-        <div className="absolute top-2 right-2 z-20 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-black/55 text-white text-[10px] font-medium">
+        <div className="absolute top-2 right-2 z-20 flex items-center gap-0.5 px-1.5 py-0.5 rounded-sq-pill bg-black/55 text-white text-[10px] font-medium">
           <Images className="h-2.5 w-2.5" />
           <span>+{item.additionalMediaCount}</span>
         </div>
@@ -118,7 +118,7 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({
 
       {/* Milestone indicator - top-left */}
       {item.isMilestone && (
-        <div className="absolute top-2 left-2 z-20 flex items-center justify-center h-5 w-5 rounded-full bg-black/50">
+        <div className="absolute top-2 left-2 z-20 flex items-center justify-center h-5 w-5 rounded-sq-pill bg-black/50">
           <Trophy className="h-2.5 w-2.5 text-amber-400" />
         </div>
       )}

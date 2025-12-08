@@ -30,7 +30,7 @@ const OverlayLabels: React.FC<OverlayLabelsProps> = ({
       {courseName && (
         <div className="pointer-events-none absolute inset-x-2 bottom-2 flex items-center">
           <span className={cn(
-            "truncate rounded-full bg-black/45 backdrop-blur-sm",
+            "truncate rounded-sq-pill bg-black/45 backdrop-blur-sm",
             "px-2.5 py-1 text-[11px] font-medium text-white/95",
             "max-w-[85%]"
           )}>
@@ -43,7 +43,7 @@ const OverlayLabels: React.FC<OverlayLabelsProps> = ({
       {isVideo && !isHovered && (
         <div className="pointer-events-none absolute bottom-2 right-2 flex items-center">
           <div className={cn(
-            "flex h-7 w-7 items-center justify-center rounded-full",
+            "flex h-7 w-7 items-center justify-center rounded-sq-pill",
             "bg-black/50 backdrop-blur-sm"
           )}>
             <Play className="h-3.5 w-3.5 fill-white text-white ml-0.5" />
@@ -55,7 +55,7 @@ const OverlayLabels: React.FC<OverlayLabelsProps> = ({
       {additionalMediaCount > 0 && (
         <div className="pointer-events-none absolute top-2 right-2">
           <div className={cn(
-            "flex items-center gap-1 rounded-full",
+            "flex items-center gap-1 rounded-sq-pill",
             "bg-black/50 backdrop-blur-sm",
             "px-2 py-0.5 text-[10px] font-semibold text-white"
           )}>
@@ -69,7 +69,7 @@ const OverlayLabels: React.FC<OverlayLabelsProps> = ({
       {isMilestone && (
         <div className="pointer-events-none absolute left-2 top-2">
           <div className={cn(
-            "flex h-6 w-6 items-center justify-center rounded-full",
+            "flex h-6 w-6 items-center justify-center rounded-sq-pill",
             "bg-black/45 backdrop-blur-sm"
           )}>
             <Trophy className="h-3 w-3 text-amber-400" />

@@ -115,7 +115,7 @@ const HeroPostTile: React.FC<HeroPostTileProps> = ({
       {/* TOP-LEFT: Course tag (only on hero cards) */}
       {showCourseTag && !item.isMilestone && (
         <div className="absolute left-3 top-3 z-20 max-w-[70%]">
-          <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-black/65 text-xs font-medium text-white shadow-sm truncate">
+          <span className="inline-flex items-center px-2.5 py-1 rounded-sq-pill bg-black/65 text-xs font-medium text-white shadow-sm truncate">
             {item.courseName}
           </span>
         </div>
@@ -123,7 +123,7 @@ const HeroPostTile: React.FC<HeroPostTileProps> = ({
 
       {/* TOP-RIGHT: Multi-media indicator */}
       {item.additionalMediaCount && item.additionalMediaCount > 0 && (
-        <div className="absolute top-3 right-3 z-20 flex items-center gap-1 px-2 py-1 rounded-full bg-black/55 text-white text-xs font-medium">
+        <div className="absolute top-3 right-3 z-20 flex items-center gap-1 px-2 py-1 rounded-sq-pill bg-black/55 text-white text-xs font-medium">
           <Images className="h-3 w-3" />
           <span>+{item.additionalMediaCount}</span>
         </div>
@@ -131,7 +131,7 @@ const HeroPostTile: React.FC<HeroPostTileProps> = ({
 
       {/* TOP-LEFT: Milestone indicator (takes precedence over course tag position) */}
       {item.isMilestone && (
-        <div className="absolute top-3 left-3 z-20 flex items-center justify-center h-6 w-6 rounded-full bg-black/50">
+        <div className="absolute top-3 left-3 z-20 flex items-center justify-center h-6 w-6 rounded-sq-pill bg-black/50">
           <Trophy className="h-3 w-3 text-amber-400" />
         </div>
       )}
