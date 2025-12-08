@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronLeft, Trophy } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
@@ -13,6 +13,7 @@ import { AchievementBadgeCard, AchievementTier } from './AchievementBadgeCard';
 import NudgeBanner from './NudgeBanner';
 import { getNextBadgeNudge } from '@/lib/achievements/nextBadgeNudge';
 import { DEBUG_UNLOCK_ALL_ACHIEVEMENTS, DEBUG_ACHIEVEMENTS_USER_EMAIL } from '@/utils/featureFlags';
+import { cn } from '@/lib/utils';
 
 interface MilestonesAndAchievementsModalProps {
   open: boolean;
@@ -31,6 +32,30 @@ function getListTier(id: string): AchievementTier {
   if (id === 'list_usa') return 'USA';
   if (id === 'list_worldwide') return 'WORLD';
   return 'WORLD';
+}
+
+// Tier-based gradient styling
+function getClubGradientClass(tierName?: string) {
+  switch (tierName) {
+    case 'Rookie Club':
+      return 'from-orange-50 via-rose-50 to-slate-50';
+    case 'Fairway Club':
+      return 'from-lime-50 via-emerald-50 to-slate-50';
+    case 'Founders Club':
+      return 'from-emerald-100 via-emerald-50 to-slate-50';
+    case 'Heritage Club':
+      return 'from-amber-50 via-amber-100 to-slate-50';
+    case 'Century Club':
+      return 'from-slate-100 via-slate-50 to-slate-50';
+    case 'Elite Club':
+      return 'from-indigo-50 via-violet-50 to-slate-50';
+    case 'Legendary Club':
+      return 'from-fuchsia-50 via-violet-50 to-slate-50';
+    case 'Grand Slam Club':
+      return 'from-amber-100 via-amber-50 to-slate-50';
+    default:
+      return 'from-slate-50 via-slate-50 to-slate-50';
+  }
 }
 
 /**
@@ -84,7 +109,6 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
     ? viewerId === ownerId
     : true; // fallback to "own" if we can't determine
 
-  const currentLevelLabel = currentClub.tierName || 'Starter';
   const coursesForNextLevel = nextClub?.threshold ?? null;
 
   // Dynamic copy with smart apostrophe
@@ -92,29 +116,39 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
     ? "Your Clubs & Achievements"
     : `${firstName}'s Clubs & Achievements`;
 
-  const heroLabel = modalTitle;
+  // 1) Hero label (small caps)
+  const heroLabel = isOwnProfile
+    ? 'Your clubs & achievements'
+    : `${firstName}'s clubs & achievements`;
 
-  const heroHeadline = currentLevelLabel;
+  // 2) Main headline (club name)
+  const heroHeadline = currentClub?.tierName || 'Rookie Club';
 
+  // 3) Progress line
   const progressLine = hasCompletedAll
     ? (isOwnProfile
-        ? `You've unlocked all ${totalMilestones} milestones`
-        : `${firstName} has unlocked all ${totalMilestones} milestones`)
+        ? `All ${totalMilestones} milestone clubs unlocked`
+        : `${firstName} has unlocked all ${totalMilestones} milestone clubs`)
     : (isOwnProfile
-        ? `You've unlocked ${unlockedMilestoneCount} of ${totalMilestones} milestones`
-        : `${firstName} has unlocked ${unlockedMilestoneCount} of ${totalMilestones} milestones`);
+        ? `${unlockedMilestoneCount} of ${totalMilestones} milestone clubs unlocked`
+        : `${firstName} has unlocked ${unlockedMilestoneCount} of ${totalMilestones} milestone clubs`);
 
+  // 4) Status line (trophy line)
   const statusLine = hasCompletedAll
     ? (isOwnProfile
-        ? `Grand Slam Club complete – 400 courses played`
-        : `Grand Slam Club complete – ${firstName} has played 400 courses`)
+        ? `Grand Slam complete – ${totalTop100Played} courses played`
+        : `Grand Slam complete – ${firstName} has played ${totalTop100Played} courses`)
     : coursesForNextLevel != null
       ? (isOwnProfile
-          ? `Next up: ${nextClub?.tierName} at ${coursesForNextLevel} courses`
-          : `Next up for ${firstName}: ${nextClub?.tierName} at ${coursesForNextLevel} courses`)
+          ? `Next club: ${nextClub?.tierName} – ${coursesForNextLevel - totalTop100Played} more to go`
+          : `Next for ${firstName}: ${nextClub?.tierName} – ${coursesForNextLevel - totalTop100Played} more to go`)
       : (isOwnProfile
-          ? "Keep playing Top 100 courses to unlock the next milestone"
-          : `${firstName} is closing in on the next milestone`);
+          ? 'Keep logging Top 100 rounds to unlock your next club'
+          : `${firstName} is closing in on the next club`);
+
+  // 5) Emblem values
+  const emblemValue = totalTop100Played;
+  const emblemCaption = emblemValue === 1 ? 'course' : 'courses';
 
   // Calculate nudge
   const nudge = progressData?.lists ? getNextBadgeNudge({
@@ -174,52 +208,63 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
                 </div>
               )}
 
-              {/* Hero "Progress" card */}
+              {/* Hero banner: Clubs & achievements */}
               <section className="px-4 md:px-8 mt-5 mb-6">
                 <div
-                  className="
-                    rounded-sq-lg
-                    bg-white/90
-                    shadow-[0_18px_45px_rgba(15,23,42,0.18)]
-                    px-4 py-4 md:px-6 md:py-5
-                    flex items-center justify-between gap-4
-                  "
+                  className={cn(
+                    'rounded-sq-lg p-5 md:p-6 shadow-lg bg-gradient-to-r',
+                    'flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 md:gap-6',
+                    getClubGradientClass(currentClub?.tierName)
+                  )}
                 >
-                  {/* Left side content */}
+                  {/* LEFT: Text block */}
                   <div className="flex-1 min-w-0">
                     {/* Small label */}
-                    <p className="text-[11px] text-muted-foreground uppercase tracking-wide mb-1">
+                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 mb-1">
                       {heroLabel}
                     </p>
-                    
-                    {/* Main headline */}
-                    <p className="text-lg font-semibold text-foreground">
+
+                    {/* Main headline (club name) */}
+                    <h2 className="text-xl md:text-2xl font-semibold text-slate-900 mb-1 truncate">
                       {heroHeadline}
-                    </p>
-                    
+                    </h2>
+
                     {/* Progress line */}
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-sm text-slate-600 mb-1">
                       {progressLine}
                     </p>
-                    
-                    {/* Status line with trophy icon */}
-                    <div className="flex items-center gap-1.5 mt-2 text-sm font-medium text-primary">
-                      <Trophy className="h-4 w-4" />
+
+                    {/* Trophy / status line */}
+                    <p className="flex items-center gap-1.5 text-sm font-medium text-amber-600">
+                      <span aria-hidden="true">🏆</span>
                       <span>{statusLine}</span>
-                    </div>
+                    </p>
                   </div>
 
-                  {/* Right side pill - uses handicap pill token styling */}
-                  <span className="flex-shrink-0 text-xs px-3 py-1.5 rounded-sq-pill bg-muted text-muted-foreground font-medium">
-                    {totalTop100Played} courses
-                  </span>
+                  {/* RIGHT: Emblem */}
+                  <div className="flex-shrink-0 self-center sm:self-auto">
+                    <div className="relative h-16 w-16 md:h-20 md:w-20 rounded-full flex items-center justify-center shadow-md bg-slate-900 text-slate-50">
+                      {/* Soft inner glow */}
+                      <div className="absolute inset-[3px] rounded-full bg-slate-800/80" />
+
+                      {/* Number + caption */}
+                      <div className="relative flex flex-col items-center justify-center leading-tight">
+                        <span className="text-lg md:text-2xl font-semibold">
+                          {emblemValue}
+                        </span>
+                        <span className="text-[10px] md:text-xs uppercase tracking-wide opacity-80">
+                          {emblemCaption}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </section>
 
               {/* Milestone badges grid */}
               <section className="px-4 md:px-8 pb-6">
                 <h2 className="text-sm font-semibold text-foreground mb-4">
-                  Top 100 milestones
+                  Top 100 milestone clubs
                 </h2>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
