@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Trophy, Globe, ArrowRight } from 'lucide-react';
+import { Trophy, ArrowRight } from 'lucide-react';
 import { useUserCourseSummary } from '@/hooks/useUserCourseSummary';
-import { TopTenEditor } from './courses/TopTenEditor';
-import { CoursesPlayedGrid } from './courses/CoursesPlayedGrid';
-import { FriendComparisonSection } from './courses/FriendComparisonSection';
-import { ProfileRecentAchievementsStrip } from './ProfileRecentAchievementsStrip';
-import { ProfileAchievementsPanel } from './ProfileAchievementsPanel';
-import { SeasonStatusCard } from './SeasonStatusCard';
+import { CourseSnapshotCard } from './courses/CourseSnapshotCard';
+import { SeasonOnCourseCard } from './courses/SeasonOnCourseCard';
+import { FavouriteCoursesSection } from './courses/FavouriteCoursesSection';
+import { SharedCoursesSection } from './courses/SharedCoursesSection';
+import { AllCoursesPlayedSection } from './courses/AllCoursesPlayedSection';
+import { CourseMilestonesStrip } from './courses/CourseMilestonesStrip';
+import { AddCourseModal } from './courses/AddCourseModal';
 import { Button } from '@/components/ui/button';
-import { useAchievementSharing } from '@/hooks/useAchievementSharing';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -23,9 +23,9 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   isOwnProfile,
 }) => {
   const navigate = useNavigate();
-  const { prepareAchievementShare } = useAchievementSharing();
-  const { totalCoursesPlayed, countriesPlayed, top100Progress, isLoading } =
-    useUserCourseSummary(userId);
+  const [showAddModal, setShowAddModal] = useState(false);
+  
+  const { totalCoursesPlayed, countriesPlayed, isLoading } = useUserCourseSummary(userId);
 
   // Fetch username for navigation
   const { data: profile } = useQuery<{ username: string } | null>({
@@ -41,6 +41,10 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
     enabled: !!userId,
   });
 
+  // Mock data for now - would come from real queries
+  const uniqueClubsPlayed = Math.max(1, Math.floor(totalCoursesPlayed * 0.7));
+  const newCoursesThisYear = Math.min(totalCoursesPlayed, 6);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -50,61 +54,44 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   }
 
   return (
-    <div className="space-y-8 pb-8">
-      {/* Golf Journey Summary */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Golf Journey</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Courses Played */}
-          <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <MapPin className="h-5 w-5 text-primary" />
-              </div>
-              <div className="text-2xl font-bold">{totalCoursesPlayed}</div>
-            </div>
-            <div className="text-sm text-muted-foreground">Courses Played</div>
-          </div>
+    <div className="space-y-6 pb-8 px-4">
+      {/* 1. Your Course Snapshot */}
+      <CourseSnapshotCard
+        totalCoursesPlayed={totalCoursesPlayed}
+        uniqueClubsPlayed={uniqueClubsPlayed}
+        newCoursesThisYear={newCoursesThisYear}
+        isOwnProfile={isOwnProfile}
+        onAddCourse={() => setShowAddModal(true)}
+      />
 
-          {/* Countries Played */}
-          <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Globe className="h-5 w-5 text-primary" />
-              </div>
-              <div className="text-2xl font-bold">{countriesPlayed}</div>
-            </div>
-            <div className="text-sm text-muted-foreground">Countries Played</div>
-          </div>
+      {/* 2. This Season on Course */}
+      {isOwnProfile && (
+        <SeasonOnCourseCard
+          userId={userId}
+          isOwnProfile={isOwnProfile}
+          roundsThisSeason={Math.min(totalCoursesPlayed, 12)}
+          newCoursesThisSeason={newCoursesThisYear}
+        />
+      )}
 
-          {/* Top 100 Progress Cards */}
-          {top100Progress.slice(0, 2).map((progress) => (
-            <div
-              key={progress.listSlug}
-              onClick={() => navigate(`/top100/${progress.listSlug}`)}
-              className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 cursor-pointer hover:bg-card/70 transition-colors"
-            >
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-yellow-500/10 rounded-lg">
-                  <Trophy className="h-5 w-5 text-yellow-500" />
-                </div>
-                <div className="text-2xl font-bold">
-                  {progress.played}/{progress.total}
-                </div>
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {progress.listName}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* 3. Favourite Courses (Top 10) */}
+      <FavouriteCoursesSection userId={userId} isOwnProfile={isOwnProfile} />
 
-      {/* Recent Achievements Strip */}
-      <ProfileRecentAchievementsStrip userId={userId} isOwnProfile={isOwnProfile} />
+      {/* 4. Courses you share with friends */}
+      {isOwnProfile && (
+        <SharedCoursesSection userId={userId} isOwnProfile={isOwnProfile} />
+      )}
 
-      {/* Season Status - Own Profile Only */}
-      {isOwnProfile && <SeasonStatusCard userId={userId} />}
+      {/* 5. All Courses Played */}
+      <AllCoursesPlayedSection userId={userId} isOwnProfile={isOwnProfile} />
+
+      {/* 6. Course Milestones */}
+      <CourseMilestonesStrip
+        totalCoursesPlayed={totalCoursesPlayed}
+        countriesPlayed={countriesPlayed}
+        newCoursesThisYear={newCoursesThisYear}
+        isOwnProfile={isOwnProfile}
+      />
 
       {/* Trophy Cabinet Link */}
       {profile && (
@@ -119,33 +106,14 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
         </Button>
       )}
 
-      {/* Full Achievements Panel */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">All Achievements</h3>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(isOwnProfile ? '/achievements' : `/achievements/${profile?.username}`)}
-            className="text-sm"
-          >
-            View Full Achievements Hub
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
-        </div>
-        <ProfileAchievementsPanel userId={userId} isOwnProfile={isOwnProfile} onShareAchievement={prepareAchievementShare} />
-      </div>
-
-      {/* Friend Comparison - only for own profile */}
-      {isOwnProfile && (
-        <FriendComparisonSection userId={userId} />
+      {/* Add Course Modal */}
+      {showAddModal && (
+        <AddCourseModal
+          userId={userId}
+          onClose={() => setShowAddModal(false)}
+          existingCourseIds={[]}
+        />
       )}
-
-      {/* Top 10 Editor */}
-      <TopTenEditor userId={userId} isOwnProfile={isOwnProfile} />
-
-      {/* Courses Played Grid */}
-      <CoursesPlayedGrid userId={userId} />
     </div>
   );
 };
