@@ -11,8 +11,7 @@ import { getDirectImageUrl } from '@/utils/r2ImageUtils';
  * - overflow: hidden
  * - object-fit: cover for images
  * 
- * Normal state (no achievement): 2px grey ring (#D1D5DB)
- * Achievement state: 2px colored ring directly on avatar (no grey ring)
+ * All avatars use 2.5px ring thickness (grey for normal, colored for achievement)
  */
 
 // Size variants mapping
@@ -189,7 +188,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
           width: `${pixelSize}px`,
           aspectRatio: '1 / 1.05',
           borderRadius: '34%',
-          border: '2px solid #D1D5DB',
+          border: '2.5px solid #D1D5DB',
         }}
       >
         {avatarContent}
