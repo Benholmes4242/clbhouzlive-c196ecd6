@@ -132,7 +132,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   return (
     <>
       {/* Filter button row */}
-      <div className="px-4 mt-0 mb-2">
+      <div className="mb-2">
         <div className="flex justify-end">
           <button 
             onClick={() => setFiltersOpen(true)}
