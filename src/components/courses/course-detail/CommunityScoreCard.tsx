@@ -181,30 +181,28 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         </div>
       )}
 
-      {/* Category rows - two-line layout */}
+      {/* Category grid - 2x2 layout matching Reviews tab */}
       {categories.length > 0 && (
-        <div className="mt-6 pt-5 border-t border-slate-100 space-y-5">
-          {categories.map((cat) => {
-            const score = cat.score || 0;
+        <div className="mt-6 pt-5 border-t border-slate-100">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+            {categories.map((cat) => {
+              const score = cat.score || 0;
 
-            return (
-              <div key={cat.id} className="space-y-1.5">
-                {/* Row 1: Labels */}
-                <div className="flex items-center justify-between">
-                  <span className="text-base font-medium text-slate-900">
+              return (
+                <div key={cat.id} className="flex flex-col">
+                  <span className="text-[11px] font-medium tracking-wide text-slate-600 mb-1">
                     {cat.label}
                   </span>
-
-                  <span className="text-base font-semibold text-slate-900">
-                    {formatScore(score)}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <RatingBar value={score} mode="neutral" />
+                    <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
+                      {formatScore(score)}
+                    </span>
+                  </div>
                 </div>
-
-                {/* Row 2: Full-width bar - dark slate using RatingBar */}
-                <RatingBar value={score} mode="neutral" />
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       )}
 
