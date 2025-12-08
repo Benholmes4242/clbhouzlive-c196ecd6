@@ -1,10 +1,11 @@
 import React from 'react';
 import { Calendar } from 'lucide-react';
-import { BEN_HANDICAP_MOCK } from '@/lib/mockHandicapData';
+import { BEN_HANDICAP_MOCK, BEN_NEXT_ROUND_PREDICTION } from '@/lib/mockHandicapData';
 import HandicapHeroStrip from './HandicapHeroStrip';
 import HandicapStatGrid from './HandicapStatGrid';
 import { HandicapJourneyCard } from './HandicapJourneyCard';
 import { HandicapCourseImpactCard } from './HandicapCourseImpactCard';
+import { HandicapNextRoundPredictionCard } from './HandicapNextRoundPredictionCard';
 import FriendsHandicapCard from './FriendsHandicapCard';
 import HandicapMilestonesCard from './HandicapMilestonesCard';
 import RecentRoundsFeed from './RecentRoundsFeed';
@@ -79,10 +80,13 @@ const HandicapDemoExperience: React.FC = () => {
       {/* D. Course Impact */}
       <HandicapCourseImpactCard rounds={data.rounds} />
 
-      {/* E. Friends & Rivals */}
+      {/* E. Next Round Prediction */}
+      <HandicapNextRoundPredictionCard prediction={BEN_NEXT_ROUND_PREDICTION} />
+
+      {/* F. Friends & Rivals */}
       <FriendsHandicapCard friends={data.friends} />
 
-      {/* F. Milestones */}
+      {/* G. Milestones */}
       <HandicapMilestonesCard milestones={data.milestones} />
 
       {/* G. Recent Rounds */}

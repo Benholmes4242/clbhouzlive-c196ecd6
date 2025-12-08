@@ -34,6 +34,15 @@ export type HandicapRoundData = {
   differential: number; // negative = index dropped, positive = index increased
 };
 
+export type NextRoundPrediction = {
+  upcomingCourse: string;
+  upcomingDate: string; // ISO string
+  currentIndex: number;
+  threeRoundAverage: number;
+  projectedIndexIfAverage: number;
+  projectedIndexIfBest: number;
+};
+
 export interface HandicapData {
   currentIndex: number;
   bestIndex: number;
@@ -111,4 +120,14 @@ export const BEN_HANDICAP_MOCK: HandicapData = {
     { id: 'r14', date: '2024-09-01', courseName: 'Walton Heath Old', differential: -0.2 },
     { id: 'r15', date: '2024-07-22', courseName: 'Sunningdale Old', differential: -0.4 },
   ],
+};
+
+// Next round prediction for demo
+export const BEN_NEXT_ROUND_PREDICTION: NextRoundPrediction = {
+  upcomingCourse: 'Sunningdale Old Course',
+  upcomingDate: '2026-02-15',
+  currentIndex: 4.0,
+  threeRoundAverage: 3.8,
+  projectedIndexIfAverage: 3.8,
+  projectedIndexIfBest: 3.7,
 };
