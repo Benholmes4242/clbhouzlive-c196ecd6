@@ -148,7 +148,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
     <div className="w-full max-w-full space-y-5 pb-6">
 
       {/* Progress Hero Strip */}
-      <div className="mt-4">
+      <div>
         <Top100ProgressHero
           displayName={displayName}
           avatarUrl={avatarUrl}

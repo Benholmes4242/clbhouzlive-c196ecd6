@@ -5,7 +5,7 @@ import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
-import { useTabSlideTransition, TransitionDirection } from '@/hooks/useTabSlideTransition';
+import { useTabSlideTransition, TransitionDirection, PROFILE_TAB_TRANSITION_MS } from '@/hooks/useTabSlideTransition';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useProfileAnalytics } from '@/hooks/useProfileAnalytics';
 import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
@@ -175,6 +175,7 @@ const HeroProfileHeader = ({
     startTransition(direction, () => {
       onSectionChange?.(newTab);
       
+      // Wait for animation to complete before restoring scroll
       setTimeout(() => {
         window.removeEventListener('scroll', preventScroll);
         document.body.style.overscrollBehavior = '';
@@ -182,7 +183,7 @@ const HeroProfileHeader = ({
         if (Math.abs(window.scrollY - currentScrollPosition) > 5) {
           window.scrollTo({ top: currentScrollPosition, behavior: 'instant' });
         }
-      }, 50);
+      }, PROFILE_TAB_TRANSITION_MS + 50);
     });
   }, [activeSection, transitionState, startTransition, onSectionChange, tabs]);
 
@@ -484,7 +485,7 @@ const HeroProfileHeader = ({
             </div>
           </>
         ) : (
-          <div className="px-4 sm:px-6 lg:px-8 pb-6">
+          <div className="pt-6 px-4 sm:px-6 lg:px-8 pb-6">
             <div className="md:max-w-[1150px] md:mx-auto">
               <div role="tabpanel" id={`tabpanel-${activeSection}`}>
                 {getCurrentContent()}
