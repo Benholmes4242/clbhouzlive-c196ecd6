@@ -85,15 +85,18 @@ export interface MilestoneTheme {
   bgDark: string;    // Card gradient end
 }
 
+// Color remap: each club uses a different tier's visual palette
+// 400 → old 50 (Heritage), 300 → old 5 (Rookie), 200 → old 10 (Fairway), 100 → old 20 (Founders)
+// 50 → old 300 (Legendary), 20 → old 200 (Elite), 10 → old 400 (Grand Slam), 5 → old 100 (Century)
 export const MILESTONE_THEMES: Record<MilestoneTier, MilestoneTheme> = {
-  5:   { id: 'rookie',     name: 'Rookie Club',     tier: 'ROOKIE',     ...asGradient(PERFORMANCE_STOPS.S2, PERFORMANCE_STOPS.S1), accent: '#C9B27A' },
-  10:  { id: 'fairway',    name: 'Fairway Club',    tier: 'FAIRWAY',    ...asGradient(PERFORMANCE_STOPS.S3, PERFORMANCE_STOPS.S4), accent: '#7CC66B' },
-  20:  { id: 'founders',   name: 'Founders Club',   tier: 'FOUNDERS',   ...asGradient(PERFORMANCE_STOPS.S4, PERFORMANCE_STOPS.S5), accent: '#2F7D32' },
-  50:  { id: 'heritage',   name: 'Heritage Club',   tier: 'HERITAGE',   ...asGradient(PERFORMANCE_STOPS.S2, '#E8D4A0'),             accent: '#D8A546' },
-  100: { id: 'century',    name: 'Century Club',    tier: 'CENTURY',    ...asGradient('#E4E4E9', '#D3D3D8'),                        accent: '#4A4A4A' },
-  200: { id: 'elite',      name: 'Elite Club',      tier: 'ELITE',      ...asGradient('#E0D8FB', '#C5B6F5'),                        accent: '#6F5BD5' },
-  300: { id: 'legendary',  name: 'Legendary Club',  tier: 'LEGENDARY',  ...asGradient('#F3D7FF', '#E4B4F0'),                        accent: '#B153CE' },
-  400: { id: 'grandslam',  name: 'Grand Slam Club', tier: 'GRAND_SLAM', ...asGradient('#E0E3EB', '#C2C7D2'),                        accent: '#111111' },
+  5:   { id: 'rookie',     name: 'Rookie Club',     tier: 'ROOKIE',     ...asGradient('#E4E4E9', '#D3D3D8'),                        accent: '#4A4A4A' },   // was Century colors
+  10:  { id: 'fairway',    name: 'Fairway Club',    tier: 'FAIRWAY',    ...asGradient('#E0E3EB', '#C2C7D2'),                        accent: '#111111' },   // was Grand Slam colors
+  20:  { id: 'founders',   name: 'Founders Club',   tier: 'FOUNDERS',   ...asGradient('#E0D8FB', '#C5B6F5'),                        accent: '#6F5BD5' },   // was Elite colors
+  50:  { id: 'heritage',   name: 'Heritage Club',   tier: 'HERITAGE',   ...asGradient('#F3D7FF', '#E4B4F0'),                        accent: '#B153CE' },   // was Legendary colors
+  100: { id: 'century',    name: 'Century Club',    tier: 'CENTURY',    ...asGradient(PERFORMANCE_STOPS.S4, PERFORMANCE_STOPS.S5), accent: '#2F7D32' },   // was Founders colors
+  200: { id: 'elite',      name: 'Elite Club',      tier: 'ELITE',      ...asGradient(PERFORMANCE_STOPS.S3, PERFORMANCE_STOPS.S4), accent: '#7CC66B' },   // was Fairway colors
+  300: { id: 'legendary',  name: 'Legendary Club',  tier: 'LEGENDARY',  ...asGradient(PERFORMANCE_STOPS.S2, PERFORMANCE_STOPS.S1), accent: '#C9B27A' },   // was Rookie colors
+  400: { id: 'grandslam',  name: 'Grand Slam Club', tier: 'GRAND_SLAM', ...asGradient(PERFORMANCE_STOPS.S2, '#E8D4A0'),             accent: '#D8A546' },   // was Heritage colors
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
