@@ -375,14 +375,13 @@ const HeroProfileHeader = ({
         {/* META BLOCK - Glass panel with avatar + text */}
         <div
           ref={profileCardRef}
-          className="relative px-2 md:px-4"
+          className="relative"
           style={{ marginTop: '-40px' }}
         >
-          <div className="mx-auto w-full px-4">
-            {/* Glass panel */}
-            <div
-              className="relative flex items-center gap-4 md:gap-6 rounded-3xl bg-white/10 backdrop-blur-md shadow-[0_18px_45px_rgba(0,0,0,0.18)] px-4 md:px-6 py-4 md:py-5"
-            >
+          {/* Glass panel - full bleed */}
+          <div
+            className="relative flex items-center gap-4 md:gap-6 rounded-3xl bg-white/10 backdrop-blur-md shadow-[0_18px_45px_rgba(0,0,0,0.18)] px-4 md:px-6 py-4 md:py-5 mx-2"
+          >
               {/* AVATAR – Left column */}
               <div className="flex-shrink-0 z-20">
                 <ProfileAvatarRing
@@ -409,8 +408,7 @@ const HeroProfileHeader = ({
                 isPersonal={isPersonal}
                 isOwnProfile={isOwnProfile}
                 onCustomiseClick={isOwnProfile ? () => setEditDialogOpen(true) : undefined}
-              />
-            </div>
+            />
           </div>
         </div>
 
