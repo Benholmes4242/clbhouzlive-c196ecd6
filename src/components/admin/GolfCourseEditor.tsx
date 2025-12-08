@@ -326,13 +326,15 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       console.log('Global rank:', globalRank);
       
       
-      // Auto-determine continent based on country
+      // Auto-determine continent based on country/region
       let continent: "North America" | "South America" | "Europe" | "Asia" | "Africa" | "Oceania" | null = null;
-      if (selectedCountry === 'USA') {
+      if (selectedCountry === 'USA' || selectedCountry === 'Caribbean') {
         continent = 'North America';
+      } else if (selectedCountry === 'Central and South America') {
+        continent = 'South America';
       } else if (selectedCountry === 'Britain & Ireland' || selectedCountry === 'Continental Europe') {
         continent = 'Europe';
-      } else if (selectedCountry === 'Asia') {
+      } else if (selectedCountry === 'Asia' || selectedCountry === 'Middle East') {
         continent = 'Asia';
       } else if (selectedCountry === 'Africa') {
         continent = 'Africa';
