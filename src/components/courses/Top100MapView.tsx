@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/button';
 import { X, MapPin } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from '@/lib/utils';
+import { FilterPill } from '@/components/ui/FilterPill';
+import { RegionFilterPill } from '@/components/ui/RegionFilterPill';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v11';
@@ -515,30 +517,24 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           <span className="font-medium">Map filters</span>
         </div>
         <div className="px-4 pb-4 pt-2">
-          {/* Rated filter + reset */}
+          {/* Played status filter + reset */}
           <div className="mb-3 flex items-center justify-between gap-2">
             <div className="inline-flex items-center gap-1.5">
-              {(['all', 'rated', 'unrated'] as RatedFilter[]).map((opt) => (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => setRatedFilter(opt)}
-                  className={cn(
-                    'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
-                    'bg-white border border-border/70',
-                    'shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]',
-                    ratedFilter === opt
-                      ? 'text-foreground'
-                      : 'text-muted-foreground hover:text-foreground'
-                  )}
-                >
-                  {opt === 'all'
-                    ? 'All'
-                    : opt === 'rated'
-                    ? 'Played'
-                    : 'Not Played'}
-                </button>
-              ))}
+              <FilterPill
+                label="All"
+                active={ratedFilter === 'all'}
+                onClick={() => setRatedFilter('all')}
+              />
+              <FilterPill
+                label="Played"
+                active={ratedFilter === 'rated'}
+                onClick={() => setRatedFilter('rated')}
+              />
+              <FilterPill
+                label="Not Played"
+                active={ratedFilter === 'unrated'}
+                onClick={() => setRatedFilter('unrated')}
+              />
             </div>
 
             <button
@@ -550,40 +546,32 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             </button>
           </div>
 
-          {/* Region chips */}
+          {/* Region chips with regional colors */}
           <div className="flex items-center gap-2">
-            {(['global', 'gb-i', 'usa', 'europe'] as Top100MapScope[]).map(
-              (slug) => {
-                const label =
-                  slug === 'global'
-                    ? 'Global'
-                    : slug === 'gb-i'
-                    ? 'GB&I'
-                    : slug === 'usa'
-                    ? 'USA'
-                    : 'Europe';
-
-                const isActive = scope === slug;
-
-                return (
-                  <button
-                    key={slug}
-                    type="button"
-                    onClick={() => onScopeChange?.(slug)}
-                    className={cn(
-                      'flex-1 rounded-full px-3 py-2 text-xs font-semibold transition-colors',
-                      'bg-white border border-border/70',
-                      'shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]',
-                      isActive
-                        ? 'text-foreground'
-                        : 'text-muted-foreground hover:text-foreground'
-                    )}
-                  >
-                    {label}
-                  </button>
-                );
-              }
-            )}
+            <RegionFilterPill
+              label="Global"
+              scope="global"
+              active={scope === 'global'}
+              onClick={() => onScopeChange?.('global')}
+            />
+            <RegionFilterPill
+              label="GB&I"
+              scope="gb-i"
+              active={scope === 'gb-i'}
+              onClick={() => onScopeChange?.('gb-i')}
+            />
+            <RegionFilterPill
+              label="USA"
+              scope="usa"
+              active={scope === 'usa'}
+              onClick={() => onScopeChange?.('usa')}
+            />
+            <RegionFilterPill
+              label="Europe"
+              scope="europe"
+              active={scope === 'europe'}
+              onClick={() => onScopeChange?.('europe')}
+            />
           </div>
         </div>
       </div>
