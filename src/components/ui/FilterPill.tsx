@@ -31,10 +31,7 @@ export const FilterPill: React.FC<FilterPillProps> = ({
         className
       )}
     >
-      <span>{label}</span>
-      {active && (
-        <span className="ml-2 h-2 w-2 rounded-full bg-slate-900" />
-      )}
+      <span className="font-medium">{label}</span>
     </button>
   );
 };
