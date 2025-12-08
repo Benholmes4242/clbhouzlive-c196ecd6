@@ -39,13 +39,15 @@ const Top100MapModal: React.FC<Top100MapModalProps> = ({
               Back to courses
             </button>
 
-            {/* Title / subtitle block */}
-            <h1 className="text-xl font-semibold text-foreground mt-2">
-              Your Top 100 Journey
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Explore your journey through the Top 100
-            </p>
+            {/* Title / subtitle block - centered */}
+            <div className="text-center mt-2">
+              <h1 className="text-xl font-semibold text-foreground">
+                Your Top 100 Journey
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Explore your journey through the Top 100
+              </p>
+            </div>
           </header>
 
           {/* Map content - fills remaining space */}
