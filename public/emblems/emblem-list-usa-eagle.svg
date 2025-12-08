@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Stylized Eagle -->
+  <!-- Head -->
+  <path d="M50 25 Q55 20 60 22 Q65 25 62 32 Q60 38 55 40"/>
+  <!-- Beak -->
+  <path d="M55 40 Q58 42 60 45 Q58 46 55 44"/>
+  <!-- Eye -->
+  <circle cx="56" cy="30" r="2"/>
+  <!-- Body outline -->
+  <path d="M50 25 Q40 30 35 40 Q30 50 35 60 Q40 70 50 75 Q60 70 65 60 Q70 50 65 40 Q60 30 50 25"/>
+  <!-- Left wing spread -->
+  <path d="M35 40 Q25 35 15 38 Q10 40 8 45"/>
+  <path d="M30 45 Q20 42 12 48"/>
+  <path d="M28 52 Q18 50 10 55"/>
+  <!-- Right wing spread -->
+  <path d="M65 40 Q75 35 85 38 Q90 40 92 45"/>
+  <path d="M70 45 Q80 42 88 48"/>
+  <path d="M72 52 Q82 50 90 55"/>
+  <!-- Tail feathers -->
+  <path d="M42 72 L38 85"/>
+  <path d="M50 75 L50 88"/>
+  <path d="M58 72 L62 85"/>
+  <!-- Chest detail -->
+  <path d="M45 50 Q50 55 55 50"/>
+  <path d="M43 58 Q50 62 57 58"/>
+</svg>

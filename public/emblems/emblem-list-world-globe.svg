@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Globe with grid lines -->
+  <!-- Outer circle -->
+  <circle cx="50" cy="50" r="40"/>
+  <!-- Equator -->
+  <ellipse cx="50" cy="50" rx="40" ry="12"/>
+  <!-- Vertical meridian -->
+  <ellipse cx="50" cy="50" rx="12" ry="40"/>
+  <!-- Additional longitude lines -->
+  <ellipse cx="50" cy="50" rx="28" ry="40"/>
+  <ellipse cx="50" cy="50" rx="38" ry="40"/>
+  <!-- Latitude lines -->
+  <ellipse cx="50" cy="30" rx="35" ry="8"/>
+  <ellipse cx="50" cy="70" rx="35" ry="8"/>
+  <!-- Pole markers -->
+  <path d="M50 10 L50 15"/>
+  <path d="M50 85 L50 90"/>
+  <!-- Stand/base hint -->
+  <path d="M35 88 Q50 95 65 88"/>
+</svg>

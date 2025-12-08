@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Sprouting Laurel Branch -->
+  <path d="M70 85 Q60 60 55 45 Q52 35 55 25"/>
+  <path d="M55 65 Q45 60 40 55 Q35 52 38 45"/>
+  <path d="M57 55 Q48 52 43 48 Q38 45 40 38"/>
+  <path d="M58 45 Q52 42 48 38 Q44 35 46 30"/>
+  <path d="M56 35 Q53 32 50 28 Q48 25 50 22"/>
+  <!-- Small leaves -->
+  <path d="M55 65 Q62 58 68 55"/>
+  <path d="M57 55 Q65 50 70 48"/>
+  <path d="M58 45 Q66 42 72 40"/>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Heraldic Shield -->
+  <path d="M50 10 L80 20 L80 50 Q80 70 50 90 Q20 70 20 50 L20 20 Z"/>
+  <!-- Vertical split -->
+  <path d="M50 10 L50 90"/>
+  <!-- Horizontal band -->
+  <path d="M20 40 L80 40"/>
+  <!-- Small decorative elements -->
+  <circle cx="35" cy="55" r="6"/>
+  <circle cx="65" cy="55" r="6"/>
+  <path d="M42 70 L50 78 L58 70"/>
+</svg>

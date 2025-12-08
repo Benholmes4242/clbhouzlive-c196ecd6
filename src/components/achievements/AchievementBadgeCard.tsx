@@ -6,6 +6,7 @@ import {
   MILESTONE_THEMES,
   MilestoneTier,
 } from '@/lib/globalAchievementMilestoneSystem';
+import { getEmblemPath } from '@/lib/achievementEmblems';
 
 export type AchievementStatus = 'UNLOCKED' | 'LOCKED' | 'NEW';
 export type AchievementType = 'MILESTONE' | 'LIST' | 'SKILL' | 'SEASONAL';
@@ -107,6 +108,7 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   const palette = getTierPalette(tier, unlocked && !isGhost);
   const tierLabel = TIER_LABELS[tier] || tier;
   const clubName = CLUB_NAMES[tier] || title;
+  const emblemSrc = getEmblemPath(tier);
   
   // Determine if this is a milestone (numeric) or regional card
   const threshold = parseInt(tier, 10);
@@ -179,6 +181,19 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         opacity: isGhost ? 0.7 : (!unlocked ? 0.85 : 1),
       }}
     >
+      {/* Background emblem - engraved crest effect */}
+      {emblemSrc && (
+        <img
+          src={emblemSrc}
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none select-none absolute inset-y-0 right-0 h-full w-auto translate-x-4 scale-125 opacity-[0.08]"
+          style={{ 
+            filter: 'brightness(0)',
+          }}
+        />
+      )}
+
       {/* Ghost overlay */}
       {isGhost && (
         <div className="absolute inset-0 rounded-[inherit] bg-white/40 pointer-events-none" />
