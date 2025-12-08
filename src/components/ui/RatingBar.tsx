@@ -7,7 +7,7 @@ export type RatingBand =
   | 'excellent'
   | 'veryGood'
   | 'good'
-  | 'respectable';
+  | 'fair';
 
 export type RatingBarMode = 'neutral' | 'banded';
 
@@ -26,14 +26,14 @@ interface RatingBarProps {
 
 /**
  * Bar fill colors from CLBHOUZ_ACHIEVEMENT_PALETTE:
- * - Respectable → #C1CFA1 (pale green)
+ * - Fair → #C1CFA1 (pale green)
  * - Good → #88B67B (fairway green)
  * - Very Good → #5B9E55 (strong green)
  * - Excellent → #3F7F41 (deep championship green)
  * - Outstanding → #D2B461 (warm trophy gold)
  */
 const bandToFillColor: Record<RatingBand, string> = {
-  respectable: CLBHOUZ_ACHIEVEMENT_PALETTE.RESPECTABLE,
+  fair: CLBHOUZ_ACHIEVEMENT_PALETTE.RESPECTABLE,
   good: CLBHOUZ_ACHIEVEMENT_PALETTE.GOOD,
   veryGood: CLBHOUZ_ACHIEVEMENT_PALETTE.VERY_GOOD,
   excellent: CLBHOUZ_ACHIEVEMENT_PALETTE.EXCELLENT,

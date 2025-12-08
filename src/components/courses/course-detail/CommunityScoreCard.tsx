@@ -135,7 +135,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
     distribution.excellent > 0 ||
     distribution.veryGood > 0 ||
     distribution.good > 0 ||
-    distribution.respectable > 0
+    distribution.fair > 0
   );
 
   return (

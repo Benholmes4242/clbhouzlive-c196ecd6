@@ -7,7 +7,7 @@
 
 import { getRatingTheme, type RatingTheme } from '@/lib/globalAchievementMilestoneSystem';
 
-export type ScoreTier = 'outstanding' | 'excellent' | 'veryGood' | 'good' | 'respectable';
+export type ScoreTier = 'outstanding' | 'excellent' | 'veryGood' | 'good' | 'fair';
 
 export interface ScoreTierData {
   tier: ScoreTier;
@@ -28,7 +28,7 @@ const tierKeyMap: Record<string, ScoreTier> = {
   'EXCELLENT': 'excellent',
   'VERY_GOOD': 'veryGood',
   'GOOD': 'good',
-  'RESPECTABLE': 'respectable',
+  'FAIR': 'fair',
 };
 
 /**

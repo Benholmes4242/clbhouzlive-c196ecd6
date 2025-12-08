@@ -6,7 +6,7 @@
  * ║                                                                                          ║
  * ║  This file defines the 8-step progression palette used across:                           ║
  * ║    • Milestone Clubs (5 → 400)                                                           ║
- * ║    • Course Ratings (Respectable → Outstanding)                                          ║
+ * ║    • Course Ratings (Fair → Outstanding)                                                  ║
  * ║                                                                                          ║
  * ║  NO hard-coded hexes for milestones or rating bars anywhere else.                        ║
  * ║  Everything must come through this file + the mappings in globalAchievementMilestoneSystem║
@@ -123,7 +123,7 @@ export const MILESTONE_PALETTE_MAP: Record<number, ClbhouzAchievementKey> = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
-// RATING TIER MAPPING (5 Steps - Respectable → Outstanding)
+// RATING TIER MAPPING (5 Steps - Fair → Outstanding)
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
 /**
@@ -131,14 +131,14 @@ export const MILESTONE_PALETTE_MAP: Record<number, ClbhouzAchievementKey> = {
  * 
  * Tier        | Palette Key   | Hex
  * ------------|---------------|----------
- * Respectable | RESPECTABLE   | #C1CFA1
+ * Fair        | RESPECTABLE   | #C1CFA1
  * Good        | GOOD          | #88B67B
  * Very Good   | VERY_GOOD     | #5B9E55
  * Excellent   | EXCELLENT     | #3F7F41
  * Outstanding | OUTSTANDING   | #D2B461
  */
 export const RATING_PALETTE_MAP = {
-  RESPECTABLE: 'RESPECTABLE',
+  FAIR:        'RESPECTABLE', // Uses RESPECTABLE color but labeled "Fair"
   GOOD:        'GOOD',
   VERY_GOOD:   'VERY_GOOD',
   EXCELLENT:   'EXCELLENT',

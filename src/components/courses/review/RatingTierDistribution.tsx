@@ -2,14 +2,14 @@ import React from 'react';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { RatingBar } from '@/components/ui/RatingBar';
 
-export type RatingTierKey = 'OUTSTANDING' | 'EXCELLENT' | 'VERY_GOOD' | 'GOOD' | 'RESPECTABLE';
+export type RatingTierKey = 'OUTSTANDING' | 'EXCELLENT' | 'VERY_GOOD' | 'GOOD' | 'FAIR';
 
 export interface RatingTierDistributionData {
   outstanding: number;
   excellent: number;
   veryGood: number;
   good: number;
-  respectable: number;
+  fair: number;
 }
 
 interface RatingTierDistributionProps {
@@ -19,7 +19,7 @@ interface RatingTierDistributionProps {
 /**
  * Shared Rating Tier Distribution Component
  * 
- * Displays Outstanding/Excellent/Very Good/Good/Respectable bars with counts.
+ * Displays Outstanding/Excellent/Very Good/Good/Fair bars with counts.
  * Used on both the About tab (CommunityScoreCard) and Reviews tab.
  * Colors are sourced from the Global Colour System via getScoreTier().
  */
@@ -32,7 +32,7 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
     { count: distribution.excellent, tier: getScoreTier(8.5) },
     { count: distribution.veryGood, tier: getScoreTier(7.5) },
     { count: distribution.good, tier: getScoreTier(6.5) },
-    { count: distribution.respectable, tier: getScoreTier(5) },
+    { count: distribution.fair, tier: getScoreTier(5) },
   ];
 
   const maxCount = Math.max(...distributionItems.map(d => d.count), 1);
