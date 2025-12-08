@@ -35,6 +35,7 @@ const primaryCountryOptions = [
   'Caribbean',
   'Central and South America',
   'Continental Europe',
+  'Middle East',
   'Oceania',
   'Rest of World',
   'USA'
@@ -91,6 +92,10 @@ const subCountryOptions: Record<string, string[]> = {
     'Kyrgyzstan', 'Laos', 'Malaysia', 'Mongolia', 'Myanmar', 'Nepal', 'North Korea',
     'Pakistan', 'Philippines', 'Singapore', 'South Korea', 'Sri Lanka', 'Taiwan',
     'Thailand', 'Uzbekistan', 'Vietnam'
+  ],
+  'Middle East': [
+    'Bahrain', 'Iran', 'Israel', 'Jordan', 'Kuwait', 'Lebanon', 'Oman', 
+    'Qatar', 'Saudi Arabia', 'United Arab Emirates'
   ],
   'Oceania': [
     'Australia', 'Cook Islands', 'Fiji', 'French Polynesia', 'Guam', 'New Caledonia', 
