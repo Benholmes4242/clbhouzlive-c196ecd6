@@ -158,11 +158,17 @@ const HeroProfileHeader = ({
     navigate(`/profile/${username}/friends`);
   }, [username, navigate]);
 
-  // Tab change handler
-  const handleTabChange = useCallback((newTab: string) => {
+  // Ref to store scroll position captured at click time
+  const previousScrollYRef = useRef<number>(0);
+
+  // Tab change handler - accepts scroll snapshot captured at pointer down
+  const handleTabChange = useCallback((newTab: string, scrollSnapshot?: number) => {
     if (newTab === activeSection || transitionState !== 'idle') return;
     
-    const currentScrollPosition = window.scrollY;
+    // Use snapshot from click time, fallback to current scroll if not provided
+    const targetScrollY = scrollSnapshot ?? window.scrollY;
+    previousScrollYRef.current = targetScrollY;
+    
     const preventScroll = (e: Event) => e.preventDefault();
     
     window.addEventListener('scroll', preventScroll, { passive: false });
@@ -180,8 +186,9 @@ const HeroProfileHeader = ({
         window.removeEventListener('scroll', preventScroll);
         document.body.style.overscrollBehavior = '';
         
-        if (Math.abs(window.scrollY - currentScrollPosition) > 5) {
-          window.scrollTo({ top: currentScrollPosition, behavior: 'instant' });
+        // Restore to the scroll position captured at click time
+        if (Math.abs(window.scrollY - previousScrollYRef.current) > 5) {
+          window.scrollTo({ top: previousScrollYRef.current, behavior: 'instant' });
         }
       }, PROFILE_TAB_TRANSITION_MS + 50);
     });
