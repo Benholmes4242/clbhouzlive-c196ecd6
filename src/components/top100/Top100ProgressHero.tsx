@@ -79,7 +79,7 @@ function HeroWithMilestoneRow({
 
   return (
     <motion.div
-      className="mb-6 w-full"
+      className="mb-4 w-full"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
