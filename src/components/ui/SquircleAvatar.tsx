@@ -163,7 +163,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
             width: `${pixelSize}px`,
             aspectRatio: '1 / 1.05',
             borderRadius: '34%',
-            border: `2px solid ${ringColor}`,
+            border: `2.5px solid ${ringColor}`,
           }}
         >
           {avatarContent}

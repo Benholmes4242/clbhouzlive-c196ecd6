@@ -84,7 +84,7 @@ function HeroWithMilestoneRow({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
     >
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-2">
         {/* Avatar on the left - responsive size */}
         <div className="shrink-0">
           <SquircleAvatar
