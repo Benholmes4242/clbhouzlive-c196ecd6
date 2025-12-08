@@ -76,20 +76,13 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   );
   const [ratedFilter, setRatedFilter] = useState<RatedFilter>('all');
   const [hasInitialFit, setHasInitialFit] = useState(false);
-  const [filtersOpen, setFiltersOpen] = useState(false);
+  // Filters drawer is always open (no toggle)
 
   // swipe-down state for course sheet
   const [dragStartY, setDragStartY] = useState<number | null>(null);
   const [dragOffsetY, setDragOffsetY] = useState(0);
 
-  // Swipe handlers for filters drawer
-  const drawerSwipeHandlers = useSwipeable({
-    onSwipedUp: () => setFiltersOpen(true),
-    onSwipedDown: () => setFiltersOpen(false),
-    trackMouse: false,
-    trackTouch: true,
-    delta: 30,
-  });
+  // Swipe handlers removed - filters always visible
 
   const {
     data: courses = [],
@@ -432,31 +425,15 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           </div>
         )}
 
-        {/* Filters drawer – full bleed, glass */}
+        {/* Filters drawer – always visible, glass */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10">
           <div
-            {...drawerSwipeHandlers}
-            className={cn(
-              'pointer-events-auto rounded-t-3xl rounded-b-none bg-white/20 backdrop-blur-xl border-t border-white/30 shadow-[0_-4px_12px_rgba(15,23,42,0.08)] dark:shadow-[0_-4px_16px_rgba(0,0,0,0.45)] text-xs text-slate-900 transition-transform duration-200',
-              filtersOpen ? 'translate-y-0' : 'translate-y-[calc(100%-40px)]'
-            )}
+            className="pointer-events-auto rounded-t-3xl rounded-b-none bg-white/20 backdrop-blur-xl border-t border-white/30 shadow-[0_-4px_12px_rgba(15,23,42,0.08)] dark:shadow-[0_-4px_16px_rgba(0,0,0,0.45)] text-xs text-slate-900"
           >
-            {/* Drag handle */}
-            <div className="flex justify-center pt-1.5">
-              <div className="h-1 w-12 rounded-full bg-slate-400/80 dark:bg-slate-500/80" />
-            </div>
-
-            {/* Header / handle */}
-            <button
-              type="button"
-              onClick={() => setFiltersOpen((v) => !v)}
-              className="flex w-full items-center justify-between px-4 pb-2"
-            >
+            {/* Header label */}
+            <div className="px-4 pt-3 pb-1">
               <span className="font-medium">Map filters</span>
-              <span className="text-xs text-slate-500">
-                {filtersOpen ? 'Hide' : 'Show'}
-              </span>
-            </button>
+            </div>
 
             {/* Drawer content */}
             <div className="px-4 pb-4 pt-2">
