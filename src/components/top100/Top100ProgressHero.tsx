@@ -172,7 +172,7 @@ export function Top100ProgressHero({
   }) : null;
 
   return (
-    <section className="flex flex-col items-center gap-3 pb-4">
+    <section className="flex flex-col items-center gap-3">
       {/* Hero: centered avatar OR avatar + milestone side by side */}
       {hasAchievement ? (
         <HeroWithMilestoneRow
