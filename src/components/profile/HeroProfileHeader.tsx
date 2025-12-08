@@ -327,7 +327,7 @@ const HeroProfileHeader = ({
   const getContentTransitionClass = (isOutgoing: boolean = false) => {
     if (transitionState === 'idle') return '';
     
-    const baseClasses = 'px-4 sm:px-6 lg:px-8 pb-6';
+    const baseClasses = 'pt-6 px-4 sm:px-6 lg:px-8 pb-6';
     const sectionClasses = '';
     
     if (isOutgoing) {

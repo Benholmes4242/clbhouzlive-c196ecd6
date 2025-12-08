@@ -54,7 +54,7 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
   }
 
   return (
-    <div className="space-y-6 pb-8 px-4">
+    <div className="space-y-6 pb-8">
       {/* 1. Your Course Snapshot */}
       <CourseSnapshotCard
         totalCoursesPlayed={totalCoursesPlayed}
