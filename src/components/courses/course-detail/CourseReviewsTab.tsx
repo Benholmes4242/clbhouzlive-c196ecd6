@@ -10,7 +10,12 @@ import { CourseReviewsSummary } from '../review/CourseReviewsSummary';
 import { SegmentedTabs, SegmentedTabOption } from '@/components/ui/SegmentedTabs';
 import { Search } from 'lucide-react';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
-import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
+import { 
+  SHOW_MOCK_REVIEWS, 
+  ENABLE_MOCK_TOP100_REVIEWS, 
+  CYPRESS_POINT_COURSE_ID, 
+  MOCK_CYPRESS_POINT_REVIEWS 
+} from '@/features/courses/config';
 import { ReviewMediaItem } from '../review/ReviewMediaStrip';
 import { getScoreTier } from '@/utils/getScoreTier';
 
@@ -268,12 +273,25 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   const myReview = reviews.find((r) => r.user_id === user?.id);
   const otherReviews = reviews.filter((r) => r.user_id !== user?.id);
 
-  const communityScore = ratingAggregates?.avg_overall_score || 0;
-  const ratingCount = ratingAggregates?.review_count ?? 0;
+  // Check if we should use mock data for Cypress Point
+  const isMockCypressPoint = ENABLE_MOCK_TOP100_REVIEWS && courseId === CYPRESS_POINT_COURSE_ID;
+
+  // Use mock data for Cypress Point when enabled, otherwise use real aggregates
+  const communityScore = isMockCypressPoint 
+    ? MOCK_CYPRESS_POINT_REVIEWS.averageRating 
+    : (ratingAggregates?.avg_overall_score || 0);
+  const ratingCount = isMockCypressPoint 
+    ? MOCK_CYPRESS_POINT_REVIEWS.totalReviews 
+    : (ratingAggregates?.review_count ?? 0);
   const hasRatings = ratingCount > 0;
 
   // Calculate distribution using System-2 unified rating bands
   const calculateDistribution = () => {
+    // Return mock distribution for Cypress Point when enabled
+    if (isMockCypressPoint) {
+      return MOCK_CYPRESS_POINT_REVIEWS.distribution;
+    }
+
     const dist = { outstanding: 0, excellent: 0, veryGood: 0, good: 0, fair: 0 };
     reviews.forEach(r => {
       const tierData = getScoreTier(r.rating);
@@ -284,6 +302,11 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
 
   // Calculate category averages
   const calculateCategoryAverages = () => {
+    // Return mock category averages for Cypress Point when enabled
+    if (isMockCypressPoint) {
+      return MOCK_CYPRESS_POINT_REVIEWS.categoryAverages;
+    }
+
     const categories = { design: 0, condition: 0, clubhouse: 0, facilities: 0 };
     const counts = { design: 0, condition: 0, clubhouse: 0, facilities: 0 };
 

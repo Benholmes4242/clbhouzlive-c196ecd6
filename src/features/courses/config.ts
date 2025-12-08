@@ -21,3 +21,39 @@
  * Similar pattern to: isMockNearby in src/features/nearby/config.ts
  */
 export const SHOW_MOCK_REVIEWS = false;
+
+/**
+ * Mock Top 100 Reviews Configuration
+ * 
+ * Enables mock review data specifically for Cypress Point Golf Club
+ * to test the rating distribution bars (all 5 tiers visible).
+ * 
+ * Set to true:  Show mock distribution data for Cypress Point
+ * Set to false: Use real data only
+ */
+export const ENABLE_MOCK_TOP100_REVIEWS = true;
+
+// Cypress Point Golf Club identifier
+export const CYPRESS_POINT_COURSE_ID = 'e69aee30-744d-4089-a127-285a62216e2c';
+
+/**
+ * Mock review distribution data for testing rating bars
+ * Equal spread ensures every tier bar is visible for visual testing
+ */
+export const MOCK_CYPRESS_POINT_REVIEWS = {
+  totalReviews: 100,
+  averageRating: 8.2,
+  distribution: {
+    outstanding: 20,  // 9.0-10.0
+    excellent: 20,    // 8.0-8.9
+    veryGood: 20,     // 7.0-7.9
+    good: 20,         // 6.5-6.9
+    fair: 20,         // <6.5
+  },
+  categoryAverages: {
+    design: 8.5,
+    condition: 7.8,
+    clubhouse: 8.0,
+    facilities: 7.5,
+  },
+};
