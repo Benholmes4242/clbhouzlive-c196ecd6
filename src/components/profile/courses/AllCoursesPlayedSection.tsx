@@ -8,8 +8,6 @@ import { RatingPill } from '@/components/ui/RatingPill';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 
-import { cn } from '@/lib/utils';
-
 interface AllCoursesPlayedSectionProps {
   userId: string;
   isOwnProfile: boolean;
@@ -40,8 +38,6 @@ export const AllCoursesPlayedSection: React.FC<AllCoursesPlayedSectionProps> = (
   const sectionRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState<FilterType>('all');
   const [page, setPage] = useState(0);
-  const [transitionDirection, setTransitionDirection] = useState<'next' | 'prev'>('next');
-  const [isAnimating, setIsAnimating] = useState(false);
 
   const { data: userActivity = [] } = useUserCourseActivity(userId);
 
@@ -115,32 +111,24 @@ export const AllCoursesPlayedSection: React.FC<AllCoursesPlayedSectionProps> = (
   const endIndex = Math.min((page + 1) * PAGE_SIZE, filteredCourses.length);
 
   const scrollToSectionTop = () => {
-    if (sectionRef.current) {
+    // Use #root container for scrolling (same as rest of app)
+    const scrollContainer = document.getElementById('root');
+    if (sectionRef.current && scrollContainer) {
       const top = sectionRef.current.offsetTop - 80;
-      window.scrollTo({ top, behavior: 'smooth' });
+      scrollContainer.scrollTo({ top, behavior: 'smooth' });
     }
   };
 
   const handleNextPage = () => {
     if (!hasNextPage) return;
-    setTransitionDirection('next');
-    setIsAnimating(true);
-    setTimeout(() => {
-      setPage(page + 1);
-      setIsAnimating(false);
-      scrollToSectionTop();
-    }, 150);
+    setPage(page + 1);
+    scrollToSectionTop();
   };
 
   const handlePrevPage = () => {
     if (page === 0) return;
-    setTransitionDirection('prev');
-    setIsAnimating(true);
-    setTimeout(() => {
-      setPage(page - 1);
-      setIsAnimating(false);
-      scrollToSectionTop();
-    }, 150);
+    setPage(page - 1);
+    scrollToSectionTop();
   };
 
   const filterOptions: { key: FilterType; label: string }[] = [
@@ -212,20 +200,13 @@ export const AllCoursesPlayedSection: React.FC<AllCoursesPlayedSectionProps> = (
         ))}
       </div>
 
-      {/* Course list with slide animation */}
+      {/* Course list - keyed by page for smooth re-render */}
       {filteredCourses.length === 0 ? (
         <div className="bg-slate-50 border border-slate-100 rounded-sq-md p-8 text-center">
           <p className="text-sm text-slate-500">{getEmptyMessage()}</p>
         </div>
       ) : (
-        <div
-          className={cn(
-            "space-y-2 transition-all duration-150",
-            isAnimating && transitionDirection === 'next' && "opacity-0 translate-x-4",
-            isAnimating && transitionDirection === 'prev' && "opacity-0 -translate-x-4",
-            !isAnimating && "opacity-100 translate-x-0"
-          )}
-        >
+        <div key={page} className="space-y-2 animate-fade-in">
           {pagedCourses.map((course) => (
             <div
               key={course.id}
