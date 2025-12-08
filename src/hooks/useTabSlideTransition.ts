@@ -3,6 +3,9 @@ import { useState, useCallback } from 'react';
 export type TransitionDirection = 'left' | 'right';
 export type TransitionState = 'idle' | 'transitioning';
 
+/** Shared constant for tab transition duration - must match CSS animation */
+export const PROFILE_TAB_TRANSITION_MS = 300;
+
 interface UseTabSlideTransitionProps {
   onTransitionComplete?: () => void;
   duration?: number;
