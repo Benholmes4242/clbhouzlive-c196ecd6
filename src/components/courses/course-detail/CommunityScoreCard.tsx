@@ -6,11 +6,13 @@ import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { RatingBar } from '@/components/ui/RatingBar';
 import { RatingBadge } from '@/components/ui/RatingBadge';
+import { RatingTierDistribution, RatingTierDistributionData } from '@/components/courses/review/RatingTierDistribution';
 
 interface CommunityScoreCardProps {
   courseId: string;
   ratingAggregates: CourseRatingAggregate | null | undefined;
   userRating: UserCourseRating | null | undefined;
+  distribution?: RatingTierDistributionData | null;
   onRateClick: () => void;
   onSeeAllReviews?: () => void;
 }
@@ -23,6 +25,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   courseId,
   ratingAggregates,
   userRating,
+  distribution,
   onRateClick,
   onSeeAllReviews,
 }) => {
@@ -31,11 +34,11 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
   // Empty state - no ratings yet
   if (totalRatings === 0) {
-  return (
-    <div className="rounded-3xl bg-white shadow-sm px-4 py-6 sm:px-5 sm:py-7">
-      <h3 className="text-xl font-semibold text-slate-900">
-        Community Score
-      </h3>
+    return (
+      <div className="rounded-3xl bg-white shadow-sm px-4 py-6 sm:px-5 sm:py-7">
+        <h3 className="text-xl font-semibold text-slate-900">
+          Community Score
+        </h3>
         <p className="mt-1 text-base text-slate-500">
           No ratings yet – be the first to rate this course!
         </p>
@@ -126,6 +129,15 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
 
   const tierData = getScoreTier(communityAverage);
 
+  // Check if we have distribution data
+  const hasDistribution = distribution && (
+    distribution.outstanding > 0 ||
+    distribution.excellent > 0 ||
+    distribution.veryGood > 0 ||
+    distribution.good > 0 ||
+    distribution.fair > 0
+  );
+
   return (
     <div className="rounded-3xl bg-white shadow-sm px-5 py-6">
       {/* Header row */}
@@ -162,9 +174,16 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
       {/* User vs community comparison */}
       {comparisonMessage}
 
+      {/* Rating tier distribution - mirrors Reviews tab */}
+      {hasDistribution && (
+        <div className="mt-6 pt-5 border-t border-slate-100">
+          <RatingTierDistribution distribution={distribution} />
+        </div>
+      )}
+
       {/* Category rows - two-line layout */}
       {categories.length > 0 && (
-        <div className="mt-6 space-y-5">
+        <div className="mt-6 pt-5 border-t border-slate-100 space-y-5">
           {categories.map((cat) => {
             const score = cat.score || 0;
 

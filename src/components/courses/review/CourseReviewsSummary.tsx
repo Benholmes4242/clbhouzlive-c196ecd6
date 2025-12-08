@@ -4,14 +4,7 @@ import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon } from
 import { getScoreTier } from '@/utils/getScoreTier';
 import { RatingBar } from '@/components/ui/RatingBar';
 import { RatingBadge } from '@/components/ui/RatingBadge';
-
-interface DistributionData {
-  outstanding: number;
-  excellent: number;
-  veryGood: number;
-  good: number;
-  fair: number;
-}
+import { RatingTierDistribution, RatingTierDistributionData } from './RatingTierDistribution';
 
 interface CategoryAverage {
   design: number | null;
@@ -23,7 +16,7 @@ interface CategoryAverage {
 interface CourseReviewsSummaryProps {
   averageRating: number;
   reviewCount: number;
-  distribution: DistributionData;
+  distribution: RatingTierDistributionData;
   categoryAverages: CategoryAverage;
   userScore?: number | null;
   userHasRating: boolean;
@@ -44,10 +37,6 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
 }) => {
   const tierData = getScoreTier(averageRating);
   const onlyUserHasRated = reviewCount === 1 && userHasRating;
-
-  // Semantic colors for comparison messages (not from rating system)
-  const positiveColor = '#059669'; // emerald-600
-  const negativeColor = '#DC2626'; // rose-600
 
   // Calculate comparison message
   let comparisonMessage: React.ReactNode = null;
@@ -103,17 +92,6 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
     }
   }
 
-  // Map distribution directly from Global Colour System tier buckets
-  const distributionItems = [
-    { count: distribution.outstanding, tier: getScoreTier(9.5) },
-    { count: distribution.excellent, tier: getScoreTier(8.5) },
-    { count: distribution.veryGood, tier: getScoreTier(7.5) },
-    { count: distribution.good, tier: getScoreTier(6.5) },
-    { count: distribution.fair, tier: getScoreTier(5) },
-  ];
-
-  const maxCount = Math.max(...distributionItems.map(d => d.count), 1);
-
   return (
     <div>
       {/* Top row: Rating + Distribution */}
@@ -139,32 +117,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
 
           {/* RIGHT: distribution bars */}
           <div className="flex-1 ml-4">
-            {distributionItems.map((item) => {
-              const percentage = (item.count / maxCount) * 100;
-              return (
-                <div key={item.tier.tier} className="mb-1.5 flex items-center gap-0">
-                  {/* Label */}
-                  <span className="w-24 text-sm text-slate-700">
-                    {item.tier.label}
-                  </span>
-
-                  {/* Bar – takes remaining width */}
-                  <div className="flex-1">
-                    <RatingBar 
-                      value={percentage}
-                      max={100}
-                      mode="banded"
-                      band={item.tier.tier}
-                    />
-                  </div>
-
-                  {/* Count */}
-                  <span className="w-6 text-right text-xs text-slate-500">
-                    {item.count}
-                  </span>
-                </div>
-              );
-            })}
+            <RatingTierDistribution distribution={distribution} />
           </div>
         </div>
       </div>
