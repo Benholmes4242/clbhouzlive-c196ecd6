@@ -85,18 +85,19 @@ export interface MilestoneTheme {
   bgDark: string;    // Card gradient end
 }
 
-// Color remap: each club uses a different tier's visual palette
-// 400 → old 50 (Heritage), 300 → old 5 (Rookie), 200 → old 10 (Fairway), 100 → old 20 (Founders)
-// 50 → old 300 (Legendary), 20 → old 200 (Elite), 10 → old 400 (Grand Slam), 5 → old 100 (Century)
+// MILESTONE COLORS
+// - 5/10 Club: neutral greys (slate)
+// - 20/50 Club: two friendly blues  
+// - 100/200/300/400 Club: warm progression (green → gold)
 export const MILESTONE_THEMES: Record<MilestoneTier, MilestoneTheme> = {
-  5:   { id: 'rookie',     name: 'Rookie Club',     tier: 'ROOKIE',     ...asGradient('#E4E4E9', '#D3D3D8'),                        accent: '#4A4A4A' },   // was Century colors
-  10:  { id: 'fairway',    name: 'Fairway Club',    tier: 'FAIRWAY',    ...asGradient('#E0E3EB', '#C2C7D2'),                        accent: '#111111' },   // was Grand Slam colors
-  20:  { id: 'founders',   name: 'Founders Club',   tier: 'FOUNDERS',   ...asGradient('#E0D8FB', '#C5B6F5'),                        accent: '#6F5BD5' },   // was Elite colors
-  50:  { id: 'heritage',   name: 'Heritage Club',   tier: 'HERITAGE',   ...asGradient('#F3D7FF', '#E4B4F0'),                        accent: '#B153CE' },   // was Legendary colors
-  100: { id: 'century',    name: 'Century Club',    tier: 'CENTURY',    ...asGradient(PERFORMANCE_STOPS.S4, PERFORMANCE_STOPS.S5), accent: '#2F7D32' },   // was Founders colors
-  200: { id: 'elite',      name: 'Elite Club',      tier: 'ELITE',      ...asGradient(PERFORMANCE_STOPS.S3, PERFORMANCE_STOPS.S4), accent: '#7CC66B' },   // was Fairway colors
-  300: { id: 'legendary',  name: 'Legendary Club',  tier: 'LEGENDARY',  ...asGradient(PERFORMANCE_STOPS.S2, PERFORMANCE_STOPS.S1), accent: '#C9B27A' },   // was Rookie colors
-  400: { id: 'grandslam',  name: 'Grand Slam Club', tier: 'GRAND_SLAM', ...asGradient(PERFORMANCE_STOPS.S2, '#E8D4A0'),             accent: '#D8A546' },   // was Heritage colors
+  5:   { id: 'rookie',     name: 'Rookie Club',     tier: 'ROOKIE',     ...asGradient('#E4E4E9', '#D3D3D8'),                        accent: '#4A4A4A' },   // neutral grey
+  10:  { id: 'fairway',    name: 'Fairway Club',    tier: 'FAIRWAY',    ...asGradient('#E0E3EB', '#C2C7D2'),                        accent: '#555555' },   // neutral grey
+  20:  { id: 'founders',   name: 'Founders Club',   tier: 'FOUNDERS',   ...asGradient('#D3E7FF', '#C1D4F5'),                        accent: '#12355B' },   // softer blue
+  50:  { id: 'heritage',   name: 'Heritage Club',   tier: 'HERITAGE',   ...asGradient('#C1D9FF', '#A8C8F5'),                        accent: '#102A5C' },   // deeper blue
+  100: { id: 'century',    name: 'Century Club',    tier: 'CENTURY',    ...asGradient(PERFORMANCE_STOPS.S4, PERFORMANCE_STOPS.S5), accent: '#2F7D32' },   // green
+  200: { id: 'elite',      name: 'Elite Club',      tier: 'ELITE',      ...asGradient(PERFORMANCE_STOPS.S3, PERFORMANCE_STOPS.S4), accent: '#7CC66B' },   // lighter green
+  300: { id: 'legendary',  name: 'Legendary Club',  tier: 'LEGENDARY',  ...asGradient(PERFORMANCE_STOPS.S2, PERFORMANCE_STOPS.S1), accent: '#C9B27A' },   // warm sand
+  400: { id: 'grandslam',  name: 'Grand Slam Club', tier: 'GRAND_SLAM', ...asGradient(PERFORMANCE_STOPS.S2, '#E8D4A0'),             accent: '#D8A546' },   // gold
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
@@ -212,16 +213,16 @@ export const REGION_THEMES: Record<RegionKey, RegionalTheme> = {
     id: 'list_worldwide',
     label: 'World',
     shortLabel: 'World',
-    accent: '#124A80',                 // deep coastal blue
-    ...asGradient('#D7E5F7', '#C3D5F0'),
-    bgLocked: 'hsl(210 30% 96%)',
+    accent: '#FFFFFF',                 // white for onyx bg
+    ...asGradient('#2B3038', '#1F2328'), // onyx / dark neutral
+    bgLocked: 'hsl(210 15% 96%)',
   },
   GBI: {
     id: 'list_gb_ireland',
     label: 'GB & Ireland',
     shortLabel: 'GB&I',
-    accent: '#145437',                 // racing green
-    ...asGradient('#CFE6D6', '#B9D8C4'),
+    accent: '#063B2B',                 // dark racing green text
+    ...asGradient('#CFE8D3', '#B9D8C0'),
     bgLocked: 'hsl(140 30% 96%)',
   },
   USA: {
@@ -236,8 +237,8 @@ export const REGION_THEMES: Record<RegionKey, RegionalTheme> = {
     id: 'list_europe',
     label: 'Europe',
     shortLabel: 'Europe',
-    accent: '#2752B8',                 // EU blue
-    ...asGradient('#D8E0F7', '#C5CFF2'),
+    accent: '#102A43',                 // dark EU blue text
+    ...asGradient('#D4E1FF', '#C0D3F7'),
     bgLocked: 'hsl(225 30% 96%)',
   },
 };
