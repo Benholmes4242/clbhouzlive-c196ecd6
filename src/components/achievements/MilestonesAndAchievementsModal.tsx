@@ -54,7 +54,7 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
   // In debug mode, show all as unlocked with 400 courses
   const totalTop100Played = isDebugUser ? 400 : (progressData?.totalTop100Played ?? 0);
 
-  const username = profile?.username || user?.email?.split('@')[0] || 'golfer';
+  const firstName = profile?.display_name?.split(' ')[0] || profile?.username || 'Golfer';
   const totalMilestones = MILESTONE_ACHIEVEMENTS.length;
   const totalLists = LIST_ACHIEVEMENTS.length;
   
@@ -68,9 +68,39 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
 
   // Progress to next milestone
   const coursesToNext = nextClub ? nextClub.threshold - totalTop100Played : 0;
-  const progressToNext = nextClub 
-    ? Math.min(100, (totalTop100Played / nextClub.threshold) * 100) 
-    : 100;
+  const hasCompletedAll = unlockedMilestoneCount === totalMilestones;
+  
+  // Currently this modal only shows logged-in user's own data
+  const isOwnProfile = true;
+  const currentLevelLabel = currentClub.tierName || 'Starter';
+  const coursesForNextLevel = nextClub?.threshold ?? null;
+
+  // Dynamic copy
+  const heroLabel = isOwnProfile
+    ? "Your Top 100 milestones"
+    : `${firstName}'s Top 100 milestones`;
+
+  const heroHeadline = currentLevelLabel;
+
+  const progressLine = hasCompletedAll
+    ? (isOwnProfile
+        ? `You've unlocked all ${totalMilestones} milestones`
+        : `${firstName} has unlocked all ${totalMilestones} milestones`)
+    : (isOwnProfile
+        ? `You've unlocked ${unlockedMilestoneCount} of ${totalMilestones} milestones`
+        : `${firstName} has unlocked ${unlockedMilestoneCount} of ${totalMilestones} milestones`);
+
+  const statusLine = hasCompletedAll
+    ? (isOwnProfile
+        ? `Grand Slam Club complete – 400 courses played`
+        : `Grand Slam Club complete – ${firstName} has played 400 courses`)
+    : coursesForNextLevel != null
+      ? (isOwnProfile
+          ? `Next up: ${nextClub?.tierName} at ${coursesForNextLevel} courses`
+          : `Next up for ${firstName}: ${nextClub?.tierName} at ${coursesForNextLevel} courses`)
+      : (isOwnProfile
+          ? "Keep playing Top 100 courses to unlock the next milestone"
+          : `${firstName} is closing in on the next milestone`);
 
   // Calculate nudge
   const nudge = progressData?.lists ? getNextBadgeNudge({
@@ -144,33 +174,24 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
                   <div className="flex-1 min-w-0">
                     {/* Small label */}
                     <p className="text-[11px] text-muted-foreground uppercase tracking-wide mb-1">
-                      Top 100 milestones
+                      {heroLabel}
                     </p>
                     
-                    {/* Main line */}
-                    <p className="text-base font-semibold text-foreground">
-                      Current level {currentClub.tierName || 'Beginner'}
+                    {/* Main headline */}
+                    <p className="text-lg font-semibold text-foreground">
+                      {heroHeadline}
                     </p>
                     
                     {/* Progress line */}
                     <p className="text-sm text-muted-foreground mt-1">
-                      {unlockedMilestoneCount} of {totalMilestones} milestones unlocked
+                      {progressLine}
                     </p>
                     
-                    {/* Trophy line - shown when all milestones complete */}
-                    {!nextClub && totalTop100Played >= 400 && (
-                      <div className="flex items-center gap-1.5 mt-2 text-sm font-medium text-primary">
-                        <Trophy className="h-4 w-4" />
-                        <span>Grand Slam Club achieved!</span>
-                      </div>
-                    )}
-                    
-                    {/* Progress to next (only if not complete) */}
-                    {nextClub && (
-                      <div className="text-[11px] text-muted-foreground mt-2">
-                        Next: <span className="font-medium">{nextClub.tierName}</span> · {coursesToNext} more courses
-                      </div>
-                    )}
+                    {/* Status line with trophy icon */}
+                    <div className="flex items-center gap-1.5 mt-2 text-sm font-medium text-primary">
+                      <Trophy className="h-4 w-4" />
+                      <span>{statusLine}</span>
+                    </div>
                   </div>
 
                   {/* Right side pill - uses handicap pill token styling */}
