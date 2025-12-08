@@ -87,10 +87,12 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
   const currentLevelLabel = currentClub.tierName || 'Starter';
   const coursesForNextLevel = nextClub?.threshold ?? null;
 
-  // Dynamic copy
-  const heroLabel = isOwnProfile
-    ? "Your Top 100 milestones"
-    : `${firstName}'s Top 100 milestones`;
+  // Dynamic copy with smart apostrophe
+  const modalTitle = isOwnProfile
+    ? "Your Clubs & Achievements"
+    : `${firstName}'s Clubs & Achievements`;
+
+  const heroLabel = modalTitle;
 
   const heroHeadline = currentLevelLabel;
 
@@ -137,6 +139,7 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
       <SheetContent 
         side="bottom" 
         className="h-full p-0 overflow-hidden"
+        hideCloseButton
       >
         <div className="h-full overflow-y-auto bg-background">
           {/* Page header - matches map modal styling */}
@@ -153,7 +156,7 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
             {/* Title block - centered */}
             <div className="text-center mt-2">
               <h1 className="text-xl font-semibold text-foreground">
-                Top 100 journey milestones
+                {modalTitle}
               </h1>
             </div>
           </header>
