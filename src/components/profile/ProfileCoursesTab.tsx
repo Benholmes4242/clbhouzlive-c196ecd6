@@ -5,13 +5,13 @@ import { useUserCourseSummary } from '@/hooks/useUserCourseSummary';
 import { CourseSnapshotCard } from './courses/CourseSnapshotCard';
 import { SeasonOnCourseCard } from './courses/SeasonOnCourseCard';
 import { FavouriteCoursesSection } from './courses/FavouriteCoursesSection';
-import { SharedCoursesSection } from './courses/SharedCoursesSection';
 import { AllCoursesPlayedSection } from './courses/AllCoursesPlayedSection';
 import { CourseMilestonesStrip } from './courses/CourseMilestonesStrip';
 import { AddCourseModal } from './courses/AddCourseModal';
 import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 interface ProfileCoursesTabProps {
   userId: string;
@@ -55,6 +55,9 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
 
   return (
     <div className="space-y-6 pb-8">
+      {/* Scroll to top FAB - same as Explore */}
+      <ScrollToTopGlass />
+
       {/* 1. Your Course Snapshot */}
       <CourseSnapshotCard
         totalCoursesPlayed={totalCoursesPlayed}
@@ -77,15 +80,10 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
       {/* 3. Favourite Courses (Top 10) */}
       <FavouriteCoursesSection userId={userId} isOwnProfile={isOwnProfile} />
 
-      {/* 4. Courses you share with friends */}
-      {isOwnProfile && (
-        <SharedCoursesSection userId={userId} isOwnProfile={isOwnProfile} />
-      )}
-
-      {/* 5. All Courses Played */}
+      {/* 4. All Courses Played */}
       <AllCoursesPlayedSection userId={userId} isOwnProfile={isOwnProfile} />
 
-      {/* 6. Course Milestones */}
+      {/* 5. Course Milestones */}
       <CourseMilestonesStrip
         totalCoursesPlayed={totalCoursesPlayed}
         countriesPlayed={countriesPlayed}
