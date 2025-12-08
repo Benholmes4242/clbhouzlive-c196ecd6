@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useUserCourseSummary } from '@/hooks/useUserCourseSummary';
 import { CourseSnapshotCard } from './courses/CourseSnapshotCard';
 import { SeasonOnCourseCard } from './courses/SeasonOnCourseCard';
 import { FavouriteCoursesSection } from './courses/FavouriteCoursesSection';
 import { AllCoursesPlayedSection } from './courses/AllCoursesPlayedSection';
-import { CourseMilestonesStrip } from './courses/CourseMilestonesStrip';
+
 import { AddCourseModal } from './courses/AddCourseModal';
 import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
@@ -82,27 +82,6 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
 
       {/* 4. All Courses Played */}
       <AllCoursesPlayedSection userId={userId} isOwnProfile={isOwnProfile} />
-
-      {/* 5. Course Milestones */}
-      <CourseMilestonesStrip
-        totalCoursesPlayed={totalCoursesPlayed}
-        countriesPlayed={countriesPlayed}
-        newCoursesThisYear={newCoursesThisYear}
-        isOwnProfile={isOwnProfile}
-      />
-
-      {/* Trophy Cabinet Link */}
-      {profile && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigate(`/achievements/${profile.username}#trophies`)}
-          className="w-full"
-        >
-          <Trophy className="w-4 h-4 mr-2" />
-          {isOwnProfile ? 'View Trophy Cabinet' : 'View Season Trophies'}
-        </Button>
-      )}
 
       {/* Add Course Modal */}
       {showAddModal && (

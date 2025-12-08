@@ -7,7 +7,7 @@ import { Filter, Calendar } from 'lucide-react';
 import { RatingPill } from '@/components/ui/RatingPill';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
-import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
+
 import { cn } from '@/lib/utils';
 
 interface AllCoursesPlayedSectionProps {
@@ -194,12 +194,6 @@ export const AllCoursesPlayedSection: React.FC<AllCoursesPlayedSectionProps> = (
         </button>
       </div>
 
-      {/* Stats line */}
-      {filteredCourses.length > 0 && (
-        <p className="text-[11px] text-slate-400 mb-3">
-          Showing {startIndex}–{endIndex} of {filteredCourses.length} courses
-        </p>
-      )}
 
       {/* Filter chips */}
       <div className="flex gap-2 overflow-x-auto pb-3 -mx-1 px-1">
@@ -295,17 +289,34 @@ export const AllCoursesPlayedSection: React.FC<AllCoursesPlayedSectionProps> = (
         </div>
       )}
 
-      {/* Pagination */}
-      <UnifiedPagination
-        page={page}
-        total={filteredCourses.length}
-        pageSize={PAGE_SIZE}
-        hasNextPage={hasNextPage}
-        onNext={handleNextPage}
-        onPrev={handlePrevPage}
-        itemLabel="courses"
-        scrollTargetRef={sectionRef}
-      />
+      {/* Pagination controls */}
+      {filteredCourses.length > PAGE_SIZE && (
+        <div className="flex items-center justify-between gap-3 pt-3">
+          <Button
+            variant="outline"
+            size="lg"
+            className="flex-1"
+            disabled={page === 0}
+            onClick={handlePrevPage}
+          >
+            Previous 15 courses
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            className="flex-1"
+            disabled={!hasNextPage}
+            onClick={handleNextPage}
+          >
+            Next 15 courses
+          </Button>
+        </div>
+      )}
+
+      {/* Summary line with 24px bottom gap */}
+      <p className="mt-3 mb-6 text-xs text-slate-500 text-center">
+        Showing {filteredCourses.length === 0 ? 0 : startIndex}–{endIndex} of {filteredCourses.length} courses
+      </p>
     </div>
   );
 };
