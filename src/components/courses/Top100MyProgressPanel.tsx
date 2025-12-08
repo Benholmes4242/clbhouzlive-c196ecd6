@@ -11,6 +11,7 @@ import { Top100CompletedListsRow } from '@/components/top100/Top100CompletedList
 import { Top100ListCompletionsRow } from '@/components/top100/Top100ListCompletionsRow';
 import type { Top100ListId } from '@/config/top100ListMilestones';
 import { MILESTONE_THEMES } from '@/lib/globalAchievementMilestoneSystem';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 
 import { Top100RegionProgressGrid } from './Top100RegionProgressGrid';
@@ -240,6 +241,9 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
           isOwnProfile={isOwnProfile}
         />
       </div>
+
+      {/* Scroll to top FAB */}
+      <ScrollToTopGlass />
     </div>
   );
 };

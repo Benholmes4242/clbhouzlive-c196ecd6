@@ -9,6 +9,7 @@ import { HandicapNextRoundPredictionCard } from './HandicapNextRoundPredictionCa
 import FriendsHandicapCard from './FriendsHandicapCard';
 import HandicapMilestonesCard from './HandicapMilestonesCard';
 import RecentRoundsFeed from './RecentRoundsFeed';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 // Mock rounds for recent rounds section
 const mockRoundsData = [
@@ -112,6 +113,9 @@ const HandicapDemoExperience: React.FC = () => {
           </button>
         </div>
       </section>
+
+      {/* Scroll to top FAB */}
+      <ScrollToTopGlass />
     </div>
   );
 };
