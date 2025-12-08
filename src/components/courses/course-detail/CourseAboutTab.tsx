@@ -10,6 +10,7 @@ import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
 import CourseMapPreview from '@/components/courses/CourseMapPreview';
 import CourseMapFullScreen from '@/components/courses/CourseMapFullScreen';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
+import { useCourseRatingDistribution } from '@/hooks/useCourseRatingDistribution';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserCourseRating } from '@/hooks/useUserCourseRating';
 import { useToast } from '@/hooks/use-toast';
@@ -79,6 +80,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   // Fetch rating aggregates using the new hook
   const { data: ratingAggregates } = useCourseRatingAggregates(course.id);
   
+  // Fetch rating distribution for tier bars
+  const { data: distribution } = useCourseRatingDistribution(course.id);
+  
   // Fetch user's rating if logged in
   const { data: userRating } = useUserCourseRating(course.id, user?.id);
 
@@ -123,6 +127,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           courseId={course.id}
           ratingAggregates={ratingAggregates}
           userRating={userRating}
+          distribution={distribution}
           onRateClick={handleRateClick}
           onSeeAllReviews={() => onTabChange?.('reviews')}
         />
