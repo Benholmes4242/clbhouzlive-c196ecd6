@@ -32,6 +32,7 @@ const primaryCountryOptions = [
   'Africa',
   'Asia',
   'Britain & Ireland',
+  'Caribbean',
   'Continental Europe',
   'Oceania',
   'Rest of World',
@@ -51,6 +52,13 @@ const subCountryOptions: Record<string, string[]> = {
   ],
   'Britain & Ireland': [
     'England', 'Ireland', 'Isle of Man', 'Northern Ireland', 'Scotland', 'Wales'
+  ],
+  'Caribbean': [
+    'Anguilla', 'Antigua and Barbuda', 'Aruba', 'Bahamas', 'Barbados', 'Cayman Islands',
+    'Cuba', 'Curaçao', 'Dominican Republic', 'Grenada', 'Guadeloupe', 'Haiti', 
+    'Jamaica', 'Martinique', 'Puerto Rico', 'St Kitts and Nevis', 'St Lucia', 
+    'St Martin', 'St Vincent and the Grenadines', 'Trinidad and Tobago', 
+    'Turks and Caicos Islands', 'Virgin Islands'
   ],
   'USA': [
     'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 
