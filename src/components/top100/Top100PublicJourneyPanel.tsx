@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Trophy, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CountryFlag from '@/components/ui/country-flag';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 interface Top100PublicJourneyPanelProps {
   profileUserId: string;
@@ -178,6 +179,9 @@ const Top100PublicJourneyPanel: React.FC<Top100PublicJourneyPanelProps> = ({
           </Button>
         </div>
       )}
+
+      {/* Scroll to top FAB */}
+      <ScrollToTopGlass />
     </div>
   );
 };

@@ -7,6 +7,7 @@ import ActivityFiltersSheet, { ActivityFilters, ActivityFilterType } from './Act
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { ActivityPost as LocalActivityPost } from './types/ActivityTypes';
 import { ActivityPost } from './activity/types';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 interface ActivityFeedProps {
   userId: string;
@@ -199,6 +200,9 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
         userProfilePhotoUrl={userProfilePhotoUrl}
         isCurrentUser={isOwnProfile}
       />
+
+      {/* Scroll to top FAB */}
+      <ScrollToTopGlass />
     </>
   );
 };

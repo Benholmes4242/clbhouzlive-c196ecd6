@@ -1,10 +1,12 @@
 import React from 'react';
 import { Zap } from 'lucide-react';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 const HandicapComingSoonCard: React.FC = () => {
   return (
-    <div className="flex min-h-[420px] items-center justify-center px-4 pb-12">
-      <div className="max-w-[440px] w-full bg-muted border border-border rounded-sq-lg px-6 py-8 text-center">
+    <>
+      <div className="flex min-h-[420px] items-center justify-center px-4 pb-12">
+        <div className="max-w-[440px] w-full bg-muted border border-border rounded-sq-lg px-6 py-8 text-center">
         <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-accent/10 rounded-sq-md mb-4">
           <Zap className="h-6 w-6 text-primary-accent" />
         </div>
@@ -38,11 +40,15 @@ const HandicapComingSoonCard: React.FC = () => {
           </li>
         </ul>
         
-        <p className="text-xs text-muted-foreground/70">
-          Future view · Powered by England Golf (pending partnership)
-        </p>
+          <p className="text-xs text-muted-foreground/70">
+            Future view · Powered by England Golf (pending partnership)
+          </p>
+        </div>
       </div>
-    </div>
+
+      {/* Scroll to top FAB */}
+      <ScrollToTopGlass />
+    </>
   );
 };
 

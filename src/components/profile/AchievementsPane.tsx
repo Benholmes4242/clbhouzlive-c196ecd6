@@ -7,6 +7,7 @@ import { MdOutlineTrendingUp } from 'react-icons/md';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AchievementDetailModal from '@/components/achievements/AchievementDetailModal';
 import { OptimizedMedalIcon } from '@/components/ui/optimized-medal-icon';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 // Using the user's original padlock image
 const padlockIcon = '/lovable-uploads/fa944ae3-272a-4bae-82bf-06e9bde7d784.png';
 
@@ -1424,6 +1425,9 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
         onClose={() => setShowAchievementDetailModal(false)}
         achievement={selectedAchievement}
       />
+
+      {/* Scroll to top FAB */}
+      <ScrollToTopGlass />
     </div>
   );
 };
