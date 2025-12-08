@@ -380,7 +380,7 @@ const HeroProfileHeader = ({
         >
           {/* Glass panel - full bleed */}
           <div
-            className="relative flex items-center gap-4 md:gap-6 rounded-3xl bg-muted/15 backdrop-blur-xl shadow-[0_18px_45px_rgba(0,0,0,0.18)] px-4 md:px-6 py-4 md:py-5"
+            className="relative flex items-center gap-4 md:gap-6 rounded-3xl bg-muted/15 backdrop-blur-xl px-4 md:px-6 py-4 md:py-5"
           >
               {/* AVATAR – Left column */}
               <div className="flex-shrink-0 z-20">
