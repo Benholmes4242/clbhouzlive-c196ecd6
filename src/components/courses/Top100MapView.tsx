@@ -21,6 +21,8 @@ type RatedFilter = 'all' | 'rated' | 'unrated';
 interface Top100MapViewProps {
   scope: Top100MapScope;
   onScopeChange?: (scope: Top100MapScope) => void;
+  /** When true, map fills 100% of parent height instead of fixed 480px */
+  fullHeight?: boolean;
 }
 
 // Canonical list sizes
@@ -61,6 +63,7 @@ const REGION_CONFIG: Record<
 const Top100MapView: React.FC<Top100MapViewProps> = ({
   scope,
   onScopeChange,
+  fullHeight = false,
 }) => {
   const navigate = useNavigate();
   const { session } = useSupabaseSession();
@@ -392,11 +395,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   }
 
   return (
-    <div className="space-y-3 top100-map-shell">
-      <div className="relative mt-1 overflow-hidden rounded-sq-lg bg-muted/40">
+    <div className={cn("top100-map-shell", fullHeight ? "h-full flex flex-col" : "space-y-3")}>
+      <div className={cn("relative overflow-hidden rounded-sq-lg bg-muted/40", fullHeight ? "flex-1 min-h-0" : "mt-1")}>
         <div
           ref={mapContainerRef}
-          className="h-[480px] w-full"
+          className={cn("w-full", fullHeight ? "h-full" : "h-[480px]")}
         />
 
         {/* Loading overlay */}
