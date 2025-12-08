@@ -4,7 +4,7 @@ import { BEN_HANDICAP_MOCK } from '@/lib/mockHandicapData';
 import HandicapHeroStrip from './HandicapHeroStrip';
 import HandicapStatGrid from './HandicapStatGrid';
 import { HandicapJourneyCard } from './HandicapJourneyCard';
-import CourseImpactCard from './CourseImpactCard';
+import { HandicapCourseImpactCard } from './HandicapCourseImpactCard';
 import FriendsHandicapCard from './FriendsHandicapCard';
 import HandicapMilestonesCard from './HandicapMilestonesCard';
 import RecentRoundsFeed from './RecentRoundsFeed';
@@ -77,10 +77,7 @@ const HandicapDemoExperience: React.FC = () => {
       <HandicapJourneyCard timeline={data.timeline} />
 
       {/* D. Course Impact */}
-      <CourseImpactCard
-        toughest={data.toughestCourses}
-        best={data.bestCourses}
-      />
+      <HandicapCourseImpactCard rounds={data.rounds} />
 
       {/* E. Friends & Rivals */}
       <FriendsHandicapCard friends={data.friends} />
