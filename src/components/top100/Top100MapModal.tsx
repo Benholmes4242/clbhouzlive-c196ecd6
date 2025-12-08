@@ -55,6 +55,7 @@ const Top100MapModal: React.FC<Top100MapModalProps> = ({
             <Top100MapView 
               scope={scope}
               onScopeChange={onScopeChange}
+              fullHeight
             />
           </div>
         </div>
