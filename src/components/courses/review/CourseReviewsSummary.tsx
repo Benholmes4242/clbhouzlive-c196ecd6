@@ -98,9 +98,9 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
       <div className="mb-5">
         <div className="mt-3 flex w-full items-start gap-1.5">
           {/* LEFT: score + badge */}
-          <div className="flex min-w-[140px] max-w-[40%] flex-col items-start">
+          <div className="flex min-w-[140px] max-w-[40%] flex-col items-center">
             {/* Number and badge group - centered together */}
-            <div className="flex flex-col items-center self-start mb-2">
+            <div className="flex flex-col items-center mb-2">
               <div className="flex items-baseline gap-1 mb-2">
                 <span className="text-4xl font-semibold tracking-tight text-slate-900">
                   {averageRating.toFixed(1)}
@@ -109,8 +109,8 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
               <RatingBadge tierData={tierData} />
             </div>
 
-            {/* Rating count */}
-            <p className="text-xs text-slate-500">
+            {/* Rating count - centered */}
+            <p className="text-xs text-slate-500 text-center">
               {reviewCount} {reviewCount === 1 ? 'rating' : 'ratings'}
             </p>
           </div>
