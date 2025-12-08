@@ -8,7 +8,7 @@ export const USE_ACCESS_GATE_V2 = import.meta.env.VITE_ACCESS_GATE_VERSION?.toSt
 
 // Debug flag: Set to true to show ALL achievements as unlocked for Benjamin Holmes
 // Set to false to return to real data
-export const DEBUG_UNLOCK_ALL_ACHIEVEMENTS = true;
+export const DEBUG_UNLOCK_ALL_ACHIEVEMENTS = false;
 export const DEBUG_ACHIEVEMENTS_USER_EMAIL = 'benjamin@clbhouz.co.uk';
 
 export const FEATURE_FLAGS = {
