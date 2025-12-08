@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GripVertical, Plus, Settings2 } from 'lucide-react';
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
@@ -7,6 +7,10 @@ import { CSS } from '@dnd-kit/utilities';
 import { useUserTopTenCourses, TopTenCourse } from '@/hooks/useUserTopTenCourses';
 import { Button } from '@/components/ui/button';
 import { AddCourseModal } from './AddCourseModal';
+import { RatingPill } from '@/components/ui/RatingPill';
+import { toast } from 'sonner';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface FavouriteCoursesSectionProps {
   userId: string;
@@ -17,12 +21,14 @@ interface SortableFavouriteItemProps {
   course: TopTenCourse;
   isEditable: boolean;
   onTap: () => void;
+  userRating?: number;
 }
 
 const SortableFavouriteItem: React.FC<SortableFavouriteItemProps> = ({ 
   course, 
   isEditable, 
   onTap,
+  userRating,
 }) => {
   const isTop100 = !!(course.global_rank || course.regional_rank || course.usa_rank);
   
@@ -81,6 +87,11 @@ const SortableFavouriteItem: React.FC<SortableFavouriteItemProps> = ({
           </div>
         )}
       </div>
+
+      {/* Rating pill */}
+      {userRating && userRating > 0 && (
+        <RatingPill score={userRating} className="text-[10px] px-2 py-1 flex-shrink-0" />
+      )}
     </div>
   );
 };
@@ -92,6 +103,28 @@ export const FavouriteCoursesSection: React.FC<FavouriteCoursesSectionProps> = (
   const navigate = useNavigate();
   const { topTen, isLoading, reorderTopTen } = useUserTopTenCourses(userId);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<'top10' | 'category'>('top10');
+
+  // Fetch user ratings for the top 10 courses
+  const courseIds = useMemo(() => topTen.map(c => c.course_id), [topTen]);
+  const { data: ratingsMap = {} } = useQuery({
+    queryKey: ['user-course-ratings', userId, courseIds],
+    enabled: !!userId && courseIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('course_ratings')
+        .select('course_id, rating')
+        .eq('user_id', userId)
+        .in('course_id', courseIds);
+
+      if (error) throw error;
+      return (data || []).reduce((acc: Record<string, number>, r) => {
+        acc[r.course_id] = r.rating;
+        return acc;
+      }, {});
+    },
+    staleTime: 60_000,
+  });
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -116,6 +149,12 @@ export const FavouriteCoursesSection: React.FC<FavouriteCoursesSectionProps> = (
 
   const handleCourseClick = (courseId: string) => {
     navigate(`/courses/${courseId}`);
+  };
+
+  const handleCategoryTabClick = () => {
+    toast.info('Coming soon', {
+      description: 'Categorized favourites will be available in a future update.',
+    });
   };
 
   if (isLoading) {
@@ -153,6 +192,26 @@ export const FavouriteCoursesSection: React.FC<FavouriteCoursesSectionProps> = (
         )}
       </div>
 
+      {/* Tabs */}
+      <div className="flex gap-2 mb-3">
+        <button
+          onClick={() => setActiveTab('top10')}
+          className={`px-3 py-1.5 text-xs rounded-sq-pill transition-colors ${
+            activeTab === 'top10'
+              ? 'bg-slate-900 text-white font-medium'
+              : 'bg-slate-100 text-slate-600'
+          }`}
+        >
+          Top 10
+        </button>
+        <button
+          onClick={handleCategoryTabClick}
+          className="px-3 py-1.5 text-xs rounded-sq-pill bg-slate-50 text-slate-400 cursor-not-allowed"
+        >
+          By category
+        </button>
+      </div>
+
       {topTen.length === 0 ? (
         <div className="bg-slate-50 border border-slate-100 rounded-sq-md p-8 text-center">
           <p className="font-medium text-slate-700 mb-1">
@@ -178,6 +237,7 @@ export const FavouriteCoursesSection: React.FC<FavouriteCoursesSectionProps> = (
                   course={course}
                   isEditable={isOwnProfile}
                   onTap={() => handleCourseClick(course.course_id)}
+                  userRating={ratingsMap[course.course_id]}
                 />
               ))}
             </div>
