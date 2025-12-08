@@ -1,12 +1,39 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <!-- Sprouting Laurel Branch -->
-  <path d="M70 85 Q60 60 55 45 Q52 35 55 25"/>
-  <path d="M55 65 Q45 60 40 55 Q35 52 38 45"/>
-  <path d="M57 55 Q48 52 43 48 Q38 45 40 38"/>
-  <path d="M58 45 Q52 42 48 38 Q44 35 46 30"/>
-  <path d="M56 35 Q53 32 50 28 Q48 25 50 22"/>
-  <!-- Small leaves -->
-  <path d="M55 65 Q62 58 68 55"/>
-  <path d="M57 55 Q65 50 70 48"/>
-  <path d="M58 45 Q66 42 72 40"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Main stem - starts bottom-right, curves up toward center-left at ~45° -->
+  <path d="M 420 480 Q 350 380 280 280 Q 230 200 200 120" />
+  
+  <!-- Leaves on left side of stem (outer curve) - 6 leaves, smaller at ends -->
+  <!-- Leaf 1 - bottom, smallest -->
+  <path d="M 380 420 Q 340 400 320 360 Q 350 380 380 420" />
+  
+  <!-- Leaf 2 -->
+  <path d="M 345 365 Q 295 340 265 290 Q 305 320 345 365" />
+  
+  <!-- Leaf 3 - getting larger -->
+  <path d="M 310 310 Q 250 275 210 215 Q 260 255 310 310" />
+  
+  <!-- Leaf 4 - center, largest -->
+  <path d="M 275 255 Q 205 210 160 140 Q 220 185 275 255" />
+  
+  <!-- Leaf 5 - getting smaller -->
+  <path d="M 245 205 Q 185 165 150 100 Q 200 140 245 205" />
+  
+  <!-- Leaf 6 - top, small -->
+  <path d="M 218 160 Q 175 130 155 80 Q 185 110 218 160" />
+  
+  <!-- Leaves on right side of stem (inner curve) - 5 leaves -->
+  <!-- Leaf 1 - bottom, smallest -->
+  <path d="M 395 435 Q 420 395 455 375 Q 430 405 395 435" />
+  
+  <!-- Leaf 2 -->
+  <path d="M 360 375 Q 395 330 440 300 Q 405 345 360 375" />
+  
+  <!-- Leaf 3 - larger -->
+  <path d="M 325 320 Q 370 265 425 225 Q 375 285 325 320" />
+  
+  <!-- Leaf 4 - center area -->
+  <path d="M 292 265 Q 345 205 400 160 Q 350 220 292 265" />
+  
+  <!-- Leaf 5 - upper, smaller -->
+  <path d="M 260 215 Q 310 160 355 115 Q 310 170 260 215" />
 </svg>
