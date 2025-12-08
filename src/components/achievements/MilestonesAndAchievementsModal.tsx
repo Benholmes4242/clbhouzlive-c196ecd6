@@ -210,13 +210,13 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
             <>
               {/* Nudge banner */}
               {nudge && !isDebugUser && (
-                <div className="px-4 md:px-8 mt-4">
+                <div className="px-2.5 md:px-5 mt-4">
                   <NudgeBanner nudge={nudge} variant="compact" />
                 </div>
               )}
 
               {/* Hero banner: Clubs & achievements */}
-              <section className="px-4 md:px-8 mt-5 mb-6">
+              <section className="px-2.5 md:px-5 mt-5 mb-6">
                 <div
                   className="rounded-sq-lg p-5 md:p-6 shadow-lg"
                   style={heroStyle}
@@ -275,8 +275,8 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
               </section>
 
               {/* Milestone badges grid */}
-              <section className="px-4 md:px-8 pb-6">
-                <h2 className="text-sm font-semibold text-foreground mb-4">
+              <section className="px-2.5 md:px-5 pb-6">
+                <h2 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground mb-3">
                   Top 100 milestone clubs
                 </h2>
 
@@ -305,8 +305,8 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
               </section>
 
               {/* List completion badges grid */}
-              <section className="px-4 md:px-8 pb-10">
-                <h2 className="text-sm font-semibold text-foreground mb-4">
+              <section className="px-2.5 md:px-5 pb-10">
+                <h2 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground mb-3">
                   Completed Top 100 lists
                 </h2>
 
