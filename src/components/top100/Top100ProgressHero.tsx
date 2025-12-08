@@ -84,26 +84,29 @@ function HeroWithMilestoneRow({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
     >
-      <div className="flex items-center justify-between">
-        {/* Avatar on the left - aligned with tabs bar left edge */}
+      <div className="flex items-center justify-between gap-4">
+        {/* Avatar on the left - responsive size */}
         <div className="shrink-0">
           <SquircleAvatar
-            size={150}
+            size={120}
             src={avatarUrl}
             alt={displayName ?? 'Player avatar'}
             fallback={initials}
             ringColor={ringColor}
+            className="sm:w-[150px] sm:h-[157px]"
           />
         </div>
 
-        {/* Achievement badge card on the right - aligned with tabs bar right edge */}
-        <AchievementBadgeCard
-          tier={achievementTier}
-          title={`${achievementTier} Club`}
-          subtitle={clubName}
-          unlocked={true}
-          totalTop100Played={totalTop100Played}
-        />
+        {/* Achievement badge card on the right */}
+        <div className="shrink-0">
+          <AchievementBadgeCard
+            tier={achievementTier}
+            title={`${achievementTier} Club`}
+            subtitle={clubName}
+            unlocked={true}
+            totalTop100Played={totalTop100Played}
+          />
+        </div>
       </div>
     </motion.div>
   );
