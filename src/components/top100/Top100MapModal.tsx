@@ -29,7 +29,7 @@ const Top100MapModal: React.FC<Top100MapModalProps> = ({
       >
         <div className="h-full flex flex-col bg-background">
           {/* Page header */}
-          <header className="flex-shrink-0 px-4 pt-4 pb-3 md:px-8 md:pt-6 md:pb-4 border-b border-border/40">
+          <header className="flex-shrink-0 px-5 pt-4 pb-3 md:px-8 md:pt-6 md:pb-4 border-b border-border/40">
             {/* Back link - matches Top100BackButton styling */}
             <button 
               onClick={() => onOpenChange(false)}
@@ -39,12 +39,13 @@ const Top100MapModal: React.FC<Top100MapModalProps> = ({
               Back to courses
             </button>
 
-            {/* Title / subtitle block - centered */}
-            <div className="mt-3 text-center">
-              <h1 className="text-lg font-semibold text-foreground">
-                See where you've played – and what's left to play
-              </h1>
-            </div>
+            {/* Title / subtitle block */}
+            <h1 className="text-xl font-semibold text-foreground mt-2">
+              Your Top 100 Journey
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Explore your journey through the Top 100
+            </p>
           </header>
 
           {/* Map content - fills remaining space */}
