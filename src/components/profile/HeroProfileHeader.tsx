@@ -181,16 +181,15 @@ const HeroProfileHeader = ({
     startTransition(direction, () => {
       onSectionChange?.(newTab);
       
-      // Wait for animation to complete before restoring scroll
+      // Wait for animation AND initial content render to complete before restoring scroll
+      // Use longer delay to account for first-mount data loading in tabs
       setTimeout(() => {
         window.removeEventListener('scroll', preventScroll);
         document.body.style.overscrollBehavior = '';
         
-        // Restore to the scroll position captured at click time
-        if (Math.abs(window.scrollY - previousScrollYRef.current) > 5) {
-          window.scrollTo({ top: previousScrollYRef.current, behavior: 'instant' });
-        }
-      }, PROFILE_TAB_TRANSITION_MS + 50);
+        // Always restore to the scroll position captured at click time
+        window.scrollTo({ top: previousScrollYRef.current, behavior: 'instant' });
+      }, PROFILE_TAB_TRANSITION_MS + 150);
     });
   }, [activeSection, transitionState, startTransition, onSectionChange, tabs]);
 
