@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useFriendsTop100Progress } from '@/hooks/useFriendsTop100Progress';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 
 interface FriendsTop100PanelProps {
   listId: string;
@@ -61,13 +62,13 @@ export const FriendsTop100Panel: React.FC<FriendsTop100PanelProps> = ({ listId, 
               className="flex-shrink-0 bg-background/50 rounded-xl p-4 cursor-pointer hover:bg-background/70 transition-colors min-w-[160px]"
             >
               <div className="flex flex-col items-center gap-2">
-                <Avatar className="w-12 h-12">
-                  <AvatarImage src={friend.profile.profile_photo_url || undefined} />
-                  <AvatarFallback className="bg-primary/10 text-primary">
-                    {friend.profile.display_name?.[0]?.toUpperCase() || 
-                     friend.profile.username?.[0]?.toUpperCase() || '?'}
-                  </AvatarFallback>
-                </Avatar>
+                <SquircleAvatar
+                  size={48}
+                  src={friend.profile.profile_photo_url}
+                  alt={friend.profile.display_name || friend.profile.username || ''}
+                  fallback={(friend.profile.display_name?.[0] || friend.profile.username?.[0] || '?').toUpperCase()}
+                  ringColor={friend.total_top100_played ? getRingColorForTotalPlayed(friend.total_top100_played) : null}
+                />
                 <div className="text-center">
                   <p className="font-medium text-sm truncate max-w-[140px]">
                     {friend.profile.display_name || friend.profile.username}
@@ -100,13 +101,13 @@ export const FriendsTop100Panel: React.FC<FriendsTop100PanelProps> = ({ listId, 
                 <div className="text-sm font-medium text-muted-foreground w-6">
                   #{index + 1}
                 </div>
-                <Avatar className="w-10 h-10">
-                  <AvatarImage src={friend.profile.profile_photo_url || undefined} />
-                  <AvatarFallback className="bg-primary/10 text-primary">
-                    {friend.profile.display_name?.[0]?.toUpperCase() || 
-                     friend.profile.username?.[0]?.toUpperCase() || '?'}
-                  </AvatarFallback>
-                </Avatar>
+                <SquircleAvatar
+                  size={40}
+                  src={friend.profile.profile_photo_url}
+                  alt={friend.profile.display_name || friend.profile.username || ''}
+                  fallback={(friend.profile.display_name?.[0] || friend.profile.username?.[0] || '?').toUpperCase()}
+                  ringColor={friend.total_top100_played ? getRingColorForTotalPlayed(friend.total_top100_played) : null}
+                />
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm truncate">
                     {friend.profile.display_name || friend.profile.username}
