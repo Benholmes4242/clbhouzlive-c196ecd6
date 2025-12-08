@@ -396,10 +396,10 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
   return (
     <div className={cn("top100-map-shell", fullHeight ? "h-full flex flex-col" : "space-y-3")}>
-      <div className={cn("relative overflow-hidden bg-muted/40", fullHeight ? "flex-1 min-h-0 h-full" : "mt-1 rounded-sq-lg")}>
+      <div className={cn("relative overflow-hidden rounded-sq-lg bg-muted/40", fullHeight ? "flex-1 min-h-0" : "mt-1")}>
         <div
           ref={mapContainerRef}
-          className={cn("w-full absolute inset-0", fullHeight ? "" : "h-[480px] relative")}
+          className={cn("w-full", fullHeight ? "h-full" : "h-[480px]")}
         />
 
         {/* Loading overlay */}
