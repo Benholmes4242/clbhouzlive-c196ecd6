@@ -243,7 +243,7 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
 
                   {/* RIGHT: Emblem */}
                   <div className="flex-shrink-0 self-center sm:self-auto">
-                    <div className="relative px-4 py-2.5 md:px-5 md:py-3 rounded-sq-md flex items-center justify-center shadow-md bg-slate-900 text-slate-50">
+                    <div className="relative px-4 py-2.5 md:px-5 md:py-3 rounded-sq-md flex items-center justify-center shadow-md bg-surface-slate text-slate-50">
                       {/* Number + caption */}
                       <div className="relative flex items-center gap-1.5 leading-tight">
                         <span className="text-lg md:text-2xl font-semibold">
