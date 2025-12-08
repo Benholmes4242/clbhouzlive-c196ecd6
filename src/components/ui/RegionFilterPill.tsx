@@ -55,12 +55,6 @@ export const RegionFilterPill: React.FC<RegionFilterPillProps> = ({
       }
     >
       <span className="font-medium">{label}</span>
-      {active && (
-        <span
-          className="ml-2 h-2 w-2 rounded-full"
-          style={{ backgroundColor: theme.accent }}
-        />
-      )}
     </button>
   );
 };

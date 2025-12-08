@@ -30,18 +30,18 @@ const Top100MapModal: React.FC<Top100MapModalProps> = ({
         <div className="h-full flex flex-col bg-background">
           {/* Page header */}
           <header className="flex-shrink-0 px-4 pt-4 pb-3 md:px-8 md:pt-6 md:pb-4 border-b border-border/40">
-            {/* Back link */}
+            {/* Back link - matches Top100BackButton styling */}
             <button 
               onClick={() => onOpenChange(false)}
-              className="inline-flex items-center text-sm text-slate-500 hover:text-slate-700 transition-colors"
+              className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition"
             >
               <ChevronLeft className="mr-1 h-4 w-4" />
-              <span>Back to courses</span>
+              Back to courses
             </button>
 
-            {/* Title / subtitle block */}
-            <div className="mt-3">
-              <h1 className="text-lg font-semibold text-slate-900">
+            {/* Title / subtitle block - centered */}
+            <div className="mt-3 text-center">
+              <h1 className="text-lg font-semibold text-foreground">
                 See where you've played – and what's left to play
               </h1>
             </div>
