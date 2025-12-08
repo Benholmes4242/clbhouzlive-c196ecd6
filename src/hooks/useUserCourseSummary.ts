@@ -9,13 +9,13 @@ export function useUserCourseSummary(userId: string | undefined) {
     queryFn: async () => {
       if (!userId) return 0;
 
-      const { data, error } = await supabase
+      const { count, error } = await supabase
         .from('user_course_activity' as any)
         .select('course_id', { count: 'exact', head: true })
         .eq('user_id', userId);
 
       if (error) throw error;
-      return data || 0;
+      return count ?? 0;
     },
     staleTime: 60_000,
   });
