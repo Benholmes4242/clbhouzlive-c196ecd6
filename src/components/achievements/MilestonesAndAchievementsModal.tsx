@@ -54,7 +54,14 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
   // In debug mode, show all as unlocked with 400 courses
   const totalTop100Played = isDebugUser ? 400 : (progressData?.totalTop100Played ?? 0);
 
-  const firstName = profile?.display_name?.split(' ')[0] || profile?.username || 'Golfer';
+  // Derive a friendly first name
+  const rawName =
+    profile?.display_name ||
+    profile?.username ||
+    user?.email?.split('@')[0] ||
+    'Golfer';
+  const firstName = rawName.split(' ')[0];
+
   const totalMilestones = MILESTONE_ACHIEVEMENTS.length;
   const totalLists = LIST_ACHIEVEMENTS.length;
   
@@ -70,8 +77,13 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
   const coursesToNext = nextClub ? nextClub.threshold - totalTop100Played : 0;
   const hasCompletedAll = unlockedMilestoneCount === totalMilestones;
   
-  // Currently this modal only shows logged-in user's own data
-  const isOwnProfile = true;
+  // Viewer vs profile owner - determine if viewing own profile
+  const viewerId = user?.id;
+  const ownerId = profile?.id ?? null;
+  const isOwnProfile = viewerId != null && ownerId != null
+    ? viewerId === ownerId
+    : true; // fallback to "own" if we can't determine
+
   const currentLevelLabel = currentClub.tierName || 'Starter';
   const coursesForNextLevel = nextClub?.threshold ?? null;
 
