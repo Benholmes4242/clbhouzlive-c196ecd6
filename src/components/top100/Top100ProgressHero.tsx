@@ -84,11 +84,11 @@ function HeroWithMilestoneRow({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
     >
-      <div className="flex items-center gap-3">
-        {/* Avatar on the left */}
+      <div className="flex items-center justify-between">
+        {/* Avatar on the left - aligned with tabs bar left edge */}
         <div className="shrink-0">
           <SquircleAvatar
-            size={92}
+            size={150}
             src={avatarUrl}
             alt={displayName ?? 'Player avatar'}
             fallback={initials}
@@ -96,7 +96,7 @@ function HeroWithMilestoneRow({
           />
         </div>
 
-        {/* Achievement badge card on the right - uses canonical component */}
+        {/* Achievement badge card on the right - aligned with tabs bar right edge */}
         <AchievementBadgeCard
           tier={achievementTier}
           title={`${achievementTier} Club`}
