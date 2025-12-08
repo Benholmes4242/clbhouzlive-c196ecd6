@@ -14,6 +14,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 import { SHOW_MOCK_REVIEWS } from '@/features/courses/config';
 import { generateVideoThumbnail } from '@/utils/videoThumbnail';
 import { getScoreTier } from '@/utils/getScoreTier';
+import { RatingPill } from '@/components/ui/RatingPill';
 
 // Maximum number of media items (photos + videos) per review
 const MAX_REVIEW_MEDIA_ITEMS = 6;
@@ -910,24 +911,13 @@ const PostPlayRatingModal = ({
                 />
               </div>
 
-              {/* Rating badge - uses unified tier system */}
-              {(() => {
-                const tierData = getScoreTier(selectedRating);
-
-                return (
-                  <div className="mt-4 flex flex-col items-center gap-1">
-                    <span className="text-xs text-slate-500 tracking-wide uppercase">
-                      Your rating summary
-                    </span>
-                    <span
-                      className={`inline-flex items-center px-3 py-1 border text-[11px] font-semibold uppercase ${tierData.bg} ${tierData.border} ${tierData.text}`}
-                      style={{ borderRadius: 'var(--radius)' }}
-                    >
-                      {tierData.label}
-                    </span>
-                  </div>
-                );
-              })()}
+              {/* Rating badge - uses unified RatingPill component */}
+              <div className="mt-4 flex flex-col items-center gap-1">
+                <span className="text-xs text-slate-500 tracking-wide uppercase">
+                  Your rating summary
+                </span>
+                <RatingPill score={selectedRating} />
+              </div>
             </section>
 
             {/* Share Your Thoughts - Section B (dark) */}

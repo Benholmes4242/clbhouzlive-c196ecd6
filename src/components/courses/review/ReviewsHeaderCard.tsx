@@ -2,17 +2,7 @@ import React from 'react';
 import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
-import { getScoreTier } from '@/utils/getScoreTier';
-
-const CommunityRatingBadge: React.FC<{ tierData: ReturnType<typeof getScoreTier> }> = ({ tierData }) => {
-  return (
-    <span
-      className={`inline-flex items-center justify-center rounded-full px-3 py-1 border text-xs font-semibold uppercase ${tierData.bg} ${tierData.border} ${tierData.text}`}
-    >
-      {tierData.label}
-    </span>
-  );
-};
+import { RatingPill } from '@/components/ui/RatingPill';
 
 interface ReviewsHeaderCardProps {
   communityScore: number;
@@ -29,7 +19,6 @@ export const ReviewsHeaderCard: React.FC<ReviewsHeaderCardProps> = ({
   userHasRating,
   onRateCourse,
 }) => {
-  const tierData = getScoreTier(communityScore);
   const onlyUserHasRated = reviewCount === 1 && userHasRating;
 
   // Calculate comparison message
@@ -100,7 +89,7 @@ export const ReviewsHeaderCard: React.FC<ReviewsHeaderCardProps> = ({
         </div>
 
         {/* Badge */}
-        <CommunityRatingBadge tierData={tierData} />
+        <RatingPill score={communityScore} />
       </div>
 
       {/* Comparison message */}
