@@ -51,7 +51,7 @@ const Top100MapModal: React.FC<Top100MapModalProps> = ({
           </header>
 
           {/* Map content - fills remaining space */}
-          <div className="flex-1 min-h-0">
+          <div className="flex-1 min-h-0 overflow-hidden">
             <Top100MapView 
               scope={scope}
               onScopeChange={onScopeChange}
