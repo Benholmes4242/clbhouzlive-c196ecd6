@@ -48,10 +48,7 @@ const ActivityFiltersSheet: React.FC<ActivityFiltersSheetProps> = ({
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="bg-background border-t border-border">
-        {/* Slate handle bar */}
-        <div className="mx-auto mt-3 mb-1 h-1 w-10 rounded-full bg-slate-200" />
-        
-        <DrawerHeader className="text-left pb-2 pt-1">
+        <DrawerHeader className="text-left pb-2 pt-4">
           <DrawerTitle className="text-lg font-semibold text-foreground">Filter posts</DrawerTitle>
         </DrawerHeader>
         
