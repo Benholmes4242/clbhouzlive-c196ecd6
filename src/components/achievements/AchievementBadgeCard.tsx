@@ -189,12 +189,13 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         <div 
           className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
           style={{ 
-            backgroundColor: unlocked ? `${palette.accent}1F` : 'rgba(148,163,184,0.12)' 
+            backgroundColor: unlocked ? 'rgba(15,23,42,0.08)' : 'rgba(148,163,184,0.12)' 
           }}
         >
+          {/* Trophy always uses dark slate to match title text */}
           <Trophy 
             className="w-3.5 h-3.5"
-            style={{ color: unlocked ? palette.accent : '#94a3b8' }} 
+            style={{ color: unlocked ? '#0F172A' : '#94a3b8' }} 
           />
         </div>
         <div className="flex-1 min-w-0 overflow-hidden text-left">
