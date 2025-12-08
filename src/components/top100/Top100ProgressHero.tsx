@@ -84,28 +84,49 @@ function HeroWithMilestoneRow({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
     >
-      <div className="flex items-center justify-between gap-2">
-        {/* Avatar on the left - responsive size */}
-        <div className="shrink-0">
-          <SquircleAvatar
-            size={140}
-            src={avatarUrl}
-            alt={displayName ?? 'Player avatar'}
-            fallback={initials}
-            ringColor={ringColor}
-            className="sm:w-[160px] sm:h-[168px]"
-          />
-        </div>
+      <div className="w-full flex justify-center">
+        <div
+          className="flex items-center justify-between gap-6 px-4"
+          style={{
+            columnGap: 'min(max(24px, 4vw), 48px)',
+            width: '100%',
+          }}
+        >
+          {/* Avatar on the left - responsive size */}
+          <div
+            className="rounded-xl overflow-hidden"
+            style={{
+              width: 'min(34vw, 140px)',
+              height: 'min(34vw, 140px)',
+              minWidth: '90px',
+              minHeight: '90px',
+            }}
+          >
+            <SquircleAvatar
+              size={140}
+              src={avatarUrl}
+              alt={displayName ?? 'Player avatar'}
+              fallback={initials}
+              ringColor={ringColor}
+              className="w-full h-full"
+            />
+          </div>
 
-        {/* Achievement badge card on the right - scaled down 10% for My Progress */}
-        <div className="shrink-0 scale-90 origin-right">
-          <AchievementBadgeCard
-            tier={achievementTier}
-            title={`${achievementTier} Club`}
-            subtitle={clubName}
-            unlocked={true}
-            totalTop100Played={totalTop100Played}
-          />
+          {/* Achievement badge card on the right */}
+          <div
+            style={{
+              width: 'min(42vw, 260px)',
+              minWidth: '140px',
+            }}
+          >
+            <AchievementBadgeCard
+              tier={achievementTier}
+              title={`${achievementTier} Club`}
+              subtitle={clubName}
+              unlocked={true}
+              totalTop100Played={totalTop100Played}
+            />
+          </div>
         </div>
       </div>
     </motion.div>
