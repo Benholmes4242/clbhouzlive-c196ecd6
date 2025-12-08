@@ -10,6 +10,7 @@ import { Top100YearSummary } from '@/components/top100/Top100YearSummary';
 import { Top100CompletedListsRow } from '@/components/top100/Top100CompletedListsRow';
 import { Top100ListCompletionsRow } from '@/components/top100/Top100ListCompletionsRow';
 import type { Top100ListId } from '@/config/top100ListMilestones';
+import { MILESTONE_THEMES } from '@/lib/globalAchievementMilestoneSystem';
 
 
 import { Top100RegionProgressGrid } from './Top100RegionProgressGrid';
@@ -18,17 +19,17 @@ import { useTop100FriendsSnapshot } from '@/hooks/useTop100FriendsSnapshot';
 import Top100FriendsActivityCard from '@/components/top100/Top100FriendsActivityCard';
 import { buildYearSummary } from '@/lib/top100ProgressSelectors';
 
-// Tier colors for next milestone chip
+// Tier colors for next milestone chip - derived from global MILESTONE_THEMES
 const TIER_COLORS: Record<string, string> = {
   none: '#94a3b8',
-  rookie: '#D9C7A3',
-  fairway: '#8BBF5A',
-  founders: '#2E5930',
-  heritage: '#C8A44B',
-  century: '#B7BCC6',
-  elite: '#D9A441',
-  legendary: '#5A3E8C',
-  grandslam: '#0C0F14',
+  rookie: MILESTONE_THEMES[5].bgDark,
+  fairway: MILESTONE_THEMES[10].bgDark,
+  founders: MILESTONE_THEMES[20].bgDark,
+  heritage: MILESTONE_THEMES[50].bgDark,
+  century: MILESTONE_THEMES[100].bgDark,
+  elite: MILESTONE_THEMES[200].bgDark,
+  legendary: MILESTONE_THEMES[300].bgDark,
+  grandslam: MILESTONE_THEMES[400].bgDark,
 };
 
 interface Top100MyProgressPanelProps {
