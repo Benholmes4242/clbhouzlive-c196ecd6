@@ -38,7 +38,7 @@ export const RegionFilterPill: React.FC<RegionFilterPillProps> = ({
       type="button"
       onClick={onClick}
       className={cn(
-        'inline-flex items-center rounded-full px-4 py-2 text-sm',
+        'inline-flex items-center rounded-sq-pill px-4 py-2 text-sm',
         'shadow-sm transition-colors flex-1 justify-center',
         active
           ? ''

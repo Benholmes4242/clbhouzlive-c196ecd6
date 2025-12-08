@@ -23,7 +23,7 @@ export const FilterPill: React.FC<FilterPillProps> = ({
       type="button"
       onClick={onClick}
       className={cn(
-        'inline-flex items-center rounded-full px-4 py-2 text-sm',
+        'inline-flex items-center rounded-sq-pill px-4 py-2 text-sm',
         'shadow-sm transition-colors',
         active
           ? 'bg-slate-100 text-slate-900'
