@@ -321,42 +321,35 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
   }
 
   return (
-    <main className="min-h-screen relative flex items-center justify-center px-4">
+    <main className="min-h-screen relative flex flex-col items-center justify-center px-4">
+      {/* Background image */}
       <div 
         className="fixed inset-0 bg-cover bg-center"
         style={{ backgroundImage: "url(/images/gate/course-blur.jpg)" }}
       />
       
+      {/* Dark overlay with blur */}
       <div className="fixed inset-0 bg-black/60 backdrop-blur-md" />
       
-      <section className="relative z-10 w-[90%] max-w-[360px] rounded-[18px] bg-surface-card border border-border shadow-shadow-medium p-8 text-center">
-        <div className="flex justify-center items-center mb-6">
-          <img
-            src="/images/brand/clubhouz-mark-dark.svg"
-            alt="clubhouz"
-            className="w-auto h-16 object-contain"
-          />
-        </div>
-
-        <h1 className="font-display text-foreground text-display-xl font-bold leading-tight mb-3">
-          YOUR HOME<br/>OF GOLF
-        </h1>
-
-        <p className="text-muted-foreground text-body-md mb-6">
+      {/* Minimal access box */}
+      <section className="relative z-10 w-[280px] rounded-sq-md bg-white shadow-[0_4px_20px_rgba(0,0,0,0.15)] px-6 py-5">
+        {/* Single line of text */}
+        <p className="text-[15px] text-[#BFBFBF] text-center mb-4 font-normal">
           Enter access code to continue
         </p>
 
+        {/* Error message */}
         {errorMessage && (
           <div 
             role="alert" 
             aria-live="polite"
-            className="text-destructive text-sm mb-3"
+            className="text-destructive text-xs text-center mb-3"
           >
             {errorMessage}
           </div>
         )}
 
-        <form className="space-y-3" onSubmit={handleSubmit}>
+        <form className="flex flex-col items-center gap-3" onSubmit={handleSubmit}>
           <label htmlFor="gate-code" className="sr-only">
             Access code
           </label>
@@ -365,30 +358,31 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
             type="password"
             inputMode="text"
             autoComplete="off"
+            autoFocus
             value={accessCode}
             onChange={(e) => setAccessCode(e.target.value)}
-            placeholder="••••••••••"
             disabled={submitting}
-            className="w-full rounded-lg bg-surface-alt text-foreground placeholder:text-tertiary
-                     border border-border px-4 py-3 text-body-md outline-none
-                     focus:border-primary-accent focus:ring-1 focus:ring-primary-accent transition-all duration-motion-fast ease-standard
-                     disabled:opacity-60"
+            className="w-[80%] rounded-sq-sm bg-white text-foreground
+                     border border-slate-200 px-3 py-2.5 text-sm outline-none text-center
+                     focus:border-slate-600 focus:ring-2 focus:ring-slate-300/70 focus:ring-offset-1 
+                     transition-all duration-150 disabled:opacity-60"
           />
           <button
             type="submit"
             disabled={submitting}
             aria-label="Submit access code"
-            className="w-full rounded-lg bg-primary-accent text-white py-3 font-medium text-body-md
-                     hover:opacity-90 disabled:opacity-60 transition-opacity"
+            className="w-[80%] rounded-sq-sm bg-[#6E7A86] text-white py-2.5 font-medium text-sm
+                     hover:bg-[#5F6B76] active:bg-[#566068] disabled:opacity-60 transition-colors"
           >
-            {submitting ? "Checking..." : "ENTER"}
+            {submitting ? "..." : "ENTER"}
           </button>
         </form>
-
-        <p className="mt-6 text-meta text-text-tertiary">
-          © 2025 clubhouz
-        </p>
       </section>
+
+      {/* Copyright below the box */}
+      <p className="relative z-10 mt-4 text-xs text-[#9CA3AF]">
+        © 2025 clubhouz
+      </p>
     </main>
   );
 };
