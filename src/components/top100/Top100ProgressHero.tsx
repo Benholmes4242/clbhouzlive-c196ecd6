@@ -1,10 +1,10 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import type { Top100TierId } from '@/lib/top100Club';
 import { getTop100Club } from '@/lib/top100Club';
-import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
-import { getNextBadgeNudge, type UserTop100Progress } from '@/lib/achievements/nextBadgeNudge';
+import { getRingColorForTotalPlayed, MILESTONE_THEMES, type MilestoneTier } from '@/lib/globalAchievementMilestoneSystem';
+import { getNextBadgeNudge } from '@/lib/achievements/nextBadgeNudge';
 import NudgeBanner from '@/components/achievements/NudgeBanner';
 
 export interface Top100ProgressHeroProps {
@@ -16,12 +16,114 @@ export interface Top100ProgressHeroProps {
   regionsCount: number;
   lastRoundAt: string | null;
   isOwnProfile?: boolean;
-  // Optional list progress for nudge calculation
   listsProgress?: Array<{
     listSlug: string;
     played: number;
     total: number;
   }>;
+}
+
+// Centered avatar for users with no milestone yet
+function CenteredHeroAvatar({ 
+  avatarUrl, 
+  displayName, 
+  ringColor 
+}: { 
+  avatarUrl: string | null; 
+  displayName: string | null;
+  ringColor: string | null;
+}) {
+  const initials = displayName
+    ?.split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2) || '?';
+
+  return (
+    <div className="flex justify-center mb-6">
+      <SquircleAvatar
+        size={136}
+        src={avatarUrl}
+        alt={displayName ?? 'Player avatar'}
+        fallback={initials}
+        ringColor={ringColor}
+      />
+    </div>
+  );
+}
+
+// Hero row with avatar left, milestone card right
+function HeroWithMilestoneRow({ 
+  avatarUrl, 
+  displayName, 
+  ringColor,
+  milestone,
+}: { 
+  avatarUrl: string | null; 
+  displayName: string | null;
+  ringColor: string | null;
+  milestone: {
+    threshold: number;
+    title: string;
+    subtitle: string;
+    statusLabel: string;
+    theme: { bgLight: string; bgDark: string };
+  };
+}) {
+  const initials = displayName
+    ?.split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2) || '?';
+
+  return (
+    <motion.div
+      className="mb-6"
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25, ease: 'easeOut' }}
+    >
+      <div className="flex items-center gap-3">
+        {/* Avatar on the left */}
+        <div className="shrink-0">
+          <SquircleAvatar
+            size={112}
+            src={avatarUrl}
+            alt={displayName ?? 'Player avatar'}
+            fallback={initials}
+            ringColor={ringColor}
+          />
+        </div>
+
+        {/* Milestone card on the right */}
+        <div className="flex-1">
+          <div
+            className="rounded-sq-lg px-4 py-3 shadow-sm"
+            style={{
+              background: `linear-gradient(135deg, ${milestone.theme.bgLight}, ${milestone.theme.bgDark})`,
+            }}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-slate-900 truncate">
+                  {milestone.title}
+                </p>
+                <p className="text-xs text-slate-700 truncate">
+                  {milestone.subtitle}
+                </p>
+              </div>
+
+              <span className="shrink-0 rounded-sq-pill bg-white/90 px-3 py-1 text-xs font-medium text-slate-900">
+                {milestone.statusLabel}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
 }
 
 export function Top100ProgressHero({
@@ -35,20 +137,10 @@ export function Top100ProgressHero({
   isOwnProfile = true,
   listsProgress,
 }: Top100ProgressHeroProps) {
-  const initials = displayName
-    ?.split(' ')
-    .map(n => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2) || '?';
-
   // Ring color from unified theme system
   const tierColor = getRingColorForTotalPlayed(totalTop100Played);
   const club = getTop100Club(totalTop100Played);
   const hasAchievement = totalTop100Played >= 5;
-  
-  // Map threshold to AchievementTier
-  const achievementTier = club.threshold?.toString() as AchievementTier || '5';
   
   const formattedDate = lastRoundAt
     ? new Date(lastRoundAt).toLocaleDateString()
@@ -72,38 +164,38 @@ export function Top100ProgressHero({
     }),
   }) : null;
 
-  return (
-    <section className="flex flex-col items-center gap-3 pb-4">
-      {/* Profile + achievement badge */}
-      <div className="flex flex-col items-center">
-        <div className="relative">
-          {/* Large avatar - uses unified ring color */}
-          <SquircleAvatar
-            size={150}
-            src={avatarUrl}
-            alt={displayName ?? 'Player avatar'}
-            fallback={initials}
-            ringColor={tierColor}
-          />
-        </div>
+  // Build milestone data for the card
+  const currentMilestone = hasAchievement && club.threshold ? {
+    threshold: club.threshold,
+    title: `${club.threshold} Club`,
+    subtitle: club.tierName || 'Top 100 Club',
+    statusLabel: 'Unlocked',
+    theme: MILESTONE_THEMES[club.threshold as MilestoneTier] || { 
+      bgLight: '#F7E3C2', 
+      bgDark: '#FBE4E4' 
+    },
+  } : null;
 
-        {/* Achievement badge below avatar - uses unified AchievementBadgeCard */}
-        {hasAchievement && (
-          <div className="mt-4">
-            <AchievementBadgeCard
-              tier={achievementTier}
-              title={`${totalTop100Played} Top 100`}
-              subtitle={club.tierName || 'Top 100 Club'}
-              unlocked={true}
-              compact={true}
-              totalTop100Played={totalTop100Played}
-            />
-          </div>
-        )}
-      </div>
+  return (
+    <section className="flex flex-col items-center gap-3 pb-4 px-4">
+      {/* Hero: centered avatar OR avatar + milestone side by side */}
+      {currentMilestone ? (
+        <HeroWithMilestoneRow
+          avatarUrl={avatarUrl}
+          displayName={displayName}
+          ringColor={tierColor}
+          milestone={currentMilestone}
+        />
+      ) : (
+        <CenteredHeroAvatar
+          avatarUrl={avatarUrl}
+          displayName={displayName}
+          ringColor={tierColor}
+        />
+      )}
 
       {/* Primary summary line */}
-      <p className="mt-2 text-center text-lg font-semibold text-foreground">
+      <p className="text-center text-lg font-semibold text-foreground">
         {isOwnProfile ? "You've" : `${displayName} has`} played{' '}
         <span className="font-bold">{totalTop100Played} Top 100 course{totalTop100Played === 1 ? '' : 's'}</span>
       </p>
@@ -117,7 +209,7 @@ export function Top100ProgressHero({
 
       {/* Nudge banner */}
       {nudge && isOwnProfile && (
-        <div className="w-full max-w-sm px-4">
+        <div className="w-full max-w-sm">
           <NudgeBanner nudge={nudge} variant="hero" />
         </div>
       )}
