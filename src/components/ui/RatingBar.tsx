@@ -1,6 +1,5 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { COURSE_RATING_THEMES } from '@/lib/globalAchievementMilestoneSystem';
 
 export type RatingBand =
   | 'outstanding'
@@ -24,13 +23,20 @@ interface RatingBarProps {
   className?: string;
 }
 
-// Map band names to Global Colour System themes
-const bandToAccent: Record<RatingBand, string> = {
-  outstanding: COURSE_RATING_THEMES.OUTSTANDING.accent,
-  excellent: COURSE_RATING_THEMES.EXCELLENT.accent,
-  veryGood: COURSE_RATING_THEMES.VERY_GOOD.accent,
-  good: COURSE_RATING_THEMES.GOOD.accent,
-  fair: COURSE_RATING_THEMES.FAIR.accent,
+/**
+ * Bar fill colors mapped to milestone club colors:
+ * - Fair → 5 Club grey/slate
+ * - Good → 10 Club blue-grey
+ * - Very Good → 20 Club soft blue
+ * - Excellent → 200 Club green
+ * - Outstanding → 400 Club gold
+ */
+const bandToFillColor: Record<RatingBand, string> = {
+  fair: '#9CA3AF',        // slate grey (5 Club tone)
+  good: '#7B95BD',        // blue-grey (10 Club tone)
+  veryGood: '#6BA3E0',    // brighter blue (20 Club tone)
+  excellent: '#5DAF62',   // green (200 Club tone)
+  outstanding: '#D4A857', // gold (400 Club tone)
 };
 
 export function RatingBar({
@@ -44,7 +50,7 @@ export function RatingBar({
   const fillColor =
     mode === 'neutral'
       ? 'var(--rating-bar-fill-neutral)'
-      : bandToAccent[band];
+      : bandToFillColor[band];
 
   return (
     <div

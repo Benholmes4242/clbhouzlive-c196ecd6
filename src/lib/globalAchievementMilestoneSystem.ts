@@ -119,56 +119,73 @@ export interface RatingTheme {
   barFillClass: string;
 }
 
+/**
+ * COURSE RATING THEMES
+ * 
+ * Rating bands are mapped to milestone club colors for visual consistency:
+ * - Fair → 5 Club (Rookie) - grey/slate
+ * - Good → 10 Club (Fairway) - darker blue-grey
+ * - Very Good → 20 Club (Founders) - soft blue
+ * - Excellent → 200 Club (Elite) - light green
+ * - Outstanding → 400 Club (Grand Slam) - gold
+ * 
+ * All text uses dark slate (#0F172A) for consistency with milestone badges.
+ */
 export const COURSE_RATING_THEMES: Record<RatingTier, RatingTheme> = {
   FAIR: {
     key: 'FAIR',
     label: 'Fair',
-    ...asGradient(PERFORMANCE_STOPS.S1, PERFORMANCE_STOPS.S2),
-    accent: '#C05B5B',
-    bgClass: `bg-[${PERFORMANCE_STOPS.S1}]`,
-    borderClass: 'border-[#C05B5B]',
-    textClass: 'text-[#8B3D3D]',
-    barFillClass: 'bg-[#C05B5B]',
+    // Uses 5 Club (Rookie) colors
+    ...asGradient(MILESTONE_THEMES[5].bgLight, MILESTONE_THEMES[5].bgDark),
+    accent: MILESTONE_THEMES[5].accent, // dark slate
+    bgClass: `bg-[${MILESTONE_THEMES[5].bgLight}]`,
+    borderClass: 'border-slate-900',
+    textClass: 'text-slate-900',
+    barFillClass: 'bg-slate-400',
   },
   GOOD: {
     key: 'GOOD',
     label: 'Good',
-    ...asGradient(PERFORMANCE_STOPS.S3, PERFORMANCE_STOPS.S4),
-    accent: '#4B8C4F',
-    bgClass: `bg-[${PERFORMANCE_STOPS.S3}]`,
-    borderClass: 'border-[#4B8C4F]',
-    textClass: 'text-[#2D5430]',
-    barFillClass: 'bg-[#4B8C4F]',
+    // Uses 10 Club (Fairway) colors
+    ...asGradient(MILESTONE_THEMES[10].bgLight, MILESTONE_THEMES[10].bgDark),
+    accent: MILESTONE_THEMES[10].accent, // dark slate
+    bgClass: `bg-[${MILESTONE_THEMES[10].bgLight}]`,
+    borderClass: 'border-slate-900',
+    textClass: 'text-slate-900',
+    barFillClass: 'bg-[#7B95BD]', // mid-tone blue
   },
   VERY_GOOD: {
     key: 'VERY_GOOD',
     label: 'Very Good',
-    ...asGradient(PERFORMANCE_STOPS.S4, PERFORMANCE_STOPS.S5),
-    accent: '#2F7D32',
-    bgClass: `bg-[${PERFORMANCE_STOPS.S4}]`,
-    borderClass: 'border-[#2F7D32]',
-    textClass: 'text-[#1E4D20]',
-    barFillClass: 'bg-[#2F7D32]',
+    // Uses 20 Club (Founders) colors
+    ...asGradient(MILESTONE_THEMES[20].bgLight, MILESTONE_THEMES[20].bgDark),
+    accent: MILESTONE_THEMES[20].accent, // dark slate
+    bgClass: `bg-[${MILESTONE_THEMES[20].bgLight}]`,
+    borderClass: 'border-slate-900',
+    textClass: 'text-slate-900',
+    barFillClass: 'bg-[#6BA3E0]', // brighter blue
   },
   EXCELLENT: {
     key: 'EXCELLENT',
     label: 'Excellent',
-    ...asGradient(PERFORMANCE_STOPS.S6, PERFORMANCE_STOPS.S7),
-    accent: '#205D89',
-    bgClass: `bg-[${PERFORMANCE_STOPS.S6}]`,
-    borderClass: 'border-[#205D89]',
-    textClass: 'text-[#163A55]',
-    barFillClass: 'bg-[#205D89]',
+    // Uses 200 Club (Elite) colors - light green
+    ...asGradient(MILESTONE_THEMES[200].bgLight, MILESTONE_THEMES[200].bgDark),
+    accent: MILESTONE_THEMES[200].accent, // dark slate
+    bgClass: `bg-[${MILESTONE_THEMES[200].bgLight}]`,
+    borderClass: 'border-slate-900',
+    textClass: 'text-slate-900',
+    barFillClass: 'bg-[#5DAF62]', // green
   },
   OUTSTANDING: {
     key: 'OUTSTANDING',
     label: 'Outstanding',
-    ...asGradient(PERFORMANCE_STOPS.S7, '#B2C2FA'),
-    accent: '#163A73',
-    bgClass: `bg-[${PERFORMANCE_STOPS.S7}]`,
-    borderClass: 'border-[#163A73]',
-    textClass: 'text-[#0F254A]',
-    barFillClass: 'bg-[#163A73]',
+    // Uses 400 Club (Grand Slam) colors - gold
+    ...asGradient(MILESTONE_THEMES[400].bgLight, MILESTONE_THEMES[400].bgDark),
+    accent: MILESTONE_THEMES[400].accent, // dark slate
+    bgClass: `bg-[${MILESTONE_THEMES[400].bgLight}]`,
+    borderClass: 'border-slate-900',
+    textClass: 'text-slate-900',
+    barFillClass: 'bg-[#D4A857]', // gold
   },
 };
 

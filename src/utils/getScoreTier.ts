@@ -44,10 +44,11 @@ export function getScoreTier(score: number): ScoreTierData {
   return {
     tier,
     label: theme.label,
+    // Tailwind classes - note: border/text now use dark slate for consistency
     bg: `bg-[${theme.bgLight}]`,
-    border: `border-[${theme.accent}]`,
-    text: `text-[${theme.accent}]`,
-    barFill: `bg-[${theme.accent}]`,
+    border: 'border-slate-900',
+    text: 'text-slate-900',
+    barFill: theme.barFillClass,
     // Raw values for direct style usage
     accent: theme.accent,
     bgLight: theme.bgLight,
