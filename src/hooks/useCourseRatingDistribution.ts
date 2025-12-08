@@ -14,7 +14,7 @@ export function useCourseRatingDistribution(courseId: string | undefined) {
     enabled: !!courseId,
     queryFn: async (): Promise<RatingTierDistributionData> => {
       if (!courseId) {
-        return { outstanding: 0, excellent: 0, veryGood: 0, good: 0, respectable: 0 };
+        return { outstanding: 0, excellent: 0, veryGood: 0, good: 0, fair: 0 };
       }
 
       let query = supabase
@@ -36,7 +36,7 @@ export function useCourseRatingDistribution(courseId: string | undefined) {
         excellent: 0, 
         veryGood: 0, 
         good: 0, 
-        respectable: 0 
+        fair: 0 
       };
 
       (data || []).forEach((r: { rating: number }) => {

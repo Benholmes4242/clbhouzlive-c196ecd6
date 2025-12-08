@@ -7,7 +7,7 @@ export type RatingBand =
   | 'excellent'
   | 'veryGood'
   | 'good'
-  | 'respectable';
+  | 'fair';
 
 interface RatingBadgeProps {
   /** Tier data from getScoreTier() */

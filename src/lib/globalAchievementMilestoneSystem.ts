@@ -11,7 +11,7 @@
  * ║                                                                                          ║
  * ║  Three key maps:                                                                          ║
  * ║    • MILESTONE_THEMES – tiers 5, 10, 20, 50, 100, 200, 300, 400                          ║
- * ║    • COURSE_RATING_THEMES – RESPECTABLE, GOOD, VERY_GOOD, EXCELLENT, OUTSTANDING         ║
+ * ║    • COURSE_RATING_THEMES – FAIR, GOOD, VERY_GOOD, EXCELLENT, OUTSTANDING                 ║
  * ║    • REGION_THEMES – WORLD, GB&I, USA, EUROPE                                            ║
  * ║                                                                                          ║
  * ║  Components should only use these helpers:                                                ║
@@ -83,10 +83,10 @@ export const MILESTONE_THEMES: Record<MilestoneTier, MilestoneTheme> = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
-// COURSE RATING THEMES (Respectable → Outstanding)
+// COURSE RATING THEMES (Fair → Outstanding)
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
-export type RatingTier = 'RESPECTABLE' | 'GOOD' | 'VERY_GOOD' | 'EXCELLENT' | 'OUTSTANDING';
+export type RatingTier = 'FAIR' | 'GOOD' | 'VERY_GOOD' | 'EXCELLENT' | 'OUTSTANDING';
 
 export interface RatingTheme {
   key: RatingTier;
@@ -101,21 +101,21 @@ export interface RatingTheme {
   barFillClass: string;
 }
 
-// Build rating themes from palette
-const rRespectable = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.RESPECTABLE);
+// Build rating themes from palette (FAIR tier uses RESPECTABLE color)
+const rFair        = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.RESPECTABLE);
 const rGood        = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.GOOD);
 const rVeryGood    = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.VERY_GOOD);
 const rExcellent   = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.EXCELLENT);
 const rOutstanding = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.OUTSTANDING);
 
 export const COURSE_RATING_THEMES: Record<RatingTier, RatingTheme> = {
-  RESPECTABLE: {
-    key: 'RESPECTABLE',
-    label: 'Respectable',
+  FAIR: {
+    key: 'FAIR',
+    label: 'Fair',
     accent: CLBHOUZ_ACHIEVEMENT_PALETTE.RESPECTABLE,
-    bgLight: rRespectable.bgLight,
-    bgDark: rRespectable.bgDark,
-    bgClass: `bg-[${rRespectable.bgLight}]`,
+    bgLight: rFair.bgLight,
+    bgDark: rFair.bgDark,
+    bgClass: `bg-[${rFair.bgLight}]`,
     borderClass: 'border-slate-900',
     textClass: 'text-slate-900',
     barFillClass: `bg-[${CLBHOUZ_ACHIEVEMENT_PALETTE.RESPECTABLE}]`,
@@ -176,7 +176,7 @@ export function getRatingTheme(score: number): RatingTheme {
   if (score >= 8.0) return COURSE_RATING_THEMES.EXCELLENT;
   if (score >= 7.0) return COURSE_RATING_THEMES.VERY_GOOD;
   if (score >= 6.5) return COURSE_RATING_THEMES.GOOD;
-  return COURSE_RATING_THEMES.RESPECTABLE;
+  return COURSE_RATING_THEMES.FAIR;
 }
 
 /**
@@ -444,7 +444,7 @@ export const RATING_CSS_VARS = {
   '--rating-band-excellent': COURSE_RATING_THEMES.EXCELLENT.accent,
   '--rating-band-very-good': COURSE_RATING_THEMES.VERY_GOOD.accent,
   '--rating-band-good': COURSE_RATING_THEMES.GOOD.accent,
-  '--rating-band-respectable': COURSE_RATING_THEMES.RESPECTABLE.accent,
+  '--rating-band-fair': COURSE_RATING_THEMES.FAIR.accent,
 } as const;
 
 // Re-export palette and helpers

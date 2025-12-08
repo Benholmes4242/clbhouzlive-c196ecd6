@@ -17,7 +17,7 @@ interface RatingPillProps {
  * 
  * Uses the Global Colour System for consistent rating badge styling.
  * Colors are mapped from milestone club colors:
- * - Respectable → 50 Club (Heritage)
+ * - Fair → 50 Club (Heritage)
  * - Good → 100 Club (Century)
  * - Very Good → 200 Club (Elite)
  * - Excellent → 300 Club (Legendary)
@@ -35,6 +35,7 @@ export function RatingPill({ score, tier, label, className }: RatingPillProps) {
         tier === 'EXCELLENT' ? 8.5 :
         tier === 'VERY_GOOD' ? 7.5 :
         tier === 'GOOD' ? 6.5 :
+        tier === 'FAIR' ? 5 :
         5
       )
     : getRatingTheme(score ?? 0);
