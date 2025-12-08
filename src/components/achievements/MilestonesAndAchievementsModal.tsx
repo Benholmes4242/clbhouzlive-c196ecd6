@@ -243,16 +243,13 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
 
                   {/* RIGHT: Emblem */}
                   <div className="flex-shrink-0 self-center sm:self-auto">
-                    <div className="relative h-16 w-16 md:h-20 md:w-20 rounded-full flex items-center justify-center shadow-md bg-slate-900 text-slate-50">
-                      {/* Soft inner glow */}
-                      <div className="absolute inset-[3px] rounded-full bg-slate-800/80" />
-
+                    <div className="relative px-4 py-2.5 md:px-5 md:py-3 rounded-sq-md flex items-center justify-center shadow-md bg-slate-900 text-slate-50">
                       {/* Number + caption */}
-                      <div className="relative flex flex-col items-center justify-center leading-tight">
+                      <div className="relative flex items-center gap-1.5 leading-tight">
                         <span className="text-lg md:text-2xl font-semibold">
                           {emblemValue}
                         </span>
-                        <span className="text-[10px] md:text-xs uppercase tracking-wide opacity-80">
+                        <span className="text-xs md:text-sm uppercase tracking-wide opacity-80">
                           {emblemCaption}
                         </span>
                       </div>
