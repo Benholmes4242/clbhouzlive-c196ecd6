@@ -389,7 +389,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
   return (
     <div className={cn("top100-map-shell", fullHeight ? "h-full flex flex-col" : "space-y-3")}>
-      <div className={cn("relative overflow-hidden rounded-sq-lg bg-muted/40", fullHeight ? "flex-1 min-h-0" : "mt-1")}>
+      {/* Map container - no rounded corners in fullHeight mode */}
+      <div className={cn("relative overflow-hidden bg-muted/40", fullHeight ? "flex-1 min-h-0" : "mt-1 rounded-sq-lg")}>
         <div
           ref={mapContainerRef}
           className={cn("w-full", fullHeight ? "h-full" : "h-[480px]")}
@@ -397,7 +398,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
         {/* Loading overlay */}
         {isLoading && (
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-sq-lg bg-white/60 text-xs text-slate-500">
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/60 text-xs text-slate-500">
             Loading map...
           </div>
         )}
@@ -424,92 +425,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             </div>
           </div>
         )}
-
-        {/* Filters drawer – always visible, glass */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10">
-          <div
-            className="pointer-events-auto rounded-t-3xl rounded-b-none bg-white/20 backdrop-blur-xl border-t border-white/30 shadow-[0_-4px_12px_rgba(15,23,42,0.08)] dark:shadow-[0_-4px_16px_rgba(0,0,0,0.45)] text-xs text-slate-900"
-          >
-            {/* Header label */}
-            <div className="px-4 pt-3 pb-1">
-              <span className="font-medium">Map filters</span>
-            </div>
-
-            {/* Drawer content */}
-            <div className="px-4 pb-4 pt-2">
-              {/* Rated filter + reset */}
-              <div className="mb-3 flex items-center justify-between gap-2">
-                <div className="inline-flex items-center gap-1.5">
-                  {(['all', 'rated', 'unrated'] as RatedFilter[]).map((opt) => (
-                    <button
-                      key={opt}
-                      type="button"
-                      onClick={() => setRatedFilter(opt)}
-                      className={cn(
-                        'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
-                        'bg-white border border-border/70',
-                        'shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]',
-                        ratedFilter === opt
-                          ? 'text-foreground'
-                          : 'text-muted-foreground hover:text-foreground'
-                      )}
-                    >
-                      {opt === 'all'
-                        ? 'All'
-                        : opt === 'rated'
-                        ? 'Played'
-                        : 'Not Played'}
-                    </button>
-                  ))}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleResetView}
-                  className="text-xs font-medium text-slate-500 underline-offset-2 hover:text-slate-800 hover:underline"
-                >
-                  Reset view
-                </button>
-              </div>
-
-              {/* Region chips */}
-              <div className="flex items-center gap-2">
-                {(['global', 'gb-i', 'usa', 'europe'] as Top100MapScope[]).map(
-                  (slug) => {
-                    const label =
-                      slug === 'global'
-                        ? 'Global'
-                        : slug === 'gb-i'
-                        ? 'GB&I'
-                        : slug === 'usa'
-                        ? 'USA'
-                        : 'Europe';
-
-                    const isActive = scope === slug;
-
-                    return (
-                      <button
-                        key={slug}
-                        type="button"
-                        onClick={() => onScopeChange?.(slug)}
-                        className={cn(
-                          'flex-1 rounded-full px-3 py-2 text-xs font-semibold transition-colors',
-                          'bg-white border border-border/70',
-                          'shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]',
-                          isActive
-                            ? 'text-foreground'
-                            : 'text-muted-foreground hover:text-foreground'
-                        )}
-                      >
-                        {label}
-                      </button>
-                    );
-                  }
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Selected course bottom sheet – glass, anchored, swipe-down & tap-outside */}
         {selectedCourse && (
@@ -592,6 +507,85 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             </div>
           </div>
         )}
+      </div>
+
+      {/* Filters sheet – always visible, no rounded corners, separate from map */}
+      <div className="flex-shrink-0 bg-white/20 backdrop-blur-xl border-t border-white/30 shadow-[0_-4px_12px_rgba(15,23,42,0.08)] dark:shadow-[0_-4px_16px_rgba(0,0,0,0.45)] text-xs text-slate-900">
+        <div className="px-4 pt-3 pb-1">
+          <span className="font-medium">Map filters</span>
+        </div>
+        <div className="px-4 pb-4 pt-2">
+          {/* Rated filter + reset */}
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <div className="inline-flex items-center gap-1.5">
+              {(['all', 'rated', 'unrated'] as RatedFilter[]).map((opt) => (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => setRatedFilter(opt)}
+                  className={cn(
+                    'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
+                    'bg-white border border-border/70',
+                    'shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]',
+                    ratedFilter === opt
+                      ? 'text-foreground'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  {opt === 'all'
+                    ? 'All'
+                    : opt === 'rated'
+                    ? 'Played'
+                    : 'Not Played'}
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={handleResetView}
+              className="text-xs font-medium text-slate-500 underline-offset-2 hover:text-slate-800 hover:underline"
+            >
+              Reset view
+            </button>
+          </div>
+
+          {/* Region chips */}
+          <div className="flex items-center gap-2">
+            {(['global', 'gb-i', 'usa', 'europe'] as Top100MapScope[]).map(
+              (slug) => {
+                const label =
+                  slug === 'global'
+                    ? 'Global'
+                    : slug === 'gb-i'
+                    ? 'GB&I'
+                    : slug === 'usa'
+                    ? 'USA'
+                    : 'Europe';
+
+                const isActive = scope === slug;
+
+                return (
+                  <button
+                    key={slug}
+                    type="button"
+                    onClick={() => onScopeChange?.(slug)}
+                    className={cn(
+                      'flex-1 rounded-full px-3 py-2 text-xs font-semibold transition-colors',
+                      'bg-white border border-border/70',
+                      'shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]',
+                      isActive
+                        ? 'text-foreground'
+                        : 'text-muted-foreground hover:text-foreground'
+                    )}
+                  >
+                    {label}
+                  </button>
+                );
+              }
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
