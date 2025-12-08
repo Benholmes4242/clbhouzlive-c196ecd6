@@ -17,10 +17,10 @@ interface RatingPillProps {
  * 
  * Uses the Global Colour System for consistent rating badge styling.
  * Colors are mapped from milestone club colors:
- * - Fair → 5 Club (Rookie)
- * - Good → 10 Club (Fairway)
- * - Very Good → 20 Club (Founders)
- * - Excellent → 200 Club (Elite)
+ * - Respectable → 50 Club (Heritage)
+ * - Good → 100 Club (Century)
+ * - Very Good → 200 Club (Elite)
+ * - Excellent → 300 Club (Legendary)
  * - Outstanding → 400 Club (Grand Slam)
  * 
  * @example

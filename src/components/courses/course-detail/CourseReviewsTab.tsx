@@ -292,7 +292,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       return MOCK_CYPRESS_POINT_REVIEWS.distribution;
     }
 
-    const dist = { outstanding: 0, excellent: 0, veryGood: 0, good: 0, fair: 0 };
+    const dist = { outstanding: 0, excellent: 0, veryGood: 0, good: 0, respectable: 0 };
     reviews.forEach(r => {
       const tierData = getScoreTier(r.rating);
       dist[tierData.tier]++;
