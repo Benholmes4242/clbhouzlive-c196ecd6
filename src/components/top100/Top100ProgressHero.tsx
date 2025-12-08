@@ -88,12 +88,12 @@ function HeroWithMilestoneRow({
         {/* Avatar on the left - responsive size */}
         <div className="shrink-0">
           <SquircleAvatar
-            size={120}
+            size={140}
             src={avatarUrl}
             alt={displayName ?? 'Player avatar'}
             fallback={initials}
             ringColor={ringColor}
-            className="sm:w-[150px] sm:h-[157px]"
+            className="sm:w-[160px] sm:h-[168px]"
           />
         </div>
 
