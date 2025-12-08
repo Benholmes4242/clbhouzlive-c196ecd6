@@ -213,47 +213,40 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
                 <div
                   className={cn(
                     'rounded-sq-lg p-5 md:p-6 shadow-lg bg-gradient-to-r',
-                    'flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 md:gap-6',
                     getClubGradientClass(currentClub?.tierName)
                   )}
                 >
-                  {/* LEFT: Text block */}
-                  <div className="flex-1 min-w-0">
-                    {/* Small label */}
-                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 mb-1">
+                  <div className="flex flex-col gap-2 md:gap-2.5">
+                    {/* Label */}
+                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
                       {heroLabel}
                     </p>
 
-                    {/* Main headline (club name) */}
-                    <h2 className="text-xl md:text-2xl font-semibold text-slate-900 mb-1 truncate">
-                      {heroHeadline}
-                    </h2>
+                    {/* TITLE + EMBLEM ROW */}
+                    <div className="flex items-center justify-between gap-3">
+                      {/* Club title */}
+                      <h2 className="text-xl md:text-2xl font-semibold text-slate-900 truncate">
+                        {heroHeadline}
+                      </h2>
+
+                      {/* Courses emblem – SDS pill style */}
+                      <div className="inline-flex items-center justify-center px-3 py-1.5 md:px-3.5 md:py-1.5
+                                      rounded-sq-pill text-xs md:text-sm font-semibold
+                                      bg-surface-slate text-slate-50 shadow-sm whitespace-nowrap">
+                        {totalTop100Played} courses
+                      </div>
+                    </div>
 
                     {/* Progress line */}
-                    <p className="text-sm text-slate-600 mb-1">
+                    <p className="text-sm text-slate-700 max-w-full">
                       {progressLine}
                     </p>
 
                     {/* Trophy / status line */}
-                    <p className="flex items-center gap-1.5 text-sm font-medium text-amber-600">
+                    <p className="flex items-center gap-1.5 text-sm font-medium text-amber-700 max-w-full">
                       <span aria-hidden="true">🏆</span>
                       <span>{statusLine}</span>
                     </p>
-                  </div>
-
-                  {/* RIGHT: Emblem */}
-                  <div className="flex-shrink-0 self-center sm:self-auto">
-                    <div className="relative px-4 py-2.5 md:px-5 md:py-3 rounded-sq-md flex items-center justify-center shadow-md bg-surface-slate text-slate-50">
-                      {/* Number + caption */}
-                      <div className="relative flex items-center gap-1.5 leading-tight">
-                        <span className="text-lg md:text-2xl font-semibold">
-                          {emblemValue}
-                        </span>
-                        <span className="text-xs md:text-sm uppercase tracking-wide opacity-80">
-                          {emblemCaption}
-                        </span>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </section>
