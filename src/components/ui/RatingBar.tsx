@@ -1,12 +1,13 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { CLBHOUZ_ACHIEVEMENT_PALETTE } from '@/lib/clbhouzAchievementPalette';
 
 export type RatingBand =
   | 'outstanding'
   | 'excellent'
   | 'veryGood'
   | 'good'
-  | 'fair';
+  | 'respectable';
 
 export type RatingBarMode = 'neutral' | 'banded';
 
@@ -24,19 +25,19 @@ interface RatingBarProps {
 }
 
 /**
- * Bar fill colors mapped to milestone club colors:
- * - Fair → 5 Club grey/slate
- * - Good → 10 Club blue-grey
- * - Very Good → 20 Club soft blue
- * - Excellent → 200 Club green
- * - Outstanding → 400 Club gold
+ * Bar fill colors from CLBHOUZ_ACHIEVEMENT_PALETTE:
+ * - Respectable → #C1CFA1 (pale green)
+ * - Good → #88B67B (fairway green)
+ * - Very Good → #5B9E55 (strong green)
+ * - Excellent → #3F7F41 (deep championship green)
+ * - Outstanding → #D2B461 (warm trophy gold)
  */
 const bandToFillColor: Record<RatingBand, string> = {
-  fair: '#9CA3AF',        // slate grey (5 Club tone)
-  good: '#7B95BD',        // blue-grey (10 Club tone)
-  veryGood: '#6BA3E0',    // brighter blue (20 Club tone)
-  excellent: '#5DAF62',   // green (200 Club tone)
-  outstanding: '#D4A857', // gold (400 Club tone)
+  respectable: CLBHOUZ_ACHIEVEMENT_PALETTE.RESPECTABLE,
+  good: CLBHOUZ_ACHIEVEMENT_PALETTE.GOOD,
+  veryGood: CLBHOUZ_ACHIEVEMENT_PALETTE.VERY_GOOD,
+  excellent: CLBHOUZ_ACHIEVEMENT_PALETTE.EXCELLENT,
+  outstanding: CLBHOUZ_ACHIEVEMENT_PALETTE.OUTSTANDING,
 };
 
 export function RatingBar({

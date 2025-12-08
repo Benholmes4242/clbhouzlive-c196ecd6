@@ -7,11 +7,12 @@
  * ║  This file is the ONLY place where achievement, rating, and regional colors are defined. ║
  * ║  ALL other files MUST reference this system - no local color definitions allowed.        ║
  * ║                                                                                          ║
+ * ║  All colors now source from CLBHOUZ_ACHIEVEMENT_PALETTE in clbhouzAchievementPalette.ts  ║
+ * ║                                                                                          ║
  * ║  Three key maps:                                                                          ║
  * ║    • MILESTONE_THEMES – tiers 5, 10, 20, 50, 100, 200, 300, 400                          ║
- * ║    • COURSE_RATING_THEMES – FAIR, GOOD, VERY_GOOD, EXCELLENT, OUTSTANDING                ║
- * ║    • REGION_THEMES – WORLD (deep coastal blue), GB&I (racing green),                     ║
- * ║                      USA (red), EUROPE (EU blue)                                          ║
+ * ║    • COURSE_RATING_THEMES – RESPECTABLE, GOOD, VERY_GOOD, EXCELLENT, OUTSTANDING         ║
+ * ║    • REGION_THEMES – WORLD, GB&I, USA, EUROPE                                            ║
  * ║                                                                                          ║
  * ║  Components should only use these helpers:                                                ║
  * ║    • getTierPalette() / MILESTONE_THEMES[...]                                            ║
@@ -29,46 +30,21 @@
  * 
  * 2. RINGS & SMALL ICONS (avatar rings, trophy icons, dots, small chips)
  *    - Use the accent color from the same theme
+ *    - ALL trophy icons use THEME_COLORS.icon (dark slate), never accent
  * 
  * 3. LOCKED STATE = Universal muted palette
  *    - Background: hsl(210 15% 96%)
  *    - Icon: hsl(215 15% 65%)
  * 
- * ═══════════════════════════════════════════════════════════════════════════════════════════
- * PERFORMANCE SCALE (SHARED BETWEEN ACHIEVEMENTS & RATINGS)
- * ═══════════════════════════════════════════════════════════════════════════════════════════
- * 
- * When users learn our colour language once (low → high performance, plus four regional
- * colours), it is consistent everywhere:
- *   • Achievements & milestones
- *   • Course/community ratings
- *   • Top 100 regional journeys
- * 
  * @module GlobalAchievementMilestoneSystem
  */
 
-// ═══════════════════════════════════════════════════════════════════════════════════════════
-// SYSTEM 1 – PERFORMANCE SCALE (LOW → HIGH)
-// ═══════════════════════════════════════════════════════════════════════════════════════════
-
-export const PERFORMANCE_STOPS = {
-  S1: '#FBE4E4', // soft clay red      – lowest
-  S2: '#F7E3C2', // sand / peach
-  S3: '#E8F3C5', // yellow-green
-  S4: '#CBEAD5', // light fresh green
-  S5: '#B3DFC9', // richer green
-  S6: '#C6E7F2', // aqua / teal-blue
-  S7: '#C2D3F7', // sky / slate blue
-  S8: '#D4CFDF', // soft ink/charcoal – highest card bg
-} as const;
-
-// Helper to create gradient objects
-function asGradient(light: string, dark: string) {
-  return {
-    bgLight: light,
-    bgDark: dark,
-  };
-}
+import {
+  CLBHOUZ_ACHIEVEMENT_PALETTE,
+  buildTheme,
+  THEME_COLORS,
+  type AchievementColorTheme,
+} from './clbhouzAchievementPalette';
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 // MILESTONE THEMES (5 → 400 Club)
@@ -80,36 +56,42 @@ export interface MilestoneTheme {
   id: string;
   name: string;
   tier: string;
-  accent: string;    // Pure color for rings/icons
+  accent: string;    // Pure color for rings/icons (dark slate)
   bgLight: string;   // Card gradient start
   bgDark: string;    // Card gradient end
 }
 
-// MILESTONE COLORS
-// - 5/10 Club: neutral greys (slate)
-// - 20/50 Club: two friendly blues  
-// - 100/200/300/400 Club: warm progression (green → gold)
+// Build themes from the unified palette
+const t5   = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.FAIR);
+const t10  = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.MILD);
+const t20  = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.STEADY);
+const t50  = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.RESPECTABLE);
+const t100 = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.GOOD);
+const t200 = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.VERY_GOOD);
+const t300 = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.EXCELLENT);
+const t400 = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.OUTSTANDING);
+
 export const MILESTONE_THEMES: Record<MilestoneTier, MilestoneTheme> = {
-  5:   { id: 'rookie',     name: 'Rookie Club',     tier: 'ROOKIE',     ...asGradient('#E4E4E9', '#D3D3D8'),                        accent: '#0F172A' },   // neutral grey - dark slate icon
-  10:  { id: 'fairway',    name: 'Fairway Club',    tier: 'FAIRWAY',    ...asGradient('#C8D5E8', '#A8B8D0'),                        accent: '#0F172A' },   // darker blue-grey - dark slate icon
-  20:  { id: 'founders',   name: 'Founders Club',   tier: 'FOUNDERS',   ...asGradient('#D3E7FF', '#C1D4F5'),                        accent: '#0F172A' },   // softer blue - dark slate icon
-  50:  { id: 'heritage',   name: 'Heritage Club',   tier: 'HERITAGE',   ...asGradient('#A8C4F0', '#8BAEE0'),                        accent: '#0F172A' },   // deeper blue - dark slate icon
-  100: { id: 'century',    name: 'Century Club',    tier: 'CENTURY',    ...asGradient(PERFORMANCE_STOPS.S4, PERFORMANCE_STOPS.S5), accent: '#0F172A' },   // green - dark slate icon
-  200: { id: 'elite',      name: 'Elite Club',      tier: 'ELITE',      ...asGradient(PERFORMANCE_STOPS.S3, PERFORMANCE_STOPS.S4), accent: '#0F172A' },   // lighter green - dark slate icon
-  300: { id: 'legendary',  name: 'Legendary Club',  tier: 'LEGENDARY',  ...asGradient(PERFORMANCE_STOPS.S2, PERFORMANCE_STOPS.S1), accent: '#0F172A' },   // warm sand - dark slate icon
-  400: { id: 'grandslam',  name: 'Grand Slam Club', tier: 'GRAND_SLAM', ...asGradient(PERFORMANCE_STOPS.S2, '#E8D4A0'),             accent: '#0F172A' },   // gold - dark slate icon
+  5:   { id: 'rookie',     name: 'Rookie Club',     tier: 'ROOKIE',     bgLight: t5.bgLight,   bgDark: t5.bgDark,   accent: THEME_COLORS.icon },
+  10:  { id: 'fairway',    name: 'Fairway Club',    tier: 'FAIRWAY',    bgLight: t10.bgLight,  bgDark: t10.bgDark,  accent: THEME_COLORS.icon },
+  20:  { id: 'founders',   name: 'Founders Club',   tier: 'FOUNDERS',   bgLight: t20.bgLight,  bgDark: t20.bgDark,  accent: THEME_COLORS.icon },
+  50:  { id: 'heritage',   name: 'Heritage Club',   tier: 'HERITAGE',   bgLight: t50.bgLight,  bgDark: t50.bgDark,  accent: THEME_COLORS.icon },
+  100: { id: 'century',    name: 'Century Club',    tier: 'CENTURY',    bgLight: t100.bgLight, bgDark: t100.bgDark, accent: THEME_COLORS.icon },
+  200: { id: 'elite',      name: 'Elite Club',      tier: 'ELITE',      bgLight: t200.bgLight, bgDark: t200.bgDark, accent: THEME_COLORS.icon },
+  300: { id: 'legendary',  name: 'Legendary Club',  tier: 'LEGENDARY',  bgLight: t300.bgLight, bgDark: t300.bgDark, accent: THEME_COLORS.icon },
+  400: { id: 'grandslam',  name: 'Grand Slam Club', tier: 'GRAND_SLAM', bgLight: t400.bgLight, bgDark: t400.bgDark, accent: THEME_COLORS.icon },
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
-// COURSE RATING THEMES (Fair → Outstanding)
+// COURSE RATING THEMES (Respectable → Outstanding)
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
-export type RatingTier = 'FAIR' | 'GOOD' | 'VERY_GOOD' | 'EXCELLENT' | 'OUTSTANDING';
+export type RatingTier = 'RESPECTABLE' | 'GOOD' | 'VERY_GOOD' | 'EXCELLENT' | 'OUTSTANDING';
 
 export interface RatingTheme {
   key: RatingTier;
   label: string;
-  accent: string;    // Pure color for small elements
+  accent: string;    // Pure accent color from palette
   bgLight: string;   // Card/badge gradient start
   bgDark: string;    // Card/badge gradient end
   // CSS class equivalents for Tailwind usage
@@ -119,73 +101,68 @@ export interface RatingTheme {
   barFillClass: string;
 }
 
-/**
- * COURSE RATING THEMES
- * 
- * Rating bands are mapped to milestone club colors for visual consistency:
- * - Fair → 5 Club (Rookie) - grey/slate
- * - Good → 10 Club (Fairway) - darker blue-grey
- * - Very Good → 20 Club (Founders) - soft blue
- * - Excellent → 200 Club (Elite) - light green
- * - Outstanding → 400 Club (Grand Slam) - gold
- * 
- * All text uses dark slate (#0F172A) for consistency with milestone badges.
- */
+// Build rating themes from palette
+const rRespectable = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.RESPECTABLE);
+const rGood        = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.GOOD);
+const rVeryGood    = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.VERY_GOOD);
+const rExcellent   = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.EXCELLENT);
+const rOutstanding = buildTheme(CLBHOUZ_ACHIEVEMENT_PALETTE.OUTSTANDING);
+
 export const COURSE_RATING_THEMES: Record<RatingTier, RatingTheme> = {
-  FAIR: {
-    key: 'FAIR',
-    label: 'Fair',
-    // Uses 5 Club (Rookie) colors
-    ...asGradient(MILESTONE_THEMES[5].bgLight, MILESTONE_THEMES[5].bgDark),
-    accent: MILESTONE_THEMES[5].accent, // dark slate
-    bgClass: `bg-[${MILESTONE_THEMES[5].bgLight}]`,
+  RESPECTABLE: {
+    key: 'RESPECTABLE',
+    label: 'Respectable',
+    accent: CLBHOUZ_ACHIEVEMENT_PALETTE.RESPECTABLE,
+    bgLight: rRespectable.bgLight,
+    bgDark: rRespectable.bgDark,
+    bgClass: `bg-[${rRespectable.bgLight}]`,
     borderClass: 'border-slate-900',
     textClass: 'text-slate-900',
-    barFillClass: 'bg-slate-400',
+    barFillClass: `bg-[${CLBHOUZ_ACHIEVEMENT_PALETTE.RESPECTABLE}]`,
   },
   GOOD: {
     key: 'GOOD',
     label: 'Good',
-    // Uses 10 Club (Fairway) colors
-    ...asGradient(MILESTONE_THEMES[10].bgLight, MILESTONE_THEMES[10].bgDark),
-    accent: MILESTONE_THEMES[10].accent, // dark slate
-    bgClass: `bg-[${MILESTONE_THEMES[10].bgLight}]`,
+    accent: CLBHOUZ_ACHIEVEMENT_PALETTE.GOOD,
+    bgLight: rGood.bgLight,
+    bgDark: rGood.bgDark,
+    bgClass: `bg-[${rGood.bgLight}]`,
     borderClass: 'border-slate-900',
     textClass: 'text-slate-900',
-    barFillClass: 'bg-[#7B95BD]', // mid-tone blue
+    barFillClass: `bg-[${CLBHOUZ_ACHIEVEMENT_PALETTE.GOOD}]`,
   },
   VERY_GOOD: {
     key: 'VERY_GOOD',
     label: 'Very Good',
-    // Uses 20 Club (Founders) colors
-    ...asGradient(MILESTONE_THEMES[20].bgLight, MILESTONE_THEMES[20].bgDark),
-    accent: MILESTONE_THEMES[20].accent, // dark slate
-    bgClass: `bg-[${MILESTONE_THEMES[20].bgLight}]`,
+    accent: CLBHOUZ_ACHIEVEMENT_PALETTE.VERY_GOOD,
+    bgLight: rVeryGood.bgLight,
+    bgDark: rVeryGood.bgDark,
+    bgClass: `bg-[${rVeryGood.bgLight}]`,
     borderClass: 'border-slate-900',
     textClass: 'text-slate-900',
-    barFillClass: 'bg-[#6BA3E0]', // brighter blue
+    barFillClass: `bg-[${CLBHOUZ_ACHIEVEMENT_PALETTE.VERY_GOOD}]`,
   },
   EXCELLENT: {
     key: 'EXCELLENT',
     label: 'Excellent',
-    // Uses 200 Club (Elite) colors - light green
-    ...asGradient(MILESTONE_THEMES[200].bgLight, MILESTONE_THEMES[200].bgDark),
-    accent: MILESTONE_THEMES[200].accent, // dark slate
-    bgClass: `bg-[${MILESTONE_THEMES[200].bgLight}]`,
+    accent: CLBHOUZ_ACHIEVEMENT_PALETTE.EXCELLENT,
+    bgLight: rExcellent.bgLight,
+    bgDark: rExcellent.bgDark,
+    bgClass: `bg-[${rExcellent.bgLight}]`,
     borderClass: 'border-slate-900',
     textClass: 'text-slate-900',
-    barFillClass: 'bg-[#5DAF62]', // green
+    barFillClass: `bg-[${CLBHOUZ_ACHIEVEMENT_PALETTE.EXCELLENT}]`,
   },
   OUTSTANDING: {
     key: 'OUTSTANDING',
     label: 'Outstanding',
-    // Uses 400 Club (Grand Slam) colors - gold
-    ...asGradient(MILESTONE_THEMES[400].bgLight, MILESTONE_THEMES[400].bgDark),
-    accent: MILESTONE_THEMES[400].accent, // dark slate
-    bgClass: `bg-[${MILESTONE_THEMES[400].bgLight}]`,
+    accent: CLBHOUZ_ACHIEVEMENT_PALETTE.OUTSTANDING,
+    bgLight: rOutstanding.bgLight,
+    bgDark: rOutstanding.bgDark,
+    bgClass: `bg-[${rOutstanding.bgLight}]`,
     borderClass: 'border-slate-900',
     textClass: 'text-slate-900',
-    barFillClass: 'bg-[#D4A857]', // gold
+    barFillClass: `bg-[${CLBHOUZ_ACHIEVEMENT_PALETTE.OUTSTANDING}]`,
   },
 };
 
@@ -199,7 +176,7 @@ export function getRatingTheme(score: number): RatingTheme {
   if (score >= 8.0) return COURSE_RATING_THEMES.EXCELLENT;
   if (score >= 7.0) return COURSE_RATING_THEMES.VERY_GOOD;
   if (score >= 6.5) return COURSE_RATING_THEMES.GOOD;
-  return COURSE_RATING_THEMES.FAIR;
+  return COURSE_RATING_THEMES.RESPECTABLE;
 }
 
 /**
@@ -219,7 +196,7 @@ export interface RegionalTheme {
   id: string;
   label: string;
   shortLabel: string;
-  accent: string;    // Pure color for icons
+  accent: string;    // Pure color for icons (dark slate)
   bgLight: string;   // Card gradient start
   bgDark: string;    // Card gradient end
   bgLocked: string;  // Locked state background
@@ -230,32 +207,36 @@ export const REGION_THEMES: Record<RegionKey, RegionalTheme> = {
     id: 'list_worldwide',
     label: 'World',
     shortLabel: 'World',
-    accent: '#0F172A',                 // dark slate icon
-    ...asGradient('#8A9DC0', '#7D91BD'), // Deep Glacier Blue
+    accent: THEME_COLORS.icon,
+    bgLight: '#8A9DC0',
+    bgDark: '#7D91BD',
     bgLocked: 'hsl(210 15% 96%)',
   },
   GBI: {
     id: 'list_gb_ireland',
     label: 'GB & Ireland',
     shortLabel: 'GB&I',
-    accent: '#0F172A',                 // dark slate icon
-    ...asGradient('#CFE8D3', '#B9D8C0'),
+    accent: THEME_COLORS.icon,
+    bgLight: '#CFE8D3',
+    bgDark: '#B9D8C0',
     bgLocked: 'hsl(140 30% 96%)',
   },
   USA: {
     id: 'list_usa',
     label: 'USA',
     shortLabel: 'USA',
-    accent: '#0F172A',                 // dark slate icon
-    ...asGradient('#F8D9D9', '#F2B9B9'),
+    accent: THEME_COLORS.icon,
+    bgLight: '#F8D9D9',
+    bgDark: '#F2B9B9',
     bgLocked: 'hsl(0 30% 96%)',
   },
   EUROPE: {
     id: 'list_europe',
     label: 'Europe',
     shortLabel: 'Europe',
-    accent: '#0F172A',                 // dark slate icon
-    ...asGradient('#D4E1FF', '#C0D3F7'),
+    accent: THEME_COLORS.icon,
+    bgLight: '#D4E1FF',
+    bgDark: '#C0D3F7',
     bgLocked: 'hsl(225 30% 96%)',
   },
 };
@@ -280,19 +261,15 @@ export const REGION_SLUG_THEMES: Record<string, RegionalTheme> = {
  * Get region theme by ID, slug, or key
  */
 export function getRegionTheme(idOrSlug: string): RegionalTheme {
-  // Check direct key first (WORLD, GBI, USA, EUROPE)
   if (idOrSlug in REGION_THEMES) {
     return REGION_THEMES[idOrSlug as RegionKey];
   }
-  // Check by ID (list_worldwide, list_gb_ireland, etc.)
   if (idOrSlug in REGION_THEMES_BY_ID) {
     return REGION_THEMES_BY_ID[idOrSlug];
   }
-  // Check by slug (global, gb-i, usa, europe)
   if (idOrSlug in REGION_SLUG_THEMES) {
     return REGION_SLUG_THEMES[idOrSlug];
   }
-  // Default to WORLD
   return REGION_THEMES.WORLD;
 }
 
@@ -349,7 +326,7 @@ export function getRingColorForTotalPlayed(totalPlayed: number): string {
       return MILESTONE_THEMES[t].bgDark;
     }
   }
-  return '#D1D5DB'; // Default grey for < 5
+  return '#D1D5DB';
 }
 
 /**
@@ -386,18 +363,17 @@ export function getAchievementTheme(
  * Returns explicit bg gradients and icon color from the unified system
  */
 export interface TierPalette {
-  accent: string;     // Pure color for rings/icons
-  bgLight: string;    // Gradient start
-  bgDark: string;     // Gradient end
-  bgLocked: string;   // Locked state background
-  icon: string;       // Icon color (same as accent when unlocked)
+  accent: string;
+  bgLight: string;
+  bgDark: string;
+  bgLocked: string;
+  icon: string;
 }
 
 export function getTierPalette(
   tier: string,
   unlocked: boolean
 ): TierPalette {
-  // Locked palette is the same for all
   const lockedPalette: TierPalette = {
     accent: '#94a3b8',
     bgLight: 'hsl(210 20% 98%)',
@@ -408,7 +384,6 @@ export function getTierPalette(
 
   if (!unlocked) return lockedPalette;
 
-  // Check if it's a milestone (numeric)
   const threshold = parseInt(tier, 10) as MilestoneTier;
   if (!isNaN(threshold) && MILESTONE_THEMES[threshold]) {
     const theme = MILESTONE_THEMES[threshold];
@@ -421,7 +396,6 @@ export function getTierPalette(
     };
   }
 
-  // Regional list completions
   const regionMap: Record<string, RegionKey> = {
     'GBI': 'GBI',
     'EU': 'EUROPE',
@@ -441,7 +415,6 @@ export function getTierPalette(
     };
   }
 
-  // Fallback
   return lockedPalette;
 }
 
@@ -466,14 +439,13 @@ export function getThresholdTierId(threshold: number): string {
 // CSS VARIABLE EXPORTS (for index.css synchronization)
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
-/**
- * Get CSS custom properties for rating bands
- * Use this to sync with index.css --rating-band-* variables
- */
 export const RATING_CSS_VARS = {
   '--rating-band-outstanding': COURSE_RATING_THEMES.OUTSTANDING.accent,
   '--rating-band-excellent': COURSE_RATING_THEMES.EXCELLENT.accent,
   '--rating-band-very-good': COURSE_RATING_THEMES.VERY_GOOD.accent,
   '--rating-band-good': COURSE_RATING_THEMES.GOOD.accent,
-  '--rating-band-fair': COURSE_RATING_THEMES.FAIR.accent,
+  '--rating-band-respectable': COURSE_RATING_THEMES.RESPECTABLE.accent,
 } as const;
+
+// Re-export palette and helpers
+export { CLBHOUZ_ACHIEVEMENT_PALETTE, THEME_COLORS, buildTheme } from './clbhouzAchievementPalette';

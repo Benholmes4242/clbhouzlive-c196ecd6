@@ -49,7 +49,7 @@ export const MOCK_CYPRESS_POINT_REVIEWS = {
     excellent: 20,
     veryGood: 20,
     good: 20,
-    fair: 20,
+    respectable: 20,
   },
   categoryAverages: {
     design: 8.5,
