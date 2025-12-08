@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 export interface FriendTop100Progress {
   user_id: string;
   courses_played_in_list: number;
+  total_top100_played: number;
   profile: {
     id: string;
     username: string;
@@ -56,6 +57,20 @@ export function useFriendsTop100Progress(userId: string | undefined, listId: str
 
       if (profileError) throw profileError;
 
+      // Get total Top 100 played for each friend (across all lists)
+      const { data: totalCounts, error: totalError } = await supabase
+        .from('user_top100_rated_courses' as any)
+        .select('user_id')
+        .in('user_id', friendIds);
+
+      if (totalError) throw totalError;
+
+      // Count total top 100 per user
+      const totalTop100Map = new Map<string, number>();
+      for (const row of (totalCounts || []) as any[]) {
+        totalTop100Map.set(row.user_id, (totalTop100Map.get(row.user_id) || 0) + 1);
+      }
+
       // Aggregate by user
       const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
       const map = new Map<string, FriendTop100Progress>();
@@ -70,6 +85,7 @@ export function useFriendsTop100Progress(userId: string | undefined, listId: str
           map.set(row.user_id, {
             user_id: row.user_id,
             courses_played_in_list: 1,
+            total_top100_played: totalTop100Map.get(row.user_id) || 0,
             profile,
           });
         } else {

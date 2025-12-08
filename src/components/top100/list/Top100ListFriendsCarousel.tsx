@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 
 interface FriendSummary {
   id: string;
@@ -8,6 +9,7 @@ interface FriendSummary {
   username: string;
   avatarUrl: string | null;
   playedOnList: number;
+  totalTop100Played?: number;
 }
 
 interface Top100ListFriendsCarouselProps {
@@ -95,6 +97,7 @@ export const Top100ListFriendsCarousel: React.FC<Top100ListFriendsCarouselProps>
                   src={friend.avatarUrl}
                   alt={friend.name}
                   fallback={friend.name[0]?.toUpperCase() || '?'}
+                  ringColor={friend.totalTop100Played ? getRingColorForTotalPlayed(friend.totalTop100Played) : null}
                 />
               </div>
 

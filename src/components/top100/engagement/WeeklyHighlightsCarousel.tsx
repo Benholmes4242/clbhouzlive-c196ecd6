@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { TrendingUp, TrendingDown, Star, Trophy } from 'lucide-react';
+import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 
 interface Highlight {
   id: string;
@@ -17,6 +18,7 @@ interface Highlight {
     list?: string;
     display_name?: string;
     avatar_url?: string;
+    total_top100_played?: number;
   };
   created_at: string;
 }
@@ -148,6 +150,7 @@ export function WeeklyHighlightsCarousel({ currentUserId }: WeeklyHighlightsCaro
                       src={highlight.details.avatar_url}
                       alt={highlight.details.display_name || ''}
                       fallback={initials}
+                      ringColor={highlight.details.total_top100_played ? getRingColorForTotalPlayed(highlight.details.total_top100_played) : null}
                     />
                   ) : (
                     <div className="w-8 h-8 rounded-lg bg-current/10 flex items-center justify-center">
