@@ -97,8 +97,8 @@ function HeroWithMilestoneRow({
           />
         </div>
 
-        {/* Achievement badge card on the right */}
-        <div className="shrink-0">
+        {/* Achievement badge card on the right - scaled down 10% for My Progress */}
+        <div className="shrink-0 scale-90 origin-right">
           <AchievementBadgeCard
             tier={achievementTier}
             title={`${achievementTier} Club`}
