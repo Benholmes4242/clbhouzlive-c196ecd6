@@ -10,7 +10,7 @@ import CountryFlag from '@/components/ui/country-flag';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import Top100LeaderboardPanel from '@/components/courses/Top100LeaderboardPanel';
-import Top100MapView from '@/components/courses/Top100MapView';
+import Top100MapModal from '@/components/top100/Top100MapModal';
 import { Top100MapScope } from '@/hooks/useTop100MapCourses';
 import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
 import Top100BackButton from '@/components/top100/Top100BackButton';
@@ -36,15 +36,33 @@ const Top100Hub = () => {
     ? (tabFromUrl as ValidTab) 
     : 'courses';
   
-  const viewFromUrl = searchParams.get('view') as 'list' | 'map' | null;
-
   const [activeTab, setActiveTab] = useState<ValidTab>(safeTab);
   
-  const [coursesViewMode, setCoursesViewMode] = useState<'list' | 'map'>(
-    viewFromUrl ?? 'list'
-  );
+  // View mode state for toggle highlight
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  
+  // Map modal state
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
   
   const [selectedListSlug, setSelectedListSlug] = useState<Top100MapScope>('global');
+
+  // Toggle handlers
+  const handleListClick = () => {
+    setViewMode('list');
+    setIsMapModalOpen(false);
+  };
+
+  const handleMapClick = () => {
+    setViewMode('map');
+    setIsMapModalOpen(true);
+  };
+
+  const handleMapModalClose = (open: boolean) => {
+    if (!open) {
+      setIsMapModalOpen(false);
+      setViewMode('list'); // snap toggle back to List when closing
+    }
+  };
 
   // Guard against invalid data
   if (!lists && !listsLoading) {
@@ -148,10 +166,10 @@ const Top100Hub = () => {
                 <div className="inline-flex rounded-sq-xs bg-muted/70 border border-border/60 p-0.5 shadow-sm">
                   <button
                     type="button"
-                    onClick={() => setCoursesViewMode('list')}
+                    onClick={handleListClick}
                     className={cn(
                       'inline-flex items-center gap-2 rounded-sq-xs px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors',
-                      coursesViewMode === 'list'
+                      viewMode === 'list'
                         ? 'bg-background text-foreground shadow-sm'
                         : 'bg-transparent text-muted-foreground hover:text-foreground'
                     )}
@@ -162,10 +180,10 @@ const Top100Hub = () => {
 
                   <button
                     type="button"
-                    onClick={() => setCoursesViewMode('map')}
+                    onClick={handleMapClick}
                     className={cn(
                       'inline-flex items-center gap-2 rounded-sq-xs px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors',
-                      coursesViewMode === 'map'
+                      viewMode === 'map'
                         ? 'bg-background text-foreground shadow-sm'
                         : 'bg-transparent text-muted-foreground hover:text-foreground'
                     )}
@@ -176,32 +194,30 @@ const Top100Hub = () => {
                 </div>
               </div>
 
-              {coursesViewMode === 'list' ? (
-                /* Region Cards */
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {summariesLoading ? (
-                    <div className="col-span-full text-center py-12 text-muted-foreground">
-                      Loading Top 100 lists...
-                    </div>
-                  ) : (
-                    listSummaries?.map((list) => (
-                      <Top100RegionCard
-                        key={list.id}
-                        list={list}
-                        onClick={() => navigate(`/top100/${list.slug}`)}
-                      />
-                    ))
-                  )}
-                </div>
-              ) : (
-                /* Map View */
-                <div className="space-y-0">
-                  <Top100MapView 
-                    scope={selectedListSlug}
-                    onScopeChange={setSelectedListSlug}
-                  />
-                </div>
-              )}
+              {/* Always render List view - Map is shown in modal */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {summariesLoading ? (
+                  <div className="col-span-full text-center py-12 text-muted-foreground">
+                    Loading Top 100 lists...
+                  </div>
+                ) : (
+                  listSummaries?.map((list) => (
+                    <Top100RegionCard
+                      key={list.id}
+                      list={list}
+                      onClick={() => navigate(`/top100/${list.slug}`)}
+                    />
+                  ))
+                )}
+              </div>
+
+              {/* Map Modal */}
+              <Top100MapModal
+                open={isMapModalOpen}
+                onOpenChange={handleMapModalClose}
+                scope={selectedListSlug}
+                onScopeChange={setSelectedListSlug}
+              />
             </TabsContent>
 
             <TabsContent value="my-progress" className="mt-0">
