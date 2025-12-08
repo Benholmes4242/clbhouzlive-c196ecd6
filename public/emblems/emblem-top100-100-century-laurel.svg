@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Laurel Wreath - Full Circle -->
+  <!-- Left side leaves -->
+  <path d="M50 90 Q35 85 28 75"/>
+  <path d="M28 75 Q22 65 22 50"/>
+  <path d="M22 50 Q22 35 30 25"/>
+  <path d="M30 25 Q38 15 50 12"/>
+  <!-- Right side leaves -->
+  <path d="M50 90 Q65 85 72 75"/>
+  <path d="M72 75 Q78 65 78 50"/>
+  <path d="M78 50 Q78 35 70 25"/>
+  <path d="M70 25 Q62 15 50 12"/>
+  <!-- Left leaves detail -->
+  <path d="M35 82 Q28 78 25 70"/>
+  <path d="M28 68 Q22 62 20 52"/>
+  <path d="M24 48 Q22 40 26 32"/>
+  <path d="M30 30 Q35 22 44 18"/>
+  <!-- Right leaves detail -->
+  <path d="M65 82 Q72 78 75 70"/>
+  <path d="M72 68 Q78 62 80 52"/>
+  <path d="M76 48 Q78 40 74 32"/>
+  <path d="M70 30 Q65 22 56 18"/>
+  <!-- Bottom ribbon/tie -->
+  <path d="M45 88 Q50 92 55 88"/>
+  <path d="M42 90 L38 95"/>
+  <path d="M58 90 L62 95"/>
+</svg>

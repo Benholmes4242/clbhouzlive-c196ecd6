@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Crown -->
+  <!-- Base band -->
+  <path d="M20 70 L80 70"/>
+  <path d="M18 75 L82 75"/>
+  <path d="M20 70 L20 75 Q20 80 25 80 L75 80 Q80 80 80 75 L80 70"/>
+  <!-- Crown body -->
+  <path d="M20 70 L15 40 L32 55 L50 25 L68 55 L85 40 L80 70"/>
+  <!-- Crown points with orbs -->
+  <circle cx="15" cy="38" r="4"/>
+  <circle cx="50" cy="22" r="5"/>
+  <circle cx="85" cy="38" r="4"/>
+  <!-- Side orbs -->
+  <circle cx="32" cy="52" r="3"/>
+  <circle cx="68" cy="52" r="3"/>
+  <!-- Band decorations -->
+  <circle cx="35" cy="72" r="2"/>
+  <circle cx="50" cy="72" r="3"/>
+  <circle cx="65" cy="72" r="2"/>
+  <!-- Jewel details -->
+  <path d="M45 72 L50 68 L55 72"/>
+</svg>

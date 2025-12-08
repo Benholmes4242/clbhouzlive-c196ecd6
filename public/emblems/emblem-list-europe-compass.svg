@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 8-Point Compass Rose -->
+  <!-- Outer circle -->
+  <circle cx="50" cy="50" r="40"/>
+  <!-- Cardinal points (N, S, E, W) - larger -->
+  <path d="M50 10 L55 45 L50 38 L45 45 Z"/>
+  <path d="M50 90 L55 55 L50 62 L45 55 Z"/>
+  <path d="M90 50 L55 55 L62 50 L55 45 Z"/>
+  <path d="M10 50 L45 55 L38 50 L45 45 Z"/>
+  <!-- Ordinal points (NE, NW, SE, SW) - smaller -->
+  <path d="M78 22 L55 45 L52 42 L58 38 Z"/>
+  <path d="M22 22 L45 45 L48 42 L42 38 Z"/>
+  <path d="M78 78 L55 55 L58 52 L62 58 Z"/>
+  <path d="M22 78 L45 55 L42 52 L38 58 Z"/>
+  <!-- Center circle -->
+  <circle cx="50" cy="50" r="8"/>
+  <circle cx="50" cy="50" r="3"/>
+  <!-- Direction markers -->
+  <path d="M50 15 L50 20"/>
+  <path d="M50 80 L50 85"/>
+  <path d="M15 50 L20 50"/>
+  <path d="M80 50 L85 50"/>
+</svg>

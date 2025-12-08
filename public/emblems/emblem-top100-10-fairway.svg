@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Fairway S-Curve -->
+  <path d="M75 85 Q60 75 55 60 Q50 45 60 35 Q70 25 55 15"/>
+  <!-- Fairway edges -->
+  <path d="M80 88 Q65 78 60 63 Q55 48 65 38 Q75 28 60 18"/>
+  <path d="M70 82 Q55 72 50 57 Q45 42 55 32 Q65 22 50 12"/>
+  <!-- Flag at top -->
+  <path d="M55 15 L55 5"/>
+  <path d="M55 5 L65 8 L55 11"/>
+  <!-- Green circle -->
+  <circle cx="55" cy="15" r="4"/>
+</svg>
