@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { BEN_HANDICAP_MOCK, BEN_NEXT_ROUND_PREDICTION } from '@/lib/mockHandicapData';
 import HandicapHeroStrip from './HandicapHeroStrip';
 import HandicapStatGrid from './HandicapStatGrid';
@@ -58,15 +58,17 @@ const HandicapDemoExperience: React.FC = () => {
   const data = BEN_HANDICAP_MOCK;
 
   return (
-    <div className="space-y-6 pb-24">
-      {/* A. Hero Strip */}
-      <HandicapHeroStrip
-        currentIndex={data.currentIndex}
-        lastUpdated={data.lastUpdated}
-        yearDelta={-2.3}
-      />
+    <div className="max-w-[480px] mx-auto pb-24 space-y-6">
+      {/* A. Hero Strip - white card on grey background */}
+      <div className="bg-background border border-border rounded-sq-lg shadow-sm p-5">
+        <HandicapHeroStrip
+          currentIndex={data.currentIndex}
+          lastUpdated={data.lastUpdated}
+          yearDelta={-2.3}
+        />
+      </div>
 
-      {/* B. Stat Grid */}
+      {/* B. Stat Grid - 2x2 */}
       <HandicapStatGrid
         currentIndex={data.currentIndex}
         bestIndex={data.bestIndex}
@@ -89,18 +91,26 @@ const HandicapDemoExperience: React.FC = () => {
       {/* G. Milestones */}
       <HandicapMilestonesCard milestones={data.milestones} />
 
-      {/* G. Recent Rounds */}
-      <section className="bg-muted border border-border rounded-sq-md p-4">
-        <div className="mb-4">
-          <h3 className="flex items-center gap-2 text-lg font-semibold text-foreground">
-            <Calendar className="h-5 w-5 text-primary-accent" />
+      {/* H. Recent Rounds */}
+      <section className="bg-background border border-border rounded-sq-lg shadow-sm overflow-hidden">
+        <div className="p-5 pb-4 border-b border-border">
+          <h3 className="text-lg font-semibold text-foreground">
             Recent Rounds
           </h3>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p className="text-sm text-muted-foreground mt-1">
             Your latest golf rounds and performance
           </p>
         </div>
-        <RecentRoundsFeed rounds={mockRoundsData} isLoading={false} />
+        <div className="p-4">
+          <RecentRoundsFeed rounds={mockRoundsData} isLoading={false} />
+        </div>
+        {/* View all CTA */}
+        <div className="border-t border-border px-5 py-3">
+          <button className="w-full flex items-center justify-center gap-1 text-sm font-medium text-primary-accent hover:text-primary-accent/80 transition-colors">
+            View all rounds
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
       </section>
     </div>
   );

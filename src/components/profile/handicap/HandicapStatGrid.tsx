@@ -8,14 +8,14 @@ interface StatCardProps {
 
 const StatCard: React.FC<StatCardProps> = ({ label, value, hint }) => {
   return (
-    <div className="bg-muted border border-border rounded-sq-md px-4 py-4 flex flex-col justify-center">
-      <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+    <div className="bg-background border border-border rounded-sq-lg shadow-sm px-4 py-4 h-[100px] flex flex-col justify-center">
+      <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
         {label}
       </span>
-      <span className="text-2xl font-bold text-foreground tabular-nums">
+      <span className="text-2xl font-bold text-foreground tabular-nums mt-1">
         {value}
       </span>
-      <span className="text-xs text-muted-foreground mt-0.5">
+      <span className="text-[13px] text-muted-foreground mt-0.5 line-clamp-1">
         {hint}
       </span>
     </div>

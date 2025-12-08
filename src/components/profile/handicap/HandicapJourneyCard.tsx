@@ -45,7 +45,7 @@ const HandicapTooltip: React.FC<TooltipProps> = ({ active, payload, label }) => 
   );
 };
 
-// Range toggle pills
+// Range toggle chips - matching Top 100 filter chips
 type RangeToggleProps = {
   value: RangeKey;
   onChange: (value: RangeKey) => void;
@@ -53,7 +53,7 @@ type RangeToggleProps = {
 
 const HandicapRangeToggle: React.FC<RangeToggleProps> = ({ value, onChange }) => {
   return (
-    <div className="inline-flex rounded-sq-pill bg-muted/70 p-1">
+    <div className="inline-flex rounded-sq-pill bg-muted/70 border border-border/60 p-1">
       {RANGE_OPTIONS.map((option) => {
         const isActive = option.key === value;
         return (
@@ -108,82 +108,86 @@ export const HandicapJourneyCard: React.FC<Props> = ({ timeline }) => {
   }));
 
   return (
-    <section className="rounded-sq-lg bg-muted border border-border px-5 py-5">
+    <section className="rounded-sq-lg bg-background border border-border shadow-sm overflow-hidden">
       {/* Header */}
-      <div className="mb-4 flex items-baseline justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-semibold text-foreground">
-            Handicap Journey
-          </h2>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Track how your index has moved over time
-          </p>
+      <div className="px-5 pt-5 pb-4">
+        <div className="flex items-baseline justify-between gap-3 mb-4">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">
+              Handicap Journey
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Track how your index has moved over time
+            </p>
+          </div>
+
+          <div className="hidden text-right sm:block">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              Data source
+            </p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              England Golf
+            </p>
+          </div>
         </div>
 
-        <div className="hidden text-right sm:block">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-            Data source
-          </p>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            England Golf
-          </p>
-        </div>
+        {/* Range toggle */}
+        <HandicapRangeToggle value={range} onChange={setRange} />
       </div>
 
-      {/* Range toggle */}
-      <HandicapRangeToggle value={range} onChange={setRange} />
+      {/* Chart with horizontal padding */}
+      <div className="px-4 pb-4">
+        <div className="h-[200px] w-full">
+          <ResponsiveContainer>
+            <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+              <XAxis
+                dataKey="date"
+                tickLine={false}
+                axisLine={false}
+                tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                interval="preserveStartEnd"
+              />
+              <YAxis
+                tickLine={false}
+                axisLine={false}
+                tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                width={32}
+                domain={['dataMin - 0.3', 'dataMax + 0.3']}
+                tickFormatter={(v) => v.toFixed(1)}
+              />
+              <Tooltip
+                cursor={{ stroke: 'hsl(var(--border))', strokeWidth: 1 }}
+                content={<HandicapTooltip />}
+              />
+              <Area
+                type="monotone"
+                dataKey="index"
+                stroke="hsl(var(--primary-accent))"
+                strokeWidth={2}
+                fill="hsl(var(--primary-accent))"
+                fillOpacity={0.12}
+                dot={{ r: 3, strokeWidth: 1, stroke: 'hsl(var(--primary-accent))', fill: 'hsl(var(--background))' }}
+                activeDot={{ r: 5, fill: 'hsl(var(--primary-accent))' }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
 
-      {/* Chart */}
-      <div className="mt-4 h-[200px] w-full">
-        <ResponsiveContainer>
-          <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -24, bottom: 0 }}>
-            <XAxis
-              dataKey="date"
-              tickLine={false}
-              axisLine={false}
-              tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
-              interval="preserveStartEnd"
-            />
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
-              width={32}
-              domain={['dataMin - 0.3', 'dataMax + 0.3']}
-              tickFormatter={(v) => v.toFixed(1)}
-            />
-            <Tooltip
-              cursor={{ stroke: 'hsl(var(--border))', strokeWidth: 1 }}
-              content={<HandicapTooltip />}
-            />
-            <Area
-              type="monotone"
-              dataKey="index"
-              stroke="hsl(var(--primary-accent))"
-              strokeWidth={2}
-              fill="hsl(var(--primary-accent))"
-              fillOpacity={0.15}
-              dot={{ r: 3, strokeWidth: 1, stroke: 'hsl(var(--primary-accent))', fill: 'hsl(var(--background))' }}
-              activeDot={{ r: 5, fill: 'hsl(var(--primary-accent))' }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Legend / footer */}
-      <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-        <div className="flex items-center gap-4">
-          <span className="flex items-center gap-1.5">
-            <span className="h-[5px] w-4 rounded-sq-pill bg-primary-accent" />
-            Handicap Index
-          </span>
-          <span className="hidden sm:inline text-muted-foreground/70">
-            Tap points for details
+        {/* Legend / footer */}
+        <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground border-t border-border pt-3">
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1.5">
+              <span className="h-[5px] w-4 rounded-sq-pill bg-primary-accent" />
+              Handicap Index
+            </span>
+            <span className="hidden sm:inline text-muted-foreground/70">
+              Tap points for details
+            </span>
+          </div>
+          <span className="text-[11px]">
+            Last {chartData.length} qualifying rounds
           </span>
         </div>
-        <span className="text-[11px]">
-          Last {chartData.length} qualifying rounds
-        </span>
       </div>
     </section>
   );
