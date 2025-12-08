@@ -2,8 +2,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import type { Top100TierId } from '@/lib/top100Club';
 import { getTop100Club } from '@/lib/top100Club';
+import { AchievementBadgeCard, type AchievementTier } from '@/components/achievements/AchievementBadgeCard';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getRingColorForTotalPlayed, MILESTONE_THEMES, type MilestoneTier } from '@/lib/globalAchievementMilestoneSystem';
+import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { getNextBadgeNudge } from '@/lib/achievements/nextBadgeNudge';
 import NudgeBanner from '@/components/achievements/NudgeBanner';
 
@@ -53,23 +54,21 @@ function CenteredHeroAvatar({
   );
 }
 
-// Hero row with avatar left, milestone card right
+// Hero row with avatar left, achievement badge card right
 function HeroWithMilestoneRow({ 
   avatarUrl, 
   displayName, 
   ringColor,
-  milestone,
+  achievementTier,
+  totalTop100Played,
+  clubName,
 }: { 
   avatarUrl: string | null; 
   displayName: string | null;
   ringColor: string | null;
-  milestone: {
-    threshold: number;
-    title: string;
-    subtitle: string;
-    statusLabel: string;
-    theme: { bgLight: string; bgDark: string };
-  };
+  achievementTier: AchievementTier;
+  totalTop100Played: number;
+  clubName: string;
 }) {
   const initials = displayName
     ?.split(' ')
@@ -80,7 +79,7 @@ function HeroWithMilestoneRow({
 
   return (
     <motion.div
-      className="mb-6"
+      className="mb-6 w-full"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
@@ -89,7 +88,7 @@ function HeroWithMilestoneRow({
         {/* Avatar on the left */}
         <div className="shrink-0">
           <SquircleAvatar
-            size={112}
+            size={92}
             src={avatarUrl}
             alt={displayName ?? 'Player avatar'}
             fallback={initials}
@@ -97,29 +96,15 @@ function HeroWithMilestoneRow({
           />
         </div>
 
-        {/* Milestone card on the right */}
-        <div className="flex-1">
-          <div
-            className="rounded-sq-lg px-4 py-3 shadow-sm"
-            style={{
-              background: `linear-gradient(135deg, ${milestone.theme.bgLight}, ${milestone.theme.bgDark})`,
-            }}
-          >
-            <div className="flex items-center justify-between gap-2">
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-slate-900 truncate">
-                  {milestone.title}
-                </p>
-                <p className="text-xs text-slate-700 truncate">
-                  {milestone.subtitle}
-                </p>
-              </div>
-
-              <span className="shrink-0 rounded-sq-pill bg-white/90 px-3 py-1 text-xs font-medium text-slate-900">
-                {milestone.statusLabel}
-              </span>
-            </div>
-          </div>
+        {/* Achievement badge card on the right - uses canonical component */}
+        <div className="flex-1 min-w-0">
+          <AchievementBadgeCard
+            tier={achievementTier}
+            title={`${achievementTier} Club`}
+            subtitle={clubName}
+            unlocked={true}
+            totalTop100Played={totalTop100Played}
+          />
         </div>
       </div>
     </motion.div>
@@ -141,6 +126,9 @@ export function Top100ProgressHero({
   const tierColor = getRingColorForTotalPlayed(totalTop100Played);
   const club = getTop100Club(totalTop100Played);
   const hasAchievement = totalTop100Played >= 5;
+  
+  // Map threshold to AchievementTier
+  const achievementTier = club.threshold?.toString() as AchievementTier || '5';
   
   const formattedDate = lastRoundAt
     ? new Date(lastRoundAt).toLocaleDateString()
@@ -164,27 +152,17 @@ export function Top100ProgressHero({
     }),
   }) : null;
 
-  // Build milestone data for the card
-  const currentMilestone = hasAchievement && club.threshold ? {
-    threshold: club.threshold,
-    title: `${club.threshold} Club`,
-    subtitle: club.tierName || 'Top 100 Club',
-    statusLabel: 'Unlocked',
-    theme: MILESTONE_THEMES[club.threshold as MilestoneTier] || { 
-      bgLight: '#F7E3C2', 
-      bgDark: '#FBE4E4' 
-    },
-  } : null;
-
   return (
     <section className="flex flex-col items-center gap-3 pb-4 px-4">
       {/* Hero: centered avatar OR avatar + milestone side by side */}
-      {currentMilestone ? (
+      {hasAchievement ? (
         <HeroWithMilestoneRow
           avatarUrl={avatarUrl}
           displayName={displayName}
           ringColor={tierColor}
-          milestone={currentMilestone}
+          achievementTier={achievementTier}
+          totalTop100Played={totalTop100Played}
+          clubName={club.tierName || 'Top 100 Club'}
         />
       ) : (
         <CenteredHeroAvatar
