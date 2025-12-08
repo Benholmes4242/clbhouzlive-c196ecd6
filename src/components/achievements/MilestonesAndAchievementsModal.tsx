@@ -14,6 +14,7 @@ import NudgeBanner from './NudgeBanner';
 import { getNextBadgeNudge } from '@/lib/achievements/nextBadgeNudge';
 import { DEBUG_UNLOCK_ALL_ACHIEVEMENTS, DEBUG_ACHIEVEMENTS_USER_EMAIL } from '@/utils/featureFlags';
 import { cn } from '@/lib/utils';
+import { MILESTONE_THEMES, MilestoneTier } from '@/lib/globalAchievementMilestoneSystem';
 
 interface MilestonesAndAchievementsModalProps {
   open: boolean;
@@ -34,29 +35,21 @@ function getListTier(id: string): AchievementTier {
   return 'WORLD';
 }
 
-// Tier-based gradient styling
-function getClubGradientClass(tierName?: string) {
-  switch (tierName) {
-    case 'Rookie Club':
-      return 'from-orange-50 via-rose-50 to-slate-50';
-    case 'Fairway Club':
-      return 'from-lime-50 via-emerald-50 to-slate-50';
-    case 'Founders Club':
-      return 'from-emerald-100 via-emerald-50 to-slate-50';
-    case 'Heritage Club':
-      return 'from-amber-50 via-amber-100 to-slate-50';
-    case 'Century Club':
-      return 'from-slate-100 via-slate-50 to-slate-50';
-    case 'Elite Club':
-      return 'from-indigo-50 via-violet-50 to-slate-50';
-    case 'Legendary Club':
-      return 'from-fuchsia-50 via-violet-50 to-slate-50';
-    case 'Grand Slam Club':
-      return 'from-amber-100 via-amber-50 to-slate-50';
-    default:
-      return 'from-slate-50 via-slate-50 to-slate-50';
+// Get inline style for hero card background from global system
+function getClubHeroStyle(threshold: number): React.CSSProperties {
+  const theme = MILESTONE_THEMES[threshold as MilestoneTier];
+  if (!theme) {
+    return { background: '#F8FAFC' }; // neutral fallback
   }
+  return {
+    background: `linear-gradient(135deg, ${theme.bgLight}, ${theme.bgDark})`,
+  };
 }
+
+// Neutral card style for empty state
+const EMPTY_STATE_STYLE: React.CSSProperties = {
+  background: 'linear-gradient(135deg, #F8FAFC, #F1F5F9)',
+};
 
 /**
  * Top 100 Milestones Modal
@@ -102,6 +95,11 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
   const coursesToNext = nextClub ? nextClub.threshold - totalTop100Played : 0;
   const hasCompletedAll = unlockedMilestoneCount === totalMilestones;
   
+  // Determine if user has a club (< 5 = no club yet)
+  const hasClub = totalTop100Played >= 5;
+  const firstClubThreshold = 5;
+  const coursesToRookie = Math.max(firstClubThreshold - totalTop100Played, 0);
+  
   // Viewer vs profile owner - determine if viewing own profile
   const viewerId = user?.id;
   const ownerId = profile?.id ?? null;
@@ -121,34 +119,43 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
     ? 'Your clubs & achievements'
     : `${firstName}'s clubs & achievements`;
 
-  // 2) Main headline (club name)
-  const heroHeadline = currentClub?.tierName || 'Rookie Club';
+  // 2) Main headline - changes based on hasClub
+  const heroHeadline = hasClub 
+    ? (currentClub?.tierName || 'Rookie Club')
+    : (isOwnProfile ? 'Your first club is waiting' : `${firstName} hasn't joined a club yet`);
 
   // 3) Progress line
-  const progressLine = hasCompletedAll
+  const progressLine = !hasClub
     ? (isOwnProfile
-        ? `All ${totalMilestones} milestone clubs unlocked`
-        : `${firstName} has unlocked all ${totalMilestones} milestone clubs`)
-    : (isOwnProfile
-        ? `${unlockedMilestoneCount} of ${totalMilestones} milestone clubs unlocked`
-        : `${firstName} has unlocked ${unlockedMilestoneCount} of ${totalMilestones} milestone clubs`);
+        ? `Play ${coursesToRookie} more Top 100 courses to join Rookie Club`
+        : 'First club unlocks at 5 Top 100 courses played')
+    : hasCompletedAll
+      ? (isOwnProfile
+          ? `All ${totalMilestones} milestone clubs unlocked`
+          : `${firstName} has unlocked all ${totalMilestones} milestone clubs`)
+      : (isOwnProfile
+          ? `${unlockedMilestoneCount} of ${totalMilestones} milestone clubs unlocked`
+          : `${firstName} has unlocked ${unlockedMilestoneCount} of ${totalMilestones} milestone clubs`);
 
   // 4) Status line (trophy line)
-  const statusLine = hasCompletedAll
-    ? (isOwnProfile
-        ? `Grand Slam complete – ${totalTop100Played} courses played`
-        : `Grand Slam complete – ${firstName} has played ${totalTop100Played} courses`)
-    : coursesForNextLevel != null
+  const statusLine = !hasClub
+    ? (isOwnProfile ? 'Rookie Club unlocks at 5 courses played' : '')
+    : hasCompletedAll
       ? (isOwnProfile
-          ? `Next club: ${nextClub?.tierName} – ${coursesForNextLevel - totalTop100Played} more to go`
-          : `Next for ${firstName}: ${nextClub?.tierName} – ${coursesForNextLevel - totalTop100Played} more to go`)
-      : (isOwnProfile
-          ? 'Keep logging Top 100 rounds to unlock your next club'
-          : `${firstName} is closing in on the next club`);
+          ? `Grand Slam complete – ${totalTop100Played} courses played`
+          : `Grand Slam complete – ${firstName} has played ${totalTop100Played} courses`)
+      : coursesForNextLevel != null
+        ? (isOwnProfile
+            ? `Next club: ${nextClub?.tierName} – ${coursesForNextLevel - totalTop100Played} more to go`
+            : `Next for ${firstName}: ${nextClub?.tierName} – ${coursesForNextLevel - totalTop100Played} more to go`)
+        : (isOwnProfile
+            ? 'Keep logging Top 100 rounds to unlock your next club'
+            : `${firstName} is closing in on the next club`);
 
-  // 5) Emblem values
-  const emblemValue = totalTop100Played;
-  const emblemCaption = emblemValue === 1 ? 'course' : 'courses';
+  // Hero card style - uses club color or neutral for empty state
+  const heroStyle = hasClub && currentClub 
+    ? getClubHeroStyle(currentClub.threshold)
+    : EMPTY_STATE_STYLE;
 
   // Calculate nudge
   const nudge = progressData?.lists ? getNextBadgeNudge({
@@ -211,42 +218,58 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
               {/* Hero banner: Clubs & achievements */}
               <section className="px-4 md:px-8 mt-5 mb-6">
                 <div
-                  className={cn(
-                    'rounded-sq-lg p-5 md:p-6 shadow-lg bg-gradient-to-r',
-                    getClubGradientClass(currentClub?.tierName)
-                  )}
+                  className="rounded-sq-lg p-5 md:p-6 shadow-lg"
+                  style={heroStyle}
                 >
                   <div className="flex flex-col gap-2 md:gap-2.5">
                     {/* Label */}
-                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+                    <p className={cn(
+                      "text-xs font-semibold uppercase tracking-[0.12em]",
+                      hasClub ? "text-slate-500" : "text-slate-400"
+                    )}>
                       {heroLabel}
                     </p>
 
                     {/* TITLE + EMBLEM ROW */}
                     <div className="flex items-center justify-between gap-3">
                       {/* Club title */}
-                      <h2 className="text-xl md:text-2xl font-semibold text-slate-900 truncate">
+                      <h2 className={cn(
+                        "text-xl md:text-2xl font-semibold truncate",
+                        hasClub ? "text-slate-900" : "text-slate-700"
+                      )}>
                         {heroHeadline}
                       </h2>
 
                       {/* Courses emblem – SDS pill style */}
-                      <div className="inline-flex items-center justify-center px-3 py-1.5 md:px-3.5 md:py-1.5
-                                      rounded-sq-pill text-xs md:text-sm font-semibold
-                                      bg-surface-slate text-slate-50 shadow-sm whitespace-nowrap">
-                        {totalTop100Played} courses
+                      <div className={cn(
+                        "inline-flex items-center justify-center px-3 py-1.5 md:px-3.5 md:py-1.5",
+                        "rounded-sq-pill text-xs md:text-sm font-semibold shadow-sm whitespace-nowrap",
+                        hasClub 
+                          ? "bg-surface-slate text-slate-50" 
+                          : "bg-slate-200 text-slate-600"
+                      )}>
+                        {totalTop100Played} {totalTop100Played === 1 ? 'course' : 'courses'}
                       </div>
                     </div>
 
                     {/* Progress line */}
-                    <p className="text-sm text-slate-700 max-w-full">
+                    <p className={cn(
+                      "text-sm max-w-full",
+                      hasClub ? "text-slate-700" : "text-slate-500"
+                    )}>
                       {progressLine}
                     </p>
 
-                    {/* Trophy / status line */}
-                    <p className="flex items-center gap-1.5 text-sm font-medium text-amber-700 max-w-full">
-                      <span aria-hidden="true">🏆</span>
-                      <span>{statusLine}</span>
-                    </p>
+                    {/* Trophy / status line - hidden for empty state with no content */}
+                    {statusLine && (
+                      <p className={cn(
+                        "flex items-center gap-1.5 text-sm font-medium max-w-full",
+                        hasClub ? "text-amber-700" : "text-slate-400"
+                      )}>
+                        <span aria-hidden="true" className={hasClub ? "" : "opacity-50"}>🏆</span>
+                        <span>{statusLine}</span>
+                      </p>
+                    )}
                   </div>
                 </div>
               </section>
