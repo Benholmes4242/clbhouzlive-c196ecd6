@@ -97,21 +97,23 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
         className="h-full p-0 overflow-hidden"
       >
         <div className="h-full overflow-y-auto bg-background">
-          {/* Page header */}
-          <header className="px-4 pt-4 pb-2 md:px-8 md:pt-6 md:pb-3 flex items-center justify-between">
+          {/* Page header - matches map modal styling */}
+          <header className="flex-shrink-0 px-5 pt-4 pb-3 md:px-8 md:pt-6 md:pb-4 border-b border-border/40">
+            {/* Back link - matches Top100BackButton styling */}
             <button 
               onClick={() => onOpenChange(false)}
-              className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 transition-colors"
+              className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition"
             >
-              <ChevronLeft className="h-4 w-4" />
-              Back
+              <ChevronLeft className="mr-1 h-4 w-4" />
+              Back to profile
             </button>
 
-            <h1 className="text-base md:text-lg font-semibold tracking-tight">
-              Top 100 milestones
-            </h1>
-
-            <div className="w-8" /> {/* spacer to balance back button */}
+            {/* Title block - centered */}
+            <div className="text-center mt-2">
+              <h1 className="text-xl font-semibold text-foreground">
+                Top 100 journey milestones
+              </h1>
+            </div>
           </header>
 
           {isLoading ? (
@@ -120,87 +122,68 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
             </div>
           ) : (
             <>
-              {/* Summary line */}
-              <p className="px-4 md:px-8 text-xs md:text-sm text-slate-500 mb-3">
-                @{username} · {totalTop100Played} Top 100 courses · {unlockedCount} milestones unlocked
-              </p>
-
               {/* Nudge banner */}
               {nudge && !isDebugUser && (
-                <div className="px-4 md:px-8">
+                <div className="px-4 md:px-8 mt-4">
                   <NudgeBanner nudge={nudge} variant="compact" />
                 </div>
               )}
 
               {/* Hero "Progress" card */}
-              <section className="px-4 md:px-8 mb-5">
+              <section className="px-4 md:px-8 mt-5 mb-6">
                 <div
                   className="
-                    rounded-[28px]
+                    rounded-sq-lg
                     bg-white/90
                     shadow-[0_18px_45px_rgba(15,23,42,0.18)]
                     px-4 py-4 md:px-6 md:py-5
-                    flex flex-col gap-3
+                    flex items-center justify-between gap-4
                   "
                 >
-                  {/* Row 1: title + unlocked count */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="h-9 w-9 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
-                        <Trophy className="h-4 w-4 text-emerald-600" />
+                  {/* Left side content */}
+                  <div className="flex-1 min-w-0">
+                    {/* Small label */}
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-wide mb-1">
+                      Top 100 milestones
+                    </p>
+                    
+                    {/* Main line */}
+                    <p className="text-base font-semibold text-foreground">
+                      Current level {currentClub.tierName || 'Beginner'}
+                    </p>
+                    
+                    {/* Progress line */}
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {unlockedMilestoneCount} of {totalMilestones} milestones unlocked
+                    </p>
+                    
+                    {/* Trophy line - shown when all milestones complete */}
+                    {!nextClub && totalTop100Played >= 400 && (
+                      <div className="flex items-center gap-1.5 mt-2 text-sm font-medium text-primary">
+                        <Trophy className="h-4 w-4" />
+                        <span>Grand Slam Club achieved!</span>
                       </div>
-                      <div>
-                        <div className="text-sm font-semibold text-slate-900">
-                          Top 100 milestones
-                        </div>
-                        <div className="text-[11px] text-slate-500">
-                          {unlockedMilestoneCount} of {totalMilestones} unlocked
-                        </div>
-                      </div>
-                    </div>
-                    <span className="text-[11px] px-2 py-[3px] rounded-full bg-slate-900 text-white uppercase tracking-wide">
-                      {totalTop100Played} courses
-                    </span>
-                  </div>
-
-                  {/* Row 2: current & next */}
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                    <div className="text-sm">
-                      <span className="text-slate-500">Current level </span>
-                      <span className="font-semibold text-slate-900">
-                        {currentClub.tierName || 'Beginner'}
-                      </span>
-                    </div>
+                    )}
+                    
+                    {/* Progress to next (only if not complete) */}
                     {nextClub && (
-                      <div className="text-[11px] text-slate-600">
-                        Next: <span className="font-semibold">{nextClub.tierName}</span> · {coursesToNext} more courses
+                      <div className="text-[11px] text-muted-foreground mt-2">
+                        Next: <span className="font-medium">{nextClub.tierName}</span> · {coursesToNext} more courses
                       </div>
                     )}
                   </div>
 
-                  {/* Row 3: progress bar */}
-                  {nextClub && (
-                    <div className="mt-1 h-2 rounded-full bg-slate-100 overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-600 transition-all"
-                        style={{ width: `${progressToNext}%` }}
-                      />
-                    </div>
-                  )}
-
-                  {/* All milestones complete */}
-                  {!nextClub && totalTop100Played >= 400 && (
-                    <div className="text-[11px] text-amber-700 font-medium">
-                      🏆 Grand Slam Club achieved!
-                    </div>
-                  )}
+                  {/* Right side pill - uses handicap pill token styling */}
+                  <span className="flex-shrink-0 text-xs px-3 py-1.5 rounded-sq-pill bg-muted text-muted-foreground font-medium">
+                    {totalTop100Played} courses
+                  </span>
                 </div>
               </section>
 
               {/* Milestone badges grid */}
               <section className="px-4 md:px-8 pb-6">
-                <h2 className="text-sm font-semibold text-slate-800 mb-3">
-                  Milestone badges
+                <h2 className="text-sm font-semibold text-foreground mb-4">
+                  Top 100 milestones
                 </h2>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
@@ -229,8 +212,8 @@ const MilestonesAndAchievementsModal: React.FC<MilestonesAndAchievementsModalPro
 
               {/* List completion badges grid */}
               <section className="px-4 md:px-8 pb-10">
-                <h2 className="text-sm font-semibold text-slate-800 mb-3">
-                  Regional lists
+                <h2 className="text-sm font-semibold text-foreground mb-4">
+                  Completed Top 100 lists
                 </h2>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
