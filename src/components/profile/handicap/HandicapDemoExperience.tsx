@@ -3,7 +3,7 @@ import { Calendar } from 'lucide-react';
 import { BEN_HANDICAP_MOCK } from '@/lib/mockHandicapData';
 import HandicapHeroStrip from './HandicapHeroStrip';
 import HandicapStatGrid from './HandicapStatGrid';
-import HandicapJourneyChart from './HandicapJourneyChart';
+import { HandicapJourneyCard } from './HandicapJourneyCard';
 import CourseImpactCard from './CourseImpactCard';
 import FriendsHandicapCard from './FriendsHandicapCard';
 import HandicapMilestonesCard from './HandicapMilestonesCard';
@@ -74,7 +74,7 @@ const HandicapDemoExperience: React.FC = () => {
       />
 
       {/* C. Handicap Journey Chart */}
-      <HandicapJourneyChart timeline={data.timeline} />
+      <HandicapJourneyCard timeline={data.timeline} />
 
       {/* D. Course Impact */}
       <CourseImpactCard
