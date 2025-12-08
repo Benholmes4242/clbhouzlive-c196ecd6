@@ -37,15 +37,27 @@ export const SeasonOnCourseCard: React.FC<SeasonOnCourseCardProps> = ({
 
   return (
     <div className="bg-gradient-to-br from-emerald-50/60 via-slate-50 to-slate-50/80 border border-slate-100 rounded-sq-lg p-5">
-      {/* Header */}
-      <div className="mb-4">
-        <h3 className="text-base font-semibold text-slate-900">
-          This season on course
-        </h3>
-        <p className="text-xs text-slate-500 mt-0.5">
-          {currentSeason.name}
-        </p>
+      {/* Header with season level pill */}
+      <div className="flex items-start justify-between mb-3">
+        <div>
+          <h3 className="text-base font-semibold text-slate-900">
+            This season on course
+          </h3>
+          <p className="text-xs text-slate-500 mt-0.5">
+            {currentSeason.name}
+          </p>
+        </div>
+        {hasActivity && (
+          <span className="text-[10px] font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-sq-pill">
+            Season level: {seasonLevel}
+          </span>
+        )}
       </div>
+
+      {/* Helper text */}
+      <p className="text-xs text-slate-400 mb-4">
+        Rounds, new courses and XP reset each season.
+      </p>
 
       {!hasActivity ? (
         // Empty state
@@ -68,12 +80,6 @@ export const SeasonOnCourseCard: React.FC<SeasonOnCourseCardProps> = ({
         </div>
       ) : (
         <>
-          {/* Season level label */}
-          <div className="mb-4">
-            <span className="text-xs text-slate-500">Season level: </span>
-            <span className="text-xs font-medium text-emerald-600">{seasonLevel}</span>
-          </div>
-
           {/* Stats row */}
           <div className="flex flex-wrap gap-4 mb-4">
             <div className="flex items-center gap-1.5">

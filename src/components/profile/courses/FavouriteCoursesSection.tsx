@@ -8,6 +8,7 @@ import { useUserTopTenCourses, TopTenCourse } from '@/hooks/useUserTopTenCourses
 import { Button } from '@/components/ui/button';
 import { AddCourseModal } from './AddCourseModal';
 import { RatingPill } from '@/components/ui/RatingPill';
+import { FavouriteHeroCard } from './FavouriteHeroCard';
 import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -51,7 +52,7 @@ const SortableFavouriteItem: React.FC<SortableFavouriteItemProps> = ({
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-white border border-slate-100 rounded-sq-sm p-3 flex items-center gap-3 hover:border-slate-200 transition-colors"
+      className="bg-slate-50 border border-slate-100 rounded-sq-sm p-3 flex items-center gap-3 hover:border-slate-200 transition-colors"
     >
       {isEditable && (
         <div
@@ -63,7 +64,7 @@ const SortableFavouriteItem: React.FC<SortableFavouriteItemProps> = ({
         </div>
       )}
 
-      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center">
+      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-white flex items-center justify-center border border-slate-200">
         <span className="text-xs font-semibold text-slate-600">{course.position}</span>
       </div>
 
@@ -170,16 +171,20 @@ export const FavouriteCoursesSection: React.FC<FavouriteCoursesSectionProps> = (
     );
   }
 
+  // Split into hero (position 1) and remaining courses
+  const heroCourse = topTen.find(c => c.position === 1);
+  const remainingCourses = topTen.filter(c => c.position !== 1);
+
   return (
     <div>
-      <div className="flex items-start justify-between mb-3">
+      <div className="flex items-start justify-between mb-2">
         <div>
           <h3 className="text-base font-semibold text-slate-900">Favourite Courses</h3>
-          {isOwnProfile && (
-            <p className="text-xs text-slate-500 mt-0.5">
-              Your personal all-time favourites. Drag to reorder.
-            </p>
-          )}
+          <p className="text-xs text-slate-500 mt-0.5">
+            {isOwnProfile 
+              ? "Your personal all-time favourites. Drag to reorder."
+              : "This golfer's all-time favourites."}
+          </p>
         </div>
         {isOwnProfile && (
           <button 
@@ -192,8 +197,17 @@ export const FavouriteCoursesSection: React.FC<FavouriteCoursesSectionProps> = (
         )}
       </div>
 
+      {/* Stat line */}
+      {topTen.length > 0 && (
+        <p className="text-[11px] text-slate-400 mb-3">
+          {isOwnProfile 
+            ? `You've picked ${topTen.length} of 10 favourites`
+            : `${topTen.length} of 10 favourites picked`}
+        </p>
+      )}
+
       {/* Tabs */}
-      <div className="flex gap-2 mb-3">
+      <div className="flex gap-2 mb-4">
         <button
           onClick={() => setActiveTab('top10')}
           className={`px-3 py-1.5 text-xs rounded-sq-pill transition-colors ${
@@ -230,16 +244,30 @@ export const FavouriteCoursesSection: React.FC<FavouriteCoursesSectionProps> = (
       ) : (
         <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={topTen.map(c => c.id)} strategy={verticalListSortingStrategy}>
-            <div className="space-y-2">
-              {topTen.map((course) => (
-                <SortableFavouriteItem
-                  key={course.id}
-                  course={course}
+            <div className="space-y-3">
+              {/* Hero card for #1 favourite */}
+              {heroCourse && (
+                <FavouriteHeroCard
+                  course={heroCourse}
+                  userRating={ratingsMap[heroCourse.course_id]}
                   isEditable={isOwnProfile}
-                  onTap={() => handleCourseClick(course.course_id)}
-                  userRating={ratingsMap[course.course_id]}
                 />
-              ))}
+              )}
+
+              {/* Remaining courses */}
+              {remainingCourses.length > 0 && (
+                <div className="space-y-2">
+                  {remainingCourses.map((course) => (
+                    <SortableFavouriteItem
+                      key={course.id}
+                      course={course}
+                      isEditable={isOwnProfile}
+                      onTap={() => handleCourseClick(course.course_id)}
+                      userRating={ratingsMap[course.course_id]}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </SortableContext>
         </DndContext>

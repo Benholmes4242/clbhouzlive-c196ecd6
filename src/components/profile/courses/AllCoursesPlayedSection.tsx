@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserCourseActivity } from '@/hooks/useUserCourseActivity';
 import { useQuery } from '@tanstack/react-query';
@@ -7,6 +7,8 @@ import { Filter, Calendar } from 'lucide-react';
 import { RatingPill } from '@/components/ui/RatingPill';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
+import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
+import { cn } from '@/lib/utils';
 
 interface AllCoursesPlayedSectionProps {
   userId: string;
@@ -28,12 +30,18 @@ interface CourseWithDetails {
   has_rating: boolean;
 }
 
+const PAGE_SIZE = 15;
+
 export const AllCoursesPlayedSection: React.FC<AllCoursesPlayedSectionProps> = ({ 
   userId,
   isOwnProfile 
 }) => {
   const navigate = useNavigate();
+  const sectionRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState<FilterType>('all');
+  const [page, setPage] = useState(0);
+  const [transitionDirection, setTransitionDirection] = useState<'next' | 'prev'>('next');
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const { data: userActivity = [] } = useUserCourseActivity(userId);
 
@@ -95,6 +103,46 @@ export const AllCoursesPlayedSection: React.FC<AllCoursesPlayedSectionProps> = (
     return filtered;
   }, [courses, filter]);
 
+  // Reset page when filter changes
+  useEffect(() => {
+    setPage(0);
+  }, [filter]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredCourses.length / PAGE_SIZE));
+  const pagedCourses = filteredCourses.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  const hasNextPage = page < totalPages - 1;
+  const startIndex = filteredCourses.length === 0 ? 0 : page * PAGE_SIZE + 1;
+  const endIndex = Math.min((page + 1) * PAGE_SIZE, filteredCourses.length);
+
+  const scrollToSectionTop = () => {
+    if (sectionRef.current) {
+      const top = sectionRef.current.offsetTop - 80;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+  };
+
+  const handleNextPage = () => {
+    if (!hasNextPage) return;
+    setTransitionDirection('next');
+    setIsAnimating(true);
+    setTimeout(() => {
+      setPage(page + 1);
+      setIsAnimating(false);
+      scrollToSectionTop();
+    }, 150);
+  };
+
+  const handlePrevPage = () => {
+    if (page === 0) return;
+    setTransitionDirection('prev');
+    setIsAnimating(true);
+    setTimeout(() => {
+      setPage(page - 1);
+      setIsAnimating(false);
+      scrollToSectionTop();
+    }, 150);
+  };
+
   const filterOptions: { key: FilterType; label: string }[] = [
     { key: 'all', label: 'All' },
     { key: 'rated', label: 'Rated only' },
@@ -117,7 +165,7 @@ export const AllCoursesPlayedSection: React.FC<AllCoursesPlayedSectionProps> = (
 
   if (isLoading) {
     return (
-      <div>
+      <div ref={sectionRef}>
         <h3 className="text-base font-semibold text-slate-900 mb-3">All Courses Played</h3>
         <div className="space-y-3">
           {[1, 2, 3].map(i => (
@@ -129,9 +177,9 @@ export const AllCoursesPlayedSection: React.FC<AllCoursesPlayedSectionProps> = (
   }
 
   return (
-    <div>
+    <div ref={sectionRef}>
       {/* Section header */}
-      <div className="flex items-start justify-between mb-3">
+      <div className="flex items-start justify-between mb-2">
         <div>
           <h3 className="text-base font-semibold text-slate-900">
             All Courses Played
@@ -145,6 +193,13 @@ export const AllCoursesPlayedSection: React.FC<AllCoursesPlayedSectionProps> = (
           Filters
         </button>
       </div>
+
+      {/* Stats line */}
+      {filteredCourses.length > 0 && (
+        <p className="text-[11px] text-slate-400 mb-3">
+          Showing {startIndex}–{endIndex} of {filteredCourses.length} courses
+        </p>
+      )}
 
       {/* Filter chips */}
       <div className="flex gap-2 overflow-x-auto pb-3 -mx-1 px-1">
@@ -163,14 +218,21 @@ export const AllCoursesPlayedSection: React.FC<AllCoursesPlayedSectionProps> = (
         ))}
       </div>
 
-      {/* Course list */}
+      {/* Course list with slide animation */}
       {filteredCourses.length === 0 ? (
         <div className="bg-slate-50 border border-slate-100 rounded-sq-md p-8 text-center">
           <p className="text-sm text-slate-500">{getEmptyMessage()}</p>
         </div>
       ) : (
-        <div className="space-y-2">
-          {filteredCourses.map((course) => (
+        <div
+          className={cn(
+            "space-y-2 transition-all duration-150",
+            isAnimating && transitionDirection === 'next' && "opacity-0 translate-x-4",
+            isAnimating && transitionDirection === 'prev' && "opacity-0 -translate-x-4",
+            !isAnimating && "opacity-100 translate-x-0"
+          )}
+        >
+          {pagedCourses.map((course) => (
             <div
               key={course.id}
               onClick={() => navigate(`/courses/${course.id}`)}
@@ -232,6 +294,18 @@ export const AllCoursesPlayedSection: React.FC<AllCoursesPlayedSectionProps> = (
           ))}
         </div>
       )}
+
+      {/* Pagination */}
+      <UnifiedPagination
+        page={page}
+        total={filteredCourses.length}
+        pageSize={PAGE_SIZE}
+        hasNextPage={hasNextPage}
+        onNext={handleNextPage}
+        onPrev={handlePrevPage}
+        itemLabel="courses"
+        scrollTargetRef={sectionRef}
+      />
     </div>
   );
 };

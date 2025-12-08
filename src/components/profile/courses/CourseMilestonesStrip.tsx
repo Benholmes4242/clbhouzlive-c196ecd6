@@ -25,39 +25,58 @@ export const CourseMilestonesStrip: React.FC<CourseMilestonesStripProps> = ({
   newCoursesThisYear,
   isOwnProfile,
 }) => {
-  // Define milestones based on user data
-  const milestones: Milestone[] = [
-    {
-      id: '10-courses',
-      title: '10 courses played',
-      icon: <MapPin className="w-3 h-3" />,
-      isUnlocked: totalCoursesPlayed >= 10,
-    },
-    {
-      id: 'first-overseas',
-      title: 'First overseas round',
-      icon: <Globe className="w-3 h-3" />,
-      isUnlocked: countriesPlayed > 1,
-    },
-    {
-      id: '3-new-season',
-      title: '3 new courses this season',
-      icon: <Flag className="w-3 h-3" />,
-      isUnlocked: newCoursesThisYear >= 3,
-    },
-    {
-      id: '25-courses',
-      title: '25 courses played',
-      icon: <Trophy className="w-3 h-3" />,
-      isUnlocked: totalCoursesPlayed >= 25,
-    },
-    {
-      id: '5-countries',
-      title: '5 countries played',
-      icon: <Globe className="w-3 h-3" />,
-      isUnlocked: countriesPlayed >= 5,
-    },
-  ];
+  // Define milestones with thresholds for "to go" calculation
+  const getMilestoneData = () => {
+    const courseMilestones = [10, 25, 50, 100];
+    const countryMilestones = [2, 5, 10];
+    const seasonMilestones = [3, 5, 10];
+
+    const milestones: (Milestone & { threshold?: number; current?: number })[] = [];
+
+    // Course milestones
+    courseMilestones.forEach(threshold => {
+      const isUnlocked = totalCoursesPlayed >= threshold;
+      const toGo = Math.max(0, threshold - totalCoursesPlayed);
+      milestones.push({
+        id: `${threshold}-courses`,
+        title: `${threshold} courses played`,
+        icon: threshold >= 50 ? <Trophy className="w-3 h-3" /> : <MapPin className="w-3 h-3" />,
+        isUnlocked,
+        threshold,
+        current: totalCoursesPlayed,
+      });
+    });
+
+    // Country milestones
+    countryMilestones.forEach(threshold => {
+      const isUnlocked = countriesPlayed >= threshold;
+      milestones.push({
+        id: `${threshold}-countries`,
+        title: threshold === 2 ? 'First overseas round' : `${threshold} countries played`,
+        icon: <Globe className="w-3 h-3" />,
+        isUnlocked,
+        threshold,
+        current: countriesPlayed,
+      });
+    });
+
+    // Season milestones
+    seasonMilestones.forEach(threshold => {
+      const isUnlocked = newCoursesThisYear >= threshold;
+      milestones.push({
+        id: `${threshold}-new-season`,
+        title: `${threshold} new courses this season`,
+        icon: <Flag className="w-3 h-3" />,
+        isUnlocked,
+        threshold,
+        current: newCoursesThisYear,
+      });
+    });
+
+    return milestones;
+  };
+
+  const milestones = getMilestoneData();
 
   const unlockedMilestones = milestones.filter(m => m.isUnlocked);
   const inProgressMilestones = milestones.filter(m => !m.isUnlocked).slice(0, 2);
@@ -104,27 +123,33 @@ export const CourseMilestonesStrip: React.FC<CourseMilestonesStripProps> = ({
             <span className="text-xs font-medium text-amber-800 whitespace-nowrap">
               {milestone.title}
             </span>
-            <span className="text-[9px] uppercase tracking-wide text-amber-600 font-semibold ml-1">
-              ✓
+            <span className="text-[9px] text-amber-600/80 font-medium ml-1">
+              • Unlocked
             </span>
           </div>
         ))}
 
-        {/* In progress milestones */}
-        {inProgressMilestones.map((milestone) => (
-          <div
-            key={milestone.id}
-            className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 bg-slate-50 border border-slate-200 rounded-sq-sm"
-          >
-            <span className="text-slate-400">{milestone.icon}</span>
-            <span className="text-xs text-slate-500 whitespace-nowrap">
-              {milestone.title}
-            </span>
-            <span className="text-[9px] uppercase tracking-wide text-slate-400 font-medium ml-1">
-              In progress
-            </span>
-          </div>
-        ))}
+        {/* In progress milestones with "X to go" */}
+        {inProgressMilestones.map((milestone: any) => {
+          const toGo = milestone.threshold && milestone.current !== undefined 
+            ? Math.max(0, milestone.threshold - milestone.current)
+            : null;
+          
+          return (
+            <div
+              key={milestone.id}
+              className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 bg-slate-50 border border-slate-200 rounded-sq-sm"
+            >
+              <span className="text-slate-400">{milestone.icon}</span>
+              <span className="text-xs text-slate-500 whitespace-nowrap">
+                {milestone.title}
+              </span>
+              <span className="text-[9px] text-slate-400 font-medium ml-1">
+                • {toGo !== null ? `${toGo} to go` : 'In progress'}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
