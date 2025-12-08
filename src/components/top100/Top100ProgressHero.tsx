@@ -97,15 +97,13 @@ function HeroWithMilestoneRow({
         </div>
 
         {/* Achievement badge card on the right - uses canonical component */}
-        <div className="flex-1 min-w-0">
-          <AchievementBadgeCard
-            tier={achievementTier}
-            title={`${achievementTier} Club`}
-            subtitle={clubName}
-            unlocked={true}
-            totalTop100Played={totalTop100Played}
-          />
-        </div>
+        <AchievementBadgeCard
+          tier={achievementTier}
+          title={`${achievementTier} Club`}
+          subtitle={clubName}
+          unlocked={true}
+          totalTop100Played={totalTop100Played}
+        />
       </div>
     </motion.div>
   );
