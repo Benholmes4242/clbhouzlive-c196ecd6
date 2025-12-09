@@ -29,11 +29,9 @@ export const ProfileAboutSection: React.FC<ProfileAboutSectionProps> = ({
 }) => {
   if (!profile) return null;
 
-  // Get category label for business profiles
+  // Get category label for business profiles (categories are now stored as display strings)
   const getCategoryLabel = (category: string | null | undefined): string => {
-    if (!category) return '';
-    const found = BUSINESS_CATEGORIES.find(c => c.value === category);
-    return found ? found.label : category;
+    return category || '';
   };
 
   // Format website URL for display

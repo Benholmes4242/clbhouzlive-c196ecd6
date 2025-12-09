@@ -48,11 +48,9 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
     return url.startsWith('http') ? url : `https://${url}`;
   };
 
-  // Get business category label
+  // Get business category label (categories are now stored as display strings)
   const getCategoryLabel = (category: string | null | undefined): string => {
-    if (!category) return '';
-    const found = BUSINESS_CATEGORIES.find(c => c.value === category);
-    return found ? found.label : category;
+    return category || '';
   };
 
   // Display name for business profiles uses business_name if available
