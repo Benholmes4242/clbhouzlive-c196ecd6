@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Check, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -29,7 +28,10 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
     
     if (isMock) {
       setState('accepted');
-      toast.success(`You're now friends with ${requesterName}!`);
+      toast.success(`You're now friends with ${requesterName}!`, {
+        position: 'top-center',
+        className: 'max-w-xs rounded-2xl bg-slate-900/90 text-white shadow-lg',
+      });
       return;
     }
 
@@ -45,7 +47,10 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
       if (error) throw error;
 
       setState('accepted');
-      toast.success(`You're now friends with ${requesterName}!`);
+      toast.success(`You're now friends with ${requesterName}!`, {
+        position: 'top-center',
+        className: 'max-w-xs rounded-2xl bg-slate-900/90 text-white shadow-lg',
+      });
       
       // Invalidate queries
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
@@ -54,7 +59,10 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
     } catch (error) {
       console.error('Error accepting friend request:', error);
       setState('pending');
-      toast.error("We couldn't accept the request. Please try again.");
+      toast.error("We couldn't accept the request. Please try again.", {
+        position: 'top-center',
+        className: 'max-w-xs rounded-2xl bg-slate-900/90 text-white shadow-lg',
+      });
     }
   };
 
@@ -63,7 +71,10 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
     
     if (isMock) {
       setState('declined');
-      toast.info('Friend request declined');
+      toast.info('Friend request declined', {
+        position: 'top-center',
+        className: 'max-w-xs rounded-2xl bg-slate-900/90 text-white shadow-lg',
+      });
       return;
     }
 
@@ -79,7 +90,10 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
       if (error) throw error;
 
       setState('declined');
-      toast.info('Friend request declined');
+      toast.info('Friend request declined', {
+        position: 'top-center',
+        className: 'max-w-xs rounded-2xl bg-slate-900/90 text-white shadow-lg',
+      });
       
       // Invalidate queries
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
@@ -88,14 +102,17 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
     } catch (error) {
       console.error('Error declining friend request:', error);
       setState('pending');
-      toast.error("We couldn't decline the request. Please try again.");
+      toast.error("We couldn't decline the request. Please try again.", {
+        position: 'top-center',
+        className: 'max-w-xs rounded-2xl bg-slate-900/90 text-white shadow-lg',
+      });
     }
   };
 
   // Already handled states
   if (state === 'accepted') {
     return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-emerald-600 bg-emerald-50 rounded-sq-pill">
+      <span className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-emerald-600 bg-emerald-50 rounded-full">
         <Check className="h-3 w-3" />
         Accepted
       </span>
@@ -104,39 +121,45 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
 
   if (state === 'declined') {
     return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-muted-foreground bg-muted/60 rounded-sq-pill">
+      <span className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-muted-foreground bg-muted/60 rounded-full">
         <X className="h-3 w-3" />
         Declined
       </span>
     );
   }
 
-  // Pending state - show Accept/Decline buttons
+  // Pending state - show glassy Accept/Decline buttons
   return (
-    <div className="flex items-center gap-1.5">
-      <Button
-        size="sm"
+    <div className="flex items-center gap-2">
+      <button
         onClick={handleAccept}
         disabled={state === 'loading'}
         className={cn(
-          "h-7 px-3 text-xs font-medium rounded-sq-pill",
-          "bg-emerald-600 hover:bg-emerald-700 text-white"
+          "rounded-full px-4 py-1.5 text-sm font-semibold",
+          "bg-emerald-500/90 text-white shadow-sm",
+          "backdrop-blur-sm",
+          "hover:bg-emerald-500",
+          "active:scale-[0.98] transition",
+          "disabled:opacity-60 disabled:cursor-not-allowed"
         )}
       >
         {state === 'loading' ? '...' : 'Accept'}
-      </Button>
-      <Button
-        size="sm"
-        variant="ghost"
+      </button>
+      <button
         onClick={handleDecline}
         disabled={state === 'loading'}
         className={cn(
-          "h-7 px-2.5 text-xs font-medium rounded-sq-pill",
-          "text-muted-foreground hover:text-foreground hover:bg-muted"
+          "rounded-full px-4 py-1.5 text-sm font-medium",
+          "border border-red-400/40",
+          "text-red-500",
+          "bg-white/70 backdrop-blur-sm",
+          "hover:bg-white",
+          "active:scale-[0.98] transition",
+          "disabled:opacity-60 disabled:cursor-not-allowed"
         )}
       >
         Decline
-      </Button>
+      </button>
     </div>
   );
 };

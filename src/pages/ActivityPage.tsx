@@ -165,7 +165,7 @@ const ActivityPage: React.FC = () => {
                 Activity
               </h1>
               <p className="text-sm text-muted-foreground mt-0.5">
-                Updates from friends, clubs, courses & messages.
+                Updates from friends, golf clubs and messages.
               </p>
             </div>
           </div>
