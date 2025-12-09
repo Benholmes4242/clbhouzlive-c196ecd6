@@ -132,8 +132,8 @@ const ActivityPage: React.FC = () => {
     <PageRoot className="bg-muted/40 pb-24">
       <CompactHeader />
 
-        {/* Main content wrapper - fixed left position to prevent content shift */}
-        <div className="w-full max-w-[640px] px-4 sm:px-5 pt-6 compact-header-offset" style={{ marginLeft: 'clamp(16px, calc(50vw - 320px), calc(50vw - 320px))' }}>
+        {/* Main content wrapper - centered with equal padding both sides */}
+        <div className="w-full max-w-[640px] mx-auto px-4 sm:px-5 pt-6 compact-header-offset">
         {/* Header section - title only, no mark all read button */}
         <section className="mb-4">
           <h1 className="text-xl font-semibold tracking-tight text-foreground">
