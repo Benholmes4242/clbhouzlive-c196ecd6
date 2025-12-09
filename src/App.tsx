@@ -128,6 +128,7 @@ const AdminEchoAnalyticsPage = lazy(() => import("./features/admin/pages/AdminEc
 const TeamPage = lazy(() => import("./pages/admin/TeamPage").then(m => ({ default: m.TeamPage })));
 const AdminSettingsPage = lazy(() => import("./pages/admin/AdminSettingsPage").then(m => ({ default: m.AdminSettingsPage })));
 const Top100GeocodingPage = lazy(() => import("./pages/admin/Top100GeocodingPage").then(m => ({ default: m.Top100GeocodingPage })));
+const AdminTestLabPage = lazy(() => import("./pages/admin/AdminTestLabPage"));
 
 const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
 const GameDetailView = lazy(() => import("./features/game/GameDetailView"));
@@ -276,6 +277,11 @@ function AppRoutes() {
           <Route path="team" element={<TeamPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
           <Route path="top100-geocoding" element={<Top100GeocodingPage />} />
+          <Route path="test-lab" element={
+            <PanelGuard need="admins">
+              <AdminTestLabPage />
+            </PanelGuard>
+          } />
         </Route>
         
         <Route path="/create-moment" element={<CreateMomentPage />} />
