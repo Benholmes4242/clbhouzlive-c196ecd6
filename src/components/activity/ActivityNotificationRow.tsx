@@ -1,5 +1,4 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
 import { ChevronRight, Heart, MessageCircle, UserPlus, Users, Bell, Mail } from 'lucide-react';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -10,26 +9,27 @@ interface ActivityNotificationRowProps {
 }
 
 function getNotificationIcon(type: string) {
+  const iconStyle = { width: '12px', height: '12px' };
   switch (type) {
     case 'like':
-      return <Heart className="h-3 w-3 text-rose-500" />;
+      return <Heart style={{ ...iconStyle, color: '#f43f5e' }} />;
     case 'comment':
     case 'mention':
-      return <MessageCircle className="h-3 w-3 text-blue-500" />;
+      return <MessageCircle style={{ ...iconStyle, color: '#3b82f6' }} />;
     case 'follow':
-      return <UserPlus className="h-3 w-3 text-emerald-500" />;
+      return <UserPlus style={{ ...iconStyle, color: '#10b981' }} />;
     case 'friend_request':
     case 'friend_accepted':
-      return <Users className="h-3 w-3 text-amber-500" />;
+      return <Users style={{ ...iconStyle, color: '#f59e0b' }} />;
     case 'message':
     case 'dm':
-      return <Mail className="h-3 w-3 text-violet-500" />;
+      return <Mail style={{ ...iconStyle, color: '#8b5cf6' }} />;
     default:
-      return <Bell className="h-3 w-3 text-muted-foreground" />;
+      return <Bell style={{ ...iconStyle, color: '#64748b' }} />;
   }
 }
 
-function renderNotificationText(notification: ActivityNotification): React.ReactNode {
+function renderNotificationText(notification: ActivityNotification): string {
   const { type, message, title } = notification;
   
   switch (type) {
@@ -68,9 +68,22 @@ function renderNotificationText(notification: ActivityNotification): React.React
 function renderRightAction(notification: ActivityNotification): React.ReactNode {
   const { type } = notification;
   
+  const pillStyle: React.CSSProperties = {
+    padding: '4px 10px',
+    fontSize: '12px',
+    fontWeight: 500,
+    borderRadius: '999px',
+    fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif'
+  };
+  
   if (type === 'follow') {
     return (
-      <span className="px-2.5 py-1 text-xs font-medium rounded-sq-pill border border-border bg-background text-foreground">
+      <span style={{ 
+        ...pillStyle,
+        border: '1px solid #e2e8f0',
+        backgroundColor: '#ffffff',
+        color: '#1f2428'
+      }}>
         View
       </span>
     );
@@ -78,7 +91,11 @@ function renderRightAction(notification: ActivityNotification): React.ReactNode 
   
   if (type === 'friend_request') {
     return (
-      <span className="px-2.5 py-1 text-xs font-medium rounded-sq-pill bg-foreground text-background">
+      <span style={{ 
+        ...pillStyle,
+        backgroundColor: '#1f2428',
+        color: '#ffffff'
+      }}>
         Respond
       </span>
     );
@@ -86,14 +103,18 @@ function renderRightAction(notification: ActivityNotification): React.ReactNode 
   
   if (type === 'message' || type === 'dm') {
     return (
-      <span className="px-2.5 py-1 text-xs font-medium rounded-sq-pill border border-border bg-background text-foreground">
+      <span style={{ 
+        ...pillStyle,
+        border: '1px solid #e2e8f0',
+        backgroundColor: '#ffffff',
+        color: '#1f2428'
+      }}>
         Open
       </span>
     );
   }
   
-  // Default: chevron
-  return <ChevronRight className="h-4 w-4 text-muted-foreground" />;
+  return <ChevronRight style={{ width: '16px', height: '16px', color: '#94a3b8' }} />;
 }
 
 export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = ({ 
@@ -105,50 +126,93 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
   return (
     <button
       onClick={onClick}
-      className={cn(
-        "w-full flex items-center gap-3 px-3 py-3 text-left bg-transparent transition-colors",
-        "hover:bg-accent/50 active:bg-accent"
-      )}
+      style={{
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        padding: '12px',
+        textAlign: 'left',
+        backgroundColor: 'transparent',
+        border: 'none',
+        cursor: 'pointer',
+        borderBottom: '1px solid rgba(0,0,0,0.05)'
+      }}
     >
       {/* Unread accent bar */}
-      <div className="flex flex-col h-full items-center self-stretch">
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        alignSelf: 'stretch' 
+      }}>
         <div
-          className={cn(
-            "w-1 rounded-full self-stretch min-h-[40px]",
-            isUnread ? "bg-primary" : "bg-transparent"
-          )}
+          style={{
+            width: '4px',
+            borderRadius: '999px',
+            alignSelf: 'stretch',
+            minHeight: '40px',
+            backgroundColor: isUnread ? '#F7931E' : 'transparent'
+          }}
         />
       </div>
 
       {/* Avatar with type icon overlay */}
-      <div className="relative flex-shrink-0">
+      <div style={{ position: 'relative', flexShrink: 0 }}>
         <SquircleAvatar
           src={notification.actor_avatar_url}
           alt={notification.actor_display_name || 'User'}
           size={40}
           fallback={notification.actor_display_name?.charAt(0) || '?'}
         />
-        <div className="absolute -bottom-0.5 -right-0.5 h-5 w-5 rounded-full bg-background border border-border flex items-center justify-center">
+        <div style={{
+          position: 'absolute',
+          bottom: '-2px',
+          right: '-2px',
+          width: '20px',
+          height: '20px',
+          borderRadius: '50%',
+          backgroundColor: '#ffffff',
+          border: '1px solid #e2e8f0',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
           {getNotificationIcon(notification.type)}
         </div>
       </div>
 
       {/* Text content */}
-      <div className="flex-1 min-w-0">
-        {/* DEBUG: Force visible with inline styles */}
-        <p style={{ color: '#000000', fontSize: '14px', fontWeight: 600, opacity: 1, visibility: 'visible' }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ 
+          color: '#0f172a', 
+          fontSize: '14px', 
+          fontWeight: 600,
+          margin: 0,
+          fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+          lineHeight: 1.4
+        }}>
           {notification.actor_display_name || 'Unknown User'}{' '}
-          <span style={{ color: '#475569', fontWeight: 400 }}>
+          <span style={{ 
+            color: '#475569', 
+            fontWeight: 400 
+          }}>
             {renderNotificationText(notification)}
           </span>
         </p>
-        <p style={{ color: '#64748b', fontSize: '12px', marginTop: '2px', opacity: 1, visibility: 'visible' }}>
+        <p style={{ 
+          color: '#64748b', 
+          fontSize: '12px', 
+          margin: 0,
+          marginTop: '2px',
+          fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif'
+        }}>
           {notification.time_ago} · {notification.context_label}
         </p>
       </div>
 
       {/* Right-side action */}
-      <div className="flex-shrink-0">
+      <div style={{ flexShrink: 0 }}>
         {renderRightAction(notification)}
       </div>
     </button>

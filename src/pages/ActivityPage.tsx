@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bell, Settings, ChevronRight } from 'lucide-react';
+import { Bell, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useActivityFeed, ActivityTabId, ACTIVITY_TABS } from '@/hooks/useActivityFeed';
@@ -44,12 +44,10 @@ const ActivityPage: React.FC = () => {
   };
 
   const handleNotificationClick = async (notification: any) => {
-    // Navigate first for snappiness
     if (notification.context_url) {
       navigate(notification.context_url);
     }
 
-    // Mark as read if unread
     if (!notification.is_read) {
       await supabase
         .from('notifications')
@@ -67,38 +65,48 @@ const ActivityPage: React.FC = () => {
     buckets.earlier.length === 0
   );
 
-  // Debug: log when component mounts
   console.log('[ActivityPage] Rendering, isLoading:', isLoading, 'buckets:', buckets);
 
   return (
-    <div className="min-h-screen bg-muted/50">
-      {/* DEBUG: Fixed position tests to prove rendering works */}
-      <div className="fixed top-20 left-4 z-[9999] bg-blue-500 p-4 rounded-lg">
-        <p style={{ color: 'white', fontSize: '16px', fontWeight: 'bold' }}>STATIC TEST 1</p>
-      </div>
-      <div className="fixed top-40 left-4 z-[9999] bg-green-500 p-4 rounded-lg">
-        <span style={{ color: 'white', fontSize: '20px', fontWeight: 'bold', display: 'block' }}>Activity (FIXED)</span>
-        <span style={{ color: 'white', fontSize: '14px', display: 'block' }}>Updates from friends test</span>
-      </div>
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-red-500 rounded-full z-[9999]" />
+    <div style={{ 
+      minHeight: '100vh', 
+      backgroundColor: '#F4F5F7',
+      paddingBottom: '96px'
+    }}>
+      {/* DEBUG: Red dot to prove page renders */}
+      <div style={{
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '48px',
+        height: '48px',
+        backgroundColor: 'red',
+        borderRadius: '50%',
+        zIndex: 9999
+      }} />
       
-      <main className="mx-auto w-full max-w-[720px] px-4 pt-4 pb-24">
-        {/* Header - changed from <header> to <div> to test if semantic element is the issue */}
-        <div className="flex items-center justify-between mb-4" style={{ position: 'relative', zIndex: 10 }}>
-          {/* Title section with explicit styling */}
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            color: '#000000',
-            visibility: 'visible',
-            opacity: 1
-          }}>
+      {/* Main content wrapper */}
+      <div style={{
+        maxWidth: '720px',
+        margin: '0 auto',
+        padding: '16px'
+      }}>
+        {/* Header section - ALL INLINE STYLES */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          marginBottom: '16px'
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ 
               fontSize: '20px', 
               fontWeight: 600, 
               color: '#0f172a',
               display: 'block',
-              lineHeight: 1.2
+              lineHeight: 1.2,
+              fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif'
             }}>
               Activity
             </span>
@@ -106,36 +114,51 @@ const ActivityPage: React.FC = () => {
               fontSize: '14px', 
               color: '#64748b',
               display: 'block',
-              marginTop: '4px'
+              marginTop: '4px',
+              fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif'
             }}>
               Updates from friends, clubs, courses & messages.
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* Mark all as read */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button 
               onClick={handleMarkAllAsRead}
-              className="relative h-9 w-9 rounded-full bg-background flex items-center justify-center shadow-sm border border-border/60 hover:bg-accent transition-colors"
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                backgroundColor: '#ffffff',
+                border: '1px solid #e2e8f0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
               title="Mark all as read"
             >
-              <Bell className="h-4 w-4 text-foreground" />
-              {hasUnread && (
-                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary" />
-              )}
+              <Bell style={{ width: '16px', height: '16px', color: '#1f2428' }} />
             </button>
-
-            {/* Settings */}
             <button 
-              className="h-9 w-9 rounded-full bg-background flex items-center justify-center shadow-sm border border-border/60 hover:bg-accent transition-colors"
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                backgroundColor: '#ffffff',
+                border: '1px solid #e2e8f0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
               title="Notification settings"
             >
-              <Settings className="h-4 w-4 text-foreground" />
+              <Settings style={{ width: '16px', height: '16px', color: '#1f2428' }} />
             </button>
           </div>
         </div>
 
-        {/* Filter tabs */}
+        {/* Filter tabs - keep some Tailwind here since tabs text DOES show */}
         <div className="mb-4 overflow-x-auto scrollbar-hide">
           <div className="inline-flex rounded-sq-pill bg-white/70 border border-border/60 px-1 py-1 gap-1">
             {ACTIVITY_TABS.map((tab) => (
@@ -159,20 +182,33 @@ const ActivityPage: React.FC = () => {
         {isLoading ? (
           <ActivitySkeleton />
         ) : error ? (
-          <div className="text-center py-12 text-muted-foreground">
+          <div style={{ textAlign: 'center', padding: '48px 0', color: '#64748b' }}>
             <p>Failed to load activity</p>
           </div>
         ) : isEmpty || !buckets ? (
           <ActivityEmptyState tab={activeTab} />
         ) : (
-          <div className="space-y-6">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             {/* Today */}
             {buckets.today.length > 0 && (
               <section>
-                <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <h2 style={{ 
+                  marginBottom: '8px', 
+                  fontSize: '12px', 
+                  fontWeight: 600, 
+                  textTransform: 'uppercase', 
+                  letterSpacing: '0.5px',
+                  color: '#64748b',
+                  fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif'
+                }}>
                   Today
                 </h2>
-                <div className="rounded-sq-md bg-background shadow-sm divide-y divide-border/40 overflow-hidden">
+                <div style={{ 
+                  borderRadius: '18px', 
+                  backgroundColor: '#ffffff', 
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                  overflow: 'hidden'
+                }}>
                   {buckets.today.map((notification) => (
                     <ActivityNotificationRow
                       key={notification.id}
@@ -187,10 +223,23 @@ const ActivityPage: React.FC = () => {
             {/* Yesterday */}
             {buckets.yesterday.length > 0 && (
               <section>
-                <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <h2 style={{ 
+                  marginBottom: '8px', 
+                  fontSize: '12px', 
+                  fontWeight: 600, 
+                  textTransform: 'uppercase', 
+                  letterSpacing: '0.5px',
+                  color: '#64748b',
+                  fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif'
+                }}>
                   Yesterday
                 </h2>
-                <div className="rounded-sq-md bg-background shadow-sm divide-y divide-border/40 overflow-hidden">
+                <div style={{ 
+                  borderRadius: '18px', 
+                  backgroundColor: '#ffffff', 
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                  overflow: 'hidden'
+                }}>
                   {buckets.yesterday.map((notification) => (
                     <ActivityNotificationRow
                       key={notification.id}
@@ -205,10 +254,23 @@ const ActivityPage: React.FC = () => {
             {/* This Week */}
             {buckets.thisWeek.length > 0 && (
               <section>
-                <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <h2 style={{ 
+                  marginBottom: '8px', 
+                  fontSize: '12px', 
+                  fontWeight: 600, 
+                  textTransform: 'uppercase', 
+                  letterSpacing: '0.5px',
+                  color: '#64748b',
+                  fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif'
+                }}>
                   This Week
                 </h2>
-                <div className="rounded-sq-md bg-background shadow-sm divide-y divide-border/40 overflow-hidden">
+                <div style={{ 
+                  borderRadius: '18px', 
+                  backgroundColor: '#ffffff', 
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                  overflow: 'hidden'
+                }}>
                   {buckets.thisWeek.map((notification) => (
                     <ActivityNotificationRow
                       key={notification.id}
@@ -223,10 +285,23 @@ const ActivityPage: React.FC = () => {
             {/* Earlier */}
             {buckets.earlier.length > 0 && (
               <section>
-                <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <h2 style={{ 
+                  marginBottom: '8px', 
+                  fontSize: '12px', 
+                  fontWeight: 600, 
+                  textTransform: 'uppercase', 
+                  letterSpacing: '0.5px',
+                  color: '#64748b',
+                  fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif'
+                }}>
                   Earlier
                 </h2>
-                <div className="rounded-sq-md bg-background shadow-sm divide-y divide-border/40 overflow-hidden">
+                <div style={{ 
+                  borderRadius: '18px', 
+                  backgroundColor: '#ffffff', 
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                  overflow: 'hidden'
+                }}>
                   {buckets.earlier.map((notification) => (
                     <ActivityNotificationRow
                       key={notification.id}
@@ -239,7 +314,7 @@ const ActivityPage: React.FC = () => {
             )}
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 };
