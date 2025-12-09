@@ -23,7 +23,7 @@ export const AtAGlanceChips: React.FC<AtAGlanceChipsProps> = ({ counts, onChipCl
   if (visibleChips.length === 0) return null;
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-2 mb-2 scrollbar-hide">
+    <div className="w-full flex gap-2 overflow-x-auto pb-2 mb-2 scrollbar-hide">
       {visibleChips.map(chip => {
         const Icon = chip.icon;
         const count = counts[chip.countKey];

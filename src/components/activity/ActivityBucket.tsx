@@ -27,7 +27,7 @@ export const ActivityBucket: React.FC<ActivityBucketProps> = ({
   if (!items || items.length === 0) return null;
 
   return (
-    <section>
+    <section className="w-full">
       {/* Section label - non-sticky, scrolls with content (no NEW badge here, shown in chips row only) */}
       <div
         className={cn(
