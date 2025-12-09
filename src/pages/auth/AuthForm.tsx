@@ -79,8 +79,14 @@ const AuthForm: React.FC<AuthFormProps> = ({
   const emailInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-focus on email field when mode changes
+  // Auto-focus on email field and clear errors when mode changes
   useEffect(() => {
+    // Clear all field-level errors when switching modes
+    setEmailError(null);
+    setPasswordError(null);
+    setForgotPasswordMsg(null);
+    setForgotPasswordSuccess(false);
+    
     if (emailInputRef.current) {
       setTimeout(() => emailInputRef.current?.focus(), 0);
     }

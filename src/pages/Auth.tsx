@@ -80,16 +80,21 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
     }
   }, [user, navigate, searchParams]);
 
+  // Clear all auth messages helper
+  const clearAuthMessages = () => {
+    setShowConfirmNotice(false);
+    setErrorMsg(null);
+    setResendMsg(null);
+    setAuthNotice(null);
+  };
+
   return (
     <>
       <AuthLayout
         isSignUp={isSignUp}
         toggleAuthMode={() => {
+          clearAuthMessages();
           setIsSignUp((s) => !s);
-          setShowConfirmNotice(false);
-          setErrorMsg(null);
-          setResendMsg(null);
-          setAuthNotice(null);
         }}
         submitting={submitting}
       >
