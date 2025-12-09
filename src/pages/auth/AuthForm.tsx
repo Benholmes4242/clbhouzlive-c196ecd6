@@ -390,14 +390,17 @@ const AuthForm: React.FC<AuthFormProps> = ({
           }}
           className="placeholder:text-text-tertiary focus:border-[#D6D9DE] focus:shadow-[0_0_0_4px_rgba(247,147,30,0.06)]"
         />
-        {emailError && (
-          <p className="text-sm mt-2" style={{ color: '#ef4444' }}>{emailError}</p>
-        )}
-        {forgotPasswordMsg && (
-          <p className={cn("text-sm mt-2", forgotPasswordSuccess ? "text-green-600" : "text-red-500")}>
-            {forgotPasswordMsg}
-          </p>
-        )}
+        {/* Reserved space for validation messages - prevents layout shifting */}
+        <div style={{ minHeight: '22px' }}>
+          {emailError && (
+            <p className="text-sm mt-2" style={{ color: '#ef4444' }}>{emailError}</p>
+          )}
+          {forgotPasswordMsg && (
+            <p className="text-sm mt-2" style={{ color: forgotPasswordSuccess ? '#3F7F41' : '#ef4444' }}>
+              {forgotPasswordMsg}
+            </p>
+          )}
+        </div>
       </div>
       
       {/* Username (signup only) */}
@@ -487,9 +490,12 @@ const AuthForm: React.FC<AuthFormProps> = ({
           }}
           className="placeholder:text-text-tertiary focus:border-[#D6D9DE] focus:shadow-[0_0_0_4px_rgba(247,147,30,0.06)]"
         />
-        {passwordError && (
-          <p className="text-sm mt-2" style={{ color: '#ef4444' }}>{passwordError}</p>
-        )}
+        {/* Reserved space for password error - prevents layout shifting */}
+        <div style={{ minHeight: '22px' }}>
+          {passwordError && (
+            <p className="text-sm mt-2" style={{ color: '#ef4444' }}>{passwordError}</p>
+          )}
+        </div>
       </div>
 
       {!showConfirmNotice && (
