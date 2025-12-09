@@ -369,7 +369,7 @@ const HeroProfileHeader = ({
   return (
     <SwipeToReturnZone onSwipeDown={reopenImmersive}>
       {/* Premium Golf Profile Layout - No card, seamless gradient */}
-      <section className="relative w-full">
+      <section className="relative w-full -mt-16">
         
         {/* HERO IMAGE */}
         <div className="relative w-full h-[250px] overflow-hidden">
