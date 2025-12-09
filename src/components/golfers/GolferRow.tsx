@@ -13,6 +13,7 @@ interface GolferRowProps {
     profileImage: string;
     homeClub?: string;
     handicap?: number | null;
+    totalTop100Played?: number;
   };
   isFollowing: boolean;
   friendStatus?: 'none' | 'pending' | 'friends';
@@ -65,13 +66,13 @@ export function GolferRow({
     >
       <div className="flex w-full gap-3">
         {/* Avatar with badge */}
-        <div className="relative shrink-0" style={{ width: 44, height: 46 }}>
+        <div className="relative shrink-0" style={{ width: 52, height: 54 }}>
           <SquircleAvatar
             src={golfer.profileImage}
             alt={golfer.displayName}
-            size={44}
+            size={52}
             fallback={golfer.displayName?.charAt(0) || '?'}
-            ringColor={getRingColorForTotalPlayed(0)}
+            ringColor={getRingColorForTotalPlayed(golfer.totalTop100Played || 0)}
           />
           <span className="absolute bottom-0 right-0 translate-x-1 translate-y-1 h-5 w-5 rounded-full border-2 border-card bg-background flex items-center justify-center shadow-sm">
             <UserPlus className="h-3 w-3 text-emerald-500" />
