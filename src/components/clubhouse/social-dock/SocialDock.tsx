@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Heart, MessageCircle, Share, Search, Volume2, VolumeX } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface SocialDockProps {
   post: {
@@ -112,7 +113,7 @@ export const SocialDock: React.FC<SocialDockProps> = ({
           className={cn(
             'pointer-events-auto',
             'mx-0 w-full',
-            'rounded-t-2xl rounded-b-none',
+            'rounded-t-sq-lg rounded-b-none',
             'bg-[rgba(10,10,10,0.78)] backdrop-blur-[22px]',
             'shadow-[0_-10px_30px_rgba(0,0,0,0.55)]',
             'border-t border-white/5',
@@ -128,10 +129,11 @@ export const SocialDock: React.FC<SocialDockProps> = ({
           <div className="flex items-center justify-between gap-3 mb-2">
             {/* Left: avatar + name (non-interactive in Clubhouse) */}
             <div className="flex items-center gap-2 min-w-0">
-              <img
-                src={post.user.avatar || '/placeholder.svg'}
+              <SquircleAvatar
+                src={post.user.avatar}
                 alt={post.user.name}
-                className="h-8 w-8 rounded-full object-cover shrink-0"
+                size={32}
+                fallback={post.user.name?.charAt(0) || '?'}
               />
               <div className="flex flex-col min-w-0">
                 <span className="text-sm font-semibold truncate text-white">
@@ -151,7 +153,7 @@ export const SocialDock: React.FC<SocialDockProps> = ({
               onClick={onNavigationTap}
               className={cn(
                 'inline-flex items-center gap-1',
-                'px-3 py-[6px] rounded-full',
+                'px-3 py-[6px] rounded-sq-pill',
                 'bg-white/10 hover:bg-white/16',
                 'text-[11px] font-medium tracking-wide uppercase text-white/90',
                 'transition-all duration-150',
