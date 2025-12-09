@@ -26,10 +26,10 @@ export const ActivityBucket: React.FC<ActivityBucketProps> = ({
 
   return (
     <section>
+      {/* Section label - non-sticky, scrolls with content */}
       <div
         className={cn(
           "mb-2 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em]",
-          sticky && "sticky top-[100px] z-10 bg-muted/90 backdrop-blur-sm -mx-4 px-4",
           accent ? "text-primary" : "text-muted-foreground"
         )}
       >

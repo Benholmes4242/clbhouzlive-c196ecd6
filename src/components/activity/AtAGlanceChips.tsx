@@ -6,6 +6,7 @@ import { ActivityCounts } from '@/hooks/useActivityFeed';
 interface AtAGlanceChipsProps {
   counts: ActivityCounts;
   onChipClick: (kind: 'new' | 'mentions' | 'follows' | 'clubs' | 'messages') => void;
+  activeFilter?: string | null;
 }
 
 const CHIP_CONFIG = [
@@ -16,36 +17,34 @@ const CHIP_CONFIG = [
   { key: 'messages' as const, label: 'Messages', icon: Mail, countKey: 'messages' as const },
 ];
 
-export const AtAGlanceChips: React.FC<AtAGlanceChipsProps> = ({ counts, onChipClick }) => {
+export const AtAGlanceChips: React.FC<AtAGlanceChipsProps> = ({ counts, onChipClick, activeFilter }) => {
   const visibleChips = CHIP_CONFIG.filter(chip => counts[chip.countKey] > 0);
 
   if (visibleChips.length === 0) return null;
 
   return (
-    <div className="mt-3 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+    <div className="flex gap-2 overflow-x-auto pb-2 mb-2 scrollbar-hide">
       {visibleChips.map(chip => {
         const Icon = chip.icon;
         const count = counts[chip.countKey];
+        const isActive = activeFilter === chip.key;
         
         return (
           <button
             key={chip.key}
             onClick={() => onChipClick(chip.key)}
             className={cn(
-              "flex shrink-0 items-center gap-2 rounded-sq-pill",
-              "border border-border/60 bg-background/80 backdrop-blur-sm",
-              "px-3 py-1.5 text-xs font-medium",
-              "shadow-sm hover:bg-background hover:shadow-md",
-              "transition-all duration-200 active:scale-[0.98]"
+              "flex shrink-0 items-center gap-1.5 rounded-sq-pill px-3 py-1.5 text-xs font-medium transition-all duration-200",
+              isActive
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "border border-border/60 bg-background/80 text-muted-foreground hover:text-foreground hover:bg-muted/50"
             )}
           >
-            <Icon className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="text-foreground">{chip.label}</span>
+            <Icon className={cn("h-3.5 w-3.5", isActive ? "text-primary-foreground" : "text-muted-foreground")} />
+            <span className={isActive ? "text-primary-foreground" : "text-foreground"}>{chip.label}</span>
             <span className={cn(
-              "rounded-full px-1.5 py-0.5 text-[10px] font-semibold min-w-[18px] text-center",
-              chip.key === 'new' 
-                ? "bg-primary text-primary-foreground" 
-                : "bg-muted text-muted-foreground"
+              "text-[10px] font-bold",
+              isActive ? "text-primary-foreground/80" : "text-muted-foreground"
             )}>
               {count}
             </span>

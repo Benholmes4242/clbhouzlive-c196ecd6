@@ -8,30 +8,29 @@ const isProd = typeof window !== 'undefined' &&
   (import.meta.env.MODE === 'production' || window.location.hostname === 'clbhouz.com');
 const SHOW_MOCK_ACTIVITY = !isProd && true; // flip inner `true` to `false` to disable mocks
 
-export type ActivityTabId = 'all' | 'you' | 'following' | 'clubs' | 'messages' | 'system';
+export type ActivityTabId = 'all' | 'following' | 'clubs' | 'messages' | 'system';
 
 export const ACTIVITY_TABS: { id: ActivityTabId; label: string }[] = [
   { id: 'all', label: 'All' },
-  { id: 'you', label: 'You' },
   { id: 'following', label: 'Following' },
   { id: 'clubs', label: 'Clubs & Courses' },
   { id: 'messages', label: 'Messages' },
 ];
 
-// Map notification types to categories
+// Map notification types to categories (removed "you" tab - everything goes to "all")
 const TYPE_TO_CATEGORY: Record<string, ActivityTabId> = {
-  // "You" category - interactions on your content
-  like: 'you',
-  comment: 'you',
-  mention: 'you',
-  tag: 'you',
+  // Interactions on your content - now part of "all"
+  like: 'all',
+  comment: 'all',
+  mention: 'all',
+  tag: 'all',
+  follow: 'all',
+  friend_request: 'all',
+  friend_accepted: 'all',
   
   // "Following" category - activity from people you follow
   new_post: 'following',
   achievement: 'following',
-  follow: 'you', // someone followed you
-  friend_request: 'you',
-  friend_accepted: 'you',
   
   // "Clubs & Courses" category
   club_update: 'clubs',

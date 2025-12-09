@@ -13,11 +13,6 @@ const TAB_EMPTY_STATES: Record<ActivityTabId, { icon: React.ReactNode; title: st
     title: 'No activity yet',
     description: 'When golfers like, comment, follow or message you, updates will show here.',
   },
-  you: {
-    icon: <Heart className="h-8 w-8 text-muted-foreground/50" />,
-    title: 'No interactions yet',
-    description: 'Likes, comments and mentions on your moments will appear here.',
-  },
   following: {
     icon: <Users className="h-8 w-8 text-muted-foreground/50" />,
     title: 'No updates from friends',
