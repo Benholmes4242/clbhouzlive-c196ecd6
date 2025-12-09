@@ -432,8 +432,8 @@ const AuthForm: React.FC<AuthFormProps> = ({
           }}
           className="placeholder:text-[#97A1AA] focus:border-[#D6D9DE] focus:shadow-[0_0_0_4px_rgba(247,147,30,0.06)]"
         />
-        {/* Message slot - 6px from input */}
-        <div className="min-h-[10px] mt-1.5">
+        {/* Message slot */}
+        <div className="mt-1.5">
           {emailError && (
             <p className="text-[13px] leading-tight" style={{ color: '#E03131' }}>{emailError}</p>
           )}
