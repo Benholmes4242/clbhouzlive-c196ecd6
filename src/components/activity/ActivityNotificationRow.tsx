@@ -5,6 +5,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { FollowBackButton } from './FollowBackButton';
+import { FriendRequestButtons } from './FriendRequestButtons';
 
 interface ActivityNotificationRowProps {
   notification: ActivityNotification;
@@ -86,12 +87,22 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
 }) => {
   const isUnread = notification.is_unread;
   
-  // Determine if we should show "Follow back" button
+  // Determine if we should show "Follow back" button (only for follow, not friend_request)
   const showFollowBack = 
-    (notification.type === 'follow' || notification.type === 'friend_request') &&
+    notification.type === 'follow' &&
     notification.actor_type === 'user' &&
     notification.actor_id &&
     notification.actor_id !== currentUserId;
+
+  // Determine if we should show friend request buttons
+  const showFriendRequestButtons = 
+    notification.type === 'friend_request' &&
+    notification.actor_type === 'user' &&
+    notification.actor_id &&
+    notification.actor_id !== currentUserId;
+
+  // Get request ID for friend request actions (from data or notification id)
+  const friendRequestId = notification.data?.request_id || notification.id;
 
   return (
     <button
@@ -150,6 +161,18 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           <FollowBackButton
             actorId={notification.actor_id!}
             actorDisplayName={notification.actor_display_name}
+            isMock={notification.is_mock}
+          />
+        </div>
+      )}
+
+      {/* Friend request Accept/Decline buttons */}
+      {showFriendRequestButtons && (
+        <div className="flex-shrink-0">
+          <FriendRequestButtons
+            requestId={friendRequestId}
+            requesterId={notification.actor_id!}
+            requesterName={notification.actor_display_name}
             isMock={notification.is_mock}
           />
         </div>
