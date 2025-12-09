@@ -3,6 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { startOfDay, subDays, startOfWeek } from 'date-fns';
 
+// ⚡ DEV FLAG: Set to true to show mock notifications alongside real ones
+const SHOW_MOCK_ACTIVITY = true;
+
 export type ActivityTabId = 'all' | 'you' | 'following' | 'clubs' | 'messages' | 'system';
 
 export const ACTIVITY_TABS: { id: ActivityTabId; label: string }[] = [
@@ -473,11 +476,11 @@ export const useActivityFeed = (tab: ActivityTabId) => {
         });
       }
 
-      // DEV / PREVIEW MOCK DATA - inject when no real data exists
-      const isProd = typeof window !== 'undefined' && window.location.hostname === 'clbhouz.com';
-      if (!isProd && enrichedNotifications.length === 0) {
-        console.log('[useActivityFeed] Injecting mock activity data');
-        enrichedNotifications = generateMockActivity();
+      // DEV FLAG: Always append mock data when flag is true (for testing)
+      if (SHOW_MOCK_ACTIVITY) {
+        const mockItems = generateMockActivity();
+        console.log('[useActivityFeed] SHOW_MOCK_ACTIVITY=true, appending', mockItems.length, 'mock items');
+        enrichedNotifications = [...enrichedNotifications, ...mockItems];
       }
 
       // Calculate counts from ALL items (before filtering by tab)
