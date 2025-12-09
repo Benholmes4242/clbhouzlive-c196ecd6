@@ -146,13 +146,13 @@ interface AvatarWithBadgeProps {
 }
 
 const AvatarWithBadge: React.FC<AvatarWithBadgeProps> = ({ notification, badgeIcon }) => (
-  <div className="relative shrink-0" style={{ width: 44, height: 46 }}>
+  <div className="relative shrink-0" style={{ width: 52, height: 54 }}>
     <SquircleAvatar
       src={notification.actor_avatar_url}
       alt={notification.actor_display_name || 'User'}
-      size={44}
+      size={52}
       fallback={notification.actor_display_name?.charAt(0) || '?'}
-      ringColor={getRingColorForTotalPlayed(0)}
+      ringColor={getRingColorForTotalPlayed(notification.data?.actor_total_top100_played || 0)}
     />
     <span className="absolute bottom-0 right-0 translate-x-1 translate-y-1 h-5 w-5 rounded-full border-2 border-card bg-background flex items-center justify-center shadow-sm">
       {badgeIcon}

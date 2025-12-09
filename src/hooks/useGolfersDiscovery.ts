@@ -17,6 +17,7 @@ interface GolferProfile {
   homeClubId?: string;
   handicap?: number | null;
   followersCount: number;
+  totalTop100Played?: number;
 }
 
 export function useGolfersDiscovery() {
@@ -68,6 +69,7 @@ export function useGolfersDiscovery() {
         homeClub: profile.home_club,
         handicap: profile.eg_handicap_index,
         followersCount: 0,
+        totalTop100Played: 0, // TODO: fetch from Top100 progress if needed
       }));
     },
   });
@@ -109,6 +111,7 @@ export function useGolfersDiscovery() {
         homeClub: profile.home_club,
         handicap: profile.eg_handicap_index,
         followersCount: 0,
+        totalTop100Played: 0, // TODO: fetch from Top100 progress if needed
       }));
 
       return {
