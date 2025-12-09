@@ -127,7 +127,8 @@ const Clubhouse = () => {
     clearAutoHideTimer();
     
     autoHideTimerRef.current = window.setTimeout(() => {
-      chromeControls.hideChromeImmediate();
+      // IMPORTANT: mark as 'auto' so scroll won't reveal chrome outside top zone
+      chromeControls.hideChromeImmediate('auto');
     }, AUTO_HIDE_DELAY_MS);
   }, [isAtTopZone, chromeControls, isAnyOverlayOpen, clearAutoHideTimer]);
   
