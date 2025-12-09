@@ -72,9 +72,13 @@ const ActivityPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-muted/50">
-      {/* DEBUG: Static test elements with NO dynamic data */}
+      {/* DEBUG: Fixed header test */}
       <div className="fixed top-20 left-4 z-[9999] bg-blue-500 p-4 rounded-lg">
         <p style={{ color: 'white', fontSize: '16px', fontWeight: 'bold' }}>STATIC TEST 1</p>
+      </div>
+      <div className="fixed top-40 left-4 z-[9999] bg-green-500 p-4 rounded-lg">
+        <h1 style={{ color: 'white', fontSize: '20px', fontWeight: 'bold', margin: 0 }}>Activity (FIXED)</h1>
+        <p style={{ color: 'white', fontSize: '14px', margin: 0 }}>Updates from friends test</p>
       </div>
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-red-500 rounded-full z-[9999]" />
       <main className="mx-auto w-full max-w-[720px] px-4 pt-4 pb-24">
