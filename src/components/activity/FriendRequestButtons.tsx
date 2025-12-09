@@ -38,6 +38,10 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
     setState('loading');
     
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
       // Update the friend request status to accepted
       const { error } = await supabase
         .from('user_friends')
@@ -45,6 +49,26 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
         .eq('id', requestId);
 
       if (error) throw error;
+
+      // Create "friend_accepted" notification for the original requester
+      // so they see "X accepted your friend request" in their Activity feed
+      const { error: notifyError } = await supabase
+        .from('notifications')
+        .insert({
+          user_id: requesterId, // The person who sent the request (they receive this notification)
+          actor_id: user.id, // The person who accepted (current user)
+          type: 'friend_accepted',
+          title: 'Friend request accepted',
+          message: null,
+          entity_type: 'profile',
+          entity_id: user.id,
+          is_read: false,
+        });
+
+      if (notifyError) {
+        console.warn('Failed to create friend_accepted notification:', notifyError);
+        // Don't throw - the main action succeeded
+      }
 
       setState('accepted');
       toast.success(`You're now friends with ${requesterName}!`, {
