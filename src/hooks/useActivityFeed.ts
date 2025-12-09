@@ -13,7 +13,7 @@ export type ActivityTabId = 'all' | 'following' | 'clubs' | 'messages' | 'system
 export const ACTIVITY_TABS: { id: ActivityTabId; label: string }[] = [
   { id: 'all', label: 'All' },
   { id: 'following', label: 'Following' },
-  { id: 'clubs', label: 'Golf clubs' },
+  { id: 'clubs', label: 'Clubs' },
   { id: 'messages', label: 'Messages' },
 ];
 
