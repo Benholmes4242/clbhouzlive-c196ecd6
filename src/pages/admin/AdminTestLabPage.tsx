@@ -15,9 +15,14 @@ import {
   useMockCommentNotification,
   useMockMentionNotification,
   useClearTestNotifications,
+  // Quick Scenario hooks
+  useFriendRequestHandshake,
+  useBusyDayActivity,
+  useFollowSwapScenario,
+  useResetTestState,
 } from '@/hooks/useAdminTestActions';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { Users, UserPlus, Heart, MessageCircle, AtSign, Trash2, AlertCircle, Check } from 'lucide-react';
+import { Users, UserPlus, Heart, MessageCircle, AtSign, Trash2, AlertCircle, Check, Zap, RotateCcw } from 'lucide-react';
 
 // Reusable button component
 const TestButton: React.FC<{
@@ -40,6 +45,36 @@ const TestButton: React.FC<{
   >
     {icon}
     {loading ? 'Processing...' : label}
+  </button>
+);
+
+// Scenario button component
+const ScenarioButton: React.FC<{
+  label: string;
+  description: string;
+  emoji: string;
+  onClick: () => void;
+  loading?: boolean;
+  variant?: 'default' | 'danger';
+}> = ({ label, description, emoji, onClick, loading, variant = 'default' }) => (
+  <button
+    onClick={onClick}
+    disabled={loading}
+    className={cn(
+      "w-full flex items-center justify-between rounded-sq-md px-4 py-3 text-left transition-colors",
+      "disabled:opacity-50 disabled:cursor-not-allowed",
+      variant === 'danger'
+        ? "bg-red-500/10 hover:bg-red-500/15 border border-red-200"
+        : "bg-muted/50 hover:bg-muted border border-border"
+    )}
+  >
+    <span className="flex items-center gap-3">
+      <span className="text-lg">{emoji}</span>
+      <span className={cn("font-medium", loading && "animate-pulse")}>
+        {loading ? 'Running...' : label}
+      </span>
+    </span>
+    <span className="text-xs text-muted-foreground">{description}</span>
   </button>
 );
 
@@ -78,8 +113,21 @@ export function AdminTestLabPage() {
   const mockMention = useMockMentionNotification();
   const clearNotifications = useClearTestNotifications();
 
+  // Quick Scenario hooks
+  const friendRequestHandshake = useFriendRequestHandshake();
+  const busyDayActivity = useBusyDayActivity();
+  const followSwapScenario = useFollowSwapScenario();
+  const resetTestState = useResetTestState();
+
   // Target is always the current user for now
   const targetUserId = user?.id;
+
+  // Check if any scenario is running
+  const isScenarioRunning = 
+    friendRequestHandshake.isPending || 
+    busyDayActivity.isPending || 
+    followSwapScenario.isPending || 
+    resetTestState.isPending;
 
   if (!user) {
     return (
@@ -163,6 +211,61 @@ export function AdminTestLabPage() {
           </div>
         </div>
       </div>
+
+      {/* Quick Scenarios Section - NEW */}
+      {testUser && targetUserId && (
+        <div className="rounded-sq-md border-2 border-primary/20 bg-primary/5 p-4 space-y-4">
+          <div className="flex items-center gap-2">
+            <Zap className="h-5 w-5 text-primary" />
+            <h2 className="text-sm font-semibold tracking-wide uppercase">Quick Scenarios</h2>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            One-click flows that run several actions in sequence using the Test User.
+          </p>
+
+          <div className="space-y-2">
+            <ScenarioButton
+              emoji="🤝"
+              label="Friend request handshake"
+              description="Test User ↔ Target"
+              onClick={() => friendRequestHandshake.mutate(targetUserId)}
+              loading={friendRequestHandshake.isPending}
+            />
+
+            <ScenarioButton
+              emoji="📬"
+              label="Busy day activity feed"
+              description="20+ mixed notifications"
+              onClick={() => busyDayActivity.mutate(targetUserId)}
+              loading={busyDayActivity.isPending}
+            />
+
+            <ScenarioButton
+              emoji="👣"
+              label="Follow swap"
+              description="Follow / follow-back"
+              onClick={() => followSwapScenario.mutate(targetUserId)}
+              loading={followSwapScenario.isPending}
+            />
+
+            <ScenarioButton
+              emoji="🧹"
+              label="Reset test state"
+              description="Clears test friend/follow + notifications"
+              onClick={() => resetTestState.mutate(targetUserId)}
+              loading={resetTestState.isPending}
+              variant="danger"
+            />
+          </div>
+
+          {isScenarioRunning && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground pt-2 border-t border-border/50">
+              <RotateCcw className="h-3 w-3 animate-spin" />
+              <span>Running scenario...</span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Action Sections */}
       {testUser && targetUserId && (
