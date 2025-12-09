@@ -3,8 +3,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { startOfDay, subDays, startOfWeek } from 'date-fns';
 
-// ⚡ DEV FLAG: Set to true to show mock notifications alongside real ones
-const SHOW_MOCK_ACTIVITY = true;
+// ⚡ DEV FLAG: Mock notifications for testing (auto-disabled in production)
+const isProd = typeof window !== 'undefined' && 
+  (import.meta.env.MODE === 'production' || window.location.hostname === 'clbhouz.com');
+const SHOW_MOCK_ACTIVITY = !isProd && true; // flip inner `true` to `false` to disable mocks
 
 export type ActivityTabId = 'all' | 'you' | 'following' | 'clubs' | 'messages' | 'system';
 
@@ -196,11 +198,11 @@ function generateMockActivity(): ActivityNotification[] {
   const daysAgo = (d: number) => new Date(now - d * 24 * 60 * 60 * 1000).toISOString();
 
   const mockItems: Partial<ActivityNotification>[] = [
-    // NEW / Unread items
+    // NEW / Unread items (mock- prefix for easy identification)
     {
       id: 'mock-1',
       type: 'follow',
-      title: 'New follower',
+      title: '[Sample] New follower',
       message: null,
       actor_display_name: 'Rory McIlroy',
       actor_username: 'rorymcilroy',
@@ -211,7 +213,7 @@ function generateMockActivity(): ActivityNotification[] {
     {
       id: 'mock-2',
       type: 'mention',
-      title: 'Mentioned you',
+      title: '[Sample] Mentioned you',
       message: 'Great round at St Andrews! @you killed it on the back 9',
       actor_display_name: 'Sarah Links',
       actor_username: 'sarahlinks',
@@ -223,7 +225,7 @@ function generateMockActivity(): ActivityNotification[] {
     {
       id: 'mock-3',
       type: 'achievement',
-      title: 'Achievement Unlocked',
+      title: '[Sample] Achievement Unlocked',
       message: 'You unlocked 50 Club – Heritage Club! 🏆',
       actor_display_name: 'clbhouz',
       actor_username: 'clbhouz',
@@ -233,7 +235,7 @@ function generateMockActivity(): ActivityNotification[] {
     {
       id: 'mock-4',
       type: 'like',
-      title: 'Liked your moment',
+      title: '[Sample] Liked your moment',
       message: null,
       actor_display_name: 'Tiger Woods',
       actor_username: 'tigerwoods',
@@ -245,7 +247,7 @@ function generateMockActivity(): ActivityNotification[] {
     {
       id: 'mock-5',
       type: 'club_update',
-      title: 'Sundridge Park GC',
+      title: '[Sample] Sundridge Park GC',
       message: 'New event: Summer Stableford – Sign up now!',
       actor_display_name: 'Sundridge Park GC',
       actor_username: 'sundridgeparkgc',
@@ -255,7 +257,7 @@ function generateMockActivity(): ActivityNotification[] {
     {
       id: 'mock-6',
       type: 'message',
-      title: 'New message',
+      title: '[Sample] New message',
       message: 'Hey, fancy a round at Royal County Down next week?',
       actor_display_name: 'James Faldo',
       actor_username: 'jamesfaldo',
@@ -265,7 +267,7 @@ function generateMockActivity(): ActivityNotification[] {
     {
       id: 'mock-7',
       type: 'comment',
-      title: 'Commented on your moment',
+      title: '[Sample] Commented on your moment',
       message: 'Incredible view! Which hole was this?',
       actor_display_name: 'Phil Mickelson',
       actor_username: 'philmickelson',
@@ -276,7 +278,7 @@ function generateMockActivity(): ActivityNotification[] {
     {
       id: 'mock-8',
       type: 'friend_accepted',
-      title: 'Friend request accepted',
+      title: '[Sample] Friend request accepted',
       message: null,
       actor_display_name: 'Jordan Spieth',
       actor_username: 'jordanspieth',
@@ -287,7 +289,7 @@ function generateMockActivity(): ActivityNotification[] {
     {
       id: 'mock-9',
       type: 'course_update',
-      title: 'Royal County Down',
+      title: '[Sample] Royal County Down',
       message: 'Course condition update: Links in pristine shape for the weekend',
       actor_display_name: 'Royal County Down',
       actor_username: 'royalcountydown',
@@ -297,7 +299,7 @@ function generateMockActivity(): ActivityNotification[] {
     {
       id: 'mock-10',
       type: 'tag',
-      title: 'Tagged you in a moment',
+      title: '[Sample] Tagged you in a moment',
       message: null,
       actor_display_name: 'Brooks Koepka',
       actor_username: 'bkoepka',
@@ -308,7 +310,7 @@ function generateMockActivity(): ActivityNotification[] {
     {
       id: 'mock-11',
       type: 'follow',
-      title: 'New follower',
+      title: '[Sample] New follower',
       message: null,
       actor_display_name: 'Scottie Scheffler',
       actor_username: 'scottiescheffler',
@@ -318,7 +320,7 @@ function generateMockActivity(): ActivityNotification[] {
     {
       id: 'mock-12',
       type: 'like',
-      title: 'Liked your moment',
+      title: '[Sample] Liked your moment',
       message: null,
       actor_display_name: 'Dustin Johnson',
       actor_username: 'djohnson',
@@ -329,7 +331,7 @@ function generateMockActivity(): ActivityNotification[] {
     {
       id: 'mock-13',
       type: 'achievement',
-      title: 'Achievement Unlocked',
+      title: '[Sample] Achievement Unlocked',
       message: 'You completed GB&I Top 100! 🎉',
       actor_display_name: 'clbhouz',
       actor_username: 'clbhouz',
@@ -340,7 +342,7 @@ function generateMockActivity(): ActivityNotification[] {
     {
       id: 'mock-14',
       type: 'event',
-      title: 'Upcoming Event',
+      title: '[Sample] Upcoming Event',
       message: 'Monthly Medal at Sunningdale – register by Friday',
       actor_display_name: 'Sunningdale Golf Club',
       actor_username: 'sunningdalegc',
@@ -350,7 +352,7 @@ function generateMockActivity(): ActivityNotification[] {
     {
       id: 'mock-15',
       type: 'message',
-      title: 'New message',
+      title: '[Sample] New message',
       message: 'Thanks for the game! Let\'s do it again soon.',
       actor_display_name: 'Collin Morikawa',
       actor_username: 'collinmorikawa',
@@ -360,7 +362,7 @@ function generateMockActivity(): ActivityNotification[] {
     {
       id: 'mock-16',
       type: 'follow',
-      title: 'New follower',
+      title: '[Sample] New follower',
       message: null,
       actor_display_name: 'Xander Schauffele',
       actor_username: 'xander',
@@ -370,7 +372,7 @@ function generateMockActivity(): ActivityNotification[] {
     {
       id: 'mock-17',
       type: 'club_update',
-      title: 'Wentworth Club',
+      title: '[Sample] Wentworth Club',
       message: 'Course maintenance complete – all 3 courses now open',
       actor_display_name: 'Wentworth Club',
       actor_username: 'wentworthclub',
