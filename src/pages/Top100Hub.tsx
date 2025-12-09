@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useTop100ListSummaries } from '@/hooks/useTop100ListSummaries';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { Globe, MapPin, List, Map as MapIcon, Trophy } from 'lucide-react';
-import CountryFlag from '@/components/ui/country-flag';
+import { List, Map as MapIcon } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import Top100LeaderboardPanel from '@/components/courses/Top100LeaderboardPanel';
@@ -14,10 +12,10 @@ import Top100MapModal from '@/components/top100/Top100MapModal';
 import { Top100MapScope } from '@/hooks/useTop100MapCourses';
 import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
 import Top100BackButton from '@/components/top100/Top100BackButton';
-import { getTop100RingDotClass } from '@/lib/top100RingStyles';
 import { Top100ProgressSummary } from '@/components/top100/Top100ProgressSummary';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { cn } from '@/lib/utils';
+import { PageRoot } from '@/components/layout/PageRoot';
 
 const Top100Hub = () => {
   const navigate = useNavigate();
@@ -67,41 +65,32 @@ const Top100Hub = () => {
   // Guard against invalid data
   if (!lists && !listsLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <ClubhouseHeaderNew />
+      <PageRoot className="min-h-screen bg-background safe-top">
         <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
           <div className="text-center py-12">
             <h2 className="text-xl font-semibold text-foreground mb-2">Unable to load Top 100 lists</h2>
             <p className="text-muted-foreground">Please try refreshing the page.</p>
           </div>
         </main>
-      </div>
+      </PageRoot>
     );
   }
 
-  const getProgress = (listId: string) => {
-    if (!progress || !progress.lists) return null;
-    return progress.lists.find((p) => p.listId === listId);
-  };
-
   if (listsLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <ClubhouseHeaderNew />
+      <PageRoot className="min-h-screen bg-background safe-top">
         <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
           <div className="animate-pulse space-y-4">
             <div className="h-64 bg-muted rounded-sq-md" />
             <div className="h-64 bg-muted rounded-sq-md" />
           </div>
         </main>
-      </div>
+      </PageRoot>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <ClubhouseHeaderNew />
-
+    <PageRoot className="min-h-screen bg-background safe-top">
       <main className="px-4 md:container md:mx-auto md:px-0 pb-3">
         <div className="max-w-6xl mx-auto">
           {/* Back Button */}
@@ -234,7 +223,7 @@ const Top100Hub = () => {
 
       {/* Scroll to top button */}
       <ScrollToTopGlass />
-    </div>
+    </PageRoot>
   );
 };
 

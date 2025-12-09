@@ -360,6 +360,19 @@ html.lightbox-open {
 }
 
 /* ========================================
+   SAFE-TOP - Safe area padding utility
+   Use on headerless pages to respect iOS notch/status bar
+   ======================================== */
+.safe-top {
+  padding-top: max(env(safe-area-inset-top), 12px);
+}
+
+/* Compact header content offset - use when CompactHeader is present */
+.compact-header-offset {
+  padding-top: calc(56px + env(safe-area-inset-top));
+}
+
+/* ========================================
    PAGE ROOT - iOS Safari Text Rendering Fix
    Forces a separate compositing layer to escape the
    position:fixed html/body + nested scroll bug on iOS.

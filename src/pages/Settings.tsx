@@ -1,14 +1,13 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import ClubhouseHeaderNew from "@/components/clubhouse/ClubhouseHeaderNew";
-import BottomNavigation from '@/components/BottomNavigation';
+import CompactHeader from '@/components/header/CompactHeader';
 import UserAccountInfo from '@/components/profile/UserAccountInfo';
 import EmailChangeSection from '@/components/profile/EmailChangeSection';
 import NotificationSettings from '@/components/settings/NotificationSettings';
 import ThemeToggle from '@/components/ui/theme-toggle';
 import { useProfileData } from '@/hooks/useProfileData';
 import { NearbyTestToolsPanel } from '@/features/nearby/components/NearbyTestToolsPanel';
+import { PageRoot } from '@/components/layout/PageRoot';
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -36,7 +35,7 @@ const Settings = () => {
   // Show loading while checking authentication
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <PageRoot className="min-h-screen bg-background safe-top">
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <div 
@@ -46,14 +45,14 @@ const Settings = () => {
             <span className="text-muted-foreground text-base">Loading...</span>
           </div>
         </div>
-      </div>
+      </PageRoot>
     );
   }
 
   // Show error if there's an issue
   if (error) {
     return (
-      <div className="min-h-screen bg-background pb-28">
+      <PageRoot className="min-h-screen bg-background pb-28 safe-top">
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center space-y-4">
             <span className="text-destructive text-base">Error loading settings</span>
@@ -65,8 +64,7 @@ const Settings = () => {
             </button>
           </div>
         </div>
-        
-      </div>
+      </PageRoot>
     );
   }
 
@@ -76,9 +74,9 @@ const Settings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-28">
-      <ClubhouseHeaderNew />
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+    <PageRoot className="min-h-screen bg-background pb-28">
+      <CompactHeader />
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6 compact-header-offset">
         <h1 className="font-display text-2xl font-bold mb-6">Settings</h1>
         
         <NotificationSettings />
@@ -95,7 +93,7 @@ const Settings = () => {
           onProfileUpdate={handleProfileUpdate}
         />
       </div>
-    </div>
+    </PageRoot>
   );
 };
 

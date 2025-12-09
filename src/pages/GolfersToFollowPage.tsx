@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
+import CompactHeader from '@/components/header/CompactHeader';
 import { FadeInContent } from '@/components/ui/FadeInContent';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, ChevronLeft } from 'lucide-react';
 import { GolferCard } from '@/components/golfers/GolferCard';
-import { GolferCardSkeleton } from '@/components/golfers/GolferCardSkeleton';
 import { useGolfersDiscovery, FilterType } from '@/hooks/useGolfersDiscovery';
 import { useFollowUser } from '@/hooks/useFollowUser';
 import { useFriendActions } from '@/hooks/useFriendActions';
@@ -15,6 +14,7 @@ import { SegmentedTabs, SegmentedTabOption } from '@/components/ui/SegmentedTabs
 import { useDebounce } from '@/hooks/useDebounce';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { PageRoot } from '@/components/layout/PageRoot';
 
 const GolfersToFollowPage = () => {
   const navigate = useNavigate();
@@ -114,10 +114,10 @@ const GolfersToFollowPage = () => {
   const direction = page > lastPage ? 'right' : 'left';
 
   return (
-    <div className="min-h-screen bg-slate-50 page-with-header m-0 p-0">
-      <ClubhouseHeaderNew />
+    <PageRoot className="min-h-screen bg-slate-50">
+      <CompactHeader />
       <FadeInContent>
-        <main className="max-w-3xl mx-auto pb-[30px]">
+        <main className="max-w-3xl mx-auto pb-[30px] compact-header-offset">
           {/* Header - Centered */}
           <header className="px-5 pt-4 pb-5">
             <button
@@ -248,7 +248,7 @@ const GolfersToFollowPage = () => {
           </div>
         </main>
       </FadeInContent>
-    </div>
+    </PageRoot>
   );
 };
 
