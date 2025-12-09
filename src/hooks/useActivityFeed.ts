@@ -6,7 +6,7 @@ import { startOfDay, subDays, startOfWeek } from 'date-fns';
 // ⚡ DEV FLAG: Mock notifications for testing (auto-disabled in production)
 const isProd = typeof window !== 'undefined' && 
   (import.meta.env.MODE === 'production' || window.location.hostname === 'clbhouz.com');
-const SHOW_MOCK_ACTIVITY = !isProd && true; // flip inner `true` to `false` to disable mocks
+const SHOW_MOCK_ACTIVITY = false; // flip to `true` to enable mocks in dev
 
 export type ActivityTabId = 'all' | 'following' | 'clubs' | 'messages' | 'system';
 
