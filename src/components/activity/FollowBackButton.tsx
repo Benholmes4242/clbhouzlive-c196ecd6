@@ -46,8 +46,8 @@ export const FollowBackButton: React.FC<FollowBackButtonProps> = ({
     return null;
   }
 
-  // Shared base pill class for unified styling (matches FriendRequestButtons)
-  const basePillClass = "inline-flex items-center justify-center rounded-full border px-4 h-9 text-xs font-semibold transition-colors";
+  // Shared base pill class for unified styling - SDS corners, 30% shorter height
+  const basePillClass = "inline-flex items-center justify-center rounded-sq-xs border px-3 h-6 text-[11px] font-semibold transition-colors";
 
   // Already following - show muted "Following" state with unified styling
   if (isFollowing === 'following') {

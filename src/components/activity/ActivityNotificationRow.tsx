@@ -16,8 +16,8 @@ interface ActivityNotificationRowProps {
   currentUserId?: string;
 }
 
-// Shared base pill class for unified styling
-const basePillClass = "inline-flex items-center justify-center rounded-full border px-4 h-9 text-xs font-semibold transition-colors";
+// Shared base pill class for unified styling - SDS corners, 30% shorter height
+const basePillClass = "inline-flex items-center justify-center rounded-sq-xs border px-3 h-6 text-[11px] font-semibold transition-colors";
 
 // Icon variants for different friend request states
 function getFriendBadgeIcon(isActive: boolean) {
@@ -154,7 +154,7 @@ const AvatarWithBadge: React.FC<AvatarWithBadgeProps> = ({ notification, badgeIc
       fallback={notification.actor_display_name?.charAt(0) || '?'}
       ringColor={getRingColorForTotalPlayed(0)}
     />
-    <span className="absolute bottom-0 right-0 h-5 w-5 rounded-full border-2 border-card bg-background flex items-center justify-center">
+    <span className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full border-2 border-card bg-background flex items-center justify-center shadow-sm">
       {badgeIcon}
     </span>
   </div>
