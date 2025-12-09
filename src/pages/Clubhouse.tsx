@@ -96,6 +96,11 @@ const Clubhouse = () => {
   // Track overlay states
   const [isCommentsDrawerOpen, setIsCommentsDrawerOpen] = useState(false);
   
+  // Top zone (first post) state for auto-hide timer
+  const [isAtTopZone, setIsAtTopZone] = useState(true); // On first load, we're at top
+  const autoHideTimerRef = useRef<number | null>(null);
+  const AUTO_HIDE_DELAY_MS = 5000;
+  
   // Chrome auto-hide state - force hidden when any overlay is open
   const isAnyOverlayOpen = isCommentsDrawerOpen || isComposerOpen;
   const chromeControls = useChromeState({
@@ -104,10 +109,70 @@ const Clubhouse = () => {
     disableDirectionalReveal: true, // Clubhouse only - swipe between posts should not toggle chrome
   });
   
+  // Clear the auto-hide timer
+  const clearAutoHideTimer = useCallback(() => {
+    if (autoHideTimerRef.current !== null) {
+      window.clearTimeout(autoHideTimerRef.current);
+      autoHideTimerRef.current = null;
+    }
+  }, []);
+  
+  // Schedule auto-hide after 5s only when at top zone and chrome is visible
+  const scheduleAutoHide = useCallback(() => {
+    // Only when at top, chrome is visible, and no overlay is forcing hidden
+    if (!isAtTopZone) return;
+    if (chromeControls.chromeState !== 'visible') return;
+    if (isAnyOverlayOpen) return;
+    
+    clearAutoHideTimer();
+    
+    autoHideTimerRef.current = window.setTimeout(() => {
+      chromeControls.hideChromeImmediate();
+    }, AUTO_HIDE_DELAY_MS);
+  }, [isAtTopZone, chromeControls, isAnyOverlayOpen, clearAutoHideTimer]);
+  
+  // Handle top zone changes from feed
+  const handleTopZoneChange = useCallback((atTop: boolean) => {
+    setIsAtTopZone(atTop);
+    
+    if (atTop) {
+      // Coming back to the top: show chrome and start idle timer
+      chromeControls.showChromeImmediate();
+      // Use setTimeout to ensure state has updated before scheduling
+      setTimeout(() => scheduleAutoHide(), 0);
+    } else {
+      // Leaving the top zone: no idle behaviour
+      clearAutoHideTimer();
+    }
+  }, [chromeControls, scheduleAutoHide, clearAutoHideTimer]);
+  
+  // Initial load: start the 5s timer when component mounts
+  useEffect(() => {
+    if (isAtTopZone && chromeControls.chromeState === 'visible' && !isAnyOverlayOpen) {
+      scheduleAutoHide();
+    }
+    
+    return clearAutoHideTimer; // Cleanup on unmount
+  }, [isAtTopZone, chromeControls.chromeState, isAnyOverlayOpen, scheduleAutoHide, clearAutoHideTimer]);
+  
+  // Reset timer on any activity while at top zone
+  const handleClubhouseScroll = useCallback((scrollTop: number) => {
+    chromeControls.handleScroll(scrollTop);
+    
+    // While at the top, any scroll movement counts as "activity" and resets timer
+    if (isAtTopZone && chromeControls.chromeState === 'visible') {
+      scheduleAutoHide();
+    }
+  }, [chromeControls, isAtTopZone, scheduleAutoHide]);
+  
   // Navigation pill tap handler - directly reveals chrome
   const showNavOverlay = useCallback(() => {
     chromeControls.showChrome();
-  }, [chromeControls]);
+    // Reset timer when nav overlay is triggered
+    if (isAtTopZone) {
+      scheduleAutoHide();
+    }
+  }, [chromeControls, isAtTopZone, scheduleAutoHide]);
   
   const hideNavOverlay = useCallback(() => {
     // No-op now since we're not using overlay state
@@ -279,7 +344,7 @@ const Clubhouse = () => {
             hasMore={hasMore}
             isLoadingMore={isLoadingMore}
             onCurrentPostChange={handleCurrentPostChange}
-            onScroll={chromeControls.handleScroll}
+            onScroll={handleClubhouseScroll}
             onTouchStart={chromeControls.handleTouchStart}
             onTouchMove={chromeControls.handleTouchMove}
             onTouchEnd={chromeControls.handleTouchEnd}
@@ -291,6 +356,7 @@ const Clubhouse = () => {
             onPostDetailsOpen={() => console.log('Post details opened')}
             onDismissNavOverlay={hideNavOverlay}
             onNavOverlayRequest={showNavOverlay}
+            onTopZoneChange={handleTopZoneChange}
           />
         ) : isLoading ? (
           <div className="flex items-center justify-center min-h-screen">

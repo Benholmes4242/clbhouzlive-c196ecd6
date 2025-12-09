@@ -95,6 +95,21 @@ export const useChromeState = ({ forceHidden = false, disabled = false, onNavOve
 
   const hideChrome = useCallback(() => scheduleHide(HIDE_DEBOUNCE_MS), [scheduleHide]);
   const showChrome = useCallback(() => scheduleReveal(REVEAL_DEBOUNCE_MS), [scheduleReveal]);
+  
+  // Immediate show/hide (no debounce) for external control like auto-hide timer
+  const showChromeImmediate = useCallback(() => {
+    if (disabled) return;
+    if (hideTimer.current) clearTimeout(hideTimer.current);
+    if (revealTimer.current) clearTimeout(revealTimer.current);
+    setChromeState('visible');
+  }, [disabled]);
+  
+  const hideChromeImmediate = useCallback(() => {
+    if (forceHiddenRef.current || disabled) return;
+    if (hideTimer.current) clearTimeout(hideTimer.current);
+    if (revealTimer.current) clearTimeout(revealTimer.current);
+    setChromeState('hidden');
+  }, [disabled]);
 
   const toggleChrome = useCallback(() => {
     if (forceHiddenRef.current || disabled) return;
@@ -256,6 +271,8 @@ export const useChromeState = ({ forceHidden = false, disabled = false, onNavOve
     isVisible: chromeState === 'visible',
     hideChrome,
     showChrome,
+    showChromeImmediate,
+    hideChromeImmediate,
     toggleChrome,
     handleScroll,
     handleTap,
