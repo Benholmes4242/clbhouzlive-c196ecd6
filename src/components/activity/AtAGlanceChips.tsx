@@ -45,7 +45,7 @@ export const AtAGlanceChips: React.FC<AtAGlanceChipsProps> = ({ counts, onChipCl
             <span className={isActive ? "text-primary-foreground" : "text-foreground"}>{chip.label}</span>
             {/* Orange count bubble for New chip, regular count for others */}
             {isNewChip ? (
-              <span className="ml-1 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-orange-500 text-[11px] font-medium text-white px-1.5">
+              <span className="ml-1 inline-flex h-5 min-w-[20px] items-center justify-center rounded-sq-xs bg-orange-500 text-[11px] font-medium text-white px-1.5">
                 {count}
               </span>
             ) : (
