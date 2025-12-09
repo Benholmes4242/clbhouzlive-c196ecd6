@@ -24,6 +24,11 @@ import {
   useNewUserOnboardingWeek,
   useHighEngagementCreatorDay,
   useQuietDayThenSpike,
+  // Focus Preset hooks
+  useClubsOnlyDay,
+  useMessagesHeavyDay,
+  useMentionsAndTagsDay,
+  useAchievementsBurst,
 } from '@/hooks/useAdminTestActions';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Users, UserPlus, Heart, MessageCircle, AtSign, Trash2, AlertCircle, Check, Zap, RotateCcw, Sparkles } from 'lucide-react';
@@ -128,6 +133,12 @@ export function AdminTestLabPage() {
   const highEngagementCreatorDay = useHighEngagementCreatorDay();
   const quietDayThenSpike = useQuietDayThenSpike();
 
+  // Focus Preset hooks
+  const clubsOnlyDay = useClubsOnlyDay();
+  const messagesHeavyDay = useMessagesHeavyDay();
+  const mentionsAndTagsDay = useMentionsAndTagsDay();
+  const achievementsBurst = useAchievementsBurst();
+
   // Target is always the current user for now
   const targetUserId = user?.id;
 
@@ -139,7 +150,11 @@ export function AdminTestLabPage() {
     resetTestState.isPending ||
     newUserOnboardingWeek.isPending ||
     highEngagementCreatorDay.isPending ||
-    quietDayThenSpike.isPending;
+    quietDayThenSpike.isPending ||
+    clubsOnlyDay.isPending ||
+    messagesHeavyDay.isPending ||
+    mentionsAndTagsDay.isPending ||
+    achievementsBurst.isPending;
 
   if (!user) {
     return (
@@ -313,6 +328,53 @@ export function AdminTestLabPage() {
               description="Almost nothing, then a burst"
               onClick={() => quietDayThenSpike.mutate(targetUserId)}
               loading={quietDayThenSpike.isPending}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Focus Presets Section */}
+      {testUser && targetUserId && (
+        <div className="rounded-sq-md border-2 border-emerald-500/20 bg-emerald-500/5 p-4 space-y-4">
+          <div className="flex items-center gap-2">
+            <AtSign className="h-5 w-5 text-emerald-600" />
+            <h2 className="text-sm font-semibold tracking-wide uppercase">Focus Presets</h2>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Stress-test specific notification channels to see how each tab behaves.
+          </p>
+
+          <div className="space-y-2">
+            <ScenarioButton
+              emoji="🏌️"
+              label="Clubs-only day"
+              description="Only golf club updates & invites"
+              onClick={() => clubsOnlyDay.mutate(targetUserId)}
+              loading={clubsOnlyDay.isPending}
+            />
+
+            <ScenarioButton
+              emoji="💬"
+              label="DM-heavy day"
+              description="Back-and-forth messages"
+              onClick={() => messagesHeavyDay.mutate(targetUserId)}
+              loading={messagesHeavyDay.isPending}
+            />
+
+            <ScenarioButton
+              emoji="@"
+              label="Mentions & tags day"
+              description="Lots of @you in posts & comments"
+              onClick={() => mentionsAndTagsDay.mutate(targetUserId)}
+              loading={mentionsAndTagsDay.isPending}
+            />
+
+            <ScenarioButton
+              emoji="🏆"
+              label="Achievements burst"
+              description="Handicap, milestones & unlocks"
+              onClick={() => achievementsBurst.mutate(targetUserId)}
+              loading={achievementsBurst.isPending}
             />
           </div>
         </div>

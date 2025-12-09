@@ -1441,3 +1441,287 @@ export function useQuietDayThenSpike() {
     },
   });
 }
+
+// ============================================
+// FOCUS PRESETS (by channel/tab)
+// ============================================
+
+/**
+ * Focus preset: Clubs-only day
+ * Only club updates & golf course notifications
+ */
+export function useClubsOnlyDay() {
+  const queryClient = useQueryClient();
+  const { data: testUser } = useTestUser();
+
+  return useMutation({
+    mutationFn: async (targetUserId: string) => {
+      if (!testUser) throw new Error('Test user not configured');
+
+      const now = new Date();
+
+      // Clear existing test notifications
+      await supabase
+        .from('notifications')
+        .delete()
+        .eq('user_id', targetUserId)
+        .eq('actor_id', testUser.id);
+
+      const notifications = [];
+
+      const clubUpdates = [
+        { title: 'Course open – temporary greens removed for the weekend', hoursAgo: 8 },
+        { title: 'New competition: Saturday Roll-up – sign up now', hoursAgo: 6 },
+        { title: "You've been added to the 'Clubhouse Athletes' watchlist", hoursAgo: 4 },
+        { title: 'Winter league fixtures released – check your schedule', hoursAgo: 3 },
+        { title: 'Course update: Back 9 now open after maintenance', hoursAgo: 2 },
+        { title: 'Member event: Christmas Texas Scramble – book your spot', hoursAgo: 1 },
+      ];
+
+      for (const update of clubUpdates) {
+        notifications.push({
+          user_id: targetUserId,
+          actor_id: testUser.id,
+          type: 'club_update',
+          title: update.title,
+          entity_type: 'club',
+          entity_id: 'mock-club-test',
+          is_read: update.hoursAgo > 4,
+          created_at: new Date(now.getTime() - update.hoursAgo * 60 * 60 * 1000).toISOString(),
+        });
+      }
+
+      await supabase.from('notifications').insert(notifications);
+
+      return { success: true, count: notifications.length };
+    },
+    onSuccess: (data) => {
+      toast.success(`Clubs-only day created`, {
+        description: `${data?.count || 6} club notifications`,
+        position: 'top-center',
+      });
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to create clubs-only day', {
+        position: 'top-center',
+      });
+    },
+  });
+}
+
+/**
+ * Focus preset: Messages-heavy day
+ * Lots of direct message notifications
+ */
+export function useMessagesHeavyDay() {
+  const queryClient = useQueryClient();
+  const { data: testUser } = useTestUser();
+
+  return useMutation({
+    mutationFn: async (targetUserId: string) => {
+      if (!testUser) throw new Error('Test user not configured');
+
+      const now = new Date();
+
+      // Clear existing test notifications
+      await supabase
+        .from('notifications')
+        .delete()
+        .eq('user_id', targetUserId)
+        .eq('actor_id', testUser.id);
+
+      const notifications = [];
+
+      const messages = [
+        { preview: 'Fancy 9 holes after work this week?', hoursAgo: 10 },
+        { preview: 'Got a spare 4-ball at your home club on Friday', hoursAgo: 8 },
+        { preview: 'We should record one of your rounds for Clubhouse', hoursAgo: 6 },
+        { preview: 'That last round looked class - rematch soon?', hoursAgo: 4 },
+        { preview: 'Sending you my society schedule - keen to get you involved', hoursAgo: 3 },
+        { preview: 'Did you see the new course photos? Amazing quality', hoursAgo: 2 },
+        { preview: 'Up for Sunningdale next month? I can get us on', hoursAgo: 1 },
+        { preview: 'Quick question about your swing video...', minsAgo: 30 },
+        { preview: 'Just booked! You in?', minsAgo: 15 },
+        { preview: 'See you on the first tee', minsAgo: 5 },
+      ];
+
+      for (const msg of messages) {
+        const createdAt = msg.hoursAgo 
+          ? new Date(now.getTime() - msg.hoursAgo * 60 * 60 * 1000)
+          : new Date(now.getTime() - (msg.minsAgo || 0) * 60 * 1000);
+
+        notifications.push({
+          user_id: targetUserId,
+          actor_id: testUser.id,
+          type: 'message',
+          title: 'Sent you a message',
+          message: msg.preview,
+          entity_type: 'message',
+          entity_id: `mock-message-${messages.indexOf(msg)}`,
+          is_read: (msg.hoursAgo || 0) > 5,
+          created_at: createdAt.toISOString(),
+        });
+      }
+
+      await supabase.from('notifications').insert(notifications);
+
+      return { success: true, count: notifications.length };
+    },
+    onSuccess: (data) => {
+      toast.success(`DM-heavy day created`, {
+        description: `${data?.count || 10} message notifications`,
+        position: 'top-center',
+      });
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to create DM-heavy day', {
+        position: 'top-center',
+      });
+    },
+  });
+}
+
+/**
+ * Focus preset: Mentions & tags day
+ * Lots of @mentions in posts and comments
+ */
+export function useMentionsAndTagsDay() {
+  const queryClient = useQueryClient();
+  const { data: testUser } = useTestUser();
+
+  return useMutation({
+    mutationFn: async (targetUserId: string) => {
+      if (!testUser) throw new Error('Test user not configured');
+
+      const now = new Date();
+
+      // Clear existing test notifications
+      await supabase
+        .from('notifications')
+        .delete()
+        .eq('user_id', targetUserId)
+        .eq('actor_id', testUser.id);
+
+      const notifications = [];
+
+      const mentions = [
+        { message: 'Had to tag you here – this looks like your kind of track', hoursAgo: 8 },
+        { message: 'We NEED to play this together next season @you', hoursAgo: 6 },
+        { message: 'Reminds me of our round at Sunningdale', hoursAgo: 5 },
+        { message: "Can't believe @you hasn't played here yet", hoursAgo: 4 },
+        { message: 'Rating this course highly – @you would love it', hoursAgo: 3 },
+        { message: 'Best swing on Clbhouz belongs to @you', hoursAgo: 2 },
+        { message: 'Getting the squad together @you @everyone', hoursAgo: 1 },
+        { message: "Who's in for Friday? @you first on the list", minsAgo: 45 },
+        { message: 'This is what @you was telling me about!', minsAgo: 20 },
+        { message: 'Just posted your swing analysis @you', minsAgo: 5 },
+      ];
+
+      for (const mention of mentions) {
+        const createdAt = mention.hoursAgo 
+          ? new Date(now.getTime() - mention.hoursAgo * 60 * 60 * 1000)
+          : new Date(now.getTime() - (mention.minsAgo || 0) * 60 * 1000);
+
+        notifications.push({
+          user_id: targetUserId,
+          actor_id: testUser.id,
+          type: 'mention',
+          title: 'Mentioned you in a post',
+          message: mention.message,
+          entity_type: 'post',
+          entity_id: `mock-post-mention-focus-${mentions.indexOf(mention)}`,
+          is_read: (mention.hoursAgo || 0) > 5,
+          created_at: createdAt.toISOString(),
+        });
+      }
+
+      await supabase.from('notifications').insert(notifications);
+
+      return { success: true, count: notifications.length };
+    },
+    onSuccess: (data) => {
+      toast.success(`Mentions & tags day created`, {
+        description: `${data?.count || 10} @mentions`,
+        position: 'top-center',
+      });
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to create mentions day', {
+        position: 'top-center',
+      });
+    },
+  });
+}
+
+/**
+ * Focus preset: Achievements burst
+ * Simulates unlocking multiple achievements/milestones
+ */
+export function useAchievementsBurst() {
+  const queryClient = useQueryClient();
+  const { data: testUser } = useTestUser();
+
+  return useMutation({
+    mutationFn: async (targetUserId: string) => {
+      if (!testUser) throw new Error('Test user not configured');
+
+      const now = new Date();
+
+      // Clear existing test notifications
+      await supabase
+        .from('notifications')
+        .delete()
+        .eq('user_id', targetUserId)
+        .eq('actor_id', testUser.id);
+
+      const notifications = [];
+
+      const achievements = [
+        { title: '🏌️ Single-figure handicap unlocked!', message: "You've dropped into single figures. Nice work.", hoursAgo: 6 },
+        { title: '🏆 20 Club – Top 100', message: "You've played 20 Top 100 courses", hoursAgo: 5 },
+        { title: '🎯 New personal best!', message: 'You set a new PB for 18 holes', hoursAgo: 4 },
+        { title: '🌍 GB&I Explorer', message: "You've played 10 courses in Great Britain & Ireland", hoursAgo: 3 },
+        { title: '📸 Content Creator', message: 'Your posts reached 1,000 views this month', hoursAgo: 2 },
+        { title: '⭐ First Review', message: 'You submitted your first course review', hoursAgo: 1 },
+        { title: '🔥 7-Day Streak', message: "You've posted for 7 days in a row", minsAgo: 30 },
+      ];
+
+      for (const achievement of achievements) {
+        const createdAt = achievement.hoursAgo 
+          ? new Date(now.getTime() - achievement.hoursAgo * 60 * 60 * 1000)
+          : new Date(now.getTime() - (achievement.minsAgo || 0) * 60 * 1000);
+
+        notifications.push({
+          user_id: targetUserId,
+          actor_id: testUser.id,
+          type: 'achievement',
+          title: achievement.title,
+          message: achievement.message,
+          entity_type: 'achievement',
+          entity_id: `mock-achievement-${achievements.indexOf(achievement)}`,
+          is_read: (achievement.hoursAgo || 0) > 4,
+          created_at: createdAt.toISOString(),
+        });
+      }
+
+      await supabase.from('notifications').insert(notifications);
+
+      return { success: true, count: notifications.length };
+    },
+    onSuccess: (data) => {
+      toast.success(`Achievements burst created`, {
+        description: `${data?.count || 7} achievement unlocks`,
+        position: 'top-center',
+      });
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to create achievements burst', {
+        position: 'top-center',
+      });
+    },
+  });
+}
