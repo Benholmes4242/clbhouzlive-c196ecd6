@@ -60,11 +60,12 @@ const ActivityPage: React.FC = () => {
     }
   };
 
-  const isEmpty = buckets && 
+  const isEmpty = !buckets || (
     buckets.today.length === 0 && 
     buckets.yesterday.length === 0 && 
     buckets.thisWeek.length === 0 && 
-    buckets.earlier.length === 0;
+    buckets.earlier.length === 0
+  );
 
   return (
     <div className="min-h-screen bg-muted/50">
@@ -128,7 +129,7 @@ const ActivityPage: React.FC = () => {
           <div className="text-center py-12 text-muted-foreground">
             <p>Failed to load activity</p>
           </div>
-        ) : isEmpty ? (
+        ) : isEmpty || !buckets ? (
           <ActivityEmptyState tab={activeTab} />
         ) : (
           <div className="space-y-6">
