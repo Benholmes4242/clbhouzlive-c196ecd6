@@ -360,20 +360,26 @@ html.lightbox-open {
 }
 
 /* ========================================
-   ACTIVITY PAGE - iOS Safari Text Rendering Fix
+   PAGE ROOT - iOS Safari Text Rendering Fix
    Forces a separate compositing layer to escape the
-   position:fixed html/body + nested scroll bug on iOS
+   position:fixed html/body + nested scroll bug on iOS.
+   Use .page-root for new pages, .activity-page-root kept for backward compat.
    ======================================== */
+.page-root,
 .activity-page-root {
   position: relative;
-  min-height: 100vh;
-  padding-bottom: 96px;
-  background-color: hsl(var(--bg-page));
   
   /* Force GPU compositing layer - fixes iOS Safari text render bug */
   transform: translateZ(0);
   -webkit-transform: translate3d(0, 0, 0);
   will-change: transform;
+}
+
+/* Activity-specific styles (backward compat) */
+.activity-page-root {
+  min-height: 100vh;
+  padding-bottom: 96px;
+  background-color: hsl(var(--bg-page));
 }
 
 /* Fade mask utility for horizontal scroll rails */
