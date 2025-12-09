@@ -135,6 +135,8 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
 
       {/* Text content */}
       <div className="flex-1 min-w-0">
+        {/* DEBUG TEXT */}
+        <p style={{ color: 'red', fontSize: '14px', fontWeight: 'bold' }}>DEBUG TEXT HERE</p>
         <p className={cn(
           "text-sm leading-snug text-slate-900",
           isUnread ? "font-medium" : ""
