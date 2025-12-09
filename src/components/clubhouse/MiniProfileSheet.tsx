@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, Building2 } from 'lucide-react';
+import { CheckCircle, Building2, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useFollow } from '@/hooks/useFollow';
@@ -24,6 +24,7 @@ interface UserProfile {
   isBusiness?: boolean;
   businessCategory?: string;
   businessLocation?: string;
+  isVerifiedBusiness?: boolean;
 }
 
 interface MiniProfileSheetProps {
@@ -323,6 +324,12 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
                         <Building2 className="w-2.5 h-2.5" />
                         Business
                       </span>
+                      {user.isVerifiedBusiness && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 px-1.5 py-[1px] text-[11px] text-emerald-400">
+                          <CheckCircle2 className="w-2.5 h-2.5" />
+                          Verified
+                        </span>
+                      )}
                       {user.businessCategory && (
                         <span className="truncate max-w-[100px] text-[11px] text-white/60">
                           {user.businessCategory}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Globe, Pencil, Building2, MapPin } from 'lucide-react';
+import { Globe, Pencil, Building2, MapPin, CheckCircle2 } from 'lucide-react';
 import { BUSINESS_CATEGORIES, BusinessCategory } from '@/types/profile';
 
 interface ProfileHeaderCardProps {
@@ -15,6 +15,7 @@ interface ProfileHeaderCardProps {
   businessName?: string | null;
   businessCategory?: string | null;
   businessLocation?: string | null;
+  isVerifiedBusiness?: boolean | null;
   // Profile type
   isPersonal: boolean;
   isOwnProfile: boolean;
@@ -34,6 +35,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   businessName,
   businessCategory,
   businessLocation,
+  isVerifiedBusiness,
   isPersonal,
   isOwnProfile,
   onCustomiseClick,
@@ -76,6 +78,12 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
               <Building2 className="w-3 h-3" />
               Business
             </span>
+            {isVerifiedBusiness && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-500">
+                <CheckCircle2 className="w-3 h-3" />
+                Verified
+              </span>
+            )}
             {businessCategory && (
               <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
                 {getCategoryLabel(businessCategory)}

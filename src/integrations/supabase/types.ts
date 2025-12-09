@@ -4032,6 +4032,7 @@ export type Database = {
           is_business_verified: boolean | null
           is_official_club: boolean | null
           is_public: boolean | null
+          is_verified_business: boolean
           last_rating_at: string | null
           location: string | null
           logo_url: string | null
@@ -4061,6 +4062,8 @@ export type Database = {
           updated_at: string | null
           user_type: Database["public"]["Enums"]["user_type"] | null
           username: string | null
+          verified_business_at: string | null
+          verified_business_notes: string | null
           website_url: string | null
           websites: string[] | null
         }
@@ -4101,6 +4104,7 @@ export type Database = {
           is_business_verified?: boolean | null
           is_official_club?: boolean | null
           is_public?: boolean | null
+          is_verified_business?: boolean
           last_rating_at?: string | null
           location?: string | null
           logo_url?: string | null
@@ -4130,6 +4134,8 @@ export type Database = {
           updated_at?: string | null
           user_type?: Database["public"]["Enums"]["user_type"] | null
           username?: string | null
+          verified_business_at?: string | null
+          verified_business_notes?: string | null
           website_url?: string | null
           websites?: string[] | null
         }
@@ -4170,6 +4176,7 @@ export type Database = {
           is_business_verified?: boolean | null
           is_official_club?: boolean | null
           is_public?: boolean | null
+          is_verified_business?: boolean
           last_rating_at?: string | null
           location?: string | null
           logo_url?: string | null
@@ -4199,6 +4206,8 @@ export type Database = {
           updated_at?: string | null
           user_type?: Database["public"]["Enums"]["user_type"] | null
           username?: string | null
+          verified_business_at?: string | null
+          verified_business_notes?: string | null
           website_url?: string | null
           websites?: string[] | null
         }
