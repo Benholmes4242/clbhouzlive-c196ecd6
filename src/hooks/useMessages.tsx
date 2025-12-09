@@ -126,8 +126,23 @@ export function useMessages() {
     };
   }, [user, fetchConversations]);
 
+  // Check if this is the first message in a conversation
+  const isFirstMessageInConversation = async (recipientId: string): Promise<boolean> => {
+    if (!user) return true;
+    
+    const { count } = await supabase
+      .from('messages')
+      .select('*', { count: 'exact', head: true })
+      .or(`and(sender_id.eq.${user.id},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${user.id})`);
+    
+    return (count ?? 0) === 0;
+  };
+
   const sendMessage = async (recipientId: string, content: string) => {
     if (!user) return null;
+
+    // Check if this is the first message (for notification)
+    const isFirstMessage = await isFirstMessageInConversation(recipientId);
 
     const { data, error } = await supabase
       .from('messages')
@@ -139,7 +154,25 @@ export function useMessages() {
       .select()
       .single();
 
-    if (!error) {
+    if (!error && data) {
+      // Only notify on first message in a new thread
+      if (isFirstMessage) {
+        await supabase.from('notifications').insert({
+          user_id: recipientId,
+          actor_id: user.id,
+          type: 'message',
+          title: 'New message',
+          message: 'sent you a message',
+          entity_type: 'message',
+          entity_id: data.id,
+          data: { 
+            message_id: data.id, 
+            sender_id: user.id,
+            message_preview: content.trim().slice(0, 100),
+          },
+        });
+      }
+
       fetchConversations();
     }
 

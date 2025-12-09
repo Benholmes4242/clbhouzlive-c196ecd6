@@ -2061,6 +2061,8 @@ export type Database = {
           actor_id: string | null
           created_at: string
           data: Json | null
+          entity_id: string | null
+          entity_type: string | null
           id: string
           is_read: boolean
           message: string | null
@@ -2074,6 +2076,8 @@ export type Database = {
           actor_id?: string | null
           created_at?: string
           data?: Json | null
+          entity_id?: string | null
+          entity_type?: string | null
           id?: string
           is_read?: boolean
           message?: string | null
@@ -2087,6 +2091,8 @@ export type Database = {
           actor_id?: string | null
           created_at?: string
           data?: Json | null
+          entity_id?: string | null
+          entity_type?: string | null
           id?: string
           is_read?: boolean
           message?: string | null
