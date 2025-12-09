@@ -135,18 +135,14 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
 
       {/* Text content */}
       <div className="flex-1 min-w-0">
-        {/* DEBUG TEXT */}
-        <p style={{ color: 'red', fontSize: '14px', fontWeight: 'bold' }}>DEBUG TEXT HERE</p>
-        <p className={cn(
-          "text-sm leading-snug text-slate-900",
-          isUnread ? "font-medium" : ""
-        )}>
-          <span className="font-semibold text-slate-900">{notification.actor_display_name || 'Unknown User'}</span>{' '}
-          <span className="text-slate-600">
+        {/* DEBUG: Force visible with inline styles */}
+        <p style={{ color: '#000000', fontSize: '14px', fontWeight: 600, opacity: 1, visibility: 'visible' }}>
+          {notification.actor_display_name || 'Unknown User'}{' '}
+          <span style={{ color: '#475569', fontWeight: 400 }}>
             {renderNotificationText(notification)}
           </span>
         </p>
-        <p className="mt-0.5 text-xs text-muted-foreground">
+        <p style={{ color: '#64748b', fontSize: '12px', marginTop: '2px', opacity: 1, visibility: 'visible' }}>
           {notification.time_ago} · {notification.context_label}
         </p>
       </div>
