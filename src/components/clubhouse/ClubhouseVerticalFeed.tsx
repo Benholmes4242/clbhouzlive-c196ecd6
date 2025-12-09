@@ -63,6 +63,8 @@ interface ClubhouseVerticalFeedProps {
   onPostDetailsOpen?: () => void;
   onDismissNavOverlay?: () => void;
   onNavOverlayRequest?: () => void;
+  /** Fires when user enters/leaves the "top zone" (first post) */
+  onTopZoneChange?: (isAtTop: boolean) => void;
 }
 
 // Helper to compute which video IDs to keep in memory
@@ -161,7 +163,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   chromeState = 'visible',
   onPostDetailsOpen,
   onDismissNavOverlay,
-  onNavOverlayRequest
+  onNavOverlayRequest,
+  onTopZoneChange
 }) => {
   const { isVisible: topBarVisible, resetTimer: resetTopBar } = useTopBarVisibility();
   const [showVideoReactions, setShowVideoReactions] = useState(false);
@@ -747,6 +750,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const lastIndexChangeTimeRef = useRef(0);
   const hasIndexChangedOnceRef = useRef(false);
   const visualIndexTimeoutRef = useRef<number | null>(null);
+  const lastAtTopZoneRef = useRef(true); // Track top zone state for change detection
 
   // Throttled scroll handler for better performance
   const handleScroll = useCallback(() => {
@@ -797,6 +801,13 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       if (currentPost && currentPost.type !== 'video') {
         setActiveVideo(null);
       }
+      
+      // Notify parent of top zone changes (first post = top zone)
+      const atTopZone = newIndex === 0;
+      if (atTopZone !== lastAtTopZoneRef.current) {
+        lastAtTopZoneRef.current = atTopZone;
+        onTopZoneChange?.(atTopZone);
+      }
     }
 
     // Debounced loading check to prevent excessive calls
@@ -811,7 +822,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     }, 150);
 
     prevScrollTopRef.current = scrollTop;
-  }, [currentIndex, filteredPosts, hasMore, isLoadingMore, onLoadMore, onScroll]);
+  }, [currentIndex, filteredPosts, hasMore, isLoadingMore, onLoadMore, onScroll, onTopZoneChange, setActiveVideo]);
 
   // Notify parent of active video ref changes
   useEffect(() => {
