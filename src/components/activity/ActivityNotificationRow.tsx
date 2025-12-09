@@ -4,12 +4,14 @@ import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
+import { FollowBackButton } from './FollowBackButton';
 
 interface ActivityNotificationRowProps {
   notification: ActivityNotification;
   onClick: () => void;
   onMarkRead?: (id: string) => void;
   onHide?: (id: string) => void;
+  currentUserId?: string;
 }
 
 function getNotificationIcon(type: string) {
@@ -79,17 +81,24 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
   notification, 
   onClick,
   onMarkRead,
-  onHide
+  onHide,
+  currentUserId
 }) => {
-  // Use the new is_unread derived flag
   const isUnread = notification.is_unread;
+  
+  // Determine if we should show "Follow back" button
+  const showFollowBack = 
+    (notification.type === 'follow' || notification.type === 'friend_request') &&
+    notification.actor_type === 'user' &&
+    notification.actor_id &&
+    notification.actor_id !== currentUserId;
 
   return (
     <button
       onClick={onClick}
       className={cn(
         "w-full flex items-center gap-3 p-3 text-left transition-all duration-200",
-        "rounded-sq-md",
+        "rounded-sq-md relative",
         isUnread 
           ? "bg-background shadow-[0_1px_3px_rgba(0,0,0,0.06)] border border-border/40" 
           : "bg-background/50 hover:bg-background/80"
@@ -98,7 +107,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
       {/* Unread dot indicator */}
       {isUnread && (
         <span 
-          className="absolute left-1.5 h-2 w-2 rounded-full bg-primary shadow-[0_0_6px_rgba(var(--primary),0.4)]" 
+          className="absolute left-1.5 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-primary shadow-[0_0_6px_rgba(var(--primary),0.4)]" 
           aria-hidden 
         />
       )}
@@ -110,7 +119,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           alt={notification.actor_display_name || 'User'}
           size={44}
           fallback={notification.actor_display_name?.charAt(0) || '?'}
-          ringColor={getRingColorForTotalPlayed(0)} // Default ring, could be enhanced with actor's total_top100_played
+          ringColor={getRingColorForTotalPlayed(0)}
         />
         <div className="absolute -bottom-0.5 -right-0.5 h-5 w-5 rounded-full bg-background border border-border/60 flex items-center justify-center shadow-sm">
           {getNotificationIcon(notification.type)}
@@ -134,6 +143,17 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           {notification.time_ago} · {notification.context_label}
         </p>
       </div>
+
+      {/* Follow back button for follow notifications */}
+      {showFollowBack && (
+        <div className="flex-shrink-0">
+          <FollowBackButton
+            actorId={notification.actor_id!}
+            actorDisplayName={notification.actor_display_name}
+            isMock={notification.is_mock}
+          />
+        </div>
+      )}
     </button>
   );
 };
