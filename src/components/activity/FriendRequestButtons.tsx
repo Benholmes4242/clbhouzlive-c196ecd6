@@ -4,7 +4,6 @@ import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
 
 interface FriendRequestButtonsProps {
   requestId: string;
@@ -110,10 +109,13 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
     }
   };
 
-  // Already handled states - show as pills
+  // Shared base pill class for unified styling
+  const basePillClass = "inline-flex items-center justify-center rounded-full border px-4 h-9 text-xs font-semibold transition-colors";
+  
+  // Already handled states - show as pills with unified styling
   if (state === 'accepted') {
     return (
-      <span className="inline-flex h-8 items-center gap-1 rounded-full bg-emerald-500/10 px-3 text-xs font-medium text-emerald-600">
+      <span className={cn(basePillClass, "border-emerald-500 bg-emerald-500/10 text-emerald-600 gap-1")}>
         <Check className="h-3 w-3" />
         Accepted
       </span>
@@ -122,42 +124,38 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
 
   if (state === 'declined') {
     return (
-      <span className="inline-flex h-8 items-center gap-1 rounded-full bg-red-500/5 px-3 text-xs font-medium text-red-500">
+      <span className={cn(basePillClass, "border-red-400 bg-red-500/5 text-red-500 gap-1")}>
         <X className="h-3 w-3" />
         Declined
       </span>
     );
   }
 
-  // Pending state - show glassy Accept/Decline buttons
+  // Pending state - show Accept/Decline buttons with unified pill styling
   return (
     <div className="flex items-center gap-2">
-      <Button
-        variant="outline"
-        size="sm"
+      <button
         onClick={handleAccept}
         disabled={state === 'loading'}
         className={cn(
-          "h-8 rounded-full border-emerald-500 bg-emerald-500/10 px-4 text-xs font-semibold text-emerald-600",
-          "hover:bg-emerald-500/15",
+          basePillClass,
+          "border-emerald-500 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/15",
           "disabled:opacity-60 disabled:cursor-not-allowed"
         )}
       >
         {state === 'loading' ? '...' : 'Accept'}
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
+      </button>
+      <button
         onClick={handleDecline}
         disabled={state === 'loading'}
         className={cn(
-          "h-8 rounded-full border-red-400 bg-red-500/5 px-4 text-xs font-semibold text-red-500",
-          "hover:bg-red-500/10",
+          basePillClass,
+          "border-red-400 bg-red-500/5 text-red-500 hover:bg-red-500/10",
           "disabled:opacity-60 disabled:cursor-not-allowed"
         )}
       >
         Decline
-      </Button>
+      </button>
     </div>
   );
 };

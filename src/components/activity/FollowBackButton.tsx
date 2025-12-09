@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useFollow } from '@/hooks/useFollow';
 import { toast } from 'sonner';
@@ -47,29 +46,31 @@ export const FollowBackButton: React.FC<FollowBackButtonProps> = ({
     return null;
   }
 
-  // Already following - show muted "Following" state
+  // Shared base pill class for unified styling (matches FriendRequestButtons)
+  const basePillClass = "inline-flex items-center justify-center rounded-full border px-4 h-9 text-xs font-semibold transition-colors";
+
+  // Already following - show muted "Following" state with unified styling
   if (isFollowing === 'following') {
     return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-muted-foreground bg-muted/60 rounded-sq-pill">
+      <span className={cn(basePillClass, "border-border bg-muted text-foreground/80 gap-1")}>
         <Check className="h-3 w-3" />
         Following
       </span>
     );
   }
 
-  // Not following - show "Follow back" button
+  // Not following - show "Follow back" button with unified styling
   return (
-    <Button
-      size="sm"
-      variant="outline"
+    <button
       onClick={handleFollowBack}
       disabled={busy}
       className={cn(
-        "h-7 px-3 text-xs font-medium rounded-sq-pill",
-        "border-primary/40 text-primary hover:bg-primary/10 hover:text-primary"
+        basePillClass,
+        "border-emerald-500 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/15",
+        "disabled:opacity-60 disabled:cursor-not-allowed"
       )}
     >
       {busy ? 'Following...' : 'Follow back'}
-    </Button>
+    </button>
   );
 };
