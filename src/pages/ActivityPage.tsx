@@ -185,7 +185,7 @@ const ActivityPage: React.FC = () => {
         ) : isAllCaughtUp ? (
           <ActivityEmptyState tab={activeTab} isAllCaughtUp />
         ) : buckets && (
-          <div className="mt-4 space-y-6">
+          <div className="w-full mt-4 space-y-6">
             {/* New (unread) - only show if there are unread items */}
             {buckets.new.length > 0 && (
               <ActivityBucket

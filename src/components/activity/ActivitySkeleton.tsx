@@ -3,7 +3,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export const ActivitySkeleton: React.FC = () => {
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-6">
       {/* Today section skeleton */}
       <section>
         <Skeleton className="h-3 w-12 mb-2" />
