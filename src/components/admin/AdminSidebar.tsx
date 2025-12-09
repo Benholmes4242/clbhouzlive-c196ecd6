@@ -34,6 +34,7 @@ export const AdminSidebar: React.FC = () => {
     { to: "/admin/team",          label: "Team Management" },
     { to: "/admin/settings",      label: "Settings" },
     { to: "/admin/top100-geocoding", label: "Top 100 Geocoding" },
+    { to: "/admin/test-lab",       label: "Test Lab" },
     // Phase 3 additions:
     { to: "/admin/admins",        label: "Admin Members" },
     { to: "/admin/invites",       label: "Invitations" },

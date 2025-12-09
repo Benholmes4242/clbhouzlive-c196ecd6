@@ -4074,6 +4074,7 @@ export type Database = {
           is_business_verified: boolean | null
           is_official_club: boolean | null
           is_public: boolean | null
+          is_test: boolean
           is_verified_business: boolean
           last_rating_at: string | null
           location: string | null
@@ -4146,6 +4147,7 @@ export type Database = {
           is_business_verified?: boolean | null
           is_official_club?: boolean | null
           is_public?: boolean | null
+          is_test?: boolean
           is_verified_business?: boolean
           last_rating_at?: string | null
           location?: string | null
@@ -4218,6 +4220,7 @@ export type Database = {
           is_business_verified?: boolean | null
           is_official_club?: boolean | null
           is_public?: boolean | null
+          is_test?: boolean
           is_verified_business?: boolean
           last_rating_at?: string | null
           location?: string | null
