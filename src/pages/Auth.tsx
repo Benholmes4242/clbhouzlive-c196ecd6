@@ -12,8 +12,12 @@ import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import type { AuthChangeEvent } from "@supabase/supabase-js";
 
-const Auth: React.FC = () => {
-  const [isSignUp, setIsSignUp] = useState(false);
+interface AuthProps {
+  defaultSignUp?: boolean;
+}
+
+const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
+  const [isSignUp, setIsSignUp] = useState(defaultSignUp);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
