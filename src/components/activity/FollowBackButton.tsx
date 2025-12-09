@@ -59,14 +59,14 @@ export const FollowBackButton: React.FC<FollowBackButtonProps> = ({
     );
   }
 
-  // Not following - show "Follow back" button with unified styling
+  // Not following - show "Follow back" button with orange glass styling
   return (
     <button
       onClick={handleFollowBack}
       disabled={busy}
       className={cn(
         basePillClass,
-        "border-emerald-500 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/15",
+        "border-orange-500 bg-orange-500/10 text-orange-600 hover:bg-orange-500/15",
         "disabled:opacity-60 disabled:cursor-not-allowed"
       )}
     >
