@@ -136,11 +136,11 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
       {/* Text content */}
       <div className="flex-1 min-w-0">
         <p className={cn(
-          "text-sm leading-snug",
-          isUnread ? "font-medium text-foreground" : "text-foreground/90"
+          "text-sm leading-snug text-slate-900",
+          isUnread ? "font-medium" : ""
         )}>
-          <span className="font-semibold">{notification.actor_display_name}</span>{' '}
-          <span className={isUnread ? "" : "text-muted-foreground"}>
+          <span className="font-semibold text-slate-900">{notification.actor_display_name || 'Unknown User'}</span>{' '}
+          <span className="text-slate-600">
             {renderNotificationText(notification)}
           </span>
         </p>
