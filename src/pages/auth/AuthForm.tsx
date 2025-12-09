@@ -390,13 +390,13 @@ const AuthForm: React.FC<AuthFormProps> = ({
           }}
           className="placeholder:text-text-tertiary focus:border-[#D6D9DE] focus:shadow-[0_0_0_4px_rgba(247,147,30,0.06)]"
         />
-        {/* 12px reserved slot for validation messages - Apple-style */}
-        <div className="h-3 flex items-center">
+        {/* 12px reserved slot with 6px top margin for breathing room */}
+        <div className="h-3 flex items-center mt-1.5">
           {emailError && (
-            <p className="text-[11px] leading-none mt-[1px] text-red-500">{emailError}</p>
+            <p className="text-[11px] leading-none text-red-500">{emailError}</p>
           )}
           {forgotPasswordMsg && (
-            <p className={cn("text-[11px] leading-none mt-[1px]", forgotPasswordSuccess ? "text-[#3F7F41]" : "text-red-500")}>
+            <p className={cn("text-[11px] leading-none", forgotPasswordSuccess ? "text-[#3F7F41]" : "text-red-500")}>
               {forgotPasswordMsg}
             </p>
           )}
@@ -490,10 +490,10 @@ const AuthForm: React.FC<AuthFormProps> = ({
           }}
           className="placeholder:text-text-tertiary focus:border-[#D6D9DE] focus:shadow-[0_0_0_4px_rgba(247,147,30,0.06)]"
         />
-        {/* 12px reserved slot for password error - Apple-style */}
-        <div className="h-3 flex items-center">
+        {/* 12px reserved slot with 6px top margin for breathing room */}
+        <div className="h-3 flex items-center mt-1.5">
           {passwordError && (
-            <p className="text-[11px] leading-none mt-[1px] text-red-500">{passwordError}</p>
+            <p className="text-[11px] leading-none text-red-500">{passwordError}</p>
           )}
         </div>
       </div>
