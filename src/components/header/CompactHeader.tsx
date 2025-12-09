@@ -40,8 +40,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           isClubhousePage && "chrome-header",
           "fixed top-0 left-0 right-0 z-header",
           "h-14", // 56px
-          "transition-transform duration-200 ease-out",
-          // On non-Clubhouse pages, use scroll direction for hide/show
+          // On non-Clubhouse pages, use scroll direction transition + hide/show
+          // On Clubhouse, chrome-autohide.css handles the transition
+          !isClubhousePage && "transition-transform duration-200 ease-out",
           !isClubhousePage && scrollHidden && "-translate-y-full",
           className
         )}
