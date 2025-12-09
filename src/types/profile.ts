@@ -12,13 +12,13 @@ export type BusinessCategory =
   | 'tour_series'
   | 'other';
 
-export const BUSINESS_CATEGORIES: { value: BusinessCategory; label: string }[] = [
-  { value: 'golf_club', label: 'Golf Club' },
-  { value: 'brand', label: 'Brand' },
-  { value: 'coach_academy', label: 'Coach / Academy' },
-  { value: 'fitter_retail', label: 'Fitter / Retail' },
-  { value: 'tour_series', label: 'Tour / Series' },
-  { value: 'other', label: 'Other' },
+export const BUSINESS_CATEGORIES: string[] = [
+  'Golf Club',
+  'Brand',
+  'Coach / Academy',
+  'Fitter / Retail',
+  'Tour / Series',
+  'Other',
 ];
 
 export interface UserProfileData {

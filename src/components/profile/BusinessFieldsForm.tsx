@@ -58,8 +58,8 @@ export const BusinessFieldsForm: React.FC<BusinessFieldsFormProps> = ({
           </SelectTrigger>
           <SelectContent>
             {BUSINESS_CATEGORIES.map((cat) => (
-              <SelectItem key={cat.value} value={cat.value}>
-                {cat.label}
+              <SelectItem key={cat} value={cat}>
+                {cat}
               </SelectItem>
             ))}
           </SelectContent>
