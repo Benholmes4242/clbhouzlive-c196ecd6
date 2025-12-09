@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { FollowBackButton } from './FollowBackButton';
 import { FriendRequestButtons } from './FriendRequestButtons';
+import { useCancelFriendRequest } from '@/hooks/useCancelFriendRequest';
 
 interface ActivityNotificationRowProps {
   notification: ActivityNotification;
@@ -13,6 +14,14 @@ interface ActivityNotificationRowProps {
   onMarkRead?: (id: string) => void;
   onHide?: (id: string) => void;
   currentUserId?: string;
+}
+
+// Shared base pill class for unified styling
+const basePillClass = "inline-flex items-center justify-center rounded-full border px-4 h-9 text-xs font-semibold transition-colors";
+
+// Icon variants for different friend request states
+function getFriendBadgeIcon(isActive: boolean) {
+  return <Users className={cn("h-3 w-3", isActive ? "text-amber-500" : "text-muted-foreground")} />;
 }
 
 function getNotificationIcon(type: string) {
@@ -60,16 +69,6 @@ function renderNotificationText(notification: ActivityNotification): string {
       return 'tagged you in a post';
     case 'follow':
       return 'started following you';
-    case 'friend_request':
-      return 'sent you a friend request';
-    case 'friend_request_sent':
-      return ''; // Will be handled specially in the component
-    case 'friend_accepted':
-      return 'accepted your friend request';
-    case 'friend_declined':
-      return ''; // Will be handled specially in the component
-    case 'friend_cancelled':
-      return ''; // Will be handled specially in the component
     case 'message':
     case 'dm':
       return message ? `sent you a message: "${message.slice(0, 40)}${message.length > 40 ? '...' : ''}"` : 'sent you a message';
@@ -88,62 +87,26 @@ function renderNotificationText(notification: ActivityNotification): string {
   }
 }
 
-export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = ({ 
+// Reusable card wrapper component
+interface ActivityCardProps {
+  notification: ActivityNotification;
+  onClick: () => void;
+  avatar: React.ReactNode;
+  title: React.ReactNode;
+  meta: string;
+  actions?: React.ReactNode;
+}
+
+const ActivityCard: React.FC<ActivityCardProps> = ({ 
   notification, 
-  onClick,
-  onMarkRead,
-  onHide,
-  currentUserId
+  onClick, 
+  avatar, 
+  title, 
+  meta, 
+  actions 
 }) => {
   const isUnread = notification.is_unread;
   
-  // Determine if we should show "Follow back" button (only for follow, not friend_request)
-  const showFollowBack = 
-    notification.type === 'follow' &&
-    notification.actor_type === 'user' &&
-    notification.actor_id &&
-    notification.actor_id !== currentUserId;
-
-  // Determine if we should show friend request buttons (receiver, pending)
-  const showFriendRequestButtons = 
-    notification.type === 'friend_request' &&
-    notification.actor_type === 'user' &&
-    notification.actor_id &&
-    notification.actor_id !== currentUserId;
-
-  // Determine various friend state pills
-  const showFriendsPill = notification.type === 'friend_accepted';
-  const showPendingPill = notification.type === 'friend_request_sent';
-  const showDeclinedPill = notification.type === 'friend_declined';
-  const showCancelledPill = notification.type === 'friend_cancelled';
-
-  // Get request ID for friend request actions (from data or notification id)
-  const friendRequestId = notification.data?.request_id || notification.id;
-  const targetUserName = notification.data?.target_user_name || notification.actor_display_name;
-
-  // Has any CTA (friend request, follow back, or status pills)
-  const hasCTA = showFriendRequestButtons || showFollowBack || showFriendsPill || showPendingPill || showDeclinedPill || showCancelledPill;
-  const statusIcon = getNotificationIcon(notification.type);
-
-  // Build custom text for sender-side notifications
-  const getCustomText = () => {
-    if (notification.type === 'friend_request_sent') {
-      return `Friend request sent to ${targetUserName}`;
-    }
-    if (notification.type === 'friend_cancelled') {
-      return `You cancelled your friend request to ${targetUserName}`;
-    }
-    if (notification.type === 'friend_declined') {
-      return `Friend request to ${targetUserName} was declined`;
-    }
-    return null;
-  };
-  
-  const customText = getCustomText();
-
-  // Shared base pill class for unified styling
-  const basePillClass = "inline-flex items-center justify-center rounded-full border px-4 h-9 text-xs font-semibold transition-colors";
-
   return (
     <button
       onClick={onClick}
@@ -156,92 +119,250 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
       )}
     >
       <div className="flex w-full gap-3">
-        {/* LEFT: Avatar with consistent status icon placement */}
-        <div className="relative shrink-0">
-          <SquircleAvatar
-            src={notification.actor_avatar_url}
-            alt={notification.actor_display_name || 'User'}
-            size={44}
-            fallback={notification.actor_display_name?.charAt(0) || '?'}
-            ringColor={getRingColorForTotalPlayed(0)}
-          />
-          {/* Status icon - always bottom-right on avatar, consistent position */}
-          <span className="absolute bottom-0 right-0 h-5 w-5 rounded-full border-2 border-card bg-background flex items-center justify-center">
-            {statusIcon}
-          </span>
-        </div>
-
-        {/* RIGHT: Content */}
+        {avatar}
         <div className="flex-1 min-w-0">
-          {/* TOP ROW: text */}
           <p className={cn(
             "text-sm leading-snug",
             isUnread ? "text-foreground" : "text-foreground/90"
           )}>
-            {customText ? (
-              <span className={cn(isUnread ? "font-medium" : "font-normal", "text-foreground/90")}>
-                {customText}
-              </span>
-            ) : (
-              <>
-                <span className={cn(isUnread ? "font-semibold" : "font-medium")}>
-                  {notification.actor_display_name || 'Unknown User'}
-                </span>{' '}
-                <span className="font-normal text-muted-foreground">
-                  {renderNotificationText(notification)}
-                </span>
-              </>
-            )}
+            {title}
           </p>
-
-          {/* MIDDLE: timestamp */}
-          <p className="mt-1 text-xs text-muted-foreground">
-            {notification.time_ago}
-          </p>
-
-          {/* BOTTOM ROW: CTAs - aligned to bottom-right */}
-          {hasCTA && (
+          <p className="mt-1 text-xs text-muted-foreground">{meta}</p>
+          {actions && (
             <div className="mt-2 flex items-center justify-end gap-2">
-              {showFriendRequestButtons && (
-                <FriendRequestButtons
-                  requestId={friendRequestId}
-                  requesterId={notification.actor_id!}
-                  requesterName={notification.actor_display_name}
-                  isMock={notification.is_mock}
-                />
-              )}
-              {showFollowBack && (
-                <FollowBackButton
-                  actorId={notification.actor_id!}
-                  actorDisplayName={notification.actor_display_name}
-                  isMock={notification.is_mock}
-                />
-              )}
-              {showFriendsPill && (
-                <span className={cn(basePillClass, "border-border bg-muted text-foreground/80 gap-1")}>
-                  <Users className="h-3 w-3" />
-                  Friends
-                </span>
-              )}
-              {showPendingPill && (
-                <span className={cn(basePillClass, "border-border bg-muted text-foreground/60 gap-1")}>
-                  Pending
-                </span>
-              )}
-              {showDeclinedPill && (
-                <span className={cn(basePillClass, "border-red-400 bg-red-500/5 text-red-500 gap-1")}>
-                  Declined
-                </span>
-              )}
-              {showCancelledPill && (
-                <span className={cn(basePillClass, "border-border bg-muted text-foreground/60 gap-1")}>
-                  Cancelled
-                </span>
-              )}
+              {actions}
             </div>
           )}
         </div>
       </div>
     </button>
   );
+};
+
+// Avatar with status badge component
+interface AvatarWithBadgeProps {
+  notification: ActivityNotification;
+  badgeIcon: React.ReactNode;
+}
+
+const AvatarWithBadge: React.FC<AvatarWithBadgeProps> = ({ notification, badgeIcon }) => (
+  <div className="relative shrink-0">
+    <SquircleAvatar
+      src={notification.actor_avatar_url}
+      alt={notification.actor_display_name || 'User'}
+      size={44}
+      fallback={notification.actor_display_name?.charAt(0) || '?'}
+      ringColor={getRingColorForTotalPlayed(0)}
+    />
+    <span className="absolute bottom-0 right-0 h-5 w-5 rounded-full border-2 border-card bg-background flex items-center justify-center">
+      {badgeIcon}
+    </span>
+  </div>
+);
+
+export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = ({ 
+  notification, 
+  onClick,
+  onMarkRead,
+  onHide,
+  currentUserId
+}) => {
+  const cancelMutation = useCancelFriendRequest();
+  const { type, data } = notification;
+  const actorName = notification.actor_display_name || 'Unknown User';
+  const targetUserName = data?.target_user_name || actorName;
+  const isUnread = notification.is_unread;
+  const friendRequestId = data?.request_id || notification.id;
+  const status = data?.status || 'pending';
+
+  const handleCancelRequest = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (notification.is_mock) return;
+    
+    cancelMutation.mutate({
+      requestId: friendRequestId,
+      targetUserId: notification.actor_id!,
+      targetUserName,
+    });
+  };
+
+  switch (type) {
+    /**
+     * 1) RECEIVED FRIEND REQUEST
+     *    – what *you* see when someone sends a request to you.
+     */
+    case 'friend_request': {
+      // Pending – Accept / Decline shown at bottom-right of card
+      return (
+        <ActivityCard
+          notification={notification}
+          onClick={onClick}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(true)} />}
+          title={
+            <>
+              <span className={cn(isUnread ? "font-semibold" : "font-medium")}>{actorName}</span>{' '}
+              <span className="font-normal text-muted-foreground">sent you a friend request</span>
+            </>
+          }
+          meta={`${notification.time_ago} · Friends`}
+          actions={
+            <FriendRequestButtons
+              requestId={friendRequestId}
+              requesterId={notification.actor_id!}
+              requesterName={actorName}
+              isMock={notification.is_mock}
+            />
+          }
+        />
+      );
+    }
+
+    /**
+     * 2) FRIEND ACCEPTED (receiver view - you accepted their request)
+     *    – Shows "is now friends with you" with Friends pill
+     */
+    case 'friend_accepted': {
+      return (
+        <ActivityCard
+          notification={notification}
+          onClick={onClick}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(true)} />}
+          title={
+            <>
+              <span className={cn(isUnread ? "font-semibold" : "font-medium")}>{actorName}</span>{' '}
+              <span className="font-normal text-muted-foreground">accepted your friend request</span>
+            </>
+          }
+          meta={`${notification.time_ago} · Friends`}
+          actions={
+            <span className={cn(basePillClass, "border-emerald-500 bg-emerald-500/10 text-emerald-600 gap-1")}>
+              <Users className="h-3 w-3" />
+              Friends
+            </span>
+          }
+        />
+      );
+    }
+
+    /**
+     * 3) SENT FRIEND REQUEST (sender view - you sent the request)
+     *    – Pending state with optional Cancel link
+     */
+    case 'friend_request_sent': {
+      return (
+        <ActivityCard
+          notification={notification}
+          onClick={onClick}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(false)} />}
+          title={
+            <span className={cn(isUnread ? "font-medium" : "font-normal", "text-foreground/90")}>
+              Friend request sent to <span className="font-semibold">{targetUserName}</span>
+            </span>
+          }
+          meta={`${notification.time_ago} · Friends`}
+          actions={
+            <div className="flex items-center gap-2">
+              <span className={cn(basePillClass, "border-border bg-muted text-foreground/60")}>
+                Pending
+              </span>
+              <button
+                type="button"
+                className="text-xs text-muted-foreground underline hover:text-foreground/80"
+                onClick={handleCancelRequest}
+                disabled={cancelMutation.isPending}
+              >
+                {cancelMutation.isPending ? '...' : 'Cancel'}
+              </button>
+            </div>
+          }
+        />
+      );
+    }
+
+    /**
+     * 4) FRIEND DECLINED (sender view - they declined your request)
+     */
+    case 'friend_declined': {
+      return (
+        <ActivityCard
+          notification={notification}
+          onClick={onClick}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(false)} />}
+          title={
+            <span className={cn(isUnread ? "font-medium" : "font-normal", "text-foreground/90")}>
+              <span className="font-semibold">{targetUserName}</span> declined your friend request
+            </span>
+          }
+          meta={`${notification.time_ago} · Friends`}
+          actions={
+            <span className={cn(basePillClass, "border-red-400 bg-red-500/5 text-red-500")}>
+              Request declined
+            </span>
+          }
+        />
+      );
+    }
+
+    /**
+     * 5) FRIEND CANCELLED (sender view - you cancelled the request)
+     */
+    case 'friend_cancelled': {
+      return (
+        <ActivityCard
+          notification={notification}
+          onClick={onClick}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(false)} />}
+          title={
+            <span className={cn(isUnread ? "font-medium" : "font-normal", "text-foreground/90")}>
+              You cancelled your friend request to <span className="font-semibold">{targetUserName}</span>
+            </span>
+          }
+          meta={`${notification.time_ago} · Friends`}
+          actions={
+            <span className={cn(basePillClass, "border-border bg-muted text-foreground/60")}>
+              Cancelled
+            </span>
+          }
+        />
+      );
+    }
+
+    /**
+     * 6) DEFAULT – All other notification types (follow, like, comment, etc.)
+     */
+    default: {
+      const statusIcon = getNotificationIcon(type);
+      
+      // Determine if we should show "Follow back" button
+      const showFollowBack = 
+        type === 'follow' &&
+        notification.actor_type === 'user' &&
+        notification.actor_id &&
+        notification.actor_id !== currentUserId;
+
+      return (
+        <ActivityCard
+          notification={notification}
+          onClick={onClick}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <>
+              <span className={cn(isUnread ? "font-semibold" : "font-medium")}>{actorName}</span>{' '}
+              <span className="font-normal text-muted-foreground">{renderNotificationText(notification)}</span>
+            </>
+          }
+          meta={notification.time_ago}
+          actions={
+            showFollowBack ? (
+              <FollowBackButton
+                actorId={notification.actor_id!}
+                actorDisplayName={actorName}
+                isMock={notification.is_mock}
+              />
+            ) : undefined
+          }
+        />
+      );
+    }
+  }
 };
