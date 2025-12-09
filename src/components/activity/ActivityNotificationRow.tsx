@@ -1,12 +1,15 @@
 import React from 'react';
-import { ChevronRight, Heart, MessageCircle, UserPlus, Users, Bell, Mail } from 'lucide-react';
+import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2 } from 'lucide-react';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { ActivityTypePill } from './ActivityTypePill';
 import { cn } from '@/lib/utils';
 
 interface ActivityNotificationRowProps {
   notification: ActivityNotification;
   onClick: () => void;
+  onMarkRead?: (id: string) => void;
+  onHide?: (id: string) => void;
 }
 
 function getNotificationIcon(type: string) {
@@ -16,6 +19,7 @@ function getNotificationIcon(type: string) {
       return <Heart className={cn(iconClass, "text-rose-500")} />;
     case 'comment':
     case 'mention':
+    case 'tag':
       return <MessageCircle className={cn(iconClass, "text-blue-500")} />;
     case 'follow':
       return <UserPlus className={cn(iconClass, "text-emerald-500")} />;
@@ -25,6 +29,11 @@ function getNotificationIcon(type: string) {
     case 'message':
     case 'dm':
       return <Mail className={cn(iconClass, "text-violet-500")} />;
+    case 'achievement':
+      return <Trophy className={cn(iconClass, "text-amber-500")} />;
+    case 'club_update':
+    case 'course_update':
+      return <Building2 className={cn(iconClass, "text-slate-500")} />;
     default:
       return <Bell className={cn(iconClass, "text-muted-foreground")} />;
   }
@@ -66,76 +75,55 @@ function renderNotificationText(notification: ActivityNotification): string {
   }
 }
 
-function renderRightAction(notification: ActivityNotification): React.ReactNode {
-  const { type } = notification;
-  
-  const pillBase = "px-2.5 py-1 text-xs font-medium rounded-full";
-  
-  if (type === 'follow') {
-    return (
-      <span className={cn(pillBase, "border border-border bg-background text-foreground")}>
-        View
-      </span>
-    );
-  }
-  
-  if (type === 'friend_request') {
-    return (
-      <span className={cn(pillBase, "bg-foreground text-background")}>
-        Respond
-      </span>
-    );
-  }
-  
-  if (type === 'message' || type === 'dm') {
-    return (
-      <span className={cn(pillBase, "border border-border bg-background text-foreground")}>
-        Open
-      </span>
-    );
-  }
-  
-  return <ChevronRight className="h-4 w-4 text-muted-foreground" />;
-}
-
 export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = ({ 
   notification, 
-  onClick 
+  onClick,
+  onMarkRead,
+  onHide
 }) => {
   const isUnread = !notification.is_read;
 
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-3 p-3 text-left bg-transparent hover:bg-accent/50 transition-colors"
+      className={cn(
+        "w-full flex items-center gap-3 p-3 text-left transition-all duration-200",
+        "rounded-sq-md",
+        isUnread 
+          ? "bg-background shadow-[0_1px_3px_rgba(0,0,0,0.06)] border border-border/40" 
+          : "bg-background/50 hover:bg-background/80"
+      )}
     >
-      {/* Unread accent bar */}
-      <div className="flex flex-col items-center self-stretch">
-        <div
-          className={cn(
-            "w-1 rounded-full self-stretch min-h-[40px]",
-            isUnread ? "bg-primary" : "bg-transparent"
-          )}
+      {/* Unread dot indicator */}
+      {isUnread && (
+        <span 
+          className="absolute left-1.5 h-2 w-2 rounded-full bg-primary shadow-[0_0_6px_rgba(var(--primary),0.4)]" 
+          aria-hidden 
         />
-      </div>
+      )}
 
       {/* Avatar with type icon overlay */}
       <div className="relative flex-shrink-0">
         <SquircleAvatar
           src={notification.actor_avatar_url}
           alt={notification.actor_display_name || 'User'}
-          size={40}
+          size={44}
           fallback={notification.actor_display_name?.charAt(0) || '?'}
         />
-        <div className="absolute -bottom-0.5 -right-0.5 h-5 w-5 rounded-full bg-background border border-border flex items-center justify-center">
+        <div className="absolute -bottom-0.5 -right-0.5 h-5 w-5 rounded-full bg-background border border-border/60 flex items-center justify-center shadow-sm">
           {getNotificationIcon(notification.type)}
         </div>
       </div>
 
       {/* Text content */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm text-foreground leading-snug">
-          <span className="font-semibold">{notification.actor_display_name || 'Unknown User'}</span>{' '}
+        <p className={cn(
+          "text-sm leading-snug",
+          isUnread ? "text-foreground" : "text-foreground/90"
+        )}>
+          <span className={cn(isUnread ? "font-semibold" : "font-medium")}>
+            {notification.actor_display_name || 'Unknown User'}
+          </span>{' '}
           <span className="text-muted-foreground font-normal">
             {renderNotificationText(notification)}
           </span>
@@ -145,9 +133,9 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
         </p>
       </div>
 
-      {/* Right-side action */}
+      {/* Type pill on right */}
       <div className="flex-shrink-0">
-        {renderRightAction(notification)}
+        <ActivityTypePill type={notification.type} />
       </div>
     </button>
   );

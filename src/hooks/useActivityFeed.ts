@@ -11,7 +11,6 @@ export const ACTIVITY_TABS: { id: ActivityTabId; label: string }[] = [
   { id: 'following', label: 'Following' },
   { id: 'clubs', label: 'Clubs & Courses' },
   { id: 'messages', label: 'Messages' },
-  { id: 'system', label: 'System' },
 ];
 
 // Map notification types to categories
@@ -44,11 +43,30 @@ const TYPE_TO_CATEGORY: Record<string, ActivityTabId> = {
   tip: 'system',
 };
 
+export type ActivityType = 
+  | 'follow'
+  | 'friend_request'
+  | 'friend_accepted'
+  | 'mention'
+  | 'tag'
+  | 'like'
+  | 'comment'
+  | 'club_update'
+  | 'course_update'
+  | 'achievement'
+  | 'message'
+  | 'dm'
+  | 'new_post'
+  | 'system'
+  | 'app_update'
+  | 'event'
+  | 'tip';
+
 export interface ActivityNotification {
   id: string;
   created_at: string;
   is_read: boolean;
-  type: string;
+  type: ActivityType | string;
   title: string;
   message: string | null;
   actor_id: string | null;
@@ -67,10 +85,19 @@ export interface ActivityNotification {
 }
 
 export interface ActivityBuckets {
+  new: ActivityNotification[];
   today: ActivityNotification[];
   yesterday: ActivityNotification[];
   thisWeek: ActivityNotification[];
   earlier: ActivityNotification[];
+}
+
+export interface ActivityCounts {
+  new: number;
+  mentions: number;
+  follows: number;
+  clubs: number;
+  messages: number;
 }
 
 function getTimeAgo(dateString: string): string {
@@ -123,13 +150,13 @@ function getContextLabel(notification: any): string {
   return 'Activity';
 }
 
-function groupNotificationsByDateBucket(items: ActivityNotification[]): ActivityBuckets {
+function groupNotificationsByDateBucket(items: ActivityNotification[]): Omit<ActivityBuckets, 'new'> {
   const now = new Date();
   const todayStart = startOfDay(now);
   const yesterdayStart = subDays(todayStart, 1);
   const weekStart = startOfWeek(now, { weekStartsOn: 1 }); // Monday
 
-  const buckets: ActivityBuckets = {
+  const buckets: Omit<ActivityBuckets, 'new'> = {
     today: [],
     yesterday: [],
     thisWeek: [],
@@ -148,14 +175,34 @@ function groupNotificationsByDateBucket(items: ActivityNotification[]): Activity
   return buckets;
 }
 
+function computeCounts(items: ActivityNotification[]): ActivityCounts {
+  return {
+    new: items.filter(i => !i.is_read).length,
+    mentions: items.filter(i => i.type === 'mention' || i.type === 'tag').length,
+    follows: items.filter(i => i.type === 'follow' || i.type === 'friend_request' || i.type === 'friend_accepted').length,
+    clubs: items.filter(i => i.type === 'club_update' || i.type === 'course_update' || i.type === 'event').length,
+    messages: items.filter(i => i.type === 'message' || i.type === 'dm').length,
+  };
+}
+
+export interface ActivityFeedResult {
+  buckets: ActivityBuckets;
+  counts: ActivityCounts;
+  allItems: ActivityNotification[];
+}
+
 export const useActivityFeed = (tab: ActivityTabId) => {
   const { user } = useSupabaseSession();
 
   return useQuery({
     queryKey: ['activity-feed', tab, user?.id],
-    queryFn: async () => {
+    queryFn: async (): Promise<ActivityFeedResult> => {
       if (!user?.id) {
-        return { today: [], yesterday: [], thisWeek: [], earlier: [] };
+        return { 
+          buckets: { new: [], today: [], yesterday: [], thisWeek: [], earlier: [] },
+          counts: { new: 0, mentions: 0, follows: 0, clubs: 0, messages: 0 },
+          allItems: []
+        };
       }
 
       // Fetch notifications with actor profile data
@@ -217,14 +264,57 @@ export const useActivityFeed = (tab: ActivityTabId) => {
         };
       });
 
+      // Calculate counts from ALL items (before filtering by tab)
+      const counts = computeCounts(enrichedNotifications);
+
       // Filter by tab
       const filtered = tab === 'all' 
         ? enrichedNotifications 
         : enrichedNotifications.filter(n => n.category === tab);
 
-      return groupNotificationsByDateBucket(filtered);
+      // Group into date buckets
+      const dateBuckets = groupNotificationsByDateBucket(filtered);
+      
+      // Add "new" bucket (unread items)
+      const newItems = filtered.filter(i => !i.is_read);
+
+      return {
+        buckets: {
+          new: newItems,
+          ...dateBuckets,
+        },
+        counts,
+        allItems: filtered,
+      };
     },
     enabled: !!user?.id,
     staleTime: 30 * 1000, // 30 seconds
+  });
+};
+
+// Hook to get unread count for header badges
+export const useUnreadActivityCount = () => {
+  const { user } = useSupabaseSession();
+
+  return useQuery({
+    queryKey: ['activity-unread-count', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return 0;
+
+      const { count, error } = await supabase
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('is_read', false);
+
+      if (error) {
+        console.error('[useUnreadActivityCount] error', error);
+        return 0;
+      }
+
+      return count || 0;
+    },
+    enabled: !!user?.id,
+    staleTime: 30 * 1000,
   });
 };
