@@ -71,6 +71,8 @@ import { useModalContext } from '@/contexts/ModalContext';
 
 // Lazy load other pages for better code splitting and loading screen experience
 const Auth = lazy(() => import("./pages/Auth"));
+const AuthCallback = lazy(() => import("./pages/auth/AuthCallback"));
+const Signup = lazy(() => import("./pages/Signup"));
 const Clubhouse = lazy(() => import("./pages/Clubhouse"));
 const CreateProfile = lazy(() => import("./pages/CreateProfile"));
 const AccountTypeOnboarding = lazy(() => import("./pages/onboarding/AccountTypeOnboarding"));
@@ -188,6 +190,8 @@ function AppRoutes() {
       <Routes location={routesLocation}>
         <Route path="/" element={<ClubhouseWrapped />} />
         <Route path="/auth" element={<AuthWrapped />} />
+        <Route path="/auth/callback" element={<Suspense fallback={<GenericPageSkeleton />}><AuthCallback /></Suspense>} />
+        <Route path="/signup" element={<Suspense fallback={<GenericPageSkeleton />}><Signup /></Suspense>} />
         <Route path="/create-profile" element={<CreateProfile />} />
         <Route path="/onboarding/account-type" element={<Suspense fallback={<GenericPageSkeleton />}><AccountTypeOnboarding /></Suspense>} />
         <Route path="/profile" element={<ProfileWrapped />} />

@@ -1,6 +1,7 @@
 
 import React from "react";
 import { useAppLogo } from "@/hooks/useAppLogo";
+import { Link } from "react-router-dom";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -33,15 +34,22 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         />
       </div>
       {children}
-      <button
-        className="mt-4 text-sm text-muted-foreground underline-offset-4 hover:underline"
-        onClick={toggleAuthMode}
-        disabled={submitting}
-      >
-        {isSignUp
-          ? "Already have an account? Sign in"
-          : "New to clbhouz? Sign up"}
-      </button>
+      {isSignUp ? (
+        <button
+          className="mt-4 text-sm text-muted-foreground underline-offset-4 hover:underline"
+          onClick={toggleAuthMode}
+          disabled={submitting}
+        >
+          Already have an account? Sign in
+        </button>
+      ) : (
+        <Link
+          to="/signup"
+          className="mt-4 text-sm text-muted-foreground underline-offset-4 hover:underline"
+        >
+          New to clbhouz? Sign up
+        </Link>
+      )}
     </div>
   </div>
   );
