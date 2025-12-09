@@ -71,7 +71,7 @@ const ActivityPage: React.FC = () => {
     <PageRoot className="bg-bg-page pb-24">
       <CompactHeader />
       {/* Main content wrapper */}
-      <div className="max-w-[720px] mx-auto p-4 pt-20">
+      <div className="max-w-[720px] mx-auto p-4 compact-header-offset">
         {/* Header section */}
         <div className="flex justify-between items-center mb-4">
           <div className="flex flex-col">

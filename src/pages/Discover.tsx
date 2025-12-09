@@ -203,7 +203,7 @@ const Discover = () => {
     <PageRoot className="min-h-screen bg-background text-foreground">
       <CompactHeader />
       <FadeInContent>
-        <main className="pb-20 pt-14">
+        <main className="pb-20 compact-header-offset">
             {/* Static Tabs */}
             <div className="relative z-30">
               {/* Segmented Control Tabs */}

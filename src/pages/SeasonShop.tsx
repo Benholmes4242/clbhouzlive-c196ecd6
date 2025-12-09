@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Lock, Sparkles, Coins } from 'lucide-react';
+import CompactHeader from '@/components/header/CompactHeader';
+import { PageRoot } from '@/components/layout/PageRoot';
 
 const rarityColors = {
   legendary: 'from-yellow-500 to-orange-500',
@@ -68,127 +70,131 @@ export default function SeasonShop() {
     : shopItems?.filter(item => item.category === selectedCategory);
 
   return (
-    <div className="min-h-screen pb-24 pt-20">
-      {/* Header */}
-      <div className="px-4 py-6 bg-gradient-to-b from-primary/10 to-background">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-2">Season Shop</h1>
-          <p className="text-muted-foreground mb-4">
-            Unlock exclusive cosmetics for {currentSeason?.name || 'the current season'}
-          </p>
-          
-          <div className="flex items-center gap-2 bg-card p-3 rounded-lg">
-            <Coins className="w-5 h-5 text-yellow-500" />
-            <span className="font-semibold">{currency}</span>
-            <span className="text-sm text-muted-foreground">Season Coins</span>
+    <PageRoot className="min-h-screen bg-background pb-24">
+      <CompactHeader />
+      
+      <div className="compact-header-offset">
+        {/* Header */}
+        <div className="px-4 py-6 bg-gradient-to-b from-primary/10 to-background">
+          <div className="max-w-4xl mx-auto">
+            <h1 className="text-3xl font-bold mb-2">Season Shop</h1>
+            <p className="text-muted-foreground mb-4">
+              Unlock exclusive cosmetics for {currentSeason?.name || 'the current season'}
+            </p>
+            
+            <div className="flex items-center gap-2 bg-card p-3 rounded-lg">
+              <Coins className="w-5 h-5 text-yellow-500" />
+              <span className="font-semibold">{currency}</span>
+              <span className="text-sm text-muted-foreground">Season Coins</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Category Tabs */}
-      <div className="px-4 pt-6 max-w-4xl mx-auto">
-        <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="w-full">
-          <TabsList className="w-full flex overflow-x-auto">
-            {categories.map(cat => (
-              <TabsTrigger key={cat.id} value={cat.id} className="flex-1 whitespace-nowrap">
-                {cat.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
-      </div>
+        {/* Category Tabs */}
+        <div className="px-4 pt-6 max-w-4xl mx-auto">
+          <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="w-full">
+            <TabsList className="w-full flex overflow-x-auto">
+              {categories.map(cat => (
+                <TabsTrigger key={cat.id} value={cat.id} className="flex-1 whitespace-nowrap">
+                  {cat.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
 
-      {/* Items Grid */}
-      <div className="px-4 py-6 max-w-4xl mx-auto">
-        {isLoadingShop ? (
-          <div className="text-center py-12 text-muted-foreground">Loading shop...</div>
-        ) : filteredItems && filteredItems.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredItems.map(item => {
-              const unlocked = isUnlocked(item.id);
-              const canBuy = canUnlock(item);
-              const isPremiumLocked = item.is_premium_only && !hasPremiumPass;
+        {/* Items Grid */}
+        <div className="px-4 py-6 max-w-4xl mx-auto">
+          {isLoadingShop ? (
+            <div className="text-center py-12 text-muted-foreground">Loading shop...</div>
+          ) : filteredItems && filteredItems.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredItems.map(item => {
+                const unlocked = isUnlocked(item.id);
+                const canBuy = canUnlock(item);
+                const isPremiumLocked = item.is_premium_only && !hasPremiumPass;
 
-              return (
-                <Card 
-                  key={item.id}
-                  className={`
-                    relative overflow-hidden transition-all duration-300
-                    ${rarityGlows[item.rarity]}
-                    ${unlocked ? 'opacity-75' : ''}
-                  `}
-                >
-                  {/* Rarity gradient border */}
-                  <div className={`
-                    absolute inset-0 opacity-50
-                    bg-gradient-to-br ${rarityColors[item.rarity]}
-                    -z-10
-                  `} />
-                  
-                  <div className="p-4 bg-card/95 backdrop-blur-sm">
-                    {/* Header */}
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <h3 className="font-semibold mb-1">{item.name}</h3>
-                        <Badge 
-                          variant="outline" 
-                          className={`
-                            text-xs
-                            bg-gradient-to-r ${rarityColors[item.rarity]}
-                            border-none text-white
-                          `}
-                        >
-                          {item.rarity}
-                        </Badge>
-                      </div>
-                      
-                      {item.is_premium_only && (
-                        <Sparkles className="w-4 h-4 text-yellow-500" />
-                      )}
-                    </div>
-
-                    {/* Description */}
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                      {item.description}
-                    </p>
-
-                    {/* Price & Action */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1">
-                        <Coins className="w-4 h-4 text-yellow-500" />
-                        <span className="font-semibold">{item.cost}</span>
+                return (
+                  <Card 
+                    key={item.id}
+                    className={`
+                      relative overflow-hidden transition-all duration-300
+                      ${rarityGlows[item.rarity]}
+                      ${unlocked ? 'opacity-75' : ''}
+                    `}
+                  >
+                    {/* Rarity gradient border */}
+                    <div className={`
+                      absolute inset-0 opacity-50
+                      bg-gradient-to-br ${rarityColors[item.rarity]}
+                      -z-10
+                    `} />
+                    
+                    <div className="p-4 bg-card/95 backdrop-blur-sm">
+                      {/* Header */}
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <h3 className="font-semibold mb-1">{item.name}</h3>
+                          <Badge 
+                            variant="outline" 
+                            className={`
+                              text-xs
+                              bg-gradient-to-r ${rarityColors[item.rarity]}
+                              border-none text-white
+                            `}
+                          >
+                            {item.rarity}
+                          </Badge>
+                        </div>
+                        
+                        {item.is_premium_only && (
+                          <Sparkles className="w-4 h-4 text-yellow-500" />
+                        )}
                       </div>
 
-                      {unlocked ? (
-                        <Button size="sm" variant="outline" disabled>
-                          Owned
-                        </Button>
-                      ) : isPremiumLocked ? (
-                        <Button size="sm" variant="outline" disabled>
-                          <Lock className="w-4 h-4 mr-1" />
-                          Premium
-                        </Button>
-                      ) : (
-                        <Button
-                          size="sm"
-                          disabled={!canBuy || isUnlocking}
-                          onClick={() => unlockItem({ itemId: item.id, cost: item.cost })}
-                        >
-                          Unlock
-                        </Button>
-                      )}
+                      {/* Description */}
+                      <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                        {item.description}
+                      </p>
+
+                      {/* Price & Action */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1">
+                          <Coins className="w-4 h-4 text-yellow-500" />
+                          <span className="font-semibold">{item.cost}</span>
+                        </div>
+
+                        {unlocked ? (
+                          <Button size="sm" variant="outline" disabled>
+                            Owned
+                          </Button>
+                        ) : isPremiumLocked ? (
+                          <Button size="sm" variant="outline" disabled>
+                            <Lock className="w-4 h-4 mr-1" />
+                            Premium
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            disabled={!canBuy || isUnlocking}
+                            onClick={() => unlockItem({ itemId: item.id, cost: item.cost })}
+                          >
+                            Unlock
+                          </Button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </Card>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="text-center py-12 text-muted-foreground">
-            No items available in this category
-          </div>
-        )}
+                  </Card>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-muted-foreground">
+              No items available in this category
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </PageRoot>
   );
 }
