@@ -409,8 +409,8 @@ const AuthForm: React.FC<AuthFormProps> = ({
           style={{ color: '#5E666D', fontSize: '14px' }}
         >
           {isSignUp 
-            ? "Join clbhouz to share your golf moments." 
-            : "Sign in to jump back into your golf moments."}
+            ? "Join clbhouz to share your golf moments" 
+            : "Sign in to jump back into your golf moments"}
         </p>
       </div>
       
@@ -462,7 +462,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
             className="mb-2 text-xs"
             style={{ color: '#5E666D', fontSize: '12px' }}
           >
-            This will be your @handle on clbhouz.
+            This will be your @handle on clbhouz
           </p>
           <div className="relative">
             <input
