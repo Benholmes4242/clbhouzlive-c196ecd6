@@ -20,9 +20,13 @@ import {
   useBusyDayActivity,
   useFollowSwapScenario,
   useResetTestState,
+  // Preset "Lives" hooks
+  useNewUserOnboardingWeek,
+  useHighEngagementCreatorDay,
+  useQuietDayThenSpike,
 } from '@/hooks/useAdminTestActions';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { Users, UserPlus, Heart, MessageCircle, AtSign, Trash2, AlertCircle, Check, Zap, RotateCcw } from 'lucide-react';
+import { Users, UserPlus, Heart, MessageCircle, AtSign, Trash2, AlertCircle, Check, Zap, RotateCcw, Sparkles } from 'lucide-react';
 
 // Reusable button component
 const TestButton: React.FC<{
@@ -119,6 +123,11 @@ export function AdminTestLabPage() {
   const followSwapScenario = useFollowSwapScenario();
   const resetTestState = useResetTestState();
 
+  // Preset "Lives" hooks
+  const newUserOnboardingWeek = useNewUserOnboardingWeek();
+  const highEngagementCreatorDay = useHighEngagementCreatorDay();
+  const quietDayThenSpike = useQuietDayThenSpike();
+
   // Target is always the current user for now
   const targetUserId = user?.id;
 
@@ -127,7 +136,10 @@ export function AdminTestLabPage() {
     friendRequestHandshake.isPending || 
     busyDayActivity.isPending || 
     followSwapScenario.isPending || 
-    resetTestState.isPending;
+    resetTestState.isPending ||
+    newUserOnboardingWeek.isPending ||
+    highEngagementCreatorDay.isPending ||
+    quietDayThenSpike.isPending;
 
   if (!user) {
     return (
@@ -264,6 +276,45 @@ export function AdminTestLabPage() {
               <span>Running scenario...</span>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Preset "Lives" Section */}
+      {testUser && targetUserId && (
+        <div className="rounded-sq-md border-2 border-amber-500/20 bg-amber-500/5 p-4 space-y-4">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-amber-600" />
+            <h2 className="text-sm font-semibold tracking-wide uppercase">Preset "Lives"</h2>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Simulate different notification patterns to test how the Activity feed looks and feels.
+          </p>
+
+          <div className="space-y-2">
+            <ScenarioButton
+              emoji="🆕"
+              label="New user onboarding week"
+              description="Gentle, varied activity over days"
+              onClick={() => newUserOnboardingWeek.mutate(targetUserId)}
+              loading={newUserOnboardingWeek.isPending}
+            />
+
+            <ScenarioButton
+              emoji="🚀"
+              label="High-engagement creator day"
+              description="Likes, follows, comments in 24h"
+              onClick={() => highEngagementCreatorDay.mutate(targetUserId)}
+              loading={highEngagementCreatorDay.isPending}
+            />
+
+            <ScenarioButton
+              emoji="📉"
+              label="Quiet day → spike"
+              description="Almost nothing, then a burst"
+              onClick={() => quietDayThenSpike.mutate(targetUserId)}
+              loading={quietDayThenSpike.isPending}
+            />
+          </div>
         </div>
       )}
 

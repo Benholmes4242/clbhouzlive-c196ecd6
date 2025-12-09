@@ -992,3 +992,452 @@ export function useResetTestState() {
     },
   });
 }
+
+// ============================================
+// PRESET "LIVES" SCENARIOS
+// ============================================
+
+/**
+ * Scenario: New user onboarding week
+ * Light, friendly activity spread over several "days"
+ */
+export function useNewUserOnboardingWeek() {
+  const queryClient = useQueryClient();
+  const { data: testUser } = useTestUser();
+
+  return useMutation({
+    mutationFn: async (targetUserId: string) => {
+      if (!testUser) throw new Error('Test user not configured');
+
+      const now = new Date();
+
+      // Clear existing test data first
+      await supabase
+        .from('notifications')
+        .delete()
+        .eq('user_id', targetUserId)
+        .eq('actor_id', testUser.id);
+
+      await supabase
+        .from('user_friends')
+        .delete()
+        .or(`and(user_id.eq.${testUser.id},friend_id.eq.${targetUserId}),and(user_id.eq.${targetUserId},friend_id.eq.${testUser.id})`);
+
+      await supabase
+        .from('user_follows')
+        .delete()
+        .eq('follower_id', testUser.id)
+        .eq('following_id', targetUserId);
+
+      const notifications = [];
+
+      // Day 1 - Welcome follow (5 days ago)
+      await supabase
+        .from('user_follows')
+        .insert({
+          follower_id: testUser.id,
+          following_id: targetUserId,
+        });
+
+      notifications.push({
+        user_id: targetUserId,
+        actor_id: testUser.id,
+        type: 'follow',
+        title: 'New follower',
+        entity_type: 'profile',
+        entity_id: testUser.id,
+        is_read: true,
+        created_at: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+      });
+
+      // Day 2 - First like + comment (4 days ago)
+      notifications.push({
+        user_id: targetUserId,
+        actor_id: testUser.id,
+        type: 'like',
+        title: 'Liked your post',
+        entity_type: 'post',
+        entity_id: 'mock-post-welcome-1',
+        is_read: true,
+        created_at: new Date(now.getTime() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+      });
+
+      notifications.push({
+        user_id: targetUserId,
+        actor_id: testUser.id,
+        type: 'comment',
+        title: 'Commented on your post',
+        message: 'Nice first post - swing is looking solid!',
+        entity_type: 'post',
+        entity_id: 'mock-post-welcome-1',
+        is_read: true,
+        created_at: new Date(now.getTime() - 4 * 24 * 60 * 60 * 1000 + 30 * 60 * 1000).toISOString(),
+      });
+
+      // Day 3 - Friend request (3 days ago)
+      const { data: friendRequest } = await supabase
+        .from('user_friends')
+        .insert({
+          user_id: testUser.id,
+          friend_id: targetUserId,
+          status: 'pending',
+        })
+        .select()
+        .single();
+
+      if (friendRequest) {
+        notifications.push({
+          user_id: targetUserId,
+          actor_id: testUser.id,
+          type: 'friend_request',
+          title: 'Friend request',
+          entity_type: 'friend_request',
+          entity_id: friendRequest.id,
+          is_read: false,
+          data: { request_id: friendRequest.id },
+          created_at: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+        });
+      }
+
+      // Day 4 - Mention (2 days ago)
+      notifications.push({
+        user_id: targetUserId,
+        actor_id: testUser.id,
+        type: 'mention',
+        title: 'Mentioned you in a post',
+        message: 'Great playing with @you this morning!',
+        entity_type: 'post',
+        entity_id: 'mock-post-mention-welcome',
+        is_read: false,
+        created_at: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      });
+
+      // Day 5 - Another like (1 day ago)
+      notifications.push({
+        user_id: targetUserId,
+        actor_id: testUser.id,
+        type: 'like',
+        title: 'Liked your post',
+        entity_type: 'post',
+        entity_id: 'mock-post-welcome-2',
+        is_read: false,
+        created_at: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+      });
+
+      // Insert all notifications
+      await supabase.from('notifications').insert(notifications);
+
+      return { success: true, count: notifications.length };
+    },
+    onSuccess: (data) => {
+      toast.success(`New user onboarding week created`, {
+        description: `${data?.count || 6} activities spread over 5 days`,
+        position: 'top-center',
+      });
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to create onboarding week', {
+        position: 'top-center',
+      });
+    },
+  });
+}
+
+/**
+ * Scenario: High-engagement creator day
+ * Many likes, comments, follows and mentions within 24 hours
+ */
+export function useHighEngagementCreatorDay() {
+  const queryClient = useQueryClient();
+  const { data: testUser } = useTestUser();
+
+  return useMutation({
+    mutationFn: async (targetUserId: string) => {
+      if (!testUser) throw new Error('Test user not configured');
+
+      const now = new Date();
+
+      // Clear existing test notifications
+      await supabase
+        .from('notifications')
+        .delete()
+        .eq('user_id', targetUserId)
+        .eq('actor_id', testUser.id);
+
+      const notifications = [];
+
+      // Follow from Test User (start of day)
+      await supabase
+        .from('user_follows')
+        .upsert({
+          follower_id: testUser.id,
+          following_id: targetUserId,
+        }, { onConflict: 'follower_id,following_id' });
+
+      notifications.push({
+        user_id: targetUserId,
+        actor_id: testUser.id,
+        type: 'follow',
+        title: 'New follower',
+        entity_type: 'profile',
+        entity_id: testUser.id,
+        is_read: false,
+        created_at: new Date(now.getTime() - 23 * 60 * 60 * 1000).toISOString(),
+      });
+
+      // Burst of likes throughout the day (8 likes)
+      for (let i = 0; i < 8; i++) {
+        notifications.push({
+          user_id: targetUserId,
+          actor_id: testUser.id,
+          type: 'like',
+          title: 'Liked your post',
+          entity_type: 'post',
+          entity_id: `mock-post-creator-${i}`,
+          is_read: i > 4, // Some read, most unread
+          created_at: new Date(now.getTime() - (20 - i * 2) * 60 * 60 * 1000).toISOString(),
+        });
+      }
+
+      // Engaged comments
+      const comments = [
+        'This angle of the 17th tee shot is unreal!',
+        'Course looks pure, what did you shoot?',
+        'Love the tempo on that swing.',
+        'Your course content is the best on here.',
+      ];
+      
+      for (let i = 0; i < comments.length; i++) {
+        notifications.push({
+          user_id: targetUserId,
+          actor_id: testUser.id,
+          type: 'comment',
+          title: 'Commented on your post',
+          message: comments[i],
+          entity_type: 'post',
+          entity_id: `mock-post-creator-comment-${i}`,
+          is_read: false,
+          created_at: new Date(now.getTime() - (10 - i * 2) * 60 * 60 * 1000).toISOString(),
+        });
+      }
+
+      // Multiple mentions
+      const mentions = [
+        'Everyone should follow @you for the best course content',
+        'Just played the course @you recommended - amazing!',
+        'Tag @you if you want swing tips',
+      ];
+
+      for (let i = 0; i < mentions.length; i++) {
+        notifications.push({
+          user_id: targetUserId,
+          actor_id: testUser.id,
+          type: 'mention',
+          title: 'Mentioned you in a post',
+          message: mentions[i],
+          entity_type: 'post',
+          entity_id: `mock-post-creator-mention-${i}`,
+          is_read: false,
+          created_at: new Date(now.getTime() - (5 - i) * 60 * 60 * 1000).toISOString(),
+        });
+      }
+
+      // Recent friend request
+      await supabase
+        .from('user_friends')
+        .delete()
+        .or(`and(user_id.eq.${testUser.id},friend_id.eq.${targetUserId}),and(user_id.eq.${targetUserId},friend_id.eq.${testUser.id})`);
+
+      const { data: friendRequest } = await supabase
+        .from('user_friends')
+        .insert({
+          user_id: testUser.id,
+          friend_id: targetUserId,
+          status: 'pending',
+        })
+        .select()
+        .single();
+
+      if (friendRequest) {
+        notifications.push({
+          user_id: targetUserId,
+          actor_id: testUser.id,
+          type: 'friend_request',
+          title: 'Friend request',
+          entity_type: 'friend_request',
+          entity_id: friendRequest.id,
+          is_read: false,
+          data: { request_id: friendRequest.id },
+          created_at: new Date(now.getTime() - 30 * 60 * 1000).toISOString(), // 30 min ago
+        });
+      }
+
+      // Insert all notifications
+      await supabase.from('notifications').insert(notifications);
+
+      return { success: true, count: notifications.length };
+    },
+    onSuccess: (data) => {
+      toast.success(`High-engagement creator day created`, {
+        description: `${data?.count || 18}+ interactions in 24 hours`,
+        position: 'top-center',
+      });
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to create creator day', {
+        position: 'top-center',
+      });
+    },
+  });
+}
+
+/**
+ * Scenario: Quiet day then spike
+ * Almost no activity, then a burst of notifications
+ */
+export function useQuietDayThenSpike() {
+  const queryClient = useQueryClient();
+  const { data: testUser } = useTestUser();
+
+  return useMutation({
+    mutationFn: async (targetUserId: string) => {
+      if (!testUser) throw new Error('Test user not configured');
+
+      const now = new Date();
+
+      // Clear existing test notifications
+      await supabase
+        .from('notifications')
+        .delete()
+        .eq('user_id', targetUserId)
+        .eq('actor_id', testUser.id);
+
+      const notifications = [];
+
+      // QUIET PERIOD - just one old notification (12 hours ago)
+      notifications.push({
+        user_id: targetUserId,
+        actor_id: testUser.id,
+        type: 'like',
+        title: 'Liked your post',
+        entity_type: 'post',
+        entity_id: 'mock-post-quiet-1',
+        is_read: true, // Already seen
+        created_at: new Date(now.getTime() - 12 * 60 * 60 * 1000).toISOString(),
+      });
+
+      // SPIKE - Multiple notifications in the last 30 minutes
+      
+      // Follow
+      await supabase
+        .from('user_follows')
+        .upsert({
+          follower_id: testUser.id,
+          following_id: targetUserId,
+        }, { onConflict: 'follower_id,following_id' });
+
+      notifications.push({
+        user_id: targetUserId,
+        actor_id: testUser.id,
+        type: 'follow',
+        title: 'New follower',
+        entity_type: 'profile',
+        entity_id: testUser.id,
+        is_read: false,
+        created_at: new Date(now.getTime() - 25 * 60 * 1000).toISOString(), // 25 min ago
+      });
+
+      // Friend request
+      await supabase
+        .from('user_friends')
+        .delete()
+        .or(`and(user_id.eq.${testUser.id},friend_id.eq.${targetUserId}),and(user_id.eq.${targetUserId},friend_id.eq.${testUser.id})`);
+
+      const { data: friendRequest } = await supabase
+        .from('user_friends')
+        .insert({
+          user_id: testUser.id,
+          friend_id: targetUserId,
+          status: 'pending',
+        })
+        .select()
+        .single();
+
+      if (friendRequest) {
+        notifications.push({
+          user_id: targetUserId,
+          actor_id: testUser.id,
+          type: 'friend_request',
+          title: 'Friend request',
+          entity_type: 'friend_request',
+          entity_id: friendRequest.id,
+          is_read: false,
+          data: { request_id: friendRequest.id },
+          created_at: new Date(now.getTime() - 20 * 60 * 1000).toISOString(), // 20 min ago
+        });
+      }
+
+      // Quick burst of likes
+      for (let i = 0; i < 3; i++) {
+        notifications.push({
+          user_id: targetUserId,
+          actor_id: testUser.id,
+          type: 'like',
+          title: 'Liked your post',
+          entity_type: 'post',
+          entity_id: `mock-post-spike-${i}`,
+          is_read: false,
+          created_at: new Date(now.getTime() - (15 - i * 3) * 60 * 1000).toISOString(),
+        });
+      }
+
+      // Comment that wakes things up
+      notifications.push({
+        user_id: targetUserId,
+        actor_id: testUser.id,
+        type: 'comment',
+        title: 'Commented on your post',
+        message: 'Have not seen you post in a while - we miss your rounds!',
+        entity_type: 'post',
+        entity_id: 'mock-post-spike-comment',
+        is_read: false,
+        created_at: new Date(now.getTime() - 5 * 60 * 1000).toISOString(), // 5 min ago
+      });
+
+      // Mention (most recent)
+      notifications.push({
+        user_id: targetUserId,
+        actor_id: testUser.id,
+        type: 'mention',
+        title: 'Mentioned you in a post',
+        message: 'Need to get @you back on the course this weekend',
+        entity_type: 'post',
+        entity_id: 'mock-post-spike-mention',
+        is_read: false,
+        created_at: new Date(now.getTime() - 2 * 60 * 1000).toISOString(), // 2 min ago
+      });
+
+      // Insert all notifications
+      await supabase.from('notifications').insert(notifications);
+
+      return { success: true, count: notifications.length };
+    },
+    onSuccess: (data) => {
+      toast.success(`Quiet day then spike created`, {
+        description: `1 old notification + ${(data?.count || 9) - 1} new in last 30 min`,
+        position: 'top-center',
+      });
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to create spike scenario', {
+        position: 'top-center',
+      });
+    },
+  });
+}
