@@ -1,5 +1,6 @@
 import React from 'react';
-import { Globe, Pencil } from 'lucide-react';
+import { Globe, Pencil, Building2, MapPin } from 'lucide-react';
+import { BUSINESS_CATEGORIES, BusinessCategory } from '@/types/profile';
 
 interface ProfileHeaderCardProps {
   displayName: string;
@@ -11,6 +12,9 @@ interface ProfileHeaderCardProps {
   websiteUrl?: string | null;
   location?: string | null;
   userType?: string | null;
+  businessName?: string | null;
+  businessCategory?: string | null;
+  businessLocation?: string | null;
   // Profile type
   isPersonal: boolean;
   isOwnProfile: boolean;
@@ -27,6 +31,9 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   handicap,
   websiteUrl,
   location,
+  businessName,
+  businessCategory,
+  businessLocation,
   isPersonal,
   isOwnProfile,
   onCustomiseClick,
@@ -41,16 +48,43 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
     return url.startsWith('http') ? url : `https://${url}`;
   };
 
+  // Get business category label
+  const getCategoryLabel = (category: string | null | undefined): string => {
+    if (!category) return '';
+    const found = BUSINESS_CATEGORIES.find(c => c.value === category);
+    return found ? found.label : category;
+  };
+
+  // Display name for business profiles uses business_name if available
+  const effectiveDisplayName = !isPersonal && businessName ? businessName : displayName;
+  
+  // Location for business profiles
+  const effectiveLocation = !isPersonal ? (businessLocation || location) : null;
+
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-1.5 md:gap-2">
       {/* Row 1: Name */}
       <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-foreground text-center">
-        {displayName}
+        {effectiveDisplayName}
       </h1>
 
-      {/* Row 2: Username */}
-      <div className="text-sm text-slate-500 text-center">
-        @{username}
+      {/* Row 2: Username + Business indicators */}
+      <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-slate-500">
+        <span>@{username}</span>
+        
+        {!isPersonal && (
+          <>
+            <span className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground">
+              <Building2 className="w-3 h-3" />
+              Business
+            </span>
+            {businessCategory && (
+              <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                {getCategoryLabel(businessCategory)}
+              </span>
+            )}
+          </>
+        )}
       </div>
 
       {/* Row 3: Club (personal) or Location (business) */}
@@ -59,13 +93,14 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
           <span className="font-semibold text-slate-800">{homeClub}</span>
         </div>
       )}
-      {!isPersonal && location && (
-        <div className="text-sm text-center">
-          <span className="font-semibold text-slate-800">{location}</span>
+      {!isPersonal && effectiveLocation && (
+        <div className="flex items-center gap-1 text-sm text-center">
+          <MapPin className="w-3.5 h-3.5 text-slate-500" />
+          <span className="text-slate-600">{effectiveLocation}</span>
         </div>
       )}
 
-      {/* Row 4: HCP pill centered + edit button on right */}
+      {/* Row 4: HCP pill centered + edit button on right (personal only) */}
       {isPersonal && handicap != null && (
         <div className="relative w-full flex justify-center items-center">
           <span className="inline-flex items-center px-3 py-1 rounded-full bg-muted text-[11px] md:text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -83,6 +118,19 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
             </button>
           )}
         </div>
+      )}
+
+      {/* Edit button for business profiles without handicap */}
+      {!isPersonal && isOwnProfile && onCustomiseClick && (
+        <button
+          type="button"
+          onClick={onCustomiseClick}
+          aria-label="Edit profile"
+          className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-muted text-xs text-muted-foreground hover:bg-muted/80 transition"
+        >
+          <Pencil className="h-3 w-3" />
+          Edit profile
+        </button>
       )}
       
       {/* Website - Business profiles */}

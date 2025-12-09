@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
 import { useProfileActions } from './actions/useProfileActions';
 import { Button } from '@/components/ui/button';
-import { Check, UserPlus, Clock, UserCheck, X, MessageCircle } from 'lucide-react';
+import { Check, UserPlus, Clock, UserCheck, X, MessageCircle, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useFollow } from '@/hooks/useFollow';
 import { useFriendship } from '@/hooks/useFriendship';
+import { getProfileType } from '@/types/profile';
 
 interface UserProfileActionsProps {
   targetUserId: string;
@@ -15,6 +16,9 @@ interface UserProfileActionsProps {
   username: string;
   targetUserType?: string;
   currentUserType?: string;
+  // Business profile fields
+  profileType?: 'personal' | 'business';
+  businessWebsite?: string | null;
 }
 
 const UserProfileActions: React.FC<UserProfileActionsProps> = ({
@@ -22,12 +26,20 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
   currentUserId,
   username,
   targetUserType = 'individual',
-  currentUserType = 'individual'
+  currentUserType = 'individual',
+  profileType,
+  businessWebsite
 }) => {
   const navigate = useNavigate();
   
+  // Determine if target is a business profile
+  const isBusiness = profileType === 'business' || 
+    (targetUserType && !['individual', 'personal'].includes(targetUserType));
+  
   // Use the new hooks
   const { isFollowing: followState, busy: followBusy, toggle: toggleFollow, ensureInitial } = useFollow(targetUserId);
+  
+  // Only use friendship hook for personal profiles
   const { 
     status: friendStatus, 
     isLoading: friendLoading, 
@@ -36,14 +48,14 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
     cancelRequest,
     acceptRequest,
     declineRequest,
-  } = useFriendship(targetUserId);
+  } = useFriendship(isBusiness ? undefined : targetUserId);
 
   // Initialize follow state on mount
   useEffect(() => {
     ensureInitial();
   }, [ensureInitial]);
 
-  // Check if target user follows the current user
+  // Check if target user follows the current user (only for personal profiles)
   const { data: targetUserFollowsMe = false } = useQuery({
     queryKey: ['userFollowsMe', targetUserId, currentUserId],
     queryFn: async () => {
@@ -56,18 +68,28 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
       
       return !!data;
     },
-    enabled: !!targetUserId && !!currentUserId,
+    enabled: !!targetUserId && !!currentUserId && !isBusiness,
   });
 
   const handleMessageClick = () => {
     navigate(`/messages?friend=${targetUserId}`);
   };
 
-  const isLoading = followState === 'unknown' || friendLoading;
-  const isUpdating = followBusy || friendUpdating;
+  const handleWebsiteClick = () => {
+    if (businessWebsite) {
+      const url = businessWebsite.startsWith('http') ? businessWebsite : `https://${businessWebsite}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  const isLoading = followState === 'unknown' || (!isBusiness && friendLoading);
+  const isUpdating = followBusy || (!isBusiness && friendUpdating);
   const following = followState === 'following';
 
   const renderFriendButton = () => {
+    // No friend buttons for business profiles
+    if (isBusiness) return null;
+    
     switch (friendStatus) {
       case 'friends':
         return (
@@ -142,8 +164,8 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
     }
   };
 
-  // Don't show actions if blocked
-  if (friendStatus === 'blocked') {
+  // Don't show actions if blocked (only applicable for personal profiles)
+  if (!isBusiness && friendStatus === 'blocked') {
     return null;
   }
 
@@ -156,7 +178,7 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
           WebkitOverflowScrolling: 'touch'
         }}
       >
-        {/* Follow Button */}
+        {/* Follow Button - shown for both personal and business */}
         <Button
           variant={following ? "chip-active" : "gradient"}
           size="chip"
@@ -174,11 +196,11 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
           )}
         </Button>
 
-        {/* Friend Button(s) */}
+        {/* Friend Button(s) - only for personal profiles */}
         {renderFriendButton()}
 
-        {/* Follows You Badge */}
-        {targetUserFollowsMe && (
+        {/* Follows You Badge - only for personal profiles */}
+        {!isBusiness && targetUserFollowsMe && (
           <div className="px-2 py-1 text-xs h-7 flex-shrink-0 bg-muted text-muted-foreground rounded-sq-sm flex items-center">
             Follows you
           </div>
@@ -194,6 +216,19 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
           <MessageCircle className="w-3 h-3 mr-1" />
           Message
         </Button>
+
+        {/* Website Button - only for business profiles with website */}
+        {isBusiness && businessWebsite && (
+          <Button
+            variant="outline"
+            size="chip"
+            onClick={handleWebsiteClick}
+            className="flex-shrink-0"
+          >
+            <ExternalLink className="w-3 h-3 mr-1" />
+            Website
+          </Button>
+        )}
       </div>
     </div>
   );

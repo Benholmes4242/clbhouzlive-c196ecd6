@@ -1,6 +1,8 @@
 import React from 'react';
 import MiniProfileSheet from './MiniProfileSheet';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { getProfileDisplayName, getProfileType } from '@/types/profile';
+import { BUSINESS_CATEGORIES } from '@/types/profile';
 
 interface MiniProfileSheetWithDataProps {
   userId: string | null;
@@ -44,14 +46,29 @@ const MiniProfileSheetWithData: React.FC<MiniProfileSheetWithDataProps> = ({
 
   if (!profileData) return null;
 
+  const profileType = getProfileType(profileData);
+  const displayName = getProfileDisplayName(profileData);
+  
+  // Get category label for business profiles
+  const getCategoryLabel = (category: string | null | undefined): string => {
+    if (!category) return '';
+    const found = BUSINESS_CATEGORIES.find(c => c.value === category);
+    return found ? found.label : category;
+  };
+
   const user = {
     id: profileData.id,
-    name: profileData.display_name || 'Unknown User',
+    name: displayName || 'Unknown User',
     avatar: profileData.profile_photo_url || undefined,
     username: profileData.username || undefined,
     homeClub: profileData.home_club || undefined,
     handicap: profileData.eg_handicap_index || undefined,
-    isFollowing: false // This would need to be fetched from a follows table
+    isFollowing: false, // This would need to be fetched from a follows table
+    // Business profile data
+    profileType: profileType,
+    isBusiness: profileType === 'business',
+    businessCategory: profileData.business_category ? getCategoryLabel(profileData.business_category) : undefined,
+    businessLocation: profileData.business_location || undefined,
   };
 
   return (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Building2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useFollow } from '@/hooks/useFollow';
@@ -19,6 +19,11 @@ interface UserProfile {
   handicap?: number;
   isFollowing?: boolean;
   isVerified?: boolean;
+  // Business profile fields
+  profileType?: 'personal' | 'business';
+  isBusiness?: boolean;
+  businessCategory?: string;
+  businessLocation?: string;
 }
 
 interface MiniProfileSheetProps {
@@ -121,6 +126,8 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [scrollMaxHeight, setScrollMaxHeight] = React.useState<number>();
   const { setSheetClosing } = useSheetPlayback();
+
+  const isBusiness = user.isBusiness || user.profileType === 'business';
 
   // Initialize follow state on mount
   useEffect(() => {
@@ -294,7 +301,7 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
                 </div>
               </button>
 
-              {/* Name, handle, handicap, home club */}
+              {/* Name, handle, handicap/business info, home club/location */}
               <div className="flex flex-col min-w-0">
                 <button
                   type="button"
@@ -306,20 +313,45 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
                   {user.isVerified && <CheckCircle className="inline-block w-4 h-4 ml-1 text-blue-400" />}
                 </button>
                 
-                {/* Row 2: @handle + handicap */}
+                {/* Row 2: @handle + handicap (personal) OR business badge (business) */}
                 <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[13px] text-white/70">
                   {user.username && <span>@{user.username}</span>}
-                  {user.username && user.handicap !== undefined && user.handicap !== null && <span>·</span>}
-                  {user.handicap !== undefined && user.handicap !== null && (
-                    <span>HCP {user.handicap}</span>
+                  
+                  {isBusiness ? (
+                    <>
+                      <span className="inline-flex items-center gap-1 rounded-full border border-white/30 px-1.5 py-[1px] text-[11px]">
+                        <Building2 className="w-2.5 h-2.5" />
+                        Business
+                      </span>
+                      {user.businessCategory && (
+                        <span className="truncate max-w-[100px] text-[11px] text-white/60">
+                          {user.businessCategory}
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      {user.username && user.handicap !== undefined && user.handicap !== null && <span>·</span>}
+                      {user.handicap !== undefined && user.handicap !== null && (
+                        <span>HCP {user.handicap}</span>
+                      )}
+                    </>
                   )}
                 </div>
                 
-                {/* Row 3: home club */}
-                {user.homeClub && user.homeClub !== 'Example Golf Club' && (
-                  <div className="mt-0.5 text-[13px] text-white/70 truncate">
-                    {user.homeClub}
-                  </div>
+                {/* Row 3: home club (personal) or location (business) */}
+                {isBusiness ? (
+                  user.businessLocation && (
+                    <div className="mt-0.5 text-[13px] text-white/70 truncate">
+                      {user.businessLocation}
+                    </div>
+                  )
+                ) : (
+                  user.homeClub && user.homeClub !== 'Example Golf Club' && (
+                    <div className="mt-0.5 text-[13px] text-white/70 truncate">
+                      {user.homeClub}
+                    </div>
+                  )
                 )}
               </div>
             </div>

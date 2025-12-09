@@ -8,6 +8,7 @@ interface ProfileActionsRowProps {
   isPersonal: boolean;
   isMobile: boolean;
   websiteUrl?: string | null;
+  businessWebsite?: string | null;
 }
 
 /**
@@ -20,7 +21,8 @@ const ProfileActionsRow: React.FC<ProfileActionsRowProps> = ({
   profileUserId,
   isPersonal,
   isMobile,
-  websiteUrl
+  websiteUrl,
+  businessWebsite
 }) => {
   // Container styling for proper centering
   const containerStyle = isMobile 
@@ -29,6 +31,9 @@ const ProfileActionsRow: React.FC<ProfileActionsRowProps> = ({
         width: 'calc(100% - var(--mini-w) - 8px)',
         marginRight: 'calc(var(--mini-w) + 8px)'
       };
+
+  // Use businessWebsite for business profiles, fall back to websiteUrl
+  const effectiveWebsite = !isPersonal ? (businessWebsite || websiteUrl) : websiteUrl;
 
   return (
     <div 
@@ -45,7 +50,7 @@ const ProfileActionsRow: React.FC<ProfileActionsRowProps> = ({
         <BusinessProfileActions
           currentUserId={currentUserId}
           profileUserId={profileUserId}
-          websiteUrl={websiteUrl}
+          websiteUrl={effectiveWebsite}
           isMobile={isMobile}
         />
       )}

@@ -70,6 +70,14 @@ interface UserProfile {
   user_type?: string | null;
   is_public?: boolean;
   location?: string;
+  // Business profile fields
+  business_name?: string | null;
+  business_category?: string | null;
+  business_website?: string | null;
+  business_location?: string | null;
+  business_contact_email?: string | null;
+  business_contact_phone?: string | null;
+  business_bio?: string | null;
 }
 
 interface HeroProfileHeaderProps {
@@ -403,9 +411,12 @@ const HeroProfileHeader = ({
                 username={username}
                 homeClub={isPersonal ? homeClub : undefined}
                 handicap={isPersonal ? profile?.eg_handicap_index : undefined}
-                websiteUrl={profile?.website}
+                websiteUrl={isBusiness ? profile?.business_website : profile?.website}
                 location={profile?.location}
                 userType={profile?.user_type}
+                businessName={profile?.business_name}
+                businessCategory={profile?.business_category}
+                businessLocation={profile?.business_location}
                 isPersonal={isPersonal}
                 isOwnProfile={isOwnProfile}
                 onCustomiseClick={isOwnProfile ? () => setEditDialogOpen(true) : undefined}
@@ -431,6 +442,7 @@ const HeroProfileHeader = ({
               isPersonal={isPersonal}
               isMobile={isMobile}
               websiteUrl={profile?.website}
+              businessWebsite={profile?.business_website}
             />
           </div>
         )}
