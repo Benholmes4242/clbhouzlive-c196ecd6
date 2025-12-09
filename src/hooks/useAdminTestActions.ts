@@ -608,3 +608,387 @@ export function useClearTestNotifications() {
     },
   });
 }
+
+// ============================================
+// QUICK SCENARIO HOOKS
+// ============================================
+
+/**
+ * Scenario: Full friend request handshake
+ * Test User sends request → Target accepts → Both get notifications
+ */
+export function useFriendRequestHandshake() {
+  const queryClient = useQueryClient();
+  const { data: testUser } = useTestUser();
+
+  return useMutation({
+    mutationFn: async (targetUserId: string) => {
+      if (!testUser) throw new Error('Test user not configured');
+
+      // Step 1: Clear any existing friendship/requests between them
+      await supabase
+        .from('user_friends')
+        .delete()
+        .or(`and(user_id.eq.${testUser.id},friend_id.eq.${targetUserId}),and(user_id.eq.${targetUserId},friend_id.eq.${testUser.id})`);
+
+      // Step 2: Test User sends friend request to target
+      const { data: request, error: requestError } = await supabase
+        .from('user_friends')
+        .insert({
+          user_id: testUser.id,
+          friend_id: targetUserId,
+          status: 'pending',
+        })
+        .select()
+        .single();
+
+      if (requestError) throw requestError;
+
+      // Step 3: Create notification for target (friend request received)
+      await supabase
+        .from('notifications')
+        .insert({
+          user_id: targetUserId,
+          actor_id: testUser.id,
+          type: 'friend_request',
+          title: 'Friend request',
+          entity_type: 'friend_request',
+          entity_id: request.id,
+          is_read: false,
+          data: { request_id: request.id },
+        });
+
+      // Small delay to make the flow feel more realistic
+      await new Promise(r => setTimeout(r, 500));
+
+      // Step 4: Target accepts the request
+      await supabase
+        .from('user_friends')
+        .update({ status: 'accepted' })
+        .eq('id', request.id);
+
+      // Step 5: Create acceptance notification for test user
+      await supabase
+        .from('notifications')
+        .insert({
+          user_id: testUser.id,
+          actor_id: targetUserId,
+          type: 'friend_accepted',
+          title: 'Friend request accepted',
+          entity_type: 'profile',
+          entity_id: targetUserId,
+          is_read: false,
+        });
+
+      return { success: true };
+    },
+    onSuccess: () => {
+      toast.success(`Friend request handshake completed`, {
+        description: 'Request sent → Accepted → Both notified',
+        position: 'top-center',
+      });
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to complete handshake', {
+        position: 'top-center',
+      });
+    },
+  });
+}
+
+/**
+ * Scenario: Busy day activity feed
+ * Creates 20+ mixed notifications to test the Activity page
+ */
+export function useBusyDayActivity() {
+  const queryClient = useQueryClient();
+  const { data: testUser } = useTestUser();
+
+  return useMutation({
+    mutationFn: async (targetUserId: string) => {
+      if (!testUser) throw new Error('Test user not configured');
+
+      // Clear existing test notifications first
+      await supabase
+        .from('notifications')
+        .delete()
+        .eq('user_id', targetUserId)
+        .eq('actor_id', testUser.id);
+
+      const notifications = [];
+      const now = new Date();
+
+      // Follow notification
+      notifications.push({
+        user_id: targetUserId,
+        actor_id: testUser.id,
+        type: 'follow',
+        title: 'New follower',
+        entity_type: 'profile',
+        entity_id: testUser.id,
+        is_read: false,
+        created_at: new Date(now.getTime() - 5 * 60 * 1000).toISOString(), // 5 min ago
+      });
+
+      // Friend request (pending)
+      notifications.push({
+        user_id: targetUserId,
+        actor_id: testUser.id,
+        type: 'friend_request',
+        title: 'Friend request',
+        entity_type: 'friend_request',
+        entity_id: 'mock-request-1',
+        is_read: false,
+        created_at: new Date(now.getTime() - 15 * 60 * 1000).toISOString(), // 15 min ago
+      });
+
+      // Likes (varied timestamps)
+      const likeMessages = [
+        'Loved your swing video!',
+        'Great course shot!',
+        'Amazing round!',
+        'Beautiful scenery',
+        'Perfect form!',
+      ];
+      for (let i = 0; i < 5; i++) {
+        notifications.push({
+          user_id: targetUserId,
+          actor_id: testUser.id,
+          type: 'like',
+          title: 'Liked your post',
+          entity_type: 'post',
+          entity_id: `mock-post-${i}`,
+          is_read: false,
+          created_at: new Date(now.getTime() - (30 + i * 20) * 60 * 1000).toISOString(),
+        });
+      }
+
+      // Comments
+      const comments = [
+        'Incredible shot - which club did you use?',
+        'We should play together sometime!',
+        'That is a tough hole, well played!',
+        'Your short game is looking sharp',
+      ];
+      for (let i = 0; i < comments.length; i++) {
+        notifications.push({
+          user_id: targetUserId,
+          actor_id: testUser.id,
+          type: 'comment',
+          title: 'Commented on your post',
+          message: comments[i],
+          entity_type: 'post',
+          entity_id: `mock-post-comment-${i}`,
+          is_read: false,
+          created_at: new Date(now.getTime() - (60 + i * 45) * 60 * 1000).toISOString(),
+        });
+      }
+
+      // Mentions
+      notifications.push({
+        user_id: targetUserId,
+        actor_id: testUser.id,
+        type: 'mention',
+        title: 'Mentioned you in a post',
+        message: 'Great round with @you yesterday at St Andrews!',
+        entity_type: 'post',
+        entity_id: 'mock-post-mention-1',
+        is_read: false,
+        created_at: new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
+      });
+
+      notifications.push({
+        user_id: targetUserId,
+        actor_id: testUser.id,
+        type: 'mention',
+        title: 'Mentioned you in a post',
+        message: 'Looking for a fourth this weekend with @you',
+        entity_type: 'post',
+        entity_id: 'mock-post-mention-2',
+        is_read: false,
+        created_at: new Date(now.getTime() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
+      });
+
+      // Add some older notifications (yesterday, this week)
+      for (let i = 0; i < 6; i++) {
+        notifications.push({
+          user_id: targetUserId,
+          actor_id: testUser.id,
+          type: i % 2 === 0 ? 'like' : 'comment',
+          title: i % 2 === 0 ? 'Liked your post' : 'Commented on your post',
+          message: i % 2 === 1 ? 'Nice one! 🏌️' : undefined,
+          entity_type: 'post',
+          entity_id: `mock-post-old-${i}`,
+          is_read: i > 2, // Some read, some unread
+          created_at: new Date(now.getTime() - (24 + i * 12) * 60 * 60 * 1000).toISOString(),
+        });
+      }
+
+      // Insert all notifications
+      const { error } = await supabase
+        .from('notifications')
+        .insert(notifications);
+
+      if (error) throw error;
+
+      // Also create follow relationship
+      await supabase
+        .from('user_follows')
+        .upsert({
+          follower_id: testUser.id,
+          following_id: targetUserId,
+        }, { onConflict: 'follower_id,following_id' });
+
+      return { success: true, count: notifications.length };
+    },
+    onSuccess: (data) => {
+      toast.success(`Created ${data?.count || 20}+ notifications`, {
+        description: 'Check your Activity feed',
+        position: 'top-center',
+      });
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to create busy day', {
+        position: 'top-center',
+      });
+    },
+  });
+}
+
+/**
+ * Scenario: Follow swap (mutual follows)
+ */
+export function useFollowSwapScenario() {
+  const queryClient = useQueryClient();
+  const { data: testUser } = useTestUser();
+
+  return useMutation({
+    mutationFn: async (targetUserId: string) => {
+      if (!testUser) throw new Error('Test user not configured');
+
+      // Clear existing follows
+      await supabase
+        .from('user_follows')
+        .delete()
+        .eq('follower_id', testUser.id)
+        .eq('following_id', targetUserId);
+
+      await supabase
+        .from('user_follows')
+        .delete()
+        .eq('follower_id', targetUserId)
+        .eq('following_id', testUser.id);
+
+      // Test User → Target
+      await supabase
+        .from('user_follows')
+        .insert({
+          follower_id: testUser.id,
+          following_id: targetUserId,
+        });
+
+      // Create follow notification
+      await supabase
+        .from('notifications')
+        .insert({
+          user_id: targetUserId,
+          actor_id: testUser.id,
+          type: 'follow',
+          title: 'New follower',
+          entity_type: 'profile',
+          entity_id: testUser.id,
+          is_read: false,
+        });
+
+      await new Promise(r => setTimeout(r, 300));
+
+      // Target → Test User (follow back)
+      await supabase
+        .from('user_follows')
+        .insert({
+          follower_id: targetUserId,
+          following_id: testUser.id,
+        });
+
+      return { success: true };
+    },
+    onSuccess: () => {
+      toast.success(`Follow swap completed`, {
+        description: 'Both users now follow each other',
+        position: 'top-center',
+      });
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to complete follow swap', {
+        position: 'top-center',
+      });
+    },
+  });
+}
+
+/**
+ * Scenario: Reset all test state
+ * Clears friendships, follows, and notifications between test user and target
+ */
+export function useResetTestState() {
+  const queryClient = useQueryClient();
+  const { data: testUser } = useTestUser();
+
+  return useMutation({
+    mutationFn: async (targetUserId: string) => {
+      if (!testUser) throw new Error('Test user not configured');
+
+      // Clear friendships/requests
+      await supabase
+        .from('user_friends')
+        .delete()
+        .or(`and(user_id.eq.${testUser.id},friend_id.eq.${targetUserId}),and(user_id.eq.${targetUserId},friend_id.eq.${testUser.id})`);
+
+      // Clear follows both directions
+      await supabase
+        .from('user_follows')
+        .delete()
+        .eq('follower_id', testUser.id)
+        .eq('following_id', targetUserId);
+
+      await supabase
+        .from('user_follows')
+        .delete()
+        .eq('follower_id', targetUserId)
+        .eq('following_id', testUser.id);
+
+      // Clear notifications from test user to target
+      await supabase
+        .from('notifications')
+        .delete()
+        .eq('user_id', targetUserId)
+        .eq('actor_id', testUser.id);
+
+      // Clear notifications from target to test user
+      await supabase
+        .from('notifications')
+        .delete()
+        .eq('user_id', testUser.id)
+        .eq('actor_id', targetUserId);
+
+      return { success: true };
+    },
+    onSuccess: () => {
+      toast.success(`Test state reset`, {
+        description: 'Friendships, follows, and notifications cleared',
+        position: 'top-center',
+      });
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to reset test state', {
+        position: 'top-center',
+      });
+    },
+  });
+}
