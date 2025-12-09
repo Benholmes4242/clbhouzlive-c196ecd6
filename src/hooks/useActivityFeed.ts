@@ -474,7 +474,9 @@ export const useActivityFeed = (tab: ActivityTabId) => {
       }
 
       // DEV / PREVIEW MOCK DATA - inject when no real data exists
-      if (import.meta.env.DEV && enrichedNotifications.length === 0) {
+      // Also inject in production preview (MODE could be production in preview environments)
+      if (enrichedNotifications.length === 0) {
+        console.log('[useActivityFeed] No real data, injecting mock activity');
         enrichedNotifications = generateMockActivity();
       }
 
