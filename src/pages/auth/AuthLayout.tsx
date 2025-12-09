@@ -27,9 +27,17 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
   
   return (
     <div 
-      className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden"
+      className="min-h-screen flex items-center justify-center px-4 pt-[90px] pb-10 relative overflow-hidden"
       style={{ backgroundColor: 'var(--bg-page)' }}
     >
+      {/* Subtle gradient glow behind card */}
+      <div 
+        className="absolute inset-0 flex items-center justify-center pointer-events-none"
+        style={{
+          background: 'linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 100%)',
+        }}
+      />
+      
       {/* Container with fade-in animation */}
       <div 
         className={cn(
@@ -41,8 +49,8 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         )}
         style={{
           backgroundColor: 'var(--surface-card)',
-          border: '1px solid rgba(151, 161, 170, 0.18)',
-          boxShadow: '0 18px 40px rgba(15, 23, 42, 0.08)',
+          border: '1px solid rgba(214, 217, 222, 0.5)',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
         }}
       >
         {/* Logo section */}

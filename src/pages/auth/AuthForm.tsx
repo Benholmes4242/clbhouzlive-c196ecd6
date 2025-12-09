@@ -24,7 +24,7 @@ interface AuthFormProps {
 const lightInputStyles: React.CSSProperties = {
   height: '48px',
   backgroundColor: 'var(--surface-card)',
-  border: '1px solid rgba(151, 161, 170, 0.25)',
+  border: '1px solid #D6D9DE',
   borderRadius: '14px',
   color: 'var(--text-primary)',
   fontSize: '15px',
@@ -32,7 +32,7 @@ const lightInputStyles: React.CSSProperties = {
   paddingRight: '16px',
   outline: 'none',
   width: '100%',
-  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+  transition: 'all 0.15s ease',
 };
 
 const AuthForm: React.FC<AuthFormProps> = ({
@@ -385,10 +385,10 @@ const AuthForm: React.FC<AuthFormProps> = ({
           required
           style={{
             ...lightInputStyles,
-            borderColor: emailError ? '#ef4444' : 'rgba(151, 161, 170, 0.25)',
+            borderColor: emailError ? '#ef4444' : '#D6D9DE',
             animation: shakeEmail ? 'shake 0.5s ease-in-out' : 'none',
           }}
-          className="placeholder:text-text-tertiary focus:border-slate-600 focus:shadow-[0_0_0_2px_rgba(44,52,64,0.12)]"
+          className="placeholder:text-text-tertiary focus:border-[#D6D9DE] focus:shadow-[0_0_0_4px_rgba(247,147,30,0.06)]"
         />
         {emailError && (
           <p className="text-sm mt-2" style={{ color: '#ef4444' }}>{emailError}</p>
@@ -482,10 +482,10 @@ const AuthForm: React.FC<AuthFormProps> = ({
           required
           style={{
             ...lightInputStyles,
-            borderColor: passwordError ? '#ef4444' : 'rgba(151, 161, 170, 0.25)',
+            borderColor: passwordError ? '#ef4444' : '#D6D9DE',
             animation: shakePassword ? 'shake 0.5s ease-in-out' : 'none',
           }}
-          className="placeholder:text-text-tertiary focus:border-slate-600 focus:shadow-[0_0_0_2px_rgba(44,52,64,0.12)]"
+          className="placeholder:text-text-tertiary focus:border-[#D6D9DE] focus:shadow-[0_0_0_4px_rgba(247,147,30,0.06)]"
         />
         {passwordError && (
           <p className="text-sm mt-2" style={{ color: '#ef4444' }}>{passwordError}</p>
@@ -498,10 +498,9 @@ const AuthForm: React.FC<AuthFormProps> = ({
           <button 
             type="submit" 
             disabled={isButtonDisabled} 
-            className="w-full h-12 rounded-sq-sm font-medium text-white transition-all active:scale-[0.98]"
+            className="w-full h-12 rounded-sq-pill font-medium text-white transition-all active:scale-[0.98] hover:bg-[#171B1F]"
             style={{
-              backgroundColor: isButtonDisabled ? 'var(--text-tertiary)' : 'var(--surface-slate)',
-              opacity: isButtonDisabled ? 0.5 : 1,
+              backgroundColor: isButtonDisabled ? '#D6D9DE' : '#1F2428',
               pointerEvents: isButtonDisabled ? 'none' : 'auto',
             }}
           >
@@ -517,14 +516,14 @@ const AuthForm: React.FC<AuthFormProps> = ({
           
           {/* Divider */}
           <div className="flex items-center my-6">
-            <div className="flex-1 h-px" style={{ backgroundColor: 'rgba(151, 161, 170, 0.15)' }} />
+            <div className="flex-1 h-px" style={{ backgroundColor: 'rgba(214, 217, 222, 0.5)' }} />
             <span 
-              className="mx-4 text-xs font-medium uppercase tracking-wide"
+              className="mx-4 text-[11px] font-medium uppercase tracking-widest"
               style={{ color: 'var(--text-secondary)' }}
             >
               OR
             </span>
-            <div className="flex-1 h-px" style={{ backgroundColor: 'rgba(151, 161, 170, 0.15)' }} />
+            <div className="flex-1 h-px" style={{ backgroundColor: 'rgba(214, 217, 222, 0.5)' }} />
           </div>
           
           {/* OAuth Buttons */}
@@ -534,10 +533,10 @@ const AuthForm: React.FC<AuthFormProps> = ({
               type="button"
               onClick={handleGoogleSignIn}
               disabled={submitting}
-              className="w-full h-12 rounded-sq-sm flex items-center transition-all active:scale-[0.98]"
+              className="w-full h-12 rounded-sq-md flex items-center transition-all active:scale-[0.98] hover:bg-[#F4F5F7]"
               style={{
                 backgroundColor: 'var(--surface-card)',
-                border: '1px solid rgba(151, 161, 170, 0.25)',
+                border: '1.25px solid #D6D9DE',
               }}
             >
               <div className="w-12 flex items-center justify-center">
@@ -565,10 +564,10 @@ const AuthForm: React.FC<AuthFormProps> = ({
               type="button"
               onClick={handleAppleSignIn}
               disabled={submitting}
-              className="w-full h-12 rounded-sq-sm flex items-center transition-all active:scale-[0.98]"
+              className="w-full h-12 rounded-sq-md flex items-center transition-all active:scale-[0.98] hover:bg-[#F4F5F7]"
               style={{
                 backgroundColor: 'var(--surface-card)',
-                border: '1px solid rgba(151, 161, 170, 0.25)',
+                border: '1.25px solid #D6D9DE',
               }}
             >
               <div className="w-12 flex items-center justify-center">
