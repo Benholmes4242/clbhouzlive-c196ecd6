@@ -15,6 +15,7 @@ import { useTop100Overview } from '@/hooks/useTop100Overview';
 import { useActivityPosts } from './hooks/useActivityPosts';
 import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import { toast } from 'sonner';
+import { trackBusinessEvent } from '@/analytics/businessAnalytics';
 
 // Modular header components
 import {
@@ -258,6 +259,17 @@ const HeroProfileHeader = ({
     
     fetchStats();
   }, [profile?.id, isPersonal]);
+
+  // Track business profile views
+  useEffect(() => {
+    if (!profile?.id) return;
+    
+    const isOwn = user?.id === profile.id;
+    
+    if (isBusiness && !isOwn) {
+      trackBusinessEvent(profile.id, 'profile_view');
+    }
+  }, [profile?.id, isBusiness, user?.id]);
 
   // Scroll depth tracking
   useEffect(() => {

@@ -296,6 +296,48 @@ export type Database = {
         }
         Relationships: []
       }
+      business_profile_events: {
+        Row: {
+          business_id: string
+          created_at: string
+          event_type: string
+          id: string
+          path: string | null
+          user_id: string | null
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          event_type: string
+          id?: string
+          path?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          path?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_profile_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_profile_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       caddie_logs: {
         Row: {
           audio_url: string | null
