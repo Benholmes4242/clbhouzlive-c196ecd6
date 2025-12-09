@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
+import { createMentionNotifications } from '@/utils/mentionExtractor';
 
 export interface PostComment {
   id: string;
@@ -61,6 +62,17 @@ export function usePostEngagement(postId: string | null) {
     },
   });
 
+  // Helper to get post owner ID
+  const getPostOwnerId = async (): Promise<string | null> => {
+    if (!postId) return null;
+    const { data } = await supabase
+      .from('posts')
+      .select('user_id')
+      .eq('id', postId)
+      .single();
+    return data?.user_id ?? null;
+  };
+
   // 2) Like toggle mutation
   const toggleLikeMutation = useMutation({
     mutationFn: async () => {
@@ -81,6 +93,21 @@ export function usePostEngagement(postId: string | null) {
             post_id: postId,
             user_id: user.id,
           });
+
+        // Create notification for post owner (only on like, not unlike)
+        const postOwnerId = await getPostOwnerId();
+        if (postOwnerId && postOwnerId !== user.id) {
+          await supabase.from('notifications').insert({
+            user_id: postOwnerId,
+            actor_id: user.id,
+            type: 'like',
+            title: 'New like',
+            message: 'liked your post',
+            entity_type: 'post',
+            entity_id: postId,
+            data: { post_id: postId },
+          });
+        }
       }
     },
     onMutate: async () => {
@@ -109,6 +136,7 @@ export function usePostEngagement(postId: string | null) {
     onSettled: () => {
       // Refetch to sync with server
       queryClient.invalidateQueries({ queryKey: ['post-engagement', postId] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
   });
 
@@ -165,20 +193,47 @@ export function usePostEngagement(postId: string | null) {
     mutationFn: async (content: string) => {
       if (!postId || !user?.id) throw new Error('Missing postId or user');
       
-      const { error } = await supabase
+      const { data: newComment, error } = await supabase
         .from('post_comments')
         .insert({
           post_id: postId,
           user_id: user.id,
           content,
-        });
+        })
+        .select('id')
+        .single();
 
       if (error) throw error;
+
+      // Create notification for post owner
+      const postOwnerId = await getPostOwnerId();
+      if (postOwnerId && postOwnerId !== user.id) {
+        await supabase.from('notifications').insert({
+          user_id: postOwnerId,
+          actor_id: user.id,
+          type: 'comment',
+          title: 'New comment',
+          message: 'commented on your post',
+          entity_type: 'post',
+          entity_id: postId,
+          data: { 
+            post_id: postId, 
+            comment_id: newComment?.id,
+            comment_preview: content.slice(0, 100),
+          },
+        });
+      }
+
+      // Create mention notifications for any @mentions in the comment
+      if (newComment?.id) {
+        await createMentionNotifications(content, user.id, 'comment', newComment.id, postId);
+      }
     },
     onSuccess: () => {
       // Refetch comments and engagement summary
       queryClient.invalidateQueries({ queryKey: ['post-comments', postId] });
       queryClient.invalidateQueries({ queryKey: ['post-engagement', postId] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
   });
 
