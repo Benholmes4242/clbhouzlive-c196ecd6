@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useActivityFeed, ActivityTabId, ACTIVITY_TABS, ActivityNotification, ChipFilterKind } from '@/hooks/useActivityFeed';
@@ -6,23 +6,15 @@ import { ActivityBucket } from '@/components/activity/ActivityBucket';
 import { AtAGlanceChips } from '@/components/activity/AtAGlanceChips';
 import { ActivityEmptyState } from '@/components/activity/ActivityEmptyState';
 import { ActivitySkeleton } from '@/components/activity/ActivitySkeleton';
-import { MarkAllReadSheet } from '@/components/activity/MarkAllReadSheet';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { toast } from 'sonner';
 import { PageRoot } from '@/components/layout/PageRoot';
 import CompactHeader from '@/components/header/CompactHeader';
-import { Button } from '@/components/ui/button';
-
-// Feature flag for Mark All Read
-const ENABLE_MARK_ALL_READ = true;
 
 const ActivityPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActivityTabId>('all');
   const [activeChipFilter, setActiveChipFilter] = useState<ChipFilterKind>(null);
-  const [showMarkAllSheet, setShowMarkAllSheet] = useState(false);
-  const [markingAllRead, setMarkingAllRead] = useState(false);
   
   // Pass chip filter to hook (only applies when on 'all' tab)
   const effectiveChipFilter = activeTab === 'all' ? activeChipFilter : null;
@@ -31,10 +23,51 @@ const ActivityPage: React.FC = () => {
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  
+  // Track if we've seen notifications this visit (for auto-mark-read on unmount)
+  const hasViewedRef = useRef(false);
 
   const buckets = data?.buckets;
   const counts = data?.counts;
   const unreadCount = counts?.new || 0;
+
+  // Mark that user has viewed notifications
+  useEffect(() => {
+    if (data && data.allItems.length > 0) {
+      hasViewedRef.current = true;
+    }
+  }, [data]);
+
+  // Auto-mark all as read when leaving the Activity page
+  const markAllAsReadSilently = useCallback(async () => {
+    if (!user?.id || !hasViewedRef.current) return;
+    
+    // Only mark if there were unread items
+    const hasUnread = data?.allItems?.some(item => item.is_unread);
+    if (!hasUnread) return;
+
+    try {
+      await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('user_id', user.id)
+        .eq('is_read', false);
+      
+      // Invalidate cache so next visit shows updated state
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
+    } catch (err) {
+      // Silent fail - not critical
+      console.warn('[ActivityPage] Auto mark-read failed:', err);
+    }
+  }, [user?.id, data?.allItems, queryClient]);
+
+  // On unmount: mark all as read
+  useEffect(() => {
+    return () => {
+      markAllAsReadSilently();
+    };
+  }, [markAllAsReadSilently]);
 
   // Clear chip filter when switching away from All tab
   const handleTabChange = (tabId: ActivityTabId) => {
@@ -42,62 +75,6 @@ const ActivityPage: React.FC = () => {
     if (tabId !== 'all') {
       setActiveChipFilter(null);
     }
-  };
-
-  const handleMarkAllAsReadClick = () => {
-    if (unreadCount === 0) {
-      toast.info("You're all caught up – no unread activity.");
-      return;
-    }
-    setShowMarkAllSheet(true);
-  };
-
-  const handleConfirmMarkAllRead = async () => {
-    if (!user?.id) return;
-    
-    setMarkingAllRead(true);
-    
-    // Optimistic update - mark all as read in local state
-    queryClient.setQueryData(['activity-feed', activeTab, effectiveChipFilter, user.id], (old: any) => {
-      if (!old) return old;
-      const updatedItems = old.allItems?.map((item: ActivityNotification) => ({
-        ...item,
-        is_unread: false,
-        is_read: true,
-      })) || [];
-      return {
-        ...old,
-        allItems: updatedItems,
-        buckets: {
-          new: [],
-          today: updatedItems.filter((i: ActivityNotification) => !i.is_unread),
-          yesterday: old.buckets.yesterday,
-          thisWeek: old.buckets.thisWeek,
-          earlier: old.buckets.earlier,
-        },
-        counts: { ...old.counts, new: 0 },
-      };
-    });
-
-    const { error } = await supabase
-      .from('notifications')
-      .update({ is_read: true })
-      .eq('user_id', user.id)
-      .eq('is_read', false);
-
-    setMarkingAllRead(false);
-    setShowMarkAllSheet(false);
-
-    if (error) {
-      toast.error("We couldn't mark everything as read. Please try again.");
-      // Revert by refetching
-      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
-      return;
-    }
-
-    queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
-    queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
-    toast.success('All caught up – activity cleared.');
   };
 
   const handleMarkRead = async (id: string) => {
@@ -157,30 +134,14 @@ const ActivityPage: React.FC = () => {
 
       {/* Main content wrapper - consistent left-aligned layout */}
       <div className="max-w-[640px] mx-auto px-4 sm:px-5 pt-6 compact-header-offset">
-        {/* Header section with title and mark all read button */}
+        {/* Header section - title only, no mark all read button */}
         <section className="mb-4">
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-xl font-semibold tracking-tight text-foreground">
-                Activity
-              </h1>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                Updates from friends, golf clubs and messages.
-              </p>
-            </div>
-            
-            {/* Mark all as read - light text button */}
-            {ENABLE_MARK_ALL_READ && unreadCount > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleMarkAllAsReadClick}
-                className="h-9 px-3 text-xs text-muted-foreground hover:text-foreground"
-              >
-                Mark all as read
-              </Button>
-            )}
-          </div>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Activity
+          </h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Updates from friends, golf clubs and messages.
+          </p>
         </section>
 
         {/* Filter tabs - Apple-style segmented control */}
@@ -289,15 +250,6 @@ const ActivityPage: React.FC = () => {
           </div>
         )}
       </div>
-
-      {/* Mark all as read confirmation sheet */}
-      <MarkAllReadSheet
-        open={showMarkAllSheet}
-        onOpenChange={setShowMarkAllSheet}
-        unreadCount={unreadCount}
-        onConfirm={handleConfirmMarkAllRead}
-        isLoading={markingAllRead}
-      />
     </PageRoot>
   );
 };
