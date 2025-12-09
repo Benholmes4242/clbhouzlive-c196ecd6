@@ -30,14 +30,14 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
       style={{ 
         backgroundColor: 'var(--bg-page)',
         minHeight: '100vh',
-        paddingTop: '96px',
-        paddingBottom: '48px',
+        maxHeight: '100vh',
         paddingLeft: '16px',
         paddingRight: '16px',
         boxSizing: 'border-box',
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'flex-start',
+        alignItems: 'center',
+        overflow: 'hidden',
       }}
     >
       {/* Subtle gradient glow behind card */}
