@@ -457,14 +457,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
       {/* Username (signup only) - 16px gap from email message slot */}
       {isSignUp && (
         <div className="mb-4">
-          {/* Helper text - 8px to input */}
-          <p 
-            className="mb-2 text-xs"
-            style={{ color: '#5E666D', fontSize: '12px' }}
-          >
-            This will be your @handle on clbhouz
-          </p>
-          <div className="relative">
+        <div className="relative">
             <input
               type="text"
               value={username}
