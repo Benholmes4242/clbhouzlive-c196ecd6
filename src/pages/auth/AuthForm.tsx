@@ -69,10 +69,11 @@ const AuthForm: React.FC<AuthFormProps> = ({
   const emailInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-focus on email field
+  // Auto-focus on email field when mode changes
   useEffect(() => {
-    if (emailInputRef.current && !isSignUp) {
-      emailInputRef.current.focus();
+    if (emailInputRef.current) {
+      // Focus email on both sign in and sign up for fresh start feel
+      setTimeout(() => emailInputRef.current?.focus(), 0);
     }
   }, [isSignUp]);
 
@@ -372,6 +373,24 @@ const AuthForm: React.FC<AuthFormProps> = ({
     <form className="w-full" onSubmit={handleAuth}>
       <style>{shakeAnimation}</style>
       
+      {/* Mode Heading */}
+      <div className="mb-4">
+        <h1 
+          className="text-lg font-semibold mb-1"
+          style={{ color: 'var(--text-primary)' }}
+        >
+          {isSignUp ? "Create your account" : "Welcome back"}
+        </h1>
+        <p 
+          className="text-sm"
+          style={{ color: 'var(--text-secondary)' }}
+        >
+          {isSignUp 
+            ? "Join Clbhouz to share your golf moments." 
+            : "Sign in to continue your Clbhouz journey."}
+        </p>
+      </div>
+      
       {/* Email Input */}
       <div className="mb-4">
         <input
@@ -406,6 +425,12 @@ const AuthForm: React.FC<AuthFormProps> = ({
       {/* Username (signup only) */}
       {isSignUp && (
         <div className="mb-4">
+          <p 
+            className="text-xs mb-1.5"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            This will be your @handle on Clbhouz.
+          </p>
           <div className="relative">
             <input
               type="text"
