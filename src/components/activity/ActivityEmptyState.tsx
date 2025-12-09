@@ -55,14 +55,18 @@ export const ActivityEmptyState: React.FC<ActivityEmptyStateProps> = ({ tab, isA
 
   const state = TAB_EMPTY_STATES[tab];
 
-  // Left-aligned empty states for all tabs - within the same content width
+  // Centered empty states for all tabs
   return (
-    <div className="flex flex-col items-start text-left gap-2 py-10">
-      {state.icon}
-      <p className="text-sm font-medium text-foreground mt-2">{state.title}</p>
-      <p className="text-xs text-muted-foreground max-w-[280px]">
-        {state.description}
-      </p>
+    <div className="mt-12 flex flex-col items-center text-center gap-4 px-6">
+      <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
+        {state.icon}
+      </div>
+      <div>
+        <p className="text-base font-semibold text-foreground">{state.title}</p>
+        <p className="text-sm text-muted-foreground mt-1 max-w-[280px]">
+          {state.description}
+        </p>
+      </div>
     </div>
   );
 };
