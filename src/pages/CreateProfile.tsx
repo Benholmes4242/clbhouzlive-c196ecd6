@@ -2,81 +2,70 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import { supabase } from "@/integrations/supabase/client";
-
-import BasicInfoForm from "@/components/profile/BasicInfoForm";
-import GolfInfoForm from "@/components/profile/GolfInfoForm";
-import UserTypeSelector from "@/components/profile/UserTypeSelector";
-import BusinessInfoForm from "@/components/profile/BusinessInfoForm";
-import SocialLinksForm from "@/components/profile/SocialLinksForm";
+import { ProfileType, BusinessCategory } from '@/types/profile';
+import { ProfileTypeToggle } from '@/components/profile/ProfileTypeToggle';
+import { PersonalFieldsForm } from '@/components/profile/PersonalFieldsForm';
+import { BusinessFieldsForm } from '@/components/profile/BusinessFieldsForm';
 
 const CreateProfile = () => {
   const [step, setStep] = useState(1);
-  // All profiles are now personal profiles
-  const userType = 'individual';
-  const [formData, setFormData] = useState({
-    // Individual fields
-    name: '',
-    username: '',
-    bio: '',
-    location: '',
-    homeClub: '',
-    handicap: '',
-    favoriteClub: '',
-    yearsPlaying: '',
-    // Business fields
-    businessName: '',
-    businessType: '',
-    contactPersonName: '',
-    phone: '',
-    websiteUrl: ''
-  });
+  const [profileType, setProfileType] = useState<ProfileType>('personal');
   
-  const [socialLinks, setSocialLinks] = useState({
-    instagram: '',
-    twitter: '',
-    facebook: '',
-    website: ''
-  });
+  // Shared fields
+  const [displayName, setDisplayName] = useState('');
+  const [username, setUsername] = useState('');
+  const [bio, setBio] = useState('');
+  
+  // Personal fields
+  const [homeClub, setHomeClub] = useState('');
+  const [handicap, setHandicap] = useState('');
+  
+  // Business fields
+  const [businessName, setBusinessName] = useState('');
+  const [businessCategory, setBusinessCategory] = useState<BusinessCategory | ''>('');
+  const [businessLocation, setBusinessLocation] = useState('');
+  const [businessWebsite, setBusinessWebsite] = useState('');
+  const [businessContactEmail, setBusinessContactEmail] = useState('');
+  const [businessContactPhone, setBusinessContactPhone] = useState('');
+  const [businessBio, setBusinessBio] = useState('');
 
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
 
-
   // Set username from auth metadata on component mount
   useEffect(() => {
     if (user?.user_metadata?.username) {
-      setFormData(prev => ({
-        ...prev,
-        username: user.user_metadata.username
-      }));
+      setUsername(user.user_metadata.username);
     }
   }, [user]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    
-    // Clean username by removing spaces and converting to lowercase
-    if (name === 'username') {
-      const cleanedValue = value.replace(/\s+/g, '').replace('@', '').toLowerCase();
-      setFormData(prev => ({ ...prev, [name]: cleanedValue }));
-    } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+  const handleUsernameChange = (value: string) => {
+    const cleanedValue = value.replace(/\s+/g, '').replace('@', '').toLowerCase();
+    setUsername(cleanedValue);
+  };
+
+  const handlePersonalFieldChange = (field: string, value: string) => {
+    if (field === 'homeClub') setHomeClub(value);
+    if (field === 'handicap') setHandicap(value);
+  };
+
+  const handleBusinessFieldChange = (field: string, value: string) => {
+    switch (field) {
+      case 'businessName': setBusinessName(value); break;
+      case 'businessCategory': setBusinessCategory(value as BusinessCategory); break;
+      case 'businessLocation': setBusinessLocation(value); break;
+      case 'businessWebsite': setBusinessWebsite(value); break;
+      case 'businessContactEmail': setBusinessContactEmail(value); break;
+      case 'businessContactPhone': setBusinessContactPhone(value); break;
+      case 'businessBio': setBusinessBio(value); break;
     }
   };
-
-  const handleSelectChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleSocialLinkChange = (platform: string, value: string) => {
-    setSocialLinks(prev => ({ ...prev, [platform]: value }));
-  };
-
 
   const handleNext = () => {
     setStep(step + 1);
@@ -96,29 +85,35 @@ const CreateProfile = () => {
       return;
     }
 
+    const isBusiness = profileType === 'business';
 
-    // Prepare profile data based on user type
     const profileData: any = {
       id: user.id,
-      user_type: 'individual',
+      profile_type: profileType,
+      display_name: isBusiness ? businessName : displayName,
+      username: username.replace(/\s+/g, '').replace('@', '').toLowerCase(),
+      bio: bio || null,
       
-      bio: formData.bio,
-      location: formData.location,
-      display_name: formData.name,
-      // Clean username one more time before saving to ensure no spaces
-      username: formData.username.replace(/\s+/g, '').replace('@', '').toLowerCase(),
+      // Personal fields (null for business)
+      home_club: isBusiness ? null : (homeClub || null),
+      eg_handicap_index: isBusiness ? null : (handicap ? parseFloat(handicap) : null),
+      
+      // Business fields (null for personal)
+      business_name: isBusiness ? businessName : null,
+      business_category: isBusiness ? (businessCategory || null) : null,
+      business_website: isBusiness ? (businessWebsite || null) : null,
+      business_location: isBusiness ? (businessLocation || null) : null,
+      business_contact_email: isBusiness ? (businessContactEmail || null) : null,
+      business_contact_phone: isBusiness ? (businessContactPhone || null) : null,
+      business_bio: isBusiness ? (businessBio || null) : null,
     };
-
-    // Only set home_club if it's not "Not applicable" or empty
-    if (formData.homeClub && formData.homeClub.toLowerCase() !== 'not applicable') {
-      profileData.home_club = formData.homeClub;
-    }
 
     const { error } = await supabase.from("user_profiles").upsert(profileData);
 
     setSubmitting(false);
 
     if (error) {
+      console.error('Error creating profile:', error);
       alert("Error saving profile.");
       return;
     }
@@ -130,43 +125,107 @@ const CreateProfile = () => {
     switch (step) {
       case 1:
         return (
-          <div className="space-y-4">
-            <h2 className="font-display text-xl font-semibold">Personal Profile</h2>
-            <p className="text-muted-foreground">
-              Create your personal golf profile to connect with other golfers and track your journey.
-            </p>
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="font-display text-xl font-semibold mb-2">What type of profile are you creating?</h2>
+              <p className="text-muted-foreground">
+                Choose how you want to be represented on Clbhouz.
+              </p>
+            </div>
+            
+            <div className="flex justify-center">
+              <ProfileTypeToggle value={profileType} onChange={setProfileType} />
+            </div>
+
+            <div className="text-center text-sm text-muted-foreground">
+              {profileType === 'personal' ? (
+                <p>Create your personal golf profile to connect with other golfers and track your journey.</p>
+              ) : (
+                <p>Create a business profile for your golf club, brand, academy, or golf-related business.</p>
+              )}
+            </div>
           </div>
         );
+      
       case 2:
         return (
           <div className="space-y-4">
             <h2 className="font-display text-xl font-semibold">Basic Information</h2>
-            <BasicInfoForm formData={formData} onChange={handleInputChange} />
-            {/* Show selected username as read-only */}
-            {formData.username && (
-              <div className="mt-4 p-4 bg-gray-50 rounded-sq-sm border">
+            
+            <div className="space-y-4">
+              {profileType === 'personal' && (
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Username (selected during sign-up)</label>
-                  <div className="text-gray-600 font-medium">@{formData.username}</div>
-                  <p className="text-xs text-gray-500">
-                    Username was selected during account creation and cannot be changed here.
-                  </p>
+                  <Label htmlFor="displayName">Display Name *</Label>
+                  <Input
+                    id="displayName"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    placeholder="Your name"
+                    required
+                  />
                 </div>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="username">Username *</Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">@</span>
+                  <Input
+                    id="username"
+                    value={username}
+                    onChange={(e) => handleUsernameChange(e.target.value)}
+                    placeholder="username"
+                    className="pl-8"
+                    required
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  This will be your unique handle on Clbhouz.
+                </p>
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="bio">Short Bio</Label>
+                <Textarea
+                  id="bio"
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  placeholder={profileType === 'personal' ? "Tell others about yourself..." : "A quick intro about your business..."}
+                  rows={3}
+                />
+              </div>
+            </div>
+          </div>
+        );
+      
+      case 3:
+        return (
+          <div className="space-y-4">
+            <h2 className="font-display text-xl font-semibold">
+              {profileType === 'personal' ? 'Golf Information' : 'Business Details'}
+            </h2>
+            
+            {profileType === 'personal' ? (
+              <PersonalFieldsForm
+                homeClub={homeClub}
+                handicap={handicap}
+                onChange={handlePersonalFieldChange}
+              />
+            ) : (
+              <BusinessFieldsForm
+                businessName={businessName}
+                businessCategory={businessCategory}
+                businessLocation={businessLocation}
+                businessWebsite={businessWebsite}
+                businessContactEmail={businessContactEmail}
+                businessContactPhone={businessContactPhone}
+                businessBio={businessBio}
+                onChange={handleBusinessFieldChange}
+              />
             )}
           </div>
         );
-      case 3:
-        return (
-          <GolfInfoForm
-            formData={{
-              handicap: formData.handicap,
-              favoriteClub: formData.favoriteClub,
-              yearsPlaying: formData.yearsPlaying
-            }}
-            onChange={handleInputChange}
-          />
-        );
+      
       default:
         return null;
     }
@@ -174,19 +233,29 @@ const CreateProfile = () => {
 
   const getStepTitle = () => {
     switch (step) {
-      case 1: return 'Personal Profile';
+      case 1: return 'Profile Type';
       case 2: return 'Basic Information';
-      case 3: return 'Golf Information';
+      case 3: return profileType === 'personal' ? 'Golf Information' : 'Business Details';
       default: return 'Create Profile';
     }
   };
 
   const isLastStep = step === 3;
+  
   const canProceed = () => {
     switch (step) {
       case 1: return true;
-      case 2: return formData.name.trim() !== '';
-      case 3: return true;
+      case 2: {
+        const hasName = profileType === 'personal' ? displayName.trim() !== '' : true;
+        const hasUsername = username.trim() !== '';
+        return hasName && hasUsername;
+      }
+      case 3: {
+        if (profileType === 'business') {
+          return businessName.trim() !== '' && businessCategory !== '';
+        }
+        return true;
+      }
       default: return false;
     }
   };
@@ -212,7 +281,7 @@ const CreateProfile = () => {
                 objectFit: "contain"
               }}
             />
-            <div className="w-16" /> {/* Spacer */}
+            <div className="w-16" />
           </div>
         </div>
       </header>
