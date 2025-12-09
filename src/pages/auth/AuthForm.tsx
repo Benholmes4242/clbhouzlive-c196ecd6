@@ -23,16 +23,16 @@ interface AuthFormProps {
 // Light theme input styling using design tokens
 const lightInputStyles: React.CSSProperties = {
   height: '48px',
-  backgroundColor: 'var(--surface-card)',
-  border: '1px solid rgba(151, 161, 170, 0.25)',
-  borderRadius: '14px',
+  backgroundColor: '#FFFFFF',
+  border: '1px solid #E1E4E8',
+  borderRadius: '18px', // sq-md
   color: 'var(--text-primary)',
   fontSize: '15px',
   paddingLeft: '16px',
   paddingRight: '16px',
   outline: 'none',
   width: '100%',
-  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+  transition: 'all 150ms ease',
 };
 
 const AuthForm: React.FC<AuthFormProps> = ({
@@ -373,7 +373,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
       <style>{shakeAnimation}</style>
       
       {/* Email Input */}
-      <div className="mb-4">
+      <div className="mb-3">
         <input
           ref={emailInputRef}
           type="email"
@@ -385,10 +385,10 @@ const AuthForm: React.FC<AuthFormProps> = ({
           required
           style={{
             ...lightInputStyles,
-            borderColor: emailError ? '#ef4444' : 'rgba(151, 161, 170, 0.25)',
+            borderColor: emailError ? '#ef4444' : '#E1E4E8',
             animation: shakeEmail ? 'shake 0.5s ease-in-out' : 'none',
           }}
-          className="placeholder:text-text-tertiary focus:border-slate-600 focus:shadow-[0_0_0_2px_rgba(44,52,64,0.12)]"
+          className="placeholder:text-[#97A1AA] focus:border-[#D6D9DE] focus:shadow-[0_0_0_4px_rgba(247,147,30,0.06)]"
         />
         {emailError && (
           <p className="text-sm mt-2" style={{ color: '#ef4444' }}>{emailError}</p>
@@ -469,7 +469,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
       )}
       
       {/* Password Input */}
-      <div className="mb-5">
+      <div className="mb-4">
         <input
           ref={passwordInputRef}
           type="password"
@@ -482,10 +482,10 @@ const AuthForm: React.FC<AuthFormProps> = ({
           required
           style={{
             ...lightInputStyles,
-            borderColor: passwordError ? '#ef4444' : 'rgba(151, 161, 170, 0.25)',
+            borderColor: passwordError ? '#ef4444' : '#E1E4E8',
             animation: shakePassword ? 'shake 0.5s ease-in-out' : 'none',
           }}
-          className="placeholder:text-text-tertiary focus:border-slate-600 focus:shadow-[0_0_0_2px_rgba(44,52,64,0.12)]"
+          className="placeholder:text-[#97A1AA] focus:border-[#D6D9DE] focus:shadow-[0_0_0_4px_rgba(247,147,30,0.06)]"
         />
         {passwordError && (
           <p className="text-sm mt-2" style={{ color: '#ef4444' }}>{passwordError}</p>
@@ -498,12 +498,12 @@ const AuthForm: React.FC<AuthFormProps> = ({
           <button 
             type="submit" 
             disabled={isButtonDisabled} 
-            className="w-full h-12 rounded-sq-sm font-medium text-white transition-all active:scale-[0.98]"
-            style={{
-              backgroundColor: isButtonDisabled ? 'var(--text-tertiary)' : 'var(--surface-slate)',
-              opacity: isButtonDisabled ? 0.5 : 1,
-              pointerEvents: isButtonDisabled ? 'none' : 'auto',
-            }}
+            className={cn(
+              "w-full h-[50px] rounded-sq-pill font-medium text-sm transition-all",
+              isButtonDisabled 
+                ? "bg-[#D6D9DE] text-[#5E666D] cursor-not-allowed" 
+                : "bg-[#1F2428] text-white hover:bg-[#171B1F] active:translate-y-[1px]"
+            )}
           >
             {submitting ? (
               <span className="flex items-center justify-center gap-2">
@@ -516,15 +516,12 @@ const AuthForm: React.FC<AuthFormProps> = ({
           </button>
           
           {/* Divider */}
-          <div className="flex items-center my-6">
-            <div className="flex-1 h-px" style={{ backgroundColor: 'rgba(151, 161, 170, 0.15)' }} />
-            <span 
-              className="mx-4 text-xs font-medium uppercase tracking-wide"
-              style={{ color: 'var(--text-secondary)' }}
-            >
+          <div className="flex items-center gap-3 my-6">
+            <div className="flex-1 h-px bg-[#E1E4E8]" />
+            <span className="text-xs font-medium uppercase tracking-[0.12em] text-[#5E666D]">
               OR
             </span>
-            <div className="flex-1 h-px" style={{ backgroundColor: 'rgba(151, 161, 170, 0.15)' }} />
+            <div className="flex-1 h-px bg-[#E1E4E8]" />
           </div>
           
           {/* OAuth Buttons */}
@@ -534,15 +531,11 @@ const AuthForm: React.FC<AuthFormProps> = ({
               type="button"
               onClick={handleGoogleSignIn}
               disabled={submitting}
-              className="w-full h-12 rounded-sq-sm flex items-center transition-all active:scale-[0.98]"
-              style={{
-                backgroundColor: 'var(--surface-card)',
-                border: '1px solid rgba(151, 161, 170, 0.25)',
-              }}
+              className="w-full h-12 rounded-sq-md flex items-center bg-white border-[1.25px] border-[#D6D9DE] transition-colors hover:bg-black/[0.02] active:scale-[0.98]"
             >
               <div className="w-12 flex items-center justify-center">
                 {submitting ? (
-                  <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'var(--text-tertiary)' }} />
+                  <Loader2 className="w-5 h-5 animate-spin text-[#97A1AA]" />
                 ) : (
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -552,10 +545,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
                   </svg>
                 )}
               </div>
-              <span 
-                className="flex-1 text-center pr-12 text-sm font-medium"
-                style={{ color: 'var(--text-primary)' }}
-              >
+              <span className="flex-1 text-center pr-12 text-sm font-medium text-[#1F2428]">
                 Continue with Google
               </span>
             </button>
@@ -565,25 +555,18 @@ const AuthForm: React.FC<AuthFormProps> = ({
               type="button"
               onClick={handleAppleSignIn}
               disabled={submitting}
-              className="w-full h-12 rounded-sq-sm flex items-center transition-all active:scale-[0.98]"
-              style={{
-                backgroundColor: 'var(--surface-card)',
-                border: '1px solid rgba(151, 161, 170, 0.25)',
-              }}
+              className="w-full h-12 rounded-sq-md flex items-center bg-white border-[1.25px] border-[#D6D9DE] transition-colors hover:bg-black/[0.02] active:scale-[0.98]"
             >
               <div className="w-12 flex items-center justify-center">
                 {submitting ? (
-                  <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'var(--text-tertiary)' }} />
+                  <Loader2 className="w-5 h-5 animate-spin text-[#97A1AA]" />
                 ) : (
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" style={{ color: 'var(--text-primary)' }} fill="currentColor">
+                  <svg className="w-5 h-5 text-[#1F2428]" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
                   </svg>
                 )}
               </div>
-              <span 
-                className="flex-1 text-center pr-12 text-sm font-medium"
-                style={{ color: 'var(--text-primary)' }}
-              >
+              <span className="flex-1 text-center pr-12 text-sm font-medium text-[#1F2428]">
                 Continue with Apple
               </span>
             </button>
@@ -593,8 +576,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
           {!isSignUp && (
             <button
               type="button"
-              className="w-full text-sm mt-5 transition-opacity hover:opacity-80"
-              style={{ color: 'var(--text-secondary)' }}
+              className="w-full text-[13px] mt-6 text-[#5E666D] transition-opacity hover:opacity-80"
               onClick={handleForgotPasswordClick}
               disabled={submitting}
             >
