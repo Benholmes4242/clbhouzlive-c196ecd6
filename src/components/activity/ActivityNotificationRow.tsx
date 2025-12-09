@@ -108,17 +108,17 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
     <button
       onClick={onClick}
       className={cn(
-        "w-full flex items-center gap-3 p-3 text-left transition-all duration-200",
+        "w-full flex gap-3 p-3 text-left transition-all duration-200",
         "rounded-sq-md relative",
         isUnread 
           ? "bg-background shadow-[0_1px_3px_rgba(0,0,0,0.06)] border border-border/40" 
           : "bg-background/50 hover:bg-background/80"
       )}
     >
-      {/* Unread dot indicator - positioned on top-left corner of card */}
+      {/* Unread dot indicator - positioned inside card, top-left */}
       {isUnread && (
         <span 
-          className="absolute -top-1.5 -left-1.5 h-3 w-3 rounded-full bg-orange-400 shadow-sm z-10" 
+          className="absolute left-3 top-3 h-2.5 w-2.5 rounded-full bg-orange-500 z-10" 
           aria-hidden 
         />
       )}
@@ -150,29 +150,31 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
             {renderNotificationText(notification)}
           </span>
         </p>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          {notification.time_ago} · {notification.context_label}
+
+        {/* Friend request buttons - on second line, right-aligned */}
+        {showFriendRequestButtons && (
+          <div className="mt-2 flex items-center justify-end">
+            <FriendRequestButtons
+              requestId={friendRequestId}
+              requesterId={notification.actor_id!}
+              requesterName={notification.actor_display_name}
+              isMock={notification.is_mock}
+            />
+          </div>
+        )}
+
+        {/* Time ago - simplified, no taxonomy */}
+        <p className="mt-1 text-xs text-muted-foreground">
+          {notification.time_ago}
         </p>
       </div>
 
-      {/* Follow back button for follow notifications */}
+      {/* Follow back button for follow notifications - stays inline */}
       {showFollowBack && (
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 self-center">
           <FollowBackButton
             actorId={notification.actor_id!}
             actorDisplayName={notification.actor_display_name}
-            isMock={notification.is_mock}
-          />
-        </div>
-      )}
-
-      {/* Friend request Accept/Decline buttons */}
-      {showFriendRequestButtons && (
-        <div className="flex-shrink-0">
-          <FriendRequestButtons
-            requestId={friendRequestId}
-            requesterId={notification.actor_id!}
-            requesterName={notification.actor_display_name}
             isMock={notification.is_mock}
           />
         </div>

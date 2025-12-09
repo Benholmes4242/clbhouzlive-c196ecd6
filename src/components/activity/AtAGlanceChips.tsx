@@ -28,6 +28,7 @@ export const AtAGlanceChips: React.FC<AtAGlanceChipsProps> = ({ counts, onChipCl
         const Icon = chip.icon;
         const count = counts[chip.countKey];
         const isActive = activeFilter === chip.key;
+        const isNewChip = chip.key === 'new';
         
         return (
           <button
@@ -42,12 +43,19 @@ export const AtAGlanceChips: React.FC<AtAGlanceChipsProps> = ({ counts, onChipCl
           >
             <Icon className={cn("h-3.5 w-3.5", isActive ? "text-primary-foreground" : "text-muted-foreground")} />
             <span className={isActive ? "text-primary-foreground" : "text-foreground"}>{chip.label}</span>
-            <span className={cn(
-              "text-[10px] font-bold",
-              isActive ? "text-primary-foreground/80" : "text-muted-foreground"
-            )}>
-              {count}
-            </span>
+            {/* Orange count bubble for New chip, regular count for others */}
+            {isNewChip ? (
+              <span className="ml-1 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-orange-500 text-[11px] font-medium text-white px-1.5">
+                {count}
+              </span>
+            ) : (
+              <span className={cn(
+                "text-[10px] font-bold",
+                isActive ? "text-primary-foreground/80" : "text-muted-foreground"
+              )}>
+                {count}
+              </span>
+            )}
           </button>
         );
       })}

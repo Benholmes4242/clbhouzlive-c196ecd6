@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import { Button } from '@/components/ui/button';
 
 interface FriendRequestButtonsProps {
   requestId: string;
@@ -109,10 +110,10 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
     }
   };
 
-  // Already handled states
+  // Already handled states - show as pills
   if (state === 'accepted') {
     return (
-      <span className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-emerald-600 bg-emerald-50 rounded-full">
+      <span className="inline-flex h-8 items-center gap-1 rounded-full bg-emerald-500/10 px-3 text-xs font-medium text-emerald-600">
         <Check className="h-3 w-3" />
         Accepted
       </span>
@@ -121,7 +122,7 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
 
   if (state === 'declined') {
     return (
-      <span className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-muted-foreground bg-muted/60 rounded-full">
+      <span className="inline-flex h-8 items-center gap-1 rounded-full bg-red-500/5 px-3 text-xs font-medium text-red-500">
         <X className="h-3 w-3" />
         Declined
       </span>
@@ -131,35 +132,32 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
   // Pending state - show glassy Accept/Decline buttons
   return (
     <div className="flex items-center gap-2">
-      <button
+      <Button
+        variant="outline"
+        size="sm"
         onClick={handleAccept}
         disabled={state === 'loading'}
         className={cn(
-          "rounded-full px-4 py-1.5 text-sm font-semibold",
-          "bg-emerald-500/90 text-white shadow-sm",
-          "backdrop-blur-sm",
-          "hover:bg-emerald-500",
-          "active:scale-[0.98] transition",
+          "h-8 rounded-full border-emerald-500 bg-emerald-500/10 px-4 text-xs font-semibold text-emerald-600",
+          "hover:bg-emerald-500/15",
           "disabled:opacity-60 disabled:cursor-not-allowed"
         )}
       >
         {state === 'loading' ? '...' : 'Accept'}
-      </button>
-      <button
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
         onClick={handleDecline}
         disabled={state === 'loading'}
         className={cn(
-          "rounded-full px-4 py-1.5 text-sm font-medium",
-          "border border-red-400/40",
-          "text-red-500",
-          "bg-white/70 backdrop-blur-sm",
-          "hover:bg-white",
-          "active:scale-[0.98] transition",
+          "h-8 rounded-full border-red-400 bg-red-500/5 px-4 text-xs font-semibold text-red-500",
+          "hover:bg-red-500/10",
           "disabled:opacity-60 disabled:cursor-not-allowed"
         )}
       >
         Decline
-      </button>
+      </Button>
     </div>
   );
 };

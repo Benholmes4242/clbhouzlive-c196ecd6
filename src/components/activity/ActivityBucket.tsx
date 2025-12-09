@@ -37,7 +37,7 @@ export const ActivityBucket: React.FC<ActivityBucketProps> = ({
       >
         {label}
         {accent && items.length > 0 && (
-          <span className="ml-2 inline-flex items-center justify-center h-4 min-w-[16px] px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+          <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-orange-500 text-[11px] font-medium text-white px-1.5">
             {items.length}
           </span>
         )}
