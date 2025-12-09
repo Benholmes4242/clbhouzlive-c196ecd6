@@ -78,6 +78,7 @@ interface UserProfile {
   business_contact_email?: string | null;
   business_contact_phone?: string | null;
   business_bio?: string | null;
+  is_verified_business?: boolean | null;
 }
 
 interface HeroProfileHeaderProps {
@@ -417,6 +418,7 @@ const HeroProfileHeader = ({
                 businessName={profile?.business_name}
                 businessCategory={profile?.business_category}
                 businessLocation={profile?.business_location}
+                isVerifiedBusiness={profile?.is_verified_business}
                 isPersonal={isPersonal}
                 isOwnProfile={isOwnProfile}
                 onCustomiseClick={isOwnProfile ? () => setEditDialogOpen(true) : undefined}

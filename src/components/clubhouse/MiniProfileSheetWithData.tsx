@@ -67,6 +67,7 @@ const MiniProfileSheetWithData: React.FC<MiniProfileSheetWithDataProps> = ({
     isBusiness: profileType === 'business',
     businessCategory: profileData.business_category ? getCategoryLabel(profileData.business_category) : undefined,
     businessLocation: profileData.business_location || undefined,
+    isVerifiedBusiness: profileData.is_verified_business || false,
   };
 
   return (

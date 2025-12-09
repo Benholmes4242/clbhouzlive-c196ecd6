@@ -43,6 +43,9 @@ export interface UserProfileData {
   business_contact_phone?: string | null;
   business_bio?: string | null;
   is_business_verified?: boolean | null;
+  is_verified_business?: boolean | null;
+  verified_business_at?: string | null;
+  verified_business_notes?: string | null;
 }
 
 /**
