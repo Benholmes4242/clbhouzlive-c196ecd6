@@ -48,21 +48,12 @@ export const SocialDock: React.FC<SocialDockProps> = ({
   onNavigationTap,
 }) => {
   const [showCounts, setShowCounts] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [motionState, setMotionState] = useState<'idle' | 'expand' | 'collapse'>('idle');
+  const [isCaptionExpanded, setIsCaptionExpanded] = useState(false);
   const startYRef = useRef<number | null>(null);
 
-  // Track expand/collapse for bounce animation
-  useEffect(() => {
-    const next = isExpanded ? 'expand' : 'collapse';
-    setMotionState(next);
-
-    const timeout = window.setTimeout(() => {
-      setMotionState('idle');
-    }, 260);
-
-    return () => window.clearTimeout(timeout);
-  }, [isExpanded]);
+  const handleCaptionToggle = () => {
+    setIsCaptionExpanded(prev => !prev);
+  };
 
   // Touch handlers for swipe-up (when collapsed) and swipe-down (when expanded)
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -73,10 +64,10 @@ export const SocialDock: React.FC<SocialDockProps> = ({
     if (startYRef.current === null) return;
     const deltaY = e.changedTouches[0].clientY - startYRef.current;
     
-    if (isExpanded && deltaY > 40) {
+    if (isCaptionExpanded && deltaY > 40) {
       // Swipe down when expanded: collapse
-      setIsExpanded(false);
-    } else if (!isExpanded && deltaY < -40) {
+      setIsCaptionExpanded(false);
+    } else if (!isCaptionExpanded && deltaY < -40) {
       // Swipe up when collapsed: show chrome
       onSwipeUp();
     }
@@ -95,10 +86,10 @@ export const SocialDock: React.FC<SocialDockProps> = ({
   return (
     <>
       {/* Backdrop for tap-outside when expanded */}
-      {isExpanded && (
+      {isCaptionExpanded && (
         <div
           className="fixed inset-0 z-[79] bg-transparent"
-          onClick={() => setIsExpanded(false)}
+          onClick={() => setIsCaptionExpanded(false)}
         />
       )}
 
@@ -113,14 +104,13 @@ export const SocialDock: React.FC<SocialDockProps> = ({
       >
         {/* Inner card: full-width, rounded only on top, safe-area padding */}
         <motion.div
-          initial={{ scale: 0.99 }}
-          animate={{ scale: isExpanded ? 1.01 : 1.0 }}
+          initial={{ scaleY: 1 }}
+          animate={{ scaleY: isCaptionExpanded ? 1.015 : 1.0 }}
           transition={{
-            type: 'spring',
-            stiffness: 260,
-            damping: 22,
-            mass: 0.9,
+            duration: 0.26,
+            ease: [0.22, 1.25, 0.36, 1],
           }}
+          style={{ transformOrigin: 'bottom center' }}
           className={cn(
             'pointer-events-auto',
             'mx-0 w-full',
@@ -130,8 +120,7 @@ export const SocialDock: React.FC<SocialDockProps> = ({
             'border-t border-white/5',
             'px-4 pt-3',
             'pb-[max(env(safe-area-inset-bottom,16px),16px)]',
-            'transition-all duration-[220ms]',
-            isExpanded ? 'max-h-[45vh]' : 'max-h-[30vh]'
+            'transition-all duration-[220ms] ease-[cubic-bezier(0.19,1,0.22,1)]'
           )}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
@@ -183,56 +172,39 @@ export const SocialDock: React.FC<SocialDockProps> = ({
           </div>
 
           {/* 2) MIDDLE: Caption with expand/collapse */}
-          <div className={cn('relative', isExpanded ? 'pb-2' : 'pb-3')}>
-            <p
+          <button
+            type="button"
+            onClick={handleCaptionToggle}
+            className={cn(
+              'w-full text-left mb-2',
+              'transition-[max-height] duration-[220ms] ease-[cubic-bezier(0.19,1,0.22,1)]',
+              'overflow-hidden',
+              isCaptionExpanded ? 'max-h-[160px]' : 'max-h-[2.8em]'
+            )}
+          >
+            <span
               className={cn(
-                'text-[13px] leading-snug text-white/90 text-left',
-                !isExpanded && 'line-clamp-2'
+                'block text-[13px] leading-snug text-white/90',
+                !isCaptionExpanded && 'line-clamp-2'
               )}
             >
               {caption}
-            </p>
+            </span>
+          </button>
 
-            {/* Course chip if present (and not already shown in top row) */}
-            {post.courseName && !post.courseName && (
+          {/* Not yet on journey label */}
+          {post.courseId && post.isTop100Course && !isPlayedByUser && (
+            <p className="mb-2 text-[11px] text-[rgba(247,158,27,0.9)]">
+              Not yet on your Top 100 journey.{' '}
               <button
                 type="button"
                 onClick={onCourseClick}
-                className="mt-2 inline-flex px-3 py-[4px] rounded-full bg-white/10 text-[11px] leading-none text-white/90 hover:bg-white/15 transition-colors"
+                className="underline underline-offset-2 hover:text-[rgba(247,158,27,1)]"
               >
-                {post.courseName}
+                View this course
               </button>
-            )}
-
-            {/* Not yet on journey label */}
-            {post.courseId && post.isTop100Course && !isPlayedByUser && (
-              <p className="mt-1 text-[11px] text-[rgba(247,158,27,0.9)]">
-                Not yet on your Top 100 journey.{' '}
-                <button
-                  type="button"
-                  onClick={onCourseClick}
-                  className="underline underline-offset-2 hover:text-[rgba(247,158,27,1)]"
-                >
-                  View this course
-                </button>
-              </p>
-            )}
-
-            {/* Fade + Show more when collapsed */}
-            {!isExpanded && caption.length > 80 && (
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-end items-end">
-                <div className="flex items-center pl-6 pr-1 pb-[2px] bg-gradient-to-l from-[rgba(15,15,15,0.95)] via-[rgba(15,15,15,0.9)] to-transparent">
-                  <button
-                    type="button"
-                    onClick={() => setIsExpanded(true)}
-                    className="pointer-events-auto text-[11px] font-medium text-white/90 hover:text-white transition-colors"
-                  >
-                    Show more
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+            </p>
+          )}
 
           {/* 3) BOTTOM ROW: Action Icons */}
           <div className="flex items-center justify-between gap-4 pt-2 border-t border-white/5">
