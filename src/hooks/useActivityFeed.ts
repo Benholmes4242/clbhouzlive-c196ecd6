@@ -17,54 +17,49 @@ export const ACTIVITY_TABS: { id: ActivityTabId; label: string }[] = [
   { id: 'messages', label: 'Messages' },
 ];
 
-// Map notification types to categories (removed "you" tab - everything goes to "all")
-const TYPE_TO_CATEGORY: Record<string, ActivityTabId> = {
-  // Interactions on your content - now part of "all"
-  like: 'all',
-  comment: 'all',
-  mention: 'all',
-  tag: 'all',
-  follow: 'all',
-  friend_request: 'all',
-  friend_accepted: 'all',
-  
-  // "Following" category - activity from people you follow
-  new_post: 'following',
-  achievement: 'following',
-  
-  // "Clubs & Courses" category
-  club_update: 'clubs',
-  course_update: 'clubs',
-  event: 'clubs',
-  
-  // "Messages" category
-  message: 'messages',
-  dm: 'messages',
-  
-  // "System" category
-  system: 'system',
-  app_update: 'system',
-  tip: 'system',
-};
-
+// Expanded activity types
 export type ActivityType = 
+  // Social / person-to-person
   | 'follow'
   | 'friend_request'
   | 'friend_accepted'
   | 'mention'
   | 'tag'
   | 'like'
+  | 'like_post'
   | 'comment'
-  | 'club_update'
-  | 'course_update'
-  | 'achievement'
+  | 'comment_post'
+  | 'mention_post'
+  // Messages
   | 'message'
+  | 'message_received'
   | 'dm'
+  // Clubs & Courses
+  | 'club_invite'
+  | 'club_follow'
+  | 'club_event'
+  | 'club_announcement'
+  | 'club_update'
+  | 'course_review'
+  | 'course_like'
+  | 'course_follow'
+  | 'course_update'
+  | 'event'
+  // Achievements
+  | 'achievement'
+  | 'achievement_unlocked'
+  | 'milestone_reached'
   | 'new_post'
+  // System
   | 'system'
   | 'app_update'
-  | 'event'
   | 'tip';
+
+// Actor types for normalized model
+export type ActorType = 'user' | 'club' | 'course' | 'system';
+
+// Target types
+export type TargetType = 'post' | 'comment' | 'message' | 'profile' | 'club' | 'course' | 'achievement';
 
 export interface ActivityNotification {
   id: string;
@@ -73,16 +68,29 @@ export interface ActivityNotification {
   type: ActivityType | string;
   title: string;
   message: string | null;
+  
+  // Actor info (who triggered the event)
   actor_id: string | null;
+  actor_type: ActorType;
+  actor_display_name: string;
+  actor_username: string;
+  actor_avatar_url: string | null;
+  
+  // Target info (what the event is about)
   entity_type: string | null;
   entity_id: string | null;
+  target_type: TargetType | null;
   data: any;
-  // Joined actor data
-  actor_display_name?: string;
-  actor_username?: string;
-  actor_avatar_url?: string | null;
-  // Computed fields
-  category: ActivityTabId;
+  
+  // Derived flags for filtering
+  is_unread: boolean;
+  is_mention: boolean;
+  is_from_following: boolean;
+  is_club_or_course: boolean;
+  is_message: boolean;
+  is_mock: boolean;
+  
+  // Computed display fields
   context_url: string;
   context_label: string;
   time_ago: string;
@@ -104,6 +112,23 @@ export interface ActivityCounts {
   messages: number;
 }
 
+export type ChipFilterKind = 'new' | 'mentions' | 'follows' | 'clubs' | 'messages' | null;
+
+// Types that count as mentions
+const MENTION_TYPES = new Set(['mention', 'mention_post', 'tag', 'comment_mention']);
+
+// Types that count as follows
+const FOLLOW_TYPES = new Set(['follow', 'friend_request', 'friend_accepted']);
+
+// Types that count as messages
+const MESSAGE_TYPES = new Set(['message', 'message_received', 'dm']);
+
+// Types that are club/course related
+const CLUB_COURSE_TYPES = new Set([
+  'club_invite', 'club_follow', 'club_event', 'club_announcement', 'club_update',
+  'course_review', 'course_like', 'course_follow', 'course_update', 'event'
+]);
+
 function getTimeAgo(dateString: string): string {
   const date = new Date(dateString);
   const now = new Date();
@@ -120,45 +145,90 @@ function getTimeAgo(dateString: string): string {
 }
 
 function getContextUrl(notification: any): string {
-  const { type, entity_type, entity_id, data } = notification;
+  const { type, entity_type, entity_id, data, actor_id } = notification;
   
-  // Try to build URL based on entity type
   if (entity_type === 'post' && entity_id) {
     return `/post/${entity_id}`;
   }
   if (entity_type === 'comment' && data?.post_id) {
     return `/post/${data.post_id}`;
   }
-  if (type === 'follow' || type === 'friend_request' || type === 'friend_accepted') {
-    return notification.actor_id ? `/profile/${notification.actor_id}` : '/';
+  if (FOLLOW_TYPES.has(type)) {
+    return actor_id ? `/profile/${actor_id}` : '/';
   }
-  if (type === 'message' || type === 'dm') {
+  if (MESSAGE_TYPES.has(type)) {
     return '/messages';
   }
+  if (entity_type === 'course' && entity_id) {
+    return `/courses/${entity_id}`;
+  }
+  if (entity_type === 'club' && entity_id) {
+    return `/clubs/${entity_id}`;
+  }
   
-  // Fallback
   return '/';
 }
 
 function getContextLabel(notification: any): string {
   const { type, entity_type } = notification;
   
-  if (entity_type === 'post') return 'Moment';
+  if (entity_type === 'post') return 'Post';
   if (entity_type === 'comment') return 'Comment';
-  if (type === 'message' || type === 'dm') return 'Message';
+  if (entity_type === 'course') return 'Course';
+  if (entity_type === 'club') return 'Club';
+  if (MESSAGE_TYPES.has(type)) return 'Message';
   if (type === 'follow') return 'Profile';
-  if (type === 'friend_request' || type === 'friend_accepted') return 'Friends';
-  if (type === 'club_update' || type === 'course_update') return 'Course';
+  if (FOLLOW_TYPES.has(type)) return 'Friends';
+  if (CLUB_COURSE_TYPES.has(type)) return 'Course';
   if (type === 'system' || type === 'app_update') return 'Update';
+  if (type === 'achievement' || type === 'achievement_unlocked' || type === 'milestone_reached') return 'Achievement';
   
   return 'Activity';
+}
+
+function deriveActorType(notification: any): ActorType {
+  const { type, data } = notification;
+  
+  // System notifications
+  if (type === 'system' || type === 'app_update' || type === 'tip') {
+    return 'system';
+  }
+  
+  // Club/course as actor
+  if (type === 'club_announcement' || type === 'club_update' || type === 'club_event') {
+    return 'club';
+  }
+  if (type === 'course_update') {
+    return 'course';
+  }
+  
+  // Check data for actor type override
+  if (data?.actor_type) {
+    return data.actor_type as ActorType;
+  }
+  
+  return 'user';
+}
+
+function deriveTargetType(notification: any): TargetType | null {
+  const { entity_type, type } = notification;
+  
+  if (entity_type === 'post') return 'post';
+  if (entity_type === 'comment') return 'comment';
+  if (entity_type === 'course') return 'course';
+  if (entity_type === 'club') return 'club';
+  if (MESSAGE_TYPES.has(type)) return 'message';
+  if (FOLLOW_TYPES.has(type)) return 'profile';
+  if (type === 'achievement' || type === 'achievement_unlocked' || type === 'milestone_reached') return 'achievement';
+  
+  return null;
 }
 
 function groupNotificationsByDateBucket(items: ActivityNotification[]): Omit<ActivityBuckets, 'new'> {
   const now = new Date();
   const todayStart = startOfDay(now);
   const yesterdayStart = subDays(todayStart, 1);
-  const weekStart = startOfWeek(now, { weekStartsOn: 1 }); // Monday
+  const weekStart = startOfWeek(now, { weekStartsOn: 1 });
 
   const buckets: Omit<ActivityBuckets, 'new'> = {
     today: [],
@@ -181,12 +251,32 @@ function groupNotificationsByDateBucket(items: ActivityNotification[]): Omit<Act
 
 function computeCounts(items: ActivityNotification[]): ActivityCounts {
   return {
-    new: items.filter(i => !i.is_read).length,
-    mentions: items.filter(i => i.type === 'mention' || i.type === 'tag').length,
-    follows: items.filter(i => i.type === 'follow' || i.type === 'friend_request' || i.type === 'friend_accepted').length,
-    clubs: items.filter(i => i.type === 'club_update' || i.type === 'course_update' || i.type === 'event').length,
-    messages: items.filter(i => i.type === 'message' || i.type === 'dm').length,
+    new: items.filter(i => i.is_unread).length,
+    mentions: items.filter(i => i.is_mention).length,
+    follows: items.filter(i => FOLLOW_TYPES.has(i.type)).length,
+    clubs: items.filter(i => i.is_club_or_course).length,
+    messages: items.filter(i => i.is_message).length,
   };
+}
+
+// Apply chip filter to items (only used on All tab)
+export function applyChipFilter(items: ActivityNotification[], filter: ChipFilterKind): ActivityNotification[] {
+  if (!filter) return items;
+  
+  switch (filter) {
+    case 'new':
+      return items.filter(i => i.is_unread);
+    case 'mentions':
+      return items.filter(i => i.is_mention);
+    case 'follows':
+      return items.filter(i => FOLLOW_TYPES.has(i.type));
+    case 'clubs':
+      return items.filter(i => i.is_club_or_course);
+    case 'messages':
+      return items.filter(i => i.is_message);
+    default:
+      return items;
+  }
 }
 
 // DEV-ONLY: Fetch real users for mock notifications
@@ -212,10 +302,9 @@ async function fetchRealUsersForMocks(currentUserId: string): Promise<Array<{
 }
 
 // DEV-ONLY: Generate mock activity data using real users from DB
-async function generateMockActivityWithRealUsers(currentUserId: string): Promise<ActivityNotification[]> {
+async function generateMockActivityWithRealUsers(currentUserId: string, followingUserIds: Set<string>): Promise<ActivityNotification[]> {
   const realUsers = await fetchRealUsersForMocks(currentUserId);
   
-  // If no real users, fall back to empty (or could use hardcoded names)
   if (realUsers.length === 0) {
     console.warn('[generateMockActivityWithRealUsers] No real users found for mocks');
     return [];
@@ -226,13 +315,10 @@ async function generateMockActivityWithRealUsers(currentUserId: string): Promise
   const hoursAgo = (h: number) => new Date(now - h * 60 * 60 * 1000).toISOString();
   const daysAgo = (d: number) => new Date(now - d * 24 * 60 * 60 * 1000).toISOString();
 
-  // Helper to get a user by index (wraps around if needed)
   const getUser = (index: number) => realUsers[index % realUsers.length];
 
-  // Mock notification templates using real users
   const mockTemplates: Array<{
     type: ActivityType;
-    title: string;
     message: string | null;
     created_at: string;
     is_read: boolean;
@@ -241,57 +327,86 @@ async function generateMockActivityWithRealUsers(currentUserId: string): Promise
     userIndex: number;
   }> = [
     // NEW / Unread items
-    { type: 'follow', title: 'started following you', message: null, created_at: minutesAgo(3), is_read: false, userIndex: 0 },
-    { type: 'mention', title: 'mentioned you', message: 'Great round! You crushed it on the back 9 🔥', created_at: minutesAgo(18), is_read: false, entity_type: 'post', entity_id: 'mock-post-1', userIndex: 1 },
-    { type: 'like', title: 'liked your moment', message: null, created_at: hoursAgo(1), is_read: false, entity_type: 'post', userIndex: 2 },
-    { type: 'comment', title: 'commented on your moment', message: 'Incredible shot! Which club did you use?', created_at: hoursAgo(2), is_read: false, entity_type: 'comment', userIndex: 3 },
+    { type: 'follow', message: null, created_at: minutesAgo(3), is_read: false, userIndex: 0 },
+    { type: 'mention', message: 'Great round! You crushed it on the back 9 🔥', created_at: minutesAgo(18), is_read: false, entity_type: 'post', entity_id: 'mock-post-1', userIndex: 1 },
+    { type: 'like', message: null, created_at: hoursAgo(1), is_read: false, entity_type: 'post', userIndex: 2 },
+    { type: 'comment', message: 'Incredible shot! Which club did you use?', created_at: hoursAgo(2), is_read: false, entity_type: 'comment', userIndex: 3 },
     
     // TODAY items
-    { type: 'friend_request', title: 'sent you a friend request', message: null, created_at: hoursAgo(4), is_read: false, userIndex: 4 },
-    { type: 'follow', title: 'started following you', message: null, created_at: hoursAgo(6), is_read: true, userIndex: 5 },
-    { type: 'like', title: 'liked your moment', message: null, created_at: hoursAgo(8), is_read: true, entity_type: 'post', userIndex: 6 },
-    { type: 'friend_accepted', title: 'accepted your friend request', message: null, created_at: hoursAgo(10), is_read: true, userIndex: 7 },
+    { type: 'friend_request', message: null, created_at: hoursAgo(4), is_read: false, userIndex: 4 },
+    { type: 'follow', message: null, created_at: hoursAgo(6), is_read: true, userIndex: 5 },
+    { type: 'like', message: null, created_at: hoursAgo(8), is_read: true, entity_type: 'post', userIndex: 6 },
+    { type: 'friend_accepted', message: null, created_at: hoursAgo(10), is_read: true, userIndex: 7 },
     
     // THIS WEEK items
-    { type: 'tag', title: 'tagged you in a moment', message: null, created_at: daysAgo(1), is_read: true, entity_type: 'post', userIndex: 8 },
-    { type: 'mention', title: 'mentioned you', message: 'Playing with @you next week – can\'t wait!', created_at: daysAgo(2), is_read: true, entity_type: 'post', userIndex: 9 },
-    { type: 'follow', title: 'started following you', message: null, created_at: daysAgo(2), is_read: true, userIndex: 10 },
-    { type: 'like', title: 'liked your moment', message: null, created_at: daysAgo(3), is_read: true, entity_type: 'post', userIndex: 11 },
-    { type: 'comment', title: 'commented on your moment', message: 'That\'s a beautiful course! Adding to my bucket list', created_at: daysAgo(4), is_read: true, entity_type: 'comment', userIndex: 12 },
+    { type: 'tag', message: null, created_at: daysAgo(1), is_read: true, entity_type: 'post', userIndex: 8 },
+    { type: 'mention', message: 'Playing with @you next week – can\'t wait!', created_at: daysAgo(2), is_read: true, entity_type: 'post', userIndex: 9 },
+    { type: 'follow', message: null, created_at: daysAgo(2), is_read: true, userIndex: 10 },
+    { type: 'like', message: null, created_at: daysAgo(3), is_read: true, entity_type: 'post', userIndex: 11 },
+    { type: 'comment', message: 'That\'s a beautiful course! Adding to my bucket list', created_at: daysAgo(4), is_read: true, entity_type: 'comment', userIndex: 12 },
     
     // EARLIER items
-    { type: 'follow', title: 'started following you', message: null, created_at: daysAgo(8), is_read: true, userIndex: 13 },
-    { type: 'like', title: 'liked your moment', message: null, created_at: daysAgo(10), is_read: true, entity_type: 'post', userIndex: 14 },
-    { type: 'friend_accepted', title: 'accepted your friend request', message: null, created_at: daysAgo(12), is_read: true, userIndex: 15 },
-    { type: 'mention', title: 'mentioned you', message: 'Best playing partner I\'ve had all year!', created_at: daysAgo(14), is_read: true, entity_type: 'post', userIndex: 16 },
+    { type: 'follow', message: null, created_at: daysAgo(8), is_read: true, userIndex: 13 },
+    { type: 'like', message: null, created_at: daysAgo(10), is_read: true, entity_type: 'post', userIndex: 14 },
+    { type: 'friend_accepted', message: null, created_at: daysAgo(12), is_read: true, userIndex: 15 },
+    { type: 'mention', message: 'Best playing partner I\'ve had all year!', created_at: daysAgo(14), is_read: true, entity_type: 'post', userIndex: 16 },
   ];
 
-  // Build mock notifications with real user data
   return mockTemplates.map((template, index) => {
     const user = getUser(template.userIndex);
-    const displayName = user.display_name || user.username || 'Someone';
+    // Prefer display_name, fallback to username, never "Someone" for mocks with real users
+    const displayName = user.display_name || user.username || 'Golfer';
+    const isFromFollowing = followingUserIds.has(user.id);
     
-    return {
+    const notification: ActivityNotification = {
       id: `mock-${index + 1}`,
       created_at: template.created_at,
       is_read: template.is_read,
       type: template.type,
-      title: template.title,
+      title: '', // Not used anymore
       message: template.message,
+      
       actor_id: user.id,
-      entity_type: template.entity_type || null,
-      entity_id: template.entity_id || null,
-      data: null,
+      actor_type: 'user',
       actor_display_name: displayName,
       actor_username: user.username || '',
       actor_avatar_url: user.profile_photo_url || null,
       
-      category: TYPE_TO_CATEGORY[template.type] || 'system',
+      entity_type: template.entity_type || null,
+      entity_id: template.entity_id || null,
+      target_type: deriveTargetType(template),
+      data: null,
+      
+      // Derived flags
+      is_unread: !template.is_read,
+      is_mention: MENTION_TYPES.has(template.type),
+      is_from_following: isFromFollowing,
+      is_club_or_course: CLUB_COURSE_TYPES.has(template.type),
+      is_message: MESSAGE_TYPES.has(template.type),
+      is_mock: true,
+      
       context_url: getContextUrl({ ...template, actor_id: user.id }),
       context_label: getContextLabel(template),
       time_ago: getTimeAgo(template.created_at),
     };
+    
+    return notification;
   });
+}
+
+// Fetch user's following list for is_from_following derivation
+async function fetchFollowingUserIds(userId: string): Promise<Set<string>> {
+  const { data, error } = await supabase
+    .from('user_follows')
+    .select('following_id')
+    .eq('follower_id', userId);
+  
+  if (error || !data) {
+    console.warn('[fetchFollowingUserIds] error', error);
+    return new Set();
+  }
+  
+  return new Set(data.map(f => f.following_id));
 }
 
 export interface ActivityFeedResult {
@@ -300,16 +415,20 @@ export interface ActivityFeedResult {
   allItems: ActivityNotification[];
 }
 
-export const useActivityFeed = (tab: ActivityTabId) => {
+export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind = null) => {
   const { user } = useSupabaseSession();
 
   return useQuery({
-    queryKey: ['activity-feed', tab, user?.id],
+    queryKey: ['activity-feed', tab, chipFilter, user?.id],
     queryFn: async (): Promise<ActivityFeedResult> => {
       let enrichedNotifications: ActivityNotification[] = [];
+      let followingUserIds = new Set<string>();
 
       if (user?.id) {
-        // Fetch notifications with actor profile data
+        // Fetch following list for is_from_following derivation
+        followingUserIds = await fetchFollowingUserIds(user.id);
+
+        // Fetch notifications
         const { data: notifications, error } = await supabase
           .from('notifications')
           .select(`
@@ -333,7 +452,7 @@ export const useActivityFeed = (tab: ActivityTabId) => {
           throw error;
         }
 
-        // Fetch actor profiles for all notifications with actor_id
+        // Fetch actor profiles
         const actorIds = [...new Set(notifications?.filter(n => n.actor_id).map(n => n.actor_id) || [])];
         
         let actorProfiles: Record<string, any> = {};
@@ -351,44 +470,90 @@ export const useActivityFeed = (tab: ActivityTabId) => {
           }
         }
 
-        // Transform notifications
+        // Transform notifications to normalized model
         enrichedNotifications = (notifications || []).map(n => {
           const actor = n.actor_id ? actorProfiles[n.actor_id] : null;
-          const category = TYPE_TO_CATEGORY[n.type] || 'system';
+          const actorType = deriveActorType(n);
+          const isFromFollowing = n.actor_id ? followingUserIds.has(n.actor_id) : false;
           
-          return {
-            ...n,
-            actor_display_name: actor?.display_name || 'Someone',
+          // Prefer display_name, fallback to username, then "Someone"
+          const actorDisplayName = actor?.display_name || actor?.username || 'Someone';
+          
+          const notification: ActivityNotification = {
+            id: n.id,
+            created_at: n.created_at,
+            is_read: n.is_read,
+            type: n.type,
+            title: n.title,
+            message: n.message,
+            
+            actor_id: n.actor_id,
+            actor_type: actorType,
+            actor_display_name: actorDisplayName,
             actor_username: actor?.username || '',
             actor_avatar_url: actor?.profile_photo_url || null,
-            category,
+            
+            entity_type: n.entity_type,
+            entity_id: n.entity_id,
+            target_type: deriveTargetType(n),
+            data: n.data,
+            
+            // Derived flags
+            is_unread: !n.is_read,
+            is_mention: MENTION_TYPES.has(n.type),
+            is_from_following: isFromFollowing,
+            is_club_or_course: CLUB_COURSE_TYPES.has(n.type) || 
+              n.entity_type === 'course' || n.entity_type === 'club' ||
+              actorType === 'club' || actorType === 'course',
+            is_message: MESSAGE_TYPES.has(n.type),
+            is_mock: false,
+            
             context_url: getContextUrl(n),
             context_label: getContextLabel(n),
             time_ago: getTimeAgo(n.created_at),
           };
+          
+          return notification;
         });
       }
 
-      // DEV FLAG: Always append mock data when flag is true (for testing)
+      // DEV FLAG: Append mock data when flag is true
       if (SHOW_MOCK_ACTIVITY && user?.id) {
-        const mockItems = await generateMockActivityWithRealUsers(user.id);
-        console.log('[useActivityFeed] SHOW_MOCK_ACTIVITY=true, appending', mockItems.length, 'mock items with real users');
+        const mockItems = await generateMockActivityWithRealUsers(user.id, followingUserIds);
+        console.log('[useActivityFeed] SHOW_MOCK_ACTIVITY=true, appending', mockItems.length, 'mock items');
         enrichedNotifications = [...enrichedNotifications, ...mockItems];
       }
 
-      // Calculate counts from ALL items (before filtering by tab)
+      // Calculate counts from ALL items (before any filtering)
       const counts = computeCounts(enrichedNotifications);
 
       // Filter by tab
-      const filtered = tab === 'all' 
-        ? enrichedNotifications 
-        : enrichedNotifications.filter(n => n.category === tab);
+      let filtered: ActivityNotification[];
+      switch (tab) {
+        case 'following':
+          // Only items from users we follow
+          filtered = enrichedNotifications.filter(n => n.is_from_following && n.actor_type === 'user');
+          break;
+        case 'clubs':
+          // Only club/course related items
+          filtered = enrichedNotifications.filter(n => n.is_club_or_course);
+          break;
+        case 'messages':
+          // Only message items
+          filtered = enrichedNotifications.filter(n => n.is_message);
+          break;
+        case 'all':
+        default:
+          // All items, but apply chip filter if set
+          filtered = chipFilter ? applyChipFilter(enrichedNotifications, chipFilter) : enrichedNotifications;
+          break;
+      }
 
       // Group into date buckets
       const dateBuckets = groupNotificationsByDateBucket(filtered);
       
       // Add "new" bucket (unread items)
-      const newItems = filtered.filter(i => !i.is_read);
+      const newItems = filtered.filter(i => i.is_unread);
 
       const result: ActivityFeedResult = {
         buckets: {
@@ -399,20 +564,9 @@ export const useActivityFeed = (tab: ActivityTabId) => {
         allItems: filtered,
       };
 
-      console.log('[useActivityFeed] Returning result:', {
-        bucketsNew: result.buckets.new.length,
-        bucketsToday: result.buckets.today.length,
-        bucketsYesterday: result.buckets.yesterday.length,
-        bucketsThisWeek: result.buckets.thisWeek.length,
-        bucketsEarlier: result.buckets.earlier.length,
-        countsNew: result.counts.new,
-        allItemsCount: result.allItems.length,
-      });
-
       return result;
     },
-    staleTime: 30 * 1000, // 30 seconds
-    // Always run the query - even without user, we return mock data
+    staleTime: 30 * 1000,
   });
 };
 

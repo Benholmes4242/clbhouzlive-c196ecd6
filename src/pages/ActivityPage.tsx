@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { useActivityFeed, ActivityTabId, ACTIVITY_TABS, ActivityNotification } from '@/hooks/useActivityFeed';
+import { useActivityFeed, ActivityTabId, ACTIVITY_TABS, ActivityNotification, ChipFilterKind } from '@/hooks/useActivityFeed';
 import { ActivityBucket } from '@/components/activity/ActivityBucket';
 import { AtAGlanceChips } from '@/components/activity/AtAGlanceChips';
 import { ActivityEmptyState } from '@/components/activity/ActivityEmptyState';
@@ -15,14 +15,26 @@ import CompactHeader from '@/components/header/CompactHeader';
 
 const ActivityPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActivityTabId>('all');
-  const [activeChipFilter, setActiveChipFilter] = useState<string | null>(null);
-  const { data, isLoading, error } = useActivityFeed(activeTab);
+  const [activeChipFilter, setActiveChipFilter] = useState<ChipFilterKind>(null);
+  
+  // Pass chip filter to hook (only applies when on 'all' tab)
+  const effectiveChipFilter = activeTab === 'all' ? activeChipFilter : null;
+  const { data, isLoading, error } = useActivityFeed(activeTab, effectiveChipFilter);
+  
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const buckets = data?.buckets;
   const counts = data?.counts;
+
+  // Clear chip filter when switching away from All tab
+  const handleTabChange = (tabId: ActivityTabId) => {
+    setActiveTab(tabId);
+    if (tabId !== 'all') {
+      setActiveChipFilter(null);
+    }
+  };
 
   const handleMarkAllAsRead = async () => {
     if (!user?.id) return;
@@ -61,8 +73,8 @@ const ActivityPage: React.FC = () => {
   };
 
   const handleNotificationClick = async (notification: ActivityNotification) => {
-    // Mark as read
-    if (!notification.is_read) {
+    // Mark as read if unread
+    if (notification.is_unread) {
       await handleMarkRead(notification.id);
     }
 
@@ -77,7 +89,7 @@ const ActivityPage: React.FC = () => {
     if (activeChipFilter === kind) {
       setActiveChipFilter(null);
     } else {
-      setActiveChipFilter(kind);
+      setActiveChipFilter(kind as ChipFilterKind);
     }
   };
 
@@ -92,7 +104,7 @@ const ActivityPage: React.FC = () => {
   // Check if all items are read (caught up state)
   const isAllCaughtUp = !isEmpty && buckets && 
     buckets.new.length === 0 && 
-    data?.allItems?.every(item => item.is_read);
+    data?.allItems?.every(item => !item.is_unread);
 
   return (
     <PageRoot className="bg-muted/40 pb-24">
@@ -116,7 +128,7 @@ const ActivityPage: React.FC = () => {
             {ACTIVITY_TABS.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
                 className={cn(
                   "px-3 py-1.5 text-sm rounded-sq-pill whitespace-nowrap transition-all duration-200",
                   activeTab === tab.id
@@ -169,7 +181,7 @@ const ActivityPage: React.FC = () => {
             {buckets.today.length > 0 && (
               <ActivityBucket
                 label="Today"
-                items={buckets.today.filter(i => i.is_read)} // Exclude unread (already in New)
+                items={buckets.today.filter(i => !i.is_unread)} // Exclude unread (already in New)
                 onNotificationClick={handleNotificationClick}
                 onMarkRead={handleMarkRead}
                 onHide={handleHide}

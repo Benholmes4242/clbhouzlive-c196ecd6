@@ -81,7 +81,8 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
   onMarkRead,
   onHide
 }) => {
-  const isUnread = !notification.is_read;
+  // Use the new is_unread derived flag
+  const isUnread = notification.is_unread;
 
   return (
     <button
