@@ -72,29 +72,44 @@ const ActivityPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-muted/50">
-      {/* DEBUG: Fixed header test */}
+      {/* DEBUG: Fixed position tests to prove rendering works */}
       <div className="fixed top-20 left-4 z-[9999] bg-blue-500 p-4 rounded-lg">
         <p style={{ color: 'white', fontSize: '16px', fontWeight: 'bold' }}>STATIC TEST 1</p>
       </div>
       <div className="fixed top-40 left-4 z-[9999] bg-green-500 p-4 rounded-lg">
-        <h1 style={{ color: 'white', fontSize: '20px', fontWeight: 'bold', margin: 0 }}>Activity (FIXED)</h1>
-        <p style={{ color: 'white', fontSize: '14px', margin: 0 }}>Updates from friends test</p>
+        <span style={{ color: 'white', fontSize: '20px', fontWeight: 'bold', display: 'block' }}>Activity (FIXED)</span>
+        <span style={{ color: 'white', fontSize: '14px', display: 'block' }}>Updates from friends test</span>
       </div>
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-red-500 rounded-full z-[9999]" />
+      
       <main className="mx-auto w-full max-w-[720px] px-4 pt-4 pb-24">
-        {/* Header - using dangerouslySetInnerHTML to bypass any React text node issues */}
-        <header className="flex items-center justify-between mb-4">
-          <div>
-            <h1 
-              className="text-xl font-semibold" 
-              style={{ color: '#000000' }}
-              dangerouslySetInnerHTML={{ __html: 'Activity' }}
-            />
-            <p 
-              className="text-sm" 
-              style={{ color: '#64748b' }}
-              dangerouslySetInnerHTML={{ __html: 'Updates from friends, clubs, courses &amp; messages.' }}
-            />
+        {/* Header - changed from <header> to <div> to test if semantic element is the issue */}
+        <div className="flex items-center justify-between mb-4" style={{ position: 'relative', zIndex: 10 }}>
+          {/* Title section with explicit styling */}
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column',
+            color: '#000000',
+            visibility: 'visible',
+            opacity: 1
+          }}>
+            <span style={{ 
+              fontSize: '20px', 
+              fontWeight: 600, 
+              color: '#0f172a',
+              display: 'block',
+              lineHeight: 1.2
+            }}>
+              Activity
+            </span>
+            <span style={{ 
+              fontSize: '14px', 
+              color: '#64748b',
+              display: 'block',
+              marginTop: '4px'
+            }}>
+              Updates from friends, clubs, courses & messages.
+            </span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -118,7 +133,7 @@ const ActivityPage: React.FC = () => {
               <Settings className="h-4 w-4 text-foreground" />
             </button>
           </div>
-        </header>
+        </div>
 
         {/* Filter tabs */}
         <div className="mb-4 overflow-x-auto scrollbar-hide">
