@@ -22,7 +22,10 @@ export type ActivityType =
   // Social / person-to-person
   | 'follow'
   | 'friend_request'
+  | 'friend_request_sent'
   | 'friend_accepted'
+  | 'friend_declined'
+  | 'friend_cancelled'
   | 'mention'
   | 'tag'
   | 'like'
@@ -118,7 +121,7 @@ export type ChipFilterKind = 'new' | 'mentions' | 'follows' | 'clubs' | 'message
 const MENTION_TYPES = new Set(['mention', 'mention_post', 'tag', 'comment_mention']);
 
 // Types that count as follows
-const FOLLOW_TYPES = new Set(['follow', 'friend_request', 'friend_accepted']);
+const FOLLOW_TYPES = new Set(['follow', 'friend_request', 'friend_request_sent', 'friend_accepted', 'friend_declined', 'friend_cancelled']);
 
 // Types that count as messages
 const MESSAGE_TYPES = new Set(['message', 'message_received', 'dm']);
@@ -326,6 +329,7 @@ async function generateMockActivityWithRealUsers(currentUserId: string, followin
     entity_id?: string;
     userIndex: number;
     request_id?: string;
+    target_user_name?: string;
   }> = [
     // NEW / Unread items - include friend request and follow for testing buttons
     { type: 'friend_request', message: null, created_at: minutesAgo(2), is_read: false, userIndex: 0, request_id: 'mock-fr-1' },
@@ -334,24 +338,26 @@ async function generateMockActivityWithRealUsers(currentUserId: string, followin
     { type: 'like', message: null, created_at: hoursAgo(1), is_read: false, entity_type: 'post', userIndex: 3 },
     { type: 'comment', message: 'Incredible shot! Which club did you use?', created_at: hoursAgo(2), is_read: false, entity_type: 'comment', userIndex: 4 },
     
-    // TODAY items - another friend request to test UI
+    // TODAY items - test various friend states
     { type: 'friend_request', message: null, created_at: hoursAgo(4), is_read: false, userIndex: 5, request_id: 'mock-fr-2' },
-    { type: 'follow', message: null, created_at: hoursAgo(6), is_read: true, userIndex: 6 },
-    { type: 'like', message: null, created_at: hoursAgo(8), is_read: true, entity_type: 'post', userIndex: 7 },
-    { type: 'friend_accepted', message: null, created_at: hoursAgo(10), is_read: true, userIndex: 8 },
+    { type: 'friend_request_sent', message: null, created_at: hoursAgo(5), is_read: true, userIndex: 6, target_user_name: 'James Wilson' },
+    { type: 'follow', message: null, created_at: hoursAgo(6), is_read: true, userIndex: 7 },
+    { type: 'like', message: null, created_at: hoursAgo(8), is_read: true, entity_type: 'post', userIndex: 8 },
+    { type: 'friend_accepted', message: null, created_at: hoursAgo(10), is_read: true, userIndex: 9 },
     
     // THIS WEEK items
-    { type: 'tag', message: null, created_at: daysAgo(1), is_read: true, entity_type: 'post', userIndex: 9 },
-    { type: 'mention', message: 'Playing with @you next week – can\'t wait!', created_at: daysAgo(2), is_read: true, entity_type: 'post', userIndex: 10 },
-    { type: 'follow', message: null, created_at: daysAgo(2), is_read: true, userIndex: 11 },
-    { type: 'like', message: null, created_at: daysAgo(3), is_read: true, entity_type: 'post', userIndex: 12 },
-    { type: 'comment', message: 'That\'s a beautiful course! Adding to my bucket list', created_at: daysAgo(4), is_read: true, entity_type: 'comment', userIndex: 13 },
+    { type: 'friend_cancelled', message: null, created_at: daysAgo(1), is_read: true, userIndex: 10, target_user_name: 'Emma Thompson' },
+    { type: 'tag', message: null, created_at: daysAgo(1), is_read: true, entity_type: 'post', userIndex: 11 },
+    { type: 'mention', message: 'Playing with @you next week – can\'t wait!', created_at: daysAgo(2), is_read: true, entity_type: 'post', userIndex: 12 },
+    { type: 'follow', message: null, created_at: daysAgo(2), is_read: true, userIndex: 13 },
+    { type: 'like', message: null, created_at: daysAgo(3), is_read: true, entity_type: 'post', userIndex: 14 },
+    { type: 'comment', message: 'That\'s a beautiful course! Adding to my bucket list', created_at: daysAgo(4), is_read: true, entity_type: 'comment', userIndex: 15 },
     
     // EARLIER items
-    { type: 'follow', message: null, created_at: daysAgo(8), is_read: true, userIndex: 14 },
-    { type: 'like', message: null, created_at: daysAgo(10), is_read: true, entity_type: 'post', userIndex: 15 },
-    { type: 'friend_accepted', message: null, created_at: daysAgo(12), is_read: true, userIndex: 16 },
-    { type: 'mention', message: 'Best playing partner I\'ve had all year!', created_at: daysAgo(14), is_read: true, entity_type: 'post', userIndex: 17 },
+    { type: 'follow', message: null, created_at: daysAgo(8), is_read: true, userIndex: 16 },
+    { type: 'like', message: null, created_at: daysAgo(10), is_read: true, entity_type: 'post', userIndex: 17 },
+    { type: 'friend_accepted', message: null, created_at: daysAgo(12), is_read: true, userIndex: 18 },
+    { type: 'mention', message: 'Best playing partner I\'ve had all year!', created_at: daysAgo(14), is_read: true, entity_type: 'post', userIndex: 19 },
   ];
 
   return mockTemplates.map((template, index) => {
@@ -377,7 +383,10 @@ async function generateMockActivityWithRealUsers(currentUserId: string, followin
       entity_type: template.entity_type || null,
       entity_id: template.entity_id || null,
       target_type: deriveTargetType(template),
-      data: template.request_id ? { request_id: template.request_id } : null,
+      data: {
+        ...(template.request_id ? { request_id: template.request_id } : {}),
+        ...(template.target_user_name ? { target_user_name: template.target_user_name } : {}),
+      },
       
       // Derived flags
       is_unread: !template.is_read,

@@ -29,6 +29,10 @@ function getNotificationIcon(type: string) {
     case 'friend_request':
     case 'friend_accepted':
       return <Users className={cn(iconClass, "text-amber-500")} />;
+    case 'friend_request_sent':
+    case 'friend_declined':
+    case 'friend_cancelled':
+      return <Users className={cn(iconClass, "text-muted-foreground")} />;
     case 'message':
     case 'dm':
       return <Mail className={cn(iconClass, "text-violet-500")} />;
@@ -58,8 +62,14 @@ function renderNotificationText(notification: ActivityNotification): string {
       return 'started following you';
     case 'friend_request':
       return 'sent you a friend request';
+    case 'friend_request_sent':
+      return ''; // Will be handled specially in the component
     case 'friend_accepted':
       return 'accepted your friend request';
+    case 'friend_declined':
+      return ''; // Will be handled specially in the component
+    case 'friend_cancelled':
+      return ''; // Will be handled specially in the component
     case 'message':
     case 'dm':
       return message ? `sent you a message: "${message.slice(0, 40)}${message.length > 40 ? '...' : ''}"` : 'sent you a message';
@@ -94,22 +104,42 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
     notification.actor_id &&
     notification.actor_id !== currentUserId;
 
-  // Determine if we should show friend request buttons
+  // Determine if we should show friend request buttons (receiver, pending)
   const showFriendRequestButtons = 
     notification.type === 'friend_request' &&
     notification.actor_type === 'user' &&
     notification.actor_id &&
     notification.actor_id !== currentUserId;
 
-  // Determine if we should show the "Friends" pill (for friend_accepted notifications)
+  // Determine various friend state pills
   const showFriendsPill = notification.type === 'friend_accepted';
+  const showPendingPill = notification.type === 'friend_request_sent';
+  const showDeclinedPill = notification.type === 'friend_declined';
+  const showCancelledPill = notification.type === 'friend_cancelled';
 
   // Get request ID for friend request actions (from data or notification id)
   const friendRequestId = notification.data?.request_id || notification.id;
+  const targetUserName = notification.data?.target_user_name || notification.actor_display_name;
 
-  // Has any CTA (friend request, follow back, or friends pill)
-  const hasCTA = showFriendRequestButtons || showFollowBack || showFriendsPill;
+  // Has any CTA (friend request, follow back, or status pills)
+  const hasCTA = showFriendRequestButtons || showFollowBack || showFriendsPill || showPendingPill || showDeclinedPill || showCancelledPill;
   const statusIcon = getNotificationIcon(notification.type);
+
+  // Build custom text for sender-side notifications
+  const getCustomText = () => {
+    if (notification.type === 'friend_request_sent') {
+      return `Friend request sent to ${targetUserName}`;
+    }
+    if (notification.type === 'friend_cancelled') {
+      return `You cancelled your friend request to ${targetUserName}`;
+    }
+    if (notification.type === 'friend_declined') {
+      return `Friend request to ${targetUserName} was declined`;
+    }
+    return null;
+  };
+  
+  const customText = getCustomText();
 
   // Shared base pill class for unified styling
   const basePillClass = "inline-flex items-center justify-center rounded-full border px-4 h-9 text-xs font-semibold transition-colors";
@@ -148,12 +178,20 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
             "text-sm leading-snug",
             isUnread ? "text-foreground" : "text-foreground/90"
           )}>
-            <span className={cn(isUnread ? "font-semibold" : "font-medium")}>
-              {notification.actor_display_name || 'Unknown User'}
-            </span>{' '}
-            <span className="font-normal text-muted-foreground">
-              {renderNotificationText(notification)}
-            </span>
+            {customText ? (
+              <span className={cn(isUnread ? "font-medium" : "font-normal", "text-foreground/90")}>
+                {customText}
+              </span>
+            ) : (
+              <>
+                <span className={cn(isUnread ? "font-semibold" : "font-medium")}>
+                  {notification.actor_display_name || 'Unknown User'}
+                </span>{' '}
+                <span className="font-normal text-muted-foreground">
+                  {renderNotificationText(notification)}
+                </span>
+              </>
+            )}
           </p>
 
           {/* MIDDLE: timestamp */}
@@ -183,6 +221,21 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
                 <span className={cn(basePillClass, "border-border bg-muted text-foreground/80 gap-1")}>
                   <Users className="h-3 w-3" />
                   Friends
+                </span>
+              )}
+              {showPendingPill && (
+                <span className={cn(basePillClass, "border-border bg-muted text-foreground/60 gap-1")}>
+                  Pending
+                </span>
+              )}
+              {showDeclinedPill && (
+                <span className={cn(basePillClass, "border-red-400 bg-red-500/5 text-red-500 gap-1")}>
+                  Declined
+                </span>
+              )}
+              {showCancelledPill && (
+                <span className={cn(basePillClass, "border-border bg-muted text-foreground/60 gap-1")}>
+                  Cancelled
                 </span>
               )}
             </div>
