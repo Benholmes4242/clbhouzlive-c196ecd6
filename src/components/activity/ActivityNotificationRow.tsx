@@ -115,10 +115,10 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           : "bg-background/50 hover:bg-background/80"
       )}
     >
-      {/* Unread dot indicator */}
+      {/* Unread dot indicator - positioned on top-left corner of card */}
       {isUnread && (
         <span 
-          className="absolute left-1.5 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-primary shadow-[0_0_6px_rgba(var(--primary),0.4)]" 
+          className="absolute -top-1.5 -left-1.5 h-3 w-3 rounded-full bg-orange-400 shadow-sm z-10" 
           aria-hidden 
         />
       )}
