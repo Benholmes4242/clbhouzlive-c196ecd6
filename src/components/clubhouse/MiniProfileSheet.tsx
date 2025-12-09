@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { X, MapPin, Target, Play, CheckCircle, Volume2, VolumeX } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { useNavigate } from 'react-router-dom';
-import { useFollowUser } from '@/hooks/useFollowUser';
+import { useFollow } from '@/hooks/useFollow';
 import { useUserProfilePosts } from '@/hooks/useUserProfilePosts';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ImageWithFallback } from '@/components/common/ImageWithFallback';
 import { SheetPlaybackProvider, useSheetPlayback } from './SheetPlaybackContext';
 import { VideoThumbPlayer } from './VideoThumbPlayer';
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
 interface UserProfile {
   id: string;
@@ -110,14 +108,13 @@ function RecentPostTile({
 }
 
 const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfileSheetProps) => {
-  const isMobile = useIsMobile();
   const navigate = useNavigate();
-  const { followUser, unfollowUser, loading: followLoading } = useFollowUser();
+  
+  // Use the new follow hook
+  const { isFollowing: followState, busy: followBusy, toggle: toggleFollow, ensureInitial } = useFollow(user?.id);
+  
   const { posts, loading: postsLoading, error: postsError, isEmpty } = useUserProfilePosts(user?.id);
   const { openMedia } = useFullscreenMedia();
-  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
-  const [isFollowing, setIsFollowing] = useState(user?.isFollowing || false);
-  const [optimisticFollowing, setOptimisticFollowing] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   
   const headerRef = React.useRef<HTMLDivElement>(null);
@@ -125,10 +122,10 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
   const [scrollMaxHeight, setScrollMaxHeight] = React.useState<number>();
   const { setSheetClosing } = useSheetPlayback();
 
-  // Update following state when user prop changes
+  // Initialize follow state on mount
   useEffect(() => {
-    setIsFollowing(user?.isFollowing || false);
-  }, [user?.isFollowing]);
+    ensureInitial();
+  }, [ensureInitial]);
 
   // Reset closing state when modal opens
   useEffect(() => {
@@ -212,32 +209,12 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
   };
 
   const handleFollowClick = async () => {
-    if (!user?.id || followLoading) return;
-
-    // Optimistic update
-    const newFollowingState = !isFollowing;
-    setOptimisticFollowing(true);
-    setIsFollowing(newFollowingState);
-
-    try {
-      const success = newFollowingState
-        ? await followUser(user.id)
-        : await unfollowUser(user.id);
-
-      if (!success) {
-        // Revert optimistic update on failure
-        setIsFollowing(!newFollowingState);
-      } else {
-        // Call parent onFollow callback if provided
-        onFollow?.();
-      }
-    } catch (error) {
-      // Revert optimistic update on error
-      setIsFollowing(!newFollowingState);
-    } finally {
-      setOptimisticFollowing(false);
-    }
+    if (!user?.id || followBusy) return;
+    await toggleFollow();
+    onFollow?.();
   };
+
+  const isFollowing = followState === 'following';
 
   const handlePostClick = (post: any) => {
     if (post.post_media?.length > 0) {
@@ -351,7 +328,7 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
             <button
               type="button"
               onClick={handleFollowClick}
-              disabled={followLoading || optimisticFollowing}
+              disabled={followBusy}
               className={cn(
                 "btn-frosted-white px-4 py-1.5 text-[13px] font-semibold rounded-full",
                 "bg-white/16 backdrop-blur-[18px] border border-white/45 text-white",
@@ -362,7 +339,7 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
                 "disabled:opacity-50 disabled:cursor-not-allowed"
               )}
             >
-              {followLoading || optimisticFollowing ? '...' : (isFollowing ? 'Following' : 'Follow')}
+              {followBusy ? '...' : (isFollowing ? 'Following' : 'Follow')}
             </button>
           </div>
 
