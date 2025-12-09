@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
-import CompactHeader from '@/components/clubhouse/CompactHeader';
+import CompactHeader from '@/components/header/CompactHeader';
 import NavigationBar from '@/components/bottom-navigation/NavigationBar';
 import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
