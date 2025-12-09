@@ -1,10 +1,9 @@
 
 import React, { useRef } from 'react';
-import { Bell, User, Settings, Shield } from 'lucide-react';
+import { User, Settings, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
-import { useNotifications } from "@/hooks/useNotifications";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdaptiveTextColor } from "@/hooks/useAdaptiveTextColor";
@@ -22,7 +21,6 @@ const HeaderNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useSupabaseSession();
-  const { unreadCount } = useNotifications();
   const { variant } = useHeader();
   
   // Create refs for adaptive text color detection
@@ -67,18 +65,6 @@ const HeaderNavigation = () => {
     },
     enabled: !!user?.id,
   });
-
-  const handleNotificationsClick = () => {
-    navigate('/notifications');
-    // Scroll to top after navigation
-    setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: 'smooth'
-      });
-    }, 50);
-  };
 
   const handleProfileClick = () => {
     if (!user) {
@@ -136,10 +122,6 @@ const HeaderNavigation = () => {
   if (!user) {
     return (
       <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
-        <Button data-action="notifications" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())} onClick={handleNotificationsClick}>
-          <Bell className="h-5 w-5" />
-        </Button>
-
         <Button data-action="profile" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())} onClick={handleProfileClick}>
           <User className="h-5 w-5" />
         </Button>
@@ -166,15 +148,6 @@ const HeaderNavigation = () => {
 
   return (
     <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
-      <Button data-action="notifications" variant="ghost" className={cn("relative p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())} onClick={handleNotificationsClick}>
-        <Bell className="h-5 w-5" />
-        {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-            {unreadCount > 9 ? '9+' : unreadCount}
-          </span>
-        )}
-      </Button>
-
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button data-action="profile" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())}>

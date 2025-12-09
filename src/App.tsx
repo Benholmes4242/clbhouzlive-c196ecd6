@@ -91,7 +91,7 @@ const News = lazy(() => import("./pages/News"));
 
 
 const MessagesPage = lazy(() => import("./pages/MessagesPage"));
-const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
+
 const GolfersToFollowPage = lazy(() => import("./pages/GolfersToFollowPage"));
 const GolfersSharedCoursesPage = lazy(() => import("./pages/GolfersSharedCoursesPage"));
 const FriendsPage = lazy(() => import("./pages/FriendsPage"));
@@ -215,7 +215,7 @@ function AppRoutes() {
           <Route path="/challenges" element={<Suspense fallback={<GenericPageSkeleton />}><ChallengesPage /></Suspense>} />
         
         <Route path="/messages" element={<Suspense fallback={<GenericPageSkeleton />}><MessagesPage /></Suspense>} />
-        <Route path="/notifications" element={<Suspense fallback={<GenericPageSkeleton />}><NotificationsPage /></Suspense>} />
+        
         <Route path="/golferstofollow" element={<Suspense fallback={<GenericPageSkeleton />}><GolfersToFollowPage /></Suspense>} />
         <Route path="/golferssharedcourses" element={<Suspense fallback={<GenericPageSkeleton />}><GolfersSharedCoursesPage /></Suspense>} />
         <Route path="/friends" element={<Suspense fallback={<GenericPageSkeleton />}><FriendsPage /></Suspense>} />
