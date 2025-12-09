@@ -134,6 +134,7 @@ export const SocialDock: React.FC<SocialDockProps> = ({
                 alt={post.user.name}
                 size={32}
                 fallback={post.user.name?.charAt(0) || '?'}
+                hideRing
               />
               <div className="flex flex-col min-w-0">
                 <span className="text-sm font-semibold truncate text-white">
