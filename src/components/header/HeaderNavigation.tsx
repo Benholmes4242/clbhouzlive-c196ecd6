@@ -129,8 +129,11 @@ const HeaderNavigation = () => {
             variant="ghost"
             className={cn(
               "p-2 md:p-3 flex-shrink-0 mt-3 transition-colors",
-              "focus:bg-transparent focus-visible:bg-transparent active:bg-transparent",
+              "bg-transparent hover:bg-transparent active:bg-transparent",
+              "focus:bg-transparent focus-visible:bg-transparent",
+              "data-[state=open]:bg-transparent",
               "focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0",
+              "!bg-transparent", // Force no background in any state
               getIconColorClass()
             )}
             onClick={() => navigate('/notificationmessages')}
@@ -173,8 +176,11 @@ const HeaderNavigation = () => {
           variant="ghost"
           className={cn(
             "p-2 md:p-3 flex-shrink-0 mt-3 transition-colors",
-            "focus:bg-transparent focus-visible:bg-transparent active:bg-transparent",
+            "bg-transparent hover:bg-transparent active:bg-transparent",
+            "focus:bg-transparent focus-visible:bg-transparent",
+            "data-[state=open]:bg-transparent",
             "focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0",
+            "!bg-transparent", // Force no background in any state
             getIconColorClass()
           )}
           onClick={() => navigate('/notificationmessages')}
