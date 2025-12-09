@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -21,13 +20,13 @@ interface AuthFormProps {
   showConfirmNotice: boolean;
 }
 
-// Custom dark input styling
-const darkInputStyles = {
+// Light theme input styling using design tokens
+const lightInputStyles: React.CSSProperties = {
   height: '48px',
-  backgroundColor: 'rgba(255,255,255,0.08)',
-  border: '1px solid rgba(255,255,255,0.12)',
-  borderRadius: '12px',
-  color: 'white',
+  backgroundColor: 'var(--surface-card)',
+  border: '1px solid rgba(151, 161, 170, 0.25)',
+  borderRadius: '14px',
+  color: 'var(--text-primary)',
   fontSize: '15px',
   paddingLeft: '16px',
   paddingRight: '16px',
@@ -325,6 +324,9 @@ const AuthForm: React.FC<AuthFormProps> = ({
     }
   `;
 
+  // Disabled state styling
+  const isButtonDisabled = submitting || (!isSignUp && !isFormValid) || (isSignUp && usernameAvailable !== true);
+
   if (showForgotPassword) {
     return (
       <form className="w-full" onSubmit={(e) => { e.preventDefault(); handleForgotPasswordClick(); }}>
@@ -337,20 +339,17 @@ const AuthForm: React.FC<AuthFormProps> = ({
             placeholder="Enter your email address"
             disabled={resetSubmitting}
             required
-            style={{
-              ...darkInputStyles,
-            }}
-            className="placeholder:text-white/40 focus:border-[#6e9277]"
+            style={lightInputStyles}
+            className="placeholder:text-text-tertiary focus:border-slate-600 focus:shadow-[0_0_0_2px_rgba(44,52,64,0.12)]"
           />
         </div>
         <button 
           type="submit" 
           disabled={resetSubmitting} 
-          className="w-full h-12 rounded-[12px] font-medium text-white transition-all active:scale-[0.98]"
+          className="w-full h-12 rounded-sq-sm font-medium text-white transition-all active:scale-[0.98]"
           style={{
-            background: 'linear-gradient(180deg, #6e9277 0%, #5a7d63 100%)',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.15), 0 2px 8px rgba(0,0,0,0.3)',
-            opacity: resetSubmitting ? 0.3 : 1,
+            backgroundColor: resetSubmitting ? 'var(--text-tertiary)' : 'var(--surface-slate)',
+            opacity: resetSubmitting ? 0.5 : 1,
             pointerEvents: resetSubmitting ? 'none' : 'auto',
           }}
         >
@@ -359,7 +358,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
         <button
           type="button"
           className="w-full text-sm mt-4 transition-opacity hover:opacity-80"
-          style={{ color: 'rgba(255,255,255,0.5)' }}
+          style={{ color: 'var(--text-secondary)' }}
           onClick={() => setShowForgotPassword(false)}
           disabled={resetSubmitting}
         >
@@ -385,17 +384,17 @@ const AuthForm: React.FC<AuthFormProps> = ({
           disabled={submitting || showConfirmNotice}
           required
           style={{
-            ...darkInputStyles,
-            borderColor: emailError ? '#ef4444' : 'rgba(255,255,255,0.12)',
+            ...lightInputStyles,
+            borderColor: emailError ? '#ef4444' : 'rgba(151, 161, 170, 0.25)',
             animation: shakeEmail ? 'shake 0.5s ease-in-out' : 'none',
           }}
-          className="placeholder:text-white/40 focus:border-[#6e9277] focus:shadow-[0_0_0_2px_rgba(110,146,119,0.2)]"
+          className="placeholder:text-text-tertiary focus:border-slate-600 focus:shadow-[0_0_0_2px_rgba(44,52,64,0.12)]"
         />
         {emailError && (
           <p className="text-sm mt-2" style={{ color: '#ef4444' }}>{emailError}</p>
         )}
         {forgotPasswordMsg && (
-          <p className={cn("text-sm mt-2", forgotPasswordSuccess ? "text-green-400" : "text-red-400")}>
+          <p className={cn("text-sm mt-2", forgotPasswordSuccess ? "text-green-600" : "text-red-500")}>
             {forgotPasswordMsg}
           </p>
         )}
@@ -413,27 +412,32 @@ const AuthForm: React.FC<AuthFormProps> = ({
               disabled={submitting || showConfirmNotice}
               required
               style={{
-                ...darkInputStyles,
+                ...lightInputStyles,
                 paddingRight: '40px',
                 borderColor: usernameAvailable === true ? '#22c55e' : 
-                  usernameAvailable === false ? '#ef4444' : 'rgba(255,255,255,0.12)',
+                  usernameAvailable === false ? '#ef4444' : 'rgba(151, 161, 170, 0.25)',
               }}
-              className="placeholder:text-white/40 focus:border-[#6e9277]"
+              className="placeholder:text-text-tertiary focus:border-slate-600"
             />
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
               {checkingUsername ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white/60 rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-500 rounded-full animate-spin" />
               ) : usernameAvailable === true ? (
-                <Check className="w-4 h-4 text-green-400" />
+                <Check className="w-4 h-4 text-green-500" />
               ) : usernameAvailable === false ? (
-                <X className="w-4 h-4 text-red-400" />
+                <X className="w-4 h-4 text-red-500" />
               ) : null}
             </div>
           </div>
           
           {usernameAvailable === false && suggestedUsernames.length > 0 && (
-            <div className="mt-2 p-3 rounded-[8px]" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}>
-              <p className="text-white/60 text-sm mb-2">Username taken. Try these:</p>
+            <div 
+              className="mt-2 p-3 rounded-sq-xs"
+              style={{ backgroundColor: 'var(--bg-page)' }}
+            >
+              <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>
+                Username taken. Try these:
+              </p>
               <div className="flex flex-wrap gap-1">
                 {suggestedUsernames.map((suggestion) => (
                   <button
@@ -443,10 +447,10 @@ const AuthForm: React.FC<AuthFormProps> = ({
                       setUsername(suggestion);
                       checkUsernameAvailability(suggestion);
                     }}
-                    className="px-2 py-1 text-sm rounded-md transition-colors"
+                    className="px-2 py-1 text-sm rounded-sq-xs transition-colors hover:bg-slate-200"
                     style={{ 
-                      backgroundColor: 'rgba(255,255,255,0.08)',
-                      color: 'rgba(255,255,255,0.8)',
+                      backgroundColor: 'rgba(151, 161, 170, 0.12)',
+                      color: 'var(--text-primary)',
                     }}
                   >
                     @{suggestion}
@@ -477,11 +481,11 @@ const AuthForm: React.FC<AuthFormProps> = ({
           disabled={submitting || showConfirmNotice}
           required
           style={{
-            ...darkInputStyles,
-            borderColor: passwordError ? '#ef4444' : 'rgba(255,255,255,0.12)',
+            ...lightInputStyles,
+            borderColor: passwordError ? '#ef4444' : 'rgba(151, 161, 170, 0.25)',
             animation: shakePassword ? 'shake 0.5s ease-in-out' : 'none',
           }}
-          className="placeholder:text-white/40 focus:border-[#6e9277] focus:shadow-[0_0_0_2px_rgba(110,146,119,0.2)]"
+          className="placeholder:text-text-tertiary focus:border-slate-600 focus:shadow-[0_0_0_2px_rgba(44,52,64,0.12)]"
         />
         {passwordError && (
           <p className="text-sm mt-2" style={{ color: '#ef4444' }}>{passwordError}</p>
@@ -493,13 +497,12 @@ const AuthForm: React.FC<AuthFormProps> = ({
           {/* Sign In Button */}
           <button 
             type="submit" 
-            disabled={submitting || (!isSignUp && !isFormValid) || (isSignUp && usernameAvailable !== true)} 
-            className="w-full h-12 rounded-[12px] font-medium text-white transition-all active:scale-[0.98]"
+            disabled={isButtonDisabled} 
+            className="w-full h-12 rounded-sq-sm font-medium text-white transition-all active:scale-[0.98]"
             style={{
-              background: 'linear-gradient(180deg, #6e9277 0%, #5a7d63 100%)',
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.15), 0 2px 8px rgba(0,0,0,0.3)',
-              opacity: (submitting || (!isSignUp && !isFormValid) || (isSignUp && usernameAvailable !== true)) ? 0.3 : 1,
-              pointerEvents: (submitting || (!isSignUp && !isFormValid) || (isSignUp && usernameAvailable !== true)) ? 'none' : 'auto',
+              backgroundColor: isButtonDisabled ? 'var(--text-tertiary)' : 'var(--surface-slate)',
+              opacity: isButtonDisabled ? 0.5 : 1,
+              pointerEvents: isButtonDisabled ? 'none' : 'auto',
             }}
           >
             {submitting ? (
@@ -514,9 +517,14 @@ const AuthForm: React.FC<AuthFormProps> = ({
           
           {/* Divider */}
           <div className="flex items-center my-6">
-            <div className="flex-1 h-px" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }} />
-            <span className="mx-4 text-sm font-medium" style={{ color: 'rgba(255,255,255,0.4)' }}>OR</span>
-            <div className="flex-1 h-px" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }} />
+            <div className="flex-1 h-px" style={{ backgroundColor: 'rgba(151, 161, 170, 0.15)' }} />
+            <span 
+              className="mx-4 text-xs font-medium uppercase tracking-wide"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              OR
+            </span>
+            <div className="flex-1 h-px" style={{ backgroundColor: 'rgba(151, 161, 170, 0.15)' }} />
           </div>
           
           {/* OAuth Buttons */}
@@ -526,15 +534,15 @@ const AuthForm: React.FC<AuthFormProps> = ({
               type="button"
               onClick={handleGoogleSignIn}
               disabled={submitting}
-              className="w-full h-12 rounded-[12px] flex items-center transition-all active:scale-[0.98] hover:bg-white/[0.08]"
+              className="w-full h-12 rounded-sq-sm flex items-center transition-all active:scale-[0.98]"
               style={{
-                backgroundColor: 'transparent',
-                border: '1px solid rgba(255,255,255,0.12)',
+                backgroundColor: 'var(--surface-card)',
+                border: '1px solid rgba(151, 161, 170, 0.25)',
               }}
             >
               <div className="w-12 flex items-center justify-center">
                 {submitting ? (
-                  <Loader2 className="w-5 h-5 animate-spin text-white/60" />
+                  <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'var(--text-tertiary)' }} />
                 ) : (
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -544,7 +552,10 @@ const AuthForm: React.FC<AuthFormProps> = ({
                   </svg>
                 )}
               </div>
-              <span className="flex-1 text-center pr-12 text-sm font-medium text-white">
+              <span 
+                className="flex-1 text-center pr-12 text-sm font-medium"
+                style={{ color: 'var(--text-primary)' }}
+              >
                 Continue with Google
               </span>
             </button>
@@ -554,22 +565,25 @@ const AuthForm: React.FC<AuthFormProps> = ({
               type="button"
               onClick={handleAppleSignIn}
               disabled={submitting}
-              className="w-full h-12 rounded-[12px] flex items-center transition-all active:scale-[0.98] hover:bg-white/[0.08]"
+              className="w-full h-12 rounded-sq-sm flex items-center transition-all active:scale-[0.98]"
               style={{
-                backgroundColor: 'transparent',
-                border: '1px solid rgba(255,255,255,0.12)',
+                backgroundColor: 'var(--surface-card)',
+                border: '1px solid rgba(151, 161, 170, 0.25)',
               }}
             >
               <div className="w-12 flex items-center justify-center">
                 {submitting ? (
-                  <Loader2 className="w-5 h-5 animate-spin text-white/60" />
+                  <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'var(--text-tertiary)' }} />
                 ) : (
-                  <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" style={{ color: 'var(--text-primary)' }} fill="currentColor">
                     <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
                   </svg>
                 )}
               </div>
-              <span className="flex-1 text-center pr-12 text-sm font-medium text-white">
+              <span 
+                className="flex-1 text-center pr-12 text-sm font-medium"
+                style={{ color: 'var(--text-primary)' }}
+              >
                 Continue with Apple
               </span>
             </button>
@@ -580,7 +594,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
             <button
               type="button"
               className="w-full text-sm mt-5 transition-opacity hover:opacity-80"
-              style={{ color: 'rgba(255,255,255,0.5)' }}
+              style={{ color: 'var(--text-secondary)' }}
               onClick={handleForgotPasswordClick}
               disabled={submitting}
             >
