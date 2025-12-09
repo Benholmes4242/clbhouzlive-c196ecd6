@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle2 } from 'lucide-react';
 import { useActivityFeed, ActivityTabId, ACTIVITY_TABS, ActivityNotification, ChipFilterKind } from '@/hooks/useActivityFeed';
 import { ActivityBucket } from '@/components/activity/ActivityBucket';
 import { AtAGlanceChips } from '@/components/activity/AtAGlanceChips';
@@ -14,6 +13,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
 import { PageRoot } from '@/components/layout/PageRoot';
 import CompactHeader from '@/components/header/CompactHeader';
+import { Button } from '@/components/ui/button';
 
 // Feature flag for Mark All Read
 const ENABLE_MARK_ALL_READ = true;
@@ -155,9 +155,9 @@ const ActivityPage: React.FC = () => {
     <PageRoot className="bg-muted/40 pb-24">
       <CompactHeader />
 
-      {/* Main content wrapper - matches Courses/Profile gutters */}
-      <div className="max-w-screen-sm mx-auto px-4 pt-6 compact-header-offset">
-        {/* Header section with title and mark all read pill */}
+      {/* Main content wrapper - consistent left-aligned layout */}
+      <div className="max-w-[640px] mx-auto px-4 sm:px-5 pt-6 compact-header-offset">
+        {/* Header section with title and mark all read button */}
         <section className="mb-4">
           <div className="flex items-start justify-between">
             <div>
@@ -168,23 +168,19 @@ const ActivityPage: React.FC = () => {
                 Updates from friends, golf clubs and messages.
               </p>
             </div>
+            
+            {/* Mark all as read - light text button */}
+            {ENABLE_MARK_ALL_READ && unreadCount > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleMarkAllAsReadClick}
+                className="h-9 px-3 text-xs text-muted-foreground hover:text-foreground"
+              >
+                Mark all as read
+              </Button>
+            )}
           </div>
-          
-          {/* Mark all as read pill button - only show when there are unread items */}
-          {ENABLE_MARK_ALL_READ && unreadCount > 0 && (
-            <button
-              onClick={handleMarkAllAsReadClick}
-              className={cn(
-                "mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium",
-                "rounded-sq-pill border border-border/60 bg-background/80",
-                "text-muted-foreground hover:text-foreground hover:bg-muted/60",
-                "transition-colors duration-200"
-              )}
-            >
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              Mark all as read
-            </button>
-          )}
         </section>
 
         {/* Filter tabs - Apple-style segmented control */}
@@ -220,7 +216,7 @@ const ActivityPage: React.FC = () => {
         {isLoading ? (
           <ActivitySkeleton />
         ) : error ? (
-          <div className="text-center py-12 text-muted-foreground">
+          <div className="text-left py-12 text-muted-foreground">
             <p>Failed to load activity</p>
           </div>
         ) : isEmpty ? (

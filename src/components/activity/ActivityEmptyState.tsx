@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell, Heart, Users, Building2, Mail, Sparkles, CheckCircle2, Flag } from 'lucide-react';
+import { Bell, Heart, Users, Building2, Mail, Sparkles, CheckCircle2 } from 'lucide-react';
 import { ActivityTabId } from '@/hooks/useActivityFeed';
 
 interface ActivityEmptyStateProps {
@@ -55,12 +55,12 @@ export const ActivityEmptyState: React.FC<ActivityEmptyStateProps> = ({ tab, isA
 
   const state = TAB_EMPTY_STATES[tab];
 
-  // Left-aligned empty states for all tabs
+  // Left-aligned empty states for all tabs - within the same content width
   return (
-    <div className="flex flex-col items-start text-left gap-2 py-10 px-4">
+    <div className="flex flex-col items-start text-left gap-2 py-10">
       {state.icon}
-      <p className="text-sm font-medium text-slate-700 mt-2">{state.title}</p>
-      <p className="text-xs text-slate-500 max-w-[280px]">
+      <p className="text-sm font-medium text-foreground mt-2">{state.title}</p>
+      <p className="text-xs text-muted-foreground max-w-[280px]">
         {state.description}
       </p>
     </div>
