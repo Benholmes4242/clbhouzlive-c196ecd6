@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useScrollDirection } from '@/hooks/useScrollDirection';
@@ -12,13 +12,19 @@ interface CompactHeaderProps {
 }
 
 /**
- * Compact Header (56px) - used on Discover, Tour, Notifications
- * Sticky at top, hides on scroll down, re-appears on scroll up
+ * Compact Header (56px) - used on Discover, Tour, Notifications, Clubhouse
+ * On Clubhouse: Uses chrome-header class for auto-hide system (body.chrome-hidden)
+ * On other pages: Uses useScrollDirection for scroll-based hide/show
  */
 const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const navigate = useNavigate();
-  const { isHidden } = useScrollDirection();
+  const location = useLocation();
+  const { isHidden: scrollHidden } = useScrollDirection();
   const [searchOpen, setSearchOpen] = useState(false);
+  
+  // On Clubhouse, use the chrome system (body.chrome-hidden .chrome-header)
+  // On other pages, use scroll direction
+  const isClubhousePage = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
 
   const handleLogoClick = () => {
     navigate('/clubhouse');
@@ -27,12 +33,16 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   return (
     <>
       <header
+        data-chrome="header"
         className={cn(
           "compact-header",
-          "sticky top-0 z-header",
+          // Add chrome-header class on Clubhouse for auto-hide system
+          isClubhousePage && "chrome-header",
+          "fixed top-0 left-0 right-0 z-header",
           "h-14", // 56px
           "transition-transform duration-200 ease-out",
-          isHidden && "-translate-y-full",
+          // On non-Clubhouse pages, use scroll direction for hide/show
+          !isClubhousePage && scrollHidden && "-translate-y-full",
           className
         )}
         style={{
