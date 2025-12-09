@@ -35,6 +35,8 @@ export interface SquircleAvatarProps {
   alt?: string;
   /** Achievement ring color (e.g., '#8CE06A' for Founder). If provided, shows outer colored ring */
   ringColor?: string | null;
+  /** Hide ring entirely (no grey or colored ring) */
+  hideRing?: boolean;
   /** Fallback text (e.g., initials) */
   fallback?: string;
   /** Additional CSS classes */
@@ -63,6 +65,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   src,
   alt = '',
   ringColor,
+  hideRing = false,
   fallback,
   className,
   onLoad,
@@ -172,7 +175,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
     );
   }
 
-  // Normal state: single grey ring around avatar
+  // Normal state: single grey ring around avatar (or no ring if hideRing)
   return (
     <div
       className={cn(
@@ -188,7 +191,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
           width: `${pixelSize}px`,
           aspectRatio: '1 / 1.05',
           borderRadius: '34%',
-          border: '2.5px solid #D1D5DB',
+          border: hideRing ? 'none' : '2.5px solid #D1D5DB',
         }}
       >
         {avatarContent}
