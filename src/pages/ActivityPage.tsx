@@ -157,31 +157,32 @@ const ActivityPage: React.FC = () => {
 
       {/* Main content wrapper - matches Courses/Profile gutters */}
       <div className="max-w-screen-sm mx-auto px-4 pt-6 compact-header-offset">
-        {/* Header section with title and mark all read button */}
-        <section className="mb-4 flex items-start justify-between">
-          <div>
-            <h1 className="text-xl font-semibold tracking-tight text-foreground">
-              Activity
-            </h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              Updates from friends, clubs, courses & messages.
-            </p>
+        {/* Header section with title and mark all read pill */}
+        <section className="mb-4">
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-xl font-semibold tracking-tight text-foreground">
+                Activity
+              </h1>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                Updates from friends, clubs, courses & messages.
+              </p>
+            </div>
           </div>
           
-          {/* Mark all as read button */}
-          {ENABLE_MARK_ALL_READ && (
+          {/* Mark all as read pill button - only show when there are unread items */}
+          {ENABLE_MARK_ALL_READ && unreadCount > 0 && (
             <button
               onClick={handleMarkAllAsReadClick}
               className={cn(
-                "flex items-center justify-center h-9 w-9 rounded-full transition-colors",
-                unreadCount > 0
-                  ? "text-foreground hover:bg-muted"
-                  : "text-muted-foreground/50"
+                "mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium",
+                "rounded-sq-pill border border-border/60 bg-background/80",
+                "text-muted-foreground hover:text-foreground hover:bg-muted/60",
+                "transition-colors duration-200"
               )}
-              title={unreadCount > 0 ? "Mark all as read" : "No unread activity"}
-              aria-disabled={unreadCount === 0}
             >
-              <CheckCircle2 className="h-5 w-5" />
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              Mark all as read
             </button>
           )}
         </section>

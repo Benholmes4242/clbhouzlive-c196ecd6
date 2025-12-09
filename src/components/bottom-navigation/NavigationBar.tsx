@@ -35,6 +35,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
           {navigationTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
+            // Activity/bell icon should not have active highlight - just show neutral
+            const isActivityTab = tab.id === 'activity';
             
             return (
               <button
@@ -50,10 +52,12 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
                   "transition-all duration-motion-fast ease-standard",
                   "hover:scale-[1.05] active:scale-[0.95]",
                   "motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100",
-                  // Active state uses accent color for all tabs
-                  isActive && "text-[color:var(--primary-accent)]",
-                  // Inactive state
-                  !isActive && (isClubhouse ? "text-white/80" : "text-white/85"),
+                  // Active state uses accent color - except for activity tab which stays neutral
+                  isActive && !isActivityTab && "text-[color:var(--primary-accent)]",
+                  // Activity tab stays neutral grey even when active
+                  isActivityTab && (isClubhouse ? "text-white/80" : "text-white/85"),
+                  // Inactive state for non-activity tabs
+                  !isActive && !isActivityTab && (isClubhouse ? "text-white/80" : "text-white/85"),
                   // Hover state
                   !isActive && (isClubhouse ? "hover:text-white" : "hover:text-white")
                 )}
