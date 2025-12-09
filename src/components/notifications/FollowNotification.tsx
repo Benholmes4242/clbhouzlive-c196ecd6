@@ -3,6 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Squircle } from '@/components/ui/squircle';
 import { UserPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useFollow } from '@/hooks/useFollow';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface FollowNotificationProps {
   notification: any;
@@ -12,11 +16,39 @@ const FollowNotification: React.FC<FollowNotificationProps> = ({
   notification
 }) => {
   const navigate = useNavigate();
+  const { user } = useSupabaseSession();
   
-  const data = notification.data || {};
-  const followerName = data.follower_name || 'Someone';
-  const followerPhoto = data.follower_photo;
-  const followerUsername = data.follower_username;
+  // Get actor_id from notification - could be in data or directly on notification
+  const actorId = notification.actor_id || notification.data?.follower_id;
+  
+  // Fetch actor profile
+  const { data: actorProfile } = useQuery({
+    queryKey: ['user-profile', actorId],
+    queryFn: async () => {
+      if (!actorId) return null;
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url')
+        .eq('id', actorId)
+        .single();
+      return data;
+    },
+    enabled: !!actorId,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Follow back functionality
+  const { isFollowing, toggle, ensureInitial } = useFollow(actorId);
+  
+  React.useEffect(() => {
+    if (actorId) {
+      ensureInitial();
+    }
+  }, [actorId, ensureInitial]);
+
+  const followerName = actorProfile?.display_name || notification.data?.follower_name || 'Someone';
+  const followerPhoto = actorProfile?.profile_photo_url || notification.data?.follower_photo;
+  const followerUsername = actorProfile?.username || notification.data?.follower_username;
 
   const formatTimeAgo = (dateString: string) => {
     const now = new Date();
@@ -33,10 +65,14 @@ const FollowNotification: React.FC<FollowNotificationProps> = ({
   };
 
   const handleViewProfile = () => {
-    if (followerUsername) {
+    if (actorId) {
+      navigate(`/profile/${actorId}`);
+    } else if (followerUsername) {
       navigate(`/profile/${followerUsername}`);
     }
   };
+
+  const isOwnProfile = user?.id === actorId;
 
   return (
     <div className="p-4 border-b border-border bg-background">
@@ -63,14 +99,27 @@ const FollowNotification: React.FC<FollowNotificationProps> = ({
               {formatTimeAgo(notification.created_at)}
             </p>
           </div>
-          <Button 
-            size="sm" 
-            onClick={handleViewProfile} 
-            className="flex items-center gap-1"
-          >
-            <UserPlus className="h-4 w-4" />
-            View Profile
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              size="sm" 
+              onClick={handleViewProfile} 
+              variant="outline"
+              className="flex items-center gap-1"
+            >
+              View Profile
+            </Button>
+            {!isOwnProfile && actorId && (
+              <Button 
+                size="sm" 
+                onClick={toggle}
+                variant={isFollowing === 'following' ? 'secondary' : 'default'}
+                className="flex items-center gap-1"
+              >
+                <UserPlus className="h-4 w-4" />
+                {isFollowing === 'following' ? 'Following' : 'Follow Back'}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>

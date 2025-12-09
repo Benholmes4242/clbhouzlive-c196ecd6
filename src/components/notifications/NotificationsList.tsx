@@ -4,6 +4,7 @@ import { Bell, UserPlus, Tag, MessageSquare, Heart, MessageCircle, Share, MapPin
 import { useNavigate } from 'react-router-dom';
 import FollowNotification from './FollowNotification';
 import TagNotification from './TagNotification';
+import FriendAcceptedNotification from './FriendAcceptedNotification';
 
 interface NotificationsListProps {
   notifications: any[];
@@ -217,8 +218,18 @@ const NotificationsList: React.FC<NotificationsListProps> = ({
             );
           }
 
-          // Skip deprecated friend request and friend accepted notifications
-          if (notification.type === 'friend_request' || notification.type === 'friend_accepted') {
+          // Handle friend accepted notifications
+          if (notification.type === 'friend_accepted') {
+            return (
+              <FriendAcceptedNotification
+                key={notification.id}
+                notification={notification}
+              />
+            );
+          }
+
+          // Skip friend_request type in general list (handled in Friend Requests section)
+          if (notification.type === 'friend_request') {
             return null;
           }
 

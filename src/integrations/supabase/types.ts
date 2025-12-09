@@ -2058,9 +2058,11 @@ export type Database = {
       }
       notifications: {
         Row: {
+          actor_id: string | null
           created_at: string
           data: Json | null
           id: string
+          is_read: boolean
           message: string | null
           read: boolean
           title: string
@@ -2069,9 +2071,11 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          actor_id?: string | null
           created_at?: string
           data?: Json | null
           id?: string
+          is_read?: boolean
           message?: string | null
           read?: boolean
           title: string
@@ -2080,9 +2084,11 @@ export type Database = {
           user_id: string
         }
         Update: {
+          actor_id?: string | null
           created_at?: string
           data?: Json | null
           id?: string
+          is_read?: boolean
           message?: string | null
           read?: boolean
           title?: string
