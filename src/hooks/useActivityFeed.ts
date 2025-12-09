@@ -474,9 +474,9 @@ export const useActivityFeed = (tab: ActivityTabId) => {
       }
 
       // DEV / PREVIEW MOCK DATA - inject when no real data exists
-      // Also inject in production preview (MODE could be production in preview environments)
-      if (enrichedNotifications.length === 0) {
-        console.log('[useActivityFeed] No real data, injecting mock activity');
+      const isProd = typeof window !== 'undefined' && window.location.hostname === 'clbhouz.com';
+      if (!isProd && enrichedNotifications.length === 0) {
+        console.log('[useActivityFeed] Injecting mock activity data');
         enrichedNotifications = generateMockActivity();
       }
 
@@ -494,7 +494,7 @@ export const useActivityFeed = (tab: ActivityTabId) => {
       // Add "new" bucket (unread items)
       const newItems = filtered.filter(i => !i.is_read);
 
-      return {
+      const result: ActivityFeedResult = {
         buckets: {
           new: newItems,
           ...dateBuckets,
@@ -502,8 +502,21 @@ export const useActivityFeed = (tab: ActivityTabId) => {
         counts,
         allItems: filtered,
       };
+
+      console.log('[useActivityFeed] Returning result:', {
+        bucketsNew: result.buckets.new.length,
+        bucketsToday: result.buckets.today.length,
+        bucketsYesterday: result.buckets.yesterday.length,
+        bucketsThisWeek: result.buckets.thisWeek.length,
+        bucketsEarlier: result.buckets.earlier.length,
+        countsNew: result.counts.new,
+        allItemsCount: result.allItems.length,
+      });
+
+      return result;
     },
     staleTime: 30 * 1000, // 30 seconds
+    // Always run the query - even without user, we return mock data
   });
 };
 
