@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useFollow } from '@/hooks/useFollow';
 import { useFriendship } from '@/hooks/useFriendship';
 import { getProfileType } from '@/types/profile';
+import { trackBusinessEvent } from '@/analytics/businessAnalytics';
 
 interface UserProfileActionsProps {
   targetUserId: string;
@@ -72,11 +73,15 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
   });
 
   const handleMessageClick = () => {
+    if (isBusiness) {
+      trackBusinessEvent(targetUserId, 'message_click');
+    }
     navigate(`/messages?friend=${targetUserId}`);
   };
 
   const handleWebsiteClick = () => {
     if (businessWebsite) {
+      trackBusinessEvent(targetUserId, 'website_click');
       const url = businessWebsite.startsWith('http') ? businessWebsite : `https://${businessWebsite}`;
       window.open(url, '_blank', 'noopener,noreferrer');
     }
