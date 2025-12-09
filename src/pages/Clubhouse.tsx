@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
-import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
+import CompactHeader from '@/components/clubhouse/CompactHeader';
 import NavigationBar from '@/components/bottom-navigation/NavigationBar';
 import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
@@ -253,7 +253,7 @@ const Clubhouse = () => {
       {/* Intersection sentinel for header fade-away */}
       <div id="clubhouse-sentinel" className="h-1 w-px absolute top-0 left-0" />
       
-      <ClubhouseHeaderNew />
+      <CompactHeader />
 
       {/* Edge gradients when chrome is hidden (Apple-level polish) */}
       {chromeControls.chromeState === 'hidden' && (
