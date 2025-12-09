@@ -69,8 +69,6 @@ const ActivityPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-muted/50">
-      {/* DEBUG RED DOT */}
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-red-500 rounded-full z-[9999]" />
       <main className="mx-auto w-full max-w-[720px] px-4 pt-4 pb-24">
         {/* Header */}
         <header className="flex items-center justify-between mb-4">
