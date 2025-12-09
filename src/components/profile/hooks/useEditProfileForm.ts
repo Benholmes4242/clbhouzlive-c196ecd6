@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { useQueryClient } from "@tanstack/react-query";
 import { CropData } from '@/components/profile/profile-config';
+import { ProfileType, BusinessCategory } from '@/types/profile';
 
 const BIO_MAX_LENGTH = 100;
 
@@ -16,6 +17,14 @@ interface Profile {
   profile_photo_url?: string | null;
   header_photo_url?: string | null;
   websites?: string[] | null;
+  profile_type?: string | null;
+  business_name?: string | null;
+  business_category?: string | null;
+  business_website?: string | null;
+  business_location?: string | null;
+  business_contact_email?: string | null;
+  business_contact_phone?: string | null;
+  business_bio?: string | null;
   mobile_crop_x?: number | null;
   mobile_crop_y?: number | null;
   mobile_crop_width?: number | null;
@@ -40,6 +49,16 @@ interface EditProfileFormData {
   websites: string[];
   profilePhoto: File | null;
   headerPhoto: File | null;
+  profileType: ProfileType;
+  // Business fields
+  businessName: string;
+  businessCategory: BusinessCategory | '';
+  businessWebsite: string;
+  businessLocation: string;
+  businessContactEmail: string;
+  businessContactPhone: string;
+  businessBio: string;
+  // Crop data
   mobileCropX: number;
   mobileCropY: number;
   mobileCropWidth: number;
@@ -72,6 +91,16 @@ export const useEditProfileForm = (
     websites: profile?.websites || [],
     profilePhoto: null,
     headerPhoto: null,
+    profileType: (profile?.profile_type as ProfileType) || 'personal',
+    // Business fields
+    businessName: profile?.business_name || "",
+    businessCategory: (profile?.business_category as BusinessCategory) || '',
+    businessWebsite: profile?.business_website || "",
+    businessLocation: profile?.business_location || "",
+    businessContactEmail: profile?.business_contact_email || "",
+    businessContactPhone: profile?.business_contact_phone || "",
+    businessBio: profile?.business_bio || "",
+    // Crop data
     mobileCropX: profile?.mobile_crop_x || 0,
     mobileCropY: profile?.mobile_crop_y || 0,
     mobileCropWidth: profile?.mobile_crop_width || 100,
@@ -99,6 +128,14 @@ export const useEditProfileForm = (
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
+  }, []);
+
+  const handleProfileTypeChange = useCallback((type: ProfileType) => {
+    setFormData(prev => ({ ...prev, profileType: type }));
+  }, []);
+
+  const handleBusinessFieldChange = useCallback((field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   }, []);
 
   const handleHandicapChange = useCallback((value: string) => {
@@ -176,13 +213,25 @@ export const useEditProfileForm = (
   const handleSave = useCallback(async () => {
     setSaving(true);
     try {
+      const isBusiness = formData.profileType === 'business';
+      
       const updateData: any = {
-        display_name: formData.displayName,
-        home_club: formData.homeClub || null,
-        eg_handicap_index: formData.handicap ? parseFloat(formData.handicap) : null,
+        profile_type: formData.profileType,
+        display_name: isBusiness ? formData.businessName : formData.displayName,
+        home_club: isBusiness ? null : (formData.homeClub || null),
+        eg_handicap_index: isBusiness ? null : (formData.handicap ? parseFloat(formData.handicap) : null),
         is_public: formData.isPublic,
         bio: formData.bio || null,
         websites: normalizeWebsites(formData.websites),
+        // Business fields
+        business_name: isBusiness ? formData.businessName : null,
+        business_category: isBusiness ? (formData.businessCategory || null) : null,
+        business_website: isBusiness ? (formData.businessWebsite || null) : null,
+        business_location: isBusiness ? (formData.businessLocation || null) : null,
+        business_contact_email: isBusiness ? (formData.businessContactEmail || null) : null,
+        business_contact_phone: isBusiness ? (formData.businessContactPhone || null) : null,
+        business_bio: isBusiness ? (formData.businessBio || null) : null,
+        // Crop data
         mobile_crop_x: formData.mobileCropX,
         mobile_crop_y: formData.mobileCropY,
         mobile_crop_width: formData.mobileCropWidth,
@@ -257,6 +306,8 @@ export const useEditProfileForm = (
     saving,
     isUsernameSet,
     handleInputChange,
+    handleProfileTypeChange,
+    handleBusinessFieldChange,
     handleHandicapChange,
     handlePublicToggle,
     handleTextareaChange,

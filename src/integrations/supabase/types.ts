@@ -3999,8 +3999,14 @@ export type Database = {
           background_image_url: string | null
           bag_visible: boolean | null
           bio: string | null
+          business_bio: string | null
+          business_category: string | null
+          business_contact_email: string | null
+          business_contact_phone: string | null
+          business_location: string | null
           business_name: string | null
           business_type: Database["public"]["Enums"]["business_type"] | null
+          business_website: string | null
           contact_person_name: string | null
           cover_photo_url: string | null
           created_at: string | null
@@ -4023,6 +4029,7 @@ export type Database = {
           home_club: string | null
           home_club_id: string | null
           id: string
+          is_business_verified: boolean | null
           is_official_club: boolean | null
           is_public: boolean | null
           last_rating_at: string | null
@@ -4041,6 +4048,7 @@ export type Database = {
           phone: string | null
           pinned_achievement_ids: string[] | null
           profile_photo_url: string | null
+          profile_type: string | null
           profile_video_thumbnail_url: string | null
           profile_video_url: string | null
           profile_video_visibility: string | null
@@ -4060,8 +4068,14 @@ export type Database = {
           background_image_url?: string | null
           bag_visible?: boolean | null
           bio?: string | null
+          business_bio?: string | null
+          business_category?: string | null
+          business_contact_email?: string | null
+          business_contact_phone?: string | null
+          business_location?: string | null
           business_name?: string | null
           business_type?: Database["public"]["Enums"]["business_type"] | null
+          business_website?: string | null
           contact_person_name?: string | null
           cover_photo_url?: string | null
           created_at?: string | null
@@ -4084,6 +4098,7 @@ export type Database = {
           home_club?: string | null
           home_club_id?: string | null
           id: string
+          is_business_verified?: boolean | null
           is_official_club?: boolean | null
           is_public?: boolean | null
           last_rating_at?: string | null
@@ -4102,6 +4117,7 @@ export type Database = {
           phone?: string | null
           pinned_achievement_ids?: string[] | null
           profile_photo_url?: string | null
+          profile_type?: string | null
           profile_video_thumbnail_url?: string | null
           profile_video_url?: string | null
           profile_video_visibility?: string | null
@@ -4121,8 +4137,14 @@ export type Database = {
           background_image_url?: string | null
           bag_visible?: boolean | null
           bio?: string | null
+          business_bio?: string | null
+          business_category?: string | null
+          business_contact_email?: string | null
+          business_contact_phone?: string | null
+          business_location?: string | null
           business_name?: string | null
           business_type?: Database["public"]["Enums"]["business_type"] | null
+          business_website?: string | null
           contact_person_name?: string | null
           cover_photo_url?: string | null
           created_at?: string | null
@@ -4145,6 +4167,7 @@ export type Database = {
           home_club?: string | null
           home_club_id?: string | null
           id?: string
+          is_business_verified?: boolean | null
           is_official_club?: boolean | null
           is_public?: boolean | null
           last_rating_at?: string | null
@@ -4163,6 +4186,7 @@ export type Database = {
           phone?: string | null
           pinned_achievement_ids?: string[] | null
           profile_photo_url?: string | null
+          profile_type?: string | null
           profile_video_thumbnail_url?: string | null
           profile_video_url?: string | null
           profile_video_visibility?: string | null

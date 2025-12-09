@@ -15,6 +15,9 @@ import { MiniCardSection } from "./components/MiniCardSection";
 import { BioWebsitesSection } from "./components/BioWebsitesSection";
 import { LivePreviewSection } from "./components/LivePreviewSection";
 import { MediaManagerSection } from "./components/MediaManagerSection";
+import { ProfileTypeToggle } from "./ProfileTypeToggle";
+import { PersonalFieldsForm } from "./PersonalFieldsForm";
+import { BusinessFieldsForm } from "./BusinessFieldsForm";
 
 interface Profile {
   display_name?: string | null;
@@ -23,8 +26,15 @@ interface Profile {
   eg_handicap_index?: number | null;
   is_public?: boolean | null;
   user_type?: string | null;
+  profile_type?: string | null;
   business_name?: string | null;
   business_type?: string | null;
+  business_category?: string | null;
+  business_website?: string | null;
+  business_location?: string | null;
+  business_contact_email?: string | null;
+  business_contact_phone?: string | null;
+  business_bio?: string | null;
   contact_person_name?: string | null;
   phone?: string | null;
   website_url?: string | null;
@@ -74,6 +84,8 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
     saving,
     isUsernameSet,
     handleInputChange,
+    handleProfileTypeChange,
+    handleBusinessFieldChange,
     handleHandicapChange,
     handlePublicToggle,
     handleTextareaChange,
@@ -108,6 +120,15 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main form content - 2/3 width on desktop */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Profile Type Toggle */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Profile Type</label>
+              <ProfileTypeToggle 
+                value={formData.profileType} 
+                onChange={handleProfileTypeChange}
+              />
+            </div>
+
             {/* Header Photo Section */}
             <HeaderPhotoSection
               headerPhoto={formData.headerPhoto}
@@ -142,6 +163,32 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
               onFileChange={(file) => handleFileChange('profilePhoto', file)}
               onCropChange={handleMiniCardCropChange}
             />
+
+            {/* Conditional Fields based on Profile Type */}
+            {formData.profileType === 'personal' ? (
+              <PersonalFieldsForm
+                homeClub={formData.homeClub}
+                handicap={formData.handicap}
+                onChange={(field, value) => {
+                  if (field === 'homeClub') {
+                    handleInputChange({ target: { name: 'homeClub', value } } as any);
+                  } else if (field === 'handicap') {
+                    handleHandicapChange(value);
+                  }
+                }}
+              />
+            ) : (
+              <BusinessFieldsForm
+                businessName={formData.businessName}
+                businessCategory={formData.businessCategory}
+                businessLocation={formData.businessLocation}
+                businessWebsite={formData.businessWebsite}
+                businessContactEmail={formData.businessContactEmail}
+                businessContactPhone={formData.businessContactPhone}
+                businessBio={formData.businessBio}
+                onChange={handleBusinessFieldChange}
+              />
+            )}
 
             {/* Bio & Websites Section */}
             <BioWebsitesSection

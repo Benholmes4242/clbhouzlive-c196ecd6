@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { ProfileType, BusinessCategory } from '@/types/profile';
 
 // Unified profile interface - all fields that might be needed
 export interface UserProfile {
@@ -15,6 +16,7 @@ export interface UserProfile {
   bio?: string | null;
   website?: string | null;
   user_type?: string | null;
+  profile_type?: ProfileType | null;
   is_public?: boolean | null;
   is_official_club?: boolean | null;
   has_completed_onboarding?: boolean | null;
@@ -33,8 +35,17 @@ export interface UserProfile {
   cover_photo_url?: string | null;
   eg_app_connected?: boolean | null;
   updated_at?: string | null;
-  // Business profile fields
+  // Location field (used by both personal and business)
   location?: string | null;
+  // Business profile fields
+  business_name?: string | null;
+  business_category?: BusinessCategory | null;
+  business_website?: string | null;
+  business_location?: string | null;
+  business_contact_email?: string | null;
+  business_contact_phone?: string | null;
+  business_bio?: string | null;
+  is_business_verified?: boolean | null;
 }
 
 /**
