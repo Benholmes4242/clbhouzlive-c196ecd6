@@ -101,12 +101,18 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
     notification.actor_id &&
     notification.actor_id !== currentUserId;
 
+  // Determine if we should show the "Friends" pill (for friend_accepted notifications)
+  const showFriendsPill = notification.type === 'friend_accepted';
+
   // Get request ID for friend request actions (from data or notification id)
   const friendRequestId = notification.data?.request_id || notification.id;
 
-  // Has any CTA (friend request or follow back)
-  const hasCTA = showFriendRequestButtons || showFollowBack;
+  // Has any CTA (friend request, follow back, or friends pill)
+  const hasCTA = showFriendRequestButtons || showFollowBack || showFriendsPill;
   const statusIcon = getNotificationIcon(notification.type);
+
+  // Shared base pill class for unified styling
+  const basePillClass = "inline-flex items-center justify-center rounded-full border px-4 h-9 text-xs font-semibold transition-colors";
 
   return (
     <button
@@ -172,6 +178,12 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
                   actorDisplayName={notification.actor_display_name}
                   isMock={notification.is_mock}
                 />
+              )}
+              {showFriendsPill && (
+                <span className={cn(basePillClass, "border-border bg-muted text-foreground/80 gap-1")}>
+                  <Users className="h-3 w-3" />
+                  Friends
+                </span>
               )}
             </div>
           )}
