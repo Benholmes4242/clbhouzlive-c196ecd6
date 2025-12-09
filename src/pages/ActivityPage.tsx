@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
+import { PageRoot } from '@/components/layout/PageRoot';
 
 const ActivityPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActivityTabId>('all');
@@ -66,7 +67,7 @@ const ActivityPage: React.FC = () => {
   );
 
   return (
-    <div className="activity-page-root">
+    <PageRoot className="bg-bg-page pb-24">
       {/* Main content wrapper */}
       <div className="max-w-[720px] mx-auto p-4">
         {/* Header section */}
@@ -202,7 +203,7 @@ const ActivityPage: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+    </PageRoot>
   );
 };
 
