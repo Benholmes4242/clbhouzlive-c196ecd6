@@ -456,7 +456,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
       
       {/* Username (signup only) - 16px gap from email message slot */}
       {isSignUp && (
-        <div className="mb-4">
+        <div className="mb-2">
         <div className="relative">
             <input
               type="text"
