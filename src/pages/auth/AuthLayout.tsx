@@ -26,18 +26,13 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
   
   return (
     <div 
-      className="relative overflow-hidden"
+      className="fixed inset-0 overflow-hidden"
       style={{ 
         backgroundColor: 'var(--bg-page)',
-        minHeight: '100vh',
-        maxHeight: '100vh',
-        paddingLeft: '16px',
-        paddingRight: '16px',
-        boxSizing: 'border-box',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        overflow: 'hidden',
+        padding: '16px',
       }}
     >
       {/* Subtle gradient glow behind card */}
