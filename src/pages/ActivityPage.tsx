@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { CheckCircle2 } from 'lucide-react';
 import { useActivityFeed, ActivityTabId, ACTIVITY_TABS, ActivityNotification, ChipFilterKind } from '@/hooks/useActivityFeed';
 import { ActivityBucket } from '@/components/activity/ActivityBucket';
 import { AtAGlanceChips } from '@/components/activity/AtAGlanceChips';
 import { ActivityEmptyState } from '@/components/activity/ActivityEmptyState';
 import { ActivitySkeleton } from '@/components/activity/ActivitySkeleton';
+import { MarkAllReadSheet } from '@/components/activity/MarkAllReadSheet';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -13,9 +15,14 @@ import { toast } from 'sonner';
 import { PageRoot } from '@/components/layout/PageRoot';
 import CompactHeader from '@/components/header/CompactHeader';
 
+// Feature flag for Mark All Read
+const ENABLE_MARK_ALL_READ = true;
+
 const ActivityPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActivityTabId>('all');
   const [activeChipFilter, setActiveChipFilter] = useState<ChipFilterKind>(null);
+  const [showMarkAllSheet, setShowMarkAllSheet] = useState(false);
+  const [markingAllRead, setMarkingAllRead] = useState(false);
   
   // Pass chip filter to hook (only applies when on 'all' tab)
   const effectiveChipFilter = activeTab === 'all' ? activeChipFilter : null;
@@ -27,6 +34,7 @@ const ActivityPage: React.FC = () => {
 
   const buckets = data?.buckets;
   const counts = data?.counts;
+  const unreadCount = counts?.new || 0;
 
   // Clear chip filter when switching away from All tab
   const handleTabChange = (tabId: ActivityTabId) => {
@@ -36,23 +44,60 @@ const ActivityPage: React.FC = () => {
     }
   };
 
-  const handleMarkAllAsRead = async () => {
+  const handleMarkAllAsReadClick = () => {
+    if (unreadCount === 0) {
+      toast.info("You're all caught up – no unread activity.");
+      return;
+    }
+    setShowMarkAllSheet(true);
+  };
+
+  const handleConfirmMarkAllRead = async () => {
     if (!user?.id) return;
     
+    setMarkingAllRead(true);
+    
+    // Optimistic update - mark all as read in local state
+    queryClient.setQueryData(['activity-feed', activeTab, effectiveChipFilter, user.id], (old: any) => {
+      if (!old) return old;
+      const updatedItems = old.allItems?.map((item: ActivityNotification) => ({
+        ...item,
+        is_unread: false,
+        is_read: true,
+      })) || [];
+      return {
+        ...old,
+        allItems: updatedItems,
+        buckets: {
+          new: [],
+          today: updatedItems.filter((i: ActivityNotification) => !i.is_unread),
+          yesterday: old.buckets.yesterday,
+          thisWeek: old.buckets.thisWeek,
+          earlier: old.buckets.earlier,
+        },
+        counts: { ...old.counts, new: 0 },
+      };
+    });
+
     const { error } = await supabase
       .from('notifications')
       .update({ is_read: true })
       .eq('user_id', user.id)
       .eq('is_read', false);
 
+    setMarkingAllRead(false);
+    setShowMarkAllSheet(false);
+
     if (error) {
-      toast.error('Failed to mark all as read');
+      toast.error("We couldn't mark everything as read. Please try again.");
+      // Revert by refetching
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
       return;
     }
 
     queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
     queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
-    toast.success('All marked as read');
+    toast.success('All caught up – activity cleared.');
   };
 
   const handleMarkRead = async (id: string) => {
@@ -112,14 +157,33 @@ const ActivityPage: React.FC = () => {
 
       {/* Main content wrapper - matches Courses/Profile gutters */}
       <div className="max-w-screen-sm mx-auto px-4 pt-6 compact-header-offset">
-        {/* Header section - clean title only */}
-        <section className="mb-4">
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">
-            Activity
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Updates from friends, clubs, courses & messages.
-          </p>
+        {/* Header section with title and mark all read button */}
+        <section className="mb-4 flex items-start justify-between">
+          <div>
+            <h1 className="text-xl font-semibold tracking-tight text-foreground">
+              Activity
+            </h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Updates from friends, clubs, courses & messages.
+            </p>
+          </div>
+          
+          {/* Mark all as read button */}
+          {ENABLE_MARK_ALL_READ && (
+            <button
+              onClick={handleMarkAllAsReadClick}
+              className={cn(
+                "flex items-center justify-center h-9 w-9 rounded-full transition-colors",
+                unreadCount > 0
+                  ? "text-foreground hover:bg-muted"
+                  : "text-muted-foreground/50"
+              )}
+              title={unreadCount > 0 ? "Mark all as read" : "No unread activity"}
+              aria-disabled={unreadCount === 0}
+            >
+              <CheckCircle2 className="h-5 w-5" />
+            </button>
+          )}
         </section>
 
         {/* Filter tabs - Apple-style segmented control */}
@@ -174,6 +238,7 @@ const ActivityPage: React.FC = () => {
                 onNotificationClick={handleNotificationClick}
                 onMarkRead={handleMarkRead}
                 onHide={handleHide}
+                currentUserId={user?.id}
               />
             )}
 
@@ -185,6 +250,7 @@ const ActivityPage: React.FC = () => {
                 onNotificationClick={handleNotificationClick}
                 onMarkRead={handleMarkRead}
                 onHide={handleHide}
+                currentUserId={user?.id}
               />
             )}
 
@@ -196,6 +262,7 @@ const ActivityPage: React.FC = () => {
                 onNotificationClick={handleNotificationClick}
                 onMarkRead={handleMarkRead}
                 onHide={handleHide}
+                currentUserId={user?.id}
               />
             )}
 
@@ -207,6 +274,7 @@ const ActivityPage: React.FC = () => {
                 onNotificationClick={handleNotificationClick}
                 onMarkRead={handleMarkRead}
                 onHide={handleHide}
+                currentUserId={user?.id}
               />
             )}
 
@@ -218,11 +286,21 @@ const ActivityPage: React.FC = () => {
                 onNotificationClick={handleNotificationClick}
                 onMarkRead={handleMarkRead}
                 onHide={handleHide}
+                currentUserId={user?.id}
               />
             )}
           </div>
         )}
       </div>
+
+      {/* Mark all as read confirmation sheet */}
+      <MarkAllReadSheet
+        open={showMarkAllSheet}
+        onOpenChange={setShowMarkAllSheet}
+        unreadCount={unreadCount}
+        onConfirm={handleConfirmMarkAllRead}
+        isLoading={markingAllRead}
+      />
     </PageRoot>
   );
 };

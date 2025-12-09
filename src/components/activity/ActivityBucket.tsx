@@ -11,6 +11,7 @@ interface ActivityBucketProps {
   onNotificationClick: (notification: ActivityNotification) => void;
   onMarkRead?: (id: string) => void;
   onHide?: (id: string) => void;
+  currentUserId?: string;
 }
 
 export const ActivityBucket: React.FC<ActivityBucketProps> = ({ 
@@ -20,7 +21,8 @@ export const ActivityBucket: React.FC<ActivityBucketProps> = ({
   accent,
   onNotificationClick,
   onMarkRead,
-  onHide
+  onHide,
+  currentUserId
 }) => {
   if (!items || items.length === 0) return null;
 
@@ -49,6 +51,7 @@ export const ActivityBucket: React.FC<ActivityBucketProps> = ({
             onClick={() => onNotificationClick(item)}
             onMarkRead={onMarkRead}
             onHide={onHide}
+            currentUserId={currentUserId}
           />
         ))}
       </div>
