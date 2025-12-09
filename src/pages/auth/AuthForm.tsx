@@ -415,7 +415,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
       </div>
       
       {/* Email Input */}
-      <div className="mb-4">
+      <div className="mb-2">
         <input
           ref={emailInputRef}
           type="email"
@@ -432,8 +432,8 @@ const AuthForm: React.FC<AuthFormProps> = ({
           }}
           className="placeholder:text-[#97A1AA] focus:border-[#D6D9DE] focus:shadow-[0_0_0_4px_rgba(247,147,30,0.06)]"
         />
-        {/* Message slot - 12px from input */}
-        <div className="min-h-[20px] mt-3">
+        {/* Message slot - 6px from input */}
+        <div className="min-h-[10px] mt-1.5">
           {emailError && (
             <p className="text-[13px] leading-tight" style={{ color: '#E03131' }}>{emailError}</p>
           )}
@@ -527,8 +527,8 @@ const AuthForm: React.FC<AuthFormProps> = ({
         </div>
       )}
       
-      {/* Password Input - 16px gap */}
-      <div className="mb-6">
+      {/* Password Input - 8px gap */}
+      <div className="mb-3">
         <input
           ref={passwordInputRef}
           type="password"
@@ -546,8 +546,8 @@ const AuthForm: React.FC<AuthFormProps> = ({
           }}
           className="placeholder:text-[#97A1AA] focus:border-[#D6D9DE] focus:shadow-[0_0_0_4px_rgba(247,147,30,0.06)]"
         />
-        {/* Message slot - 12px from input */}
-        <div className="min-h-[20px] mt-3">
+        {/* Message slot - 6px from input */}
+        <div className="min-h-[10px] mt-1.5">
           {passwordError && (
             <p className="text-[13px] leading-tight" style={{ color: '#E03131' }}>{passwordError}</p>
           )}
