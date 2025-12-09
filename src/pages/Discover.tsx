@@ -1,7 +1,8 @@
 import React, { useState, useMemo, lazy, Suspense } from 'react';
-import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
+import CompactHeader from '@/components/header/CompactHeader';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 import { FadeInContent } from '@/components/ui/FadeInContent';
+import { PageRoot } from '@/components/layout/PageRoot';
 
 import SegmentedControl from '@/components/discover/SegmentedControl';
 import ExploreFilters from '@/components/explore/ExploreFilters';
@@ -199,10 +200,10 @@ const Discover = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground page-with-header">
-      <ClubhouseHeaderNew />
+    <PageRoot className="min-h-screen bg-background text-foreground">
+      <CompactHeader />
       <FadeInContent>
-        <main className="pb-20">
+        <main className="pb-20 pt-14">
             {/* Static Tabs */}
             <div className="relative z-30">
               {/* Segmented Control Tabs */}
@@ -496,7 +497,7 @@ const Discover = () => {
             animation: shimmer 2s infinite;
           }
         `}</style>
-      </div>
+      </PageRoot>
     );
   };
 

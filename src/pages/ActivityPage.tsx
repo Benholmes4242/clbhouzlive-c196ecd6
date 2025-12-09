@@ -11,6 +11,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
 import { PageRoot } from '@/components/layout/PageRoot';
+import CompactHeader from '@/components/header/CompactHeader';
 
 const ActivityPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActivityTabId>('all');
@@ -68,8 +69,9 @@ const ActivityPage: React.FC = () => {
 
   return (
     <PageRoot className="bg-bg-page pb-24">
+      <CompactHeader />
       {/* Main content wrapper */}
-      <div className="max-w-[720px] mx-auto p-4">
+      <div className="max-w-[720px] mx-auto p-4 pt-20">
         {/* Header section */}
         <div className="flex justify-between items-center mb-4">
           <div className="flex flex-col">

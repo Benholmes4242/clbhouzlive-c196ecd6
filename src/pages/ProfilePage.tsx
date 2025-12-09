@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
+import { PageRoot } from '@/components/layout/PageRoot';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -83,22 +83,15 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background page-with-header relative">
-      <ClubhouseHeaderNew />
-      
-      {/* Add spacing for fixed header */}
-      <div className="h-16 md:h-18" />
-      
+    <PageRoot className="min-h-screen bg-background">
       <HeroProfileHeader
         profile={profile ?? null}
-        isOwnProfile={true} // This is always the user's own profile on this route
+        isOwnProfile={true}
         onProfileUpdate={() => refreshProfile()}
         activeSection={activeSection}
         onSectionChange={handleSectionChange}
       />
-      
-      {/* Activity content is now handled by ActivityFeed within HeroProfileHeader */}
-    </div>
+    </PageRoot>
   );
 };
 
