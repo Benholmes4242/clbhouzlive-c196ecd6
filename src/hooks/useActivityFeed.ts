@@ -190,217 +190,109 @@ function computeCounts(items: ActivityNotification[]): ActivityCounts {
   };
 }
 
-// DEV-ONLY: Generate mock activity data for preview
-function generateMockActivity(): ActivityNotification[] {
+// DEV-ONLY: Fetch real users for mock notifications
+async function fetchRealUsersForMocks(currentUserId: string): Promise<Array<{
+  id: string;
+  display_name: string | null;
+  username: string | null;
+  profile_photo_url: string | null;
+}>> {
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('id, display_name, username, profile_photo_url')
+    .neq('id', currentUserId)
+    .not('display_name', 'is', null)
+    .limit(20);
+  
+  if (error) {
+    console.warn('[fetchRealUsersForMocks] error', error);
+    return [];
+  }
+  
+  return data || [];
+}
+
+// DEV-ONLY: Generate mock activity data using real users from DB
+async function generateMockActivityWithRealUsers(currentUserId: string): Promise<ActivityNotification[]> {
+  const realUsers = await fetchRealUsersForMocks(currentUserId);
+  
+  // If no real users, fall back to empty (or could use hardcoded names)
+  if (realUsers.length === 0) {
+    console.warn('[generateMockActivityWithRealUsers] No real users found for mocks');
+    return [];
+  }
+
   const now = Date.now();
   const minutesAgo = (m: number) => new Date(now - m * 60 * 1000).toISOString();
   const hoursAgo = (h: number) => new Date(now - h * 60 * 60 * 1000).toISOString();
   const daysAgo = (d: number) => new Date(now - d * 24 * 60 * 60 * 1000).toISOString();
 
-  const mockItems: Partial<ActivityNotification>[] = [
-    // NEW / Unread items (mock- prefix for easy identification)
-    {
-      id: 'mock-1',
-      type: 'follow',
-      title: '[Sample] New follower',
-      message: null,
-      actor_display_name: 'Rory McIlroy',
-      actor_username: 'rorymcilroy',
-      actor_avatar_url: null,
-      created_at: minutesAgo(3),
-      is_read: false,
-    },
-    {
-      id: 'mock-2',
-      type: 'mention',
-      title: '[Sample] Mentioned you',
-      message: 'Great round at St Andrews! @you killed it on the back 9',
-      actor_display_name: 'Sarah Links',
-      actor_username: 'sarahlinks',
-      created_at: minutesAgo(18),
-      is_read: false,
-      entity_type: 'post',
-      entity_id: 'post-123',
-    },
-    {
-      id: 'mock-3',
-      type: 'achievement',
-      title: '[Sample] Achievement Unlocked',
-      message: 'You unlocked 50 Club – Heritage Club! 🏆',
-      actor_display_name: 'clbhouz',
-      actor_username: 'clbhouz',
-      created_at: minutesAgo(45),
-      is_read: false,
-    },
-    {
-      id: 'mock-4',
-      type: 'like',
-      title: '[Sample] Liked your moment',
-      message: null,
-      actor_display_name: 'Tiger Woods',
-      actor_username: 'tigerwoods',
-      created_at: hoursAgo(1),
-      is_read: false,
-      entity_type: 'post',
-    },
+  // Helper to get a user by index (wraps around if needed)
+  const getUser = (index: number) => realUsers[index % realUsers.length];
+
+  // Mock notification templates using real users
+  const mockTemplates: Array<{
+    type: ActivityType;
+    title: string;
+    message: string | null;
+    created_at: string;
+    is_read: boolean;
+    entity_type?: string;
+    entity_id?: string;
+    userIndex: number;
+  }> = [
+    // NEW / Unread items
+    { type: 'follow', title: 'started following you', message: null, created_at: minutesAgo(3), is_read: false, userIndex: 0 },
+    { type: 'mention', title: 'mentioned you', message: 'Great round! You crushed it on the back 9 🔥', created_at: minutesAgo(18), is_read: false, entity_type: 'post', entity_id: 'mock-post-1', userIndex: 1 },
+    { type: 'like', title: 'liked your moment', message: null, created_at: hoursAgo(1), is_read: false, entity_type: 'post', userIndex: 2 },
+    { type: 'comment', title: 'commented on your moment', message: 'Incredible shot! Which club did you use?', created_at: hoursAgo(2), is_read: false, entity_type: 'comment', userIndex: 3 },
+    
     // TODAY items
-    {
-      id: 'mock-5',
-      type: 'club_update',
-      title: '[Sample] Sundridge Park GC',
-      message: 'New event: Summer Stableford – Sign up now!',
-      actor_display_name: 'Sundridge Park GC',
-      actor_username: 'sundridgeparkgc',
-      created_at: hoursAgo(3),
-      is_read: false,
-    },
-    {
-      id: 'mock-6',
-      type: 'message',
-      title: '[Sample] New message',
-      message: 'Hey, fancy a round at Royal County Down next week?',
-      actor_display_name: 'James Faldo',
-      actor_username: 'jamesfaldo',
-      created_at: hoursAgo(5),
-      is_read: true,
-    },
-    {
-      id: 'mock-7',
-      type: 'comment',
-      title: '[Sample] Commented on your moment',
-      message: 'Incredible view! Which hole was this?',
-      actor_display_name: 'Phil Mickelson',
-      actor_username: 'philmickelson',
-      created_at: hoursAgo(7),
-      is_read: true,
-      entity_type: 'comment',
-    },
-    {
-      id: 'mock-8',
-      type: 'friend_accepted',
-      title: '[Sample] Friend request accepted',
-      message: null,
-      actor_display_name: 'Jordan Spieth',
-      actor_username: 'jordanspieth',
-      created_at: hoursAgo(9),
-      is_read: true,
-    },
+    { type: 'friend_request', title: 'sent you a friend request', message: null, created_at: hoursAgo(4), is_read: false, userIndex: 4 },
+    { type: 'follow', title: 'started following you', message: null, created_at: hoursAgo(6), is_read: true, userIndex: 5 },
+    { type: 'like', title: 'liked your moment', message: null, created_at: hoursAgo(8), is_read: true, entity_type: 'post', userIndex: 6 },
+    { type: 'friend_accepted', title: 'accepted your friend request', message: null, created_at: hoursAgo(10), is_read: true, userIndex: 7 },
+    
     // THIS WEEK items
-    {
-      id: 'mock-9',
-      type: 'course_update',
-      title: '[Sample] Royal County Down',
-      message: 'Course condition update: Links in pristine shape for the weekend',
-      actor_display_name: 'Royal County Down',
-      actor_username: 'royalcountydown',
-      created_at: daysAgo(1),
-      is_read: true,
-    },
-    {
-      id: 'mock-10',
-      type: 'tag',
-      title: '[Sample] Tagged you in a moment',
-      message: null,
-      actor_display_name: 'Brooks Koepka',
-      actor_username: 'bkoepka',
-      created_at: daysAgo(2),
-      is_read: true,
-      entity_type: 'post',
-    },
-    {
-      id: 'mock-11',
-      type: 'follow',
-      title: '[Sample] New follower',
-      message: null,
-      actor_display_name: 'Scottie Scheffler',
-      actor_username: 'scottiescheffler',
-      created_at: daysAgo(2),
-      is_read: true,
-    },
-    {
-      id: 'mock-12',
-      type: 'like',
-      title: '[Sample] Liked your moment',
-      message: null,
-      actor_display_name: 'Dustin Johnson',
-      actor_username: 'djohnson',
-      created_at: daysAgo(3),
-      is_read: true,
-      entity_type: 'post',
-    },
-    {
-      id: 'mock-13',
-      type: 'achievement',
-      title: '[Sample] Achievement Unlocked',
-      message: 'You completed GB&I Top 100! 🎉',
-      actor_display_name: 'clbhouz',
-      actor_username: 'clbhouz',
-      created_at: daysAgo(4),
-      is_read: true,
-    },
+    { type: 'tag', title: 'tagged you in a moment', message: null, created_at: daysAgo(1), is_read: true, entity_type: 'post', userIndex: 8 },
+    { type: 'mention', title: 'mentioned you', message: 'Playing with @you next week – can\'t wait!', created_at: daysAgo(2), is_read: true, entity_type: 'post', userIndex: 9 },
+    { type: 'follow', title: 'started following you', message: null, created_at: daysAgo(2), is_read: true, userIndex: 10 },
+    { type: 'like', title: 'liked your moment', message: null, created_at: daysAgo(3), is_read: true, entity_type: 'post', userIndex: 11 },
+    { type: 'comment', title: 'commented on your moment', message: 'That\'s a beautiful course! Adding to my bucket list', created_at: daysAgo(4), is_read: true, entity_type: 'comment', userIndex: 12 },
+    
     // EARLIER items
-    {
-      id: 'mock-14',
-      type: 'event',
-      title: '[Sample] Upcoming Event',
-      message: 'Monthly Medal at Sunningdale – register by Friday',
-      actor_display_name: 'Sunningdale Golf Club',
-      actor_username: 'sunningdalegc',
-      created_at: daysAgo(8),
-      is_read: true,
-    },
-    {
-      id: 'mock-15',
-      type: 'message',
-      title: '[Sample] New message',
-      message: 'Thanks for the game! Let\'s do it again soon.',
-      actor_display_name: 'Collin Morikawa',
-      actor_username: 'collinmorikawa',
-      created_at: daysAgo(10),
-      is_read: true,
-    },
-    {
-      id: 'mock-16',
-      type: 'follow',
-      title: '[Sample] New follower',
-      message: null,
-      actor_display_name: 'Xander Schauffele',
-      actor_username: 'xander',
-      created_at: daysAgo(12),
-      is_read: true,
-    },
-    {
-      id: 'mock-17',
-      type: 'club_update',
-      title: '[Sample] Wentworth Club',
-      message: 'Course maintenance complete – all 3 courses now open',
-      actor_display_name: 'Wentworth Club',
-      actor_username: 'wentworthclub',
-      created_at: daysAgo(14),
-      is_read: true,
-    },
+    { type: 'follow', title: 'started following you', message: null, created_at: daysAgo(8), is_read: true, userIndex: 13 },
+    { type: 'like', title: 'liked your moment', message: null, created_at: daysAgo(10), is_read: true, entity_type: 'post', userIndex: 14 },
+    { type: 'friend_accepted', title: 'accepted your friend request', message: null, created_at: daysAgo(12), is_read: true, userIndex: 15 },
+    { type: 'mention', title: 'mentioned you', message: 'Best playing partner I\'ve had all year!', created_at: daysAgo(14), is_read: true, entity_type: 'post', userIndex: 16 },
   ];
 
-  // Enrich with computed fields
-  return mockItems.map(item => ({
-    id: item.id!,
-    created_at: item.created_at!,
-    is_read: item.is_read!,
-    type: item.type!,
-    title: item.title!,
-    message: item.message || null,
-    actor_id: null,
-    entity_type: item.entity_type || null,
-    entity_id: item.entity_id || null,
-    data: null,
-    actor_display_name: item.actor_display_name,
-    actor_username: item.actor_username,
-    actor_avatar_url: item.actor_avatar_url || null,
-    category: TYPE_TO_CATEGORY[item.type!] || 'system',
-    context_url: getContextUrl(item),
-    context_label: getContextLabel(item),
-    time_ago: getTimeAgo(item.created_at!),
-  }));
+  // Build mock notifications with real user data
+  return mockTemplates.map((template, index) => {
+    const user = getUser(template.userIndex);
+    const displayName = user.display_name || user.username || 'Someone';
+    
+    return {
+      id: `mock-${index + 1}`,
+      created_at: template.created_at,
+      is_read: template.is_read,
+      type: template.type,
+      title: template.title,
+      message: template.message,
+      actor_id: user.id,
+      entity_type: template.entity_type || null,
+      entity_id: template.entity_id || null,
+      data: null,
+      actor_display_name: displayName,
+      actor_username: user.username || '',
+      actor_avatar_url: user.profile_photo_url || null,
+      
+      category: TYPE_TO_CATEGORY[template.type] || 'system',
+      context_url: getContextUrl({ ...template, actor_id: user.id }),
+      context_label: getContextLabel(template),
+      time_ago: getTimeAgo(template.created_at),
+    };
+  });
 }
 
 export interface ActivityFeedResult {
@@ -479,9 +371,9 @@ export const useActivityFeed = (tab: ActivityTabId) => {
       }
 
       // DEV FLAG: Always append mock data when flag is true (for testing)
-      if (SHOW_MOCK_ACTIVITY) {
-        const mockItems = generateMockActivity();
-        console.log('[useActivityFeed] SHOW_MOCK_ACTIVITY=true, appending', mockItems.length, 'mock items');
+      if (SHOW_MOCK_ACTIVITY && user?.id) {
+        const mockItems = await generateMockActivityWithRealUsers(user.id);
+        console.log('[useActivityFeed] SHOW_MOCK_ACTIVITY=true, appending', mockItems.length, 'mock items with real users');
         enrichedNotifications = [...enrichedNotifications, ...mockItems];
       }
 
