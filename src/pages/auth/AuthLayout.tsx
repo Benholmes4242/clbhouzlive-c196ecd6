@@ -27,8 +27,19 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
   
   return (
     <div 
-      className="min-h-screen flex items-center justify-center px-4 pt-[90px] pb-10 relative overflow-hidden"
-      style={{ backgroundColor: 'var(--bg-page)' }}
+      className="relative overflow-hidden"
+      style={{ 
+        backgroundColor: 'var(--bg-page)',
+        minHeight: '100vh',
+        paddingTop: '96px',
+        paddingBottom: '48px',
+        paddingLeft: '16px',
+        paddingRight: '16px',
+        boxSizing: 'border-box',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+      }}
     >
       {/* Subtle gradient glow behind card */}
       <div 
@@ -44,13 +55,13 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
           "relative z-10 w-full max-w-[380px] mx-auto flex flex-col items-center",
           "px-6 py-8",
           "rounded-sq-lg",
-          "transition-all duration-500 ease-out",
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
         )}
         style={{
           backgroundColor: 'var(--surface-card)',
           border: '1px solid rgba(214, 217, 222, 0.5)',
           boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+          transition: 'opacity 0.5s ease-out, transform 0.5s ease-out, height 0.25s ease, padding 0.25s ease',
         }}
       >
         {/* Logo section */}
