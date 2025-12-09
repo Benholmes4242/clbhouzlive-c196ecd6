@@ -204,7 +204,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
               <span className="font-normal text-muted-foreground">sent you a friend request</span>
             </>
           }
-          meta={`${notification.time_ago} · Friends`}
+          meta={notification.time_ago}
           actions={
             <FriendRequestButtons
               requestId={friendRequestId}
@@ -233,7 +233,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
               <span className="font-normal text-muted-foreground">accepted your friend request</span>
             </>
           }
-          meta={`${notification.time_ago} · Friends`}
+          meta={notification.time_ago}
           actions={
             <span className={cn(basePillClass, "border-emerald-500 bg-emerald-500/10 text-emerald-600 gap-1")}>
               <Users className="h-3 w-3" />
@@ -259,7 +259,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
               Friend request sent to <span className="font-semibold">{targetUserName}</span>
             </span>
           }
-          meta={`${notification.time_ago} · Friends`}
+          meta={notification.time_ago}
           actions={
             <div className="flex items-center gap-2">
               <span className={cn(basePillClass, "border-border bg-muted text-foreground/60")}>
@@ -293,7 +293,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
               <span className="font-semibold">{targetUserName}</span> declined your friend request
             </span>
           }
-          meta={`${notification.time_ago} · Friends`}
+          meta={notification.time_ago}
           actions={
             <span className={cn(basePillClass, "border-red-400 bg-red-500/5 text-red-500")}>
               Request declined
@@ -317,7 +317,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
               You cancelled your friend request to <span className="font-semibold">{targetUserName}</span>
             </span>
           }
-          meta={`${notification.time_ago} · Friends`}
+          meta={notification.time_ago}
           actions={
             <span className={cn(basePillClass, "border-border bg-muted text-foreground/60")}>
               Cancelled

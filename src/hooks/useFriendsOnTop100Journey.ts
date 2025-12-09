@@ -41,26 +41,40 @@ export function useFriendsOnTop100Journey(userId: string | undefined) {
       if (profilesError) throw profilesError;
       if (!profilesData || profilesData.length === 0) return [];
 
-      // Step 3: Get Top 100 courses with most recent activity timestamp per user
+      // Step 3: Get Top 100 rated courses count per user from user_top100_rated_courses view
       const { data: top100Data, error: top100Error } = await supabase
+        .from('user_top100_rated_courses' as any)
+        .select('user_id')
+        .in('user_id', followingIds);
+
+      if (top100Error) throw top100Error;
+
+      // Count Top 100 courses per user
+      const userTop100CountMap = new Map<string, number>();
+      for (const row of (top100Data || []) as any[]) {
+        userTop100CountMap.set(row.user_id, (userTop100CountMap.get(row.user_id) || 0) + 1);
+      }
+
+      // Step 4: Get most recent activity timestamp per user
+      const { data: activityData, error: activityError } = await supabase
         .from('user_top100_courses')
         .select('user_id, updated_at')
         .in('user_id', followingIds)
         .order('updated_at', { ascending: false });
 
-      if (top100Error) throw top100Error;
-      if (!top100Data || top100Data.length === 0) return [];
+      if (activityError) throw activityError;
 
       // Get most recent activity per user
       const userActivityMap = new Map<string, string>();
-      top100Data.forEach((row) => {
+      (activityData || []).forEach((row) => {
         if (!userActivityMap.has(row.user_id)) {
           userActivityMap.set(row.user_id, row.updated_at);
         }
       });
 
+      // Build friends list with actual Top 100 count
       const friendsWithTop100: FriendOnTop100[] = profilesData
-        .filter((friend) => userActivityMap.has(friend.id))
+        .filter((friend) => userTop100CountMap.has(friend.id) && userTop100CountMap.get(friend.id)! > 0)
         .map((friend) => ({
           user_id: friend.id,
           profile: {
@@ -70,15 +84,12 @@ export function useFriendsOnTop100Journey(userId: string | undefined) {
             home_club: (friend as any).home_club || null,
             handicap: (friend as any).eg_handicap_index ?? null,
           },
-          // Flag indicating they're on a Top 100 journey
-          top100CoursesPlayed: 1,
+          top100CoursesPlayed: userTop100CountMap.get(friend.id) || 0,
           lastActivityAt: userActivityMap.get(friend.id) || '',
         }));
 
-      // Sort by most recent activity
-      friendsWithTop100.sort((a, b) => {
-        return b.lastActivityAt.localeCompare(a.lastActivityAt);
-      });
+      // Sort by total Top 100 courses played (descending)
+      friendsWithTop100.sort((a, b) => b.top100CoursesPlayed - a.top100CoursesPlayed);
 
       return friendsWithTop100;
     },

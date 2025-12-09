@@ -8,6 +8,7 @@ import { useGolfCoursesInfinite } from '@/hooks/useGolfCoursesInfinite';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { getTop100Club } from '@/lib/top100Club';
 import { getTop100RingDotClass } from '@/lib/top100RingStyles';
+import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Search, Award, X } from 'lucide-react';
 import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
@@ -372,13 +373,14 @@ const Top100CoursesHubPanel = () => {
                   onClick={() => navigate(`/profile/${friend.profile.username}?tab=top100`)}
                   className={`flex-shrink-0 w-32 snap-start text-center ${isFirst ? 'ml-4' : ''} ${isLast ? 'mr-4' : ''}`}
                 >
-                  {/* Avatar */}
+                  {/* Avatar with achievement ring */}
                   {friend.profile.profile_photo_url ? (
                     <div className="mx-auto">
                       <SquircleAvatar
                         size={48}
                         src={friend.profile.profile_photo_url}
                         alt={displayName}
+                        ringColor={topCount >= 5 ? getRingColorForTotalPlayed(topCount) : undefined}
                       />
                     </div>
                   ) : (
