@@ -20,7 +20,6 @@ interface SocialDockProps {
   isVisible: boolean;
   isPlayedByUser?: boolean;
   onSwipeUp: () => void;
-  onProfileClick: () => void;
   onCourseClick: () => void;
   onLike: () => void;
   onComment: () => void;
@@ -38,7 +37,6 @@ export const SocialDock: React.FC<SocialDockProps> = ({
   isVisible,
   isPlayedByUser = false,
   onSwipeUp,
-  onProfileClick,
   onCourseClick,
   onLike,
   onComment,
@@ -128,12 +126,8 @@ export const SocialDock: React.FC<SocialDockProps> = ({
         >
           {/* 1) TOP ROW: Avatar + Name + Navigation Pill */}
           <div className="flex items-center justify-between gap-3 mb-2">
-            {/* Left: avatar + name */}
-            <button
-              type="button"
-              onClick={onProfileClick}
-              className="flex items-center gap-2 min-w-0 hover:opacity-80 transition-opacity"
-            >
+            {/* Left: avatar + name (non-interactive in Clubhouse) */}
+            <div className="flex items-center gap-2 min-w-0">
               <img
                 src={post.user.avatar || '/placeholder.svg'}
                 alt={post.user.name}
@@ -149,7 +143,7 @@ export const SocialDock: React.FC<SocialDockProps> = ({
                   </span>
                 )}
               </div>
-            </button>
+            </div>
 
             {/* Right: Navigation pill */}
             <button

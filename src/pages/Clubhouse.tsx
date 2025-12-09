@@ -94,11 +94,10 @@ const Clubhouse = () => {
   }, [seasonRecap]);
   
   // Track overlay states
-  const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState(false);
   const [isCommentsDrawerOpen, setIsCommentsDrawerOpen] = useState(false);
   
   // Chrome auto-hide state - force hidden when any overlay is open
-  const isAnyOverlayOpen = isProfileDrawerOpen || isCommentsDrawerOpen || isComposerOpen;
+  const isAnyOverlayOpen = isCommentsDrawerOpen || isComposerOpen;
   const chromeControls = useChromeState({
     forceHidden: isAnyOverlayOpen,
     disabled: false,
@@ -288,7 +287,6 @@ const Clubhouse = () => {
               activeVideoRef.current = ref;
             }}
             onCommentsOpenChange={setIsCommentsDrawerOpen}
-            onProfileOpenChange={setIsProfileDrawerOpen}
             chromeState={chromeControls.chromeState}
             onPostDetailsOpen={() => console.log('Post details opened')}
             onDismissNavOverlay={hideNavOverlay}
