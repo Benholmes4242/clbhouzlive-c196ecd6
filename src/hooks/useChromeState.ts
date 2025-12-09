@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 
 export type ChromeState = 'visible' | 'hidden';
+export type HideReason = 'none' | 'scroll' | 'auto' | 'overlay';
 
 interface UseChromeStateOptions {
   forceHidden?: boolean;
@@ -30,6 +31,9 @@ export const useChromeState = ({ forceHidden = false, disabled = false, onNavOve
   const hideTimer = useRef<number | null>(null);
   const forceHiddenRef = useRef(false);
   
+  // Track why chrome was hidden to prevent scroll from revealing after auto-hide
+  const hideReasonRef = useRef<HideReason>('none');
+  
   // Edge swipe detection
   const edgeSwipeRef = useRef<{
     isEdge: boolean;
@@ -44,9 +48,11 @@ export const useChromeState = ({ forceHidden = false, disabled = false, onNavOve
     
     if (forceHidden) {
       // When overlay opens, hide chrome immediately
+      hideReasonRef.current = 'overlay';
       setChromeState('hidden');
     } else {
       // When overlay closes, show chrome
+      hideReasonRef.current = 'none';
       setChromeState('visible');
     }
   }, [forceHidden]);
@@ -69,7 +75,12 @@ export const useChromeState = ({ forceHidden = false, disabled = false, onNavOve
     };
   }, [chromeState, disabled]);
 
-  const scheduleHide = useCallback((ms: number) => {
+  // Helper to check if in top zone
+  const isInTopZone = useCallback((scrollTop: number) => {
+    return scrollTop <= TOP_GUARD_PX;
+  }, []);
+
+  const scheduleHide = useCallback((ms: number, reason: HideReason = 'scroll') => {
     if (forceHiddenRef.current || disabled) return;
     if (revealTimer.current) {
       clearTimeout(revealTimer.current);
@@ -77,37 +88,53 @@ export const useChromeState = ({ forceHidden = false, disabled = false, onNavOve
     }
     if (hideTimer.current) clearTimeout(hideTimer.current);
     hideTimer.current = window.setTimeout(() => {
+      hideReasonRef.current = reason;
       setChromeState('hidden');
     }, ms);
   }, [disabled]);
 
-  const scheduleReveal = useCallback((ms: number) => {
+  const scheduleReveal = useCallback((ms: number, scrollTop?: number) => {
     if (disabled) return;
+    
+    // If chrome was auto-hidden and we're not in the top zone, block the reveal
+    if (hideReasonRef.current === 'auto' && scrollTop !== undefined && !isInTopZone(scrollTop)) {
+      return;
+    }
+    
     if (hideTimer.current) {
       clearTimeout(hideTimer.current);
       hideTimer.current = null;
     }
     if (revealTimer.current) clearTimeout(revealTimer.current);
     revealTimer.current = window.setTimeout(() => {
+      hideReasonRef.current = 'none';
       setChromeState('visible');
     }, ms);
-  }, [disabled]);
+  }, [disabled, isInTopZone]);
 
-  const hideChrome = useCallback(() => scheduleHide(HIDE_DEBOUNCE_MS), [scheduleHide]);
-  const showChrome = useCallback(() => scheduleReveal(REVEAL_DEBOUNCE_MS), [scheduleReveal]);
+  const hideChrome = useCallback((reason: HideReason = 'scroll') => {
+    scheduleHide(HIDE_DEBOUNCE_MS, reason);
+  }, [scheduleHide]);
+  
+  const showChrome = useCallback(() => {
+    hideReasonRef.current = 'none';
+    scheduleReveal(REVEAL_DEBOUNCE_MS);
+  }, [scheduleReveal]);
   
   // Immediate show/hide (no debounce) for external control like auto-hide timer
   const showChromeImmediate = useCallback(() => {
     if (disabled) return;
     if (hideTimer.current) clearTimeout(hideTimer.current);
     if (revealTimer.current) clearTimeout(revealTimer.current);
+    hideReasonRef.current = 'none';
     setChromeState('visible');
   }, [disabled]);
   
-  const hideChromeImmediate = useCallback(() => {
+  const hideChromeImmediate = useCallback((reason: HideReason = 'scroll') => {
     if (forceHiddenRef.current || disabled) return;
     if (hideTimer.current) clearTimeout(hideTimer.current);
     if (revealTimer.current) clearTimeout(revealTimer.current);
+    hideReasonRef.current = reason;
     setChromeState('hidden');
   }, [disabled]);
 
@@ -120,7 +147,15 @@ export const useChromeState = ({ forceHidden = false, disabled = false, onNavOve
     
     // Schedule toggle with 140ms debounce
     const timer = window.setTimeout(() => {
-      setChromeState(s => s === 'visible' ? 'hidden' : 'visible');
+      setChromeState(s => {
+        if (s === 'visible') {
+          hideReasonRef.current = 'scroll';
+          return 'hidden';
+        } else {
+          hideReasonRef.current = 'none';
+          return 'visible';
+        }
+      });
     }, 140);
     
     // Store in appropriate timer ref based on current state
@@ -159,24 +194,27 @@ export const useChromeState = ({ forceHidden = false, disabled = false, onNavOve
     // Ignore iOS rubber-band at absolute top
     if (scrollTop <= 0 && deltaY < 0) return;
 
-    const atTopZone = scrollTop <= TOP_GUARD_PX;
+    const atTopZone = isInTopZone(scrollTop);
 
-    // Always show chrome in top zone
+    // Always show chrome in top zone (this clears auto-hide lock)
     if (atTopZone) {
-      scheduleReveal(REVEAL_DEBOUNCE_AT_TOP_MS);
+      hideReasonRef.current = 'none';
+      scheduleReveal(REVEAL_DEBOUNCE_AT_TOP_MS, scrollTop);
       return;
     }
 
     // Hide on downward scroll (deltaY > 0 means scrolling down the page = content moving up)
     if (deltaY > 8 && timeDelta < 100) {
-      scheduleHide(HIDE_DEBOUNCE_MS);
+      scheduleHide(HIDE_DEBOUNCE_MS, 'scroll');
     }
     // Reveal on upward scroll (deltaY < 0 means scrolling up the page = content moving down)
     // Only if directional reveal is not disabled
+    // AND only if not auto-hidden (auto-hide lock prevents scroll reveal outside top zone)
     else if (!disableDirectionalReveal && deltaY < -6 && timeDelta < 120) {
-      scheduleReveal(REVEAL_DEBOUNCE_MS);
+      // Pass scrollTop so scheduleReveal can check if we're in top zone
+      scheduleReveal(REVEAL_DEBOUNCE_MS, scrollTop);
     }
-  }, [disabled, scheduleHide, scheduleReveal]);
+  }, [disabled, scheduleHide, scheduleReveal, isInTopZone, disableDirectionalReveal]);
 
   // Tap toggle handler
   const handleTap = useCallback((event: React.MouseEvent | React.TouchEvent) => {
@@ -265,6 +303,9 @@ export const useChromeState = ({ forceHidden = false, disabled = false, onNavOve
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [disabled, showChrome]);
 
+  // Getter for hide reason (useful for debugging)
+  const getHideReason = useCallback(() => hideReasonRef.current, []);
+
   return {
     chromeState,
     isHidden: chromeState === 'hidden',
@@ -279,5 +320,6 @@ export const useChromeState = ({ forceHidden = false, disabled = false, onNavOve
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd,
+    getHideReason,
   };
 };
