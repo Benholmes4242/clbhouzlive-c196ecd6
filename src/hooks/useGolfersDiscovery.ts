@@ -17,7 +17,28 @@ interface GolferProfile {
   homeClubId?: string;
   handicap?: number | null;
   followersCount: number;
-  totalTop100Played?: number;
+  totalTop100Played: number;
+}
+
+// Helper to fetch Top 100 counts for a list of user IDs
+async function fetchTop100Counts(userIds: string[]): Promise<Map<string, number>> {
+  if (userIds.length === 0) return new Map();
+  
+  const { data, error } = await supabase
+    .from('user_top100_rated_courses' as any)
+    .select('user_id')
+    .in('user_id', userIds);
+
+  if (error) {
+    console.warn('[useGolfersDiscovery] Failed to fetch Top 100 counts:', error);
+    return new Map();
+  }
+
+  const countMap = new Map<string, number>();
+  for (const row of (data || []) as any[]) {
+    countMap.set(row.user_id, (countMap.get(row.user_id) || 0) + 1);
+  }
+  return countMap;
 }
 
 export function useGolfersDiscovery() {
@@ -61,6 +82,9 @@ export function useGolfersDiscovery() {
 
       if (error) throw error;
 
+      const userIds = (data || []).map(p => p.id);
+      const top100Counts = await fetchTop100Counts(userIds);
+
       return (data || []).map(profile => ({
         id: profile.id,
         displayName: profile.display_name || profile.username || 'User',
@@ -69,7 +93,7 @@ export function useGolfersDiscovery() {
         homeClub: profile.home_club,
         handicap: profile.eg_handicap_index,
         followersCount: 0,
-        totalTop100Played: 0, // TODO: fetch from Top100 progress if needed
+        totalTop100Played: top100Counts.get(profile.id) || 0,
       }));
     },
   });
@@ -103,6 +127,9 @@ export function useGolfersDiscovery() {
 
       if (error) throw error;
 
+      const userIds = (data || []).map(p => p.id);
+      const top100Counts = await fetchTop100Counts(userIds);
+
       const profiles = (data || []).map(profile => ({
         id: profile.id,
         displayName: profile.display_name || profile.username || 'User',
@@ -111,7 +138,7 @@ export function useGolfersDiscovery() {
         homeClub: profile.home_club,
         handicap: profile.eg_handicap_index,
         followersCount: 0,
-        totalTop100Played: 0, // TODO: fetch from Top100 progress if needed
+        totalTop100Played: top100Counts.get(profile.id) || 0,
       }));
 
       return {
