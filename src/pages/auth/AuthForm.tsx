@@ -1,10 +1,10 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Check, X, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 interface AuthFormProps {
   isSignUp: boolean;
@@ -20,6 +20,21 @@ interface AuthFormProps {
   submitting: boolean;
   showConfirmNotice: boolean;
 }
+
+// Custom dark input styling
+const darkInputStyles = {
+  height: '48px',
+  backgroundColor: 'rgba(255,255,255,0.08)',
+  border: '1px solid rgba(255,255,255,0.12)',
+  borderRadius: '12px',
+  color: 'white',
+  fontSize: '15px',
+  paddingLeft: '16px',
+  paddingRight: '16px',
+  outline: 'none',
+  width: '100%',
+  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+};
 
 const AuthForm: React.FC<AuthFormProps> = ({
   isSignUp,
@@ -49,8 +64,18 @@ const AuthForm: React.FC<AuthFormProps> = ({
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [forgotPasswordMsg, setForgotPasswordMsg] = useState<string | null>(null);
   const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState(false);
+  const [shakeEmail, setShakeEmail] = useState(false);
+  const [shakePassword, setShakePassword] = useState(false);
   
+  const emailInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-focus on email field
+  useEffect(() => {
+    if (emailInputRef.current && !isSignUp) {
+      emailInputRef.current.focus();
+    }
+  }, [isSignUp]);
 
   // Validation helpers
   const isEmailValid = email.includes('@') && email.includes('.');
@@ -67,6 +92,17 @@ const AuthForm: React.FC<AuthFormProps> = ({
   useEffect(() => {
     if (passwordError) setPasswordError(null);
   }, [password]);
+
+  // Shake animation trigger
+  const triggerShake = (field: 'email' | 'password') => {
+    if (field === 'email') {
+      setShakeEmail(true);
+      setTimeout(() => setShakeEmail(false), 500);
+    } else {
+      setShakePassword(true);
+      setTimeout(() => setShakePassword(false), 500);
+    }
+  };
 
   const checkUsernameAvailability = async (usernameToCheck: string) => {
     if (!usernameToCheck.trim() || usernameToCheck.length < 3) {
@@ -148,10 +184,12 @@ const AuthForm: React.FC<AuthFormProps> = ({
     if (!isSignUp) {
       if (!isEmailValid) {
         setEmailError("Please enter a valid email address");
+        triggerShake('email');
         return;
       }
       if (!isPasswordValid) {
         setPasswordError("Password must be at least 6 characters");
+        triggerShake('password');
         return;
       }
     }
@@ -186,20 +224,20 @@ const AuthForm: React.FC<AuthFormProps> = ({
       if (error) {
         if (error.message.includes('already registered')) {
           setEmailError("This email is already registered");
+          triggerShake('email');
         } else {
           setErrorMsg(error.message);
         }
       } else if (data?.user) {
-        // Redirect to callback for profile setup
         navigate('/auth/callback');
       }
     } else {
       // EMAIL LOGIN
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        setPasswordError("Email or password is incorrect. Please try again.");
+        setPasswordError("Email or password is incorrect");
+        triggerShake('password');
       } else if (data?.user) {
-        // Redirect to callback
         navigate('/auth/callback');
       }
     }
@@ -214,15 +252,14 @@ const AuthForm: React.FC<AuthFormProps> = ({
   };
 
   const handleForgotPasswordClick = async () => {
-    // Check if email is empty
     if (!email.trim()) {
-      setForgotPasswordMsg("Please enter your email first.");
+      setForgotPasswordMsg("Please enter your email first");
       setForgotPasswordSuccess(false);
       return;
     }
 
     if (!isEmailValid) {
-      setForgotPasswordMsg("Please enter a valid email address.");
+      setForgotPasswordMsg("Please enter a valid email address");
       setForgotPasswordSuccess(false);
       return;
     }
@@ -235,10 +272,10 @@ const AuthForm: React.FC<AuthFormProps> = ({
     });
 
     if (error) {
-      setForgotPasswordMsg("Failed to send reset email. Please try again.");
+      setForgotPasswordMsg("Failed to send reset email");
       setForgotPasswordSuccess(false);
     } else {
-      setForgotPasswordMsg("We've sent you a password reset link.");
+      setForgotPasswordMsg("We've sent you a password reset link");
       setForgotPasswordSuccess(true);
     }
 
@@ -279,30 +316,50 @@ const AuthForm: React.FC<AuthFormProps> = ({
     }
   };
 
+  // Shake animation CSS
+  const shakeAnimation = `
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+      20%, 40%, 60%, 80% { transform: translateX(4px); }
+    }
+  `;
+
   if (showForgotPassword) {
     return (
       <form className="w-full" onSubmit={(e) => { e.preventDefault(); handleForgotPasswordClick(); }}>
+        <style>{shakeAnimation}</style>
         <div className="mb-4">
-          <Input
+          <input
             type="email"
             value={resetEmail}
             onChange={(e) => setResetEmail(e.target.value)}
             placeholder="Enter your email address"
             disabled={resetSubmitting}
             required
+            style={{
+              ...darkInputStyles,
+            }}
+            className="placeholder:text-white/40 focus:border-[#6e9277]"
           />
         </div>
-        <Button 
+        <button 
           type="submit" 
-          variant="gradient-primary"
           disabled={resetSubmitting} 
-          className="w-full mb-3"
+          className="w-full h-12 rounded-[12px] font-medium text-white transition-all active:scale-[0.98]"
+          style={{
+            background: 'linear-gradient(180deg, #6e9277 0%, #5a7d63 100%)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.15), 0 2px 8px rgba(0,0,0,0.3)',
+            opacity: resetSubmitting ? 0.3 : 1,
+            pointerEvents: resetSubmitting ? 'none' : 'auto',
+          }}
         >
           {resetSubmitting ? "Sending..." : "Send Reset Email"}
-        </Button>
+        </button>
         <button
           type="button"
-          className="w-full text-sm text-muted-foreground underline-offset-4 hover:underline"
+          className="w-full text-sm mt-4 transition-opacity hover:opacity-80"
+          style={{ color: 'rgba(255,255,255,0.5)' }}
           onClick={() => setShowForgotPassword(false)}
           disabled={resetSubmitting}
         >
@@ -314,8 +371,12 @@ const AuthForm: React.FC<AuthFormProps> = ({
 
   return (
     <form className="w-full" onSubmit={handleAuth}>
+      <style>{shakeAnimation}</style>
+      
+      {/* Email Input */}
       <div className="mb-4">
-        <Input
+        <input
+          ref={emailInputRef}
           type="email"
           value={email}
           autoComplete="email"
@@ -323,47 +384,56 @@ const AuthForm: React.FC<AuthFormProps> = ({
           placeholder="Email"
           disabled={submitting || showConfirmNotice}
           required
-          className={emailError ? 'border-destructive focus-visible:border-destructive' : ''}
+          style={{
+            ...darkInputStyles,
+            borderColor: emailError ? '#ef4444' : 'rgba(255,255,255,0.12)',
+            animation: shakeEmail ? 'shake 0.5s ease-in-out' : 'none',
+          }}
+          className="placeholder:text-white/40 focus:border-[#6e9277] focus:shadow-[0_0_0_2px_rgba(110,146,119,0.2)]"
         />
         {emailError && (
-          <p className="text-sm text-destructive mt-1">{emailError}</p>
+          <p className="text-sm mt-2" style={{ color: '#ef4444' }}>{emailError}</p>
         )}
         {forgotPasswordMsg && (
-          <p className={`text-sm mt-1 ${forgotPasswordSuccess ? 'text-green-600' : 'text-destructive'}`}>
+          <p className={cn("text-sm mt-2", forgotPasswordSuccess ? "text-green-400" : "text-red-400")}>
             {forgotPasswordMsg}
           </p>
         )}
       </div>
       
+      {/* Username (signup only) */}
       {isSignUp && (
         <div className="mb-4">
           <div className="relative">
-            <Input
+            <input
               type="text"
               value={username}
               onChange={(e) => handleUsernameChange(e.target.value)}
               placeholder="Username"
               disabled={submitting || showConfirmNotice}
               required
-              className={`pr-10 ${
-                usernameAvailable === true ? 'border-green-500' : 
-                usernameAvailable === false ? 'border-destructive' : ''
-              }`}
+              style={{
+                ...darkInputStyles,
+                paddingRight: '40px',
+                borderColor: usernameAvailable === true ? '#22c55e' : 
+                  usernameAvailable === false ? '#ef4444' : 'rgba(255,255,255,0.12)',
+              }}
+              className="placeholder:text-white/40 focus:border-[#6e9277]"
             />
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
               {checkingUsername ? (
-                <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white/60 rounded-full animate-spin" />
               ) : usernameAvailable === true ? (
-                <Check className="w-4 h-4 text-green-500" />
+                <Check className="w-4 h-4 text-green-400" />
               ) : usernameAvailable === false ? (
-                <X className="w-4 h-4 text-destructive" />
+                <X className="w-4 h-4 text-red-400" />
               ) : null}
             </div>
           </div>
           
           {usernameAvailable === false && suggestedUsernames.length > 0 && (
-            <div className="mt-2 p-2 bg-slate-50 rounded-sq-xs text-base">
-              <p className="text-slate-600 mb-2">Username taken. Try these:</p>
+            <div className="mt-2 p-3 rounded-[8px]" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}>
+              <p className="text-white/60 text-sm mb-2">Username taken. Try these:</p>
               <div className="flex flex-wrap gap-1">
                 {suggestedUsernames.map((suggestion) => (
                   <button
@@ -373,7 +443,11 @@ const AuthForm: React.FC<AuthFormProps> = ({
                       setUsername(suggestion);
                       checkUsernameAvailability(suggestion);
                     }}
-                    className="px-2 py-1 bg-slate-100 text-slate-700 rounded-sq-xs text-sm hover:bg-slate-200"
+                    className="px-2 py-1 text-sm rounded-md transition-colors"
+                    style={{ 
+                      backgroundColor: 'rgba(255,255,255,0.08)',
+                      color: 'rgba(255,255,255,0.8)',
+                    }}
                   >
                     @{suggestion}
                   </button>
@@ -383,13 +457,16 @@ const AuthForm: React.FC<AuthFormProps> = ({
           )}
           
           {username.length > 0 && username.length < 3 && (
-            <p className="text-sm text-destructive mt-1">Username must be at least 3 characters</p>
+            <p className="text-sm mt-2" style={{ color: '#ef4444' }}>
+              Username must be at least 3 characters
+            </p>
           )}
         </div>
       )}
       
-      <div className="mb-4">
-        <Input
+      {/* Password Input */}
+      <div className="mb-5">
+        <input
           ref={passwordInputRef}
           type="password"
           value={password}
@@ -399,81 +476,111 @@ const AuthForm: React.FC<AuthFormProps> = ({
           placeholder="Password"
           disabled={submitting || showConfirmNotice}
           required
-          className={passwordError ? 'border-destructive focus-visible:border-destructive' : ''}
+          style={{
+            ...darkInputStyles,
+            borderColor: passwordError ? '#ef4444' : 'rgba(255,255,255,0.12)',
+            animation: shakePassword ? 'shake 0.5s ease-in-out' : 'none',
+          }}
+          className="placeholder:text-white/40 focus:border-[#6e9277] focus:shadow-[0_0_0_2px_rgba(110,146,119,0.2)]"
         />
         {passwordError && (
-          <p className="text-sm text-destructive mt-1">{passwordError}</p>
+          <p className="text-sm mt-2" style={{ color: '#ef4444' }}>{passwordError}</p>
         )}
       </div>
+
       {!showConfirmNotice && (
         <>
-          <Button 
+          {/* Sign In Button */}
+          <button 
             type="submit" 
             disabled={submitting || (!isSignUp && !isFormValid) || (isSignUp && usernameAvailable !== true)} 
-            className="w-full mb-3 text-white hover:opacity-90"
-            style={{ backgroundColor: '#0a0a0a' }}
+            className="w-full h-12 rounded-[12px] font-medium text-white transition-all active:scale-[0.98]"
+            style={{
+              background: 'linear-gradient(180deg, #6e9277 0%, #5a7d63 100%)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.15), 0 2px 8px rgba(0,0,0,0.3)',
+              opacity: (submitting || (!isSignUp && !isFormValid) || (isSignUp && usernameAvailable !== true)) ? 0.3 : 1,
+              pointerEvents: (submitting || (!isSignUp && !isFormValid) || (isSignUp && usernameAvailable !== true)) ? 'none' : 'auto',
+            }}
           >
             {submitting ? (
-              <span className="flex items-center gap-2">
+              <span className="flex items-center justify-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                {isSignUp ? "Signing up..." : "Signing in..."}
+                {isSignUp ? "Signing up…" : "Signing in…"}
               </span>
             ) : (
               isSignUp ? "Sign Up" : "Sign In"
             )}
-          </Button>
+          </button>
           
-          {/* Social Login Divider */}
-          <div className="flex items-center my-4">
-            <div className="flex-1 border-t border-slate-300"></div>
-            <span className="mx-4 text-base text-slate-500">or</span>
-            <div className="flex-1 border-t border-slate-300"></div>
+          {/* Divider */}
+          <div className="flex items-center my-6">
+            <div className="flex-1 h-px" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }} />
+            <span className="mx-4 text-sm font-medium" style={{ color: 'rgba(255,255,255,0.4)' }}>OR</span>
+            <div className="flex-1 h-px" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }} />
           </div>
           
-          {/* Social Login Buttons */}
+          {/* OAuth Buttons */}
           <div className="space-y-3">
-            <Button
+            {/* Google */}
+            <button
               type="button"
               onClick={handleGoogleSignIn}
               disabled={submitting}
-              variant="outline"
-              className="w-full flex items-center justify-center gap-3 py-3"
+              className="w-full h-12 rounded-[12px] flex items-center transition-all active:scale-[0.98] hover:bg-white/[0.08]"
+              style={{
+                backgroundColor: 'transparent',
+                border: '1px solid rgba(255,255,255,0.12)',
+              }}
             >
-              {submitting ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <svg className="w-5 h-5" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-              )}
-              Continue with Google
-            </Button>
+              <div className="w-12 flex items-center justify-center">
+                {submitting ? (
+                  <Loader2 className="w-5 h-5 animate-spin text-white/60" />
+                ) : (
+                  <svg className="w-5 h-5" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                  </svg>
+                )}
+              </div>
+              <span className="flex-1 text-center pr-12 text-sm font-medium text-white">
+                Continue with Google
+              </span>
+            </button>
             
-            <Button
+            {/* Apple */}
+            <button
               type="button"
               onClick={handleAppleSignIn}
               disabled={submitting}
-              variant="outline"
-              className="w-full flex items-center justify-center gap-3 py-3"
+              className="w-full h-12 rounded-[12px] flex items-center transition-all active:scale-[0.98] hover:bg-white/[0.08]"
+              style={{
+                backgroundColor: 'transparent',
+                border: '1px solid rgba(255,255,255,0.12)',
+              }}
             >
-              {submitting ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-                </svg>
-              )}
-              Continue with Apple
-            </Button>
+              <div className="w-12 flex items-center justify-center">
+                {submitting ? (
+                  <Loader2 className="w-5 h-5 animate-spin text-white/60" />
+                ) : (
+                  <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                  </svg>
+                )}
+              </div>
+              <span className="flex-1 text-center pr-12 text-sm font-medium text-white">
+                Continue with Apple
+              </span>
+            </button>
           </div>
           
+          {/* Forgot password */}
           {!isSignUp && (
             <button
               type="button"
-              className="w-full text-sm text-muted-foreground underline-offset-4 hover:underline mt-4"
+              className="w-full text-sm mt-5 transition-opacity hover:opacity-80"
+              style={{ color: 'rgba(255,255,255,0.5)' }}
               onClick={handleForgotPasswordClick}
               disabled={submitting}
             >
