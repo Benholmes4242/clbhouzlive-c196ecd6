@@ -96,6 +96,16 @@ export function useFriendship(targetUserId: string | undefined) {
         }
         throw error;
       }
+
+      // Create notification for the receiver
+      await supabase.from('notifications').insert({
+        user_id: targetUserId,
+        type: 'friend_request',
+        actor_id: currentUserId,
+        title: 'Friend request',
+        message: 'sent you a friend request',
+        data: { requester_id: currentUserId },
+      });
     },
     onSuccess: () => {
       toast.success('Friend request sent');
@@ -135,6 +145,15 @@ export function useFriendship(targetUserId: string | undefined) {
     mutationFn: async () => {
       if (!currentUserId || !relationshipId) throw new Error('Missing data');
       
+      // First get the original requester ID before updating
+      const { data: friendshipRow } = await supabase
+        .from('user_friends')
+        .select('user_id')
+        .eq('id', relationshipId)
+        .single();
+      
+      const requesterId = friendshipRow?.user_id;
+      
       const { error } = await supabase
         .from('user_friends')
         .update({ status: 'accepted' })
@@ -142,6 +161,18 @@ export function useFriendship(targetUserId: string | undefined) {
         .eq('friend_id', currentUserId); // Only accept if I'm the receiver
       
       if (error) throw error;
+
+      // Create notification for the original requester
+      if (requesterId) {
+        await supabase.from('notifications').insert({
+          user_id: requesterId,
+          type: 'friend_accepted',
+          actor_id: currentUserId,
+          title: 'Friend request accepted',
+          message: 'accepted your friend request',
+          data: { accepter_id: currentUserId },
+        });
+      }
     },
     onSuccess: () => {
       toast.success('Friend request accepted!');
@@ -203,6 +234,7 @@ export function useFriendship(targetUserId: string | undefined) {
     queryClient.invalidateQueries({ queryKey: ['relationship-status', targetUserId] });
     queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
     queryClient.invalidateQueries({ queryKey: ['friends'] });
+    queryClient.invalidateQueries({ queryKey: ['notifications'] });
   };
 
   const isUpdating = 
