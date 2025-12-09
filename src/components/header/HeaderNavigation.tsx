@@ -1,6 +1,7 @@
 
 import React, { useRef } from 'react';
 import { User, Settings, Shield } from 'lucide-react';
+import { IoMdNotificationsOutline } from "react-icons/io";
 import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
@@ -122,6 +123,19 @@ const HeaderNavigation = () => {
   if (!user) {
     return (
       <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
+        {/* Notifications bell icon with badge-ready wrapper */}
+        <div className="relative">
+          <Button
+            variant="ghost"
+            className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())}
+            onClick={() => navigate('/notificationmessages')}
+          >
+            <IoMdNotificationsOutline className="h-5 w-5" />
+          </Button>
+          {/* Unread badge (future-ready; not displayed yet) */}
+          {/* <span className="absolute top-2 right-1 bg-red-500 text-white text-[10px] rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">3</span> */}
+        </div>
+
         <Button data-action="profile" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())} onClick={handleProfileClick}>
           <User className="h-5 w-5" />
         </Button>
@@ -148,6 +162,19 @@ const HeaderNavigation = () => {
 
   return (
     <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
+      {/* Notifications bell icon with badge-ready wrapper */}
+      <div className="relative">
+        <Button
+          variant="ghost"
+          className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())}
+          onClick={() => navigate('/notificationmessages')}
+        >
+          <IoMdNotificationsOutline className="h-5 w-5" />
+        </Button>
+        {/* Unread badge (future-ready; not displayed yet) */}
+        {/* <span className="absolute top-2 right-1 bg-red-500 text-white text-[10px] rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">3</span> */}
+      </div>
+
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button data-action="profile" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())}>
