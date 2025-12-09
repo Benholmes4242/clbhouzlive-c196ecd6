@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Bell, Settings, CheckCheck } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 import { useActivityFeed, ActivityTabId, ACTIVITY_TABS, ActivityNotification } from '@/hooks/useActivityFeed';
 import { ActivityBucket } from '@/components/activity/ActivityBucket';
 import { AtAGlanceChips } from '@/components/activity/AtAGlanceChips';
 import { ActivityEmptyState } from '@/components/activity/ActivityEmptyState';
 import { ActivitySkeleton } from '@/components/activity/ActivitySkeleton';
-import { NewUpdatesToast } from '@/components/activity/NewUpdatesToast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -17,7 +15,7 @@ import CompactHeader from '@/components/header/CompactHeader';
 
 const ActivityPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActivityTabId>('all');
-  const [showToast, setShowToast] = useState(true);
+  const [activeChipFilter, setActiveChipFilter] = useState<string | null>(null);
   const { data, isLoading, error } = useActivityFeed(activeTab);
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
@@ -25,16 +23,6 @@ const ActivityPage: React.FC = () => {
 
   const buckets = data?.buckets;
   const counts = data?.counts;
-
-  const hasUnread = counts && counts.new > 0;
-
-  // Show toast only once on mount if there are unread items
-  useEffect(() => {
-    if (showToast && counts?.new && counts.new > 0) {
-      // Toast shown via NewUpdatesToast component
-      setShowToast(false);
-    }
-  }, [counts?.new, showToast]);
 
   const handleMarkAllAsRead = async () => {
     if (!user?.id) return;
@@ -85,24 +73,11 @@ const ActivityPage: React.FC = () => {
   };
 
   const handleChipClick = (kind: 'new' | 'mentions' | 'follows' | 'clubs' | 'messages') => {
-    // Map chip kind to tab
-    switch (kind) {
-      case 'new':
-        // Stay on all tab, scroll to new section
-        setActiveTab('all');
-        break;
-      case 'mentions':
-        setActiveTab('you');
-        break;
-      case 'follows':
-        setActiveTab('you');
-        break;
-      case 'clubs':
-        setActiveTab('clubs');
-        break;
-      case 'messages':
-        setActiveTab('messages');
-        break;
+    // Toggle filter: tap again to clear
+    if (activeChipFilter === kind) {
+      setActiveChipFilter(null);
+    } else {
+      setActiveChipFilter(kind);
     }
   };
 
@@ -122,43 +97,17 @@ const ActivityPage: React.FC = () => {
   return (
     <PageRoot className="bg-muted/40 pb-24">
       <CompactHeader />
-      
-      {/* Toast for new updates */}
-      {counts && <NewUpdatesToast count={counts.new} />}
 
-      {/* Main content wrapper */}
-      <div className="max-w-xl mx-auto p-4 compact-header-offset">
-        {/* Header section */}
+      {/* Main content wrapper - matches Courses/Profile gutters */}
+      <div className="max-w-screen-sm mx-auto px-4 pt-6 compact-header-offset">
+        {/* Header section - clean title only */}
         <section className="mb-4">
-          <div className="flex justify-between items-start">
-            <div className="flex flex-col">
-              <h1 className="text-xl font-semibold tracking-tight text-foreground">
-                Activity
-              </h1>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                Updates from friends, clubs, courses & messages.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2">
-              {hasUnread && (
-                <button 
-                  onClick={handleMarkAllAsRead}
-                  className="h-9 px-3 rounded-sq-pill bg-background flex items-center gap-2 shadow-sm border border-border/60 hover:bg-accent transition-colors text-xs font-medium"
-                  title="Mark all as read"
-                >
-                  <CheckCheck className="h-4 w-4" />
-                  <span className="hidden sm:inline">Mark all read</span>
-                </button>
-              )}
-              <button 
-                className="h-9 w-9 rounded-full bg-background flex items-center justify-center shadow-sm border border-border/60 hover:bg-accent transition-colors"
-                title="Notification settings"
-              >
-                <Settings className="h-4 w-4 text-foreground" />
-              </button>
-            </div>
-          </div>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Activity
+          </h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Updates from friends, clubs, courses & messages.
+          </p>
         </section>
 
         {/* Filter tabs - Apple-style segmented control */}
@@ -183,7 +132,11 @@ const ActivityPage: React.FC = () => {
 
         {/* At-a-glance chips (All tab only) */}
         {activeTab === 'all' && counts && (
-          <AtAGlanceChips counts={counts} onChipClick={handleChipClick} />
+          <AtAGlanceChips 
+            counts={counts} 
+            onChipClick={handleChipClick}
+            activeFilter={activeChipFilter}
+          />
         )}
 
         {/* Content */}

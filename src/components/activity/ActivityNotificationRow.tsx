@@ -2,8 +2,8 @@ import React from 'react';
 import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2 } from 'lucide-react';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { ActivityTypePill } from './ActivityTypePill';
 import { cn } from '@/lib/utils';
+import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 
 interface ActivityNotificationRowProps {
   notification: ActivityNotification;
@@ -44,13 +44,13 @@ function renderNotificationText(notification: ActivityNotification): string {
   
   switch (type) {
     case 'like':
-      return 'liked your moment';
+      return 'liked your post';
     case 'comment':
-      return message ? `commented: "${message.slice(0, 50)}${message.length > 50 ? '...' : ''}"` : 'commented on your moment';
+      return message ? `commented: "${message.slice(0, 50)}${message.length > 50 ? '...' : ''}"` : 'commented on your post';
     case 'mention':
       return 'mentioned you in a post';
     case 'tag':
-      return 'tagged you in a moment';
+      return 'tagged you in a post';
     case 'follow':
       return 'started following you';
     case 'friend_request':
@@ -61,7 +61,7 @@ function renderNotificationText(notification: ActivityNotification): string {
     case 'dm':
       return message ? `sent you a message: "${message.slice(0, 40)}${message.length > 40 ? '...' : ''}"` : 'sent you a message';
     case 'new_post':
-      return 'shared a new moment';
+      return 'shared a new post';
     case 'achievement':
       return 'earned a new achievement';
     case 'club_update':
@@ -102,13 +102,14 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
         />
       )}
 
-      {/* Avatar with type icon overlay */}
+      {/* Avatar with type icon overlay + achievement ring */}
       <div className="relative flex-shrink-0">
         <SquircleAvatar
           src={notification.actor_avatar_url}
           alt={notification.actor_display_name || 'User'}
           size={44}
           fallback={notification.actor_display_name?.charAt(0) || '?'}
+          ringColor={getRingColorForTotalPlayed(0)} // Default ring, could be enhanced with actor's total_top100_played
         />
         <div className="absolute -bottom-0.5 -right-0.5 h-5 w-5 rounded-full bg-background border border-border/60 flex items-center justify-center shadow-sm">
           {getNotificationIcon(notification.type)}
@@ -131,11 +132,6 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
         <p className="text-xs text-muted-foreground mt-0.5">
           {notification.time_ago} · {notification.context_label}
         </p>
-      </div>
-
-      {/* Type pill on right */}
-      <div className="flex-shrink-0">
-        <ActivityTypePill type={notification.type} />
       </div>
     </button>
   );
