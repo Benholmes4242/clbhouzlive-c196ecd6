@@ -127,7 +127,12 @@ const HeaderNavigation = () => {
         <div className="relative">
           <Button
             variant="ghost"
-            className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())}
+            className={cn(
+              "p-2 md:p-3 flex-shrink-0 mt-3 transition-colors",
+              "focus:bg-transparent focus-visible:bg-transparent active:bg-transparent",
+              "focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0",
+              getIconColorClass()
+            )}
             onClick={() => navigate('/notificationmessages')}
           >
             <IoMdNotificationsOutline className="h-5 w-5" />
@@ -166,7 +171,12 @@ const HeaderNavigation = () => {
       <div className="relative">
         <Button
           variant="ghost"
-          className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())}
+          className={cn(
+            "p-2 md:p-3 flex-shrink-0 mt-3 transition-colors",
+            "focus:bg-transparent focus-visible:bg-transparent active:bg-transparent",
+            "focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0",
+            getIconColorClass()
+          )}
           onClick={() => navigate('/notificationmessages')}
         >
           <IoMdNotificationsOutline className="h-5 w-5" />
