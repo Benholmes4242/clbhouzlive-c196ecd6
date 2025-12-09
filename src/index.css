@@ -359,6 +359,23 @@ html.lightbox-open {
   @apply text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground px-2.5;
 }
 
+/* ========================================
+   ACTIVITY PAGE - iOS Safari Text Rendering Fix
+   Forces a separate compositing layer to escape the
+   position:fixed html/body + nested scroll bug on iOS
+   ======================================== */
+.activity-page-root {
+  position: relative;
+  min-height: 100vh;
+  padding-bottom: 96px;
+  background-color: hsl(var(--bg-page));
+  
+  /* Force GPU compositing layer - fixes iOS Safari text render bug */
+  transform: translateZ(0);
+  -webkit-transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
 /* Fade mask utility for horizontal scroll rails */
 .mask-fade-right {
   -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
