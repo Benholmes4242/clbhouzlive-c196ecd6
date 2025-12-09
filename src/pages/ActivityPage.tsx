@@ -144,17 +144,17 @@ const ActivityPage: React.FC = () => {
           </p>
         </section>
 
-        {/* Filter tabs - Apple-style segmented control */}
+        {/* Filter tabs - Apple-style segmented control matching Golf Courses width */}
         <div className="mb-4">
-          <div className="inline-flex rounded-sq-pill bg-muted/70 border border-border/40 p-1 gap-0.5">
+          <div className="grid w-full grid-cols-4 rounded-sq-md bg-muted/70 border border-border/60 px-2 py-[3px]">
             {ACTIVITY_TABS.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
                 className={cn(
-                  "px-3 py-1.5 text-sm rounded-sq-pill whitespace-nowrap transition-all duration-200",
+                  "rounded-sq-pill text-sm px-3 py-[6px] font-medium transition-all duration-motion-fast ease-standard",
                   activeTab === tab.id
-                    ? "bg-background text-foreground shadow-sm font-medium"
+                    ? "bg-background shadow-sm text-foreground"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
