@@ -13,7 +13,7 @@ import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
 import ClubTagPill from './ClubTagPill';
 import { Top100OverlayPills } from './Top100OverlayPills';
-import MiniProfileSheetWithData from './MiniProfileSheetWithData';
+
 import HLSVideoCard from '@/components/ui/HLSVideoCard';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
@@ -230,8 +230,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const [visualIndex, setVisualIndex] = useState(0);
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>('');
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [showMiniProfile, setShowMiniProfile] = useState(false);
 
   // Get engagement data for the current post
   const currentPost = filteredPosts[currentIndex];
@@ -265,10 +263,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   useEffect(() => {
     onCommentsOpenChange?.(commentsModalOpen);
   }, [commentsModalOpen, onCommentsOpenChange]);
-
-  useEffect(() => {
-    onProfileOpenChange?.(showMiniProfile);
-  }, [showMiniProfile, onProfileOpenChange]);
 
   // Cleanup visualIndexTimeout on unmount to prevent memory leaks
   useEffect(() => {
@@ -1316,16 +1310,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         />
       )}
 
-      {/* Mini Profile Sheet */}
-      <MiniProfileSheetWithData
-        userId={selectedUserId}
-        isOpen={showMiniProfile}
-        onClose={() => setShowMiniProfile(false)}
-        onFollow={() => {
-          // Handle follow action - could update local state or refetch
-        }}
-      />
-
       {/* Top Bar */}
       <TopBar isVisible={topBarVisible} />
 
@@ -1355,10 +1339,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
           isPlayedByUser={isCurrentCoursePlayed}
           isVisible={true}
           onSwipeUp={() => onPostDetailsOpen?.()}
-          onProfileClick={() => {
-            setSelectedUserId(filteredPosts[currentIndex].user?.id || null);
-            setShowMiniProfile(true);
-          }}
           onCourseClick={() => console.log('Course clicked')}
           onLike={() => currentPostEngagement.toggleLike()}
           onComment={() => handleComment(filteredPosts[currentIndex].id)}
