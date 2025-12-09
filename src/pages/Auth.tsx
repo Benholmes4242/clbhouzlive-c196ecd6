@@ -16,6 +16,11 @@ interface AuthProps {
   defaultSignUp?: boolean;
 }
 
+type AuthNotice = {
+  type: 'success' | 'error';
+  message: string;
+} | null;
+
 const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
   const [isSignUp, setIsSignUp] = useState(defaultSignUp);
   const [email, setEmail] = useState("");
@@ -25,6 +30,7 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
   const [showConfirmNotice, setShowConfirmNotice] = useState(false);
   const [resending, setResending] = useState(false);
   const [resendMsg, setResendMsg] = useState<string | null>(null);
+  const [authNotice, setAuthNotice] = useState<AuthNotice>(null);
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -83,11 +89,13 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
           setShowConfirmNotice(false);
           setErrorMsg(null);
           setResendMsg(null);
+          setAuthNotice(null);
         }}
         submitting={submitting}
       >
         <AuthForm
           isSignUp={isSignUp}
+          setIsSignUp={setIsSignUp}
           setShowConfirmNotice={setShowConfirmNotice}
           setErrorMsg={setErrorMsg}
           setSubmitting={setSubmitting}
@@ -99,6 +107,8 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
           password={password}
           submitting={submitting}
           showConfirmNotice={showConfirmNotice}
+          authNotice={authNotice}
+          setAuthNotice={setAuthNotice}
         />
         {/* Only show confirmation notice if explicitly needed (shouldn't happen with disabled email confirmation) */}
         {showConfirmNotice && (

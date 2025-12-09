@@ -5,8 +5,14 @@ import { Check, X, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
+type AuthNotice = {
+  type: 'success' | 'error';
+  message: string;
+} | null;
+
 interface AuthFormProps {
   isSignUp: boolean;
+  setIsSignUp: (b: boolean) => void;
   setShowConfirmNotice: (b: boolean) => void;
   setErrorMsg: (msg: string | null) => void;
   setSubmitting: (b: boolean) => void;
@@ -18,6 +24,8 @@ interface AuthFormProps {
   password: string;
   submitting: boolean;
   showConfirmNotice: boolean;
+  authNotice: AuthNotice;
+  setAuthNotice: (notice: AuthNotice) => void;
 }
 
 // Light theme input styling using design tokens
@@ -37,6 +45,7 @@ const lightInputStyles: React.CSSProperties = {
 
 const AuthForm: React.FC<AuthFormProps> = ({
   isSignUp,
+  setIsSignUp,
   setShowConfirmNotice,
   setErrorMsg,
   setSubmitting,
@@ -48,6 +57,8 @@ const AuthForm: React.FC<AuthFormProps> = ({
   password,
   submitting,
   showConfirmNotice,
+  authNotice,
+  setAuthNotice,
 }) => {
   const navigate = useNavigate();
   const [showForgotPassword, setShowForgotPassword] = useState(false);
@@ -229,7 +240,14 @@ const AuthForm: React.FC<AuthFormProps> = ({
           setErrorMsg(error.message);
         }
       } else if (data?.user) {
-        navigate('/auth/callback');
+        // Switch back to sign-in and show success notice
+        setIsSignUp(false);
+        setPassword('');
+        setUsername('');
+        setAuthNotice({
+          type: 'success',
+          message: `We've created your account. Check ${email} for a verification link, then sign in.`,
+        });
       }
     } else {
       // EMAIL LOGIN
@@ -420,6 +438,15 @@ const AuthForm: React.FC<AuthFormProps> = ({
             </p>
           )}
         </div>
+        {/* Auth notice (sign-up success) - only show on sign-in view */}
+        {!isSignUp && authNotice && (
+          <p 
+            className="text-xs mt-2"
+            style={{ color: authNotice.type === 'success' ? '#3F7F41' : '#D64545' }}
+          >
+            {authNotice.message}
+          </p>
+        )}
       </div>
       
       {/* Username (signup only) */}
