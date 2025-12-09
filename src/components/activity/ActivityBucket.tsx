@@ -28,19 +28,14 @@ export const ActivityBucket: React.FC<ActivityBucketProps> = ({
 
   return (
     <section>
-      {/* Section label - non-sticky, scrolls with content */}
+      {/* Section label - non-sticky, scrolls with content (no NEW badge here, shown in chips row only) */}
       <div
         className={cn(
           "mb-2 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em]",
-          accent ? "text-primary" : "text-muted-foreground"
+          "text-muted-foreground"
         )}
       >
         {label}
-        {accent && items.length > 0 && (
-          <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-orange-500 text-[11px] font-medium text-white px-1.5">
-            {items.length}
-          </span>
-        )}
       </div>
 
       <div className="space-y-1.5">

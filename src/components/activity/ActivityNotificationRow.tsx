@@ -113,23 +113,15 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
       onClick={onClick}
       className={cn(
         "w-full text-left transition-all duration-200 relative",
-        "rounded-sq-md px-4 py-3",
+        "rounded-sq-md px-4 py-3 min-h-[86px] flex items-stretch",
         isUnread 
           ? "bg-background shadow-[0_1px_3px_rgba(0,0,0,0.06)] border border-border/40" 
           : "bg-background/50 hover:bg-background/80"
       )}
     >
-      {/* Unread dot indicator - positioned inside card, top-left */}
-      {isUnread && (
-        <span 
-          className="absolute left-3 top-3 h-2.5 w-2.5 rounded-full bg-orange-500 z-10" 
-          aria-hidden 
-        />
-      )}
-
-      <div className="flex gap-3">
+      <div className="flex w-full gap-3">
         {/* LEFT: Avatar with consistent status icon placement */}
-        <div className="relative flex-shrink-0">
+        <div className="relative shrink-0">
           <SquircleAvatar
             src={notification.actor_avatar_url}
             alt={notification.actor_display_name || 'User'}
