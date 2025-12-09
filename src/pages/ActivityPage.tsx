@@ -67,18 +67,30 @@ const ActivityPage: React.FC = () => {
     buckets.earlier.length === 0
   );
 
+  // Debug: log when component mounts
+  console.log('[ActivityPage] Rendering, isLoading:', isLoading, 'buckets:', buckets);
+
   return (
     <div className="min-h-screen bg-muted/50">
-      {/* DEBUG RED DOT */}
+      {/* DEBUG: Static test elements with NO dynamic data */}
+      <div className="fixed top-20 left-4 z-[9999] bg-blue-500 p-4 rounded-lg">
+        <p style={{ color: 'white', fontSize: '16px', fontWeight: 'bold' }}>STATIC TEST 1</p>
+      </div>
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-red-500 rounded-full z-[9999]" />
       <main className="mx-auto w-full max-w-[720px] px-4 pt-4 pb-24">
-        {/* Header */}
+        {/* Header - using dangerouslySetInnerHTML to bypass any React text node issues */}
         <header className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-xl font-semibold text-foreground">Activity</h1>
-            <p className="text-sm text-muted-foreground">
-              Updates from friends, clubs, courses & messages.
-            </p>
+            <h1 
+              className="text-xl font-semibold" 
+              style={{ color: '#000000' }}
+              dangerouslySetInnerHTML={{ __html: 'Activity' }}
+            />
+            <p 
+              className="text-sm" 
+              style={{ color: '#64748b' }}
+              dangerouslySetInnerHTML={{ __html: 'Updates from friends, clubs, courses &amp; messages.' }}
+            />
           </div>
 
           <div className="flex items-center gap-2">
