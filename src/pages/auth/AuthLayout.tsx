@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useAppLogo } from "@/hooks/useAppLogo";
-import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 interface AuthLayoutProps {
@@ -82,30 +81,29 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
 
         {/* Footer links */}
         <div className="mt-6 w-full text-center">
-          {isSignUp ? (
-            <button
-              className="text-sm transition-opacity hover:opacity-80"
-              style={{ color: 'var(--text-secondary)' }}
-              onClick={toggleAuthMode}
-              disabled={submitting}
-            >
-              Already have an account?{' '}
-              <span className="font-semibold" style={{ color: 'var(--primary-accent)' }}>
-                Sign in →
-              </span>
-            </button>
-          ) : (
-            <Link
-              to="/signup"
-              className="text-sm transition-opacity hover:opacity-80"
-              style={{ color: 'var(--text-secondary)' }}
-            >
-              New to clbhouz?{' '}
-              <span className="font-semibold" style={{ color: 'var(--primary-accent)' }}>
-                Sign up →
-              </span>
-            </Link>
-          )}
+          <button
+            type="button"
+            className="text-sm transition-opacity hover:opacity-80"
+            style={{ color: 'var(--text-secondary)' }}
+            onClick={toggleAuthMode}
+            disabled={submitting}
+          >
+            {isSignUp ? (
+              <>
+                Already have an account?{' '}
+                <span className="font-semibold" style={{ color: 'var(--primary-accent)' }}>
+                  Sign in →
+                </span>
+              </>
+            ) : (
+              <>
+                New to clbhouz?{' '}
+                <span className="font-semibold" style={{ color: 'var(--primary-accent)' }}>
+                  Sign up →
+                </span>
+              </>
+            )}
+          </button>
         </div>
       </div>
     </div>
