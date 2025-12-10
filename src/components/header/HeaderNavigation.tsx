@@ -237,10 +237,14 @@ const HeaderNavigation = () => {
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => navigate('/businesses')}>
-            <Building2 className="h-4 w-4 mr-2" />
-            Business Directory
-          </DropdownMenuItem>
+          {/* Business Directory - only shown for business profiles */}
+          {isBusinessProfile && (
+            <DropdownMenuItem onClick={() => navigate('/businesses')}>
+              <Building2 className="h-4 w-4 mr-2" />
+              Business Directory
+            </DropdownMenuItem>
+          )}
+          {/* Create Business Profile - only shown for personal profiles */}
           {isPersonalProfile && (
             <DropdownMenuItem onClick={() => navigate('/profile?edit=business')}>
               <Building2 className="h-4 w-4 mr-2" />

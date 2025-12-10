@@ -64,12 +64,9 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
         const { hasProfile, hasCompletedOnboarding } = await checkProfileAndOnboarding(user.id);
         const redirectPath = searchParams.get('redirect');
         
-        if (!hasProfile) {
-          // Profile doesn't exist yet (shouldn't happen with trigger, but fallback)
+        if (!hasProfile || !hasCompletedOnboarding) {
+          // Profile doesn't exist or onboarding not complete - redirect to create profile
           navigate("/create-profile", { replace: true });
-        } else if (!hasCompletedOnboarding) {
-          // Profile exists but hasn't completed onboarding
-          navigate("/onboarding/account-type", { replace: true });
         } else {
           // Fully onboarded - go to requested page or home
           navigate(redirectPath || "/", { replace: true });
