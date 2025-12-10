@@ -6828,6 +6828,49 @@ export type Database = {
         Returns: unknown
       }
       test_echo_insert: { Args: never; Returns: string }
+      test_lab_clear_notifications: {
+        Args: { p_target_user_id: string; p_test_user_id: string }
+        Returns: undefined
+      }
+      test_lab_clear_relationships: {
+        Args: { p_target_user_id: string; p_test_user_id: string }
+        Returns: undefined
+      }
+      test_lab_follow: {
+        Args: { p_target_user_id: string; p_test_user_id: string }
+        Returns: undefined
+      }
+      test_lab_insert_notification: {
+        Args: {
+          p_actor_id: string
+          p_created_at?: string
+          p_data?: Json
+          p_entity_id?: string
+          p_entity_type?: string
+          p_is_read?: boolean
+          p_message?: string
+          p_title: string
+          p_type: string
+          p_user_id: string
+        }
+        Returns: string
+      }
+      test_lab_insert_notifications_batch: {
+        Args: { p_notifications: Json }
+        Returns: number
+      }
+      test_lab_send_friend_request: {
+        Args: { p_target_user_id: string; p_test_user_id: string }
+        Returns: string
+      }
+      test_lab_unfollow: {
+        Args: { p_target_user_id: string; p_test_user_id: string }
+        Returns: undefined
+      }
+      test_lab_update_friend_request: {
+        Args: { p_friend_id: string; p_new_status: string; p_user_id: string }
+        Returns: undefined
+      }
       unlockrows: { Args: { "": string }; Returns: number }
       update_mobile_crop_data: {
         Args: {
