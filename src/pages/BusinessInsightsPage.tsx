@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useProfileData } from '@/hooks/useProfileData';
+import { useBusinessProfile } from '@/hooks/useBusinessProfile';
+import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessAnalytics, AnalyticsRange, DailyAnalytics } from '@/hooks/useBusinessAnalytics';
 import { Button } from '@/components/ui/button';
-import { Eye, MousePointerClick, MessageSquare, AtSign, TrendingUp, Users } from 'lucide-react';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { Eye, MousePointerClick, MessageSquare, AtSign, TrendingUp, Users, ArrowLeft, ShieldAlert } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { format, parseISO } from 'date-fns';
 
@@ -105,16 +108,36 @@ const AnalyticsChart = ({ title, subtitle, data, lines }: AnalyticsChartProps) =
 
 const BusinessInsightsPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const businessIdFromQuery = searchParams.get('businessId');
+  
   const { profile, loading: profileLoading } = useProfileData();
   const [range, setRange] = useState<AnalyticsRange>('30d');
+
+  // If businessId is in query params, fetch that business
+  const { data: businessFromQuery, isLoading: businessLoading } = useBusinessProfile(
+    businessIdFromQuery || undefined
+  );
+  
+  // Check if current user has access to this business
+  const { data: membership, isLoading: membershipLoading } = useBusinessMembership(
+    businessIdFromQuery || undefined
+  );
+
+  // Determine which business ID to use for analytics
+  const targetBusinessId = businessIdFromQuery || profile?.id;
+  const isStandaloneBusinessView = !!businessIdFromQuery;
 
   const {
     daily,
     headline,
     isLoading: analyticsLoading,
-  } = useBusinessAnalytics(profile?.id, range);
+  } = useBusinessAnalytics(targetBusinessId, range);
 
-  if (profileLoading || analyticsLoading) {
+  const isLoading = profileLoading || analyticsLoading || 
+    (isStandaloneBusinessView && (businessLoading || membershipLoading));
+
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
@@ -122,11 +145,35 @@ const BusinessInsightsPage = () => {
     );
   }
 
-  if (!profile) {
+  // Access denied for standalone view without membership
+  if (isStandaloneBusinessView && !membership?.canViewInsights) {
+    return (
+      <div className="max-w-xl mx-auto mt-10 text-center px-4">
+        <div className="bg-card border border-border rounded-sq-lg p-8">
+          <ShieldAlert className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h1 className="text-2xl font-semibold mb-2">Access denied</h1>
+          <p className="text-muted-foreground mb-6">
+            You don't have access to insights for this business.
+          </p>
+          {businessFromQuery && (
+            <Button 
+              onClick={() => navigate(`/business/${businessFromQuery.slug || businessFromQuery.id}`)}
+              className="rounded-sq-sm"
+            >
+              Back to business profile
+            </Button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (!profile && !isStandaloneBusinessView) {
     return null;
   }
 
-  if (profile.profile_type !== 'business') {
+  // Non-business profile trying to access without query param
+  if (!isStandaloneBusinessView && profile?.profile_type !== 'business') {
     return (
       <div className="max-w-xl mx-auto mt-10 text-center px-4">
         <div className="bg-card border border-border rounded-sq-lg p-8">
@@ -152,15 +199,44 @@ const BusinessInsightsPage = () => {
     '90d': 'Last 90 days',
   };
 
+  const businessName = businessFromQuery?.name || profile?.display_name || 'Your Business';
+  const businessLogo = businessFromQuery?.logo_url || profile?.profile_photo_url;
+  const businessSlug = businessFromQuery?.slug || businessFromQuery?.id;
+
   return (
     <div className="max-w-6xl mx-auto py-8 px-4 md:px-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-semibold">Business Insights</h1>
-          <p className="text-muted-foreground">
-            See how golfers are discovering and engaging with your business.
-          </p>
+        <div className="flex items-start gap-4">
+          {/* Back link for standalone view */}
+          {isStandaloneBusinessView && businessSlug && (
+            <Link 
+              to={`/business/${businessSlug}`}
+              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mt-1"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Link>
+          )}
+          
+          <div className="flex items-center gap-3">
+            {/* Business context pill */}
+            {isStandaloneBusinessView && businessFromQuery && (
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-sq-pill bg-muted border border-border">
+                {businessLogo && (
+                  <SquircleAvatar src={businessLogo} alt={businessName} size={24} />
+                )}
+                <span className="text-sm font-medium">{businessName}</span>
+              </div>
+            )}
+          </div>
+          
+          <div>
+            <h1 className="text-2xl font-semibold">Business Insights</h1>
+            <p className="text-muted-foreground">
+              See how golfers are discovering and engaging with {isStandaloneBusinessView ? businessName : 'your business'}.
+            </p>
+          </div>
         </div>
 
         {/* Range selector */}

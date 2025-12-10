@@ -158,6 +158,7 @@ const SeasonShop = lazy(() => import("./pages/SeasonShop"));
 const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 const BusinessDirectoryPage = lazy(() => import("./pages/BusinessDirectoryPage"));
 const BusinessInsightsPage = lazy(() => import("./pages/BusinessInsightsPage"));
+const BusinessProfilePage = lazy(() => import("./pages/BusinessProfilePage"));
 const MyBusinessesPage = lazy(() => import("./pages/MyBusinessesPage"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -233,6 +234,7 @@ function AppRoutes() {
         <Route path="/businesses" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessDirectoryPage /></Suspense>} />
         <Route path="/businesses/manage" element={<Suspense fallback={<GenericPageSkeleton />}><MyBusinessesPage /></Suspense>} />
         <Route path="/business/insights" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInsightsPage /></Suspense>} />
+        <Route path="/business/:idOrSlug" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessProfilePage /></Suspense>} />
         
         <Route path="/top100" element={<Top100Hub />} />
         <Route path="/top100/:slug" element={<Top100List />} />
