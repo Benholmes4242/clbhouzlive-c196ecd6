@@ -1,6 +1,6 @@
 
 import React, { useRef } from 'react';
-import { User, Settings, Shield, BarChart3 } from 'lucide-react';
+import { User, Settings, Shield, BarChart3, Building2 } from 'lucide-react';
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from "react-router-dom";
@@ -85,6 +85,7 @@ const HeaderNavigation = () => {
   });
 
   const isBusinessProfile = userProfile?.profile_type === 'business';
+  const isPersonalProfile = userProfile?.profile_type === 'personal' || (!userProfile?.profile_type && user);
 
   const handleProfileClick = () => {
     if (!user) {
@@ -233,6 +234,12 @@ const HeaderNavigation = () => {
               }
             }}>
               Edit Profile
+            </DropdownMenuItem>
+          )}
+          {isPersonalProfile && (
+            <DropdownMenuItem onClick={() => navigate('/settings?tab=profile&action=switch-to-business')}>
+              <Building2 className="h-4 w-4 mr-2" />
+              Create Business Profile
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />
