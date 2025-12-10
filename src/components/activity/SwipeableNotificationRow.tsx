@@ -14,7 +14,8 @@ interface SwipeableNotificationRowProps {
 }
 
 const ACTION_WIDTH = 88;
-const SWIPE_THRESHOLD = 10; // Minimum horizontal movement to trigger swipe
+const SWIPE_THRESHOLD = 8; // Minimum horizontal movement to trigger swipe
+const SNAP_THRESHOLD = 30; // How far to drag before snapping to action
 
 export const SwipeableNotificationRow: React.FC<SwipeableNotificationRowProps> = ({
   notification,
@@ -62,11 +63,11 @@ export const SwipeableNotificationRow: React.FC<SwipeableNotificationRowProps> =
     const offsetX = info.offset.x;
 
     // Swipe right = Delete
-    if (offsetX > ACTION_WIDTH / 2) {
+    if (offsetX > SNAP_THRESHOLD) {
       snapTo(ACTION_WIDTH);
     }
     // Swipe left = Mark unread
-    else if (offsetX < -ACTION_WIDTH / 2) {
+    else if (offsetX < -SNAP_THRESHOLD) {
       snapTo(-ACTION_WIDTH);
     }
     // Not far enough, snap back
