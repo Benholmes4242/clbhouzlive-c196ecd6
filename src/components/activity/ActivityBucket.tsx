@@ -27,10 +27,10 @@ export const ActivityBucket: React.FC<ActivityBucketProps> = ({
 
   return (
     <section className="w-full">
-      {/* Section label - with side padding */}
+      {/* Section label */}
       <div
         className={cn(
-          "mb-2 py-1.5 px-4 sm:px-5 text-[11px] font-semibold uppercase tracking-[0.14em]",
+          "mb-2 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em]",
           "text-muted-foreground"
         )}
       >
