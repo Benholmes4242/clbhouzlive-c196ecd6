@@ -438,7 +438,7 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
   // Get last seen timestamp from user profile
   const lastNotificationsSeen = userProfile?.last_notifications_seen_at ?? null;
 
-  return useQuery({
+  const query = useQuery({
     queryKey: ['activity-feed', tab, chipFilter, user?.id, lastNotificationsSeen],
     queryFn: async (): Promise<ActivityFeedResult> => {
       let enrichedNotifications: ActivityNotification[] = [];
@@ -624,6 +624,14 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
     refetchOnReconnect: false,
     placeholderData: keepPreviousData,
   });
+
+  return {
+    data: query.data,
+    isLoading: query.isLoading,
+    isFetching: query.isFetching,
+    isFetched: query.isFetched,
+    error: query.error,
+  };
 };
 
 // Hook to get unread count for header badges - Instagram-style
