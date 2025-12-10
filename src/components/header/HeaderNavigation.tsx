@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdaptiveTextColor } from "@/hooks/useAdaptiveTextColor";
 import { useHeader } from "@/contexts/GlobalHeaderContext";
+import { useUnreadNotifications } from "@/hooks/useUnreadNotifications";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -137,11 +138,12 @@ const HeaderNavigation = () => {
   };
 
   const hasAdminAccess = adminStatus?.isAdmin || adminStatus?.isLimitedAdmin;
+  const { hasUnread } = useUnreadNotifications();
 
   if (!user) {
     return (
       <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
-        {/* Notifications bell icon with badge-ready wrapper */}
+        {/* Notifications bell icon with unread badge */}
         <div className="relative">
           <Button
             variant="ghost"
@@ -151,15 +153,13 @@ const HeaderNavigation = () => {
               "focus:bg-transparent focus-visible:bg-transparent",
               "data-[state=open]:bg-transparent",
               "focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0",
-              "!bg-transparent", // Force no background in any state
+              "!bg-transparent",
               getIconColorClass()
             )}
             onClick={() => navigate('/notificationmessages')}
           >
             <IoMdNotificationsOutline className="h-5 w-5" />
           </Button>
-          {/* Unread badge (future-ready; not displayed yet) */}
-          {/* <span className="absolute top-2 right-1 bg-red-500 text-white text-[10px] rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">3</span> */}
         </div>
 
         <Button data-action="profile" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())} onClick={handleProfileClick}>
@@ -188,7 +188,7 @@ const HeaderNavigation = () => {
 
   return (
     <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
-      {/* Notifications bell icon with badge-ready wrapper */}
+      {/* Notifications bell icon with unread badge */}
       <div className="relative">
         <Button
           variant="ghost"
@@ -198,15 +198,19 @@ const HeaderNavigation = () => {
             "focus:bg-transparent focus-visible:bg-transparent",
             "data-[state=open]:bg-transparent",
             "focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0",
-            "!bg-transparent", // Force no background in any state
+            "!bg-transparent",
             getIconColorClass()
           )}
           onClick={() => navigate('/notificationmessages')}
         >
           <IoMdNotificationsOutline className="h-5 w-5" />
         </Button>
-        {/* Unread badge (future-ready; not displayed yet) */}
-        {/* <span className="absolute top-2 right-1 bg-red-500 text-white text-[10px] rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">3</span> */}
+        {/* Orange dot for unread notifications */}
+        {hasUnread && (
+          <span
+            className="absolute bottom-2 right-1 h-2 w-2 rounded-full bg-orange-500 border-2 border-background"
+          />
+        )}
       </div>
 
       <DropdownMenu>

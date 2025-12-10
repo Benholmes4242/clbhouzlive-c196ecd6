@@ -60,6 +60,30 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
     }
   };
 
+  const handleMarkUnread = async (id: string) => {
+    const { error } = await supabase
+      .from('notifications')
+      .update({ is_read: false })
+      .eq('id', id);
+
+    if (!error) {
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    const { error } = await supabase
+      .from('notifications')
+      .delete()
+      .eq('id', id);
+
+    if (!error) {
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
+    }
+  };
+
   const handleNotificationClick = async (notification: ActivityNotification) => {
     // Close modal first
     onOpenChange(false);
@@ -170,7 +194,8 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
                     sticky
                     accent
                     onNotificationClick={handleNotificationClick}
-                    onMarkRead={handleMarkRead}
+                    onMarkUnread={handleMarkUnread}
+                    onDelete={handleDelete}
                   />
                 )}
 
@@ -179,7 +204,8 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
                     label="Today"
                     items={buckets.today.filter(i => i.is_read)}
                     onNotificationClick={handleNotificationClick}
-                    onMarkRead={handleMarkRead}
+                    onMarkUnread={handleMarkUnread}
+                    onDelete={handleDelete}
                   />
                 )}
 
@@ -188,7 +214,8 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
                     label="Yesterday"
                     items={buckets.yesterday}
                     onNotificationClick={handleNotificationClick}
-                    onMarkRead={handleMarkRead}
+                    onMarkUnread={handleMarkUnread}
+                    onDelete={handleDelete}
                   />
                 )}
 
@@ -197,7 +224,8 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
                     label="This Week"
                     items={buckets.thisWeek}
                     onNotificationClick={handleNotificationClick}
-                    onMarkRead={handleMarkRead}
+                    onMarkUnread={handleMarkUnread}
+                    onDelete={handleDelete}
                   />
                 )}
 
@@ -206,7 +234,8 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
                     label="Earlier"
                     items={buckets.earlier}
                     onNotificationClick={handleNotificationClick}
-                    onMarkRead={handleMarkRead}
+                    onMarkUnread={handleMarkUnread}
+                    onDelete={handleDelete}
                   />
                 )}
               </div>
