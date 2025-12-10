@@ -5,6 +5,7 @@ import {
   useTestUser,
   useSendFriendRequestFromTestUser,
   useAcceptFriendRequestAsTarget,
+  useTestUserAcceptsFriendRequestFromTarget,
   useDeclineFriendRequestAsTarget,
   useCancelFriendRequestFromTestUser,
   useFollowTargetFromTestUser,
@@ -111,6 +112,7 @@ export function AdminTestLabPage() {
   // All the test action hooks
   const sendFriendRequest = useSendFriendRequestFromTestUser();
   const acceptFriendRequest = useAcceptFriendRequestAsTarget();
+  const testUserAcceptsRequest = useTestUserAcceptsFriendRequestFromTarget();
   const declineFriendRequest = useDeclineFriendRequestAsTarget();
   const cancelFriendRequest = useCancelFriendRequestFromTestUser();
   const followTarget = useFollowTargetFromTestUser();
@@ -145,6 +147,7 @@ export function AdminTestLabPage() {
   // Check if any scenario is running
   const isScenarioRunning = 
     friendRequestHandshake.isPending || 
+    testUserAcceptsRequest.isPending ||
     busyDayActivity.isPending || 
     followSwapScenario.isPending || 
     resetTestState.isPending ||
@@ -257,6 +260,14 @@ export function AdminTestLabPage() {
               description="Test User ↔ Target"
               onClick={() => friendRequestHandshake.mutate(targetUserId)}
               loading={friendRequestHandshake.isPending}
+            />
+
+            <ScenarioButton
+              emoji="✅"
+              label="Test User accepts YOUR request"
+              description="You see 'accepted your friend request'"
+              onClick={() => testUserAcceptsRequest.mutate(targetUserId)}
+              loading={testUserAcceptsRequest.isPending}
             />
 
             <ScenarioButton

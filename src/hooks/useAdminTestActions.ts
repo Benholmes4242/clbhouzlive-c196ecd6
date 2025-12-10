@@ -144,6 +144,68 @@ export function useAcceptFriendRequestAsTarget() {
 }
 
 /**
+ * Hook to simulate: Target sends friend request to Test User, Test User accepts it
+ * Creates a "friend_accepted" notification for the TARGET (Benjamin sees "Test User accepted your friend request")
+ */
+export function useTestUserAcceptsFriendRequestFromTarget() {
+  const queryClient = useQueryClient();
+  const { data: testUser } = useTestUser();
+
+  return useMutation({
+    mutationFn: async (targetUserId: string) => {
+      if (!testUser) throw new Error('Test user not configured');
+
+      // 1) Create a friend request FROM target TO test user (simulating target sent the request)
+      const { error: requestError } = await supabase.rpc('test_lab_send_friend_request', {
+        p_test_user_id: targetUserId, // target is the sender
+        p_target_user_id: testUser.id, // test user is the recipient
+      });
+
+      if (requestError) throw requestError;
+
+      // 2) Accept it (test user accepts)
+      const { error: acceptError } = await supabase.rpc('test_lab_update_friend_request', {
+        p_user_id: targetUserId, // original sender
+        p_friend_id: testUser.id, // original recipient
+        p_new_status: 'accepted',
+      });
+
+      if (acceptError) throw acceptError;
+
+      // 3) Create friend_accepted notification for the TARGET (Benjamin)
+      const { error: notifyError } = await supabase.rpc('test_lab_insert_notification', {
+        p_user_id: targetUserId, // Benjamin receives the notification
+        p_actor_id: testUser.id, // Test User is the actor who accepted
+        p_type: 'friend_accepted',
+        p_title: 'Friend request accepted',
+        p_entity_type: 'profile',
+        p_entity_id: testUser.id,
+        p_is_read: false,
+      });
+
+      if (notifyError) {
+        console.warn('Failed to create friend_accepted notification:', notifyError);
+      }
+
+      return { success: true };
+    },
+    onSuccess: () => {
+      toast.success(`Test user accepted friend request from target`, {
+        description: 'Target should see "accepted your friend request" notification',
+        position: 'top-center',
+      });
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to simulate acceptance', {
+        position: 'top-center',
+      });
+    },
+  });
+}
+
+/**
  * Hook to decline the latest friend request from test user (as target)
  */
 export function useDeclineFriendRequestAsTarget() {
