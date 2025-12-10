@@ -439,7 +439,7 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
         // Fetch following list for is_from_following derivation
         followingUserIds = await fetchFollowingUserIds(user.id);
 
-        // Fetch notifications
+        // Fetch notifications (excluding soft-deleted)
         const { data: notifications, error } = await supabase
           .from('notifications')
           .select(`
@@ -455,6 +455,7 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
             data
           `)
           .eq('user_id', user.id)
+          .eq('is_deleted', false)
           .order('created_at', { ascending: false })
           .limit(100);
 

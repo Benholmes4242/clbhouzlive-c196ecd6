@@ -61,12 +61,11 @@ const ActivityPage: React.FC = () => {
     }
   };
 
-  // Delete/hide a notification (swipe right action)
+  // Delete/hide a notification (swipe right action) - soft delete
   const handleDelete = async (id: string) => {
-    // Soft delete by updating a flag (or hard delete if preferred)
     const { error } = await supabase
       .from('notifications')
-      .delete()
+      .update({ is_deleted: true })
       .eq('id', id);
 
     if (!error) {
@@ -105,10 +104,8 @@ const ActivityPage: React.FC = () => {
     buckets.earlier.length === 0
   );
 
-  // Check if all items are read (caught up state)
-  const isAllCaughtUp = !isEmpty && buckets && 
-    buckets.new.length === 0 && 
-    data?.allItems?.every(item => !item.is_unread);
+  // Check if there are no new/unread items (for showing "caught up" banner, NOT for hiding history)
+  const isAllCaughtUp = !isEmpty && buckets && buckets.new.length === 0;
 
   return (
     <PageRoot className="bg-muted/40 pb-24">
@@ -164,10 +161,16 @@ const ActivityPage: React.FC = () => {
           </div>
         ) : isEmpty ? (
           <ActivityEmptyState tab={activeTab} />
-        ) : isAllCaughtUp ? (
-          <ActivityEmptyState tab={activeTab} isAllCaughtUp />
         ) : buckets && (
           <div className="w-full mt-4 space-y-6">
+            {/* All caught up banner - shown when no new/unread items but history exists */}
+            {isAllCaughtUp && (
+              <div className="flex flex-col items-center py-4 text-center">
+                <span className="text-sm font-medium text-foreground">You're all caught up</span>
+                <span className="text-xs text-muted-foreground mt-0.5">These are your recent updates</span>
+              </div>
+            )}
+
             {/* New (unread) - only show if there are unread items */}
             {buckets.new.length > 0 && (
               <ActivityBucket
