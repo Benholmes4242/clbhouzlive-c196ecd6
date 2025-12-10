@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
-import { ActivityNotificationRow } from './ActivityNotificationRow';
+import { SwipeableNotificationRow } from './SwipeableNotificationRow';
 
 interface ActivityBucketProps {
   label: string;
@@ -9,8 +9,8 @@ interface ActivityBucketProps {
   sticky?: boolean;
   accent?: boolean;
   onNotificationClick: (notification: ActivityNotification) => void;
-  onMarkRead?: (id: string) => void;
-  onHide?: (id: string) => void;
+  onMarkUnread?: (id: string) => void;
+  onDelete?: (id: string) => void;
   currentUserId?: string;
 }
 
@@ -20,15 +20,15 @@ export const ActivityBucket: React.FC<ActivityBucketProps> = ({
   sticky,
   accent,
   onNotificationClick,
-  onMarkRead,
-  onHide,
+  onMarkUnread,
+  onDelete,
   currentUserId
 }) => {
   if (!items || items.length === 0) return null;
 
   return (
     <section className="w-full">
-      {/* Section label - non-sticky, scrolls with content (no NEW badge here, shown in chips row only) */}
+      {/* Section label */}
       <div
         className={cn(
           "mb-2 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em]",
@@ -40,12 +40,12 @@ export const ActivityBucket: React.FC<ActivityBucketProps> = ({
 
       <div className="space-y-1.5">
         {items.map(item => (
-          <ActivityNotificationRow 
-            key={item.id} 
+          <SwipeableNotificationRow
+            key={item.id}
             notification={item}
             onClick={() => onNotificationClick(item)}
-            onMarkRead={onMarkRead}
-            onHide={onHide}
+            onMarkUnread={onMarkUnread || (() => {})}
+            onDelete={onDelete || (() => {})}
             currentUserId={currentUserId}
           />
         ))}

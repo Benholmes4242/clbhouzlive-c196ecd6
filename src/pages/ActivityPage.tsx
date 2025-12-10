@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useActivityFeed, ActivityTabId, ACTIVITY_TABS, ActivityNotification, ChipFilterKind } from '@/hooks/useActivityFeed';
@@ -23,51 +23,9 @@ const ActivityPage: React.FC = () => {
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  
-  // Track if we've seen notifications this visit (for auto-mark-read on unmount)
-  const hasViewedRef = useRef(false);
 
   const buckets = data?.buckets;
   const counts = data?.counts;
-  const unreadCount = counts?.new || 0;
-
-  // Mark that user has viewed notifications
-  useEffect(() => {
-    if (data && data.allItems.length > 0) {
-      hasViewedRef.current = true;
-    }
-  }, [data]);
-
-  // Auto-mark all as read when leaving the Activity page
-  const markAllAsReadSilently = useCallback(async () => {
-    if (!user?.id || !hasViewedRef.current) return;
-    
-    // Only mark if there were unread items
-    const hasUnread = data?.allItems?.some(item => item.is_unread);
-    if (!hasUnread) return;
-
-    try {
-      await supabase
-        .from('notifications')
-        .update({ is_read: true })
-        .eq('user_id', user.id)
-        .eq('is_read', false);
-      
-      // Invalidate cache so next visit shows updated state
-      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
-      queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
-    } catch (err) {
-      // Silent fail - not critical
-      console.warn('[ActivityPage] Auto mark-read failed:', err);
-    }
-  }, [user?.id, data?.allItems, queryClient]);
-
-  // On unmount: mark all as read
-  useEffect(() => {
-    return () => {
-      markAllAsReadSilently();
-    };
-  }, [markAllAsReadSilently]);
 
   // Clear chip filter when switching away from All tab
   const handleTabChange = (tabId: ActivityTabId) => {
@@ -77,6 +35,7 @@ const ActivityPage: React.FC = () => {
     }
   };
 
+  // Mark a single notification as read
   const handleMarkRead = async (id: string) => {
     const { error } = await supabase
       .from('notifications')
@@ -89,14 +48,37 @@ const ActivityPage: React.FC = () => {
     }
   };
 
-  const handleHide = async (id: string) => {
-    // For now, just mark as read. Could delete in future.
-    await handleMarkRead(id);
+  // Mark a single notification as unread (swipe left action)
+  const handleMarkUnread = async (id: string) => {
+    const { error } = await supabase
+      .from('notifications')
+      .update({ is_read: false })
+      .eq('id', id);
+
+    if (!error) {
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
+    }
   };
 
+  // Delete/hide a notification (swipe right action)
+  const handleDelete = async (id: string) => {
+    // Soft delete by updating a flag (or hard delete if preferred)
+    const { error } = await supabase
+      .from('notifications')
+      .delete()
+      .eq('id', id);
+
+    if (!error) {
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
+    }
+  };
+
+  // When user clicks a notification: mark as read + navigate
   const handleNotificationClick = async (notification: ActivityNotification) => {
     // Mark as read if unread
-    if (notification.is_unread) {
+    if (notification.is_unread && !notification.is_mock) {
       await handleMarkRead(notification.id);
     }
 
@@ -134,7 +116,7 @@ const ActivityPage: React.FC = () => {
 
         {/* Main content wrapper - centered with equal padding both sides */}
         <div className="w-full max-w-[640px] mx-auto px-4 sm:px-5 pt-6 compact-header-offset">
-        {/* Header section - title only, no mark all read button */}
+        {/* Header section - title only */}
         <section className="mb-4">
           <h1 className="text-xl font-semibold tracking-tight text-foreground">
             Activity
@@ -194,8 +176,8 @@ const ActivityPage: React.FC = () => {
                 sticky
                 accent
                 onNotificationClick={handleNotificationClick}
-                onMarkRead={handleMarkRead}
-                onHide={handleHide}
+                onMarkUnread={handleMarkUnread}
+                onDelete={handleDelete}
                 currentUserId={user?.id}
               />
             )}
@@ -206,8 +188,8 @@ const ActivityPage: React.FC = () => {
                 label="Today"
                 items={buckets.today.filter(i => !i.is_unread)} // Exclude unread (already in New)
                 onNotificationClick={handleNotificationClick}
-                onMarkRead={handleMarkRead}
-                onHide={handleHide}
+                onMarkUnread={handleMarkUnread}
+                onDelete={handleDelete}
                 currentUserId={user?.id}
               />
             )}
@@ -218,8 +200,8 @@ const ActivityPage: React.FC = () => {
                 label="Yesterday"
                 items={buckets.yesterday}
                 onNotificationClick={handleNotificationClick}
-                onMarkRead={handleMarkRead}
-                onHide={handleHide}
+                onMarkUnread={handleMarkUnread}
+                onDelete={handleDelete}
                 currentUserId={user?.id}
               />
             )}
@@ -230,8 +212,8 @@ const ActivityPage: React.FC = () => {
                 label="This Week"
                 items={buckets.thisWeek}
                 onNotificationClick={handleNotificationClick}
-                onMarkRead={handleMarkRead}
-                onHide={handleHide}
+                onMarkUnread={handleMarkUnread}
+                onDelete={handleDelete}
                 currentUserId={user?.id}
               />
             )}
@@ -242,8 +224,8 @@ const ActivityPage: React.FC = () => {
                 label="Earlier"
                 items={buckets.earlier}
                 onNotificationClick={handleNotificationClick}
-                onMarkRead={handleMarkRead}
-                onHide={handleHide}
+                onMarkUnread={handleMarkUnread}
+                onDelete={handleDelete}
                 currentUserId={user?.id}
               />
             )}
