@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2 } from 'lucide-react';
+import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X } from 'lucide-react';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
@@ -190,8 +190,56 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
     /**
      * 1) RECEIVED FRIEND REQUEST
      *    – what *you* see when someone sends a request to you.
+     *    – Uses notification.data.status to persist accepted/declined state across reloads.
      */
     case 'friend_request': {
+      // Check if already accepted/declined via persisted data.status
+      if (status === 'accepted') {
+        return (
+          <ActivityCard
+            notification={notification}
+            onClick={onClick}
+            avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(true)} />}
+            title={
+              <>
+                <span className="font-medium">{actorName}</span>{' '}
+                <span className="font-normal text-muted-foreground">sent you a friend request</span>
+              </>
+            }
+            meta={notification.time_ago}
+            actions={
+              <span className={cn(basePillClass, "border-emerald-500 bg-emerald-500/10 text-emerald-600 gap-1")}>
+                <Users className="h-3 w-3" />
+                Accepted
+              </span>
+            }
+          />
+        );
+      }
+      
+      if (status === 'declined') {
+        return (
+          <ActivityCard
+            notification={notification}
+            onClick={onClick}
+            avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(false)} />}
+            title={
+              <>
+                <span className="font-medium">{actorName}</span>{' '}
+                <span className="font-normal text-muted-foreground">sent you a friend request</span>
+              </>
+            }
+            meta={notification.time_ago}
+            actions={
+              <span className={cn(basePillClass, "border-red-400 bg-red-500/5 text-red-500 gap-1")}>
+                <X className="h-3 w-3" />
+                Declined
+              </span>
+            }
+          />
+        );
+      }
+      
       // Pending – Accept / Decline shown at bottom-right of card
       return (
         <ActivityCard
@@ -207,9 +255,11 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           meta={notification.time_ago}
           actions={
             <FriendRequestButtons
+              notificationId={notification.id}
               requestId={friendRequestId}
               requesterId={notification.actor_id!}
               requesterName={actorName}
+              initialStatus={status}
               isMock={notification.is_mock}
             />
           }
