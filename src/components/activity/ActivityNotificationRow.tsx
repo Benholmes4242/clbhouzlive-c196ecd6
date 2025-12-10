@@ -7,13 +7,13 @@ import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSyst
 import { FollowBackButton } from './FollowBackButton';
 import { FriendRequestButtons } from './FriendRequestButtons';
 import { useCancelFriendRequest } from '@/hooks/useCancelFriendRequest';
+import { MediaHighlightRow, CourseHighlightRow } from './CinematicNotificationRow';
 
 interface ActivityNotificationRowProps {
   notification: ActivityNotification;
   onClick: () => void;
   onOpenActionsSheet: () => void;
   currentUserId?: string;
-  bucket?: 'new' | 'today' | 'yesterday' | 'thisWeek' | 'earlier';
 }
 
 // Shared base pill class for unified styling - SDS corners, 30% shorter height
@@ -117,7 +117,6 @@ interface FlatRowProps {
   title: React.ReactNode;
   meta: string;
   actions?: React.ReactNode;
-  isNewBucket?: boolean;
 }
 
 const FlatRow: React.FC<FlatRowProps> = ({ 
@@ -127,19 +126,17 @@ const FlatRow: React.FC<FlatRowProps> = ({
   avatar, 
   title, 
   meta, 
-  actions,
-  isNewBucket = false
+  actions 
 }) => {
   const isUnread = notification.is_unread;
   
   return (
     <div
       className={cn(
-        "flex items-center gap-3 py-3 transition-colors",
-        // Full-bleed for "New" bucket: no rounded corners, edge-to-edge
-        isNewBucket 
-          ? "px-4 bg-[#FFF4E5] border-b border-black/[0.04]" 
-          : "px-4 bg-white hover:bg-muted/30 border-b border-black/[0.04]"
+        "flex items-center gap-3 px-4 py-3 transition-colors",
+        isUnread 
+          ? "bg-amber-500/[0.06]" 
+          : "bg-transparent hover:bg-muted/30"
       )}
     >
       {/* Unread dot indicator */}
@@ -191,8 +188,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
   notification, 
   onClick,
   onOpenActionsSheet,
-  currentUserId,
-  bucket
+  currentUserId
 }) => {
   const cancelMutation = useCancelFriendRequest();
   const { type, data } = notification;
@@ -201,7 +197,13 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
   const isUnread = notification.is_unread;
   const friendRequestId = data?.request_id || notification.id;
   const status = data?.status || 'pending';
-  const isNewBucket = bucket === 'new';
+
+  // Check for cinematic background URL in notification data
+  const cinematicBackgroundUrl = 
+    data?.cinematic_background_url ?? 
+    data?.course_photo_url ?? 
+    data?.post_thumbnail_url ?? 
+    null;
 
   const handleCancelRequest = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -213,6 +215,30 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
       targetUserName,
     });
   };
+
+  // Use cinematic layout if background URL is present (for non-friend-request types)
+  if (cinematicBackgroundUrl && !['friend_request', 'friend_accepted', 'friend_request_sent', 'friend_declined', 'friend_cancelled'].includes(type)) {
+    // Check if it's course-related
+    if (data?.course_photo_url || data?.course_name) {
+      return (
+        <CourseHighlightRow
+          notification={notification}
+          onClick={onClick}
+          courseImageUrl={cinematicBackgroundUrl}
+          currentUserId={currentUserId}
+        />
+      );
+    }
+    // Default to media highlight
+    return (
+      <MediaHighlightRow
+        notification={notification}
+        onClick={onClick}
+        mediaUrl={cinematicBackgroundUrl}
+        currentUserId={currentUserId}
+      />
+    );
+  }
 
   switch (type) {
     /**
@@ -228,7 +254,6 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
             notification={notification}
             onClick={onClick}
             onOpenActionsSheet={onOpenActionsSheet}
-            isNewBucket={isNewBucket}
             avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(true)} />}
             title={
               <>
@@ -253,7 +278,6 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
             notification={notification}
             onClick={onClick}
             onOpenActionsSheet={onOpenActionsSheet}
-            isNewBucket={isNewBucket}
             avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(false)} />}
             title={
               <>
@@ -278,7 +302,6 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           notification={notification}
           onClick={onClick}
           onOpenActionsSheet={onOpenActionsSheet}
-          isNewBucket={isNewBucket}
           avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(true)} />}
           title={
             <>
@@ -311,7 +334,6 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           notification={notification}
           onClick={onClick}
           onOpenActionsSheet={onOpenActionsSheet}
-          isNewBucket={isNewBucket}
           avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(true)} />}
           title={
             <>
@@ -340,7 +362,6 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           notification={notification}
           onClick={onClick}
           onOpenActionsSheet={onOpenActionsSheet}
-          isNewBucket={isNewBucket}
           avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(false)} />}
           title={
             <span className={cn(isUnread ? "font-medium" : "font-normal", "text-foreground/90")}>
@@ -376,7 +397,6 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           notification={notification}
           onClick={onClick}
           onOpenActionsSheet={onOpenActionsSheet}
-          isNewBucket={isNewBucket}
           avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(false)} />}
           title={
             <span className={cn(isUnread ? "font-medium" : "font-normal", "text-foreground/90")}>
@@ -402,7 +422,6 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           notification={notification}
           onClick={onClick}
           onOpenActionsSheet={onOpenActionsSheet}
-          isNewBucket={isNewBucket}
           avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(false)} />}
           title={
             <span className={cn(isUnread ? "font-medium" : "font-normal", "text-foreground/90")}>
@@ -437,7 +456,6 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           notification={notification}
           onClick={onClick}
           onOpenActionsSheet={onOpenActionsSheet}
-          isNewBucket={isNewBucket}
           avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
           title={
             <>

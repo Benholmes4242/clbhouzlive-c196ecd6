@@ -12,7 +12,6 @@ interface ActivityBucketProps {
   onNotificationClick: (notification: ActivityNotification) => void;
   onOpenActionsSheet: (notification: ActivityNotification) => void;
   currentUserId?: string;
-  bucket?: 'new' | 'today' | 'yesterday' | 'thisWeek' | 'earlier';
 }
 
 export const ActivityBucket: React.FC<ActivityBucketProps> = ({ 
@@ -22,8 +21,7 @@ export const ActivityBucket: React.FC<ActivityBucketProps> = ({
   accent,
   onNotificationClick,
   onOpenActionsSheet,
-  currentUserId,
-  bucket
+  currentUserId
 }) => {
   if (!items || items.length === 0) return null;
 
@@ -54,7 +52,6 @@ export const ActivityBucket: React.FC<ActivityBucketProps> = ({
                 onClick={() => onNotificationClick(item)}
                 onOpenActionsSheet={() => onOpenActionsSheet(item)}
                 currentUserId={currentUserId}
-                bucket={bucket}
               />
             </motion.div>
           ))}

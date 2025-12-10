@@ -265,20 +265,17 @@ const ActivityPage: React.FC = () => {
               </div>
             )}
 
-            {/* New (unread) - full-bleed section with orange background */}
+            {/* New (unread) - use session-based items to keep them visible until leaving */}
             {effectiveNewItems.length > 0 && (
-              <div className="-mx-4 sm:-mx-5">
-                <ActivityBucket
-                  label="New"
-                  items={effectiveNewItems}
-                  sticky
-                  accent
-                  onNotificationClick={handleNotificationClick}
-                  onOpenActionsSheet={openActionsSheet}
-                  currentUserId={user?.id}
-                  bucket="new"
-                />
-              </div>
+              <ActivityBucket
+                label="New"
+                items={effectiveNewItems}
+                sticky
+                accent
+                onNotificationClick={handleNotificationClick}
+                onOpenActionsSheet={openActionsSheet}
+                currentUserId={user?.id}
+              />
             )}
 
             {/* Today - exclude items we're showing in "New" via sessionNewIds */}
@@ -291,7 +288,6 @@ const ActivityPage: React.FC = () => {
                 onNotificationClick={handleNotificationClick}
                 onOpenActionsSheet={openActionsSheet}
                 currentUserId={user?.id}
-                bucket="today"
               />
             )}
 
@@ -303,7 +299,6 @@ const ActivityPage: React.FC = () => {
                 onNotificationClick={handleNotificationClick}
                 onOpenActionsSheet={openActionsSheet}
                 currentUserId={user?.id}
-                bucket="yesterday"
               />
             )}
 
@@ -315,7 +310,6 @@ const ActivityPage: React.FC = () => {
                 onNotificationClick={handleNotificationClick}
                 onOpenActionsSheet={openActionsSheet}
                 currentUserId={user?.id}
-                bucket="thisWeek"
               />
             )}
 
@@ -327,7 +321,6 @@ const ActivityPage: React.FC = () => {
                 onNotificationClick={handleNotificationClick}
                 onOpenActionsSheet={openActionsSheet}
                 currentUserId={user?.id}
-                bucket="earlier"
               />
             )}
           </div>
