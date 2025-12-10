@@ -35,10 +35,10 @@ function getNotificationIcon(type: string) {
     case 'tag':
       return <MessageCircle className={cn(iconClass, "text-blue-500")} />;
     case 'follow':
-      return <UserPlus className={cn(iconClass, "text-emerald-500")} />;
+      return <Users className={cn(iconClass, "text-amber-500")} />;
     case 'friend_request':
     case 'friend_accepted':
-      return <Users className={cn(iconClass, "text-amber-500")} />;
+      return <UserPlus className={cn(iconClass, "text-emerald-500")} />;
     case 'friend_request_sent':
     case 'friend_declined':
     case 'friend_cancelled':
