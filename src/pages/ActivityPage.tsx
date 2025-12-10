@@ -23,7 +23,7 @@ const ActivityPage: React.FC = () => {
   
   // Pass chip filter to hook (only applies when on 'all' tab)
   const effectiveChipFilter = activeTab === 'all' ? activeChipFilter : null;
-  const { data, isLoading, error } = useActivityFeed(activeTab, effectiveChipFilter);
+  const { data, isLoading, isFetching, error } = useActivityFeed(activeTab, effectiveChipFilter);
   
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
@@ -32,8 +32,9 @@ const ActivityPage: React.FC = () => {
   // Track if we've already marked notifications as seen this session
   const hasMarkedSeen = useRef(false);
   
-  // Session-based "New" retention: capture IDs on first load, keep them in "New" until leaving
+  // Session-based "New" retention: capture IDs + count on first load, keep them in "New" until leaving
   const [sessionNewIds, setSessionNewIds] = useState<string[] | null>(null);
+  const [sessionNewCount, setSessionNewCount] = useState<number | null>(null);
   const [hasInitializedNew, setHasInitializedNew] = useState(false);
   
   // On first load: capture "New" IDs, mark them read (clears bell), but keep showing in "New"
@@ -48,9 +49,10 @@ const ActivityPage: React.FC = () => {
       return;
     }
     
-    // Capture the IDs of items currently in "New"
+    // Capture the IDs and count of items currently in "New"
     const ids = data.buckets.new.map((n) => n.id);
     setSessionNewIds(ids);
+    setSessionNewCount(ids.length);
     setHasInitializedNew(true);
     
     const markSeen = async () => {
@@ -242,13 +244,15 @@ const ActivityPage: React.FC = () => {
             counts={counts} 
             onChipClick={handleChipClick}
             activeFilter={activeChipFilter}
+            sessionNewCount={sessionNewCount}
           />
         )}
       </div>
 
       {/* Notifications list - full width, no padding */}
       <div className="w-full">
-        {isLoading ? (
+        {/* Show skeleton during initial load OR when fetching with no cached data */}
+        {(isLoading || (isFetching && !data)) ? (
           <div className="max-w-[640px] mx-auto px-4 sm:px-5">
             <ActivitySkeleton />
           </div>

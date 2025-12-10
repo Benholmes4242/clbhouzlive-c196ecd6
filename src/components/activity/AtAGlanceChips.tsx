@@ -7,6 +7,7 @@ interface AtAGlanceChipsProps {
   counts: ActivityCounts;
   onChipClick: (kind: 'new' | 'mentions' | 'follows' | 'clubs' | 'messages') => void;
   activeFilter?: string | null;
+  sessionNewCount?: number | null;
 }
 
 const CHIP_CONFIG = [
@@ -17,8 +18,13 @@ const CHIP_CONFIG = [
   { key: 'messages' as const, label: 'Messages', icon: Mail, countKey: 'messages' as const },
 ];
 
-export const AtAGlanceChips: React.FC<AtAGlanceChipsProps> = ({ counts, onChipClick, activeFilter }) => {
-  const visibleChips = CHIP_CONFIG.filter(chip => counts[chip.countKey] > 0);
+export const AtAGlanceChips: React.FC<AtAGlanceChipsProps> = ({ counts, onChipClick, activeFilter, sessionNewCount }) => {
+  // Use session count for "new" chip if available (locked to initial visit count)
+  const effectiveCounts = {
+    ...counts,
+    new: sessionNewCount !== null && sessionNewCount !== undefined ? sessionNewCount : counts.new,
+  };
+  const visibleChips = CHIP_CONFIG.filter(chip => effectiveCounts[chip.countKey] > 0);
 
   if (visibleChips.length === 0) return null;
 
@@ -26,7 +32,7 @@ export const AtAGlanceChips: React.FC<AtAGlanceChipsProps> = ({ counts, onChipCl
     <div className="w-full flex gap-2 overflow-x-auto pb-2 mb-2 scrollbar-hide">
       {visibleChips.map(chip => {
         const Icon = chip.icon;
-        const count = counts[chip.countKey];
+        const count = effectiveCounts[chip.countKey];
         const isActive = activeFilter === chip.key;
         const isNewChip = chip.key === 'new';
         
