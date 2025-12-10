@@ -141,7 +141,7 @@ export const SwipeableNotificationRow: React.FC<SwipeableNotificationRowProps> =
         onPointerDown={handlePointerDown}
         onPan={handlePan}
         onDragEnd={handleDragEnd}
-        className="relative z-10 bg-background"
+        className="relative z-10"
       >
         <ActivityNotificationRow
           notification={notification}
