@@ -488,8 +488,29 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
           const actorType = deriveActorType(n);
           const isFromFollowing = n.actor_id ? followingUserIds.has(n.actor_id) : false;
           
-          // Prefer display_name, fallback to username, then "Someone"
-          const actorDisplayName = actor?.display_name || actor?.username || 'Someone';
+          // Extract data for legacy notifications that don't have actor_id
+          const dataObj = (typeof n.data === 'object' && n.data !== null && !Array.isArray(n.data)) 
+            ? (n.data as Record<string, any>) 
+            : {};
+          
+          // Prefer actor profile, fallback to data JSON fields for legacy notifications
+          const actorDisplayName = actor?.display_name 
+            || actor?.username 
+            || dataObj.follower_name 
+            || dataObj.tagger_name 
+            || dataObj.commenter_name
+            || dataObj.liker_name
+            || 'Someone';
+          
+          const actorUsername = actor?.username || '';
+          
+          // Avatar: prefer actor profile, fallback to data JSON for legacy
+          const actorAvatarUrl = actor?.profile_photo_url 
+            || dataObj.follower_photo 
+            || dataObj.tagger_photo
+            || dataObj.commenter_photo
+            || dataObj.liker_photo
+            || null;
           
           const notification: ActivityNotification = {
             id: n.id,
@@ -502,8 +523,8 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
             actor_id: n.actor_id,
             actor_type: actorType,
             actor_display_name: actorDisplayName,
-            actor_username: actor?.username || '',
-            actor_avatar_url: actor?.profile_photo_url || null,
+            actor_username: actorUsername,
+            actor_avatar_url: actorAvatarUrl,
             
             entity_type: n.entity_type,
             entity_id: n.entity_id,
