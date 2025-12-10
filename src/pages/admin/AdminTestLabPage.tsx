@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { 
   useTestUser,
   useSendFriendRequestFromTestUser,
@@ -105,6 +108,42 @@ const TestSection: React.FC<{
   </div>
 );
 
+// Button to set test user profile photo
+const SetTestUserPhotoButton: React.FC = () => {
+  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
+  
+  const handleSetPhoto = async () => {
+    setLoading(true);
+    try {
+      const photoUrl = `${window.location.origin}/images/test-user-avatar.jpg`;
+      const { error } = await supabase.rpc('admin_set_test_user_photo', {
+        p_photo_url: photoUrl
+      });
+      
+      if (error) throw error;
+      
+      toast.success('Test user photo set!');
+      queryClient.invalidateQueries({ queryKey: ['test-user'] });
+    } catch (err) {
+      console.error('Error setting test user photo:', err);
+      toast.error('Failed to set photo');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  return (
+    <button
+      onClick={handleSetPhoto}
+      disabled={loading}
+      className="text-xs px-2 py-1 rounded-sq-xs bg-primary/10 text-primary hover:bg-primary/20 disabled:opacity-50"
+    >
+      {loading ? 'Setting...' : 'Set Photo'}
+    </button>
+  );
+};
+
 export function AdminTestLabPage() {
   const { user } = useSupabaseSession();
   const { data: testUser, isLoading: testUserLoading, error: testUserError } = useTestUser();
@@ -205,9 +244,14 @@ export function AdminTestLabPage() {
               <div className="font-medium">{testUser.display_name}</div>
               <div className="text-sm text-muted-foreground">@{testUser.username}</div>
             </div>
-            <div className="ml-auto flex items-center gap-1 text-emerald-600 text-sm">
-              <Check className="h-4 w-4" />
-              <span>Active</span>
+            <div className="ml-auto flex items-center gap-2">
+              {!testUser.profile_photo_url && (
+                <SetTestUserPhotoButton />
+              )}
+              <div className="flex items-center gap-1 text-emerald-600 text-sm">
+                <Check className="h-4 w-4" />
+                <span>Active</span>
+              </div>
             </div>
           </div>
         ) : (

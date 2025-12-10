@@ -5354,6 +5354,10 @@ export type Database = {
           total_users: number
         }[]
       }
+      admin_set_test_user_photo: {
+        Args: { p_photo_url: string }
+        Returns: undefined
+      }
       are_users_blocked: {
         Args: { user_a: string; user_b: string }
         Returns: boolean
