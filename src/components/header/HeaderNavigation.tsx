@@ -1,6 +1,5 @@
-
-import React, { useRef } from 'react';
-import { User, Settings, Shield, BarChart3, Building2 } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { User, Settings, Shield, BarChart3, Building2, Plus } from 'lucide-react';
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from "react-router-dom";
@@ -18,6 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { CreateBusinessProfileIntroModal } from '@/components/profile/CreateBusinessProfileIntroModal';
 
 const HeaderNavigation = () => {
   const navigate = useNavigate();
@@ -87,12 +87,23 @@ const HeaderNavigation = () => {
   const isBusinessProfile = userProfile?.profile_type === 'business';
   const isPersonalProfile = userProfile?.profile_type === 'personal' || (!userProfile?.profile_type && user);
 
+  // Business intro modal state
+  const [showBusinessIntroModal, setShowBusinessIntroModal] = useState(false);
+
   const handleProfileClick = () => {
     if (!user) {
       navigate('/auth');
     } else {
       navigate('/profile');
     }
+  };
+
+  const handleCreateBusinessProfile = () => {
+    setShowBusinessIntroModal(true);
+  };
+
+  const handleBusinessIntroContinue = () => {
+    navigate('/profile?edit=business');
   };
 
   const handleAdminClick = () => {
@@ -237,24 +248,21 @@ const HeaderNavigation = () => {
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />
-          {/* Business Directory - only shown for business profiles */}
-          {isBusinessProfile && (
-            <DropdownMenuItem onClick={() => navigate('/businesses')}>
-              <Building2 className="h-4 w-4 mr-2" />
-              Business Directory
-            </DropdownMenuItem>
-          )}
+          {/* Business Directory - available to all logged-in users */}
+          <DropdownMenuItem onClick={() => navigate('/businesses')}>
+            <Building2 className="h-4 w-4 mr-2" />
+            Business Directory
+          </DropdownMenuItem>
           {/* Create Business Profile - only shown for personal profiles */}
           {isPersonalProfile && (
-            <DropdownMenuItem onClick={() => navigate('/profile?edit=business')}>
-              <Building2 className="h-4 w-4 mr-2" />
+            <DropdownMenuItem onClick={handleCreateBusinessProfile}>
+              <Plus className="h-4 w-4 mr-2" />
               Create Business Profile
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />
         </DropdownMenuContent>
       </DropdownMenu>
-
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button data-action="settings" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())}>
@@ -283,6 +291,13 @@ const HeaderNavigation = () => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {/* Business Profile Intro Modal */}
+      <CreateBusinessProfileIntroModal
+        open={showBusinessIntroModal}
+        onClose={() => setShowBusinessIntroModal(false)}
+        onContinue={handleBusinessIntroContinue}
+      />
     </div>
   );
 };

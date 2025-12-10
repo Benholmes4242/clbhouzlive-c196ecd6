@@ -5,10 +5,11 @@ import { getProfileDisplayName } from '@/types/profile';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Building2, MapPin, Search, CheckCircle2, ChevronLeft, Plus } from 'lucide-react';
+import { Building2, MapPin, Search, CheckCircle2, ChevronLeft, Plus, Pencil } from 'lucide-react';
 import { BUSINESS_CATEGORIES } from '@/types/profile';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileData } from '@/hooks/useProfileData';
+import { CreateBusinessProfileIntroModal } from '@/components/profile/CreateBusinessProfileIntroModal';
 
 const BusinessDirectoryPage = () => {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const BusinessDirectoryPage = () => {
   const [category, setCategory] = useState<string | undefined>();
   const [location, setLocation] = useState('');
   const [page, setPage] = useState(1);
+  const [showBusinessIntroModal, setShowBusinessIntroModal] = useState(false);
 
   const { data, isLoading } = useBusinessDirectory({
     search,
@@ -33,15 +35,19 @@ const BusinessDirectoryPage = () => {
 
   const handleCreateBusinessProfile = () => {
     if (!user) {
-      // Not logged in - redirect to auth with business mode
-      navigate('/auth?mode=business');
+      // Not logged in - redirect to auth, then they can create business after
+      navigate('/auth');
     } else if (isBusinessProfile) {
       // Already a business - go to profile to edit
       navigate('/profile');
     } else {
-      // Personal user - go to profile settings to switch
-      navigate('/settings?tab=profile&action=switch-to-business');
+      // Personal user - show intro modal
+      setShowBusinessIntroModal(true);
     }
+  };
+
+  const handleBusinessIntroContinue = () => {
+    navigate('/profile?edit=business');
   };
 
   return (
@@ -71,19 +77,35 @@ const BusinessDirectoryPage = () => {
         <div className="flex items-center justify-between p-4 rounded-sq-md bg-muted/50 border border-border">
           <div>
             <h2 className="font-medium text-foreground">
-              {isBusinessProfile ? 'Manage your business profile' : 'Create a business profile'}
+              {isBusinessProfile ? 'Manage your business profile' : 'List your golf business on Clbhouz'}
             </h2>
             <p className="text-sm text-muted-foreground">
               {isBusinessProfile 
-                ? 'Update your business details and get discovered by golfers'
-                : 'List your golf club, academy, shop, or brand on clbhouz'}
+                ? 'Update your business details so golfers always see the most accurate information.'
+                : 'Create a free business profile to reach more golfers, showcase your venue, and appear in the Clbhouz Business Directory.'}
             </p>
           </div>
           <Button onClick={handleCreateBusinessProfile} className="gap-2 flex-shrink-0">
-            <Plus className="h-4 w-4" />
-            {isBusinessProfile ? 'Edit Profile' : 'Get Started'}
+            {isBusinessProfile ? (
+              <>
+                <Pencil className="h-4 w-4" />
+                Edit Business Profile
+              </>
+            ) : (
+              <>
+                <Plus className="h-4 w-4" />
+                Create Business Profile
+              </>
+            )}
           </Button>
         </div>
+
+        {/* Business Profile Intro Modal */}
+        <CreateBusinessProfileIntroModal
+          open={showBusinessIntroModal}
+          onClose={() => setShowBusinessIntroModal(false)}
+          onContinue={handleBusinessIntroContinue}
+        />
 
         {/* Filters */}
         <div className="flex flex-wrap gap-3 items-center">
