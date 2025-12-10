@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useBusinessDirectory } from '@/hooks/useBusinessDirectory';
-import { getProfileDisplayName } from '@/types/profile';
+import { useBusinessDirectory, BusinessDirectoryItem } from '@/hooks/useBusinessDirectory';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -9,12 +8,14 @@ import { Building2, MapPin, Search, CheckCircle2, ChevronLeft, Plus, Pencil } fr
 import { BUSINESS_CATEGORIES } from '@/types/profile';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileData } from '@/hooks/useProfileData';
+import { useHasBusinesses } from '@/hooks/useMyBusinesses';
 import { CreateBusinessProfileIntroModal } from '@/components/profile/CreateBusinessProfileIntroModal';
 
 const BusinessDirectoryPage = () => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { profile: currentProfile } = useProfileData();
+  const { hasBusinesses, count: businessCount } = useHasBusinesses(currentProfile?.id);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<string | undefined>();
   const [location, setLocation] = useState('');
@@ -30,24 +31,23 @@ const BusinessDirectoryPage = () => {
   });
 
   const { businesses = [], total = 0 } = data ?? {};
-  
-  const isBusinessProfile = currentProfile?.profile_type === 'business';
 
   const handleCreateBusinessProfile = () => {
     if (!user) {
-      // Not logged in - redirect to auth, then they can create business after
       navigate('/auth');
-    } else if (isBusinessProfile) {
-      // Already a business - go to profile to edit
-      navigate('/profile');
+    } else if (hasBusinesses) {
+      navigate('/businesses/manage');
     } else {
-      // Personal user - show intro modal
       setShowBusinessIntroModal(true);
     }
   };
 
   const handleBusinessIntroContinue = () => {
     navigate('/profile?edit=business');
+  };
+
+  const getInitials = (name: string) => {
+    return name.charAt(0).toUpperCase();
   };
 
   return (
@@ -77,19 +77,19 @@ const BusinessDirectoryPage = () => {
         <div className="flex items-center justify-between p-4 rounded-sq-md bg-muted/50 border border-border">
           <div>
             <h2 className="font-medium text-foreground">
-              {isBusinessProfile ? 'Manage your business profile' : 'List your golf business on Clbhouz'}
+              {hasBusinesses ? 'Manage your business profiles' : 'List your golf business on Clbhouz'}
             </h2>
             <p className="text-sm text-muted-foreground">
-              {isBusinessProfile 
-                ? 'Update your business details so golfers always see the most accurate information.'
+              {hasBusinesses 
+                ? `You have ${businessCount} business${businessCount > 1 ? 'es' : ''} on Clbhouz.`
                 : 'Create a free business profile to reach more golfers, showcase your venue, and appear in the Clbhouz Business Directory.'}
             </p>
           </div>
           <Button onClick={handleCreateBusinessProfile} className="gap-2 flex-shrink-0">
-            {isBusinessProfile ? (
+            {hasBusinesses ? (
               <>
                 <Pencil className="h-4 w-4" />
-                Edit Business Profile
+                Manage Businesses
               </>
             ) : (
               <>
@@ -170,55 +170,54 @@ const BusinessDirectoryPage = () => {
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {businesses.map(biz => {
-              const name = getProfileDisplayName(biz);
-              return (
-                <button
-                  key={biz.id}
-                  className="rounded-sq-md border bg-card p-4 text-left hover:border-foreground/40 transition-colors"
-                  onClick={() => navigate(`/profile/${biz.username || biz.id}`)}
-                >
-                  <div className="flex items-center gap-3">
-                    {biz.profile_photo_url ? (
-                      <img
-                        src={biz.profile_photo_url}
-                        alt={name}
-                        className="h-12 w-12 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-lg font-medium">
-                        {name.charAt(0).toUpperCase()}
-                      </div>
-                    )}
+            {businesses.map((biz: BusinessDirectoryItem) => (
+              <button
+                key={biz.id}
+                className="rounded-sq-md border bg-card p-4 text-left hover:border-foreground/40 transition-colors"
+                onClick={() => navigate(`/business/${biz.slug ?? biz.id}`)}
+              >
+                <div className="flex items-center gap-3">
+                  {biz.logo_url ? (
+                    <img
+                      src={biz.logo_url}
+                      alt={biz.name}
+                      className="h-12 w-12 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-lg font-medium">
+                      {getInitials(biz.name)}
+                    </div>
+                  )}
 
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-medium truncate">{name}</span>
-                        {biz.is_business_verified && (
-                          <CheckCircle2 className="h-4 w-4 text-emerald-500 flex-shrink-0" />
-                        )}
-                      </div>
-                      <div className="text-xs text-muted-foreground truncate">
-                        @{biz.username}
-                      </div>
-                      {biz.business_category && (
-                        <div className="mt-1.5">
-                          <span className="text-[11px] px-2 py-0.5 rounded-sq-pill bg-muted text-muted-foreground">
-                            {biz.business_category}
-                          </span>
-                        </div>
-                      )}
-                      {biz.business_location && (
-                        <div className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground">
-                          <MapPin className="h-3 w-3" />
-                          <span className="truncate">{biz.business_location}</span>
-                        </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-medium truncate">{biz.name}</span>
+                      {biz.is_verified && (
+                        <CheckCircle2 className="h-4 w-4 text-emerald-500 flex-shrink-0" />
                       )}
                     </div>
+                    {biz.slug && (
+                      <div className="text-xs text-muted-foreground truncate">
+                        @{biz.slug}
+                      </div>
+                    )}
+                    {biz.category && (
+                      <div className="mt-1.5">
+                        <span className="text-[11px] px-2 py-0.5 rounded-sq-pill bg-muted text-muted-foreground">
+                          {biz.category}
+                        </span>
+                      </div>
+                    )}
+                    {biz.location && (
+                      <div className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground">
+                        <MapPin className="h-3 w-3" />
+                        <span className="truncate">{biz.location}</span>
+                      </div>
+                    )}
                   </div>
-                </button>
-              );
-            })}
+                </div>
+              </button>
+            ))}
           </div>
         )}
 
