@@ -201,12 +201,12 @@ function AppRoutes() {
         <Route path="/auth" element={<AuthWrapped />} />
         <Route path="/auth/callback" element={<Suspense fallback={<GenericPageSkeleton />}><AuthCallback /></Suspense>} />
         <Route path="/signup" element={<Suspense fallback={<GenericPageSkeleton />}><Signup /></Suspense>} />
-        <Route path="/create-profile" element={<CreateProfile />} />
+        <Route path="/create-profile" element={<Suspense fallback={<GenericPageSkeleton />}><CreateProfile /></Suspense>} />
         <Route path="/onboarding/account-type" element={<Suspense fallback={<GenericPageSkeleton />}><AccountTypeOnboarding /></Suspense>} />
         <Route path="/profile" element={<ProfileWrapped />} />
-        <Route path="/profile-test" element={<ProfileTestPage />} />
+        <Route path="/profile-test" element={<Suspense fallback={<ProfileSkeleton />}><ProfileTestPage /></Suspense>} />
         <Route path="/profile/:username" element={<Suspense fallback={<ProfileSkeleton />}><UserProfilePage /></Suspense>} />
-        <Route path="/profile/:username/reviews" element={<UserReviewsPage />} />
+        <Route path="/profile/:username/reviews" element={<Suspense fallback={<ProfileSkeleton />}><UserReviewsPage /></Suspense>} />
         <Route path="/settings" element={<SettingsWrapped />} />
         <Route path="/clubhouse" element={<Suspense fallback={<ClubhouseSkeleton />}><ClubhouseWrapped /></Suspense>} />
         <Route path="/discover" element={<Suspense fallback={<DiscoverSkeleton />}><DiscoverWrapped /></Suspense>} />
@@ -214,9 +214,9 @@ function AppRoutes() {
         <Route path="/courses/:courseId" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseDetailPage /></Suspense>} />
         <Route path="/courses/:courseId/rate" element={<Suspense fallback={<RateCoursePageSkeleton />}><RateCoursePage /></Suspense>} />
         <Route path="/courses/:courseId/reviews" element={<Suspense fallback={<CourseDetailSkeleton />}><CourseReviewsPage /></Suspense>} />
-        <Route path="/user/:username/courses" element={<UserCoursesPage />} />
-        <Route path="/my-ratings" element={<MyRatings />} />
-        <Route path="/news" element={<News />} />
+        <Route path="/user/:username/courses" element={<Suspense fallback={<CoursesListSkeleton />}><UserCoursesPage /></Suspense>} />
+        <Route path="/my-ratings" element={<Suspense fallback={<CoursesListSkeleton />}><MyRatings /></Suspense>} />
+        <Route path="/news" element={<Suspense fallback={<GenericPageSkeleton />}><News /></Suspense>} />
         
         <Route path="/videos" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><VideosPage /></Suspense>} />
           <Route path="/season-shop" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><SeasonShop /></Suspense>} />
@@ -238,76 +238,76 @@ function AppRoutes() {
         <Route path="/business/insights" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInsightsPage /></Suspense>} />
         <Route path="/business/:idOrSlug" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessProfilePage /></Suspense>} />
         
-        <Route path="/top100" element={<Top100Hub />} />
-        <Route path="/top100/:slug" element={<Top100List />} />
+        <Route path="/top100" element={<Suspense fallback={<CoursesListSkeleton />}><Top100Hub /></Suspense>} />
+        <Route path="/top100/:slug" element={<Suspense fallback={<CoursesListSkeleton />}><Top100List /></Suspense>} />
         <Route path="/achievementshub" element={<Suspense fallback={<AchievementsSkeleton />}><AchievementsHubPage /></Suspense>} />
         <Route path="/achievements" element={<Suspense fallback={<AchievementsSkeleton />}><AchievementsPage /></Suspense>} />
-        <Route path="/admin-setup" element={<AdminSetupPage />} />
+        <Route path="/admin-setup" element={<Suspense fallback={<GenericPageSkeleton />}><AdminSetupPage /></Suspense>} />
         
         {/* Admin routes wrapped with AdminLayout */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminLanding />} />
+        <Route path="/admin" element={<Suspense fallback={<GenericPageSkeleton />}><AdminLayout /></Suspense>}>
+          <Route index element={<Suspense fallback={<GenericPageSkeleton />}><AdminLanding /></Suspense>} />
           <Route path="overview" element={
             <PanelGuard need="admins">
-              <AdminOverviewPage />
+              <Suspense fallback={<GenericPageSkeleton />}><AdminOverviewPage /></Suspense>
             </PanelGuard>
           } />
           <Route path="users" element={
             <PanelGuard need="users">
-              <AdminUsersPage />
+              <Suspense fallback={<GenericPageSkeleton />}><AdminUsersPage /></Suspense>
             </PanelGuard>
           } />
           <Route path="admins" element={
             <PanelGuard need="admins">
-              <AdminMembersPage />
+              <Suspense fallback={<GenericPageSkeleton />}><AdminMembersPage /></Suspense>
             </PanelGuard>
           } />
           <Route path="invites" element={
             <PanelGuard need="admins">
-              <AdminInvitesPage />
+              <Suspense fallback={<GenericPageSkeleton />}><AdminInvitesPage /></Suspense>
             </PanelGuard>
           } />
           
           {/* Legacy/management sections */}
-          <Route path="golf-courses" element={<GolfCoursesPage />} />
-          <Route path="logos" element={<LogosPage />} />
-          <Route path="country-flags" element={<CountryFlagsPage />} />
-          <Route path="courses" element={<CourseImportPage />} />
+          <Route path="golf-courses" element={<Suspense fallback={<GenericPageSkeleton />}><GolfCoursesPage /></Suspense>} />
+          <Route path="logos" element={<Suspense fallback={<GenericPageSkeleton />}><LogosPage /></Suspense>} />
+          <Route path="country-flags" element={<Suspense fallback={<GenericPageSkeleton />}><CountryFlagsPage /></Suspense>} />
+          <Route path="courses" element={<Suspense fallback={<GenericPageSkeleton />}><CourseImportPage /></Suspense>} />
           <Route path="analytics" element={
             <PanelGuard need="admins">
-              <AnalyticsPage />
+              <Suspense fallback={<GenericPageSkeleton />}><AnalyticsPage /></Suspense>
             </PanelGuard>
           } />
           <Route path="analytics/echo" element={
             <PanelGuard need="admins">
-              <AdminEchoAnalyticsPage />
+              <Suspense fallback={<GenericPageSkeleton />}><AdminEchoAnalyticsPage /></Suspense>
             </PanelGuard>
           } />
-          <Route path="team" element={<TeamPage />} />
-          <Route path="settings" element={<AdminSettingsPage />} />
-          <Route path="top100-geocoding" element={<Top100GeocodingPage />} />
+          <Route path="team" element={<Suspense fallback={<GenericPageSkeleton />}><TeamPage /></Suspense>} />
+          <Route path="settings" element={<Suspense fallback={<GenericPageSkeleton />}><AdminSettingsPage /></Suspense>} />
+          <Route path="top100-geocoding" element={<Suspense fallback={<GenericPageSkeleton />}><Top100GeocodingPage /></Suspense>} />
           <Route path="test-lab" element={
             <PanelGuard need="admins">
-              <AdminTestLabPage />
+              <Suspense fallback={<GenericPageSkeleton />}><AdminTestLabPage /></Suspense>
             </PanelGuard>
           } />
         </Route>
         
-        <Route path="/create-moment" element={<CreateMomentPage />} />
+        <Route path="/create-moment" element={<Suspense fallback={<GenericPageSkeleton />}><CreateMomentPage /></Suspense>} />
         <Route path="/error-logs" element={<ErrorLogPage />} />
         
         {/* Public Echo Share Page */}
-        <Route path="/echo/share/:token" element={<EchoSharePage />} />
+        <Route path="/echo/share/:token" element={<Suspense fallback={<GenericPageSkeleton />}><EchoSharePage /></Suspense>} />
         
         {/* Golf Course Editor - full page routes outside AdminLayout */}
-        <Route path="/admin/golf-courses/new" element={<GolfCourseEditorPage />} />
-        <Route path="/admin/golf-courses/:id/edit" element={<GolfCourseEditorPage />} />
+        <Route path="/admin/golf-courses/new" element={<Suspense fallback={<GenericPageSkeleton />}><GolfCourseEditorPage /></Suspense>} />
+        <Route path="/admin/golf-courses/:id/edit" element={<Suspense fallback={<GenericPageSkeleton />}><GolfCourseEditorPage /></Suspense>} />
         
-        <Route path="/admin/invite-accept" element={<InviteAcceptPage />} />
-        <Route path="/admin-backfill" element={<AdminBackfill />} />
+        <Route path="/admin/invite-accept" element={<Suspense fallback={<GenericPageSkeleton />}><InviteAcceptPage /></Suspense>} />
+        <Route path="/admin-backfill" element={<Suspense fallback={<GenericPageSkeleton />}><AdminBackfill /></Suspense>} />
 
-        <Route path="/channel/:slug" element={<ChannelProfile />} />
-        <Route path="/game/:id" element={<GameDetailView />} />
+        <Route path="/channel/:slug" element={<Suspense fallback={<ProfileSkeleton />}><ChannelProfile /></Suspense>} />
+        <Route path="/game/:id" element={<Suspense fallback={<GenericPageSkeleton />}><GameDetailView /></Suspense>} />
         
         {/* Hub routes - only when NOT using background location */}
         {!showHubOverlay && FEATURE_FLAGS.HUB && (
@@ -317,7 +317,7 @@ function AppRoutes() {
             <Route path="/hub/echo" element={<Suspense fallback={<HubSkeleton />}><HubEchoChatPage /></Suspense>} />
             <Route path="/hub/create-game" element={<Suspense fallback={<HubSkeleton />}><HubCreateGamePage /></Suspense>} />
             <Route path="/hub/games" element={<Suspense fallback={<HubSkeleton />}><HubGamesPage /></Suspense>} />
-            <Route path="/hub/your-games" element={<Suspense fallback={<HubYourGamesPage />}><HubYourGamesPage /></Suspense>} />
+            <Route path="/hub/your-games" element={<Suspense fallback={<HubSkeleton />}><HubYourGamesPage /></Suspense>} />
             <Route path="/hub/swing" element={<Suspense fallback={<HubSkeleton />}><HubSwingPage /></Suspense>} />
           <Route path="/hub/swing/history" element={<Suspense fallback={<HubSkeleton />}><HubSwingHistoryPage /></Suspense>} />
           <Route path="/hub/swing/history/:id" element={<Suspense fallback={<HubSkeleton />}><HubSwingDetailPage /></Suspense>} />
@@ -329,7 +329,7 @@ function AppRoutes() {
           </>
         )}
         
-        <Route path="*" element={<NotFound />} />
+        <Route path="*" element={<Suspense fallback={<GenericPageSkeleton />}><NotFound /></Suspense>} />
       </Routes>
 
       {/* Hub Overlays - rendered over origin page when background location exists */}
