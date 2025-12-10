@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { SwipeableNotificationRow } from './SwipeableNotificationRow';
@@ -39,16 +40,25 @@ export const ActivityBucket: React.FC<ActivityBucketProps> = ({
       </div>
 
       <div className="space-y-1.5">
-        {items.map(item => (
-          <SwipeableNotificationRow
-            key={item.id}
-            notification={item}
-            onClick={() => onNotificationClick(item)}
-            onMarkUnread={onMarkUnread || (() => {})}
-            onDelete={onDelete || (() => {})}
-            currentUserId={currentUserId}
-          />
-        ))}
+        <AnimatePresence initial={false}>
+          {items.map(item => (
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0, y: 10, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.97 }}
+              transition={{ duration: 0.22 }}
+            >
+              <SwipeableNotificationRow
+                notification={item}
+                onClick={() => onNotificationClick(item)}
+                onMarkUnread={onMarkUnread || (() => {})}
+                onDelete={onDelete || (() => {})}
+                currentUserId={currentUserId}
+              />
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </section>
   );
