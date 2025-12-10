@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Heart, MessageCircle, Share, Search, Volume2, VolumeX } from 'lucide-react';
-import { HiOutlineMenuAlt2 } from 'react-icons/hi';
+import { TbMenu } from 'react-icons/tb';
+
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -159,14 +160,14 @@ export const SocialDock: React.FC<SocialDockProps> = ({
                 'bg-orange-500/20 hover:bg-orange-500/30',
                 'border border-orange-400/40',
                 'backdrop-blur-sm',
-                'text-[11px] font-medium tracking-wide uppercase text-orange-100',
+                'text-[11px] font-medium tracking-wide uppercase text-orange-400',
                 'transition-all duration-150',
                 'active:scale-[0.97]',
                 'flex-shrink-0'
               )}
               aria-label="Show menu"
             >
-              <HiOutlineMenuAlt2 className="w-3.5 h-3.5" />
+              <TbMenu className="w-3.5 h-3.5" />
               <span>Menu</span>
             </button>
           </div>
