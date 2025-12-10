@@ -205,9 +205,8 @@ const ActivityPage: React.FC = () => {
     <PageRoot className="bg-[#f5f5f7] pb-24">
       <CompactHeader />
 
-        {/* Main content wrapper - centered with equal padding both sides */}
-        <div className="w-full max-w-[640px] mx-auto px-4 sm:px-5 pt-6 compact-header-offset">
-        {/* Header section - title only */}
+      {/* Header section with padding */}
+      <div className="w-full max-w-[640px] mx-auto px-4 sm:px-5 pt-6 compact-header-offset">
         <section className="mb-4">
           <h1 className="text-xl font-semibold tracking-tight text-foreground">
             Activity
@@ -217,7 +216,7 @@ const ActivityPage: React.FC = () => {
           </p>
         </section>
 
-        {/* Filter tabs - Apple-style segmented control matching Golf Courses width */}
+        {/* Filter tabs - Apple-style segmented control */}
         <div className="mb-4">
           <div className="grid w-full grid-cols-4 rounded-sq-md bg-muted/70 border border-border/60 px-2 py-[3px]">
             {ACTIVITY_TABS.map((tab) => (
@@ -245,19 +244,25 @@ const ActivityPage: React.FC = () => {
             activeFilter={activeChipFilter}
           />
         )}
+      </div>
 
-        {/* Content */}
+      {/* Notifications list - full width, no padding */}
+      <div className="w-full">
         {isLoading ? (
-          <ActivitySkeleton />
+          <div className="max-w-[640px] mx-auto px-4 sm:px-5">
+            <ActivitySkeleton />
+          </div>
         ) : error ? (
-          <div className="text-left py-12 text-muted-foreground">
+          <div className="text-left py-12 text-muted-foreground max-w-[640px] mx-auto px-4 sm:px-5">
             <p>Failed to load activity</p>
           </div>
         ) : isEmpty ? (
-          <ActivityEmptyState tab={activeTab} />
+          <div className="max-w-[640px] mx-auto px-4 sm:px-5">
+            <ActivityEmptyState tab={activeTab} />
+          </div>
         ) : buckets && (
-          <div className="w-full mt-4 space-y-6">
-            {/* All caught up banner - shown when no new/unread items but history exists */}
+          <div className="w-full mt-4 space-y-0">
+            {/* All caught up banner */}
             {isAllCaughtUp && (
               <div className="flex flex-col items-center py-4 text-center">
                 <span className="text-sm font-medium text-foreground">You're all caught up</span>
@@ -265,7 +270,7 @@ const ActivityPage: React.FC = () => {
               </div>
             )}
 
-            {/* New (unread) - use session-based items to keep them visible until leaving */}
+            {/* New (unread) */}
             {effectiveNewItems.length > 0 && (
               <ActivityBucket
                 label="New"
@@ -278,7 +283,7 @@ const ActivityPage: React.FC = () => {
               />
             )}
 
-            {/* Today - exclude items we're showing in "New" via sessionNewIds */}
+            {/* Today */}
             {buckets.today.length > 0 && (
               <ActivityBucket
                 label="Today"
