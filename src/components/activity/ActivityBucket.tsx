@@ -12,6 +12,7 @@ interface ActivityBucketProps {
   onNotificationClick: (notification: ActivityNotification) => void;
   onOpenActionsSheet: (notification: ActivityNotification) => void;
   currentUserId?: string;
+  sessionNewIds?: string[] | null;
 }
 
 export const ActivityBucket: React.FC<ActivityBucketProps> = ({ 
@@ -21,15 +22,17 @@ export const ActivityBucket: React.FC<ActivityBucketProps> = ({
   accent,
   onNotificationClick,
   onOpenActionsSheet,
-  currentUserId
+  currentUserId,
+  sessionNewIds
 }) => {
   if (!items || items.length === 0) return null;
 
   return (
     <section className="w-full">
-      {/* Section label */}
+      {/* Section label - with padding */}
       <div
         className={cn(
+          "max-w-[640px] mx-auto px-4 sm:px-5",
           "mb-2 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em]",
           "text-muted-foreground"
         )}
@@ -37,6 +40,7 @@ export const ActivityBucket: React.FC<ActivityBucketProps> = ({
         {label}
       </div>
 
+      {/* Notification rows - full bleed */}
       <div className="divide-y divide-border/30">
         <AnimatePresence initial={false}>
           {items.map(item => (
@@ -52,6 +56,7 @@ export const ActivityBucket: React.FC<ActivityBucketProps> = ({
                 onClick={() => onNotificationClick(item)}
                 onOpenActionsSheet={() => onOpenActionsSheet(item)}
                 currentUserId={currentUserId}
+                isSessionNew={sessionNewIds?.includes(item.id) ?? false}
               />
             </motion.div>
           ))}
