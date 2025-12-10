@@ -76,29 +76,29 @@ export const MediaHighlightRow: React.FC<CinematicNotificationRowProps & { media
   return (
     <motion.article
       onClick={onClick}
-      className="relative overflow-hidden rounded-sq-md mb-1.5 cursor-pointer"
+      className="relative overflow-hidden rounded-sq-md mb-1.5 cursor-pointer min-h-[86px]"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -4 }}
       transition={{ duration: 0.22 }}
       whileTap={{ scale: 0.98 }}
     >
-      {/* Background image */}
+      {/* Background image - full cover */}
       <div
-        className="absolute inset-0 bg-cover bg-center"
+        className="absolute inset-0 bg-cover bg-center z-0"
         style={{ backgroundImage: `url(${mediaUrl})` }}
       />
 
       {/* Vignette overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-black/10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-black/10 z-[1]" />
 
       {/* Unread indicator bar */}
       {isUnread && (
-        <div className="absolute left-0 top-0 bottom-0 w-1 bg-[hsl(var(--echo-accent))]" />
+        <div className="absolute left-0 top-0 bottom-0 w-1 bg-[hsl(var(--echo-accent))] z-[2]" />
       )}
 
       {/* Content */}
-      <div className="relative z-10 flex items-center px-4 py-3 gap-3 min-h-[86px]">
+      <div className="relative z-10 flex items-center px-4 py-3 gap-3 h-full">
         {/* Avatar with badge */}
         <div className="relative shrink-0" style={{ width: 52, height: 54 }}>
           <SquircleAvatar
@@ -152,29 +152,29 @@ export const CourseHighlightRow: React.FC<CinematicNotificationRowProps & { cour
   return (
     <motion.article
       onClick={onClick}
-      className="relative overflow-hidden rounded-sq-md mb-1.5 cursor-pointer"
+      className="relative overflow-hidden rounded-sq-md mb-1.5 cursor-pointer min-h-[86px]"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -4 }}
       transition={{ duration: 0.22 }}
       whileTap={{ scale: 0.98 }}
     >
-      {/* Course image */}
+      {/* Course image - full cover */}
       <div
-        className="absolute inset-0 bg-cover bg-center"
+        className="absolute inset-0 bg-cover bg-center z-0"
         style={{ backgroundImage: `url(${courseImageUrl})` }}
       />
 
       {/* Green-tinted vignette */}
-      <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/80 via-emerald-900/40 to-emerald-900/20" />
+      <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/80 via-emerald-900/40 to-emerald-900/20 z-[1]" />
 
       {/* Unread indicator bar */}
       {isUnread && (
-        <div className="absolute left-0 top-0 bottom-0 w-1 bg-[hsl(var(--echo-accent))]" />
+        <div className="absolute left-0 top-0 bottom-0 w-1 bg-[hsl(var(--echo-accent))] z-[2]" />
       )}
 
       {/* Content */}
-      <div className="relative z-10 flex items-center px-4 py-3 gap-3 min-h-[86px]">
+      <div className="relative z-10 flex items-center px-4 py-3 gap-3 h-full">
         {/* Avatar with badge */}
         <div className="relative shrink-0" style={{ width: 52, height: 54 }}>
           <SquircleAvatar
