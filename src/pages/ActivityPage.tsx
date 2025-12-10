@@ -37,6 +37,16 @@ const ActivityPage: React.FC = () => {
   const [sessionNewCount, setSessionNewCount] = useState<number | null>(null);
   const [hasInitializedNew, setHasInitializedNew] = useState(false);
   
+  // Track if we've completed at least one successful data load
+  const [hasCompletedInitialLoad, setHasCompletedInitialLoad] = useState(false);
+  
+  // Mark initial load as complete once data arrives and loading finishes
+  useEffect(() => {
+    if (!isLoading && data && !hasCompletedInitialLoad) {
+      setHasCompletedInitialLoad(true);
+    }
+  }, [isLoading, data, hasCompletedInitialLoad]);
+  
   // On first load: capture "New" IDs, mark them read (clears bell), but keep showing in "New"
   useEffect(() => {
     if (hasInitializedNew) return;
@@ -252,7 +262,7 @@ const ActivityPage: React.FC = () => {
       {/* Notifications list - full width, no padding */}
       <div className="w-full">
         {/* Show skeleton during initial load OR when fetching with no cached data */}
-        {(isLoading || (isFetching && !data)) ? (
+        {(isLoading || (isFetching && !data) || !hasCompletedInitialLoad) ? (
           <div className="max-w-[640px] mx-auto px-4 sm:px-5">
             <ActivitySkeleton />
           </div>
@@ -260,7 +270,7 @@ const ActivityPage: React.FC = () => {
           <div className="text-left py-12 text-muted-foreground max-w-[640px] mx-auto px-4 sm:px-5">
             <p>Failed to load activity</p>
           </div>
-        ) : !isLoading && !isFetching && isEmpty ? (
+        ) : isEmpty ? (
           <div className="max-w-[640px] mx-auto px-4 sm:px-5">
             <ActivityEmptyState tab={activeTab} />
           </div>
