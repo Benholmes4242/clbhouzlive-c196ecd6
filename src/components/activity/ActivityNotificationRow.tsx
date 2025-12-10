@@ -7,7 +7,6 @@ import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSyst
 import { FollowBackButton } from './FollowBackButton';
 import { FriendRequestButtons } from './FriendRequestButtons';
 import { useCancelFriendRequest } from '@/hooks/useCancelFriendRequest';
-import { MediaHighlightRow, CourseHighlightRow } from './CinematicNotificationRow';
 
 interface ActivityNotificationRowProps {
   notification: ActivityNotification;
@@ -198,13 +197,6 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
   const friendRequestId = data?.request_id || notification.id;
   const status = data?.status || 'pending';
 
-  // Check for cinematic background URL in notification data
-  const cinematicBackgroundUrl = 
-    data?.cinematic_background_url ?? 
-    data?.course_photo_url ?? 
-    data?.post_thumbnail_url ?? 
-    null;
-
   const handleCancelRequest = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (notification.is_mock) return;
@@ -215,30 +207,6 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
       targetUserName,
     });
   };
-
-  // Use cinematic layout if background URL is present (for non-friend-request types)
-  if (cinematicBackgroundUrl && !['friend_request', 'friend_accepted', 'friend_request_sent', 'friend_declined', 'friend_cancelled'].includes(type)) {
-    // Check if it's course-related
-    if (data?.course_photo_url || data?.course_name) {
-      return (
-        <CourseHighlightRow
-          notification={notification}
-          onClick={onClick}
-          courseImageUrl={cinematicBackgroundUrl}
-          currentUserId={currentUserId}
-        />
-      );
-    }
-    // Default to media highlight
-    return (
-      <MediaHighlightRow
-        notification={notification}
-        onClick={onClick}
-        mediaUrl={cinematicBackgroundUrl}
-        currentUserId={currentUserId}
-      />
-    );
-  }
 
   switch (type) {
     /**

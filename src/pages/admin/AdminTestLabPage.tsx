@@ -33,8 +33,6 @@ import {
   useMessagesHeavyDay,
   useMentionsAndTagsDay,
   useAchievementsBurst,
-  // Cinematic layout test
-  useCinematicLayoutSample,
 } from '@/hooks/useAdminTestActions';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Users, UserPlus, Heart, MessageCircle, AtSign, Trash2, AlertCircle, Check, Zap, RotateCcw, Sparkles } from 'lucide-react';
@@ -182,8 +180,6 @@ export function AdminTestLabPage() {
   const mentionsAndTagsDay = useMentionsAndTagsDay();
   const achievementsBurst = useAchievementsBurst();
 
-  // Cinematic layout test
-  const cinematicLayoutSample = useCinematicLayoutSample();
 
   // Target is always the current user for now
   const targetUserId = user?.id;
@@ -515,23 +511,6 @@ export function AdminTestLabPage() {
             />
           </TestSection>
 
-          {/* Cinematic Layout Test Section */}
-          <div className="rounded-sq-md border-2 border-violet-500/20 bg-violet-500/5 p-4 space-y-3">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-violet-600" />
-              <h2 className="text-sm font-semibold tracking-wide uppercase">Visual Tests</h2>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Test new visual layouts and design features.
-            </p>
-            <ScenarioButton
-              emoji="🎬"
-              label="Cinematic layout sample"
-              description="2-3 notifications with demo background"
-              onClick={() => cinematicLayoutSample.mutate(targetUserId)}
-              loading={cinematicLayoutSample.isPending}
-            />
-          </div>
 
           <TestSection title="Cleanup" icon={<Trash2 className="h-4 w-4" />}>
             <TestButton
