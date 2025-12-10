@@ -13,6 +13,7 @@ interface ActivityNotificationRowProps {
   onClick: () => void;
   onOpenActionsSheet: () => void;
   currentUserId?: string;
+  isSessionNew?: boolean;
 }
 
 // Shared base pill class for unified styling - SDS corners, 30% shorter height
@@ -116,6 +117,7 @@ interface FlatRowProps {
   title: React.ReactNode;
   meta: string;
   actions?: React.ReactNode;
+  isSessionNew?: boolean;
 }
 
 const FlatRow: React.FC<FlatRowProps> = ({ 
@@ -125,22 +127,24 @@ const FlatRow: React.FC<FlatRowProps> = ({
   avatar, 
   title, 
   meta, 
-  actions 
+  actions,
+  isSessionNew
 }) => {
-  const isUnread = notification.is_unread;
+  // Use session-based "new" status for orange styling (persists until user leaves page)
+  const showOrange = isSessionNew || notification.is_unread;
   
   return (
     <div
       className={cn(
         "flex items-center gap-3 px-4 py-3 transition-colors",
-        isUnread 
+        showOrange 
           ? "bg-amber-500/[0.06]" 
           : "bg-transparent hover:bg-muted/30"
       )}
     >
       {/* Unread dot indicator */}
       <div className="w-2 shrink-0 flex items-center justify-center">
-        {isUnread && (
+        {showOrange && (
           <span className="w-2 h-2 rounded-full bg-amber-500" />
         )}
       </div>
@@ -154,7 +158,7 @@ const FlatRow: React.FC<FlatRowProps> = ({
         <div className="flex-1 min-w-0">
           <p className={cn(
             "text-sm leading-snug",
-            isUnread ? "text-foreground" : "text-foreground/90"
+            showOrange ? "text-foreground" : "text-foreground/90"
           )}>
             {title}
           </p>
@@ -187,13 +191,14 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
   notification, 
   onClick,
   onOpenActionsSheet,
-  currentUserId
+  currentUserId,
+  isSessionNew
 }) => {
   const cancelMutation = useCancelFriendRequest();
   const { type, data } = notification;
   const actorName = notification.actor_display_name || 'Unknown User';
   const targetUserName = data?.target_user_name || actorName;
-  const isUnread = notification.is_unread;
+  const showOrange = isSessionNew || notification.is_unread;
   const friendRequestId = data?.request_id || notification.id;
   const status = data?.status || 'pending';
 
@@ -236,6 +241,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
                 Accepted
               </span>
             }
+            isSessionNew={isSessionNew}
           />
         );
       }
@@ -260,6 +266,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
                 Declined
               </span>
             }
+            isSessionNew={isSessionNew}
           />
         );
       }
@@ -273,7 +280,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(true)} />}
           title={
             <>
-              <span className={cn(isUnread ? "font-semibold" : "font-medium")}>{actorName}</span>{' '}
+              <span className={cn(showOrange ? "font-semibold" : "font-medium")}>{actorName}</span>{' '}
               <span className="font-normal text-muted-foreground">sent you a friend request</span>
             </>
           }
@@ -288,6 +295,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
               isMock={notification.is_mock}
             />
           }
+          isSessionNew={isSessionNew}
         />
       );
     }
@@ -305,7 +313,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(true)} />}
           title={
             <>
-              <span className={cn(isUnread ? "font-semibold" : "font-medium")}>{actorName}</span>{' '}
+              <span className={cn(showOrange ? "font-semibold" : "font-medium")}>{actorName}</span>{' '}
               <span className="font-normal text-muted-foreground">accepted your friend request</span>
             </>
           }
@@ -316,6 +324,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
               Friends
             </span>
           }
+          isSessionNew={isSessionNew}
         />
       );
     }
@@ -332,7 +341,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           onOpenActionsSheet={onOpenActionsSheet}
           avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(false)} />}
           title={
-            <span className={cn(isUnread ? "font-medium" : "font-normal", "text-foreground/90")}>
+            <span className={cn(showOrange ? "font-medium" : "font-normal", "text-foreground/90")}>
               Friend request sent to <span className="font-semibold">{targetUserName}</span>
             </span>
           }
@@ -352,6 +361,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
               </button>
             </div>
           }
+          isSessionNew={isSessionNew}
         />
       );
     }
@@ -367,7 +377,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           onOpenActionsSheet={onOpenActionsSheet}
           avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(false)} />}
           title={
-            <span className={cn(isUnread ? "font-medium" : "font-normal", "text-foreground/90")}>
+            <span className={cn(showOrange ? "font-medium" : "font-normal", "text-foreground/90")}>
               <span className="font-semibold">{targetUserName}</span> declined your friend request
             </span>
           }
@@ -377,6 +387,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
               Request declined
             </span>
           }
+          isSessionNew={isSessionNew}
         />
       );
     }
@@ -392,7 +403,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           onOpenActionsSheet={onOpenActionsSheet}
           avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(false)} />}
           title={
-            <span className={cn(isUnread ? "font-medium" : "font-normal", "text-foreground/90")}>
+            <span className={cn(showOrange ? "font-medium" : "font-normal", "text-foreground/90")}>
               You cancelled your friend request to <span className="font-semibold">{targetUserName}</span>
             </span>
           }
@@ -402,6 +413,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
               Cancelled
             </span>
           }
+          isSessionNew={isSessionNew}
         />
       );
     }
@@ -427,7 +439,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
           title={
             <>
-              <span className={cn(isUnread ? "font-semibold" : "font-medium")}>{actorName}</span>{' '}
+              <span className={cn(showOrange ? "font-semibold" : "font-medium")}>{actorName}</span>{' '}
               <span className="font-normal text-muted-foreground">{renderNotificationText(notification)}</span>
             </>
           }
@@ -441,6 +453,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
               />
             ) : undefined
           }
+          isSessionNew={isSessionNew}
         />
       );
     }

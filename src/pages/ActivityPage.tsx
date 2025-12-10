@@ -280,6 +280,7 @@ const ActivityPage: React.FC = () => {
                 onNotificationClick={handleNotificationClick}
                 onOpenActionsSheet={openActionsSheet}
                 currentUserId={user?.id}
+                sessionNewIds={sessionNewIds}
               />
             )}
 
