@@ -1657,3 +1657,91 @@ export function useAchievementsBurst() {
     },
   });
 }
+
+// ============================================
+// CINEMATIC LAYOUT SMOKE TEST
+// ============================================
+
+const CINEMATIC_TEST_IMAGE = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800&q=80';
+
+/**
+ * Hook to inject sample notifications with cinematic background URL
+ * for testing the new cinematic Activity feed layout
+ */
+export function useCinematicLayoutSample() {
+  const queryClient = useQueryClient();
+  const { data: testUser } = useTestUser();
+
+  return useMutation({
+    mutationFn: async (targetUserId: string) => {
+      if (!testUser) throw new Error('Test user not configured');
+
+      const now = new Date();
+      const testUserName = testUser.display_name || 'Test User';
+
+      // Create a batch of notifications with cinematic_background_url
+      const notifications = [
+        {
+          p_user_id: targetUserId,
+          p_actor_id: testUser.id,
+          p_type: 'comment',
+          p_title: 'Commented on your post',
+          p_entity_type: 'post',
+          p_entity_id: null,
+          p_is_read: false,
+          p_data: {
+            cinematic_background_url: CINEMATIC_TEST_IMAGE,
+            preview_text: 'Incredible shot – which club did you use?',
+          },
+        },
+        {
+          p_user_id: targetUserId,
+          p_actor_id: testUser.id,
+          p_type: 'like',
+          p_title: 'Liked your post',
+          p_entity_type: 'post',
+          p_entity_id: null,
+          p_is_read: false,
+          p_data: {
+            cinematic_background_url: CINEMATIC_TEST_IMAGE,
+          },
+        },
+        {
+          p_user_id: targetUserId,
+          p_actor_id: testUser.id,
+          p_type: 'mention',
+          p_title: 'Mentioned you in a post',
+          p_entity_type: 'post',
+          p_entity_id: null,
+          p_is_read: false,
+          p_data: {
+            cinematic_background_url: CINEMATIC_TEST_IMAGE,
+          },
+        },
+      ];
+
+      // Insert each notification
+      for (const notif of notifications) {
+        const { error } = await supabase.rpc('test_lab_insert_notification', notif);
+        if (error) {
+          console.error('Failed to insert cinematic notification:', error);
+          throw error;
+        }
+      }
+
+      return { success: true, count: notifications.length };
+    },
+    onSuccess: (result) => {
+      toast.success(`Created ${result.count} cinematic notifications`, {
+        description: 'Go to Activity to see the new layout',
+        position: 'top-center',
+      });
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to create cinematic samples', {
+        position: 'top-center',
+      });
+    },
+  });
+}
