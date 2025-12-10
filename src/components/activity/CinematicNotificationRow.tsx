@@ -7,6 +7,7 @@ import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSyst
 import { Heart, MessageCircle, UserPlus, Users, Trophy } from 'lucide-react';
 import { FollowBackButton } from './FollowBackButton';
 import { FriendRequestButtons } from './FriendRequestButtons';
+import { TONE_GRADIENTS } from '@/lib/notificationTone';
 
 interface CinematicNotificationRowProps {
   notification: ActivityNotification;
@@ -66,6 +67,7 @@ export const MediaHighlightRow: React.FC<CinematicNotificationRowProps & { media
   const actorName = notification.actor_display_name || 'Unknown User';
   const isUnread = notification.is_unread;
   const icon = getNotificationIcon(notification.type);
+  const toneGradient = TONE_GRADIENTS[notification.tone] || TONE_GRADIENTS.system;
 
   const showFollowBack = 
     notification.type === 'follow' &&
@@ -89,8 +91,8 @@ export const MediaHighlightRow: React.FC<CinematicNotificationRowProps & { media
         style={{ backgroundImage: `url(${mediaUrl})` }}
       />
 
-      {/* Vignette overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-black/10 z-[1]" />
+      {/* Tone-based vignette overlay */}
+      <div className={cn("absolute inset-0 z-[1]", toneGradient)} />
 
       {/* Unread indicator bar */}
       {isUnread && (
@@ -148,6 +150,7 @@ export const CourseHighlightRow: React.FC<CinematicNotificationRowProps & { cour
   const isUnread = notification.is_unread;
   const courseName = notification.data?.course_name || 'Golf Course';
   const icon = getNotificationIcon(notification.type);
+  const toneGradient = TONE_GRADIENTS[notification.tone] || TONE_GRADIENTS.clubs;
 
   return (
     <motion.article
@@ -165,8 +168,8 @@ export const CourseHighlightRow: React.FC<CinematicNotificationRowProps & { cour
         style={{ backgroundImage: `url(${courseImageUrl})` }}
       />
 
-      {/* Green-tinted vignette */}
-      <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/80 via-emerald-900/40 to-emerald-900/20 z-[1]" />
+      {/* Tone-based vignette */}
+      <div className={cn("absolute inset-0 z-[1]", toneGradient)} />
 
       {/* Unread indicator bar */}
       {isUnread && (
@@ -185,7 +188,7 @@ export const CourseHighlightRow: React.FC<CinematicNotificationRowProps & { cour
             ringColor={getRingColorForTotalPlayed(notification.data?.actor_total_top100_played || 0)}
           />
           {icon && (
-            <span className="absolute bottom-0 right-0 translate-x-1 translate-y-1 h-5 w-5 rounded-full border-2 border-emerald-900/40 bg-emerald-900/60 backdrop-blur-sm flex items-center justify-center shadow-sm">
+            <span className="absolute bottom-0 right-0 translate-x-1 translate-y-1 h-5 w-5 rounded-full border-2 border-black/40 bg-black/60 backdrop-blur-sm flex items-center justify-center shadow-sm">
               {icon}
             </span>
           )}
