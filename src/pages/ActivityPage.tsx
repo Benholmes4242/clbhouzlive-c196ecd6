@@ -27,10 +27,26 @@ const ActivityPage: React.FC = () => {
   // Track if we've already marked notifications as seen this session
   const hasMarkedSeen = useRef(false);
   
-  // Instagram-style: Mark all notifications as "seen" when user visits the page
+  // Session-based "New" retention: capture IDs on first load, keep them in "New" until leaving
+  const [sessionNewIds, setSessionNewIds] = useState<string[] | null>(null);
+  const [hasInitializedNew, setHasInitializedNew] = useState(false);
+  
+  // On first load: capture "New" IDs, mark them read (clears bell), but keep showing in "New"
   useEffect(() => {
-    if (!user?.id || isLoading || hasMarkedSeen.current) return;
-    if (!data || !data.allItems || data.allItems.length === 0) return;
+    if (hasInitializedNew) return;
+    if (!user?.id || isLoading) return;
+    if (!data?.buckets?.new || data.buckets.new.length === 0) {
+      // No new items - still mark initialized to prevent re-running
+      if (data && !isLoading) {
+        setHasInitializedNew(true);
+      }
+      return;
+    }
+    
+    // Capture the IDs of items currently in "New"
+    const ids = data.buckets.new.map((n) => n.id);
+    setSessionNewIds(ids);
+    setHasInitializedNew(true);
     
     const markSeen = async () => {
       const now = new Date().toISOString();
@@ -50,14 +66,20 @@ const ActivityPage: React.FC = () => {
       
       hasMarkedSeen.current = true;
       
-      // Invalidate queries to refresh UI (bell dot, counts, etc.)
-      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+      // Clear bell count only - do NOT invalidate activity-feed to keep "New" visible
       queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
       queryClient.invalidateQueries({ queryKey: ['user-profile', user.id] });
     };
     
     void markSeen();
-  }, [user?.id, isLoading, data, queryClient]);
+  }, [user?.id, isLoading, data, queryClient, hasInitializedNew]);
+  
+  // On unmount: invalidate activity-feed so next visit shows items in proper time buckets
+  useEffect(() => {
+    return () => {
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+    };
+  }, [queryClient]);
 
   const buckets = data?.buckets;
   const counts = data?.counts;
@@ -131,8 +153,18 @@ const ActivityPage: React.FC = () => {
     }
   };
 
+  // Derive "New" items: use sessionNewIds if captured, otherwise fall back to buckets.new
+  const sessionNewItems = React.useMemo(() => {
+    if (!sessionNewIds || !data?.allItems) return null;
+    const byId = new Map(data.allItems.map((n) => [n.id, n]));
+    return sessionNewIds.map((id) => byId.get(id)).filter(Boolean) as ActivityNotification[];
+  }, [sessionNewIds, data?.allItems]);
+
+  // Use session-based new items if available, otherwise fall back to buckets
+  const effectiveNewItems = sessionNewItems ?? buckets?.new ?? [];
+  
   const isEmpty = !buckets || (
-    buckets.new.length === 0 &&
+    effectiveNewItems.length === 0 &&
     buckets.today.length === 0 && 
     buckets.yesterday.length === 0 && 
     buckets.thisWeek.length === 0 && 
@@ -140,7 +172,7 @@ const ActivityPage: React.FC = () => {
   );
 
   // Check if there are no new/unread items (for showing "caught up" banner, NOT for hiding history)
-  const isAllCaughtUp = !isEmpty && buckets && buckets.new.length === 0;
+  const isAllCaughtUp = !isEmpty && effectiveNewItems.length === 0;
 
   return (
     <PageRoot className="bg-muted/40 pb-24">
@@ -202,15 +234,15 @@ const ActivityPage: React.FC = () => {
             {isAllCaughtUp && (
               <div className="flex flex-col items-center py-4 text-center">
                 <span className="text-sm font-medium text-foreground">You're all caught up</span>
-                <span className="text-xs text-muted-foreground mt-0.5">These are your recent updates</span>
+                <span className="text-xs text-muted-foreground mt-0.5">No further new notifications.</span>
               </div>
             )}
 
-            {/* New (unread) - only show if there are unread items */}
-            {buckets.new.length > 0 && (
+            {/* New (unread) - use session-based items to keep them visible until leaving */}
+            {effectiveNewItems.length > 0 && (
               <ActivityBucket
                 label="New"
-                items={buckets.new}
+                items={effectiveNewItems}
                 sticky
                 accent
                 onNotificationClick={handleNotificationClick}
@@ -220,11 +252,13 @@ const ActivityPage: React.FC = () => {
               />
             )}
 
-            {/* Today */}
+            {/* Today - exclude items we're showing in "New" via sessionNewIds */}
             {buckets.today.length > 0 && (
               <ActivityBucket
                 label="Today"
-                items={buckets.today.filter(i => !i.is_unread)} // Exclude unread (already in New)
+                items={buckets.today.filter(i => 
+                  !i.is_unread && (!sessionNewIds || !sessionNewIds.includes(i.id))
+                )}
                 onNotificationClick={handleNotificationClick}
                 onMarkUnread={handleMarkUnread}
                 onDelete={handleDelete}
