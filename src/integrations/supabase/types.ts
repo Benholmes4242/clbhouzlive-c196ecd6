@@ -6840,21 +6840,37 @@ export type Database = {
         Args: { p_target_user_id: string; p_test_user_id: string }
         Returns: undefined
       }
-      test_lab_insert_notification: {
-        Args: {
-          p_actor_id: string
-          p_created_at?: string
-          p_data?: Json
-          p_entity_id?: string
-          p_entity_type?: string
-          p_is_read?: boolean
-          p_message?: string
-          p_title: string
-          p_type: string
-          p_user_id: string
-        }
-        Returns: string
-      }
+      test_lab_insert_notification:
+        | {
+            Args: {
+              p_actor_id: string
+              p_created_at?: string
+              p_data?: Json
+              p_entity_id?: string
+              p_entity_type?: string
+              p_is_read?: boolean
+              p_message?: string
+              p_title: string
+              p_type: string
+              p_user_id: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              p_actor_id: string
+              p_created_at?: string
+              p_data?: Json
+              p_entity_id?: string
+              p_entity_type?: string
+              p_is_read?: boolean
+              p_message?: string
+              p_title: string
+              p_type: string
+              p_user_id: string
+            }
+            Returns: string
+          }
       test_lab_insert_notifications_batch: {
         Args: { p_notifications: Json }
         Returns: number
