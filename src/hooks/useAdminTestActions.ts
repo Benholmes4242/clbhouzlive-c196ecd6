@@ -405,7 +405,7 @@ export function useMockLikeNotification() {
         p_type: 'like',
         p_title: 'Liked your post',
         p_entity_type: 'post',
-        p_entity_id: 'mock-post-test',
+        p_entity_id: null, // No real post entity for mock
         p_is_read: false,
       });
 
@@ -444,7 +444,7 @@ export function useMockCommentNotification() {
         p_title: 'Commented on your post',
         p_message: 'Incredible shot – which club did you use?',
         p_entity_type: 'post',
-        p_entity_id: 'mock-post-test',
+        p_entity_id: null, // No real post entity for mock
         p_is_read: false,
       });
 
@@ -483,7 +483,7 @@ export function useMockMentionNotification() {
         p_title: 'Mentioned you in a post',
         p_message: 'Great round with @you yesterday!',
         p_entity_type: 'post',
-        p_entity_id: 'mock-post-test',
+        p_entity_id: null, // No real post entity for mock
         p_is_read: false,
       });
 
