@@ -34,8 +34,13 @@ export function useTestUser() {
   });
 }
 
+// ============================================
+// ADMIN RPC-BASED HOOKS (bypass RLS via SECURITY DEFINER)
+// ============================================
+
 /**
  * Hook to send a friend request FROM the test user TO the target
+ * Uses admin RPC to bypass RLS
  */
 export function useSendFriendRequestFromTestUser() {
   const queryClient = useQueryClient();
@@ -45,54 +50,31 @@ export function useSendFriendRequestFromTestUser() {
     mutationFn: async (targetUserId: string) => {
       if (!testUser) throw new Error('Test user not configured');
 
-      // Check if request already exists
-      const { data: existing } = await supabase
-        .from('user_friends')
-        .select('id, status')
-        .or(`and(user_id.eq.${testUser.id},friend_id.eq.${targetUserId}),and(user_id.eq.${targetUserId},friend_id.eq.${testUser.id})`)
-        .maybeSingle();
-
-      if (existing) {
-        if (existing.status === 'accepted') {
-          throw new Error('Already friends');
-        }
-        if (existing.status === 'pending') {
-          throw new Error('Friend request already pending');
-        }
-      }
-
-      // Create friend request
-      const { data: request, error: requestError } = await supabase
-        .from('user_friends')
-        .insert({
-          user_id: testUser.id,
-          friend_id: targetUserId,
-          status: 'pending',
-        })
-        .select()
-        .single();
+      // Use admin RPC to create friend request
+      const { data: requestId, error: requestError } = await supabase.rpc('test_lab_send_friend_request', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
       if (requestError) throw requestError;
 
-      // Create notification for target
-      const { error: notifyError } = await supabase
-        .from('notifications')
-        .insert({
-          user_id: targetUserId,
-          actor_id: testUser.id,
-          type: 'friend_request',
-          title: 'Friend request',
-          entity_type: 'friend_request',
-          entity_id: request.id,
-          is_read: false,
-          data: { request_id: request.id },
-        });
+      // Create notification for target using batch insert RPC
+      const { error: notifyError } = await supabase.rpc('test_lab_insert_notification', {
+        p_user_id: targetUserId,
+        p_actor_id: testUser.id,
+        p_type: 'friend_request',
+        p_title: 'Friend request',
+        p_entity_type: 'friend_request',
+        p_entity_id: requestId,
+        p_is_read: false,
+        p_data: { request_id: requestId },
+      });
 
       if (notifyError) {
         console.warn('Failed to create notification:', notifyError);
       }
 
-      return request;
+      return { id: requestId };
     },
     onSuccess: () => {
       toast.success(`Test user sent friend request`, {
@@ -120,44 +102,31 @@ export function useAcceptFriendRequestAsTarget() {
     mutationFn: async (targetUserId: string) => {
       if (!testUser) throw new Error('Test user not configured');
 
-      // Find pending request from test user to target
-      const { data: request, error: findError } = await supabase
-        .from('user_friends')
-        .select('id')
-        .eq('user_id', testUser.id)
-        .eq('friend_id', targetUserId)
-        .eq('status', 'pending')
-        .maybeSingle();
-
-      if (findError) throw findError;
-      if (!request) throw new Error('No pending friend request found');
-
-      // Accept the request
-      const { error: updateError } = await supabase
-        .from('user_friends')
-        .update({ status: 'accepted' })
-        .eq('id', request.id);
+      // Use admin RPC to update friend request status
+      const { error: updateError } = await supabase.rpc('test_lab_update_friend_request', {
+        p_user_id: testUser.id,
+        p_friend_id: targetUserId,
+        p_new_status: 'accepted',
+      });
 
       if (updateError) throw updateError;
 
       // Create acceptance notification for test user
-      const { error: notifyError } = await supabase
-        .from('notifications')
-        .insert({
-          user_id: testUser.id,
-          actor_id: targetUserId,
-          type: 'friend_accepted',
-          title: 'Friend request accepted',
-          entity_type: 'profile',
-          entity_id: targetUserId,
-          is_read: false,
-        });
+      const { error: notifyError } = await supabase.rpc('test_lab_insert_notification', {
+        p_user_id: testUser.id,
+        p_actor_id: targetUserId,
+        p_type: 'friend_accepted',
+        p_title: 'Friend request accepted',
+        p_entity_type: 'profile',
+        p_entity_id: targetUserId,
+        p_is_read: false,
+      });
 
       if (notifyError) {
         console.warn('Failed to create notification:', notifyError);
       }
 
-      return request;
+      return { success: true };
     },
     onSuccess: () => {
       toast.success(`Accepted friend request from test user`, {
@@ -185,27 +154,16 @@ export function useDeclineFriendRequestAsTarget() {
     mutationFn: async (targetUserId: string) => {
       if (!testUser) throw new Error('Test user not configured');
 
-      // Find pending request from test user to target
-      const { data: request, error: findError } = await supabase
-        .from('user_friends')
-        .select('id')
-        .eq('user_id', testUser.id)
-        .eq('friend_id', targetUserId)
-        .eq('status', 'pending')
-        .maybeSingle();
-
-      if (findError) throw findError;
-      if (!request) throw new Error('No pending friend request found');
-
-      // Decline the request
-      const { error: updateError } = await supabase
-        .from('user_friends')
-        .update({ status: 'declined' })
-        .eq('id', request.id);
+      // Use admin RPC to update friend request status
+      const { error: updateError } = await supabase.rpc('test_lab_update_friend_request', {
+        p_user_id: testUser.id,
+        p_friend_id: targetUserId,
+        p_new_status: 'declined',
+      });
 
       if (updateError) throw updateError;
 
-      return request;
+      return { success: true };
     },
     onSuccess: () => {
       toast.success(`Declined friend request from test user`, {
@@ -233,35 +191,22 @@ export function useCancelFriendRequestFromTestUser() {
     mutationFn: async (targetUserId: string) => {
       if (!testUser) throw new Error('Test user not configured');
 
-      // Find pending request from test user to target
-      const { data: request, error: findError } = await supabase
-        .from('user_friends')
-        .select('id')
-        .eq('user_id', testUser.id)
-        .eq('friend_id', targetUserId)
-        .eq('status', 'pending')
-        .maybeSingle();
-
-      if (findError) throw findError;
-      if (!request) throw new Error('No pending friend request found');
-
-      // Cancel (delete) the request
-      const { error: deleteError } = await supabase
-        .from('user_friends')
-        .delete()
-        .eq('id', request.id);
+      // Use admin RPC to remove the friend request
+      const { error: deleteError } = await supabase.rpc('test_lab_update_friend_request', {
+        p_user_id: testUser.id,
+        p_friend_id: targetUserId,
+        p_new_status: 'removed',
+      });
 
       if (deleteError) throw deleteError;
 
-      // Remove notification for target
-      await supabase
-        .from('notifications')
-        .delete()
-        .eq('user_id', targetUserId)
-        .eq('actor_id', testUser.id)
-        .eq('type', 'friend_request');
+      // Clear notifications between them
+      await supabase.rpc('test_lab_clear_notifications', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
-      return request;
+      return { success: true };
     },
     onSuccess: () => {
       toast.success(`Cancelled friend request from test user`, {
@@ -289,33 +234,24 @@ export function useFollowTargetFromTestUser() {
     mutationFn: async (targetUserId: string) => {
       if (!testUser) throw new Error('Test user not configured');
 
-      // Create follow relationship
-      const { error: followError } = await supabase
-        .from('user_follows')
-        .insert({
-          follower_id: testUser.id,
-          following_id: targetUserId,
-        });
+      // Use admin RPC to create follow relationship
+      const { error: followError } = await supabase.rpc('test_lab_follow', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
-      if (followError) {
-        if (followError.code === '23505') {
-          throw new Error('Test user already follows this user');
-        }
-        throw followError;
-      }
+      if (followError) throw followError;
 
       // Create notification for target
-      const { error: notifyError } = await supabase
-        .from('notifications')
-        .insert({
-          user_id: targetUserId,
-          actor_id: testUser.id,
-          type: 'follow',
-          title: 'New follower',
-          entity_type: 'profile',
-          entity_id: testUser.id,
-          is_read: false,
-        });
+      const { error: notifyError } = await supabase.rpc('test_lab_insert_notification', {
+        p_user_id: targetUserId,
+        p_actor_id: testUser.id,
+        p_type: 'follow',
+        p_title: 'New follower',
+        p_entity_type: 'profile',
+        p_entity_id: testUser.id,
+        p_is_read: false,
+      });
 
       if (notifyError) {
         console.warn('Failed to create notification:', notifyError);
@@ -339,6 +275,7 @@ export function useFollowTargetFromTestUser() {
 
 /**
  * Hook to make target follow the test user
+ * This uses the user's own auth, so no RPC needed
  */
 export function useFollowTestUserFromTarget() {
   const queryClient = useQueryClient();
@@ -348,7 +285,7 @@ export function useFollowTestUserFromTarget() {
     mutationFn: async (targetUserId: string) => {
       if (!testUser) throw new Error('Test user not configured');
 
-      // Create follow relationship
+      // This direction (target → test user) works with normal RLS since target = auth.uid()
       const { error: followError } = await supabase
         .from('user_follows')
         .insert({
@@ -390,18 +327,13 @@ export function useUnfollowBoth() {
     mutationFn: async (targetUserId: string) => {
       if (!testUser) throw new Error('Test user not configured');
 
-      // Remove both follow directions
-      await supabase
-        .from('user_follows')
-        .delete()
-        .eq('follower_id', testUser.id)
-        .eq('following_id', targetUserId);
+      // Use admin RPC to unfollow in both directions
+      const { error } = await supabase.rpc('test_lab_unfollow', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
-      await supabase
-        .from('user_follows')
-        .delete()
-        .eq('follower_id', targetUserId)
-        .eq('following_id', testUser.id);
+      if (error) throw error;
 
       return { success: true };
     },
@@ -430,11 +362,14 @@ export function useRemoveFriendship() {
     mutationFn: async (targetUserId: string) => {
       if (!testUser) throw new Error('Test user not configured');
 
-      // Remove friendship in both directions
-      await supabase
-        .from('user_friends')
-        .delete()
-        .or(`and(user_id.eq.${testUser.id},friend_id.eq.${targetUserId}),and(user_id.eq.${targetUserId},friend_id.eq.${testUser.id})`);
+      // Use admin RPC to remove friendship
+      const { error } = await supabase.rpc('test_lab_update_friend_request', {
+        p_user_id: testUser.id,
+        p_friend_id: targetUserId,
+        p_new_status: 'removed',
+      });
+
+      if (error) throw error;
 
       return { success: true };
     },
@@ -464,17 +399,15 @@ export function useMockLikeNotification() {
     mutationFn: async (targetUserId: string) => {
       if (!testUser) throw new Error('Test user not configured');
 
-      const { error } = await supabase
-        .from('notifications')
-        .insert({
-          user_id: targetUserId,
-          actor_id: testUser.id,
-          type: 'like',
-          title: 'Liked your post',
-          entity_type: 'post',
-          entity_id: 'mock-post-test',
-          is_read: false,
-        });
+      const { error } = await supabase.rpc('test_lab_insert_notification', {
+        p_user_id: targetUserId,
+        p_actor_id: testUser.id,
+        p_type: 'like',
+        p_title: 'Liked your post',
+        p_entity_type: 'post',
+        p_entity_id: 'mock-post-test',
+        p_is_read: false,
+      });
 
       if (error) throw error;
       return { success: true };
@@ -504,18 +437,16 @@ export function useMockCommentNotification() {
     mutationFn: async (targetUserId: string) => {
       if (!testUser) throw new Error('Test user not configured');
 
-      const { error } = await supabase
-        .from('notifications')
-        .insert({
-          user_id: targetUserId,
-          actor_id: testUser.id,
-          type: 'comment',
-          title: 'Commented on your post',
-          message: 'Incredible shot – which club did you use?',
-          entity_type: 'post',
-          entity_id: 'mock-post-test',
-          is_read: false,
-        });
+      const { error } = await supabase.rpc('test_lab_insert_notification', {
+        p_user_id: targetUserId,
+        p_actor_id: testUser.id,
+        p_type: 'comment',
+        p_title: 'Commented on your post',
+        p_message: 'Incredible shot – which club did you use?',
+        p_entity_type: 'post',
+        p_entity_id: 'mock-post-test',
+        p_is_read: false,
+      });
 
       if (error) throw error;
       return { success: true };
@@ -545,18 +476,16 @@ export function useMockMentionNotification() {
     mutationFn: async (targetUserId: string) => {
       if (!testUser) throw new Error('Test user not configured');
 
-      const { error } = await supabase
-        .from('notifications')
-        .insert({
-          user_id: targetUserId,
-          actor_id: testUser.id,
-          type: 'mention',
-          title: 'Mentioned you in a post',
-          message: 'Great round with @you yesterday!',
-          entity_type: 'post',
-          entity_id: 'mock-post-test',
-          is_read: false,
-        });
+      const { error } = await supabase.rpc('test_lab_insert_notification', {
+        p_user_id: targetUserId,
+        p_actor_id: testUser.id,
+        p_type: 'mention',
+        p_title: 'Mentioned you in a post',
+        p_message: 'Great round with @you yesterday!',
+        p_entity_type: 'post',
+        p_entity_id: 'mock-post-test',
+        p_is_read: false,
+      });
 
       if (error) throw error;
       return { success: true };
@@ -586,11 +515,10 @@ export function useClearTestNotifications() {
     mutationFn: async (targetUserId: string) => {
       if (!testUser) throw new Error('Test user not configured');
 
-      const { error } = await supabase
-        .from('notifications')
-        .delete()
-        .eq('user_id', targetUserId)
-        .eq('actor_id', testUser.id);
+      const { error } = await supabase.rpc('test_lab_clear_notifications', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
       if (error) throw error;
       return { success: true };
@@ -626,59 +554,51 @@ export function useFriendRequestHandshake() {
       if (!testUser) throw new Error('Test user not configured');
 
       // Step 1: Clear any existing friendship/requests between them
-      await supabase
-        .from('user_friends')
-        .delete()
-        .or(`and(user_id.eq.${testUser.id},friend_id.eq.${targetUserId}),and(user_id.eq.${targetUserId},friend_id.eq.${testUser.id})`);
+      await supabase.rpc('test_lab_clear_relationships', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
       // Step 2: Test User sends friend request to target
-      const { data: request, error: requestError } = await supabase
-        .from('user_friends')
-        .insert({
-          user_id: testUser.id,
-          friend_id: targetUserId,
-          status: 'pending',
-        })
-        .select()
-        .single();
+      const { data: requestId, error: requestError } = await supabase.rpc('test_lab_send_friend_request', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
       if (requestError) throw requestError;
 
       // Step 3: Create notification for target (friend request received)
-      await supabase
-        .from('notifications')
-        .insert({
-          user_id: targetUserId,
-          actor_id: testUser.id,
-          type: 'friend_request',
-          title: 'Friend request',
-          entity_type: 'friend_request',
-          entity_id: request.id,
-          is_read: false,
-          data: { request_id: request.id },
-        });
+      await supabase.rpc('test_lab_insert_notification', {
+        p_user_id: targetUserId,
+        p_actor_id: testUser.id,
+        p_type: 'friend_request',
+        p_title: 'Friend request',
+        p_entity_type: 'friend_request',
+        p_entity_id: requestId,
+        p_is_read: false,
+        p_data: { request_id: requestId },
+      });
 
       // Small delay to make the flow feel more realistic
       await new Promise(r => setTimeout(r, 500));
 
       // Step 4: Target accepts the request
-      await supabase
-        .from('user_friends')
-        .update({ status: 'accepted' })
-        .eq('id', request.id);
+      await supabase.rpc('test_lab_update_friend_request', {
+        p_user_id: testUser.id,
+        p_friend_id: targetUserId,
+        p_new_status: 'accepted',
+      });
 
       // Step 5: Create acceptance notification for test user
-      await supabase
-        .from('notifications')
-        .insert({
-          user_id: testUser.id,
-          actor_id: targetUserId,
-          type: 'friend_accepted',
-          title: 'Friend request accepted',
-          entity_type: 'profile',
-          entity_id: targetUserId,
-          is_read: false,
-        });
+      await supabase.rpc('test_lab_insert_notification', {
+        p_user_id: testUser.id,
+        p_actor_id: targetUserId,
+        p_type: 'friend_accepted',
+        p_title: 'Friend request accepted',
+        p_entity_type: 'profile',
+        p_entity_id: targetUserId,
+        p_is_read: false,
+      });
 
       return { success: true };
     },
@@ -711,11 +631,10 @@ export function useBusyDayActivity() {
       if (!testUser) throw new Error('Test user not configured');
 
       // Clear existing test notifications first
-      await supabase
-        .from('notifications')
-        .delete()
-        .eq('user_id', targetUserId)
-        .eq('actor_id', testUser.id);
+      await supabase.rpc('test_lab_clear_notifications', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
       const notifications = [];
       const now = new Date();
@@ -745,13 +664,6 @@ export function useBusyDayActivity() {
       });
 
       // Likes (varied timestamps)
-      const likeMessages = [
-        'Loved your swing video!',
-        'Great course shot!',
-        'Amazing round!',
-        'Beautiful scenery',
-        'Perfect form!',
-      ];
       for (let i = 0; i < 5; i++) {
         notifications.push({
           user_id: targetUserId,
@@ -826,22 +738,20 @@ export function useBusyDayActivity() {
         });
       }
 
-      // Insert all notifications
-      const { error } = await supabase
-        .from('notifications')
-        .insert(notifications);
+      // Batch insert all notifications using admin RPC
+      const { data: count, error } = await supabase.rpc('test_lab_insert_notifications_batch', {
+        p_notifications: notifications,
+      });
 
       if (error) throw error;
 
       // Also create follow relationship
-      await supabase
-        .from('user_follows')
-        .upsert({
-          follower_id: testUser.id,
-          following_id: targetUserId,
-        }, { onConflict: 'follower_id,following_id' });
+      await supabase.rpc('test_lab_follow', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
-      return { success: true, count: notifications.length };
+      return { success: true, count: count || notifications.length };
     },
     onSuccess: (data) => {
       toast.success(`Created ${data?.count || 20}+ notifications`, {
@@ -869,49 +779,38 @@ export function useFollowSwapScenario() {
     mutationFn: async (targetUserId: string) => {
       if (!testUser) throw new Error('Test user not configured');
 
-      // Clear existing follows
-      await supabase
-        .from('user_follows')
-        .delete()
-        .eq('follower_id', testUser.id)
-        .eq('following_id', targetUserId);
-
-      await supabase
-        .from('user_follows')
-        .delete()
-        .eq('follower_id', targetUserId)
-        .eq('following_id', testUser.id);
+      // Clear existing follows using admin RPC
+      await supabase.rpc('test_lab_unfollow', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
       // Test User → Target
-      await supabase
-        .from('user_follows')
-        .insert({
-          follower_id: testUser.id,
-          following_id: targetUserId,
-        });
+      await supabase.rpc('test_lab_follow', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
       // Create follow notification
-      await supabase
-        .from('notifications')
-        .insert({
-          user_id: targetUserId,
-          actor_id: testUser.id,
-          type: 'follow',
-          title: 'New follower',
-          entity_type: 'profile',
-          entity_id: testUser.id,
-          is_read: false,
-        });
+      await supabase.rpc('test_lab_insert_notification', {
+        p_user_id: targetUserId,
+        p_actor_id: testUser.id,
+        p_type: 'follow',
+        p_title: 'New follower',
+        p_entity_type: 'profile',
+        p_entity_id: testUser.id,
+        p_is_read: false,
+      });
 
       await new Promise(r => setTimeout(r, 300));
 
-      // Target → Test User (follow back)
+      // Target → Test User (this uses normal auth since target = auth.uid())
       await supabase
         .from('user_follows')
-        .insert({
+        .upsert({
           follower_id: targetUserId,
           following_id: testUser.id,
-        });
+        }, { onConflict: 'follower_id,following_id' });
 
       return { success: true };
     },
@@ -942,38 +841,17 @@ export function useResetTestState() {
     mutationFn: async (targetUserId: string) => {
       if (!testUser) throw new Error('Test user not configured');
 
-      // Clear friendships/requests
-      await supabase
-        .from('user_friends')
-        .delete()
-        .or(`and(user_id.eq.${testUser.id},friend_id.eq.${targetUserId}),and(user_id.eq.${targetUserId},friend_id.eq.${testUser.id})`);
+      // Clear relationships using admin RPC
+      await supabase.rpc('test_lab_clear_relationships', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
-      // Clear follows both directions
-      await supabase
-        .from('user_follows')
-        .delete()
-        .eq('follower_id', testUser.id)
-        .eq('following_id', targetUserId);
-
-      await supabase
-        .from('user_follows')
-        .delete()
-        .eq('follower_id', targetUserId)
-        .eq('following_id', testUser.id);
-
-      // Clear notifications from test user to target
-      await supabase
-        .from('notifications')
-        .delete()
-        .eq('user_id', targetUserId)
-        .eq('actor_id', testUser.id);
-
-      // Clear notifications from target to test user
-      await supabase
-        .from('notifications')
-        .delete()
-        .eq('user_id', testUser.id)
-        .eq('actor_id', targetUserId);
+      // Clear notifications using admin RPC
+      await supabase.rpc('test_lab_clear_notifications', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
       return { success: true };
     },
@@ -1012,32 +890,23 @@ export function useNewUserOnboardingWeek() {
       const now = new Date();
 
       // Clear existing test data first
-      await supabase
-        .from('notifications')
-        .delete()
-        .eq('user_id', targetUserId)
-        .eq('actor_id', testUser.id);
+      await supabase.rpc('test_lab_clear_notifications', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
-      await supabase
-        .from('user_friends')
-        .delete()
-        .or(`and(user_id.eq.${testUser.id},friend_id.eq.${targetUserId}),and(user_id.eq.${targetUserId},friend_id.eq.${testUser.id})`);
-
-      await supabase
-        .from('user_follows')
-        .delete()
-        .eq('follower_id', testUser.id)
-        .eq('following_id', targetUserId);
+      await supabase.rpc('test_lab_clear_relationships', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
       const notifications = [];
 
       // Day 1 - Welcome follow (5 days ago)
-      await supabase
-        .from('user_follows')
-        .insert({
-          follower_id: testUser.id,
-          following_id: targetUserId,
-        });
+      await supabase.rpc('test_lab_follow', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
       notifications.push({
         user_id: targetUserId,
@@ -1075,26 +944,21 @@ export function useNewUserOnboardingWeek() {
       });
 
       // Day 3 - Friend request (3 days ago)
-      const { data: friendRequest } = await supabase
-        .from('user_friends')
-        .insert({
-          user_id: testUser.id,
-          friend_id: targetUserId,
-          status: 'pending',
-        })
-        .select()
-        .single();
+      const { data: friendRequestId } = await supabase.rpc('test_lab_send_friend_request', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
-      if (friendRequest) {
+      if (friendRequestId) {
         notifications.push({
           user_id: targetUserId,
           actor_id: testUser.id,
           type: 'friend_request',
           title: 'Friend request',
           entity_type: 'friend_request',
-          entity_id: friendRequest.id,
+          entity_id: friendRequestId,
           is_read: false,
-          data: { request_id: friendRequest.id },
+          data: { request_id: friendRequestId },
           created_at: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(),
         });
       }
@@ -1124,8 +988,10 @@ export function useNewUserOnboardingWeek() {
         created_at: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000).toISOString(),
       });
 
-      // Insert all notifications
-      await supabase.from('notifications').insert(notifications);
+      // Batch insert all notifications
+      await supabase.rpc('test_lab_insert_notifications_batch', {
+        p_notifications: notifications,
+      });
 
       return { success: true, count: notifications.length };
     },
@@ -1160,21 +1026,18 @@ export function useHighEngagementCreatorDay() {
       const now = new Date();
 
       // Clear existing test notifications
-      await supabase
-        .from('notifications')
-        .delete()
-        .eq('user_id', targetUserId)
-        .eq('actor_id', testUser.id);
+      await supabase.rpc('test_lab_clear_notifications', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
       const notifications = [];
 
       // Follow from Test User (start of day)
-      await supabase
-        .from('user_follows')
-        .upsert({
-          follower_id: testUser.id,
-          following_id: targetUserId,
-        }, { onConflict: 'follower_id,following_id' });
+      await supabase.rpc('test_lab_follow', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
       notifications.push({
         user_id: targetUserId,
@@ -1245,37 +1108,40 @@ export function useHighEngagementCreatorDay() {
       }
 
       // Recent friend request
-      await supabase
-        .from('user_friends')
-        .delete()
-        .or(`and(user_id.eq.${testUser.id},friend_id.eq.${targetUserId}),and(user_id.eq.${targetUserId},friend_id.eq.${testUser.id})`);
+      await supabase.rpc('test_lab_clear_relationships', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
-      const { data: friendRequest } = await supabase
-        .from('user_friends')
-        .insert({
-          user_id: testUser.id,
-          friend_id: targetUserId,
-          status: 'pending',
-        })
-        .select()
-        .single();
+      // Re-add the follow
+      await supabase.rpc('test_lab_follow', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
-      if (friendRequest) {
+      const { data: friendRequestId } = await supabase.rpc('test_lab_send_friend_request', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
+
+      if (friendRequestId) {
         notifications.push({
           user_id: targetUserId,
           actor_id: testUser.id,
           type: 'friend_request',
           title: 'Friend request',
           entity_type: 'friend_request',
-          entity_id: friendRequest.id,
+          entity_id: friendRequestId,
           is_read: false,
-          data: { request_id: friendRequest.id },
+          data: { request_id: friendRequestId },
           created_at: new Date(now.getTime() - 30 * 60 * 1000).toISOString(), // 30 min ago
         });
       }
 
-      // Insert all notifications
-      await supabase.from('notifications').insert(notifications);
+      // Batch insert all notifications
+      await supabase.rpc('test_lab_insert_notifications_batch', {
+        p_notifications: notifications,
+      });
 
       return { success: true, count: notifications.length };
     },
@@ -1310,11 +1176,10 @@ export function useQuietDayThenSpike() {
       const now = new Date();
 
       // Clear existing test notifications
-      await supabase
-        .from('notifications')
-        .delete()
-        .eq('user_id', targetUserId)
-        .eq('actor_id', testUser.id);
+      await supabase.rpc('test_lab_clear_notifications', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
       const notifications = [];
 
@@ -1333,12 +1198,10 @@ export function useQuietDayThenSpike() {
       // SPIKE - Multiple notifications in the last 30 minutes
       
       // Follow
-      await supabase
-        .from('user_follows')
-        .upsert({
-          follower_id: testUser.id,
-          following_id: targetUserId,
-        }, { onConflict: 'follower_id,following_id' });
+      await supabase.rpc('test_lab_follow', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
       notifications.push({
         user_id: targetUserId,
@@ -1352,31 +1215,32 @@ export function useQuietDayThenSpike() {
       });
 
       // Friend request
-      await supabase
-        .from('user_friends')
-        .delete()
-        .or(`and(user_id.eq.${testUser.id},friend_id.eq.${targetUserId}),and(user_id.eq.${targetUserId},friend_id.eq.${testUser.id})`);
+      await supabase.rpc('test_lab_clear_relationships', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
-      const { data: friendRequest } = await supabase
-        .from('user_friends')
-        .insert({
-          user_id: testUser.id,
-          friend_id: targetUserId,
-          status: 'pending',
-        })
-        .select()
-        .single();
+      // Re-add the follow
+      await supabase.rpc('test_lab_follow', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
-      if (friendRequest) {
+      const { data: friendRequestId } = await supabase.rpc('test_lab_send_friend_request', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
+
+      if (friendRequestId) {
         notifications.push({
           user_id: targetUserId,
           actor_id: testUser.id,
           type: 'friend_request',
           title: 'Friend request',
           entity_type: 'friend_request',
-          entity_id: friendRequest.id,
+          entity_id: friendRequestId,
           is_read: false,
-          data: { request_id: friendRequest.id },
+          data: { request_id: friendRequestId },
           created_at: new Date(now.getTime() - 20 * 60 * 1000).toISOString(), // 20 min ago
         });
       }
@@ -1421,8 +1285,10 @@ export function useQuietDayThenSpike() {
         created_at: new Date(now.getTime() - 2 * 60 * 1000).toISOString(), // 2 min ago
       });
 
-      // Insert all notifications
-      await supabase.from('notifications').insert(notifications);
+      // Batch insert all notifications
+      await supabase.rpc('test_lab_insert_notifications_batch', {
+        p_notifications: notifications,
+      });
 
       return { success: true, count: notifications.length };
     },
@@ -1461,11 +1327,10 @@ export function useClubsOnlyDay() {
       const now = new Date();
 
       // Clear existing test notifications
-      await supabase
-        .from('notifications')
-        .delete()
-        .eq('user_id', targetUserId)
-        .eq('actor_id', testUser.id);
+      await supabase.rpc('test_lab_clear_notifications', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
       const notifications = [];
 
@@ -1491,7 +1356,9 @@ export function useClubsOnlyDay() {
         });
       }
 
-      await supabase.from('notifications').insert(notifications);
+      await supabase.rpc('test_lab_insert_notifications_batch', {
+        p_notifications: notifications,
+      });
 
       return { success: true, count: notifications.length };
     },
@@ -1525,11 +1392,10 @@ export function useMessagesHeavyDay() {
       const now = new Date();
 
       // Clear existing test notifications
-      await supabase
-        .from('notifications')
-        .delete()
-        .eq('user_id', targetUserId)
-        .eq('actor_id', testUser.id);
+      await supabase.rpc('test_lab_clear_notifications', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
       const notifications = [];
 
@@ -1564,7 +1430,9 @@ export function useMessagesHeavyDay() {
         });
       }
 
-      await supabase.from('notifications').insert(notifications);
+      await supabase.rpc('test_lab_insert_notifications_batch', {
+        p_notifications: notifications,
+      });
 
       return { success: true, count: notifications.length };
     },
@@ -1598,11 +1466,10 @@ export function useMentionsAndTagsDay() {
       const now = new Date();
 
       // Clear existing test notifications
-      await supabase
-        .from('notifications')
-        .delete()
-        .eq('user_id', targetUserId)
-        .eq('actor_id', testUser.id);
+      await supabase.rpc('test_lab_clear_notifications', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
       const notifications = [];
 
@@ -1637,7 +1504,9 @@ export function useMentionsAndTagsDay() {
         });
       }
 
-      await supabase.from('notifications').insert(notifications);
+      await supabase.rpc('test_lab_insert_notifications_batch', {
+        p_notifications: notifications,
+      });
 
       return { success: true, count: notifications.length };
     },
@@ -1671,11 +1540,10 @@ export function useAchievementsBurst() {
       const now = new Date();
 
       // Clear existing test notifications
-      await supabase
-        .from('notifications')
-        .delete()
-        .eq('user_id', targetUserId)
-        .eq('actor_id', testUser.id);
+      await supabase.rpc('test_lab_clear_notifications', {
+        p_test_user_id: testUser.id,
+        p_target_user_id: targetUserId,
+      });
 
       const notifications = [];
 
@@ -1707,7 +1575,9 @@ export function useAchievementsBurst() {
         });
       }
 
-      await supabase.from('notifications').insert(notifications);
+      await supabase.rpc('test_lab_insert_notifications_batch', {
+        p_notifications: notifications,
+      });
 
       return { success: true, count: notifications.length };
     },
