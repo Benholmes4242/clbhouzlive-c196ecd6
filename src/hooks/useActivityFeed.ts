@@ -65,7 +65,7 @@ export type ActorType = 'user' | 'club' | 'course' | 'system';
 // Target types
 export type TargetType = 'post' | 'comment' | 'message' | 'profile' | 'club' | 'course' | 'achievement';
 
-import { NotificationTone, getNotificationTone } from '@/lib/notificationTone';
+
 
 export interface ActivityNotification {
   id: string;
@@ -96,8 +96,6 @@ export interface ActivityNotification {
   is_message: boolean;
   is_mock: boolean;
   
-  // Visual tone for cinematic overlays
-  tone: NotificationTone;
   
   // Computed display fields
   context_url: string;
@@ -401,7 +399,7 @@ async function generateMockActivityWithRealUsers(currentUserId: string, followin
       is_club_or_course: CLUB_COURSE_TYPES.has(template.type),
       is_message: MESSAGE_TYPES.has(template.type),
       is_mock: true,
-      tone: getNotificationTone(template.type),
+      
       
       context_url: getContextUrl({ ...template, actor_id: user.id }),
       context_label: getContextLabel(template),
@@ -560,7 +558,7 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
               actorType === 'club' || actorType === 'course',
             is_message: MESSAGE_TYPES.has(n.type),
             is_mock: false,
-            tone: getNotificationTone(n.type),
+            
             
             context_url: getContextUrl(n),
             context_label: getContextLabel(n),
