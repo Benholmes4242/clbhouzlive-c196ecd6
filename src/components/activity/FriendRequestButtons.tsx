@@ -6,22 +6,29 @@ import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface FriendRequestButtonsProps {
-  requestId: string;
-  requesterId: string;
+  notificationId: string;   // notifications.id for updating is_read + data.status
+  requestId: string;        // user_friends.id
+  requesterId: string;      // user who sent the request
   requesterName: string;
+  initialStatus?: 'pending' | 'accepted' | 'declined';
   isMock?: boolean;
 }
 
 type RequestState = 'pending' | 'accepted' | 'declined' | 'loading';
 
 export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
+  notificationId,
   requestId,
   requesterId,
   requesterName,
+  initialStatus = 'pending',
   isMock = false,
 }) => {
-  const [state, setState] = useState<RequestState>('pending');
+  const [state, setState] = useState<RequestState>(initialStatus);
   const queryClient = useQueryClient();
+
+  // Shared base pill class for unified styling - SDS corners, 30% shorter height
+  const basePillClass = "inline-flex items-center justify-center rounded-sq-xs border px-3 h-6 text-[11px] font-semibold transition-colors";
 
   const handleAccept = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -42,32 +49,52 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Update the friend request status to accepted
-      const { error } = await supabase
+      // 1) Update user_friends.status -> 'accepted'
+      const { error: friendError } = await supabase
         .from('user_friends')
         .update({ status: 'accepted' })
         .eq('id', requestId);
 
-      if (error) throw error;
+      if (friendError) throw friendError;
 
-      // Create "friend_accepted" notification for the original requester
-      // so they see "X accepted your friend request" in their Activity feed
+      // 2) Create friend_accepted notification for the requester
       const { error: notifyError } = await supabase
         .from('notifications')
         .insert({
-          user_id: requesterId, // The person who sent the request (they receive this notification)
-          actor_id: user.id, // The person who accepted (current user)
+          user_id: requesterId,
+          actor_id: user.id,
           type: 'friend_accepted',
           title: 'Friend request accepted',
           message: null,
           entity_type: 'profile',
           entity_id: user.id,
           is_read: false,
+          data: {
+            request_id: requestId,
+            requester_id: requesterId,
+          },
         });
 
       if (notifyError) {
         console.warn('Failed to create friend_accepted notification:', notifyError);
-        // Don't throw - the main action succeeded
+      }
+
+      // 3) Update the original friend_request notification: is_read = true, data.status = 'accepted'
+      const { error: updateNotifError } = await supabase
+        .from('notifications')
+        .update({
+          is_read: true,
+          updated_at: new Date().toISOString(),
+          data: {
+            status: 'accepted',
+            request_id: requestId,
+            requester_id: requesterId,
+          },
+        })
+        .eq('id', notificationId);
+
+      if (updateNotifError) {
+        console.warn('Failed to update notification status:', updateNotifError);
       }
 
       setState('accepted');
@@ -78,6 +105,7 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
       
       // Invalidate queries
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
       queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
       queryClient.invalidateQueries({ queryKey: ['relationship-status', requesterId] });
     } catch (error) {
@@ -105,13 +133,31 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
     setState('loading');
     
     try {
-      // Update the friend request status to declined
-      const { error } = await supabase
+      // 1) Update user_friends.status -> 'declined'
+      const { error: friendError } = await supabase
         .from('user_friends')
         .update({ status: 'declined' })
         .eq('id', requestId);
 
-      if (error) throw error;
+      if (friendError) throw friendError;
+
+      // 2) Update the notification: is_read = true, data.status = 'declined'
+      const { error: updateNotifError } = await supabase
+        .from('notifications')
+        .update({
+          is_read: true,
+          updated_at: new Date().toISOString(),
+          data: {
+            status: 'declined',
+            request_id: requestId,
+            requester_id: requesterId,
+          },
+        })
+        .eq('id', notificationId);
+
+      if (updateNotifError) {
+        console.warn('Failed to update notification status:', updateNotifError);
+      }
 
       setState('declined');
       toast.info('Friend request declined', {
@@ -121,6 +167,7 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
       
       // Invalidate queries
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
       queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
       queryClient.invalidateQueries({ queryKey: ['relationship-status', requesterId] });
     } catch (error) {
@@ -132,9 +179,6 @@ export const FriendRequestButtons: React.FC<FriendRequestButtonsProps> = ({
       });
     }
   };
-
-  // Shared base pill class for unified styling - SDS corners, 30% shorter height
-  const basePillClass = "inline-flex items-center justify-center rounded-sq-xs border px-3 h-6 text-[11px] font-semibold transition-colors";
   
   // Already handled states - show as pills with unified styling
   if (state === 'accepted') {
