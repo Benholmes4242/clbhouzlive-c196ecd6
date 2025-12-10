@@ -23,7 +23,7 @@ const ActivityPage: React.FC = () => {
   
   // Pass chip filter to hook (only applies when on 'all' tab)
   const effectiveChipFilter = activeTab === 'all' ? activeChipFilter : null;
-  const { data, isLoading, isFetching, error } = useActivityFeed(activeTab, effectiveChipFilter);
+  const { data, isLoading, isFetching, isFetched, error } = useActivityFeed(activeTab, effectiveChipFilter);
   
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
@@ -192,16 +192,17 @@ const ActivityPage: React.FC = () => {
   // Use session-based new items if available, otherwise fall back to buckets
   const effectiveNewItems = sessionNewItems ?? buckets?.new ?? [];
   
-  const isEmpty = !buckets || (
-    effectiveNewItems.length === 0 &&
-    buckets.today.length === 0 && 
-    buckets.yesterday.length === 0 && 
-    buckets.thisWeek.length === 0 && 
-    buckets.earlier.length === 0
-  );
+  const allItems = data?.allItems ?? [];
+  const hasNotifications = allItems.length > 0;
+  
+  // Show skeleton until query has actually fetched (prevents empty-state flash)
+  const showSkeleton = !isFetched;
+  
+  // Only show empty state when we KNOW there are no items (query finished + no data)
+  const showEmptyState = isFetched && !hasNotifications && !isFetching;
 
   // Check if there are no new/unread items (for showing "caught up" banner, NOT for hiding history)
-  const isAllCaughtUp = !isEmpty && effectiveNewItems.length === 0;
+  const isAllCaughtUp = hasNotifications && effectiveNewItems.length === 0;
 
   return (
     <PageRoot className="bg-[#f5f5f7] pb-24">
@@ -251,8 +252,8 @@ const ActivityPage: React.FC = () => {
 
       {/* Notifications list - full width, no padding */}
       <div className="w-full">
-        {/* Show skeleton during initial load OR when fetching with no cached data */}
-        {(isLoading || (isFetching && !data)) ? (
+        {/* Show skeleton until query has fetched */}
+        {showSkeleton ? (
           <div className="max-w-[640px] mx-auto px-4 sm:px-5">
             <ActivitySkeleton />
           </div>
@@ -260,7 +261,7 @@ const ActivityPage: React.FC = () => {
           <div className="text-left py-12 text-muted-foreground max-w-[640px] mx-auto px-4 sm:px-5">
             <p>Failed to load activity</p>
           </div>
-        ) : isEmpty ? (
+        ) : showEmptyState ? (
           <div className="max-w-[640px] mx-auto px-4 sm:px-5">
             <ActivityEmptyState tab={activeTab} />
           </div>
