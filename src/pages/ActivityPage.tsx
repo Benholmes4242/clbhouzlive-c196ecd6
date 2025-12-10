@@ -260,7 +260,7 @@ const ActivityPage: React.FC = () => {
           <div className="text-left py-12 text-muted-foreground max-w-[640px] mx-auto px-4 sm:px-5">
             <p>Failed to load activity</p>
           </div>
-        ) : isEmpty ? (
+        ) : !isLoading && !isFetching && isEmpty ? (
           <div className="max-w-[640px] mx-auto px-4 sm:px-5">
             <ActivityEmptyState tab={activeTab} />
           </div>
