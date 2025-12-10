@@ -2203,6 +2203,7 @@ export type Database = {
           entity_id: string | null
           entity_type: string | null
           id: string
+          is_deleted: boolean
           is_read: boolean
           message: string | null
           read: boolean
@@ -2218,6 +2219,7 @@ export type Database = {
           entity_id?: string | null
           entity_type?: string | null
           id?: string
+          is_deleted?: boolean
           is_read?: boolean
           message?: string | null
           read?: boolean
@@ -2233,6 +2235,7 @@ export type Database = {
           entity_id?: string | null
           entity_type?: string | null
           id?: string
+          is_deleted?: boolean
           is_read?: boolean
           message?: string | null
           read?: boolean
