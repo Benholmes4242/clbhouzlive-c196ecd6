@@ -242,7 +242,7 @@ const HeaderNavigation = () => {
             Business Directory
           </DropdownMenuItem>
           {isPersonalProfile && (
-            <DropdownMenuItem onClick={() => navigate('/settings?tab=profile&action=switch-to-business')}>
+            <DropdownMenuItem onClick={() => navigate('/profile?edit=business')}>
               <Building2 className="h-4 w-4 mr-2" />
               Create Business Profile
             </DropdownMenuItem>
