@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { ActivityNotificationRow } from './ActivityNotificationRow';
@@ -41,16 +42,25 @@ export const ActivityBucket: React.FC<ActivityBucketProps> = ({
 
       {/* Notification rows - full bleed */}
       <div className="divide-y divide-border/30">
-        {items.map(item => (
-          <ActivityNotificationRow
-            key={item.id}
-            notification={item}
-            onClick={() => onNotificationClick(item)}
-            onOpenActionsSheet={() => onOpenActionsSheet(item)}
-            currentUserId={currentUserId}
-            isSessionNew={sessionNewIds?.includes(item.id) ?? false}
-          />
-        ))}
+        <AnimatePresence initial={false}>
+          {items.map(item => (
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.18 }}
+            >
+              <ActivityNotificationRow
+                notification={item}
+                onClick={() => onNotificationClick(item)}
+                onOpenActionsSheet={() => onOpenActionsSheet(item)}
+                currentUserId={currentUserId}
+                isSessionNew={sessionNewIds?.includes(item.id) ?? false}
+              />
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </section>
   );
