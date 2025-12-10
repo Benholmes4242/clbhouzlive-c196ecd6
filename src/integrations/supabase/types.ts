@@ -4670,6 +4670,35 @@ export type Database = {
       }
     }
     Views: {
+      business_profile_daily_insights: {
+        Row: {
+          business_profile_id: string | null
+          click_outs: number | null
+          day: string | null
+          directory_impressions: number | null
+          mentions: number | null
+          message_clicks: number | null
+          post_engagements: number | null
+          post_views: number | null
+          profile_views: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_profile_events_business_id_fkey"
+            columns: ["business_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_profile_events_business_id_fkey"
+            columns: ["business_profile_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_rating_aggregates: {
         Row: {
           avg_clubhouse_score: number | null
@@ -5755,6 +5784,23 @@ export type Database = {
           role: Database["public"]["Enums"]["app_role"]
           username: string
         }[]
+      }
+      get_business_profile_analytics: {
+        Args: { p_business_profile_id: string; p_days?: number }
+        Returns: {
+          click_outs: number
+          day: string
+          directory_impressions: number
+          mentions: number
+          message_clicks: number
+          post_engagements: number
+          post_views: number
+          profile_views: number
+        }[]
+      }
+      get_business_profile_headline_stats: {
+        Args: { p_business_profile_id: string; p_days?: number }
+        Returns: Json
       }
       get_cloudflare_secrets: { Args: never; Returns: Json }
       get_relationship_status: {

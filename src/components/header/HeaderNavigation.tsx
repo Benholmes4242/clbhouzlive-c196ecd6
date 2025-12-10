@@ -1,6 +1,6 @@
 
 import React, { useRef } from 'react';
-import { User, Settings, Shield } from 'lucide-react';
+import { User, Settings, Shield, BarChart3 } from 'lucide-react';
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from "react-router-dom";
@@ -66,6 +66,24 @@ const HeaderNavigation = () => {
     },
     enabled: !!user?.id,
   });
+
+  // Fetch user profile type for business insights access
+  const { data: userProfile } = useQuery({
+    queryKey: ['userProfileType', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('profile_type')
+        .eq('id', user.id)
+        .single();
+      if (error) return null;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  const isBusinessProfile = userProfile?.profile_type === 'business';
 
   const handleProfileClick = () => {
     if (!user) {
@@ -227,6 +245,12 @@ const HeaderNavigation = () => {
           <DropdownMenuItem onClick={() => navigate('/settings')}>
             Settings
           </DropdownMenuItem>
+          {isBusinessProfile && (
+            <DropdownMenuItem onClick={() => navigate('/business/insights')}>
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Business Insights
+            </DropdownMenuItem>
+          )}
           {hasAdminAccess && (
             <DropdownMenuItem onClick={handleAdminClick}>
               <Shield className="h-4 w-4 mr-2" />
