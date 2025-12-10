@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Heart, MessageCircle, Share, Search, Volume2, VolumeX } from 'lucide-react';
+import { HiOutlineMenuAlt2 } from 'react-icons/hi';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -148,23 +149,25 @@ export const SocialDock: React.FC<SocialDockProps> = ({
               </div>
             </div>
 
-            {/* Right: Navigation pill */}
+            {/* Right: Menu pill */}
             <button
               type="button"
               onClick={onNavigationTap}
               className={cn(
-                'inline-flex items-center gap-1',
+                'inline-flex items-center gap-1.5',
                 'px-3 py-[6px] rounded-sq-pill',
-                'bg-white/10 hover:bg-white/16',
-                'text-[11px] font-medium tracking-wide uppercase text-white/90',
+                'bg-orange-500/20 hover:bg-orange-500/30',
+                'border border-orange-400/40',
+                'backdrop-blur-sm',
+                'text-[11px] font-medium tracking-wide uppercase text-orange-100',
                 'transition-all duration-150',
                 'active:scale-[0.97]',
                 'flex-shrink-0'
               )}
-              aria-label="Show navigation"
+              aria-label="Show menu"
             >
-              <span className="inline-block text-xs leading-none">↑</span>
-              <span>Navigation</span>
+              <HiOutlineMenuAlt2 className="w-3.5 h-3.5" />
+              <span>Menu</span>
             </button>
           </div>
 
