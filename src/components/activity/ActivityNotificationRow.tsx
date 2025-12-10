@@ -134,7 +134,7 @@ const FlatRow: React.FC<FlatRowProps> = ({
       className={cn(
         "flex items-center gap-3 px-4 py-3 transition-colors",
         isUnread 
-          ? "bg-amber-500/[0.06]" 
+          ? "bg-amber-500/[0.12]" 
           : "bg-transparent hover:bg-muted/30"
       )}
     >
