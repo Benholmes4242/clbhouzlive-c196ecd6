@@ -32,10 +32,13 @@ const AuthCallback: React.FC = () => {
           console.error('Error checking profile:', profileError);
         }
 
+        // Get account type from user metadata (set during signup)
+        const accountType = user.user_metadata?.account_type || 'personal';
+
         if (!profile) {
-          // No profile exists - redirect to profile setup
+          // No profile exists - redirect to profile setup with account type
           setStatus("Setting up your profile...");
-          navigate('/create-profile', { replace: true });
+          navigate(`/create-profile?profileType=${accountType}`, { replace: true });
         } else if (!profile.has_completed_onboarding) {
           // Profile exists but onboarding not complete
           setStatus("Completing onboarding...");

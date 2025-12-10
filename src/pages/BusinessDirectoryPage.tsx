@@ -5,11 +5,15 @@ import { getProfileDisplayName } from '@/types/profile';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Building2, MapPin, Search, CheckCircle2, ChevronLeft } from 'lucide-react';
+import { Building2, MapPin, Search, CheckCircle2, ChevronLeft, Plus } from 'lucide-react';
 import { BUSINESS_CATEGORIES } from '@/types/profile';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useProfileData } from '@/hooks/useProfileData';
 
 const BusinessDirectoryPage = () => {
   const navigate = useNavigate();
+  const { user } = useSupabaseSession();
+  const { profile: currentProfile } = useProfileData();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<string | undefined>();
   const [location, setLocation] = useState('');
@@ -24,6 +28,21 @@ const BusinessDirectoryPage = () => {
   });
 
   const { businesses = [], total = 0 } = data ?? {};
+  
+  const isBusinessProfile = currentProfile?.profile_type === 'business';
+
+  const handleCreateBusinessProfile = () => {
+    if (!user) {
+      // Not logged in - redirect to auth with business mode
+      navigate('/auth?mode=business');
+    } else if (isBusinessProfile) {
+      // Already a business - go to profile to edit
+      navigate('/profile');
+    } else {
+      // Personal user - go to profile settings to switch
+      navigate('/settings?tab=profile&action=switch-to-business');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -48,6 +67,24 @@ const BusinessDirectoryPage = () => {
       </div>
 
       <div className="mx-auto max-w-5xl px-4 py-6 space-y-6">
+        {/* CTA Banner */}
+        <div className="flex items-center justify-between p-4 rounded-sq-md bg-muted/50 border border-border">
+          <div>
+            <h2 className="font-medium text-foreground">
+              {isBusinessProfile ? 'Manage your business profile' : 'Create a business profile'}
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              {isBusinessProfile 
+                ? 'Update your business details and get discovered by golfers'
+                : 'List your golf club, academy, shop, or brand on clbhouz'}
+            </p>
+          </div>
+          <Button onClick={handleCreateBusinessProfile} className="gap-2 flex-shrink-0">
+            <Plus className="h-4 w-4" />
+            {isBusinessProfile ? 'Edit Profile' : 'Get Started'}
+          </Button>
+        </div>
+
         {/* Filters */}
         <div className="flex flex-wrap gap-3 items-center">
           <div className="relative flex-1 min-w-[200px]">

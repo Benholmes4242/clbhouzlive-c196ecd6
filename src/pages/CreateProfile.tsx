@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,8 +13,11 @@ import { PersonalFieldsForm } from '@/components/profile/PersonalFieldsForm';
 import { BusinessFieldsForm } from '@/components/profile/BusinessFieldsForm';
 
 const CreateProfile = () => {
+  const [searchParams] = useSearchParams();
+  const initialProfileType = (searchParams.get('profileType') as ProfileType) || 'personal';
+  
   const [step, setStep] = useState(1);
-  const [profileType, setProfileType] = useState<ProfileType>('personal');
+  const [profileType, setProfileType] = useState<ProfileType>(initialProfileType);
   
   // Shared fields
   const [displayName, setDisplayName] = useState('');
