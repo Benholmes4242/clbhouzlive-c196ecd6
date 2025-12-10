@@ -156,6 +156,7 @@ const VideosPage = lazy(() => import("./features/videos2/pages/VideosPage"));
 const SeasonShop = lazy(() => import("./pages/SeasonShop"));
 const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 const BusinessDirectoryPage = lazy(() => import("./pages/BusinessDirectoryPage"));
+const BusinessInsightsPage = lazy(() => import("./pages/BusinessInsightsPage"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 const CreateMomentPage = lazy(() => import("./pages/CreateMomentPage"));
@@ -228,6 +229,7 @@ function AppRoutes() {
         <Route path="/profile/:username/friends" element={<Suspense fallback={<GenericPageSkeleton />}><FriendsListPage /></Suspense>} />
         
         <Route path="/businesses" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessDirectoryPage /></Suspense>} />
+        <Route path="/business/insights" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInsightsPage /></Suspense>} />
         
         <Route path="/top100" element={<Top100Hub />} />
         <Route path="/top100/:slug" element={<Top100List />} />
