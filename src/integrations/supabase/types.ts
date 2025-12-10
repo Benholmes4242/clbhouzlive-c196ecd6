@@ -2587,6 +2587,8 @@ export type Database = {
       posts: {
         Row: {
           achievement_id: string | null
+          actor_id: string | null
+          actor_type: string | null
           content: string | null
           created_at: string
           id: string
@@ -2595,6 +2597,8 @@ export type Database = {
         }
         Insert: {
           achievement_id?: string | null
+          actor_id?: string | null
+          actor_type?: string | null
           content?: string | null
           created_at?: string
           id?: string
@@ -2603,6 +2607,8 @@ export type Database = {
         }
         Update: {
           achievement_id?: string | null
+          actor_id?: string | null
+          actor_type?: string | null
           content?: string | null
           created_at?: string
           id?: string

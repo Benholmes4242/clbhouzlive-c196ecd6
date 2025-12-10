@@ -8,6 +8,7 @@ import { updateRecentMediaFromItems } from '@/hooks/usePostSubmission/recentMedi
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
 import { useChromeState } from '@/hooks/useChromeState';
 import AccessControl from '@/components/AccessControl';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 export default function CreateMomentPage() {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ export default function CreateMomentPage() {
   const { user } = useSupabaseSession();
   const { submitPost } = useOptimisticPostSubmission();
   const { addOptimisticPost } = useOptimisticPostInsertion();
+  const { activeActor } = useActiveActor();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Get state from navigation (media items, course, etc.)
@@ -71,7 +73,7 @@ export default function CreateMomentPage() {
         await updateRecentMediaFromItems(mediaItems);
       }
 
-      // Background upload
+      // Background upload with active actor identity
       submitPost({
         user,
         content: data.caption,
@@ -80,6 +82,8 @@ export default function CreateMomentPage() {
         selectedTags: data.tags ?? [],
         courseInfo: data.selectedCourse ?? data.course,
         studioEditsByMediaId: data.studioEditsByMediaId ?? {},
+        actorType: activeActor?.type ?? 'personal',
+        actorId: activeActor?.id ?? user?.id,
         onSuccess: () => {
           console.log('Post submission successful - background upload completed');
           setIsSubmitting(false);

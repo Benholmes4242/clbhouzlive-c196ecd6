@@ -6,6 +6,7 @@ import { updateRecentMediaFromItems } from '@/hooks/usePostSubmission/recentMedi
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
 import EnhancedCreateMomentModal from '@/components/post/EnhancedCreateMomentModal.cinematic';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 interface PostSubmissionHandlerProps {
   isComposerOpen: boolean;
@@ -35,6 +36,7 @@ const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
   const { user } = useSupabaseSession();
   const { submitPost } = useOptimisticPostSubmission();
   const { addOptimisticPost } = useOptimisticPostInsertion();
+  const { activeActor } = useActiveActor();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -80,7 +82,7 @@ const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
         await updateRecentMediaFromItems(mediaItems);
       }
 
-      // Background upload
+      // Background upload with active actor identity
       submitPost({
         user,
         content: data.caption,
@@ -89,6 +91,8 @@ const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
         selectedTags: data.tags ?? [],
         courseInfo: data.selectedCourse ?? data.course,
         studioEditsByMediaId: data.studioEditsByMediaId ?? {},
+        actorType: activeActor?.type ?? 'personal',
+        actorId: activeActor?.id ?? user?.id,
         onSuccess: () => {
           console.log('Post submission successful - background upload completed');
           setIsSubmitting(false);

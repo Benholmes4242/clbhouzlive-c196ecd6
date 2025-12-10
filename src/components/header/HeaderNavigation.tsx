@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CreateBusinessProfileIntroModal } from '@/components/profile/CreateBusinessProfileIntroModal';
+import { IdentitySelector } from '@/components/identity/IdentitySelector';
 
 const HeaderNavigation = () => {
   const navigate = useNavigate();
@@ -204,6 +205,10 @@ const HeaderNavigation = () => {
 
   return (
     <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
+      {/* Identity Selector - only shown when user has multiple identities */}
+      <div className="hidden sm:block">
+        <IdentitySelector />
+      </div>
       {/* Notifications bell icon with unread badge */}
       <div className="relative">
         <Button

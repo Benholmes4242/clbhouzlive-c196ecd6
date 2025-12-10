@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMemo, useState, useEffect, useRef, useLayoutEffect, useCallback } from "react";
-import { ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play, Layers, Camera, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Globe, Lock, Sparkles, BarChart3, Play, Layers, Camera, X, Building2, User } from "lucide-react";
 import { prefersReduced } from '@/lib/ui/motion';
 import { useSnapModal, ComposerMediaItem } from "@/hooks/useSnapModal";
 import { useOptimisticPostSubmission } from "@/hooks/useOptimisticPostSubmission";
@@ -18,6 +18,8 @@ import { openMediaPicker } from "@/utils/openMediaPicker";
 import { normalizeFilesToMediaItems } from "@/lib/mediaUtils";
 import { useStudio } from "@/hooks/useStudio";
 import StudioShelf from "@/components/studio/StudioShelf";
+import { useActiveActor } from "@/context/ActiveActorContext";
+import { IdentitySelector } from "@/components/identity/IdentitySelector";
 
 const CAPTION_OVERLAP_PX = 16; // small, neat overlap
 
@@ -98,6 +100,7 @@ export default function EnhancedCreateMomentModalCinematic({
   onMediaChange
 }: Props) {
   const { setCreateMomentModalOpen } = useModalContext();
+  const { activeActor, availableActors } = useActiveActor();
   const [aiLoading, setAiLoading] = useState(false);
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
   const prefersReducedMotion = useReducedMotion();
@@ -752,6 +755,14 @@ export default function EnhancedCreateMomentModalCinematic({
                 >
                   {/* Unified Details Section - No tabs, everything visible */}
                   <div className="flex flex-col gap-3 flex-1">
+                    {/* Posting As Selector - only show when multiple identities available */}
+                    {availableActors.length > 1 && (
+                      <div className="flex items-center gap-2 pb-2 border-b border-white/10">
+                        <span className="text-xs text-white/60">Posting as:</span>
+                        <IdentitySelector compact />
+                      </div>
+                    )}
+
                     {/* Caption Section */}
                     <div className="flex flex-col">
                       <label className="block text-base font-semibold text-white mb-3">Add a caption</label>
