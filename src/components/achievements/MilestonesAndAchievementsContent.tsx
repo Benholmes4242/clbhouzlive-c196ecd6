@@ -14,6 +14,7 @@ import { getNextBadgeNudge } from '@/lib/achievements/nextBadgeNudge';
 import { DEBUG_UNLOCK_ALL_ACHIEVEMENTS, DEBUG_ACHIEVEMENTS_USER_EMAIL } from '@/utils/featureFlags';
 import { cn } from '@/lib/utils';
 import { MILESTONE_THEMES, MilestoneTier } from '@/lib/globalAchievementMilestoneSystem';
+import { AchievementsSkeleton } from '@/components/skeletons/AchievementsSkeleton';
 
 interface MilestonesAndAchievementsContentProps {
   /** Called when user clicks back. If not provided, back button is hidden. */
@@ -201,9 +202,7 @@ export const MilestonesAndAchievementsContent: React.FC<MilestonesAndAchievement
 
       <div className="flex-1 overflow-y-auto">
         {isLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-          </div>
+          <AchievementsSkeleton />
         ) : (
           <>
             {/* Nudge banner */}

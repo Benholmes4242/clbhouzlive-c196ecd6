@@ -37,6 +37,8 @@ import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { DiscoverSkeleton } from '@/components/skeletons/DiscoverSkeleton';
 
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
+import { AchievementsSkeleton } from '@/components/skeletons/AchievementsSkeleton';
+import { ActivityPageSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
 import { HubSkeleton } from '@/components/skeletons/HubSkeleton';
 import { RateCoursePageSkeleton } from '@/components/skeletons/RateCoursePageSkeleton';
 import { HubProvider } from '@/features/hub/useHub';
@@ -221,7 +223,7 @@ function AppRoutes() {
           <Route path="/challenges" element={<Suspense fallback={<GenericPageSkeleton />}><ChallengesPage /></Suspense>} />
         
         <Route path="/messages" element={<Suspense fallback={<GenericPageSkeleton />}><MessagesPage /></Suspense>} />
-        <Route path="/notificationmessages" element={<Suspense fallback={<GenericPageSkeleton />}><ActivityPageWrapped /></Suspense>} />
+        <Route path="/notificationmessages" element={<Suspense fallback={<ActivityPageSkeleton />}><ActivityPageWrapped /></Suspense>} />
         <Route path="/golferstofollow" element={<Suspense fallback={<GenericPageSkeleton />}><GolfersToFollowPage /></Suspense>} />
         <Route path="/golferssharedcourses" element={<Suspense fallback={<GenericPageSkeleton />}><GolfersSharedCoursesPage /></Suspense>} />
         <Route path="/friends" element={<Suspense fallback={<GenericPageSkeleton />}><FriendsPage /></Suspense>} />
@@ -238,8 +240,8 @@ function AppRoutes() {
         
         <Route path="/top100" element={<Top100Hub />} />
         <Route path="/top100/:slug" element={<Top100List />} />
-        <Route path="/achievementshub" element={<Suspense fallback={<GenericPageSkeleton />}><AchievementsHubPage /></Suspense>} />
-        <Route path="/achievements" element={<Suspense fallback={<GenericPageSkeleton />}><AchievementsPage /></Suspense>} />
+        <Route path="/achievementshub" element={<Suspense fallback={<AchievementsSkeleton />}><AchievementsHubPage /></Suspense>} />
+        <Route path="/achievements" element={<Suspense fallback={<AchievementsSkeleton />}><AchievementsPage /></Suspense>} />
         <Route path="/admin-setup" element={<AdminSetupPage />} />
         
         {/* Admin routes wrapped with AdminLayout */}
