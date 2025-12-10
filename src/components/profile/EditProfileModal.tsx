@@ -63,6 +63,7 @@ interface EditProfileModalProps {
   onProfileUpdate: () => void;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  forceBusinessMode?: boolean;
 }
 
 export const EditProfileModal: React.FC<EditProfileModalProps> = ({
@@ -71,6 +72,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
   onProfileUpdate,
   open: externalOpen,
   onOpenChange: externalOnOpenChange,
+  forceBusinessMode = false,
 }) => {
   const [internalOpen, setInternalOpen] = useState(false);
   const [activePreviewMode, setActivePreviewMode] = useState<'mobile' | 'desktop'>('mobile');
@@ -96,6 +98,13 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
     handleMiniCardCropChange,
     handleSave,
   } = useEditProfileForm(profile, userId, onProfileUpdate, () => setOpen(false));
+
+  // Force business mode when opening from "Create Business Profile"
+  React.useEffect(() => {
+    if (forceBusinessMode && isOpen && formData.profileType !== 'business') {
+      handleProfileTypeChange('business');
+    }
+  }, [forceBusinessMode, isOpen, formData.profileType, handleProfileTypeChange]);
 
   const handleClose = useCallback(() => {
     setOpen(false);

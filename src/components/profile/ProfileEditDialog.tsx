@@ -36,6 +36,7 @@ interface ProfileEditDialogProps {
   onProfileUpdate: () => void;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  forceBusinessMode?: boolean;
 }
 
 const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
@@ -44,6 +45,7 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
   onProfileUpdate,
   open,
   onOpenChange,
+  forceBusinessMode,
 }) => {
   return (
     <EditProfileModal
@@ -52,6 +54,7 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
       onProfileUpdate={onProfileUpdate}
       open={open}
       onOpenChange={onOpenChange}
+      forceBusinessMode={forceBusinessMode}
     />
   );
 };
