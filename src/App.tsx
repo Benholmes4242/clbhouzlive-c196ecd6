@@ -493,13 +493,13 @@ const AppInner: React.FC = () => {
                 <ToastHost>
                   <BrowserRouter>
                     <HubProvider>
-                      <ScrollToTop />
-                      <ScrollRestoration />
-                      <GlobalAudioProvider>
-                        <VideoManagerProvider>
-                          <VideoPlaybackManagerProvider>
-                            <TopTenProvider>
-                              <ActiveActorProvider>
+                      <ActiveActorProvider>
+                        <ScrollToTop />
+                        <ScrollRestoration />
+                        <GlobalAudioProvider>
+                          <VideoManagerProvider>
+                            <VideoPlaybackManagerProvider>
+                              <TopTenProvider>
                                 <ErrorBoundary>
                                   <AuthWrapper>
                                     <SeasonWrapModal />
@@ -512,14 +512,14 @@ const AppInner: React.FC = () => {
                                     </Suspense>
                                   </AuthWrapper>
                                 </ErrorBoundary>
-                              </ActiveActorProvider>
-                            </TopTenProvider>
-                          </VideoPlaybackManagerProvider>
-                        </VideoManagerProvider>
-                      </GlobalAudioProvider>
-                      <Toaster />
-                      <Sonner />
-                      <GlobalBottomNavigation />
+                              </TopTenProvider>
+                            </VideoPlaybackManagerProvider>
+                          </VideoManagerProvider>
+                        </GlobalAudioProvider>
+                        <Toaster />
+                        <Sonner />
+                        <GlobalBottomNavigation />
+                      </ActiveActorProvider>
                     </HubProvider>
                   </BrowserRouter>
                 </ToastHost>
