@@ -236,6 +236,11 @@ const HeaderNavigation = () => {
               Edit Profile
             </DropdownMenuItem>
           )}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => navigate('/businesses')}>
+            <Building2 className="h-4 w-4 mr-2" />
+            Business Directory
+          </DropdownMenuItem>
           {isPersonalProfile && (
             <DropdownMenuItem onClick={() => navigate('/settings?tab=profile&action=switch-to-business')}>
               <Building2 className="h-4 w-4 mr-2" />
