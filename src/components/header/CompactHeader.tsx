@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
-import { Search } from 'lucide-react';
+import { Search, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useScrollDirection } from '@/hooks/useScrollDirection';
 import HeaderNavigation from './HeaderNavigation';
@@ -74,6 +74,17 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
+            {/* Businesses Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white/70 hover:text-white hover:bg-white/10 h-9 w-9"
+              onClick={() => navigate('/businesses')}
+              aria-label="Businesses"
+            >
+              <Building2 className="h-5 w-5" />
+            </Button>
+            
             {/* Search Button */}
             <Button
               variant="ghost"
