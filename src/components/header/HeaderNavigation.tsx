@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { User, Settings, Shield, BarChart3, Building2, Plus } from 'lucide-react';
+import { User, Settings, Shield, BarChart3, Building2, Plus, Briefcase } from 'lucide-react';
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from "react-router-dom";
@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAdaptiveTextColor } from "@/hooks/useAdaptiveTextColor";
 import { useHeader } from "@/contexts/GlobalHeaderContext";
 import { useUnreadNotifications } from "@/hooks/useUnreadNotifications";
+import { useHasBusinesses } from "@/hooks/useMyBusinesses";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -86,6 +87,9 @@ const HeaderNavigation = () => {
 
   const isBusinessProfile = userProfile?.profile_type === 'business';
   const isPersonalProfile = userProfile?.profile_type === 'personal' || (!userProfile?.profile_type && user);
+
+  // Check if user has any businesses they manage
+  const { hasBusinesses } = useHasBusinesses(user?.id);
 
   // Business intro modal state
   const [showBusinessIntroModal, setShowBusinessIntroModal] = useState(false);
@@ -248,6 +252,13 @@ const HeaderNavigation = () => {
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />
+          {/* My Businesses - only shown if user has businesses */}
+          {hasBusinesses && (
+            <DropdownMenuItem onClick={() => navigate('/businesses/manage')}>
+              <Briefcase className="h-4 w-4 mr-2" />
+              My Businesses
+            </DropdownMenuItem>
+          )}
           {/* Business Directory - available to all logged-in users */}
           <DropdownMenuItem onClick={() => navigate('/businesses')}>
             <Building2 className="h-4 w-4 mr-2" />
