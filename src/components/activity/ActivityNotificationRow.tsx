@@ -115,7 +115,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
         "w-full text-left transition-all duration-200 relative",
         "rounded-sq-md px-4 py-3 min-h-[86px] flex items-stretch",
         isUnread 
-          ? "bg-background shadow-[0_1px_3px_rgba(0,0,0,0.06)] border border-border/40" 
+          ? "bg-[#f7f7f9]" 
           : "bg-background/50 hover:bg-background/80"
       )}
     >

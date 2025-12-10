@@ -175,7 +175,7 @@ const ActivityPage: React.FC = () => {
   const isAllCaughtUp = !isEmpty && effectiveNewItems.length === 0;
 
   return (
-    <PageRoot className="bg-muted/40 pb-24">
+    <PageRoot className="bg-[#f0f1f4] pb-24">
       <CompactHeader />
 
         {/* Main content wrapper - centered with equal padding both sides */}
