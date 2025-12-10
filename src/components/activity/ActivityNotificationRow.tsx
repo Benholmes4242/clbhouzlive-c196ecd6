@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X } from 'lucide-react';
+import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X, MoreVertical } from 'lucide-react';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
@@ -12,8 +12,7 @@ import { MediaHighlightRow, CourseHighlightRow } from './CinematicNotificationRo
 interface ActivityNotificationRowProps {
   notification: ActivityNotification;
   onClick: () => void;
-  onMarkRead?: (id: string) => void;
-  onHide?: (id: string) => void;
+  onOpenActionsSheet: () => void;
   currentUserId?: string;
 }
 
@@ -88,19 +87,42 @@ function renderNotificationText(notification: ActivityNotification): string {
   }
 }
 
-// Reusable card wrapper component
-interface ActivityCardProps {
+// Avatar with status badge component
+interface AvatarWithBadgeProps {
+  notification: ActivityNotification;
+  badgeIcon: React.ReactNode;
+}
+
+const AvatarWithBadge: React.FC<AvatarWithBadgeProps> = ({ notification, badgeIcon }) => (
+  <div className="relative shrink-0" style={{ width: 48, height: 50 }}>
+    <SquircleAvatar
+      src={notification.actor_avatar_url}
+      alt={notification.actor_display_name || 'User'}
+      size={48}
+      fallback={notification.actor_display_name?.charAt(0) || '?'}
+      ringColor={getRingColorForTotalPlayed(notification.data?.actor_total_top100_played || 0)}
+    />
+    <span className="absolute bottom-0 right-0 translate-x-1 translate-y-1 h-5 w-5 rounded-full border-2 border-background bg-background flex items-center justify-center shadow-sm">
+      {badgeIcon}
+    </span>
+  </div>
+);
+
+// LinkedIn-style flat row component
+interface FlatRowProps {
   notification: ActivityNotification;
   onClick: () => void;
+  onOpenActionsSheet: () => void;
   avatar: React.ReactNode;
   title: React.ReactNode;
   meta: string;
   actions?: React.ReactNode;
 }
 
-const ActivityCard: React.FC<ActivityCardProps> = ({ 
+const FlatRow: React.FC<FlatRowProps> = ({ 
   notification, 
   onClick, 
+  onOpenActionsSheet,
   avatar, 
   title, 
   meta, 
@@ -109,17 +131,26 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
   const isUnread = notification.is_unread;
   
   return (
-    <button
-      onClick={onClick}
+    <div
       className={cn(
-        "w-full text-left transition-all duration-200 relative",
-        "rounded-sq-md px-4 py-3 min-h-[86px] flex items-stretch",
+        "flex items-center gap-3 px-4 py-3 transition-colors",
         isUnread 
-          ? "bg-[#f7f7f9]" 
-          : "bg-background/50 hover:bg-background/80"
+          ? "bg-amber-500/[0.06]" 
+          : "bg-transparent hover:bg-muted/30"
       )}
     >
-      <div className="flex w-full gap-3">
+      {/* Unread dot indicator */}
+      <div className="w-2 shrink-0 flex items-center justify-center">
+        {isUnread && (
+          <span className="w-2 h-2 rounded-full bg-amber-500" />
+        )}
+      </div>
+
+      {/* Main clickable area */}
+      <button
+        onClick={onClick}
+        className="flex-1 flex items-center gap-3 text-left min-w-0"
+      >
         {avatar}
         <div className="flex-1 min-w-0">
           <p className={cn(
@@ -128,44 +159,35 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
           )}>
             {title}
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">{meta}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">{meta}</p>
           {actions && (
             <div className="mt-2 flex items-center justify-end gap-2">
               {actions}
             </div>
           )}
         </div>
-      </div>
-    </button>
+      </button>
+
+      {/* 3-dot menu */}
+      <button
+        type="button"
+        className="shrink-0 p-2 -mr-2 rounded-full hover:bg-muted/50 active:scale-95 transition-all"
+        onClick={(e) => {
+          e.stopPropagation();
+          onOpenActionsSheet();
+        }}
+        aria-label="More options"
+      >
+        <MoreVertical className="h-4 w-4 text-muted-foreground" />
+      </button>
+    </div>
   );
 };
-
-// Avatar with status badge component
-interface AvatarWithBadgeProps {
-  notification: ActivityNotification;
-  badgeIcon: React.ReactNode;
-}
-
-const AvatarWithBadge: React.FC<AvatarWithBadgeProps> = ({ notification, badgeIcon }) => (
-  <div className="relative shrink-0" style={{ width: 52, height: 54 }}>
-    <SquircleAvatar
-      src={notification.actor_avatar_url}
-      alt={notification.actor_display_name || 'User'}
-      size={52}
-      fallback={notification.actor_display_name?.charAt(0) || '?'}
-      ringColor={getRingColorForTotalPlayed(notification.data?.actor_total_top100_played || 0)}
-    />
-    <span className="absolute bottom-0 right-0 translate-x-1 translate-y-1 h-5 w-5 rounded-full border-2 border-card bg-background flex items-center justify-center shadow-sm">
-      {badgeIcon}
-    </span>
-  </div>
-);
 
 export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = ({ 
   notification, 
   onClick,
-  onMarkRead,
-  onHide,
+  onOpenActionsSheet,
   currentUserId
 }) => {
   const cancelMutation = useCancelFriendRequest();
@@ -228,9 +250,10 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
       // Check if already accepted/declined via persisted data.status
       if (status === 'accepted') {
         return (
-          <ActivityCard
+          <FlatRow
             notification={notification}
             onClick={onClick}
+            onOpenActionsSheet={onOpenActionsSheet}
             avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(true)} />}
             title={
               <>
@@ -251,9 +274,10 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
       
       if (status === 'declined') {
         return (
-          <ActivityCard
+          <FlatRow
             notification={notification}
             onClick={onClick}
+            onOpenActionsSheet={onOpenActionsSheet}
             avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(false)} />}
             title={
               <>
@@ -274,9 +298,10 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
       
       // Pending – Accept / Decline shown at bottom-right of card
       return (
-        <ActivityCard
+        <FlatRow
           notification={notification}
           onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
           avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(true)} />}
           title={
             <>
@@ -305,9 +330,10 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
      */
     case 'friend_accepted': {
       return (
-        <ActivityCard
+        <FlatRow
           notification={notification}
           onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
           avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(true)} />}
           title={
             <>
@@ -332,9 +358,10 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
      */
     case 'friend_request_sent': {
       return (
-        <ActivityCard
+        <FlatRow
           notification={notification}
           onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
           avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(false)} />}
           title={
             <span className={cn(isUnread ? "font-medium" : "font-normal", "text-foreground/90")}>
@@ -366,9 +393,10 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
      */
     case 'friend_declined': {
       return (
-        <ActivityCard
+        <FlatRow
           notification={notification}
           onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
           avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(false)} />}
           title={
             <span className={cn(isUnread ? "font-medium" : "font-normal", "text-foreground/90")}>
@@ -390,9 +418,10 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
      */
     case 'friend_cancelled': {
       return (
-        <ActivityCard
+        <FlatRow
           notification={notification}
           onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
           avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(false)} />}
           title={
             <span className={cn(isUnread ? "font-medium" : "font-normal", "text-foreground/90")}>
@@ -423,9 +452,10 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
         notification.actor_id !== currentUserId;
 
       return (
-        <ActivityCard
+        <FlatRow
           notification={notification}
           onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
           avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
           title={
             <>

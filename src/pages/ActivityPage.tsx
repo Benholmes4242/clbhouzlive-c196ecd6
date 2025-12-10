@@ -6,6 +6,7 @@ import { ActivityBucket } from '@/components/activity/ActivityBucket';
 import { AtAGlanceChips } from '@/components/activity/AtAGlanceChips';
 import { ActivityEmptyState } from '@/components/activity/ActivityEmptyState';
 import { ActivitySkeleton } from '@/components/activity/ActivitySkeleton';
+import { NotificationActionsSheet } from '@/components/activity/NotificationActionsSheet';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -15,6 +16,10 @@ import CompactHeader from '@/components/header/CompactHeader';
 const ActivityPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActivityTabId>('all');
   const [activeChipFilter, setActiveChipFilter] = useState<ChipFilterKind>(null);
+  
+  // Bottom sheet state for notification actions
+  const [actionSheetOpen, setActionSheetOpen] = useState(false);
+  const [selectedNotification, setSelectedNotification] = useState<ActivityNotification | null>(null);
   
   // Pass chip filter to hook (only applies when on 'all' tab)
   const effectiveChipFilter = activeTab === 'all' ? activeChipFilter : null;
@@ -105,7 +110,7 @@ const ActivityPage: React.FC = () => {
     }
   };
 
-  // Mark a single notification as unread (swipe left action)
+  // Mark a single notification as unread
   const handleMarkUnread = async (id: string) => {
     const { error } = await supabase
       .from('notifications')
@@ -118,7 +123,7 @@ const ActivityPage: React.FC = () => {
     }
   };
 
-  // Delete/hide a notification (swipe right action) - soft delete
+  // Delete/hide a notification - soft delete
   const handleDelete = async (id: string) => {
     const { error } = await supabase
       .from('notifications')
@@ -129,6 +134,28 @@ const ActivityPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
       queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
     }
+  };
+
+  // Toggle read state from bottom sheet
+  const handleToggleRead = (notification: ActivityNotification) => {
+    if (notification.is_mock) return;
+    if (notification.is_unread) {
+      handleMarkRead(notification.id);
+    } else {
+      handleMarkUnread(notification.id);
+    }
+  };
+
+  // Delete from bottom sheet
+  const handleDeleteNotification = (notification: ActivityNotification) => {
+    if (notification.is_mock) return;
+    handleDelete(notification.id);
+  };
+
+  // Open bottom sheet for a notification
+  const openActionsSheet = (notification: ActivityNotification) => {
+    setSelectedNotification(notification);
+    setActionSheetOpen(true);
   };
 
   // When user clicks a notification: mark as read + navigate
@@ -175,7 +202,7 @@ const ActivityPage: React.FC = () => {
   const isAllCaughtUp = !isEmpty && effectiveNewItems.length === 0;
 
   return (
-    <PageRoot className="bg-[#f0f1f4] pb-24">
+    <PageRoot className="bg-[#f5f5f7] pb-24">
       <CompactHeader />
 
         {/* Main content wrapper - centered with equal padding both sides */}
@@ -246,8 +273,7 @@ const ActivityPage: React.FC = () => {
                 sticky
                 accent
                 onNotificationClick={handleNotificationClick}
-                onMarkUnread={handleMarkUnread}
-                onDelete={handleDelete}
+                onOpenActionsSheet={openActionsSheet}
                 currentUserId={user?.id}
               />
             )}
@@ -260,8 +286,7 @@ const ActivityPage: React.FC = () => {
                   !i.is_unread && (!sessionNewIds || !sessionNewIds.includes(i.id))
                 )}
                 onNotificationClick={handleNotificationClick}
-                onMarkUnread={handleMarkUnread}
-                onDelete={handleDelete}
+                onOpenActionsSheet={openActionsSheet}
                 currentUserId={user?.id}
               />
             )}
@@ -272,8 +297,7 @@ const ActivityPage: React.FC = () => {
                 label="Yesterday"
                 items={buckets.yesterday}
                 onNotificationClick={handleNotificationClick}
-                onMarkUnread={handleMarkUnread}
-                onDelete={handleDelete}
+                onOpenActionsSheet={openActionsSheet}
                 currentUserId={user?.id}
               />
             )}
@@ -284,8 +308,7 @@ const ActivityPage: React.FC = () => {
                 label="This Week"
                 items={buckets.thisWeek}
                 onNotificationClick={handleNotificationClick}
-                onMarkUnread={handleMarkUnread}
-                onDelete={handleDelete}
+                onOpenActionsSheet={openActionsSheet}
                 currentUserId={user?.id}
               />
             )}
@@ -296,14 +319,22 @@ const ActivityPage: React.FC = () => {
                 label="Earlier"
                 items={buckets.earlier}
                 onNotificationClick={handleNotificationClick}
-                onMarkUnread={handleMarkUnread}
-                onDelete={handleDelete}
+                onOpenActionsSheet={openActionsSheet}
                 currentUserId={user?.id}
               />
             )}
           </div>
         )}
       </div>
+
+      {/* Bottom sheet for notification actions */}
+      <NotificationActionsSheet
+        open={actionSheetOpen}
+        notification={selectedNotification}
+        onClose={() => setActionSheetOpen(false)}
+        onToggleRead={handleToggleRead}
+        onDelete={handleDeleteNotification}
+      />
     </PageRoot>
   );
 };

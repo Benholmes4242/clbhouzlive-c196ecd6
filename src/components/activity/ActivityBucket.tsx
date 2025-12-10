@@ -2,7 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
-import { SwipeableNotificationRow } from './SwipeableNotificationRow';
+import { ActivityNotificationRow } from './ActivityNotificationRow';
 
 interface ActivityBucketProps {
   label: string;
@@ -10,8 +10,7 @@ interface ActivityBucketProps {
   sticky?: boolean;
   accent?: boolean;
   onNotificationClick: (notification: ActivityNotification) => void;
-  onMarkUnread?: (id: string) => void;
-  onDelete?: (id: string) => void;
+  onOpenActionsSheet: (notification: ActivityNotification) => void;
   currentUserId?: string;
 }
 
@@ -21,8 +20,7 @@ export const ActivityBucket: React.FC<ActivityBucketProps> = ({
   sticky,
   accent,
   onNotificationClick,
-  onMarkUnread,
-  onDelete,
+  onOpenActionsSheet,
   currentUserId
 }) => {
   if (!items || items.length === 0) return null;
@@ -39,21 +37,20 @@ export const ActivityBucket: React.FC<ActivityBucketProps> = ({
         {label}
       </div>
 
-      <div className="space-y-1.5">
+      <div className="divide-y divide-border/30">
         <AnimatePresence initial={false}>
           {items.map(item => (
             <motion.div
               key={item.id}
-              initial={{ opacity: 0, y: 10, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -6, scale: 0.97 }}
-              transition={{ duration: 0.22 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.18 }}
             >
-              <SwipeableNotificationRow
+              <ActivityNotificationRow
                 notification={item}
                 onClick={() => onNotificationClick(item)}
-                onMarkUnread={onMarkUnread || (() => {})}
-                onDelete={onDelete || (() => {})}
+                onOpenActionsSheet={() => onOpenActionsSheet(item)}
                 currentUserId={currentUserId}
               />
             </motion.div>

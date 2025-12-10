@@ -7,6 +7,7 @@ import { useActivityFeed, ActivityTabId, ACTIVITY_TABS, ActivityNotification } f
 import { ActivityBucket } from '@/components/activity/ActivityBucket';
 import { ActivityEmptyState } from '@/components/activity/ActivityEmptyState';
 import { ActivitySkeleton } from '@/components/activity/ActivitySkeleton';
+import { NotificationActionsSheet } from '@/components/activity/NotificationActionsSheet';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -23,6 +24,10 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+
+  // Bottom sheet state for notification actions
+  const [actionSheetOpen, setActionSheetOpen] = useState(false);
+  const [selectedNotification, setSelectedNotification] = useState<ActivityNotification | null>(null);
 
   const buckets = data?.buckets;
   const counts = data?.counts;
@@ -75,13 +80,35 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
   const handleDelete = async (id: string) => {
     const { error } = await supabase
       .from('notifications')
-      .delete()
+      .update({ is_deleted: true })
       .eq('id', id);
 
     if (!error) {
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
       queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
     }
+  };
+
+  // Toggle read state from bottom sheet
+  const handleToggleRead = (notification: ActivityNotification) => {
+    if (notification.is_mock) return;
+    if (notification.is_unread) {
+      handleMarkRead(notification.id);
+    } else {
+      handleMarkUnread(notification.id);
+    }
+  };
+
+  // Delete from bottom sheet
+  const handleDeleteNotification = (notification: ActivityNotification) => {
+    if (notification.is_mock) return;
+    handleDelete(notification.id);
+  };
+
+  // Open bottom sheet for a notification
+  const openActionsSheet = (notification: ActivityNotification) => {
+    setSelectedNotification(notification);
+    setActionSheetOpen(true);
   };
 
   const handleNotificationClick = async (notification: ActivityNotification) => {
@@ -114,7 +141,7 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
         className="h-full p-0 overflow-hidden"
         hideCloseButton
       >
-        <div className="h-full overflow-y-auto bg-muted/50">
+        <div className="h-full overflow-y-auto bg-[#f5f5f7]">
           {/* Page header */}
           <header className="flex-shrink-0 px-5 pt-4 pb-3 md:px-8 md:pt-6 md:pb-4 border-b border-border/40 bg-background">
             <div className="flex items-center justify-between">
@@ -194,8 +221,8 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
                     sticky
                     accent
                     onNotificationClick={handleNotificationClick}
-                    onMarkUnread={handleMarkUnread}
-                    onDelete={handleDelete}
+                    onOpenActionsSheet={openActionsSheet}
+                    currentUserId={user?.id}
                   />
                 )}
 
@@ -204,8 +231,8 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
                     label="Today"
                     items={buckets.today.filter(i => i.is_read)}
                     onNotificationClick={handleNotificationClick}
-                    onMarkUnread={handleMarkUnread}
-                    onDelete={handleDelete}
+                    onOpenActionsSheet={openActionsSheet}
+                    currentUserId={user?.id}
                   />
                 )}
 
@@ -214,8 +241,8 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
                     label="Yesterday"
                     items={buckets.yesterday}
                     onNotificationClick={handleNotificationClick}
-                    onMarkUnread={handleMarkUnread}
-                    onDelete={handleDelete}
+                    onOpenActionsSheet={openActionsSheet}
+                    currentUserId={user?.id}
                   />
                 )}
 
@@ -224,8 +251,8 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
                     label="This Week"
                     items={buckets.thisWeek}
                     onNotificationClick={handleNotificationClick}
-                    onMarkUnread={handleMarkUnread}
-                    onDelete={handleDelete}
+                    onOpenActionsSheet={openActionsSheet}
+                    currentUserId={user?.id}
                   />
                 )}
 
@@ -234,14 +261,23 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
                     label="Earlier"
                     items={buckets.earlier}
                     onNotificationClick={handleNotificationClick}
-                    onMarkUnread={handleMarkUnread}
-                    onDelete={handleDelete}
+                    onOpenActionsSheet={openActionsSheet}
+                    currentUserId={user?.id}
                   />
                 )}
               </div>
             )}
           </main>
         </div>
+
+        {/* Bottom sheet for notification actions */}
+        <NotificationActionsSheet
+          open={actionSheetOpen}
+          notification={selectedNotification}
+          onClose={() => setActionSheetOpen(false)}
+          onToggleRead={handleToggleRead}
+          onDelete={handleDeleteNotification}
+        />
       </SheetContent>
     </Sheet>
   );
