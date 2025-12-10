@@ -441,6 +441,15 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
   const query = useQuery({
     queryKey: ['activity-feed', tab, chipFilter, user?.id, lastNotificationsSeen],
     queryFn: async (): Promise<ActivityFeedResult> => {
+      // Safety net - enabled guarantees user?.id exists, but guard anyway
+      if (!user?.id) {
+        return {
+          buckets: { new: [], today: [], yesterday: [], thisWeek: [], earlier: [] },
+          counts: { new: 0, mentions: 0, follows: 0, clubs: 0, messages: 0 },
+          allItems: [],
+        };
+      }
+
       let enrichedNotifications: ActivityNotification[] = [];
       let followingUserIds = new Set<string>();
 
@@ -619,6 +628,7 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
       return result;
     },
     staleTime: 30_000,
+    enabled: !!user?.id,  // Don't run until auth is ready
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
