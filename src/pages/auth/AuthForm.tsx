@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Check, X, Loader2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { AccountTypeToggle, AccountType } from "@/components/profile/AccountTypeToggle";
 
 type AuthNotice = {
   type: 'success' | 'error';
@@ -60,12 +61,17 @@ const AuthForm: React.FC<AuthFormProps> = ({
   setAuthNotice,
 }) => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetSubmitting, setResetSubmitting] = useState(false);
   const [username, setUsername] = useState("");
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
   const [checkingUsername, setCheckingUsername] = useState(false);
+  
+  // Account type for signup - default from URL param or 'personal'
+  const initialAccountType = (searchParams.get('mode') === 'business' ? 'business' : 'personal') as AccountType;
+  const [accountType, setAccountType] = useState<AccountType>(initialAccountType);
   const [suggestedUsernames, setSuggestedUsernames] = useState<string[]>([]);
   
   // Field-level error states
@@ -239,6 +245,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
           emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
             username: username.toLowerCase(),
+            account_type: accountType,
           }
         }
       });
@@ -255,6 +262,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
         setIsSignUp(false);
         setPassword('');
         setUsername('');
+        setAccountType('personal');
         setAuthNotice({
           type: 'success',
           message: `Your account is almost ready. Check ${email} for a verification link, then sign in here.`,
@@ -419,6 +427,21 @@ const AuthForm: React.FC<AuthFormProps> = ({
             : "Sign in to jump back into your golf moments"}
         </p>
       </div>
+      
+      {/* Account Type Toggle (signup only) */}
+      {isSignUp && (
+        <div className="mb-5">
+          <p className="text-sm mb-3" style={{ color: '#5E666D' }}>
+            What are you signing up as?
+          </p>
+          <AccountTypeToggle
+            value={accountType}
+            onChange={setAccountType}
+            variant="compact"
+            disabled={submitting}
+          />
+        </div>
+      )}
       
       {/* Email Input */}
       <div className="mb-2">

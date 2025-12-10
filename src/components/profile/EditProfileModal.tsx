@@ -123,6 +123,9 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
             {/* Profile Type Toggle */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Profile Type</label>
+              <p className="text-sm text-muted-foreground">
+                Golfer profiles are for players. Business profiles are for clubs, academies, shops, and brands.
+              </p>
               <ProfileTypeToggle 
                 value={formData.profileType} 
                 onChange={handleProfileTypeChange}

@@ -14,10 +14,12 @@ export type BusinessCategory =
 
 export const BUSINESS_CATEGORIES: string[] = [
   'Golf Club',
-  'Brand',
-  'Coach / Academy',
-  'Fitter / Retail',
-  'Tour / Series',
+  'Golf Academy',
+  'Coach / Instructor',
+  'Retailer / Pro Shop',
+  'Club Fitter',
+  'Resort',
+  'Brand / Manufacturer',
   'Other',
 ];
 
