@@ -18,6 +18,9 @@ interface PostSubmissionData {
   } | null;
   achievementId?: string | null;
   studioEditsByMediaId?: Record<string, { filter?: string }>;
+  /** Actor info for "posting as" feature */
+  actorType?: 'personal' | 'business';
+  actorId?: string;
   onSuccess?: () => void;
   onError?: () => void;
 }
@@ -36,6 +39,8 @@ export const useOptimisticPostSubmission = () => {
     courseInfo,
     achievementId,
     studioEditsByMediaId,
+    actorType = 'personal',
+    actorId,
     onSuccess,
     onError
   }: PostSubmissionData) => {
@@ -80,13 +85,19 @@ export const useOptimisticPostSubmission = () => {
         }))
       });
 
+      // Resolve actor - default to personal profile if not specified
+      const resolvedActorType = actorType || 'personal';
+      const resolvedActorId = actorId || user.id;
+
       // Create the post first
       const { data: postData, error: postError } = await supabase
         .from('posts')
         .insert({
           user_id: user.id,
           content: content || null,
-          achievement_id: achievementId || null
+          achievement_id: achievementId || null,
+          actor_type: resolvedActorType,
+          actor_id: resolvedActorId,
         })
         .select()
         .single();

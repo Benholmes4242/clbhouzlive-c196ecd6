@@ -22,6 +22,7 @@ import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { usePresenceTracker } from '@/hooks/usePresenceTracker';
 import { useLocationBroadcast } from '@/features/nearby/hooks/useLocationBroadcast';
 import { TopTenProvider } from '@/context/TopTenContext';
+import { ActiveActorProvider } from '@/context/ActiveActorContext';
 import { Top100DebugProvider } from '@/context/Top100DebugContext';
 import { UIProvider } from '@/contexts/UIContext';
 import { ModalProvider } from '@/contexts/ModalContext';
@@ -496,18 +497,20 @@ const AppInner: React.FC = () => {
                         <VideoManagerProvider>
                           <VideoPlaybackManagerProvider>
                             <TopTenProvider>
-                              <ErrorBoundary>
-                                <AuthWrapper>
-                                  <SeasonWrapModal />
-                                  <AchievementToastWrapper />
-                                  <Suspense fallback={null}>
-                                    <div className="app-depth">
-                                      {/* No global header - each page renders its own ClubhouseHeaderNew */}
-                                      <AppRoutes />
-                                    </div>
-                                  </Suspense>
-                                </AuthWrapper>
-                              </ErrorBoundary>
+                              <ActiveActorProvider>
+                                <ErrorBoundary>
+                                  <AuthWrapper>
+                                    <SeasonWrapModal />
+                                    <AchievementToastWrapper />
+                                    <Suspense fallback={null}>
+                                      <div className="app-depth">
+                                        {/* No global header - each page renders its own ClubhouseHeaderNew */}
+                                        <AppRoutes />
+                                      </div>
+                                    </Suspense>
+                                  </AuthWrapper>
+                                </ErrorBoundary>
+                              </ActiveActorProvider>
                             </TopTenProvider>
                           </VideoPlaybackManagerProvider>
                         </VideoManagerProvider>
