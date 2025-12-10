@@ -9,6 +9,21 @@ export type BusinessDirectoryFilters = {
   pageSize?: number;
 };
 
+export interface BusinessDirectoryItem {
+  id: string;
+  name: string;
+  slug: string | null;
+  category: string | null;
+  location: string | null;
+  description: string | null;
+  website: string | null;
+  email: string | null;
+  phone: string | null;
+  logo_url: string | null;
+  cover_image_url: string | null;
+  is_verified: boolean;
+}
+
 export function useBusinessDirectory(filters: BusinessDirectoryFilters = {}) {
   const {
     search = '',
@@ -22,39 +37,22 @@ export function useBusinessDirectory(filters: BusinessDirectoryFilters = {}) {
     queryKey: ['business-directory', { search, category, location, page, pageSize }],
     queryFn: async () => {
       let query = supabase
-        .from('user_profiles')
-        .select(
-          `
-          id,
-          username,
-          profile_type,
-          display_name,
-          business_name,
-          business_category,
-          business_location,
-          business_website,
-          business_contact_email,
-          profile_photo_url,
-          header_photo_url,
-          is_business_verified
-        `,
-          { count: 'exact' }
-        )
-        .eq('profile_type', 'business')
-        .order('business_name', { ascending: true });
+        .from('business_accounts')
+        .select('*', { count: 'exact' })
+        .order('name', { ascending: true });
 
       if (category) {
-        query = query.eq('business_category', category);
+        query = query.eq('category', category);
       }
 
       if (location) {
-        query = query.ilike('business_location', `%${location}%`);
+        query = query.ilike('location', `%${location}%`);
       }
 
       if (search.trim()) {
         const s = search.trim();
         query = query.or(
-          `business_name.ilike.%${s}%,display_name.ilike.%${s}%,username.ilike.%${s}%`
+          `name.ilike.%${s}%,description.ilike.%${s}%`
         );
       }
 
@@ -68,8 +66,24 @@ export function useBusinessDirectory(filters: BusinessDirectoryFilters = {}) {
         throw error;
       }
 
+      // Map to typed interface
+      const businesses: BusinessDirectoryItem[] = (data || []).map(row => ({
+        id: row.id,
+        name: row.name,
+        slug: row.slug,
+        category: row.category,
+        location: row.location,
+        description: row.description,
+        website: row.website,
+        email: row.email,
+        phone: row.phone,
+        logo_url: row.logo_url,
+        cover_image_url: row.cover_image_url,
+        is_verified: row.is_verified ?? false,
+      }));
+
       return {
-        businesses: data || [],
+        businesses,
         total: count ?? 0,
         page,
         pageSize,
