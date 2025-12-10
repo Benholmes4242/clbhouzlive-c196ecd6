@@ -14,7 +14,7 @@ interface SwipeableNotificationRowProps {
 }
 
 const ACTION_WIDTH = 88;
-const SWIPE_THRESHOLD = 18; // Minimum horizontal movement to trigger swipe
+const SWIPE_THRESHOLD = 10; // Minimum horizontal movement to trigger swipe
 
 export const SwipeableNotificationRow: React.FC<SwipeableNotificationRowProps> = ({
   notification,
