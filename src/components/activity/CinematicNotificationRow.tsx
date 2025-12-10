@@ -76,7 +76,7 @@ export const MediaHighlightRow: React.FC<CinematicNotificationRowProps & { media
   return (
     <motion.article
       onClick={onClick}
-      className="relative overflow-hidden rounded-sq-md mb-1.5 cursor-pointer min-h-[86px]"
+      className="relative overflow-hidden rounded-sq-md cursor-pointer min-h-[86px]"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -4 }}
@@ -152,7 +152,7 @@ export const CourseHighlightRow: React.FC<CinematicNotificationRowProps & { cour
   return (
     <motion.article
       onClick={onClick}
-      className="relative overflow-hidden rounded-sq-md mb-1.5 cursor-pointer min-h-[86px]"
+      className="relative overflow-hidden rounded-sq-md cursor-pointer min-h-[86px]"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -4 }}
