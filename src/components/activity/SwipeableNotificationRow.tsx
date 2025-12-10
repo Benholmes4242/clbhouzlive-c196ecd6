@@ -13,8 +13,8 @@ interface SwipeableNotificationRowProps {
   currentUserId?: string;
 }
 
-const ACTION_WIDTH = 88;
-const SWIPE_THRESHOLD = 10; // Minimum horizontal movement to trigger swipe
+const ACTION_WIDTH = 72;
+const SWIPE_THRESHOLD = 6; // Minimum horizontal movement to trigger swipe (lower = more sensitive)
 
 export const SwipeableNotificationRow: React.FC<SwipeableNotificationRowProps> = ({
   notification,
@@ -60,13 +60,14 @@ export const SwipeableNotificationRow: React.FC<SwipeableNotificationRowProps> =
     startPoint.current = null;
     
     const offsetX = info.offset.x;
+    const TRIGGER_DISTANCE = 28; // Lower = more sensitive swipe detection
 
     // Swipe right = Delete
-    if (offsetX > ACTION_WIDTH / 2) {
+    if (offsetX > TRIGGER_DISTANCE) {
       snapTo(ACTION_WIDTH);
     }
     // Swipe left = Mark unread
-    else if (offsetX < -ACTION_WIDTH / 2) {
+    else if (offsetX < -TRIGGER_DISTANCE) {
       snapTo(-ACTION_WIDTH);
     }
     // Not far enough, snap back
@@ -91,7 +92,7 @@ export const SwipeableNotificationRow: React.FC<SwipeableNotificationRowProps> =
   return (
     <div 
       className={cn(
-        "relative overflow-hidden rounded-sq-md transition-all duration-200",
+        "relative overflow-hidden rounded-sq-md transition-all duration-200 shadow-[0_4px_12px_rgba(0,0,0,0.04)]",
         isDeleting && "opacity-0 h-0 -my-1"
       )}
     >
