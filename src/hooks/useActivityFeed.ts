@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useUserProfile } from '@/hooks/useUserProfile';
 import { startOfDay, subDays, startOfWeek } from 'date-fns';
 
 // ⚡ DEV FLAG: Mock notifications for testing (auto-disabled in production)
@@ -428,9 +429,13 @@ export interface ActivityFeedResult {
 
 export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind = null) => {
   const { user } = useSupabaseSession();
+  const { data: userProfile } = useUserProfile(user?.id);
+
+  // Get last seen timestamp from user profile
+  const lastNotificationsSeen = userProfile?.last_notifications_seen_at ?? null;
 
   return useQuery({
-    queryKey: ['activity-feed', tab, chipFilter, user?.id],
+    queryKey: ['activity-feed', tab, chipFilter, user?.id, lastNotificationsSeen],
     queryFn: async (): Promise<ActivityFeedResult> => {
       let enrichedNotifications: ActivityNotification[] = [];
       let followingUserIds = new Set<string>();
@@ -483,6 +488,9 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
         }
 
         // Transform notifications to normalized model
+        // Instagram-style: "unseen" means created_at > last_seen OR manually marked unread (is_read = false)
+        const lastSeenTime = lastNotificationsSeen ? new Date(lastNotificationsSeen).getTime() : 0;
+        
         enrichedNotifications = (notifications || []).map(n => {
           const actor = n.actor_id ? actorProfiles[n.actor_id] : null;
           const actorType = deriveActorType(n);
@@ -512,6 +520,12 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
             || dataObj.liker_photo
             || null;
           
+          // Instagram-style unseen logic:
+          // 1) Anything created after last_notifications_seen_at is "new"
+          // 2) Anything manually marked unread (is_read = false) is also "new"
+          const createdAtTime = new Date(n.created_at).getTime();
+          const isUnseen = createdAtTime > lastSeenTime || n.is_read === false;
+          
           const notification: ActivityNotification = {
             id: n.id,
             created_at: n.created_at,
@@ -531,8 +545,8 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
             target_type: deriveTargetType(n),
             data: n.data,
             
-            // Derived flags
-            is_unread: !n.is_read,
+            // Derived flags - is_unread now uses Instagram-style logic
+            is_unread: isUnseen,
             is_mention: MENTION_TYPES.has(n.type),
             is_from_following: isFromFollowing,
             is_club_or_course: CLUB_COURSE_TYPES.has(n.type) || 
@@ -603,27 +617,71 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
   });
 };
 
-// Hook to get unread count for header badges
+// Hook to get unread count for header badges - Instagram-style
 export const useUnreadActivityCount = () => {
   const { user } = useSupabaseSession();
+  const { data: userProfile } = useUserProfile(user?.id);
+
+  const lastNotificationsSeen = userProfile?.last_notifications_seen_at ?? null;
 
   return useQuery({
-    queryKey: ['activity-unread-count', user?.id],
+    queryKey: ['activity-unread-count', user?.id, lastNotificationsSeen],
     queryFn: async () => {
       if (!user?.id) return 0;
 
-      const { count, error } = await supabase
-        .from('notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .eq('is_read', false);
+      // Instagram-style: count notifications that are either:
+      // 1) Created after last_notifications_seen_at
+      // 2) Manually marked unread (is_read = false)
+      
+      let count = 0;
 
-      if (error) {
-        console.error('[useUnreadActivityCount] error', error);
-        return 0;
+      if (lastNotificationsSeen) {
+        // Count items created after last seen OR manually marked unread
+        const { count: newCount, error: newError } = await supabase
+          .from('notifications')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('is_deleted', false)
+          .gt('created_at', lastNotificationsSeen);
+
+        if (newError) {
+          console.error('[useUnreadActivityCount] error counting new:', newError);
+          return 0;
+        }
+
+        // Also count manually marked unread that are OLDER than last seen
+        const { count: unreadCount, error: unreadError } = await supabase
+          .from('notifications')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('is_deleted', false)
+          .eq('is_read', false)
+          .lte('created_at', lastNotificationsSeen);
+
+        if (unreadError) {
+          console.error('[useUnreadActivityCount] error counting unread:', unreadError);
+          return newCount || 0;
+        }
+
+        count = (newCount || 0) + (unreadCount || 0);
+      } else {
+        // User has never visited notifications - count all unread
+        const { count: allUnread, error } = await supabase
+          .from('notifications')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('is_deleted', false)
+          .eq('is_read', false);
+
+        if (error) {
+          console.error('[useUnreadActivityCount] error:', error);
+          return 0;
+        }
+
+        count = allUnread || 0;
       }
 
-      return count || 0;
+      return count;
     },
     enabled: !!user?.id,
     staleTime: 30 * 1000,

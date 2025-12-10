@@ -4182,6 +4182,7 @@ export type Database = {
           is_public: boolean | null
           is_test: boolean
           is_verified_business: boolean
+          last_notifications_seen_at: string | null
           last_rating_at: string | null
           location: string | null
           logo_url: string | null
@@ -4255,6 +4256,7 @@ export type Database = {
           is_public?: boolean | null
           is_test?: boolean
           is_verified_business?: boolean
+          last_notifications_seen_at?: string | null
           last_rating_at?: string | null
           location?: string | null
           logo_url?: string | null
@@ -4328,6 +4330,7 @@ export type Database = {
           is_public?: boolean | null
           is_test?: boolean
           is_verified_business?: boolean
+          last_notifications_seen_at?: string | null
           last_rating_at?: string | null
           location?: string | null
           logo_url?: string | null

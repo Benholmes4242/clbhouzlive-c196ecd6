@@ -49,6 +49,8 @@ export interface UserProfile {
   is_verified_business?: boolean | null;
   verified_business_at?: string | null;
   verified_business_notes?: string | null;
+  // Notification tracking
+  last_notifications_seen_at?: string | null;
 }
 
 /**

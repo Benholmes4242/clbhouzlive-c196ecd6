@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useActivityFeed, ActivityTabId, ACTIVITY_TABS, ActivityNotification, ChipFilterKind } from '@/hooks/useActivityFeed';
@@ -23,6 +23,41 @@ const ActivityPage: React.FC = () => {
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  
+  // Track if we've already marked notifications as seen this session
+  const hasMarkedSeen = useRef(false);
+  
+  // Instagram-style: Mark all notifications as "seen" when user visits the page
+  useEffect(() => {
+    if (!user?.id || isLoading || hasMarkedSeen.current) return;
+    if (!data || !data.allItems || data.allItems.length === 0) return;
+    
+    const markSeen = async () => {
+      const now = new Date().toISOString();
+      
+      // 1) Update last_notifications_seen_at to now
+      await supabase
+        .from('user_profiles')
+        .update({ last_notifications_seen_at: now })
+        .eq('id', user.id);
+      
+      // 2) Mark all existing notifications as read at that moment
+      await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('user_id', user.id)
+        .lte('created_at', now);
+      
+      hasMarkedSeen.current = true;
+      
+      // Invalidate queries to refresh UI (bell dot, counts, etc.)
+      queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
+      queryClient.invalidateQueries({ queryKey: ['user-profile', user.id] });
+    };
+    
+    void markSeen();
+  }, [user?.id, isLoading, data, queryClient]);
 
   const buckets = data?.buckets;
   const counts = data?.counts;
