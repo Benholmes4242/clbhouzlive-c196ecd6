@@ -24,10 +24,10 @@ function getNotificationIcon(type: string) {
     case 'tag':
       return <MessageCircle className={cn(iconClass, "text-white")} />;
     case 'follow':
-      return <UserPlus className={cn(iconClass, "text-white")} />;
+      return <Users className={cn(iconClass, "text-white")} />;
     case 'friend_request':
     case 'friend_accepted':
-      return <Users className={cn(iconClass, "text-white")} />;
+      return <UserPlus className={cn(iconClass, "text-white")} />;
     case 'achievement':
       return <Trophy className={cn(iconClass, "text-white")} />;
     default:
