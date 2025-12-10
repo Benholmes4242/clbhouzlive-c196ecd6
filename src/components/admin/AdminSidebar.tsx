@@ -3,9 +3,16 @@ import { NavLink } from "react-router-dom";
 import { usePanelRole } from "@/hooks/usePanelRole";
 import { panelCan } from "@/lib/panelCan";
 
-const LinkItem: React.FC<{ to: string; children: React.ReactNode }> = ({ to, children }) => (
+interface LinkItemProps {
+  to: string;
+  children: React.ReactNode;
+  onClick?: () => void;
+}
+
+const LinkItem: React.FC<LinkItemProps> = ({ to, children, onClick }) => (
   <NavLink
     to={to}
+    onClick={onClick}
     className={({ isActive }) =>
       [
         "flex items-center gap-3 rounded-sq-sm px-3 py-2 text-sm transition-all duration-motion-fast ease-standard",
@@ -17,7 +24,11 @@ const LinkItem: React.FC<{ to: string; children: React.ReactNode }> = ({ to, chi
   </NavLink>
 );
 
-export const AdminSidebar: React.FC = () => {
+interface AdminSidebarProps {
+  onNavigate?: () => void;
+}
+
+export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate }) => {
   const { role, loading } = usePanelRole();
   const can = panelCan(role);
 
@@ -58,7 +69,7 @@ export const AdminSidebar: React.FC = () => {
 
       <nav className="space-y-1">
         {menu.map((item) => (
-          <LinkItem key={item.to} to={item.to}>
+          <LinkItem key={item.to} to={item.to} onClick={onNavigate}>
             <span>{item.label}</span>
           </LinkItem>
         ))}
