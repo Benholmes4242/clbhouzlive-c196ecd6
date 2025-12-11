@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-import CourseCard from './CourseCard';
+import { CourseListCard } from './CourseListCard';
 import { AppSelect, AppSelectOption } from '@/components/ui/AppSelect';
 import { COURSES_PAGE_SIZE } from '@/config/pagination';
 import { FLAGS } from '@/config/flags';
@@ -267,29 +267,25 @@ const Top100CoursesHubPanel = () => {
 
   return (
     <div className="space-y-6 pb-8">
-      {/* 1. Top 100 Club hero */}
-      <section className="rounded-sq-lg border border-border/60 bg-card shadow-[0_4px_28px_rgba(0,0,0,0.14)] px-4 py-5 relative overflow-hidden before:absolute before:inset-0 before:bg-white/[0.02] before:pointer-events-none">
+      {/* 1. Top 100 Club hero - slimmed down */}
+      <section className="rounded-sq-lg border border-border/60 bg-card shadow-[0_4px_28px_rgba(0,0,0,0.14)] px-4 py-4 relative overflow-hidden before:absolute before:inset-0 before:bg-white/[0.02] before:pointer-events-none">
         {/* Title + subtitle */}
         <div className="items-center text-center">
-          <h2 className="text-[18px] font-semibold text-foreground">Top 100 Club</h2>
+          <h2 className="text-[17px] font-semibold text-foreground leading-tight">Top 100 Club</h2>
           <p className="text-[12px] text-muted-foreground">
             Your journey across the world&apos;s greatest courses.
           </p>
         </div>
 
         {user ? (
-          <div className="flex flex-col items-center text-center gap-6 mt-5">
+          <div className="flex flex-col items-center text-center gap-3 mt-3">
             {/* 1. Progress summary + bar */}
-            <section className="w-full max-w-[420px] space-y-2">
+            <section className="w-full max-w-[420px] space-y-1.5">
               <p className="text-sm text-slate-700">
                 You&apos;ve rated {totalRated} course{totalRated === 1 ? '' : 's'} across {listsCount} Top 100 list{listsCount === 1 ? '' : 's'}
               </p>
 
-              <p className="text-xs text-slate-500">
-                {totalRated} / {listsCount * 100} courses
-              </p>
-
-              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-200 mx-auto">
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200 mx-auto">
                 <div
                   className="h-full rounded-full bg-amber-500 transition-all"
                   style={{ width: `${listsCount > 0 ? Math.min(100, (totalRated / (listsCount * 100)) * 100) : 0}%` }}
@@ -297,42 +293,57 @@ const Top100CoursesHubPanel = () => {
               </div>
             </section>
 
-            {/* 2. Hero achievement badge row - using unified AchievementBadgeCard */}
-            {totalRated >= 5 && (
-              <AchievementBadgeCard
-                tier={club.threshold?.toString() as AchievementTier || '5'}
-                title={`${totalRated} Top 100`}
-                subtitle={club.tierName || 'Top 100 Club'}
-                unlocked={true}
-                compact={true}
-              />
-            )}
+            {/* 2. Badge + CTAs row - compact layout */}
+            <div className="mt-2 flex items-center justify-between gap-3 w-full max-w-[420px]">
+              {/* Left: achievement badge (if earned) */}
+              {totalRated >= 5 && (
+                <div className="flex-shrink-0">
+                  <AchievementBadgeCard
+                    tier={club.threshold?.toString() as AchievementTier || '5'}
+                    title={`${totalRated} Top 100`}
+                    subtitle={club.tierName || 'Top 100 Club'}
+                    unlocked={true}
+                    compact={true}
+                  />
+                </div>
+              )}
 
-            {/* 3. CTA */}
-            <section className="w-full max-w-[420px]">
-              <Button
-                variant="primary"
-                onClick={handleOpenTop100Journey}
-                className="w-full justify-center rounded-2xl"
-              >
-                Open your Top 100 Journey →
-              </Button>
-            </section>
+              {/* Right: inline CTAs */}
+              <div className="flex flex-col items-end gap-1 text-sm flex-1">
+                <button
+                  type="button"
+                  onClick={handleOpenTop100Journey}
+                  className="inline-flex items-center font-semibold text-primary hover:text-primary/80 transition-colors"
+                >
+                  Visit Top 100 Club
+                  <span className="ml-1">→</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleOpenTop100Leaderboard}
+                  className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  View leaderboard
+                  <span className="ml-1">→</span>
+                </button>
+              </div>
+            </div>
           </div>
         ) : (
-          <>
-            <p className="text-[14px] text-muted-foreground mt-4">
-              Sign in to track your progress and see where you rank on the global leaderboard.
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <p className="text-[13px] text-muted-foreground flex-1">
+              Sign in to track your progress.
             </p>
-            <Button
-              variant="primary"
+            <button
+              type="button"
               onClick={handleOpenTop100Journey}
-              className="mt-4 w-full active:scale-[0.98] transition-transform duration-150"
+              className="inline-flex items-center font-semibold text-sm text-primary hover:text-primary/80 transition-colors"
             >
-              Sign in to join the Top 100 Club
-              <span className="text-[16px]">↗</span>
-            </Button>
-          </>
+              Sign in
+              <span className="ml-1">→</span>
+            </button>
+          </div>
         )}
       </section>
 
@@ -567,10 +578,13 @@ const Top100CoursesHubPanel = () => {
             <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
               {paginatedCourses.map((course) => (
                 <div key={course.id} className="mb-4 sm:mb-0">
-                  <CourseCard 
+                  <CourseListCard 
                     course={course}
-                    showRankBadge={true}
-                    onClick={handleCourseClick}
+                    listSlug={selectedList as 'global' | 'gb-i' | 'usa' | 'europe'}
+                    onClick={() => {
+                      handleCourseClick();
+                      navigate(`/courses/${course.id}`);
+                    }}
                   />
                 </div>
               ))}
