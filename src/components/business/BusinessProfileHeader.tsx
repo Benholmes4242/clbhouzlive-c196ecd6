@@ -1,5 +1,5 @@
 import React from 'react';
-import { Phone, Globe, MapPin, BadgeCheck, BarChart2 } from 'lucide-react';
+import { Phone, Globe, MapPin, BadgeCheck, BarChart2, Flag, GraduationCap, ShoppingBag, Briefcase, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
@@ -12,6 +12,25 @@ interface BusinessProfileHeaderProps {
   postsCount: number;
   followersCount: number;
 }
+
+// Get icon for category
+const getCategoryIcon = (category: string | null) => {
+  switch (category) {
+    case 'Golf Club':
+      return Flag;
+    case 'Golf Academy':
+    case 'Coach / Instructor':
+      return GraduationCap;
+    case 'Retailer / Pro Shop':
+      return ShoppingBag;
+    case 'Club Fitter':
+    case 'Brand / Manufacturer':
+      return Briefcase;
+    case 'Resort':
+    default:
+      return Building2;
+  }
+};
 
 export function BusinessProfileHeader({
   business,
@@ -55,6 +74,8 @@ export function BusinessProfileHeader({
     .join('')
     .toUpperCase();
 
+  const CategoryIcon = getCategoryIcon(business.category);
+
   return (
     <div className="relative">
       {/* Cover image / gradient background */}
@@ -68,8 +89,8 @@ export function BusinessProfileHeader({
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600" />
         )}
-        {/* Gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+        {/* Enhanced gradient overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
       </div>
 
       {/* Content overlay */}
@@ -101,39 +122,61 @@ export function BusinessProfileHeader({
                   <BadgeCheck className="h-6 w-6 text-blue-400" />
                 )}
               </div>
-              <p className="text-white/80 text-sm md:text-base">
-                {[business.category, business.location].filter(Boolean).join(' · ')}
+              <p className="text-white/80 text-sm md:text-base flex items-center gap-1.5 mt-0.5">
+                {business.category && (
+                  <>
+                    <CategoryIcon className="h-4 w-4" />
+                    <span>{business.category}</span>
+                  </>
+                )}
+                {business.category && business.location && <span className="mx-1">·</span>}
+                {business.location && <span>{business.location}</span>}
               </p>
             </div>
           </div>
 
-          {/* Right: CTAs */}
+          {/* Right: CTAs - Modern pill buttons */}
           <div className="flex flex-wrap items-center gap-2">
             {membership?.canViewInsights && (
               <Button
                 variant="glass"
                 size="sm"
                 onClick={handleViewInsights}
-                className="gap-1.5"
+                className="gap-1.5 rounded-full px-4"
               >
                 <BarChart2 className="h-4 w-4" />
-                View insights
+                Insights
               </Button>
             )}
             {business.phone && (
-              <Button variant="glass" size="sm" onClick={handleCall}>
+              <Button 
+                variant="glass" 
+                size="sm" 
+                onClick={handleCall}
+                className="rounded-full px-4 hover:bg-white/20 active:scale-[0.98] transition-all"
+              >
                 <Phone className="h-4 w-4 mr-1.5" />
                 Call
               </Button>
             )}
             {business.website && (
-              <Button variant="glass-outline" size="sm" onClick={handleWebsite}>
+              <Button 
+                variant="glass-outline" 
+                size="sm" 
+                onClick={handleWebsite}
+                className="rounded-full px-4 hover:bg-white/10 active:scale-[0.98] transition-all"
+              >
                 <Globe className="h-4 w-4 mr-1.5" />
                 Website
               </Button>
             )}
             {business.location && (
-              <Button variant="glass-outline" size="sm" onClick={handleDirections}>
+              <Button 
+                variant="glass-outline" 
+                size="sm" 
+                onClick={handleDirections}
+                className="rounded-full px-4 hover:bg-white/10 active:scale-[0.98] transition-all"
+              >
                 <MapPin className="h-4 w-4 mr-1.5" />
                 Directions
               </Button>

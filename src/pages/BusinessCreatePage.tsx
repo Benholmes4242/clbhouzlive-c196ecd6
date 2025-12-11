@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Building2, MapPin, Globe, Mail, Phone, Check, Loader2 } from 'lucide-react';
+import { ArrowLeft, Building2, MapPin, Globe, Mail, Phone, Check, Loader2, GraduationCap, ShoppingBag, Briefcase, Flag } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,11 +10,22 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { BUSINESS_CATEGORIES } from '@/types/profile';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { cn } from '@/lib/utils';
 import { LocationAutocomplete, LocationValue } from '@/components/business/LocationAutocomplete';
 import { PhoneInputWithDialCode, PhoneValue } from '@/components/business/PhoneInputWithDialCode';
+
+// Categories with icons
+const BUSINESS_CATEGORIES_WITH_ICONS = [
+  { value: 'Golf Club', label: 'Golf Club', icon: Flag },
+  { value: 'Golf Academy', label: 'Golf Academy', icon: GraduationCap },
+  { value: 'Coach / Instructor', label: 'Coach / Instructor', icon: GraduationCap },
+  { value: 'Retailer / Pro Shop', label: 'Retailer / Pro Shop', icon: ShoppingBag },
+  { value: 'Club Fitter', label: 'Club Fitter', icon: Briefcase },
+  { value: 'Resort', label: 'Resort', icon: Building2 },
+  { value: 'Brand / Manufacturer', label: 'Brand / Manufacturer', icon: Briefcase },
+  { value: 'Other', label: 'Other', icon: Building2 },
+];
 
 const BusinessCreatePage = () => {
   const navigate = useNavigate();
@@ -65,13 +76,18 @@ const BusinessCreatePage = () => {
     setSaveSuccess(false);
 
     try {
+      // Format location as "City, Country" for cleaner display
+      const formattedLocation = location.country 
+        ? `${location.city}, ${location.country}`
+        : location.label;
+
       // 1. Create the business account
       const { data: businessData, error: businessError } = await supabase
         .from('business_accounts')
         .insert({
           name: formData.businessName,
           category: formData.businessCategory || null,
-          location: location?.label || null,
+          location: formattedLocation,
           website: formData.businessWebsite || null,
           email: formData.businessContactEmail || null,
           phone: phone?.fullNumber || null,
@@ -103,10 +119,10 @@ const BusinessCreatePage = () => {
       
       toast.success('Business profile created!');
 
-      // Navigate to the new business profile after success animation
+      // Navigate to the new business profile immediately
       setTimeout(() => {
         navigate(`/business/${businessId}`);
-      }, 800);
+      }, 600);
     } catch (error) {
       console.error('Error creating business profile:', error);
       toast.error('Failed to create business profile');
@@ -152,42 +168,29 @@ const BusinessCreatePage = () => {
             className="inline-flex items-center gap-1 text-xs text-primary hover:underline mb-2"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            <span>Back to profile</span>
+            <span>Back</span>
           </button>
 
-          {/* Title */}
-          <h1 className="text-xl font-semibold text-center">Create business profile</h1>
+          {/* Step indicator + Title */}
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-[11px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-sq-pill">
+              Step 2 of 2
+            </span>
+          </div>
+          <h1 className="text-xl font-semibold text-center mt-1">Business details</h1>
         </div>
       </header>
 
       {/* Content */}
       <main className="flex-1">
         <div className="mx-auto w-full max-w-3xl pb-28">
-          {/* Info banner */}
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 }}
-            className="px-4 py-4"
-          >
-            <div className="rounded-sq-md bg-gradient-to-br from-amber-50 to-amber-50/40 border border-amber-100/60 px-4 py-3">
-              <p className="text-sm font-semibold text-amber-900">
-                Business profiles get more visibility
-              </p>
-              <p className="mt-1 text-sm text-amber-900/70">
-                Your business will appear in the directory and can receive reviews, messages,
-                and follows from golfers.
-              </p>
-            </div>
-          </motion.div>
-
           {/* Band A: Business Identity */}
           <motion.section
             custom={0}
             initial="hidden"
             animate="visible"
             variants={sectionVariants}
-            className="px-4 py-6 bg-background"
+            className="px-4 py-5 bg-background"
           >
             <div className="flex items-center gap-2 mb-1">
               <Building2 className="w-4 h-4 text-muted-foreground" />
@@ -198,7 +201,7 @@ const BusinessCreatePage = () => {
             </p>
 
             <div className="space-y-4">
-            <div className="space-y-4">
+              <div className="space-y-1.5">
                 <Label htmlFor="businessName" className="text-xs text-muted-foreground">
                   Business Name <span className="text-destructive">*</span>
                 </Label>
@@ -207,10 +210,11 @@ const BusinessCreatePage = () => {
                   value={formData.businessName}
                   onChange={(e) => handleInputChange('businessName', e.target.value)}
                   placeholder="e.g., Royal Golf Club"
-                  className="h-10"
+                  className="h-10 capitalize"
+                  autoCapitalize="words"
                 />
-                <p className="text-[11px] text-muted-foreground -mt-2">
-                  Use your official business name. You can add location details below.
+                <p className="text-[11px] text-muted-foreground">
+                  This will appear publicly on your profile.
                 </p>
               </div>
 
@@ -226,11 +230,17 @@ const BusinessCreatePage = () => {
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent>
-                    {BUSINESS_CATEGORIES.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
+                    {BUSINESS_CATEGORIES_WITH_ICONS.map((category) => {
+                      const Icon = category.icon;
+                      return (
+                        <SelectItem key={category.value} value={category.value}>
+                          <span className="flex items-center gap-2">
+                            <Icon className="h-4 w-4 text-muted-foreground" />
+                            <span>{category.label}</span>
+                          </span>
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
                 <p className="text-[11px] text-muted-foreground">
@@ -252,11 +262,11 @@ const BusinessCreatePage = () => {
                   value={formData.businessBio}
                   onChange={(e) => handleInputChange('businessBio', e.target.value)}
                   placeholder="Tell golfers about your business..."
-                  className="min-h-[100px] resize-none"
+                  className="min-h-[120px] resize-none rounded-[14px] leading-relaxed"
                   maxLength={500}
                 />
                 <p className="text-[11px] text-muted-foreground">
-                  Highlight what makes you different — facilities, coaching, events, or anything golfers should know first.
+                  Highlight what makes you different — facilities, coaching, events, or anything golfers should know.
                 </p>
               </div>
             </div>
@@ -268,7 +278,7 @@ const BusinessCreatePage = () => {
             initial="hidden"
             animate="visible"
             variants={sectionVariants}
-            className="px-4 py-6 bg-muted/30"
+            className="px-4 py-5 bg-muted/30"
           >
             <div className="flex items-center gap-2 mb-1">
               <MapPin className="w-4 h-4 text-muted-foreground" />
@@ -280,7 +290,7 @@ const BusinessCreatePage = () => {
             
             {!isValid && formData.businessName.trim().length > 0 && (
               <p className="text-xs text-amber-700 mb-4">
-                Add a location and at least one contact method (website or email) to create your business profile.
+                Add a location and at least one contact method (website or email) to continue.
               </p>
             )}
 
@@ -295,11 +305,11 @@ const BusinessCreatePage = () => {
                     setLocation(val);
                     setLocationError(null);
                   }}
-                  placeholder="Search for a location..."
+                  placeholder="Search for a city…"
                   error={locationError || undefined}
                 />
                 <p className="text-[11px] text-muted-foreground">
-                  If you have multiple locations, use your main one.
+                  Choose the main location for your business.
                 </p>
               </div>
 
@@ -334,9 +344,6 @@ const BusinessCreatePage = () => {
                     placeholder="contact@business.com"
                     className="h-10"
                   />
-                  <p className="text-[11px] text-muted-foreground">
-                    Shown on your profile for golfers who prefer email.
-                  </p>
                 </div>
 
                 <div className="space-y-1.5">
@@ -348,9 +355,6 @@ const BusinessCreatePage = () => {
                     value={phone}
                     onChange={setPhone}
                   />
-                  <p className="text-[11px] text-muted-foreground">
-                    Select your country code and enter your local number. Optional but recommended.
-                  </p>
                 </div>
               </div>
 
@@ -379,7 +383,7 @@ const BusinessCreatePage = () => {
             onClick={handleSubmit}
             disabled={saving || saveSuccess || !isValid}
             className={cn(
-              "inline-flex h-10 flex-[1.5] items-center justify-center rounded-full px-4 text-sm font-semibold transition-all",
+              "inline-flex h-11 flex-[1.5] items-center justify-center rounded-full px-5 text-sm font-semibold transition-all",
               "bg-amber-500 text-white shadow-sm",
               "hover:bg-amber-600 active:scale-[0.99]",
               "disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-amber-300",

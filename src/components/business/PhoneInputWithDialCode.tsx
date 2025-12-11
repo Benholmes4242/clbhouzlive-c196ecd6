@@ -105,21 +105,23 @@ export const PhoneInputWithDialCode: React.FC<PhoneInputWithDialCodeProps> = ({
     });
   };
 
+  const selectedCountry = COUNTRY_DIAL_CODES.find(c => c.code === dialCode);
+
   return (
     <div className={cn('flex gap-2', className)}>
       <Select value={dialCode} onValueChange={handleDialCodeChange} disabled={disabled}>
-        <SelectTrigger className="w-[120px] h-10 shrink-0">
-          <span className="flex items-center gap-1.5 truncate">
-            <span>{COUNTRY_DIAL_CODES.find(c => c.code === dialCode)?.flag || '🌐'}</span>
-            <span>{dialCode}</span>
+        <SelectTrigger className="w-[100px] h-10 shrink-0 overflow-hidden">
+          <span className="flex items-center gap-1.5 text-clip">
+            <span className="text-base">{selectedCountry?.flag || '🌐'}</span>
+            <span className="text-sm">{dialCode}</span>
           </span>
         </SelectTrigger>
-        <SelectContent className="max-h-[300px]">
+        <SelectContent className="max-h-[240px]">
           {COUNTRY_DIAL_CODES.map((country) => (
-            <SelectItem key={country.code} value={country.code}>
+            <SelectItem key={country.code} value={country.code} className="py-2">
               <span className="flex items-center gap-2">
-                <span>{country.flag}</span>
-                <span>{country.code}</span>
+                <span className="text-base">{country.flag}</span>
+                <span className="text-sm">{country.code}</span>
               </span>
             </SelectItem>
           ))}
@@ -138,4 +140,3 @@ export const PhoneInputWithDialCode: React.FC<PhoneInputWithDialCodeProps> = ({
 };
 
 export default PhoneInputWithDialCode;
-

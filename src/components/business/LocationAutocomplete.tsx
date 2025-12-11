@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MapPin, Loader2, X, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { supabase } from '@/integrations/supabase/client';
 
 export interface LocationValue {
   label: string;
@@ -42,10 +41,18 @@ interface MapboxResponse {
   error?: string;
 }
 
+// Format location as "City, Country" for clean display
+const formatLocationDisplay = (value: LocationValue): string => {
+  if (value.country) {
+    return `${value.city}, ${value.country}`;
+  }
+  return value.label;
+};
+
 export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
   value,
   onChange,
-  placeholder = 'Search for a location...',
+  placeholder = 'Search for a city…',
   className,
   disabled = false,
   error,
@@ -81,14 +88,6 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
     setSearchError(null);
     
     try {
-      // Call our edge function that securely uses the Mapbox token
-      const { data, error } = await supabase.functions.invoke('location-search', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        body: null,
-      });
-
-      // Since invoke doesn't support query params directly, we need to use fetch
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL || 'https://ybxkehyomcakqjvuhnna.supabase.co'}/functions/v1/location-search?q=${encodeURIComponent(searchQuery)}`,
         {
@@ -186,7 +185,8 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
     };
 
     onChange(locationValue);
-    setQuery(feature.place_name);
+    // Show clean format in input after selection
+    setQuery(formatLocationDisplay(locationValue));
     setShowDropdown(false);
     setSuggestions([]);
     setSearchError(null);
@@ -201,8 +201,8 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
     inputRef.current?.focus();
   };
 
-  // Display the selected value or the query
-  const displayValue = value ? value.label : query;
+  // Display the selected value (clean format) or the query
+  const displayValue = value ? formatLocationDisplay(value) : query;
   const showError = error || (searchError && !loading);
 
   return (
@@ -219,6 +219,7 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
           placeholder={placeholder}
           className={cn(
             "pl-9 pr-9 h-10",
+            value && "text-foreground",
             showError && "border-destructive focus-visible:ring-destructive"
           )}
           disabled={disabled}
@@ -248,17 +249,28 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
       {/* Suggestions dropdown */}
       {showDropdown && suggestions.length > 0 && (
         <div className="absolute z-50 mt-1 w-full rounded-sq-md border bg-background shadow-lg max-h-60 overflow-auto">
-          {suggestions.map((feature) => (
-            <button
-              key={feature.id}
-              type="button"
-              onClick={() => handleSelect(feature)}
-              className="w-full px-3 py-2.5 text-left text-sm hover:bg-muted transition-colors flex items-start gap-2"
-            >
-              <MapPin className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
-              <span className="line-clamp-2">{feature.place_name}</span>
-            </button>
-          ))}
+          {suggestions.map((feature) => {
+            // Parse for cleaner display in suggestions
+            let city = feature.text;
+            let country = '';
+            if (feature.context) {
+              const countryCtx = feature.context.find(c => c.id.startsWith('country'));
+              if (countryCtx) country = countryCtx.text;
+            }
+            const cleanLabel = country ? `${city}, ${country}` : feature.place_name;
+            
+            return (
+              <button
+                key={feature.id}
+                type="button"
+                onClick={() => handleSelect(feature)}
+                className="w-full px-3 py-2.5 text-left text-sm hover:bg-muted transition-colors flex items-start gap-2"
+              >
+                <MapPin className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                <span>{cleanLabel}</span>
+              </button>
+            );
+          })}
         </div>
       )}
 
