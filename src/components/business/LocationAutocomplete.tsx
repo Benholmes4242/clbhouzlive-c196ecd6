@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MapPin, Loader2, X, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface LocationValue {
   label: string;
@@ -38,9 +39,8 @@ interface MapboxResponse {
   type: string;
   features: MapboxFeature[];
   attribution?: string;
+  error?: string;
 }
-
-const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiY2xiaG91eiIsImEiOiJjbTRsNGplOTEweHNuMmxzZXRlaWFzYWFoIn0.zdM-1W-rbIrRLAXMdl3hgA';
 
 export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
   value,
@@ -81,27 +81,38 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
     setSearchError(null);
     
     try {
-      // Mapbox Geocoding API - search for places
-      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchQuery)}.json?` +
-        `access_token=${MAPBOX_ACCESS_TOKEN}&types=place,locality,region,country&limit=8&language=en`;
-      
-      console.log('Searching locations for:', searchQuery);
-      
-      const response = await fetch(url);
+      // Call our edge function that securely uses the Mapbox token
+      const { data, error } = await supabase.functions.invoke('location-search', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        body: null,
+      });
+
+      // Since invoke doesn't support query params directly, we need to use fetch
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL || 'https://ybxkehyomcakqjvuhnna.supabase.co'}/functions/v1/location-search?q=${encodeURIComponent(searchQuery)}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
       
       if (!response.ok) {
-        console.error('Mapbox API error:', response.status, response.statusText);
+        console.error('Location search API error:', response.status);
         throw new Error(`API error: ${response.status}`);
       }
       
-      const data: MapboxResponse = await response.json();
-      console.log('Mapbox response:', data);
+      const responseData: MapboxResponse = await response.json();
       
-      if (data.features && Array.isArray(data.features)) {
-        setSuggestions(data.features);
+      if (responseData.error) {
+        throw new Error(responseData.error);
+      }
+      
+      if (responseData.features && Array.isArray(responseData.features)) {
+        setSuggestions(responseData.features);
         setShowDropdown(true);
       } else {
-        console.warn('Unexpected response format:', data);
         setSuggestions([]);
       }
     } catch (error) {
