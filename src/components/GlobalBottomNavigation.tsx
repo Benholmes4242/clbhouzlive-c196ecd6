@@ -201,12 +201,11 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 setNavRef(el);
               }}
               className={cn(
-                "chrome-bottom-nav", // Chrome auto-hide class lives on inner element to avoid Framer inline transform conflicts
-                "backdrop-blur-md",
-                isClubhouseRoute ? "bg-black/60" : "bg-surface-slate",
-                // Top border/shadow for separation
-                "relative before:absolute before:inset-x-0 before:top-0 before:h-px",
-                isClubhouseRoute ? "before:bg-white/10" : "before:bg-black/10"
+                "chrome-bottom-nav",
+                "backdrop-blur-xl",
+                isClubhouseRoute ? "bg-black/80" : "bg-surface-slate",
+                "border-t border-white/10",
+                "shadow-[0_-10px_30px_rgba(0,0,0,0.35)]"
               )}
               data-chrome="bottom-nav"
               style={{
