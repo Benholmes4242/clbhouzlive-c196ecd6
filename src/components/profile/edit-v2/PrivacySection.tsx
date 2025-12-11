@@ -31,6 +31,7 @@ export const PrivacySection: React.FC<PrivacySectionProps> = ({
           id="public-profile"
           checked={isPublic}
           onCheckedChange={onChange}
+          variant="slate"
         />
       </div>
     </div>

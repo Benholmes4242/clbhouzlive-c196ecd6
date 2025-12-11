@@ -25,16 +25,16 @@ export const SectionJumpStrip: React.FC<SectionJumpStripProps> = ({
             type="button"
             onClick={() => onSectionClick(section.id)}
             className={cn(
-              "text-xs whitespace-nowrap px-2.5 py-1 rounded-sq-pill transition-all",
+              "text-xs whitespace-nowrap px-3 py-1.5 rounded-full transition-all",
               activeSection === section.id
-                ? "bg-foreground text-background font-medium"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                ? "bg-slate-900 text-white font-medium"
+                : "text-slate-500 hover:text-slate-700"
             )}
           >
             {section.label}
           </button>
           {index < sections.length - 1 && (
-            <span className="text-muted-foreground/30 text-xs">·</span>
+            <span className="text-slate-300 text-xs">·</span>
           )}
         </React.Fragment>
       ))}

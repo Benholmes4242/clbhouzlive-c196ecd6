@@ -38,7 +38,7 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
           <button
             type="button"
             onClick={handleClick}
-            className="text-xs font-medium text-primary hover:underline"
+            className="text-sm font-medium text-slate-600 hover:text-slate-500"
           >
             Change photo
           </button>
