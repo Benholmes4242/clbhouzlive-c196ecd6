@@ -165,6 +165,7 @@ const BusinessInsightsPage = lazy(() => import("./pages/BusinessInsightsPage"));
 const BusinessProfilePage = lazy(() => import("./pages/BusinessProfilePage"));
 const MyBusinessesPage = lazy(() => import("./pages/MyBusinessesPage"));
 const BusinessCreatePage = lazy(() => import("./pages/BusinessCreatePage"));
+const BusinessIntroPage = lazy(() => import("./pages/BusinessIntroPage"));
 const BusinessManagePage = lazy(() => import("./pages/BusinessManagePage"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -240,6 +241,7 @@ function AppRoutes() {
         
         <Route path="/businesses" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessDirectoryPage /></Suspense>} />
         <Route path="/businesses/manage" element={<Suspense fallback={<GenericPageSkeleton />}><MyBusinessesPage /></Suspense>} />
+        <Route path="/business/intro" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessIntroPage /></Suspense>} />
         <Route path="/business/create" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessCreatePage /></Suspense>} />
         <Route path="/business/manage" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessManagePage /></Suspense>} />
         <Route path="/business/insights" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInsightsPage /></Suspense>} />

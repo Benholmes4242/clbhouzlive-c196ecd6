@@ -104,8 +104,8 @@ const HeaderNavigation = () => {
   };
 
   const handleCreateBusinessProfile = () => {
-    // Navigate directly to dedicated business create page
-    navigate('/business/create');
+    // Navigate to business intro page first
+    navigate('/business/intro');
   };
 
   // Keep modal handler for intro flow if needed elsewhere

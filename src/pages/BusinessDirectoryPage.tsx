@@ -9,7 +9,6 @@ import { BUSINESS_CATEGORIES } from '@/types/profile';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useHasBusinesses } from '@/hooks/useMyBusinesses';
-import { CreateBusinessProfileIntroModal } from '@/components/profile/CreateBusinessProfileIntroModal';
 
 const BusinessDirectoryPage = () => {
   const navigate = useNavigate();
@@ -20,7 +19,6 @@ const BusinessDirectoryPage = () => {
   const [category, setCategory] = useState<string | undefined>();
   const [location, setLocation] = useState('');
   const [page, setPage] = useState(1);
-  const [showBusinessIntroModal, setShowBusinessIntroModal] = useState(false);
 
   const { data, isLoading } = useBusinessDirectory({
     search,
@@ -38,12 +36,8 @@ const BusinessDirectoryPage = () => {
     } else if (hasBusinesses) {
       navigate('/businesses/manage');
     } else {
-      setShowBusinessIntroModal(true);
+      navigate('/business/intro');
     }
-  };
-
-  const handleBusinessIntroContinue = () => {
-    navigate('/edit-profile');
   };
 
   const getInitials = (name: string) => {
@@ -99,13 +93,6 @@ const BusinessDirectoryPage = () => {
             )}
           </Button>
         </div>
-
-        {/* Business Profile Intro Modal */}
-        <CreateBusinessProfileIntroModal
-          open={showBusinessIntroModal}
-          onClose={() => setShowBusinessIntroModal(false)}
-          onContinue={handleBusinessIntroContinue}
-        />
 
         {/* Filters */}
         <div className="flex flex-wrap gap-3 items-center">
