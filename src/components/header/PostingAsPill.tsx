@@ -7,16 +7,17 @@ import { cn } from '@/lib/utils';
 interface PostingAsPillProps {
   onClick: () => void;
   isOpen: boolean;
+  hasUnread?: boolean;
 }
 
-export function PostingAsPill({ onClick, isOpen }: PostingAsPillProps) {
+export function PostingAsPill({ onClick, isOpen, hasUnread = false }: PostingAsPillProps) {
   const { activeActor, isLoading } = useActiveActor();
 
   if (isLoading || !activeActor) {
     return (
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded-sq-pill bg-white/5 border border-white/10">
-        <div className="h-6 w-6 bg-white/10 animate-pulse" style={{ borderRadius: '34%' }} />
-        <div className="h-3 w-16 rounded bg-white/10 animate-pulse" />
+      <div className="flex items-center gap-2 pl-1.5 pr-2 py-1 rounded-full bg-white/5 border border-white/8">
+        <div className="h-7 w-7 bg-white/10 animate-pulse" style={{ borderRadius: '34%' }} />
+        <div className="h-3 w-12 rounded bg-white/10 animate-pulse" />
       </div>
     );
   }
@@ -27,31 +28,40 @@ export function PostingAsPill({ onClick, isOpen }: PostingAsPillProps) {
     <button
       onClick={onClick}
       className={cn(
-        "flex items-center gap-2 px-3 py-1.5",
-        "rounded-sq-pill bg-white/5 border border-white/10",
-        "hover:bg-white/10 active:bg-white/15 transition-colors",
-        "max-w-[200px]"
+        "flex items-center gap-2 pl-1.5 pr-2 py-1",
+        "rounded-full bg-white/5 border border-white/8",
+        "hover:bg-white/10 active:bg-white/15 active:scale-[0.98] transition-all",
+        "shadow-sm"
       )}
+      aria-label="Open account menu"
     >
-      {/* Squircle Avatar */}
-      <SquircleAvatar
-        size={24}
-        src={activeActor.avatarUrl}
-        alt={activeActor.name}
-        fallback={getInitials(activeActor.name)}
-        hideRing
-        className="flex-shrink-0"
-      />
+      {/* Avatar with notification dot */}
+      <div className="relative">
+        <SquircleAvatar
+          size={28}
+          src={activeActor.avatarUrl}
+          alt={activeActor.name}
+          fallback={getInitials(activeActor.name)}
+          hideRing
+        />
+        {/* Unread notification dot */}
+        {hasUnread && (
+          <span 
+            className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-orange-500 ring-2 ring-[rgb(10,10,10)]"
+            aria-label="Unread notifications"
+          />
+        )}
+      </div>
       
       {/* Name */}
-      <span className="text-xs font-medium text-white truncate max-w-[120px]">
+      <span className="text-xs font-medium text-white truncate max-w-[90px]">
         {activeActor.name}
       </span>
       
       {/* Chevron */}
       <ChevronDown 
         className={cn(
-          "h-3 w-3 text-white/50 flex-shrink-0 transition-transform duration-200",
+          "h-4 w-4 text-white/70 flex-shrink-0 transition-transform duration-200",
           isOpen && "rotate-180"
         )} 
       />

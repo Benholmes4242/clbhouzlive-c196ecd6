@@ -1,11 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Building2, User, Settings, LogOut, Shield } from 'lucide-react';
-import { useActiveActor, ActiveActor } from '@/context/ActiveActorContext';
+import { Check, Building2, User, Settings, LogOut, Shield, Bell } from 'lucide-react';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { cn } from '@/lib/utils';
 
 interface PostingAsMenuProps {
@@ -17,6 +19,8 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
   const navigate = useNavigate();
   const { activeActor, setActiveActor, availableActors } = useActiveActor();
   const { user } = useSupabaseSession();
+  const { data: userProfile } = useUserProfile(user?.id);
+  const { hasUnread } = useUnreadNotifications();
 
   // Check admin status
   const { data: adminStatus } = useQuery({
@@ -50,6 +54,9 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
 
   if (!isOpen) return null;
 
+  const displayName = userProfile?.display_name || user?.user_metadata?.full_name || 'User';
+  const email = user?.email || '';
+
   return (
     <>
       {/* Backdrop */}
@@ -59,7 +66,7 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
         aria-label="Close profile menu"
       />
       
-      {/* Menu panel - iOS Safari compositing layer fix */}
+      {/* Menu panel */}
       <div 
         className={cn(
           "fixed inset-x-0 z-[200]",
@@ -75,125 +82,175 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
         <div 
           className="mx-3 rounded-sq-lg bg-white shadow-xl border border-slate-200 overflow-hidden"
           style={{
-            // Reset to light theme colors - override clubhouse dark theme
             '--foreground': '210 13% 18%',
             '--muted-foreground': '210 10% 38%',
             '--muted': '240 5% 92%',
             '--border': '210 8% 89%',
           } as React.CSSProperties}
         >
-          {/* Profile list section */}
-          <div className="px-4 pt-3 pb-2">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Posting as
-            </span>
+          {/* Top identity summary */}
+          <div className="px-4 py-3 border-b border-slate-100">
+            <div className="flex items-center gap-3">
+              <SquircleAvatar
+                size={36}
+                src={activeActor?.avatarUrl}
+                alt={displayName}
+                fallback={getInitials(displayName)}
+                hideRing
+              />
+              <div className="flex flex-col min-w-0">
+                <span className="text-sm font-semibold text-slate-900 truncate">
+                  {displayName}
+                </span>
+                <span className="text-xs text-slate-500 truncate">
+                  {email}
+                </span>
+                <span className="mt-0.5 text-[11px] text-slate-500">
+                  Posting as{' '}
+                  <span className="font-medium text-slate-700">
+                    {activeActor?.name}
+                  </span>
+                </span>
+              </div>
+            </div>
           </div>
           
-          <div className="px-2 pb-2 space-y-1">
-            {availableActors.map((actor) => {
-              const isActive = activeActor?.type === actor.type && activeActor?.id === actor.id;
-              
-              return (
-                <button
-                  key={`${actor.type}-${actor.id}`}
-                  onClick={() => {
-                    if (!isActive) setActiveActor(actor);
-                    onClose();
-                  }}
-                  className="flex w-full items-center gap-3 rounded-sq-md px-3 py-2.5 hover:bg-muted/50 active:bg-muted transition-colors"
-                >
-                  <SquircleAvatar
-                    size="sm"
-                    src={actor.avatarUrl}
-                    alt={actor.name}
-                    fallback={getInitials(actor.name)}
-                    hideRing
-                  />
-                  <div className="flex-1 text-left min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-sm font-medium text-foreground truncate">
-                        {actor.name}
+          {/* Posting-as selector */}
+          <div className="px-2 py-2">
+            <span className="px-3 text-[11px] font-medium text-slate-400 uppercase tracking-wide">
+              Switch profile
+            </span>
+            <div className="mt-1 space-y-0.5">
+              {availableActors.map((actor) => {
+                const isActive = activeActor?.type === actor.type && activeActor?.id === actor.id;
+                
+                return (
+                  <button
+                    key={`${actor.type}-${actor.id}`}
+                    onClick={() => {
+                      if (!isActive) setActiveActor(actor);
+                      onClose();
+                    }}
+                    className={cn(
+                      "flex w-full items-center gap-2.5 rounded-sq-md px-3 py-2",
+                      isActive ? "bg-slate-100" : "hover:bg-slate-50"
+                    )}
+                  >
+                    <SquircleAvatar
+                      size={24}
+                      src={actor.avatarUrl}
+                      alt={actor.name}
+                      fallback={getInitials(actor.name)}
+                      hideRing
+                    />
+                    <div className="flex-1 text-left min-w-0">
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs font-medium text-slate-800 truncate">
+                          {actor.name}
+                        </span>
+                        {actor.type === 'business' ? (
+                          <Building2 className="h-3 w-3 text-slate-400 flex-shrink-0" />
+                        ) : (
+                          <User className="h-3 w-3 text-slate-400 flex-shrink-0" />
+                        )}
+                      </div>
+                      <span className="text-[11px] text-slate-500">
+                        {actor.type === 'personal' ? 'Personal' : 'Business'}
                       </span>
-                      {actor.type === 'business' ? (
-                        <Building2 className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                      ) : (
-                        <User className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                      )}
                     </div>
-                    <span className="text-xs text-muted-foreground">
-                      {actor.type === 'personal' ? 'Personal profile' : 'Business'}
-                    </span>
-                  </div>
-                  {isActive && (
-                    <Check className="h-4 w-4 text-emerald-500 flex-shrink-0" />
-                  )}
-                </button>
-              );
-            })}
+                    {isActive && (
+                      <Check className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
           
           {/* Divider */}
-          <div className="border-t border-border" />
+          <div className="border-t border-slate-100" />
           
-          {/* Account & settings section */}
-          <div className="px-2 py-2 space-y-1">
+          {/* Menu items */}
+          <nav className="px-2 py-2 space-y-0.5">
+            {/* Notifications */}
+            <button
+              onClick={() => {
+                navigate('/notificationmessages');
+                onClose();
+              }}
+              className="flex w-full items-center justify-between rounded-sq-md px-3 py-2.5 hover:bg-slate-50 text-left"
+            >
+              <span className="flex items-center gap-2.5">
+                <Bell className="h-4 w-4 text-slate-500" />
+                <span className="text-sm text-slate-700">Notifications</span>
+              </span>
+              {hasUnread && (
+                <span className="h-2.5 w-2.5 rounded-full bg-orange-500" />
+              )}
+            </button>
+            
+            {/* View profile */}
             <button
               onClick={() => {
                 navigate('/profile');
                 onClose();
               }}
-              className="flex w-full items-center gap-3 rounded-sq-md px-3 py-2.5 hover:bg-muted/50 active:bg-muted transition-colors text-left"
+              className="flex w-full items-center gap-2.5 rounded-sq-md px-3 py-2.5 hover:bg-slate-50 text-left"
             >
-              <User className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-foreground">View profile</span>
+              <User className="h-4 w-4 text-slate-500" />
+              <span className="text-sm text-slate-700">View profile</span>
             </button>
             
+            {/* Business profiles */}
             <button
               onClick={() => {
                 navigate('/businesses/manage');
                 onClose();
               }}
-              className="flex w-full items-center gap-3 rounded-sq-md px-3 py-2.5 hover:bg-muted/50 active:bg-muted transition-colors text-left"
+              className="flex w-full items-center gap-2.5 rounded-sq-md px-3 py-2.5 hover:bg-slate-50 text-left"
             >
-              <Building2 className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-foreground">Business profiles</span>
+              <Building2 className="h-4 w-4 text-slate-500" />
+              <span className="text-sm text-slate-700">Business profiles</span>
             </button>
             
+            {/* Settings */}
             <button
               onClick={() => {
                 navigate('/settings');
                 onClose();
               }}
-              className="flex w-full items-center gap-3 rounded-sq-md px-3 py-2.5 hover:bg-muted/50 active:bg-muted transition-colors text-left"
+              className="flex w-full items-center gap-2.5 rounded-sq-md px-3 py-2.5 hover:bg-slate-50 text-left"
             >
-              <Settings className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-foreground">Settings</span>
+              <Settings className="h-4 w-4 text-slate-500" />
+              <span className="text-sm text-slate-700">Profile & settings</span>
             </button>
 
+            {/* Admin Dashboard */}
             {hasAdminAccess && (
               <button
                 onClick={() => {
                   navigate('/admin');
                   onClose();
                 }}
-                className="flex w-full items-center gap-3 rounded-sq-md px-3 py-2.5 hover:bg-muted/50 active:bg-muted transition-colors text-left"
+                className="flex w-full items-center gap-2.5 rounded-sq-md px-3 py-2.5 hover:bg-slate-50 text-left"
               >
-                <Shield className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-foreground">Admin Dashboard</span>
+                <Shield className="h-4 w-4 text-slate-500" />
+                <span className="text-sm text-slate-700">Admin Dashboard</span>
               </button>
             )}
             
+            {/* Log out */}
             <button
               onClick={() => {
                 handleLogout();
                 onClose();
               }}
-              className="flex w-full items-center gap-3 rounded-sq-md px-3 py-2.5 hover:bg-red-50 active:bg-red-100 transition-colors text-left"
+              className="flex w-full items-center gap-2.5 rounded-sq-md px-3 py-2.5 hover:bg-red-50 text-left"
             >
               <LogOut className="h-4 w-4 text-red-500" />
               <span className="text-sm text-red-600">Log out</span>
             </button>
-          </div>
+          </nav>
         </div>
       </div>
     </>
