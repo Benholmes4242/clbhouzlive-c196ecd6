@@ -215,23 +215,14 @@ export const useEditProfileForm = (
     try {
       const isBusiness = formData.profileType === 'business';
       
+      // Base update data - always included
       const updateData: any = {
         profile_type: formData.profileType,
         display_name: isBusiness ? formData.businessName : formData.displayName,
-        home_club: isBusiness ? null : (formData.homeClub || null),
-        eg_handicap_index: isBusiness ? null : (formData.handicap ? parseFloat(formData.handicap) : null),
         is_public: formData.isPublic,
         bio: formData.bio || null,
         websites: normalizeWebsites(formData.websites),
-        // Business fields
-        business_name: isBusiness ? formData.businessName : null,
-        business_category: isBusiness ? (formData.businessCategory || null) : null,
-        business_website: isBusiness ? (formData.businessWebsite || null) : null,
-        business_location: isBusiness ? (formData.businessLocation || null) : null,
-        business_contact_email: isBusiness ? (formData.businessContactEmail || null) : null,
-        business_contact_phone: isBusiness ? (formData.businessContactPhone || null) : null,
-        business_bio: isBusiness ? (formData.businessBio || null) : null,
-        // Crop data
+        // Crop data (always save)
         mobile_crop_x: formData.mobileCropX,
         mobile_crop_y: formData.mobileCropY,
         mobile_crop_width: formData.mobileCropWidth,
@@ -246,6 +237,26 @@ export const useEditProfileForm = (
         mini_card_crop_height: formData.miniCardCropHeight,
         updated_at: new Date().toISOString(),
       };
+
+      if (isBusiness) {
+        // Business mode: update business fields, null out personal-specific fields
+        updateData.business_name = formData.businessName || null;
+        updateData.business_category = formData.businessCategory || null;
+        updateData.business_website = formData.businessWebsite || null;
+        updateData.business_location = formData.businessLocation || null;
+        updateData.business_contact_email = formData.businessContactEmail || null;
+        updateData.business_contact_phone = formData.businessContactPhone || null;
+        updateData.business_bio = formData.businessBio || null;
+        updateData.home_club = null;
+        updateData.eg_handicap_index = null;
+      } else {
+        // Personal mode: update personal fields, DO NOT touch business fields
+        // This prevents accidentally wiping business data for users who haven't set up business yet
+        updateData.home_club = formData.homeClub || null;
+        updateData.eg_handicap_index = formData.handicap ? parseFloat(formData.handicap) : null;
+        // Note: We intentionally don't null out business_* fields here
+        // This preserves any existing business data if user switches modes
+      }
 
       if (!isUsernameSet) {
         updateData.username = formData.username ? formData.username.replace(/\s+/g, '').replace('@', '').toLowerCase() : null;
