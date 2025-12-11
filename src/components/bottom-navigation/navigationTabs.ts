@@ -11,8 +11,8 @@ import { FEATURE_FLAGS } from '@/config/featureFlags';
 
 // Base tabs (always visible)
 const baseTabs = [
-  { id: 'clubhouse', label: 'Clubhouse', icon: HomeIcon, path: '/clubhouse' },
-  { id: 'discover', label: 'Explore', icon: IoCompassOutline, path: '/discover' },
+  { id: 'clubhouse', label: 'Home', icon: HomeIcon, path: '/clubhouse' },
+  { id: 'discover', label: 'Discover', icon: IoCompassOutline, path: '/discover' },
   { id: 'post', label: 'Post', icon: CameraIcon, path: null, isAction: true },
   { id: 'courses', label: 'Courses', icon: MapPinIcon, path: '/courses' },
 ];
@@ -20,6 +20,6 @@ const baseTabs = [
 // Conditional last tab based on Hub feature flag
 const lastTab = FEATURE_FLAGS.HUB
   ? { id: 'hub', label: 'Hub', icon: Squares2X2Icon, path: '/hub' }
-  : { id: 'profile', label: 'Profile', icon: UserIcon, path: '/profile' };
+  : { id: 'profile', label: 'Hub', icon: UserIcon, path: '/profile' };
 
 export const navigationTabs = [...baseTabs, lastTab];
