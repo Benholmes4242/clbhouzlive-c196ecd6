@@ -75,7 +75,7 @@ const BusinessProfilePage = () => {
         </Button>
       </div>
 
-      {/* Hero header */}
+      {/* Hero header - now matches personal profile structure */}
       <BusinessProfileHeader
         business={business}
         membership={membership ?? null}
@@ -83,30 +83,52 @@ const BusinessProfilePage = () => {
         followersCount={followersCount}
       />
 
-      {/* Tabs */}
-      <div className="max-w-6xl mx-auto px-4 md:px-6 py-6">
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as BusinessTab)}>
-          <TabsList className="w-full md:w-auto grid grid-cols-3 md:inline-grid mb-6">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="posts">Posts</TabsTrigger>
-            <TabsTrigger value="info">Info</TabsTrigger>
+      {/* Tab Navigation - matches personal profile styling */}
+      <section className="mt-6 px-4">
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as BusinessTab)} className="w-full">
+          <TabsList 
+            className="grid w-full rounded-sq-md bg-muted/70 border border-border/60 px-2 py-[3px]"
+            style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}
+          >
+            <TabsTrigger 
+              value="overview"
+              className="rounded-sq-pill text-sm px-3 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all"
+            >
+              Overview
+            </TabsTrigger>
+            <TabsTrigger 
+              value="posts"
+              className="rounded-sq-pill text-sm px-3 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all"
+            >
+              Posts
+            </TabsTrigger>
+            <TabsTrigger 
+              value="info"
+              className="rounded-sq-pill text-sm px-3 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all"
+            >
+              Info
+            </TabsTrigger>
           </TabsList>
+        </Tabs>
+      </section>
 
-          <TabsContent value="overview">
+      {/* Tab Content - with padding matching personal profile */}
+      <div className="pt-6 px-4 sm:px-6 lg:px-8 pb-6">
+        <div className="md:max-w-[1150px] md:mx-auto">
+          {activeTab === 'overview' && (
             <BusinessProfileOverview business={business} />
-          </TabsContent>
-
-          <TabsContent value="posts">
+          )}
+          {activeTab === 'posts' && (
             <BusinessProfilePosts 
-              businessId={business.id} 
+              businessId={business.id}
+              businessName={business.name}
               membership={membership ?? null} 
             />
-          </TabsContent>
-
-          <TabsContent value="info">
+          )}
+          {activeTab === 'info' && (
             <BusinessProfileInfo business={business} />
-          </TabsContent>
-        </Tabs>
+          )}
+        </div>
       </div>
     </PageRoot>
   );
