@@ -6,8 +6,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { toast } from 'sonner';
-import { ArrowLeft, Check, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ChevronLeft, Check, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // Section components
@@ -81,7 +80,7 @@ const EditProfilePage: React.FC = () => {
         displayName: profile.display_name || '',
         username: profile.username || '',
         homeClub: profile.home_club || '',
-        homeClubId: null, // We don't store club ID currently
+        homeClubId: null,
         handicap: profile.eg_handicap_index?.toString() || '',
         bio: profile.bio || '',
         websites: profile.websites || [],
@@ -226,192 +225,206 @@ const EditProfilePage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   // Section animation variants
-  const cardVariants = {
+  const sectionVariants = {
     hidden: { opacity: 0, y: 8 },
     visible: (i: number) => ({
       opacity: 1,
       y: 0,
       transition: {
-        delay: i * 0.05,
-        duration: 0.3,
+        delay: i * 0.04,
+        duration: 0.25,
         ease: 'easeOut' as const,
       },
     }),
   };
 
   return (
-    <div className="min-h-screen bg-muted/30 pb-24">
+    <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
+      <header className="sticky top-0 z-20 border-b bg-background/95 backdrop-blur">
+        <div className="mx-auto w-full max-w-3xl px-4 py-3 flex items-center gap-3">
           <button
+            type="button"
             onClick={handleCancel}
             className="p-2 -ml-2 rounded-full hover:bg-muted transition-colors"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ChevronLeft className="h-5 w-5" />
           </button>
-          <h1 className="text-lg font-semibold">Edit Profile</h1>
+          <h1 className="text-base font-semibold">Edit profile</h1>
+          {/* Spacer to balance */}
+          <div className="w-9" />
         </div>
-      </div>
+      </header>
 
-      {/* Content */}
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
-        {/* Section 1: Header Photo */}
-        <motion.div
-          custom={0}
-          initial="hidden"
-          animate="visible"
-          variants={cardVariants}
-        >
-          <HeaderPhotoCard
-            currentUrl={profile?.header_photo_url}
-            previewUrl={formData.headerPhotoPreview}
-            onFileChange={(file) => handlePhotoChange('headerPhoto', file)}
-          />
-        </motion.div>
+      {/* Scrollable content */}
+      <main className="flex-1">
+        <div className="mx-auto w-full max-w-3xl px-4 pb-28 pt-3">
+          {/* Section 1: Header Photo */}
+          <motion.section
+            custom={0}
+            initial="hidden"
+            animate="visible"
+            variants={sectionVariants}
+            className="py-4 border-b border-border/60"
+          >
+            <HeaderPhotoCard
+              currentUrl={profile?.header_photo_url}
+              previewUrl={formData.headerPhotoPreview}
+              onFileChange={(file) => handlePhotoChange('headerPhoto', file)}
+            />
+          </motion.section>
 
-        {/* Section 2: Profile Photo */}
-        <motion.div
-          custom={1}
-          initial="hidden"
-          animate="visible"
-          variants={cardVariants}
-        >
-          <ProfilePhotoCard
-            currentUrl={profile?.profile_photo_url}
-            previewUrl={formData.profilePhotoPreview}
-            onFileChange={(file) => handlePhotoChange('profilePhoto', file)}
-          />
-        </motion.div>
+          {/* Section 2: Profile Photo */}
+          <motion.section
+            custom={1}
+            initial="hidden"
+            animate="visible"
+            variants={sectionVariants}
+            className="py-4 border-b border-border/60"
+          >
+            <ProfilePhotoCard
+              currentUrl={profile?.profile_photo_url}
+              previewUrl={formData.profilePhotoPreview}
+              onFileChange={(file) => handlePhotoChange('profilePhoto', file)}
+            />
+          </motion.section>
 
-        {/* Section 3: Identity */}
-        <motion.div
-          custom={2}
-          initial="hidden"
-          animate="visible"
-          variants={cardVariants}
-        >
-          <IdentitySection
-            displayName={formData.displayName}
-            username={formData.username}
-            isUsernameSet={isUsernameSet}
-            onChange={handleFieldChange}
-          />
-        </motion.div>
+          {/* Section 3: Identity */}
+          <motion.section
+            custom={2}
+            initial="hidden"
+            animate="visible"
+            variants={sectionVariants}
+            className="py-4 border-b border-border/60"
+          >
+            <IdentitySection
+              displayName={formData.displayName}
+              username={formData.username}
+              isUsernameSet={isUsernameSet}
+              onChange={handleFieldChange}
+            />
+          </motion.section>
 
-        {/* Section 4: Golf Information */}
-        <motion.div
-          custom={3}
-          initial="hidden"
-          animate="visible"
-          variants={cardVariants}
-        >
-          <GolfInfoSection
-            homeClub={formData.homeClub}
-            handicap={formData.handicap}
-            onChange={handleFieldChange}
-          />
-        </motion.div>
+          {/* Section 4: Golf Information */}
+          <motion.section
+            custom={3}
+            initial="hidden"
+            animate="visible"
+            variants={sectionVariants}
+            className="py-4 border-b border-border/60"
+          >
+            <GolfInfoSection
+              homeClub={formData.homeClub}
+              handicap={formData.handicap}
+              onChange={handleFieldChange}
+            />
+          </motion.section>
 
-        {/* Section 5: Bio & Websites */}
-        <motion.div
-          custom={4}
-          initial="hidden"
-          animate="visible"
-          variants={cardVariants}
-        >
-          <BioWebsitesSection
-            bio={formData.bio}
-            websites={formData.websites}
-            maxBioLength={BIO_MAX_LENGTH}
-            onBioChange={(bio) => handleFieldChange('bio', bio)}
-            onWebsitesChange={(websites) => handleFieldChange('websites', websites)}
-          />
-        </motion.div>
+          {/* Section 5: Bio & Websites */}
+          <motion.section
+            custom={4}
+            initial="hidden"
+            animate="visible"
+            variants={sectionVariants}
+            className="py-4 border-b border-border/60"
+          >
+            <BioWebsitesSection
+              bio={formData.bio}
+              websites={formData.websites}
+              maxBioLength={BIO_MAX_LENGTH}
+              onBioChange={(bio) => handleFieldChange('bio', bio)}
+              onWebsitesChange={(websites) => handleFieldChange('websites', websites)}
+            />
+          </motion.section>
 
-        {/* Section 6: Privacy */}
-        <motion.div
-          custom={5}
-          initial="hidden"
-          animate="visible"
-          variants={cardVariants}
-        >
-          <PrivacySection
-            isPublic={formData.isPublic}
-            onChange={(isPublic) => handleFieldChange('isPublic', isPublic)}
-          />
-        </motion.div>
-      </div>
+          {/* Section 6: Privacy */}
+          <motion.section
+            custom={5}
+            initial="hidden"
+            animate="visible"
+            variants={sectionVariants}
+            className="py-4"
+          >
+            <PrivacySection
+              isPublic={formData.isPublic}
+              onChange={(isPublic) => handleFieldChange('isPublic', isPublic)}
+            />
+          </motion.section>
+        </div>
+      </main>
 
       {/* Sticky Footer */}
-      <div className="fixed bottom-0 inset-x-0 z-50">
-        <div className="bg-background/80 backdrop-blur-xl border-t border-border">
-          <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-            <Button
-              variant="ghost"
-              onClick={handleCancel}
-              disabled={saving}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={saving || saveSuccess}
-              className={cn(
-                'min-w-[140px] transition-all',
-                saveSuccess && 'bg-emerald-500 hover:bg-emerald-500'
+      <footer className="fixed inset-x-0 bottom-0 z-20 border-t bg-background/95 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-3xl items-center justify-end gap-3 px-4 py-3">
+          <button
+            type="button"
+            onClick={handleCancel}
+            disabled={saving}
+            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving || saveSuccess}
+            className={cn(
+              "inline-flex items-center justify-center rounded-full px-5 py-2 text-sm font-semibold transition-all",
+              "bg-primary text-primary-foreground",
+              "disabled:opacity-60 disabled:cursor-not-allowed",
+              saveSuccess && "bg-emerald-500"
+            )}
+          >
+            <AnimatePresence mode="wait">
+              {saving ? (
+                <motion.span
+                  key="saving"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex items-center gap-2"
+                >
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Saving…
+                </motion.span>
+              ) : saveSuccess ? (
+                <motion.span
+                  key="success"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex items-center gap-2"
+                >
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+                  >
+                    <Check className="w-4 h-4" />
+                  </motion.div>
+                  Saved
+                </motion.span>
+              ) : (
+                <motion.span
+                  key="save"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  Save
+                </motion.span>
               )}
-            >
-              <AnimatePresence mode="wait">
-                {saving ? (
-                  <motion.span
-                    key="saving"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="flex items-center gap-2"
-                  >
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Saving...
-                  </motion.span>
-                ) : saveSuccess ? (
-                  <motion.span
-                    key="success"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="flex items-center gap-2"
-                  >
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 10 }}
-                    >
-                      <Check className="w-4 h-4" />
-                    </motion.div>
-                    Saved
-                  </motion.span>
-                ) : (
-                  <motion.span
-                    key="save"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    Save Changes
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </Button>
-          </div>
+            </AnimatePresence>
+          </button>
         </div>
-      </div>
+      </footer>
     </div>
   );
 };
