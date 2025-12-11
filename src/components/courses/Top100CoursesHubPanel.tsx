@@ -308,23 +308,14 @@ const Top100CoursesHubPanel = () => {
                 </div>
               )}
 
-              {/* Right: inline CTAs */}
+              {/* Right: inline CTA */}
               <div className="flex flex-col items-end gap-1 text-sm flex-1">
                 <button
                   type="button"
                   onClick={handleOpenTop100Journey}
-                  className="inline-flex items-center font-semibold text-primary hover:text-primary/80 transition-colors"
+                  className="inline-flex items-center font-semibold text-slate-700 hover:text-slate-900 transition-colors"
                 >
                   Visit Top 100 Club
-                  <span className="ml-1">→</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleOpenTop100Leaderboard}
-                  className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  View leaderboard
                   <span className="ml-1">→</span>
                 </button>
               </div>
