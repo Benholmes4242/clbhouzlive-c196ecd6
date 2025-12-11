@@ -2418,6 +2418,57 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications_backup_pre_golive: {
+        Row: {
+          actor_id: string | null
+          created_at: string | null
+          data: Json | null
+          entity_id: string | null
+          entity_type: string | null
+          id: string | null
+          is_deleted: boolean | null
+          is_read: boolean | null
+          message: string | null
+          read: boolean | null
+          title: string | null
+          type: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string | null
+          data?: Json | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string | null
+          is_deleted?: boolean | null
+          is_read?: boolean | null
+          message?: string | null
+          read?: boolean | null
+          title?: string | null
+          type?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string | null
+          data?: Json | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string | null
+          is_deleted?: boolean | null
+          is_read?: boolean | null
+          message?: string | null
+          read?: boolean | null
+          title?: string | null
+          type?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       ping_matches: {
         Row: {
           created_at: string
