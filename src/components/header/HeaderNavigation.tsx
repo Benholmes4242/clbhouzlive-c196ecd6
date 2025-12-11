@@ -242,7 +242,7 @@ const HeaderNavigation = () => {
             <User className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48 mr-2 bg-white border shadow-lg z-50">
+        <DropdownMenuContent align="end" className="w-48 mr-2 bg-white border shadow-lg z-50 max-h-none overflow-visible">
           <DropdownMenuItem onClick={handleProfileClick}>
             View Profile
           </DropdownMenuItem>
@@ -263,7 +263,6 @@ const HeaderNavigation = () => {
               Create business profile
             </DropdownMenuItem>
           )}
-          <DropdownMenuSeparator />
         </DropdownMenuContent>
       </DropdownMenu>
       <DropdownMenu>
