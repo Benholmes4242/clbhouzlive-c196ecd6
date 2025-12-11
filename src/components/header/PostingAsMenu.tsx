@@ -83,7 +83,7 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
         )}
         style={{ top: 'calc(56px + env(safe-area-inset-top))' }}
       >
-        <div className="mx-3 rounded-sq-lg bg-white shadow-xl border border-border overflow-hidden">
+        <div className="mx-3 rounded-sq-lg shadow-xl border border-border overflow-hidden" style={{ backgroundColor: '#ffffff' }}>
           {/* Profile list section */}
           <div className="px-4 pt-3 pb-2">
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
