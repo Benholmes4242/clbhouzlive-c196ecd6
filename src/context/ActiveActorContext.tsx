@@ -93,6 +93,24 @@ export function ActiveActorProvider({ children }: { children: ReactNode }) {
     setInitialized(true);
   }, [profile, profileLoading, businessesLoading, availableActors, initialized]);
 
+  // Keep activeActor in sync with fresh availableActors data (avatar/name changes)
+  useEffect(() => {
+    if (!activeActor || !initialized) return;
+    
+    // Find the matching fresh actor from availableActors
+    const freshActor = availableActors.find(
+      a => a.type === activeActor.type && a.id === activeActor.id
+    );
+    
+    // If found and data differs, update to fresh values
+    if (freshActor && (
+      freshActor.avatarUrl !== activeActor.avatarUrl ||
+      freshActor.name !== activeActor.name
+    )) {
+      setActiveActorState(freshActor);
+    }
+  }, [availableActors, activeActor, initialized]);
+
   // Persist to localStorage
   useEffect(() => {
     if (activeActor) {
