@@ -6,6 +6,12 @@ import { ShieldCheck, Clock, XCircle, CheckCircle, AlertCircle } from 'lucide-re
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface VerificationStatusPanelProps {
   profile: {
@@ -36,13 +42,6 @@ const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profi
     (profile.business_website?.trim() || profile.business_contact_email?.trim())
   );
 
-  const missingFields: string[] = [];
-  if (!profile.business_name?.trim()) missingFields.push('Business name');
-  if (!profile.business_location?.trim()) missingFields.push('Location');
-  if (!profile.business_website?.trim() && !profile.business_contact_email?.trim()) {
-    missingFields.push('Website or contact email');
-  }
-
   const handleRequestVerification = async () => {
     if (!profile.id) return;
 
@@ -61,7 +60,7 @@ const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profi
           body: {
             profileId: profile.id,
             businessName: profile.business_name,
-            businessCategory: null, // Not available in props
+            businessCategory: null,
             businessLocation: profile.business_location,
             businessWebsite: profile.business_website,
             businessContactEmail: profile.business_contact_email,
@@ -69,7 +68,6 @@ const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profi
         });
       } catch (emailErr) {
         console.error('Failed to send admin notification email:', emailErr);
-        // Don't fail the request if email fails
       }
 
       // Invalidate profile caches
@@ -95,48 +93,78 @@ const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profi
         </div>
 
         <p className="text-sm text-muted-foreground">
-          Verified businesses get a check badge and priority placement in the directory.
-          To request verification, make sure your profile includes:
+          Verification helps golfers trust that your business is authentic.
+          Once verified, you'll appear with a blue badge across Clbhouz and may receive higher visibility in the directory.
         </p>
 
-        <ul className="text-sm text-muted-foreground space-y-1.5 ml-4">
-          <li className="flex items-center gap-2">
-            {profile.business_name?.trim() ? (
-              <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />
-            ) : (
-              <AlertCircle className="h-3.5 w-3.5 text-amber-500" />
-            )}
-            A clear business name
-          </li>
-          <li className="flex items-center gap-2">
-            {profile.business_location?.trim() ? (
-              <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />
-            ) : (
-              <AlertCircle className="h-3.5 w-3.5 text-amber-500" />
-            )}
-            Location
-          </li>
-          <li className="flex items-center gap-2">
-            {(profile.business_website?.trim() || profile.business_contact_email?.trim()) ? (
-              <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />
-            ) : (
-              <AlertCircle className="h-3.5 w-3.5 text-amber-500" />
-            )}
-            Website or contact email
-          </li>
-        </ul>
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground font-medium">
+            Before requesting verification, make sure your profile includes:
+          </p>
+          <ul className="text-sm text-muted-foreground space-y-1.5 ml-1">
+            <li className="flex items-center gap-2">
+              {profile.business_name?.trim() ? (
+                <CheckCircle className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+              ) : (
+                <AlertCircle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+              )}
+              A clear business name
+            </li>
+            <li className="flex items-center gap-2">
+              {(profile.business_website?.trim() || profile.business_contact_email?.trim()) ? (
+                <CheckCircle className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+              ) : (
+                <AlertCircle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+              )}
+              A website or contact email
+            </li>
+            <li className="flex items-center gap-2">
+              {profile.business_location?.trim() ? (
+                <CheckCircle className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+              ) : (
+                <AlertCircle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+              )}
+              Your location
+            </li>
+            <li className="flex items-center gap-2">
+              {profile.profile_photo_url?.trim() ? (
+                <CheckCircle className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+              ) : (
+                <AlertCircle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+              )}
+              A profile image or logo
+            </li>
+          </ul>
+        </div>
 
-        <Button
-          onClick={handleRequestVerification}
-          disabled={isRequesting || !canRequestVerification}
-          className="w-full"
-        >
-          {isRequesting ? 'Submitting...' : 'Request Verification'}
-        </Button>
+        {canRequestVerification ? (
+          <Button
+            onClick={handleRequestVerification}
+            disabled={isRequesting}
+            className="w-full"
+          >
+            {isRequesting ? 'Submitting...' : 'Request Verification'}
+          </Button>
+        ) : (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <Button disabled className="w-full">
+                    Complete your profile to request verification
+                  </Button>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Add a business name, location, and website or email to continue.</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
 
-        {!canRequestVerification && missingFields.length > 0 && (
+        {!canRequestVerification && (
           <p className="text-xs text-amber-600">
-            Complete the following to request verification: {missingFields.join(', ')}
+            Your business profile is missing key information needed for verification.
           </p>
         )}
       </Card>
@@ -150,17 +178,17 @@ const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profi
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-foreground">
             <ShieldCheck className="w-4 h-4" />
-            <h3 className="font-medium">Business Verification</h3>
+            <h3 className="font-medium">Verification in Progress</h3>
           </div>
           <Badge variant="secondary" className="bg-amber-500/10 text-amber-600 border-amber-500/20 gap-1">
             <Clock className="h-3 w-3" />
-            Pending review
+            Pending Review
           </Badge>
         </div>
 
         <p className="text-sm text-muted-foreground">
-          Your verification request is being reviewed by the Clbhouz team.
-          We'll notify you in-app when it's complete.
+          Thanks — your request has been received.
+          Our team is reviewing your business details. We'll notify you as soon as we've made a decision.
         </p>
 
         {profile.verification_requested_at && (
@@ -172,6 +200,21 @@ const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profi
             })}
           </p>
         )}
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <Button disabled className="w-full" variant="outline">
+                  Request Verification
+                </Button>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>A request is already in progress.</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </Card>
     );
   }
@@ -183,7 +226,7 @@ const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profi
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-foreground">
             <ShieldCheck className="w-4 h-4" />
-            <h3 className="font-medium">Business Verification</h3>
+            <h3 className="font-medium">Your Business Is Verified</h3>
           </div>
           <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 gap-1">
             <CheckCircle className="h-3 w-3" />
@@ -192,7 +235,8 @@ const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profi
         </div>
 
         <p className="text-sm text-muted-foreground">
-          Your business is verified. Golfers will see a verified badge on your profile and in the directory.
+          Your business now displays a verified badge across Clbhouz.
+          Golfers will see this badge in the directory, search results, and your profile.
         </p>
       </Card>
     );
@@ -205,16 +249,17 @@ const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profi
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-foreground">
             <ShieldCheck className="w-4 h-4" />
-            <h3 className="font-medium">Business Verification</h3>
+            <h3 className="font-medium">Verification Not Approved</h3>
           </div>
           <Badge variant="secondary" className="bg-red-500/10 text-red-600 border-red-500/20 gap-1">
             <XCircle className="h-3 w-3" />
-            Not verified
+            Rejected
           </Badge>
         </div>
 
         <p className="text-sm text-muted-foreground">
-          Your last verification request was not approved.
+          Your previous verification request wasn't approved.
+          You can review the notes below, update your profile, and request verification again.
         </p>
 
         {profile.verification_notes && (
@@ -224,19 +269,34 @@ const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profi
           </div>
         )}
 
-        <Button
-          onClick={handleRequestVerification}
-          disabled={isRequesting || !canRequestVerification}
-          className="w-full"
-        >
-          {isRequesting ? 'Submitting...' : 'Request Verification Again'}
-        </Button>
-
-        {!canRequestVerification && missingFields.length > 0 && (
-          <p className="text-xs text-amber-600">
-            Complete the following to request verification: {missingFields.join(', ')}
-          </p>
+        {canRequestVerification ? (
+          <Button
+            onClick={handleRequestVerification}
+            disabled={isRequesting}
+            className="w-full"
+          >
+            {isRequesting ? 'Submitting...' : 'Request Verification Again'}
+          </Button>
+        ) : (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <Button disabled className="w-full">
+                    Complete your profile to request verification
+                  </Button>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Add a business name, location, and website or email to continue.</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )}
+
+        <p className="text-xs text-muted-foreground">
+          Make sure your profile details are accurate and match your official business information.
+        </p>
       </Card>
     );
   }

@@ -9,8 +9,19 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
@@ -34,6 +45,7 @@ interface BusinessVerificationRequest {
 const BusinessVerificationsPage = () => {
   const queryClient = useQueryClient();
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
+  const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState<BusinessVerificationRequest | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [processing, setProcessing] = useState(false);
@@ -84,15 +96,17 @@ const BusinessVerificationsPage = () => {
       toast.success(status === 'verified' ? 'Business verified successfully.' : 'Verification request rejected.');
 
       await queryClient.invalidateQueries({ queryKey: ['admin-business-verifications'] });
+      await queryClient.invalidateQueries({ queryKey: ['admin-business-verifications-count'] });
       await queryClient.invalidateQueries({ queryKey: ['profile'] });
       await queryClient.invalidateQueries({ queryKey: ['user-profile'] });
       
       setRejectModalOpen(false);
+      setApproveDialogOpen(false);
       setSelectedProfile(null);
       setRejectReason('');
     } catch (err) {
       console.error(err);
-      toast.error('Failed to update verification status. Please try again.');
+      toast.error('Could not update verification status. Please try again.');
     } finally {
       setProcessing(false);
     }
@@ -104,14 +118,33 @@ const BusinessVerificationsPage = () => {
     setRejectModalOpen(true);
   };
 
+  const openApproveDialog = (request: BusinessVerificationRequest) => {
+    setSelectedProfile(request);
+    setApproveDialogOpen(true);
+  };
+
+  const handleWebsiteClick = (url: string | null) => {
+    if (!url) return;
+    
+    try {
+      const fullUrl = url.startsWith('http') ? url : `https://${url}`;
+      new URL(fullUrl);
+      window.open(fullUrl, '_blank', 'noopener,noreferrer');
+    } catch {
+      toast.error('This website link appears to be invalid.');
+    }
+  };
+
   const getStatusBadge = (status: string | null) => {
     switch (status) {
       case 'pending_review':
-        return <Badge variant="secondary" className="bg-amber-500/10 text-amber-600 border-amber-500/20">Pending</Badge>;
+        return <Badge variant="secondary" className="bg-amber-500/10 text-amber-600 border-amber-500/20">Pending Review</Badge>;
       case 'verified':
-        return <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">Verified</Badge>;
+        return <Badge variant="secondary" className="bg-blue-500/10 text-blue-600 border-blue-500/20">Verified</Badge>;
       case 'rejected':
         return <Badge variant="secondary" className="bg-red-500/10 text-red-600 border-red-500/20">Rejected</Badge>;
+      case 'unverified':
+        return <Badge variant="outline" className="text-muted-foreground">Unverified</Badge>;
       default:
         return <Badge variant="outline">Unknown</Badge>;
     }
@@ -120,7 +153,7 @@ const BusinessVerificationsPage = () => {
   if (isLoading) {
     return (
       <div className="p-6 space-y-4">
-        <h1 className="text-2xl font-semibold">Business Verification</h1>
+        <h1 className="text-2xl font-semibold">Business Verification Requests</h1>
         <div className="animate-pulse space-y-4">
           {[1, 2, 3].map(i => (
             <div key={i} className="h-32 bg-muted rounded-sq-md" />
@@ -134,9 +167,9 @@ const BusinessVerificationsPage = () => {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Business Verification</h1>
+          <h1 className="text-2xl font-semibold">Business Verification Requests</h1>
           <p className="text-muted-foreground">
-            Review and manage business verification requests
+            Review and approve verification requests from businesses on Clbhouz.
           </p>
         </div>
         {pendingCount > 0 && (
@@ -156,6 +189,16 @@ const BusinessVerificationsPage = () => {
         </Card>
       ) : (
         <div className="space-y-4">
+          {/* Table header for larger screens */}
+          <div className="hidden lg:grid lg:grid-cols-[2fr_1fr_1fr_1.5fr_1fr_auto] gap-4 px-5 py-2 text-sm font-medium text-muted-foreground border-b">
+            <span>Business</span>
+            <span>Category</span>
+            <span>Location</span>
+            <span>Contact Details</span>
+            <span>Status</span>
+            <span>Actions</span>
+          </div>
+
           {requests?.map((request) => (
             <Card key={request.id} className="p-5">
               <div className="flex flex-col gap-4">
@@ -185,40 +228,38 @@ const BusinessVerificationsPage = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                   {request.business_category && (
                     <div className="flex items-center gap-2 text-muted-foreground">
-                      <Building2 className="h-4 w-4" />
+                      <Building2 className="h-4 w-4 shrink-0" />
                       <span>{request.business_category}</span>
                     </div>
                   )}
                   {request.business_location && (
                     <div className="flex items-center gap-2 text-muted-foreground">
-                      <MapPin className="h-4 w-4" />
+                      <MapPin className="h-4 w-4 shrink-0" />
                       <span>{request.business_location}</span>
                     </div>
                   )}
                   {request.business_website && (
                     <div className="flex items-center gap-2 text-muted-foreground">
-                      <Globe className="h-4 w-4" />
-                      <a 
-                        href={request.business_website.startsWith('http') ? request.business_website : `https://${request.business_website}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hover:text-primary hover:underline truncate"
+                      <Globe className="h-4 w-4 shrink-0" />
+                      <button
+                        onClick={() => handleWebsiteClick(request.business_website)}
+                        className="hover:text-primary hover:underline truncate text-left"
                       >
                         {request.business_website}
-                      </a>
+                      </button>
                     </div>
                   )}
                   {request.business_contact_email && (
                     <div className="flex items-center gap-2 text-muted-foreground">
-                      <Mail className="h-4 w-4" />
-                      <a href={`mailto:${request.business_contact_email}`} className="hover:text-primary hover:underline">
+                      <Mail className="h-4 w-4 shrink-0" />
+                      <a href={`mailto:${request.business_contact_email}`} className="hover:text-primary hover:underline truncate">
                         {request.business_contact_email}
                       </a>
                     </div>
                   )}
                   {request.business_contact_phone && (
                     <div className="flex items-center gap-2 text-muted-foreground">
-                      <Phone className="h-4 w-4" />
+                      <Phone className="h-4 w-4 shrink-0" />
                       <span>{request.business_contact_phone}</span>
                     </div>
                   )}
@@ -227,7 +268,7 @@ const BusinessVerificationsPage = () => {
                 {/* Requested At */}
                 {request.verification_requested_at && (
                   <p className="text-xs text-muted-foreground">
-                    Requested {new Date(request.verification_requested_at).toLocaleDateString('en-GB', {
+                    Requested on {new Date(request.verification_requested_at).toLocaleDateString('en-GB', {
                       day: 'numeric',
                       month: 'short',
                       year: 'numeric',
@@ -242,7 +283,7 @@ const BusinessVerificationsPage = () => {
                   <div className="flex items-center gap-2 pt-2 border-t">
                     <Button
                       size="sm"
-                      onClick={() => handleUpdateStatus(request.id, 'verified')}
+                      onClick={() => openApproveDialog(request)}
                       disabled={processing}
                       className="gap-1.5 bg-emerald-600 hover:bg-emerald-700"
                     >
@@ -267,27 +308,47 @@ const BusinessVerificationsPage = () => {
         </div>
       )}
 
+      {/* Approve Confirmation Dialog */}
+      <AlertDialog open={approveDialogOpen} onOpenChange={setApproveDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Approve this business?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This business will receive a verified badge and appear as verified across Clbhouz.
+              Are you sure you want to approve this request?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={processing}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => selectedProfile && handleUpdateStatus(selectedProfile.id, 'verified')}
+              disabled={processing}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
+              {processing ? 'Approving...' : 'Approve'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Reject Modal */}
       <Dialog open={rejectModalOpen} onOpenChange={setRejectModalOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Reject Verification Request</DialogTitle>
+            <DialogDescription>
+              If you'd like, you can provide a reason for rejecting this request.
+              This may help the business update their profile before requesting again.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <p className="text-sm text-muted-foreground">
-              Are you sure you want to reject the verification request for{' '}
-              <span className="font-medium text-foreground">
-                {selectedProfile?.business_name || selectedProfile?.display_name}
-              </span>
-              ?
-            </p>
             <div className="space-y-2">
-              <Label htmlFor="rejectReason">Reason (optional)</Label>
+              <Label htmlFor="rejectReason">Reason for rejection (optional)</Label>
               <Textarea
                 id="rejectReason"
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
-                placeholder="Provide a reason for rejection..."
+                placeholder="Reason for rejection (optional)…"
                 className="min-h-[100px]"
               />
             </div>
@@ -301,7 +362,7 @@ const BusinessVerificationsPage = () => {
               onClick={() => selectedProfile && handleUpdateStatus(selectedProfile.id, 'rejected', rejectReason)}
               disabled={processing}
             >
-              {processing ? 'Rejecting...' : 'Reject'}
+              {processing ? 'Rejecting...' : 'Reject Request'}
             </Button>
           </DialogFooter>
         </DialogContent>
