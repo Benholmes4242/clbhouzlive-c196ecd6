@@ -167,7 +167,6 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
             <div key={course.id} className="mb-4 sm:mb-0">
               <CourseListCard 
                 course={course}
-                showGlobalRank={!!course.global_rank}
                 onClick={() => {
                   onCourseClick?.();
                   navigate(`/courses/${course.id}`);
@@ -193,7 +192,6 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
             <div key={course.id} className="mb-4 sm:mb-0">
               <CourseListCard 
                 course={course}
-                showGlobalRank={!!course.global_rank}
                 onClick={() => {
                   onCourseClick?.();
                   navigate(`/courses/${course.id}`);
@@ -229,7 +227,6 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
           >
             <CourseListCard 
               course={course}
-              showGlobalRank={!!course.global_rank}
               onClick={() => {
                 onCourseClick?.();
                 navigate(`/courses/${course.id}`);
