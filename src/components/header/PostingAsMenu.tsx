@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, Building2, User, Settings, LogOut, Shield } from 'lucide-react';
 import { useActiveActor, ActiveActor } from '@/context/ActiveActorContext';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -46,23 +47,6 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
   };
 
   const getInitials = (name: string) => name.charAt(0).toUpperCase();
-
-  const renderAvatar = (actor: ActiveActor) => {
-    if (actor.avatarUrl) {
-      return (
-        <img
-          src={actor.avatarUrl}
-          alt={actor.name}
-          className="h-10 w-10 rounded-full object-cover"
-        />
-      );
-    }
-    return (
-      <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-sm font-medium">
-        {getInitials(actor.name)}
-      </div>
-    );
-  };
 
   if (!isOpen) return null;
 
@@ -118,7 +102,13 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
                   }}
                   className="flex w-full items-center gap-3 rounded-sq-md px-3 py-2.5 hover:bg-muted/50 active:bg-muted transition-colors"
                 >
-                  {renderAvatar(actor)}
+                  <SquircleAvatar
+                    size="sm"
+                    src={actor.avatarUrl}
+                    alt={actor.name}
+                    fallback={getInitials(actor.name)}
+                    hideRing
+                  />
                   <div className="flex-1 text-left min-w-0">
                     <div className="flex items-center gap-1.5">
                       <span className="text-sm font-medium text-foreground truncate">
