@@ -81,10 +81,13 @@ export const BioWebsitesSection: React.FC<BioWebsitesSectionProps> = ({
             id="bio"
             value={bio}
             onChange={handleBioChange}
-            placeholder="Tell us about yourself..."
+            placeholder="Share how you play – e.g. favourite club, dream course or biggest golf flex..."
             className="min-h-[80px] resize-none"
             maxLength={maxBioLength}
           />
+          <p className="text-[11px] text-muted-foreground">
+            Share how you play – your favourite club, dream course or biggest golf flex.
+          </p>
         </div>
 
         {/* Websites */}

@@ -1,12 +1,12 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { toast } from 'sonner';
-import { ChevronLeft, Check, Loader2 } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PageRoot } from '@/components/layout/PageRoot';
 
@@ -17,8 +17,19 @@ import { IdentitySection } from '@/components/profile/edit-v2/IdentitySection';
 import { GolfInfoSection } from '@/components/profile/edit-v2/GolfInfoSection';
 import { BioWebsitesSection } from '@/components/profile/edit-v2/BioWebsitesSection';
 import { PrivacySection } from '@/components/profile/edit-v2/PrivacySection';
+import { ProfileSnapshotPreview } from '@/components/profile/edit-v2/ProfileSnapshotPreview';
+import { SectionJumpStrip } from '@/components/profile/edit-v2/SectionJumpStrip';
+import { ProfileCompletenessChip } from '@/components/profile/edit-v2/ProfileCompletenessChip';
 
 const BIO_MAX_LENGTH = 150;
+
+const SECTIONS = [
+  { id: 'photos', label: 'Photos' },
+  { id: 'basic', label: 'Basic info' },
+  { id: 'golf', label: 'Golf info' },
+  { id: 'bio', label: 'Bio & links' },
+  { id: 'privacy', label: 'Privacy' },
+];
 
 interface FormData {
   displayName: string;
@@ -37,8 +48,27 @@ interface FormData {
 
 const EditProfilePage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
+
+  // Section refs for scroll-to
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+  const [activeSection, setActiveSection] = useState('photos');
+
+  // Determine back destination
+  const getBackDestination = () => {
+    const state = location.state as { from?: string } | null;
+    if (state?.from) return state.from;
+    return '/profile';
+  };
+
+  const getBackLabel = () => {
+    const dest = getBackDestination();
+    if (dest.includes('top-100') || dest.includes('top100')) return 'Back to Top 100';
+    if (dest.includes('settings')) return 'Back to Settings';
+    return 'Back to profile';
+  };
 
   // Fetch profile
   const { data: profile, isLoading } = useQuery({
@@ -95,6 +125,37 @@ const EditProfilePage: React.FC = () => {
   }, [profile]);
 
   const isUsernameSet = profile?.username && profile.username.trim() !== '';
+
+  // Intersection observer for active section
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: '-20% 0px -60% 0px',
+      threshold: 0,
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    }, observerOptions);
+
+    Object.values(sectionRefs.current).forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Scroll to section
+  const handleSectionClick = useCallback((sectionId: string) => {
+    const ref = sectionRefs.current[sectionId];
+    if (ref) {
+      ref.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, []);
 
   // Handle field changes
   const handleFieldChange = useCallback((field: keyof FormData, value: any) => {
@@ -193,12 +254,19 @@ const EditProfilePage: React.FC = () => {
       await queryClient.invalidateQueries({ queryKey: ['user-profile'] });
 
       setSaveSuccess(true);
-      toast.success('Profile updated successfully');
+      
+      // Show toast with View profile CTA
+      toast.success('Profile updated', {
+        action: {
+          label: 'View profile',
+          onClick: () => navigate('/profile'),
+        },
+      });
 
       // Navigate back after success animation
       setTimeout(() => {
         navigate('/profile');
-      }, 600);
+      }, 800);
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Failed to update profile');
@@ -207,10 +275,10 @@ const EditProfilePage: React.FC = () => {
     }
   }, [user?.id, formData, isUsernameSet, normalizeWebsites, queryClient, navigate]);
 
-  // Handle cancel
-  const handleCancel = useCallback(() => {
-    navigate(-1);
-  }, [navigate]);
+  // Handle cancel/back
+  const handleBack = useCallback(() => {
+    navigate(getBackDestination());
+  }, [navigate, location]);
 
   // Cleanup preview URLs on unmount
   useEffect(() => {
@@ -246,64 +314,103 @@ const EditProfilePage: React.FC = () => {
     }),
   };
 
+  const hasProfilePhoto = !!(formData.profilePhotoPreview || profile?.profile_photo_url);
+
   return (
     <PageRoot className="min-h-screen flex flex-col bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-20 border-b bg-background/95 backdrop-blur">
-        <div className="mx-auto w-full max-w-3xl px-4 py-3 flex items-center gap-3">
+      <header className="sticky top-0 z-20 bg-background/95 backdrop-blur border-b border-border/40">
+        <div className="mx-auto w-full max-w-3xl px-4 pt-3 pb-2">
+          {/* Back link */}
           <button
             type="button"
-            onClick={handleCancel}
-            className="p-2 -ml-2 rounded-full hover:bg-muted transition-colors"
+            onClick={handleBack}
+            className="text-xs text-primary hover:underline mb-2"
           >
-            <ChevronLeft className="h-5 w-5" />
+            ‹ {getBackLabel()}
           </button>
-          <h1 className="text-base font-semibold">Edit profile</h1>
-          {/* Spacer to balance */}
-          <div className="w-9" />
+          
+          {/* Title */}
+          <h1 className="text-xl font-semibold text-center">Personalise your profile</h1>
+          <p className="text-sm text-muted-foreground text-center mt-0.5">
+            Update your photos, golf info and links in one place.
+          </p>
+          
+          {/* Progress chip */}
+          <div className="flex justify-center mt-2">
+            <ProfileCompletenessChip
+              displayName={formData.displayName}
+              homeClub={formData.homeClub}
+              handicap={formData.handicap}
+              bio={formData.bio}
+              hasProfilePhoto={hasProfilePhoto}
+            />
+          </div>
+          
+          {/* Section jump strip */}
+          <div className="mt-3 flex justify-center">
+            <SectionJumpStrip
+              sections={SECTIONS}
+              activeSection={activeSection}
+              onSectionClick={handleSectionClick}
+            />
+          </div>
         </div>
       </header>
 
       {/* Scrollable content */}
       <main className="flex-1">
-        <div className="mx-auto w-full max-w-3xl px-4 pb-28 pt-3">
-          {/* Section 1: Header Photo */}
+        <div className="mx-auto w-full max-w-3xl pb-28">
+          {/* Profile Snapshot Preview */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="px-4 py-4 bg-muted/20"
+          >
+            <ProfileSnapshotPreview
+              displayName={formData.displayName}
+              homeClub={formData.homeClub}
+              handicap={formData.handicap}
+              bio={formData.bio}
+              profilePhotoUrl={profile?.profile_photo_url}
+              profilePhotoPreview={formData.profilePhotoPreview}
+            />
+          </motion.div>
+
+          {/* Band A: Photos */}
           <motion.section
+            id="photos"
+            ref={(el) => { sectionRefs.current.photos = el; }}
             custom={0}
             initial="hidden"
             animate="visible"
             variants={sectionVariants}
-            className="py-4 border-b border-border/60"
+            className="px-4 py-6 bg-muted/30"
           >
-            <HeaderPhotoCard
-              currentUrl={profile?.header_photo_url}
-              previewUrl={formData.headerPhotoPreview}
-              onFileChange={(file) => handlePhotoChange('headerPhoto', file)}
-            />
+            <div className="space-y-6">
+              <HeaderPhotoCard
+                currentUrl={profile?.header_photo_url}
+                previewUrl={formData.headerPhotoPreview}
+                onFileChange={(file) => handlePhotoChange('headerPhoto', file)}
+              />
+              <ProfilePhotoCard
+                currentUrl={profile?.profile_photo_url}
+                previewUrl={formData.profilePhotoPreview}
+                onFileChange={(file) => handlePhotoChange('profilePhoto', file)}
+              />
+            </div>
           </motion.section>
 
-          {/* Section 2: Profile Photo */}
+          {/* Band B: Basic Info */}
           <motion.section
+            id="basic"
+            ref={(el) => { sectionRefs.current.basic = el; }}
             custom={1}
             initial="hidden"
             animate="visible"
             variants={sectionVariants}
-            className="py-4 border-b border-border/60"
-          >
-            <ProfilePhotoCard
-              currentUrl={profile?.profile_photo_url}
-              previewUrl={formData.profilePhotoPreview}
-              onFileChange={(file) => handlePhotoChange('profilePhoto', file)}
-            />
-          </motion.section>
-
-          {/* Section 3: Identity */}
-          <motion.section
-            custom={2}
-            initial="hidden"
-            animate="visible"
-            variants={sectionVariants}
-            className="py-4 border-b border-border/60"
+            className="px-4 py-6"
           >
             <IdentitySection
               displayName={formData.displayName}
@@ -313,13 +420,15 @@ const EditProfilePage: React.FC = () => {
             />
           </motion.section>
 
-          {/* Section 4: Golf Information */}
+          {/* Band A: Golf Info */}
           <motion.section
-            custom={3}
+            id="golf"
+            ref={(el) => { sectionRefs.current.golf = el; }}
+            custom={2}
             initial="hidden"
             animate="visible"
             variants={sectionVariants}
-            className="py-4 border-b border-border/60"
+            className="px-4 py-6 bg-muted/30"
           >
             <GolfInfoSection
               homeClub={formData.homeClub}
@@ -328,13 +437,15 @@ const EditProfilePage: React.FC = () => {
             />
           </motion.section>
 
-          {/* Section 5: Bio & Websites */}
+          {/* Band B: Bio & Websites */}
           <motion.section
-            custom={4}
+            id="bio"
+            ref={(el) => { sectionRefs.current.bio = el; }}
+            custom={3}
             initial="hidden"
             animate="visible"
             variants={sectionVariants}
-            className="py-4 border-b border-border/60"
+            className="px-4 py-6"
           >
             <BioWebsitesSection
               bio={formData.bio}
@@ -345,13 +456,15 @@ const EditProfilePage: React.FC = () => {
             />
           </motion.section>
 
-          {/* Section 6: Privacy */}
+          {/* Band A: Privacy */}
           <motion.section
-            custom={5}
+            id="privacy"
+            ref={(el) => { sectionRefs.current.privacy = el; }}
+            custom={4}
             initial="hidden"
             animate="visible"
             variants={sectionVariants}
-            className="py-4"
+            className="px-4 py-6 bg-muted/30"
           >
             <PrivacySection
               isPublic={formData.isPublic}
@@ -366,7 +479,7 @@ const EditProfilePage: React.FC = () => {
         <div className="mx-auto flex w-full max-w-3xl items-center justify-end gap-3 px-4 py-3">
           <button
             type="button"
-            onClick={handleCancel}
+            onClick={handleBack}
             disabled={saving}
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >

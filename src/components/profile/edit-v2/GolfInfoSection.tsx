@@ -137,6 +137,9 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
               </>
             )}
           </div>
+          <p className="text-[11px] text-muted-foreground">
+            This helps us show you local courses and friends.
+          </p>
         </div>
 
         {/* Handicap Index */}
@@ -156,7 +159,7 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
             className="h-10"
           />
           <p className="text-[11px] text-muted-foreground">
-            Your official handicap index (WHS)
+            Used for leaderboards and round stats – leave blank if you don't have one yet.
           </p>
         </div>
       </div>
