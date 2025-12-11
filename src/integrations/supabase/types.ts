@@ -92,6 +92,33 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_email_notifications: {
+        Row: {
+          created_at: string
+          error: string | null
+          id: string
+          payload: Json
+          processed_at: string | null
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          payload: Json
+          processed_at?: string | null
+          type: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+          type?: string
+        }
+        Relationships: []
+      }
       admin_invitations: {
         Row: {
           accepted_at: string | null
@@ -429,6 +456,51 @@ export type Database = {
           {
             foreignKeyName: "business_profile_events_business_id_fkey"
             columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_verification_events: {
+        Row: {
+          action: string
+          actor_user_id: string | null
+          business_profile_id: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          reason: string | null
+        }
+        Insert: {
+          action: string
+          actor_user_id?: string | null
+          business_profile_id: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string | null
+          business_profile_id?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_verification_events_business_profile_id_fkey"
+            columns: ["business_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_verification_events_business_profile_id_fkey"
+            columns: ["business_profile_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
@@ -4212,6 +4284,11 @@ export type Database = {
           updated_at: string | null
           user_type: Database["public"]["Enums"]["user_type"] | null
           username: string | null
+          verification_notes: string | null
+          verification_requested_at: string | null
+          verification_reviewed_at: string | null
+          verification_reviewed_by: string | null
+          verification_status: string | null
           verified_business_at: string | null
           verified_business_notes: string | null
           website_url: string | null
@@ -4286,6 +4363,11 @@ export type Database = {
           updated_at?: string | null
           user_type?: Database["public"]["Enums"]["user_type"] | null
           username?: string | null
+          verification_notes?: string | null
+          verification_requested_at?: string | null
+          verification_reviewed_at?: string | null
+          verification_reviewed_by?: string | null
+          verification_status?: string | null
           verified_business_at?: string | null
           verified_business_notes?: string | null
           website_url?: string | null
@@ -4360,6 +4442,11 @@ export type Database = {
           updated_at?: string | null
           user_type?: Database["public"]["Enums"]["user_type"] | null
           username?: string | null
+          verification_notes?: string | null
+          verification_requested_at?: string | null
+          verification_reviewed_at?: string | null
+          verification_reviewed_by?: string | null
+          verification_status?: string | null
           verified_business_at?: string | null
           verified_business_notes?: string | null
           website_url?: string | null
@@ -6209,6 +6296,10 @@ export type Database = {
         Args: { review_id_param: string }
         Returns: undefined
       }
+      request_business_verification: {
+        Args: { p_profile_id: string }
+        Returns: undefined
+      }
       search_golf_courses: {
         Args: {
           country_filter?: string
@@ -6879,6 +6970,10 @@ export type Database = {
         Returns: undefined
       }
       unlockrows: { Args: { "": string }; Returns: number }
+      update_business_verification_status: {
+        Args: { p_notes?: string; p_profile_id: string; p_status: string }
+        Returns: undefined
+      }
       update_mobile_crop_data: {
         Args: {
           p_crop_height: number

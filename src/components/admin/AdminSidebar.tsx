@@ -1,26 +1,34 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { usePanelRole } from "@/hooks/usePanelRole";
 import { panelCan } from "@/lib/panelCan";
+import { supabase } from "@/integrations/supabase/client";
 
 interface LinkItemProps {
   to: string;
   children: React.ReactNode;
   onClick?: () => void;
+  badge?: number;
 }
 
-const LinkItem: React.FC<LinkItemProps> = ({ to, children, onClick }) => (
+const LinkItem: React.FC<LinkItemProps> = ({ to, children, onClick, badge }) => (
   <NavLink
     to={to}
     onClick={onClick}
     className={({ isActive }) =>
       [
-        "flex items-center gap-3 rounded-sq-sm px-3 py-2 text-sm transition-all duration-motion-fast ease-standard",
+        "flex items-center justify-between gap-3 rounded-sq-sm px-3 py-2 text-sm transition-all duration-motion-fast ease-standard",
         isActive ? "bg-muted text-foreground font-medium" : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
       ].join(" ")
     }
   >
-    {children}
+    <span>{children}</span>
+    {badge !== undefined && badge > 0 && (
+      <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1.5 text-xs font-medium text-white">
+        {badge > 99 ? "99+" : badge}
+      </span>
+    )}
   </NavLink>
 );
 
@@ -32,10 +40,27 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate }) => {
   const { role, loading } = usePanelRole();
   const can = panelCan(role);
 
+  // Fetch pending verification count
+  const { data: pendingVerificationCount } = useQuery({
+    queryKey: ['admin-business-verifications-count'],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('user_profiles')
+        .select('id', { count: 'exact', head: true })
+        .eq('verification_status', 'pending_review');
+      if (error) throw error;
+      return count ?? 0;
+    },
+    enabled: can.manageAdmins,
+    staleTime: 30 * 1000, // 30 seconds
+    refetchInterval: 60 * 1000, // Refetch every minute
+  });
+
   // FULL ADMIN — match the legacy set + new admin pages
   const fullMenu = [
     { to: "/admin/overview",      label: "Overview" },
     { to: "/admin/users",         label: "User Management" },
+    { to: "/admin/business-verifications", label: "Business Verification", badge: pendingVerificationCount },
     { to: "/admin/golf-courses",  label: "Golf Courses" },
     { to: "/admin/logos",         label: "Logos" },
     { to: "/admin/country-flags", label: "Country Flags" },
@@ -69,8 +94,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate }) => {
 
       <nav className="space-y-1">
         {menu.map((item) => (
-          <LinkItem key={item.to} to={item.to} onClick={onNavigate}>
-            <span>{item.label}</span>
+          <LinkItem key={item.to} to={item.to} onClick={onNavigate} badge={(item as any).badge}>
+            {item.label}
           </LinkItem>
         ))}
       </nav>
