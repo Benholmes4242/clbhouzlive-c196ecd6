@@ -4,33 +4,57 @@ import { useQuery } from "@tanstack/react-query";
 import { usePanelRole } from "@/hooks/usePanelRole";
 import { panelCan } from "@/lib/panelCan";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface LinkItemProps {
   to: string;
   children: React.ReactNode;
   onClick?: () => void;
   badge?: number;
+  tooltip?: string;
 }
 
-const LinkItem: React.FC<LinkItemProps> = ({ to, children, onClick, badge }) => (
-  <NavLink
-    to={to}
-    onClick={onClick}
-    className={({ isActive }) =>
-      [
-        "flex items-center justify-between gap-3 rounded-sq-sm px-3 py-2 text-sm transition-all duration-motion-fast ease-standard",
-        isActive ? "bg-muted text-foreground font-medium" : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
-      ].join(" ")
-    }
-  >
-    <span>{children}</span>
-    {badge !== undefined && badge > 0 && (
-      <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1.5 text-xs font-medium text-white">
-        {badge > 99 ? "99+" : badge}
-      </span>
-    )}
-  </NavLink>
-);
+const LinkItem: React.FC<LinkItemProps> = ({ to, children, onClick, badge, tooltip }) => {
+  const linkContent = (
+    <NavLink
+      to={to}
+      onClick={onClick}
+      className={({ isActive }) =>
+        [
+          "flex items-center justify-between gap-3 rounded-sq-sm px-3 py-2 text-sm transition-all duration-motion-fast ease-standard",
+          isActive ? "bg-muted text-foreground font-medium" : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
+        ].join(" ")
+      }
+    >
+      <span>{children}</span>
+      {badge !== undefined && badge > 0 && (
+        <span className="inline-flex h-2 w-2 rounded-full bg-amber-400" />
+      )}
+    </NavLink>
+  );
+
+  if (tooltip && badge && badge > 0) {
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            {linkContent}
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{tooltip}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+
+  return linkContent;
+};
 
 interface AdminSidebarProps {
   onNavigate?: () => void;
@@ -60,7 +84,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate }) => {
   const fullMenu = [
     { to: "/admin/overview",      label: "Overview" },
     { to: "/admin/users",         label: "User Management" },
-    { to: "/admin/business-verifications", label: "Business Verification", badge: pendingVerificationCount },
+    { to: "/admin/business-verifications", label: "Business Verification", badge: pendingVerificationCount, tooltip: "There are verification requests awaiting review." },
     { to: "/admin/golf-courses",  label: "Golf Courses" },
     { to: "/admin/logos",         label: "Logos" },
     { to: "/admin/country-flags", label: "Country Flags" },
@@ -94,7 +118,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate }) => {
 
       <nav className="space-y-1">
         {menu.map((item) => (
-          <LinkItem key={item.to} to={item.to} onClick={onNavigate} badge={(item as any).badge}>
+          <LinkItem key={item.to} to={item.to} onClick={onNavigate} badge={(item as any).badge} tooltip={(item as any).tooltip}>
             {item.label}
           </LinkItem>
         ))}
