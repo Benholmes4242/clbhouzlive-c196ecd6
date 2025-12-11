@@ -363,12 +363,17 @@ const PostPlayRatingModal = ({
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
       
       // Force refetch for BOTH user rating AND community aggregates
-      const userRatingRefetch = await queryClient.refetchQueries({ 
+      await queryClient.refetchQueries({ 
         queryKey: ['user-course-rating', course?.id, userId] 
       });
       
-      const aggregatesRefetch = await queryClient.refetchQueries({ 
+      await queryClient.refetchQueries({ 
         queryKey: ['course-rating-aggregates', course?.id] 
+      });
+      
+      // PHASE 2 FIX: Invalidate distribution/histogram (fixes About tab bars)
+      queryClient.invalidateQueries({ 
+        queryKey: ['course-rating-distribution', course?.id] 
       });
       
       // Force aggressive refetch of ALL reviews queries (bypasses staleTime)
@@ -380,6 +385,11 @@ const PostPlayRatingModal = ({
       queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
       queryClient.invalidateQueries({ queryKey: ['user-played-course', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['friends-courses'] });
+      
+      // PHASE 2 FIX: Invalidate Top 100 and Explore cards so they reflect updated ratings
+      queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['top100-course-leaderboard'], exact: false });
       
       // Show "Added!" text for 1.5 seconds
       setButtonText('Added!');
@@ -492,6 +502,11 @@ const PostPlayRatingModal = ({
       await queryClient.refetchQueries({ queryKey: ['user-course-rating', course?.id, userId] });
       await queryClient.refetchQueries({ queryKey: ['course-rating-aggregates', course?.id] });
       
+      // PHASE 2 FIX: Invalidate distribution/histogram (fixes About tab bars)
+      queryClient.invalidateQueries({ 
+        queryKey: ['course-rating-distribution', course?.id] 
+      });
+      
       // Invalidate and refetch reviews list with correct prefix matching
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
       await queryClient.refetchQueries({ 
@@ -506,6 +521,11 @@ const PostPlayRatingModal = ({
       queryClient.invalidateQueries({ queryKey: ['userTop100CoursesInRegion'] });
       queryClient.invalidateQueries({ queryKey: ['top100-courses'] });
       queryClient.invalidateQueries({ queryKey: ['course-detail', course?.id] });
+      
+      // PHASE 2 FIX: Invalidate Top 100 and Explore cards so they reflect updated ratings
+      queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['top100-course-leaderboard'], exact: false });
       
       // Trigger badge checking for the user (non-blocking)
       try {
