@@ -9,6 +9,7 @@ import { BUSINESS_CATEGORIES } from '@/types/profile';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useHasBusinesses } from '@/hooks/useMyBusinesses';
+import { PageRoot } from '@/components/layout/PageRoot';
 
 const BusinessDirectoryPage = () => {
   const navigate = useNavigate();
@@ -45,7 +46,7 @@ const BusinessDirectoryPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <PageRoot className="min-h-screen bg-background">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b">
         <div className="mx-auto max-w-5xl px-4 py-4">
@@ -235,7 +236,7 @@ const BusinessDirectoryPage = () => {
           </div>
         )}
       </div>
-    </div>
+    </PageRoot>
   );
 };
 
