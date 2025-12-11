@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Building2, MapPin, Globe, Mail, Phone, BarChart3, Settings, ExternalLink } from 'lucide-react';
+import { ChevronLeft, Building2, MapPin, Globe, Mail, Phone, BarChart3, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,6 +14,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { BUSINESS_CATEGORIES } from '@/types/profile';
 import PageRoot from '@/components/layout/PageRoot';
+import VerificationStatusPanel from '@/components/business/VerificationStatusPanel';
 
 const BusinessManagePage = () => {
   const navigate = useNavigate();
@@ -271,6 +272,11 @@ const BusinessManagePage = () => {
             </div>
           </div>
         </Card>
+
+        {/* Verification Status Panel */}
+        {profile && (
+          <VerificationStatusPanel profile={profile} />
+        )}
 
         {/* Save Button */}
         <Button
