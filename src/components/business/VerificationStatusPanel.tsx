@@ -93,49 +93,43 @@ const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profi
         </div>
 
         <p className="text-sm text-muted-foreground">
-          Verification helps golfers trust that your business is authentic.
-          Once verified, you'll appear with a blue badge across Clbhouz and may receive higher visibility in the directory.
+          Verification helps golfers trust that your business is authentic. Once verified, you'll receive a blue badge and greater visibility in the directory.
         </p>
 
-        <div className="space-y-2">
-          <p className="text-sm text-muted-foreground font-medium">
-            Before requesting verification, make sure your profile includes:
-          </p>
-          <ul className="text-sm text-muted-foreground space-y-1.5 ml-1">
-            <li className="flex items-center gap-2">
-              {profile.business_name?.trim() ? (
-                <CheckCircle className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-              ) : (
-                <AlertCircle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-              )}
-              A clear business name
-            </li>
-            <li className="flex items-center gap-2">
-              {(profile.business_website?.trim() || profile.business_contact_email?.trim()) ? (
-                <CheckCircle className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-              ) : (
-                <AlertCircle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-              )}
-              A website or contact email
-            </li>
-            <li className="flex items-center gap-2">
-              {profile.business_location?.trim() ? (
-                <CheckCircle className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-              ) : (
-                <AlertCircle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-              )}
-              Your location
-            </li>
-            <li className="flex items-center gap-2">
-              {profile.profile_photo_url?.trim() ? (
-                <CheckCircle className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-              ) : (
-                <AlertCircle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-              )}
-              A profile image or logo
-            </li>
-          </ul>
-        </div>
+        <ul className="text-sm text-muted-foreground space-y-1.5 ml-1">
+          <li className="flex items-center gap-2">
+            {profile.business_name?.trim() ? (
+              <CheckCircle className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+            ) : (
+              <AlertCircle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+            )}
+            Add a business name
+          </li>
+          <li className="flex items-center gap-2">
+            {profile.business_location?.trim() ? (
+              <CheckCircle className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+            ) : (
+              <AlertCircle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+            )}
+            Add a location
+          </li>
+          <li className="flex items-center gap-2">
+            {(profile.business_website?.trim() || profile.business_contact_email?.trim()) ? (
+              <CheckCircle className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+            ) : (
+              <AlertCircle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+            )}
+            Add a website or email
+          </li>
+          <li className="flex items-center gap-2">
+            {profile.profile_photo_url?.trim() ? (
+              <CheckCircle className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+            ) : (
+              <AlertCircle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+            )}
+            Add a profile image or logo
+          </li>
+        </ul>
 
         {canRequestVerification ? (
           <Button
@@ -161,12 +155,6 @@ const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profi
             </Tooltip>
           </TooltipProvider>
         )}
-
-        {!canRequestVerification && (
-          <p className="text-xs text-amber-600">
-            Your business profile is missing key information needed for verification.
-          </p>
-        )}
       </Card>
     );
   }
@@ -187,8 +175,7 @@ const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profi
         </div>
 
         <p className="text-sm text-muted-foreground">
-          Thanks — your request has been received.
-          Our team is reviewing your business details. We'll notify you as soon as we've made a decision.
+          Thanks — your request has been received. Our team is reviewing your details. We'll notify you once a decision is made.
         </p>
 
         {profile.verification_requested_at && (
@@ -235,8 +222,7 @@ const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profi
         </div>
 
         <p className="text-sm text-muted-foreground">
-          Your business now displays a verified badge across Clbhouz.
-          Golfers will see this badge in the directory, search results, and your profile.
+          Your business now displays a verified badge across Clbhouz, including the directory, search results, and your profile.
         </p>
       </Card>
     );
@@ -258,8 +244,7 @@ const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profi
         </div>
 
         <p className="text-sm text-muted-foreground">
-          Your previous verification request wasn't approved.
-          You can review the notes below, update your profile, and request verification again.
+          Your verification request wasn't approved. Review the notes below, update your profile, and request verification again.
         </p>
 
         {profile.verification_notes && (
@@ -295,7 +280,7 @@ const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profi
         )}
 
         <p className="text-xs text-muted-foreground">
-          Make sure your profile details are accurate and match your official business information.
+          Ensure your business details match your official information.
         </p>
       </Card>
     );
