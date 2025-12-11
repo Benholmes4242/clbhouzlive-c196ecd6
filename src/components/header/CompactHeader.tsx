@@ -71,7 +71,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             <img
               src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
               alt="clbhouz"
-              className="h-7 w-7 object-contain hover:opacity-80 transition-opacity"
+              className="h-8 w-8 object-contain hover:opacity-80 transition-opacity"
             />
           </button>
 
@@ -81,7 +81,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             <Button
               variant="ghost"
               size="icon"
-              className="text-white/70 hover:text-white hover:bg-white/10 h-9 w-9"
+              className="text-white/70 hover:text-white hover:bg-white/10 h-8 w-8 p-0 flex items-center justify-center"
               onClick={() => setSearchOpen(true)}
               aria-label="Search"
             >
