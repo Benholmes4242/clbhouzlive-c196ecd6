@@ -104,11 +104,13 @@ const HeaderNavigation = () => {
   };
 
   const handleCreateBusinessProfile = () => {
-    setShowBusinessIntroModal(true);
+    // Navigate directly to dedicated business create page
+    navigate('/business/create');
   };
 
+  // Keep modal handler for intro flow if needed elsewhere
   const handleBusinessIntroContinue = () => {
-    navigate('/profile?edit=business');
+    navigate('/business/create');
   };
 
   const handleAdminClick = () => {

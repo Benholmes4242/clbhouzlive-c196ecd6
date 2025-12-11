@@ -1,13 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Crop } from 'lucide-react';
-import { MINI_CARD_MOBILE, MINI_CARD_DESKTOP } from '@/components/profile/profile-config';
+import { User } from 'lucide-react';
 import { CropData } from '@/components/profile/profile-config';
-import { MiniCardCropTool } from './MiniCardCropTool';
-
 
 interface MiniCardSectionProps {
   profilePhoto: File | null;
@@ -17,15 +13,17 @@ interface MiniCardSectionProps {
   onCropChange: (crop: CropData) => void;
 }
 
+/**
+ * Simplified Profile Photo Section
+ * 
+ * Uses simple center-crop with object-cover instead of complex crop tools.
+ * Displays the squircle avatar preview matching the live profile.
+ */
 export const MiniCardSection: React.FC<MiniCardSectionProps> = ({
   profilePhoto,
   profilePhotoUrl,
-  miniCardCrop,
   onFileChange,
-  onCropChange,
 }) => {
-  const [showCropTool, setShowCropTool] = useState(false);
-
   const getCurrentImageUrl = () => {
     if (profilePhoto) {
       return URL.createObjectURL(profilePhoto);
@@ -33,151 +31,64 @@ export const MiniCardSection: React.FC<MiniCardSectionProps> = ({
     return profilePhotoUrl || '';
   };
 
-  const handleCropClick = () => {
-    const imageUrl = getCurrentImageUrl();
-    if (!imageUrl) {
-      return;
-    }
-    setShowCropTool(true);
-  };
-
-  const handleCropSave = (crop: CropData) => {
-    onCropChange(crop);
-    setShowCropTool(false);
-  };
-
-  const getCropStyle = () => {
-    const centerX = miniCardCrop.x + miniCardCrop.width / 2;
-    const centerY = miniCardCrop.y + miniCardCrop.height / 2;
-    
-    return {
-      objectPosition: `${centerX}% ${centerY}%`,
-      transform: `scale(${100 / Math.min(miniCardCrop.width, miniCardCrop.height)})`,
-    };
-  };
-
   const imageUrl = getCurrentImageUrl();
 
   return (
-    <Card className="p-6">
-      <div className="space-y-4">
-        <div>
-          <Label className="text-lg font-semibold">Mini Profile Card Photo</Label>
-          <p className="text-sm text-muted-foreground">
-            This appears as the small photo in your profile panel (3:4 aspect ratio)
+    <Card className="p-5 space-y-4">
+      <div className="flex items-center gap-2 text-foreground">
+        <User className="w-4 h-4" />
+        <h3 className="font-medium">Profile Photo</h3>
+      </div>
+      
+      <p className="text-sm text-muted-foreground">
+        Your profile photo appears as a squircle avatar across the app.
+      </p>
+
+      {/* Current Image Preview */}
+      <div className="flex items-center gap-4">
+        {imageUrl ? (
+          <div 
+            className="flex-shrink-0 overflow-hidden border-2 border-border"
+            style={{
+              width: '80px',
+              aspectRatio: '1 / 1.05',
+              borderRadius: '34%',
+            }}
+          >
+            <img 
+              src={imageUrl} 
+              alt="Profile preview" 
+              className="w-full h-full object-cover"
+            />
+          </div>
+        ) : (
+          <div 
+            className="flex-shrink-0 bg-muted flex items-center justify-center text-muted-foreground border-2 border-border"
+            style={{
+              width: '80px',
+              aspectRatio: '1 / 1.05',
+              borderRadius: '34%',
+            }}
+          >
+            <User className="w-8 h-8" />
+          </div>
+        )}
+        
+        <div className="flex-1 space-y-2">
+          <Label htmlFor="profilePhoto" className="text-sm">
+            {imageUrl ? 'Change Photo' : 'Upload Photo'}
+          </Label>
+          <Input
+            id="profilePhoto"
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            onChange={(e) => onFileChange(e.target.files?.[0] || null)}
+            className="cursor-pointer"
+          />
+          <p className="text-xs text-muted-foreground">
+            Square images work best. JPG, PNG, or WebP.
           </p>
         </div>
-
-        {/* File Upload */}
-        <div className="space-y-3">
-          <Label htmlFor="profilePhoto">Upload Profile Photo</Label>
-          <div className="flex items-center gap-4">
-            {imageUrl && (
-              <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
-                <img 
-                  src={imageUrl} 
-                  alt="Profile preview" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
-            <div className="flex-1">
-              <Input
-                id="profilePhoto"
-                type="file"
-                accept="image/*"
-                onChange={(e) => onFileChange(e.target.files?.[0] || null)}
-                className="cursor-pointer"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Square or portrait images work best. JPG, PNG, or WebP format.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Crop Controls */}
-        {imageUrl && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-body-sm font-medium">Adjust 3:4 Crop</Label>
-                <p className="text-meta text-muted-foreground">
-                  Choose which part of your photo appears in the mini card
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleCropClick}
-                className="gap-2"
-              >
-                <Crop className="w-4 h-4" />
-                Adjust Crop
-              </Button>
-            </div>
-            
-            {/* Preview */}
-            <div className="space-y-3">
-              <Label className="text-xs font-medium">Preview:</Label>
-              <div className="flex items-center gap-6">
-                {/* Mobile preview */}
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground">Mobile</p>
-                  <div 
-                    className="rounded-lg overflow-hidden bg-gray-200 border shadow-sm"
-                    style={{ 
-                      width: MINI_CARD_MOBILE.w,
-                      height: MINI_CARD_MOBILE.h 
-                    }}
-                  >
-                    <img 
-                      src={imageUrl} 
-                      alt="Mobile mini card preview" 
-                      className="w-full h-full object-cover"
-                      style={getCropStyle()}
-                    />
-                  </div>
-                </div>
-                
-                {/* Desktop preview */}
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground">Desktop</p>
-                  <div 
-                    className="rounded-lg overflow-hidden bg-gray-200 border shadow-sm"
-                    style={{ 
-                      width: MINI_CARD_DESKTOP.w,
-                      height: MINI_CARD_DESKTOP.h 
-                    }}
-                  >
-                    <img 
-                      src={imageUrl} 
-                      alt="Desktop mini card preview" 
-                      className="w-full h-full object-cover"
-                      style={getCropStyle()}
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              {/* Crop info */}
-              <div className="text-xs text-muted-foreground space-y-1">
-                <p>Crop: {miniCardCrop.x.toFixed(1)}%, {miniCardCrop.y.toFixed(1)}%</p>
-                <p>Size: {miniCardCrop.width.toFixed(1)}% × {miniCardCrop.height.toFixed(1)}%</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Crop Tool Modal */}
-        {showCropTool && imageUrl && (
-          <MiniCardCropTool
-            imageUrl={imageUrl}
-            initialCrop={miniCardCrop}
-            onSave={handleCropSave}
-            onCancel={() => setShowCropTool(false)}
-          />
-        )}
       </div>
     </Card>
   );
