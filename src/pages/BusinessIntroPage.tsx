@@ -42,10 +42,10 @@ const BusinessIntroPage: React.FC = () => {
           </button>
 
           {/* Title */}
-          <h1 className="text-xl font-semibold text-center">Business Profiles</h1>
-          <p className="text-sm text-muted-foreground text-center mt-0.5">
-            Set up your golf club, academy, or brand on Clbhouz
-          </p>
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground text-center">Business profiles</p>
+          <h1 className="text-xl font-semibold text-center mt-0.5">
+            Set up your golf club, academy, or brand
+          </h1>
         </div>
       </header>
 
@@ -172,7 +172,7 @@ const BusinessIntroPage: React.FC = () => {
             onClick={handleContinue}
             className="inline-flex h-10 flex-[1.5] items-center justify-center rounded-full bg-amber-500 px-4 text-sm font-semibold text-white shadow-sm hover:bg-amber-600 active:scale-[0.99] transition-all"
           >
-            Continue to setup
+            Continue to business setup
           </button>
         </div>
       </footer>
