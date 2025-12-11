@@ -139,14 +139,12 @@ const BusinessCreatePage = () => {
             className="inline-flex items-center gap-1 text-xs text-primary hover:underline mb-2"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            <span>Back</span>
+            <span>Back to profile</span>
           </button>
 
           {/* Title */}
-          <h1 className="text-xl font-semibold text-center">Create Business Profile</h1>
-          <p className="text-sm text-muted-foreground text-center mt-0.5">
-            Set up your golf club, academy, or brand
-          </p>
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground text-center">Business setup</p>
+          <h1 className="text-xl font-semibold text-center mt-0.5">Create Business Profile</h1>
         </div>
       </header>
 
@@ -188,7 +186,7 @@ const BusinessCreatePage = () => {
             </p>
 
             <div className="space-y-4">
-              <div className="space-y-1.5">
+            <div className="space-y-4">
                 <Label htmlFor="businessName" className="text-xs text-muted-foreground">
                   Business Name <span className="text-destructive">*</span>
                 </Label>
@@ -199,6 +197,9 @@ const BusinessCreatePage = () => {
                   placeholder="e.g., Royal Golf Club"
                   className="h-10"
                 />
+                <p className="text-[11px] text-muted-foreground -mt-2">
+                  Use your official business name. You can add location details below.
+                </p>
               </div>
 
               <div className="space-y-1.5">
@@ -220,12 +221,15 @@ const BusinessCreatePage = () => {
                     ))}
                   </SelectContent>
                 </Select>
+                <p className="text-[11px] text-muted-foreground">
+                  Helps golfers find the right type of business.
+                </p>
               </div>
 
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="businessBio" className="text-xs text-muted-foreground">
-                    About Your Business
+                    About your business
                   </Label>
                   <span className="text-[11px] text-muted-foreground/70">
                     {formData.businessBio.length}/500
@@ -235,12 +239,12 @@ const BusinessCreatePage = () => {
                   id="businessBio"
                   value={formData.businessBio}
                   onChange={(e) => handleInputChange('businessBio', e.target.value)}
-                  placeholder="Tell golfers about your business – what makes it special, what you offer..."
+                  placeholder="Tell golfers about your business..."
                   className="min-h-[100px] resize-none"
                   maxLength={500}
                 />
                 <p className="text-[11px] text-muted-foreground">
-                  Share what makes your business unique to golfers.
+                  Highlight what makes you different — facilities, coaching, events, or anything golfers should know first.
                 </p>
               </div>
             </div>
@@ -259,12 +263,12 @@ const BusinessCreatePage = () => {
               <h2 className="text-sm font-semibold text-foreground">Location & contact</h2>
             </div>
             <p className="text-xs text-muted-foreground mb-1">
-              Help golfers find and reach you.
+              Where you are and how golfers reach you.
             </p>
             
             {!isValid && formData.businessName.trim().length > 0 && (
               <p className="text-xs text-amber-700 mb-4">
-                Add a location and at least one contact method (website or email) to continue.
+                Add a location and at least one contact method (website or email) to create your business profile.
               </p>
             )}
 
@@ -281,7 +285,7 @@ const BusinessCreatePage = () => {
                   className="h-10"
                 />
                 <p className="text-[11px] text-muted-foreground">
-                  Helps golfers discover you when searching nearby.
+                  If you have multiple locations, use your main one.
                 </p>
               </div>
 
@@ -297,13 +301,16 @@ const BusinessCreatePage = () => {
                   placeholder="https://yourwebsite.com"
                   className="h-10"
                 />
+                <p className="text-[11px] text-muted-foreground">
+                  Use your main booking or information page.
+                </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="businessContactEmail" className="text-xs text-muted-foreground flex items-center gap-1.5">
                     <Mail className="w-3.5 h-3.5" />
-                    Contact Email
+                    Contact email
                   </Label>
                   <Input
                     id="businessContactEmail"
@@ -313,6 +320,9 @@ const BusinessCreatePage = () => {
                     placeholder="contact@business.com"
                     className="h-10"
                   />
+                  <p className="text-[11px] text-muted-foreground">
+                    Shown on your profile for golfers who prefer email.
+                  </p>
                 </div>
 
                 <div className="space-y-1.5">
@@ -325,11 +335,18 @@ const BusinessCreatePage = () => {
                     type="tel"
                     value={formData.businessContactPhone}
                     onChange={(e) => handleInputChange('businessContactPhone', e.target.value)}
-                    placeholder="+1 (555) 000-0000"
+                    placeholder="+44 20 0000 0000"
                     className="h-10"
                   />
+                  <p className="text-[11px] text-muted-foreground">
+                    Include your country code. Optional but recommended.
+                  </p>
                 </div>
               </div>
+
+              <p className="text-[11px] text-muted-foreground pt-2 border-t border-border/40">
+                We'll only use these details to help golfers contact you — we won't share them with third parties.
+              </p>
             </div>
           </motion.section>
         </div>
