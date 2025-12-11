@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Building2, MapPin, Globe, Mail, Phone, Info } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, Building2, MapPin, Globe, Mail, Phone, Check, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
@@ -13,7 +12,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { BUSINESS_CATEGORIES } from '@/types/profile';
-import PageRoot from '@/components/layout/PageRoot';
+import { PageRoot } from '@/components/layout/PageRoot';
+import { cn } from '@/lib/utils';
 
 const BusinessCreatePage = () => {
   const navigate = useNavigate();
@@ -22,6 +22,7 @@ const BusinessCreatePage = () => {
   const { data: profile } = useUserProfile(user?.id);
   
   const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [formData, setFormData] = useState({
     businessName: '',
     businessCategory: '',
@@ -33,24 +34,29 @@ const BusinessCreatePage = () => {
   });
 
   // Redirect to auth if not logged in
-  if (!authLoading && !user) {
-    navigate('/auth');
-    return null;
-  }
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/auth');
+    }
+  }, [authLoading, user, navigate]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  // Validation
+  const isValid =
+    formData.businessName.trim().length > 0 &&
+    formData.businessLocation.trim().length > 0 &&
+    (formData.businessWebsite.trim().length > 0 ||
+      formData.businessContactEmail.trim().length > 0);
+
   const handleSubmit = async () => {
-    if (!user?.id) return;
-    
-    if (!formData.businessName.trim()) {
-      toast.error('Business name is required');
-      return;
-    }
+    if (!user?.id || !isValid) return;
 
     setSaving(true);
+    setSaveSuccess(false);
+
     try {
       const { error } = await supabase
         .from('user_profiles')
@@ -75,8 +81,19 @@ const BusinessCreatePage = () => {
       await queryClient.invalidateQueries({ queryKey: ['profile'] });
       await queryClient.invalidateQueries({ queryKey: ['user-profile'] });
 
-      toast.success('Business profile created!');
-      navigate(`/profile/${profile?.username || user.id}`);
+      setSaveSuccess(true);
+      
+      toast.success('Business profile created!', {
+        action: {
+          label: 'View profile',
+          onClick: () => navigate(`/profile/${profile?.username || user.id}`),
+        },
+      });
+
+      // Navigate after success animation
+      setTimeout(() => {
+        navigate(`/profile/${profile?.username || user.id}`);
+      }, 800);
     } catch (error) {
       console.error('Error creating business profile:', error);
       toast.error('Failed to create business profile');
@@ -85,173 +102,305 @@ const BusinessCreatePage = () => {
     }
   };
 
-  return (
-    <PageRoot className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b safe-top">
-        <div className="mx-auto max-w-2xl px-4 py-4">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate(-1)}
-              className="p-2 -ml-2 hover:bg-muted rounded-sq-sm transition-colors"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <div className="flex-1">
-              <h1 className="text-xl font-semibold">Create Business Profile</h1>
-              <p className="text-sm text-muted-foreground">
-                Set up your golf club, academy, or brand
-              </p>
-            </div>
-          </div>
-        </div>
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
+    );
+  }
 
-      <div className="mx-auto max-w-2xl px-4 py-6 space-y-6">
-        {/* Info banner */}
-        <Card className="p-4 bg-primary/5 border-primary/20">
-          <div className="flex gap-3">
-            <Info className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-            <div className="text-sm">
-              <p className="font-medium text-foreground">Business profiles get more visibility</p>
-              <p className="text-muted-foreground mt-1">
-                Your business will appear in the directory and can receive reviews, messages, and follows from golfers.
+  // Section animation variants
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 8 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: i * 0.05,
+        duration: 0.25,
+        ease: 'easeOut' as const,
+      },
+    }),
+  };
+
+  return (
+    <PageRoot className="min-h-screen flex flex-col bg-muted/40">
+      {/* Header */}
+      <header className="sticky top-0 z-20 border-b border-border/40 bg-background/95 backdrop-blur">
+        <div className="mx-auto w-full max-w-3xl px-4 pt-3 pb-3">
+          {/* Back link */}
+          <button
+            onClick={handleBack}
+            className="inline-flex items-center gap-1 text-xs text-primary hover:underline mb-2"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            <span>Back</span>
+          </button>
+
+          {/* Title */}
+          <h1 className="text-xl font-semibold text-center">Create Business Profile</h1>
+          <p className="text-sm text-muted-foreground text-center mt-0.5">
+            Set up your golf club, academy, or brand
+          </p>
+        </div>
+      </header>
+
+      {/* Content */}
+      <main className="flex-1">
+        <div className="mx-auto w-full max-w-3xl pb-28">
+          {/* Info banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="px-4 py-4"
+          >
+            <div className="rounded-sq-md bg-gradient-to-br from-amber-50 to-amber-50/40 border border-amber-100/60 px-4 py-3">
+              <p className="text-sm font-semibold text-amber-900">
+                Business profiles get more visibility
+              </p>
+              <p className="mt-1 text-sm text-amber-900/70">
+                Your business will appear in the directory and can receive reviews, messages,
+                and follows from golfers.
               </p>
             </div>
-          </div>
-        </Card>
+          </motion.div>
 
-        {/* Business Identity */}
-        <Card className="p-5 space-y-4">
-          <div className="flex items-center gap-2 text-foreground">
-            <Building2 className="w-4 h-4" />
-            <h3 className="font-medium">Business Identity</h3>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="businessName">Business Name *</Label>
-            <Input
-              id="businessName"
-              value={formData.businessName}
-              onChange={(e) => handleInputChange('businessName', e.target.value)}
-              placeholder="e.g., Royal Golf Club"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="businessCategory">Category</Label>
-            <Select
-              value={formData.businessCategory}
-              onValueChange={(value) => handleInputChange('businessCategory', value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                {BUSINESS_CATEGORIES.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="businessBio">About Your Business</Label>
-            <Textarea
-              id="businessBio"
-              value={formData.businessBio}
-              onChange={(e) => handleInputChange('businessBio', e.target.value)}
-              placeholder="Tell golfers about your business..."
-              className="min-h-[100px] resize-none"
-              maxLength={500}
-            />
-            <p className="text-xs text-muted-foreground text-right">
-              {formData.businessBio.length}/500
+          {/* Band A: Business Identity */}
+          <motion.section
+            custom={0}
+            initial="hidden"
+            animate="visible"
+            variants={sectionVariants}
+            className="px-4 py-6 bg-background"
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <Building2 className="w-4 h-4 text-muted-foreground" />
+              <h2 className="text-sm font-semibold text-foreground">Business identity</h2>
+            </div>
+            <p className="text-xs text-muted-foreground mb-4">
+              How your business appears on Clbhouz.
             </p>
-          </div>
-        </Card>
 
-        {/* Location & Contact */}
-        <Card className="p-5 space-y-4">
-          <div className="flex items-center gap-2 text-foreground">
-            <MapPin className="w-4 h-4" />
-            <h3 className="font-medium">Location & Contact</h3>
-          </div>
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="businessName" className="text-xs text-muted-foreground">
+                  Business Name <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="businessName"
+                  value={formData.businessName}
+                  onChange={(e) => handleInputChange('businessName', e.target.value)}
+                  placeholder="e.g., Royal Golf Club"
+                  className="h-10"
+                />
+              </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="businessLocation">Location</Label>
-            <Input
-              id="businessLocation"
-              value={formData.businessLocation}
-              onChange={(e) => handleInputChange('businessLocation', e.target.value)}
-              placeholder="City, Country"
-            />
-          </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="businessCategory" className="text-xs text-muted-foreground">
+                  Category
+                </Label>
+                <Select
+                  value={formData.businessCategory}
+                  onValueChange={(value) => handleInputChange('businessCategory', value)}
+                >
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {BUSINESS_CATEGORIES.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="businessWebsite" className="flex items-center gap-2">
-              <Globe className="w-3.5 h-3.5" />
-              Website
-            </Label>
-            <Input
-              id="businessWebsite"
-              value={formData.businessWebsite}
-              onChange={(e) => handleInputChange('businessWebsite', e.target.value)}
-              placeholder="https://yourwebsite.com"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="businessContactEmail" className="flex items-center gap-2">
-                <Mail className="w-3.5 h-3.5" />
-                Contact Email
-              </Label>
-              <Input
-                id="businessContactEmail"
-                type="email"
-                value={formData.businessContactEmail}
-                onChange={(e) => handleInputChange('businessContactEmail', e.target.value)}
-                placeholder="contact@business.com"
-              />
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="businessBio" className="text-xs text-muted-foreground">
+                    About Your Business
+                  </Label>
+                  <span className="text-[11px] text-muted-foreground/70">
+                    {formData.businessBio.length}/500
+                  </span>
+                </div>
+                <Textarea
+                  id="businessBio"
+                  value={formData.businessBio}
+                  onChange={(e) => handleInputChange('businessBio', e.target.value)}
+                  placeholder="Tell golfers about your business – what makes it special, what you offer..."
+                  className="min-h-[100px] resize-none"
+                  maxLength={500}
+                />
+                <p className="text-[11px] text-muted-foreground">
+                  Share what makes your business unique to golfers.
+                </p>
+              </div>
             </div>
+          </motion.section>
 
-            <div className="space-y-2">
-              <Label htmlFor="businessContactPhone" className="flex items-center gap-2">
-                <Phone className="w-3.5 h-3.5" />
-                Phone
-              </Label>
-              <Input
-                id="businessContactPhone"
-                type="tel"
-                value={formData.businessContactPhone}
-                onChange={(e) => handleInputChange('businessContactPhone', e.target.value)}
-                placeholder="+1 (555) 000-0000"
-              />
+          {/* Band B: Location & Contact */}
+          <motion.section
+            custom={1}
+            initial="hidden"
+            animate="visible"
+            variants={sectionVariants}
+            className="px-4 py-6 bg-muted/30"
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <MapPin className="w-4 h-4 text-muted-foreground" />
+              <h2 className="text-sm font-semibold text-foreground">Location & contact</h2>
             </div>
-          </div>
-        </Card>
+            <p className="text-xs text-muted-foreground mb-1">
+              Help golfers find and reach you.
+            </p>
+            
+            {!isValid && formData.businessName.trim().length > 0 && (
+              <p className="text-xs text-amber-700 mb-4">
+                Add a location and at least one contact method (website or email) to continue.
+              </p>
+            )}
 
-        {/* Actions */}
-        <div className="flex gap-3 pt-2">
-          <Button
-            variant="outline"
-            onClick={() => navigate(-1)}
-            className="flex-1"
+            <div className="space-y-4 mt-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="businessLocation" className="text-xs text-muted-foreground">
+                  Location <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="businessLocation"
+                  value={formData.businessLocation}
+                  onChange={(e) => handleInputChange('businessLocation', e.target.value)}
+                  placeholder="City, Country"
+                  className="h-10"
+                />
+                <p className="text-[11px] text-muted-foreground">
+                  Helps golfers discover you when searching nearby.
+                </p>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="businessWebsite" className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <Globe className="w-3.5 h-3.5" />
+                  Website
+                </Label>
+                <Input
+                  id="businessWebsite"
+                  value={formData.businessWebsite}
+                  onChange={(e) => handleInputChange('businessWebsite', e.target.value)}
+                  placeholder="https://yourwebsite.com"
+                  className="h-10"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="businessContactEmail" className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <Mail className="w-3.5 h-3.5" />
+                    Contact Email
+                  </Label>
+                  <Input
+                    id="businessContactEmail"
+                    type="email"
+                    value={formData.businessContactEmail}
+                    onChange={(e) => handleInputChange('businessContactEmail', e.target.value)}
+                    placeholder="contact@business.com"
+                    className="h-10"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="businessContactPhone" className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <Phone className="w-3.5 h-3.5" />
+                    Phone
+                  </Label>
+                  <Input
+                    id="businessContactPhone"
+                    type="tel"
+                    value={formData.businessContactPhone}
+                    onChange={(e) => handleInputChange('businessContactPhone', e.target.value)}
+                    placeholder="+1 (555) 000-0000"
+                    className="h-10"
+                  />
+                </div>
+              </div>
+            </div>
+          </motion.section>
+        </div>
+      </main>
+
+      {/* Sticky Footer */}
+      <footer className="fixed inset-x-0 bottom-0 z-20 border-t bg-background/95 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-3">
+          <button
+            type="button"
+            onClick={handleBack}
+            disabled={saving}
+            className="inline-flex h-10 flex-1 items-center justify-center rounded-full border border-input bg-background text-sm font-medium text-muted-foreground hover:bg-muted transition-colors"
           >
             Cancel
-          </Button>
-          <Button
+          </button>
+
+          <button
+            type="button"
             onClick={handleSubmit}
-            disabled={saving || !formData.businessName.trim()}
-            className="flex-1"
+            disabled={saving || saveSuccess || !isValid}
+            className={cn(
+              "inline-flex h-10 flex-[1.5] items-center justify-center rounded-full px-4 text-sm font-semibold transition-all",
+              "bg-amber-500 text-white shadow-sm",
+              "hover:bg-amber-600 active:scale-[0.99]",
+              "disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-amber-300",
+              saveSuccess && "bg-emerald-500"
+            )}
           >
-            {saving ? 'Creating...' : 'Create Business'}
-          </Button>
+            <AnimatePresence mode="wait">
+              {saving ? (
+                <motion.span
+                  key="saving"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex items-center gap-2"
+                >
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Creating…
+                </motion.span>
+              ) : saveSuccess ? (
+                <motion.span
+                  key="success"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex items-center gap-2"
+                >
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+                  >
+                    <Check className="w-4 h-4" />
+                  </motion.div>
+                  Created
+                </motion.span>
+              ) : (
+                <motion.span
+                  key="create"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  Create Business
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </button>
         </div>
-      </div>
+      </footer>
     </PageRoot>
   );
 };
