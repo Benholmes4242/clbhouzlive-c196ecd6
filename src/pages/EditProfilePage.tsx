@@ -126,28 +126,35 @@ const EditProfilePage: React.FC = () => {
 
   const isUsernameSet = profile?.username && profile.username.trim() !== '';
 
-  // Intersection observer for active section
+  // Intersection observer for active section (scrollspy)
   useEffect(() => {
-    const observerOptions = {
-      root: null,
-      rootMargin: '-20% 0px -60% 0px',
-      threshold: 0,
-    };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Find the entry with highest intersection ratio that's visible
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setActiveSection(entry.target.id);
+        if (visible) {
+          const id = visible.target.id;
+          if (id && id !== activeSection) {
+            setActiveSection(id);
+          }
         }
-      });
-    }, observerOptions);
+      },
+      {
+        root: null,
+        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5],
+        rootMargin: '-120px 0px -40% 0px', // Account for sticky header
+      }
+    );
 
     Object.values(sectionRefs.current).forEach((ref) => {
       if (ref) observer.observe(ref);
     });
 
     return () => observer.disconnect();
-  }, []);
+  }, [activeSection]);
 
   // Scroll to section
   const handleSectionClick = useCallback((sectionId: string) => {
