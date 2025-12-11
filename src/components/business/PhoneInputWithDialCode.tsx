@@ -69,12 +69,12 @@ const COUNTRY_DIAL_CODES = [
 
 // Sanitize phone number - keep only digits, spaces, and hyphens
 const sanitizePhoneNumber = (value: string): string => {
-  return value.replace(/[^\\d\\s\\-]/g, '');
+  return value.replace(/[^\d\s\-]/g, '');
 };
 
 // Strip all non-digits for storage
 const stripToDigits = (value: string): string => {
-  return value.replace(/\\D/g, '');
+  return value.replace(/\D/g, '');
 };
 
 export const PhoneInputWithDialCode: React.FC<PhoneInputWithDialCodeProps> = ({
