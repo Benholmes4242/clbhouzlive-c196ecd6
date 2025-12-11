@@ -67,16 +67,6 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
         onAddCourse={() => setShowAddModal(true)}
       />
 
-      {/* 2. This Season on Course */}
-      {isOwnProfile && (
-        <SeasonOnCourseCard
-          userId={userId}
-          isOwnProfile={isOwnProfile}
-          roundsThisSeason={Math.min(totalCoursesPlayed, 12)}
-          newCoursesThisSeason={newCoursesThisYear}
-        />
-      )}
-
       {/* 3. Favourite Courses (Top 10) */}
       <FavouriteCoursesSection userId={userId} isOwnProfile={isOwnProfile} />
 
