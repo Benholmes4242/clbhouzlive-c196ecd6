@@ -4,7 +4,8 @@
  */
 
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import CourseCard from './CourseCard';
+import { CourseListCard } from './CourseListCard';
+import { useNavigate } from 'react-router-dom';
 
 interface Course {
   id: string;
@@ -38,6 +39,7 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
   onCourseClick,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: 10 });
   const [itemHeight, setItemHeight] = useState(ITEM_HEIGHT);
   const [isMobile, setIsMobile] = useState(true);
@@ -163,10 +165,13 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
           {courses.map((course) => (
             <div key={course.id} className="mb-4 sm:mb-0">
-              <CourseCard 
+              <CourseListCard 
                 course={course}
-                showRankBadge={!!course.global_rank}
-                onClick={onCourseClick}
+                showGlobalRank={!!course.global_rank}
+                onClick={() => {
+                  onCourseClick?.();
+                  navigate(`/courses/${course.id}`);
+                }}
               />
             </div>
           ))}
@@ -186,10 +191,13 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
           {courses.map((course) => (
             <div key={course.id} className="mb-4 sm:mb-0">
-              <CourseCard 
+              <CourseListCard 
                 course={course}
-                showRankBadge={!!course.global_rank}
-                onClick={onCourseClick}
+                showGlobalRank={!!course.global_rank}
+                onClick={() => {
+                  onCourseClick?.();
+                  navigate(`/courses/${course.id}`);
+                }}
               />
             </div>
           ))}
@@ -219,10 +227,13 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
             className="mb-4 sm:mb-0"
             style={{ height: itemHeight }}
           >
-            <CourseCard 
+            <CourseListCard 
               course={course}
-              showRankBadge={!!course.global_rank}
-              onClick={onCourseClick}
+              showGlobalRank={!!course.global_rank}
+              onClick={() => {
+                onCourseClick?.();
+                navigate(`/courses/${course.id}`);
+              }}
             />
           </div>
         ))}
