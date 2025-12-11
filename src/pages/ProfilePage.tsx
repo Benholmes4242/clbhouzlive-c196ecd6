@@ -6,7 +6,6 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { PageRoot } from '@/components/layout/PageRoot';
-import ProfileEditDialog from '@/components/profile/ProfileEditDialog';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -16,10 +15,6 @@ const ProfilePage = () => {
     return searchParams.get('tab') || 'activity';
   });
   const queryClient = useQueryClient();
-  
-  // Edit dialog state for business mode
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [forceBusinessMode, setForceBusinessMode] = useState(false);
   const hasCheckedEditParam = useRef(false);
   
   // Get current user
@@ -41,22 +36,16 @@ const ProfilePage = () => {
     }
   }, [user, authLoading, navigate]);
   
-  // Auto-open edit dialog in business mode when ?edit=business is present
+  // Redirect legacy ?edit=business or ?edit=profile to /edit-profile
   useEffect(() => {
     if (hasCheckedEditParam.current) return;
     
     const editMode = searchParams.get('edit');
-    if (editMode === 'business' && profile && user) {
+    if (editMode && user) {
       hasCheckedEditParam.current = true;
-      setForceBusinessMode(true);
-      setEditDialogOpen(true);
-      
-      // Clear the query param to avoid reopening on navigation
-      const newSearchParams = new URLSearchParams(searchParams);
-      newSearchParams.delete('edit');
-      setSearchParams(newSearchParams, { replace: true });
+      navigate('/edit-profile', { replace: true });
     }
-  }, [searchParams, profile, user, setSearchParams]);
+  }, [searchParams, user, navigate]);
 
   // Loading state handled by route-level Suspense with ProfileSkeleton
   // Auth check still returns early - wait for both auth and profile to load
@@ -104,14 +93,6 @@ const ProfilePage = () => {
   if (!user) {
     return null;
   }
-
-  // Handle closing the edit dialog
-  const handleEditDialogClose = (open: boolean) => {
-    setEditDialogOpen(open);
-    if (!open) {
-      setForceBusinessMode(false);
-    }
-  };
   
   return (
     <PageRoot className="min-h-screen bg-background safe-top">
@@ -122,18 +103,6 @@ const ProfilePage = () => {
         activeSection={activeSection}
         onSectionChange={handleSectionChange}
       />
-      
-      {/* Business mode edit dialog - triggered by ?edit=business */}
-      {user && profile && (
-        <ProfileEditDialog
-          open={editDialogOpen}
-          onOpenChange={handleEditDialogClose}
-          userId={user.id}
-          profile={profile}
-          onProfileUpdate={() => refreshProfile()}
-          forceBusinessMode={forceBusinessMode}
-        />
-      )}
     </PageRoot>
   );
 };
