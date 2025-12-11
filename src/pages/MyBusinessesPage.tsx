@@ -59,7 +59,7 @@ const MyBusinessesPage = () => {
             <div className="flex-1">
               <h1 className="text-xl font-semibold">Business profiles</h1>
               <p className="text-sm text-muted-foreground">
-                See and manage the golf businesses you represent
+                Manage the golf businesses you represent.
               </p>
             </div>
           </div>
@@ -92,7 +92,7 @@ const MyBusinessesPage = () => {
             </div>
             <h3 className="text-lg font-medium mb-2">You don't have any business profiles yet</h3>
             <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
-              Create a profile for a golf club, coach, brand or shop you officially represent.
+              Create a profile for a golf club, coach, brand, course, shop, or any golf business you officially represent.
             </p>
             <Button onClick={handleCreateBusiness} className="gap-2">
               <Plus className="h-4 w-4" />

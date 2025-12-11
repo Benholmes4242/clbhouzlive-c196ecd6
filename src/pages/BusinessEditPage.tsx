@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Building2, MapPin, Globe, Mail, Phone, Check, Loader2, GraduationCap, ShoppingBag, Briefcase, Flag, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -150,7 +151,7 @@ const BusinessEditPage = () => {
       await queryClient.invalidateQueries({ queryKey: ['business-profile', id] });
 
       setSaveSuccess(true);
-      toast.success('Business profile updated!');
+      toast.success('Business profile updated');
 
       // Navigate back to business profile
       setTimeout(() => {
@@ -158,7 +159,7 @@ const BusinessEditPage = () => {
       }, 600);
     } catch (error) {
       console.error('Error updating business profile:', error);
-      toast.error('Failed to update business profile');
+      toast.error('Unable to save your changes. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -181,10 +182,13 @@ const BusinessEditPage = () => {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="max-w-md text-center">
           <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h1 className="text-2xl font-semibold mb-2">Business not found</h1>
+          <h1 className="text-2xl font-semibold mb-2">This business profile isn't available</h1>
           <p className="text-muted-foreground mb-6">
-            The business you're looking for doesn't exist or you don't have access.
+            It may have been removed or isn't visible to your account.
           </p>
+          <Button onClick={() => navigate('/')}>
+            Go home
+          </Button>
         </div>
       </div>
     );
@@ -219,6 +223,9 @@ const BusinessEditPage = () => {
           </button>
 
           <h1 className="text-xl font-semibold text-center">Edit business profile</h1>
+          <p className="text-xs text-muted-foreground text-center mt-1">
+            Update your business details to keep golfers informed and engaged.
+          </p>
         </div>
       </header>
 
