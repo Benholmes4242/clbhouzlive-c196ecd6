@@ -43,15 +43,10 @@ export function PostingAsPill({ onClick, isOpen }: PostingAsPillProps) {
         className="flex-shrink-0"
       />
       
-      {/* Label and name */}
-      <div className="flex flex-col items-start leading-tight min-w-0">
-        <span className="text-[9px] uppercase tracking-wide text-white/50">
-          Posting as
-        </span>
-        <span className="text-xs font-medium text-white truncate max-w-[120px]">
-          {activeActor.name}
-        </span>
-      </div>
+      {/* Name */}
+      <span className="text-xs font-medium text-white truncate max-w-[120px]">
+        {activeActor.name}
+      </span>
       
       {/* Chevron */}
       <ChevronDown 
