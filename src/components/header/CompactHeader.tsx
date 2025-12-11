@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
-import { Search, Building2 } from 'lucide-react';
+import { Search } from 'lucide-react';
+import { IoMdNotificationsOutline } from "react-icons/io";
 import { Button } from '@/components/ui/button';
 import { useScrollDirection } from '@/hooks/useScrollDirection';
-import { useProfileData } from '@/hooks/useProfileData';
-import { useMyBusinesses } from '@/hooks/useMyBusinesses';
+import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import HeaderNavigation from './HeaderNavigation';
 import SearchPill from '@/components/clubhouse/SearchPill';
+import { PostingAsPill } from './PostingAsPill';
+import { PostingAsMenu } from './PostingAsMenu';
 import { cn } from '@/lib/utils';
 
 interface CompactHeaderProps {
@@ -22,21 +25,14 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isHidden: scrollHidden } = useScrollDirection();
-  const { profile } = useProfileData();
-  const { data: myBusinesses } = useMyBusinesses(profile?.id);
+  const { user } = useSupabaseSession();
+  const { hasUnread } = useUnreadNotifications();
   const [searchOpen, setSearchOpen] = useState(false);
-  
-  // Only show building icon if user has at least one business
-  const hasBusiness = (myBusinesses?.length ?? 0) > 0;
+  const [menuOpen, setMenuOpen] = useState(false);
   
   // On Clubhouse, use the chrome system (body.chrome-hidden .chrome-header)
   // On other pages, use scroll direction
   const isClubhousePage = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
-  
-  // Building icon click handler - navigates to business hub
-  const handleBusinessIconClick = () => {
-    navigate('/businesses/manage');
-  };
 
   const handleLogoClick = () => {
     navigate('/clubhouse');
@@ -66,7 +62,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         }}
       >
         <div className="mx-auto flex h-full items-center justify-between px-4 max-w-5xl">
-          {/* Logo */}
+          {/* Left: Logo */}
           <button
             type="button"
             className="flex items-center gap-1.5 shrink-0 bg-transparent border-0 cursor-pointer"
@@ -77,28 +73,26 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               alt="Logo Mark"
               className="h-8 w-auto object-contain hover:opacity-80 transition-opacity"
             />
+            {/* Hide text logo on mobile to make room for posting-as pill */}
             <img
               src="/assets/clbhouz-white-logo.png"
               alt="clbhouz Logo"
-              className="h-8 w-auto object-contain hover:opacity-80 transition-opacity"
+              className="h-8 w-auto object-contain hover:opacity-80 transition-opacity hidden sm:block"
             />
           </button>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2">
-            {/* Business Hub Button - only visible when user has a business */}
-            {profile && hasBusiness && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-white/70 hover:text-white hover:bg-white/10 h-9 w-9"
-                onClick={handleBusinessIconClick}
-                aria-label="Business"
-              >
-                <Building2 className="h-5 w-5" />
-              </Button>
-            )}
-            
+          {/* Centre: Posting-as pill (mobile only, logged in users) */}
+          {user && (
+            <div className="flex-1 flex justify-center sm:hidden px-2">
+              <PostingAsPill 
+                onClick={() => setMenuOpen(v => !v)} 
+                isOpen={menuOpen}
+              />
+            </div>
+          )}
+
+          {/* Right: Actions */}
+          <div className="flex items-center gap-1 sm:gap-2">
             {/* Search Button */}
             <Button
               variant="ghost"
@@ -110,11 +104,39 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               <Search className="h-5 w-5" />
             </Button>
             
-            {/* Navigation Icons (notifications, profile, settings) */}
-            <HeaderNavigation />
+            {/* Notifications (mobile) - only show on mobile when logged in */}
+            {user && (
+              <div className="relative sm:hidden">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-white/70 hover:text-white hover:bg-white/10 h-9 w-9"
+                  onClick={() => navigate('/notificationmessages')}
+                  aria-label="Notifications"
+                >
+                  <IoMdNotificationsOutline className="h-5 w-5" />
+                </Button>
+                {hasUnread && (
+                  <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-orange-500 border-2 border-[rgb(10,10,10)]" />
+                )}
+              </div>
+            )}
+            
+            {/* Desktop: Full navigation (notifications, profile, settings) */}
+            <div className="hidden sm:flex items-center">
+              <HeaderNavigation />
+            </div>
           </div>
         </div>
       </header>
+
+      {/* Mobile: Posting-as menu */}
+      {user && (
+        <PostingAsMenu
+          isOpen={menuOpen}
+          onClose={() => setMenuOpen(false)}
+        />
+      )}
 
       {/* Mobile Search Overlay */}
       {searchOpen && (
