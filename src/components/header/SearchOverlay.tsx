@@ -67,8 +67,21 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose })
     id: item.id || crypto.randomUUID(),
     type: item.type === 'clubs' ? 'course' as const : 'user' as const,
     title: item.label,
-    subtitle: item.type === 'clubs' ? 'Popular course' : 'Trending'
+    subtitle: item.subtitle || (item.type === 'clubs' ? 'Popular course' : 'Trending'),
+    image: item.image || undefined
   }));
+
+  // Lock body scroll when overlay is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
 
   // Auto-focus input when overlay opens
   useEffect(() => {

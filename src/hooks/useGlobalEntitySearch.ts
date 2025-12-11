@@ -39,6 +39,8 @@ export interface TrendingItem {
   label: string;
   type: 'people' | 'clubs' | 'pages';
   id?: string;
+  image?: string | null;
+  subtitle?: string;
 }
 
 export interface RecentSearch {
@@ -154,12 +156,12 @@ const getRecentSearches = (): RecentSearch[] => {
   return [];
 };
 
-// Get trending items (popular courses)
+// Get trending items (popular courses) with images
 const getTrendingItems = async (): Promise<TrendingItem[]> => {
   try {
     const { data, error } = await supabase
       .from('golf_courses')
-      .select('id, name, global_rank')
+      .select('id, name, global_rank, thumbnail_image, country, region')
       .not('global_rank', 'is', null)
       .order('global_rank', { ascending: true })
       .limit(8);
@@ -169,7 +171,9 @@ const getTrendingItems = async (): Promise<TrendingItem[]> => {
     return (data || []).map(course => ({
       label: course.name,
       type: 'clubs' as const,
-      id: course.id
+      id: course.id,
+      image: course.thumbnail_image,
+      subtitle: `${course.region ? `${course.region}, ` : ''}${course.country}${course.global_rank ? ` • #${course.global_rank}` : ''}`
     }));
   } catch (error) {
     console.error('Error loading trending items:', error);
