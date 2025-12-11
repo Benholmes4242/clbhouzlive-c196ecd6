@@ -6,9 +6,9 @@ import { useScrollDirection } from '@/hooks/useScrollDirection';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import HeaderNavigation from './HeaderNavigation';
-import SearchPill from '@/components/clubhouse/SearchPill';
 import { PostingAsPill } from './PostingAsPill';
 import { PostingAsMenu } from './PostingAsMenu';
+import { SearchOverlay } from './SearchOverlay';
 import { cn } from '@/lib/utils';
 
 interface CompactHeaderProps {
@@ -54,17 +54,18 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           className
         )}
         style={{
-          background: 'rgba(10, 10, 10, 0.7)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
+          background: 'rgba(10, 10, 10, 0.95)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
           paddingTop: 'env(safe-area-inset-top)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
         }}
       >
-        <div className="mx-auto flex h-full items-center justify-between px-4 max-w-5xl">
-          {/* Left: Logo icon only */}
+        <div className="mx-auto flex h-full items-center justify-between px-3 sm:px-4 max-w-5xl">
+          {/* Left: Logo icon (mobile) + wordmark (desktop) */}
           <button
             type="button"
-            className="flex items-center shrink-0 bg-transparent border-0 cursor-pointer"
+            className="flex items-center gap-2 shrink-0 bg-transparent border-0 cursor-pointer active:scale-[0.98] transition-transform"
             onClick={handleLogoClick}
             aria-label="Go to home"
           >
@@ -73,35 +74,66 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               alt="clbhouz"
               className="h-9 w-9 object-contain hover:opacity-80 transition-opacity"
             />
+            {/* Wordmark - desktop only */}
+            <span className="hidden md:inline text-white font-semibold text-lg tracking-tight">
+              clbhouz
+            </span>
           </button>
 
+          {/* Desktop center: main nav links */}
+          <nav className="hidden lg:flex items-center gap-1">
+            {[
+              { label: 'Clubhouse', path: '/clubhouse' },
+              { label: 'Discover', path: '/discover' },
+              { label: 'Courses', path: '/courses' },
+              { label: 'Tour', path: '/tour' },
+            ].map((item) => {
+              const isActive = location.pathname === item.path || 
+                (item.path === '/clubhouse' && location.pathname === '/');
+              return (
+                <button
+                  key={item.path}
+                  onClick={() => navigate(item.path)}
+                  className={cn(
+                    "px-3 py-1.5 text-sm font-medium rounded-sq-sm transition-colors",
+                    isActive 
+                      ? "text-white bg-white/10" 
+                      : "text-white/60 hover:text-white hover:bg-white/5"
+                  )}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
+          </nav>
+
           {/* Right: Search + Bell + Identity pill */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             {/* Search Button */}
             <Button
               variant="ghost"
               size="icon"
-              className="text-white/70 hover:text-white hover:bg-white/10 h-8 w-8 p-0 flex items-center justify-center"
+              className="text-white/70 hover:text-white hover:bg-white/10 h-10 w-10 p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-transform"
               onClick={() => setSearchOpen(true)}
               aria-label="Search"
             >
               <Search className="h-5 w-5" />
             </Button>
             
-            {/* Notifications Bell (mobile) */}
+            {/* Notifications Bell */}
             {user && (
-              <div className="relative sm:hidden">
+              <div className="relative">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-white/70 hover:text-white hover:bg-white/10 h-8 w-8 p-0 flex items-center justify-center"
+                  className="text-white/70 hover:text-white hover:bg-white/10 h-10 w-10 p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-transform"
                   onClick={() => navigate('/notificationmessages')}
                   aria-label="Notifications"
                 >
                   <Bell className="h-5 w-5" />
                 </Button>
                 {hasUnread && (
-                  <span className="absolute top-0.5 right-0.5 h-2 w-2 rounded-full bg-orange-500 ring-[1.5px] ring-[rgb(10,10,10)]" />
+                  <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-orange-500 ring-[1.5px] ring-[rgb(10,10,10)]" />
                 )}
               </div>
             )}
@@ -133,26 +165,11 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         />
       )}
 
-      {/* Mobile Search Overlay */}
-      {searchOpen && (
-        <>
-          <div 
-            className="fixed inset-0 z-[70] bg-black/20 backdrop-blur-sm"
-            onClick={() => setSearchOpen(false)}
-          />
-          <div className="fixed inset-x-0 top-0 z-[70] p-3">
-            <div className="rounded-full backdrop-blur-2xl bg-hud-bg border-hud-border border shadow-hud">
-              <SearchPill 
-                autoFocus 
-                onClose={() => setSearchOpen(false)}
-                placeholder="Search clbhouz..."
-                variant="glass-dark"
-                isClubhousePage={true}
-              />
-            </div>
-          </div>
-        </>
-      )}
+      {/* Search Overlay - full-screen, covers header */}
+      <SearchOverlay 
+        isOpen={searchOpen} 
+        onClose={() => setSearchOpen(false)} 
+      />
     </>
   );
 };
