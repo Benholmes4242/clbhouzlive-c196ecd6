@@ -14,6 +14,7 @@ import { BUSINESS_CATEGORIES } from '@/types/profile';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { cn } from '@/lib/utils';
 import { LocationAutocomplete, LocationValue } from '@/components/business/LocationAutocomplete';
+import { PhoneInputWithDialCode, PhoneValue } from '@/components/business/PhoneInputWithDialCode';
 
 const BusinessCreatePage = () => {
   const navigate = useNavigate();
@@ -23,12 +24,13 @@ const BusinessCreatePage = () => {
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [location, setLocation] = useState<LocationValue | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [phone, setPhone] = useState<PhoneValue | null>(null);
   const [formData, setFormData] = useState({
     businessName: '',
     businessCategory: '',
     businessWebsite: '',
     businessContactEmail: '',
-    businessContactPhone: '',
     businessBio: '',
   });
 
@@ -51,6 +53,12 @@ const BusinessCreatePage = () => {
       formData.businessContactEmail.trim().length > 0);
 
   const handleSubmit = async () => {
+    // Validate location selection
+    if (!location) {
+      setLocationError('Please select a location from the list');
+      return;
+    }
+    
     if (!user?.id || !isValid) return;
 
     setSaving(true);
@@ -66,7 +74,7 @@ const BusinessCreatePage = () => {
           location: location?.label || null,
           website: formData.businessWebsite || null,
           email: formData.businessContactEmail || null,
-          phone: formData.businessContactPhone || null,
+          phone: phone?.fullNumber || null,
           description: formData.businessBio || null,
           is_verified: false,
         })
@@ -283,8 +291,12 @@ const BusinessCreatePage = () => {
                 </Label>
                 <LocationAutocomplete
                   value={location}
-                  onChange={setLocation}
+                  onChange={(val) => {
+                    setLocation(val);
+                    setLocationError(null);
+                  }}
                   placeholder="Search for a location..."
+                  error={locationError || undefined}
                 />
                 <p className="text-[11px] text-muted-foreground">
                   If you have multiple locations, use your main one.
@@ -328,20 +340,16 @@ const BusinessCreatePage = () => {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="businessContactPhone" className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
                     <Phone className="w-3.5 h-3.5" />
                     Phone
                   </Label>
-                  <Input
-                    id="businessContactPhone"
-                    type="tel"
-                    value={formData.businessContactPhone}
-                    onChange={(e) => handleInputChange('businessContactPhone', e.target.value)}
-                    placeholder="+44 20 0000 0000"
-                    className="h-10"
+                  <PhoneInputWithDialCode
+                    value={phone}
+                    onChange={setPhone}
                   />
                   <p className="text-[11px] text-muted-foreground">
-                    Include your country code. Optional but recommended.
+                    Select your country code and enter your local number. Optional but recommended.
                   </p>
                 </div>
               </div>
