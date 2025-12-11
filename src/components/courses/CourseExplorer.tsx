@@ -180,7 +180,10 @@ const CourseExplorer = () => {
       try {
         let query = supabase
           .from('golf_courses')
-          .select('*', { count: 'exact' });
+          .select(`
+            *,
+            course_rating_stats(average_rating)
+          `, { count: 'exact' });
 
         // Apply region filter based on country
         if (selectedRegion !== PRIMARY_REGIONS.ALL) {
@@ -237,8 +240,14 @@ const CourseExplorer = () => {
           throw error;
         }
 
+        // Flatten course_rating_stats to average_rating
+        const coursesWithRatings = (data || []).map(course => ({
+          ...course,
+          average_rating: course.course_rating_stats?.[0]?.average_rating ?? null,
+        }));
+
         return {
-          courses: data || [],
+          courses: coursesWithRatings,
           totalCount: count ?? 0,
         };
       } catch (error) {
