@@ -31,14 +31,12 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
             )}
             aria-label={tab.label}
           >
-            {/* Icon with optional active squircle */}
-            {isActive ? (
-              <div className="h-10 w-10 rounded-2xl bg-white/10 flex items-center justify-center">
-                <Icon className="h-7 w-7 text-primary" />
-              </div>
-            ) : (
-              <Icon className="h-7 w-7 text-white/70" />
-            )}
+            <Icon 
+              className={cn(
+                "h-7 w-7",
+                isActive ? "text-primary" : "text-white/70"
+              )}
+            />
             
             {/* Label */}
             <span className={cn(
