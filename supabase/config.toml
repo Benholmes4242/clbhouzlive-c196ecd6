@@ -39,3 +39,6 @@ verify_jwt = false
 [functions.generate-season-wrap]
 verify_jwt = true
 
+[functions.location-search]
+verify_jwt = false
+
