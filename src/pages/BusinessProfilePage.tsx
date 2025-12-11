@@ -7,6 +7,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessPostsCount } from '@/hooks/useBusinessPosts';
+import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
 import { BusinessProfileHeader } from '@/components/business/BusinessProfileHeader';
 import { BusinessProfileOverview } from '@/components/business/BusinessProfileOverview';
 import { BusinessProfilePosts } from '@/components/business/BusinessProfilePosts';
@@ -30,6 +31,7 @@ const BusinessProfilePage = () => {
   const { data: business, isLoading, error } = useBusinessProfile(idOrSlug);
   const { data: membership } = useBusinessMembership(business?.id);
   const { data: postsCount = 0 } = useBusinessPostsCount(business?.id);
+  const { data: followersCount = 0 } = useBusinessFollowersCount(business?.id);
 
   // Track profile visit
   useEffect(() => {
@@ -38,9 +40,6 @@ const BusinessProfilePage = () => {
       trackBusinessProfileVisit(business.id, user?.id, source);
     }
   }, [business?.id, user?.id, searchParams]);
-
-  // TODO: Implement followers count when follow system is wired up
-  const followersCount = 0;
 
   if (isLoading) {
     return <GenericPageSkeleton />;
@@ -80,7 +79,8 @@ const BusinessProfilePage = () => {
       {/* Owner menu - fixed top right */}
       <div className="absolute top-4 right-4 z-20">
         <BusinessOwnerMenu 
-          businessId={business.id} 
+          businessId={business.id}
+          businessName={business.name}
           membership={membership ?? null}
           className="h-10 w-10"
         />

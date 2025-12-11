@@ -39,6 +39,7 @@ export function useBusinessDirectory(filters: BusinessDirectoryFilters = {}) {
       let query = supabase
         .from('business_accounts')
         .select('*', { count: 'exact' })
+        .eq('is_deleted', false)
         .order('name', { ascending: true });
 
       if (category) {

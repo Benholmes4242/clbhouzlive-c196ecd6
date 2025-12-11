@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { useBusinessPosts, BusinessPost } from '@/hooks/useBusinessPosts';
 import { BusinessMembership } from '@/hooks/useBusinessMembership';
-import { Play, Heart, MessageCircle, Image as ImageIcon } from 'lucide-react';
+import { Play, Heart, MessageCircle, Image as ImageIcon, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useActiveActor } from '@/context/ActiveActorContext';
+import { normalizeFilesToMediaItems } from '@/lib/mediaUtils';
+import { openMediaPicker } from '@/utils/openMediaPicker';
+import EnhancedCreateMomentModalCinematic from '@/components/post/EnhancedCreateMomentModal.cinematic';
+import { ComposerMediaItem } from '@/hooks/useSnapModal';
+import { useOptimisticPostSubmission } from '@/hooks/useOptimisticPostSubmission';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface BusinessProfilePostsProps {
   businessId: string;
@@ -12,6 +20,69 @@ interface BusinessProfilePostsProps {
 
 export function BusinessProfilePosts({ businessId, businessName, membership }: BusinessProfilePostsProps) {
   const { data: posts, isLoading, error } = useBusinessPosts(businessId);
+  const { setActiveActor, availableActors } = useActiveActor();
+  const { submitPost } = useOptimisticPostSubmission();
+  const { user } = useSupabaseSession();
+  const queryClient = useQueryClient();
+  
+  // Create post modal state
+  const [isComposerOpen, setIsComposerOpen] = useState(false);
+  const [composerMedia, setComposerMedia] = useState<ComposerMediaItem[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Open composer with business pre-selected
+  const handleCreatePost = useCallback(() => {
+    // Pre-select this business in the active actor context
+    const businessActor = availableActors.find(
+      a => a.type === 'business' && a.id === businessId
+    );
+    if (businessActor) {
+      setActiveActor(businessActor);
+    }
+    
+    // Open media picker
+    openMediaPicker(async (files) => {
+      if (files.length > 0) {
+        const items = await normalizeFilesToMediaItems(files);
+        setComposerMedia(items);
+        setIsComposerOpen(true);
+      }
+    }, 10);
+  }, [businessId, availableActors, setActiveActor]);
+
+  const handleComposerSubmit = useCallback(async (data: any) => {
+    if (!user) return;
+    
+    setIsSubmitting(true);
+    
+    await submitPost({
+      user,
+      content: data.caption || '',
+      mediaFiles: data.files || [],
+      mediaItems: data.mediaItems,
+      selectedTags: [],
+      courseInfo: data.selectedCourse,
+      studioEditsByMediaId: data.studioEditsByMediaId,
+      actorType: 'business',
+      actorId: businessId,
+      onSuccess: () => {
+        setIsComposerOpen(false);
+        setComposerMedia([]);
+        setIsSubmitting(false);
+        // Refresh business posts
+        queryClient.invalidateQueries({ queryKey: ['business-posts', businessId] });
+        queryClient.invalidateQueries({ queryKey: ['business-posts-count', businessId] });
+      },
+      onError: () => {
+        setIsSubmitting(false);
+      },
+    });
+  }, [user, businessId, submitPost, queryClient]);
+
+  const handleComposerClose = useCallback(() => {
+    setIsComposerOpen(false);
+    setComposerMedia([]);
+  }, []);
 
   if (isLoading) {
     return (
@@ -31,6 +102,17 @@ export function BusinessProfilePosts({ businessId, businessName, membership }: B
     );
   }
 
+  // Show create post button for owners/admins
+  const CreatePostButton = membership?.canManage ? (
+    <Button 
+      onClick={handleCreatePost}
+      className="w-full rounded-sq-md mb-4"
+    >
+      <Plus className="h-4 w-4 mr-2" />
+      Create post as {businessName || 'this business'}
+    </Button>
+  ) : null;
+
   if (!posts || posts.length === 0) {
     return (
       <div className="py-12 text-center">
@@ -41,20 +123,44 @@ export function BusinessProfilePosts({ businessId, businessName, membership }: B
             : `No posts yet from ${businessName || 'this business'}.`}
         </p>
         {membership?.canManage && (
-          <Button variant="outline" className="rounded-full">
-            Post as this business
+          <Button variant="outline" className="rounded-full" onClick={handleCreatePost}>
+            Create post as {businessName || 'this business'}
           </Button>
         )}
+        
+        {/* Composer Modal */}
+        <EnhancedCreateMomentModalCinematic
+          isOpen={isComposerOpen}
+          onClose={handleComposerClose}
+          onSubmit={handleComposerSubmit}
+          isSubmitting={isSubmitting}
+          mediaItems={composerMedia}
+          onMediaChange={setComposerMedia}
+        />
       </div>
     );
   }
 
   // Instagram-style 3-column grid with no gap (matches personal Activity)
   return (
-    <div className="grid grid-cols-3 gap-0.5">
-      {posts.map((post) => (
-        <PostTile key={post.id} post={post} />
-      ))}
+    <div>
+      {CreatePostButton}
+      
+      <div className="grid grid-cols-3 gap-0.5">
+        {posts.map((post) => (
+          <PostTile key={post.id} post={post} />
+        ))}
+      </div>
+
+      {/* Composer Modal */}
+      <EnhancedCreateMomentModalCinematic
+        isOpen={isComposerOpen}
+        onClose={handleComposerClose}
+        onSubmit={handleComposerSubmit}
+        isSubmitting={isSubmitting}
+        mediaItems={composerMedia}
+        onMediaChange={setComposerMedia}
+      />
     </div>
   );
 }

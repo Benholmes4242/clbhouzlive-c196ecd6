@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, Globe, MapPin, BadgeCheck, BarChart2, Building2, UserPlus, Camera, Loader2 } from 'lucide-react';
+import { Phone, Globe, MapPin, BadgeCheck, BarChart2, Building2, Camera, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
@@ -12,6 +12,8 @@ import { BusinessAchievementsStrip } from './BusinessAchievementsStrip';
 import { BusinessHighlightsReel } from './BusinessHighlightsReel';
 import { BusinessImageActionSheet } from './BusinessImageActionSheet';
 import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
+import { BusinessFollowButton } from './BusinessFollowButton';
+import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
 
 interface BusinessProfileHeaderProps {
   business: BusinessProfile;
@@ -230,14 +232,10 @@ export function BusinessProfileHeader({
       <div className="mt-4 px-4 flex flex-wrap justify-center gap-2">
         {/* Follow button for non-owners */}
         {!membership?.canManage && (
-          <Button
-            variant="default"
-            size="sm"
-            className="gap-1.5 rounded-full px-4"
-          >
-            <UserPlus className="h-4 w-4" />
-            Follow
-          </Button>
+          <BusinessFollowButton 
+            businessId={business.id} 
+            className="rounded-full px-4"
+          />
         )}
         {membership?.canViewInsights && (
           <Button
