@@ -9,6 +9,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Eye, MousePointerClick, MessageSquare, AtSign, TrendingUp, Users, ArrowLeft, ShieldAlert } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { format, parseISO } from 'date-fns';
+import { PageRoot } from '@/components/layout/PageRoot';
 
 const StatCard = ({ 
   label, 
@@ -204,7 +205,7 @@ const BusinessInsightsPage = () => {
   const businessSlug = businessFromQuery?.slug || businessFromQuery?.id;
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4 md:px-6">
+    <PageRoot className="max-w-6xl mx-auto py-8 px-4 md:px-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div className="flex items-start gap-4">
@@ -327,7 +328,7 @@ const BusinessInsightsPage = () => {
           Coming soon: see which posts drive the most engagement for your business.
         </p>
       </section>
-    </div>
+    </PageRoot>
   );
 };
 

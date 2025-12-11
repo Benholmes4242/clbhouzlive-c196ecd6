@@ -10,7 +10,7 @@ import { useNavigationHandlers } from '@/components/bottom-navigation/useNavigat
 import { useSnapModal } from '@/hooks/useSnapModal';
 import { useChromeState } from '@/hooks/useChromeState';
 import { useChromeAnchors } from '@/hooks/useChromeAnchors';
-
+import { PageRoot } from '@/components/layout/PageRoot';
 
 import { useInfiniteClubhouseShorts } from '@/hooks/useInfiniteFollowedPosts';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -314,7 +314,7 @@ const Clubhouse = () => {
   // if (isLoading && posts.length === 0) return null;
 
   return (
-    <div ref={clubhouseRootRef} className="clubhouse-root" style={{ position: 'relative', isolation: 'isolate', zIndex: 0 }}>
+    <PageRoot ref={clubhouseRootRef} className="clubhouse-root" style={{ position: 'relative', isolation: 'isolate', zIndex: 0 }}>
       {/* Intersection sentinel for header fade-away */}
       <div id="clubhouse-sentinel" className="h-1 w-px absolute top-0 left-0" />
       
@@ -416,7 +416,7 @@ const Clubhouse = () => {
           userId={user.id}
         />
       )}
-    </div>
+    </PageRoot>
   );
 };
 

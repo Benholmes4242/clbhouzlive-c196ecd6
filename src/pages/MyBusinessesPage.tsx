@@ -5,6 +5,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMyBusinesses } from '@/hooks/useMyBusinesses';
 import { useState } from 'react';
 import { CreateBusinessProfileIntroModal } from '@/components/profile/CreateBusinessProfileIntroModal';
+import { PageRoot } from '@/components/layout/PageRoot';
 
 const ROLE_LABELS: Record<string, string> = {
   owner: 'Owner',
@@ -45,7 +46,7 @@ const MyBusinessesPage = () => {
   const canViewInsights = (role: string) => ['owner', 'admin', 'editor', 'analyst'].includes(role);
 
   return (
-    <div className="min-h-screen bg-background">
+    <PageRoot className="min-h-screen bg-background">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b">
         <div className="mx-auto max-w-3xl px-4 py-4">
@@ -213,7 +214,7 @@ const MyBusinessesPage = () => {
         onClose={() => setShowCreateModal(false)}
         onContinue={handleCreateContinue}
       />
-    </div>
+    </PageRoot>
   );
 };
 

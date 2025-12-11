@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { PageRoot } from '@/components/layout/PageRoot';
 
 interface SocialListPageShellProps {
   title: string;
@@ -21,7 +22,7 @@ export const SocialListPageShell: React.FC<SocialListPageShellProps> = ({
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background">
+    <PageRoot className="min-h-screen bg-background">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
         <div className="flex items-center gap-3 px-4 py-3">
@@ -49,6 +50,6 @@ export const SocialListPageShell: React.FC<SocialListPageShellProps> = ({
       <div className="mx-auto max-w-2xl">
         {children}
       </div>
-    </div>
+    </PageRoot>
   );
 };

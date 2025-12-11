@@ -3,10 +3,11 @@ import React from 'react';
 import ClubhouseHeaderNew from '@/components/clubhouse/ClubhouseHeaderNew';
 import BottomNavigation from '@/components/BottomNavigation';
 import MyRatingsContent from '@/components/courses/MyRatingsContent';
+import { PageRoot } from '@/components/layout/PageRoot';
 
 const MyRatings = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <PageRoot className="min-h-screen bg-background">
       <ClubhouseHeaderNew />
       
       <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
@@ -16,7 +17,7 @@ const MyRatings = () => {
       </main>
       
       
-    </div>
+    </PageRoot>
   );
 };
 
