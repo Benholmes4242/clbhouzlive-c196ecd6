@@ -233,18 +233,11 @@ const HeaderNavigation = () => {
             Edit Profile
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          {/* Business profile option - adapts based on whether user has businesses */}
+          {/* Business profiles option - always goes to hub */}
           {hasBusinesses && businesses && businesses.length > 0 ? (
-            <DropdownMenuItem onClick={() => {
-              // If exactly 1 business, go directly to it. Otherwise show business list
-              if (businesses.length === 1) {
-                navigate(`/business/${businesses[0].business.id}`);
-              } else {
-                navigate('/businesses/manage');
-              }
-            }}>
+            <DropdownMenuItem onClick={() => navigate('/businesses/manage')}>
               <Briefcase className="h-4 w-4 mr-2" />
-              Business profile
+              Business profiles
             </DropdownMenuItem>
           ) : (
             <DropdownMenuItem onClick={handleCreateBusinessProfile}>

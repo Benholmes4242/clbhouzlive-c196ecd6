@@ -169,6 +169,7 @@ const MyBusinessesPage = lazy(() => import("./pages/MyBusinessesPage"));
 const BusinessCreatePage = lazy(() => import("./pages/BusinessCreatePage"));
 const BusinessIntroPage = lazy(() => import("./pages/BusinessIntroPage"));
 const BusinessManagePage = lazy(() => import("./pages/BusinessManagePage"));
+const BusinessEditPage = lazy(() => import("./pages/BusinessEditPage"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 const CreateMomentPage = lazy(() => import("./pages/CreateMomentPage"));
@@ -241,14 +242,14 @@ function AppRoutes() {
         <Route path="/profile/:username/following" element={<Suspense fallback={<GenericPageSkeleton />}><FollowingListPage /></Suspense>} />
         <Route path="/profile/:username/friends" element={<Suspense fallback={<GenericPageSkeleton />}><FriendsListPage /></Suspense>} />
         
-        {/* Redirect old /businesses to home - directory is now admin-only */}
-        <Route path="/businesses" element={<Navigate to="/" replace />} />
+        {/* Business routes */}
         <Route path="/businesses/manage" element={<Suspense fallback={<GenericPageSkeleton />}><MyBusinessesPage /></Suspense>} />
         <Route path="/business/intro" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessIntroPage /></Suspense>} />
         <Route path="/business/create" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessCreatePage /></Suspense>} />
         <Route path="/business/manage" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessManagePage /></Suspense>} />
         <Route path="/business/insights" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInsightsPage /></Suspense>} />
         <Route path="/business/:id/insights" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInsightsPageV2 /></Suspense>} />
+        <Route path="/business/:id/edit" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessEditPage /></Suspense>} />
         <Route path="/business/:idOrSlug" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessProfilePage /></Suspense>} />
         
         <Route path="/top100" element={<Suspense fallback={<CoursesListSkeleton />}><Top100Hub /></Suspense>} />

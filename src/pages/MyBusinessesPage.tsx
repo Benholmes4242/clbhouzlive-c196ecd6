@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Building2, ChevronLeft, ChevronRight, Plus, BarChart3, CheckCircle2, MapPin } from 'lucide-react';
+import { Building2, ChevronLeft, ChevronRight, Plus, BarChart3, CheckCircle2, MapPin, Pencil, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMyBusinesses } from '@/hooks/useMyBusinesses';
@@ -32,19 +32,17 @@ const MyBusinessesPage = () => {
     return null;
   }
 
-  // Auto-redirect if user has exactly 1 business
-  if (!isLoading && businesses && businesses.length === 1) {
-    navigate(`/business/${businesses[0].business.id}`, { replace: true });
-    return null;
-  }
-
   const handleCreateBusiness = () => {
     setShowCreateModal(true);
   };
 
   const handleCreateContinue = () => {
-    navigate('/edit-profile');
+    setShowCreateModal(false);
+    navigate('/business/intro');
   };
+
+  const canEdit = (role: string) => ['owner', 'admin'].includes(role);
+  const canViewInsights = (role: string) => ['owner', 'admin', 'editor', 'analyst'].includes(role);
 
   return (
     <div className="min-h-screen bg-background">
@@ -59,9 +57,9 @@ const MyBusinessesPage = () => {
               <ChevronLeft className="h-5 w-5" />
             </button>
             <div className="flex-1">
-              <h1 className="text-xl font-semibold">Your Businesses</h1>
+              <h1 className="text-xl font-semibold">Business profiles</h1>
               <p className="text-sm text-muted-foreground">
-                See and manage the golf businesses you own or help run
+                See and manage the golf businesses you represent
               </p>
             </div>
           </div>
@@ -92,13 +90,13 @@ const MyBusinessesPage = () => {
             <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-muted flex items-center justify-center">
               <Building2 className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-medium mb-2">No businesses yet</h3>
+            <h3 className="text-lg font-medium mb-2">You don't have any business profiles yet</h3>
             <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
-              Create a business profile to list your golf club, academy, shop, or brand on Clbhouz.
+              Create a profile for a golf club, coach, brand or shop you officially represent.
             </p>
             <Button onClick={handleCreateBusiness} className="gap-2">
               <Plus className="h-4 w-4" />
-              Create Business Profile
+              Create business profile
             </Button>
           </div>
         )}
@@ -111,16 +109,16 @@ const MyBusinessesPage = () => {
                 key={membership.id}
                 className="rounded-sq-md border bg-card p-4 hover:border-foreground/20 transition-colors"
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-start gap-4">
                   {/* Logo */}
                   {membership.business.logo_url ? (
                     <img
                       src={membership.business.logo_url}
                       alt={membership.business.name}
-                      className="h-14 w-14 rounded-full object-cover"
+                      className="h-14 w-14 rounded-full object-cover flex-shrink-0"
                     />
                   ) : (
-                    <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center text-xl font-medium">
+                    <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center text-xl font-medium flex-shrink-0">
                       {membership.business.name.charAt(0).toUpperCase()}
                     </div>
                   )}
@@ -134,7 +132,7 @@ const MyBusinessesPage = () => {
                       )}
                     </div>
                     
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-2 flex-wrap mb-1.5">
                       {/* Role badge */}
                       <span className={`text-xs px-2 py-0.5 rounded-sq-pill border ${ROLE_COLORS[membership.role]}`}>
                         {ROLE_LABELS[membership.role]}
@@ -148,35 +146,48 @@ const MyBusinessesPage = () => {
                     </div>
 
                     {membership.business.location && (
-                      <div className="mt-1.5 flex items-center gap-1 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground mb-3">
                         <MapPin className="h-3 w-3" />
                         <span className="truncate">{membership.business.location}</span>
                       </div>
                     )}
-                  </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-2">
-                    {(membership.role === 'owner' || membership.role === 'admin' || membership.role === 'analyst') && (
+                    {/* Actions Row */}
+                    <div className="flex items-center gap-2 flex-wrap">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => navigate(`/business/${membership.business.id}/insights`)}
-                        className="gap-1.5"
+                        onClick={() => navigate(`/business/${membership.business.id}`)}
+                        className="gap-1.5 h-8"
                       >
-                        <BarChart3 className="h-4 w-4" />
-                        <span className="hidden sm:inline">Insights</span>
+                        <Eye className="h-3.5 w-3.5" />
+                        View profile
                       </Button>
-                    )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => navigate(`/business/${membership.business.id}`)}
-                      className="gap-1"
-                    >
-                      View
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
+                      
+                      {canEdit(membership.role) && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => navigate(`/business/${membership.business.id}/edit`)}
+                          className="gap-1.5 h-8"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                          Edit
+                        </Button>
+                      )}
+                      
+                      {canViewInsights(membership.role) && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => navigate(`/business/${membership.business.id}/insights`)}
+                          className="gap-1.5 h-8"
+                        >
+                          <BarChart3 className="h-3.5 w-3.5" />
+                          Insights
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
