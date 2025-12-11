@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Eye, Users, MousePointerClick, UserPlus, Phone, Globe, MapPin, MessageSquare, TrendingUp, TrendingDown, Star } from 'lucide-react';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
@@ -7,10 +7,12 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { trackBusinessProfileVisit } from '@/lib/businessAnalyticsTracking';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 type DateRange = '7d' | '28d' | '90d';
 
-// Mock data for charts
+// Mock data for charts (will be replaced with real data)
 const MOCK_TRAFFIC_DATA = [
   { day: 'Mon', visits: 42 },
   { day: 'Tue', visits: 58 },
@@ -22,10 +24,10 @@ const MOCK_TRAFFIC_DATA = [
 ];
 
 const MOCK_DISCOVERY_DATA = [
-  { name: 'Search', value: 45, color: 'hsl(var(--primary))' },
-  { name: 'Content', value: 30, color: 'hsl(var(--chart-2))' },
-  { name: 'Course pages', value: 15, color: 'hsl(var(--chart-3))' },
-  { name: 'Shares', value: 10, color: 'hsl(var(--chart-4))' },
+  { name: 'Search', value: 45, color: '#ff9f1c' },
+  { name: 'Content', value: 30, color: '#2dd4bf' },
+  { name: 'Course pages', value: 15, color: '#60a5fa' },
+  { name: 'Shares', value: 10, color: '#a78bfa' },
 ];
 
 const MOCK_POSTS = [
@@ -42,7 +44,7 @@ const MOCK_RATING_DISTRIBUTION = [
   { stars: 1, count: 1, percent: 2 },
 ];
 
-// Stat Card Component
+// Stat Card Component - Dark theme
 const StatCard = ({ 
   label, 
   value, 
@@ -57,26 +59,26 @@ const StatCard = ({
   const isPositive = change >= 0;
   
   return (
-    <div className="bg-card border border-border rounded-sq-md p-4 min-w-[140px] flex-shrink-0">
+    <div className="bg-[#070a12]/95 border border-white/[0.04] rounded-[18px] p-3 md:p-4 min-w-[140px] flex-shrink-0 shadow-[0_12px_30px_rgba(0,0,0,0.5)]">
       <div className="flex items-center justify-between mb-2">
-        <div className="h-9 w-9 rounded-sq-sm bg-muted flex items-center justify-center">
-          <Icon className="h-4 w-4 text-muted-foreground" />
+        <div className="h-8 w-8 md:h-9 md:w-9 rounded-[10px] bg-white/[0.04] flex items-center justify-center">
+          <Icon className="h-4 w-4 text-white/60" />
         </div>
         <div className={cn(
           "flex items-center gap-0.5 text-xs font-medium",
-          isPositive ? "text-emerald-600" : "text-red-500"
+          isPositive ? "text-[#4ade80]" : "text-[#f97373]"
         )}>
           {isPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
           {isPositive ? '+' : ''}{change}%
         </div>
       </div>
-      <p className="text-2xl font-semibold">{value}</p>
-      <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
+      <p className="text-[1.4rem] font-semibold text-white">{value}</p>
+      <p className="text-[0.75rem] text-white/55 mt-0.5">{label}</p>
     </div>
   );
 };
 
-// Action Card Component
+// Action Card Component - Dark theme
 const ActionCard = ({ 
   label, 
   value, 
@@ -86,30 +88,30 @@ const ActionCard = ({
   value: number; 
   icon: React.ElementType;
 }) => (
-  <div className="bg-card border border-border rounded-sq-md p-4 text-center">
-    <div className="h-10 w-10 rounded-sq-sm bg-muted flex items-center justify-center mx-auto mb-2">
-      <Icon className="h-5 w-5 text-muted-foreground" />
+  <div className="rounded-[14px] border border-white/[0.05] p-3 md:p-4 text-center bg-[radial-gradient(circle_at_top_left,_rgba(255,159,28,0.08),_rgba(7,10,18,1))]">
+    <div className="h-9 w-9 md:h-10 md:w-10 rounded-[10px] bg-white/[0.04] flex items-center justify-center mx-auto mb-2">
+      <Icon className="h-4 w-4 md:h-5 md:w-5 text-white/60" />
     </div>
-    <p className="text-xl font-semibold">{value}</p>
-    <p className="text-xs text-muted-foreground">{label}</p>
+    <p className="text-lg md:text-xl font-semibold text-white">{value}</p>
+    <p className="text-[0.78rem] text-white/70">{label}</p>
   </div>
 );
 
-// Post Performance Row
+// Post Performance Row - Dark theme
 const PostPerformanceRow = ({ post }: { post: typeof MOCK_POSTS[0] }) => (
-  <div className="flex items-center gap-3 py-3 border-b border-border last:border-0">
+  <div className="flex items-center gap-3 py-2 md:py-3 rounded-[12px] hover:bg-white/[0.02] transition-colors">
     <img 
       src={post.thumbnail} 
       alt="" 
-      className="h-14 w-14 rounded-sq-sm object-cover flex-shrink-0"
+      className="h-14 w-14 md:h-16 md:w-16 rounded-[10px] object-cover flex-shrink-0"
     />
     <div className="flex-1 min-w-0">
-      <p className="text-sm font-medium truncate">{post.caption}</p>
-      <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+      <p className="text-[0.8rem] font-medium text-white truncate">{post.caption}</p>
+      <div className="flex items-center gap-3 mt-1 text-[0.75rem] text-white/60">
         <span>{post.views.toLocaleString()} views</span>
         <span>{post.likes} likes</span>
         <span>{post.comments} comments</span>
-        <span className="text-primary">{post.profileVisits} profile visits</span>
+        <span className="text-[#ff9f1c]">{post.profileVisits} visits</span>
       </div>
     </div>
   </div>
@@ -119,18 +121,26 @@ const BusinessInsightsPageV2 = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [dateRange, setDateRange] = useState<DateRange>('28d');
+  const { user } = useSupabaseSession();
 
   const { data: business, isLoading: businessLoading } = useBusinessProfile(id);
   const { data: membership, isLoading: membershipLoading } = useBusinessMembership(id);
 
   const isLoading = businessLoading || membershipLoading;
 
+  // Track page visit
+  useEffect(() => {
+    if (business?.id && !isLoading) {
+      trackBusinessProfileVisit(business.id, user?.id, 'direct', { page: 'insights' });
+    }
+  }, [business?.id, user?.id, isLoading]);
+
   // Loading state
   if (isLoading) {
     return (
-      <PageRoot className="min-h-screen bg-background">
+      <PageRoot className="min-h-screen bg-[#05060a]">
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#ff9f1c]" />
         </div>
       </PageRoot>
     );
@@ -139,9 +149,9 @@ const BusinessInsightsPageV2 = () => {
   // Business not found
   if (!business) {
     return (
-      <PageRoot className="min-h-screen bg-background">
+      <PageRoot className="min-h-screen bg-[#05060a]">
         <div className="max-w-xl mx-auto mt-10 text-center px-4">
-          <p className="text-muted-foreground">Business not found</p>
+          <p className="text-white/60">Business not found</p>
           <Button onClick={() => navigate('/')} className="mt-4">Go home</Button>
         </div>
       </PageRoot>
@@ -161,49 +171,51 @@ const BusinessInsightsPageV2 = () => {
   };
 
   return (
-    <PageRoot className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b">
-        <div className="max-w-3xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate(`/business/${id}`)}
-              className="p-2 -ml-2 hover:bg-muted rounded-sq-sm transition-colors"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-            <div className="flex-1 min-w-0">
-              <h1 className="text-xl font-semibold">Insights</h1>
-              <p className="text-sm text-muted-foreground truncate">
-                {business.name} {business.location && `· ${business.location}`}
-              </p>
-            </div>
-          </div>
-
-          {/* Date range selector */}
-          <div className="mt-4 inline-flex rounded-sq-pill border border-border bg-muted/50 p-1">
-            {(['7d', '28d', '90d'] as DateRange[]).map((range) => (
+    <PageRoot className="min-h-screen bg-[#05060a] pb-20">
+      {/* Header - Dark theme */}
+      <div className="sticky top-0 z-10 bg-[#05060a]/95 backdrop-blur-md border-b border-white/[0.04]">
+        <div className="max-w-[1024px] mx-auto px-4 md:px-6 py-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
               <button
-                key={range}
-                onClick={() => setDateRange(range)}
-                className={cn(
-                  "px-4 py-1.5 text-sm rounded-sq-pill transition-colors",
-                  dateRange === range 
-                    ? "bg-background text-foreground shadow-sm" 
-                    : "text-muted-foreground hover:text-foreground"
-                )}
+                onClick={() => navigate(`/business/${id}`)}
+                className="p-2 -ml-2 hover:bg-white/[0.04] rounded-[10px] transition-colors"
               >
-                {rangeLabels[range]}
+                <ArrowLeft className="h-5 w-5 text-white/70" />
               </button>
-            ))}
+              <div className="min-w-0">
+                <h1 className="text-xl font-semibold text-white">Insights</h1>
+                <p className="text-[0.8rem] text-white/60 truncate">
+                  {business.name} {business.location && `· ${business.location.split(',')[0]}`}
+                </p>
+              </div>
+            </div>
+
+            {/* Date range selector */}
+            <div className="inline-flex rounded-full border border-white/[0.08] bg-white/[0.03] p-1">
+              {(['7d', '28d', '90d'] as DateRange[]).map((range) => (
+                <button
+                  key={range}
+                  onClick={() => setDateRange(range)}
+                  className={cn(
+                    "px-3 md:px-4 py-1.5 text-[0.8rem] rounded-full transition-colors",
+                    dateRange === range 
+                      ? "bg-[rgba(255,159,28,0.16)] border border-[#ff9f1c] text-white" 
+                      : "text-white/60 hover:text-white"
+                  )}
+                >
+                  {rangeLabels[range]}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-[1024px] mx-auto px-4 md:px-6 py-6 space-y-5 md:space-y-6">
         {/* Key Metrics Strip */}
         <section>
-          <h2 className="text-sm font-medium text-muted-foreground mb-3">Overview</h2>
+          <h2 className="text-[0.75rem] font-medium text-white/55 uppercase tracking-wider mb-3">Overview</h2>
           <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-4">
             <StatCard label="Profile Visits" value="482" change={18} icon={Eye} />
             <StatCard label="Golfers Reached" value="2.1K" change={9} icon={Users} />
@@ -213,44 +225,46 @@ const BusinessInsightsPageV2 = () => {
         </section>
 
         {/* Traffic Over Time */}
-        <section className="bg-card border border-border rounded-sq-md p-4">
-          <h3 className="font-semibold mb-1">Profile visits over time</h3>
-          <p className="text-sm text-muted-foreground mb-4">Last {rangeLabels[dateRange]}</p>
+        <section className="bg-[rgba(7,10,18,0.98)] border border-white/[0.04] rounded-[18px] p-4 md:p-5">
+          <h3 className="text-[0.9rem] font-medium text-white mb-1">Profile visits over time</h3>
+          <p className="text-[0.8rem] text-white/55 mb-4">Last {rangeLabels[dateRange]}</p>
           <div className="h-[200px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={MOCK_TRAFFIC_DATA}>
                 <defs>
-                  <linearGradient id="colorVisits" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                  <linearGradient id="colorVisitsDark" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#ff9f1c" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#ff9f1c" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
                 <XAxis 
                   dataKey="day" 
-                  tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+                  tick={{ fontSize: 12, fill: 'rgba(255,255,255,0.55)' }}
                   tickLine={false}
                   axisLine={false}
                 />
                 <YAxis 
-                  tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
+                  tick={{ fontSize: 12, fill: 'rgba(255,255,255,0.55)' }}
                   tickLine={false}
                   axisLine={false}
                 />
                 <Tooltip 
                   contentStyle={{ 
-                    backgroundColor: 'hsl(var(--card))', 
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px',
+                    backgroundColor: '#11141d', 
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: '10px',
+                    color: '#fff',
                   }}
+                  labelStyle={{ color: 'rgba(255,255,255,0.7)' }}
                 />
                 <Area 
                   type="monotone" 
                   dataKey="visits" 
-                  stroke="hsl(var(--primary))" 
+                  stroke="#ff9f1c" 
                   strokeWidth={2}
                   fillOpacity={1} 
-                  fill="url(#colorVisits)" 
+                  fill="url(#colorVisitsDark)" 
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -258,8 +272,8 @@ const BusinessInsightsPageV2 = () => {
         </section>
 
         {/* How Golfers Discover You */}
-        <section className="bg-card border border-border rounded-sq-md p-4">
-          <h3 className="font-semibold mb-4">How golfers discover you</h3>
+        <section className="bg-[rgba(7,10,18,0.98)] border border-white/[0.04] rounded-[18px] p-4 md:p-5">
+          <h3 className="text-[0.9rem] font-medium text-white mb-4">How golfers discover you</h3>
           <div className="flex flex-col md:flex-row md:items-center gap-6">
             <div className="h-[160px] w-[160px] mx-auto md:mx-0 flex-shrink-0">
               <ResponsiveContainer width="100%" height="100%">
@@ -282,13 +296,15 @@ const BusinessInsightsPageV2 = () => {
             </div>
             <div className="flex-1 space-y-2">
               {MOCK_DISCOVERY_DATA.map((item, index) => (
-                <div key={index} className="flex items-center gap-3">
-                  <div 
-                    className="h-3 w-3 rounded-full flex-shrink-0" 
-                    style={{ backgroundColor: item.color }}
-                  />
-                  <span className="text-sm flex-1">{item.name}</span>
-                  <span className="text-sm font-medium">{item.value}%</span>
+                <div key={index} className="flex items-center justify-between py-1">
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="h-2 w-2 rounded-full flex-shrink-0" 
+                      style={{ backgroundColor: item.color }}
+                    />
+                    <span className="text-[0.8rem] text-white/70">{item.name}</span>
+                  </div>
+                  <span className="text-[0.8rem] font-medium text-white">{item.value}%</span>
                 </div>
               ))}
             </div>
@@ -297,7 +313,7 @@ const BusinessInsightsPageV2 = () => {
 
         {/* What Golfers Do Next */}
         <section>
-          <h3 className="font-semibold mb-3">What golfers do next</h3>
+          <h3 className="text-[0.9rem] font-medium text-white mb-3">What golfers do next</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <ActionCard label="Call taps" value={24} icon={Phone} />
             <ActionCard label="Website clicks" value={34} icon={Globe} />
@@ -307,10 +323,10 @@ const BusinessInsightsPageV2 = () => {
         </section>
 
         {/* Content Performance */}
-        <section className="bg-card border border-border rounded-sq-md p-4">
-          <h3 className="font-semibold mb-1">Content performance</h3>
-          <p className="text-sm text-muted-foreground mb-3">Your top performing posts</p>
-          <div>
+        <section className="bg-[rgba(7,10,18,0.98)] border border-white/[0.04] rounded-[18px] p-4 md:p-5">
+          <h3 className="text-[0.9rem] font-medium text-white mb-1">Content performance</h3>
+          <p className="text-[0.8rem] text-white/55 mb-3">Your top performing posts</p>
+          <div className="divide-y divide-white/[0.04]">
             {MOCK_POSTS.map(post => (
               <PostPerformanceRow key={post.id} post={post} />
             ))}
@@ -318,14 +334,14 @@ const BusinessInsightsPageV2 = () => {
         </section>
 
         {/* Reviews & Reputation */}
-        <section className="bg-card border border-border rounded-sq-md p-4">
-          <h3 className="font-semibold mb-4">Reviews & reputation</h3>
+        <section className="bg-[rgba(7,10,18,0.98)] border border-white/[0.04] rounded-[18px] p-4 md:p-5">
+          <h3 className="text-[0.9rem] font-medium text-white mb-4">Reviews & reputation</h3>
           <div className="flex flex-col md:flex-row gap-6">
             {/* Rating summary */}
             <div className="text-center md:text-left">
               <div className="flex items-baseline gap-1 justify-center md:justify-start">
-                <span className="text-4xl font-bold">4.7</span>
-                <span className="text-muted-foreground">/ 5</span>
+                <span className="text-[1.6rem] font-bold text-white">4.7</span>
+                <span className="text-white/60">/ 5</span>
               </div>
               <div className="flex items-center gap-1 justify-center md:justify-start mt-1">
                 {[1, 2, 3, 4, 5].map((star) => (
@@ -338,22 +354,22 @@ const BusinessInsightsPageV2 = () => {
                   />
                 ))}
               </div>
-              <p className="text-sm text-muted-foreground mt-1">86 reviews</p>
+              <p className="text-[0.8rem] text-white/60 mt-1">86 reviews</p>
             </div>
 
             {/* Rating distribution */}
             <div className="flex-1 space-y-1.5">
               {MOCK_RATING_DISTRIBUTION.map((item) => (
                 <div key={item.stars} className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground w-3">{item.stars}</span>
+                  <span className="text-xs text-white/60 w-3">{item.stars}</span>
                   <Star className="h-3 w-3 text-amber-400 fill-amber-400" />
-                  <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="flex-1 h-2 bg-white/[0.06] rounded-full overflow-hidden">
                     <div 
                       className="h-full bg-amber-400 rounded-full transition-all"
                       style={{ width: `${item.percent}%` }}
                     />
                   </div>
-                  <span className="text-xs text-muted-foreground w-8 text-right">{item.count}</span>
+                  <span className="text-xs text-white/60 w-8 text-right">{item.count}</span>
                 </div>
               ))}
             </div>
