@@ -66,6 +66,7 @@ interface UserProfile {
   cover_photo_url?: string;
   bio?: string;
   website?: string;
+  websites?: string[] | null;
   eg_handicap_index?: number;
   eg_app_connected?: boolean;
   user_type?: string | null;
@@ -444,6 +445,30 @@ const HeroProfileHeader = ({
             <p className="mx-auto max-w-3xl text-center text-sm md:text-[15px] leading-relaxed text-muted-foreground">
               {profile.bio}
             </p>
+          </div>
+        )}
+
+        {/* Websites - Capsule buttons below bio (personal profiles) */}
+        {isPersonal && profile?.websites && profile.websites.length > 0 && (
+          <div className="mt-3 px-6 md:px-8 flex flex-wrap justify-center gap-2">
+            {profile.websites.map((url, index) => {
+              const displayUrl = url.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '');
+              const href = url.startsWith('http') ? url : `https://${url}`;
+              return (
+                <a
+                  key={index}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/60 hover:bg-muted text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                  {displayUrl}
+                </a>
+              );
+            })}
           </div>
         )}
 
