@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Building2, MapPin, Globe, Mail, Phone, Check, Loader2, GraduationCap, ShoppingBag, Briefcase, Flag, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Building2, MapPin, Globe, Mail, Phone, Check, Loader2, GraduationCap, ShoppingBag, Briefcase, Flag, AlertCircle, Camera, ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
+import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -17,6 +18,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { cn } from '@/lib/utils';
 import { LocationAutocomplete, LocationValue } from '@/components/business/LocationAutocomplete';
 import { PhoneInputWithDialCode, PhoneValue } from '@/components/business/PhoneInputWithDialCode';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 // Categories with icons
 const BUSINESS_CATEGORIES_WITH_ICONS = [
@@ -38,6 +40,10 @@ const BusinessEditPage = () => {
   
   const { data: business, isLoading: businessLoading, error: businessError } = useBusinessProfile(id);
   const { data: membership, isLoading: membershipLoading } = useBusinessMembership(id);
+  const { uploadLogo, removeLogo, uploadCover, removeCover, uploadingLogo, uploadingCover } = useBusinessImageUpload(id);
+  
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
   
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -232,9 +238,147 @@ const BusinessEditPage = () => {
       {/* Content */}
       <main className="flex-1">
         <div className="mx-auto w-full max-w-3xl pb-28">
-          {/* Band A: Business Identity */}
+          {/* Band 0: Images */}
           <motion.section
             custom={0}
+            initial="hidden"
+            animate="visible"
+            variants={sectionVariants}
+            className="px-4 py-5 bg-background"
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <ImageIcon className="w-4 h-4 text-muted-foreground" />
+              <h2 className="text-sm font-semibold text-foreground">Images</h2>
+            </div>
+            <p className="text-xs text-muted-foreground mb-4">
+              Your logo and cover photo help golfers recognize your business.
+            </p>
+
+            <div className="space-y-4">
+              {/* Logo row */}
+              <div className="flex items-center gap-4">
+                <div className="flex-shrink-0">
+                  {business?.logo_url ? (
+                    <SquircleAvatar
+                      src={business.logo_url}
+                      alt={business.name}
+                      size={64}
+                      className="border-[2px] border-border"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-sq-md bg-muted flex items-center justify-center text-lg font-bold text-muted-foreground border-2 border-border">
+                      {business?.name?.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()}
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <Label className="text-xs text-muted-foreground">Logo</Label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => logoInputRef.current?.click()}
+                      disabled={uploadingLogo}
+                      className="text-xs"
+                    >
+                      {uploadingLogo ? (
+                        <>
+                          <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Camera className="h-3.5 w-3.5 mr-1.5" />
+                          Change
+                        </>
+                      )}
+                    </Button>
+                    {business?.logo_url && (
+                      <button
+                        onClick={() => removeLogo()}
+                        disabled={uploadingLogo}
+                        className="text-xs text-muted-foreground hover:text-destructive transition-colors"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <input
+                  ref={logoInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) await uploadLogo(file);
+                    if (logoInputRef.current) logoInputRef.current.value = '';
+                  }}
+                  className="hidden"
+                />
+              </div>
+
+              {/* Cover photo row */}
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Cover photo</Label>
+                <div className="relative w-full h-24 rounded-sq-md overflow-hidden border border-border">
+                  {business?.cover_image_url ? (
+                    <img
+                      src={business.cover_image_url}
+                      alt="Cover"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200" />
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => coverInputRef.current?.click()}
+                    disabled={uploadingCover}
+                    className="text-xs"
+                  >
+                    {uploadingCover ? (
+                      <>
+                        <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Camera className="h-3.5 w-3.5 mr-1.5" />
+                        Change
+                      </>
+                    )}
+                  </Button>
+                  {business?.cover_image_url && (
+                    <button
+                      onClick={() => removeCover()}
+                      disabled={uploadingCover}
+                      className="text-xs text-muted-foreground hover:text-destructive transition-colors"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+                <input
+                  ref={coverInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) await uploadCover(file);
+                    if (coverInputRef.current) coverInputRef.current.value = '';
+                  }}
+                  className="hidden"
+                />
+              </div>
+            </div>
+          </motion.section>
+
+          {/* Band A: Business Identity */}
+          <motion.section
+            custom={1}
             initial="hidden"
             animate="visible"
             variants={sectionVariants}
@@ -313,7 +457,7 @@ const BusinessEditPage = () => {
 
           {/* Band B: Location & Contact */}
           <motion.section
-            custom={1}
+            custom={2}
             initial="hidden"
             animate="visible"
             variants={sectionVariants}

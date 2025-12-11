@@ -1,5 +1,5 @@
-import React from 'react';
-import { Phone, Globe, MapPin, BadgeCheck, BarChart2, Building2, UserPlus } from 'lucide-react';
+import React, { useState } from 'react';
+import { Phone, Globe, MapPin, BadgeCheck, BarChart2, Building2, UserPlus, Camera, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
@@ -10,6 +10,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from '@/lib/utils';
 import { BusinessAchievementsStrip } from './BusinessAchievementsStrip';
 import { BusinessHighlightsReel } from './BusinessHighlightsReel';
+import { BusinessImageActionSheet } from './BusinessImageActionSheet';
+import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 
 interface BusinessProfileHeaderProps {
   business: BusinessProfile;
@@ -26,6 +28,14 @@ export function BusinessProfileHeader({
 }: BusinessProfileHeaderProps) {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
+  
+  // Image editing state
+  const [logoSheetOpen, setLogoSheetOpen] = useState(false);
+  const [coverSheetOpen, setCoverSheetOpen] = useState(false);
+  const { uploadLogo, removeLogo, uploadCover, removeCover, uploadingLogo, uploadingCover } = useBusinessImageUpload(business.id);
+  
+  // Check if user can edit images
+  const canEditImages = membership?.role === 'owner' || membership?.role === 'admin';
 
   const handleCall = () => {
     if (business.phone) {
@@ -94,25 +104,60 @@ export function BusinessProfileHeader({
             background: 'radial-gradient(circle at top, rgba(0,0,0,0.22), transparent 55%), radial-gradient(circle at bottom, rgba(0,0,0,0.18), transparent 55%)',
           }}
         />
+
+        {/* Edit cover button - for owners/admins only */}
+        {canEditImages && (
+          <button
+            onClick={() => setCoverSheetOpen(true)}
+            className="absolute bottom-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-sm text-white text-xs font-medium hover:bg-black/60 transition-colors"
+          >
+            {uploadingCover ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Camera className="h-3.5 w-3.5" />
+            )}
+            <span>Change cover</span>
+          </button>
+        )}
       </div>
 
       {/* META BLOCK - Glass panel with avatar + text (matches personal profile) */}
       <div className="relative" style={{ marginTop: '-40px' }}>
         <div className="relative flex items-center gap-4 md:gap-6 rounded-3xl bg-muted/0 backdrop-blur-xl px-4 md:px-6 py-4 md:py-5">
-          {/* AVATAR */}
-          <div className="flex-shrink-0 z-20">
-            {business.logo_url ? (
-              <SquircleAvatar
-                src={business.logo_url}
-                alt={business.name}
-                size={80}
-                className="border-[2.5px] border-white shadow-lg"
-              />
-            ) : (
-              <div className="w-20 h-20 rounded-sq-md bg-white flex items-center justify-center text-xl font-bold text-slate-700 border-[2.5px] border-white shadow-lg">
-                {initials}
-              </div>
-            )}
+          {/* AVATAR with camera badge for owners */}
+          <div className="flex-shrink-0 z-20 relative">
+            <button
+              onClick={canEditImages ? () => setLogoSheetOpen(true) : undefined}
+              className={cn(
+                "relative",
+                canEditImages && "cursor-pointer"
+              )}
+              disabled={!canEditImages}
+            >
+              {business.logo_url ? (
+                <SquircleAvatar
+                  src={business.logo_url}
+                  alt={business.name}
+                  size={80}
+                  className="border-[2.5px] border-white shadow-lg"
+                />
+              ) : (
+                <div className="w-20 h-20 rounded-sq-md bg-white flex items-center justify-center text-xl font-bold text-slate-700 border-[2.5px] border-white shadow-lg">
+                  {initials}
+                </div>
+              )}
+              
+              {/* Camera badge - bottom right of avatar */}
+              {canEditImages && (
+                <span className="absolute -bottom-1 -right-1 flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground shadow-md">
+                  {uploadingLogo ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Camera className="h-3.5 w-3.5" />
+                  )}
+                </span>
+              )}
+            </button>
           </div>
 
           {/* TEXT META (name, handle, category · location) */}
@@ -260,6 +305,26 @@ export function BusinessProfileHeader({
         style={{
           background: 'linear-gradient(90deg, transparent 0%, hsl(var(--foreground) / 0.05) 20%, hsl(var(--foreground) / 0.05) 80%, transparent 100%)',
         }}
+      />
+
+      {/* Image Action Sheets */}
+      <BusinessImageActionSheet
+        open={logoSheetOpen}
+        onOpenChange={setLogoSheetOpen}
+        type="logo"
+        hasImage={!!business.logo_url}
+        uploading={uploadingLogo}
+        onUpload={async (file) => { await uploadLogo(file); }}
+        onRemove={async () => { await removeLogo(); }}
+      />
+      <BusinessImageActionSheet
+        open={coverSheetOpen}
+        onOpenChange={setCoverSheetOpen}
+        type="cover"
+        hasImage={!!business.cover_image_url}
+        uploading={uploadingCover}
+        onUpload={async (file) => { await uploadCover(file); }}
+        onRemove={async () => { await removeCover(); }}
       />
     </section>
   );
