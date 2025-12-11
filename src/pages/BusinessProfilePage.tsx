@@ -11,11 +11,12 @@ import { BusinessProfileHeader } from '@/components/business/BusinessProfileHead
 import { BusinessProfileOverview } from '@/components/business/BusinessProfileOverview';
 import { BusinessProfilePosts } from '@/components/business/BusinessProfilePosts';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
+import { GolfersHereTab } from '@/components/business/GolfersHereTab';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 import { trackBusinessProfileVisit } from '@/lib/businessAnalyticsTracking';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
-type BusinessTab = 'overview' | 'posts' | 'info';
+type BusinessTab = 'overview' | 'posts' | 'golfers' | 'info';
 type SourceType = 'search' | 'content' | 'course_page' | 'share' | 'direct';
 
 const BusinessProfilePage = () => {
@@ -88,23 +89,29 @@ const BusinessProfilePage = () => {
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as BusinessTab)} className="w-full">
           <TabsList 
             className="grid w-full rounded-sq-md bg-muted/70 border border-border/60 px-2 py-[3px]"
-            style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}
+            style={{ gridTemplateColumns: 'repeat(4, minmax(0, 1fr))' }}
           >
             <TabsTrigger 
               value="overview"
-              className="rounded-sq-pill text-sm px-3 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all"
+              className="rounded-sq-pill text-sm px-2 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all"
             >
               Overview
             </TabsTrigger>
             <TabsTrigger 
               value="posts"
-              className="rounded-sq-pill text-sm px-3 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all"
+              className="rounded-sq-pill text-sm px-2 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all"
             >
               Posts
             </TabsTrigger>
             <TabsTrigger 
+              value="golfers"
+              className="rounded-sq-pill text-sm px-2 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all"
+            >
+              Golfers
+            </TabsTrigger>
+            <TabsTrigger 
               value="info"
-              className="rounded-sq-pill text-sm px-3 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all"
+              className="rounded-sq-pill text-sm px-2 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all"
             >
               Info
             </TabsTrigger>
@@ -116,13 +123,23 @@ const BusinessProfilePage = () => {
       <div className="pt-6 px-4 sm:px-6 lg:px-8 pb-6">
         <div className="md:max-w-[1150px] md:mx-auto">
           {activeTab === 'overview' && (
-            <BusinessProfileOverview business={business} />
+            <BusinessProfileOverview 
+              business={business} 
+              membership={membership}
+            />
           )}
           {activeTab === 'posts' && (
             <BusinessProfilePosts 
               businessId={business.id}
               businessName={business.name}
               membership={membership ?? null} 
+            />
+          )}
+          {activeTab === 'golfers' && (
+            <GolfersHereTab 
+              businessId={business.id}
+              businessName={business.name}
+              businessLocation={business.location || undefined}
             />
           )}
           {activeTab === 'info' && (
