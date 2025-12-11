@@ -10,7 +10,7 @@ interface NavigationBarProps {
 
 const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, variant = 'default' }) => {
   return (
-    <nav className="w-full h-14 flex items-center justify-around px-4 sm:px-6">
+    <nav className="w-full h-14 flex items-center justify-around">
       {navigationTabs.map((tab) => {
         const Icon = tab.icon;
         const isActive = activeTab === tab.id;
@@ -24,23 +24,29 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
               onTabClick(tab);
             }}
             className={cn(
-              "flex items-center justify-center relative",
-              "h-10 w-10",
-              "transition-all duration-150 ease-out",
-              "active:scale-[0.94]",
+              "flex flex-col items-center justify-center gap-1 flex-1 py-1",
+              "transition-transform duration-[120ms] ease-out",
+              "active:scale-95",
               "focus:outline-none"
             )}
             aria-label={tab.label}
           >
+            {/* Icon with optional active squircle */}
+            {isActive ? (
+              <div className="h-10 w-10 rounded-2xl bg-white/10 flex items-center justify-center">
+                <Icon className="h-7 w-7 text-primary" />
+              </div>
+            ) : (
+              <Icon className="h-7 w-7 text-white/70" />
+            )}
             
-            <Icon 
-              className={cn(
-                "h-6 w-6 relative z-10 transition-colors duration-150",
-                isActive 
-                  ? "text-primary" // Brand orange for active
-                  : "text-white/70 hover:text-white/90"
-              )}
-            />
+            {/* Label */}
+            <span className={cn(
+              "text-[11px] leading-none",
+              isActive ? "text-white" : "text-white/60"
+            )}>
+              {tab.label}
+            </span>
           </button>
         );
       })}
