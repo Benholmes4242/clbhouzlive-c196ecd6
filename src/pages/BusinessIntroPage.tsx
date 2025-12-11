@@ -42,9 +42,8 @@ const BusinessIntroPage: React.FC = () => {
           </button>
 
           {/* Title */}
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground text-center">Business profiles</p>
-          <h1 className="text-xl font-semibold text-center mt-0.5">
-            Set up your golf club, academy, or brand
+          <h1 className="text-xl font-semibold text-center">
+            Create business profile
           </h1>
         </div>
       </header>

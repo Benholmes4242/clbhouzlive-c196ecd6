@@ -4,6 +4,7 @@ import { Search, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useScrollDirection } from '@/hooks/useScrollDirection';
 import { useProfileData } from '@/hooks/useProfileData';
+import { useMyBusinesses } from '@/hooks/useMyBusinesses';
 import HeaderNavigation from './HeaderNavigation';
 import SearchPill from '@/components/clubhouse/SearchPill';
 import { cn } from '@/lib/utils';
@@ -22,14 +23,25 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const location = useLocation();
   const { isHidden: scrollHidden } = useScrollDirection();
   const { profile } = useProfileData();
+  const { data: myBusinesses } = useMyBusinesses(profile?.id);
   const [searchOpen, setSearchOpen] = useState(false);
   
   // On Clubhouse, use the chrome system (body.chrome-hidden .chrome-header)
   // On other pages, use scroll direction
   const isClubhousePage = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
   
-  // Only show Business Directory icon for business accounts
-  const isBusinessProfile = profile?.profile_type === 'business';
+  // Building icon click handler - smart routing based on user's businesses
+  const handleBusinessIconClick = () => {
+    const count = myBusinesses?.length ?? 0;
+    if (count === 0) {
+      navigate('/business/intro');
+    } else if (count === 1) {
+      navigate(`/business/${myBusinesses![0].business.id}`);
+    } else {
+      // Multiple businesses - go to first one for now
+      navigate(`/business/${myBusinesses![0].business.id}`);
+    }
+  };
 
   const handleLogoClick = () => {
     navigate('/clubhouse');
@@ -79,14 +91,14 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            {/* Businesses Button - Only visible for business accounts */}
-            {isBusinessProfile && (
+            {/* Business Hub Button - always visible for logged in users */}
+            {profile && (
               <Button
                 variant="ghost"
                 size="icon"
                 className="text-white/70 hover:text-white hover:bg-white/10 h-9 w-9"
-                onClick={() => navigate('/businesses')}
-                aria-label="Businesses"
+                onClick={handleBusinessIconClick}
+                aria-label="Business"
               >
                 <Building2 className="h-5 w-5" />
               </Button>

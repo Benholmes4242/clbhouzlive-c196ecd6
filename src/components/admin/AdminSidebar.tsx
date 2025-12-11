@@ -84,6 +84,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate }) => {
   const fullMenu = [
     { to: "/admin/overview",      label: "Overview" },
     { to: "/admin/users",         label: "User Management" },
+    { to: "/admin/businesses",    label: "Business Directory" },
     { to: "/admin/business-verifications", label: "Business Verification", badge: pendingVerificationCount, tooltip: "There are verification requests awaiting review." },
     { to: "/admin/golf-courses",  label: "Golf Courses" },
     { to: "/admin/logos",         label: "Logos" },

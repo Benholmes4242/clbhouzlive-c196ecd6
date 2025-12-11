@@ -7,26 +7,25 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useUserProfile } from '@/hooks/useUserProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { BUSINESS_CATEGORIES } from '@/types/profile';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { cn } from '@/lib/utils';
+import { LocationAutocomplete, LocationValue } from '@/components/business/LocationAutocomplete';
 
 const BusinessCreatePage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user, loading: authLoading } = useSupabaseSession();
-  const { data: profile } = useUserProfile(user?.id);
   
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [location, setLocation] = useState<LocationValue | null>(null);
   const [formData, setFormData] = useState({
     businessName: '',
     businessCategory: '',
-    businessLocation: '',
     businessWebsite: '',
     businessContactEmail: '',
     businessContactPhone: '',
@@ -44,10 +43,10 @@ const BusinessCreatePage = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  // Validation
+  // Validation - require selected location (not just any string)
   const isValid =
     formData.businessName.trim().length > 0 &&
-    formData.businessLocation.trim().length > 0 &&
+    location !== null &&
     (formData.businessWebsite.trim().length > 0 ||
       formData.businessContactEmail.trim().length > 0);
 
@@ -58,41 +57,47 @@ const BusinessCreatePage = () => {
     setSaveSuccess(false);
 
     try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({
-          profile_type: 'business',
-          display_name: formData.businessName,
-          business_name: formData.businessName,
-          business_category: formData.businessCategory || null,
-          business_location: formData.businessLocation || null,
-          business_website: formData.businessWebsite || null,
-          business_contact_email: formData.businessContactEmail || null,
-          business_contact_phone: formData.businessContactPhone || null,
-          business_bio: formData.businessBio || null,
-          is_business_verified: false,
-          updated_at: new Date().toISOString(),
+      // 1. Create the business account
+      const { data: businessData, error: businessError } = await supabase
+        .from('business_accounts')
+        .insert({
+          name: formData.businessName,
+          category: formData.businessCategory || null,
+          location: location?.label || null,
+          website: formData.businessWebsite || null,
+          email: formData.businessContactEmail || null,
+          phone: formData.businessContactPhone || null,
+          description: formData.businessBio || null,
+          is_verified: false,
         })
-        .eq('id', user.id);
+        .select('id')
+        .single();
 
-      if (error) throw error;
+      if (businessError) throw businessError;
 
-      // Invalidate profile cache
-      await queryClient.invalidateQueries({ queryKey: ['profile'] });
-      await queryClient.invalidateQueries({ queryKey: ['user-profile'] });
+      const businessId = businessData.id;
+
+      // 2. Add current user as owner
+      const { error: memberError } = await supabase
+        .from('business_members')
+        .insert({
+          business_id: businessId,
+          user_profile_id: user.id,
+          role: 'owner',
+        });
+
+      if (memberError) throw memberError;
+
+      // Invalidate my-businesses cache
+      await queryClient.invalidateQueries({ queryKey: ['my-businesses'] });
 
       setSaveSuccess(true);
       
-      toast.success('Business profile created!', {
-        action: {
-          label: 'View profile',
-          onClick: () => navigate(`/profile/${profile?.username || user.id}`),
-        },
-      });
+      toast.success('Business profile created!');
 
-      // Navigate after success animation
+      // Navigate to the new business profile after success animation
       setTimeout(() => {
-        navigate(`/profile/${profile?.username || user.id}`);
+        navigate(`/business/${businessId}`);
       }, 800);
     } catch (error) {
       console.error('Error creating business profile:', error);
@@ -143,8 +148,7 @@ const BusinessCreatePage = () => {
           </button>
 
           {/* Title */}
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground text-center">Business setup</p>
-          <h1 className="text-xl font-semibold text-center mt-0.5">Create Business Profile</h1>
+          <h1 className="text-xl font-semibold text-center">Create business profile</h1>
         </div>
       </header>
 
@@ -274,15 +278,13 @@ const BusinessCreatePage = () => {
 
             <div className="space-y-4 mt-4">
               <div className="space-y-1.5">
-                <Label htmlFor="businessLocation" className="text-xs text-muted-foreground">
+                <Label className="text-xs text-muted-foreground">
                   Location <span className="text-destructive">*</span>
                 </Label>
-                <Input
-                  id="businessLocation"
-                  value={formData.businessLocation}
-                  onChange={(e) => handleInputChange('businessLocation', e.target.value)}
-                  placeholder="City, Country"
-                  className="h-10"
+                <LocationAutocomplete
+                  value={location}
+                  onChange={setLocation}
+                  placeholder="Search for a location..."
                 />
                 <p className="text-[11px] text-muted-foreground">
                   If you have multiple locations, use your main one.
