@@ -25,7 +25,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
             }}
             className={cn(
               "flex items-center justify-center relative",
-              "h-9 w-9",
+              "h-10 w-10",
               "transition-all duration-150 ease-out",
               "active:scale-[0.94]",
               "focus:outline-none"
@@ -35,19 +35,19 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
             {/* Active background squircle */}
             {isActive && (
               <span 
-                className="absolute inset-0 rounded-2xl bg-white/6"
+                className="absolute inset-0 rounded-2xl bg-white/10"
                 style={{
-                  boxShadow: 'inset 0 1px 2px rgba(255, 255, 255, 0.05)',
+                  boxShadow: 'inset 0 1px 2px rgba(255, 255, 255, 0.06)',
                 }}
               />
             )}
             
             <Icon 
               className={cn(
-                "h-[22px] w-[22px] relative z-10 transition-colors duration-150",
+                "h-6 w-6 relative z-10 transition-colors duration-150",
                 isActive 
                   ? "text-primary" // Brand orange for active
-                  : "text-white/60 hover:text-white/80"
+                  : "text-white/70 hover:text-white/90"
               )}
             />
           </button>
