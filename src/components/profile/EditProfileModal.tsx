@@ -81,6 +81,14 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
   const isOpen = externalOpen !== undefined ? externalOpen : internalOpen;
   const setOpen = externalOnOpenChange || setInternalOpen;
 
+  // Determine if user is an existing business user
+  // Business = has business_name set OR profile_type is 'business' OR user_type indicates business
+  const isExistingBusinessUser = Boolean(
+    profile?.business_name ||
+    profile?.profile_type === 'business' ||
+    ['club', 'brand', 'creator', 'business'].includes(profile?.user_type || '')
+  );
+
   const {
     formData,
     saving,
@@ -110,6 +118,9 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
     setOpen(false);
   }, [setOpen]);
 
+  // Show business tab only for existing business users or when forced
+  const showBusinessToggle = isExistingBusinessUser || forceBusinessMode;
+
   return (
     <Dialog open={isOpen} onOpenChange={setOpen}>
       {/* Only show trigger button if not controlled externally */}
@@ -123,23 +134,27 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
       )}
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-background border border-border">
         <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
+          <DialogTitle>
+            {formData.profileType === 'business' ? 'Edit Business Profile' : 'Edit Profile'}
+          </DialogTitle>
         </DialogHeader>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main form content - 2/3 width on desktop */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Profile Type Toggle */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Profile Type</label>
-              <p className="text-sm text-muted-foreground">
-                Golfer profiles are for players. Business profiles are for clubs, academies, shops, and brands.
-              </p>
-              <ProfileTypeToggle 
-                value={formData.profileType} 
-                onChange={handleProfileTypeChange}
-              />
-            </div>
+            {/* Profile Type Toggle - Only show for business users */}
+            {showBusinessToggle && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Profile Type</label>
+                <p className="text-sm text-muted-foreground">
+                  Golfer profiles are for players. Business profiles are for clubs, academies, shops, and brands.
+                </p>
+                <ProfileTypeToggle 
+                  value={formData.profileType} 
+                  onChange={handleProfileTypeChange}
+                />
+              </div>
+            )}
 
             {/* Header Photo Section */}
             <HeaderPhotoSection
@@ -179,10 +194,17 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
             {/* Conditional Fields based on Profile Type */}
             {formData.profileType === 'personal' ? (
               <PersonalFieldsForm
+                displayName={formData.displayName}
+                username={formData.username}
                 homeClub={formData.homeClub}
                 handicap={formData.handicap}
+                isUsernameSet={isUsernameSet}
                 onChange={(field, value) => {
-                  if (field === 'homeClub') {
+                  if (field === 'displayName') {
+                    handleInputChange({ target: { name: 'displayName', value } } as any);
+                  } else if (field === 'username') {
+                    handleInputChange({ target: { name: 'username', value } } as any);
+                  } else if (field === 'homeClub') {
                     handleInputChange({ target: { name: 'homeClub', value } } as any);
                   } else if (field === 'handicap') {
                     handleHandicapChange(value);
