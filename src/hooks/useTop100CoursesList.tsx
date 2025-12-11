@@ -13,7 +13,10 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
     queryFn: async () => {
       let query = supabase
         .from('golf_courses')
-        .select('*');
+        .select(`
+          *,
+          course_rating_stats(average_rating)
+        `);
 
       // Filter by region based on the primary country selection
       if (region === 'britain-ireland') {
@@ -47,7 +50,11 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
       const { data, error } = await query;
       if (error) throw error;
 
-      return data || [];
+      // Flatten course_rating_stats to average_rating
+      return (data || []).map(course => ({
+        ...course,
+        average_rating: course.course_rating_stats?.[0]?.average_rating ?? null,
+      }));
     },
     enabled: !!region,
   });
