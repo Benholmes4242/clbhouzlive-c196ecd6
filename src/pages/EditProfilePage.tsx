@@ -8,6 +8,7 @@ import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { toast } from 'sonner';
 import { ChevronLeft, Check, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { PageRoot } from '@/components/layout/PageRoot';
 
 // Section components
 import { HeaderPhotoCard } from '@/components/profile/edit-v2/HeaderPhotoCard';
@@ -246,7 +247,7 @@ const EditProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <PageRoot className="min-h-screen flex flex-col bg-background">
       {/* Header */}
       <header className="sticky top-0 z-20 border-b bg-background/95 backdrop-blur">
         <div className="mx-auto w-full max-w-3xl px-4 py-3 flex items-center gap-3">
@@ -425,7 +426,7 @@ const EditProfilePage: React.FC = () => {
           </button>
         </div>
       </footer>
-    </div>
+    </PageRoot>
   );
 };
 
