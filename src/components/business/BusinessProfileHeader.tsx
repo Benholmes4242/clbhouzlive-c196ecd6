@@ -63,7 +63,7 @@ export function BusinessProfileHeader({
   };
 
   const handleViewInsights = () => {
-    navigate(`/business/insights?businessId=${business.id}`);
+    navigate(`/business/${business.id}/insights`);
   };
 
   // Generate initials from business name

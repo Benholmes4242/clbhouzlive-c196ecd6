@@ -161,7 +161,7 @@ const MyBusinessesPage = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => navigate(`/business/insights?businessId=${membership.business.id}`)}
+                        onClick={() => navigate(`/business/${membership.business.id}/insights`)}
                         className="gap-1.5"
                       >
                         <BarChart3 className="h-4 w-4" />
