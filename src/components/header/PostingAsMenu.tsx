@@ -75,13 +75,18 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
         aria-label="Close profile menu"
       />
       
-      {/* Menu panel */}
+      {/* Menu panel - iOS Safari compositing layer fix */}
       <div 
         className={cn(
           "fixed inset-x-0 z-[200]",
           "animate-in fade-in slide-in-from-top-2 duration-200"
         )}
-        style={{ top: 'calc(56px + env(safe-area-inset-top))' }}
+        style={{ 
+          top: 'calc(56px + env(safe-area-inset-top))',
+          transform: 'translateZ(0)',
+          WebkitTransform: 'translate3d(0, 0, 0)',
+          willChange: 'transform'
+        }}
       >
         <div className="mx-3 rounded-sq-lg bg-white shadow-xl border border-border overflow-hidden">
           {/* Profile list section */}
