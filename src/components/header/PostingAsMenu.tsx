@@ -88,7 +88,16 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
           willChange: 'transform'
         }}
       >
-        <div className="mx-3 rounded-sq-lg bg-white shadow-xl border border-border overflow-hidden">
+        <div 
+          className="mx-3 rounded-sq-lg bg-white shadow-xl border border-slate-200 overflow-hidden"
+          style={{
+            // Reset to light theme colors - override clubhouse dark theme
+            '--foreground': '210 13% 18%',
+            '--muted-foreground': '210 10% 38%',
+            '--muted': '240 5% 92%',
+            '--border': '210 8% 89%',
+          } as React.CSSProperties}
+        >
           {/* Profile list section */}
           <div className="px-4 pt-3 pb-2">
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
