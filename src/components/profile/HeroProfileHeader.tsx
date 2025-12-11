@@ -37,7 +37,6 @@ import AchievementsPane from './AchievementsPane';
 import HandicapSection from './HandicapSection';
 
 // Other profile components
-import ProfileEditDialog from "./ProfileEditDialog";
 import ProfileAchievementsRail from './ProfileAchievementsRail';
 import ImmersiveProfileModal from './immersive/ImmersiveProfileModal';
 import SwipeToReturnZone from './SwipeToReturnZone';
@@ -108,7 +107,6 @@ const HeroProfileHeader = ({
   const tabs = getProfileTabs(profile?.user_type);
 
   // State
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
   const [friendsCount, setFriendsCount] = useState(0);
@@ -434,7 +432,7 @@ const HeroProfileHeader = ({
                 isVerifiedBusiness={profile?.is_verified_business}
                 isPersonal={isPersonal}
                 isOwnProfile={isOwnProfile}
-                onCustomiseClick={isOwnProfile ? () => setEditDialogOpen(true) : undefined}
+                onCustomiseClick={isOwnProfile ? () => navigate('/edit-profile') : undefined}
             />
           </div>
         </div>
@@ -551,15 +549,6 @@ const HeroProfileHeader = ({
           </div>
         )}
       </div>
-
-      {/* Profile Edit Dialog */}
-      <ProfileEditDialog
-        open={editDialogOpen}
-        onOpenChange={setEditDialogOpen}
-        userId={profile?.id || ''}
-        profile={profile}
-        onProfileUpdate={onProfileUpdate}
-      />
 
       {/* Immersive Profile Modal */}
       {hasImmersiveMedia && (

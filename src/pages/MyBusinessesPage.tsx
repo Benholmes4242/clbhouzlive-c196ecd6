@@ -37,7 +37,7 @@ const MyBusinessesPage = () => {
   };
 
   const handleCreateContinue = () => {
-    navigate('/profile?edit=business');
+    navigate('/edit-profile');
   };
 
   return (

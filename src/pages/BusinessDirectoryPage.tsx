@@ -43,7 +43,7 @@ const BusinessDirectoryPage = () => {
   };
 
   const handleBusinessIntroContinue = () => {
-    navigate('/profile?edit=business');
+    navigate('/edit-profile');
   };
 
   const getInitials = (name: string) => {
