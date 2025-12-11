@@ -200,15 +200,10 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 navRef.current = el;
                 setNavRef(el);
               }}
-              className={cn(
-                "chrome-bottom-nav",
-                "backdrop-blur-xl",
-                isClubhouseRoute ? "bg-black/80" : "bg-surface-slate",
-                "border-t border-white/10",
-                "shadow-[0_-10px_30px_rgba(0,0,0,0.35)]"
-              )}
+              className="chrome-bottom-nav backdrop-blur-xl border-t border-white/10"
               data-chrome="bottom-nav"
               style={{
+                background: 'var(--header-bg)',
                 paddingBottom: 'env(safe-area-inset-bottom, 0px)',
               }}
             >
