@@ -22,6 +22,7 @@ import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
 import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import { PageRoot } from '@/components/layout/PageRoot';
 
 const REGION_DISPLAY_NAMES: Record<string, string> = {
   global: 'Worldwide',
@@ -270,7 +271,7 @@ const Top100List = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <PageRoot className="min-h-screen bg-background">
         <main className="pb-20">
           <div className="animate-pulse space-y-4 pt-4">
             <div className="h-[260px] bg-muted" />
@@ -281,12 +282,12 @@ const Top100List = () => {
             ))}
           </div>
         </main>
-      </div>
+      </PageRoot>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <PageRoot className="min-h-screen bg-background">
       <main>
         {/* 1. Hero Section - Full-width with back button */}
         {listSummary && (
@@ -397,7 +398,7 @@ const Top100List = () => {
 
       {/* Scroll to top button */}
       <ScrollToTopGlass />
-    </div>
+    </PageRoot>
   );
 };
 
