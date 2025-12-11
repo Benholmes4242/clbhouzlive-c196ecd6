@@ -26,19 +26,24 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const { data: myBusinesses } = useMyBusinesses(profile?.id);
   const [searchOpen, setSearchOpen] = useState(false);
   
+  // Only show building icon if user has at least one business
+  const hasBusiness = (myBusinesses?.length ?? 0) > 0;
+  
   // On Clubhouse, use the chrome system (body.chrome-hidden .chrome-header)
   // On other pages, use scroll direction
   const isClubhousePage = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
   
-  // Building icon click handler - smart routing based on user's businesses
+  // Building icon click handler - navigates to user's business profile
   const handleBusinessIconClick = () => {
     const count = myBusinesses?.length ?? 0;
-    if (count === 0) {
-      navigate('/business/intro');
-    } else if (count === 1) {
+    if (count === 0) return; // Icon shouldn't be visible anyway
+    
+    if (count === 1) {
+      // Single business → go straight to that profile
       navigate(`/business/${myBusinesses![0].business.id}`);
     } else {
       // Multiple businesses - go to first one for now
+      // TODO: Future enhancement - show business switcher
       navigate(`/business/${myBusinesses![0].business.id}`);
     }
   };
@@ -91,8 +96,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            {/* Business Hub Button - always visible for logged in users */}
-            {profile && (
+            {/* Business Hub Button - only visible when user has a business */}
+            {profile && hasBusiness && (
               <Button
                 variant="ghost"
                 size="icon"
