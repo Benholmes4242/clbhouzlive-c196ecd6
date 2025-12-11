@@ -325,7 +325,7 @@ const EditProfilePage: React.FC = () => {
           <button
             type="button"
             onClick={handleBack}
-            className="text-xs text-primary hover:underline mb-2"
+            className="inline-flex items-center gap-0.5 text-sm text-slate-500 hover:text-slate-400 mb-2"
           >
             ‹ {getBackLabel()}
           </button>
@@ -492,7 +492,7 @@ const EditProfilePage: React.FC = () => {
             disabled={saving || saveSuccess}
             className={cn(
               "inline-flex items-center justify-center rounded-full px-5 py-2 text-sm font-semibold transition-all",
-              "bg-primary text-primary-foreground",
+              "bg-slate-900 text-white hover:bg-slate-800",
               "disabled:opacity-60 disabled:cursor-not-allowed",
               saveSuccess && "bg-emerald-500"
             )}
