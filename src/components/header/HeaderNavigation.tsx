@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { User, Settings, Shield, BarChart3, Building2, Plus, Briefcase, Pencil } from 'lucide-react';
+import { User, Settings, Shield, Building2, Plus, Briefcase, Pencil } from 'lucide-react';
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from "react-router-dom";
@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAdaptiveTextColor } from "@/hooks/useAdaptiveTextColor";
 import { useHeader } from "@/contexts/GlobalHeaderContext";
 import { useUnreadNotifications } from "@/hooks/useUnreadNotifications";
-import { useHasBusinesses } from "@/hooks/useMyBusinesses";
+import { useMyBusinesses, useHasBusinesses } from "@/hooks/useMyBusinesses";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -70,27 +70,9 @@ const HeaderNavigation = () => {
     enabled: !!user?.id,
   });
 
-  // Fetch user profile type for business insights access
-  const { data: userProfile } = useQuery({
-    queryKey: ['userProfileType', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select('profile_type')
-        .eq('id', user.id)
-        .single();
-      if (error) return null;
-      return data;
-    },
-    enabled: !!user?.id,
-  });
-
-  const isBusinessProfile = userProfile?.profile_type === 'business';
-  const isPersonalProfile = userProfile?.profile_type === 'personal' || (!userProfile?.profile_type && user);
-
   // Check if user has any businesses they manage
   const { hasBusinesses } = useHasBusinesses(user?.id);
+  const { data: businesses } = useMyBusinesses(user?.id);
 
   // Business intro modal state
   const [showBusinessIntroModal, setShowBusinessIntroModal] = useState(false);
@@ -252,8 +234,15 @@ const HeaderNavigation = () => {
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           {/* Business profile option - adapts based on whether user has businesses */}
-          {hasBusinesses ? (
-            <DropdownMenuItem onClick={() => navigate('/businesses/manage')}>
+          {hasBusinesses && businesses && businesses.length > 0 ? (
+            <DropdownMenuItem onClick={() => {
+              // If exactly 1 business, go directly to it. Otherwise show business list
+              if (businesses.length === 1) {
+                navigate(`/business/${businesses[0].business.id}`);
+              } else {
+                navigate('/businesses/manage');
+              }
+            }}>
               <Briefcase className="h-4 w-4 mr-2" />
               Business profile
             </DropdownMenuItem>
@@ -275,12 +264,6 @@ const HeaderNavigation = () => {
           <DropdownMenuItem onClick={() => navigate('/settings')}>
             Settings
           </DropdownMenuItem>
-          {isBusinessProfile && (
-            <DropdownMenuItem onClick={() => navigate('/business/insights')}>
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Business Insights
-            </DropdownMenuItem>
-          )}
           {hasAdminAccess && (
             <DropdownMenuItem onClick={handleAdminClick}>
               <Shield className="h-4 w-4 mr-2" />

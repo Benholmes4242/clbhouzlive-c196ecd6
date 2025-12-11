@@ -32,6 +32,12 @@ const MyBusinessesPage = () => {
     return null;
   }
 
+  // Auto-redirect if user has exactly 1 business
+  if (!isLoading && businesses && businesses.length === 1) {
+    navigate(`/business/${businesses[0].business.id}`, { replace: true });
+    return null;
+  }
+
   const handleCreateBusiness = () => {
     setShowCreateModal(true);
   };
@@ -155,7 +161,7 @@ const MyBusinessesPage = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => navigate('/business/insights')}
+                        onClick={() => navigate(`/business/insights?businessId=${membership.business.id}`)}
                         className="gap-1.5"
                       >
                         <BarChart3 className="h-4 w-4" />
@@ -165,7 +171,7 @@ const MyBusinessesPage = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => navigate(`/profile/${membership.business.slug || membership.business.id}`)}
+                      onClick={() => navigate(`/business/${membership.business.id}`)}
                       className="gap-1"
                     >
                       View
