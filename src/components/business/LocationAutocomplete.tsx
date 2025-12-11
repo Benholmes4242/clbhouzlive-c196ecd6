@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MapPin, Loader2, X } from 'lucide-react';
+import { MapPin, Loader2, X, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
@@ -19,6 +19,7 @@ interface LocationAutocompleteProps {
   placeholder?: string;
   className?: string;
   disabled?: boolean;
+  error?: string;
 }
 
 interface MapboxFeature {
@@ -33,6 +34,12 @@ interface MapboxFeature {
   center: [number, number];
 }
 
+interface MapboxResponse {
+  type: string;
+  features: MapboxFeature[];
+  attribution?: string;
+}
+
 const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiY2xiaG91eiIsImEiOiJjbTRsNGplOTEweHNuMmxzZXRlaWFzYWFoIn0.zdM-1W-rbIrRLAXMdl3hgA';
 
 export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
@@ -41,11 +48,13 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
   placeholder = 'Search for a location...',
   className,
   disabled = false,
+  error,
 }) => {
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<MapboxFeature[]>([]);
   const [loading, setLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
@@ -64,20 +73,40 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
   const searchLocations = async (searchQuery: string) => {
     if (searchQuery.length < 2) {
       setSuggestions([]);
+      setSearchError(null);
       return;
     }
 
     setLoading(true);
+    setSearchError(null);
+    
     try {
-      const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchQuery)}.json?` +
-        `access_token=${MAPBOX_ACCESS_TOKEN}&types=place,locality,region&limit=5`
-      );
-      const data = await response.json();
-      setSuggestions(data.features || []);
-      setShowDropdown(true);
+      // Mapbox Geocoding API - search for places
+      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchQuery)}.json?` +
+        `access_token=${MAPBOX_ACCESS_TOKEN}&types=place,locality,region,country&limit=8&language=en`;
+      
+      console.log('Searching locations for:', searchQuery);
+      
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        console.error('Mapbox API error:', response.status, response.statusText);
+        throw new Error(`API error: ${response.status}`);
+      }
+      
+      const data: MapboxResponse = await response.json();
+      console.log('Mapbox response:', data);
+      
+      if (data.features && Array.isArray(data.features)) {
+        setSuggestions(data.features);
+        setShowDropdown(true);
+      } else {
+        console.warn('Unexpected response format:', data);
+        setSuggestions([]);
+      }
     } catch (error) {
       console.error('Location search error:', error);
+      setSearchError('Unable to search locations. Please try again.');
       setSuggestions([]);
     } finally {
       setLoading(false);
@@ -87,6 +116,7 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newQuery = e.target.value;
     setQuery(newQuery);
+    setSearchError(null);
     
     // Clear the selected value when user starts typing
     if (value) {
@@ -97,9 +127,15 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
     }
-    debounceRef.current = setTimeout(() => {
-      searchLocations(newQuery);
-    }, 300);
+    
+    if (newQuery.length >= 2) {
+      debounceRef.current = setTimeout(() => {
+        searchLocations(newQuery);
+      }, 300);
+    } else {
+      setSuggestions([]);
+      setShowDropdown(false);
+    }
   };
 
   const handleSelect = (feature: MapboxFeature) => {
@@ -121,6 +157,13 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
       }
     }
 
+    // If no country in context, the feature itself might be the country
+    if (!country && feature.id.startsWith('country')) {
+      country = feature.text;
+      const countryCtx = feature.context?.find(c => c.id.startsWith('country'));
+      countryCode = countryCtx?.short_code?.toUpperCase() || '';
+    }
+
     const locationValue: LocationValue = {
       label: feature.place_name,
       city,
@@ -135,6 +178,7 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
     setQuery(feature.place_name);
     setShowDropdown(false);
     setSuggestions([]);
+    setSearchError(null);
   };
 
   const handleClear = () => {
@@ -142,11 +186,13 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
     onChange(null);
     setSuggestions([]);
     setShowDropdown(false);
+    setSearchError(null);
     inputRef.current?.focus();
   };
 
   // Display the selected value or the query
   const displayValue = value ? value.label : query;
+  const showError = error || (searchError && !loading);
 
   return (
     <div ref={containerRef} className={cn('relative', className)}>
@@ -160,7 +206,10 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
             if (suggestions.length > 0) setShowDropdown(true);
           }}
           placeholder={placeholder}
-          className="pl-9 pr-9 h-10"
+          className={cn(
+            "pl-9 pr-9 h-10",
+            showError && "border-destructive focus-visible:ring-destructive"
+          )}
           disabled={disabled}
         />
         {loading && (
@@ -176,6 +225,14 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
           </button>
         )}
       </div>
+
+      {/* Error message */}
+      {showError && (
+        <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+          <AlertCircle className="h-3 w-3" />
+          {error || searchError}
+        </p>
+      )}
 
       {/* Suggestions dropdown */}
       {showDropdown && suggestions.length > 0 && (
@@ -195,10 +252,13 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
       )}
 
       {/* No results state */}
-      {showDropdown && query.length >= 2 && suggestions.length === 0 && !loading && (
+      {showDropdown && query.length >= 2 && suggestions.length === 0 && !loading && !searchError && (
         <div className="absolute z-50 mt-1 w-full rounded-sq-md border bg-background shadow-lg p-3">
           <p className="text-sm text-muted-foreground text-center">
-            No locations found
+            No locations found for "{query}"
+          </p>
+          <p className="text-xs text-muted-foreground/70 text-center mt-1">
+            Try a different search term
           </p>
         </div>
       )}
