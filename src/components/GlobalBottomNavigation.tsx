@@ -209,7 +209,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
               )}
               data-chrome="bottom-nav"
               style={{
-                paddingBottom: 'var(--safe-bottom, 0px)',
+                paddingBottom: 'env(safe-area-inset-bottom, 0px)',
               }}
             >
               <NavigationBar
