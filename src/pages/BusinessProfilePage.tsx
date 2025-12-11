@@ -1,5 +1,5 @@
-import React, { useState, Suspense } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronLeft, AlertCircle } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Button } from '@/components/ui/button';
@@ -12,17 +12,30 @@ import { BusinessProfileOverview } from '@/components/business/BusinessProfileOv
 import { BusinessProfilePosts } from '@/components/business/BusinessProfilePosts';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
+import { trackBusinessProfileVisit } from '@/lib/businessAnalyticsTracking';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 type BusinessTab = 'overview' | 'posts' | 'info';
+type SourceType = 'search' | 'content' | 'course_page' | 'share' | 'direct';
 
 const BusinessProfilePage = () => {
   const { idOrSlug } = useParams<{ idOrSlug: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<BusinessTab>('overview');
+  const { user } = useSupabaseSession();
 
   const { data: business, isLoading, error } = useBusinessProfile(idOrSlug);
   const { data: membership } = useBusinessMembership(business?.id);
   const { data: postsCount = 0 } = useBusinessPostsCount(business?.id);
+
+  // Track profile visit
+  useEffect(() => {
+    if (business?.id) {
+      const source = (searchParams.get('source') as SourceType) || 'direct';
+      trackBusinessProfileVisit(business.id, user?.id, source);
+    }
+  }, [business?.id, user?.id, searchParams]);
 
   // TODO: Implement followers count when follow system is wired up
   const followersCount = 0;

@@ -5,6 +5,8 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
 import { BusinessMembership } from '@/hooks/useBusinessMembership';
 import { useNavigate } from 'react-router-dom';
+import { trackBusinessAction } from '@/lib/businessAnalyticsTracking';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface BusinessProfileHeaderProps {
   business: BusinessProfile;
@@ -39,15 +41,18 @@ export function BusinessProfileHeader({
   followersCount,
 }: BusinessProfileHeaderProps) {
   const navigate = useNavigate();
+  const { user } = useSupabaseSession();
 
   const handleCall = () => {
     if (business.phone) {
+      trackBusinessAction(business.id, 'call', user?.id);
       window.location.href = `tel:${business.phone}`;
     }
   };
 
   const handleWebsite = () => {
     if (business.website) {
+      trackBusinessAction(business.id, 'website', user?.id);
       const url = business.website.startsWith('http') 
         ? business.website 
         : `https://${business.website}`;
@@ -57,6 +62,7 @@ export function BusinessProfileHeader({
 
   const handleDirections = () => {
     if (business.location) {
+      trackBusinessAction(business.id, 'directions', user?.id);
       const query = encodeURIComponent(business.location);
       window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
     }

@@ -374,6 +374,106 @@ export type Database = {
         }
         Relationships: []
       }
+      business_analytics_events: {
+        Row: {
+          action_type: string | null
+          business_id: string
+          content_id: string | null
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          source: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action_type?: string | null
+          business_id: string
+          content_id?: string | null
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          source?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action_type?: string | null
+          business_id?: string
+          content_id?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          source?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_analytics_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_daily_metrics: {
+        Row: {
+          actions_call: number
+          actions_directions: number
+          actions_message: number
+          actions_total: number
+          actions_website: number
+          business_id: string
+          engagements: number
+          golfers_reached: number
+          impressions: number
+          metric_date: string
+          new_followers: number
+          profile_visits: number
+          reviews_count: number
+        }
+        Insert: {
+          actions_call?: number
+          actions_directions?: number
+          actions_message?: number
+          actions_total?: number
+          actions_website?: number
+          business_id: string
+          engagements?: number
+          golfers_reached?: number
+          impressions?: number
+          metric_date: string
+          new_followers?: number
+          profile_visits?: number
+          reviews_count?: number
+        }
+        Update: {
+          actions_call?: number
+          actions_directions?: number
+          actions_message?: number
+          actions_total?: number
+          actions_website?: number
+          business_id?: string
+          engagements?: number
+          golfers_reached?: number
+          impressions?: number
+          metric_date?: string
+          new_followers?: number
+          profile_visits?: number
+          reviews_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_daily_metrics_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_members: {
         Row: {
           business_id: string
@@ -5443,6 +5543,10 @@ export type Database = {
       }
       admin_set_test_user_photo: {
         Args: { p_photo_url: string }
+        Returns: undefined
+      }
+      aggregate_business_daily_metrics: {
+        Args: { target_date?: string }
         Returns: undefined
       }
       are_users_blocked: {
