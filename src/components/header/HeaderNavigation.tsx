@@ -251,23 +251,16 @@ const HeaderNavigation = () => {
             Edit Profile
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          {/* My Businesses - only shown if user has businesses */}
-          {hasBusinesses && (
+          {/* Business profile option - adapts based on whether user has businesses */}
+          {hasBusinesses ? (
             <DropdownMenuItem onClick={() => navigate('/businesses/manage')}>
               <Briefcase className="h-4 w-4 mr-2" />
-              My Businesses
+              Business profile
             </DropdownMenuItem>
-          )}
-          {/* Business Directory - available to all logged-in users */}
-          <DropdownMenuItem onClick={() => navigate('/businesses')}>
-            <Building2 className="h-4 w-4 mr-2" />
-            Business Directory
-          </DropdownMenuItem>
-          {/* Create Business Profile - only shown for personal profiles */}
-          {isPersonalProfile && (
+          ) : (
             <DropdownMenuItem onClick={handleCreateBusinessProfile}>
               <Plus className="h-4 w-4 mr-2" />
-              Create Business Profile
+              Create business profile
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />

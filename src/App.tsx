@@ -121,6 +121,7 @@ const AdminOverviewPage = lazy(() => import("./pages/admin/AdminOverviewPage").t
 const AdminInvitesPage = lazy(() => import("./pages/admin/AdminInvitesPage").then(m => ({ default: m.AdminInvitesPage })));
 const InviteAcceptPage = lazy(() => import("./pages/admin/InviteAcceptPage").then(m => ({ default: m.InviteAcceptPage })));
 const BusinessVerificationsPage = lazy(() => import("./pages/admin/BusinessVerificationsPage"));
+const AdminBusinessDirectoryPage = lazy(() => import("./pages/admin/AdminBusinessDirectoryPage"));
 
 // Legacy admin pages
 const GolfCoursesPage = lazy(() => import("./pages/admin/GolfCoursesPage").then(m => ({ default: m.GolfCoursesPage })));
@@ -239,7 +240,8 @@ function AppRoutes() {
         <Route path="/profile/:username/following" element={<Suspense fallback={<GenericPageSkeleton />}><FollowingListPage /></Suspense>} />
         <Route path="/profile/:username/friends" element={<Suspense fallback={<GenericPageSkeleton />}><FriendsListPage /></Suspense>} />
         
-        <Route path="/businesses" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessDirectoryPage /></Suspense>} />
+        {/* Redirect old /businesses to home - directory is now admin-only */}
+        <Route path="/businesses" element={<Navigate to="/" replace />} />
         <Route path="/businesses/manage" element={<Suspense fallback={<GenericPageSkeleton />}><MyBusinessesPage /></Suspense>} />
         <Route path="/business/intro" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessIntroPage /></Suspense>} />
         <Route path="/business/create" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessCreatePage /></Suspense>} />
@@ -279,6 +281,11 @@ function AppRoutes() {
           <Route path="business-verifications" element={
             <PanelGuard need="admins">
               <Suspense fallback={<GenericPageSkeleton />}><BusinessVerificationsPage /></Suspense>
+            </PanelGuard>
+          } />
+          <Route path="businesses" element={
+            <PanelGuard need="admins">
+              <Suspense fallback={<GenericPageSkeleton />}><AdminBusinessDirectoryPage /></Suspense>
             </PanelGuard>
           } />
           
