@@ -12,6 +12,7 @@ import { BusinessProfileOverview } from '@/components/business/BusinessProfileOv
 import { BusinessProfilePosts } from '@/components/business/BusinessProfilePosts';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
 import { GolfersHereTab } from '@/components/business/GolfersHereTab';
+import { BusinessOwnerMenu } from '@/components/business/BusinessOwnerMenu';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 import { trackBusinessProfileVisit } from '@/lib/businessAnalyticsTracking';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -74,6 +75,15 @@ const BusinessProfilePage = () => {
         >
           <ChevronLeft className="h-5 w-5" />
         </Button>
+      </div>
+
+      {/* Owner menu - fixed top right */}
+      <div className="absolute top-4 right-4 z-20">
+        <BusinessOwnerMenu 
+          businessId={business.id} 
+          membership={membership ?? null}
+          className="h-10 w-10"
+        />
       </div>
 
       {/* Hero header - now matches personal profile structure */}

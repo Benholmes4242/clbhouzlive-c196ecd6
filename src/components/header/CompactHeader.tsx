@@ -33,19 +33,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // On other pages, use scroll direction
   const isClubhousePage = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
   
-  // Building icon click handler - navigates to user's business profile
+  // Building icon click handler - navigates to business hub
   const handleBusinessIconClick = () => {
-    const count = myBusinesses?.length ?? 0;
-    if (count === 0) return; // Icon shouldn't be visible anyway
-    
-    if (count === 1) {
-      // Single business → go straight to that profile
-      navigate(`/business/${myBusinesses![0].business.id}`);
-    } else {
-      // Multiple businesses - go to first one for now
-      // TODO: Future enhancement - show business switcher
-      navigate(`/business/${myBusinesses![0].business.id}`);
-    }
+    navigate('/businesses/manage');
   };
 
   const handleLogoClick = () => {
