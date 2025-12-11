@@ -124,7 +124,7 @@ const BusinessInsightsPageV2 = () => {
   const { user } = useSupabaseSession();
 
   const { data: business, isLoading: businessLoading } = useBusinessProfile(id);
-  const { data: membership, isLoading: membershipLoading } = useBusinessMembership(id);
+  const { data: membership, isLoading: membershipLoading, isFetched: membershipFetched } = useBusinessMembership(id);
 
   const isLoading = businessLoading || membershipLoading;
 
@@ -135,8 +135,15 @@ const BusinessInsightsPageV2 = () => {
     }
   }, [business?.id, user?.id, isLoading]);
 
+  // Access redirect - only after membership has been fetched
+  useEffect(() => {
+    if (membershipFetched && !membershipLoading && !membership?.canViewInsights && business) {
+      navigate(`/business/${id}`, { replace: true });
+    }
+  }, [membershipFetched, membershipLoading, membership, business, id, navigate]);
+
   // Loading state
-  if (isLoading) {
+  if (isLoading || !membershipFetched) {
     return (
       <PageRoot className="min-h-screen bg-[#05060a]">
         <div className="flex items-center justify-center min-h-[60vh]">
@@ -158,10 +165,15 @@ const BusinessInsightsPageV2 = () => {
     );
   }
 
-  // Access check - only owners/admins can view insights
+  // Access check - wait for redirect effect, show loading meanwhile
   if (!membership?.canViewInsights) {
-    navigate(`/business/${id}`, { replace: true });
-    return null;
+    return (
+      <PageRoot className="min-h-screen bg-[#05060a]">
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#ff9f1c]" />
+        </div>
+      </PageRoot>
+    );
   }
 
   const rangeLabels: Record<DateRange, string> = {
