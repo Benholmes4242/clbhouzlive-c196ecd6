@@ -195,11 +195,13 @@ const ActivityPage: React.FC = () => {
   const allItems = data?.allItems ?? [];
   const hasNotifications = allItems.length > 0;
   
-  // Show skeleton until query has actually fetched (prevents empty-state flash)
-  const showSkeleton = !isFetched;
+  // Show skeleton only if we have NO data at all (not even placeholder)
+  // This prevents flash when query key changes (e.g., lastNotificationsSeen updates)
+  // because keepPreviousData keeps `data` populated even while refetching with new key
+  const showSkeleton = !data;
   
-  // Only show empty state when we KNOW there are no items (query finished + no data)
-  const showEmptyState = isFetched && !hasNotifications && !isFetching;
+  // Only show empty state when we have definitive empty data (not just missing data)
+  const showEmptyState = !!data && !hasNotifications && !isFetching;
 
   // Check if there are no new/unread items (for showing "caught up" banner, NOT for hiding history)
   const isAllCaughtUp = hasNotifications && effectiveNewItems.length === 0;
