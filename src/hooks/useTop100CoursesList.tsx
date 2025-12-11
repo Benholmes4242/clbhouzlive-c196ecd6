@@ -15,7 +15,7 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
         .from('golf_courses')
         .select(`
           *,
-          course_rating_stats(average_rating)
+          course_rating_aggregates(avg_overall_score, review_count)
         `);
 
       // Filter by region based on the primary country selection
@@ -50,11 +50,17 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
       const { data, error } = await query;
       if (error) throw error;
 
-      // Flatten course_rating_stats to average_rating
-      return (data || []).map(course => ({
-        ...course,
-        average_rating: course.course_rating_stats?.[0]?.average_rating ?? null,
-      }));
+      // Flatten course_rating_aggregates to average_rating (only when real reviews exist)
+      return (data || []).map(course => {
+        const agg = course.course_rating_aggregates?.[0];
+        // Only show rating if there are real reviews (review_count > 0)
+        const hasRealReviews = agg && agg.review_count > 0;
+        return {
+          ...course,
+          average_rating: hasRealReviews ? agg.avg_overall_score : null,
+          review_count: hasRealReviews ? agg.review_count : 0,
+        };
+      });
     },
     enabled: !!region,
   });
