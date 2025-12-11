@@ -1,7 +1,6 @@
 import React, { useRef } from 'react';
 import { Camera, ImageIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 interface HeaderPhotoCardProps {
   currentUrl?: string | null;
@@ -28,64 +27,67 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
   };
 
   return (
-    <Card className="overflow-hidden bg-white shadow-sm">
-      <div className="p-4 space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-            <ImageIcon className="w-5 h-5 text-muted-foreground" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-base">Header Photo</h3>
-            <p className="text-sm text-muted-foreground">
-              Best results with landscape images (1600×600 or larger)
-            </p>
-          </div>
+    <div>
+      <div className="mb-2 flex items-center justify-between">
+        <div>
+          <h2 className="text-sm font-medium">Header photo</h2>
+          <p className="text-xs text-muted-foreground">
+            This image appears at the top of your profile. Use a wide, landscape photo.
+          </p>
         </div>
+        {!!displayUrl && (
+          <button
+            type="button"
+            onClick={handleClick}
+            className="text-xs font-medium text-primary hover:underline"
+          >
+            Change photo
+          </button>
+        )}
+      </div>
 
-        {/* Preview */}
-        <div 
-          className="relative aspect-[16/6] bg-muted rounded-sq-md overflow-hidden cursor-pointer group"
-          onClick={handleClick}
-        >
-          {displayUrl ? (
+      <button
+        type="button"
+        onClick={handleClick}
+        className={cn(
+          "relative w-full overflow-hidden rounded-xl border border-dashed border-border/70",
+          "bg-muted/40 aspect-[16/6] flex items-center justify-center",
+          "hover:bg-muted/60 transition-colors group"
+        )}
+      >
+        {displayUrl ? (
+          <>
             <img
               src={displayUrl}
               alt="Header preview"
-              className="w-full h-full object-cover"
+              className="h-full w-full object-cover"
             />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <ImageIcon className="w-12 h-12 text-muted-foreground/30" />
+            {/* Hover overlay */}
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <div className="flex items-center gap-2 text-white text-sm font-medium">
+                <Camera className="w-4 h-4" />
+                Change photo
+              </div>
             </div>
-          )}
-          
-          {/* Hover overlay */}
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-            <div className="flex items-center gap-2 text-white text-sm font-medium">
-              <Camera className="w-4 h-4" />
-              Change Photo
-            </div>
-          </div>
-        </div>
+          </>
+        ) : (
+          <span className="text-xs text-muted-foreground">
+            Tap to upload a header photo
+          </span>
+        )}
+      </button>
 
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleClick}
-          className="w-full"
-        >
-          <Camera className="w-4 h-4 mr-2" />
-          {displayUrl ? 'Change Header Photo' : 'Add Header Photo'}
-        </Button>
+      <p className="mt-2 text-[11px] text-muted-foreground">
+        Recommended: 1600×600px or larger. JPG, PNG, or WebP.
+      </p>
 
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          onChange={handleChange}
-          className="hidden"
-        />
-      </div>
-    </Card>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        onChange={handleChange}
+        className="hidden"
+      />
+    </div>
   );
 };

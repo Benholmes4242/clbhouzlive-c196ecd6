@@ -1,8 +1,5 @@
 import React, { useRef } from 'react';
 import { Camera, User } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface ProfilePhotoCardProps {
   currentUrl?: string | null;
@@ -29,58 +26,67 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
   };
 
   return (
-    <Card className="overflow-hidden bg-white shadow-sm">
-      <div className="p-4 space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-            <User className="w-5 h-5 text-muted-foreground" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-base">Profile Photo</h3>
-            <p className="text-sm text-muted-foreground">
-              Square images work best
-            </p>
-          </div>
+    <div>
+      <div className="mb-2 flex items-center justify-between">
+        <div>
+          <h2 className="text-sm font-medium">Profile photo</h2>
+          <p className="text-xs text-muted-foreground">
+            Your photo appears as a rounded square across Clbhouz.
+          </p>
         </div>
-
-        {/* Preview */}
-        <div className="flex items-center justify-center py-4">
-          <div 
-            className="relative cursor-pointer group"
+        {displayUrl && (
+          <button
+            type="button"
             onClick={handleClick}
+            className="text-xs font-medium text-primary hover:underline"
           >
-            <SquircleAvatar
-              src={displayUrl || undefined}
-              alt="Profile photo"
-              size={120}
-              className="border-4 border-white shadow-lg"
-            />
-            
-            {/* Hover overlay */}
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-[28%]">
-              <Camera className="w-8 h-8 text-white" />
-            </div>
-          </div>
-        </div>
-
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleClick}
-          className="w-full"
-        >
-          <Camera className="w-4 h-4 mr-2" />
-          {displayUrl ? 'Change Profile Photo' : 'Add Profile Photo'}
-        </Button>
-
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          onChange={handleChange}
-          className="hidden"
-        />
+            Change photo
+          </button>
+        )}
       </div>
-    </Card>
+
+      <button
+        type="button"
+        onClick={handleClick}
+        className="inline-flex items-center gap-3 group"
+      >
+        <div className="h-20 w-20 rounded-[28%] overflow-hidden border border-border bg-muted/60 relative">
+          {displayUrl ? (
+            <>
+              <img 
+                src={displayUrl} 
+                alt="Profile preview" 
+                className="h-full w-full object-cover" 
+              />
+              {/* Hover overlay */}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-[28%]">
+                <Camera className="w-6 h-6 text-white" />
+              </div>
+            </>
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+              <User className="w-8 h-8" />
+            </div>
+          )}
+        </div>
+        {!displayUrl && (
+          <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+            Add photo
+          </span>
+        )}
+      </button>
+
+      <p className="mt-2 text-[11px] text-muted-foreground">
+        Square images work best. JPG, PNG, or WebP.
+      </p>
+
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        onChange={handleChange}
+        className="hidden"
+      />
+    </div>
   );
 };
