@@ -32,15 +32,6 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
             )}
             aria-label={tab.label}
           >
-            {/* Active background squircle */}
-            {isActive && (
-              <span 
-                className="absolute inset-0 rounded-2xl bg-white/10"
-                style={{
-                  boxShadow: 'inset 0 1px 2px rgba(255, 255, 255, 0.06)',
-                }}
-              />
-            )}
             
             <Icon 
               className={cn(
