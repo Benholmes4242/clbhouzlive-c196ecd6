@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, Download, Trash2, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { PageRoot } from '@/components/layout/PageRoot';
 
 /**
  * Error Log Diagnostic Page
@@ -56,7 +57,7 @@ export default function ErrorLogPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 pb-safe">
+    <PageRoot className="min-h-screen bg-background p-4 pb-safe">
       <div className="max-w-4xl mx-auto space-y-4">
         <div className="flex items-center justify-between">
           <div>
@@ -185,8 +186,8 @@ export default function ErrorLogPage() {
               </Card>
             ))}
           </div>
-        )}
+         )}
       </div>
-    </div>
+    </PageRoot>
   );
 }

@@ -7,6 +7,7 @@ import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { Button } from '@/components/ui/button';
 import { User, Building2, Megaphone, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
+import { PageRoot } from '@/components/layout/PageRoot';
 
 type AccountType = 'individual' | 'club' | 'brand' | 'creator';
 
@@ -81,7 +82,7 @@ const AccountTypeOnboarding: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <PageRoot className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="px-4 md:container md:mx-auto">
@@ -172,7 +173,7 @@ const AccountTypeOnboarding: React.FC = () => {
           </div>
         </div>
       </main>
-    </div>
+    </PageRoot>
   );
 };
 
