@@ -2,20 +2,22 @@ import React from 'react';
 import { useBusinessPosts, BusinessPost } from '@/hooks/useBusinessPosts';
 import { BusinessMembership } from '@/hooks/useBusinessMembership';
 import { Play, Heart, MessageCircle, Image as ImageIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface BusinessProfilePostsProps {
   businessId: string;
+  businessName?: string;
   membership: BusinessMembership | null;
 }
 
-export function BusinessProfilePosts({ businessId, membership }: BusinessProfilePostsProps) {
+export function BusinessProfilePosts({ businessId, businessName, membership }: BusinessProfilePostsProps) {
   const { data: posts, isLoading, error } = useBusinessPosts(businessId);
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="aspect-square bg-muted animate-pulse rounded-sq-sm" />
+      <div className="grid grid-cols-3 gap-0.5">
+        {Array.from({ length: 9 }).map((_, i) => (
+          <div key={i} className="aspect-square bg-muted animate-pulse" />
         ))}
       </div>
     );
@@ -31,28 +33,25 @@ export function BusinessProfilePosts({ businessId, membership }: BusinessProfile
 
   if (!posts || posts.length === 0) {
     return (
-      <div className="bg-card border border-border rounded-sq-md p-8 text-center">
-        <ImageIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-        {membership?.canManage ? (
-          <>
-            <p className="text-muted-foreground mb-2">
-              You haven't posted as this business yet.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Create a Moment and choose this business in the "Posting as" selector.
-            </p>
-          </>
-        ) : (
-          <p className="text-muted-foreground">
-            No posts yet from this business.
-          </p>
+      <div className="py-12 text-center">
+        <ImageIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-40" />
+        <p className="text-sm text-muted-foreground mb-4">
+          {membership?.canManage 
+            ? "No posts yet. Post as this business to share updates, photos and offers."
+            : `No posts yet from ${businessName || 'this business'}.`}
+        </p>
+        {membership?.canManage && (
+          <Button variant="outline" className="rounded-full">
+            Post as this business
+          </Button>
         )}
       </div>
     );
   }
 
+  // Instagram-style 3-column grid with no gap (matches personal Activity)
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1">
+    <div className="grid grid-cols-3 gap-0.5">
       {posts.map((post) => (
         <PostTile key={post.id} post={post} />
       ))}
@@ -66,7 +65,7 @@ function PostTile({ post }: { post: BusinessPost }) {
   const thumbnailUrl = isVideo ? primaryMedia?.poster_url : primaryMedia?.media_url;
 
   return (
-    <div className="group relative aspect-square bg-muted rounded-sq-sm overflow-hidden cursor-pointer">
+    <div className="group relative aspect-square bg-muted overflow-hidden cursor-pointer">
       {thumbnailUrl ? (
         <img
           src={thumbnailUrl}
@@ -86,7 +85,7 @@ function PostTile({ post }: { post: BusinessPost }) {
         </div>
       )}
 
-      {/* Hover overlay */}
+      {/* Hover overlay with stats */}
       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 text-white">
         <div className="flex items-center gap-1">
           <Heart className="h-5 w-5" />
