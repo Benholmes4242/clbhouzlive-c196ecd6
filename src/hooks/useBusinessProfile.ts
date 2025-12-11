@@ -25,11 +25,12 @@ export function useBusinessProfile(idOrSlug: string | undefined) {
     queryFn: async () => {
       if (!idOrSlug) throw new Error('No business ID or slug provided');
 
-      // Try to fetch by slug first, then by id
+      // Try to fetch by slug first, then by id - filter out deleted businesses
       const { data, error } = await supabase
         .from('business_accounts')
         .select('*')
         .or(`id.eq.${idOrSlug},slug.eq.${idOrSlug}`)
+        .eq('is_deleted', false)
         .maybeSingle();
 
       if (error) {

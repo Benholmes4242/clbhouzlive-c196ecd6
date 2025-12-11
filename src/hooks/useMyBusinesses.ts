@@ -36,19 +36,20 @@ export function useMyBusinesses(userProfileId?: string) {
             category,
             location,
             logo_url,
-            is_verified
+            is_verified,
+            is_deleted
           )
         `)
         .eq('user_profile_id', userProfileId);
 
       if (error) throw error;
       
-      // Transform the data to match our interface
+      // Transform the data to match our interface, filtering out deleted businesses
       return (data ?? []).map(item => ({
         id: item.id,
         role: item.role as BusinessMembership['role'],
         business: item.business as BusinessMembership['business'],
-      })).filter(item => item.business !== null);
+      })).filter(item => item.business !== null && !(item.business as any).is_deleted);
     },
   });
 }

@@ -328,9 +328,11 @@ export type Database = {
           category: string | null
           cover_image_url: string | null
           created_at: string | null
+          deleted_at: string | null
           description: string | null
           email: string | null
           id: string
+          is_deleted: boolean
           is_verified: boolean | null
           location: string | null
           logo_url: string | null
@@ -344,9 +346,11 @@ export type Database = {
           category?: string | null
           cover_image_url?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           description?: string | null
           email?: string | null
           id?: string
+          is_deleted?: boolean
           is_verified?: boolean | null
           location?: string | null
           logo_url?: string | null
@@ -360,9 +364,11 @@ export type Database = {
           category?: string | null
           cover_image_url?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           description?: string | null
           email?: string | null
           id?: string
+          is_deleted?: boolean
           is_verified?: boolean | null
           location?: string | null
           logo_url?: string | null
@@ -470,6 +476,49 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_follows: {
+        Row: {
+          business_id: string
+          created_at: string
+          follower_id: string
+          id: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          follower_id: string
+          id?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          follower_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_follows_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
         ]
