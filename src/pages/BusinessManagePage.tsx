@@ -181,9 +181,9 @@ const BusinessManagePage = () => {
             </div>
             
             {/* Right CTA - only for verified */}
-            {isVerified && (
+            {isVerified && user?.id && (
               <button
-                onClick={() => navigate('/business/insights')}
+                onClick={() => navigate(`/business/${user.id}/insights`)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
               >
                 <BarChart3 className="h-3.5 w-3.5" />
