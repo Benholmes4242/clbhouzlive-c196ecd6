@@ -1,6 +1,7 @@
 import React, { useState, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, AlertCircle } from 'lucide-react';
+import { PageRoot } from '@/components/layout/PageRoot';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
@@ -48,7 +49,7 @@ const BusinessProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <PageRoot className="min-h-screen bg-background">
       {/* Back button - fixed top left */}
       <div className="absolute top-4 left-4 z-20">
         <Button
@@ -94,7 +95,7 @@ const BusinessProfilePage = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </PageRoot>
   );
 };
 
