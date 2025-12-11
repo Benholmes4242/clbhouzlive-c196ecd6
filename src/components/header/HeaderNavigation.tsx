@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { User, Settings, Shield, BarChart3, Building2, Plus, Briefcase } from 'lucide-react';
+import { User, Settings, Shield, BarChart3, Building2, Plus, Briefcase, Pencil } from 'lucide-react';
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from "react-router-dom";
@@ -246,18 +246,10 @@ const HeaderNavigation = () => {
           <DropdownMenuItem onClick={handleProfileClick}>
             View Profile
           </DropdownMenuItem>
-          {/* Add Edit Profile option only when on profile page */}
-          {isProfilePage && (
-            <DropdownMenuItem onClick={() => {
-              // Trigger edit profile modal using the hidden trigger
-              const editButton = document.querySelector('[data-edit-profile-trigger]') as HTMLButtonElement;
-              if (editButton) {
-                editButton.click();
-              }
-            }}>
-              Edit Profile
-            </DropdownMenuItem>
-          )}
+          <DropdownMenuItem onClick={() => navigate('/edit-profile')}>
+            <Pencil className="h-4 w-4 mr-2" />
+            Edit Profile
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           {/* My Businesses - only shown if user has businesses */}
           {hasBusinesses && (
