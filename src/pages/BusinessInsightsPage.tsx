@@ -172,21 +172,21 @@ const BusinessInsightsPage = () => {
     return null;
   }
 
-  // Non-business profile trying to access without query param
+  // Non-business profile trying to access without query param - redirect to create business
   if (!isStandaloneBusinessView && profile?.profile_type !== 'business') {
     return (
       <div className="max-w-xl mx-auto mt-10 text-center px-4">
         <div className="bg-card border border-border rounded-sq-lg p-8">
           <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h1 className="text-2xl font-semibold mb-2">Business insights are for business profiles</h1>
+          <h1 className="text-2xl font-semibold mb-2">Business Insights</h1>
           <p className="text-muted-foreground mb-6">
-            Switch your account to a business profile to unlock analytics and insights about how golfers discover and engage with your business.
+            Create a business profile to unlock analytics and insights about how golfers discover and engage with your business.
           </p>
           <Button 
-            onClick={() => navigate('/settings?tab=profile&action=switch-to-business')}
+            onClick={() => navigate('/business/intro')}
             className="rounded-sq-sm"
           >
-            Switch to business profile
+            Create business profile
           </Button>
         </div>
       </div>
