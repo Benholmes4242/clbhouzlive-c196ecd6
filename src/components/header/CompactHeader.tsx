@@ -62,7 +62,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         }}
       >
         <div className="mx-auto flex h-full items-center justify-between px-4 max-w-5xl">
-          {/* Left: Logo */}
+          {/* Left: Logo + wordmark */}
           <button
             type="button"
             className="flex items-center gap-1.5 shrink-0 bg-transparent border-0 cursor-pointer"
@@ -73,25 +73,14 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               alt="Logo Mark"
               className="h-8 w-auto object-contain hover:opacity-80 transition-opacity"
             />
-            {/* Hide text logo on mobile to make room for posting-as pill */}
             <img
               src="/assets/clbhouz-white-logo.png"
               alt="clbhouz Logo"
-              className="h-8 w-auto object-contain hover:opacity-80 transition-opacity hidden sm:block"
+              className="h-8 w-auto object-contain hover:opacity-80 transition-opacity"
             />
           </button>
 
-          {/* Centre: Posting-as pill (mobile only, logged in users) */}
-          {user && (
-            <div className="flex-1 flex justify-center sm:hidden px-2">
-              <PostingAsPill 
-                onClick={() => setMenuOpen(v => !v)} 
-                isOpen={menuOpen}
-              />
-            </div>
-          )}
-
-          {/* Right: Actions */}
+          {/* Right: Search, Notifications, Posting-as pill */}
           <div className="flex items-center gap-1 sm:gap-2">
             {/* Search Button */}
             <Button
@@ -119,6 +108,16 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 {hasUnread && (
                   <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-orange-500 border-2 border-[rgb(10,10,10)]" />
                 )}
+              </div>
+            )}
+            
+            {/* Posting-as pill (mobile only, logged in users) */}
+            {user && (
+              <div className="sm:hidden">
+                <PostingAsPill 
+                  onClick={() => setMenuOpen(v => !v)} 
+                  isOpen={menuOpen}
+                />
               </div>
             )}
             
