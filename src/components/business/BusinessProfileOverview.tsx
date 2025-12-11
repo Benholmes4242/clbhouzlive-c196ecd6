@@ -2,10 +2,14 @@ import React, { useState } from 'react';
 import { MapPin, Star, Image as ImageIcon, Flag, CircleDot, ShoppingBag, Grip } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
+import { BusinessMembership } from '@/hooks/useBusinessMembership';
 import { motion, AnimatePresence } from 'framer-motion';
+import { InsightsMiniStrip } from './InsightsMiniStrip';
+import { FeaturedVideoBlock } from './FeaturedVideoBlock';
 
 interface BusinessProfileOverviewProps {
   business: BusinessProfile;
+  membership?: BusinessMembership | null;
 }
 
 // Icons for common highlights
@@ -17,7 +21,7 @@ const HIGHLIGHT_ICONS: Record<string, typeof Flag> = {
   'Practice facilities': Grip,
 };
 
-export function BusinessProfileOverview({ business }: BusinessProfileOverviewProps) {
+export function BusinessProfileOverview({ business, membership }: BusinessProfileOverviewProps) {
   const [showFullDescription, setShowFullDescription] = useState(false);
   
   const MAX_CHARS = 200;
@@ -41,8 +45,29 @@ export function BusinessProfileOverview({ business }: BusinessProfileOverviewPro
     'Pro shop',
   ].filter(Boolean);
 
+  const isOwner = membership?.canManage || false;
+
   return (
     <div className="space-y-8">
+      {/* Insights Mini-Strip - Owner only */}
+      {isOwner && (
+        <InsightsMiniStrip
+          businessId={business.id}
+          visits7d={127}
+          followersGained={12}
+          postImpressions={458}
+        />
+      )}
+
+      {/* Featured Video Block */}
+      <FeaturedVideoBlock
+        videoUrl={null} // TODO: Add featured_video_url to business profile
+        posterUrl={null}
+        businessName={business.name}
+        isOwner={isOwner}
+        onEditClick={() => console.log('Edit featured video')}
+      />
+
       {/* About section - Soft panel style (no card border) */}
       <section className="space-y-3">
         <h2 className="text-base font-semibold text-foreground">About</h2>

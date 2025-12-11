@@ -1,5 +1,5 @@
 import React from 'react';
-import { Phone, Globe, MapPin, BadgeCheck, BarChart2, Building2 } from 'lucide-react';
+import { Phone, Globe, MapPin, BadgeCheck, BarChart2, Building2, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { trackBusinessAction } from '@/lib/businessAnalyticsTracking';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from '@/lib/utils';
+import { BusinessAchievementsStrip } from './BusinessAchievementsStrip';
+import { BusinessHighlightsReel } from './BusinessHighlightsReel';
 
 interface BusinessProfileHeaderProps {
   business: BusinessProfile;
@@ -172,8 +174,26 @@ export function BusinessProfileHeader({
         </div>
       )}
 
+      {/* Stories-Style Highlights Reel */}
+      <BusinessHighlightsReel 
+        businessId={business.id}
+        isOwner={membership?.canManage || false}
+        className="mt-4"
+      />
+
       {/* Actions Row - Tight row of pill buttons */}
       <div className="mt-4 px-4 flex flex-wrap justify-center gap-2">
+        {/* Follow button for non-owners */}
+        {!membership?.canManage && (
+          <Button
+            variant="default"
+            size="sm"
+            className="gap-1.5 rounded-full px-4"
+          >
+            <UserPlus className="h-4 w-4" />
+            Follow
+          </Button>
+        )}
         {membership?.canViewInsights && (
           <Button
             variant="secondary"
@@ -219,6 +239,13 @@ export function BusinessProfileHeader({
           </Button>
         )}
       </div>
+
+      {/* Business Achievements Strip */}
+      <BusinessAchievementsStrip 
+        followersCount={followersCount}
+        postsCount={postsCount}
+        className="mt-4"
+      />
 
       {/* Stats Row - Matches personal profile styling */}
       <section className="mt-5 flex items-center justify-center gap-8 px-4">
