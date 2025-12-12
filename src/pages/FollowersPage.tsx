@@ -65,14 +65,14 @@ const FollowersPage = () => {
 
   return (
     <PageRoot className="min-h-screen bg-background safe-top">
-      <div className="max-w-2xl mx-auto px-4 py-6">
-        <div className="flex items-center gap-2 mb-6">
+      <div className="max-w-2xl mx-auto px-4 py-section">
+        <div className="flex items-center gap-2 mb-section">
           <Users className="h-6 w-6" />
           <h1 className="text-2xl font-bold">Followers</h1>
         </div>
 
         {followers && followers.length > 0 ? (
-          <div className="space-y-3">
+          <div className="space-y-internal">
             {followers.map((profile) => (
               <Card key={profile.id}>
                 <CardContent className="p-4">

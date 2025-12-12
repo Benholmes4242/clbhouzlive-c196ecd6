@@ -65,14 +65,14 @@ const FollowingPage = () => {
 
   return (
     <PageRoot className="min-h-screen bg-background safe-top">
-      <div className="max-w-2xl mx-auto px-4 py-6">
-        <div className="flex items-center gap-2 mb-6">
+      <div className="max-w-2xl mx-auto px-4 py-section">
+        <div className="flex items-center gap-2 mb-section">
           <UserPlus className="h-6 w-6" />
           <h1 className="text-2xl font-bold">Following</h1>
         </div>
 
         {following && following.length > 0 ? (
-          <div className="space-y-3">
+          <div className="space-y-internal">
             {following.map((profile) => (
               <Card key={profile.id}>
                 <CardContent className="p-4">

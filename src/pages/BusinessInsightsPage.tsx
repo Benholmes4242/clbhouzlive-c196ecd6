@@ -151,11 +151,11 @@ const BusinessInsightsPage = () => {
   if (isStandaloneBusinessView && !membership?.canViewInsights) {
     return (
       <PageRoot className="min-h-screen bg-[hsl(var(--muted))]">
-        <div className="max-w-xl mx-auto mt-10 text-center px-4">
+        <div className="max-w-xl mx-auto mt-section text-center px-4">
           <div className="bg-card border border-border rounded-sq-lg p-8">
-            <ShieldAlert className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h1 className="text-2xl font-semibold mb-2">{insightsEmptyStatesCopy.permissionDenied.title}</h1>
-            <p className="text-muted-foreground mb-6">
+            <ShieldAlert className="h-12 w-12 text-muted-foreground mx-auto mb-block" />
+            <h1 className="text-2xl font-semibold mb-sub">{insightsEmptyStatesCopy.permissionDenied.title}</h1>
+            <p className="text-muted-foreground mb-section">
               {insightsEmptyStatesCopy.permissionDenied.body}
             </p>
             {businessFromQuery && (
@@ -180,11 +180,11 @@ const BusinessInsightsPage = () => {
   if (!isStandaloneBusinessView && profile?.profile_type !== 'business') {
     return (
       <PageRoot className="min-h-screen bg-[hsl(var(--muted))]">
-        <div className="max-w-xl mx-auto mt-10 text-center px-4">
+        <div className="max-w-xl mx-auto mt-section text-center px-4">
           <div className="bg-card border border-border rounded-sq-lg p-8">
-            <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h1 className="text-2xl font-semibold mb-2">{insightsEmptyStatesCopy.noBusinessProfile.title}</h1>
-            <p className="text-muted-foreground mb-6">
+            <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-block" />
+            <h1 className="text-2xl font-semibold mb-sub">{insightsEmptyStatesCopy.noBusinessProfile.title}</h1>
+            <p className="text-muted-foreground mb-section">
               {insightsEmptyStatesCopy.noBusinessProfile.body}
             </p>
             <Button 
@@ -211,9 +211,9 @@ const BusinessInsightsPage = () => {
 
   return (
     <PageRoot className="min-h-screen bg-[hsl(var(--muted))] pb-24">
-      <div className="max-w-6xl mx-auto py-8 px-4 md:px-6">
+      <div className="max-w-6xl mx-auto py-section px-4 md:px-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-block mb-section">
         <div className="flex items-start gap-4">
           {/* Back link for standalone view */}
           {isStandaloneBusinessView && businessSlug && (
@@ -265,7 +265,7 @@ const BusinessInsightsPage = () => {
       </div>
 
       {/* Headline stats cards */}
-      <section className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-6">
+      <section className="grid gap-block grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-section">
         <StatCard 
           label="Profile views" 
           value={headline.profile_views} 

@@ -11,6 +11,7 @@
 @import './styles/style-tokens.css';
 @import './styles/studio-filters.css';
 @import './styles/social-dock.css';
+@import './styles/vertical-spacing.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -90,6 +91,22 @@ html.lightbox-open {
 /* Glass panel utilities for Clubhouse overlays */
 :root {
   --radius-tile: 18px;
+  
+  /* ========================================
+     GLOBAL VERTICAL SPACING SYSTEM
+     ======================================== */
+  
+  /* 
+   * USAGE:
+   * - space-section (24px): Between major sections/modules
+   * - space-block (16px): Header→content, card→card stacks
+   * - space-sub (8px): Title→subtitle, button→helper text
+   * - space-internal (12px): Inside cards, list row padding
+   */
+  --space-section: 24px;
+  --space-block: 16px;
+  --space-sub: 8px;
+  --space-internal: 12px;
   
   /* ========================================
      PHASE 4: GLOBAL MOTION TOKENS
