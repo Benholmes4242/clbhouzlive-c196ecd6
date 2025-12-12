@@ -98,13 +98,13 @@ const Top100Hub = () => {
             <Top100BackButton to="/courses?tab=top100" />
           </div>
           
-          <div className="space-y-6">
-          {/* Hero Section */}
-          <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 pb-2">
-            <h1 className="text-center text-3xl font-semibold tracking-tight text-slate-900">
+          <div className="space-y-5">
+          {/* Hero Section - polished spacing and hierarchy */}
+          <div className="mx-auto flex max-w-5xl flex-col gap-1.5 px-4 pb-1">
+            <h1 className="text-center text-2xl sm:text-3xl font-semibold tracking-tight text-foreground">
               World's Top 100 Golf Courses
             </h1>
-            <p className="text-center text-sm text-slate-500">
+            <p className="text-center text-sm text-muted-foreground/70">
               Explore the most prestigious golf courses across the globe
             </p>
           </div>
@@ -141,23 +141,21 @@ const Top100Hub = () => {
                 if (totalRated === 0) return null;
                 
                 return (
-                  <div className="mt-4">
-                    <Top100ProgressSummary
-                      ratedCount={totalRated}
-                      listCount={listsCount}
-                    />
-                  </div>
+                  <Top100ProgressSummary
+                    ratedCount={totalRated}
+                    listCount={listsCount}
+                  />
                 );
               })()}
               
-              {/* View Mode Toggle */}
-              <div className="mt-3 flex justify-center mb-6">
-                <div className="inline-flex rounded-sq-xs bg-muted/70 border border-border/60 p-0.5 shadow-sm">
+              {/* View Mode Toggle - centered with balanced spacing */}
+              <div className="flex justify-center py-4">
+                <div className="inline-flex rounded-sq-sm bg-muted/60 border border-border/50 p-0.5">
                   <button
                     type="button"
                     onClick={handleListClick}
                     className={cn(
-                      'inline-flex items-center gap-2 rounded-sq-xs px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors',
+                      'inline-flex items-center gap-1.5 rounded-sq-xs px-3.5 py-1.5 text-sm font-medium transition-colors',
                       viewMode === 'list'
                         ? 'bg-background text-foreground shadow-sm'
                         : 'bg-transparent text-muted-foreground hover:text-foreground'
@@ -171,7 +169,7 @@ const Top100Hub = () => {
                     type="button"
                     onClick={handleMapClick}
                     className={cn(
-                      'inline-flex items-center gap-2 rounded-sq-xs px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors',
+                      'inline-flex items-center gap-1.5 rounded-sq-xs px-3.5 py-1.5 text-sm font-medium transition-colors',
                       viewMode === 'map'
                         ? 'bg-background text-foreground shadow-sm'
                         : 'bg-transparent text-muted-foreground hover:text-foreground'
