@@ -66,24 +66,24 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
       )}
       
       {/* Course Info */}
-      <div className="p-4 space-y-2">
+      <div className="px-3.5 py-2.5 space-y-1.5">
         {/* Highlight label */}
         <div className="inline-block px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
-          <span className="text-xs font-medium text-primary">{getHighlightLabel()}</span>
+          <span className="text-[10px] font-medium text-primary">{getHighlightLabel()}</span>
         </div>
 
         {/* Course name & location */}
         <div>
-          <h3 className="font-semibold text-lg text-foreground">
+          <h3 className="font-semibold text-sm text-foreground">
             {course.course_name}
           </h3>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             {course.country}{course.sub_country ? `, ${course.sub_country}` : ''}
           </p>
         </div>
 
         {/* Friend line with avatar */}
-        <div className="flex items-center justify-between gap-3 pt-1">
+        <div className="flex items-center justify-between gap-3 pt-0.5">
           <p className="text-xs text-muted-foreground">
             Played by{" "}
             <span className="font-medium text-foreground">

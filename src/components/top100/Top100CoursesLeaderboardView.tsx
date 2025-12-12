@@ -256,21 +256,21 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
                 )}
 
                 {/* Meta block - matching My Progress structure */}
-                <div className="px-4 py-3 bg-background space-y-1">
+                <div className="px-3.5 py-2.5 bg-background space-y-0.5">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         {!hasImage && (course.global_rank || course.regional_rank || course.usa_rank) && (
-                          <span className="text-[11px] font-semibold text-muted-foreground">
+                          <span className="text-[10px] font-semibold text-muted-foreground">
                             #{course.global_rank || course.regional_rank || course.usa_rank}
                           </span>
                         )}
-                        <h3 className="text-base font-semibold text-foreground truncate">
+                        <h3 className="text-sm font-semibold text-foreground truncate">
                           {course.course_name}
                         </h3>
                       </div>
                       
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-xs text-muted-foreground">
                         {course.sub_country && `${course.sub_country}, `}
                         {course.country}
                       </p>
