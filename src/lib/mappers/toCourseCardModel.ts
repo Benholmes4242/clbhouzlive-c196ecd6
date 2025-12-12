@@ -12,8 +12,9 @@ import { CourseCardModel } from '@/types/courseCard';
  * - ranks: global_rank, regional_rank, usa_rank
  */
 
-// Generic course shape from golf_courses table (Explore source)
-interface GolfCourseRaw {
+// Generic course shape from golf_courses table or search RPC (Explore, GlobalTop100, VirtualizedCourseList)
+// This is the CANONICAL raw course type - all course sources should align to this shape
+export interface GolfCourseRaw {
   id: string;
   name: string;
   country: string;
