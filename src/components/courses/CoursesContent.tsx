@@ -91,8 +91,8 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
 
   return (
     <CoursesErrorBoundary>
-      <div className="space-y-6">
-        <div className="text-center space-y-1 pt-4 mb-4">
+      <div className="space-y-section">
+        <div className="text-center space-y-sub pt-block mb-block">
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">
             {username ? `${username}'s Courses` : 'Golf Courses'}
           </h1>
@@ -119,19 +119,19 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="explore" className="mt-6">
+          <TabsContent value="explore" className="mt-section">
             <CourseExplorer />
           </TabsContent>
 
 
-          <TabsContent value="my-courses" className="mt-6">
+          <TabsContent value="my-courses" className="mt-section">
             <UserCoursesContent username={username} />
           </TabsContent>
         </Tabs>
       ) : (
         /* Main courses page - show Explore, Global Top 100, and Friends' Courses */
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 rounded-sq-md bg-muted/70 border border-border/60 px-2 py-[3px] mb-5">
+          <TabsList className="grid w-full grid-cols-3 rounded-sq-md bg-muted/70 border border-border/60 px-2 py-[3px] mb-block">
             <TabsTrigger 
               value="explore"
               className="rounded-sq-pill text-sm px-3 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard"
@@ -153,15 +153,15 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="explore" className="mt-6">
+          <TabsContent value="explore" className="mt-section">
             <CourseExplorer />
           </TabsContent>
 
-          <TabsContent value="top100" className="mt-6">
+          <TabsContent value="top100" className="mt-section">
             <Top100CoursesHubPanel />
           </TabsContent>
 
-          <TabsContent value="friends-courses" className="mt-6">
+          <TabsContent value="friends-courses" className="mt-section">
             {user ? (
               <FriendsCoursesPanel />
             ) : (

@@ -4,9 +4,9 @@ import { Upload } from "lucide-react";
 
 export function CourseImportPage() {
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="font-display text-2xl font-bold mb-2">Course Import</h2>
+    <div className="space-y-section">
+      <div className="space-y-sub">
+        <h2 className="font-display text-2xl font-bold">Course Import</h2>
         <p className="text-muted-foreground">Upload and import golf course data from Excel/CSV files</p>
       </div>
       <Card>

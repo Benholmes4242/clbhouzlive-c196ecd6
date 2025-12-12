@@ -244,10 +244,10 @@ const Discover = () => {
 
             {/* Top 100 Journey Rails - only show on shorts/videos tabs */}
             {(main === 'shorts' || main === 'videos') && (
-              <div className="md:container md:mx-auto md:px-4 space-y-6 mt-6">
+              <div className="md:container md:mx-auto md:px-4 space-y-section mt-section">
                 {/* Personalised Top 100 Journey rail */}
                 {hasTop100Journey && (
-                  <section className="space-y-3">
+                  <section className="space-y-internal">
                     <div className="flex items-center justify-between">
                       <div>
                         <h2 className="text-sm font-semibold">

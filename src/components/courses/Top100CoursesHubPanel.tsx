@@ -212,20 +212,20 @@ const Top100CoursesHubPanel = () => {
   const showEndMessage = hasReachedEnd && displayedCourses.length > PAGE_SIZE;
 
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-section pb-section">
       {/* 1. Header / Identity Section */}
-      <section className="text-center pt-2">
+      <section className="text-center pt-sub">
         <h1 className="text-xl font-bold text-foreground tracking-tight">Top 100 Club</h1>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-sm text-muted-foreground mt-sub">
           Your journey across the world's greatest courses
         </p>
       </section>
 
       {/* 2. Personal Progress Section */}
       {user && (
-        <section className="space-y-4">
+        <section className="space-y-block">
           {/* Progress Summary */}
-          <div className="text-center space-y-3">
+          <div className="text-center space-y-internal">
             <p className="text-sm text-foreground">
               You've rated <span className="font-semibold">{totalRated}</span> course{totalRated === 1 ? '' : 's'} across{' '}
               <span className="font-semibold">{listsCount}</span> Top 100 list{listsCount === 1 ? '' : 's'}

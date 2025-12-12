@@ -342,7 +342,7 @@ const GolfersToFollowPage = () => {
 
             {/* Pagination - Load next 10 */}
             {!isSearching && hasMore && (
-              <div className="mt-6 px-6">
+              <div className="mt-block px-6">
                 <Button
                   variant="secondary"
                   onClick={handleLoadNext}
@@ -355,7 +355,7 @@ const GolfersToFollowPage = () => {
 
             {/* Status text */}
             {!isSearching && totalCount > 0 && (
-              <p className="mt-4 text-center text-xs text-muted-foreground">
+              <p className="mt-sub text-center text-xs text-muted-foreground">
                 Showing {showingCount} of {totalCount} golfers
               </p>
             )}

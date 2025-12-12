@@ -1,0 +1,102 @@
+/**
+ * GLOBAL VERTICAL SPACING SYSTEM
+ * ================================
+ * 
+ * This file defines utility classes for consistent vertical rhythm.
+ * Use these tokens instead of ad-hoc spacing values.
+ * 
+ * SPACING VALUES:
+ * - section (24px): Between major sections/modules
+ * - block (16px): Header→content, card→card stacks
+ * - sub (8px): Title→subtitle, button→helper text
+ * - internal (12px): Inside cards, list row padding
+ * 
+ * DO NOT USE: mt-5, mt-7, gap-5, space-y-5, space-y-7, etc.
+ * INSTEAD USE: mt-section, gap-block, space-y-internal, etc.
+ */
+
+/* ========================================
+   MARGIN TOP UTILITIES
+   ======================================== */
+.mt-section { margin-top: var(--space-section); }
+.mt-block { margin-top: var(--space-block); }
+.mt-sub { margin-top: var(--space-sub); }
+.mt-internal { margin-top: var(--space-internal); }
+
+/* ========================================
+   MARGIN BOTTOM UTILITIES
+   ======================================== */
+.mb-section { margin-bottom: var(--space-section); }
+.mb-block { margin-bottom: var(--space-block); }
+.mb-sub { margin-bottom: var(--space-sub); }
+.mb-internal { margin-bottom: var(--space-internal); }
+
+/* ========================================
+   GAP UTILITIES (for flex/grid)
+   ======================================== */
+.gap-section { gap: var(--space-section); }
+.gap-block { gap: var(--space-block); }
+.gap-sub { gap: var(--space-sub); }
+.gap-internal { gap: var(--space-internal); }
+
+/* ========================================
+   SPACE-Y UTILITIES (vertical stacks)
+   ======================================== */
+.space-y-section > * + * { margin-top: var(--space-section); }
+.space-y-block > * + * { margin-top: var(--space-block); }
+.space-y-sub > * + * { margin-top: var(--space-sub); }
+.space-y-internal > * + * { margin-top: var(--space-internal); }
+
+/* ========================================
+   PADDING UTILITIES (for list rows, cards)
+   ======================================== */
+.py-internal { 
+  padding-top: var(--space-internal); 
+  padding-bottom: var(--space-internal); 
+}
+.pt-internal { padding-top: var(--space-internal); }
+.pb-internal { padding-bottom: var(--space-internal); }
+
+.py-block {
+  padding-top: var(--space-block);
+  padding-bottom: var(--space-block);
+}
+.pt-block { padding-top: var(--space-block); }
+.pb-block { padding-bottom: var(--space-block); }
+
+/* ========================================
+   SECTION HEADER PATTERN
+   Title → subtitle: 8px
+   Header block → content: 16px
+   ======================================== */
+.section-header-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sub);
+  margin-bottom: var(--space-block);
+}
+
+/* ========================================
+   CARD INTERNAL PATTERN
+   Stack elements with 12px gaps
+   ======================================== */
+.card-internal-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-internal);
+}
+
+/* ========================================
+   PAGINATION PATTERN
+   Content → button: 16px
+   Button → helper: 8px
+   Helper → next section: 24px
+   ======================================== */
+.pagination-wrapper {
+  margin-top: var(--space-block);
+  margin-bottom: var(--space-section);
+}
+
+.pagination-helper {
+  margin-top: var(--space-sub);
+}

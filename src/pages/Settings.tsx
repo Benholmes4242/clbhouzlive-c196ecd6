@@ -76,8 +76,8 @@ const Settings = () => {
   return (
     <PageRoot className="min-h-screen bg-background pb-28">
       <CompactHeader />
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6 compact-header-offset">
-        <h1 className="font-display text-2xl font-bold mb-6">Settings</h1>
+      <div className="max-w-2xl mx-auto px-4 py-section space-y-section compact-header-offset">
+        <h1 className="font-display text-2xl font-bold mb-section">Settings</h1>
         
         <NotificationSettings />
         

@@ -94,13 +94,13 @@ const Top100Hub = () => {
       <main className="px-4 md:container md:mx-auto md:px-0 pb-3">
         <div className="max-w-6xl mx-auto">
           {/* Back Button */}
-          <div className="pt-4 pb-5">
+          <div className="pt-block pb-block">
             <Top100BackButton to="/courses?tab=top100" />
           </div>
           
-          <div className="space-y-5">
+          <div className="space-y-block">
           {/* Hero Section - polished spacing and hierarchy */}
-          <div className="mx-auto flex max-w-5xl flex-col gap-1.5 px-4 pb-1">
+          <div className="mx-auto flex max-w-5xl flex-col gap-sub px-4 pb-1">
             <h1 className="text-center text-2xl sm:text-3xl font-semibold tracking-tight text-foreground">
               World's Top 100 Golf Courses
             </h1>
@@ -111,7 +111,7 @@ const Top100Hub = () => {
 
           {/* Tabs: Courses | My Progress | Leaderboard */}
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-muted/70 border border-border/60 px-2 py-[3px] mb-5">
+            <TabsList className="grid w-full grid-cols-3 bg-muted/70 border border-border/60 px-2 py-[3px] mb-block">
               <TabsTrigger 
                 value="courses" 
                 className="text-sm px-3 py-[6px] rounded-sq-xs font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors"

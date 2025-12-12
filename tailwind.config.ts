@@ -179,7 +179,25 @@ export default {
 			spacing: {
 				'header-mobile': 'var(--header-h-mobile)',
 				'header-desktop': 'var(--header-h-desktop)',
-				'tag-offset': 'var(--tag-offset)'
+				'tag-offset': 'var(--tag-offset)',
+				/**
+				 * GLOBAL VERTICAL SPACING SYSTEM
+				 * ================================
+				 * These tokens create consistent vertical rhythm across all pages.
+				 * 
+				 * USAGE GUIDE:
+				 * - space-section (24px): Between major sections/modules
+				 * - space-block (16px): Header→content, card→card stacks
+				 * - space-sub (8px): Title→subtitle, button→helper text
+				 * - space-internal (12px): Inside cards, list row padding
+				 * 
+				 * DO NOT USE: mt-5, mt-7, gap-5, space-y-5, space-y-7, etc.
+				 * INSTEAD USE: mt-section, gap-block, space-y-internal, etc.
+				 */
+				'section': '24px',   // Section → section
+				'block': '16px',     // Header → content, card → card
+				'sub': '8px',        // Title → subtitle
+				'internal': '12px',  // Inside cards, list rows
 			},
 			height: {
 				'header-mobile': 'var(--header-h-mobile)',
