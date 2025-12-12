@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Plus, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ChevronLeft } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMyBusinesses } from '@/hooks/useMyBusinesses';
 import { useState } from 'react';
@@ -35,35 +34,23 @@ const MyBusinessesPage = () => {
 
   return (
     <PageRoot className="min-h-screen bg-muted/30">
-      {/* Header */}
+      {/* Header - Global system parity */}
       <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50">
         <div className="mx-auto max-w-xl px-4 py-4">
-          <div className="flex items-start gap-3">
-            <button
-              onClick={() => navigate(-1)}
-              className="p-2 -ml-2 hover:bg-muted rounded-sq-sm transition-colors mt-0.5"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <div className="flex-1 min-w-0">
-              <h1 className="text-xl font-semibold text-foreground">Business profiles</h1>
-              <p className="text-sm text-muted-foreground">
-                Manage the golf businesses you represent
-              </p>
-            </div>
-            {/* Desktop-only Add CTA */}
-            {hasBusinesses && (
-              <Button
-                variant="default"
-                size="sm"
-                onClick={handleCreateBusiness}
-                className="hidden sm:flex gap-1.5 h-9"
-              >
-                <Plus className="h-4 w-4" />
-                Create business profile
-              </Button>
-            )}
-          </div>
+          {/* Back CTA */}
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-3"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Back
+          </button>
+          
+          {/* Title stack */}
+          <h1 className="text-xl font-semibold text-foreground">Business profiles</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Manage the golf businesses you represent
+          </p>
         </div>
       </header>
 
@@ -99,7 +86,6 @@ const MyBusinessesPage = () => {
                 <div className="flex gap-2">
                   <div className="h-9 flex-1 rounded-sq-sm bg-muted" />
                   <div className="h-9 flex-1 rounded-sq-sm bg-muted" />
-                  <div className="h-9 flex-1 rounded-sq-sm bg-muted" />
                 </div>
               </motion.div>
             ))}
@@ -125,21 +111,6 @@ const MyBusinessesPage = () => {
 
             {/* Add another business CTA */}
             <AddBusinessCard onClick={handleCreateBusiness} />
-          </div>
-        )}
-
-        {/* Mobile-only full-width Create CTA at bottom */}
-        {hasBusinesses && (
-          <div className="sm:hidden mt-6">
-            <Button
-              variant="default"
-              size="lg"
-              onClick={handleCreateBusiness}
-              className="w-full gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Create business profile
-            </Button>
           </div>
         )}
       </main>
