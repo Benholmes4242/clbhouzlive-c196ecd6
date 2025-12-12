@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-import CourseListItem from './CourseListItem';
+import VirtualizedCourseList from './VirtualizedCourseList';
 import { AppSelect, AppSelectOption } from '@/components/ui/AppSelect';
 import { FLAGS } from '@/config/flags';
 import {
@@ -413,17 +413,11 @@ const Top100CoursesHubPanel = () => {
         </div>
       ) : (
         <div className="space-y-6">
-          {/* Course list */}
-          <div className="grid grid-cols-1 gap-3">
-            {displayedCourses.map((course) => (
-              <CourseListItem
-                key={course.id}
-                course={course}
-                viewingUserId={user?.id}
-                viewContext={selectedList === 'usa' ? 'usa' : selectedList === 'europe' ? 'europe' : selectedList === 'gb-i' ? 'regional' : 'global'}
-              />
-            ))}
-          </div>
+          {/* Course list - using VirtualizedCourseList like Explore */}
+          <VirtualizedCourseList 
+            courses={displayedCourses}
+            onCourseClick={() => {}}
+          />
 
           {/* Pagination - load more button */}
           {showLoadMoreButton && (
