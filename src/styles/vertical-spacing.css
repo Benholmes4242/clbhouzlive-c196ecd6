@@ -5,11 +5,20 @@
  * This file defines utility classes for consistent vertical rhythm.
  * Use these tokens instead of ad-hoc spacing values.
  * 
+ * NON-NEGOTIABLES:
+ * - Do NOT change gutters or horizontal padding
+ * - Do NOT change component sizes/layouts — only adjust vertical spacing
+ *   (margins/gaps/padding top-bottom)
+ * 
  * SPACING VALUES:
- * - section (24px): Between major sections/modules
- * - block (16px): Header→content, card→card stacks
+ * - section (24px): Between major sections/modules ONLY
+ * - block (16px): Header→content, card→card stacks WITHIN a section
  * - sub (8px): Title→subtitle, button→helper text
  * - internal (12px): Inside cards, list row padding
+ * 
+ * KEY DISTINCTION:
+ * - Use 24px ONLY between major sections/modules
+ * - Use 16px between cards within a section
  * 
  * DO NOT USE: mt-5, mt-7, gap-5, space-y-5, space-y-7, etc.
  * INSTEAD USE: mt-section, gap-block, space-y-internal, etc.
