@@ -103,7 +103,7 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
     return (
       <>
          <div
-           className="relative overflow-hidden transition-all duration-300 cursor-pointer aspect-[1.6/1]"
+           className="relative overflow-hidden transition-all duration-300 cursor-pointer aspect-[1.88/1]"
            style={{
              backgroundImage: `url(${course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'})`,
              backgroundSize: 'cover',
@@ -203,7 +203,7 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
         onClick={handleCardClick}
       >
         {/* Course Image */}
-        <div className="relative aspect-[1.6/1] overflow-hidden">
+        <div className="relative aspect-[1.88/1] overflow-hidden">
           <img
             src={course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'}
             alt={course.name}

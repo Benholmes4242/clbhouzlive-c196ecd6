@@ -76,7 +76,7 @@ export function LeaderboardCourseCard({ course, listPosition, showFriendsContext
     >
       {/* Image with overlay */}
       {hasImage && (
-        <div className="relative w-full aspect-[1.6/1] overflow-hidden">
+        <div className="relative w-full aspect-[1.88/1] overflow-hidden">
           <img
             src={course.thumbnail_url!}
             alt={course.course_name}

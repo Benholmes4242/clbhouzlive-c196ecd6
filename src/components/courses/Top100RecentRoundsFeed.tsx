@@ -65,7 +65,7 @@ export function Top100RecentRoundsFeed({
               className="w-full rounded-none sm:rounded-sq-md overflow-hidden bg-card border-y sm:border border-border/60 text-left shadow-none sm:shadow-sm hover:sm:shadow-md transition-all"
             >
               {round.image_url && (
-                <div className="relative w-full aspect-[1.6/1] overflow-hidden">
+                <div className="relative w-full aspect-[1.88/1] overflow-hidden">
                   <img
                     src={round.image_url}
                     alt={round.course_name}
