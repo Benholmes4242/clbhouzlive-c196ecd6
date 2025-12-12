@@ -1,6 +1,6 @@
 // Mock course leaderboard data for dev/demo testing
 // Toggle this to enable mock data in development
-export const USE_MOCK_COURSE_LEADERBOARD_DATA = true;
+export const USE_MOCK_COURSE_LEADERBOARD_DATA = false;
 
 // Regions and countries
 const REGIONS = ['GB&I', 'USA', 'Europe', 'Global'] as const;

@@ -1,6 +1,6 @@
 // Mock leaderboard data for dev/demo testing
 // Toggle this to enable mock data in development
-export const USE_MOCK_LEADERBOARD_DATA = true;
+export const USE_MOCK_LEADERBOARD_DATA = false;
 
 // Mock current user position (can be changed for testing different scenarios)
 export const MOCK_CURRENT_USER_RANK = 42;
