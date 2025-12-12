@@ -75,16 +75,16 @@ export const CourseListCard: React.FC<CourseListCardProps> = ({
           )}
         </div>
 
-        {/* Played/Unplayed status - bottom-left */}
+        {/* Played/Unplayed status - top-right, slightly smaller than rank badges */}
         {isPlayed !== undefined && (
-          <div className={`absolute bottom-3 left-3 flex items-center gap-1 px-2 py-1 rounded-sq-pill text-[10px] font-medium ${
+          <div className={`absolute top-3 right-3 flex items-center gap-1 px-2 py-0.5 rounded-sq-pill text-[9px] font-medium shadow-sm ${
             isPlayed 
               ? 'bg-emerald-500/90 text-white' 
-              : 'bg-black/40 text-white/80'
+              : 'bg-black/50 text-white/90'
           }`}>
             {isPlayed ? (
               <>
-                <Check className="w-3 h-3" />
+                <Check className="w-2.5 h-2.5" />
                 <span>Played</span>
               </>
             ) : (
