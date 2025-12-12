@@ -36,7 +36,7 @@ export const CreateBusinessProfileIntroModal: React.FC<CreateBusinessProfileIntr
 }) => {
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md rounded-sq-lg sm:rounded-sq-lg">
+      <DialogContent className="max-w-md rounded-none sm:rounded-sq-lg">
         <DialogHeader className="text-center sm:text-center">
           <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
             <Building2 className="h-6 w-6 text-primary" />
