@@ -19,7 +19,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useToast } from '@/hooks/use-toast';
-import CommentsModal from '@/components/posts/CommentsModal';
+// CommentsModal removed - now using cinematic CommentsPage inside the feed
 import { NewSeasonBanner } from '@/components/feed/NewSeasonBanner';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
@@ -391,17 +391,7 @@ const Clubhouse = () => {
         onHide={hideToast}
       />
 
-      {/* Comments Modal */}
-      {commentsModalOpen && selectedPostId && (
-        <CommentsModal
-          isOpen={commentsModalOpen}
-          postId={selectedPostId}
-          onClose={() => {
-            setCommentsModalOpen(false);
-            setSelectedPostId('');
-          }}
-        />
-      )}
+      {/* Comments handled inside ClubhouseVerticalFeed with cinematic CommentsPage */}
 
       {/* Season Recap Modal */}
       {seasonRecap && user && (

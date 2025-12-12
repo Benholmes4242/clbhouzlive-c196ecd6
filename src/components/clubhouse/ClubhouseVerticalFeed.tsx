@@ -19,10 +19,8 @@ import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
-import CommentsModal from '@/components/posts/CommentsModal';
 import { useVideoManager } from '@/contexts/VideoManagerContext';
 import { AudioStrip } from './AudioStrip';
-import { SocialDock } from './social-dock/SocialDock';
 import { TopBar } from './social-dock/TopBar';
 import { VideoReactionTray } from './social-dock/VideoReactionTray';
 import { useTopBarVisibility } from '@/hooks/useTopBarVisibility';
@@ -40,6 +38,9 @@ import {
   resetScrollMetrics,
   markPerformance
 } from '@/utils/clubhouseAudit';
+
+// Cinematic overlay components
+import { CinematicActionRail, CreatorCapsule, CommentsPage } from './cinematic';
 
 // Video ref management - keep only current + neighbors to prevent memory leaks
 const MAX_VIDEO_REFS = 20;
@@ -1309,11 +1310,18 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         }
       `}</style>
 
-      {/* Comments Modal */}
-      {commentsModalOpen && selectedPostId && (
-        <CommentsModal
+      {/* Comments Page - Full-screen slide-in */}
+      {commentsModalOpen && selectedPostId && filteredPosts[currentIndex] && (
+        <CommentsPage
           isOpen={commentsModalOpen}
           postId={selectedPostId}
+          videoThumbnail={
+            filteredPosts[currentIndex].media?.[0]?.media_url
+              ? `https://videodelivery.net/${uidFromNode({ src: filteredPosts[currentIndex].media?.[0]?.media_url || '' })}/thumbnails/thumbnail.jpg?height=400`
+              : undefined
+          }
+          creatorName={filteredPosts[currentIndex].user?.name}
+          creatorAvatar={filteredPosts[currentIndex].user?.avatar}
           onClose={() => {
             setCommentsModalOpen(false);
             setSelectedPostId('');
@@ -1324,39 +1332,41 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       {/* Top Bar */}
       <TopBar isVisible={topBarVisible} />
 
-      {/* Fixed Social Dock - Dynamically updates based on currentIndex */}
-      {chromeState === 'hidden' && filteredPosts[currentIndex] && (
-        <SocialDock
-          post={{
-            id: filteredPosts[currentIndex].id,
-            user: {
-              id: filteredPosts[currentIndex].user?.id || '',
-              name: filteredPosts[currentIndex].user?.name || 'Unknown User',
-              avatar: filteredPosts[currentIndex].user?.avatar
-            },
-            caption: removeGolfCourseFromContent(
-              (filteredPosts[currentIndex].title as string | null) ?? 
-              (filteredPosts[currentIndex].ctaDescription as string | null) ?? ''
-            ),
-            courseName: filteredPosts[currentIndex].golfCourse?.name,
-            courseId: currentCourseId,
-            isTop100Course: isCurrentCourseTop100,
-            holeNumber: undefined,
-            isMuted: isGloballyMuted,
-          }}
+      {/* Cinematic Overlay System - Right Action Rail */}
+      {filteredPosts[currentIndex] && (
+        <CinematicActionRail
+          postId={filteredPosts[currentIndex].id}
           likesCount={currentPostEngagement.likesCount}
           commentsCount={currentPostEngagement.commentsCount}
           hasLiked={currentPostEngagement.hasLiked}
-          isPlayedByUser={isCurrentCoursePlayed}
+          isMuted={isGloballyMuted}
           isVisible={true}
-          onSwipeUp={() => onPostDetailsOpen?.()}
-          onCourseClick={() => console.log('Course clicked')}
           onLike={() => currentPostEngagement.toggleLike()}
           onComment={() => handleComment(filteredPosts[currentIndex].id)}
           onShare={handleShare}
           onMuteToggle={() => setGlobalMute(!isGloballyMuted)}
-          onSearch={() => console.log('Search clicked')}
-          onNavigationTap={onNavOverlayRequest}
+        />
+      )}
+
+      {/* Cinematic Overlay System - Creator Capsule (Bottom-left) */}
+      {filteredPosts[currentIndex] && (
+        <CreatorCapsule
+          user={{
+            id: filteredPosts[currentIndex].user?.id || '',
+            name: filteredPosts[currentIndex].user?.name || 'Unknown User',
+            username: filteredPosts[currentIndex].user?.username,
+            avatar: filteredPosts[currentIndex].user?.avatar
+          }}
+          caption={removeGolfCourseFromContent(
+            (filteredPosts[currentIndex].title as string | null) ?? 
+            (filteredPosts[currentIndex].ctaDescription as string | null) ?? ''
+          )}
+          courseName={filteredPosts[currentIndex].golfCourse?.name}
+          courseId={currentCourseId}
+          isFollowing={isFollowing === true}
+          isOwnPost={filteredPosts[currentIndex].user?.id === user?.id}
+          isVisible={true}
+          onFollow={handleFollowToggle}
         />
       )}
 
