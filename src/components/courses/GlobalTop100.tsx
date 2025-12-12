@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Award, X } from 'lucide-react';
 import { UnifiedCourseCard } from './UnifiedCourseCard';
-import { toCourseCardModel } from '@/lib/mappers/toCourseCardModel';
+import { fromGolfCourse } from '@/lib/mappers/toCourseCardModel';
 import { Skeleton } from '@/components/ui/skeleton';
 import { scrollToTop } from '@/utils/scrollToTop';
 import Top100ClubCallout from './Top100ClubCallout';
@@ -443,7 +443,17 @@ const GlobalTop100 = () => {
               {paginatedCourses.map((course) => (
                 <div key={course.id} className="mb-4 sm:mb-0">
                   <UnifiedCourseCard 
-                    course={toCourseCardModel(course)}
+                    course={fromGolfCourse({
+                      id: course.id,
+                      name: course.name,
+                      country: course.country,
+                      sub_country: course.sub_country,
+                      thumbnail_image: course.thumbnail_image,
+                      average_rating: course.average_rating,
+                      global_rank: course.global_rank,
+                      regional_rank: course.regional_rank,
+                      usa_rank: course.usa_rank,
+                    })}
                     variant="vertical"
                     showRankBadges={true}
                     showRating={true}
