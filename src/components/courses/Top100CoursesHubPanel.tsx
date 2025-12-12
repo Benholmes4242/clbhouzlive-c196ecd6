@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-import { CourseListCard } from './CourseListCard';
+import CourseListItem from './CourseListItem';
 import { AppSelect, AppSelectOption } from '@/components/ui/AppSelect';
 import { FLAGS } from '@/config/flags';
 import {
@@ -413,14 +413,14 @@ const Top100CoursesHubPanel = () => {
         </div>
       ) : (
         <div className="space-y-6">
-          {/* Course grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Course list */}
+          <div className="grid grid-cols-1 gap-3">
             {displayedCourses.map((course) => (
-              <CourseListCard 
+              <CourseListItem
                 key={course.id}
                 course={course}
-                listSlug={selectedList as 'global' | 'gb-i' | 'usa' | 'europe'}
-                onClick={() => navigate(`/courses/${course.id}`)}
+                viewingUserId={user?.id}
+                viewContext={selectedList === 'usa' ? 'usa' : selectedList === 'europe' ? 'europe' : selectedList === 'gb-i' ? 'regional' : 'global'}
               />
             ))}
           </div>
