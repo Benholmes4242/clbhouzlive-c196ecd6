@@ -372,8 +372,10 @@ const PostPlayRatingModal = ({
       });
       
       // PHASE 2 FIX: Invalidate distribution/histogram (fixes About tab bars)
+      // Use prefix matching since query key includes SHOW_MOCK_REVIEWS as third element
       queryClient.invalidateQueries({ 
-        queryKey: ['course-rating-distribution', course?.id] 
+        queryKey: ['course-rating-distribution', course?.id],
+        exact: false 
       });
       
       // Force aggressive refetch of ALL reviews queries (bypasses staleTime)
@@ -503,8 +505,10 @@ const PostPlayRatingModal = ({
       await queryClient.refetchQueries({ queryKey: ['course-rating-aggregates', course?.id] });
       
       // PHASE 2 FIX: Invalidate distribution/histogram (fixes About tab bars)
+      // Use prefix matching since query key includes SHOW_MOCK_REVIEWS as third element
       queryClient.invalidateQueries({ 
-        queryKey: ['course-rating-distribution', course?.id] 
+        queryKey: ['course-rating-distribution', course?.id],
+        exact: false 
       });
       
       // Invalidate and refetch reviews list with correct prefix matching
