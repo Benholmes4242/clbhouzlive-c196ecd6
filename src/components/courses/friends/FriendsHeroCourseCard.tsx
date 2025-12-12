@@ -64,8 +64,8 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
         </div>
       )}
       
-      {/* Course Info - standardized padding */}
-      <div className="px-4 py-3 space-y-1.5">
+      {/* Course Info - 12px internal stack */}
+      <div className="px-4 py-3 space-y-3">
         {/* Course name with highlight pill on same line */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
