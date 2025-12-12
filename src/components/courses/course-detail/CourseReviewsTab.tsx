@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -7,8 +7,10 @@ import { useToast } from '@/hooks/use-toast';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { ReviewBlockFlat } from '../review/ReviewBlockFlat';
 import { CourseReviewsSummary } from '../review/CourseReviewsSummary';
+import { RatingFilterChips, RatingFilterValue } from '../review/RatingFilterChips';
+import { WriteReviewPrompt } from '../review/WriteReviewPrompt';
 import { SegmentedTabs, SegmentedTabOption } from '@/components/ui/SegmentedTabs';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { 
   SHOW_MOCK_REVIEWS, 
@@ -69,6 +71,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   // Sorting, filtering, and search state
   const [sortBy, setSortBy] = useState<SortOption>('recent');
   const [searchQuery, setSearchQuery] = useState('');
+  const [ratingFilter, setRatingFilter] = useState<RatingFilterValue>(null);
 
   // Sort options for Reviews tab
   const sortOptions: SegmentedTabOption[] = [
@@ -269,9 +272,24 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     navigate(`/courses/${courseId}/rate`);
   };
 
+  const handleClearSearch = () => {
+    setSearchQuery('');
+  };
+
   const reviews = reviewsData || [];
   const myReview = reviews.find((r) => r.user_id === user?.id);
-  const otherReviews = reviews.filter((r) => r.user_id !== user?.id);
+  
+  // Apply rating filter client-side (after search and sort from server)
+  const filteredReviews = useMemo(() => {
+    if (!ratingFilter) return reviews;
+    return reviews.filter((r) => {
+      const tierData = getScoreTier(r.rating);
+      return tierData.tier === ratingFilter;
+    });
+  }, [reviews, ratingFilter]);
+  
+  const filteredMyReview = filteredReviews.find((r) => r.user_id === user?.id);
+  const otherReviews = filteredReviews.filter((r) => r.user_id !== user?.id);
 
   // Check if we should use mock data for Cypress Point
   const isMockCypressPoint = ENABLE_MOCK_TOP100_REVIEWS && courseId === CYPRESS_POINT_COURSE_ID;
@@ -391,14 +409,14 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     return (
       <div className="flex flex-col">
         <section className="px-4 pt-6 pb-5 bg-slate-100">
-          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4 text-center">
-            <p className="text-sm font-semibold text-slate-900">No reviews yet</p>
-            <p className="mt-1 text-xs text-slate-500">
+          <div className="rounded-sq-md border border-slate-200 bg-white px-4 py-6 text-center">
+            <p className="text-base font-semibold text-slate-900">No reviews yet</p>
+            <p className="mt-1 text-sm text-slate-500">
               Be the first to share your experience at {courseName}.
             </p>
             <button
               type="button"
-              className="mt-3 w-full h-11 rounded-lg inline-flex items-center justify-center px-4 py-2 text-sm font-semibold bg-white text-slate-900 border border-slate-600 shadow-sm transition"
+              className="mt-4 w-full h-11 rounded-sq-sm inline-flex items-center justify-center px-4 py-2 text-sm font-semibold bg-white text-slate-900 border border-slate-600 shadow-sm transition hover:bg-slate-50 active:scale-[0.98]"
               onClick={handleRateClick}
             >
               Rate this course
@@ -412,9 +430,9 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
   return (
     <div className="flex flex-col">
       {/* Section 1 – Summary header (flattened on background) */}
-      <section className="px-5 pt-3 pb-2 bg-slate-50 sm:pt-5">
+      <section className="px-5 pt-4 pb-4 bg-slate-50 sm:pt-5">
         {/* Section label with Clubhouse logo */}
-        <div className="flex items-center justify-center gap-1.5 mb-0.5">
+        <div className="flex items-center justify-center gap-1.5 mb-4">
           <ClubhouseLogo size="xs" className="opacity-70" />
           <p className="text-sm font-semibold tracking-[0.14em] text-slate-500">
             Community Rating
@@ -432,42 +450,69 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         />
       </section>
 
-      {/* Section 2 – Search bar */}
-      <section className="px-4 pt-2 pb-2 bg-slate-100">
+      {/* Section 2 – Search bar (24px from summary) */}
+      <section className="px-4 pt-6 pb-4 bg-slate-100">
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search reviews"
+            placeholder="Search reviews (name or keywords)"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-11 pl-10 pr-4 border border-slate-200 bg-white text-base placeholder:text-[15px] placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-300/70 focus:ring-offset-1 focus:border-slate-600 shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition"
-            style={{ borderRadius: 'var(--radius)' }}
+            className="w-full h-11 pl-10 pr-10 border border-slate-200 bg-white text-base placeholder:text-[15px] placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-300/70 focus:ring-offset-1 focus:border-slate-600 shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition rounded-sq-sm"
           />
+          {/* Clear button */}
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={handleClearSearch}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-slate-100 transition-colors"
+              aria-label="Clear search"
+            >
+              <X className="h-4 w-4 text-slate-400" />
+            </button>
+          )}
         </div>
       </section>
 
-      {/* Section 3 – Sort pills */}
-      <div className="px-5 pt-3 pb-3 bg-slate-100">
-        <p className="mb-2 text-xs font-semibold tracking-[0.08em] text-slate-500">
+      {/* Section 3 – Sort & Filter controls (16px from search) */}
+      <div className="px-5 pt-4 pb-3 bg-slate-100">
+        <p className="mb-3 text-xs font-semibold tracking-[0.08em] text-slate-500">
           Sort &amp; filter
         </p>
+        {/* Sort pills */}
         <SegmentedTabs
           options={sortOptions}
           value={sortBy}
           onChange={(value) => setSortBy(value as SortOption)}
         />
+        
+        {/* Rating filter chips (Upgrade B) - 12px below sort pills */}
+        <div className="mt-3">
+          <RatingFilterChips 
+            value={ratingFilter}
+            onChange={setRatingFilter}
+          />
+        </div>
       </div>
 
-      {/* Section 4 – Your review + other reviews (flat blocks) */}
-      <section className="px-4 pt-3 pb-4 bg-slate-50">
-        {myReview && (
+      {/* Section 4 – Reviews list (24px from filters) */}
+      <section className="px-4 pt-6 pb-4 bg-slate-50">
+        {/* Upgrade C: "Write a review" prompt - only for non-reviewers */}
+        {!myReview && (
+          <div className="mb-4">
+            <WriteReviewPrompt onRateClick={handleRateClick} />
+          </div>
+        )}
+
+        {/* Your review section */}
+        {filteredMyReview && (
           <div className="mb-4">
             <p className="mb-3 text-xs font-medium uppercase tracking-wide text-slate-500">
               Your review
             </p>
             <ReviewBlockFlat
-              review={transformReview(myReview, isJustSubmittedOrUpdated)}
+              review={transformReview(filteredMyReview, isJustSubmittedOrUpdated)}
               isMine
               isHighlighted={isJustSubmittedOrUpdated}
               onToggleHelpful={handleToggleHelpful}
@@ -479,6 +524,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           </div>
         )}
 
+        {/* Other reviews */}
         {otherReviews.length > 0 && (
           <div>
             {otherReviews.map((review) => (
@@ -495,20 +541,41 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           </div>
         )}
 
-        {/* No results message for search */}
-        {searchQuery && reviews.length === 0 && (
+        {/* No results message for search/filter */}
+        {(searchQuery || ratingFilter) && filteredReviews.length === 0 && (
           <div className="text-center py-8">
-            <p className="text-sm text-slate-500">No reviews match your search.</p>
+            <p className="text-sm text-slate-500">No reviews match your criteria.</p>
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery('');
+                setRatingFilter(null);
+              }}
+              className="mt-2 text-sm font-medium text-slate-600 hover:text-slate-900 underline"
+            >
+              Clear filters
+            </button>
           </div>
         )}
       </section>
 
-      {/* Section 5 – End message (only show if there are reviews) */}
-      {reviews.length > 0 && !searchQuery && (
-        <section className="px-4 pt-4 pb-4 bg-slate-100">
-          <p className="text-center text-xs text-slate-500">
-            You've reached the end of the reviews.
-          </p>
+      {/* Section 5 – End message (improved) */}
+      {filteredReviews.length > 0 && !searchQuery && !ratingFilter && (
+        <section className="px-4 pt-4 pb-6 bg-slate-100">
+          <div className="text-center">
+            <p className="text-sm text-slate-500">
+              No more reviews yet.
+            </p>
+            {!myReview && (
+              <button
+                type="button"
+                onClick={handleRateClick}
+                className="mt-2 text-sm font-medium text-slate-700 hover:text-slate-900 underline"
+              >
+                Be the first to add one
+              </button>
+            )}
+          </div>
         </section>
       )}
     </div>
