@@ -3,9 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Squircle } from '@/components/ui/squircle';
 import { Flame } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { formatDistanceToNow } from 'date-fns';
 import CourseRankBadges from '../CourseRankBadges';
-import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { extractRanksFromMemberships } from '@/utils/rankingUtils';
 import type { CourseWithFriends, FriendCourseHit } from '@/hooks/useFriendsCourses';
 
@@ -49,117 +47,100 @@ const HotInNetworkModule: React.FC<HotInNetworkModuleProps> = ({
         </span>
       </div>
 
-      {/* Course cards */}
-      <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
-        <div className="space-y-4">
-          {courses.map((course) => {
-            const ranks = extractRanksFromMemberships(
-              course.top100_memberships,
-              course.country
-            );
-            const mostRecentFriend = course.friends[0];
+      {/* Course cards - pointed corners, NO community rating */}
+      <div className="space-y-4">
+        {courses.map((course) => {
+          const ranks = extractRanksFromMemberships(
+            course.top100_memberships,
+            course.country
+          );
 
-            return (
-              <Card
-                key={course.course_id}
-                className="overflow-hidden rounded-none sm:rounded-sq-md hover:shadow-md transition-all cursor-pointer bg-card/50 border-border/20"
-                onClick={() => navigate(`/courses/${course.course_id}`)}
-              >
-                {/* Course Image */}
-                {course.thumbnail_url && (
-                  <div className="relative w-full aspect-[1.7/1] overflow-hidden">
-                    <CourseRankBadges
-                      globalRank={ranks.globalRank}
-                      regionalRank={ranks.regionalRank}
-                      usaRank={ranks.usaRank}
-                      country={course.country || ''}
-                      positioning="top-left"
-                    />
+          return (
+            <Card
+              key={course.course_id}
+              className="overflow-hidden rounded-none hover:shadow-md transition-all cursor-pointer bg-card border-border/20"
+              onClick={() => navigate(`/courses/${course.course_id}`)}
+            >
+              {/* Course Image */}
+              {course.thumbnail_url && (
+                <div className="relative w-full aspect-[1.7/1] overflow-hidden">
+                  <CourseRankBadges
+                    globalRank={ranks.globalRank}
+                    regionalRank={ranks.regionalRank}
+                    usaRank={ranks.usaRank}
+                    country={course.country || ''}
+                    positioning="top-left"
+                  />
 
-                    <img
-                      src={course.thumbnail_url}
-                      alt={course.course_name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src = '/placeholder.svg';
-                      }}
-                    />
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/55 via-black/25 to-transparent" />
+                  <img
+                    src={course.thumbnail_url}
+                    alt={course.course_name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder.svg';
+                    }}
+                  />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/55 via-black/25 to-transparent" />
+                </div>
+              )}
+
+              <div className="p-4 space-y-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-base">
+                      {course.course_name}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {course.country}
+                      {course.sub_country ? `, ${course.sub_country}` : ''}
+                    </p>
                   </div>
-                )}
-
-                <div className="p-4 space-y-3">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <h3 className="font-semibold text-base">
-                            {course.course_name}
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            {course.country}
-                            {course.sub_country ? `, ${course.sub_country}` : ''}
-                          </p>
+                  {/* Hot this month pill - RIGHT side, NO community rating */}
+                  <span className="shrink-0 inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 whitespace-nowrap">
+                    Hot this month
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="flex -space-x-2">
+                      {course.friends.slice(0, 3).map((friend, idx) => (
+                        <div
+                          key={friend.friend_id}
+                          className="relative"
+                          style={{ zIndex: 10 - idx }}
+                        >
+                          <Squircle width={28} height={28}>
+                            <img
+                              src={
+                                friend.friend_profile.profile_photo_url ||
+                                '/placeholder.svg'
+                              }
+                              alt={
+                                friend.friend_profile.display_name ||
+                                friend.friend_profile.username
+                              }
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                              }}
+                              onError={(e) => {
+                                e.currentTarget.src = '/placeholder.svg';
+                              }}
+                            />
+                          </Squircle>
                         </div>
-                        <div className="flex items-center gap-2">
-                          {typeof course.community_rating === 'number' &&
-                            !Number.isNaN(course.community_rating) && (
-                              <div className="flex items-center gap-1.5 shrink-0">
-                                <ClubhouseLogo className="h-4 w-4" />
-                                <span className="text-sm font-semibold text-foreground">
-                                  {course.community_rating.toFixed(1)}
-                                </span>
-                              </div>
-                            )}
-                          <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 whitespace-nowrap">
-                            Hot this month
-                          </span>
-                        </div>
-                      </div>
+                      ))}
                     </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="flex -space-x-2">
-                        {course.friends.slice(0, 3).map((friend, idx) => (
-                          <div
-                            key={friend.friend_id}
-                            className="relative"
-                            style={{ zIndex: 10 - idx }}
-                          >
-                            <Squircle width={28} height={28}>
-                              <img
-                                src={
-                                  friend.friend_profile.profile_photo_url ||
-                                  '/placeholder.svg'
-                                }
-                                alt={
-                                  friend.friend_profile.display_name ||
-                                  friend.friend_profile.username
-                                }
-                                style={{
-                                  width: '100%',
-                                  height: '100%',
-                                  objectFit: 'cover',
-                                }}
-                                onError={(e) => {
-                                  e.currentTarget.src = '/placeholder.svg';
-                                }}
-                              />
-                            </Squircle>
-                          </div>
-                        ))}
-                      </div>
-                      <span className="text-xs text-muted-foreground">
-                        Played by {formatFriendsList(course.friends, 2)}
-                      </span>
-                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      Played by {formatFriendsList(course.friends, 2)}
+                    </span>
                   </div>
                 </div>
-              </Card>
-            );
-          })}
-        </div>
+              </div>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

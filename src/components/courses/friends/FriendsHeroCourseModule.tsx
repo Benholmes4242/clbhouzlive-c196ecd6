@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Top100RankBadge } from '@/components/top100/Top100RankBadge';
 import { extractRanksFromMemberships } from '@/utils/rankingUtils';
-import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import type { CourseWithFriends } from '@/hooks/useFriendsCourses';
 
 interface FriendsHeroCourseModuleProps {
@@ -39,9 +38,9 @@ const FriendsHeroCourseModule: React.FC<FriendsHeroCourseModuleProps> = ({
         <p className="text-sm text-muted-foreground">Based on your network this month</p>
       </div>
 
-      {/* Hero card */}
+      {/* Hero card - pointed corners, NO community rating */}
       <Card
-        className="relative overflow-hidden rounded-none sm:rounded-sq-md hover:shadow-lg transition-all cursor-pointer bg-card border border-border/20 shadow-sm"
+        className="relative overflow-hidden rounded-none hover:shadow-lg transition-all cursor-pointer bg-card border border-border/20 shadow-sm"
         onClick={handleClick}
       >
         {/* Course Image */}
@@ -75,12 +74,7 @@ const FriendsHeroCourseModule: React.FC<FriendsHeroCourseModuleProps> = ({
 
         {/* Course Info */}
         <div className="px-4 py-3 space-y-1.5">
-          {/* Highlight label */}
-          <div className="inline-block px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
-            <span className="text-[10px] font-medium text-primary">{label}</span>
-          </div>
-
-          {/* Course name & location */}
+          {/* Course name & location with pill on RIGHT */}
           <div className="flex items-start justify-between gap-3">
             <div>
               <h3 className="font-semibold text-sm text-foreground">
@@ -91,16 +85,10 @@ const FriendsHeroCourseModule: React.FC<FriendsHeroCourseModuleProps> = ({
                 {course.sub_country ? `, ${course.sub_country}` : ''}
               </p>
             </div>
-            {/* Community rating */}
-            {typeof course.community_rating === 'number' &&
-              !Number.isNaN(course.community_rating) && (
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <ClubhouseLogo className="h-5 w-5" />
-                  <span className="text-sm font-semibold text-foreground">
-                    {course.community_rating.toFixed(1)}
-                  </span>
-                </div>
-              )}
+            {/* Highlight label pill - RIGHT aligned */}
+            <span className="shrink-0 px-2.5 py-1 text-[10px] font-medium rounded-full bg-primary/10 border border-primary/20 text-primary whitespace-nowrap">
+              {label}
+            </span>
           </div>
 
           {/* Friend line with avatar */}

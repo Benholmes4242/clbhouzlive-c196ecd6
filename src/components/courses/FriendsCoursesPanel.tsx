@@ -465,13 +465,13 @@ const FriendsCoursesPanel: React.FC = () => {
   const getHeroLabel = () => {
     switch (courseFilter) {
       case 'most_played':
-        return 'Most popular course this month';
+        return 'Most popular this month';
       case 'highest_rated':
         return 'Highest rated this period';
       case 'new':
         return 'Recently discovered';
       default:
-        return 'Most popular course this month';
+        return 'Most popular this month';
     }
   };
 
@@ -488,19 +488,13 @@ const FriendsCoursesPanel: React.FC = () => {
     return <FriendsCoursesEmpty />;
   }
 
-  const formatFriendsList = (friends: FriendCourseHit[], limit = 3) => {
-    const names = friends.slice(0, limit).map(f => f.friend_profile.display_name || f.friend_profile.username);
-    const remaining = friends.length - limit;
-    return remaining > 0 ? `${names.join(', ')} and ${remaining} other${remaining > 1 ? 's' : ''}` : names.join(', ');
-  };
-
   const coursesStart = (page - 1) * PAGE_SIZE + 1;
   const coursesEnd = Math.min(page * PAGE_SIZE, regularCourses.length);
   const recentStart = recentPage * RECENT_PAGE_SIZE + 1;
   const recentEnd = Math.min((recentPage + 1) * RECENT_PAGE_SIZE, totalRecent);
 
   return (
-    <div className="px-4 sm:px-6 pt-4 pb-6 space-y-6">
+    <div className="mx-auto w-full max-w-[720px] px-4 pt-4 pb-6 space-y-6">
       {/* Header block - no card */}
       <div className="space-y-1">
         <h1 className="text-xl font-semibold text-foreground">Friends' Courses</h1>
@@ -544,7 +538,7 @@ const FriendsCoursesPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* Snapshot strip */}
+      {/* Snapshot strip - pointed corners */}
       <FriendsCoursesSnapshot
         periodLabel={getPeriodLabel()}
         coursesCount={totalCourses}
@@ -553,23 +547,21 @@ const FriendsCoursesPanel: React.FC = () => {
         roundsCount={totalRounds}
       />
 
-      {/* Hero Course Module */}
+      {/* Hero Course Module - pointed corners, NO community rating */}
       {heroCourse && (
-        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
-          <FriendsHeroCourseModule 
-            course={heroCourse} 
-            label={getHeroLabel()}
-          />
-        </div>
+        <FriendsHeroCourseModule 
+          course={heroCourse} 
+          label={getHeroLabel()}
+        />
       )}
 
-      {/* Friends Activity Module */}
+      {/* Friends Activity Module - full width, pointed corners */}
       <FriendsActivityModule
         players={activityPlayers}
         timeframeLabel="Top 10"
       />
 
-      {/* Hot in your network */}
+      {/* Hot in your network - pointed corners, NO community rating */}
       {hotCourses.length > 0 && (
         <HotInNetworkModule courses={hotCourses} />
       )}
@@ -577,9 +569,9 @@ const FriendsCoursesPanel: React.FC = () => {
       {/* Anchor for scrolling to start of course list */}
       <div ref={coursesListAnchorRef} />
 
-      {/* Regular courses - Paginated list with slide animation */}
+      {/* Regular courses - Paginated list with pointed corners + community rating */}
       {paginatedCourses.length > 0 && (
-        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 space-y-4">
+        <div className="space-y-4">
           <motion.div
             key={page}
             initial={{ x: 40, opacity: 0 }}
@@ -596,10 +588,10 @@ const FriendsCoursesPanel: React.FC = () => {
                 <Card 
                   key={course.course_id} 
                   data-friends-course-card={course.course_id}
-                  className="relative overflow-hidden rounded-none sm:rounded-sq-md hover:shadow-md transition-all cursor-pointer bg-card/50 border border-border/20 shadow-sm"
+                  className="relative overflow-hidden rounded-none hover:shadow-md transition-all cursor-pointer bg-card border border-border/20 shadow-sm"
                   onClick={() => navigate(`/courses/${course.course_id}`)}
                 >
-                  {/* Course Image - Taller, Full Width */}
+                  {/* Course Image */}
                   {course.thumbnail_url && (
                     <div className="relative w-full aspect-[1.7/1] overflow-hidden">
                       {/* Rank badges (top-left) */}
@@ -630,7 +622,7 @@ const FriendsCoursesPanel: React.FC = () => {
                       <h3 className="flex-1 min-w-0 pr-3 font-semibold text-base text-foreground truncate">
                         {course.course_name}
                       </h3>
-                      {/* Community rating - logo + text on white */}
+                      {/* Community rating - YES on regular cards */}
                       {typeof course.community_rating === 'number' && !Number.isNaN(course.community_rating) && (
                         <div className="flex-shrink-0 flex items-center gap-1.5">
                           <ClubhouseLogo className="h-5 w-5" />
@@ -689,7 +681,7 @@ const FriendsCoursesPanel: React.FC = () => {
       {/* Recent rounds timeline */}
       {sortedRecent.length > 0 && (
         <div className="space-y-3">
-          {/* Section header - no box */}
+          {/* Section header - sits on page background, NOT inside card */}
           <div>
             <h3 className="text-base font-semibold text-foreground">Your friends' recent rounds</h3>
             <p className="text-xs text-muted-foreground mt-1">
@@ -703,14 +695,12 @@ const FriendsCoursesPanel: React.FC = () => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
           >
-            {/* Light surface for recent rounds */}
-            <div className="rounded-sq-md bg-card/50 border border-border/20 shadow-sm overflow-hidden">
+            {/* Pointed corners container for recent rounds */}
+            <div className="rounded-none bg-card border border-border/20 shadow-sm overflow-hidden divide-y divide-border/15">
               {visibleRecent.map((hit, idx) => (
                 <div 
                   key={`${hit.friend_id}-${hit.course_id}-${idx}`}
-                  className={`flex items-center gap-3 px-4 py-3 hover:bg-muted/30 transition-colors cursor-pointer ${
-                    idx !== visibleRecent.length - 1 ? 'border-b border-border/15' : ''
-                  }`}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 transition-colors cursor-pointer"
                   onClick={() => handleRecentRoundClick(hit)}
                 >
                   <Squircle width={36} height={36} className="shrink-0">

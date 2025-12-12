@@ -73,7 +73,7 @@ const FriendsActivityModule: React.FC<FriendsActivityModuleProps> = ({
   }
 
   return (
-    <div className="rounded-sq-md bg-card/50 border border-border/20 shadow-sm overflow-hidden">
+    <div className="w-full rounded-none bg-card border border-border/20 shadow-sm overflow-hidden">
       {/* Header row */}
       <div className="px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
