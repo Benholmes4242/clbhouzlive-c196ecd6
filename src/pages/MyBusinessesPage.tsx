@@ -38,29 +38,29 @@ const MyBusinessesPage = () => {
       {/* Header */}
       <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50">
         <div className="mx-auto max-w-xl px-4 py-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-start gap-3">
             <button
               onClick={() => navigate(-1)}
-              className="p-2 -ml-2 hover:bg-muted rounded-sq-sm transition-colors"
+              className="p-2 -ml-2 hover:bg-muted rounded-sq-sm transition-colors mt-0.5"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
-            <div className="flex-1">
-              <h1 className="text-xl font-semibold text-foreground">Your businesses</h1>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl font-semibold text-foreground">Business profiles</h1>
               <p className="text-sm text-muted-foreground">
-                Manage and grow the golf businesses you represent on Clbhouz.
+                Manage the golf businesses you represent
               </p>
             </div>
             {/* Desktop-only Add CTA */}
             {hasBusinesses && (
               <Button
-                variant="outline"
+                variant="default"
                 size="sm"
                 onClick={handleCreateBusiness}
                 className="hidden sm:flex gap-1.5 h-9"
               >
                 <Plus className="h-4 w-4" />
-                Add business
+                Create business profile
               </Button>
             )}
           </div>
@@ -80,17 +80,24 @@ const MyBusinessesPage = () => {
                 className="rounded-sq-lg border bg-card p-5 animate-pulse"
               >
                 <div className="flex items-start gap-4 mb-4">
-                  <div className="h-12 w-12 rounded-full bg-muted" />
+                  <div className="h-14 w-14 rounded-full bg-muted" />
                   <div className="flex-1 space-y-2">
                     <div className="h-4 w-2/3 rounded bg-muted" />
-                    <div className="flex gap-2">
-                      <div className="h-5 w-16 rounded-sq-pill bg-muted" />
-                      <div className="h-5 w-14 rounded-sq-pill bg-muted" />
-                    </div>
+                    <div className="h-3 w-1/2 rounded bg-muted" />
                   </div>
                 </div>
-                <div className="rounded-sq-md bg-muted/50 h-14 mb-4" />
+                <div className="h-px bg-border/50 -mx-5 mb-4" />
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                  {[1, 2, 3].map(j => (
+                    <div key={j} className="text-center">
+                      <div className="h-6 w-10 mx-auto bg-muted rounded mb-1" />
+                      <div className="h-3 w-14 mx-auto bg-muted rounded" />
+                    </div>
+                  ))}
+                </div>
+                <div className="h-px bg-border/50 -mx-5 mb-4" />
                 <div className="flex gap-2">
+                  <div className="h-9 flex-1 rounded-sq-sm bg-muted" />
                   <div className="h-9 flex-1 rounded-sq-sm bg-muted" />
                   <div className="h-9 flex-1 rounded-sq-sm bg-muted" />
                 </div>
@@ -116,8 +123,23 @@ const MyBusinessesPage = () => {
               />
             ))}
 
-            {/* Add another business CTA (mobile + desktop fallback) */}
+            {/* Add another business CTA */}
             <AddBusinessCard onClick={handleCreateBusiness} />
+          </div>
+        )}
+
+        {/* Mobile-only full-width Create CTA at bottom */}
+        {hasBusinesses && (
+          <div className="sm:hidden mt-6">
+            <Button
+              variant="default"
+              size="lg"
+              onClick={handleCreateBusiness}
+              className="w-full gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Create business profile
+            </Button>
           </div>
         )}
       </main>
