@@ -62,7 +62,7 @@ const BusinessIntroPage: React.FC = () => {
           transition={{ delay: 0.1 }}
           className="py-3"
         >
-          <div className="rounded-[18px] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-5 py-5 border border-slate-700/50 shadow-lg">
+          <div className="rounded-none sm:rounded-sq-lg bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-5 py-5 border-y sm:border border-slate-700/50 shadow-lg -mx-4 sm:mx-0">
             <div className="flex items-start gap-4">
               <div className="mt-0.5 inline-flex h-11 w-11 items-center justify-center rounded-[14px] bg-amber-500/15 border border-amber-500/20">
                 <Building2 className="h-5 w-5 text-amber-400" />
@@ -97,7 +97,7 @@ const BusinessIntroPage: React.FC = () => {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mt-2 rounded-[18px] bg-background px-5 py-5 border border-border/50"
+          className="mt-2 rounded-none sm:rounded-sq-lg bg-background px-5 py-5 border-y sm:border border-border/50 -mx-4 sm:mx-0"
         >
           <div className="grid gap-5 md:grid-cols-2">
             <div>
