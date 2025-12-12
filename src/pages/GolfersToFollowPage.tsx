@@ -24,7 +24,8 @@ const FILTER_TABS = [
 const PAGE_SIZE = 10;
 
 // Shared base pill class for action buttons
-const basePillClass = "inline-flex items-center justify-center rounded-sq-xs border px-3 h-7 text-xs font-semibold transition-colors";
+// Smaller action buttons (10-20% reduction: h-6 instead of h-7, px-2 instead of px-3, text-[11px])
+const basePillClass = "inline-flex items-center justify-center rounded-sq-xs border px-2 h-6 text-[11px] font-semibold transition-colors";
 
 const GolfersToFollowPage = () => {
   const navigate = useNavigate();
@@ -134,9 +135,8 @@ const GolfersToFollowPage = () => {
       <CompactHeader />
 
       <div className="w-full compact-header-offset">
-        {/* Header with back button - 3-column grid for true centering */}
-        <div className="grid grid-cols-[48px_1fr_48px] items-center px-4 pt-4 pb-3">
-          {/* Left: Back button */}
+        {/* Back CTA - top left, matching Notifications page */}
+        <div className="px-4 pt-3">
           <button
             type="button"
             onClick={handleBack}
@@ -145,19 +145,16 @@ const GolfersToFollowPage = () => {
             <ChevronLeft className="h-5 w-5" />
             <span className="text-sm">Back</span>
           </button>
+        </div>
 
-          {/* Center: Title block */}
-          <div className="text-center">
-            <h1 className="text-xl font-semibold tracking-tight text-foreground">
-              Golfers to follow
-            </h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              Discover new golfers and build your community.
-            </p>
-          </div>
-
-          {/* Right: spacer */}
-          <div />
+        {/* Title block - centered beneath back button */}
+        <div className="text-center px-4 pt-4 pb-3">
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Golfers to follow
+          </h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Discover new golfers and build your community.
+          </p>
         </div>
 
         {/* Filter tabs - centered */}
@@ -269,73 +266,80 @@ const GolfersToFollowPage = () => {
                   <button
                     key={golfer.id}
                     onClick={() => navigate(`/users/${golfer.id}`)}
-                    className="w-full text-left px-6 py-4 flex items-center gap-3 hover:bg-muted/30 transition-colors"
+                    className="w-full text-left px-6 py-4 hover:bg-muted/30 transition-colors"
                   >
-                    {/* Avatar */}
-                    <SquircleAvatar
-                      src={golfer.profileImage}
-                      alt={golfer.displayName}
-                      size={48}
-                      fallback={golfer.displayName?.charAt(0) || '?'}
-                      ringColor={getRingColorForTotalPlayed(golfer.totalTop100Played || 0)}
-                    />
+                    <div className="flex items-start gap-3">
+                      {/* Avatar */}
+                      <SquircleAvatar
+                        src={golfer.profileImage}
+                        alt={golfer.displayName}
+                        size={48}
+                        fallback={golfer.displayName?.charAt(0) || '?'}
+                        ringColor={getRingColorForTotalPlayed(golfer.totalTop100Played || 0)}
+                      />
 
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-foreground truncate">{golfer.displayName}</p>
-                      <p className="text-sm text-muted-foreground truncate">{clubLine}</p>
-                      {handicapLine && (
-                        <p className="text-xs text-muted-foreground">{handicapLine}</p>
-                      )}
-                    </div>
-
-                    {/* Actions - colored buttons restored */}
-                    <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
-                      {/* Follow/Following button */}
-                      {isFollowing ? (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleFollowToggle(golfer.id, golfer.displayName, true);
-                          }}
-                          disabled={isActioning}
-                          className={cn(basePillClass, "border-border bg-muted text-foreground/80 gap-1")}
-                        >
-                          <Check className="h-3 w-3" />
-                          Following
-                        </button>
-                      ) : (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleFollowToggle(golfer.id, golfer.displayName, false);
-                          }}
-                          disabled={isActioning}
-                          className={cn(
-                            basePillClass,
-                            "border-orange-500 bg-orange-500/10 text-orange-600 hover:bg-orange-500/15",
-                            "disabled:opacity-60"
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-foreground">{golfer.displayName}</p>
+                        <p className="text-sm text-muted-foreground">{clubLine}</p>
+                        
+                        {/* Row with handicap + action buttons */}
+                        <div className="flex items-center justify-between mt-1.5">
+                          {handicapLine && (
+                            <p className="text-xs text-muted-foreground">{handicapLine}</p>
                           )}
-                        >
-                          {isActioning ? 'Following...' : 'Follow'}
-                        </button>
-                      )}
+                          {!handicapLine && <div />}
+                          
+                          {/* Actions - smaller colored buttons */}
+                          <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                            {/* Follow/Following button */}
+                            {isFollowing ? (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleFollowToggle(golfer.id, golfer.displayName, true);
+                                }}
+                                disabled={isActioning}
+                                className={cn(basePillClass, "border-border bg-muted text-foreground/80 gap-0.5")}
+                              >
+                                <Check className="h-2.5 w-2.5" />
+                                Following
+                              </button>
+                            ) : (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleFollowToggle(golfer.id, golfer.displayName, false);
+                                }}
+                                disabled={isActioning}
+                                className={cn(
+                                  basePillClass,
+                                  "border-orange-500 bg-orange-500/10 text-orange-600 hover:bg-orange-500/15",
+                                  "disabled:opacity-60"
+                                )}
+                              >
+                                {isActioning ? 'Following...' : 'Follow'}
+                              </button>
+                            )}
 
-                      {/* Add friend button - green styled */}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleFriendRequest(golfer.id, golfer.displayName);
-                        }}
-                        disabled={isActioning}
-                        className={cn(
-                          basePillClass,
-                          "border-emerald-500 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/15",
-                          "disabled:opacity-60"
-                        )}
-                      >
-                        Add friend
-                      </button>
+                            {/* Add friend button - green styled */}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleFriendRequest(golfer.id, golfer.displayName);
+                              }}
+                              disabled={isActioning}
+                              className={cn(
+                                basePillClass,
+                                "border-emerald-500 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/15",
+                                "disabled:opacity-60"
+                              )}
+                            >
+                              Add friend
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </button>
                 );
