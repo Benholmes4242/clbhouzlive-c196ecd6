@@ -21,7 +21,7 @@ const FriendsCoursesEmpty: React.FC = () => {
 
         {/* Body */}
         <p className="text-sm text-muted-foreground leading-relaxed max-w-[360px]">
-          Follow golfers to unlock friends' course trails, ratings, and hidden gems.
+          Friend golfers to unlock friends' course trails, ratings, and hidden gems.
         </p>
 
         {/* Primary CTA */}
@@ -29,12 +29,12 @@ const FriendsCoursesEmpty: React.FC = () => {
           onClick={() => navigate('/golferstofollow?source=friends_courses_empty')}
           className="w-full h-12 rounded-xl"
         >
-          Find golfers to follow
+          Find friends
         </Button>
 
-        {/* Micro-tip */}
-        <p className="text-xs text-muted-foreground">
-          Tip: Following 5 golfers makes this tab come alive.
+        {/* Micro-tip - tighter spacing */}
+        <p className="text-xs text-muted-foreground mt-[-8px]">
+          Tip: Friending 5 golfers makes this tab come alive.
         </p>
       </div>
     </div>

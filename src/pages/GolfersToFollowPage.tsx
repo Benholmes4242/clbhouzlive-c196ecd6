@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import CompactHeader from '@/components/header/CompactHeader';
-import { Search } from 'lucide-react';
+import { Search, ChevronLeft, Check, UserPlus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useGolfersDiscovery, FilterType } from '@/hooks/useGolfersDiscovery';
 import { useFollowUser } from '@/hooks/useFollowUser';
@@ -11,7 +11,8 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { GolferRowFlat } from '@/components/golfers/GolferRowFlat';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { Button } from '@/components/ui/button';
 
 const FILTER_TABS = [
@@ -21,6 +22,9 @@ const FILTER_TABS = [
 ];
 
 const PAGE_SIZE = 10;
+
+// Shared base pill class for action buttons
+const basePillClass = "inline-flex items-center justify-center rounded-sq-xs border px-3 h-7 text-xs font-semibold transition-colors";
 
 const GolfersToFollowPage = () => {
   const navigate = useNavigate();
@@ -57,6 +61,14 @@ const GolfersToFollowPage = () => {
   useEffect(() => {
     setSearchQuery(debouncedSearchQuery);
   }, [debouncedSearchQuery, setSearchQuery]);
+
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/courses?tab=friends-courses');
+    }
+  };
 
   const handleFollowToggle = async (userId: string, userName: string, isFollowing: boolean) => {
     setActioningUserId(userId);
@@ -114,8 +126,6 @@ const GolfersToFollowPage = () => {
     }
   };
 
-  const startIndex = (page - 1) * PAGE_SIZE + 1;
-  const endIndex = Math.min(page * PAGE_SIZE, totalCount);
   const showingCount = golfers.length;
   const hasMore = page < totalPages;
 
@@ -124,18 +134,34 @@ const GolfersToFollowPage = () => {
       <CompactHeader />
 
       <div className="w-full compact-header-offset">
-        {/* Title block */}
-        <div className="px-6 pt-4 pb-3">
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">
-            Golfers to follow
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Discover new golfers and build your community.
-          </p>
+        {/* Header with back button - 3-column grid for true centering */}
+        <div className="grid grid-cols-[48px_1fr_48px] items-center px-4 pt-4 pb-3">
+          {/* Left: Back button */}
+          <button
+            type="button"
+            onClick={handleBack}
+            className="flex items-center gap-0.5 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ChevronLeft className="h-5 w-5" />
+            <span className="text-sm">Back</span>
+          </button>
+
+          {/* Center: Title block */}
+          <div className="text-center">
+            <h1 className="text-xl font-semibold tracking-tight text-foreground">
+              Golfers to follow
+            </h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Discover new golfers and build your community.
+            </p>
+          </div>
+
+          {/* Right: spacer */}
+          <div />
         </div>
 
-        {/* Filter tabs - lighter pill style */}
-        <div className="px-6 mb-4">
+        {/* Filter tabs - centered */}
+        <div className="flex justify-center px-6 mb-4">
           <div className="inline-flex rounded-sq-pill bg-muted/50 p-1 gap-0.5">
             {FILTER_TABS.map((tab) => (
               <button
@@ -181,7 +207,7 @@ const GolfersToFollowPage = () => {
                   <div className="h-3 w-1/2 rounded-full bg-muted animate-pulse" />
                   <div className="h-3 w-1/3 rounded-full bg-muted/60 animate-pulse" />
                 </div>
-                <div className="h-9 w-20 rounded-lg bg-muted animate-pulse" />
+                <div className="h-7 w-20 rounded-sq-xs bg-muted animate-pulse" />
               </div>
             ))}
           </div>
@@ -231,20 +257,89 @@ const GolfersToFollowPage = () => {
           </div>
         ) : (
           <>
-            {/* Flat list rows */}
+            {/* Flat list rows with colored buttons */}
             <div className="divide-y divide-border/25">
-              {golfers.map((golfer) => (
-                <GolferRowFlat
-                  key={golfer.id}
-                  golfer={golfer}
-                  isFollowing={followingIds.has(golfer.id)}
-                  loading={actioningUserId === golfer.id}
-                  onFollowToggle={() =>
-                    handleFollowToggle(golfer.id, golfer.displayName, followingIds.has(golfer.id))
-                  }
-                  onFriendRequest={() => handleFriendRequest(golfer.id, golfer.displayName)}
-                />
-              ))}
+              {golfers.map((golfer) => {
+                const isFollowing = followingIds.has(golfer.id);
+                const isActioning = actioningUserId === golfer.id;
+                const clubLine = golfer.homeClub || 'No home club set';
+                const handicapLine = golfer.handicap != null ? `HCP ${golfer.handicap.toFixed(1)}` : null;
+
+                return (
+                  <button
+                    key={golfer.id}
+                    onClick={() => navigate(`/users/${golfer.id}`)}
+                    className="w-full text-left px-6 py-4 flex items-center gap-3 hover:bg-muted/30 transition-colors"
+                  >
+                    {/* Avatar */}
+                    <SquircleAvatar
+                      src={golfer.profileImage}
+                      alt={golfer.displayName}
+                      size={48}
+                      fallback={golfer.displayName?.charAt(0) || '?'}
+                      ringColor={getRingColorForTotalPlayed(golfer.totalTop100Played || 0)}
+                    />
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-foreground truncate">{golfer.displayName}</p>
+                      <p className="text-sm text-muted-foreground truncate">{clubLine}</p>
+                      {handicapLine && (
+                        <p className="text-xs text-muted-foreground">{handicapLine}</p>
+                      )}
+                    </div>
+
+                    {/* Actions - colored buttons restored */}
+                    <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
+                      {/* Follow/Following button */}
+                      {isFollowing ? (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleFollowToggle(golfer.id, golfer.displayName, true);
+                          }}
+                          disabled={isActioning}
+                          className={cn(basePillClass, "border-border bg-muted text-foreground/80 gap-1")}
+                        >
+                          <Check className="h-3 w-3" />
+                          Following
+                        </button>
+                      ) : (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleFollowToggle(golfer.id, golfer.displayName, false);
+                          }}
+                          disabled={isActioning}
+                          className={cn(
+                            basePillClass,
+                            "border-orange-500 bg-orange-500/10 text-orange-600 hover:bg-orange-500/15",
+                            "disabled:opacity-60"
+                          )}
+                        >
+                          {isActioning ? 'Following...' : 'Follow'}
+                        </button>
+                      )}
+
+                      {/* Add friend button - green styled */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleFriendRequest(golfer.id, golfer.displayName);
+                        }}
+                        disabled={isActioning}
+                        className={cn(
+                          basePillClass,
+                          "border-emerald-500 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/15",
+                          "disabled:opacity-60"
+                        )}
+                      >
+                        Add friend
+                      </button>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
 
             {/* Pagination - Load next 10 */}
