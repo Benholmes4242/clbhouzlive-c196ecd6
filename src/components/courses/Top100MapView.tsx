@@ -376,22 +376,22 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   }
 
   return (
-    <div className={cn('top100-map-shell', fullHeight ? 'h-full flex flex-col' : 'space-y-3')}>
-      {/* Header with dynamic stats */}
-      <div className="flex-shrink-0 px-4 pt-4 pb-2">
-        <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+    <div className={cn('top100-map-shell', fullHeight ? 'h-full flex flex-col' : 'space-y-2')}>
+      {/* Header with dynamic stats - tighter spacing */}
+      <div className="flex-shrink-0 px-4 pt-3 pb-1">
+        <h2 className="text-sm font-semibold text-slate-900 dark:text-white leading-tight">
           {regionConfig.label}
         </h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+        <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 leading-tight">
           {ratedCount} played · {remaining} remaining · {regionsExplored} region{regionsExplored !== 1 ? 's' : ''} explored
         </p>
       </div>
 
       {/* Map container */}
-      <div className={cn('relative overflow-hidden bg-muted/40', fullHeight ? 'flex-1 min-h-0' : 'mt-1 rounded-sq-lg')}>
+      <div className={cn('relative overflow-hidden bg-muted/40', fullHeight ? 'flex-1 min-h-0' : 'rounded-sq-lg')}>
         <div
           ref={mapContainerRef}
-          className={cn('w-full', fullHeight ? 'h-full' : 'h-[480px]')}
+          className={cn('w-full', fullHeight ? 'h-full' : 'h-[500px]')}
         />
 
         {/* Loading overlay */}
@@ -401,52 +401,60 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           </div>
         )}
 
-        {/* Insight chip (top center) */}
-        <MapInsightChip
-          courses={courses}
-          playedCount={ratedCount}
-          totalCount={officialTotal}
-          scope={scope}
-          ratedFilter={ratedFilter}
-        />
-
-        {/* Legend (top-left) */}
-        <div className="pointer-events-none absolute left-3 top-14 z-10">
-          <div className="flex items-center gap-3 rounded-sq-md bg-white/90 dark:bg-slate-900/90 px-3 py-2 text-xs text-slate-900 dark:text-white shadow-[0_4px_20px_rgba(0,0,0,0.15)] backdrop-blur-xl border border-white/30 dark:border-slate-700/50">
-            <div className="flex items-center gap-1.5">
-              <span className="inline-block h-2.5 w-2.5 rounded-full bg-[#F7931E] shadow-[0_0_6px_rgba(247,147,30,0.5)]" />
+        {/* Top overlay zone - consistent padding */}
+        <div className="pointer-events-none absolute top-0 left-0 right-0 z-20 px-3 pt-3">
+          {/* Insight chip (centered) */}
+          <div className="pointer-events-auto flex justify-center mb-2">
+            <MapInsightChip
+              courses={courses}
+              playedCount={ratedCount}
+              totalCount={officialTotal}
+              scope={scope}
+              ratedFilter={ratedFilter}
+            />
+          </div>
+          
+          {/* Legend row - aligned with same padding */}
+          <div className="pointer-events-auto flex items-center gap-2.5 rounded-sq-sm bg-white/90 dark:bg-slate-900/90 px-2.5 py-1.5 text-[10px] text-slate-700 dark:text-slate-300 shadow-[0_2px_12px_rgba(0,0,0,0.1)] backdrop-blur-xl border border-white/40 dark:border-slate-700/50 w-fit">
+            <div className="flex items-center gap-1">
+              <span className="inline-block h-2 w-2 rounded-full bg-[#F7931E] shadow-[0_0_4px_rgba(247,147,30,0.4)]" />
               <span>Played</span>
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className="inline-block h-2 w-2 rounded-full border-2 border-slate-500 bg-transparent" />
+            <div className="flex items-center gap-1">
+              <span className="inline-block h-1.5 w-1.5 rounded-full border-[1.5px] border-slate-400 bg-transparent" />
               <span>Not Played</span>
             </div>
           </div>
         </div>
 
-        {/* Reset view button (near zoom controls) */}
-        <button
-          onClick={handleResetView}
-          className={cn(
-            'absolute right-[52px] bottom-[88px] z-10',
-            'flex items-center justify-center',
-            'w-[29px] h-[29px] rounded-sq-sm',
-            'bg-white shadow-md border border-slate-200',
-            'text-slate-600 hover:bg-slate-50 active:bg-slate-100',
-            'transition-colors duration-150'
-          )}
-          title="Reset view"
-        >
-          <RotateCcw className="h-3.5 w-3.5" />
-        </button>
-
-        {/* Floating progress orb */}
-        <MapProgressOrb
-          playedCount={ratedCount}
-          totalCount={officialTotal}
-          scope={scope}
-          onMilestoneClick={() => navigate('/top100?tab=my-progress')}
-        />
+        {/* Bottom-right control stack: orb + reset */}
+        <div className="pointer-events-none absolute right-3 bottom-24 z-20 flex flex-col items-center gap-2">
+          {/* Progress orb */}
+          <div className="pointer-events-auto">
+            <MapProgressOrb
+              playedCount={ratedCount}
+              totalCount={officialTotal}
+              scope={scope}
+              onMilestoneClick={() => navigate('/top100?tab=my-progress')}
+            />
+          </div>
+          
+          {/* Reset view button */}
+          <button
+            onClick={handleResetView}
+            className={cn(
+              'pointer-events-auto',
+              'flex items-center justify-center',
+              'w-8 h-8 rounded-sq-sm',
+              'bg-white/95 shadow-[0_2px_8px_rgba(0,0,0,0.1)] border border-slate-200/80',
+              'text-slate-500 hover:bg-slate-50 active:bg-slate-100',
+              'transition-colors duration-150'
+            )}
+            title="Reset view"
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+          </button>
+        </div>
 
         {/* Course bottom sheet */}
         <MapCourseSheet
@@ -456,14 +464,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         />
       </div>
 
-      {/* Filters section */}
-      <div className="flex-shrink-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/50 dark:border-slate-700/50 shadow-[0_-4px_12px_rgba(15,23,42,0.08)] text-xs">
-        <div className="px-4 pt-3 pb-1">
-          <span className="font-medium text-slate-700 dark:text-slate-300">Filters</span>
-        </div>
-        <div className="px-4 pb-4 pt-2 space-y-3">
-          {/* Status filter - Mode toggle style */}
-          <div className="flex items-center gap-1 p-1 rounded-sq-pill bg-slate-100 dark:bg-slate-800 w-fit">
+      {/* Filters section - tighter, no label */}
+      <div className="flex-shrink-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 shadow-[0_-2px_8px_rgba(15,23,42,0.04)]">
+        <div className="px-4 py-3 space-y-2.5">
+          {/* Status filter - Mode toggle style, larger */}
+          <div className="flex items-center gap-1 p-1 rounded-sq-pill bg-slate-100/80 dark:bg-slate-800 w-fit">
             {(['all', 'rated', 'unrated'] as RatedFilter[]).map((filter) => {
               const isActive = ratedFilter === filter;
               const labels = { all: 'All', rated: 'Played', unrated: 'Not Played' };
@@ -476,8 +481,10 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                     isActive
                       ? filter === 'rated'
                         ? 'bg-[#F7931E] text-white shadow-sm'
+                        : filter === 'unrated'
+                        ? 'bg-slate-600 text-white shadow-sm'
                         : 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white'
                   )}
                 >
                   {labels[filter]}
@@ -486,8 +493,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             })}
           </div>
 
-          {/* Region chips */}
-          <div className="flex items-center gap-2">
+          {/* Region chips - same height as status */}
+          <div className="flex items-center gap-1.5">
             {(['global', 'gb-i', 'usa', 'europe'] as Top100MapScope[]).map((regionScope) => {
               const isActive = scope === regionScope;
               const labels = { global: 'Global', 'gb-i': 'GB&I', usa: 'USA', europe: 'Europe' };
@@ -496,10 +503,10 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                   key={regionScope}
                   onClick={() => onScopeChange?.(regionScope)}
                   className={cn(
-                    'px-3 py-1.5 rounded-sq-pill text-xs font-medium border transition-all duration-200',
+                    'px-3 py-2 rounded-sq-pill text-xs font-medium border transition-all duration-200',
                     isActive
                       ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white'
-                      : 'bg-transparent border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-500'
+                      : 'bg-transparent border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600'
                   )}
                 >
                   {labels[regionScope]}
