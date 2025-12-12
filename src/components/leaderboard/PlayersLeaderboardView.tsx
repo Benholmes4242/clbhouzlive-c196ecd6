@@ -74,16 +74,18 @@ export function PlayersLeaderboardView() {
         return allEntries.slice(0, 100);
       
       case 'around':
+        // Show 5 above + user + 5 below
         if (myIndex < 0) return [];
-        const start = Math.max(0, myIndex - 10);
-        const end = Math.min(allEntries.length, myIndex + 11);
+        const start = Math.max(0, myIndex - 5);
+        const end = Math.min(allEntries.length, myIndex + 6);
         return allEntries.slice(start, end);
       
       case 'friends':
-        return allEntries.filter((e: any) => e.is_friend);
+        // Only friends with at least 1 Top 100 course
+        return allEntries.filter((e: any) => e.is_friend && e.total_top100_played > 0);
       
       case 'rising':
-        // Sort by delta_rank (biggest positive changes)
+        // Sort by delta_rank (biggest positive changes) in last 7/30 days
         return [...allEntries]
           .filter((e: any) => e.delta_rank && e.delta_rank > 0)
           .sort((a: any, b: any) => (b.delta_rank || 0) - (a.delta_rank || 0))
@@ -181,14 +183,6 @@ export function PlayersLeaderboardView() {
         )}
       </div>
 
-      {/* Gamification micro-moment */}
-      {segment === 'around' && meModel && displayedEntries.length > 0 && (
-        <div className="text-center py-2">
-          <p className="text-xs text-muted-foreground">
-            One more round puts you closer to the top.
-          </p>
-        </div>
-      )}
     </div>
   );
 }

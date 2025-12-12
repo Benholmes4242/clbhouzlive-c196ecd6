@@ -34,6 +34,12 @@ export function LeaderboardPositionCard({ user, variant = 'full' }: LeaderboardP
     ? Math.min(100, ((user.total_top100_played) / nextClub.threshold) * 100)
     : 100;
 
+  // Contextual helper copy based on rank
+  const isTopRanked = user.rank === 1;
+  const helperCopy = isTopRanked
+    ? "You're setting the pace."
+    : 'One more round puts you closer to the top.';
+
   if (variant === 'compact') {
     return (
       <div className="w-full bg-primary/5 border-y border-primary/20 px-3 py-2 flex items-center justify-between gap-2">
@@ -50,7 +56,7 @@ export function LeaderboardPositionCard({ user, variant = 'full' }: LeaderboardP
           </span>
         </div>
         <span className="text-xs text-muted-foreground">
-          {user.total_top100_played} Top 100s
+          {user.total_top100_played} Top 100 courses
         </span>
       </div>
     );
@@ -60,7 +66,7 @@ export function LeaderboardPositionCard({ user, variant = 'full' }: LeaderboardP
     <button
       type="button"
       onClick={() => navigate('/top100?tab=my-progress')}
-      className="w-full rounded-sq-md border border-border/70 bg-card px-4 py-3.5 flex items-center justify-between gap-3 shadow-sm active:scale-[0.99] transition-all hover:bg-muted/30"
+      className="w-full rounded-sq-md border border-border/70 bg-card px-4 py-3.5 shadow-sm active:scale-[0.99] transition-all hover:bg-muted/30"
     >
       <div className="flex items-center gap-3">
         <SquircleAvatar
@@ -71,11 +77,11 @@ export function LeaderboardPositionCard({ user, variant = 'full' }: LeaderboardP
           ringColor={ringColor}
         />
 
-        <div className="flex flex-col text-left">
+        <div className="flex flex-col text-left flex-1 min-w-0">
           <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
             Your position
           </span>
-          <span className="text-sm font-semibold">
+          <span className="text-sm font-semibold whitespace-nowrap">
             #{user.rank} · {user.total_top100_played} Top 100 courses
           </span>
           {club.tierName && (
@@ -84,25 +90,32 @@ export function LeaderboardPositionCard({ user, variant = 'full' }: LeaderboardP
             </span>
           )}
         </div>
+
+        {/* Progress to next tier */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {nextClub ? (
+            <div className="flex flex-col items-end gap-1 min-w-[100px]">
+              <span className="text-[11px] text-muted-foreground">
+                Next: <span className="font-medium">{nextClub.tierName}</span>
+              </span>
+              <div className="w-24 h-1.5 rounded-full bg-muted overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-primary/60 transition-[width]"
+                  style={{ width: `${progressPct}%` }}
+                />
+              </div>
+            </div>
+          ) : (
+            <span className="text-[11px] text-primary font-medium">Max tier!</span>
+          )}
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+        </div>
       </div>
 
-      {/* Progress to next tier */}
-      <div className="flex items-center gap-2">
-        {nextClub && (
-          <div className="flex flex-col items-end gap-1 min-w-[100px]">
-            <span className="text-[11px] text-muted-foreground">
-              Next: <span className="font-medium">{nextClub.tierName}</span>
-            </span>
-            <div className="w-24 h-1.5 rounded-full bg-muted overflow-hidden">
-              <div
-                className="h-full rounded-full bg-primary/60 transition-[width]"
-                style={{ width: `${progressPct}%` }}
-              />
-            </div>
-          </div>
-        )}
-        <ChevronRight className="w-4 h-4 text-muted-foreground" />
-      </div>
+      {/* Helper copy */}
+      <p className="text-xs text-muted-foreground mt-2 text-left">
+        {helperCopy}
+      </p>
     </button>
   );
 }
