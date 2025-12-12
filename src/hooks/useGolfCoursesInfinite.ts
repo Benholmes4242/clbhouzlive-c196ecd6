@@ -4,10 +4,16 @@ import type { CourseSearchFilters, SearchedCourse } from './useGolfCoursesSearch
 
 const PAGE_SIZE = 25;
 
+// Extended type that includes rating
+export interface SearchedCourseWithRating extends SearchedCourse {
+  average_rating?: number | null;
+}
+
 export function useGolfCoursesInfinite(filters: Omit<CourseSearchFilters, 'limit' | 'offset'>) {
   return useInfiniteQuery({
     queryKey: ['golf-courses-infinite', filters],
     queryFn: async ({ pageParam = 0 }) => {
+      // 1. Fetch courses from RPC
       const { data, error } = await supabase.rpc('search_golf_courses', {
         search_query: filters.searchQuery || null,
         region_slug: filters.regionSlug || null,
@@ -18,7 +24,28 @@ export function useGolfCoursesInfinite(filters: Omit<CourseSearchFilters, 'limit
       });
 
       if (error) throw error;
-      return (data || []) as unknown as SearchedCourse[];
+      
+      const courses = (data || []) as unknown as SearchedCourse[];
+      
+      // 2. Fetch ratings for these courses
+      if (courses.length === 0) return [] as SearchedCourseWithRating[];
+      
+      const courseIds = courses.map(c => c.id);
+      const { data: ratingsData } = await supabase
+        .from('course_rating_aggregates')
+        .select('course_id, avg_overall_score')
+        .in('course_id', courseIds);
+      
+      // 3. Create a map for quick lookup
+      const ratingsMap = new Map<string, number>(
+        (ratingsData || []).map((r: any) => [r.course_id, r.avg_overall_score])
+      );
+      
+      // 4. Merge ratings into courses
+      return courses.map(course => ({
+        ...course,
+        average_rating: ratingsMap.get(course.id) ?? null,
+      })) as SearchedCourseWithRating[];
     },
     getNextPageParam: (lastPage, allPages) => {
       // If last page has fewer items than PAGE_SIZE, we're done
