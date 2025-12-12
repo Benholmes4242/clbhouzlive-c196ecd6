@@ -1,15 +1,20 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
+import { Play } from 'lucide-react';
 import type { ExtendedMediaItem } from '@/components/media-grid';
 
 interface MediaGridItemProps {
   item: ExtendedMediaItem;
   onClick: (item: ExtendedMediaItem) => void;
+  /** Show "+X" overlay for additional media count */
+  overflowCount?: number;
 }
 
 /**
  * Phase 1 Fix #4: Memoized grid item to prevent unnecessary re-renders on filter changes
+ * Polish: skeleton placeholder, centered play icon, consistent styling
  */
-export const MediaGridItem = memo(function MediaGridItem({ item, onClick }: MediaGridItemProps) {
+export const MediaGridItem = memo(function MediaGridItem({ item, onClick, overflowCount }: MediaGridItemProps) {
+  const [isLoaded, setIsLoaded] = useState(false);
   const isVideo = item.type === 'video';
   const imageSrc = isVideo ? (item.posterUrl || item.url) : item.url;
   
@@ -24,35 +29,52 @@ export const MediaGridItem = memo(function MediaGridItem({ item, onClick }: Medi
   return (
     <button
       onClick={() => onClick(item)}
-      className="relative aspect-square rounded-[var(--squircle-radius)] overflow-hidden bg-slate-200 border border-slate-300/40 shadow-sm hover:shadow-md transition-shadow duration-150"
+      className="relative aspect-square overflow-hidden bg-muted border-[0.5px] border-border/30 hover:brightness-95 active:scale-[0.98] transition-all duration-150"
     >
-      {/* Phase 1 Fix #1: Lazy-loading thumbnails */}
+      {/* Skeleton placeholder - shows until image loads */}
+      {!isLoaded && (
+        <div className="absolute inset-0 bg-muted animate-pulse" />
+      )}
+
+      {/* Lazy-loading image */}
       <img
         src={imageSrc}
         alt={item.alt || 'Media'}
-        className="w-full h-full object-cover"
+        className={`w-full h-full object-cover transition-opacity duration-200 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
         loading="lazy"
         decoding="async"
+        onLoad={() => setIsLoaded(true)}
       />
 
-      {/* Video overlays: gradient + duration */}
+      {/* Video overlays: gradient + centered play + duration */}
       {isVideo && (
         <>
           {/* Bottom gradient for readability */}
-          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
+          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
 
-          {/* Duration pill */}
+          {/* Centered play icon */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm">
+              <Play className="h-4 w-4 text-white fill-white ml-0.5" />
+            </div>
+          </div>
+
+          {/* Duration pill - bottom right */}
           <div className="absolute bottom-2 right-2">
-            <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-black/70 backdrop-blur-sm">
-              <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M3 2v12l10-6L3 2z" />
-              </svg>
-              <span className="text-[10px] font-medium text-white">
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-sm">
+              <span className="text-[10px] font-medium text-white tabular-nums">
                 {formatDuration(item.duration)}
               </span>
             </div>
           </div>
         </>
+      )}
+
+      {/* "+X more" overlay for overflow indication */}
+      {overflowCount && overflowCount > 0 && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[2px]">
+          <span className="text-lg font-semibold text-white">+{overflowCount}</span>
+        </div>
       )}
     </button>
   );

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Squircle } from '@/components/ui/squircle';
+import { Camera, Plus } from 'lucide-react';
 
 interface CourseMediaSummaryCardProps {
   photoCount: number;
@@ -14,7 +14,6 @@ export const CourseMediaSummaryCard: React.FC<CourseMediaSummaryCardProps> = ({
   photoCount,
   videoCount,
   contributorsCount = 0,
-  contributors = [],
   courseName,
   onAddMedia,
 }) => {
@@ -23,17 +22,25 @@ export const CourseMediaSummaryCard: React.FC<CourseMediaSummaryCardProps> = ({
   // Empty state
   if (!hasMedia) {
     return (
-      <section className="px-4 pt-4 pb-6">
-        <div className="rounded-2xl bg-white shadow-[0_8px_24px_rgba(15,23,42,0.06)] px-4 py-4 text-center">
-          <p className="text-[11px] font-semibold tracking-[0.12em] uppercase text-slate-500 mb-1.5">
-            Course media
+      <section className="px-4 pt-6 pb-6">
+        <div className="rounded-sq-lg border border-border/60 bg-card px-4 py-6 text-center">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+            <Camera className="h-5 w-5 text-muted-foreground" />
+          </div>
+          <p className="text-sm font-semibold text-foreground">No media yet</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Be the first to share photos or videos of {courseName || 'this course'}.
           </p>
-          <p className="text-sm font-medium text-slate-900 mb-1">
-            No photos or videos yet
-          </p>
-          <p className="text-sm text-slate-500">
-            Help other golfers see {courseName || 'this course'} before they play - add your photos or a short video.
-          </p>
+          {onAddMedia && (
+            <button
+              type="button"
+              onClick={onAddMedia}
+              className="mt-4 inline-flex items-center gap-1.5 rounded-sq-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 active:scale-[0.98] transition-all"
+            >
+              <Plus className="h-4 w-4" />
+              Add a photo or video
+            </button>
+          )}
         </div>
       </section>
     );
@@ -41,40 +48,40 @@ export const CourseMediaSummaryCard: React.FC<CourseMediaSummaryCardProps> = ({
 
   // Structured header when there is media
   return (
-    <section className="px-4 pt-4 pb-2">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <p className="text-[11px] font-semibold tracking-[0.12em] uppercase text-slate-500">
+    <section className="px-4 pt-6">
+      {/* Header row with title + Add media CTA */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="space-y-2">
+          {/* Title */}
+          <p className="text-[11px] font-semibold tracking-[0.12em] uppercase text-muted-foreground">
             Course media
           </p>
 
-          <p className="mt-1 text-sm font-medium text-slate-900">
+          {/* Counts - 8px below title */}
+          <p className="text-sm font-medium text-foreground tabular-nums">
             {photoCount} {photoCount === 1 ? 'photo' : 'photos'}
             {' · '}
             {videoCount} {videoCount === 1 ? 'video' : 'videos'}
           </p>
 
+          {/* Contributors - 8px below counts */}
           {contributorsCount > 0 && (
-            <p className="mt-0.5 text-[12px] text-slate-500">
+            <p className="text-xs text-muted-foreground">
               Shared by {contributorsCount} {contributorsCount === 1 ? 'golfer' : 'golfers'}
             </p>
           )}
         </div>
 
-        {contributors.length > 0 && (
-          <div className="flex -space-x-2">
-            {contributors.slice(0, 3).map((user) => (
-              <div key={user.id} className="ring-2 ring-white rounded-lg">
-                <Squircle width={28} height={28}>
-                  <img
-                    src={user.avatarUrl || 'https://via.placeholder.com/32'}
-                    alt={user.name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                </Squircle>
-              </div>
-            ))}
-          </div>
+        {/* Add media CTA (right side) */}
+        {onAddMedia && (
+          <button
+            type="button"
+            onClick={onAddMedia}
+            className="flex items-center gap-1.5 rounded-sq-md border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted active:scale-[0.97] transition-all"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            Add media
+          </button>
         )}
       </div>
     </section>
