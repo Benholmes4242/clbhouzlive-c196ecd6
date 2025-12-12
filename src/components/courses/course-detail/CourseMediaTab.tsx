@@ -56,7 +56,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
   }, []);
 
   // Phase 1 Fix #2: Use shared hook - single query for all media consumers
-  const { data: mediaResp, isLoading } = useClubMedia(courseId, 30);
+  const { data: mediaResp, isLoading, isError, refetch } = useClubMedia(courseId, 30);
 
   // A3: Pre-warm HLS.js when media tab mounts with videos
   useEffect(() => {
@@ -104,7 +104,9 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     }).filter(Boolean) as Array<{ id: string; name: string; avatarUrl: string | null }>;
   }, [exploreItems]);
 
-  // Filter options
+  // Filter options with clear option when filter active
+  const isFilterActive = filterMode === 'photos' || filterMode === 'videos';
+  
   const filterOptions: SegmentedTabOption[] = [
     { value: 'most_recent', label: 'Most recent' },
     { value: 'photos', label: 'Photos' },
@@ -145,12 +147,50 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     setSelectedMediaIndex(null);
   }, []);
 
+  // Loading state with proper skeleton placeholders
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-          <div key={i} className="aspect-square bg-muted rounded-lg animate-pulse" />
-        ))}
+      <div className="space-y-0">
+        {/* Header skeleton */}
+        <section className="px-4 pt-6 pb-6">
+          <div className="space-y-2">
+            <div className="h-3 w-24 bg-muted rounded animate-pulse" />
+            <div className="h-4 w-32 bg-muted rounded animate-pulse" />
+            <div className="h-3 w-28 bg-muted rounded animate-pulse" />
+          </div>
+        </section>
+        {/* Filter skeleton */}
+        <div className="px-4 pt-4 pb-4 bg-muted/30">
+          <div className="h-3 w-20 bg-muted rounded animate-pulse mb-3" />
+          <div className="h-10 w-full bg-muted rounded-sq-md animate-pulse" />
+        </div>
+        {/* Grid skeleton - 2 tiles matching final aspect ratio */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-muted/30 pt-6">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="aspect-square bg-muted animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (isError) {
+    return (
+      <div className="px-4 py-8">
+        <div className="rounded-sq-lg border border-border/60 bg-card px-4 py-6 text-center">
+          <p className="text-sm font-semibold text-foreground">Couldn't load media</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Something went wrong. Please try again.
+          </p>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            className="mt-4 inline-flex items-center gap-1.5 rounded-sq-md border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-muted active:scale-[0.98] transition-all"
+          >
+            Tap to retry
+          </button>
+        </div>
       </div>
     );
   }
@@ -226,60 +266,85 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
     return modalPortalTarget ? createPortal(modalContent, modalPortalTarget) : modalContent;
   };
 
+  // Calculate overflow count for "+X" indicator on last visible tile
+  const totalMediaCount = exploreItems.length;
+  const visibleCount = 4; // Show 4 tiles in preview
+  const overflowCount = Math.max(0, mediaItems.length - visibleCount);
+
   return (
     <div className="space-y-0">
-      {/* Summary Card */}
+      {/* Summary Card - 24px section spacing */}
       <CourseMediaSummaryCard
         photoCount={summary.photoCount}
         videoCount={summary.videoCount}
         contributorsCount={contributors.length}
-        contributors={contributors}
         courseName={courseName}
         onAddMedia={() => navigate(`/courses/${courseId}/rate`)}
       />
 
-      {/* Sort/Filter Bar */}
-      <div className="px-4 pt-3 pb-3 bg-slate-50">
-        <p className="mb-2 text-xs font-semibold tracking-[0.08em] uppercase text-slate-500">
+      {/* Sort/Filter Bar - 24px from header, 12px label→pills, 24px to grid */}
+      <div className="px-4 pt-6 pb-6 bg-muted/30">
+        <p className="mb-3 text-[11px] font-semibold tracking-[0.12em] uppercase text-muted-foreground">
           Sort &amp; filter
         </p>
-        <SegmentedTabs
-          options={filterOptions}
-          value={filterMode}
-          onChange={(value) => setFilterMode(value as MediaFilterMode)}
-        />
+        <div className="flex items-center gap-2">
+          <SegmentedTabs
+            options={filterOptions}
+            value={filterMode}
+            onChange={(value) => setFilterMode(value as MediaFilterMode)}
+            className="flex-1"
+          />
+          {/* Clear button - only when filter active */}
+          {isFilterActive && (
+            <button
+              type="button"
+              onClick={() => setFilterMode('most_recent')}
+              className="flex items-center gap-1 rounded-sq-md border border-border bg-card px-3 py-2 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted active:scale-[0.97] transition-all"
+            >
+              Clear
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Empty state - matches Reviews tab styling */}
+      {/* Empty state after filtering */}
       {filteredItems.length === 0 && !isLoading && (
-        <div className="px-4 py-8 bg-slate-100">
-          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-6 text-center">
-            <p className="text-sm font-semibold text-slate-900">No photos or videos yet</p>
-            <p className="mt-1 text-xs text-slate-500">
-              Help other golfers discover this course — share your experience.
+        <div className="px-4 py-8">
+          <div className="rounded-sq-lg border border-border/60 bg-card px-4 py-6 text-center">
+            <p className="text-sm font-semibold text-foreground">
+              {filterMode === 'photos' ? 'No photos yet' : filterMode === 'videos' ? 'No videos yet' : 'No media yet'}
+            </p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              {filterMode === 'most_recent' 
+                ? 'Be the first to share media for this course.'
+                : `Try a different filter or add your own ${filterMode === 'photos' ? 'photos' : 'videos'}.`
+              }
             </p>
             <button
               type="button"
-              className="mt-4 w-full h-11 rounded-xl border border-slate-200 bg-slate-100 text-slate-900 text-sm font-medium hover:bg-slate-200 transition-colors"
+              className="mt-4 inline-flex items-center gap-1.5 rounded-sq-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 active:scale-[0.98] transition-all"
               onClick={() => navigate(`/courses/${courseId}/rate`)}
             >
-              Add photos or videos
+              Add a photo or video
             </button>
           </div>
         </div>
       )}
 
-      {/* Square Squircle Media Grid - 2 columns mobile, 4 desktop */}
-      {/* Phase 1 Fix #4: Memoized grid items */}
-      <div className="py-6 grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-slate-50">
-        {mediaItems.map((item) => (
-          <MediaGridItem
-            key={item.id}
-            item={item}
-            onClick={handleMediaClick}
-          />
-        ))}
-      </div>
+      {/* Square Media Grid - 2 columns mobile, 4 desktop */}
+      {filteredItems.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-muted/30">
+          {mediaItems.map((item, index) => (
+            <MediaGridItem
+              key={item.id}
+              item={item}
+              onClick={handleMediaClick}
+              // Show overflow count on 4th tile (index 3) if there's more
+              overflowCount={index === visibleCount - 1 && overflowCount > 0 ? overflowCount : undefined}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Phase 2 Fix #5: Single lightbox implementation only */}
       {renderFullscreenModal()}
