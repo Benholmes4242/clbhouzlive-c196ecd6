@@ -46,8 +46,9 @@ export function Top100RecentRoundsFeed({
   const hasPrev = page > 0;
 
   return (
-    <section className={cn("mt-6 w-full", className)}>
-      <div className="flex items-center justify-between mb-2 px-2.5">
+    <section className={cn("w-full", className)}>
+      {/* Section header - memory/reflection layer */}
+      <div className="flex items-center justify-between mb-3 px-2.5">
         <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
           Recent Top 100 rounds
         </h3>

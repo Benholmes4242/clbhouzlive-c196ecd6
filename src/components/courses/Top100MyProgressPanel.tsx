@@ -13,7 +13,6 @@ import type { Top100ListId } from '@/config/top100ListMilestones';
 import { MILESTONE_THEMES } from '@/lib/globalAchievementMilestoneSystem';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
-
 import { Top100RegionProgressGrid } from './Top100RegionProgressGrid';
 import { Top100RecentRoundsFeed } from './Top100RecentRoundsFeed';
 import { useTop100FriendsSnapshot } from '@/hooks/useTop100FriendsSnapshot';
@@ -53,27 +52,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
     prevTotalRef.current = data.totalTop100Played;
   }, [data?.totalTop100Played, isOwnProfile]);
 
-  // Calculate badge props for ProfileBadgeStrip
-  const badgeProps = React.useMemo(() => {
-    if (!data) return null;
-    
-    const totalPlayed = data.totalTop100Played;
-    const gbIList = data.lists.find(l => l.listSlug === 'gb-i');
-    const europeList = data.lists.find(l => l.listSlug === 'europe');
-    const usaList = data.lists.find(l => l.listSlug === 'usa');
-    const globalList = data.lists.find(l => l.listSlug === 'global');
-
-    return {
-      coursesPlayed: totalPlayed,
-      totalXP: 0, // XP not tracked in Top 100 context
-      britainIrelandCompleted: gbIList?.played || 0,
-      europeCompleted: europeList?.played || 0,
-      usaCompleted: usaList?.played || 0,
-      worldwideCompleted: globalList?.played || 0,
-    };
-  }, [data]);
-
-  // Calculate next milestone progress percentage - MUST be before early returns
+  // Calculate next milestone progress percentage
   const nextMilestoneProgress = React.useMemo(() => {
     if (!data?.next_milestone) return 0;
     const thresholds = [5, 10, 20, 50, 100, 200, 300, 400];
@@ -95,7 +74,8 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
-        <div className="h-32 bg-muted rounded-xl" />
+        <div className="h-40 bg-muted rounded-xl" />
+        <div className="h-16 bg-muted rounded-xl" />
         <div className="grid grid-cols-2 gap-4">
           <div className="h-24 bg-muted rounded-xl" />
           <div className="h-24 bg-muted rounded-xl" />
@@ -143,14 +123,30 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
     }
   }
 
-  // Derive Group B insights
+  // Derive year summary
   const yearSummary = buildYearSummary(data.recent_rounds);
 
-  return (
-    <div className="w-full max-w-full space-y-5 pb-6">
+  // Build completed lists stats
+  const statsByList: Partial<Record<Top100ListId, { playedCount: number; totalCount: number }>> = {};
+  for (const list of data.lists) {
+    const slug = list.listSlug as Top100ListId;
+    if (slug) {
+      statsByList[slug] = {
+        playedCount: list.played,
+        totalCount: list.total,
+      };
+    }
+  }
 
-      {/* Progress Hero Strip */}
-      <div>
+  return (
+    <div className="w-full max-w-full pb-8">
+      {/* ============================================
+          SECTION 1: PAGE HEADER & HERO CONTEXT
+          "Who you are now"
+          ============================================ */}
+      
+      {/* 1.1 Hero: User Identity & Total Progress */}
+      <div className="pt-4 pb-6">
         <Top100ProgressHero
           displayName={displayName}
           avatarUrl={avatarUrl}
@@ -163,14 +159,31 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
         />
       </div>
 
-      {/* B1: This year so far strip */}
-      <Top100YearSummary summary={yearSummary} regionsCount={data.regions_count} />
+      {/* 1.2 Supporting Stats Row - lighter visual weight */}
+      <div className="mb-6">
+        <Top100YearSummary summary={yearSummary} regionsCount={data.regions_count} />
+      </div>
 
-      {/* Next Achievement Callout - centered text, no icon */}
+      {/* ============================================
+          SECTION 2: ACHIEVEMENTS (CELEBRATION LAYER)
+          "What you've achieved"
+          ============================================ */}
+      
+      {/* 2.1 Unlocked Milestone Card */}
+      <div className="mb-4">
+        <Top100MilestonesCarousel totalPlayed={data.totalTop100Played} />
+      </div>
+
+      {/* ============================================
+          SECTION 3: NEXT ACHIEVEMENT PROGRESS
+          "What's next"
+          ============================================ */}
+      
+      {/* 3.1 Progress-to-next-achievement bar */}
       {data?.next_milestone && (() => {
         const nextTierColor = TIER_COLORS[data.next_milestone.tierId] || TIER_COLORS.none;
         return (
-          <div className="flex justify-center">
+          <div className="flex justify-center mb-6">
             <div className="w-full max-w-sm bg-card border border-border/60 rounded-full py-2.5 px-4 flex flex-col gap-2">
               <p className="text-xs sm:text-sm font-medium text-center text-foreground whitespace-nowrap">
                 Next achievement:{' '}
@@ -193,48 +206,63 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
         );
       })()}
 
-      {/* Friends Chasing the Top 100 - Only show if there are friends with Top 100 courses played */}
+      {/* ============================================
+          SECTION 4: SOCIAL CONTEXT (SECONDARY)
+          "How you compare socially"
+          ============================================ */}
+      
+      {/* 4.1 Friends Chasing the Top 100 - reduced contrast, expanded by default */}
       {isOwnProfile && topFriends.length > 0 && (
-        <Top100FriendsActivityCard
-          friends={topFriends}
-          friendMessage={friendMessage}
-          onViewLeaderboard={() => navigate('/top100?tab=leaderboard&view=players')}
-        />
+        <div className="mb-6 opacity-95">
+          <Top100FriendsActivityCard
+            friends={topFriends}
+            friendMessage={friendMessage}
+            onViewLeaderboard={() => navigate('/top100?tab=leaderboard&view=players')}
+          />
+        </div>
       )}
 
-      {/* Achievements Section */}
-      <Top100MilestonesCarousel totalPlayed={data.totalTop100Played} />
+      {/* ============================================
+          SECTION 5: JOURNEY BY REGION
+          "Where your journey has taken you"
+          ============================================ */}
       
-      {/* Top 100 List Completions Row - new section */}
-      <Top100ListCompletionsRow lists={data.lists} />
+      {/* 5.1 Regional Progress Cards - calmer progress bars */}
+      <div className="mb-6">
+        <Top100RegionProgressGrid
+          lists={data.lists}
+          onListClick={(slug) => navigate(`/top100/${slug}`)}
+          isOwnProfile={isOwnProfile}
+          displayName={displayName}
+        />
+      </div>
 
-      {/* Completed Lists Row - show when any list is fully completed */}
-      {(() => {
-        const statsByList: Partial<Record<Top100ListId, { playedCount: number; totalCount: number }>> = {};
-        for (const list of data.lists) {
-          const slug = list.listSlug as Top100ListId;
-          if (slug) {
-            statsByList[slug] = {
-              playedCount: list.played,
-              totalCount: list.total,
-            };
-          }
-        }
-        return <Top100CompletedListsRow statsByList={statsByList} />;
-      })()}
+      {/* ============================================
+          SECTION 6: COMPLETIONS & NEAR COMPLETIONS
+          "What you're close to finishing"
+          ============================================ */}
+      
+      {/* 6.1 Top 100 List Completions */}
+      <div className="mb-4">
+        <Top100ListCompletionsRow lists={data.lists} />
+      </div>
 
-      {/* Badges You're Close To */}
-      <Top100NearAchievements totalTop100Played={data.totalTop100Played} />
+      {/* 6.2 Completed Lists Row - show when any list is fully completed */}
+      <div className="mb-4">
+        <Top100CompletedListsRow statsByList={statsByList} />
+      </div>
 
-      {/* Region Progress Grid */}
-      <Top100RegionProgressGrid
-        lists={data.lists}
-        onListClick={(slug) => navigate(`/top100/${slug}`)}
-        isOwnProfile={isOwnProfile}
-        displayName={displayName}
-      />
+      {/* 6.3 Badges You're Close To - single badge, clear distance */}
+      <div className="mb-6">
+        <Top100NearAchievements totalTop100Played={data.totalTop100Played} />
+      </div>
 
-      {/* Recent Top 100 Rounds - Full-width breakout */}
+      {/* ============================================
+          SECTION 7: RECENT ACTIVITY (MEMORY LAYER)
+          "What you've done recently"
+          ============================================ */}
+      
+      {/* 7.1 Recent Top 100 Rounds - reflection, not action */}
       <div className="-mx-4 sm:mx-0">
         <Top100RecentRoundsFeed
           rounds={data.recent_rounds}
