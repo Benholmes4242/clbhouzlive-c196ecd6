@@ -66,6 +66,8 @@ interface ClubhouseVerticalFeedProps {
   onNavOverlayRequest?: () => void;
   /** Fires when user enters/leaves the "top zone" (first post) */
   onTopZoneChange?: (isAtTop: boolean) => void;
+  /** Fires when user performs a meaningful interaction (like, share, save, swipe, pause) */
+  onMeaningfulInteraction?: () => void;
 }
 
 // Helper to compute which video IDs to keep in memory
@@ -165,7 +167,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   onPostDetailsOpen,
   onDismissNavOverlay,
   onNavOverlayRequest,
-  onTopZoneChange
+  onTopZoneChange,
+  onMeaningfulInteraction
 }) => {
   const { isVisible: topBarVisible, resetTimer: resetTopBar } = useTopBarVisibility();
   const [showVideoReactions, setShowVideoReactions] = useState(false);
@@ -646,6 +649,9 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         setVideosPlaying(prev => ({ ...prev, [postId]: true }));
       }
       
+      // Pause/play = meaningful interaction, trigger progressive immersion
+      onMeaningfulInteraction?.();
+      
       // Show controls briefly
       setVideoControlsVisible(prev => ({ ...prev, [postId]: true }));
       
@@ -787,6 +793,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
       if (!hasIndexChangedOnceRef.current) {
         hasIndexChangedOnceRef.current = true;
+        // First swipe = meaningful interaction, trigger progressive immersion
+        onMeaningfulInteraction?.();
       }
 
       // Soft delay for visual HUD switch - lets scroll snap settle
@@ -1341,10 +1349,19 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
           hasLiked={currentPostEngagement.hasLiked}
           isMuted={isGloballyMuted}
           isVisible={true}
-          onLike={() => currentPostEngagement.toggleLike()}
+          onLike={() => {
+            currentPostEngagement.toggleLike();
+            onMeaningfulInteraction?.();
+          }}
           onComment={() => handleComment(filteredPosts[currentIndex].id)}
-          onShare={handleShare}
-          onMuteToggle={() => setGlobalMute(!isGloballyMuted)}
+          onShare={() => {
+            handleShare();
+            onMeaningfulInteraction?.();
+          }}
+          onMuteToggle={() => {
+            setGlobalMute(!isGloballyMuted);
+            onMeaningfulInteraction?.();
+          }}
         />
       )}
 
