@@ -1,19 +1,17 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { useSwipeable } from 'react-swipeable';
 import {
   useTop100MapCourses,
   Top100MapScope,
   Top100MapCourse,
 } from '@/hooks/useTop100MapCourses';
 import { Button } from '@/components/ui/button';
-import { X, MapPin } from 'lucide-react';
+import { RotateCcw } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from '@/lib/utils';
-import { FilterPill } from '@/components/ui/FilterPill';
-import { RegionFilterPill } from '@/components/ui/RegionFilterPill';
+import { MapCourseSheet, MapProgressOrb, MapInsightChip } from './map';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v11';
@@ -35,7 +33,7 @@ const REGION_TOTALS: Record<Top100MapScope, number> = {
   europe: 99,
 };
 
-// Region configs (includes the USA zoom+centre tweaks)
+// Region configs
 const REGION_CONFIG: Record<
   Top100MapScope,
   { center: [number, number]; zoom: number; label: string }
@@ -62,6 +60,12 @@ const REGION_CONFIG: Record<
   },
 };
 
+// Marker colors
+const PLAYED_COLOR = '#F7931E';
+const NOT_PLAYED_COLOR = '#64748b';
+const CLUSTER_COLOR_MIXED = '#334155';
+const CLUSTER_COLOR_PLAYED = '#F7931E';
+
 const Top100MapView: React.FC<Top100MapViewProps> = ({
   scope,
   onScopeChange,
@@ -73,18 +77,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
 
-  const [selectedCourse, setSelectedCourse] = useState<Top100MapCourse | null>(
-    null
-  );
+  const [selectedCourse, setSelectedCourse] = useState<Top100MapCourse | null>(null);
   const [ratedFilter, setRatedFilter] = useState<RatedFilter>('all');
   const [hasInitialFit, setHasInitialFit] = useState(false);
-  // Filters drawer is always open (no toggle)
-
-  // swipe-down state for course sheet
-  const [dragStartY, setDragStartY] = useState<number | null>(null);
-  const [dragOffsetY, setDragOffsetY] = useState(0);
-
-  // Swipe handlers removed - filters always visible
 
   const {
     data: courses = [],
@@ -96,19 +91,23 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   // Filter courses by rated status
   const filteredCourses = useMemo(() => {
     if (ratedFilter === 'rated') return courses.filter((c) => c.user_has_rated);
-    if (ratedFilter === 'unrated')
-      return courses.filter((c) => !c.user_has_rated);
+    if (ratedFilter === 'unrated') return courses.filter((c) => !c.user_has_rated);
     return courses;
   }, [courses, ratedFilter]);
 
   // Official list size
-  const officialTotal =
-    REGION_TOTALS[scope] !== undefined ? REGION_TOTALS[scope] : courses.length;
-
+  const officialTotal = REGION_TOTALS[scope] ?? courses.length;
   const ratedCount = courses.filter((c) => c.user_has_rated).length;
   const remaining = Math.max(officialTotal - ratedCount, 0);
 
-  // Reset some state when scope changes
+  // Count unique regions explored
+  const regionsExplored = useMemo(() => {
+    const playedCourses = courses.filter((c) => c.user_has_rated);
+    const countries = new Set(playedCourses.map((c) => c.country).filter(Boolean));
+    return countries.size;
+  }, [courses]);
+
+  // Reset state when scope changes
   useEffect(() => {
     setHasInitialFit(false);
     setSelectedCourse(null);
@@ -133,7 +132,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
     const mapInstance = mapRef.current;
 
-    // controls: attribution bottom-left, zoom bottom-right
     mapInstance.addControl(
       new mapboxgl.AttributionControl({ compact: true }),
       'bottom-left'
@@ -149,10 +147,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
       }
       mapRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scope]);
 
-  // Fit to bounds when courses load (with special handling for USA)
+  // Fit to bounds when courses load
   useEffect(() => {
     if (!mapRef.current || hasInitialFit || !courses.length || !regionConfig) {
       return;
@@ -173,32 +170,27 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
 
     if (scope === 'usa') {
       const currentZoom = mapInstance.getZoom();
-      mapInstance.setZoom(currentZoom + 1); // extra zoom
-      mapInstance.setCenter(regionConfig.center); // re-centre USA
+      mapInstance.setZoom(currentZoom + 1);
+      mapInstance.setCenter(regionConfig.center);
     }
 
     setHasInitialFit(true);
   }, [courses, hasInitialFit, regionConfig, scope]);
 
-  // Clustering + layers whenever filteredCourses change
+  // Clustering + layers with differentiated markers
   useEffect(() => {
     if (!mapRef.current) return;
 
     const mapInstance = mapRef.current;
 
     const addClustering = () => {
-      if (mapInstance.getLayer('clusters')) mapInstance.removeLayer('clusters');
-      if (mapInstance.getLayer('cluster-count'))
-        mapInstance.removeLayer('cluster-count');
-      if (mapInstance.getLayer('unclustered-point'))
-        mapInstance.removeLayer('unclustered-point');
-      if (mapInstance.getSource('courses'))
-        mapInstance.removeSource('courses');
+      // Clean up existing layers
+      ['clusters', 'cluster-count', 'played-points', 'unplayed-points'].forEach((id) => {
+        if (mapInstance.getLayer(id)) mapInstance.removeLayer(id);
+      });
+      if (mapInstance.getSource('courses')) mapInstance.removeSource('courses');
 
-      if (!filteredCourses.length) {
-        console.log('[Top100MapView] ❌ No filtered courses to display');
-        return;
-      }
+      if (!filteredCourses.length) return;
 
       const geojson: GeoJSON.FeatureCollection = {
         type: 'FeatureCollection',
@@ -225,10 +217,14 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         type: 'geojson',
         data: geojson,
         cluster: true,
-        clusterMaxZoom: 6,
-        clusterRadius: 40,
+        clusterMaxZoom: 7,
+        clusterRadius: 45,
+        clusterProperties: {
+          played_count: ['+', ['case', ['get', 'user_has_rated'], 1, 0]],
+        },
       });
 
+      // Cluster circles - color based on played ratio
       mapInstance.addLayer({
         id: 'clusters',
         type: 'circle',
@@ -238,17 +234,23 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           'circle-radius': [
             'step',
             ['get', 'point_count'],
-            14,
-            10,
-            18,
-            25,
-            22,
+            16, 5,
+            20, 15,
+            24, 30,
+            28,
           ],
-          'circle-color': '#0f172a',
-          'circle-stroke-width': 0,
+          'circle-color': [
+            'case',
+            ['>', ['/', ['get', 'played_count'], ['get', 'point_count']], 0.5],
+            CLUSTER_COLOR_PLAYED,
+            CLUSTER_COLOR_MIXED,
+          ],
+          'circle-stroke-width': 2,
+          'circle-stroke-color': 'rgba(255,255,255,0.3)',
         },
       });
 
+      // Cluster count text
       mapInstance.addLayer({
         id: 'cluster-count',
         type: 'symbol',
@@ -264,24 +266,35 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         },
       });
 
+      // UNPLAYED points (render first, below played)
       mapInstance.addLayer({
-        id: 'unclustered-point',
+        id: 'unplayed-points',
         type: 'circle',
         source: 'courses',
-        filter: ['!', ['has', 'point_count']],
+        filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'user_has_rated'], false]],
         paint: {
-          'circle-color': [
-            'case',
-            ['==', ['get', 'user_has_rated'], true],
-            '#F7931E',
-            '#0f172a',
-          ],
-          'circle-radius': 6,
+          'circle-radius': 5,
+          'circle-color': 'transparent',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': NOT_PLAYED_COLOR,
+        },
+      });
+
+      // PLAYED points (render on top, with glow effect)
+      mapInstance.addLayer({
+        id: 'played-points',
+        type: 'circle',
+        source: 'courses',
+        filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'user_has_rated'], true]],
+        paint: {
+          'circle-radius': 7,
+          'circle-color': PLAYED_COLOR,
+          'circle-blur': 0.15,
           'circle-stroke-width': 0,
         },
       });
 
-      // cluster click
+      // Click handlers
       mapInstance.on('click', 'clusters', (e) => {
         const features = mapInstance.queryRenderedFeatures(e.point, {
           layers: ['clusters'],
@@ -289,23 +302,20 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         const clusterId = features[0]?.properties?.cluster_id;
         if (!clusterId) return;
 
-        const source = mapInstance.getSource(
-          'courses'
-        ) as mapboxgl.GeoJSONSource;
+        const source = mapInstance.getSource('courses') as mapboxgl.GeoJSONSource;
         source.getClusterExpansionZoom(clusterId, (err, zoom) => {
           if (err) return;
 
           mapInstance.easeTo({
-            center: (features[0].geometry as GeoJSON.Point)
-              .coordinates as [number, number],
+            center: (features[0].geometry as GeoJSON.Point).coordinates as [number, number],
             zoom: zoom || mapInstance.getZoom() + 2,
             duration: 500,
           });
         });
       });
 
-      // pin click → sheet
-      mapInstance.on('click', 'unclustered-point', (e) => {
+      // Individual point click → open bottom sheet
+      const handlePointClick = (e: mapboxgl.MapMouseEvent) => {
         const feature = e.features?.[0];
         if (!feature) return;
 
@@ -316,23 +326,22 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         setSelectedCourse(course);
         mapInstance.flyTo({
           center: [course.longitude, course.latitude],
-          zoom: 8,
-          duration: 800,
+          zoom: Math.max(mapInstance.getZoom(), 6),
+          duration: 600,
         });
-      });
+      };
 
-      // cursor styles
-      mapInstance.on('mouseenter', 'clusters', () => {
-        mapInstance.getCanvas().style.cursor = 'pointer';
-      });
-      mapInstance.on('mouseleave', 'clusters', () => {
-        mapInstance.getCanvas().style.cursor = '';
-      });
-      mapInstance.on('mouseenter', 'unclustered-point', () => {
-        mapInstance.getCanvas().style.cursor = 'pointer';
-      });
-      mapInstance.on('mouseleave', 'unclustered-point', () => {
-        mapInstance.getCanvas().style.cursor = '';
+      mapInstance.on('click', 'played-points', handlePointClick);
+      mapInstance.on('click', 'unplayed-points', handlePointClick);
+
+      // Cursor styles
+      ['clusters', 'played-points', 'unplayed-points'].forEach((layer) => {
+        mapInstance.on('mouseenter', layer, () => {
+          mapInstance.getCanvas().style.cursor = 'pointer';
+        });
+        mapInstance.on('mouseleave', layer, () => {
+          mapInstance.getCanvas().style.cursor = '';
+        });
       });
     };
 
@@ -343,7 +352,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
     }
   }, [filteredCourses]);
 
-  const handleResetView = () => {
+  const handleResetView = useCallback(() => {
     if (!mapRef.current || !regionConfig) return;
 
     mapRef.current.flyTo({
@@ -353,49 +362,36 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
     });
 
     setSelectedCourse(null);
-    setRatedFilter('all');
-  };
-
-  // swipe handlers for course sheet
-  const handleSheetTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    setDragStartY(e.touches[0].clientY);
-    setDragOffsetY(0);
-  };
-
-  const handleSheetTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (dragStartY === null) return;
-    const currentY = e.touches[0].clientY;
-    const delta = currentY - dragStartY;
-    if (delta > 0) setDragOffsetY(delta);
-  };
-
-  const handleSheetTouchEnd = () => {
-    if (dragOffsetY > 60) {
-      setSelectedCourse(null);
-    }
-    setDragStartY(null);
-    setDragOffsetY(0);
-  };
+  }, [regionConfig]);
 
   if (!MAPBOX_TOKEN) {
     return (
       <div className="rounded-sq-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center text-sm text-slate-600">
         <p className="font-semibold">Map Temporarily Unavailable</p>
         <p className="mt-1 text-xs text-slate-500">
-          The interactive map feature is currently unavailable. Please try again
-          later.
+          The interactive map feature is currently unavailable.
         </p>
       </div>
     );
   }
 
   return (
-    <div className={cn("top100-map-shell", fullHeight ? "h-full flex flex-col" : "space-y-3")}>
-      {/* Map container - no rounded corners in fullHeight mode */}
-      <div className={cn("relative overflow-hidden bg-muted/40", fullHeight ? "flex-1 min-h-0" : "mt-1 rounded-sq-lg")}>
+    <div className={cn('top100-map-shell', fullHeight ? 'h-full flex flex-col' : 'space-y-3')}>
+      {/* Header with dynamic stats */}
+      <div className="flex-shrink-0 px-4 pt-4 pb-2">
+        <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+          {regionConfig.label}
+        </h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+          {ratedCount} played · {remaining} remaining · {regionsExplored} region{regionsExplored !== 1 ? 's' : ''} explored
+        </p>
+      </div>
+
+      {/* Map container */}
+      <div className={cn('relative overflow-hidden bg-muted/40', fullHeight ? 'flex-1 min-h-0' : 'mt-1 rounded-sq-lg')}>
         <div
           ref={mapContainerRef}
-          className={cn("w-full", fullHeight ? "h-full" : "h-[480px]")}
+          className={cn('w-full', fullHeight ? 'h-full' : 'h-[480px]')}
         />
 
         {/* Loading overlay */}
@@ -405,173 +401,111 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           </div>
         )}
 
+        {/* Insight chip (top center) */}
+        <MapInsightChip
+          courses={courses}
+          playedCount={ratedCount}
+          totalCount={officialTotal}
+          scope={scope}
+          ratedFilter={ratedFilter}
+        />
+
         {/* Legend (top-left) */}
-        <div className="pointer-events-none absolute left-3 top-3 z-10">
-          <div className="flex items-center gap-3 rounded-sq-md bg-white/20 px-3 py-2 text-xs text-slate-900 shadow-[0_4px_20px_rgba(0,0,0,0.15)] backdrop-blur-xl border border-white/30">
-            <div className="flex items-center gap-1">
-              <span className="inline-block h-2 w-2 rounded-full bg-[#F7931E]" />
+        <div className="pointer-events-none absolute left-3 top-14 z-10">
+          <div className="flex items-center gap-3 rounded-sq-md bg-white/90 dark:bg-slate-900/90 px-3 py-2 text-xs text-slate-900 dark:text-white shadow-[0_4px_20px_rgba(0,0,0,0.15)] backdrop-blur-xl border border-white/30 dark:border-slate-700/50">
+            <div className="flex items-center gap-1.5">
+              <span className="inline-block h-2.5 w-2.5 rounded-full bg-[#F7931E] shadow-[0_0_6px_rgba(247,147,30,0.5)]" />
               <span>Played</span>
             </div>
-            <div className="flex items-center gap-1">
-              <span className="inline-block h-2 w-2 rounded-full bg-[#0f172a]" />
+            <div className="flex items-center gap-1.5">
+              <span className="inline-block h-2 w-2 rounded-full border-2 border-slate-500 bg-transparent" />
               <span>Not Played</span>
             </div>
           </div>
         </div>
 
-        {/* Stats pill (top-right) */}
-        {officialTotal > 0 && (
-          <div className="pointer-events-none absolute right-3 top-3 z-10">
-            <div className="rounded-sq-md bg-white/20 px-3 py-2 text-xs font-medium text-slate-900 shadow-[0_4px_20px_rgba(0,0,0,0.15)] backdrop-blur-xl border border-white/30">
-              {ratedCount}/{officialTotal} Played · {remaining} left
-            </div>
-          </div>
-        )}
+        {/* Reset view button (near zoom controls) */}
+        <button
+          onClick={handleResetView}
+          className={cn(
+            'absolute right-[52px] bottom-[88px] z-10',
+            'flex items-center justify-center',
+            'w-[29px] h-[29px] rounded-sq-sm',
+            'bg-white shadow-md border border-slate-200',
+            'text-slate-600 hover:bg-slate-50 active:bg-slate-100',
+            'transition-colors duration-150'
+          )}
+          title="Reset view"
+        >
+          <RotateCcw className="h-3.5 w-3.5" />
+        </button>
 
-        {/* Selected course bottom sheet – glass, anchored, swipe-down & tap-outside */}
-        {selectedCourse && (
-          <div
-            className="absolute inset-0 z-20 flex flex-col justify-end"
-            onClick={() => setSelectedCourse(null)}
-          >
-            <div
-              className="
-                pointer-events-auto
-                rounded-t-3xl rounded-b-none
-                bg-white/20
-                backdrop-blur-xl
-                border border-white/20
-                shadow-[0_8px_32px_rgba(0,0,0,0.2)]
-                px-4 pb-4 pt-3
-              "
-              onClick={(e) => e.stopPropagation()}
-              onTouchStart={handleSheetTouchStart}
-              onTouchMove={handleSheetTouchMove}
-              onTouchEnd={handleSheetTouchEnd}
-              style={{
-                transform: dragOffsetY
-                  ? `translateY(${dragOffsetY}px)`
-                  : undefined,
-                transition: dragStartY ? 'none' : 'transform 0.2s ease-out',
-              }}
-            >
-              <div className="mx-auto mb-2 h-1 w-10 rounded-full bg-slate-200" />
+        {/* Floating progress orb */}
+        <MapProgressOrb
+          playedCount={ratedCount}
+          totalCount={officialTotal}
+          scope={scope}
+          onMilestoneClick={() => navigate('/top100?tab=my-progress')}
+        />
 
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-900">
-                    <MapPin className="h-3 w-3 shrink-0 text-slate-400" />
-                    <span className="truncate">{selectedCourse.name}</span>
-                  </div>
-                  <p className="truncate text-[11px] text-slate-500">
-                    {selectedCourse.sub_country &&
-                      `${selectedCourse.sub_country}, `}
-                    {selectedCourse.country}
-                    {selectedCourse.region && ` · ${selectedCourse.region}`}
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedCourse(null)}
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              </div>
-
-              <div className="mt-2 flex flex-wrap items-center gap-2 text-[10px]">
-                {typeof selectedCourse.rank === 'number' && (
-                  <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 font-medium text-slate-700">
-                    #{selectedCourse.rank} in this list
-                  </span>
-                )}
-
-                {selectedCourse.user_has_rated &&
-                selectedCourse.user_rating ? (
-                  <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-1 font-medium text-emerald-700">
-                    Your rating: {selectedCourse.user_rating.toFixed(1)}
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center rounded-full bg-slate-50 px-2 py-1 font-medium text-slate-600">
-                    Not Played yet
-                  </span>
-                )}
-              </div>
-
-              <Button
-                size="sm"
-                className="mt-3 w-full"
-                onClick={() => navigate(`/courses/${selectedCourse.id}`)}
-              >
-                Open course
-              </Button>
-            </div>
-          </div>
-        )}
+        {/* Course bottom sheet */}
+        <MapCourseSheet
+          course={selectedCourse}
+          onClose={() => setSelectedCourse(null)}
+          scope={scope}
+        />
       </div>
 
-      {/* Filters sheet – always visible, no rounded corners, separate from map */}
-      <div className="flex-shrink-0 bg-white/20 backdrop-blur-xl border-t border-white/30 shadow-[0_-4px_12px_rgba(15,23,42,0.08)] dark:shadow-[0_-4px_16px_rgba(0,0,0,0.45)] text-xs text-slate-900">
+      {/* Filters section */}
+      <div className="flex-shrink-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/50 dark:border-slate-700/50 shadow-[0_-4px_12px_rgba(15,23,42,0.08)] text-xs">
         <div className="px-4 pt-3 pb-1">
-          <span className="font-medium">Map filters</span>
+          <span className="font-medium text-slate-700 dark:text-slate-300">Filters</span>
         </div>
-        <div className="px-4 pb-4 pt-2">
-          {/* Played status filter + reset */}
-          <div className="mb-3 flex items-center justify-between gap-2">
-            <div className="inline-flex items-center gap-1.5">
-              <FilterPill
-                label="All"
-                active={ratedFilter === 'all'}
-                onClick={() => setRatedFilter('all')}
-              />
-              <FilterPill
-                label="Played"
-                active={ratedFilter === 'rated'}
-                onClick={() => setRatedFilter('rated')}
-              />
-              <FilterPill
-                label="Not Played"
-                active={ratedFilter === 'unrated'}
-                onClick={() => setRatedFilter('unrated')}
-              />
-            </div>
-
-            <button
-              type="button"
-              onClick={handleResetView}
-              className="text-xs font-medium text-slate-500 underline-offset-2 hover:text-slate-800 hover:underline"
-            >
-              Reset view
-            </button>
+        <div className="px-4 pb-4 pt-2 space-y-3">
+          {/* Status filter - Mode toggle style */}
+          <div className="flex items-center gap-1 p-1 rounded-sq-pill bg-slate-100 dark:bg-slate-800 w-fit">
+            {(['all', 'rated', 'unrated'] as RatedFilter[]).map((filter) => {
+              const isActive = ratedFilter === filter;
+              const labels = { all: 'All', rated: 'Played', unrated: 'Not Played' };
+              return (
+                <button
+                  key={filter}
+                  onClick={() => setRatedFilter(filter)}
+                  className={cn(
+                    'px-4 py-2 rounded-sq-pill text-xs font-medium transition-all duration-200',
+                    isActive
+                      ? filter === 'rated'
+                        ? 'bg-[#F7931E] text-white shadow-sm'
+                        : 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  )}
+                >
+                  {labels[filter]}
+                </button>
+              );
+            })}
           </div>
 
-          {/* Region chips with regional colors */}
+          {/* Region chips */}
           <div className="flex items-center gap-2">
-            <RegionFilterPill
-              label="Global"
-              scope="global"
-              active={scope === 'global'}
-              onClick={() => onScopeChange?.('global')}
-            />
-            <RegionFilterPill
-              label="GB&I"
-              scope="gb-i"
-              active={scope === 'gb-i'}
-              onClick={() => onScopeChange?.('gb-i')}
-            />
-            <RegionFilterPill
-              label="USA"
-              scope="usa"
-              active={scope === 'usa'}
-              onClick={() => onScopeChange?.('usa')}
-            />
-            <RegionFilterPill
-              label="Europe"
-              scope="europe"
-              active={scope === 'europe'}
-              onClick={() => onScopeChange?.('europe')}
-            />
+            {(['global', 'gb-i', 'usa', 'europe'] as Top100MapScope[]).map((regionScope) => {
+              const isActive = scope === regionScope;
+              const labels = { global: 'Global', 'gb-i': 'GB&I', usa: 'USA', europe: 'Europe' };
+              return (
+                <button
+                  key={regionScope}
+                  onClick={() => onScopeChange?.(regionScope)}
+                  className={cn(
+                    'px-3 py-1.5 rounded-sq-pill text-xs font-medium border transition-all duration-200',
+                    isActive
+                      ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white'
+                      : 'bg-transparent border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-500'
+                  )}
+                >
+                  {labels[regionScope]}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
