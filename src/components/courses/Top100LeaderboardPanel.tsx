@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Target } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Top100PlayersLeaderboardView } from '@/components/top100/Top100PlayersLeaderboardView';
-import { Top100CoursesLeaderboardView } from '@/components/top100/Top100CoursesLeaderboardView';
-import { Top100LeaderboardFilterBar, Top100LeaderboardFilters } from '@/components/top100/Top100LeaderboardFilterBar';
+import { PlayersLeaderboardView } from '@/components/leaderboard/PlayersLeaderboardView';
+import { CoursesLeaderboardView } from '@/components/leaderboard/CoursesLeaderboardView';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
@@ -23,14 +22,6 @@ const Top100LeaderboardPanel = () => {
 
   const [view, setView] = useState<'players' | 'courses'>(initialView);
 
-  // Shared filters state
-  const [filters, setFilters] = useState<Top100LeaderboardFilters>({
-    listSlug: 'all',
-    locationScope: 'worldwide',
-    timeRange: 'all_time',
-    sortBy: 'official_rank',
-  });
-
   const handleViewChange = (next: string) => {
     const nextView = next as 'players' | 'courses';
     setView(nextView);
@@ -45,30 +36,23 @@ const Top100LeaderboardPanel = () => {
   const showGoalsBanner = !!nextMilestone && totalPlayed > 0;
 
   const handleShowCoursesClick = () => {
-    // Switch to courses view
     handleViewChange('courses');
-    // Scroll to the list
-    setTimeout(() => {
-      const el = document.getElementById('top100-courses-list');
-      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-6 pb-6">
-
+    <div className="w-full max-w-6xl mx-auto space-y-4 pb-6">
       {/* Closest Goal Banner */}
       {showGoalsBanner && (
-        <div className="w-full rounded-sq-md border border-border/70 bg-card/90 px-4 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-3">
+        <div className="w-full rounded-sq-md border border-border/60 bg-card/90 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
           <div className="flex items-center gap-2">
             <div className="h-7 w-7 rounded-full bg-emerald-500/10 flex items-center justify-center">
               <Target className="h-3.5 w-3.5 text-emerald-500" />
             </div>
             <div className="flex flex-col">
-              <span className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
+              <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
                 Closest goal
               </span>
-              <span className="text-sm md:text-[15px] font-medium">
+              <span className="text-sm font-medium">
                 You're{' '}
                 <span className="font-semibold">
                   {nextMilestone.remaining} course
@@ -83,36 +67,28 @@ const Top100LeaderboardPanel = () => {
           <button
             type="button"
             onClick={handleShowCoursesClick}
-            className="inline-flex items-center justify-center rounded-full border border-border px-3 py-1.5 text-xs md:text-sm font-medium bg-background hover:bg-muted/80 transition-colors"
+            className="inline-flex items-center justify-center rounded-full border border-border px-3 py-1.5 text-xs font-medium bg-background hover:bg-muted/80 transition-colors"
           >
             Show courses that count
           </button>
         </div>
       )}
 
-      {/* Tabs */}
+      {/* Tabs - sticky once scrolled */}
       <Tabs value={view} onValueChange={handleViewChange} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="players">Players</TabsTrigger>
-          <TabsTrigger value="courses">Courses</TabsTrigger>
-        </TabsList>
+        <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm pb-2">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="players">Players</TabsTrigger>
+            <TabsTrigger value="courses">Courses</TabsTrigger>
+          </TabsList>
+        </div>
 
-        <TabsContent value="players" className="mt-6 space-y-4">
-          <Top100LeaderboardFilterBar
-            mode="players"
-            value={filters}
-            onChange={setFilters}
-          />
-          <Top100PlayersLeaderboardView filters={filters} />
+        <TabsContent value="players" className="mt-4">
+          <PlayersLeaderboardView />
         </TabsContent>
 
-        <TabsContent value="courses" className="mt-6 space-y-4">
-          <Top100LeaderboardFilterBar
-            mode="courses"
-            value={filters}
-            onChange={setFilters}
-          />
-          <Top100CoursesLeaderboardView filters={filters} />
+        <TabsContent value="courses" className="mt-4">
+          <CoursesLeaderboardView />
         </TabsContent>
       </Tabs>
     </div>
