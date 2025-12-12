@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
@@ -7,10 +7,9 @@ import { useFriendsOnTop100Journey } from '@/hooks/useFriendsOnTop100Journey';
 import { useGolfCoursesInfinite } from '@/hooks/useGolfCoursesInfinite';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { getTop100Club } from '@/lib/top100Club';
-import { getTop100RingDotClass } from '@/lib/top100RingStyles';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { Search, Award, X } from 'lucide-react';
+import { Search, Award, X, ChevronDown, ChevronRight } from 'lucide-react';
 import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -19,9 +18,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { CourseListCard } from './CourseListCard';
 import { AppSelect, AppSelectOption } from '@/components/ui/AppSelect';
-import { COURSES_PAGE_SIZE } from '@/config/pagination';
 import { FLAGS } from '@/config/flags';
-import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 import {
   PRIMARY_REGIONS,
   SUBREGIONS,
@@ -29,7 +26,9 @@ import {
   normalizeLabel,
 } from '@/constants/courseRegions';
 
-type Top100SortOption = 'official' | 'name_asc' | 'name_desc';
+const PAGE_SIZE = 10;
+
+type Top100SortOption = 'official' | 'user_rating' | 'friends_rated';
 
 function listSlugToRegionKey(slug: string): PrimaryRegionKey {
   switch (slug) {
@@ -53,165 +52,122 @@ function listSlugToRegionKey(slug: string): PrimaryRegionKey {
 const Top100CoursesHubPanel = () => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
-  const listTopRef = useRef<HTMLDivElement>(null);
   
-  // Search and filter state
+  // State
   const [selectedList, setSelectedList] = useState('global');
-  const [selectedSubregion, setSelectedSubregion] = useState<'all' | string>('all');
-  const [page, setPage] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
   const [sortOption, setSortOption] = useState<Top100SortOption>('official');
+  
+  // Load-more pagination
+  const [displayedCourses, setDisplayedCourses] = useState<any[]>([]);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasReachedEnd, setHasReachedEnd] = useState(false);
 
-  // Fetch user's Top 100 progress
+  // Fetch data
   const { data: progress } = useTop100ProgressForUser(user?.id);
   const { data: listSummaries = [] } = useTop100ListSummaries(user?.id);
   const { data: friendsData = [] } = useFriendsOnTop100Journey(user?.id);
+  const { data: lists = [] } = useTop100Lists();
   
-  // Mock friends for testing layout with 15+ friends
+  // Mock friends for testing
   const mockFriends = FLAGS.TOP100_MOCK_FRIENDS_ENABLED ? [
-    { user_id: 'mock1', profile: { display_name: 'Sarah Mitchell', username: 'sarahm', profile_photo_url: null, home_club: 'Augusta National', handicap: 7.2 }, top100CoursesPlayed: 8 },
-    { user_id: 'mock2', profile: { display_name: 'James Anderson', username: 'jamesA', profile_photo_url: null, home_club: 'Pebble Beach', handicap: 12.5 }, top100CoursesPlayed: 12 },
-    { user_id: 'mock3', profile: { display_name: 'Emma Wilson', username: 'emmaw', profile_photo_url: null, home_club: null, handicap: 5.8 }, top100CoursesPlayed: 5 },
-    { user_id: 'mock4', profile: { display_name: 'David Chen', username: 'dchen', profile_photo_url: null, home_club: 'Royal County Down', handicap: null }, top100CoursesPlayed: 15 },
-    { user_id: 'mock5', profile: { display_name: 'Lisa Thompson', username: 'lisat', profile_photo_url: null, home_club: 'Whistling Straits', handicap: 9.3 }, top100CoursesPlayed: 7 },
-    { user_id: 'mock6', profile: { display_name: 'Michael Brown', username: 'mbrown', profile_photo_url: null, home_club: 'Cypress Point', handicap: 2.1 }, top100CoursesPlayed: 20 },
-    { user_id: 'mock7', profile: { display_name: 'Sophie Davis', username: 'sophied', profile_photo_url: null, home_club: null, handicap: null }, top100CoursesPlayed: 3 },
-    { user_id: 'mock8', profile: { display_name: 'Robert Taylor', username: 'rtaylor', profile_photo_url: null, home_club: 'Pinehurst No. 2', handicap: 18.0 }, top100CoursesPlayed: 18 },
-    { user_id: 'mock9', profile: { display_name: 'Jessica Lee', username: 'jessicalee', profile_photo_url: null, home_club: 'Shinnecock Hills', handicap: 4.5 }, top100CoursesPlayed: 9 },
-    { user_id: 'mock10', profile: { display_name: 'Tom Harrison', username: 'tomh', profile_photo_url: null, home_club: 'Oakmont', handicap: 11.7 }, top100CoursesPlayed: 11 },
+    { user_id: 'mock1', profile: { display_name: 'Sarah Mitchell', username: 'sarahm', profile_photo_url: null, home_club: 'Augusta National' }, top100CoursesPlayed: 8 },
+    { user_id: 'mock2', profile: { display_name: 'James Anderson', username: 'jamesA', profile_photo_url: null, home_club: 'Pebble Beach' }, top100CoursesPlayed: 12 },
+    { user_id: 'mock3', profile: { display_name: 'Emma Wilson', username: 'emmaw', profile_photo_url: null, home_club: null }, top100CoursesPlayed: 5 },
+    { user_id: 'mock4', profile: { display_name: 'David Chen', username: 'dchen', profile_photo_url: null, home_club: 'Royal County Down' }, top100CoursesPlayed: 15 },
+    { user_id: 'mock5', profile: { display_name: 'Lisa Thompson', username: 'lisat', profile_photo_url: null, home_club: null }, top100CoursesPlayed: 7 },
   ] : [];
   
   const friends = [...friendsData, ...mockFriends];
+  const hasFriends = friends.length > 0;
 
-  // Extract stats from progress - prefer new field, fallback to old
+  // Progress calculations
   const totalRated = progress?.total_top100_rated ?? progress?.total_played_top100 ?? 0;
-  const regionsCount = progress?.regions_count || 0;
-  
-  // Use new unified club system
-  const club = getTop100Club(totalRated);
-  const ringKey = club.tierId;
-  const ringDotClass = getTop100RingDotClass(ringKey);
-
-  // Calculate lists count from summaries (only lists where user has played at least one course)
   const listsCount = listSummaries.filter(list => list.played_count > 0).length;
+  const club = getTop100Club(totalRated);
 
-  const handleOpenTop100Journey = () => {
-    if (user) {
-      navigate('/top100?tab=my-progress');
-    } else {
-      navigate('/auth?redirect=/top100?tab=my-progress');
-    }
-  };
-
-  const handleOpenTop100Leaderboard = () => {
-    navigate('/top100?tab=leaderboard');
-  };
-
-  const hasFriends = friends && friends.length > 0;
-
-  // Debounce search input
+  // Debounce search
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchTerm);
-    }, 300);
+    const timer = setTimeout(() => setDebouncedSearch(searchTerm), 300);
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Reset page when filters change
-  useEffect(() => {
-    setPage(0);
-  }, [selectedList, selectedSubregion, debouncedSearch, sortOption]);
-
-  // Fetch available lists
-  const { data: lists = [] } = useTop100Lists();
-
-  // Validate selectedList against available lists
-  useEffect(() => {
-    if (!lists || !lists.length) return;
-
-    setSelectedList((current) => {
-      if (lists.some((list) => list.slug === current)) return current;
-      const global = lists.find((l) => l.slug === 'global');
-      return global?.slug ?? lists[0].slug;
-    });
-  }, [lists]);
-
-  // Fetch courses with pagination
+  // Fetch courses
   const { 
     data: coursesData,
     isLoading,
     fetchNextPage,
     hasNextPage: hasMorePages,
-    isFetchingNextPage
   } = useGolfCoursesInfinite({
     searchQuery: debouncedSearch,
     listSlug: selectedList,
   });
 
-  // Flatten pages into single array
-  const courses = React.useMemo(() => {
-    return coursesData?.pages.flat() ?? [];
-  }, [coursesData]);
+  // Flatten and sort courses
+  const allCourses = React.useMemo(() => {
+    const courses = coursesData?.pages.flat() ?? [];
+    
+    return [...courses].sort((a, b) => {
+      switch (sortOption) {
+        case 'user_rating':
+          // Sort by any available rating if exists
+          return 0; // Courses don't have user rating in this context
+        case 'friends_rated':
+          // Sort by friends who rated - not available in this data
+          return 0;
+        case 'official':
+        default:
+          const rankA = selectedList.includes('global') ? a.list_memberships.find((m: any) => m.list_slug.includes('global'))?.rank :
+                       selectedList.includes('usa') ? a.list_memberships.find((m: any) => m.list_slug.includes('usa'))?.rank :
+                       selectedList.includes('gb-i') ? a.list_memberships.find((m: any) => m.list_slug.includes('gb-i'))?.rank :
+                       selectedList.includes('europe') ? a.list_memberships.find((m: any) => m.list_slug.includes('europe'))?.rank :
+                       a.list_memberships[0]?.rank;
+          const rankB = selectedList.includes('global') ? b.list_memberships.find((m: any) => m.list_slug.includes('global'))?.rank :
+                       selectedList.includes('usa') ? b.list_memberships.find((m: any) => m.list_slug.includes('usa'))?.rank :
+                       selectedList.includes('gb-i') ? b.list_memberships.find((m: any) => m.list_slug.includes('gb-i'))?.rank :
+                       selectedList.includes('europe') ? b.list_memberships.find((m: any) => m.list_slug.includes('europe'))?.rank :
+                       b.list_memberships[0]?.rank;
+          return (rankA || 999) - (rankB || 999);
+      }
+    });
+  }, [coursesData, sortOption, selectedList]);
 
-  // Apply subregion filter and sorting
-  const normalizedSelectedSub = selectedSubregion === 'all' ? null : selectedSubregion;
+  const totalCount = allCourses.length;
 
-  let filteredCourses = (courses || []).filter((course) => {
-    if (!normalizedSelectedSub) return true;
-    if (!course.sub_country) return false;
-    return normalizeLabel(course.sub_country) === normalizedSelectedSub;
-  });
+  // Reset displayed courses when filters change
+  useEffect(() => {
+    setDisplayedCourses(allCourses.slice(0, PAGE_SIZE));
+    setHasReachedEnd(allCourses.length <= PAGE_SIZE);
+  }, [allCourses]);
 
-  // Apply sorting
-  filteredCourses = [...filteredCourses].sort((a, b) => {
-    switch (sortOption) {
-      case 'name_asc':
-        return a.name.localeCompare(b.name);
-      case 'name_desc':
-        return b.name.localeCompare(a.name);
-      case 'official':
-      default:
-        const rankA = selectedList.includes('global') ? a.list_memberships.find(m => m.list_slug.includes('global'))?.rank :
-                     selectedList.includes('usa') ? a.list_memberships.find(m => m.list_slug.includes('usa'))?.rank :
-                     selectedList.includes('gb-i') ? a.list_memberships.find(m => m.list_slug.includes('gb-i'))?.rank :
-                     selectedList.includes('europe') ? a.list_memberships.find(m => m.list_slug.includes('europe'))?.rank :
-                     a.list_memberships[0]?.rank;
-        const rankB = selectedList.includes('global') ? b.list_memberships.find(m => m.list_slug.includes('global'))?.rank :
-                     selectedList.includes('usa') ? b.list_memberships.find(m => m.list_slug.includes('usa'))?.rank :
-                     selectedList.includes('gb-i') ? b.list_memberships.find(m => m.list_slug.includes('gb-i'))?.rank :
-                     selectedList.includes('europe') ? b.list_memberships.find(m => m.list_slug.includes('europe'))?.rank :
-                     b.list_memberships[0]?.rank;
-        return (rankA || 999) - (rankB || 999);
-    }
-  });
+  // Load more handler
+  const loadMore = useCallback(() => {
+    if (isLoadingMore || hasReachedEnd) return;
+    
+    setIsLoadingMore(true);
+    const nextCount = displayedCourses.length + PAGE_SIZE;
+    
+    setTimeout(() => {
+      if (nextCount >= allCourses.length) {
+        setDisplayedCourses(allCourses);
+        setHasReachedEnd(true);
+        if (hasMorePages) fetchNextPage();
+      } else {
+        setDisplayedCourses(allCourses.slice(0, nextCount));
+      }
+      setIsLoadingMore(false);
+    }, 100);
+  }, [allCourses, displayedCourses.length, hasReachedEnd, isLoadingMore, hasMorePages, fetchNextPage]);
 
-  const totalCount = filteredCourses.length;
-  const paginatedCourses = filteredCourses.slice(page * COURSES_PAGE_SIZE, (page + 1) * COURSES_PAGE_SIZE);
-  const startIndex = totalCount === 0 ? 0 : page * COURSES_PAGE_SIZE + 1;
-  const endIndex = Math.min((page + 1) * COURSES_PAGE_SIZE, totalCount);
-  const hasNextPage = endIndex < totalCount || hasMorePages;
-
-  const LoadingSkeleton = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {[1, 2, 3, 4, 5, 6].map((i) => (
-        <div key={i} className="space-y-3">
-          <Skeleton className="h-48 w-full rounded-lg" />
-          <Skeleton className="h-6 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
-        </div>
-      ))}
-    </div>
-  );
-
-  // Build list options
+  // List options
   const listOptions = lists.length > 0 
     ? (() => {
         const transformed = lists.map(list => ({
           value: list.slug,
           label: list.short_label.includes('Top 100') ? list.short_label : `${list.short_label} Top 100`
         }));
-        const desiredOrder = ['global', 'usa', 'gb-i', 'europe'];
+        const desiredOrder = ['global', 'gb-i', 'usa', 'europe'];
         return transformed.sort((a, b) => {
           const indexA = desiredOrder.indexOf(a.value);
           const indexB = desiredOrder.indexOf(b.value);
@@ -223,196 +179,154 @@ const Top100CoursesHubPanel = () => {
       })()
     : [
         { value: 'global', label: 'Global Top 100' },
+        { value: 'gb-i', label: 'Britain & Ireland Top 100' },
         { value: 'usa', label: 'USA Top 100' },
-        { value: 'gb-i', label: 'GB&I Top 100' },
-        { value: 'europe', label: 'Europe Top 100' },
+        { value: 'europe', label: 'Continental Europe Top 100' },
       ];
-
-  const currentListLabel = listOptions.find((opt) => opt.value === selectedList)?.label || 'Global Top 100';
 
   const sortOptions: AppSelectOption<Top100SortOption>[] = [
     { value: 'official', label: 'Official ranking' },
-    { value: 'name_asc', label: 'A–Z' },
-    { value: 'name_desc', label: 'Z–A' },
+    { value: 'user_rating', label: 'User rating' },
+    { value: 'friends_rated', label: 'Friends rated' },
   ];
+
+  const handleOpenTop100Club = () => {
+    if (user) {
+      navigate('/top100?tab=my-progress');
+    } else {
+      navigate('/auth?redirect=/top100?tab=my-progress');
+    }
+  };
+
+  const handleOpenLeaderboard = () => {
+    navigate('/top100?tab=leaderboard');
+  };
 
   const handleResetFilters = () => {
     setSelectedList('global');
-    setSelectedSubregion('all');
     setSearchTerm('');
-    setPage(0);
+    setSortOption('official');
   };
 
-  const handleCourseClick = () => {
-    // Placeholder for scroll position tracking
-  };
-
-  const hasActiveFilters = selectedList !== 'global' || selectedSubregion !== 'all' || searchTerm !== '';
-
-  // Stable pagination handlers for reliable first-tap
-  const hasPrev = page > 0;
-  const handlePrevPage = useCallback(() => {
-    if (!hasPrev || isLoading) return;
-    setPage((prev) => Math.max(prev - 1, 0));
-  }, [hasPrev, isLoading]);
-
-  const handleNextPage = useCallback(() => {
-    if (!hasNextPage || isLoading || isFetchingNextPage) return;
-    if (hasMorePages && endIndex >= totalCount) {
-      fetchNextPage();
-    } else {
-      setPage((prev) => prev + 1);
-    }
-  }, [hasNextPage, isLoading, isFetchingNextPage, hasMorePages, endIndex, totalCount, fetchNextPage]);
+  const showLoadMoreButton = displayedCourses.length > 0 && !hasReachedEnd && displayedCourses.length < totalCount;
+  const showEndMessage = hasReachedEnd && displayedCourses.length > PAGE_SIZE;
 
   return (
     <div className="space-y-6 pb-8">
-      {/* 1. Top 100 Club hero - slimmed down */}
-      <section className="rounded-sq-lg border border-border/60 bg-card shadow-[0_4px_28px_rgba(0,0,0,0.14)] px-4 py-4 relative overflow-hidden before:absolute before:inset-0 before:bg-white/[0.02] before:pointer-events-none">
-        {/* Title + subtitle */}
-        <div className="items-center text-center">
-          <h2 className="text-[17px] font-semibold text-foreground leading-tight">Top 100 Club</h2>
-          <p className="text-[12px] text-muted-foreground">
-            Your journey across the world&apos;s greatest courses.
-          </p>
-        </div>
+      {/* 1. Header / Identity Section */}
+      <section className="text-center pt-2">
+        <h1 className="text-xl font-bold text-foreground tracking-tight">Top 100 Club</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Your journey across the world's greatest courses
+        </p>
+      </section>
 
-        {user ? (
-          <div className="flex flex-col items-center text-center gap-3 mt-3">
-            {/* 1. Progress summary + bar */}
-            <section className="w-full max-w-[420px] space-y-1.5">
-              <p className="text-sm text-slate-700">
-                You&apos;ve rated {totalRated} course{totalRated === 1 ? '' : 's'} across {listsCount} Top 100 list{listsCount === 1 ? '' : 's'}
-              </p>
-
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200 mx-auto">
+      {/* 2. Personal Progress Section */}
+      {user && (
+        <section className="space-y-4">
+          {/* Progress Summary */}
+          <div className="text-center space-y-3">
+            <p className="text-sm text-foreground">
+              You've rated <span className="font-semibold">{totalRated}</span> course{totalRated === 1 ? '' : 's'} across{' '}
+              <span className="font-semibold">{listsCount}</span> Top 100 list{listsCount === 1 ? '' : 's'}
+            </p>
+            
+            {/* Progress bar - thicker with rounded ends */}
+            <div className="max-w-md mx-auto">
+              <div className="h-2.5 w-full overflow-hidden rounded-full bg-muted">
                 <div
-                  className="h-full rounded-full bg-amber-500 transition-all"
-                  style={{ width: `${listsCount > 0 ? Math.min(100, (totalRated / (listsCount * 100)) * 100) : 0}%` }}
+                  className="h-full rounded-full bg-amber-500 transition-all duration-500 ease-out"
+                  style={{ width: `${Math.min(100, (totalRated / 100) * 100)}%` }}
                 />
               </div>
-            </section>
+            </div>
+          </div>
 
-            {/* 2. Badge + CTAs row - compact layout */}
-            <div className="mt-2 flex items-center justify-between gap-3 w-full max-w-[420px]">
-              {/* Left: achievement badge (if earned) */}
-              {totalRated >= 5 && (
-                <div className="flex-shrink-0">
+          {/* Club Status Card */}
+          <div className="rounded-sq-lg border border-border/60 bg-card shadow-sm p-4">
+            <div className="flex items-center gap-4">
+              {/* Badge */}
+              <div className="flex-shrink-0">
+                {totalRated >= 5 ? (
                   <AchievementBadgeCard
                     tier={club.threshold?.toString() as AchievementTier || '5'}
-                    title={`${totalRated} Top 100`}
+                    title={`${club.threshold} Club`}
                     subtitle={club.tierName || 'Top 100 Club'}
                     unlocked={true}
                     compact={true}
                   />
-                </div>
-              )}
-
-              {/* Right: inline CTA */}
-              <div className="flex flex-col items-end gap-1 text-sm flex-1">
-                <button
-                  type="button"
-                  onClick={handleOpenTop100Journey}
-                  className="inline-flex items-center font-semibold text-slate-700 hover:text-slate-900 transition-colors"
-                >
-                  Visit Top 100 Club
-                  <span className="ml-1">→</span>
-                </button>
+                ) : (
+                  <div className="w-14 h-14 rounded-sq-md bg-muted/50 border border-dashed border-muted-foreground/30 flex items-center justify-center">
+                    <Award className="w-6 h-6 text-muted-foreground/50" />
+                  </div>
+                )}
               </div>
+
+              {/* Text */}
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-foreground">
+                  {totalRated >= 5 ? `${club.threshold} Club – ${club.tierName}` : 'Start your journey'}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {totalRated >= 5 ? 'Unlocked' : `Rate ${5 - totalRated} more Top 100 courses to unlock`}
+                </p>
+              </div>
+
+              {/* CTA */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleOpenTop100Club}
+                className="flex-shrink-0 text-muted-foreground hover:text-foreground"
+              >
+                Visit Top 100 Club
+                <ChevronRight className="ml-1 h-4 w-4" />
+              </Button>
             </div>
           </div>
-        ) : (
-          <div className="mt-3 flex items-center justify-between gap-3">
-            <p className="text-[13px] text-muted-foreground flex-1">
-              Sign in to track your progress.
-            </p>
-            <button
-              type="button"
-              onClick={handleOpenTop100Journey}
-              className="inline-flex items-center font-semibold text-sm text-primary hover:text-primary/80 transition-colors"
-            >
-              Sign in
-              <span className="ml-1">→</span>
-            </button>
-          </div>
-        )}
-      </section>
+        </section>
+      )}
 
-      {/* Friends on their Top 100 journey - horizontal carousel */}
+      {/* 3. Social Proof - Friends on Their Journey */}
       {user && hasFriends && (
-        <section>
-          {/* Header row */}
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-[13px] font-semibold text-foreground">
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-foreground">
               Friends on their Top 100 journey
-            </p>
+            </h3>
             <button
               type="button"
-              className="text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors"
-              onClick={handleOpenTop100Leaderboard}
+              onClick={handleOpenLeaderboard}
+              className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               View leaderboard →
             </button>
           </div>
 
-          {/* Horizontal carousel */}
-          <div className="-mx-4 flex gap-1 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-none">
-            {friends.slice(0, 10).map((friend, index) => {
-              const nameRaw = friend.profile.display_name || friend.profile.username || 'Golfer';
-              const displayName =
-                nameRaw.length > 14 ? `${nameRaw.slice(0, 14)}…` : nameRaw;
-
-              const homeClub = friend.profile.home_club?.trim() || null;
+          {/* Avatar row - horizontal scroll on mobile */}
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none -mx-1 px-1">
+            {friends.slice(0, 7).map((friend) => {
+              const name = friend.profile.display_name || friend.profile.username || 'Golfer';
               const topCount = friend.top100CoursesPlayed ?? 0;
               
-              const isFirst = index === 0;
-              const isLast = index === friends.slice(0, 10).length - 1;
-
               return (
                 <button
                   key={friend.user_id}
                   type="button"
                   onClick={() => navigate(`/profile/${friend.profile.username}?tab=top100`)}
-                  className={`flex-shrink-0 w-32 snap-start text-center ${isFirst ? 'ml-4' : ''} ${isLast ? 'mr-4' : ''}`}
+                  className="flex-shrink-0 text-center w-16"
                 >
-                  {/* Avatar with achievement ring */}
-                  {friend.profile.profile_photo_url ? (
-                    <div className="mx-auto">
-                      <SquircleAvatar
-                        size={48}
-                        src={friend.profile.profile_photo_url}
-                        alt={displayName}
-                        ringColor={topCount >= 5 ? getRingColorForTotalPlayed(topCount) : undefined}
-                      />
-                    </div>
-                  ) : (
-                    <div className="mx-auto h-12 w-12 rounded-xl bg-muted flex items-center justify-center text-sm font-semibold">
-                      {nameRaw
-                        .split(' ')
-                        .filter(Boolean)
-                        .slice(0, 2)
-                        .map((n) => n[0])
-                        .join('')
-                        .toUpperCase()}
-                    </div>
-                  )}
-
-                  {/* Text */}
-                  <div className="mt-2 space-y-0.5 w-full">
-                    <div className="text-sm font-semibold truncate max-w-full px-1">
-                      {displayName}
-                    </div>
-
-                    {homeClub && (
-                      <div className="text-xs text-muted-foreground truncate max-w-full px-1">
-                        {homeClub}
-                      </div>
-                    )}
-
-                    <div className="text-xs text-muted-foreground">
-                      {topCount} Top 100{topCount === 1 ? '' : 's'}
-                    </div>
-                  </div>
+                  <SquircleAvatar
+                    size={48}
+                    src={friend.profile.profile_photo_url}
+                    alt={name}
+                    fallback={name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                    ringColor={topCount >= 5 ? getRingColorForTotalPlayed(topCount) : undefined}
+                    className="mx-auto"
+                  />
+                  <p className="mt-1.5 text-xs font-medium text-foreground truncate">
+                    {name.split(' ')[0]}
+                  </p>
                 </button>
               );
             })}
@@ -420,178 +334,125 @@ const Top100CoursesHubPanel = () => {
         </section>
       )}
 
-      {user && !hasFriends && (
-        <section>
-          <div className="mb-3">
-            <p className="text-[13px] font-semibold text-foreground">
-              Friends on their Top 100 journey
-            </p>
-          </div>
-          <div className="px-4 py-4 rounded-2xl bg-slate-50 border border-slate-100">
-            <p className="text-sm text-slate-500">
-              Follow other golfers to see their Top 100 progress.
-            </p>
+      {/* 4. Controls Section - grouped in soft container */}
+      <section className="rounded-sq-md bg-muted/30 border border-border/40 p-4 space-y-3">
+        {/* Search */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search within this Top 100 list"
+            className="pl-9 pr-9 h-10 bg-background border-border/60 rounded-sq-sm text-sm"
+          />
+          {searchTerm && (
             <button
               type="button"
-              className="mt-3 inline-flex items-center justify-center rounded-[var(--radius-squircle)] bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 transition-colors"
-              onClick={() => navigate('/golferstofollow')}
+              onClick={() => setSearchTerm('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
-              Find golfers to follow
+              <X className="h-4 w-4" />
             </button>
+          )}
+        </div>
+
+        {/* List + Sort selectors */}
+        <div className="flex gap-3">
+          {/* List selector */}
+          <div className="flex-1">
+            <Select value={selectedList} onValueChange={setSelectedList}>
+              <SelectTrigger className="h-10 w-full bg-background border-border/60 rounded-sq-sm text-sm">
+                <SelectValue placeholder="Choose list" />
+              </SelectTrigger>
+              <SelectContent className="bg-card border-border z-50 rounded-sq-sm">
+                {listOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-        </section>
-      )}
 
-      {/* Divider */}
-      <div className="mt-6 mb-6 h-px w-full bg-slate-200/70" />
-
-      {/* 4. Search */}
-      <div className="relative max-w-xl mx-auto">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search within this Top 100 list"
-          className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-xl shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--slate-secondary)]/70 focus-visible:border-[color:var(--slate-secondary)] transition-shadow text-base placeholder:text-[15px]"
-        />
-        {searchTerm && (
-          <button
-            type="button"
-            onClick={() => setSearchTerm('')}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        )}
-      </div>
-
-      {/* 5. Top 100 List Selector + Sub-region */}
-      <div className="max-w-xl mx-auto flex items-center justify-center gap-3">
-        <div className="flex-1">
-          <Select
-            value={selectedList}
-            onValueChange={(val) => {
-              setSelectedList(val);
-              setPage(0);
-              const regionKey = listSlugToRegionKey(val);
-              if (!SUBREGIONS[regionKey as Exclude<PrimaryRegionKey, 'all'>]?.length) {
-                setSelectedSubregion('all');
-              }
-            }}
-          >
-            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
-              <SelectValue placeholder="Choose Top 100 list" />
-            </SelectTrigger>
-            <SelectContent>
-              {listOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {/* Sort selector */}
+          <div className="flex-1">
+            <AppSelect
+              value={sortOption}
+              onChange={(v) => setSortOption(v as Top100SortOption)}
+              options={sortOptions}
+              ariaLabel="Sort courses"
+              triggerClassName="h-10"
+            />
+          </div>
         </div>
+      </section>
 
-        {/* Sub-region filter */}
-        {(() => {
-          const regionKey = listSlugToRegionKey(selectedList);
-          const subregions = SUBREGIONS[regionKey as Exclude<PrimaryRegionKey, 'all'>] || [];
-          if (!subregions.length) return null;
-
-          return (
-            <div className="flex-1">
-              <Select
-                value={selectedSubregion}
-                onValueChange={setSelectedSubregion}
-              >
-                <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
-                  <SelectValue placeholder="All sub-regions" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All sub-regions</SelectItem>
-                  {subregions.map((s) => (
-                    <SelectItem key={s} value={normalizeLabel(s)}>
-                      {s}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          );
-        })()}
-      </div>
-
-      {/* 6. Context line with sort button */}
-      {totalCount > 0 && (
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-xs text-muted-foreground flex-1">
-            Exploring the <span className="font-medium">{currentListLabel}</span>
-          </p>
-          <AppSelect
-            value={sortOption}
-            onChange={(v) => setSortOption(v as Top100SortOption)}
-            options={sortOptions}
-            ariaLabel="Sort courses"
-            triggerClassName="h-9"
-          />
-        </div>
-      )}
-
-      {/* 7. Results */}
+      {/* 5. Rankings List */}
       {isLoading ? (
-        <LoadingSkeleton />
-      ) : filteredCourses.length === 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="space-y-3">
+              <Skeleton className="h-44 w-full rounded-sq-md" />
+              <Skeleton className="h-5 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+            </div>
+          ))}
+        </div>
+      ) : displayedCourses.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
-          <div className="w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 flex items-center justify-center text-muted-foreground mb-1">
-            <Award className="w-4 h-4" />
+          <div className="w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 flex items-center justify-center">
+            <Award className="w-4 h-4 text-muted-foreground" />
           </div>
           <h3 className="text-sm font-semibold">No courses match your filters</h3>
           <p className="text-sm text-muted-foreground max-w-xs">
-            Try clearing your search or choosing a different Top 100 list to browse.
+            Try clearing your search or choosing a different Top 100 list.
           </p>
-          {hasActiveFilters && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="mt-2"
-              onClick={handleResetFilters}
-            >
-              Reset filters
-            </Button>
-          )}
+          <Button variant="outline" size="sm" onClick={handleResetFilters} className="mt-2">
+            Reset filters
+          </Button>
         </div>
       ) : (
         <div className="space-y-6">
-          {/* Scroll target for pagination */}
-          <div ref={listTopRef} className="h-0" />
-          
-          <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
-            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
-              {paginatedCourses.map((course) => (
-                <div key={course.id} className="mb-4 sm:mb-0">
-                  <CourseListCard 
-                    course={course}
-                    listSlug={selectedList as 'global' | 'gb-i' | 'usa' | 'europe'}
-                    onClick={() => {
-                      handleCourseClick();
-                      navigate(`/courses/${course.id}`);
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
+          {/* Course grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {displayedCourses.map((course) => (
+              <CourseListCard 
+                key={course.id}
+                course={course}
+                listSlug={selectedList as 'global' | 'gb-i' | 'usa' | 'europe'}
+                onClick={() => navigate(`/courses/${course.id}`)}
+              />
+            ))}
           </div>
-          
-          {/* Pagination Footer */}
-          <UnifiedPagination
-            page={page}
-            total={totalCount}
-            hasNextPage={hasNextPage}
-            onNext={handleNextPage}
-            onPrev={handlePrevPage}
-            disabled={isLoading || isFetchingNextPage}
-            scrollTargetRef={listTopRef as React.RefObject<HTMLElement>}
-          />
+
+          {/* Pagination - load more button */}
+          {showLoadMoreButton && (
+            <div className="flex flex-col items-center gap-2 pt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={loadMore}
+                disabled={isLoadingMore}
+                className="w-full max-w-xs gap-1.5"
+              >
+                <ChevronDown className="h-4 w-4" />
+                {isLoadingMore 
+                  ? 'Loading...' 
+                  : `Next ${Math.min(PAGE_SIZE, totalCount - displayedCourses.length)} courses`
+                }
+              </Button>
+              <p className="text-[11px] text-muted-foreground">
+                Showing 1–{displayedCourses.length} of {totalCount} courses
+              </p>
+            </div>
+          )}
+
+          {/* End message */}
+          {showEndMessage && (
+            <p className="text-center text-[11px] text-muted-foreground pt-2">
+              You've reached the end • {totalCount} courses total
+            </p>
+          )}
         </div>
       )}
     </div>
