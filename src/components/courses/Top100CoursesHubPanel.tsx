@@ -275,16 +275,16 @@ const Top100CoursesHubPanel = () => {
                 </div>
 
                 {/* Row 2: CTA pinned bottom-right */}
-                <div className="flex justify-end mt-2">
+                <div className="flex items-center justify-end gap-1 mt-2">
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={handleOpenTop100Club}
-                    className="shrink-0 text-muted-foreground hover:text-foreground -mr-2"
+                    className="shrink-0 text-muted-foreground hover:text-foreground"
                   >
                     Visit Top 100 Club
-                    <ChevronRight className="ml-1 h-4 w-4" />
                   </Button>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 </div>
               </div>
             </div>
