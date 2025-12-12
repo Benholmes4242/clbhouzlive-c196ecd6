@@ -4,17 +4,51 @@ import { useTop100Leaderboard } from '@/hooks/useTop100Leaderboard';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 import { LeaderboardPositionCard } from './LeaderboardPositionCard';
 import { LeaderboardSegmentedControl, LeaderboardSegment } from './LeaderboardSegmentedControl';
 import { LeaderboardPlayerRow } from './LeaderboardPlayerRow';
 import { EmptyFriendsState } from '@/components/shared/EmptyFriendsState';
+import { getTop100Club } from '@/lib/top100Club';
+import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
+import {
+  USE_MOCK_LEADERBOARD_DATA,
+  MOCK_CURRENT_USER_RANK,
+  getMockTop100,
+  getMockAroundYou,
+  getMockFriends,
+  getMockRising,
+  getMockCurrentUser,
+  MockLeaderboardPlayer,
+} from '@/lib/mockLeaderboardData';
 
-const CHUNK_SIZE = 25;
+const PAGE_SIZE = 50;
+
+// Transform mock player to display format
+function transformMockPlayer(player: MockLeaderboardPlayer & { rank: number; isCurrentUser?: boolean }) {
+  const club = getTop100Club(player.top100_played_global);
+  return {
+    user_id: player.user_id,
+    display_name: player.display_name,
+    avatar_url: player.avatar_url,
+    total_top100_played: player.top100_played_global,
+    rank: player.rank,
+    home_club: player.home_club,
+    club_tier: club.tierName,
+    isCurrentUser: player.isCurrentUser,
+  };
+}
 
 export function PlayersLeaderboardView() {
   const navigate = useNavigate();
   const [segment, setSegment] = useState<LeaderboardSegment>('around');
+  const [page, setPage] = useState(1);
   const listRef = useRef<HTMLDivElement>(null);
+
+  // Reset page when segment changes
+  useEffect(() => {
+    setPage(1);
+  }, [segment]);
 
   // Get current user
   const { data: currentUser } = useQuery({
@@ -28,7 +62,7 @@ export function PlayersLeaderboardView() {
   // Get current user's profile
   const { data: currentUserProfile } = useQuery({
     queryKey: ['current-user-profile', currentUser?.id],
-    enabled: !!currentUser?.id,
+    enabled: !!currentUser?.id && !USE_MOCK_LEADERBOARD_DATA,
     queryFn: async () => {
       const { data } = await supabase
         .from('user_profiles')
@@ -39,25 +73,63 @@ export function PlayersLeaderboardView() {
     },
   });
 
-  // Fetch leaderboard data
+  // Fetch leaderboard data (real)
   const { data, isLoading } = useTop100Leaderboard({
     scope: 'worldwide',
     timeRange: 'all_time',
     pageSize: 500,
   });
 
+  // Mock data logic
+  const mockData = useMemo(() => {
+    if (!USE_MOCK_LEADERBOARD_DATA) return null;
+
+    let allPlayers: (MockLeaderboardPlayer & { rank: number; isCurrentUser?: boolean })[];
+    
+    switch (segment) {
+      case 'top100':
+        allPlayers = getMockTop100();
+        break;
+      case 'around':
+        allPlayers = getMockAroundYou(MOCK_CURRENT_USER_RANK);
+        break;
+      case 'friends':
+        allPlayers = getMockFriends();
+        break;
+      case 'rising':
+        allPlayers = getMockRising();
+        break;
+      default:
+        allPlayers = getMockTop100();
+    }
+
+    const start = (page - 1) * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+    const paginated = allPlayers.slice(start, end);
+
+    return {
+      players: paginated.map(transformMockPlayer),
+      total: allPlayers.length,
+      hasMore: end < allPlayers.length,
+      currentUser: getMockCurrentUser(),
+    };
+  }, [segment, page]);
+
+  // Real data logic
   const allEntries = data?.pages.flatMap(page => page.entries) || [];
   const currentUserEntry = data?.pages[0]?.current_user_entry;
 
-  // Find user's position
+  // Find user's position (real data)
   const myIndex = currentUserEntry
     ? allEntries.findIndex((e: any) => e.user_id === currentUserEntry.user_id)
     : -1;
 
   // Determine if user is new (no position yet)
-  const isNewUser = !currentUserEntry || currentUserEntry.total_top100_played === 0;
+  const isNewUser = USE_MOCK_LEADERBOARD_DATA 
+    ? false 
+    : (!currentUserEntry || currentUserEntry.total_top100_played === 0);
 
-  // Disable "Around You" for new users
+  // Disable "Around You" for new users (real mode only)
   const disabledSegments: LeaderboardSegment[] = isNewUser ? ['around'] : [];
 
   // Default segment based on user status
@@ -67,25 +139,24 @@ export function PlayersLeaderboardView() {
     }
   }, [isNewUser, segment]);
 
-  // Filter entries based on segment
+  // Filter entries based on segment (real data)
   const displayedEntries = useMemo(() => {
+    if (USE_MOCK_LEADERBOARD_DATA) return [];
+
     switch (segment) {
       case 'top100':
         return allEntries.slice(0, 100);
       
       case 'around':
-        // Show 5 above + user + 5 below
         if (myIndex < 0) return [];
         const start = Math.max(0, myIndex - 5);
         const end = Math.min(allEntries.length, myIndex + 6);
         return allEntries.slice(start, end);
       
       case 'friends':
-        // Only friends with at least 1 Top 100 course
         return allEntries.filter((e: any) => e.is_friend && e.total_top100_played > 0);
       
       case 'rising':
-        // Sort by delta_rank (biggest positive changes) in last 7/30 days
         return [...allEntries]
           .filter((e: any) => e.delta_rank && e.delta_rank > 0)
           .sort((a: any, b: any) => (b.delta_rank || 0) - (a.delta_rank || 0))
@@ -97,15 +168,39 @@ export function PlayersLeaderboardView() {
   }, [allEntries, segment, myIndex]);
 
   // Build user position model for card
-  const meModel = currentUserEntry && currentUserProfile ? {
-    user_id: currentUserEntry.user_id,
-    display_name: currentUserProfile.display_name || currentUserEntry.display_name,
-    avatar_url: currentUserProfile.profile_photo_url || currentUserEntry.avatar_url,
-    total_top100_played: currentUserEntry.total_top100_played,
-    rank: currentUserEntry.rank,
-  } : null;
+  const meModel = USE_MOCK_LEADERBOARD_DATA
+    ? mockData?.currentUser ? {
+        user_id: mockData.currentUser.user_id,
+        display_name: mockData.currentUser.display_name,
+        avatar_url: mockData.currentUser.avatar_url,
+        total_top100_played: mockData.currentUser.top100_played_global,
+        rank: mockData.currentUser.rank,
+      } : null
+    : currentUserEntry && currentUserProfile ? {
+        user_id: currentUserEntry.user_id,
+        display_name: currentUserProfile.display_name || currentUserEntry.display_name,
+        avatar_url: currentUserProfile.profile_photo_url || currentUserEntry.avatar_url,
+        total_top100_played: currentUserEntry.total_top100_played,
+        rank: currentUserEntry.rank,
+      } : null;
 
-  if (isLoading) {
+  // Entries to render
+  const entriesToRender = USE_MOCK_LEADERBOARD_DATA 
+    ? mockData?.players || []
+    : displayedEntries;
+
+  const totalEntries = USE_MOCK_LEADERBOARD_DATA 
+    ? mockData?.total || 0 
+    : displayedEntries.length;
+
+  const hasMore = USE_MOCK_LEADERBOARD_DATA 
+    ? mockData?.hasMore || false 
+    : false;
+
+  const showingStart = (page - 1) * PAGE_SIZE + 1;
+  const showingEnd = Math.min(page * PAGE_SIZE, totalEntries);
+
+  if (isLoading && !USE_MOCK_LEADERBOARD_DATA) {
     return (
       <div className="space-y-4">
         <Skeleton className="h-20 w-full rounded-sq-md" />
@@ -146,7 +241,7 @@ export function PlayersLeaderboardView() {
 
       {/* Player List */}
       <div className="rounded-sq-md border border-border/50 bg-card/60 overflow-hidden">
-        {displayedEntries.length === 0 ? (
+        {entriesToRender.length === 0 ? (
           <div className="py-12 px-4">
             {segment === 'friends' ? (
               <EmptyFriendsState title="No friends on the leaderboard yet" />
@@ -162,9 +257,12 @@ export function PlayersLeaderboardView() {
           </div>
         ) : (
           <>
-            {displayedEntries.map((entry: any, idx: number) => {
-              const isMe = currentUserEntry?.user_id === entry.user_id;
-              const showMarker = idx > 0 && idx % 50 === 0;
+            {entriesToRender.map((entry: any, idx: number) => {
+              const isMe = USE_MOCK_LEADERBOARD_DATA 
+                ? entry.isCurrentUser 
+                : currentUserEntry?.user_id === entry.user_id;
+              const globalIdx = (page - 1) * PAGE_SIZE + idx;
+              const showMarker = globalIdx > 0 && globalIdx % 50 === 0;
 
               return (
                 <React.Fragment key={entry.user_id}>
@@ -183,6 +281,36 @@ export function PlayersLeaderboardView() {
         )}
       </div>
 
+      {/* Pagination controls */}
+      {USE_MOCK_LEADERBOARD_DATA && totalEntries > PAGE_SIZE && (
+        <div className="flex flex-col items-center gap-3 pt-2 pb-4">
+          <div className="flex items-center gap-3">
+            {page > 1 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(p => p - 1)}
+                className="rounded-sq-sm"
+              >
+                Previous {PAGE_SIZE}
+              </Button>
+            )}
+            {hasMore && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(p => p + 1)}
+                className="rounded-sq-sm"
+              >
+                Next {PAGE_SIZE} players
+              </Button>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Showing {showingStart}–{showingEnd} of {totalEntries} players
+          </p>
+        </div>
+      )}
     </div>
   );
 }
