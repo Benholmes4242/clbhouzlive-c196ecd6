@@ -6,10 +6,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LeaderboardCourseCard } from './LeaderboardCourseCard';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { TrendingUp, Star, Users, ChevronDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, Star, Users, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { Button } from '@/components/ui/button';
+import {
+  USE_MOCK_COURSE_LEADERBOARD_DATA,
+  getMockCoursesPaginated,
+  getMockCircleRecentRounds,
+  getMockCoursesOnTheMove,
+  CourseSortKey,
+} from '@/lib/mockCourseLeaderboardData';
 
 type CourseSortOption = 'most_played' | 'highest_rated' | 'trending' | 'friends';
 type AudienceFilter = 'all' | 'friends';
@@ -37,6 +44,7 @@ export function CoursesLeaderboardView() {
   const [audienceFilter, setAudienceFilter] = useState<AudienceFilter>('all');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
+  // Real data hooks (disabled in mock mode)
   const { data, isLoading } = useTop100CourseLeaderboard({
     scope: 'worldwide',
     timeRange: 'all_time',
@@ -45,9 +53,10 @@ export function CoursesLeaderboardView() {
 
   const allCourses = data?.pages.flatMap(page => page.entries) || [];
 
-  // Fetch recent Top 100 rounds by friends
+  // Fetch recent Top 100 rounds by friends (real)
   const { data: friendsRecentRounds } = useQuery({
     queryKey: ['friends-recent-top100-rounds'],
+    enabled: !USE_MOCK_COURSE_LEADERBOARD_DATA,
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
@@ -81,19 +90,39 @@ export function CoursesLeaderboardView() {
     staleTime: 60_000,
   });
 
-  // Get trending courses (rating increases)
+  // Mock data
+  const mockData = useMemo(() => {
+    if (!USE_MOCK_COURSE_LEADERBOARD_DATA) return null;
+    
+    const page = Math.ceil(visibleCount / PAGE_SIZE);
+    return getMockCoursesPaginated(sort as CourseSortKey, 1, visibleCount, audienceFilter, MAX_COURSES);
+  }, [sort, audienceFilter, visibleCount]);
+
+  const mockCircleRounds = useMemo(() => {
+    if (!USE_MOCK_COURSE_LEADERBOARD_DATA) return [];
+    return getMockCircleRecentRounds().slice(0, 8);
+  }, []);
+
+  const mockCoursesOnTheMove = useMemo(() => {
+    if (!USE_MOCK_COURSE_LEADERBOARD_DATA) return [];
+    return getMockCoursesOnTheMove();
+  }, []);
+
+  // Get trending courses (real data)
   const trendingCourses = useMemo(() => {
+    if (USE_MOCK_COURSE_LEADERBOARD_DATA) return [];
     return [...allCourses]
       .filter(c => c.avg_rating && c.avg_rating >= 7.5)
       .sort((a, b) => (b.avg_rating ?? 0) - (a.avg_rating ?? 0))
       .slice(0, 6);
   }, [allCourses]);
 
-  // Sort and filter courses based on selection
+  // Sort and filter courses based on selection (real data)
   const sortedCourses = useMemo(() => {
+    if (USE_MOCK_COURSE_LEADERBOARD_DATA) return [];
+    
     let courses = [...allCourses];
     
-    // Apply audience filter
     if (audienceFilter === 'friends') {
       courses = courses.filter(c => (c.friends_count ?? 0) > 0);
     }
@@ -113,11 +142,38 @@ export function CoursesLeaderboardView() {
     }
   }, [allCourses, sort, audienceFilter]);
 
-  // Limit to max 100 courses
-  const cappedCourses = sortedCourses.slice(0, MAX_COURSES);
-  const totalCount = cappedCourses.length;
-  const visibleCourses = cappedCourses.slice(0, visibleCount);
-  const hasMore = visibleCount < totalCount;
+  // Data to display
+  const cappedCourses = USE_MOCK_COURSE_LEADERBOARD_DATA
+    ? mockData?.courses || []
+    : sortedCourses.slice(0, MAX_COURSES);
+  
+  const totalCount = USE_MOCK_COURSE_LEADERBOARD_DATA
+    ? mockData?.total || 0
+    : Math.min(sortedCourses.length, MAX_COURSES);
+  
+  const visibleCourses = USE_MOCK_COURSE_LEADERBOARD_DATA
+    ? cappedCourses
+    : cappedCourses.slice(0, visibleCount);
+  
+  const hasMore = USE_MOCK_COURSE_LEADERBOARD_DATA
+    ? mockData?.hasMore || visibleCount < totalCount
+    : visibleCount < totalCount;
+
+  // Transform mock data to match real data shape
+  const displayCourses = USE_MOCK_COURSE_LEADERBOARD_DATA
+    ? visibleCourses.map((c: any) => ({
+        course_id: c.course_id,
+        course_name: c.course_name,
+        thumbnail_image: c.hero_image_url,
+        country: c.region,
+        global_rank: c.global_rank,
+        regional_rank: c.regional_rank,
+        avg_rating: c.avg_rating,
+        times_played: c.plays_count_total,
+        ratings_count: c.ratings_count,
+        friends_count: c.friends_played_count_30d,
+      }))
+    : visibleCourses;
 
   // Reset pagination when sort changes
   const handleSortChange = useCallback((newSort: CourseSortOption) => {
@@ -135,7 +191,17 @@ export function CoursesLeaderboardView() {
     setVisibleCount(prev => Math.min(prev + PAGE_SIZE, MAX_COURSES));
   }, []);
 
-  if (isLoading) {
+  // Circle rounds to display
+  const circleRoundsToDisplay = USE_MOCK_COURSE_LEADERBOARD_DATA 
+    ? mockCircleRounds 
+    : friendsRecentRounds;
+
+  // Courses on the move to display
+  const coursesOnTheMoveToDisplay = USE_MOCK_COURSE_LEADERBOARD_DATA 
+    ? mockCoursesOnTheMove 
+    : trendingCourses;
+
+  if (isLoading && !USE_MOCK_COURSE_LEADERBOARD_DATA) {
     return (
       <div className="space-y-4">
         <Skeleton className="h-24 w-full rounded-sq-md" />
@@ -150,90 +216,163 @@ export function CoursesLeaderboardView() {
   return (
     <div className="space-y-4">
       {/* Recently Played by Your Circle */}
-      {friendsRecentRounds && friendsRecentRounds.length > 0 && (
+      {circleRoundsToDisplay && circleRoundsToDisplay.length > 0 && (
         <section className="space-y-3">
           <h3 className="text-sm font-semibold text-foreground px-2.5">
             Recently Played by Your Circle
           </h3>
           <div className="overflow-x-auto pb-2 -mx-4 px-4">
             <div className="flex gap-3 min-w-max">
-              {friendsRecentRounds.slice(0, 8).map((round: any) => (
-                <button
-                  key={round.id}
-                  onClick={() => navigate(`/courses/${round.course_id}`)}
-                  className="w-[200px] flex-shrink-0 rounded-sq-md border border-border/50 bg-card overflow-hidden shadow-sm hover:bg-muted/20 transition-colors text-left"
-                >
-                  {round.golf_courses?.thumbnail_image && (
-                    <div className="relative h-24 w-full">
-                      <img
-                        src={round.golf_courses.thumbnail_image}
-                        alt={round.golf_courses.name}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                    </div>
-                  )}
-                  <div className="p-2.5 space-y-1.5">
-                    <p className="text-xs font-medium text-foreground truncate">
-                      {round.golf_courses?.name}
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <SquircleAvatar
-                        size={20}
-                        src={round.user_profiles?.profile_photo_url}
-                        alt={round.user_profiles?.display_name}
-                        fallback={(round.user_profiles?.display_name?.[0] || '?').toUpperCase()}
-                      />
-                      <span className="text-[11px] text-muted-foreground truncate flex-1">
-                        {round.user_profiles?.display_name}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-[10px] text-muted-foreground">
-                      <span>{formatDistanceToNow(new Date(round.created_at), { addSuffix: false })} ago</span>
-                      {round.rating && (
-                        <span className="flex items-center gap-0.5">
-                          <Star className="h-2.5 w-2.5 text-primary/70" />
-                          Gave it {round.rating.toFixed(1)}
-                        </span>
+              {USE_MOCK_COURSE_LEADERBOARD_DATA 
+                ? mockCircleRounds.map((round) => (
+                    <button
+                      key={round.id}
+                      onClick={() => navigate(`/courses/${round.course_id}`)}
+                      className="w-[200px] flex-shrink-0 rounded-sq-md border border-border/50 bg-card overflow-hidden shadow-sm hover:bg-muted/20 transition-colors text-left"
+                    >
+                      <div className="relative h-24 w-full">
+                        <img
+                          src={round.course_image_url}
+                          alt={round.course_name}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                      </div>
+                      <div className="p-2.5 space-y-1.5">
+                        <p className="text-xs font-medium text-foreground truncate">
+                          {round.course_name}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <SquircleAvatar
+                            size={20}
+                            src={round.friend_avatar_url}
+                            alt={round.friend_name}
+                            fallback={(round.friend_name?.[0] || '?').toUpperCase()}
+                          />
+                          <span className="text-[11px] text-muted-foreground truncate flex-1">
+                            {round.friend_name}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                          <span>{round.time_ago} ago</span>
+                          <span className="flex items-center gap-0.5">
+                            <Star className="h-2.5 w-2.5 text-primary/70" />
+                            Gave it {round.rating_given.toFixed(1)}
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  ))
+                : (friendsRecentRounds || []).slice(0, 8).map((round: any) => (
+                    <button
+                      key={round.id}
+                      onClick={() => navigate(`/courses/${round.course_id}`)}
+                      className="w-[200px] flex-shrink-0 rounded-sq-md border border-border/50 bg-card overflow-hidden shadow-sm hover:bg-muted/20 transition-colors text-left"
+                    >
+                      {round.golf_courses?.thumbnail_image && (
+                        <div className="relative h-24 w-full">
+                          <img
+                            src={round.golf_courses.thumbnail_image}
+                            alt={round.golf_courses.name}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                        </div>
                       )}
-                    </div>
-                  </div>
-                </button>
-              ))}
+                      <div className="p-2.5 space-y-1.5">
+                        <p className="text-xs font-medium text-foreground truncate">
+                          {round.golf_courses?.name}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <SquircleAvatar
+                            size={20}
+                            src={round.user_profiles?.profile_photo_url}
+                            alt={round.user_profiles?.display_name}
+                            fallback={(round.user_profiles?.display_name?.[0] || '?').toUpperCase()}
+                          />
+                          <span className="text-[11px] text-muted-foreground truncate flex-1">
+                            {round.user_profiles?.display_name}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                          <span>{formatDistanceToNow(new Date(round.created_at), { addSuffix: false })} ago</span>
+                          {round.rating && (
+                            <span className="flex items-center gap-0.5">
+                              <Star className="h-2.5 w-2.5 text-primary/70" />
+                              Gave it {round.rating.toFixed(1)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </button>
+                  ))
+              }
             </div>
           </div>
         </section>
       )}
 
       {/* Courses on the Move */}
-      {trendingCourses.length > 0 && (
+      {coursesOnTheMoveToDisplay && coursesOnTheMoveToDisplay.length > 0 && (
         <section className="space-y-3">
           <h3 className="text-sm font-semibold text-foreground px-2.5">
             Courses on the Move
           </h3>
           <div className="overflow-x-auto pb-2 -mx-4 px-4">
             <div className="flex gap-2.5 min-w-max">
-              {trendingCourses.map((course) => (
-                <button
-                  key={course.course_id}
-                  onClick={() => navigate(`/courses/${course.course_id}`)}
-                  className="w-[150px] flex-shrink-0 rounded-sq-md border border-border/50 bg-card p-2.5 text-left hover:bg-muted/20 transition-colors"
-                >
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    <TrendingUp className="h-3 w-3 text-emerald-500" />
-                    <span className="text-[10px] font-medium text-emerald-600">
-                      Rating up +{((course.avg_rating ?? 7) - 7).toFixed(1)}
-                    </span>
-                  </div>
-                  <p className="text-xs font-medium text-foreground line-clamp-2 mb-1">
-                    {course.course_name}
-                  </p>
-                  <p className="text-[10px] text-muted-foreground">
-                    {course.country}
-                  </p>
-                </button>
-              ))}
+              {USE_MOCK_COURSE_LEADERBOARD_DATA
+                ? mockCoursesOnTheMove.map((course) => (
+                    <button
+                      key={course.id}
+                      onClick={() => navigate(`/courses/${course.course_id}`)}
+                      className="w-[150px] flex-shrink-0 rounded-sq-md border border-border/50 bg-card p-2.5 text-left hover:bg-muted/20 transition-colors"
+                    >
+                      <div className="flex items-center gap-1.5 mb-2">
+                        <span className={cn(
+                          'w-1.5 h-1.5 rounded-full',
+                          course.rating_delta_30d > 0 ? 'bg-emerald-500' : 'bg-red-400'
+                        )} />
+                        {course.rating_delta_30d > 0 
+                          ? <TrendingUp className="h-3 w-3 text-emerald-500" />
+                          : <TrendingDown className="h-3 w-3 text-red-400" />
+                        }
+                        <span className={cn(
+                          'text-[10px] font-medium',
+                          course.rating_delta_30d > 0 ? 'text-emerald-600' : 'text-red-500'
+                        )}>
+                          {course.trend_label}
+                        </span>
+                      </div>
+                      <p className="text-xs font-medium text-foreground line-clamp-2 mb-1">
+                        {course.course_name}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">
+                        {course.region}
+                      </p>
+                    </button>
+                  ))
+                : trendingCourses.map((course) => (
+                    <button
+                      key={course.course_id}
+                      onClick={() => navigate(`/courses/${course.course_id}`)}
+                      className="w-[150px] flex-shrink-0 rounded-sq-md border border-border/50 bg-card p-2.5 text-left hover:bg-muted/20 transition-colors"
+                    >
+                      <div className="flex items-center gap-1.5 mb-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        <TrendingUp className="h-3 w-3 text-emerald-500" />
+                        <span className="text-[10px] font-medium text-emerald-600">
+                          Rating up +{((course.avg_rating ?? 7) - 7).toFixed(1)}
+                        </span>
+                      </div>
+                      <p className="text-xs font-medium text-foreground line-clamp-2 mb-1">
+                        {course.course_name}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">
+                        {course.country}
+                      </p>
+                    </button>
+                  ))
+              }
             </div>
           </div>
         </section>
@@ -303,12 +442,12 @@ export function CoursesLeaderboardView() {
         {/* Ranked Course List */}
         <div className="-mx-4 sm:mx-0">
           <div className="space-y-4">
-            {visibleCourses.length === 0 ? (
+            {displayCourses.length === 0 ? (
               <div className="py-12 px-4 text-center space-y-3">
                 <Users className="h-8 w-8 mx-auto text-muted-foreground/50" />
                 {sort === 'friends' || audienceFilter === 'friends' ? (
                   <>
-                    <p className="text-sm font-medium text-foreground">No friends playing yet</p>
+                    <p className="text-sm font-medium text-foreground">No friends activity yet</p>
                     <p className="text-xs text-muted-foreground">
                       Invite a friend or follow golfers to see activity here.
                     </p>
@@ -327,12 +466,12 @@ export function CoursesLeaderboardView() {
               </div>
             ) : (
               <>
-                {visibleCourses.map((course, idx) => (
+                {displayCourses.map((course: any, idx: number) => (
                   <LeaderboardCourseCard
                     key={course.course_id}
                     course={course}
                     listPosition={idx + 1}
-                    showFriendsContext={audienceFilter === 'friends'}
+                    showFriendsContext={audienceFilter === 'friends' || sort === 'friends'}
                   />
                 ))}
               </>
@@ -341,7 +480,7 @@ export function CoursesLeaderboardView() {
         </div>
 
         {/* Pagination controls */}
-        {visibleCourses.length > 0 && (
+        {displayCourses.length > 0 && (
           <div className="flex flex-col items-center gap-2 pt-4 pb-8">
             {hasMore && (
               <Button
@@ -355,7 +494,7 @@ export function CoursesLeaderboardView() {
               </Button>
             )}
             <p className="text-[11px] text-muted-foreground">
-              Showing {1}–{visibleCount} of {totalCount} courses
+              Showing 1–{Math.min(visibleCount, totalCount)} of {totalCount} courses
             </p>
           </div>
         )}
