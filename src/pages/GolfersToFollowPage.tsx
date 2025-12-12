@@ -260,7 +260,6 @@ const GolfersToFollowPage = () => {
                 const isFollowing = followingIds.has(golfer.id);
                 const isActioning = actioningUserId === golfer.id;
                 const clubLine = golfer.homeClub || 'No home club set';
-                const handicapLine = golfer.handicap != null ? `HCP ${golfer.handicap.toFixed(1)}` : null;
 
                 return (
                   <button
@@ -283,13 +282,8 @@ const GolfersToFollowPage = () => {
                         <p className="text-sm font-semibold text-foreground">{golfer.displayName}</p>
                         <p className="text-sm text-muted-foreground">{clubLine}</p>
                         
-                        {/* Row with handicap + action buttons */}
-                        <div className="flex items-center justify-between mt-1.5">
-                          {handicapLine && (
-                            <p className="text-xs text-muted-foreground">{handicapLine}</p>
-                          )}
-                          {!handicapLine && <div />}
-                          
+                        {/* Row with action buttons */}
+                        <div className="flex items-center justify-end mt-1.5">
                           {/* Actions - smaller colored buttons */}
                           <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                             {/* Follow/Following button */}
