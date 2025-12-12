@@ -25,7 +25,8 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
   friendMessage,
   onViewLeaderboard 
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  // Default to expanded state
+  const [isExpanded, setIsExpanded] = useState(true);
   const navigate = useNavigate();
 
   // Show top 10 friends sorted by total_top100_played

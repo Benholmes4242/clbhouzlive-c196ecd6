@@ -42,8 +42,8 @@ export function Top100RegionProgressGrid({
     : `${displayName?.toUpperCase() ?? 'THEIR'} JOURNEY BY REGION`;
 
   return (
-    <section className="mt-6 w-full">
-      <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground mb-2 px-2.5">
+    <section className="w-full">
+      <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground mb-3 px-2.5">
         {label}
       </h3>
 
@@ -51,17 +51,18 @@ export function Top100RegionProgressGrid({
         {lists.map((list) => {
           const progressPercent =
             list.total > 0 ? (list.played / list.total) * 100 : 0;
+          const remainingPercent = 100 - progressPercent;
 
           return (
             <button
               key={list.listSlug}
               type="button"
               onClick={() => onListClick(list.listSlug)}
-              className="w-full rounded-sq-md border border-border/70 bg-card/90 px-4 py-3 text-left shadow-xs hover:shadow-md hover:bg-muted/40 transition-shadow transition-colors flex items-center justify-between gap-3"
+              className="w-full rounded-sq-md border border-border/50 bg-card/80 px-4 py-3 text-left shadow-xs hover:shadow-sm hover:bg-muted/30 transition-shadow transition-colors flex items-center justify-between gap-3"
             >
               {/* Left side: icon + names */}
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-9 h-9 rounded-sq-md bg-muted flex items-center justify-center flex-shrink-0">
+                <div className="w-9 h-9 rounded-sq-md bg-muted/60 flex items-center justify-center flex-shrink-0">
                   {getRegionIcon(list.listSlug)}
                 </div>
 
@@ -75,15 +76,16 @@ export function Top100RegionProgressGrid({
                 </div>
               </div>
 
-              {/* Right side: remaining + bar */}
-              <div className="flex flex-col items-end gap-1 flex-shrink-0 min-w-[120px]">
+              {/* Right side: remaining + bar - calmer, less saturated */}
+              <div className="flex flex-col items-end gap-1 flex-shrink-0 min-w-[110px]">
                 <span className="text-[11px] text-muted-foreground">
-                  {(100 - progressPercent).toFixed(0)}% remaining
+                  {remainingPercent.toFixed(0)}% remaining
                 </span>
 
-                <div className="w-full h-1.5 rounded-full bg-muted overflow-hidden">
+                {/* Quieter, less saturated progress bar */}
+                <div className="w-full h-1.5 rounded-full bg-muted/50 overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-foreground/70 transition-all"
+                    className="h-full rounded-full bg-foreground/40 transition-all"
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
