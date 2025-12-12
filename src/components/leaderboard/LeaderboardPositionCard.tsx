@@ -66,49 +66,56 @@ export function LeaderboardPositionCard({ user, variant = 'full' }: LeaderboardP
     <button
       type="button"
       onClick={() => navigate('/top100?tab=my-progress')}
-      className="w-full rounded-sq-md border border-border/70 bg-card px-4 py-3.5 shadow-sm active:scale-[0.99] transition-all hover:bg-muted/30"
+      className="w-full rounded-sq-md border border-border/70 bg-card px-3 py-3 shadow-sm active:scale-[0.99] transition-all hover:bg-muted/30"
     >
+      {/* 3-column layout: Avatar (fixed) + Main text (flex, truncates) + Next goal (fixed width) */}
       <div className="flex items-center gap-3">
-        <SquircleAvatar
-          size={52}
-          src={user.avatar_url}
-          alt={user.display_name}
-          fallback={initials}
-          ringColor={ringColor}
-        />
+        {/* Avatar - fixed size */}
+        <div className="flex-shrink-0">
+          <SquircleAvatar
+            size={48}
+            src={user.avatar_url}
+            alt={user.display_name}
+            fallback={initials}
+            ringColor={ringColor}
+          />
+        </div>
 
+        {/* Main text - flex with min-w-0 for truncation */}
         <div className="flex flex-col text-left flex-1 min-w-0">
           <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
             Your position
           </span>
-          <span className="text-sm font-semibold whitespace-nowrap">
-            #{user.rank} · {user.total_top100_played} Top 100 courses
+          <span className="text-sm font-semibold truncate">
+            #{user.rank} · {user.total_top100_played} Top 100s
           </span>
           {club.tierName && (
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-muted-foreground truncate">
               {club.tierName}
             </span>
           )}
         </div>
 
-        {/* Progress to next tier */}
-        <div className="flex items-center gap-2 flex-shrink-0">
-          {nextClub ? (
-            <div className="flex flex-col items-end gap-1 min-w-[100px]">
-              <span className="text-[11px] text-muted-foreground">
-                Next: <span className="font-medium">{nextClub.tierName}</span>
-              </span>
-              <div className="w-24 h-1.5 rounded-full bg-muted overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-primary/60 transition-[width]"
-                  style={{ width: `${progressPct}%` }}
-                />
+        {/* Next goal - fixed width, no-wrap, right aligned */}
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          <div className="w-[110px] text-right">
+            {nextClub ? (
+              <div className="flex flex-col items-end gap-1">
+                <span className="text-[11px] text-muted-foreground whitespace-nowrap">
+                  Next: <span className="font-medium">{nextClub.tierName}</span>
+                </span>
+                <div className="w-full h-1.5 rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-primary/60 transition-[width]"
+                    style={{ width: `${progressPct}%` }}
+                  />
+                </div>
               </div>
-            </div>
-          ) : (
-            <span className="text-[11px] text-primary font-medium">Max tier!</span>
-          )}
-          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            ) : (
+              <span className="text-[11px] text-primary font-medium whitespace-nowrap">Max tier!</span>
+            )}
+          </div>
+          <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
         </div>
       </div>
 
