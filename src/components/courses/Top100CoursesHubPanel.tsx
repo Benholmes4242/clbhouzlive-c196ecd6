@@ -231,22 +231,22 @@ const Top100CoursesHubPanel = () => {
               <span className="font-semibold">{listsCount}</span> Top 100 list{listsCount === 1 ? '' : 's'}
             </p>
             
-            {/* Progress bar - thicker with rounded ends */}
+            {/* Progress bar - h-2, rounded-full, animated */}
             <div className="max-w-md mx-auto">
-              <div className="h-2.5 w-full overflow-hidden rounded-full bg-muted">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-muted/60">
                 <div
-                  className="h-full rounded-full bg-amber-500 transition-all duration-500 ease-out"
+                  className="h-2 rounded-full bg-amber-500 transition-all duration-300 ease-out"
                   style={{ width: `${Math.min(100, (totalRated / 100) * 100)}%` }}
                 />
               </div>
             </div>
           </div>
 
-          {/* Club Status Card */}
+          {/* Club Status Card - controlled layout */}
           <div className="rounded-sq-lg border border-border/60 bg-card shadow-sm p-4">
-            <div className="flex items-center gap-4">
-              {/* Badge */}
-              <div className="flex-shrink-0">
+            <div className="flex gap-4 items-stretch">
+              {/* Left: Badge tile */}
+              <div className="w-[150px] shrink-0">
                 {totalRated >= 5 ? (
                   <AchievementBadgeCard
                     tier={club.threshold?.toString() as AchievementTier || '5'}
@@ -256,40 +256,47 @@ const Top100CoursesHubPanel = () => {
                     compact={true}
                   />
                 ) : (
-                  <div className="w-14 h-14 rounded-sq-md bg-muted/50 border border-dashed border-muted-foreground/30 flex items-center justify-center">
+                  <div className="h-full rounded-sq-md bg-muted/50 border border-dashed border-muted-foreground/30 flex items-center justify-center">
                     <Award className="w-6 h-6 text-muted-foreground/50" />
                   </div>
                 )}
               </div>
 
-              {/* Text */}
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-foreground">
-                  {totalRated >= 5 ? `${club.threshold} Club – ${club.tierName}` : 'Start your journey'}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {totalRated >= 5 ? 'Unlocked' : `Rate ${5 - totalRated} more Top 100 courses to unlock`}
-                </p>
-              </div>
+              {/* Right: controlled flex column */}
+              <div className="flex-1 min-w-0 flex flex-col justify-between">
+                {/* Row 1: Title/Sub + CTA */}
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-foreground truncate">
+                      {totalRated >= 5 ? `${club.threshold} Club – ${club.tierName}` : 'Start your journey'}
+                    </p>
+                    <p className="text-sm text-muted-foreground truncate">
+                      {totalRated >= 5 ? 'Unlocked' : `Rate ${5 - totalRated} more Top 100 courses to unlock`}
+                    </p>
+                  </div>
+                </div>
 
-              {/* CTA */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleOpenTop100Club}
-                className="flex-shrink-0 text-muted-foreground hover:text-foreground"
-              >
-                Visit Top 100 Club
-                <ChevronRight className="ml-1 h-4 w-4" />
-              </Button>
+                {/* Row 2: CTA pinned bottom-right */}
+                <div className="flex justify-end mt-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleOpenTop100Club}
+                    className="shrink-0 text-muted-foreground hover:text-foreground"
+                  >
+                    Visit Top 100 Club
+                    <ChevronRight className="ml-1 h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </section>
       )}
 
-      {/* 3. Social Proof - Friends on Their Journey */}
+      {/* 3. Social Proof - Friends on Their Journey - mt-6 spacing */}
       {user && hasFriends && (
-        <section className="space-y-3">
+        <section className="mt-6 space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-foreground">
               Friends on their Top 100 journey
@@ -303,8 +310,8 @@ const Top100CoursesHubPanel = () => {
             </button>
           </div>
 
-          {/* Avatar row - horizontal scroll on mobile */}
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none -mx-1 px-1">
+          {/* Avatar row - names under avatars, fully tappable */}
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none -mx-1 px-1">
             {friends.slice(0, 7).map((friend) => {
               const name = friend.profile.display_name || friend.profile.username || 'Golfer';
               const topCount = friend.top100CoursesPlayed ?? 0;
@@ -314,7 +321,7 @@ const Top100CoursesHubPanel = () => {
                   key={friend.user_id}
                   type="button"
                   onClick={() => navigate(`/profile/${friend.profile.username}?tab=top100`)}
-                  className="flex-shrink-0 text-center w-16"
+                  className="flex-shrink-0 text-center w-[72px]"
                 >
                   <SquircleAvatar
                     size={48}
@@ -324,7 +331,7 @@ const Top100CoursesHubPanel = () => {
                     ringColor={topCount >= 5 ? getRingColorForTotalPlayed(topCount) : undefined}
                     className="mx-auto"
                   />
-                  <p className="mt-1.5 text-xs font-medium text-foreground truncate">
+                  <p className="mt-1.5 text-xs font-medium text-foreground truncate w-[72px] text-center">
                     {name.split(' ')[0]}
                   </p>
                 </button>
@@ -334,34 +341,34 @@ const Top100CoursesHubPanel = () => {
         </section>
       )}
 
-      {/* 4. Controls Section - grouped in soft container */}
-      <section className="rounded-sq-md bg-muted/30 border border-border/40 p-4 space-y-3">
+      {/* 4. Controls Section - flat, no boxed container */}
+      <section className="mt-4 space-y-3">
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search within this Top 100 list"
-            className="pl-9 pr-9 h-10 bg-background border-border/60 rounded-sq-sm text-sm"
+            className="pl-10 pr-10 h-11 bg-card border border-border/60 rounded-sq-sm shadow-[0_1px_3px_rgba(0,0,0,0.06)] text-base"
           />
           {searchTerm && (
             <button
               type="button"
               onClick={() => setSearchTerm('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
               <X className="h-4 w-4" />
             </button>
           )}
         </div>
 
-        {/* List + Sort selectors */}
-        <div className="flex gap-3">
+        {/* List + Sort selectors - grid on mobile */}
+        <div className="grid grid-cols-2 gap-3 sm:flex sm:gap-3">
           {/* List selector */}
           <div className="flex-1">
             <Select value={selectedList} onValueChange={setSelectedList}>
-              <SelectTrigger className="h-10 w-full bg-background border-border/60 rounded-sq-sm text-sm">
+              <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-sq-sm text-sm shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
                 <SelectValue placeholder="Choose list" />
               </SelectTrigger>
               <SelectContent className="bg-card border-border z-50 rounded-sq-sm">
@@ -381,13 +388,13 @@ const Top100CoursesHubPanel = () => {
               onChange={(v) => setSortOption(v as Top100SortOption)}
               options={sortOptions}
               ariaLabel="Sort courses"
-              triggerClassName="h-10"
+              triggerClassName="h-11"
             />
           </div>
         </div>
       </section>
 
-      {/* 5. Rankings List */}
+      {/* 5. Rankings List - mt-4 from controls */}
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
