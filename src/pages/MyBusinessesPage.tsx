@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMyBusinesses } from '@/hooks/useMyBusinesses';
 import { useState } from 'react';
@@ -34,21 +33,20 @@ const MyBusinessesPage = () => {
 
   return (
     <PageRoot className="min-h-screen bg-muted/30">
-      {/* Header - Global system parity */}
+      {/* Header */}
       <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50">
-        <div className="mx-auto max-w-xl px-4 py-4">
-          {/* Back CTA */}
+        <div className="mx-auto max-w-xl px-4 pt-3 pb-4">
+          {/* Back CTA - matching EditProfilePage style */}
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-3"
+            className="inline-flex items-center gap-0.5 text-sm text-slate-500 hover:text-slate-400 mb-3"
           >
-            <ChevronLeft className="h-4 w-4" />
-            Back
+            ‹ Back
           </button>
           
-          {/* Title stack */}
-          <h1 className="text-xl font-semibold text-foreground">Business profiles</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          {/* Centered title stack */}
+          <h1 className="text-xl font-semibold text-foreground text-center">Business profiles</h1>
+          <p className="text-sm text-muted-foreground mt-0.5 text-center">
             Manage the golf businesses you represent
           </p>
         </div>
