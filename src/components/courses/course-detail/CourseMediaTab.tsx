@@ -271,63 +271,91 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
   const visibleCount = 4; // Show 4 tiles in preview
   const overflowCount = Math.max(0, mediaItems.length - visibleCount);
 
+  // Check if we have any media at all (before filtering)
+  const hasAnyMedia = exploreItems.length > 0;
+
   return (
     <div className="space-y-0">
-      {/* Summary Card - 24px section spacing */}
-      <CourseMediaSummaryCard
-        photoCount={summary.photoCount}
-        videoCount={summary.videoCount}
-        contributorsCount={contributors.length}
-        courseName={courseName}
-        onAddMedia={() => navigate(`/courses/${courseId}/rate`)}
-      />
+      {/* Summary Card - only show if media exists */}
+      {hasAnyMedia && (
+        <CourseMediaSummaryCard
+          photoCount={summary.photoCount}
+          videoCount={summary.videoCount}
+          contributorsCount={contributors.length}
+          courseName={courseName}
+          onAddMedia={() => navigate(`/courses/${courseId}/rate`)}
+        />
+      )}
 
-      {/* Sort/Filter Bar - 24px from header, 12px label→pills, 24px to grid */}
-      <div className="px-4 pt-6 pb-6 bg-muted/30">
-        <p className="mb-3 text-[11px] font-semibold tracking-[0.12em] uppercase text-muted-foreground">
-          Sort &amp; filter
-        </p>
-        <div className="flex items-center gap-2">
-          <SegmentedTabs
-            options={filterOptions}
-            value={filterMode}
-            onChange={(value) => setFilterMode(value as MediaFilterMode)}
-            className="flex-1"
-          />
-          {/* Clear button - only when filter active */}
-          {isFilterActive && (
-            <button
-              type="button"
-              onClick={() => setFilterMode('most_recent')}
-              className="flex items-center gap-1 rounded-sq-md border border-border bg-card px-3 py-2 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted active:scale-[0.97] transition-all"
-            >
-              Clear
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Empty state after filtering */}
-      {filteredItems.length === 0 && !isLoading && (
-        <div className="px-4 py-8">
-          <div className="rounded-sq-lg border border-border/60 bg-card px-4 py-6 text-center">
-            <p className="text-sm font-semibold text-foreground">
-              {filterMode === 'photos' ? 'No photos yet' : filterMode === 'videos' ? 'No videos yet' : 'No media yet'}
-            </p>
-            <p className="mt-2 text-xs text-muted-foreground">
-              {filterMode === 'most_recent' 
-                ? 'Be the first to share media for this course.'
-                : `Try a different filter or add your own ${filterMode === 'photos' ? 'photos' : 'videos'}.`
-              }
-            </p>
-            <button
-              type="button"
-              className="mt-4 inline-flex items-center gap-1.5 rounded-sq-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 active:scale-[0.98] transition-all"
-              onClick={() => navigate(`/courses/${courseId}/rate`)}
-            >
-              Add a photo or video
-            </button>
+      {/* Sort/Filter Bar - only show if media exists */}
+      {hasAnyMedia && (
+        <div className="px-4 pt-6 pb-6 bg-muted/30">
+          <p className="mb-3 text-[11px] font-semibold tracking-[0.12em] uppercase text-muted-foreground">
+            Sort &amp; filter
+          </p>
+          <div className="flex items-center gap-2">
+            <SegmentedTabs
+              options={filterOptions}
+              value={filterMode}
+              onChange={(value) => setFilterMode(value as MediaFilterMode)}
+              className="flex-1"
+            />
+            {/* Clear button - only when filter active */}
+            {isFilterActive && (
+              <button
+                type="button"
+                onClick={() => setFilterMode('most_recent')}
+                className="flex items-center gap-1 rounded-sq-md border border-border bg-card px-3 py-2 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted active:scale-[0.97] transition-all"
+              >
+                Clear
+              </button>
+            )}
           </div>
+        </div>
+      )}
+
+      {/* Empty state - no media at all (on background, not in card) */}
+      {!hasAnyMedia && !isLoading && (
+        <div className="px-4 py-12 flex flex-col items-center text-center">
+          <div className="h-12 w-12 rounded-full bg-muted/60 flex items-center justify-center mb-4">
+            <svg className="h-6 w-6 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </div>
+          <p className="text-base font-semibold text-foreground mb-1">No media yet</p>
+          <p className="text-sm text-muted-foreground mb-6 max-w-[280px]">
+            Be the first to share photos or videos of {courseName || 'this course'}.
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate(`/courses/${courseId}/rate`)}
+            className="inline-flex items-center gap-2 rounded-sq-sm border border-border bg-card px-5 py-2.5 text-sm font-medium text-foreground hover:bg-muted active:scale-[0.98] transition-all"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Add a photo or video
+          </button>
+        </div>
+      )}
+
+      {/* Filtered empty state - has media but filter shows none */}
+      {hasAnyMedia && filteredItems.length === 0 && !isLoading && (
+        <div className="px-4 py-8 flex flex-col items-center text-center">
+          <p className="text-sm font-semibold text-foreground mb-1">
+            {filterMode === 'photos' ? 'No photos yet' : 'No videos yet'}
+          </p>
+          <p className="text-sm text-muted-foreground mb-4">
+            Try a different filter or add your own.
+          </p>
+          <button
+            type="button"
+            onClick={() => setFilterMode('most_recent')}
+            className="inline-flex items-center gap-1.5 rounded-sq-sm border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-muted active:scale-[0.98] transition-all"
+          >
+            Clear filter
+          </button>
         </div>
       )}
 
