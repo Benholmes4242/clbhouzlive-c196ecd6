@@ -58,10 +58,10 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
       <motion.div
         onClick={handleClick}
         whileTap={{ scale: 0.98 }}
-        className="relative bg-white border border-amber-200/60 rounded-sq-sm overflow-hidden cursor-pointer hover:shadow-md transition-all group"
+        className="relative bg-white border border-amber-200/50 rounded-sq-sm overflow-hidden cursor-pointer hover:shadow-md transition-all group"
       >
-        {/* Gold accent line */}
-        <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400" />
+        {/* Gold accent line - consistent 2px */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 rounded-t-sq-sm" />
         
         <div className="flex">
           {/* Thumbnail - slightly larger */}
@@ -97,10 +97,10 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             )}
           </div>
 
-          {/* Rating */}
+          {/* Rating - refined pill */}
           <div className="flex items-center px-3">
             {isRated && course.rating_value ? (
-              <RatingPill score={course.rating_value} className="text-[10px] px-2 py-1" />
+              <RatingPill score={course.rating_value} className="text-[10px] px-3 py-0.5 h-6" />
             ) : isOwnProfile ? (
               <button 
                 onClick={handleRateClick}
@@ -194,10 +194,10 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
           )}
         </div>
 
-        {/* Rating */}
+        {/* Rating - refined pill */}
         <div className="flex items-center px-3">
           {course.rating_value && (
-            <RatingPill score={course.rating_value} className="text-[10px] px-2 py-1" />
+            <RatingPill score={course.rating_value} className="text-[10px] px-3 py-0.5 h-6" />
           )}
         </div>
       </div>

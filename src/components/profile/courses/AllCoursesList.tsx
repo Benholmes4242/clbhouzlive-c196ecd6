@@ -169,14 +169,17 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
 
   return (
     <div ref={sectionRef}>
-      {/* Section header */}
-      <div className="flex items-start justify-between mb-2">
+      {/* Section divider */}
+      <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent mb-6" />
+
+      {/* Section header with breathing room */}
+      <div className="flex items-start justify-between mb-3 pt-2">
         <div>
           <h3 className="text-base font-semibold text-slate-900">
             All Courses Played
           </h3>
           <p className="text-xs text-slate-500 mt-0.5">
-            Every course you've logged a round on
+            Your complete journey
           </p>
         </div>
       </div>
@@ -220,10 +223,17 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
             </div>
           )}
 
-          {/* Summary line */}
-          <p className="text-xs text-slate-500 text-center pt-2 pb-6">
-            Showing {displayedCourses.length} of {filteredCourses.length} courses
-          </p>
+          {/* End-of-list closure */}
+          {!hasMore && filteredCourses.length > 0 && (
+            <div className="text-center pt-4 pb-8">
+              <p className="text-sm text-slate-600 font-medium">
+                That's your journey so far.
+              </p>
+              <p className="text-xs text-slate-400 mt-1">
+                {filteredCourses.length} courses played. On to {filteredCourses.length + 1}.
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>

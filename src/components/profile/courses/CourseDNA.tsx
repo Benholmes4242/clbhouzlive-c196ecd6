@@ -41,15 +41,16 @@ export const CourseDNA: React.FC<CourseDNAProps> = ({
   if (chips.length === 0) return null;
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+    <div className="flex gap-2.5 overflow-x-auto pb-1 -mx-1 px-1 mt-1">
       {chips.map((chip, index) => (
         <div
           key={index}
-          className="flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-100 rounded-sq-sm shadow-[0_1px_2px_rgba(0,0,0,0.04)] whitespace-nowrap"
+          className="flex items-center gap-2 px-3.5 py-2.5 bg-white border border-slate-100/80 rounded-sq-md shadow-[0_1px_3px_rgba(0,0,0,0.05)] whitespace-nowrap"
+          title={chip.label}
         >
-          <chip.icon className="w-3.5 h-3.5 text-slate-400" />
+          <chip.icon className="w-4 h-4 text-slate-400" strokeWidth={1.5} />
           <span className="text-sm font-semibold text-slate-900">{chip.value}</span>
-          <span className="text-xs text-slate-500">{chip.label}</span>
+          <span className="text-[11px] text-slate-400 uppercase tracking-wide">{chip.label}</span>
         </div>
       ))}
     </div>

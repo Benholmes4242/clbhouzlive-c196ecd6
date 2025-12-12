@@ -32,8 +32,8 @@ export const FeaturedFavouriteCard: React.FC<FeaturedFavouriteCardProps> = ({
       whileTap={{ scale: 0.98 }}
       className="relative bg-slate-900 rounded-sq-md overflow-hidden cursor-pointer group"
     >
-      {/* Hero image with gradient overlay */}
-      <div className="aspect-[16/9] relative overflow-hidden">
+      {/* Hero image with gradient overlay - slightly reduced height */}
+      <div className="aspect-[16/8.5] relative overflow-hidden">
         {course.thumbnail_image ? (
           <img
             src={course.thumbnail_image}
@@ -47,10 +47,10 @@ export const FeaturedFavouriteCard: React.FC<FeaturedFavouriteCardProps> = ({
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
-        {/* Rank badge - top left */}
-        <div className="absolute top-3 left-3 z-10">
-          <div className="w-10 h-10 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-lg">
-            <span className="text-base font-bold text-slate-900">#1</span>
+        {/* Rank badge - top left, slightly inward */}
+        <div className="absolute top-4 left-4 z-10">
+          <div className="w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg">
+            <span className="text-sm font-bold text-slate-900">#1</span>
           </div>
         </div>
 

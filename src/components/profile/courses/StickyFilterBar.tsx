@@ -34,12 +34,13 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
   onOpenFilters,
   isSticky = false,
 }) => {
+  // Ordered by how golfers think
   const filterOptions: FilterOption[] = [
     { key: 'all', label: 'All' },
     { key: 'top100', label: 'Top 100', icon: <Trophy className="w-3 h-3" />, count: counts.top100 },
+    { key: 'highest-rated', label: 'Highest', icon: <Star className="w-3 h-3" /> },
     { key: 'rated', label: 'Rated', count: counts.rated },
     { key: 'unrated', label: 'Unrated', count: counts.unrated },
-    { key: 'highest-rated', label: 'Highest Rated', icon: <Star className="w-3 h-3" /> },
     { key: 'recently-played', label: 'Recent', icon: <Clock className="w-3 h-3" /> },
     { key: 'travel', label: 'Travel', icon: <Globe className="w-3 h-3" /> },
   ];
@@ -62,12 +63,20 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
                 key={option.key}
                 onClick={() => onFilterChange(option.key)}
                 whileTap={{ scale: 0.95 }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-sq-pill whitespace-nowrap transition-all ${
+                className={`relative flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-sq-pill whitespace-nowrap transition-all ${
                   isActive
                     ? 'bg-slate-900 text-white shadow-sm'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
+                {/* Active underline indicator */}
+                {isActive && (
+                  <motion.div
+                    layoutId="activeFilterIndicator"
+                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-slate-900 rounded-full"
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  />
+                )}
                 {option.icon && (
                   <span className={isActive ? 'text-white' : 'text-slate-500'}>
                     {option.icon}
