@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { Button } from '@/components/ui/button';
-import { MapPin } from 'lucide-react';
+import { Maximize2 } from 'lucide-react';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-streets-v12';
@@ -103,7 +102,7 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
     };
   }, [latitude, longitude, mapInitialized]);
 
-  // Always show map preview (removed mobile button to restore Phase 2 behavior)
+  // E1: Proper pill control for expand overlay
   return (
     <div
       onClick={onOpenFullMap}
@@ -111,9 +110,15 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
     >
       <div ref={mapContainerRef} className="w-full h-full" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20" />
-      <div className="pointer-events-none absolute bottom-3 right-3 text-[10px] px-2 py-1 rounded-full bg-black/60 text-white">
-        Tap to expand map
-      </div>
+      
+      {/* E1: Pill control overlay - looks like a proper control, not a watermark */}
+      <button
+        type="button"
+        className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/70 backdrop-blur-sm text-white text-xs font-medium shadow-lg"
+      >
+        <Maximize2 className="h-3 w-3" />
+        <span>Tap to expand</span>
+      </button>
     </div>
   );
 };

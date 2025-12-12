@@ -61,7 +61,7 @@ export function RatingBar({
       )}
       style={{
         height: 'var(--rating-bar-height-sm)',
-        backgroundColor: 'var(--rating-bar-track)',
+        backgroundColor: '#E8ECEF', // Lighter track for better contrast on white cards
         borderRadius: 'var(--rating-bar-radius)',
       }}
     >

@@ -5,6 +5,7 @@ import { CardType } from '@/components/explore/media/CardMediaTypes';
 import { adaptClubMediaArrayToExploreItems } from '@/lib/adapters/clubMediaToExplore';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useClubMedia } from '@/hooks/useClubMedia';
+import { ChevronRight } from 'lucide-react';
 
 interface LocalMediaItem {
   id: string;
@@ -36,9 +37,11 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
   
   // Responsive limits: 9 on desktop, 3 on mobile
   const maxItems = isMobile ? 3 : 9;
+  // Fetch more to know if there's overflow
+  const fetchLimit = isMobile ? 10 : 20;
 
   // Phase 1 Fix #2: Use shared hook - consumes same cache as CourseMediaTab
-  const { data: rawMedia, isLoading: loading } = useClubMedia(clubId, maxItems);
+  const { data: rawMedia, isLoading: loading } = useClubMedia(clubId, fetchLimit);
   
   // Slice to required limit from cached data
   const items = useMemo(() => {
@@ -101,14 +104,18 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
   const displayItems = Array.from({ length: maxItems }, (_, i) => mediaTiles[i] || null);
 
   // Calculate photo and video counts (MUST be before ANY early returns)
-  const { photoCount, videoCount } = useMemo(() => {
-    if (loading) return { photoCount: 0, videoCount: 0 };
+  const { photoCount, videoCount, totalCount } = useMemo(() => {
+    if (loading) return { photoCount: 0, videoCount: 0, totalCount: 0 };
     const photos = mediaTiles.filter(m => m.media_type === 'image').length;
     const videos = mediaTiles.filter(m => m.media_type === 'video').length;
-    return { photoCount: photos, videoCount: videos };
-  }, [loading, mediaTiles]);
+    const total = rawMedia?.length || 0;
+    return { photoCount: photos, videoCount: videos, totalCount: total };
+  }, [loading, mediaTiles, rawMedia]);
 
   const hasMedia = mediaTiles.length > 0;
+  
+  // F2: Calculate overflow count for "+X" indicator
+  const overflowCount = totalCount > maxItems ? totalCount - maxItems : 0;
 
   if (loading) {
     return (
@@ -170,37 +177,54 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
             {photoCount} {photoCount === 1 ? 'photo' : 'photos'} · {videoCount} {videoCount === 1 ? 'video' : 'videos'}
           </p>
         </div>
+        {/* See all CTA with chevron */}
         <button
           type="button"
-          className="text-sm font-medium text-foreground hover:underline"
+          className="flex items-center gap-1 text-sm font-medium text-foreground hover:text-slate-900 active:opacity-70 transition-colors"
           onClick={(e) => {
             e.stopPropagation();
             onSeeAllClick();
           }}
         >
-          See all
+          <span>See all</span>
+          <ChevronRight className="h-4 w-4 text-slate-400" />
         </button>
       </div>
 
       <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 grid grid-cols-3 gap-[1px]">
-        {mediaTiles.map((media) => (
-          <button
-            key={media.id}
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onSeeAllClick();
-            }}
-            className="overflow-hidden w-full aspect-square focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow hover:shadow-md border border-border/60 sm:border-border/40"
-            aria-label="Open Media tab"
-          >
-            <SquareCardMedia
-              media={media}
-              cardType={CardType.SQUARE}
-              className="w-full h-full"
-            />
-          </button>
-        ))}
+        {mediaTiles.map((media, index) => {
+          // F2: Show "+X" overlay on last tile if there's more media
+          const isLastTile = index === mediaTiles.length - 1;
+          const showOverflow = isLastTile && overflowCount > 0;
+          
+          return (
+            <button
+              key={media.id}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onSeeAllClick();
+              }}
+              className="relative overflow-hidden w-full aspect-square focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow hover:shadow-md border border-border/60 sm:border-border/40"
+              aria-label="Open Media tab"
+            >
+              <SquareCardMedia
+                media={media}
+                cardType={CardType.SQUARE}
+                className="w-full h-full"
+              />
+              
+              {/* F2: "+X" overflow indicator */}
+              {showOverflow && (
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                  <span className="text-white text-xl font-semibold">
+                    +{overflowCount}
+                  </span>
+                </div>
+              )}
+            </button>
+          );
+        })}
       </div>
     </>
   );
