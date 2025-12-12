@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import CompactHeader from '@/components/header/CompactHeader';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { GolferRow } from '@/components/golfers/GolferRow';
+import { GolferRowFlat } from '@/components/golfers/GolferRowFlat';
 import { Button } from '@/components/ui/button';
 
 const FILTER_TABS = [
@@ -20,8 +20,13 @@ const FILTER_TABS = [
   { id: 'popular' as const, label: 'Popular' },
 ];
 
+const PAGE_SIZE = 10;
+
 const GolfersToFollowPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const source = searchParams.get('source');
+  
   const [searchInput, setSearchInput] = useState('');
   const debouncedSearchQuery = useDebounce(searchInput, 300);
   
@@ -93,28 +98,45 @@ const GolfersToFollowPage = () => {
     setActioningUserId(null);
   };
 
-  const startIndex = (page - 1) * pageSize + 1;
-  const endIndex = Math.min(page * pageSize, totalCount);
+  const handleClearSearch = () => {
+    setSearchInput('');
+    setSearchQuery('');
+  };
+
+  const handleGoToPopular = () => {
+    setActiveFilter('popular');
+    setPage(1);
+  };
+
+  const handleLoadNext = () => {
+    if (page < totalPages) {
+      setPage(page + 1);
+    }
+  };
+
+  const startIndex = (page - 1) * PAGE_SIZE + 1;
+  const endIndex = Math.min(page * PAGE_SIZE, totalCount);
+  const showingCount = golfers.length;
+  const hasMore = page < totalPages;
 
   return (
     <PageRoot className="bg-muted/40 pb-24">
       <CompactHeader />
 
-      {/* Main content wrapper - fixed left position to match Activity page */}
-      <div className="w-full max-w-[640px] px-4 sm:px-5 pt-6 compact-header-offset" style={{ marginLeft: 'clamp(16px, calc(50vw - 320px), calc(50vw - 320px))' }}>
-        {/* Header section */}
-        <section className="mb-4">
+      <div className="w-full compact-header-offset">
+        {/* Title block */}
+        <div className="px-6 pt-4 pb-3">
           <h1 className="text-xl font-semibold tracking-tight text-foreground">
             Golfers to follow
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             Discover new golfers and build your community.
           </p>
-        </section>
+        </div>
 
-        {/* Filter tabs - Apple-style segmented control matching Activity page */}
-        <div className="mb-4">
-          <div className="inline-flex rounded-sq-pill bg-muted/70 border border-border/40 p-1 gap-0.5">
+        {/* Filter tabs - lighter pill style */}
+        <div className="px-6 mb-4">
+          <div className="inline-flex rounded-sq-pill bg-muted/50 p-1 gap-0.5">
             {FILTER_TABS.map((tab) => (
               <button
                 key={tab.id}
@@ -135,8 +157,8 @@ const GolfersToFollowPage = () => {
           </div>
         </div>
 
-        {/* Search bar */}
-        <div className="mb-4">
+        {/* Search bar - lighter treatment */}
+        <div className="px-6 mb-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -144,40 +166,75 @@ const GolfersToFollowPage = () => {
               placeholder="Search golfers by name or club"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="pl-9 h-10 rounded-sq-sm"
+              className="pl-9 h-11 rounded-xl border-border/40 bg-white/35"
             />
           </div>
         </div>
 
         {/* Content */}
         {loading ? (
-          <div className="space-y-1.5">
+          <div className="divide-y divide-border/25">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div
-                key={i}
-                className="rounded-sq-md px-4 py-3 min-h-[86px] bg-background/50 flex items-center gap-3"
-              >
-                <div className="h-11 w-11 rounded-sq-md bg-muted animate-pulse" />
+              <div key={i} className="px-6 py-4 flex items-center gap-3">
+                <div className="h-12 w-12 rounded-sq-md bg-muted animate-pulse" />
                 <div className="flex-1 space-y-2">
                   <div className="h-3 w-1/2 rounded-full bg-muted animate-pulse" />
                   <div className="h-3 w-1/3 rounded-full bg-muted/60 animate-pulse" />
                 </div>
-                <div className="h-6 w-20 rounded-sq-xs bg-muted animate-pulse" />
+                <div className="h-9 w-20 rounded-lg bg-muted animate-pulse" />
               </div>
             ))}
           </div>
         ) : golfers.length === 0 ? (
-          <div className="flex flex-col items-start text-left gap-2 py-10">
-            <p className="text-sm font-medium text-foreground">No golfers found</p>
-            <p className="text-xs text-muted-foreground max-w-[280px]">
-              Try another tab, search by name or club, or invite a friend to join.
-            </p>
+          // Empty states
+          <div className="flex flex-col items-center text-center gap-4 py-16 px-6">
+            {isSearching || searchInput ? (
+              // Search = no results
+              <>
+                <p className="text-sm font-medium text-foreground">No golfers found</p>
+                <p className="text-sm text-muted-foreground max-w-[280px]">
+                  Try a different name or club.
+                </p>
+                <Button variant="secondary" size="sm" onClick={handleClearSearch}>
+                  Clear search
+                </Button>
+              </>
+            ) : activeFilter === 'suggested' ? (
+              // Suggested tab = empty
+              <>
+                <p className="text-sm font-medium text-foreground">No suggestions yet</p>
+                <p className="text-sm text-muted-foreground max-w-[280px]">
+                  Try Popular or search for a club.
+                </p>
+                <div className="flex gap-2">
+                  <Button variant="secondary" size="sm" onClick={handleGoToPopular}>
+                    Go to Popular
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => document.querySelector<HTMLInputElement>('input[type="search"]')?.focus()}
+                  >
+                    Search
+                  </Button>
+                </div>
+              </>
+            ) : (
+              // Generic empty
+              <>
+                <p className="text-sm font-medium text-foreground">No golfers found</p>
+                <p className="text-sm text-muted-foreground max-w-[280px]">
+                  Try another tab or search by name or club.
+                </p>
+              </>
+            )}
           </div>
         ) : (
           <>
-            <div className="space-y-1.5">
+            {/* Flat list rows */}
+            <div className="divide-y divide-border/25">
               {golfers.map((golfer) => (
-                <GolferRow
+                <GolferRowFlat
                   key={golfer.id}
                   golfer={golfer}
                   isFollowing={followingIds.has(golfer.id)}
@@ -190,33 +247,24 @@ const GolfersToFollowPage = () => {
               ))}
             </div>
 
-            {/* Pagination */}
-            {!isSearching && totalPages > 1 && (
-              <div className="mt-6 flex items-center justify-between gap-3 text-sm text-muted-foreground">
+            {/* Pagination - Load next 10 */}
+            {!isSearching && hasMore && (
+              <div className="mt-6 px-6">
                 <Button
                   variant="secondary"
-                  size="sm"
-                  disabled={page === 1}
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
-                  className="rounded-sq-xs"
+                  onClick={handleLoadNext}
+                  className="w-full max-w-[420px] mx-auto block rounded-xl"
                 >
-                  Previous
-                </Button>
-
-                <span className="flex-1 text-center text-xs">
-                  {startIndex}–{endIndex} of {totalCount}
-                </span>
-
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  disabled={page === totalPages}
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                  className="rounded-sq-xs"
-                >
-                  Next
+                  Load next 10 golfers
                 </Button>
               </div>
+            )}
+
+            {/* Status text */}
+            {!isSearching && totalCount > 0 && (
+              <p className="mt-4 text-center text-xs text-muted-foreground">
+                Showing {showingCount} of {totalCount} golfers
+              </p>
             )}
           </>
         )}
