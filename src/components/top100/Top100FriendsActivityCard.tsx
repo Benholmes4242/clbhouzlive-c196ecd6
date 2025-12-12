@@ -3,7 +3,6 @@ import { Card } from '@/components/ui/card';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ChevronDown, ChevronUp, Trophy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { getTop100Club } from '@/lib/top100Club';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 
 interface Top100FriendEntry {
@@ -37,46 +36,36 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
 
   const visibleEntries = isExpanded ? topFriends : topFriends.slice(0, 3);
 
-  // Ranking badge - gold/silver/bronze only
   const getRankBadge = (index: number) => {
     const rank = index + 1;
     
-    // Podium styling for ranks 1-3 with gold/silver/bronze
+    // Podium styling for ranks 1-3
     if (rank === 1) {
       return (
-        <span 
-          className="inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold"
-          style={{ backgroundColor: '#D4A857', color: '#1a1a1a' }}
-        >
-          {rank}
+        <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2 py-[2px] text-xs font-semibold text-amber-700">
+          #{rank}
         </span>
       );
     }
     if (rank === 2) {
       return (
-        <span 
-          className="inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold"
-          style={{ backgroundColor: '#A8A8A8', color: '#1a1a1a' }}
-        >
-          {rank}
+        <span className="inline-flex items-center rounded-full border border-slate-300 bg-slate-100 px-2 py-[2px] text-xs font-semibold text-slate-700">
+          #{rank}
         </span>
       );
     }
     if (rank === 3) {
       return (
-        <span 
-          className="inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold"
-          style={{ backgroundColor: '#CD7F32', color: '#1a1a1a' }}
-        >
-          {rank}
+        <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2 py-[2px] text-xs font-semibold text-orange-600">
+          #{rank}
         </span>
       );
     }
     
     // Ghost pill for ranks 4-10
     return (
-      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full border border-border/60 bg-background/40 text-[10px] font-medium text-muted-foreground">
-        {rank}
+      <span className="inline-flex items-center rounded-full border border-border/60 bg-background/40 px-2 py-[2px] text-xs font-medium text-muted-foreground">
+        #{rank}
       </span>
     );
   };
@@ -86,27 +75,32 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
   }
 
   return (
-    <Card className="bg-card/80 border border-border/50 rounded-xl shadow-sm overflow-hidden">
-      {/* Header - Always visible, clickable - +8px spacing below */}
+    <Card className="bg-card border border-border/60 rounded-xl shadow-sm overflow-hidden">
+      {/* Header - Always visible, clickable */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-5 py-4 flex items-center justify-between hover:bg-muted/20 transition-colors min-h-[64px]"
+        className="w-full px-5 py-4 flex items-center justify-between hover:bg-muted/30 transition-colors min-h-[64px]"
       >
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center w-9 h-9 rounded-full bg-amber-50 border border-amber-200">
             <Trophy className="w-4 h-4 text-amber-600" />
           </div>
           <div className="text-left">
-            <h3 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">Friends chasing the Top 100</h3>
-            <p className="text-xs text-muted-foreground mt-1">{friendMessage ?? 'Top players this period'}</p>
+            <h3 className="text-base font-semibold text-foreground">Friends chasing the Top 100</h3>
+            <p className="text-xs text-muted-foreground">{friendMessage ?? 'Top players this period'}</p>
           </div>
         </div>
 
-        {isExpanded ? (
-          <ChevronUp className="w-5 h-5 text-muted-foreground transition-transform duration-200" />
-        ) : (
-          <ChevronDown className="w-5 h-5 text-muted-foreground transition-transform duration-200" />
-        )}
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 py-[2px] text-xs font-semibold text-amber-700">
+            Top 10
+          </span>
+          {isExpanded ? (
+            <ChevronUp className="w-5 h-5 text-muted-foreground transition-transform duration-200" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-muted-foreground transition-transform duration-200" />
+          )}
+        </div>
       </button>
 
       {/* Leaderboard List */}
