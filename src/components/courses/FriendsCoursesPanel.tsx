@@ -17,10 +17,8 @@ import { friendsCoursesMockData } from '@/mocks/friendsCoursesMock';
 import FriendsSnapshotCard from './friends/FriendsSnapshotCard';
 import FriendsHeroCourseCard from './friends/FriendsHeroCourseCard';
 import FriendsActivityCard from './friends/FriendsActivityCard';
-import FriendsTop100Card from './friends/FriendsTop100Card';
 import FriendsCoursesSkeleton from './friends/FriendsCoursesSkeleton';
 import FriendsCoursesEmpty from './friends/FriendsCoursesEmpty';
-import { useFriendsOnTop100Journey } from '@/hooks/useFriendsOnTop100Journey';
 import CourseRankBadges from './CourseRankBadges';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { extractRanksFromMemberships } from '@/utils/rankingUtils';
@@ -38,7 +36,6 @@ const FriendsCoursesPanel: React.FC = () => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const { data: realData, isLoading } = useFriendsCourses(user?.id);
-  const { data: top100Friends } = useFriendsOnTop100Journey(user?.id);
   
   // When using mock, we still fetch real course data for photos/details
   const mockCourseIds = useMemo(() => {
@@ -533,12 +530,6 @@ const FriendsCoursesPanel: React.FC = () => {
         />
       </div>
 
-      {/* Friends chasing Top 100 */}
-      {top100Friends && top100Friends.length > 0 && (
-        <div className="mt-8">
-          <FriendsTop100Card friends={top100Friends} />
-        </div>
-      )}
 
       {hotCourses.length > 0 && (
         <div className="mt-12 space-y-3">
