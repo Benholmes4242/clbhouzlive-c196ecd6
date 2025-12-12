@@ -84,11 +84,13 @@ export const JourneyHero: React.FC<JourneyHeroProps> = ({
 
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-amber-50/60 via-stone-50 to-slate-50 border border-slate-200/60 rounded-sq-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-      {/* Subtle background texture */}
+      {/* Subtle background texture - faded right side */}
       <div 
-        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        className="absolute inset-0 opacity-[0.015] pointer-events-none"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          maskImage: 'linear-gradient(to right, black 40%, transparent 80%)',
+          WebkitMaskImage: 'linear-gradient(to right, black 40%, transparent 80%)',
         }}
       />
       
@@ -125,18 +127,24 @@ export const JourneyHero: React.FC<JourneyHeroProps> = ({
             </div>
           </div>
           
-          <div className="flex items-baseline gap-1 mb-2.5">
-            <span className="text-lg font-bold text-slate-900">{coursesToNextMilestone}</span>
-            <span className="text-xs text-slate-600">to reach</span>
+          <div className="mb-2.5">
             <span className="text-xs font-semibold text-amber-700">{nextMilestone.name}</span>
+            <span className="text-xs text-slate-500"> · {coursesToNextMilestone} remaining</span>
           </div>
 
-          {/* Animated progress bar */}
-          <div className="h-2 bg-slate-200/80 rounded-full overflow-hidden">
+          {/* Animated progress bar with position marker */}
+          <div className="relative h-2 bg-slate-200/80 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${animatedProgress}%` }}
+              transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+            />
+            {/* Position marker */}
+            <motion.div
+              className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white border-2 border-amber-500 rounded-full shadow-sm"
+              initial={{ left: 0 }}
+              animate={{ left: `calc(${animatedProgress}% - 6px)` }}
               transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
             />
           </div>
