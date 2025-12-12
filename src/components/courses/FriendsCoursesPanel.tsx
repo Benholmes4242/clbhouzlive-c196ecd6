@@ -460,49 +460,50 @@ const FriendsCoursesPanel: React.FC = () => {
 
   return (
     <div className="w-full pb-6">
-      <div className="space-y-3">
-        <div>
+      {/* Page Header - 8px title→subtitle, 16px header→filters */}
+      <div className="mb-4">
+        <div className="flex flex-col gap-2">
           <h2 className="text-lg font-semibold tracking-tight">Friends' Courses</h2>
           <p className="text-sm text-muted-foreground">See where your friends have been playing lately</p>
         </div>
+      </div>
+      
+      {/* Filter Dropdowns */}
+      <div className="flex items-center gap-3">
+        {/* Time Range Dropdown */}
+        <div className="flex-1">
+          <Select value={timeframe} onValueChange={(value) => setTimeframe(value as Timeframe)}>
+            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
+              <SelectValue placeholder="Select time range" />
+            </SelectTrigger>
+            <SelectContent className="bg-card border-border z-50">
+              <SelectItem value="7d">Last 7 days</SelectItem>
+              <SelectItem value="30d">Last 30 days</SelectItem>
+              <SelectItem value="90d">Last 90 days</SelectItem>
+              <SelectItem value="12m">Last 12 months</SelectItem>
+              <SelectItem value="all">All time</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         
-        {/* Filter Dropdowns */}
-        <div className="flex items-center gap-3">
-          {/* Time Range Dropdown */}
-          <div className="flex-1">
-            <Select value={timeframe} onValueChange={(value) => setTimeframe(value as Timeframe)}>
-              <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
-                <SelectValue placeholder="Select time range" />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border z-50">
-                <SelectItem value="7d">Last 7 days</SelectItem>
-                <SelectItem value="30d">Last 30 days</SelectItem>
-                <SelectItem value="90d">Last 90 days</SelectItem>
-                <SelectItem value="12m">Last 12 months</SelectItem>
-                <SelectItem value="all">All time</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          {/* Course Filter Dropdown */}
-          <div className="flex-1">
-            <Select value={courseFilter} onValueChange={(value) => setCourseFilter(value as CourseFilter)}>
-              <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
-                <SelectValue placeholder="Select filter" />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border z-50">
-                <SelectItem value="all">All courses</SelectItem>
-                <SelectItem value="new">New this period</SelectItem>
-                <SelectItem value="most_played">Most played</SelectItem>
-                <SelectItem value="highest_rated">Highest rated</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        {/* Course Filter Dropdown */}
+        <div className="flex-1">
+          <Select value={courseFilter} onValueChange={(value) => setCourseFilter(value as CourseFilter)}>
+            <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
+              <SelectValue placeholder="Select filter" />
+            </SelectTrigger>
+            <SelectContent className="bg-card border-border z-50">
+              <SelectItem value="all">All courses</SelectItem>
+              <SelectItem value="new">New this period</SelectItem>
+              <SelectItem value="most_played">Most played</SelectItem>
+              <SelectItem value="highest_rated">Highest rated</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
-      {/* Friends Snapshot Card */}
-      <div className="mt-8">
+      {/* Friends Snapshot Card - 24px section gap */}
+      <div className="mt-6">
         <FriendsSnapshotCard
           timeframe={timeframe}
           totalCourses={totalCourses}
@@ -512,9 +513,9 @@ const FriendsCoursesPanel: React.FC = () => {
         />
       </div>
 
-      {/* Hero Course Card - Most Popular */}
+      {/* Hero Course Card - Most Popular - 24px section gap */}
       {heroCourse && (
-        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 mt-8">
+        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 mt-6">
           <FriendsHeroCourseCard 
             course={heroCourse} 
             filterType={courseFilter}
@@ -522,8 +523,8 @@ const FriendsCoursesPanel: React.FC = () => {
         </div>
       )}
 
-      {/* Friends Activity Leaderboard */}
-      <div className="mt-8">
+      {/* Friends Activity Leaderboard - 24px section gap */}
+      <div className="mt-6">
         <FriendsActivityCard 
           leaderboard={leaderboard}
           timeframe={timeframe}
@@ -531,9 +532,11 @@ const FriendsCoursesPanel: React.FC = () => {
       </div>
 
 
+      {/* Hot in your network - 24px section gap */}
       {hotCourses.length > 0 && (
-        <div className="mt-12 space-y-3">
-          <div className="flex items-center justify-between">
+        <div className="mt-6">
+          {/* Section header - 8px title gap, 16px to content */}
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Flame className="w-4 h-4 text-primary-accent" />
               <h3 className="text-sm font-semibold">Hot in your network</h3>
@@ -543,7 +546,7 @@ const FriendsCoursesPanel: React.FC = () => {
             </span>
           </div>
 
-          {/* Full width breakout for cards */}
+          {/* Full width breakout for cards - 16px card-to-card */}
           <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
             <div className="space-y-4">
               {hotCourses.map((course) => (
@@ -625,9 +628,9 @@ const FriendsCoursesPanel: React.FC = () => {
       {/* Anchor for scrolling to start of course list */}
       <div ref={coursesListAnchorRef} />
 
-      {/* Regular courses - Paginated list with slide animation */}
+      {/* Regular courses - Paginated list - 24px section gap, 16px card-to-card */}
       {paginatedCourses.length > 0 && (
-        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 mt-9">
+        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 mt-6">
           <motion.div
             key={page}
             initial={{ x: 40, opacity: 0 }}
@@ -676,8 +679,8 @@ const FriendsCoursesPanel: React.FC = () => {
                     </div>
                   )}
                   
-                  {/* Course Info */}
-                  <div className="p-4">
+                  {/* Course Info - 12px internal stack */}
+                  <div className="p-4 space-y-3">
                     <div className="flex items-center justify-between">
                       <h3 className="flex-1 min-w-0 pr-3 font-semibold text-base text-foreground truncate">
                         {course.course_name}
@@ -692,12 +695,12 @@ const FriendsCoursesPanel: React.FC = () => {
                         </div>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground mb-3">
+                    <p className="text-sm text-muted-foreground">
                       {course.country}{course.sub_country ? `, ${course.sub_country}` : ''}
                     </p>
 
                     {/* Bottom row: "Played by..." with avatar */}
-                    <div className="mt-1 flex items-center justify-between gap-3">
+                    <div className="flex items-center justify-between gap-3">
                       <p className="text-xs text-muted-foreground">
                         Played by{" "}
                         <span className="font-medium text-foreground">
@@ -740,12 +743,13 @@ const FriendsCoursesPanel: React.FC = () => {
         </div>
       )}
 
-      {/* Recent rounds timeline */}
+      {/* Recent rounds timeline - 24px section gap */}
       {sortedRecent.length > 0 && (
-        <div className="space-y-3 mt-12">
-          <div>
+        <div className="mt-6">
+          {/* Section header - 8px title→subtitle, 16px to content */}
+          <div className="flex flex-col gap-2 mb-4">
             <h3 className="text-base font-semibold text-foreground">Your friends' recent rounds</h3>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground">
               Rounds played in the last {timeframe === '7d' ? '7 days' : timeframe === '30d' ? '30 days' : timeframe === '90d' ? '90 days' : timeframe === '12m' ? '12 months' : 'all time'}
             </p>
           </div>

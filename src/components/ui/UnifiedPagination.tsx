@@ -85,7 +85,7 @@ export function UnifiedPagination({
     : 'justify-between';
 
   return (
-    <div className="flex flex-col items-center gap-3 mt-8">
+    <div className="flex flex-col items-center gap-2 mt-4 mb-6">
       {/* Pagination Buttons */}
       {(hasPrevPage || hasNextPage) && (
         <div className={`flex items-center gap-3 w-full ${layoutClass}`}>
@@ -110,7 +110,7 @@ export function UnifiedPagination({
         </div>
       )}
       
-      {/* Status Text */}
+      {/* Status Text - 8px gap from buttons */}
       <p className="text-xs text-muted-foreground">
         {usePageFormat ? (
           <>Page {currentPage} of {totalPages}</>
