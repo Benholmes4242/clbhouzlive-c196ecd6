@@ -1,13 +1,15 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 
 export type ChromeState = 'visible' | 'hidden';
-export type HideReason = 'none' | 'scroll' | 'auto' | 'overlay';
+export type HideReason = 'none' | 'scroll' | 'auto' | 'overlay' | 'interaction';
 
 interface UseChromeStateOptions {
   forceHidden?: boolean;
   disabled?: boolean;
   onNavOverlayRequest?: () => void;
   disableDirectionalReveal?: boolean;
+  /** Enable progressive immersion: hide after first meaningful interaction */
+  progressiveImmersion?: boolean;
 }
 
 interface ScrollMetrics {
@@ -21,8 +23,18 @@ const TOP_GUARD_PX = Math.round(window.innerHeight * 0.5);
 const HIDE_DEBOUNCE_MS = 140;
 const REVEAL_DEBOUNCE_MS = 140;
 const REVEAL_DEBOUNCE_AT_TOP_MS = 0; // Instant reveal at top
+const EDGE_REVEAL_TIMEOUT_MS = 5000; // Chrome stays visible for 5s after edge reveal
 
-export const useChromeState = ({ forceHidden = false, disabled = false, onNavOverlayRequest, disableDirectionalReveal = false }: UseChromeStateOptions = {}) => {
+// Bottom edge zone for recovery gesture (15% of viewport)
+const BOTTOM_EDGE_ZONE_PERCENT = 0.15;
+
+export const useChromeState = ({ 
+  forceHidden = false, 
+  disabled = false, 
+  onNavOverlayRequest, 
+  disableDirectionalReveal = false,
+  progressiveImmersion = false,
+}: UseChromeStateOptions = {}) => {
   const [chromeState, setChromeState] = useState<ChromeState>('visible');
   const scrollMetricsRef = useRef<ScrollMetrics>({ deltaY: 0, scrollTop: 0, velocity: 0 });
   const lastScrollTop = useRef(0);
@@ -30,6 +42,10 @@ export const useChromeState = ({ forceHidden = false, disabled = false, onNavOve
   const revealTimer = useRef<number | null>(null);
   const hideTimer = useRef<number | null>(null);
   const forceHiddenRef = useRef(false);
+  
+  // Progressive immersion: track if user has performed a meaningful interaction
+  const hasHadMeaningfulInteraction = useRef(false);
+  const edgeRevealTimeoutRef = useRef<number | null>(null);
   
   // Track why chrome was hidden to prevent scroll from revealing after auto-hide
   const hideReasonRef = useRef<HideReason>('none');
@@ -40,7 +56,16 @@ export const useChromeState = ({ forceHidden = false, disabled = false, onNavOve
     isTop: boolean;
     isBottom: boolean;
     startY: number;
-  }>({ isEdge: false, isTop: false, isBottom: false, startY: 0 });
+    isBottomRecoveryZone: boolean;
+  }>({ isEdge: false, isTop: false, isBottom: false, startY: 0, isBottomRecoveryZone: false });
+
+  // Clear edge reveal timeout
+  const clearEdgeRevealTimeout = useCallback(() => {
+    if (edgeRevealTimeoutRef.current) {
+      window.clearTimeout(edgeRevealTimeoutRef.current);
+      edgeRevealTimeoutRef.current = null;
+    }
+  }, []);
 
   // Handle forceHidden state changes
   useEffect(() => {
@@ -101,6 +126,11 @@ export const useChromeState = ({ forceHidden = false, disabled = false, onNavOve
       return;
     }
     
+    // If hidden by interaction and not in top zone, block scroll-based reveal
+    if (hideReasonRef.current === 'interaction' && scrollTop !== undefined && !isInTopZone(scrollTop)) {
+      return;
+    }
+    
     if (hideTimer.current) {
       clearTimeout(hideTimer.current);
       hideTimer.current = null;
@@ -137,6 +167,31 @@ export const useChromeState = ({ forceHidden = false, disabled = false, onNavOve
     hideReasonRef.current = reason;
     setChromeState('hidden');
   }, [disabled]);
+
+  // Progressive immersion: hide chrome after meaningful interaction
+  const triggerProgressiveHide = useCallback(() => {
+    if (!progressiveImmersion) return;
+    if (forceHiddenRef.current || disabled) return;
+    if (hasHadMeaningfulInteraction.current) return; // Only trigger once
+    
+    hasHadMeaningfulInteraction.current = true;
+    hideChromeImmediate('interaction');
+  }, [progressiveImmersion, disabled, hideChromeImmediate]);
+
+  // Edge reveal with 5s timeout
+  const revealFromEdge = useCallback(() => {
+    if (disabled) return;
+    
+    clearEdgeRevealTimeout();
+    showChromeImmediate();
+    
+    // Schedule re-hide after 5s if no further interaction
+    edgeRevealTimeoutRef.current = window.setTimeout(() => {
+      if (!forceHiddenRef.current) {
+        hideChromeImmediate('interaction');
+      }
+    }, EDGE_REVEAL_TIMEOUT_MS);
+  }, [disabled, showChromeImmediate, hideChromeImmediate, clearEdgeRevealTimeout]);
 
   const toggleChrome = useCallback(() => {
     if (forceHiddenRef.current || disabled) return;
@@ -232,7 +287,7 @@ export const useChromeState = ({ forceHidden = false, disabled = false, onNavOve
     toggleChrome();
   }, [disabled, toggleChrome]);
 
-  // Edge swipe handlers
+  // Edge swipe handlers with bottom recovery gesture
   const handleTouchStart = useCallback((event: React.TouchEvent) => {
     if (forceHiddenRef.current || disabled) return;
 
@@ -241,14 +296,18 @@ export const useChromeState = ({ forceHidden = false, disabled = false, onNavOve
     const viewportHeight = window.innerHeight;
     
     const EDGE_ZONE = 32;
+    const bottomRecoveryZone = viewportHeight * (1 - BOTTOM_EDGE_ZONE_PERCENT);
+    
     const isTop = y <= EDGE_ZONE;
     const isBottom = y >= viewportHeight - EDGE_ZONE;
+    const isBottomRecoveryZone = y >= bottomRecoveryZone;
     
     edgeSwipeRef.current = {
-      isEdge: isTop || isBottom,
+      isEdge: isTop || isBottom || isBottomRecoveryZone,
       isTop,
       isBottom,
-      startY: y
+      startY: y,
+      isBottomRecoveryZone,
     };
   }, [disabled]);
 
@@ -262,12 +321,22 @@ export const useChromeState = ({ forceHidden = false, disabled = false, onNavOve
     const absDistance = Math.abs(distance);
 
     const SWIPE_THRESHOLD = 12;
+    const RECOVERY_SWIPE_THRESHOLD = 24; // Slightly larger for recovery gesture
+
+    // Bottom recovery zone: swipe UP to reveal header/footer
+    if (edgeSwipeRef.current.isBottomRecoveryZone && chromeState === 'hidden') {
+      if (distance < 0 && absDistance >= RECOVERY_SWIPE_THRESHOLD) {
+        revealFromEdge();
+        edgeSwipeRef.current = { isEdge: false, isTop: false, isBottom: false, startY: 0, isBottomRecoveryZone: false };
+        return;
+      }
+    }
 
     // When chrome is hidden and edge swipe detected, request nav overlay instead
     if (chromeState === 'hidden' && absDistance >= SWIPE_THRESHOLD) {
       if (onNavOverlayRequest) {
         onNavOverlayRequest();
-        edgeSwipeRef.current.isEdge = false;
+        edgeSwipeRef.current = { isEdge: false, isTop: false, isBottom: false, startY: 0, isBottomRecoveryZone: false };
       }
       return;
     }
@@ -277,18 +346,18 @@ export const useChromeState = ({ forceHidden = false, disabled = false, onNavOve
       // Top edge: swipe down to reveal
       if (edgeSwipeRef.current.isTop && distance > 0 && absDistance >= SWIPE_THRESHOLD) {
         showChrome();
-        edgeSwipeRef.current.isEdge = false;
+        edgeSwipeRef.current = { isEdge: false, isTop: false, isBottom: false, startY: 0, isBottomRecoveryZone: false };
       }
       // Bottom edge: swipe up to reveal
       else if (edgeSwipeRef.current.isBottom && distance < 0 && absDistance >= SWIPE_THRESHOLD) {
         showChrome();
-        edgeSwipeRef.current.isEdge = false;
+        edgeSwipeRef.current = { isEdge: false, isTop: false, isBottom: false, startY: 0, isBottomRecoveryZone: false };
       }
     }
-  }, [disabled, showChrome, chromeState, onNavOverlayRequest]);
+  }, [disabled, showChrome, chromeState, onNavOverlayRequest, revealFromEdge]);
 
   const handleTouchEnd = useCallback(() => {
-    edgeSwipeRef.current = { isEdge: false, isTop: false, isBottom: false, startY: 0 };
+    edgeSwipeRef.current = { isEdge: false, isTop: false, isBottom: false, startY: 0, isBottomRecoveryZone: false };
   }, []);
 
   // Keyboard escape to reveal (desktop helper)
@@ -303,8 +372,20 @@ export const useChromeState = ({ forceHidden = false, disabled = false, onNavOve
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [disabled, showChrome]);
 
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      clearEdgeRevealTimeout();
+    };
+  }, [clearEdgeRevealTimeout]);
+
   // Getter for hide reason (useful for debugging)
   const getHideReason = useCallback(() => hideReasonRef.current, []);
+
+  // Reset progressive immersion state (for when navigating away and back)
+  const resetProgressiveImmersion = useCallback(() => {
+    hasHadMeaningfulInteraction.current = false;
+  }, []);
 
   return {
     chromeState,
@@ -321,5 +402,9 @@ export const useChromeState = ({ forceHidden = false, disabled = false, onNavOve
     handleTouchMove,
     handleTouchEnd,
     getHideReason,
+    // Progressive immersion
+    triggerProgressiveHide,
+    resetProgressiveImmersion,
+    revealFromEdge,
   };
 };

@@ -99,14 +99,16 @@ const Clubhouse = () => {
   // Top zone (first post) state for auto-hide timer
   const [isAtTopZone, setIsAtTopZone] = useState(true); // On first load, we're at top
   const autoHideTimerRef = useRef<number | null>(null);
-  const AUTO_HIDE_DELAY_MS = 5000;
+  const AUTO_HIDE_DELAY_MS = 4000; // 4s initial timer before first hide
   
   // Chrome auto-hide state - force hidden when any overlay is open
+  // Progressive immersion enabled: hide after first meaningful interaction
   const isAnyOverlayOpen = isCommentsDrawerOpen || isComposerOpen;
   const chromeControls = useChromeState({
     forceHidden: isAnyOverlayOpen,
     disabled: false,
     disableDirectionalReveal: true, // Clubhouse only - swipe between posts should not toggle chrome
+    progressiveImmersion: true, // Enable progressive immersion
   });
   
   // Clear the auto-hide timer
@@ -117,7 +119,7 @@ const Clubhouse = () => {
     }
   }, []);
   
-  // Schedule auto-hide after 5s only when at top zone and chrome is visible
+  // Schedule auto-hide after entry timer (only if no user engagement yet)
   const scheduleAutoHide = useCallback(() => {
     // Only when at top, chrome is visible, and no overlay is forcing hidden
     if (!isAtTopZone) return;
@@ -127,8 +129,8 @@ const Clubhouse = () => {
     clearAutoHideTimer();
     
     autoHideTimerRef.current = window.setTimeout(() => {
-      // IMPORTANT: mark as 'auto' so scroll won't reveal chrome outside top zone
-      chromeControls.hideChromeImmediate('auto');
+      // Use progressive hide which marks the reason as 'interaction'
+      chromeControls.triggerProgressiveHide();
     }, AUTO_HIDE_DELAY_MS);
   }, [isAtTopZone, chromeControls, isAnyOverlayOpen, clearAutoHideTimer]);
   
@@ -358,6 +360,7 @@ const Clubhouse = () => {
             onDismissNavOverlay={hideNavOverlay}
             onNavOverlayRequest={showNavOverlay}
             onTopZoneChange={handleTopZoneChange}
+            onMeaningfulInteraction={chromeControls.triggerProgressiveHide}
           />
         ) : isLoading ? (
           <div className="flex items-center justify-center min-h-screen">

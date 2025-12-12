@@ -1,7 +1,7 @@
 /**
  * CinematicActionRail - Right-side floating action buttons
- * "Liquid glass" circular buttons for Like, Comment, Share, Save
- * Fixed position, vertically centered on right side
+ * Fixed-height slots ensure no layout jumping when counts change
+ * "Liquid glass" circular buttons for Mute, Like, Comment, Share, Save
  */
 
 import React, { useState, useCallback } from 'react';
@@ -29,22 +29,33 @@ const formatCount = (count: number): string => {
   return count.toString();
 };
 
-interface ActionButtonProps {
+// Fixed slot height: icon (44px) + gap (4px) + count container (16px) = 64px
+const SLOT_HEIGHT = 64;
+const ICON_SIZE = 44;
+const COUNT_HEIGHT = 16;
+
+interface ActionSlotProps {
   icon: React.ElementType;
   count?: number;
   isActive?: boolean;
   onClick: () => void;
   ariaLabel: string;
   activeColor?: string;
+  showCount?: boolean;
 }
 
-const ActionButton: React.FC<ActionButtonProps> = ({
+/**
+ * ActionSlot - Fixed-height container for each action
+ * Count container always exists in layout, visibility controlled by opacity
+ */
+const ActionSlot: React.FC<ActionSlotProps> = ({
   icon: Icon,
   count,
   isActive,
   onClick,
   ariaLabel,
   activeColor = 'text-red-500',
+  showCount = true,
 }) => {
   const [isPressed, setIsPressed] = useState(false);
 
@@ -58,14 +69,20 @@ const ActionButton: React.FC<ActionButtonProps> = ({
     onClick();
   }, [onClick]);
 
+  const hasVisibleCount = showCount && count !== undefined && count > 0;
+
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div 
+      className="flex flex-col items-center"
+      style={{ height: SLOT_HEIGHT }}
+    >
+      {/* Icon button - fixed size */}
       <motion.button
         whileTap={{ scale: 0.92 }}
         onClick={handlePress}
         aria-label={ariaLabel}
         className={cn(
-          'relative w-11 h-11 rounded-full',
+          'relative rounded-full',
           'bg-black/25 backdrop-blur-xl',
           'border border-white/10',
           'flex items-center justify-center',
@@ -74,6 +91,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
           'hover:bg-black/35',
           'active:scale-95'
         )}
+        style={{ width: ICON_SIZE, height: ICON_SIZE }}
       >
         {/* Ripple effect */}
         <AnimatePresence>
@@ -97,16 +115,21 @@ const ActionButton: React.FC<ActionButtonProps> = ({
         />
       </motion.button>
 
-      {/* Count label - fade in/out */}
-      {count !== undefined && count > 0 && (
-        <motion.span
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-[11px] font-medium text-white/90 drop-shadow-sm"
+      {/* Count container - ALWAYS in layout, opacity controls visibility */}
+      <div 
+        className="flex items-center justify-center"
+        style={{ height: COUNT_HEIGHT, marginTop: 4 }}
+      >
+        <span
+          className={cn(
+            'text-[11px] font-medium text-white/90 drop-shadow-sm',
+            'transition-opacity duration-150 ease-out'
+          )}
+          style={{ opacity: hasVisibleCount ? 1 : 0 }}
         >
-          {formatCount(count)}
-        </motion.span>
-      )}
+          {hasVisibleCount ? formatCount(count!) : '\u00A0'}
+        </span>
+      </div>
     </div>
   );
 };
@@ -124,6 +147,11 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   onSave,
   onMuteToggle,
 }) => {
+  // Total rail height is fixed: 5 slots * SLOT_HEIGHT + 4 gaps * 12px
+  const GAP = 12;
+  const slotCount = onSave ? 5 : 4;
+  const totalHeight = slotCount * SLOT_HEIGHT + (slotCount - 1) * GAP;
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -134,23 +162,26 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
       transition={{ duration: 0.2, ease: 'easeOut' }}
       className={cn(
         'fixed right-4 z-40',
-        'flex flex-col items-center gap-5',
+        'flex flex-col items-center',
         'pointer-events-auto'
       )}
       style={{
         top: '50%',
         transform: 'translateY(-50%)',
+        gap: GAP,
+        height: totalHeight,
       }}
     >
-      {/* Mute/Unmute */}
-      <ActionButton
+      {/* Slot 1: Mute/Unmute */}
+      <ActionSlot
         icon={isMuted ? VolumeX : Volume2}
         onClick={onMuteToggle}
         ariaLabel={isMuted ? 'Unmute' : 'Mute'}
+        showCount={false}
       />
 
-      {/* Like */}
-      <ActionButton
+      {/* Slot 2: Like */}
+      <ActionSlot
         icon={Heart}
         count={likesCount}
         isActive={hasLiked}
@@ -159,27 +190,29 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         activeColor="text-red-500"
       />
 
-      {/* Comment */}
-      <ActionButton
+      {/* Slot 3: Comment */}
+      <ActionSlot
         icon={MessageCircle}
         count={commentsCount}
         onClick={onComment}
         ariaLabel="Comments"
       />
 
-      {/* Share */}
-      <ActionButton
+      {/* Slot 4: Share */}
+      <ActionSlot
         icon={Share2}
         onClick={onShare}
         ariaLabel="Share"
+        showCount={false}
       />
 
-      {/* Save/Bookmark */}
+      {/* Slot 5: Save/Bookmark (optional) */}
       {onSave && (
-        <ActionButton
+        <ActionSlot
           icon={Bookmark}
           onClick={onSave}
           ariaLabel="Save"
+          showCount={false}
         />
       )}
     </motion.div>
