@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, MapPin, X } from 'lucide-react';
+import { Search, MapPin, X, ArrowUp } from 'lucide-react';
 import CourseCard from './CourseCard';
+import VirtualizedCourseList from './VirtualizedCourseList';
 import { Skeleton } from '@/components/ui/skeleton';
+import { scrollToTop } from '@/utils/scrollToTop';
 import { useSearchParams } from 'react-router-dom';
 import {
   PRIMARY_REGIONS,
@@ -18,10 +20,10 @@ import {
   subregionKeyToLabel,
 } from '@/constants/courseRegions';
 import { AppSelect, AppSelectOption } from '@/components/ui/AppSelect';
-import { EXPLORE_PAGE_SIZE } from '@/config/pagination';
-import { ExploreLoadMoreButton } from './ExploreLoadMoreButton';
+import { COURSES_PAGE_SIZE } from '@/config/pagination';
+import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 
-type SortOption = 'popular' | 'rating_desc' | 'recently_added' | 'name_asc';
+type SortOption = 'popular' | 'rating_desc' | 'rating_asc' | 'name_asc' | 'name_desc';
 
 const CourseExplorer = () => {
   const listTopRef = useRef<HTMLDivElement>(null);
@@ -31,12 +33,14 @@ const CourseExplorer = () => {
   
   // URL params take priority, then sessionStorage, then defaults
   const [selectedRegion, setSelectedRegion] = useState<PrimaryRegionKey>(() => {
+    // 1. Check URL first
     const urlRegion = searchParams.get('region');
     if (urlRegion) {
       hasInitialisedFromUrlRef.current = true;
       return urlRegion as PrimaryRegionKey;
     }
     
+    // 2. Fall back to sessionStorage
     const saved = sessionStorage.getItem('explore-last-filters');
     if (saved) {
       try {
@@ -47,16 +51,19 @@ const CourseExplorer = () => {
       }
     }
     
+    // 3. Default
     return PRIMARY_REGIONS.ALL;
   });
   
   const [selectedSubregion, setSelectedSubregion] = useState(() => {
+    // 1. Check URL first
     const urlSub = searchParams.get('sub');
     if (urlSub) {
       hasInitialisedFromUrlRef.current = true;
       return urlSub;
     }
     
+    // 2. Fall back to sessionStorage
     const saved = sessionStorage.getItem('explore-last-filters');
     if (saved) {
       try {
@@ -67,9 +74,11 @@ const CourseExplorer = () => {
       }
     }
     
+    // 3. Default
     return 'all';
   });
-
+  const [page, setPage] = useState(0);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const [searchTerm, setSearchTerm] = useState(() => {
     const saved = sessionStorage.getItem('explore-last-filters');
     if (saved) {
@@ -81,8 +90,9 @@ const CourseExplorer = () => {
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
   const [sortOption, setSortOption] = useState<SortOption>('popular');
 
-  // Save filters to sessionStorage whenever they change
+  // Save filters to sessionStorage whenever they change (only after URL initialization)
   useEffect(() => {
+    // Don't immediately overwrite URL-driven state on first render
     if (!hasInitialisedFromUrlRef.current || !mountedRef.current) return;
 
     try {
@@ -92,7 +102,7 @@ const CourseExplorer = () => {
         searchTerm,
       }));
     } catch {
-      // fail safe
+      // fail safe – ignore storage errors
     }
   }, [selectedRegion, selectedSubregion, searchTerm]);
 
@@ -107,7 +117,7 @@ const CourseExplorer = () => {
     }
   }, []);
 
-  // Debounce search input (300ms)
+  // Debounce search input
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchTerm);
@@ -115,7 +125,28 @@ const CourseExplorer = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Cleanup on unmount
+  // Scroll-to-top button visibility with throttling
+  useEffect(() => {
+    let ticking = false;
+    
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setShowScrollTop(window.scrollY > 600);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  // Cleanup on unmount - clear sessionStorage to prevent stale state on revisit
   useEffect(() => {
     return () => {
       mountedRef.current = false;
@@ -128,16 +159,22 @@ const CourseExplorer = () => {
     };
   }, []);
 
-  // Infinite query for load-more pagination
-  const {
-    data,
-    isLoading,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-  } = useInfiniteQuery({
-    queryKey: ['explore-courses', selectedRegion, selectedSubregion, debouncedSearch, sortOption],
-    queryFn: async ({ pageParam = 0 }) => {
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(0);
+  }, [selectedRegion, selectedSubregion, debouncedSearch, sortOption]);
+
+  // Scroll to top when page changes (for pagination buttons)
+  useEffect(() => {
+    if (page > 0) {
+      scrollToTop();
+    }
+  }, [page]);
+
+  // Fetch courses with region filtering based on country
+  const { data, isLoading } = useQuery({
+    queryKey: ['explore-courses', selectedRegion, selectedSubregion, debouncedSearch, sortOption, page],
+    queryFn: async () => {
       if (!mountedRef.current) throw new Error('Component unmounted');
       
       try {
@@ -148,7 +185,7 @@ const CourseExplorer = () => {
             course_rating_stats(average_rating)
           `, { count: 'exact' });
 
-        // Apply region filter
+        // Apply region filter based on country
         if (selectedRegion !== PRIMARY_REGIONS.ALL) {
           const dbRegion = regionKeyToDbValue(selectedRegion);
           if (dbRegion) {
@@ -162,7 +199,7 @@ const CourseExplorer = () => {
           query = query.eq('sub_country', label);
         }
 
-        // Apply search filter
+        // Apply search filter - safer, primary name search only
         if (debouncedSearch && debouncedSearch.length >= 2) {
           query = query.ilike('name', `%${debouncedSearch}%`);
         }
@@ -172,22 +209,26 @@ const CourseExplorer = () => {
           case 'rating_desc':
             query = query.order('global_rank', { ascending: true, nullsFirst: false });
             break;
-          case 'recently_added':
-            query = query.order('created_at', { ascending: false });
+          case 'rating_asc':
+            query = query.order('global_rank', { ascending: false, nullsFirst: true });
             break;
           case 'name_asc':
             query = query.order('name', { ascending: true });
             break;
+          case 'name_desc':
+            query = query.order('name', { ascending: false });
+            break;
           case 'popular':
           default:
+            // Popular: Top 100 courses first, then alphabetically
             query = query.order('global_rank', { ascending: true, nullsFirst: false });
             query = query.order('name', { ascending: true });
             break;
         }
         
         // Pagination
-        const from = pageParam * EXPLORE_PAGE_SIZE;
-        const to = from + EXPLORE_PAGE_SIZE - 1;
+        const from = page * COURSES_PAGE_SIZE;
+        const to = from + COURSES_PAGE_SIZE - 1;
         query = query.range(from, to);
 
         const { data, error, count } = await query;
@@ -208,36 +249,48 @@ const CourseExplorer = () => {
         return {
           courses: coursesWithRatings,
           totalCount: count ?? 0,
-          nextPage: coursesWithRatings.length === EXPLORE_PAGE_SIZE ? pageParam + 1 : undefined,
         };
       } catch (error) {
-        if (!mountedRef.current) return { courses: [], totalCount: 0, nextPage: undefined };
+        if (!mountedRef.current) return { courses: [], totalCount: 0 };
         console.error('CourseExplorer error:', error);
         throw error;
       }
     },
-    getNextPageParam: (lastPage) => lastPage.nextPage,
-    initialPageParam: 0,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 5 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 5 * 60 * 1000, // Reduced to 5 minutes for mobile memory
     retry: 1,
     enabled: mountedRef.current,
   });
 
-  // Flatten all pages into single array
-  const allCourses = data?.pages.flatMap(page => page.courses) ?? [];
-  const totalCount = data?.pages[0]?.totalCount ?? 0;
+  const courses = data?.courses || [];
+  const totalCount = data?.totalCount || 0;
+  const hasMore = courses.length === COURSES_PAGE_SIZE && (page + 1) * COURSES_PAGE_SIZE < totalCount;
 
-  // Loading skeleton
-  const LoadingSkeleton = () => (
-    <div className="space-y-4 animate-in fade-in duration-200">
-      {[1, 2, 3, 4, 5, 6].map((i) => (
-        <div key={i} className="rounded-sq-md overflow-hidden">
-          <Skeleton className="h-48 w-full" />
-        </div>
-      ))}
-    </div>
-  );
+  // Phase 2 Perf: Import skeleton component with minimum display time
+  const LoadingSkeleton = () => {
+    const [shouldShow, setShouldShow] = useState(false);
+
+    useEffect(() => {
+      const timer = setTimeout(() => setShouldShow(true), 150);
+      return () => clearTimeout(timer);
+    }, []);
+
+    if (!shouldShow) {
+      return <div className="min-h-[400px]" />;
+    }
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-200">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div key={i} className="space-y-3">
+            <Skeleton className="h-48 w-full rounded-sq-sm" />
+            <Skeleton className="h-6 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   const regionOptions = [
     { value: PRIMARY_REGIONS.ALL, label: PRIMARY_REGION_LABELS['all'] },
@@ -256,10 +309,15 @@ const CourseExplorer = () => {
   const hasSearch = debouncedSearch.trim().length > 0;
   const hasActiveFilters = selectedRegion !== PRIMARY_REGIONS.ALL || selectedSubregion !== 'all' || hasSearch;
 
+  const startIndex = totalCount === 0 ? 0 : page * COURSES_PAGE_SIZE + 1;
+  const endIndex = Math.min((page + 1) * COURSES_PAGE_SIZE, totalCount);
+  const hasNextPage = endIndex < totalCount;
+
   const handleResetFilters = () => {
     setSelectedRegion(PRIMARY_REGIONS.ALL);
     setSelectedSubregion('all');
     setSearchTerm('');
+    setPage(0);
     sessionStorage.setItem('explore-last-filters', JSON.stringify({
       region: PRIMARY_REGIONS.ALL,
       subregion: 'all',
@@ -275,25 +333,24 @@ const CourseExplorer = () => {
   const sortOptions: AppSelectOption<SortOption>[] = [
     { value: 'popular', label: 'Most popular' },
     { value: 'rating_desc', label: 'Highest rated' },
-    { value: 'recently_added', label: 'Recently added' },
+    { value: 'rating_asc', label: 'Lowest rated' },
     { value: 'name_asc', label: 'A–Z' },
+    { value: 'name_desc', label: 'Z–A' },
   ];
 
-  const subregionDisabled = selectedRegion === PRIMARY_REGIONS.ALL || !SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length;
-
   return (
-    <div className="w-full space-y-5">
-      {/* Scroll target for state preservation */}
-      <div ref={listTopRef} className="h-0" />
-
-      {/* Search bar */}
-      <div className="relative">
+    <div className="w-full space-y-4">
+      {/* Scroll to top button */}
+      {/* Search */}
+      <div className="relative max-w-xl mx-auto">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
         <Input
           placeholder="Search by name, county or area..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 pr-10 h-11 rounded-sq-sm bg-card border border-border/60 shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border transition-shadow text-base placeholder:text-[15px]"
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+          }}
+          className="pl-10 pr-10 h-11 rounded-sq-sm bg-card border border-border/60 shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[color:var(--slate-secondary)]/70 focus-visible:border-[color:var(--slate-secondary)] transition-shadow text-base placeholder:text-[15px]"
         />
         {searchTerm && (
           <button
@@ -305,8 +362,8 @@ const CourseExplorer = () => {
         )}
       </div>
 
-      {/* Filters row - Region + Sub-region */}
-      <div className="flex items-center gap-3">
+      {/* Region + sub-region filters */}
+      <div className="max-w-xl mx-auto flex items-center justify-center gap-3">
         {/* Primary region */}
         <div className="flex-1">
           <Select value={selectedRegion} onValueChange={(value) => {
@@ -316,12 +373,15 @@ const CourseExplorer = () => {
             <SelectTrigger className="h-11 w-full rounded-sq-sm bg-card border border-border/60 justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
               <div className="flex items-center">
                 <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
-                <SelectValue placeholder="All Regions" />
+                <SelectValue placeholder="Select region" />
               </div>
             </SelectTrigger>
             <SelectContent className="bg-card border-border z-50 rounded-sq-sm">
               {regionOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
+                <SelectItem 
+                  key={option.value} 
+                  value={option.value}
+                >
                   {option.label}
                 </SelectItem>
               ))}
@@ -334,10 +394,10 @@ const CourseExplorer = () => {
           <Select
             value={selectedSubregion}
             onValueChange={setSelectedSubregion}
-            disabled={subregionDisabled}
+            disabled={selectedRegion === PRIMARY_REGIONS.ALL || !SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length}
           >
-            <SelectTrigger className="h-11 w-full rounded-sq-sm bg-card border border-border/60 justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow disabled:opacity-50 disabled:cursor-not-allowed">
-              <SelectValue placeholder={subregionDisabled ? "Choose a region first" : "All sub-regions"} />
+            <SelectTrigger className="h-11 w-full rounded-sq-sm bg-card border border-border/60 justify-between text-base shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
+              <SelectValue placeholder="All sub-regions" />
             </SelectTrigger>
             <SelectContent className="bg-card border-border z-50 rounded-sq-sm">
               <SelectItem value="all">All sub-regions</SelectItem>
@@ -351,59 +411,18 @@ const CourseExplorer = () => {
         </div>
       </div>
 
-      {/* Context row: exploring label + sort + optional clear filters */}
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <p className="text-xs text-muted-foreground truncate">
-            {hasSearch ? (
-              <>
-                Results for "{debouncedSearch}" {selectedRegion === PRIMARY_REGIONS.ALL
-                  ? 'worldwide'
-                  : <>in <span className="font-medium text-foreground">{getRegionLabel()}</span></>}
-                {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
-              </>
-            ) : selectedRegion === PRIMARY_REGIONS.ALL ? (
-              'Exploring all courses worldwide'
-            ) : (
-              <>
-                Exploring courses in{' '}
-                <span className="font-medium text-foreground">{getRegionLabel()}</span>
-                {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
-              </>
-            )}
-            {totalCount > 0 && !isLoading && (
-              <span className="ml-1 text-muted-foreground/70">· {totalCount.toLocaleString()} results</span>
-            )}
-          </p>
-          {hasActiveFilters && (
-            <button
-              onClick={handleResetFilters}
-              className="text-xs text-primary hover:underline flex-shrink-0"
-            >
-              Clear filters
-            </button>
-          )}
-        </div>
-        <AppSelect
-          value={sortOption}
-          onChange={(v) => setSortOption(v as SortOption)}
-          options={sortOptions}
-          ariaLabel="Sort courses"
-          triggerClassName="h-9"
-        />
-      </div>
-
       {/* Results */}
       {isLoading ? (
         <LoadingSkeleton />
-      ) : allCourses.length === 0 ? (
+      ) : courses.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
-          <div className="w-12 h-12 rounded-full border border-dashed border-muted-foreground/40 flex items-center justify-center text-muted-foreground mb-2">
-            <Search className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 flex items-center justify-center text-muted-foreground mb-1">
+            <Search className="w-4 h-4" />
           </div>
-          <h3 className="text-base font-semibold">No courses found</h3>
+          <h3 className="text-sm font-semibold">No courses match your filters</h3>
           <p className="text-sm text-muted-foreground max-w-xs">
-            Try a different search or broaden your filters.
+            Try clearing filters or searching for a different course name or
+            location.
           </p>
           {hasActiveFilters && (
             <Button
@@ -417,24 +436,57 @@ const CourseExplorer = () => {
           )}
         </div>
       ) : (
-        <div className="space-y-4">
-          {/* Course cards - full width */}
-          {allCourses.map((course) => (
-            <CourseCard
-              key={course.id}
-              course={course}
-              onClick={handleCourseClick}
+        <div className="space-y-6">
+        {/* Scroll target for pagination */}
+        <div ref={listTopRef} className="h-0" />
+        
+        {/* Context line with sort button */}
+        {totalCount > 0 && (
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs text-muted-foreground flex-1">
+              {hasSearch ? (
+                <>
+                  Results for "{debouncedSearch}" {selectedRegion === PRIMARY_REGIONS.ALL
+                    ? 'worldwide'
+                    : <>in <span className="font-medium text-foreground">{getRegionLabel()}</span></>}
+                  {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
+                </>
+              ) : selectedRegion === PRIMARY_REGIONS.ALL ? (
+                'Exploring all courses worldwide'
+              ) : (
+                <>
+                  Exploring courses in{' '}
+                  <span className="font-medium text-foreground">{getRegionLabel()}</span>
+                  {selectedSubregion !== 'all' && <> → <span className="font-medium text-foreground">{subregionKeyToLabel(selectedRegion, selectedSubregion)}</span></>}
+                </>
+              )}
+            </p>
+            <AppSelect
+              value={sortOption}
+              onChange={(v) => setSortOption(v as SortOption)}
+              options={sortOptions}
+              ariaLabel="Sort courses"
+              triggerClassName="h-9"
             />
-          ))}
+          </div>
+        )}
+
           
-          {/* Load more button */}
-          <ExploreLoadMoreButton
-            hasMore={!!hasNextPage}
-            isLoading={isFetchingNextPage}
-            onLoadMore={() => fetchNextPage()}
-            loadedCount={allCourses.length}
-            totalCount={totalCount}
-            pageSize={EXPLORE_PAGE_SIZE}
+        {/* Phase 2 Perf: Use virtualized list for better performance */}
+        <VirtualizedCourseList 
+          courses={courses}
+          onCourseClick={handleCourseClick}
+        />
+          
+          {/* Pagination Footer */}
+          <UnifiedPagination
+            page={page}
+            total={totalCount}
+            hasNextPage={hasNextPage}
+            onNext={() => setPage((p) => p + 1)}
+            onPrev={() => setPage((p) => p - 1)}
+            disabled={isLoading}
+            scrollTargetRef={listTopRef as React.RefObject<HTMLElement>}
           />
         </div>
       )}
