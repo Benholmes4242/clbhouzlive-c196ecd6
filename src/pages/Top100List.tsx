@@ -454,17 +454,39 @@ const Top100List = () => {
           )}
         </section>
 
-        {/* 7. Pagination */}
+        {/* 7. Pagination with intent-driven copy */}
         <div className="px-4 pb-[24px]">
-          <UnifiedPagination
-            page={page}
-            total={totalFiltered}
-            pageSize={PAGE_SIZE}
-            hasNextPage={hasNextPage}
-            onNext={handleNextPage}
-            onPrev={handlePrevPage}
-            scrollTargetRef={listTopRef as React.RefObject<HTMLElement>}
-          />
+          <div className="flex items-center justify-between gap-4">
+            <button
+              onClick={handlePrevPage}
+              disabled={!hasPrevPage}
+              className={`px-4 py-2 text-sm font-medium rounded-sq-sm transition-colors ${
+                hasPrevPage 
+                  ? 'bg-slate-100 text-slate-700 hover:bg-slate-200' 
+                  : 'bg-slate-50 text-slate-300 cursor-not-allowed'
+              }`}
+            >
+              Previous 25
+            </button>
+            
+            <span className="text-xs text-slate-500">
+              {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, totalFiltered)} of {totalFiltered}
+            </span>
+            
+            <button
+              onClick={handleNextPage}
+              disabled={!hasNextPage}
+              className={`px-4 py-2 text-sm font-medium rounded-sq-sm transition-colors ${
+                hasNextPage 
+                  ? 'bg-slate-900 text-white hover:bg-slate-800' 
+                  : 'bg-slate-50 text-slate-300 cursor-not-allowed'
+              }`}
+            >
+              {nextMilestoneData.toNext > 0 && nextMilestoneData.toNext <= 25 
+                ? `Chasing ${nextMilestoneData.name}` 
+                : 'Next 25'}
+            </button>
+          </div>
         </div>
 
       </main>

@@ -31,12 +31,12 @@ export const FloatingJourneyButton: React.FC<FloatingJourneyButtonProps> = ({
 
   const percent = totalCount > 0 ? Math.round((playedCount / totalCount) * 100) : 0;
 
-  // Auto-minimize after 5 seconds of inactivity
+  // Auto-minimize after 3 seconds of inactivity
   useEffect(() => {
     if (isExpanded) {
       const timer = setTimeout(() => {
         setIsExpanded(false);
-      }, 5000);
+      }, 3000);
       setAutoMinimizeTimer(timer);
       return () => clearTimeout(timer);
     }
