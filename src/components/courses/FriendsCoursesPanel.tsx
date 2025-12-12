@@ -5,22 +5,24 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFriendsCourses } from '@/hooks/useFriendsCourses';
 import { Card } from '@/components/ui/card';
 import { Squircle } from '@/components/ui/squircle';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
+import { Users, MapPin, Flame, Video } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { friendsCoursesMockData } from '@/mocks/friendsCoursesMock';
-import FriendsCoursesSnapshot from './friends/FriendsCoursesSnapshot';
-import FriendsHeroCourseModule from './friends/FriendsHeroCourseModule';
-import FriendsActivityModule from './friends/FriendsActivityModule';
-import HotInNetworkModule from './friends/HotInNetworkModule';
+import FriendsSnapshotCard from './friends/FriendsSnapshotCard';
+import FriendsHeroCourseCard from './friends/FriendsHeroCourseCard';
+import FriendsActivityCard from './friends/FriendsActivityCard';
 import FriendsCoursesSkeleton from './friends/FriendsCoursesSkeleton';
 import FriendsCoursesEmpty from './friends/FriendsCoursesEmpty';
 import CourseRankBadges from './CourseRankBadges';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { extractRanksFromMemberships } from '@/utils/rankingUtils';
-import { LoadMoreBlock } from '@/components/ui/LoadMoreBlock';
+import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 import type { CourseWithFriends, FriendCourseHit, Top100Membership } from '@/hooks/useFriendsCourses';
 
 // Temporary: toggle to use high-activity mock data for Friends' Courses
@@ -296,18 +298,6 @@ const FriendsCoursesPanel: React.FC = () => {
       });
   }, [recent]);
 
-  // Transform leaderboard for FriendsActivityModule
-  const activityPlayers = useMemo(() => {
-    return leaderboard.slice(0, 10).map((entry, idx) => ({
-      id: entry.friendId,
-      name: entry.friendName,
-      avatarUrl: entry.avatarUrl,
-      rounds: entry.roundCount,
-      lastPlayedAt: entry.lastPlayedAt,
-      rank: idx + 1,
-    }));
-  }, [leaderboard]);
-
   // Select hero course based on filter
   const heroCourse = useMemo(() => {
     if (courses.length === 0) return null;
@@ -449,32 +439,6 @@ const FriendsCoursesPanel: React.FC = () => {
     });
   };
 
-  // Get period label for snapshot
-  const getPeriodLabel = () => {
-    switch (timeframe) {
-      case '7d': return 'last 7 days';
-      case '30d': return 'last 30 days';
-      case '90d': return 'last 90 days';
-      case '12m': return 'last 12 months';
-      case 'all': return 'all time';
-      default: return 'last 30 days';
-    }
-  };
-
-  // Get hero label based on filter
-  const getHeroLabel = () => {
-    switch (courseFilter) {
-      case 'most_played':
-        return 'Most popular this month';
-      case 'highest_rated':
-        return 'Highest rated this period';
-      case 'new':
-        return 'Recently discovered';
-      default:
-        return 'Most popular this month';
-    }
-  };
-
   // Now conditional returns - no more hooks after this point
   if (!user) return null;
 
@@ -488,90 +452,181 @@ const FriendsCoursesPanel: React.FC = () => {
     return <FriendsCoursesEmpty />;
   }
 
-  const coursesStart = (page - 1) * PAGE_SIZE + 1;
-  const coursesEnd = Math.min(page * PAGE_SIZE, regularCourses.length);
-  const recentStart = recentPage * RECENT_PAGE_SIZE + 1;
-  const recentEnd = Math.min((recentPage + 1) * RECENT_PAGE_SIZE, totalRecent);
+  const formatFriendsList = (friends: FriendCourseHit[], limit = 3) => {
+    const names = friends.slice(0, limit).map(f => f.friend_profile.display_name || f.friend_profile.username);
+    const remaining = friends.length - limit;
+    return remaining > 0 ? `${names.join(', ')} and ${remaining} other${remaining > 1 ? 's' : ''}` : names.join(', ');
+  };
 
   return (
-    <div className="mx-auto w-full max-w-[720px] px-4 pt-4 pb-6 space-y-6">
-      {/* Header block - no card */}
-      <div className="space-y-1">
-        <h1 className="text-xl font-semibold text-foreground">Friends' Courses</h1>
-        <p className="text-sm text-muted-foreground">
-          See where your friends have been playing lately
-        </p>
-      </div>
-
-      {/* Filters row as pill triggers on page background */}
-      <div className="space-y-2">
-        <span className="text-[11px] uppercase tracking-wide text-muted-foreground/80">
-          Filters
-        </span>
-        <div className="flex flex-wrap gap-3">
+    <div className="w-full pb-6">
+      <div className="space-y-3">
+        <div>
+          <h2 className="text-lg font-semibold tracking-tight">Friends' Courses</h2>
+          <p className="text-sm text-muted-foreground">See where your friends have been playing lately</p>
+        </div>
+        
+        {/* Filter Dropdowns */}
+        <div className="flex items-center gap-3">
           {/* Time Range Dropdown */}
-          <Select value={timeframe} onValueChange={(value) => setTimeframe(value as Timeframe)}>
-            <SelectTrigger className="h-10 px-4 rounded-full border border-border/40 bg-background/60 backdrop-blur-sm text-sm font-medium flex items-center gap-2 w-auto">
-              <SelectValue placeholder="Select time range" />
-            </SelectTrigger>
-            <SelectContent className="bg-card border-border z-50">
-              <SelectItem value="7d">Last 7 days</SelectItem>
-              <SelectItem value="30d">Last 30 days</SelectItem>
-              <SelectItem value="90d">Last 90 days</SelectItem>
-              <SelectItem value="12m">Last 12 months</SelectItem>
-              <SelectItem value="all">All time</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex-1">
+            <Select value={timeframe} onValueChange={(value) => setTimeframe(value as Timeframe)}>
+              <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
+                <SelectValue placeholder="Select time range" />
+              </SelectTrigger>
+              <SelectContent className="bg-card border-border z-50">
+                <SelectItem value="7d">Last 7 days</SelectItem>
+                <SelectItem value="30d">Last 30 days</SelectItem>
+                <SelectItem value="90d">Last 90 days</SelectItem>
+                <SelectItem value="12m">Last 12 months</SelectItem>
+                <SelectItem value="all">All time</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           
           {/* Course Filter Dropdown */}
-          <Select value={courseFilter} onValueChange={(value) => setCourseFilter(value as CourseFilter)}>
-            <SelectTrigger className="h-10 px-4 rounded-full border border-border/40 bg-background/60 backdrop-blur-sm text-sm font-medium flex items-center gap-2 w-auto">
-              <SelectValue placeholder="Select filter" />
-            </SelectTrigger>
-            <SelectContent className="bg-card border-border z-50">
-              <SelectItem value="all">All courses</SelectItem>
-              <SelectItem value="new">New this period</SelectItem>
-              <SelectItem value="most_played">Most played</SelectItem>
-              <SelectItem value="highest_rated">Highest rated</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex-1">
+            <Select value={courseFilter} onValueChange={(value) => setCourseFilter(value as CourseFilter)}>
+              <SelectTrigger className="h-11 w-full bg-card border border-border/60 rounded-xl justify-between text-base focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-border/70 focus-visible:border-border data-[state=open]:ring-0 data-[state=open]:border-border/60 transition-shadow">
+                <SelectValue placeholder="Select filter" />
+              </SelectTrigger>
+              <SelectContent className="bg-card border-border z-50">
+                <SelectItem value="all">All courses</SelectItem>
+                <SelectItem value="new">New this period</SelectItem>
+                <SelectItem value="most_played">Most played</SelectItem>
+                <SelectItem value="highest_rated">Highest rated</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
-      {/* Snapshot strip - pointed corners */}
-      <FriendsCoursesSnapshot
-        periodLabel={getPeriodLabel()}
-        coursesCount={totalCourses}
-        regionsCount={totalRegions}
-        avgRating={averageRating}
-        roundsCount={totalRounds}
-      />
-
-      {/* Hero Course Module - pointed corners, NO community rating */}
-      {heroCourse && (
-        <FriendsHeroCourseModule 
-          course={heroCourse} 
-          label={getHeroLabel()}
+      {/* Friends Snapshot Card */}
+      <div className="mt-8">
+        <FriendsSnapshotCard
+          timeframe={timeframe}
+          totalCourses={totalCourses}
+          totalRegions={totalRegions}
+          averageRating={averageRating}
+          totalRounds={totalRounds}
         />
+      </div>
+
+      {/* Hero Course Card - Most Popular */}
+      {heroCourse && (
+        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 mt-8">
+          <FriendsHeroCourseCard 
+            course={heroCourse} 
+            filterType={courseFilter}
+          />
+        </div>
       )}
 
-      {/* Friends Activity Module - full width, pointed corners */}
-      <FriendsActivityModule
-        players={activityPlayers}
-        timeframeLabel="Top 10"
-      />
+      {/* Friends Activity Leaderboard */}
+      <div className="mt-8">
+        <FriendsActivityCard 
+          leaderboard={leaderboard}
+          timeframe={timeframe}
+        />
+      </div>
 
-      {/* Hot in your network - pointed corners, NO community rating */}
       {hotCourses.length > 0 && (
-        <HotInNetworkModule courses={hotCourses} />
+        <div className="mt-12 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Flame className="w-4 h-4 text-primary-accent" />
+              <h3 className="text-sm font-semibold">Hot in your network</h3>
+            </div>
+            <span className="text-[11px] px-2 py-0.5 rounded-full bg-surface-alt text-muted-foreground">
+              Courses multiple friends played recently
+            </span>
+          </div>
+
+          {/* Full width breakout for cards */}
+          <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
+            <div className="space-y-4">
+              {hotCourses.map((course) => (
+              <Card key={course.course_id} className="overflow-hidden rounded-none sm:rounded-xl hover:shadow-md transition-all cursor-pointer bg-surface-card border-border/60"
+                onClick={() => navigate(`/courses/${course.course_id}`)}>
+                {/* Course Image - Taller */}
+                {course.thumbnail_url && (
+                  <div className="relative w-full aspect-[1.7/1] overflow-hidden">
+                    {/* Rank badges (top-left) */}
+                    {(() => {
+                      const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
+                      return (
+                        <CourseRankBadges
+                          globalRank={ranks.globalRank}
+                          regionalRank={ranks.regionalRank}
+                          usaRank={ranks.usaRank}
+                          country={course.country || ''}
+                          positioning="top-left"
+                        />
+                      );
+                    })()}
+                    
+                    <img
+                      src={course.thumbnail_url}
+                      alt={course.course_name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = '/placeholder.svg';
+                      }}
+                    />
+                    {/* Stronger bottom gradient */}
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/55 via-black/25 to-transparent" />
+                  </div>
+                )}
+                
+                <div className="p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <h3 className="font-semibold text-base">{course.course_name}</h3>
+                          <p className="text-sm text-muted-foreground">{course.country}{course.sub_country ? `, ${course.sub_country}` : ''}</p>
+                        </div>
+                        <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 whitespace-nowrap">
+                          Hot this month
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="flex -space-x-2">
+                        {course.friends.slice(0, 3).map((friend, idx) => (
+                          <div key={friend.friend_id} className="relative" style={{ zIndex: 10 - idx }}>
+                            <Squircle width={28} height={28}>
+                              <img 
+                                src={friend.friend_profile.profile_photo_url || '/placeholder.svg'} 
+                                alt={friend.friend_profile.display_name || friend.friend_profile.username}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                onError={(e) => {
+                                  e.currentTarget.src = '/placeholder.svg';
+                                }}
+                              />
+                            </Squircle>
+                          </div>
+                        ))}
+                      </div>
+                      <span className="text-xs text-muted-foreground">Played by {formatFriendsList(course.friends, 2)}</span>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+              ))}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Anchor for scrolling to start of course list */}
       <div ref={coursesListAnchorRef} />
 
-      {/* Regular courses - Paginated list with pointed corners + community rating */}
+      {/* Regular courses - Paginated list with slide animation */}
       {paginatedCourses.length > 0 && (
-        <div className="space-y-4">
+        <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 mt-9">
           <motion.div
             key={page}
             initial={{ x: 40, opacity: 0 }}
@@ -582,26 +637,30 @@ const FriendsCoursesPanel: React.FC = () => {
           >
             {paginatedCourses.map((course) => {
               const mostRecentFriend = course.friends[0];
-              const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
               
               return (
                 <Card 
                   key={course.course_id} 
                   data-friends-course-card={course.course_id}
-                  className="relative overflow-hidden rounded-none hover:shadow-md transition-all cursor-pointer bg-card border border-border/20 shadow-sm"
+                  className="relative overflow-hidden rounded-none sm:rounded-xl hover:shadow-md transition-all cursor-pointer bg-card border shadow-sm"
                   onClick={() => navigate(`/courses/${course.course_id}`)}
                 >
-                  {/* Course Image */}
+                  {/* Course Image - Taller, Full Width */}
                   {course.thumbnail_url && (
                     <div className="relative w-full aspect-[1.7/1] overflow-hidden">
                       {/* Rank badges (top-left) */}
-                      <CourseRankBadges
-                        globalRank={ranks.globalRank}
-                        regionalRank={ranks.regionalRank}
-                        usaRank={ranks.usaRank}
-                        country={course.country || ''}
-                        positioning="top-left"
-                      />
+                      {(() => {
+                        const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
+                        return (
+                          <CourseRankBadges
+                            globalRank={ranks.globalRank}
+                            regionalRank={ranks.regionalRank}
+                            usaRank={ranks.usaRank}
+                            country={course.country || ''}
+                            positioning="top-left"
+                          />
+                        );
+                      })()}
                       
                       <img
                         src={course.thumbnail_url}
@@ -622,7 +681,7 @@ const FriendsCoursesPanel: React.FC = () => {
                       <h3 className="flex-1 min-w-0 pr-3 font-semibold text-base text-foreground truncate">
                         {course.course_name}
                       </h3>
-                      {/* Community rating - YES on regular cards */}
+                      {/* Community rating - logo + text on white */}
                       {typeof course.community_rating === 'number' && !Number.isNaN(course.community_rating) && (
                         <div className="flex-shrink-0 flex items-center gap-1.5">
                           <ClubhouseLogo className="h-5 w-5" />
@@ -667,25 +726,26 @@ const FriendsCoursesPanel: React.FC = () => {
           </motion.div>
 
           {/* Pagination Footer */}
-          {totalPages > 1 && (
-            <LoadMoreBlock
-              buttonLabel={page < totalPages ? `Next ${PAGE_SIZE} courses` : 'Back to start'}
-              caption={`Showing ${coursesStart}–${coursesEnd} of ${regularCourses.length} courses`}
-              onClick={() => handleChangeCoursesPage(page < totalPages ? 'next' : 'prev')}
-              disabled={false}
-            />
-          )}
+          <UnifiedPagination
+            page={page - 1}
+            total={regularCourses.length}
+            pageSize={PAGE_SIZE}
+            hasNextPage={page < totalPages}
+            onNext={() => handleChangeCoursesPage('next')}
+            onPrev={() => handleChangeCoursesPage('prev')}
+            itemLabel="courses"
+            scrollTargetRef={coursesListAnchorRef as React.RefObject<HTMLElement>}
+          />
         </div>
       )}
 
       {/* Recent rounds timeline */}
       {sortedRecent.length > 0 && (
-        <div className="space-y-3">
-          {/* Section header - sits on page background, NOT inside card */}
+        <div className="space-y-3 mt-12">
           <div>
             <h3 className="text-base font-semibold text-foreground">Your friends' recent rounds</h3>
             <p className="text-xs text-muted-foreground mt-1">
-              Rounds played in the {getPeriodLabel()}
+              Rounds played in the last {timeframe === '7d' ? '7 days' : timeframe === '30d' ? '30 days' : timeframe === '90d' ? '90 days' : timeframe === '12m' ? '12 months' : 'all time'}
             </p>
           </div>
           
@@ -695,12 +755,13 @@ const FriendsCoursesPanel: React.FC = () => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
           >
-            {/* Pointed corners container for recent rounds */}
-            <div className="rounded-none bg-card border border-border/20 shadow-sm overflow-hidden divide-y divide-border/15">
+            <div className="space-y-0">
               {visibleRecent.map((hit, idx) => (
                 <div 
                   key={`${hit.friend_id}-${hit.course_id}-${idx}`}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 transition-colors cursor-pointer"
+                  className={`flex items-center gap-3 py-3 hover:bg-muted/50 transition-colors cursor-pointer ${
+                    idx !== visibleRecent.length - 1 ? 'border-b border-border' : ''
+                  }`}
                   onClick={() => handleRecentRoundClick(hit)}
                 >
                   <Squircle width={36} height={36} className="shrink-0">
@@ -727,20 +788,15 @@ const FriendsCoursesPanel: React.FC = () => {
           </motion.div>
 
           {/* Recent rounds pagination */}
-          {totalRecentPages > 1 && (
-            <LoadMoreBlock
-              buttonLabel={recentPage < totalRecentPages - 1 ? `Next ${RECENT_PAGE_SIZE} rounds` : 'Back to start'}
-              caption={`Showing ${recentStart}–${recentEnd} of ${totalRecent} rounds`}
-              onClick={() => {
-                if (recentPage < totalRecentPages - 1) {
-                  setRecentPage((p) => p + 1);
-                } else {
-                  setRecentPage(0);
-                }
-              }}
-              disabled={false}
-            />
-          )}
+          <UnifiedPagination
+            page={recentPage}
+            total={sortedRecent.length}
+            pageSize={RECENT_PAGE_SIZE}
+            hasNextPage={recentPage < totalRecentPages - 1}
+            onNext={() => setRecentPage((p) => Math.min(totalRecentPages - 1, p + 1))}
+            onPrev={() => setRecentPage((p) => Math.max(0, p - 1))}
+            itemLabel="rounds"
+          />
         </div>
       )}
     </div>
