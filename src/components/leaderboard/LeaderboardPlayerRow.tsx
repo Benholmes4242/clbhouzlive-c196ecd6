@@ -44,37 +44,35 @@ export function LeaderboardPlayerRow({ entry, isCurrentUser = false }: Leaderboa
       type="button"
       onClick={() => navigate(`/profile/${entry.user_id}?tab=top100`)}
       className={cn(
-        'w-full px-3 py-2.5 flex items-center justify-between gap-3 transition-colors border-b border-border/40 last:border-b-0',
-        isTop3 ? 'bg-card/95' : 'bg-transparent',
-        isCurrentUser && 'bg-primary/5',
-        'hover:bg-muted/30'
+        'w-full px-0 py-3 flex items-center gap-3 transition-colors',
+        isCurrentUser && 'bg-primary/5 -mx-4 px-4',
+        'hover:bg-muted/20 active:bg-muted/30'
       )}
     >
-      {/* Left: Avatar + name + club */}
-      <div className="flex items-center gap-3 min-w-0 flex-1">
-        <SquircleAvatar
-          size={44}
-          src={entry.avatar_url}
-          alt={entry.display_name}
-          fallback={initials}
-          ringColor={ringColor}
-          className="flex-shrink-0"
-        />
+      {/* Left: Avatar (fixed) */}
+      <SquircleAvatar
+        size={44}
+        src={entry.avatar_url}
+        alt={entry.display_name}
+        fallback={initials}
+        ringColor={ringColor}
+        className="flex-shrink-0"
+      />
 
-        <div className="flex flex-col min-w-0 text-left">
-          <span className={cn(
-            'text-sm font-medium leading-tight truncate',
-            isCurrentUser && 'font-semibold'
-          )}>
-            {entry.display_name}
-          </span>
-          <span className="text-xs text-muted-foreground">
-            {club.tierName || 'Getting started'} · {entry.total_top100_played} Top 100s
-          </span>
-        </div>
+      {/* Middle: Name + club/top100 count (flex-1, can truncate) */}
+      <div className="flex flex-col min-w-0 flex-1 text-left">
+        <span className={cn(
+          'text-sm font-medium leading-tight truncate',
+          isCurrentUser && 'font-semibold'
+        )}>
+          {entry.display_name}
+        </span>
+        <span className="text-xs text-muted-foreground truncate">
+          {entry.home_club ? `${entry.home_club} · ` : ''}{entry.total_top100_played} Top 100s
+        </span>
       </div>
 
-      {/* Right: Rank badge */}
+      {/* Right: Rank badge (fixed) */}
       <div className="flex-shrink-0">
         {isTop3 && medalStyle ? (
           <span className={cn(

@@ -172,21 +172,23 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {/* 1. Location Breadcrumb & Quick Filters (Explore more + See Top 100 in) */}
       <CourseLocationBreadcrumb course={course} />
 
-      {/* Quick Facts Strip - compact, below breadcrumb */}
+      {/* Quick Facts Strip - compact, centered block below breadcrumb */}
       {quickFacts.length > 0 && (
-        <section className="px-4 pt-4 pb-2 bg-slate-50 md:px-6">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            {quickFacts.map((fact, index) => (
-              <React.Fragment key={fact.label}>
-                <div className="flex items-center gap-1.5">
-                  <fact.icon className="h-3.5 w-3.5 text-slate-400" />
-                  <span className="text-sm text-slate-600">{fact.label}</span>
-                </div>
-                {index < quickFacts.length - 1 && (
-                  <span className="text-slate-300">·</span>
-                )}
-              </React.Fragment>
-            ))}
+        <section className="px-4 pt-3 pb-4 bg-slate-50 md:px-6">
+          <div className="flex justify-center">
+            <div className="inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-sm text-slate-600">
+              {quickFacts.map((fact, index) => (
+                <React.Fragment key={fact.label}>
+                  <div className="flex items-center gap-1.5">
+                    <fact.icon className="h-3.5 w-3.5 text-slate-400" />
+                    <span>{fact.label}</span>
+                  </div>
+                  {index < quickFacts.length - 1 && (
+                    <span className="text-slate-300">·</span>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
           </div>
         </section>
       )}

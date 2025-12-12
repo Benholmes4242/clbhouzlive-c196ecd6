@@ -22,10 +22,9 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
   onChange,
 }) => {
   return (
-    <div className="flex items-center gap-2 overflow-x-auto pb-1 -mb-1 scrollbar-hide">
+    <div className="flex flex-wrap items-center gap-2">
       {FILTER_OPTIONS.map((option) => {
         const isSelected = value === option.key;
-        const tierData = getScoreTier(option.sampleScore);
         
         return (
           <button
@@ -33,8 +32,8 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
             type="button"
             onClick={() => onChange(isSelected ? null : option.key)}
             className={`
-              inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium
-              whitespace-nowrap shrink-0 min-h-[36px] transition-all duration-100
+              inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium
+              whitespace-nowrap min-h-[28px] transition-all duration-100
               ${isSelected 
                 ? 'bg-slate-900 text-white border border-slate-900' 
                 : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 active:scale-[0.97]'
@@ -51,11 +50,11 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
         <button
           type="button"
           onClick={() => onChange(null)}
-          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium
-            whitespace-nowrap shrink-0 min-h-[36px] bg-slate-100 text-slate-600 
+          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium
+            whitespace-nowrap min-h-[28px] bg-slate-100 text-slate-600 
             border border-slate-200 hover:bg-slate-200 active:scale-[0.97] transition-all"
         >
-          <X className="w-3.5 h-3.5" />
+          <X className="w-3 h-3" />
           Clear
         </button>
       )}
