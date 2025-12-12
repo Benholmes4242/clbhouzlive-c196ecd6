@@ -22,12 +22,21 @@ export interface UserPostData {
   id: string;
   content: string | null;
   created_at: string;
+  actor_type?: 'personal' | 'business' | null;
+  actor_id?: string | null;
   user: {
     id: string;
     display_name: string | null;
     username: string | null;
     profile_photo_url: string | null;
   };
+  // Business info when actor_type is 'business'
+  business?: {
+    id: string;
+    name: string;
+    slug: string | null;
+    logo_url: string | null;
+  } | null;
   post_media: PostMedia[];
   post_tags: PostTag[];
 }
