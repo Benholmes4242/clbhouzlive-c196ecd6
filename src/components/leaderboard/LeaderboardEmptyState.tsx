@@ -95,11 +95,11 @@ export function LeaderboardEmptyState({ type, onResetFilters }: LeaderboardEmpty
     
     switch (state.cta.action) {
       case 'find-friends':
-        navigate('/golfers-to-follow');
+        navigate('/golferstofollow');
         break;
       case 'invite-friend':
         // Could open share sheet or invite flow
-        navigate('/golfers-to-follow');
+        navigate('/golferstofollow');
         break;
       case 'show-top100':
         navigate('/courses?tab=top100');
