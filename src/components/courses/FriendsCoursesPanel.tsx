@@ -547,7 +547,7 @@ const FriendsCoursesPanel: React.FC = () => {
           <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
             <div className="space-y-4">
               {hotCourses.map((course) => (
-              <Card key={course.course_id} className="overflow-hidden rounded-none sm:rounded-xl hover:shadow-md transition-all cursor-pointer bg-surface-card border-border/60"
+              <Card key={course.course_id} className="overflow-hidden rounded-none hover:shadow-md transition-all cursor-pointer bg-surface-card border-border/60"
                 onClick={() => navigate(`/courses/${course.course_id}`)}>
                 {/* Course Image - Taller */}
                 {course.thumbnail_url && (
@@ -643,7 +643,7 @@ const FriendsCoursesPanel: React.FC = () => {
                 <Card 
                   key={course.course_id} 
                   data-friends-course-card={course.course_id}
-                  className="relative overflow-hidden rounded-none sm:rounded-xl hover:shadow-md transition-all cursor-pointer bg-card border shadow-sm"
+                  className="relative overflow-hidden rounded-none hover:shadow-md transition-all cursor-pointer bg-card border shadow-sm"
                   onClick={() => navigate(`/courses/${course.course_id}`)}
                 >
                   {/* Course Image - Taller, Full Width */}
