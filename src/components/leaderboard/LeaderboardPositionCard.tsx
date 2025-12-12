@@ -16,6 +16,33 @@ interface LeaderboardPositionCardProps {
   variant?: 'full' | 'compact';
 }
 
+// Generate contextual helper copy based on rank, played count, and milestone proximity
+function getHelperCopy(rank: number, totalPlayed: number, nextClub: { threshold: number; tierName: string } | null): string {
+  // No courses logged yet
+  if (totalPlayed === 0) {
+    return 'Log your first Top 100 course to get ranked.';
+  }
+  
+  // Rank #1
+  if (rank === 1) {
+    return "You're setting the pace.";
+  }
+  
+  // Top 10
+  if (rank <= 10) {
+    return 'Top 10 — keep it going.';
+  }
+  
+  // Close to milestone (within 3 courses)
+  if (nextClub && (nextClub.threshold - totalPlayed) <= 3) {
+    const remaining = nextClub.threshold - totalPlayed;
+    return `${remaining} more to unlock ${nextClub.tierName}.`;
+  }
+  
+  // Mid-pack default
+  return 'Next jump is within reach.';
+}
+
 export function LeaderboardPositionCard({ user, variant = 'full' }: LeaderboardPositionCardProps) {
   const navigate = useNavigate();
   const club = getTop100Club(user.total_top100_played);
@@ -34,11 +61,8 @@ export function LeaderboardPositionCard({ user, variant = 'full' }: LeaderboardP
     ? Math.min(100, ((user.total_top100_played) / nextClub.threshold) * 100)
     : 100;
 
-  // Contextual helper copy based on rank
-  const isTopRanked = user.rank === 1;
-  const helperCopy = isTopRanked
-    ? "You're setting the pace."
-    : 'One more round puts you closer to the top.';
+  // Contextual helper copy
+  const helperCopy = getHelperCopy(user.rank, user.total_top100_played, nextClub);
 
   if (variant === 'compact') {
     return (

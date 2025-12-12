@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { LeaderboardPositionCard } from './LeaderboardPositionCard';
 import { LeaderboardSegmentedControl, LeaderboardSegment } from './LeaderboardSegmentedControl';
 import { LeaderboardPlayerRow } from './LeaderboardPlayerRow';
-import { EmptyFriendsState } from '@/components/shared/EmptyFriendsState';
+import { LeaderboardEmptyState } from './LeaderboardEmptyState';
+import { LeaderboardInsightChip } from './LeaderboardInsightChip';
 import { getTop100Club } from '@/lib/top100Club';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import {
@@ -230,6 +231,16 @@ export function PlayersLeaderboardView() {
         </div>
       )}
 
+      {/* Insight Chip */}
+      {meModel && meModel.total_top100_played > 0 && (
+        <LeaderboardInsightChip
+          userRank={meModel.rank}
+          totalPlayed={meModel.total_top100_played}
+          friendsCount={segment === 'friends' ? entriesToRender.length : 0}
+          variant="players"
+        />
+      )}
+
       {/* Segmented Control - sticky */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm py-2 -mx-4 px-4">
         <LeaderboardSegmentedControl
@@ -242,17 +253,15 @@ export function PlayersLeaderboardView() {
       {/* Player List */}
       <div className="rounded-sq-md border border-border/50 bg-card/60 overflow-hidden">
         {entriesToRender.length === 0 ? (
-          <div className="py-12 px-4">
+          <div className="py-2">
             {segment === 'friends' ? (
-              <EmptyFriendsState title="No friends on the leaderboard yet" />
+              <LeaderboardEmptyState type="friends-no-friends" />
+            ) : segment === 'around' && isNewUser ? (
+              <LeaderboardEmptyState type="around-you-no-rank" />
             ) : segment === 'rising' ? (
-              <p className="text-sm text-muted-foreground text-center">
-                No rising players this month. Check back soon!
-              </p>
+              <LeaderboardEmptyState type="rising-no-data" />
             ) : (
-              <p className="text-sm text-muted-foreground text-center">
-                No players found.
-              </p>
+              <LeaderboardEmptyState type="no-matches" onResetFilters={() => setSegment('top100')} />
             )}
           </div>
         ) : (

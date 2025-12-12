@@ -5,6 +5,8 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LeaderboardCourseCard } from './LeaderboardCourseCard';
+import { LeaderboardEmptyState } from './LeaderboardEmptyState';
+import { LeaderboardInsightChip } from './LeaderboardInsightChip';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { TrendingUp, TrendingDown, Star, Users, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -439,29 +441,24 @@ export function CoursesLeaderboardView() {
           </div>
         </div>
 
+        {/* Insight Chip */}
+        <LeaderboardInsightChip variant="courses" />
+
         {/* Ranked Course List */}
         <div className="-mx-4 sm:mx-0">
           <div className="space-y-4">
             {displayCourses.length === 0 ? (
-              <div className="py-12 px-4 text-center space-y-3">
-                <Users className="h-8 w-8 mx-auto text-muted-foreground/50" />
+              <div className="py-2">
                 {sort === 'friends' || audienceFilter === 'friends' ? (
-                  <>
-                    <p className="text-sm font-medium text-foreground">No friends activity yet</p>
-                    <p className="text-xs text-muted-foreground">
-                      Invite a friend or follow golfers to see activity here.
-                    </p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => navigate('/discover')}
-                      className="mt-2"
-                    >
-                      Find friends
-                    </Button>
-                  </>
+                  <LeaderboardEmptyState type="courses-friends-no-friends" />
+                ) : sort === 'trending' ? (
+                  <LeaderboardEmptyState type="courses-trending" />
+                ) : sort === 'highest_rated' ? (
+                  <LeaderboardEmptyState type="courses-highest-rated" />
+                ) : sort === 'most_played' ? (
+                  <LeaderboardEmptyState type="courses-most-played" />
                 ) : (
-                  <p className="text-sm text-muted-foreground">No courses found.</p>
+                  <LeaderboardEmptyState type="no-matches" onResetFilters={() => handleSortChange('most_played')} />
                 )}
               </div>
             ) : (
