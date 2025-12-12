@@ -5,7 +5,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Globe, Star, Bookmark, ChevronUp, Flag } from 'lucide-react';
+import { Globe, Star, Bookmark, ChevronUp, Flag } from 'lucide-react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -135,7 +135,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
         {/* Expand/collapse hint */}
         <button
           onClick={() => setSheetState(sheetState === 'full' ? 'half' : 'full')}
-          className="absolute top-2 right-11 p-2 text-slate-400 hover:text-slate-600"
+          className="absolute top-2 right-3 p-2 text-slate-400 hover:text-slate-600"
         >
           <ChevronUp
             className={cn(
@@ -143,14 +143,6 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
               sheetState === 'full' && 'rotate-180'
             )}
           />
-        </button>
-
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-        >
-          <X className="h-4 w-4" />
         </button>
 
         {/* Content */}

@@ -16,7 +16,6 @@ import {
   Top100ListProgressHero,
   JourneyInsightCard,
   generateJourneyInsights,
-  FloatingJourneyButton,
   type Top100FilterChip,
 } from '@/components/top100/list';
 import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
@@ -24,7 +23,6 @@ import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PageRoot } from '@/components/layout/PageRoot';
-import { getTop100Club, CLUB_STEPS } from '@/lib/top100Club';
 
 const REGION_DISPLAY_NAMES: Record<string, string> = {
   global: 'Worldwide',
@@ -197,30 +195,36 @@ const Top100List = () => {
     }));
   }, [friendsProgress]);
 
-  // Build achievements data
-  const achievementsData = useMemo(() => {
-    const currentClub = getTop100Club(playedCount);
-    const nextStep = CLUB_STEPS.find(s => s.threshold > playedCount);
+  // Build list-specific milestones (not global achievements)
+  // List milestones: 25 / 50 / 75 / 100 complete for each list
+  const listMilestones = useMemo(() => {
+    const listMilestoneThresholds = [25, 50, 75, 100];
+    const listShortName = currentList?.short_label || listDisplayName.replace('Great Britain & Ireland', 'GB&I');
     
-    const primary = currentClub.meta ? {
-      id: currentClub.tierId,
-      title: currentClub.shortLabel || '',
+    // Find current milestone (highest achieved)
+    const achievedMilestones = listMilestoneThresholds.filter(t => playedCount >= t);
+    const currentThreshold = achievedMilestones[achievedMilestones.length - 1];
+    const nextThreshold = listMilestoneThresholds.find(t => t > playedCount);
+    
+    const primary = currentThreshold ? {
+      id: `${slug}-${currentThreshold}`,
+      title: currentThreshold === 50 ? `${listShortName} – Halfway` : `${listShortName} – ${currentThreshold} Complete`,
       current: playedCount,
-      target: currentClub.threshold || playedCount,
+      target: currentThreshold,
       isComplete: true,
-      percentOfPlayers: playedCount >= 50 ? 5 : playedCount >= 20 ? 15 : 30,
+      percentOfPlayers: currentThreshold >= 50 ? 8 : currentThreshold >= 25 ? 18 : 35,
     } : null;
 
-    const upcoming = nextStep ? {
-      id: nextStep.tierId,
-      title: nextStep.shortLabel,
+    const upcoming = nextThreshold ? {
+      id: `${slug}-${nextThreshold}`,
+      title: nextThreshold === 50 ? `${listShortName} – Halfway` : `${listShortName} – ${nextThreshold} Complete`,
       current: playedCount,
-      target: nextStep.threshold,
+      target: nextThreshold,
       isComplete: false,
     } : null;
 
     return { primary, upcoming };
-  }, [playedCount]);
+  }, [playedCount, slug, currentList?.short_label, listDisplayName]);
 
   // Generate journey insights
   const journeyInsights = useMemo(() => {
@@ -231,27 +235,7 @@ const Top100List = () => {
     return generateJourneyInsights(playedCourses, totalCount, slug);
   }, [courses, playedCourseIds, totalCount, slug]);
 
-  // Closest friend for floating button
-  const closestFriend = useMemo(() => {
-    if (friendsSummary.length === 0) return undefined;
-    const sorted = [...friendsSummary].sort((a, b) => 
-      Math.abs(a.playedOnList - playedCount) - Math.abs(b.playedOnList - playedCount)
-    );
-    const closest = sorted[0];
-    if (closest && closest.playedOnList !== playedCount) {
-      return { name: closest.name, played: closest.playedOnList };
-    }
-    return undefined;
-  }, [friendsSummary, playedCount]);
 
-  // Calculate next milestone for floating button
-  const nextMilestoneData = useMemo(() => {
-    const nextStep = CLUB_STEPS.find(s => s.threshold > playedCount);
-    return {
-      name: nextStep?.shortLabel || 'Grand Slam',
-      toNext: nextStep ? nextStep.threshold - playedCount : 0,
-    };
-  }, [playedCount]);
 
   // Reset page when filter changes
   useEffect(() => {
@@ -387,8 +371,8 @@ const Top100List = () => {
         {/* 4. Achievements Pair */}
         {session && (
           <Top100ListAchievementsPair
-            primary={achievementsData.primary}
-            upcoming={achievementsData.upcoming}
+            primary={listMilestones.primary}
+            upcoming={listMilestones.upcoming}
           />
         )}
 
@@ -482,9 +466,7 @@ const Top100List = () => {
                   : 'bg-slate-50 text-slate-300 cursor-not-allowed'
               }`}
             >
-              {nextMilestoneData.toNext > 0 && nextMilestoneData.toNext <= 25 
-                ? `Chasing ${nextMilestoneData.name}` 
-                : 'Next 25'}
+              Next 25
             </button>
           </div>
         </div>
@@ -497,17 +479,6 @@ const Top100List = () => {
           courseId={selectedCourseId}
           isInModal={true}
           onClose={() => setSelectedCourseId(null)}
-        />
-      )}
-
-      {/* Floating Journey Button */}
-      {session && (
-        <FloatingJourneyButton
-          playedCount={playedCount}
-          totalCount={totalCount}
-          nextMilestone={nextMilestoneData.name}
-          toNextMilestone={nextMilestoneData.toNext}
-          closestFriend={closestFriend}
         />
       )}
 

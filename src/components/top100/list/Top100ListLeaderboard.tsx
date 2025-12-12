@@ -39,7 +39,7 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
   if (friends.length === 0) {
     return (
       <section className="mt-6">
-        <div className="px-2.5">
+        <div className="px-4">
           <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
             Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
           </h2>
@@ -68,7 +68,7 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
 
   return (
     <section className="mt-6">
-      <div className="px-2.5 flex items-start justify-between">
+      <div className="px-4 flex items-start justify-between">
         <div>
           <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
             Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
@@ -87,11 +87,8 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
         )}
       </div>
 
-      <div className="-mx-4 flex gap-2 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-none mt-3">
-        {sortedFriends.slice(0, 10).map((friend, index) => {
-          const isFirst = index === 0;
-          const isLast = index === sortedFriends.slice(0, 10).length - 1;
-          
+      <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-none mt-3 px-4">
+        {sortedFriends.slice(0, 10).map((friend) => {
           // Calculate relative position
           const diff = friend.playedOnList - currentUserPlayed;
           const isAhead = diff > 0;
@@ -110,8 +107,6 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
               onClick={() => navigate(`/profile/${friend.username}`)}
               className={`
                 flex-shrink-0 w-28 snap-start p-3 rounded-sq-md bg-white border transition-all
-                ${isFirst ? 'ml-4' : ''} 
-                ${isLast ? 'mr-4' : ''}
                 ${isClosestCompetitor ? 'border-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.3)]' : 'border-slate-100'}
               `}
             >

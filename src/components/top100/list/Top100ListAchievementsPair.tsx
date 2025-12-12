@@ -35,9 +35,9 @@ export const Top100ListAchievementsPair: React.FC<Top100ListAchievementsPairProp
 
   return (
     <section className="mt-6">
-      <div className="px-2.5 flex items-center justify-between mb-3">
+      <div className="px-4 flex items-center justify-between mb-3">
         <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
-          Achievements
+          Milestones
         </h2>
         <button
           onClick={onViewAll || (() => navigate('/achievements'))}
