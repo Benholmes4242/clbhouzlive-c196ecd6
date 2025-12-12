@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Trophy, Lock } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getTop100Club } from '@/lib/top100Club';
 
@@ -40,62 +40,61 @@ export const Top100ListProgressHero: React.FC<Top100ListProgressHeroProps> = ({
   }, [percent]);
 
   return (
-    <div className="px-4 py-5 bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-slate-900/95 backdrop-blur-sm">
-      {/* Single unified journey state container */}
-      <div className="bg-white/5 rounded-sq-md p-4 border border-white/10">
-        <div className="flex items-center justify-between gap-4 mb-4">
-          {/* Left: Large numeric progress */}
-          <div className="flex items-baseline gap-1">
-            <motion.span
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-              className="text-5xl font-bold text-white tracking-tight"
-            >
-              {playedCount}
-            </motion.span>
-            <span className="text-2xl text-white/50 font-medium">/ {totalCount}</span>
-          </div>
+    <div className="px-4 pt-6 pb-4">
+      {/* Single unified journey state container - no boxed background */}
+      <div className="p-4 flex gap-4 items-stretch">
+        {/* Left: Large numeric tile */}
+        <div className="w-[100px] shrink-0 flex flex-col items-center justify-center bg-slate-900 rounded-sq-md p-3">
+          <motion.span
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+            className="text-4xl font-bold text-white tracking-tight"
+          >
+            {playedCount}
+          </motion.span>
+          <span className="text-sm text-white/60 font-medium">/ {totalCount}</span>
+        </div>
 
-          {/* Right: Club status */}
-          <div className="text-right">
-            <div className="flex items-center justify-end gap-1.5 mb-1">
-              <Trophy className="w-4 h-4 text-amber-400" />
-              <span className="text-sm font-semibold text-white">
+        {/* Right column: controlled flex layout */}
+        <div className="flex-1 min-w-0 flex flex-col justify-between">
+          {/* Row 1: Title/Sub + Status pill */}
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <h3 className="text-base font-semibold text-foreground truncate">
                 {currentClub?.shortLabel || 'Rookie'}
-              </span>
+              </h3>
+              {toNext > 0 && (
+                <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                  {toNext} to {nextClubName}
+                </p>
+              )}
             </div>
             
-            {/* Next milestone */}
-            {toNext > 0 && (
-              <div className="flex items-center justify-end gap-1.5">
-                <Lock className="w-3 h-3 text-white/40" />
-                <span className="text-xs text-white/60">
-                  {toNext} to <span className="font-medium text-white/80">{nextClubName}</span>
-                </span>
-              </div>
-            )}
+            {/* Status pill - shrink-0 */}
+            <div className="shrink-0 flex items-center gap-1.5 px-2.5 py-1 bg-amber-100 rounded-sq-pill">
+              <Trophy className="w-3.5 h-3.5 text-amber-600" />
+              <span className="text-xs font-semibold text-amber-700">
+                {Math.round(percent)}%
+              </span>
+            </div>
           </div>
-        </div>
 
-        {/* Animated progress bar */}
-        <div className="h-2.5 rounded-full bg-white/15 overflow-hidden">
-          <motion.div
-            className="h-full rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400"
-            initial={{ width: 0 }}
-            animate={{ width: `${animatedProgress}%` }}
-            transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-          />
-        </div>
-
-        {/* Progress label */}
-        <div className="mt-2 flex items-center justify-between">
-          <span className="text-xs text-white/50">
-            {listName} progress
-          </span>
-          <span className="text-xs font-medium text-white/70">
-            {Math.round(percent)}% complete
-          </span>
+          {/* Progress bar */}
+          <div className="mt-3">
+            <div className="h-2 rounded-full bg-muted/60 overflow-hidden">
+              <motion.div
+                className="h-2 rounded-full bg-amber-500"
+                initial={{ width: 0 }}
+                animate={{ width: `${animatedProgress}%` }}
+                transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+                style={{ transition: 'all 300ms ease-out' }}
+              />
+            </div>
+            <p className="text-[11px] text-muted-foreground mt-1.5">
+              {listName} progress
+            </p>
+          </div>
         </div>
       </div>
     </div>

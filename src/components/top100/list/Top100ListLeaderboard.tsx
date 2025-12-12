@@ -67,7 +67,7 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
   }
 
   return (
-    <section className="mt-6">
+    <section className="mt-4">
       <div className="px-4 flex items-start justify-between">
         <div>
           <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-500">
@@ -106,14 +106,14 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
               type="button"
               onClick={() => navigate(`/profile/${friend.username}`)}
               className={`
-                flex-shrink-0 w-28 snap-start p-3 rounded-sq-md bg-white border transition-all
+                flex-shrink-0 w-[72px] snap-start p-2 rounded-sq-md bg-white border transition-all text-center
                 ${isClosestCompetitor ? 'border-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.3)]' : 'border-slate-100'}
               `}
             >
               {/* Avatar with progress ring */}
-              <div className="relative mx-auto mb-2">
+              <div className="relative mx-auto mb-1.5">
                 <SquircleAvatar
-                  size={44}
+                  size={40}
                   src={friend.avatarUrl}
                   alt={friend.name}
                   fallback={friend.name[0]?.toUpperCase() || '?'}
@@ -121,45 +121,40 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
                 />
                 {/* Mini progress ring indicator */}
                 <div 
-                  className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-slate-900 flex items-center justify-center text-[9px] font-bold text-white"
+                  className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-slate-900 flex items-center justify-center text-[8px] font-bold text-white"
                   title={`${friend.playedOnList}/${totalInList} played`}
                 >
                   {friend.playedOnList}
                 </div>
               </div>
 
-              {/* Name */}
-              <div className="text-xs font-semibold text-slate-900 truncate">
+              {/* Name - centered, truncated, fixed width */}
+              <div className="text-xs font-medium text-slate-900 truncate w-[72px] text-center px-1">
                 {friend.name.split(' ')[0]}
-              </div>
-
-              {/* Progress */}
-              <div className="text-[10px] text-slate-500 mt-0.5">
-                {friend.playedOnList}/{totalInList}
               </div>
 
               {/* Relative position indicator */}
               <div className={`
-                mt-1.5 flex items-center justify-center gap-0.5 text-[10px] font-medium rounded-sq-pill px-2 py-0.5
+                mt-1 flex items-center justify-center gap-0.5 text-[9px] font-medium rounded-sq-pill px-1.5 py-0.5
                 ${isAhead ? 'bg-emerald-50 text-emerald-600' : ''}
                 ${isBehind ? 'bg-slate-50 text-slate-500' : ''}
                 ${isSame ? 'bg-amber-50 text-amber-600' : ''}
               `}>
                 {isAhead && (
                   <>
-                    <ArrowUp className="w-2.5 h-2.5" />
-                    <span>{diff} ahead</span>
+                    <ArrowUp className="w-2 h-2" />
+                    <span>+{diff}</span>
                   </>
                 )}
                 {isBehind && (
                   <>
-                    <ArrowDown className="w-2.5 h-2.5" />
-                    <span>{Math.abs(diff)} behind</span>
+                    <ArrowDown className="w-2 h-2" />
+                    <span>{diff}</span>
                   </>
                 )}
                 {isSame && (
                   <>
-                    <Minus className="w-2.5 h-2.5" />
+                    <Minus className="w-2 h-2" />
                     <span>Tied</span>
                   </>
                 )}

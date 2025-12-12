@@ -43,6 +43,7 @@ const Top100List = () => {
   const { data: progressData } = useTop100ProgressForUser(user?.id);
   const { data: userActivity } = useUserCourseActivity(user?.id);
 
+
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [filterChip, setFilterChip] = useState<Top100FilterChip>('official');
   const [page, setPage] = useState(0);
@@ -348,39 +349,45 @@ const Top100List = () => {
           </section>
         )}
 
-        {/* 2. Progress Hero Module */}
+        {/* 2. Progress Hero Module - mt-6 from hero */}
         {session && (
-          <Top100ListProgressHero
-            playedCount={playedCount}
-            totalCount={totalCount}
-            listName={listDisplayName}
-            listSlug={slug}
-          />
+          <div className="mt-6">
+            <Top100ListProgressHero
+              playedCount={playedCount}
+              totalCount={totalCount}
+              listName={listDisplayName}
+              listSlug={slug}
+            />
+          </div>
         )}
 
-        {/* 3. Social Leaderboard */}
+        {/* 3. Social Leaderboard - mt-4 from progress hero */}
         {session && (
-          <Top100ListLeaderboard
-            friends={friendsSummary}
-            totalInList={totalCount}
-            listName={listDisplayName}
-            currentUserPlayed={playedCount}
-          />
+          <div className="mt-4">
+            <Top100ListLeaderboard
+              friends={friendsSummary}
+              totalInList={totalCount}
+              listName={listDisplayName}
+              currentUserPlayed={playedCount}
+            />
+          </div>
         )}
 
-        {/* 4. Achievements Pair */}
+        {/* 4. Achievements Pair - mt-4 from leaderboard */}
         {session && (
-          <Top100ListAchievementsPair
-            primary={listMilestones.primary}
-            upcoming={listMilestones.upcoming}
-          />
+          <div className="mt-4">
+            <Top100ListAchievementsPair
+              primary={listMilestones.primary}
+              upcoming={listMilestones.upcoming}
+            />
+          </div>
         )}
 
         {/* Ref target for scroll-to-top after pagination */}
         <div ref={listTopRef} />
 
-        {/* 5. Filter Chips (sticky) */}
-        <div ref={filterRef} className={isFilterSticky ? 'sticky top-14 z-10' : ''}>
+        {/* 5. Filter Chips (sticky) - mt-4 from achievements */}
+        <div ref={filterRef} className={`mt-4 ${isFilterSticky ? 'sticky top-14 z-10' : ''}`}>
           <Top100ListFilterChips
             activeFilter={filterChip}
             onFilterChange={setFilterChip}
