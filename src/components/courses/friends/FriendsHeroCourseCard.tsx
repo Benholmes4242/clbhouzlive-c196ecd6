@@ -1,10 +1,9 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Squircle } from '@/components/ui/squircle';
-import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import CourseRankBadges from '../CourseRankBadges';
+import { Top100RankBadge } from '@/components/top100/Top100RankBadge';
 import { extractRanksFromMemberships } from '@/utils/rankingUtils';
 import type { CourseWithFriends } from '@/hooks/useFriendsCourses';
 
@@ -16,6 +15,7 @@ interface FriendsHeroCourseCardProps {
 const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, filterType }) => {
   const navigate = useNavigate();
   const mostRecentFriend = course.friends[0];
+  const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
 
   const getHighlightLabel = () => {
     switch (filterType) {
@@ -32,12 +32,12 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
 
   return (
     <Card 
-      className="relative overflow-hidden rounded-none sm:rounded-xl hover:shadow-lg transition-all cursor-pointer bg-card border border-border/60 shadow-md"
+      className="relative overflow-hidden rounded-none sm:rounded-sq-md hover:shadow-lg transition-all cursor-pointer bg-card border border-border/60 shadow-md"
       onClick={() => navigate(`/courses/${course.course_id}`)}
     >
-      {/* Course Image - Slightly taller */}
+      {/* Course Image - 6% taller aspect ratio */}
       {course.thumbnail_url && (
-        <div className="relative w-full aspect-[1.88/1] overflow-hidden">
+        <div className="relative w-full aspect-[1.77/1] overflow-hidden">
           <img
             src={course.thumbnail_url}
             alt={course.course_name}
@@ -49,24 +49,23 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
           {/* Bottom gradient */}
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
           
-          {/* Rank badges (top-left) - no rating badge on hero card */}
-          {(() => {
-            const ranks = extractRanksFromMemberships(course.top100_memberships, course.country);
-            return (
-              <CourseRankBadges
-                globalRank={ranks.globalRank}
-                regionalRank={ranks.regionalRank}
-                usaRank={ranks.usaRank}
-                country={course.country || ''}
-                positioning="top-left"
-              />
-            );
-          })()}
+          {/* Rank badges (top-left) */}
+          <div className="absolute top-3 left-3 flex items-center gap-2">
+            {ranks.globalRank && (
+              <Top100RankBadge listSlug="global" rank={ranks.globalRank} />
+            )}
+            {ranks.usaRank && (
+              <Top100RankBadge listSlug="usa" rank={ranks.usaRank} />
+            )}
+            {ranks.regionalRank && !ranks.usaRank && (
+              <Top100RankBadge listSlug="gb-i" rank={ranks.regionalRank} />
+            )}
+          </div>
         </div>
       )}
       
-      {/* Course Info */}
-      <div className="px-3.5 py-2.5 space-y-1.5">
+      {/* Course Info - standardized padding */}
+      <div className="px-4 py-3 space-y-1.5">
         {/* Highlight label */}
         <div className="inline-block px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
           <span className="text-[10px] font-medium text-primary">{getHighlightLabel()}</span>

@@ -10,8 +10,8 @@ import { Top100LeaderboardFilters } from './Top100LeaderboardFilterBar';
 import { Top100FriendCoursesStrip } from './Top100FriendCoursesStrip';
 import { Top100CourseMoversStrip } from './Top100CourseMoversStrip';
 import { getCourseTrophies } from './getCourseTrophies';
-import CourseRankBadges from '@/components/courses/CourseRankBadges';
-import ClubhouseLogo from '@/components/ui/clubhouse-logo';
+import { UnifiedCourseCard } from '@/components/courses/UnifiedCourseCard';
+import { fromLeaderboardCourse } from '@/lib/mappers/toCourseCardModel';
 import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 
 interface Top100CoursesLeaderboardViewProps {
@@ -208,122 +208,37 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
       <div className="-mx-4 sm:mx-0">
         <section className="space-y-3">
           {paginatedCourses.map((course, index) => {
-            const hasImage = !!course.thumbnail_url;
-            const rating = course.avg_rating ?? null;
             const tags = getCourseTags(course, filters);
             const trophies = getCourseTrophies(course, index);
+            
+            // Map to CourseCardModel
+            const cardModel = fromLeaderboardCourse({
+              course_id: course.course_id,
+              course_name: course.course_name,
+              country: course.country,
+              sub_country: course.sub_country,
+              thumbnail_url: course.thumbnail_url,
+              avg_rating: course.avg_rating,
+              global_rank: course.global_rank,
+              regional_rank: course.regional_rank,
+              usa_rank: course.usa_rank,
+              times_played: course.times_played,
+              friends_count: course.friends_count,
+            });
+
+            // Get trophy tag if available
+            const contextTag = trophies.length > 0 ? trophies[0].label : undefined;
 
             return (
-              <button
+              <UnifiedCourseCard
                 key={course.course_id}
-                type="button"
+                course={cardModel}
+                showRankBadges={true}
+                showRating={true}
+                showFriendsContext={true}
+                contextTag={contextTag}
                 onClick={() => navigate(`/courses/${course.course_id}`)}
-                className="w-full rounded-none sm:rounded-xl overflow-hidden bg-card border-y sm:border border-border/60 text-left shadow-none sm:shadow-sm hover:sm:shadow-md transition-all"
-              >
-                {/* Image with overlay - matching My Progress aspect ratio */}
-                {hasImage && (
-                  <div className="relative w-full aspect-[1.88/1] overflow-hidden">
-                    <img
-                      src={course.thumbnail_url!}
-                      alt={course.course_name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                    
-                    {/* Gradient overlay */}
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
-                    
-                    {/* Rank badges top-left */}
-                    <CourseRankBadges
-                      globalRank={course.global_rank}
-                      regionalRank={course.regional_rank}
-                      usaRank={course.usa_rank}
-                      country={course.country || ''}
-                      positioning="top-left"
-                    />
-
-                    {/* Trophy badge top-right */}
-                    {trophies.length > 0 && (
-                      <div className="absolute top-2 right-2">
-                        <span className="inline-flex items-center rounded-full bg-background/95 border border-border/70 px-2 py-0.5 text-[11px] font-medium">
-                          {trophies[0].label}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Meta block - matching My Progress structure */}
-                <div className="px-3.5 py-2.5 bg-background space-y-0.5">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        {!hasImage && (course.global_rank || course.regional_rank || course.usa_rank) && (
-                          <span className="text-[10px] font-semibold text-muted-foreground">
-                            #{course.global_rank || course.regional_rank || course.usa_rank}
-                          </span>
-                        )}
-                        <h3 className="text-sm font-semibold text-foreground truncate">
-                          {course.course_name}
-                        </h3>
-                      </div>
-                      
-                      <p className="text-xs text-muted-foreground">
-                        {course.sub_country && `${course.sub_country}, `}
-                        {course.country}
-                      </p>
-                      
-                      <p className="text-[11px] text-muted-foreground mt-0.5">
-                        Rated by {course.times_played} member{course.times_played === 1 ? '' : 's'}
-                      </p>
-
-                      {/* Friends line */}
-                      {course.friends_count > 0 ? (
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          Rated by {course.friends_count}{' '}
-                          {course.friends_count === 1 ? 'friend' : 'friends'}
-                          {course.friends_avg_rating != null && (
-                            <>
-                              {' · '}
-                              Friends' avg {course.friends_avg_rating.toFixed(1)}
-                            </>
-                          )}
-                        </p>
-                      ) : (
-                        <p className="text-xs text-muted-foreground/60 mt-0.5">
-                          No friends have rated this course yet
-                        </p>
-                      )}
-
-                      {/* Smart Tags */}
-                      {tags.length > 0 && (
-                        <div className="mt-1.5 flex flex-wrap gap-1">
-                          {tags.map((tag) => (
-                            <span
-                              key={tag.id}
-                              className="inline-flex items-center rounded-full border border-border/70 px-2 py-0.5 text-[11px] font-medium text-muted-foreground bg-background/80"
-                            >
-                              {tag.label}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Right: Clbhouz logo and rating */}
-                    {rating !== null && (
-                      <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <ClubhouseLogo className="h-5 w-5" />
-                        <span className="text-sm font-semibold text-foreground">
-                          {rating.toFixed(1)}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </button>
+              />
             );
           })}
         </section>

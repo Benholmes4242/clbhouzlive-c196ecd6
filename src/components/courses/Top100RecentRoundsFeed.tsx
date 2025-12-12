@@ -1,9 +1,8 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Top100RecentRound } from '@/hooks/useTop100ProgressForUser';
 import { cn } from '@/lib/utils';
-import CourseRankBadges from './CourseRankBadges';
-import ClubhouseLogo from '@/components/ui/clubhouse-logo';
+import { UnifiedCourseCard } from './UnifiedCourseCard';
+import { fromTop100Round } from '@/lib/mappers/toCourseCardModel';
 
 interface Top100RecentRoundsFeedProps {
   rounds: Top100RecentRound[];
@@ -16,7 +15,6 @@ export function Top100RecentRoundsFeed({
   isOwnProfile,
   className,
 }: Top100RecentRoundsFeedProps) {
-  const navigate = useNavigate();
   const pageSize = 4;
   const [page, setPage] = React.useState(0);
 
@@ -55,68 +53,14 @@ export function Top100RecentRoundsFeed({
       </div>
 
       <div className="space-y-3">
-        {current.map((round) => {
-
-          return (
-            <button
-              key={`${round.course_id}-${round.played_at}`}
-              type="button"
-              onClick={() => navigate(`/courses/${round.course_id}`)}
-              className="w-full rounded-none sm:rounded-sq-md overflow-hidden bg-card border-y sm:border border-border/60 text-left shadow-none sm:shadow-sm hover:sm:shadow-md transition-all"
-            >
-              {round.image_url && (
-                <div className="relative w-full aspect-[1.88/1] overflow-hidden">
-                  <img
-                    src={round.image_url}
-                    alt={round.course_name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src = '/placeholder.svg';
-                    }}
-                  />
-                  
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
-                  
-                  {/* Rank badges - positioned slightly further from edges, SDS corners */}
-                  <div className="absolute top-3 left-3 z-10">
-                    <CourseRankBadges
-                      globalRank={round.global_rank}
-                      regionalRank={round.regional_rank}
-                      usaRank={round.usa_rank}
-                      country={round.country || ''}
-                      positioning="inline"
-                    />
-                  </div>
-                </div>
-              )}
-
-              <div className="px-3.5 py-2.5 bg-background space-y-0.5">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-semibold text-foreground">
-                      {round.course_name}
-                    </h3>
-                    
-                    <p className="text-xs text-muted-foreground">
-                      {round.sub_country && `${round.sub_country}, `}
-                      {round.country}
-                    </p>
-                  </div>
-
-                  {/* Rating - vertically centered relative to course name */}
-                  {round.rating != null && (
-                    <div className="flex items-center gap-1 flex-shrink-0 self-center">
-                      <ClubhouseLogo className="h-4 w-4" />
-                      <span className="text-xs font-semibold text-foreground">
-                        {round.rating.toFixed(1)}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </button>
-          );
-        })}
+        {current.map((round) => (
+          <UnifiedCourseCard
+            key={`${round.course_id}-${round.played_at}`}
+            course={fromTop100Round(round)}
+            showRankBadges={true}
+            showRating={true}
+          />
+        ))}
       </div>
 
       {/* Pagination - increased tap targets, reduced visual weight */}
