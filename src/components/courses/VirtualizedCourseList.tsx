@@ -1,10 +1,13 @@
 /**
  * Phase 2 Perf: Virtualized course list for better scroll performance
  * Only renders visible items + buffer, reducing DOM nodes significantly
+ * 
+ * Uses UnifiedCourseCard - the single source of truth for course cards.
  */
 
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { CourseListCard } from './CourseListCard';
+import { UnifiedCourseCard } from './UnifiedCourseCard';
+import { fromGolfCourse } from '@/lib/mappers/toCourseCardModel';
 import { useNavigate } from 'react-router-dom';
 
 interface Course {
@@ -30,9 +33,9 @@ interface VirtualizedCourseListProps {
   onCourseClick?: () => void;
 }
 
-// Card aspect ratio is 1.88/1 (15% shorter), so height = width / 1.88. With padding, estimate:
-const ITEM_HEIGHT = 280; // Mobile: accounts for aspect ratio + meta bar
-const ITEM_HEIGHT_SM = 240; // Desktop: slightly shorter
+// Card aspect ratio is 1.77/1 (6% taller than previous), so height = width / 1.77. With padding:
+const ITEM_HEIGHT = 300; // Mobile: accounts for aspect ratio + meta bar (6% taller)
+const ITEM_HEIGHT_SM = 260; // Desktop: slightly shorter
 const BUFFER_SIZE = 3; // Number of items to render above/below viewport
 
 const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
@@ -166,8 +169,10 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
           {courses.map((course) => (
             <div key={course.id} className="mb-4 sm:mb-0">
-              <CourseListCard 
-                course={course}
+              <UnifiedCourseCard 
+                course={fromGolfCourse(course)}
+                showRankBadges={true}
+                showRating={true}
                 onClick={() => {
                   onCourseClick?.();
                   navigate(`/courses/${course.id}`);
@@ -191,8 +196,10 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
           {courses.map((course) => (
             <div key={course.id} className="mb-4 sm:mb-0">
-              <CourseListCard 
-                course={course}
+              <UnifiedCourseCard 
+                course={fromGolfCourse(course)}
+                showRankBadges={true}
+                showRating={true}
                 onClick={() => {
                   onCourseClick?.();
                   navigate(`/courses/${course.id}`);
@@ -226,8 +233,10 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
             className="mb-4 sm:mb-0"
             style={{ height: itemHeight }}
           >
-            <CourseListCard 
-              course={course}
+            <UnifiedCourseCard 
+              course={fromGolfCourse(course)}
+              showRankBadges={true}
+              showRating={true}
               onClick={() => {
                 onCourseClick?.();
                 navigate(`/courses/${course.id}`);
