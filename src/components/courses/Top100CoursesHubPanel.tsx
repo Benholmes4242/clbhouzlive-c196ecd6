@@ -274,18 +274,15 @@ const Top100CoursesHubPanel = () => {
                   </p>
                 </div>
 
-                {/* Row 2: CTA pinned bottom-right */}
-                <div className="flex justify-end mt-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleOpenTop100Club}
-                    className="shrink-0 text-muted-foreground hover:text-foreground -mr-2"
-                  >
-                    Visit Top 100 Club
-                    <ChevronRight className="ml-1 h-4 w-4" />
-                  </Button>
-                </div>
+                {/* Row 2: CTA pinned bottom-right, aligned with text edge */}
+                <button
+                  type="button"
+                  onClick={handleOpenTop100Club}
+                  className="mt-2 inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Visit Top 100 Club
+                  <ChevronRight className="ml-0.5 h-4 w-4" />
+                </button>
               </div>
             </div>
           </div>
