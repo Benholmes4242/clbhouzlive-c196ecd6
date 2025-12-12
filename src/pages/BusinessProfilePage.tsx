@@ -50,12 +50,12 @@ const BusinessProfilePage = () => {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="max-w-md text-center">
           <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h1 className="text-2xl font-semibold mb-2">This business profile isn't available</h1>
+          <h1 className="text-2xl font-semibold mb-2">Business not found</h1>
           <p className="text-muted-foreground mb-6">
-            It may have been removed or isn't visible to your account.
+            This business may have been removed or is no longer available.
           </p>
-          <Button onClick={() => navigate('/')}>
-            Go home
+          <Button onClick={() => navigate(-1)}>
+            Go back
           </Button>
         </div>
       </div>

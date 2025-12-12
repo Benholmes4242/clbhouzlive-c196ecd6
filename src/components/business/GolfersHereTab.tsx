@@ -87,11 +87,8 @@ export function GolfersHereTab({ businessId, businessName, businessLocation }: G
         <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
           <Users className="h-8 w-8 text-muted-foreground/50" />
         </div>
-        <h3 className="text-base font-medium text-foreground mb-2">
-          No golfers tagged here yet
-        </h3>
-        <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-          When golfers tag {businessName || 'this location'} in their posts, they'll appear here.
+        <p className="text-sm text-muted-foreground">
+          No followers yet.
         </p>
       </div>
     );

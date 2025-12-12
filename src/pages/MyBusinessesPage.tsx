@@ -91,9 +91,9 @@ const MyBusinessesPage = () => {
             <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-muted flex items-center justify-center">
               <Building2 className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-medium mb-2">You don't have any business profiles yet</h3>
+            <h3 className="text-lg font-medium mb-2">Create your first business profile</h3>
             <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
-              Create a profile for a golf club, coach, brand, course, shop, or any golf business you officially represent.
+              Appear in search, share updates, and connect with golfers on Clbhouz.
             </p>
             <Button onClick={handleCreateBusiness} className="gap-2">
               <Plus className="h-4 w-4" />
