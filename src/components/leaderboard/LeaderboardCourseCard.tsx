@@ -112,7 +112,7 @@ export function LeaderboardCourseCard({ course, listPosition, showFriendsContext
       )}
 
       {/* Meta block */}
-      <div className="px-3.5 py-3 bg-background">
+      <div className="px-3 py-2.5 bg-background">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0 space-y-0.5">
             {/* Course name */}
