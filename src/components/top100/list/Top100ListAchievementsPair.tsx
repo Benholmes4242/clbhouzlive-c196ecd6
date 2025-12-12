@@ -48,21 +48,18 @@ export const Top100ListAchievementsPair: React.FC<Top100ListAchievementsPairProp
       </div>
 
       <div className="px-4 flex gap-3">
-        {/* Primary Achievement (Unlocked) */}
+        {/* Primary Achievement (Unlocked) - reduced saturation */}
         {primary && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
-            className="flex-1 relative overflow-hidden rounded-sq-md bg-gradient-to-br from-amber-50 to-amber-100/50 border border-amber-200/60 p-4"
+            className="flex-1 relative overflow-hidden rounded-sq-md bg-gradient-to-br from-amber-50/80 to-amber-100/40 border border-amber-200/50 p-4"
           >
-            {/* Subtle glow effect */}
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-400/10 to-transparent pointer-events-none" />
-            
             <div className="relative">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center shadow-sm">
-                  <Trophy className="w-4 h-4 text-white" />
+                <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center shadow-md">
+                  <Trophy className="w-4 h-4 text-white drop-shadow-sm" />
                 </div>
                 <div>
                   <div className="text-sm font-semibold text-slate-900">{primary.title}</div>

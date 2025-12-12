@@ -56,7 +56,7 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
     <div 
       className={`py-3 transition-all ${
         isSticky 
-          ? 'bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm' 
+          ? 'bg-gradient-to-b from-white via-white to-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm' 
           : ''
       }`}
     >

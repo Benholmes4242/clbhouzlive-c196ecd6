@@ -47,6 +47,7 @@ export const Top100ListCourseCard: React.FC<Top100ListCourseCardProps> = ({
       course={transformedCourse}
       listSlug={listSlug as 'global' | 'gb-i' | 'usa' | 'europe'}
       onClick={onClick}
+      isPlayed={course.played}
     />
   );
 };

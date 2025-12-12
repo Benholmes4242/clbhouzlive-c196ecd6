@@ -1,4 +1,5 @@
 import React from 'react';
+import { Check } from 'lucide-react';
 import { Top100RankBadge } from '@/components/top100/Top100RankBadge';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 
@@ -17,6 +18,8 @@ interface CourseListCardProps {
   onClick?: () => void;
   /** Which list context we're in - helps determine regional badge type */
   listSlug?: 'global' | 'gb-i' | 'usa' | 'europe';
+  /** Whether the user has played this course */
+  isPlayed?: boolean;
 }
 
 /**
@@ -27,6 +30,7 @@ export const CourseListCard: React.FC<CourseListCardProps> = ({
   course,
   onClick,
   listSlug,
+  isPlayed,
 }) => {
   // Derive regional rank from usa_rank or regional_rank
   const regionalRank = course.usa_rank ?? course.regional_rank ?? null;
@@ -70,6 +74,24 @@ export const CourseListCard: React.FC<CourseListCardProps> = ({
             <Top100RankBadge listSlug={regionalBadgeSlug} rank={regionalRank} />
           )}
         </div>
+
+        {/* Played/Unplayed status - bottom-left */}
+        {isPlayed !== undefined && (
+          <div className={`absolute bottom-3 left-3 flex items-center gap-1 px-2 py-1 rounded-sq-pill text-[10px] font-medium ${
+            isPlayed 
+              ? 'bg-emerald-500/90 text-white' 
+              : 'bg-black/40 text-white/80'
+          }`}>
+            {isPlayed ? (
+              <>
+                <Check className="w-3 h-3" />
+                <span>Played</span>
+              </>
+            ) : (
+              <span>Unplayed</span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Meta area - white bar */}
