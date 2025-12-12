@@ -128,8 +128,8 @@ export function LeaderboardCourseCard({ course, listPosition, showFriendsContext
 
             {/* Third line - contextual */}
             {thirdLine && (
-              <p className="text-[11px] text-muted-foreground/80 flex items-center gap-1 pt-0.5">
-                <Users className="h-3 w-3" />
+              <p className="text-[10px] text-muted-foreground/80 flex items-center gap-1 pt-0.5">
+                <Users className="h-2.5 w-2.5" />
                 {thirdLine}
               </p>
             )}
@@ -139,7 +139,7 @@ export function LeaderboardCourseCard({ course, listPosition, showFriendsContext
           {rating !== null && (
             <div className="flex items-center gap-1 flex-shrink-0 pt-0.5">
               <ClubhouseLogo className="h-4 w-4" />
-              <span className="text-sm font-semibold text-foreground">
+              <span className="text-xs font-semibold text-foreground">
                 {rating.toFixed(1)}
               </span>
             </div>
