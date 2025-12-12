@@ -1,6 +1,7 @@
 /**
  * MapProgressOrb - Floating progress orb for Top 100 Map
  * Shows % complete, expands to show milestone info
+ * Now a standalone component (not positioned absolutely)
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -85,132 +86,129 @@ export const MapProgressOrb: React.FC<MapProgressOrbProps> = ({
   }, [isExpanded, scheduleAutoCollapse]);
 
   return (
-    <div className="pointer-events-auto absolute right-4 bottom-28 z-20">
-      <AnimatePresence mode="wait">
-        {!isExpanded ? (
-          <motion.button
-            key="orb"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
-            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            onClick={handleToggle}
-            className={cn(
-              'relative flex items-center justify-center',
-              'w-14 h-14 rounded-full',
-              'bg-slate-900 text-white',
-              'shadow-[0_4px_20px_rgba(0,0,0,0.3)]',
-              'hover:bg-slate-800 active:scale-95',
-              'transition-all duration-150'
-            )}
+    <AnimatePresence mode="wait">
+      {!isExpanded ? (
+        <motion.button
+          key="orb"
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.8, opacity: 0 }}
+          transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+          onClick={handleToggle}
+          className={cn(
+            'relative flex items-center justify-center',
+            'w-12 h-12 rounded-full',
+            'bg-slate-900 text-white',
+            'shadow-[0_4px_16px_rgba(0,0,0,0.25)]',
+            'hover:bg-slate-800 active:scale-95',
+            'transition-all duration-150'
+          )}
+        >
+          {/* Progress ring */}
+          <svg className="absolute inset-0 w-full h-full -rotate-90">
+            <circle
+              cx="24"
+              cy="24"
+              r="20"
+              fill="none"
+              stroke="rgba(255,255,255,0.15)"
+              strokeWidth="2.5"
+            />
+            <circle
+              cx="24"
+              cy="24"
+              r="20"
+              fill="none"
+              stroke="#F7931E"
+              strokeWidth="2.5"
+              strokeDasharray={`${(percentage / 100) * 125.6} 125.6`}
+              strokeLinecap="round"
+            />
+          </svg>
+          
+          {/* Percentage */}
+          <span className="text-xs font-bold relative z-10">{percentage}%</span>
+        </motion.button>
+      ) : (
+        <motion.div
+          key="panel"
+          initial={{ scale: 0.9, opacity: 0, y: 10 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.9, opacity: 0, y: 10 }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          onClick={handlePanelInteraction}
+          className={cn(
+            'relative',
+            'bg-white dark:bg-slate-900',
+            'rounded-sq-md',
+            'shadow-[0_4px_24px_rgba(0,0,0,0.15)]',
+            'border border-slate-200/80 dark:border-slate-700/50',
+            'p-3.5 min-w-[180px]'
+          )}
+        >
+          {/* Close button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsExpanded(false);
+              clearAutoCollapseTimer();
+            }}
+            className="absolute top-2 right-2 p-1 text-slate-400 hover:text-slate-600"
           >
-            {/* Progress ring */}
-            <svg className="absolute inset-0 w-full h-full -rotate-90">
-              <circle
-                cx="28"
-                cy="28"
-                r="24"
-                fill="none"
-                stroke="rgba(255,255,255,0.2)"
-                strokeWidth="3"
-              />
-              <circle
-                cx="28"
-                cy="28"
-                r="24"
-                fill="none"
-                stroke="#F7931E"
-                strokeWidth="3"
-                strokeDasharray={`${(percentage / 100) * 150.8} 150.8`}
-                strokeLinecap="round"
-              />
-            </svg>
-            
-            {/* Percentage */}
-            <span className="text-sm font-bold relative z-10">{percentage}%</span>
-          </motion.button>
-        ) : (
-          <motion.div
-            key="panel"
-            initial={{ scale: 0.9, opacity: 0, y: 10 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.9, opacity: 0, y: 10 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            onClick={handlePanelInteraction}
-            className={cn(
-              'relative',
-              'bg-white/95 dark:bg-slate-900/95',
-              'backdrop-blur-xl',
-              'rounded-sq-lg',
-              'shadow-[0_8px_32px_rgba(0,0,0,0.2)]',
-              'border border-white/30 dark:border-slate-700/50',
-              'p-4 min-w-[200px]'
-            )}
-          >
-            {/* Close button */}
+            <X className="h-3 w-3" />
+          </button>
+
+          {/* Current progress */}
+          <div className="flex items-center gap-2 mb-2.5">
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800">
+              <Trophy className="h-4 w-4 text-amber-500" />
+            </div>
+            <div>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500">Current</p>
+              <p className="text-xs font-semibold text-slate-900 dark:text-white">
+                {clubInfo?.tierName || 'Getting Started'}
+              </p>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="h-px bg-slate-100 dark:bg-slate-800 my-2.5" />
+
+          {/* Next milestone */}
+          <div className="mb-2.5">
+            <p className="text-[10px] text-slate-400 dark:text-slate-500 mb-0.5">
+              Next milestone
+            </p>
+            <p className="text-sm font-bold text-slate-900 dark:text-white">
+              {getNextClubName(nextMilestone)}
+            </p>
+            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
+              {coursesRemaining} course{coursesRemaining !== 1 ? 's' : ''} remaining
+            </p>
+          </div>
+
+          {/* CTA */}
+          {onMilestoneClick && (
             <button
-              onClick={(e) => {
-                e.stopPropagation();
+              onClick={() => {
+                onMilestoneClick();
                 setIsExpanded(false);
-                clearAutoCollapseTimer();
               }}
-              className="absolute top-2 right-2 p-1 text-slate-400 hover:text-slate-600"
+              className={cn(
+                'w-full flex items-center justify-center gap-1',
+                'px-2.5 py-1.5 rounded-sq-sm',
+                'bg-slate-900 text-white text-[10px] font-medium',
+                'hover:bg-slate-800 active:scale-[0.98]',
+                'transition-all duration-150'
+              )}
             >
-              <X className="h-3.5 w-3.5" />
+              Plan next milestone
+              <ChevronRight className="h-3 w-3" />
             </button>
-
-            {/* Current progress */}
-            <div className="flex items-center gap-2 mb-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800">
-                <Trophy className="h-5 w-5 text-amber-500" />
-              </div>
-              <div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Current</p>
-                <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                  {clubInfo?.tierName || 'Getting Started'}
-                </p>
-              </div>
-            </div>
-
-            {/* Divider */}
-            <div className="h-px bg-slate-200 dark:bg-slate-700 my-3" />
-
-            {/* Next milestone */}
-            <div className="mb-3">
-              <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
-                Next milestone
-              </p>
-              <p className="text-base font-bold text-slate-900 dark:text-white">
-                {getNextClubName(nextMilestone)}
-              </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                {coursesRemaining} course{coursesRemaining !== 1 ? 's' : ''} remaining
-              </p>
-            </div>
-
-            {/* CTA */}
-            {onMilestoneClick && (
-              <button
-                onClick={() => {
-                  onMilestoneClick();
-                  setIsExpanded(false);
-                }}
-                className={cn(
-                  'w-full flex items-center justify-center gap-1.5',
-                  'px-3 py-2 rounded-sq-sm',
-                  'bg-slate-900 text-white text-xs font-medium',
-                  'hover:bg-slate-800 active:scale-[0.98]',
-                  'transition-all duration-150'
-                )}
-              >
-                Plan next milestone
-                <ChevronRight className="h-3.5 w-3.5" />
-              </button>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+          )}
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

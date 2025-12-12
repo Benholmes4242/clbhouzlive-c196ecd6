@@ -1,7 +1,7 @@
 /**
  * MapInsightChip - Floating insight chip for Top 100 Map
  * Shows dynamic insights based on filters/region
- * Rotates on filter change, region change, or idle timer (20-30s)
+ * Hides during map interaction, shows after 1-2s idle
  */
 
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
@@ -71,7 +71,7 @@ export const MapInsightChip: React.FC<MapInsightChipProps> = ({
   // Reset dismissed state and rotate when filters change
   useEffect(() => {
     setIsDismissed(false);
-    setCurrentInsightIndex((prev) => prev + 1); // Rotate on change
+    setCurrentInsightIndex((prev) => prev + 1);
     resetIdleTimer();
   }, [scope, ratedFilter, resetIdleTimer]);
 
@@ -288,21 +288,18 @@ export const MapInsightChip: React.FC<MapInsightChipProps> = ({
   if (isMapError) {
     return (
       <motion.div
-        initial={{ opacity: 0, y: -10 }}
+        initial={{ opacity: 0, y: -6 }}
         animate={{ opacity: 1, y: 0 }}
-        className={cn(
-          'pointer-events-auto absolute top-3 left-1/2 -translate-x-1/2 z-20',
-          'max-w-[85%]'
-        )}
+        className="inline-flex"
       >
         <div
           className={cn(
-            'flex items-center gap-2',
-            'px-3 py-2 rounded-sq-pill',
+            'flex items-center gap-1.5',
+            'px-2.5 py-1.5 rounded-sq-sm',
             'bg-slate-900/90 dark:bg-white/95',
             'backdrop-blur-xl',
-            'shadow-[0_4px_20px_rgba(0,0,0,0.25)]',
-            'text-xs text-white dark:text-slate-900'
+            'shadow-[0_2px_12px_rgba(0,0,0,0.15)]',
+            'text-[11px] text-white dark:text-slate-900'
           )}
         >
           <span className="leading-tight">Map unavailable — your journey progress is still safe.</span>
@@ -315,35 +312,32 @@ export const MapInsightChip: React.FC<MapInsightChipProps> = ({
     <AnimatePresence mode="wait">
       <motion.div
         key={currentInsight.id}
-        initial={{ opacity: 0, y: -10 }}
+        initial={{ opacity: 0, y: -6 }}
         animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className={cn(
-          'pointer-events-auto absolute top-3 left-1/2 -translate-x-1/2 z-20',
-          'max-w-[85%]'
-        )}
+        exit={{ opacity: 0, y: -6 }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
+        className="inline-flex"
       >
         <div
           className={cn(
-            'flex items-center gap-2',
-            'px-3 py-2 rounded-sq-pill',
+            'flex items-center gap-1.5',
+            'px-2.5 py-1.5 rounded-sq-sm',
             'bg-slate-900/90 dark:bg-white/95',
             'backdrop-blur-xl',
-            'shadow-[0_4px_20px_rgba(0,0,0,0.25)]',
-            'text-xs text-white dark:text-slate-900'
+            'shadow-[0_2px_12px_rgba(0,0,0,0.15)]',
+            'text-[11px] text-white dark:text-slate-900'
           )}
         >
-          <Sparkles className="h-3.5 w-3.5 text-amber-400 dark:text-amber-500 flex-shrink-0" />
+          <Sparkles className="h-3 w-3 text-amber-400 dark:text-amber-500 flex-shrink-0" />
           
           <span className="leading-tight">{currentInsight.text}</span>
           
           <button
             onClick={() => setIsDismissed(true)}
-            className="flex-shrink-0 p-0.5 -mr-1 text-white/60 dark:text-slate-500 hover:text-white dark:hover:text-slate-700 transition-colors"
+            className="flex-shrink-0 p-0.5 -mr-0.5 text-white/50 dark:text-slate-400 hover:text-white dark:hover:text-slate-600 transition-colors"
             aria-label="Dismiss insight"
           >
-            <X className="h-3.5 w-3.5" />
+            <X className="h-3 w-3" />
           </button>
         </div>
       </motion.div>
