@@ -27,26 +27,55 @@ export const businessVerificationCopy = {
     adminNotesTitle: "Reason provided:",
     helperTextRejected: "Ensure your business details match your official information.",
     buttons: {
-      requestVerification: "Request Verification",
+      requestVerification: "Request verification",
       requestVerificationDisabled: "Complete your profile to request verification",
       requestVerificationAgain: "Request Verification Again"
     },
+    helperText: "Verification helps golfers trust the account is authentic.",
     tooltips: {
       requestDisabled: "Add a business name, location, and website or email to continue.",
       pendingDisabled: "A request is already in progress."
     },
     badges: {
-      unverified: "Unverified",
-      pending: "Pending Review",
-      verified: "Verified",
+      unverified: "Not verified",
+      pending: "Verification pending",
+      verified: "Official Business",
       rejected: "Rejected"
     },
     toasts: {
-      requestSubmitted: "Verification request submitted.",
+      requestSubmitted: "Verification request sent",
+      requestUpdated: "Verification request updated",
+      requestCancelled: "Verification request cancelled",
       requestFailed: "Could not submit your verification request. Please try again.",
       profileIncomplete: "Please complete your business profile before requesting verification.",
       cooldown: "You can request verification again in {days} days."
-    }
+    },
+    requestModal: {
+      title: "Request verification",
+      body: "Verify this business to show an Official Business badge across Clbhouz.",
+      fields: {
+        contactName: { label: "Contact name", placeholder: "Your name" },
+        businessEmail: { label: "Business email", placeholder: "name@business.com" },
+        proofLink: { label: "Proof link", placeholder: "Website, Companies House, or official social profile" },
+        notes: { label: "Notes (optional)", placeholder: "Anything that helps us verify faster…" },
+      },
+      primaryCta: "Submit request",
+      secondaryCta: "Cancel",
+    },
+  },
+  badgeTooltips: {
+    verified: {
+      title: "Official Business",
+      body: "This business has been verified by Clbhouz.",
+    },
+    pending: {
+      title: "Verification pending",
+      body: "We're reviewing this request. You'll be notified once it's complete.",
+    },
+    rejected: {
+      title: "Verification not approved",
+      body: "This request wasn't approved. You can submit a new request with more details.",
+    },
   },
   adminVerification: {
     page: {

@@ -6,10 +6,11 @@ import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessAnalytics, AnalyticsRange, DailyAnalytics } from '@/hooks/useBusinessAnalytics';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { Eye, MousePointerClick, MessageSquare, AtSign, TrendingUp, Users, ArrowLeft, ShieldAlert } from 'lucide-react';
+import { Eye, MousePointerClick, MessageSquare, AtSign, TrendingUp, Users, ArrowLeft, ShieldAlert, Plus } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { format, parseISO } from 'date-fns';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { insightsEmptyStatesCopy } from '@/lib/insightsEmptyStatesCopy';
 
 const StatCard = ({ 
   label, 
@@ -149,23 +150,25 @@ const BusinessInsightsPage = () => {
   // Access denied for standalone view without membership
   if (isStandaloneBusinessView && !membership?.canViewInsights) {
     return (
-      <div className="max-w-xl mx-auto mt-10 text-center px-4">
-        <div className="bg-card border border-border rounded-sq-lg p-8">
-          <ShieldAlert className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h1 className="text-2xl font-semibold mb-2">Access denied</h1>
-          <p className="text-muted-foreground mb-6">
-            You don't have access to insights for this business.
-          </p>
-          {businessFromQuery && (
-            <Button 
-              onClick={() => navigate(`/business/${businessFromQuery.slug || businessFromQuery.id}`)}
-              className="rounded-sq-sm"
-            >
-              Back to business profile
-            </Button>
-          )}
+      <PageRoot className="min-h-screen bg-[hsl(var(--muted))]">
+        <div className="max-w-xl mx-auto mt-10 text-center px-4">
+          <div className="bg-card border border-border rounded-sq-lg p-8">
+            <ShieldAlert className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h1 className="text-2xl font-semibold mb-2">{insightsEmptyStatesCopy.permissionDenied.title}</h1>
+            <p className="text-muted-foreground mb-6">
+              {insightsEmptyStatesCopy.permissionDenied.body}
+            </p>
+            {businessFromQuery && (
+              <Button 
+                onClick={() => navigate(`/business/${businessFromQuery.slug || businessFromQuery.id}`)}
+                className="rounded-sq-sm"
+              >
+                Back to business profile
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
+      </PageRoot>
     );
   }
 
@@ -176,21 +179,23 @@ const BusinessInsightsPage = () => {
   // Non-business profile trying to access without query param - redirect to create business
   if (!isStandaloneBusinessView && profile?.profile_type !== 'business') {
     return (
-      <div className="max-w-xl mx-auto mt-10 text-center px-4">
-        <div className="bg-card border border-border rounded-sq-lg p-8">
-          <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h1 className="text-2xl font-semibold mb-2">Business Insights</h1>
-          <p className="text-muted-foreground mb-6">
-            Create a business profile to unlock analytics and insights about how golfers discover and engage with your business.
-          </p>
-          <Button 
-            onClick={() => navigate('/business/intro')}
-            className="rounded-sq-sm"
-          >
-            Create business profile
-          </Button>
+      <PageRoot className="min-h-screen bg-[hsl(var(--muted))]">
+        <div className="max-w-xl mx-auto mt-10 text-center px-4">
+          <div className="bg-card border border-border rounded-sq-lg p-8">
+            <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h1 className="text-2xl font-semibold mb-2">{insightsEmptyStatesCopy.noBusinessProfile.title}</h1>
+            <p className="text-muted-foreground mb-6">
+              {insightsEmptyStatesCopy.noBusinessProfile.body}
+            </p>
+            <Button 
+              onClick={() => navigate('/business/intro')}
+              className="rounded-sq-sm"
+            >
+              {insightsEmptyStatesCopy.noBusinessProfile.cta}
+            </Button>
+          </div>
         </div>
-      </div>
+      </PageRoot>
     );
   }
 
