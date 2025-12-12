@@ -89,13 +89,13 @@ export function Top100MilestonesCarousel({
                   {/* Squircle ring - uses bgDark for softer pastel matching cards */}
                   <div className="relative">
                     <div
-                      className="h-14 w-14 rounded-[18px] flex items-center justify-center bg-white"
+                      className="h-14 w-14 rounded-sq-md flex items-center justify-center bg-white"
                       style={{
                         boxShadow: isUnlocked
                           ? `0 0 18px ${ringColor}22`
-                          : '0 0 10px rgba(15,23,42,0.06)',
+                          : 'none',
                         border: `2px solid ${isUnlocked ? ringColor : `${ringColor}66`}`,
-                        opacity: isUnlocked ? 1 : 0.45,
+                        opacity: isUnlocked ? 1 : 0.65,
                       }}
                     >
                       <span className="text-sm font-semibold" style={{ color: accentColor }}>
@@ -109,7 +109,7 @@ export function Top100MilestonesCarousel({
                     <p className="text-xs font-medium text-foreground whitespace-nowrap">
                       {milestone.tierName}
                     </p>
-                    <p className="text-[11px] leading-[1.2] text-muted-foreground">
+                    <p className="text-[10px] leading-[1.2] text-muted-foreground py-0.5">
                       {isUnlocked ? 'Unlocked' : `${remaining} away`}
                     </p>
                   </div>
@@ -118,13 +118,12 @@ export function Top100MilestonesCarousel({
             })}
           </div>
 
-          {/* Progress bar - uses bgDark colors from global system */}
-          <div className="h-1 rounded-full bg-muted/80 relative">
+          {/* Progress bar - neutral grey indicator, reduced height */}
+          <div className="h-0.5 rounded-full bg-border/60 relative">
             <div
-              className="h-full rounded-full"
+              className="h-full rounded-full bg-muted-foreground/40"
               style={{ 
                 width: `${progressPct}%`,
-                background: `linear-gradient(to right, ${MILESTONE_THEMES[5].bgDark}, ${MILESTONE_THEMES[20].bgDark}, ${MILESTONE_THEMES[400].bgDark})`,
               }}
             />
           </div>

@@ -90,6 +90,7 @@ const ScrollToTopGlass = () => {
         glass-dark-no-shadow
         transition-transform
         active:scale-95
+        opacity-70
       "
     >
       <ChevronUp className="h-5 w-5 text-white" />

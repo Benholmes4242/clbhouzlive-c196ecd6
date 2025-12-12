@@ -23,11 +23,11 @@ export function Top100NearAchievements({ totalTop100Played }: Top100NearAchievem
 
   return (
     <section>
-      <div className="mb-2 flex items-center justify-between px-2.5">
-        <h2 className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground">
+      <div className="mb-3 flex items-center justify-between px-2.5">
+        <h2 className="text-[13px] font-semibold uppercase tracking-[0.5px] text-foreground/80">
           Badge you're close to
         </h2>
-        <span className="text-xs text-muted-foreground">
+        <span className="text-xs font-medium text-muted-foreground">
           {totalTop100Played} courses logged
         </span>
       </div>
@@ -38,7 +38,7 @@ export function Top100NearAchievements({ totalTop100Played }: Top100NearAchievem
           <AchievementBadgeCard
             tier={closest.threshold.toString() as AchievementTier}
             title={`${closest.threshold} Club`}
-            subtitle={closest.remaining === 1 ? 'Just 1 more course' : `${closest.remaining} courses away`}
+            subtitle={closest.remaining === 1 ? 'Just 1 more course' : `${closest.remaining} away`}
             unlocked={false}
             remaining={closest.remaining}
           />

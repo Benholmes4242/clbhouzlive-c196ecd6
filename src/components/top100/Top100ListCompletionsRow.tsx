@@ -44,7 +44,7 @@ export const Top100ListCompletionsRow: React.FC<Top100ListCompletionsRowProps> =
   );
 
   return (
-    <div className="mt-4">
+    <div className="mt-4 opacity-90">
       <p className="text-[13px] font-medium uppercase tracking-[0.5px] text-muted-foreground mb-3 px-2.5">
         Top 100 list completions
       </p>
