@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Building2, User, Settings, LogOut, Shield, Bell, Pencil } from 'lucide-react';
+import { Check, Building2, User, Settings, LogOut, Shield, Bell, Pencil, Plus } from 'lucide-react';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,6 +9,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { cn } from '@/lib/utils';
+import { postingAsCopy } from '@/lib/postingAsCopy';
+import { toast } from 'sonner';
 
 interface PostingAsMenuProps {
   isOpen: boolean;
@@ -115,7 +117,7 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
                   {email}
                 </span>
                 <span className="mt-0.5 text-[11px] text-white/40">
-                  Posting as{' '}
+                  {postingAsCopy.headerPill.label}{' '}
                   <span className="font-medium text-white/60">
                     {activeActor?.name}
                   </span>
@@ -126,9 +128,14 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
           
           {/* Switch profile section */}
           <div className="px-3 py-2">
-            <span className="px-2 text-[11px] font-medium text-white/45 uppercase tracking-wider">
-              Switch profile
-            </span>
+            <div className="px-2 mb-1">
+              <span className="text-[11px] font-medium text-white/45 uppercase tracking-wider">
+                {postingAsCopy.dropdown.sectionTitle}
+              </span>
+              <p className="text-[10px] text-white/30 mt-0.5">
+                {postingAsCopy.dropdown.helper}
+              </p>
+            </div>
             <div className="mt-2 space-y-0.5">
               {availableActors.map((actor) => {
                 const isActive = activeActor?.type === actor.type && activeActor?.id === actor.id;
@@ -137,7 +144,10 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
                   <button
                     key={`${actor.type}-${actor.id}`}
                     onClick={() => {
-                      if (!isActive) setActiveActor(actor);
+                      if (!isActive) {
+                        setActiveActor(actor);
+                        toast.success(postingAsCopy.toasts.switchedToBusiness(actor.name));
+                      }
                       onClose();
                     }}
                     className={cn(
@@ -167,7 +177,9 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
                         )}
                       </div>
                       <span className="text-[10px] text-white/40">
-                        {actor.type === 'personal' ? 'Personal' : 'Business'}
+                        {actor.type === 'personal' 
+                          ? postingAsCopy.actorLabels.personal 
+                          : postingAsCopy.actorLabels.business}
                       </span>
                     </div>
                     {isActive && (
@@ -176,6 +188,25 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
                   </button>
                 );
               })}
+              
+              {/* Empty state when no businesses */}
+              {availableActors.filter(a => a.type === 'business').length === 0 && (
+                <div className="px-3 py-3 rounded-sq-md border border-dashed border-white/10 mt-2">
+                  <p className="text-xs font-medium text-white/60">
+                    {postingAsCopy.emptyState.title}
+                  </p>
+                  <p className="text-[10px] text-white/40 mt-0.5">
+                    {postingAsCopy.emptyState.body}
+                  </p>
+                  <button
+                    onClick={() => handleNavigate('/business/intro')}
+                    className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-primary hover:text-primary/80 transition-colors"
+                  >
+                    <Plus className="h-3 w-3" />
+                    {postingAsCopy.emptyState.cta}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
           
