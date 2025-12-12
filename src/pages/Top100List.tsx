@@ -7,22 +7,24 @@ import { useUserCourseActivity } from '@/hooks/useUserCourseActivity';
 import { useFriendsTop100Progress } from '@/hooks/useFriendsTop100Progress';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { cn } from '@/lib/utils';
 import GolfClubView from '@/components/golf-club/GolfClubView';
 import {
-  Top100ListUserStrip,
-  Top100ListFriendsCarousel,
-  Top100ListAchievementsRow,
-  Top100ListFilters,
+  Top100ListLeaderboard,
+  Top100ListAchievementsPair,
+  Top100ListFilterChips,
   Top100ListCourseCard,
-  type SortMode,
-  type FilterMode,
+  Top100ListProgressHero,
+  JourneyInsightCard,
+  generateJourneyInsights,
+  FloatingJourneyButton,
+  type Top100FilterChip,
 } from '@/components/top100/list';
 import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
 import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { getTop100Club, CLUB_STEPS } from '@/lib/top100Club';
 
 const REGION_DISPLAY_NAMES: Record<string, string> = {
   global: 'Worldwide',
@@ -32,6 +34,7 @@ const REGION_DISPLAY_NAMES: Record<string, string> = {
 };
 
 const PAGE_SIZE = 25;
+const INSIGHT_INTERVAL = 10; // Insert insight card every N courses
 
 const Top100List = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -43,19 +46,19 @@ const Top100List = () => {
   const { data: userActivity } = useUserCourseActivity(user?.id);
 
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
-  const [sortMode, setSortMode] = useState<SortMode>('official');
-  const [filterMode, setFilterMode] = useState<FilterMode>('all');
+  const [filterChip, setFilterChip] = useState<Top100FilterChip>('official');
   const [page, setPage] = useState(0);
+  const [isFilterSticky, setIsFilterSticky] = useState(false);
 
-  // Ref for scroll-to-top after pagination
   const listTopRef = useRef<HTMLDivElement | null>(null);
+  const filterRef = useRef<HTMLDivElement | null>(null);
 
-  // G1/M1: Scroll to top on mount / slug change
+  // Scroll to top on mount / slug change
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [slug]);
 
-  // M12: Restore page + scroll from sessionStorage on mount
+  // Restore page + scroll from sessionStorage on mount
   useEffect(() => {
     const savedPage = sessionStorage.getItem('top100:list:page');
     const savedScrollY = sessionStorage.getItem('top100:list:scrollY');
@@ -64,7 +67,6 @@ const Top100List = () => {
       setPage(Number(savedPage));
     }
     if (savedScrollY) {
-      // Delay scroll restore until after render
       requestAnimationFrame(() => {
         window.scrollTo({
           top: Number(savedScrollY),
@@ -74,15 +76,28 @@ const Top100List = () => {
       });
     }
 
-    // Clear after restoring
     sessionStorage.removeItem('top100:list:page');
     sessionStorage.removeItem('top100:list:scrollY');
+  }, []);
+
+  // Sticky filter detection
+  useEffect(() => {
+    const handleScroll = () => {
+      if (filterRef.current) {
+        const rect = filterRef.current.getBoundingClientRect();
+        setIsFilterSticky(rect.top <= 56);
+      }
+    };
+
+    const scrollContainer = document.getElementById('root');
+    scrollContainer?.addEventListener('scroll', handleScroll);
+    return () => scrollContainer?.removeEventListener('scroll', handleScroll);
   }, []);
 
   // Find the current list
   const currentList = lists?.find((l) => l.slug === slug);
 
-  // Fetch courses for this list (including #1 hero course)
+  // Fetch courses for this list
   const { data: courses, isLoading } = useQuery({
     queryKey: ['top100-list-courses', currentList?.id],
     enabled: !!currentList?.id,
@@ -112,10 +127,8 @@ const Top100List = () => {
 
       if (error) throw error;
 
-      // Get course IDs to fetch ratings
       const courseIds = (data || []).map((item: any) => item.golf_courses.id);
       
-      // Fetch community ratings for all courses
       const { data: ratingsData } = await supabase
         .from('course_rating_aggregates')
         .select('course_id, avg_overall_score')
@@ -149,9 +162,8 @@ const Top100List = () => {
 
   // Build hero course for region card
   const heroCourse = courses?.[0];
-  const firstUnplayedCourse = courses?.find((c) => !playedCourseIds.has(c.id));
 
-  // Build list summary for the region card (same format as Courses tab)
+  // Build list summary for the region card
   const listSummary: Top100ListSummary | null = useMemo(() => {
     if (!currentList) return null;
     return {
@@ -172,11 +184,9 @@ const Top100List = () => {
     };
   }, [currentList, totalCount, playedCount, heroCourse]);
 
-
-  // Get display name for this list
   const listDisplayName = REGION_DISPLAY_NAMES[slug || 'global'] || 'Worldwide';
 
-  // Build friends list for carousel
+  // Build friends list for leaderboard
   const friendsSummary = useMemo(() => {
     return friendsProgress.map((f) => ({
       id: f.user_id,
@@ -187,10 +197,66 @@ const Top100List = () => {
     }));
   }, [friendsProgress]);
 
-  // Reset page when filter or sort changes
-  React.useEffect(() => {
+  // Build achievements data
+  const achievementsData = useMemo(() => {
+    const currentClub = getTop100Club(playedCount);
+    const nextStep = CLUB_STEPS.find(s => s.threshold > playedCount);
+    
+    const primary = currentClub.meta ? {
+      id: currentClub.tierId,
+      title: currentClub.shortLabel || '',
+      current: playedCount,
+      target: currentClub.threshold || playedCount,
+      isComplete: true,
+      percentOfPlayers: playedCount >= 50 ? 5 : playedCount >= 20 ? 15 : 30,
+    } : null;
+
+    const upcoming = nextStep ? {
+      id: nextStep.tierId,
+      title: nextStep.shortLabel,
+      current: playedCount,
+      target: nextStep.threshold,
+      isComplete: false,
+    } : null;
+
+    return { primary, upcoming };
+  }, [playedCount]);
+
+  // Generate journey insights
+  const journeyInsights = useMemo(() => {
+    if (!courses) return [];
+    const playedCourses = courses
+      .filter(c => playedCourseIds.has(c.id))
+      .map(c => ({ id: c.id, country: c.country, rank: c.rank }));
+    return generateJourneyInsights(playedCourses, totalCount, slug);
+  }, [courses, playedCourseIds, totalCount, slug]);
+
+  // Closest friend for floating button
+  const closestFriend = useMemo(() => {
+    if (friendsSummary.length === 0) return undefined;
+    const sorted = [...friendsSummary].sort((a, b) => 
+      Math.abs(a.playedOnList - playedCount) - Math.abs(b.playedOnList - playedCount)
+    );
+    const closest = sorted[0];
+    if (closest && closest.playedOnList !== playedCount) {
+      return { name: closest.name, played: closest.playedOnList };
+    }
+    return undefined;
+  }, [friendsSummary, playedCount]);
+
+  // Calculate next milestone for floating button
+  const nextMilestoneData = useMemo(() => {
+    const nextStep = CLUB_STEPS.find(s => s.threshold > playedCount);
+    return {
+      name: nextStep?.shortLabel || 'Grand Slam',
+      toNext: nextStep ? nextStep.threshold - playedCount : 0,
+    };
+  }, [playedCount]);
+
+  // Reset page when filter changes
+  useEffect(() => {
     setPage(0);
-  }, [filterMode, sortMode]);
+  }, [filterChip]);
 
   // Filter and sort courses
   const filteredAndSortedCourses = useMemo(() => {
@@ -198,40 +264,34 @@ const Top100List = () => {
 
     let filtered = [...courses];
 
-    // Apply filter
-    if (filterMode === 'played') {
-      filtered = filtered.filter((c) => playedCourseIds.has(c.id));
-    } else if (filterMode === 'not-played') {
+    // Apply filter based on chip
+    if (filterChip === 'unplayed') {
       filtered = filtered.filter((c) => !playedCourseIds.has(c.id));
     }
-    // TODO: shortlisted filter
 
     // Apply sort
     filtered.sort((a, b) => {
-      switch (sortMode) {
+      switch (filterChip) {
         case 'official':
           return a.rank - b.rank;
-        case 'rating-desc':
-          return 0; // TODO: implement rating sort when we have ratings
-        case 'rating-asc':
-          return 0;
-        case 'name-asc':
-          return a.name.localeCompare(b.name);
-        case 'name-desc':
-          return b.name.localeCompare(a.name);
+        case 'highest-rated':
+          return (b.communityRating || 0) - (a.communityRating || 0);
+        case 'most-played':
+          // Would need play count data - for now keep official order
+          return a.rank - b.rank;
+        case 'unplayed':
+          return a.rank - b.rank;
         default:
           return 0;
       }
     });
 
     return filtered;
-  }, [courses, sortMode, filterMode, playedCourseIds]);
+  }, [courses, filterChip, playedCourseIds]);
 
   // Pagination calculations
   const totalFiltered = filteredAndSortedCourses.length;
-  const startIndex = page * PAGE_SIZE + 1;
-  const endIndex = Math.min((page + 1) * PAGE_SIZE, totalFiltered);
-  const hasNextPage = endIndex < totalFiltered;
+  const hasNextPage = (page + 1) * PAGE_SIZE < totalFiltered;
   const hasPrevPage = page > 0;
 
   // Paginated courses for current page
@@ -239,7 +299,7 @@ const Top100List = () => {
     return filteredAndSortedCourses.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
   }, [filteredAndSortedCourses, page]);
 
-  // G2/M2: Scroll to list top after pagination
+  // Scroll to list top after pagination
   const scrollToListTop = useCallback(() => {
     if (listTopRef.current) {
       window.scrollTo({
@@ -262,7 +322,7 @@ const Top100List = () => {
     scrollToListTop();
   }, [hasNextPage, scrollToListTop]);
 
-  // M12: Save page + scroll before navigating to course detail
+  // Save page + scroll before navigating to course detail
   const handleOpenCourse = useCallback((courseId: string) => {
     sessionStorage.setItem('top100:list:page', String(page));
     sessionStorage.setItem('top100:list:scrollY', String(window.scrollY));
@@ -286,10 +346,13 @@ const Top100List = () => {
     );
   }
 
+  // Calculate unplayed count for filter chip
+  const unplayedCount = courses?.filter(c => !playedCourseIds.has(c.id)).length || 0;
+
   return (
     <PageRoot className="min-h-screen bg-background">
       <main>
-        {/* 1. Hero Section - Full-width with back button */}
+        {/* 1. Hero Section */}
         {listSummary && (
           <section className="px-4">
             <Top100RegionCard
@@ -301,67 +364,86 @@ const Top100List = () => {
           </section>
         )}
 
-        {/* 2. User Progress Strip */}
+        {/* 2. Progress Hero Module */}
         {session && (
-          <Top100ListUserStrip
+          <Top100ListProgressHero
             playedCount={playedCount}
-            totalCourses={totalCount}
+            totalCount={totalCount}
             listName={listDisplayName}
+            listSlug={slug}
           />
         )}
 
-        {/* 3. Friends Carousel */}
+        {/* 3. Social Leaderboard */}
         {session && (
-          <Top100ListFriendsCarousel
+          <Top100ListLeaderboard
             friends={friendsSummary}
             totalInList={totalCount}
             listName={listDisplayName}
+            currentUserPlayed={playedCount}
           />
         )}
 
-        {/* 4. Achievements */}
+        {/* 4. Achievements Pair */}
         {session && (
-          <Top100ListAchievementsRow
-            listName={currentList?.name || 'Top 100'}
-            listSlug={slug}
-            playedCount={playedCount}
-            totalCount={totalCount}
+          <Top100ListAchievementsPair
+            primary={achievementsData.primary}
+            upcoming={achievementsData.upcoming}
           />
         )}
 
         {/* Ref target for scroll-to-top after pagination */}
         <div ref={listTopRef} />
 
-        {/* 5. Sort & Filter Bar */}
-        <Top100ListFilters
-          sortBy={sortMode}
-          onSortChange={setSortMode}
-          courseFilter={filterMode}
-          onFilterChange={setFilterMode}
-        />
+        {/* 5. Filter Chips (sticky) */}
+        <div ref={filterRef} className={isFilterSticky ? 'sticky top-14 z-10' : ''}>
+          <Top100ListFilterChips
+            activeFilter={filterChip}
+            onFilterChange={setFilterChip}
+            counts={{ unplayed: unplayedCount }}
+            isSticky={isFilterSticky}
+          />
+        </div>
 
-        {/* 6. Course List */}
+        {/* 6. Course List with Journey Insights */}
         <section className="mt-4 pb-6 space-y-3">
-          {paginatedCourses.map((course) => (
-            <Top100ListCourseCard
-              key={course.id}
-              listSlug={slug}
-              course={{
-                id: course.id,
-                name: course.name,
-                rank: course.rank,
-                imageUrl: course.thumbnail_image,
-                country: course.country,
-                subCountry: course.sub_country,
-                played: playedCourseIds.has(course.id),
-                communityRating: course.communityRating,
-                globalRank: course.global_rank,
-                regionalRank: course.regional_rank,
-                usaRank: course.usa_rank,
-              }}
-              onClick={() => handleOpenCourse(course.id)}
-            />
-          ))}
+          {paginatedCourses.map((course, index) => {
+            // Insert insight card every N courses
+            const absoluteIndex = page * PAGE_SIZE + index;
+            const shouldInsertInsight = 
+              absoluteIndex > 0 && 
+              absoluteIndex % INSIGHT_INTERVAL === 0 && 
+              journeyInsights[Math.floor(absoluteIndex / INSIGHT_INTERVAL) - 1];
+            
+            const insightText = shouldInsertInsight 
+              ? journeyInsights[Math.floor(absoluteIndex / INSIGHT_INTERVAL) - 1] 
+              : null;
+
+            return (
+              <React.Fragment key={course.id}>
+                {insightText && (
+                  <JourneyInsightCard insight={insightText} />
+                )}
+                <Top100ListCourseCard
+                  listSlug={slug}
+                  course={{
+                    id: course.id,
+                    name: course.name,
+                    rank: course.rank,
+                    imageUrl: course.thumbnail_image,
+                    country: course.country,
+                    subCountry: course.sub_country,
+                    played: playedCourseIds.has(course.id),
+                    communityRating: course.communityRating,
+                    globalRank: course.global_rank,
+                    regionalRank: course.regional_rank,
+                    usaRank: course.usa_rank,
+                  }}
+                  onClick={() => handleOpenCourse(course.id)}
+                />
+              </React.Fragment>
+            );
+          })}
 
           {paginatedCourses.length === 0 && (
             <div className="text-center py-12 mx-4">
@@ -393,6 +475,17 @@ const Top100List = () => {
           courseId={selectedCourseId}
           isInModal={true}
           onClose={() => setSelectedCourseId(null)}
+        />
+      )}
+
+      {/* Floating Journey Button */}
+      {session && (
+        <FloatingJourneyButton
+          playedCount={playedCount}
+          totalCount={totalCount}
+          nextMilestone={nextMilestoneData.name}
+          toNextMilestone={nextMilestoneData.toNext}
+          closestFriend={closestFriend}
         />
       )}
 
