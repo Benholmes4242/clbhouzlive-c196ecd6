@@ -5,7 +5,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Award, X } from 'lucide-react';
-import CourseCard from './CourseCard';
+import { UnifiedCourseCard } from './UnifiedCourseCard';
+import { toCourseCardModel } from '@/lib/mappers/toCourseCardModel';
 import { Skeleton } from '@/components/ui/skeleton';
 import { scrollToTop } from '@/utils/scrollToTop';
 import Top100ClubCallout from './Top100ClubCallout';
@@ -441,9 +442,11 @@ const GlobalTop100 = () => {
             <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
               {paginatedCourses.map((course) => (
                 <div key={course.id} className="mb-4 sm:mb-0">
-                  <CourseCard 
-                    course={course}
-                    showRankBadge={true}
+                  <UnifiedCourseCard 
+                    course={toCourseCardModel(course)}
+                    variant="vertical"
+                    showRankBadges={true}
+                    showRating={true}
                     onClick={handleCourseClick}
                   />
                 </div>
