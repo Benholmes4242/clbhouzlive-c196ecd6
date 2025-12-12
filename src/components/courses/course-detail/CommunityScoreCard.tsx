@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon } from 'lucide-react';
+import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon, ChevronRight, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
@@ -17,9 +17,8 @@ interface CommunityScoreCardProps {
   onSeeAllReviews?: () => void;
 }
 
-const formatScore = (score: number) => {
-  return score % 1 === 0 ? score.toString() : score.toFixed(1);
-};
+// A3: Always show 1 decimal for consistency + tabular numerals
+const formatScore = (score: number) => score.toFixed(1);
 
 const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
   courseId,
@@ -138,6 +137,23 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
     distribution.fair > 0
   );
 
+  // Community Highlights v1 - derive from highest scoring categories
+  const getCommunityHighlights = () => {
+    if (categories.length === 0) return null;
+    
+    // Sort categories by score descending, take top 2-3
+    const sorted = [...categories]
+      .filter(c => c.score && c.score >= 7.0) // Only include decent scores
+      .sort((a, b) => (b.score || 0) - (a.score || 0))
+      .slice(0, 3);
+    
+    if (sorted.length === 0) return null;
+    
+    return sorted.map(c => c.label.replace('Course ', ''));
+  };
+
+  const highlights = getCommunityHighlights();
+
   return (
     <div className="rounded-3xl bg-white shadow-sm px-5 py-6">
       {/* Header row */}
@@ -162,7 +178,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         {/* Right - score + badge stack (centered) */}
         <div className="inline-flex flex-col items-center gap-2">
           {/* Score centered above badge */}
-          <span className="text-[34px] font-semibold text-slate-900 leading-none">
+          <span className="text-[34px] font-semibold text-slate-900 leading-none tabular-nums">
             {formatScore(communityAverage)}
           </span>
 
@@ -170,6 +186,28 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
           <RatingBadge tierData={tierData} />
         </div>
       </div>
+
+      {/* Community Highlights v1 - under score, above distribution */}
+      {highlights && highlights.length > 0 && (
+        <div className="mt-4 pt-4 border-t border-slate-100">
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+              Highlights
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {highlights.map((highlight) => (
+              <span
+                key={highlight}
+                className="inline-flex items-center px-2.5 py-1 text-xs font-medium text-slate-700 bg-slate-100 rounded-full"
+              >
+                {highlight}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* User vs community comparison */}
       {comparisonMessage}
@@ -195,7 +233,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                   </span>
                   <div className="flex items-center gap-2">
                     <RatingBar value={score} mode="neutral" />
-                    <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
+                    <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap tabular-nums">
                       {formatScore(score)}
                     </span>
                   </div>
@@ -206,15 +244,16 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         </div>
       )}
 
-      {/* See all reviews link */}
+      {/* A1: See all reviews CTA - proper button styling with chevron */}
       {onSeeAllReviews && (
-        <div className="mt-3 flex items-center justify-end">
+        <div className="mt-4 pt-3 border-t border-slate-100">
           <button
             type="button"
             onClick={onSeeAllReviews}
-            className="text-sm font-medium text-slate-700 underline-offset-2 hover:underline transition-colors"
+            className="flex items-center justify-between w-full py-2 text-sm font-medium text-slate-700 hover:text-slate-900 active:opacity-70 transition-colors min-h-[44px]"
           >
-            See all reviews
+            <span>See all reviews</span>
+            <ChevronRight className="h-4 w-4 text-slate-400" />
           </button>
         </div>
       )}

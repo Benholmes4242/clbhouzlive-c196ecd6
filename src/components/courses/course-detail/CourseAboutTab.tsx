@@ -1,9 +1,9 @@
-import React, { useState } from 'react'; // v2 - reordered sections
+import React, { useState } from 'react'; // v3 - Phase 1 polish pass
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, ChevronDown, ChevronUp, MapPin, Trophy, Users, Globe, Loader2 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AboutMediaStrip from './AboutMediaStrip';
 import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
@@ -61,6 +61,7 @@ const formatDescription = (description: string) => {
 const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
+  const [websiteLoading, setWebsiteLoading] = useState(false);
   const isMobile = useIsMobile();
   const { user } = useSupabaseSession();
   const { toast } = useToast();
@@ -86,9 +87,20 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   // Fetch user's rating if logged in
   const { data: userRating } = useUserCourseRating(course.id, user?.id);
 
-  const handleWebsiteClick = () => {
+  const handleWebsiteClick = async () => {
     if (course.website_url) {
-      window.open(course.website_url, '_blank');
+      setWebsiteLoading(true);
+      try {
+        window.open(course.website_url, '_blank');
+      } catch (error) {
+        toast({
+          title: "Unable to open website",
+          description: "Please try again later",
+          variant: "destructive",
+        });
+      } finally {
+        setTimeout(() => setWebsiteLoading(false), 500);
+      }
     }
   };
 
@@ -96,7 +108,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const truncateDescription = (text: string, wordLimit: number) => {
     const words = text.split(' ');
     if (words.length <= wordLimit) return text;
-    return words.slice(0, wordLimit).join(' ') + '...';
+    return words.slice(0, wordLimit).join(' ');
   };
 
   const shouldShowReadMore = course.description && course.description.split(' ').length > 50;
@@ -116,13 +128,71 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     navigate(`/courses/${course.id}/rate`);
   };
 
+  // Build Quick Facts data
+  const quickFacts = [];
+  
+  // Region/Country
+  if (course.sub_country || course.region) {
+    quickFacts.push({
+      icon: MapPin,
+      label: course.sub_country || course.region,
+    });
+  }
+  
+  // Top 100 presence
+  const hasTop100 = course.global_rank || course.regional_rank || course.usa_rank;
+  if (hasTop100) {
+    const top100Label = course.global_rank 
+      ? 'Top 100: Global' 
+      : course.usa_rank 
+        ? 'Top 100: USA'
+        : 'Top 100: GB&I';
+    quickFacts.push({
+      icon: Trophy,
+      label: top100Label,
+    });
+  }
+  
+  // Total ratings count
+  if (ratingAggregates?.review_count) {
+    quickFacts.push({
+      icon: Users,
+      label: `${ratingAggregates.review_count} ${ratingAggregates.review_count === 1 ? 'rating' : 'ratings'}`,
+    });
+  }
+
+  // B1: Contextual button label
+  const rateButtonLabel = userRating ? 'Edit Your Rating' : 'Rate this course';
+  const rateButtonHelper = userRating 
+    ? 'Update your community score & breakdown' 
+    : 'Add your rating to see how it compares';
+
   return (
     <div>
       {/* 1. Location Breadcrumb & Quick Filters (Explore more + See Top 100 in) */}
       <CourseLocationBreadcrumb course={course} />
+
+      {/* Quick Facts Strip - compact, below breadcrumb */}
+      {quickFacts.length > 0 && (
+        <section className="px-4 pt-4 pb-2 bg-slate-50 md:px-6">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            {quickFacts.map((fact, index) => (
+              <React.Fragment key={fact.label}>
+                <div className="flex items-center gap-1.5">
+                  <fact.icon className="h-3.5 w-3.5 text-slate-400" />
+                  <span className="text-sm text-slate-600">{fact.label}</span>
+                </div>
+                {index < quickFacts.length - 1 && (
+                  <span className="text-slate-300">·</span>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+        </section>
+      )}
       
       {/* 2. Community Score Section - Card-based design */}
-      <section className="px-4 pt-7 pb-5 bg-slate-100 md:px-6 md:pt-9 space-y-6">
+      <section className="px-4 pt-5 pb-5 bg-slate-100 md:px-6 md:pt-7 space-y-4">
         <CommunityScoreCard
           courseId={course.id}
           ratingAggregates={ratingAggregates}
@@ -132,15 +202,20 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           onSeeAllReviews={() => onTabChange?.('reviews')}
         />
 
-        {/* Edit Rating button - only show if user has rated */}
+        {/* Edit/Rate button with helper text */}
         {userRating && (
-          <Button 
-            onClick={handleRateClick}
-            className="w-full justify-center h-11 rounded-sq-sm"
-            variant="outline"
-          >
-            Edit Your Rating
-          </Button>
+          <div className="space-y-2">
+            <Button 
+              onClick={handleRateClick}
+              className="w-full justify-center h-11 rounded-sq-sm"
+              variant="outline"
+            >
+              {rateButtonLabel}
+            </Button>
+            <p className="text-xs text-slate-500 text-center">
+              {rateButtonHelper}
+            </p>
+          </div>
         )}
 
         {/* Friends Who've Played - only show if there are friends */}
@@ -149,7 +224,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
 
       {/* CTA for users who haven't rated yet */}
       {user && !userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
-        <section className="px-4 pt-6 pb-5 bg-slate-100 md:pt-8">
+        <section className="px-4 pt-5 pb-5 bg-slate-100 md:pt-6">
           <h3 className="text-lg font-semibold mb-1">How do you rate this course?</h3>
           <p className="text-base text-slate-500 mb-3">
             Add your rating to see how it compares with the clbhouz community.
@@ -160,18 +235,34 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </section>
       )}
 
-      {/* 3. About Section */}
+      {/* 3. About Section with fade gradient */}
       {course.description && (
         <section className="pt-6 pb-5 bg-slate-50 space-y-3 md:pt-8">
           <h2 className="px-5 text-lg md:text-xl font-semibold">About</h2>
-          <div className="px-5 text-base md:text-lg leading-relaxed text-foreground">
-            {formatDescription(displayDescription)}
+          <div className="px-5 relative">
+            <div 
+              className={`text-base md:text-lg leading-relaxed text-foreground ${
+                !showFullDescription && shouldShowReadMore ? 'relative' : ''
+              }`}
+            >
+              {formatDescription(displayDescription)}
+              {/* C1: Fade gradient overlay when collapsed */}
+              {!showFullDescription && shouldShowReadMore && (
+                <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-slate-50 to-transparent pointer-events-none" />
+              )}
+            </div>
+            {/* C2: Read more/Show less affordance */}
             {shouldShowReadMore && (
               <button
                 onClick={() => setShowFullDescription(!showFullDescription)}
-                className="block mt-4 text-base font-medium hover:underline text-slate-600"
+                className="flex items-center gap-1.5 mt-3 text-base font-medium text-slate-600 hover:text-slate-900 active:opacity-70 transition-colors"
               >
-                {showFullDescription ? 'Show less' : 'Read more'}
+                <span>{showFullDescription ? 'Show less' : 'Read more'}</span>
+                {showFullDescription ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
               </button>
             )}
           </div>
@@ -250,19 +341,24 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         />
       </section>
 
-      {/* Visit Website - Seamless section */}
-      {course.website_url && (
+      {/* Visit Website - Seamless section with G1/G2 states */}
+      {course.website_url ? (
         <section className="px-4 pt-6 pb-3 bg-slate-100 md:pt-8">
           <Button
             onClick={handleWebsiteClick}
             className="w-full flex items-center justify-center gap-2 h-11 rounded-lg"
             variant="outline"
+            disabled={websiteLoading}
           >
-            <ExternalLink className="h-4 w-4" />
-            Visit Website
+            {websiteLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <ExternalLink className="h-4 w-4" />
+            )}
+            {websiteLoading ? 'Opening...' : 'Visit Website'}
           </Button>
         </section>
-      )}
+      ) : null}
     </div>
   );
 };

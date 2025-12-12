@@ -38,13 +38,13 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
   const maxCount = Math.max(...distributionItems.map(d => d.count), 1);
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-2">
       {distributionItems.map((item) => {
         const percentage = (item.count / maxCount) * 100;
         return (
-          <div key={item.tier.tier} className="flex items-center gap-0">
-            {/* Label */}
-            <span className="w-24 text-sm text-slate-700">
+          <div key={item.tier.tier} className="flex items-center gap-2">
+            {/* Label - consistent width */}
+            <span className="w-[76px] text-[13px] text-slate-600 shrink-0">
               {item.tier.label}
             </span>
 
@@ -58,8 +58,8 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
               />
             </div>
 
-            {/* Count */}
-            <span className="w-6 text-right text-xs text-slate-500">
+            {/* Count - tabular numerals for alignment */}
+            <span className="w-6 text-right text-xs text-slate-500 tabular-nums shrink-0">
               {item.count}
             </span>
           </div>
