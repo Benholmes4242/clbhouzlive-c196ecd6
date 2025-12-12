@@ -4,8 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, MapPin, X, Loader2 } from 'lucide-react';
-import CourseCard from './CourseCard';
+import { Search, MapPin, X, ChevronDown } from 'lucide-react';
+import VirtualizedCourseList from './VirtualizedCourseList';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams } from 'react-router-dom';
 import {
@@ -490,42 +490,38 @@ const CourseExplorer = () => {
         </div>
       ) : (
         <div className="space-y-6">
-          {/* Course grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayedCourses.map((course) => (
-              <CourseCard
-                key={course.id}
-                course={course}
-                onClick={handleCourseClick}
-              />
-            ))}
-          </div>
+          {/* Course list - using VirtualizedCourseList */}
+          <VirtualizedCourseList 
+            courses={displayedCourses}
+            onCourseClick={handleCourseClick}
+          />
 
-          {/* Load more button */}
+          {/* Load more button - matches leaderboard style */}
           {showLoadMoreButton && (
-            <div className="flex justify-center pt-4">
+            <div className="flex flex-col items-center gap-2 pt-4">
               <Button
-                variant="secondary"
+                variant="outline"
+                size="sm"
                 onClick={loadMore}
                 disabled={isLoadingMore}
-                className="min-w-[200px]"
+                className="w-full max-w-xs gap-1.5"
               >
-                {isLoadingMore ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Loading...
-                  </>
-                ) : (
-                  `Next ${EXPLORE_PAGE_SIZE} courses`
-                )}
+                <ChevronDown className="h-4 w-4" />
+                {isLoadingMore 
+                  ? 'Loading...' 
+                  : `Next ${Math.min(EXPLORE_PAGE_SIZE, totalCount - displayedCourses.length)} courses`
+                }
               </Button>
+              <p className="text-[11px] text-muted-foreground">
+                Showing 1–{displayedCourses.length} of {totalCount.toLocaleString()} courses
+              </p>
             </div>
           )}
 
           {/* End message */}
           {showEndMessage && (
-            <p className="text-center text-sm text-muted-foreground pt-4">
-              You've reached the end
+            <p className="text-center text-[11px] text-muted-foreground pt-4">
+              You've reached the end • {totalCount.toLocaleString()} courses total
             </p>
           )}
         </div>
