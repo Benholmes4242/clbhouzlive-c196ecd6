@@ -1,8 +1,14 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTop100CourseLeaderboard } from '@/hooks/useTop100CourseLeaderboard';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LeaderboardCourseCard } from './LeaderboardCourseCard';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { TrendingUp, Clock, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatDistanceToNow } from 'date-fns';
 
 type CourseSortOption = 'most_played' | 'highest_rated' | 'trending' | 'friends';
 
@@ -22,6 +28,7 @@ const CONTEXT_COPY: Record<CourseSortOption, string> = {
 };
 
 export function CoursesLeaderboardView() {
+  const navigate = useNavigate();
   const [sort, setSort] = useState<CourseSortOption>('most_played');
 
   const { data, isLoading } = useTop100CourseLeaderboard({
@@ -31,6 +38,51 @@ export function CoursesLeaderboardView() {
   });
 
   const allCourses = data?.pages.flatMap(page => page.entries) || [];
+
+  // Fetch recent Top 100 rounds by friends
+  const { data: friendsRecentRounds } = useQuery({
+    queryKey: ['friends-recent-top100-rounds'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+      
+      // Get friends who have rated Top 100 courses recently
+      const { data } = await supabase
+        .from('course_ratings')
+        .select(`
+          id,
+          rating,
+          created_at,
+          course_id,
+          user_id,
+          golf_courses!inner (
+            id,
+            name,
+            thumbnail_image,
+            global_rank
+          ),
+          user_profiles!inner (
+            id,
+            display_name,
+            profile_photo_url
+          )
+        `)
+        .not('golf_courses.global_rank', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      return data || [];
+    },
+    staleTime: 60_000,
+  });
+
+  // Get trending courses (rating increases)
+  const trendingCourses = useMemo(() => {
+    return [...allCourses]
+      .filter(c => c.avg_rating && c.avg_rating >= 7.5)
+      .sort((a, b) => (b.avg_rating ?? 0) - (a.avg_rating ?? 0))
+      .slice(0, 5);
+  }, [allCourses]);
 
   // Sort courses based on selection
   const sortedCourses = useMemo(() => {
@@ -108,7 +160,93 @@ export function CoursesLeaderboardView() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
+      {/* Recently Played by Your Circle */}
+      {friendsRecentRounds && friendsRecentRounds.length > 0 && (
+        <div className="space-y-2">
+          <h3 className="text-sm font-semibold text-foreground px-2.5">
+            Recently Played by Your Circle
+          </h3>
+          <div className="overflow-x-auto pb-2 -mx-4 px-4">
+            <div className="flex gap-2.5 min-w-max">
+              {friendsRecentRounds.slice(0, 6).map((round: any) => (
+                <button
+                  key={round.id}
+                  onClick={() => navigate(`/courses/${round.course_id}`)}
+                  className="w-[180px] flex-shrink-0 rounded-sq-md border border-border/50 bg-card overflow-hidden shadow-sm hover:bg-muted/20 transition-colors"
+                >
+                  {round.golf_courses?.thumbnail_image && (
+                    <div className="relative h-20 w-full">
+                      <img
+                        src={round.golf_courses.thumbnail_image}
+                        alt={round.golf_courses.name}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                    </div>
+                  )}
+                  <div className="p-2.5 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <SquircleAvatar
+                        size={24}
+                        src={round.user_profiles?.profile_photo_url}
+                        alt={round.user_profiles?.display_name}
+                        fallback={(round.user_profiles?.display_name?.[0] || '?').toUpperCase()}
+                      />
+                      <span className="text-xs text-muted-foreground truncate">
+                        {formatDistanceToNow(new Date(round.created_at), { addSuffix: true })}
+                      </span>
+                    </div>
+                    <p className="text-xs font-medium text-foreground truncate text-left">
+                      {round.golf_courses?.name}
+                    </p>
+                    {round.rating && (
+                      <div className="flex items-center gap-1">
+                        <Star className="h-3 w-3 text-primary/70" />
+                        <span className="text-xs text-muted-foreground">{round.rating.toFixed(1)}</span>
+                      </div>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Courses on the Move */}
+      {trendingCourses.length > 0 && (
+        <div className="space-y-2">
+          <h3 className="text-sm font-semibold text-foreground px-2.5">
+            Courses on the Move
+          </h3>
+          <div className="overflow-x-auto pb-2 -mx-4 px-4">
+            <div className="flex gap-2.5 min-w-max">
+              {trendingCourses.map((course) => (
+                <button
+                  key={course.course_id}
+                  onClick={() => navigate(`/courses/${course.course_id}`)}
+                  className="w-[140px] flex-shrink-0 rounded-sq-md border border-border/50 bg-card p-2.5 text-left hover:bg-muted/20 transition-colors"
+                >
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />
+                    <span className="text-[10px] font-medium text-emerald-600">Trending</span>
+                  </div>
+                  <p className="text-xs font-medium text-foreground line-clamp-2">
+                    {course.course_name}
+                  </p>
+                  {course.avg_rating && (
+                    <p className="text-[10px] text-muted-foreground mt-1">
+                      {course.avg_rating.toFixed(1)} avg rating
+                    </p>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Context strip */}
       <div className="px-2.5">
         <p className="text-sm text-muted-foreground">
@@ -139,7 +277,7 @@ export function CoursesLeaderboardView() {
         </div>
       </div>
 
-      {/* Course List - infinite scroll style */}
+      {/* Course List */}
       <div className="-mx-4 sm:mx-0">
         <div className="space-y-2">
           {sortedCourses.length === 0 ? (
@@ -155,15 +293,6 @@ export function CoursesLeaderboardView() {
           )}
         </div>
       </div>
-
-      {/* Gamification micro-moment */}
-      {sortedCourses.length > 0 && (
-        <div className="text-center py-2">
-          <p className="text-xs text-muted-foreground">
-            Tap any course to see details and log your round.
-          </p>
-        </div>
-      )}
     </div>
   );
 }
