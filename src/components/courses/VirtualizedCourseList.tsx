@@ -30,9 +30,9 @@ interface VirtualizedCourseListProps {
   onCourseClick?: () => void;
 }
 
-// Card aspect ratio is 1.6/1, so height = width / 1.6. With padding, estimate:
-const ITEM_HEIGHT = 320; // Mobile: accounts for aspect ratio + meta bar
-const ITEM_HEIGHT_SM = 280; // Desktop: slightly shorter
+// Card aspect ratio is 1.88/1 (15% shorter), so height = width / 1.88. With padding, estimate:
+const ITEM_HEIGHT = 280; // Mobile: accounts for aspect ratio + meta bar
+const ITEM_HEIGHT_SM = 240; // Desktop: slightly shorter
 const BUFFER_SIZE = 3; // Number of items to render above/below viewport
 
 const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({

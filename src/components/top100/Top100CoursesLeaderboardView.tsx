@@ -222,7 +222,7 @@ export function Top100CoursesLeaderboardView({ filters }: Top100CoursesLeaderboa
               >
                 {/* Image with overlay - matching My Progress aspect ratio */}
                 {hasImage && (
-                  <div className="relative w-full aspect-[1.6/1] overflow-hidden">
+                  <div className="relative w-full aspect-[1.88/1] overflow-hidden">
                     <img
                       src={course.thumbnail_url!}
                       alt={course.course_name}

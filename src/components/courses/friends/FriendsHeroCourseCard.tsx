@@ -37,7 +37,7 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
     >
       {/* Course Image - Slightly taller */}
       {course.thumbnail_url && (
-        <div className="relative w-full aspect-[1.6/1] overflow-hidden">
+        <div className="relative w-full aspect-[1.88/1] overflow-hidden">
           <img
             src={course.thumbnail_url}
             alt={course.course_name}

@@ -197,7 +197,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
   return (
     <>
       <div 
-        className={`group transition-all duration-200 ${disableClick ? 'cursor-default' : 'cursor-pointer'} overflow-hidden relative aspect-[1.6/1] rounded-none shadow-none sm:rounded-sq-md sm:shadow-md md:shadow-lg border border-border/60 sm:border-border/40 animate-fadeIn`}
+        className={`group transition-all duration-200 ${disableClick ? 'cursor-default' : 'cursor-pointer'} overflow-hidden relative aspect-[1.88/1] rounded-none shadow-none sm:rounded-sq-md sm:shadow-md md:shadow-lg border border-border/60 sm:border-border/40 animate-fadeIn`}
         onClick={handleCardClick}
       >
         <div
