@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, X } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useOptimisticPostSubmission } from '@/hooks/useOptimisticPostSubmission';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import PostContentForm from './PostContentForm';
 
 interface TaggableEntity {
@@ -23,6 +24,7 @@ interface CreatePostDialogProps {
 const CreatePostDialog = ({ onPostCreated, variant = 'header' }: CreatePostDialogProps) => {
   const { user } = useSupabaseSession();
   const { submitPost } = useOptimisticPostSubmission();
+  const { activeActor } = useActiveActor();
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -36,6 +38,8 @@ const CreatePostDialog = ({ onPostCreated, variant = 'header' }: CreatePostDialo
       content,
       mediaFiles,
       selectedTags,
+      actorType: activeActor?.type ?? 'personal',
+      actorId: activeActor?.id ?? user.id,
       onSuccess: () => {
         setIsOpen(false);
         setIsSubmitting(false);

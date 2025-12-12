@@ -1,4 +1,5 @@
 import React from 'react';
+import { BadgeCheck, Building2 } from 'lucide-react';
 import { OptimizedImage } from '@/components/ui/optimized-image';
 import { getOptimizedImageUrl } from '@/utils/imageOptimization';
 import CoursePostBadge from '../../CoursePostBadge';
@@ -16,19 +17,30 @@ interface UserInfoOverlayProps {
     profile_photo_url: string | null;
   };
   displayName: string;
+  avatarUrl?: string | null;
   onProfileClick: () => void;
   golfCourse?: GolfCourse | null;
   source?: 'profile' | 'index';
+  /** Whether this is a business post */
+  isBusinessPost?: boolean;
+  /** Whether the business is verified */
+  isVerified?: boolean;
 }
 
 export const UserInfoOverlay: React.FC<UserInfoOverlayProps> = ({
   user,
   displayName,
+  avatarUrl,
   onProfileClick,
   golfCourse,
-  source
+  source,
+  isBusinessPost = false,
+  isVerified = false
 }) => {
   const isClubhouse = source === 'index';
+  
+  // Use provided avatarUrl or fall back to user's profile photo
+  const photoUrl = avatarUrl ?? user.profile_photo_url;
   
   return (
     <>
@@ -49,7 +61,7 @@ export const UserInfoOverlay: React.FC<UserInfoOverlayProps> = ({
               <div className="absolute inset-0 rounded-full bg-gradient-to-r from-white/20 to-white/10 blur-sm animate-pulse"></div>
               <OptimizedImage
                 src={getOptimizedImageUrl(
-                  user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face',
+                  photoUrl || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face',
                   64,
                   64
                 )}
@@ -71,12 +83,22 @@ export const UserInfoOverlay: React.FC<UserInfoOverlayProps> = ({
                 }}
               />
               <div className="relative px-4 py-2 space-y-1">
-                <span 
-                  className="block text-white text-base font-semibold leading-tight"
-                  style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
-                >
-                  {displayName}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span 
+                    className="text-white text-base font-semibold leading-tight"
+                    style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
+                  >
+                    {displayName}
+                  </span>
+                  {isVerified && (
+                    <BadgeCheck className="h-4 w-4 text-emerald-400" />
+                  )}
+                  {isBusinessPost && (
+                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-white/20 text-[10px] font-medium text-white/80">
+                      <Building2 className="w-2.5 h-2.5" />
+                    </span>
+                  )}
+                </div>
                 
                 {/* Golf Course Badge - Only show on clubhouse page */}
                 {isClubhouse && golfCourse && (

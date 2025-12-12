@@ -12,11 +12,19 @@ export const usePostData = () => {
         .from('posts')
         .select(`
           *,
+          actor_type,
+          actor_id,
           user:user_profiles(
             id,
             display_name,
             username,
             profile_photo_url
+          ),
+          business:business_accounts!actor_id(
+            id,
+            name,
+            slug,
+            logo_url
           ),
           post_media(*),
           post_tags(
@@ -57,11 +65,19 @@ export const usePostData = () => {
         .from('posts')
         .select(`
           *,
+          actor_type,
+          actor_id,
           user:user_profiles(
             id,
             display_name,
             username,
             profile_photo_url
+          ),
+          business:business_accounts!actor_id(
+            id,
+            name,
+            slug,
+            logo_url
           ),
           post_media(*),
           post_tags(

@@ -28,8 +28,21 @@ export const useUserPostLogic = ({
   
   const { isOpen: isFullscreenOpen, currentMedia, openMedia, closeMedia } = useFullscreenMedia();
 
-  // Computed values
-  const displayName = post.user.display_name || post.user.username || 'User';
+  // Computed values - resolve actor (business or personal)
+  const isBusinessPost = post.actor_type === 'business' && post.business;
+  
+  const displayName = isBusinessPost && post.business
+    ? post.business.name
+    : (post.user.display_name || post.user.username || 'User');
+  
+  const avatarUrl = isBusinessPost && post.business
+    ? post.business.logo_url
+    : post.user.profile_photo_url;
+  
+  const profilePath = isBusinessPost && post.business
+    ? `/business/${post.business.slug || post.business.id}`
+    : `/profile/${post.user.username}`;
+  
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
   const isOwnPost = user?.id === post.user.id;
   const golfClubTags = post.post_tags?.filter(tag => tag.entity_type === 'golf_club') || [];
@@ -79,7 +92,7 @@ export const useUserPostLogic = ({
   };
 
   const handleProfileClick = () => {
-    navigate(`/profile/${post.user.username}`);
+    navigate(profilePath);
   };
 
   const handlePostClick = () => {
@@ -89,6 +102,9 @@ export const useUserPostLogic = ({
 
   return {
     displayName,
+    avatarUrl,
+    profilePath,
+    isBusinessPost,
     timeAgo,
     isOwnPost,
     golfCourse,
