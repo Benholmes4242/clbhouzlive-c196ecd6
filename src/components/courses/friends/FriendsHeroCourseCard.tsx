@@ -1,5 +1,4 @@
 import React from 'react';
-import { Card } from '@/components/ui/card';
 import { Squircle } from '@/components/ui/squircle';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
@@ -31,7 +30,7 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
   };
 
   return (
-    <Card 
+    <div 
       className="relative overflow-hidden rounded-none hover:shadow-lg transition-all cursor-pointer bg-card border border-border/60 shadow-md"
       onClick={() => navigate(`/courses/${course.course_id}`)}
     >
@@ -106,7 +105,7 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
           </Squircle>
         </div>
       </div>
-    </Card>
+    </div>
   );
 };
 
