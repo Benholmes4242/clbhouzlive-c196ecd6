@@ -1,5 +1,6 @@
 import React from 'react';
-import { CourseListCard } from '@/components/courses/CourseListCard';
+import { UnifiedCourseCard } from '@/components/courses/UnifiedCourseCard';
+import { toCourseCardModel } from '@/lib/mappers/toCourseCardModel';
 
 interface CourseData {
   id: string;
@@ -24,13 +25,17 @@ interface Top100ListCourseCardProps {
   onClick: () => void;
 }
 
+/**
+ * Thin wrapper for Top 100 list pages.
+ * Now uses UnifiedCourseCard as the SINGLE SOURCE OF TRUTH.
+ */
 export const Top100ListCourseCard: React.FC<Top100ListCourseCardProps> = ({
   course,
   listSlug,
   onClick,
 }) => {
-  // Transform the course data to match CourseListCard's expected shape
-  const transformedCourse = {
+  // Map to unified CourseCardModel
+  const cardModel = toCourseCardModel({
     id: course.id,
     name: course.name,
     country: course.country,
@@ -40,14 +45,18 @@ export const Top100ListCourseCard: React.FC<Top100ListCourseCardProps> = ({
     regional_rank: course.regionalRank,
     usa_rank: course.usaRank,
     average_rating: course.communityRating,
-  };
+  }, {
+    isPlayedByViewer: course.played,
+  });
 
   return (
-    <CourseListCard
-      course={transformedCourse}
-      listSlug={listSlug as 'global' | 'gb-i' | 'usa' | 'europe'}
+    <UnifiedCourseCard
+      course={cardModel}
+      variant="vertical"
+      showRankBadges={true}
+      showRating={true}
+      showPlayedStatus={true}
       onClick={onClick}
-      isPlayed={course.played}
     />
   );
 };

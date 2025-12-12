@@ -44,7 +44,7 @@ export const Top100CourseListItem: React.FC<Top100CourseListItemProps> = ({
           onClick={onClick}
         >
           {/* Thumbnail */}
-          <div className="relative aspect-[1.88/1] w-28 flex-shrink-0 overflow-hidden rounded-[18px]">
+          <div className="relative aspect-[1.77/1] w-28 flex-shrink-0 overflow-hidden rounded-[18px]">
             <img
               src={thumbnailUrl || '/placeholder.svg'}
               alt={courseName}
