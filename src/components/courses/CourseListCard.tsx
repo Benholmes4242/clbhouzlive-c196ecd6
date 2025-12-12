@@ -52,7 +52,7 @@ export const CourseListCard: React.FC<CourseListCardProps> = ({
       className="w-full rounded-none sm:rounded-sq-md overflow-hidden bg-card border-y sm:border border-border/60 text-left shadow-none sm:shadow-sm hover:sm:shadow-md transition-all"
     >
       {/* Hero image with rank badges */}
-      <div className="relative w-full aspect-[1.88/1] overflow-hidden">
+      <div className="relative w-full aspect-[1.77/1] overflow-hidden">
         <img
           src={course.thumbnail_image || '/placeholder.svg'}
           alt={course.name}
@@ -95,7 +95,7 @@ export const CourseListCard: React.FC<CourseListCardProps> = ({
       </div>
 
       {/* Meta area - white bar */}
-      <div className="px-3.5 py-2.5 bg-background space-y-0.5">
+      <div className="px-4 py-3 bg-background space-y-0.5">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             <h3 className="text-sm font-semibold text-foreground truncate">
