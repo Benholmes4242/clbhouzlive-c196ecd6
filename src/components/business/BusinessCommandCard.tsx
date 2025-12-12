@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   MoreHorizontal, Eye, Pencil, BarChart3, Trash2, 
-  CheckCircle2, MapPin, Users
+  CheckCircle2, MapPin
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -135,30 +135,26 @@ export function BusinessCommandCard({ membership, userId, index = 0 }: BusinessC
                 <Eye className="h-4 w-4" />
                 View profile
               </DropdownMenuItem>
-              {canEdit && (
-                <DropdownMenuItem 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/business/${business.id}/edit`);
-                  }}
-                  className="gap-2 cursor-pointer"
-                >
-                  <Pencil className="h-4 w-4" />
-                  Edit business
-                </DropdownMenuItem>
-              )}
-              {canViewInsights && (
-                <DropdownMenuItem 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/business/${business.id}/insights`);
-                  }}
-                  className="gap-2 cursor-pointer"
-                >
-                  <BarChart3 className="h-4 w-4" />
-                  Insights
-                </DropdownMenuItem>
-              )}
+              <DropdownMenuItem 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/business/${business.id}/edit`);
+                }}
+                className="gap-2 cursor-pointer"
+              >
+                <Pencil className="h-4 w-4" />
+                Edit profile
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/business/${business.id}/insights`);
+                }}
+                className="gap-2 cursor-pointer"
+              >
+                <BarChart3 className="h-4 w-4" />
+                Insights
+              </DropdownMenuItem>
               {canDelete && (
                 <>
                   <DropdownMenuSeparator />
@@ -170,7 +166,7 @@ export function BusinessCommandCard({ membership, userId, index = 0 }: BusinessC
                     className="gap-2 cursor-pointer text-destructive focus:text-destructive"
                   >
                     <Trash2 className="h-4 w-4" />
-                    Delete business
+                    Delete business profile
                   </DropdownMenuItem>
                 </>
               )}
@@ -224,50 +220,33 @@ export function BusinessCommandCard({ membership, userId, index = 0 }: BusinessC
         {/* Divider */}
         <div className="h-px bg-border/50 -mx-5 mb-4" />
 
-        {/* Actions Row - Explicit buttons */}
+        {/* Actions Row - 2 buttons only */}
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={(e) => {
               e.stopPropagation();
-              navigate(`/business/${business.id}`);
+              navigate(`/business/${business.id}/edit`);
             }}
             className="gap-1.5 h-9 flex-1"
           >
-            <Eye className="h-3.5 w-3.5" />
-            View profile
+            <Pencil className="h-3.5 w-3.5" />
+            Edit profile
           </Button>
           
-          {canEdit && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/business/${business.id}/edit`);
-              }}
-              className="gap-1.5 h-9 flex-1"
-            >
-              <Pencil className="h-3.5 w-3.5" />
-              Edit
-            </Button>
-          )}
-          
-          {canViewInsights && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/business/${business.id}/insights`);
-              }}
-              className="gap-1.5 h-9 flex-1"
-            >
-              <BarChart3 className="h-3.5 w-3.5" />
-              Insights
-            </Button>
-          )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/business/${business.id}/insights`);
+            }}
+            className="gap-1.5 h-9 flex-1"
+          >
+            <BarChart3 className="h-3.5 w-3.5" />
+            Insights
+          </Button>
         </div>
       </motion.div>
 
