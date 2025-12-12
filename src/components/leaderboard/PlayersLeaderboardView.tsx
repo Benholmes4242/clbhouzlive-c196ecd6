@@ -250,10 +250,10 @@ export function PlayersLeaderboardView() {
         />
       </div>
 
-      {/* Player List */}
-      <div className="rounded-sq-md border border-border/50 bg-card/60 overflow-hidden">
+      {/* Player List - flat rows on page background */}
+      <div className="w-full">
         {entriesToRender.length === 0 ? (
-          <div className="py-2">
+          <div className="py-6">
             {segment === 'friends' ? (
               <LeaderboardEmptyState type="friends-no-friends" />
             ) : segment === 'around' && isNewUser ? (
@@ -265,7 +265,7 @@ export function PlayersLeaderboardView() {
             )}
           </div>
         ) : (
-          <>
+          <div className="divide-y divide-border/40">
             {entriesToRender.map((entry: any, idx: number) => {
               const isMe = USE_MOCK_LEADERBOARD_DATA 
                 ? entry.isCurrentUser 
@@ -286,7 +286,7 @@ export function PlayersLeaderboardView() {
                 </React.Fragment>
               );
             })}
-          </>
+          </div>
         )}
       </div>
 
