@@ -71,15 +71,19 @@ export function FeaturedVideoBlock({
   // Empty state for owners
   if (!videoUrl && isOwner) {
     return (
-      <div className={cn("w-full", className)}>
+      <section className={cn("w-full space-y-3", className)}>
+        <h2 className="text-base font-semibold text-foreground">Feature a video</h2>
         <button
           onClick={onEditClick}
           className="w-full aspect-video rounded-sq-md border-2 border-dashed border-border flex flex-col items-center justify-center gap-2 bg-muted/30 hover:bg-muted/50 transition-colors"
         >
           <Play className="h-8 w-8 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">Add featured video</span>
+          <span className="text-sm text-muted-foreground text-center px-4">
+            Pin a video here to introduce your business to golfers.
+          </span>
+          <span className="text-sm font-medium text-primary mt-1">Add featured video</span>
         </button>
-      </div>
+      </section>
     );
   }
 
