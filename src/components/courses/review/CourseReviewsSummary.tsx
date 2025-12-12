@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon } from 'lucide-react';
+import { CheckCircle2, ArrowUp as ArrowUpIcon, ArrowDown as ArrowDownIcon, Pencil } from 'lucide-react';
 import { getScoreTier } from '@/utils/getScoreTier';
 import { RatingBar } from '@/components/ui/RatingBar';
 import { RatingBadge } from '@/components/ui/RatingBadge';
@@ -26,6 +26,30 @@ interface CourseReviewsSummaryProps {
 const formatScore = (value: number | null | undefined) =>
   value == null ? '—' : value.toFixed(1);
 
+/**
+ * Compute community highlights from category averages.
+ * Returns top 2-3 categories with sufficient scores.
+ */
+const computeHighlights = (categoryAverages: CategoryAverage): string[] => {
+  const categories = [
+    { name: 'Design', value: categoryAverages.design },
+    { name: 'Condition', value: categoryAverages.condition },
+    { name: 'Clubhouse', value: categoryAverages.clubhouse },
+    { name: 'Facilities', value: categoryAverages.facilities },
+  ].filter((c) => c.value !== null && c.value >= 6.0) as { name: string; value: number }[];
+
+  // Sort by value descending and take top 2-3
+  categories.sort((a, b) => b.value - a.value);
+  
+  // Take top 2, or 3 if there's a clear gap
+  const top = categories.slice(0, 2);
+  if (categories.length >= 3 && categories[2].value >= 7.0) {
+    top.push(categories[2]);
+  }
+  
+  return top.map((c) => c.name);
+};
+
 export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
   averageRating,
   reviewCount,
@@ -37,6 +61,9 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
 }) => {
   const tierData = getScoreTier(averageRating);
   const onlyUserHasRated = reviewCount === 1 && userHasRating;
+
+  // Community highlights - only show when ≥3 reviews
+  const highlights = reviewCount >= 3 ? computeHighlights(categoryAverages) : [];
 
   // Calculate comparison message
   let comparisonMessage: React.ReactNode = null;
@@ -94,9 +121,21 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
 
   return (
     <div>
+      {/* Header row with rate/edit CTA */}
+      <div className="flex items-center justify-end mb-4">
+        <button
+          type="button"
+          onClick={onRateCourse}
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 active:scale-[0.97] transition-all min-h-[44px] px-2"
+        >
+          <Pencil className="w-3.5 h-3.5" />
+          <span>{userHasRating ? 'Edit your rating' : 'Rate this course'}</span>
+        </button>
+      </div>
+
       {/* Top row: Rating + Distribution */}
-      <div className="mb-5">
-        <div className="mt-3 flex w-full items-start gap-1.5">
+      <div className="mb-4">
+        <div className="flex w-full items-start gap-1.5">
           {/* LEFT: score + badge */}
           <div className="flex min-w-[140px] max-w-[40%] flex-col items-center">
             {/* Number and badge group - centered together */}
@@ -122,10 +161,22 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
         </div>
       </div>
 
+      {/* Community Highlights (Upgrade A) - only show when ≥3 reviews */}
+      {highlights.length > 0 && (
+        <div className="mb-4 pb-4 border-b border-slate-200/60">
+          <p className="text-[11px] font-medium tracking-wide text-slate-500 mb-1.5">
+            Highlights
+          </p>
+          <p className="text-sm text-slate-700">
+            {highlights.join(' • ')}
+          </p>
+        </div>
+      )}
+
       {/* Category averages - 2x2 grid with labels above bars */}
       {(categoryAverages.design || categoryAverages.condition || categoryAverages.clubhouse || categoryAverages.facilities) && (
-        <div className="border-t border-slate-200/60 pt-3 mt-3 mb-4">
-          <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+        <div className="border-t border-slate-200/60 pt-4 mt-4 mb-4">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-3">
             {/* Design */}
             {categoryAverages.design !== null && (
               <div className="flex flex-col">
@@ -134,7 +185,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                 </span>
                 <div className="flex items-center gap-2">
                   <RatingBar value={categoryAverages.design} mode="neutral" />
-                  <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
+                  <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap tabular-nums">
                     {formatScore(categoryAverages.design)}
                   </span>
                 </div>
@@ -149,7 +200,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                 </span>
                 <div className="flex items-center gap-2">
                   <RatingBar value={categoryAverages.condition} mode="neutral" />
-                  <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
+                  <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap tabular-nums">
                     {formatScore(categoryAverages.condition)}
                   </span>
                 </div>
@@ -164,7 +215,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                 </span>
                 <div className="flex items-center gap-2">
                   <RatingBar value={categoryAverages.clubhouse} mode="neutral" />
-                  <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
+                  <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap tabular-nums">
                     {formatScore(categoryAverages.clubhouse)}
                   </span>
                 </div>
@@ -179,7 +230,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
                 </span>
                 <div className="flex items-center gap-2">
                   <RatingBar value={categoryAverages.facilities} mode="neutral" />
-                  <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap">
+                  <span className="text-[11px] font-semibold text-slate-700 whitespace-nowrap tabular-nums">
                     {formatScore(categoryAverages.facilities)}
                   </span>
                 </div>
@@ -194,18 +245,6 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
         <div className="mt-3 mb-3 pb-[2px] flex items-center justify-center">
           {comparisonMessage}
         </div>
-      )}
-
-      {/* CTA button */}
-      {!userHasRating && (
-        <Button
-          type="button"
-          className="w-full h-11 rounded-lg"
-          variant="outline"
-          onClick={onRateCourse}
-        >
-          Rate this course
-        </Button>
       )}
     </div>
   );

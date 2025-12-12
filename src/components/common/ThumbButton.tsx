@@ -19,7 +19,7 @@ export const ThumbButton: React.FC<ThumbButtonProps> = ({
   const Icon = type === 'up' ? ThumbsUp : ThumbsDown;
   
   const base =
-    'inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium transition-all duration-100';
+    'inline-flex items-center gap-2 px-3 min-h-[44px] rounded-full border text-xs font-medium transition-all duration-100';
   
   const inactive = 'border-slate-200 text-slate-600 bg-white hover:bg-slate-50';
   
