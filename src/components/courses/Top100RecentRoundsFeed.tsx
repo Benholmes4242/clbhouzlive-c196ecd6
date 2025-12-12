@@ -77,13 +77,16 @@ export function Top100RecentRoundsFeed({
                   
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
                   
-                  <CourseRankBadges
-                    globalRank={round.global_rank}
-                    regionalRank={round.regional_rank}
-                    usaRank={round.usa_rank}
-                    country={round.country || ''}
-                    positioning="top-left"
-                  />
+                  {/* Rank badges - positioned slightly further from edges, SDS corners */}
+                  <div className="absolute top-3 left-3 z-10">
+                    <CourseRankBadges
+                      globalRank={round.global_rank}
+                      regionalRank={round.regional_rank}
+                      usaRank={round.usa_rank}
+                      country={round.country || ''}
+                      positioning="inline"
+                    />
+                  </div>
                 </div>
               )}
 
@@ -100,8 +103,9 @@ export function Top100RecentRoundsFeed({
                     </p>
                   </div>
 
+                  {/* Rating - vertically centered relative to course name */}
                   {round.rating != null && (
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <div className="flex items-center gap-1.5 flex-shrink-0 self-center">
                       <ClubhouseLogo className="h-5 w-5" />
                       <span className="text-sm font-semibold text-foreground">
                         {round.rating.toFixed(1)}
@@ -115,24 +119,25 @@ export function Top100RecentRoundsFeed({
         })}
       </div>
 
+      {/* Pagination - increased tap targets, reduced visual weight */}
       {(hasPrev || hasNext) && (
-        <div className="mt-3 flex items-center justify-between gap-3 px-1">
+        <div className="mt-4 flex items-center justify-between gap-3 px-2.5">
           <button
             type="button"
             onClick={() => hasPrev && setPage((p) => Math.max(0, p - 1))}
             disabled={!hasPrev}
             className={cn(
-              'flex-1 inline-flex items-center justify-center rounded-full border px-3 py-2 text-sm font-medium transition-colors',
+              'flex-1 inline-flex items-center justify-center rounded-full border px-4 py-2.5 text-xs font-medium transition-colors min-h-[44px]',
               hasPrev
-                ? 'bg-card hover:bg-muted/70 border-border text-foreground'
-                : 'bg-muted/40 border-border/60 text-muted-foreground cursor-default'
+                ? 'bg-card/60 hover:bg-muted/50 border-border/50 text-foreground'
+                : 'bg-transparent border-border/30 text-muted-foreground/60 cursor-default'
             )}
           >
             Previous
           </button>
 
-          <div className="min-w-[90px] text-center text-[11px] text-muted-foreground">
-            Page {currentPage} of {totalPages}
+          <div className="min-w-[80px] text-center text-[10px] text-muted-foreground/70">
+            {currentPage} / {totalPages}
           </div>
 
           <button
@@ -143,10 +148,10 @@ export function Top100RecentRoundsFeed({
             }
             disabled={!hasNext}
             className={cn(
-              'flex-1 inline-flex items-center justify-center rounded-full border px-3 py-2 text-sm font-medium transition-colors',
+              'flex-1 inline-flex items-center justify-center rounded-full border px-4 py-2.5 text-xs font-medium transition-colors min-h-[44px]',
               hasNext
-                ? 'bg-card hover:bg-muted/70 border-border text-foreground'
-                : 'bg-muted/40 border-border/60 text-muted-foreground cursor-default'
+                ? 'bg-card/60 hover:bg-muted/50 border-border/50 text-foreground'
+                : 'bg-transparent border-border/30 text-muted-foreground/60 cursor-default'
             )}
           >
             Next

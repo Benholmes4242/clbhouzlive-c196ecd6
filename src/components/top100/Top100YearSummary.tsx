@@ -9,41 +9,28 @@ interface Top100YearSummaryProps {
 export function Top100YearSummary({ summary, regionsCount }: Top100YearSummaryProps) {
   if (!summary) return null;
 
+  const stats = [
+    { label: String(summary.year), value: 'Year' },
+    { label: regionsCount.toString(), value: 'Regions' },
+    { label: summary.newCourses.toString(), value: 'New courses' },
+    { label: summary.avgRating?.toFixed(1) ?? '—', value: 'Avg rating' },
+  ];
+
   return (
-    <section>
-      {/* Lighter background, softer contrast - supporting facts, not headlines */}
-      <div className="rounded-2xl bg-muted/30 border border-border/40 px-4 py-3 flex items-center justify-between whitespace-nowrap overflow-x-auto">
-        {/* Year - left aligned */}
-        <span className="text-xs font-semibold text-foreground/80">
-          {summary.year}
-        </span>
-
-        {/* Regions */}
-        <div className="flex flex-col items-center text-xs">
-          <span className="font-semibold text-foreground/80">{regionsCount}</span>
-          <span className="text-[11px] text-muted-foreground">
-            {regionsCount === 1 ? 'region' : 'regions'}
-          </span>
-        </div>
-
-        {/* Divider */}
-        <div className="h-5 w-px bg-border/60" />
-
-        {/* New courses - middle */}
-        <div className="flex flex-col items-center text-xs">
-          <span className="font-semibold text-foreground/80">{summary.newCourses}</span>
-          <span className="text-[11px] text-muted-foreground">new courses</span>
-        </div>
-
-        {/* Divider */}
-        <div className="h-5 w-px bg-border/60" />
-
-        {/* Avg rating */}
-        <div className="flex flex-col items-center text-xs">
-          <span className="font-semibold text-foreground/80">
-            {summary.avgRating?.toFixed(1) ?? '—'}
-          </span>
-          <span className="text-[11px] text-muted-foreground">Avg rating</span>
+    <section className="px-2.5">
+      {/* Supporting stats row - lighter visual weight, standardised label font, locked height */}
+      <div className="bg-muted/40 border border-border/40 rounded-sq-md p-4 min-h-[72px]">
+        <div className="grid grid-cols-4 gap-3">
+          {stats.map((stat, i) => (
+            <div key={i} className="text-center">
+              <p className="text-sm font-semibold text-foreground leading-tight">
+                {stat.label}
+              </p>
+              <p className="text-[11px] font-medium text-muted-foreground mt-0.5">
+                {stat.value}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </section>

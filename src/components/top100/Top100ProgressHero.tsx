@@ -85,10 +85,11 @@ function HeroWithMilestoneRow({
       transition={{ duration: 0.25, ease: 'easeOut' }}
     >
       {/* Direct flex row on page background - no container clipping */}
+      {/* Increased gap +8-12px for visual distinction between avatar and card */}
       <div
         className="flex items-center justify-between"
         style={{
-          columnGap: 'min(max(24px, 4vw), 48px)',
+          columnGap: 'min(max(32px, 5vw), 56px)',
         }}
       >
         {/* Avatar on the left - responsive size, no clipping wrapper */}

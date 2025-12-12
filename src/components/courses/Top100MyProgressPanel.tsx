@@ -179,12 +179,12 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
           "What's next"
           ============================================ */}
       
-      {/* 3.1 Progress-to-next-achievement bar */}
+      {/* 3.1 Progress-to-next-achievement bar - reduced vertical padding, aligned with tiles */}
       {data?.next_milestone && (() => {
         const nextTierColor = TIER_COLORS[data.next_milestone.tierId] || TIER_COLORS.none;
         return (
-          <div className="flex justify-center mb-6">
-            <div className="w-full max-w-sm bg-card border border-border/60 rounded-full py-2.5 px-4 flex flex-col gap-2">
+          <div className="flex justify-center mb-4 mt-2">
+            <div className="w-full max-w-sm bg-card border border-border/60 rounded-full py-2 px-4 flex flex-col gap-1.5">
               <p className="text-xs sm:text-sm font-medium text-center text-foreground whitespace-nowrap">
                 Next achievement:{' '}
                 <span className="font-semibold">
