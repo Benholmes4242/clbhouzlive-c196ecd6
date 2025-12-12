@@ -14,6 +14,8 @@ export interface BusinessProfile {
   logo_url: string | null;
   cover_image_url: string | null;
   is_verified: boolean;
+  is_deleted: boolean;
+  deleted_at: string | null;
   created_at: string | null;
   updated_at: string | null;
 }

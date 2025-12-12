@@ -36,6 +36,7 @@ export function useMyBusinesses(userProfileId?: string) {
             category,
             location,
             logo_url,
+            cover_image_url,
             is_verified,
             is_deleted
           )

@@ -9,6 +9,14 @@ export function useBusinessImageUpload(businessId: string | undefined) {
   const [uploadingCover, setUploadingCover] = useState(false);
   const queryClient = useQueryClient();
 
+  const invalidateAllBusinessQueries = useCallback(async () => {
+    // Invalidate both the specific business profile and the list
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['business-profile', businessId] }),
+      queryClient.invalidateQueries({ queryKey: ['my-businesses'] }),
+    ]);
+  }, [businessId, queryClient]);
+
   const uploadLogo = useCallback(async (file: File) => {
     if (!businessId) return;
     
@@ -25,12 +33,17 @@ export function useBusinessImageUpload(businessId: string | undefined) {
 
       const { error } = await supabase
         .from('business_accounts')
-        .update({ logo_url: uploadResult.publicUrl })
+        .update({ logo_url: uploadResult.publicUrl, updated_at: new Date().toISOString() })
         .eq('id', businessId);
 
       if (error) throw error;
 
-      await queryClient.invalidateQueries({ queryKey: ['business-profile', businessId] });
+      // Optimistic update for immediate UI feedback
+      queryClient.setQueryData(['business-profile', businessId], (old: any) => 
+        old ? { ...old, logo_url: uploadResult.publicUrl } : old
+      );
+
+      await invalidateAllBusinessQueries();
       toast.success('Logo updated');
       
       return uploadResult.publicUrl;
@@ -41,7 +54,7 @@ export function useBusinessImageUpload(businessId: string | undefined) {
     } finally {
       setUploadingLogo(false);
     }
-  }, [businessId, queryClient]);
+  }, [businessId, queryClient, invalidateAllBusinessQueries]);
 
   const removeLogo = useCallback(async () => {
     if (!businessId) return;
@@ -49,18 +62,23 @@ export function useBusinessImageUpload(businessId: string | undefined) {
     try {
       const { error } = await supabase
         .from('business_accounts')
-        .update({ logo_url: null })
+        .update({ logo_url: null, updated_at: new Date().toISOString() })
         .eq('id', businessId);
 
       if (error) throw error;
 
-      await queryClient.invalidateQueries({ queryKey: ['business-profile', businessId] });
+      // Optimistic update
+      queryClient.setQueryData(['business-profile', businessId], (old: any) => 
+        old ? { ...old, logo_url: null } : old
+      );
+
+      await invalidateAllBusinessQueries();
       toast.success('Logo removed');
     } catch (error) {
       console.error('Error removing logo:', error);
       toast.error('Failed to remove logo');
     }
-  }, [businessId, queryClient]);
+  }, [businessId, queryClient, invalidateAllBusinessQueries]);
 
   const uploadCover = useCallback(async (file: File) => {
     if (!businessId) return;
@@ -70,7 +88,6 @@ export function useBusinessImageUpload(businessId: string | undefined) {
       const fileExt = file.name.split('.').pop();
       const fileName = `${businessId}/cover-${Date.now()}.${fileExt}`;
       
-      // Use profile-banners bucket for cover images
       const uploadResult = await uploadToR2Only(file, 'clbhouz-profile-banners', fileName);
       
       if (!uploadResult.success) {
@@ -79,12 +96,17 @@ export function useBusinessImageUpload(businessId: string | undefined) {
 
       const { error } = await supabase
         .from('business_accounts')
-        .update({ cover_image_url: uploadResult.publicUrl })
+        .update({ cover_image_url: uploadResult.publicUrl, updated_at: new Date().toISOString() })
         .eq('id', businessId);
 
       if (error) throw error;
 
-      await queryClient.invalidateQueries({ queryKey: ['business-profile', businessId] });
+      // Optimistic update for immediate UI feedback
+      queryClient.setQueryData(['business-profile', businessId], (old: any) => 
+        old ? { ...old, cover_image_url: uploadResult.publicUrl } : old
+      );
+
+      await invalidateAllBusinessQueries();
       toast.success('Cover photo updated');
       
       return uploadResult.publicUrl;
@@ -95,7 +117,7 @@ export function useBusinessImageUpload(businessId: string | undefined) {
     } finally {
       setUploadingCover(false);
     }
-  }, [businessId, queryClient]);
+  }, [businessId, queryClient, invalidateAllBusinessQueries]);
 
   const removeCover = useCallback(async () => {
     if (!businessId) return;
@@ -103,18 +125,23 @@ export function useBusinessImageUpload(businessId: string | undefined) {
     try {
       const { error } = await supabase
         .from('business_accounts')
-        .update({ cover_image_url: null })
+        .update({ cover_image_url: null, updated_at: new Date().toISOString() })
         .eq('id', businessId);
 
       if (error) throw error;
 
-      await queryClient.invalidateQueries({ queryKey: ['business-profile', businessId] });
+      // Optimistic update
+      queryClient.setQueryData(['business-profile', businessId], (old: any) => 
+        old ? { ...old, cover_image_url: null } : old
+      );
+
+      await invalidateAllBusinessQueries();
       toast.success('Cover photo removed');
     } catch (error) {
       console.error('Error removing cover:', error);
       toast.error('Failed to remove cover photo');
     }
-  }, [businessId, queryClient]);
+  }, [businessId, queryClient, invalidateAllBusinessQueries]);
 
   return {
     uploadLogo,
