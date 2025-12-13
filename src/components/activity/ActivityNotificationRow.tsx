@@ -50,14 +50,16 @@ function getNotificationIcon(type: string) {
     case 'club_update':
     case 'course_update':
       return <Building2 className={cn(iconClass, "text-slate-500")} />;
-    // Business verification notifications
+    // Business verification notifications (canonical + legacy types)
     case 'business_verification_submitted':
     case 'business_verification_approved':
     case 'business_verification_rejected':
-    case 'business_verification_revoked':
+    case 'business_verification_removed':
+    case 'business_verification_revoked': // Legacy support
+    case 'business_verification_more_proof_requested':
       return <Building2 className={cn(iconClass, 
         type === 'business_verification_approved' ? "text-emerald-500" : 
-        type === 'business_verification_rejected' || type === 'business_verification_revoked' ? "text-red-500" : 
+        type === 'business_verification_rejected' || type === 'business_verification_removed' || type === 'business_verification_revoked' ? "text-red-500" : 
         "text-amber-500"
       )} />;
     default:
