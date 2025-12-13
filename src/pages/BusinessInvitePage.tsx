@@ -7,8 +7,8 @@ import { Label } from '@/components/ui/label';
 import { useCreateInvite } from '@/hooks/useBusinessTeam';
 
 const roles = [
-  { value: 'admin', label: 'Admin', icon: Shield, description: 'Can manage team and settings' },
-  { value: 'member', label: 'Member', icon: User, description: 'Can post content only' },
+  { value: 'admin', label: 'Admin', icon: Shield, description: 'Can manage the business profile and post on its behalf' },
+  { value: 'member', label: 'Member', icon: User, description: 'Can post on behalf of the business' },
 ] as const;
 
 export default function BusinessInvitePage() {
@@ -38,8 +38,7 @@ export default function BusinessInvitePage() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-lg font-semibold">Invite teammate</h1>
-            <p className="text-sm text-muted-foreground">Add someone to your team</p>
+            <h1 className="text-lg font-semibold">Invite someone to your team</h1>
           </div>
         </div>
       </div>
@@ -53,16 +52,13 @@ export default function BusinessInvitePage() {
             <Input
               id="email"
               type="email"
-              placeholder="colleague@company.com"
+              placeholder="name@company.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="pl-10"
               required
             />
           </div>
-          <p className="text-xs text-muted-foreground">
-            They'll receive an in-app invitation to join your team.
-          </p>
         </div>
 
         {/* Role Selection */}
@@ -101,18 +97,28 @@ export default function BusinessInvitePage() {
             })}
           </div>
           <p className="text-xs text-muted-foreground">
-            They'll be able to post and manage content based on their role.
+            You can change their role or remove access at any time.
           </p>
         </div>
 
         {/* Submit */}
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={!email.trim() || createInvite.isPending}
-        >
-          {createInvite.isPending ? 'Sending...' : 'Send invitation'}
-        </Button>
+        <div className="flex gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1"
+            onClick={() => navigate(-1)}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            className="flex-1"
+            disabled={!email.trim() || createInvite.isPending}
+          >
+            {createInvite.isPending ? 'Sending...' : 'Send invite'}
+          </Button>
+        </div>
       </form>
     </div>
   );

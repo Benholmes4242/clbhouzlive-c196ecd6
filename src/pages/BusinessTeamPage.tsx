@@ -18,9 +18,9 @@ import { formatDistanceToNow } from 'date-fns';
 type RoleKey = 'owner' | 'admin' | 'member';
 
 const roleConfig: Record<RoleKey, { label: string; description: string }> = {
-  owner: { label: 'Owner', description: 'Full control over business' },
-  admin: { label: 'Admin', description: 'Manage team and settings' },
-  member: { label: 'Member', description: 'Can post content' },
+  owner: { label: 'Owner', description: 'Full control of this business' },
+  admin: { label: 'Admin', description: 'Can manage the business profile and post' },
+  member: { label: 'Member', description: 'Can post as the business' },
 };
 
 export default function BusinessTeamPage() {
@@ -117,7 +117,7 @@ export default function BusinessTeamPage() {
           </Button>
           <div className="flex-1">
             <h1 className="text-lg font-semibold">Team & access</h1>
-            <p className="text-sm text-muted-foreground">Manage who can access this business</p>
+            <p className="text-sm text-muted-foreground">Manage who can access and post from this business profile.</p>
           </div>
         </div>
       </div>
@@ -137,7 +137,7 @@ export default function BusinessTeamPage() {
               ))
             )}
           </div>
-          <p className="text-xs text-muted-foreground mt-2">The owner has full control of this business.</p>
+          <p className="text-xs text-muted-foreground mt-2">The owner has full control of this business, including verification and team access.</p>
         </section>
 
         {/* Admins Section */}
@@ -149,6 +149,7 @@ export default function BusinessTeamPage() {
                 <MemberRow key={member.id} member={member} showActions={true} />
               ))}
             </div>
+            <p className="text-xs text-muted-foreground mt-2">Admins can manage the business profile and post on behalf of the business.</p>
           </section>
         )}
 
@@ -161,13 +162,14 @@ export default function BusinessTeamPage() {
                 <MemberRow key={member.id} member={member} showActions={true} />
               ))}
             </div>
+            <p className="text-xs text-muted-foreground mt-2">Members can post as the business but can't manage settings or team access.</p>
           </section>
         )}
 
         {/* Pending Invites */}
         {canManage && pendingInvites.length > 0 && (
           <section>
-            <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Pending invitations</h2>
+            <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Pending</h2>
             <div className="divide-y divide-border">
               {pendingInvites.map((invite) => {
                 const role = roleConfig[invite.role as RoleKey] || roleConfig.member;
@@ -178,24 +180,40 @@ export default function BusinessTeamPage() {
                       <Users className="h-5 w-5 text-muted-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-[15px] truncate">{invite.invitee_email}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-[15px] truncate">{invite.invitee_email}</p>
+                        <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-sq-pill bg-amber-100 text-amber-700">
+                          Pending
+                        </span>
+                      </div>
                       <p className="text-sm text-muted-foreground">
-                        {role.label} · Sent {formatDistanceToNow(new Date(invite.created_at), { addSuffix: true })}
+                        {role.label}
                       </p>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-muted-foreground text-sm"
-                      onClick={() => revokeInvite.mutate(invite.id)}
-                      disabled={revokeInvite.isPending}
-                    >
-                      Revoke
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuItem className="text-sm">
+                          Resend invite
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          className="text-destructive text-sm"
+                          onClick={() => revokeInvite.mutate(invite.id)}
+                          disabled={revokeInvite.isPending}
+                        >
+                          Revoke invite
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 );
               })}
             </div>
+            <p className="text-xs text-muted-foreground mt-2">Invitation sent. They'll appear here once accepted.</p>
           </section>
         )}
 
