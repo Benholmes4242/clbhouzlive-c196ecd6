@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
-  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, MapPin
+  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, MapPin, ShieldCheck, Clock, CheckCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,6 +16,8 @@ import { DeleteBusinessDialog } from './DeleteBusinessDialog';
 import { useBusinessStats7d } from '@/hooks/useBusinessStats7d';
 import { cn } from '@/lib/utils';
 import { VerifiedBadge } from './VerifiedBadge';
+import BusinessVerificationModal from './verification/BusinessVerificationModal';
+import { useBusinessVerificationRequest, deriveVerificationState } from '@/hooks/useBusinessVerificationRequest';
 import type { BusinessMembership } from '@/hooks/useMyBusinesses';
 
 interface BusinessCommandCardProps {
@@ -35,10 +37,16 @@ const ROLE_LABELS: Record<string, string> = {
 export function BusinessCommandCard({ membership, userId, index = 0, isActive = false }: BusinessCommandCardProps) {
   const navigate = useNavigate();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
   const { data: stats, isLoading: statsLoading } = useBusinessStats7d(membership.business.id);
+  const { data: verificationRequest } = useBusinessVerificationRequest(membership.business.id);
 
   const { business, role } = membership;
   const canDelete = role === 'owner';
+  const canManage = role === 'owner' || role === 'admin';
+  
+  // Derive verification state
+  const verificationState = deriveVerificationState(business.is_verified, verificationRequest);
 
   // Format stat display - show "-" for zero/empty with fixed width
   const formatStat = (value: number | undefined) => {
@@ -161,6 +169,36 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                 <BarChart3 className="h-4 w-4 text-muted-foreground" />
                 Insights
               </DropdownMenuItem>
+              
+              {canManage && (
+                <>
+                  <DropdownMenuSeparator className="my-1" />
+                  {/* Verification menu item - state-based */}
+                  {verificationState === 'verified' ? (
+                    <DropdownMenuItem disabled className="gap-2.5 py-2 text-emerald-600">
+                      <CheckCircle className="h-4 w-4" />
+                      Verified
+                    </DropdownMenuItem>
+                  ) : verificationState === 'pending' ? (
+                    <DropdownMenuItem disabled className="gap-2.5 py-2 text-amber-600">
+                      <Clock className="h-4 w-4" />
+                      Verification pending
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowVerificationModal(true);
+                      }}
+                      className="gap-2.5 cursor-pointer py-2"
+                    >
+                      <ShieldCheck className="h-4 w-4 text-muted-foreground" />
+                      {verificationState === 'rejected' ? 'Request verification (reapply)' : 'Request verification'}
+                    </DropdownMenuItem>
+                  )}
+                </>
+              )}
+              
               {canDelete && (
                 <>
                   <DropdownMenuSeparator className="my-1" />
@@ -252,6 +290,13 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
         businessId={business.id}
         businessName={business.name}
         userId={userId}
+      />
+
+      <BusinessVerificationModal
+        open={showVerificationModal}
+        onOpenChange={setShowVerificationModal}
+        businessId={business.id}
+        isReapply={verificationState === 'rejected'}
       />
     </>
   );

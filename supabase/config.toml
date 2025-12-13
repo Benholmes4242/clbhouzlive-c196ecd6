@@ -45,3 +45,9 @@ verify_jwt = false
 [functions.compute-golfer-eligibility-signals]
 verify_jwt = true
 
+[functions.verify-business-approve]
+verify_jwt = true
+
+[functions.verify-business-reject]
+verify_jwt = true
+
