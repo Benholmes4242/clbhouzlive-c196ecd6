@@ -15,9 +15,13 @@ export const GolferVerificationInviteButtons: React.FC<GolferVerificationInviteB
   initialStatus = 'pending',
   isMock = false,
 }) => {
-  const [status, setStatus] = React.useState(initialStatus);
+  // Track local optimistic state, but always reset to server state on remount
+  const [optimisticStatus, setOptimisticStatus] = React.useState<'pending' | 'accepted' | 'declined' | null>(null);
   const acceptMutation = useAcceptGolferInvite();
   const declineMutation = useDeclineGolferInvite();
+
+  // Derive display status: use optimistic if set, otherwise use initialStatus from server
+  const displayStatus = optimisticStatus ?? initialStatus;
 
   const handleAccept = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -26,7 +30,7 @@ export const GolferVerificationInviteButtons: React.FC<GolferVerificationInviteB
     acceptMutation.mutate(
       { requestId },
       {
-        onSuccess: () => setStatus('accepted'),
+        onSuccess: () => setOptimisticStatus('accepted'),
       }
     );
   };
@@ -38,15 +42,15 @@ export const GolferVerificationInviteButtons: React.FC<GolferVerificationInviteB
     declineMutation.mutate(
       { requestId },
       {
-        onSuccess: () => setStatus('declined'),
+        onSuccess: () => setOptimisticStatus('declined'),
       }
     );
   };
 
   const isPending = acceptMutation.isPending || declineMutation.isPending;
 
-  // Already responded
-  if (status === 'accepted') {
+  // Already responded (either optimistically or from server)
+  if (displayStatus === 'accepted') {
     return (
       <span className="inline-flex items-center gap-1 px-3 h-6 text-[11px] font-semibold rounded-sq-xs border border-emerald-500 bg-emerald-500/10 text-emerald-600">
         <Check className="h-3 w-3" />
@@ -55,7 +59,7 @@ export const GolferVerificationInviteButtons: React.FC<GolferVerificationInviteB
     );
   }
 
-  if (status === 'declined') {
+  if (displayStatus === 'declined') {
     return (
       <span className="inline-flex items-center gap-1 px-3 h-6 text-[11px] font-semibold rounded-sq-xs border border-muted-foreground/30 bg-muted text-muted-foreground">
         <X className="h-3 w-3" />

@@ -152,6 +152,7 @@ const GolferVerificationTab = () => {
   const invitedRequests = requests?.filter(r => r.status === 'invited') ?? [];
   const approvedRequests = requests?.filter(r => r.status === 'approved') ?? [];
   const rejectedRequests = requests?.filter(r => r.status === 'rejected') ?? [];
+  const declinedRequests = requests?.filter(r => r.status === 'declined') ?? [];
 
   // Invite golfer mutation
   const inviteMutation = useMutation({
@@ -214,6 +215,8 @@ const GolferVerificationTab = () => {
         return <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">Verified</Badge>;
       case 'rejected':
         return <Badge variant="secondary" className="bg-red-500/10 text-red-600 border-red-500/20">Rejected</Badge>;
+      case 'declined':
+        return <Badge variant="secondary" className="bg-slate-500/10 text-slate-600 border-slate-500/20">Declined</Badge>;
       default:
         return <Badge variant="outline">Unknown</Badge>;
     }
@@ -377,6 +380,10 @@ const GolferVerificationTab = () => {
               Rejected
               <span className="text-[10px] md:text-xs opacity-60">({rejectedRequests.length})</span>
             </TabsTrigger>
+            <TabsTrigger value="declined" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
+              Declined
+              <span className="text-[10px] md:text-xs opacity-60">({declinedRequests.length})</span>
+            </TabsTrigger>
           </TabsList>
         </div>
 
@@ -424,6 +431,17 @@ const GolferVerificationTab = () => {
               <p className="text-muted-foreground text-sm mt-1">Rejected requests will appear here.</p>
             </Card>
           ) : rejectedRequests.map(request => renderRequestCard(request, false))}
+        </TabsContent>
+
+        <TabsContent value="declined" className="mt-4 space-y-4">
+          <p className="text-sm text-muted-foreground">Golfers who declined their invite. They can be re-invited later.</p>
+          {declinedRequests.length === 0 ? (
+            <Card className="p-8 text-center">
+              <User className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
+              <h3 className="font-medium text-lg">No declined invites</h3>
+              <p className="text-muted-foreground text-sm mt-1">Golfers who decline their invites will appear here.</p>
+            </Card>
+          ) : declinedRequests.map(request => renderRequestCard(request, false))}
         </TabsContent>
       </Tabs>
 
