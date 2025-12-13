@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MoreHorizontal, Pencil, BarChart2, Building2, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Pencil, BarChart2, Building2, Trash2, ShieldCheck, Clock, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -18,9 +18,18 @@ interface BusinessOwnerMenuProps {
   businessName?: string;
   membership: BusinessMembership | null;
   className?: string;
+  verificationStatus?: string | null;
+  isBusinessVerified?: boolean | null;
 }
 
-export function BusinessOwnerMenu({ businessId, businessName = 'this business', membership, className }: BusinessOwnerMenuProps) {
+export function BusinessOwnerMenu({ 
+  businessId, 
+  businessName = 'this business', 
+  membership, 
+  className,
+  verificationStatus,
+  isBusinessVerified 
+}: BusinessOwnerMenuProps) {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -31,6 +40,17 @@ export function BusinessOwnerMenu({ businessId, businessName = 'this business', 
   }
 
   const isOwner = membership.role === 'owner';
+  
+  // Derive verification state
+  const status = verificationStatus ?? 'unverified';
+  const isVerified = isBusinessVerified === true;
+  const isPending = status === 'pending_review' || status === 'pending';
+  const isRejected = status === 'rejected';
+
+  const handleRequestVerification = () => {
+    // Navigate to the verification request flow
+    navigate(`/business/${businessId}/verification/about`);
+  };
 
   return (
     <>
@@ -54,6 +74,26 @@ export function BusinessOwnerMenu({ businessId, businessName = 'this business', 
             <DropdownMenuItem onClick={() => navigate(`/business/${businessId}/insights`)}>
               <BarChart2 className="h-4 w-4 mr-2" />
               View insights
+            </DropdownMenuItem>
+          )}
+          
+          <DropdownMenuSeparator />
+          
+          {/* Verification menu item - state-based */}
+          {isVerified ? (
+            <DropdownMenuItem disabled className="text-emerald-600">
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Verified
+            </DropdownMenuItem>
+          ) : isPending ? (
+            <DropdownMenuItem disabled className="text-amber-600">
+              <Clock className="h-4 w-4 mr-2" />
+              Verification pending
+            </DropdownMenuItem>
+          ) : (
+            <DropdownMenuItem onClick={handleRequestVerification}>
+              <ShieldCheck className="h-4 w-4 mr-2" />
+              {isRejected ? 'Request verification (reapply)' : 'Request verification'}
             </DropdownMenuItem>
           )}
           

@@ -8,6 +8,7 @@ import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessPostsCount } from '@/hooks/useBusinessPosts';
 import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
+import { useBusinessVerificationRequest } from '@/hooks/useBusinessVerificationRequest';
 import { BusinessProfileHeader } from '@/components/business/BusinessProfileHeader';
 import { BusinessProfileOverview } from '@/components/business/BusinessProfileOverview';
 import { BusinessProfilePosts } from '@/components/business/BusinessProfilePosts';
@@ -32,6 +33,7 @@ const BusinessProfilePage = () => {
   const { data: membership } = useBusinessMembership(business?.id);
   const { data: postsCount = 0 } = useBusinessPostsCount(business?.id);
   const { data: followersCount = 0 } = useBusinessFollowersCount(business?.id);
+  const { data: verificationRequest } = useBusinessVerificationRequest(business?.id);
 
   // Track profile visit
   useEffect(() => {
@@ -83,6 +85,8 @@ const BusinessProfilePage = () => {
           businessName={business.name}
           membership={membership ?? null}
           className="h-10 w-10"
+          isBusinessVerified={business.is_verified}
+          verificationStatus={verificationRequest?.status}
         />
       </div>
 
