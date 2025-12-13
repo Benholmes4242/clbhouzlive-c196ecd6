@@ -27,7 +27,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { CheckCircle, XCircle, ExternalLink, User, Loader2, Users, Search, UserPlus, Radar } from 'lucide-react';
+import { CheckCircle, XCircle, ExternalLink, User, Loader2, Users, Search, UserPlus, Radar, RotateCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import GolferDiscoverTab from './GolferDiscoverTab';
 import { format } from 'date-fns';
@@ -178,6 +178,34 @@ const GolferVerificationTab = () => {
     },
   });
 
+  // Re-invite golfer mutation (for declined/rejected)
+  const reinviteMutation = useMutation({
+    mutationFn: async ({ requestId, note }: { requestId: string; note?: string }) => {
+      const { data, error } = await supabase.rpc('reinvite_golfer_verification_request', {
+        p_request_id: requestId,
+        p_admin_id: currentUser?.id,
+        p_note: note || null,
+      });
+      if (error) throw error;
+      return data as { status: string; message?: string; request_id?: string };
+    },
+    onSuccess: (data) => {
+      if (data.status === 'already_active') {
+        toast.info(data.message || 'Already has an active invite.');
+      } else if (data.status === 'already_verified') {
+        toast.info(data.message || 'Already verified.');
+      } else {
+        toast.success('Invite sent.');
+      }
+      queryClient.invalidateQueries({ queryKey: ['admin-golfer-verification-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-golfer-verifications-pending-count'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Could not re-invite golfer. Please try again.');
+    },
+  });
+
   // Submit review mutation
   const submitReviewMutation = useMutation({
     mutationFn: async ({ requestId, decision, note }: { requestId: string; decision: string; note?: string }) => {
@@ -203,7 +231,7 @@ const GolferVerificationTab = () => {
     },
   });
 
-  const processing = submitReviewMutation.isPending || inviteMutation.isPending;
+  const processing = submitReviewMutation.isPending || inviteMutation.isPending || reinviteMutation.isPending;
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -324,6 +352,38 @@ const GolferVerificationTab = () => {
                 <XCircle className="h-3.5 w-3.5 md:h-4 md:w-4" />
                 Reject
               </Button>
+            </div>
+          )}
+
+          {/* Re-invite action for declined/rejected */}
+          {(request.status === 'declined' || request.status === 'rejected') && (
+            <div className="flex gap-2 pt-3 md:pt-2 border-t">
+              <Button 
+                size="sm" 
+                onClick={() => reinviteMutation.mutate({ requestId: request.id })} 
+                disabled={processing} 
+                className="flex-1 md:flex-none gap-1.5 text-xs md:text-sm"
+              >
+                {reinviteMutation.isPending ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <RotateCcw className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                )}
+                Re-invite
+              </Button>
+              {profile?.username && (
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  asChild
+                  className="flex-1 md:flex-none gap-1.5 text-xs md:text-sm"
+                >
+                  <Link to={`/${profile.username}`} target="_blank">
+                    <ExternalLink className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                    View profile
+                  </Link>
+                </Button>
+              )}
             </div>
           )}
         </div>
@@ -465,23 +525,41 @@ const GolferVerificationTab = () => {
 
             {searchResults && searchResults.length > 0 && (
               <div className="space-y-2 max-h-48 overflow-y-auto">
-                {searchResults.map(golfer => (
-                  <button
-                    key={golfer.id}
-                    onClick={() => setSelectedGolfer(golfer)}
-                    className={`w-full flex items-center gap-3 p-2 rounded-sq-sm hover:bg-muted/50 transition-colors ${selectedGolfer?.id === golfer.id ? 'bg-muted' : ''}`}
-                  >
-                    <Avatar className="h-9 w-9">
-                      <AvatarImage src={golfer.profile_photo_url || undefined} />
-                      <AvatarFallback>{(golfer.display_name || golfer.username || '?').charAt(0).toUpperCase()}</AvatarFallback>
-                    </Avatar>
-                    <div className="text-left flex-1">
-                      <p className="font-medium text-sm">{golfer.display_name || golfer.username}</p>
-                      {golfer.username && <p className="text-xs text-muted-foreground">@{golfer.username}</p>}
-                    </div>
-                    {golfer.is_verified_golfer && <Badge variant="secondary" className="text-xs">Already verified</Badge>}
-                  </button>
-                ))}
+                {searchResults.map(golfer => {
+                  // Check if this golfer already has a request
+                  const existingRequest = requests?.find(r => r.user_id === golfer.id);
+                  const existingStatus = existingRequest?.status;
+                  const isAlreadyInvitedOrPending = existingStatus === 'invited' || existingStatus === 'pending';
+                  
+                  return (
+                    <button
+                      key={golfer.id}
+                      onClick={() => !isAlreadyInvitedOrPending && !golfer.is_verified_golfer && setSelectedGolfer(golfer)}
+                      disabled={isAlreadyInvitedOrPending || golfer.is_verified_golfer}
+                      className={`w-full flex items-center gap-3 p-2 rounded-sq-sm transition-colors ${
+                        selectedGolfer?.id === golfer.id ? 'bg-muted' : ''
+                      } ${isAlreadyInvitedOrPending || golfer.is_verified_golfer ? 'opacity-60 cursor-not-allowed' : 'hover:bg-muted/50'}`}
+                    >
+                      <Avatar className="h-9 w-9">
+                        <AvatarImage src={golfer.profile_photo_url || undefined} />
+                        <AvatarFallback>{(golfer.display_name || golfer.username || '?').charAt(0).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                      <div className="text-left flex-1">
+                        <p className="font-medium text-sm">{golfer.display_name || golfer.username}</p>
+                        {golfer.username && <p className="text-xs text-muted-foreground">@{golfer.username}</p>}
+                      </div>
+                      {golfer.is_verified_golfer && (
+                        <Badge variant="secondary" className="text-xs bg-emerald-500/10 text-emerald-600 border-emerald-500/20">Verified</Badge>
+                      )}
+                      {!golfer.is_verified_golfer && existingStatus === 'invited' && (
+                        <Badge variant="secondary" className="text-xs bg-blue-500/10 text-blue-600 border-blue-500/20">Already invited</Badge>
+                      )}
+                      {!golfer.is_verified_golfer && existingStatus === 'pending' && (
+                        <Badge variant="secondary" className="text-xs bg-amber-500/10 text-amber-600 border-amber-500/20">Pending</Badge>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             )}
 

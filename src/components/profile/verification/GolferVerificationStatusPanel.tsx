@@ -256,6 +256,29 @@ const GolferVerificationStatusPanel: React.FC<GolferVerificationStatusPanelProps
 
   // Check if user has an active invite (status === 'invited')
   const hasActiveInvite = verificationRequest?.status === 'invited';
+  // Check if user declined an invite
+  const hasDeclined = verificationRequest?.status === 'declined';
+
+  // Declined state - user can be re-invited later
+  if (hasDeclined) {
+    return (
+      <Card className="p-5 space-y-4 border-slate-200 bg-slate-50/50">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-foreground">
+            <ShieldCheck className="w-4 h-4" />
+            <h3 className="font-medium">Golfer Verification</h3>
+          </div>
+          <Badge variant="secondary" className="bg-slate-500/10 text-slate-600 border-slate-500/20">
+            Declined
+          </Badge>
+        </div>
+
+        <p className="text-sm text-muted-foreground">
+          You declined the verification invite. You can be re-invited later if eligible.
+        </p>
+      </Card>
+    );
+  }
 
   // Unverified/none state - now requires invite
   return (
