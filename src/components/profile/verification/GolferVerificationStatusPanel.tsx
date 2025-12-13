@@ -254,46 +254,46 @@ const GolferVerificationStatusPanel: React.FC<GolferVerificationStatusPanelProps
     );
   }
 
-  // Unverified/none state
+  // Check if user has an active invite (status === 'invited')
+  const hasActiveInvite = verificationRequest?.status === 'invited';
+
+  // Unverified/none state - now requires invite
   return (
     <>
       <Card className="p-5 space-y-4">
         <div className="flex items-center gap-2 text-foreground">
           <ShieldCheck className="w-4 h-4" />
-          <h3 className="font-medium">Get Verified</h3>
+          <h3 className="font-medium">Golfer Verification</h3>
         </div>
 
-        <p className="text-sm text-muted-foreground">
-          Verification shows you're a notable person in the golf community. You'll receive a blue badge on your profile.
-        </p>
-
-        {hasDisplayName ? (
-          <div className="space-y-2">
+        {hasActiveInvite ? (
+          // User has been invited - show accept flow
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              You've been invited to verify your profile. Verification adds a badge showing you're a notable person in the golf community.
+            </p>
             <Button onClick={handleRequestVerification} className="w-full">
-              Request Verification
+              Accept & Get Verified
             </Button>
             <p className="text-xs text-muted-foreground text-center">
-              Verification helps golfers identify trusted accounts.
+              You can also accept via your notifications.
             </p>
           </div>
         ) : (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div>
-                  <Button disabled className="w-full">
-                    Complete your profile to request verification
-                  </Button>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Add a display name to continue.</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          // No invite - show invite-only message
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Verification is invite-only and reserved for notable members of the golf community.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Keep building your profile — if you qualify, we'll reach out.
+            </p>
+          </div>
         )}
       </Card>
-      <GolferVerificationModal open={modalOpen} onOpenChange={setModalOpen} />
+      {hasActiveInvite && (
+        <GolferVerificationModal open={modalOpen} onOpenChange={setModalOpen} />
+      )}
     </>
   );
 };

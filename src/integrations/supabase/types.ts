@@ -6015,6 +6015,10 @@ export type Database = {
       }
       _st_within: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       accept_business_invite: { Args: { p_token: string }; Returns: Json }
+      accept_golfer_verification_invite: {
+        Args: { p_evidence_url?: string; p_note?: string; p_request_id: string }
+        Returns: undefined
+      }
       addauth: { Args: { "": string }; Returns: boolean }
       addgeometrycolumn:
         | {
@@ -6173,6 +6177,10 @@ export type Database = {
       }
       count_orphan_posts: { Args: never; Returns: number }
       current_auth_uid: { Args: never; Returns: string }
+      decline_golfer_verification_invite: {
+        Args: { p_note?: string; p_request_id: string }
+        Returns: undefined
+      }
       decrement_slots_if_available: {
         Args: { p_game_id: string }
         Returns: undefined
