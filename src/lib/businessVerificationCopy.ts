@@ -234,12 +234,12 @@ export const BUSINESS_VERIFICATION_COPY: Record<BusinessVerificationEvent, Verif
   },
 
   more_proof_requested: {
-    title: 'Additional proof needed',
-    body: 'Our team needs more information to complete your verification.',
-    push: 'Additional proof requested',
-    audit: 'Admin requested additional proof from business owner.',
-    email_subject: 'Additional information needed for verification',
-    email_body: 'Our team needs more information to verify your business. Please provide the requested documentation to continue.'
+    title: 'More information needed',
+    body: 'We need a little more information to complete your business verification.',
+    push: 'More verification info needed',
+    audit: 'Additional verification information requested by admin.',
+    email_subject: 'Action needed: more information required',
+    email_body: 'To complete your business verification, we need a little more information. Open Clbhouz to submit the requested details and continue the review.'
   }
 };
 
@@ -262,22 +262,31 @@ export function getVerificationTranslationKey(
 }
 
 /**
- * Notification type to event mapping (for frontend rendering)
+ * DB notification type to event mapping
+ * Standardized notification types stored in DB:
+ * - business_verification_submitted
+ * - business_verification_approved
+ * - business_verification_rejected
+ * - business_verification_removed (canonical - use instead of revoked)
+ * - business_verification_more_proof_requested
  */
 export const NOTIFICATION_TYPE_TO_EVENT: Record<string, BusinessVerificationEvent> = {
   'business_verification_submitted': 'submitted',
   'business_verification_approved': 'approved',
   'business_verification_rejected': 'rejected',
-  'business_verification_revoked': 'removed',
-  'business_verification_more_proof_requested': 'more_proof_requested'
+  'business_verification_removed': 'removed',
+  'business_verification_more_proof_requested': 'more_proof_requested',
+  // Legacy support for existing notifications
+  'business_verification_revoked': 'removed'
 };
 
 /**
- * Legacy mapping for backwards compatibility
- * Maps old event names to new simplified names
+ * Event to DB notification type mapping (for inserting notifications)
  */
-export const LEGACY_EVENT_MAP: Record<string, BusinessVerificationEvent> = {
-  'verification_submitted': 'submitted',
-  'verification_approved': 'approved',
-  'verification_removed': 'removed'
+export const EVENT_TO_NOTIFICATION_TYPE: Record<BusinessVerificationEvent, string> = {
+  'submitted': 'business_verification_submitted',
+  'approved': 'business_verification_approved',
+  'rejected': 'business_verification_rejected',
+  'removed': 'business_verification_removed',
+  'more_proof_requested': 'business_verification_more_proof_requested'
 };
