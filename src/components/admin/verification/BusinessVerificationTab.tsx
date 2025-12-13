@@ -293,57 +293,24 @@ const BusinessVerificationTab = () => {
     },
   });
 
-  // Mock approver ID for bypass functionality (simulates a second reviewer)
-  const MOCK_APPROVER_ID = '00000000-0000-0000-0000-000000000002';
-
-  // Bypass 2nd approval mutation - for system accounts only
+  // Bypass 2nd approval mutation - calls edge function with service role
   const bypassSecondApprovalMutation = useMutation({
     mutationFn: async ({ requestId, businessId }: { requestId: string; businessId: string }) => {
-      // Insert a synthetic second approval using mock approver ID
-      const { error: reviewError } = await supabase
-        .from('business_verification_reviews')
-        .insert({
-          request_id: requestId,
-          reviewer_id: MOCK_APPROVER_ID,
-          decision: 'approved',
-          note: 'Bypass approval for system account testing',
-        });
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('Not authenticated');
 
-      if (reviewError) throw reviewError;
+      const response = await supabase.functions.invoke('bypass-second-approval', {
+        body: { request_id: requestId },
+      });
 
-      // Update the verification request to approved
-      const { error: requestError } = await supabase
-        .from('business_verification_requests')
-        .update({
-          status: 'approved',
-          approval_count: 2,
-          reviewed_at: new Date().toISOString(),
-          reviewed_by: currentUser?.id,
-          admin_note: 'Approved via bypass for system account testing',
-          domain_confirmed: true,
-          domain_confirmed_at: new Date().toISOString(),
-        })
-        .eq('id', requestId);
+      if (response.error) throw new Error(response.error.message || 'Bypass failed');
+      if (!response.data?.ok) throw new Error(response.data?.error || 'Bypass failed');
 
-      if (requestError) throw requestError;
-
-      // Set the business as verified
-      const { error: businessError } = await supabase
-        .from('business_accounts')
-        .update({
-          is_verified: true,
-          verified_at: new Date().toISOString(),
-          verified_by: currentUser?.id,
-        })
-        .eq('id', businessId);
-
-      if (businessError) throw businessError;
-
-      return { success: true };
+      return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success('2nd approval bypassed', {
-        description: 'Business has been verified (system account test mode).',
+        description: `Business has been verified (${data.approvals} approvals).`,
       });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verifications-pending-count'] });

@@ -51,3 +51,6 @@ verify_jwt = true
 [functions.verify-business-reject]
 verify_jwt = true
 
+[functions.bypass-second-approval]
+verify_jwt = true
+
