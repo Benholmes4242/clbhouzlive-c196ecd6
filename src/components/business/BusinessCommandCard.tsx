@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   MoreHorizontal, Eye, Pencil, BarChart3, Trash2, 
-  CheckCircle2, MapPin
+  CheckCircle2, MapPin, ChevronRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -37,8 +37,6 @@ export function BusinessCommandCard({ membership, userId, index = 0 }: BusinessC
   const { data: stats, isLoading: statsLoading } = useBusinessStats7d(membership.business.id);
 
   const { business, role } = membership;
-  const canEdit = ['owner', 'admin'].includes(role);
-  const canViewInsights = ['owner', 'admin', 'editor', 'analyst'].includes(role);
   const canDelete = role === 'owner';
 
   // Format stat display - show "—" for zero/empty
@@ -52,7 +50,7 @@ export function BusinessCommandCard({ membership, userId, index = 0 }: BusinessC
     return value >= 0 ? `+${value.toLocaleString()}` : value.toLocaleString();
   };
 
-  const handleCardClick = (e: React.MouseEvent) => {
+  const handleRowClick = (e: React.MouseEvent) => {
     // Don't navigate if clicking on buttons or dropdown
     if ((e.target as HTMLElement).closest('button')) return;
     navigate(`/business/${business.id}`);
@@ -61,36 +59,32 @@ export function BusinessCommandCard({ membership, userId, index = 0 }: BusinessC
   return (
     <>
       <motion.div
-        initial={{ opacity: 0, y: 12 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: index * 0.05, duration: 0.25, ease: 'easeOut' }}
-        onClick={handleCardClick}
-        className={cn(
-          "rounded-sq-lg bg-card border border-border/50",
-          "shadow-sm hover:shadow-md transition-all duration-200",
-          "p-5 cursor-pointer",
-          "active:scale-[0.995]"
-        )}
+        transition={{ delay: index * 0.05, duration: 0.2, ease: 'easeOut' }}
       >
-        {/* Header Row */}
-        <div className="flex items-start gap-4 mb-4">
-          {/* Logo - larger */}
+        {/* Business Row - flat on background */}
+        <div 
+          onClick={handleRowClick}
+          className="flex items-start gap-4 px-4 py-4 cursor-pointer hover:bg-muted/30 transition-colors"
+        >
+          {/* Logo */}
           {business.logo_url ? (
             <img
               src={business.logo_url}
               alt={business.name}
-              className="h-14 w-14 rounded-full object-cover flex-shrink-0 ring-2 ring-border/30"
+              className="h-12 w-12 rounded-full object-cover flex-shrink-0"
             />
           ) : (
-            <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center text-xl font-semibold flex-shrink-0 ring-2 ring-border/30">
+            <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-lg font-semibold flex-shrink-0">
               {business.name.charAt(0).toUpperCase()}
             </div>
           )}
 
-          {/* Name & Badges */}
+          {/* Name & Meta */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="font-semibold text-foreground truncate text-[15px]">{business.name}</span>
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="font-semibold text-foreground truncate">{business.name}</span>
               {business.is_verified && (
                 <CheckCircle2 className="h-4 w-4 text-emerald-500 flex-shrink-0" />
               )}
@@ -100,7 +94,7 @@ export function BusinessCommandCard({ membership, userId, index = 0 }: BusinessC
               <span>{ROLE_LABELS[role]}</span>
               {business.category && (
                 <>
-                  <span>·</span>
+                  <span>•</span>
                   <span>{business.category}</span>
                 </>
               )}
@@ -118,7 +112,7 @@ export function BusinessCommandCard({ membership, userId, index = 0 }: BusinessC
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button 
-                className="p-2 -mr-2 -mt-1 hover:bg-muted rounded-sq-sm transition-colors"
+                className="p-2 -mr-2 hover:bg-muted rounded-sq-sm transition-colors"
                 onClick={(e) => e.stopPropagation()}
               >
                 <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
@@ -174,17 +168,17 @@ export function BusinessCommandCard({ membership, userId, index = 0 }: BusinessC
           </DropdownMenu>
         </div>
 
-        {/* Divider */}
-        <div className="h-px bg-border/50 -mx-5 mb-4" />
+        {/* Hairline divider */}
+        <div className="h-px bg-border/30 mx-4" />
 
-        {/* KPI Strip - Premium Layout */}
-        <div className="mb-4">
+        {/* Metrics Strip - flat, inline */}
+        <div className="px-4 py-4">
           {statsLoading ? (
             <div className="grid grid-cols-3 gap-4">
               {[1, 2, 3].map(i => (
                 <div key={i} className="text-center">
-                  <div className="h-6 w-10 mx-auto bg-muted rounded animate-pulse mb-1" />
-                  <div className="h-3 w-14 mx-auto bg-muted rounded animate-pulse" />
+                  <div className="h-5 w-10 mx-auto bg-muted rounded animate-pulse mb-1" />
+                  <div className="h-3 w-12 mx-auto bg-muted rounded animate-pulse" />
                 </div>
               ))}
             </div>
@@ -210,18 +204,18 @@ export function BusinessCommandCard({ membership, userId, index = 0 }: BusinessC
                   <p className="text-[11px] text-muted-foreground">Impressions</p>
                 </div>
               </div>
-              <p className="text-[10px] text-muted-foreground/70 text-center mt-2">
+              <p className="text-[10px] text-muted-foreground/60 text-center mt-2">
                 Last 7 days
               </p>
             </>
           )}
         </div>
 
-        {/* Divider */}
-        <div className="h-px bg-border/50 -mx-5 mb-4" />
+        {/* Hairline divider */}
+        <div className="h-px bg-border/30 mx-4" />
 
-        {/* Actions Row - 2 buttons only */}
-        <div className="flex items-center gap-2">
+        {/* Actions Row - flat buttons */}
+        <div className="flex items-center gap-3 px-4 py-4">
           <Button
             variant="outline"
             size="sm"
@@ -248,6 +242,9 @@ export function BusinessCommandCard({ membership, userId, index = 0 }: BusinessC
             Insights
           </Button>
         </div>
+
+        {/* Bottom divider for section separation */}
+        <div className="h-px bg-border/40" />
       </motion.div>
 
       <DeleteBusinessDialog
