@@ -333,6 +333,7 @@ export type Database = {
           email: string | null
           id: string
           is_deleted: boolean
+          is_system_account: boolean
           is_verified: boolean | null
           last_verification_action: string | null
           location: string | null
@@ -355,6 +356,7 @@ export type Database = {
           email?: string | null
           id?: string
           is_deleted?: boolean
+          is_system_account?: boolean
           is_verified?: boolean | null
           last_verification_action?: string | null
           location?: string | null
@@ -377,6 +379,7 @@ export type Database = {
           email?: string | null
           id?: string
           is_deleted?: boolean
+          is_system_account?: boolean
           is_verified?: boolean | null
           last_verification_action?: string | null
           location?: string | null
@@ -7005,10 +7008,17 @@ export type Database = {
         Args: { p_domain: string; p_request_id: string }
         Returns: Json
       }
-      revoke_business_verification: {
-        Args: { _business_id: string; _reason?: string }
-        Returns: Json
-      }
+      revoke_business_verification:
+        | { Args: { _business_id: string; _reason?: string }; Returns: Json }
+        | {
+            Args: {
+              p_admin_id: string
+              p_business_id: string
+              p_bypass_cooldown?: boolean
+              p_reason?: string
+            }
+            Returns: undefined
+          }
       search_golf_courses: {
         Args: {
           country_filter?: string
@@ -7634,10 +7644,21 @@ export type Database = {
         Args: { geom: unknown; move: number; wrap: number }
         Returns: unknown
       }
-      submit_business_verification_review: {
-        Args: { _decision: string; _note?: string; _request_id: string }
-        Returns: Json
-      }
+      submit_business_verification_review:
+        | {
+            Args: { _decision: string; _note?: string; _request_id: string }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_bypass_cooldown?: boolean
+              p_decision: string
+              p_note?: string
+              p_request_id: string
+              p_reviewer_id: string
+            }
+            Returns: Json
+          }
       submit_golfer_verification_request: {
         Args: { _evidence_url?: string; _note?: string; _request_id: string }
         Returns: undefined

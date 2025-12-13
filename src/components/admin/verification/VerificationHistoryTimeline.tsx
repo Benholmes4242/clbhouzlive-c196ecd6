@@ -109,6 +109,12 @@ export function VerificationHistoryTimeline({ businessId }: VerificationHistoryT
                         Previously verified
                       </span>
                     )}
+                    {/* Cooldown bypass indicator (admin-only) */}
+                    {entry.metadata?.cooldown_bypassed && (
+                      <span className="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">
+                        {entry.metadata?.is_system_account ? 'System account' : 'Cooldown bypassed (admin override)'}
+                      </span>
+                    )}
                   </div>
                   
                   <p className="text-xs text-muted-foreground mt-0.5">
