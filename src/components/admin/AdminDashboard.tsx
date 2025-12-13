@@ -101,12 +101,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ users, onRoleChange, us
       <div className="min-h-screen flex w-full">
         <AdminSidebar />
         <SidebarInset className="flex-1">
-          {/* Mobile sidebar trigger */}
-          <div className="sticky top-0 z-10 flex h-14 items-center gap-2 border-b bg-background px-4 md:hidden">
-            <SidebarTrigger />
-            <span className="font-medium">Admin Panel</span>
-          </div>
           <div className="p-6">
+            {/* Mobile sidebar trigger - floating button */}
+            <div className="md:hidden mb-4">
+              <SidebarTrigger className="h-10 w-10 border bg-card shadow-sm" />
+            </div>
             {renderContent()}
           </div>
         </SidebarInset>
