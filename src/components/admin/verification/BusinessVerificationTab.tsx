@@ -293,9 +293,11 @@ const BusinessVerificationTab = () => {
       setRevokeConfirmed(false);
     },
     onError: (error: any) => {
+      console.error('[Revoke Verification Error]', error);
       toast.error('Unable to remove verification', {
-        description: 'Please try again or contact support.',
+        description: error?.message || 'Please try again or contact support.',
       });
+      // Keep modal open on error - don't close it
     },
   });
 
