@@ -157,45 +157,89 @@ export type BusinessVerificationCopy = typeof businessVerificationCopy;
 export type VerificationStatus = 'unverified' | 'pending' | 'verified' | 'rejected';
 
 /**
- * Enum-based notification copy map (authoritative, future-proof)
- * Single source of truth for all verification events across:
+ * i18n-ready Notification Copy System
+ * 
+ * Translation key structure:
+ *   business_verification.{event}.{field}
+ * 
+ * Example keys:
+ *   business_verification.submitted.title
+ *   business_verification.approved.body
+ *   business_verification.removed.push
+ *   business_verification.more_proof_requested.audit
+ * 
+ * Single source of truth for:
  * - Edge functions (notifications + audit logs)
  * - Frontend (title + body)
  * - Push service (push string)
  * - Audit logs (audit string)
+ * - Email notifications (email_subject + email_body)
  */
+
 export type BusinessVerificationEvent = 
-  | 'verification_submitted'
-  | 'verification_approved'
-  | 'verification_removed';
+  | 'submitted'
+  | 'approved'
+  | 'removed'
+  | 'rejected'
+  | 'more_proof_requested';
 
 export interface VerificationCopySet {
   title: string;
   body: string;
   push: string;
   audit: string;
+  email_subject?: string;
+  email_body?: string;
 }
 
+/**
+ * i18n-ready copy map with translation key paths
+ * Keys follow pattern: business_verification.{event}.{field}
+ */
 export const BUSINESS_VERIFICATION_COPY: Record<BusinessVerificationEvent, VerificationCopySet> = {
-  verification_submitted: {
+  submitted: {
     title: 'Request received',
     body: 'Your verification request is being reviewed by our team.',
     push: 'Verification request received',
-    audit: 'Verification request submitted by business owner.'
+    audit: 'Verification request submitted by business owner.',
+    email_subject: "We've received your verification request",
+    email_body: "Your verification request is being reviewed by our team. We'll notify you once a decision is made."
   },
 
-  verification_approved: {
+  approved: {
     title: "You're verified",
     body: 'Your business profile has been successfully verified.',
     push: 'Your business is now verified',
-    audit: 'Business verification approved.'
+    audit: 'Business verification approved.',
+    email_subject: 'Your business is now verified',
+    email_body: 'Congratulations! Your business profile has been successfully verified. You now display a verified badge across Clbhouz.'
   },
 
-  verification_removed: {
+  rejected: {
+    title: 'Verification not approved',
+    body: 'Your verification request was not approved at this time.',
+    push: 'Verification not approved',
+    audit: 'Business verification rejected.',
+    email_subject: 'Verification update',
+    email_body: 'Your verification request was not approved. You can update your profile and submit a new request.'
+  },
+
+  removed: {
     title: 'Verification status changed',
     body: 'Your business verification has been removed.',
     push: 'Business verification removed',
-    audit: 'Business verification removed by admin.'
+    audit: 'Business verification removed by admin.',
+    email_subject: 'Verification status update',
+    email_body: 'Your business verification has been removed. Contact support if you have questions.'
+  },
+
+  more_proof_requested: {
+    title: 'Additional proof needed',
+    body: 'Our team needs more information to complete your verification.',
+    push: 'Additional proof requested',
+    audit: 'Admin requested additional proof from business owner.',
+    email_subject: 'Additional information needed for verification',
+    email_body: 'Our team needs more information to verify your business. Please provide the requested documentation to continue.'
   }
 };
 
@@ -207,10 +251,33 @@ export function getVerificationCopy(event: BusinessVerificationEvent): Verificat
 }
 
 /**
+ * Get i18n translation key for a specific field
+ * Example: getVerificationTranslationKey('submitted', 'title') => 'business_verification.submitted.title'
+ */
+export function getVerificationTranslationKey(
+  event: BusinessVerificationEvent, 
+  field: keyof VerificationCopySet
+): string {
+  return `business_verification.${event}.${field}`;
+}
+
+/**
  * Notification type to event mapping (for frontend rendering)
  */
 export const NOTIFICATION_TYPE_TO_EVENT: Record<string, BusinessVerificationEvent> = {
-  'business_verification_submitted': 'verification_submitted',
-  'business_verification_approved': 'verification_approved',
-  'business_verification_revoked': 'verification_removed'
+  'business_verification_submitted': 'submitted',
+  'business_verification_approved': 'approved',
+  'business_verification_rejected': 'rejected',
+  'business_verification_revoked': 'removed',
+  'business_verification_more_proof_requested': 'more_proof_requested'
+};
+
+/**
+ * Legacy mapping for backwards compatibility
+ * Maps old event names to new simplified names
+ */
+export const LEGACY_EVENT_MAP: Record<string, BusinessVerificationEvent> = {
+  'verification_submitted': 'submitted',
+  'verification_approved': 'approved',
+  'verification_removed': 'removed'
 };
