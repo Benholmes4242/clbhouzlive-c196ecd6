@@ -80,6 +80,7 @@ interface UserProfile {
   business_contact_phone?: string | null;
   business_bio?: string | null;
   is_verified_business?: boolean | null;
+  is_verified_golfer?: boolean | null;
 }
 
 interface HeroProfileHeaderProps {
@@ -430,6 +431,7 @@ const HeroProfileHeader = ({
                 businessCategory={profile?.business_category}
                 businessLocation={profile?.business_location}
                 isVerifiedBusiness={profile?.is_verified_business}
+                isVerifiedGolfer={profile?.is_verified_golfer}
                 isPersonal={isPersonal}
                 isOwnProfile={isOwnProfile}
                 onCustomiseClick={isOwnProfile ? () => navigate('/edit-profile') : undefined}

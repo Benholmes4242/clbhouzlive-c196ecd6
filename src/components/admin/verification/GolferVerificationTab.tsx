@@ -314,11 +314,14 @@ const GolferVerificationTab = () => {
               <div className="space-y-0.5 md:space-y-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
                   <h3 className="font-semibold text-sm md:text-lg truncate">{profile?.display_name || profile?.username || 'Unknown User'}</h3>
-                  {getStatusBadge(request.status)}
-                  {profile?.is_verified_golfer && (
-                    <Badge variant="secondary" className="bg-blue-500/10 text-blue-600 border-blue-500/20 text-xs">
+                  {/* Show status badge OR verified badge - not both for approved status */}
+                  {request.status === 'approved' ? (
+                    <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs gap-1">
                       <CheckCircle className="h-3 w-3" />
+                      Verified
                     </Badge>
+                  ) : (
+                    getStatusBadge(request.status)
                   )}
                 </div>
                 {profile?.username && <p className="text-xs md:text-sm text-muted-foreground truncate">@{profile.username}</p>}
@@ -476,38 +479,40 @@ const GolferVerificationTab = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        {/* Status tabs - single row with horizontal scroll */}
-        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-          <TabsList className="inline-flex w-full md:w-auto h-9 md:h-10 gap-1">
-            <TabsTrigger value="discover" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
-              <Radar className="h-3.5 w-3.5 md:h-4 md:w-4" />
-              Discover
-            </TabsTrigger>
-            <TabsTrigger value="pending" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
-              Pending
-              {pendingRequests.length > 0 && (
-                <span className="text-[10px] md:text-xs bg-amber-500/20 text-amber-600 px-1.5 py-0.5 rounded-full">
-                  {pendingRequests.length}
-                </span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="invited" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
-              Invited
-              <span className="text-[10px] md:text-xs opacity-60">({invitedRequests.length})</span>
-            </TabsTrigger>
-            <TabsTrigger value="approved" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
-              Verified
-              <span className="text-[10px] md:text-xs opacity-60">({approvedRequests.length})</span>
-            </TabsTrigger>
-            <TabsTrigger value="rejected" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
-              Rejected
-              <span className="text-[10px] md:text-xs opacity-60">({rejectedRequests.length})</span>
-            </TabsTrigger>
-            <TabsTrigger value="declined" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
-              Declined
-              <span className="text-[10px] md:text-xs opacity-60">({declinedRequests.length})</span>
-            </TabsTrigger>
-          </TabsList>
+        {/* Status tabs - contained width with horizontal scroll, no overflow */}
+        <div className="w-full overflow-hidden">
+          <div className="overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <TabsList className="inline-flex w-max min-w-full h-9 md:h-10 gap-1 p-1">
+              <TabsTrigger value="discover" className="shrink-0 gap-1 text-xs md:text-sm px-3 md:px-4">
+                <Radar className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                Discover
+              </TabsTrigger>
+              <TabsTrigger value="pending" className="shrink-0 gap-1 text-xs md:text-sm px-3 md:px-4">
+                Pending
+                {pendingRequests.length > 0 && (
+                  <span className="text-[10px] md:text-xs bg-amber-500/20 text-amber-600 px-1.5 py-0.5 rounded-full">
+                    {pendingRequests.length}
+                  </span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="invited" className="shrink-0 gap-1 text-xs md:text-sm px-3 md:px-4">
+                Invited
+                <span className="text-[10px] md:text-xs opacity-60">({invitedRequests.length})</span>
+              </TabsTrigger>
+              <TabsTrigger value="approved" className="shrink-0 gap-1 text-xs md:text-sm px-3 md:px-4">
+                Verified
+                <span className="text-[10px] md:text-xs opacity-60">({approvedRequests.length})</span>
+              </TabsTrigger>
+              <TabsTrigger value="rejected" className="shrink-0 gap-1 text-xs md:text-sm px-3 md:px-4">
+                Rejected
+                <span className="text-[10px] md:text-xs opacity-60">({rejectedRequests.length})</span>
+              </TabsTrigger>
+              <TabsTrigger value="declined" className="shrink-0 gap-1 text-xs md:text-sm px-3 md:px-4">
+                Declined
+                <span className="text-[10px] md:text-xs opacity-60">({declinedRequests.length})</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
         </div>
 
         <TabsContent value="discover" className="mt-4">
@@ -568,89 +573,126 @@ const GolferVerificationTab = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Invite Modal */}
+      {/* Invite Modal - improved layout with better scroll and sticky footer */}
       <Dialog open={inviteModalOpen} onOpenChange={setInviteModalOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
+        <DialogContent className="max-w-md flex flex-col max-h-[85vh] p-0 gap-0">
+          {/* Header */}
+          <DialogHeader className="px-6 pt-6 pb-4 shrink-0">
             <DialogTitle>Invite golfer to verification</DialogTitle>
-            <DialogDescription>Search for a golfer to invite them to request verification. They'll receive a notification.</DialogDescription>
+            <DialogDescription className="mt-1.5">Search for a golfer to invite them to request verification.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>Search golfers</Label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search by name or username..." className="pl-9" />
-              </div>
+          
+          {/* Scrollable body */}
+          <div className="flex-1 overflow-y-auto px-6 pb-4 space-y-4">
+            {/* Search input at top */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input 
+                value={searchQuery} 
+                onChange={(e) => setSearchQuery(e.target.value)} 
+                placeholder="Search by name or username..." 
+                className="pl-9" 
+              />
             </div>
 
+            {/* Loading state */}
             {isSearching && <div className="flex justify-center py-4"><Loader2 className="h-5 w-5 animate-spin" /></div>}
 
-            {searchResults && searchResults.length > 0 && (
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {searchResults.map(golfer => {
-                  // Check if this golfer already has a request
-                  const existingRequest = requests?.find(r => r.user_id === golfer.id);
-                  const existingStatus = existingRequest?.status;
-                  const isAlreadyInvitedOrPending = existingStatus === 'invited' || existingStatus === 'pending';
-                  
-                  return (
-                    <button
-                      key={golfer.id}
-                      onClick={() => !isAlreadyInvitedOrPending && !golfer.is_verified_golfer && setSelectedGolfer(golfer)}
-                      disabled={isAlreadyInvitedOrPending || golfer.is_verified_golfer}
-                      className={`w-full flex items-center gap-3 p-2 rounded-sq-sm transition-colors ${
-                        selectedGolfer?.id === golfer.id ? 'bg-muted' : ''
-                      } ${isAlreadyInvitedOrPending || golfer.is_verified_golfer ? 'opacity-60 cursor-not-allowed' : 'hover:bg-muted/50'}`}
-                    >
-                      <Avatar className="h-9 w-9">
-                        <AvatarImage src={golfer.profile_photo_url || undefined} />
-                        <AvatarFallback>{(golfer.display_name || golfer.username || '?').charAt(0).toUpperCase()}</AvatarFallback>
-                      </Avatar>
-                      <div className="text-left flex-1">
-                        <p className="font-medium text-sm">{golfer.display_name || golfer.username}</p>
-                        {golfer.username && <p className="text-xs text-muted-foreground">@{golfer.username}</p>}
-                      </div>
-                      {golfer.is_verified_golfer && (
-                        <Badge variant="secondary" className="text-xs bg-emerald-500/10 text-emerald-600 border-emerald-500/20">Verified</Badge>
-                      )}
-                      {!golfer.is_verified_golfer && existingStatus === 'invited' && (
-                        <Badge variant="secondary" className="text-xs bg-blue-500/10 text-blue-600 border-blue-500/20">Already invited</Badge>
-                      )}
-                      {!golfer.is_verified_golfer && existingStatus === 'pending' && (
-                        <Badge variant="secondary" className="text-xs bg-amber-500/10 text-amber-600 border-amber-500/20">Pending</Badge>
-                      )}
-                    </button>
-                  );
-                })}
+            {/* Search results - longer scroll area, exclude selected */}
+            {searchResults && searchResults.length > 0 && !selectedGolfer && (
+              <div className="space-y-1.5 max-h-64 overflow-y-auto">
+                {searchResults
+                  .filter(golfer => golfer.id !== selectedGolfer?.id)
+                  .map(golfer => {
+                    const existingRequest = requests?.find(r => r.user_id === golfer.id);
+                    const existingStatus = existingRequest?.status;
+                    const isAlreadyInvitedOrPending = existingStatus === 'invited' || existingStatus === 'pending';
+                    
+                    return (
+                      <button
+                        key={golfer.id}
+                        onClick={() => !isAlreadyInvitedOrPending && !golfer.is_verified_golfer && setSelectedGolfer(golfer)}
+                        disabled={isAlreadyInvitedOrPending || golfer.is_verified_golfer}
+                        className={`w-full flex items-center gap-3 p-2.5 rounded-sq-sm transition-colors ${
+                          isAlreadyInvitedOrPending || golfer.is_verified_golfer ? 'opacity-60 cursor-not-allowed' : 'hover:bg-muted/50'
+                        }`}
+                      >
+                        <Avatar className="h-9 w-9">
+                          <AvatarImage src={golfer.profile_photo_url || undefined} />
+                          <AvatarFallback>{(golfer.display_name || golfer.username || '?').charAt(0).toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                        <div className="text-left flex-1 min-w-0">
+                          <p className="font-medium text-sm truncate">{golfer.display_name || golfer.username}</p>
+                          {golfer.username && <p className="text-xs text-muted-foreground truncate">@{golfer.username}</p>}
+                        </div>
+                        {golfer.is_verified_golfer && (
+                          <Badge variant="secondary" className="text-xs bg-emerald-500/10 text-emerald-600 border-emerald-500/20 shrink-0">Verified</Badge>
+                        )}
+                        {!golfer.is_verified_golfer && existingStatus === 'invited' && (
+                          <Badge variant="secondary" className="text-xs bg-blue-500/10 text-blue-600 border-blue-500/20 shrink-0">Invited</Badge>
+                        )}
+                        {!golfer.is_verified_golfer && existingStatus === 'pending' && (
+                          <Badge variant="secondary" className="text-xs bg-amber-500/10 text-amber-600 border-amber-500/20 shrink-0">Pending</Badge>
+                        )}
+                      </button>
+                    );
+                  })}
               </div>
             )}
 
+            {/* Selected golfer card */}
             {selectedGolfer && (
-              <div className="space-y-2 border-t pt-4">
-                <div className="flex items-center gap-3 p-2 bg-muted/30 rounded-sq-sm">
-                  <Avatar className="h-10 w-10">
+              <div className="space-y-4 pt-2">
+                <div className="flex items-center gap-3 p-3 bg-emerald-500/5 border border-emerald-500/20 rounded-sq-md">
+                  <Avatar className="h-11 w-11 shrink-0">
                     <AvatarImage src={selectedGolfer.profile_photo_url || undefined} />
                     <AvatarFallback>{(selectedGolfer.display_name || selectedGolfer.username || '?').charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
-                  <div>
-                    <p className="font-medium">{selectedGolfer.display_name || selectedGolfer.username}</p>
-                    <p className="text-xs text-muted-foreground">Will receive a verification invite</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate">{selectedGolfer.display_name || selectedGolfer.username}</p>
+                    {selectedGolfer.username && <p className="text-xs text-muted-foreground truncate">@{selectedGolfer.username}</p>}
+                    <p className="text-xs text-emerald-600 mt-0.5">Will receive a verification invite</p>
                   </div>
+                  <button 
+                    type="button"
+                    onClick={() => setSelectedGolfer(null)}
+                    className="shrink-0 p-1.5 rounded-full hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label="Change selection"
+                  >
+                    <XCircle className="h-4 w-4" />
+                  </button>
                 </div>
+                
                 <div className="space-y-2">
                   <Label htmlFor="inviteNote">Internal note (optional)</Label>
-                  <Textarea id="inviteNote" value={inviteNote} onChange={(e) => setInviteNote(e.target.value)} placeholder="e.g., Pro golfer, verified via tour profile..." className="min-h-[60px]" />
+                  <Textarea 
+                    id="inviteNote" 
+                    value={inviteNote} 
+                    onChange={(e) => setInviteNote(e.target.value)} 
+                    placeholder="e.g., Pro golfer, verified via tour profile..." 
+                    className="min-h-[60px]" 
+                  />
                 </div>
               </div>
             )}
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => { setInviteModalOpen(false); setSelectedGolfer(null); setSearchQuery(''); setInviteNote(''); }} disabled={processing}>Cancel</Button>
-            <Button onClick={() => selectedGolfer && inviteMutation.mutate({ userId: selectedGolfer.id, note: inviteNote })} disabled={processing || !selectedGolfer || selectedGolfer.is_verified_golfer}>
+          
+          {/* Sticky footer */}
+          <div className="shrink-0 px-6 py-4 border-t bg-background/95 backdrop-blur-sm flex gap-2 justify-end" style={{ paddingBottom: 'calc(16px + env(safe-area-inset-bottom, 0px))' }}>
+            <Button 
+              variant="outline" 
+              onClick={() => { setInviteModalOpen(false); setSelectedGolfer(null); setSearchQuery(''); setInviteNote(''); }} 
+              disabled={processing}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => selectedGolfer && inviteMutation.mutate({ userId: selectedGolfer.id, note: inviteNote })} 
+              disabled={processing || !selectedGolfer || selectedGolfer.is_verified_golfer}
+            >
               {processing ? 'Inviting...' : 'Send Invite'}
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
 
