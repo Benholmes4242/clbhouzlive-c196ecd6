@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 export interface GolferVerificationRequest {
   id: string;
   user_id: string;
-  status: 'pending' | 'approved' | 'rejected' | 'revoked';
+  status: 'invited' | 'pending' | 'approved' | 'rejected' | 'declined' | 'revoked';
   invited_by: string;
   evidence_url: string | null;
   note: string | null;
@@ -89,11 +89,13 @@ export function useGolferCooldown(userId: string | undefined) {
 export function deriveGolferVerificationState(
   isVerified: boolean | null | undefined,
   request: GolferVerificationRequest | null | undefined
-): 'verified' | 'pending' | 'rejected' | 'none' {
+): 'verified' | 'pending' | 'rejected' | 'invited' | 'declined' | 'none' {
   if (isVerified) return 'verified';
   if (!request) return 'none';
+  if (request.status === 'invited') return 'invited';
   if (request.status === 'pending') return 'pending';
   if (request.status === 'rejected') return 'rejected';
+  if (request.status === 'declined') return 'declined';
   if (request.status === 'approved') return 'verified';
   return 'none';
 }

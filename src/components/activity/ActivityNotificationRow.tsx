@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X, MoreVertical } from 'lucide-react';
+import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X, MoreVertical, ShieldCheck } from 'lucide-react';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
@@ -7,7 +7,7 @@ import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSyst
 import { FollowBackButton } from './FollowBackButton';
 import { FriendRequestButtons } from './FriendRequestButtons';
 import { useCancelFriendRequest } from '@/hooks/useCancelFriendRequest';
-
+import { GolferVerificationInviteButtons } from './GolferVerificationInviteButtons';
 interface ActivityNotificationRowProps {
   notification: ActivityNotification;
   onClick: () => void;
@@ -60,6 +60,18 @@ function getNotificationIcon(type: string) {
       return <Building2 className={cn(iconClass, 
         type === 'business_verification_approved' ? "text-emerald-500" : 
         type === 'business_verification_rejected' || type === 'business_verification_removed' || type === 'business_verification_revoked' ? "text-red-500" : 
+        "text-amber-500"
+      )} />;
+    // Golfer verification notifications
+    case 'golfer_verification_invite':
+    case 'golfer_verification_submitted':
+    case 'golfer_verification_approved':
+    case 'golfer_verification_rejected':
+    case 'golfer_verification_removed':
+      return <ShieldCheck className={cn(iconClass,
+        type === 'golfer_verification_approved' ? "text-emerald-500" :
+        type === 'golfer_verification_rejected' || type === 'golfer_verification_removed' ? "text-red-500" :
+        type === 'golfer_verification_invite' ? "text-blue-500" :
         "text-amber-500"
       )} />;
     default:
@@ -140,6 +152,17 @@ function renderNotificationText(notification: ActivityNotification): string {
       return 'Business verification removed';
     case 'business_verification_domain_required':
       return 'Action required: verify your business email domain';
+    // Golfer verification notifications
+    case 'golfer_verification_invite':
+      return "You're eligible for verification";
+    case 'golfer_verification_submitted':
+      return 'Verification request submitted';
+    case 'golfer_verification_approved':
+      return "You're now a verified golfer";
+    case 'golfer_verification_rejected':
+      return 'Verification request not approved';
+    case 'golfer_verification_removed':
+      return 'Golfer verification removed';
     default:
       return title || message || 'New notification';
   }
@@ -482,7 +505,100 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
     }
 
     /**
-     * 6) DEFAULT – All other notification types (follow, like, comment, etc.)
+     * 6) GOLFER VERIFICATION INVITE
+     *    – User received an invite to verify their golfer profile
+     */
+    case 'golfer_verification_invite': {
+      const requestId = data?.request_id;
+      const inviteStatus = data?.status || 'pending';
+      const statusIcon = getNotificationIcon(type);
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <>
+              <span className={cn(showOrange ? "font-semibold" : "font-medium")}>Clbhouz Team</span>{' '}
+              <span className="font-normal text-muted-foreground">invited you to get verified</span>
+            </>
+          }
+          meta={notification.time_ago}
+          actions={
+            requestId ? (
+              <GolferVerificationInviteButtons
+                requestId={requestId}
+                initialStatus={inviteStatus === 'accepted' ? 'accepted' : inviteStatus === 'declined' ? 'declined' : 'pending'}
+                isMock={notification.is_mock}
+              />
+            ) : undefined
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 7) GOLFER VERIFICATION APPROVED
+     */
+    case 'golfer_verification_approved': {
+      const statusIcon = getNotificationIcon(type);
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <>
+              <span className={cn(showOrange ? "font-semibold" : "font-medium")}>Clbhouz Team</span>{' '}
+              <span className="font-normal text-muted-foreground">verified your profile</span>
+            </>
+          }
+          meta={notification.time_ago}
+          actions={
+            <span className={cn(basePillClass, "border-emerald-500 bg-emerald-500/10 text-emerald-600 gap-1")}>
+              <ShieldCheck className="h-3 w-3" />
+              Verified
+            </span>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 8) GOLFER VERIFICATION REJECTED
+     */
+    case 'golfer_verification_rejected': {
+      const statusIcon = getNotificationIcon(type);
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <>
+              <span className={cn(showOrange ? "font-semibold" : "font-medium")}>Clbhouz Team</span>{' '}
+              <span className="font-normal text-muted-foreground">couldn't verify your profile</span>
+            </>
+          }
+          meta={notification.time_ago}
+          actions={
+            <span className={cn(basePillClass, "border-red-400 bg-red-500/5 text-red-500")}>
+              Not approved
+            </span>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 9) DEFAULT – All other notification types (follow, like, comment, etc.)
      */
     default: {
       const statusIcon = getNotificationIcon(type);

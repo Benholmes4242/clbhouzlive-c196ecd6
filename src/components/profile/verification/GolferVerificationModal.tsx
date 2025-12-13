@@ -86,19 +86,37 @@ const GolferVerificationModal: React.FC<GolferVerificationModalProps> = ({
   const canProceedStep2 = proofTypes.length > 0;
   const canProceedStep3 = contactEmail.trim() && role;
 
+  // Fetch current verification request to check for active invite
+  const { data: verificationRequest } = useQuery({
+    queryKey: ['golfer-verification-request-modal', user?.id],
+    enabled: open && !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('golfer_verification_requests')
+        .select('id, status')
+        .eq('user_id', user!.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const hasActiveInvite = verificationRequest?.status === 'invited';
+  const requestId = verificationRequest?.id;
+
   const submitMutation = useMutation({
     mutationFn: async () => {
-      if (!user?.id) throw new Error('Not authenticated');
+      if (!user?.id || !requestId) throw new Error('Not authenticated or no invite');
 
-      const { error } = await supabase
-        .from('golfer_verification_requests')
-        .insert({
-          user_id: user.id,
-          invited_by: user.id, // Self-invited for now
-          evidence_url: proofLinks || null,
-          note: description || null,
-          status: 'pending',
-        });
+      // Use the accept RPC instead of direct insert
+      const { error } = await supabase.rpc('accept_golfer_verification_invite', {
+        p_request_id: requestId,
+        p_evidence_url: proofLinks || null,
+        p_note: description || null,
+      });
 
       if (error) throw error;
     },
@@ -107,6 +125,7 @@ const GolferVerificationModal: React.FC<GolferVerificationModalProps> = ({
         description: 'We\'ll review your request and notify you once a decision is made.',
       });
       queryClient.invalidateQueries({ queryKey: ['golfer-verification-request'] });
+      queryClient.invalidateQueries({ queryKey: ['golfer-verification-request-modal'] });
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       onOpenChange(false);
       resetForm();
@@ -163,9 +182,14 @@ const GolferVerificationModal: React.FC<GolferVerificationModalProps> = ({
         <div className="sticky top-0 z-10 bg-background border-b border-border/40 px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <DialogTitle className="text-lg font-semibold">Get verified</DialogTitle>
+              <DialogTitle className="text-lg font-semibold">
+                {hasActiveInvite ? "You're invited" : 'Get verified'}
+              </DialogTitle>
               <DialogDescription className="text-sm text-muted-foreground mt-0.5">
-                Verification shows you're a notable person in the golf community.
+                {hasActiveInvite 
+                  ? "Complete your verification request to get a verified badge."
+                  : "Verification shows you're a notable person in the golf community."
+                }
               </DialogDescription>
             </div>
             <button
