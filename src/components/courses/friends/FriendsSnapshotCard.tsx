@@ -37,7 +37,7 @@ const FriendsSnapshotCard: React.FC<FriendsSnapshotCardProps> = ({
   return (
     <section className="pt-3 pb-5">
       {/* Header */}
-      <div className="flex items-center gap-2.5 mb-4">
+      <div className="flex items-center gap-2.5 mb-5">
         <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
           <Users className="w-4 h-4 text-primary" />
         </div>
@@ -47,45 +47,40 @@ const FriendsSnapshotCard: React.FC<FriendsSnapshotCardProps> = ({
         </div>
       </div>
 
-      {/* Stats Grid - 2×2 with subtle dividers */}
-      <div className="grid grid-cols-2 gap-y-3">
-        {/* Row 1 */}
-        <div className="text-center border-r border-border/40 pr-4">
+      {/* Stats Grid - 2×2 with spacing only */}
+      <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+        <div>
           <div className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground/70">
             Courses
           </div>
-          <div className="mt-0.5 font-medium text-foreground">
+          <div className="mt-0.5 text-base font-semibold text-foreground">
             {totalCourses} course{totalCourses !== 1 ? "s" : ""}
           </div>
         </div>
 
-        <div className="text-center pl-4">
+        <div>
           <div className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground/70">
             Regions
           </div>
-          <div className="mt-0.5 font-medium text-foreground">
+          <div className="mt-0.5 text-base font-semibold text-foreground">
             {totalRegions} region{totalRegions !== 1 ? "s" : ""}
           </div>
         </div>
 
-        {/* Horizontal divider */}
-        <div className="col-span-2 border-t border-border/40 my-1" />
-
-        {/* Row 2 */}
-        <div className="text-center border-r border-border/40 pr-4">
+        <div>
           <div className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground/70">
             Average rating
           </div>
-          <div className="mt-0.5 font-medium text-foreground">
+          <div className="mt-0.5 text-base font-semibold text-foreground">
             {averageRating ? averageRating.toFixed(1) : "—"}
           </div>
         </div>
 
-        <div className="text-center pl-4">
+        <div>
           <div className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground/70">
             Rounds
           </div>
-          <div className="mt-0.5 font-medium text-foreground">
+          <div className="mt-0.5 text-base font-semibold text-foreground">
             {totalRounds} round{totalRounds !== 1 ? "s" : ""}
           </div>
         </div>
