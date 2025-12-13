@@ -44,7 +44,7 @@ const VerificationsPage = () => {
   });
 
   return (
-    <div className="p-6 space-y-section">
+    <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold">Verification</h1>
         <p className="text-muted-foreground">
@@ -53,26 +53,29 @@ const VerificationsPage = () => {
       </div>
 
       <Tabs value={activeType} onValueChange={handleTabChange}>
-        <TabsList>
-          <TabsTrigger value="businesses" className="gap-1.5">
-            <Building2 className="h-4 w-4" />
-            Businesses
-            {(businessPendingCount ?? 0) > 0 && (
-              <span className="ml-1 text-xs bg-amber-500/20 text-amber-600 px-1.5 py-0.5 rounded-full">
-                {businessPendingCount}
-              </span>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="people" className="gap-1.5">
-            <User className="h-4 w-4" />
-            People
-            {(peoplePendingCount ?? 0) > 0 && (
-              <span className="ml-1 text-xs bg-amber-500/20 text-amber-600 px-1.5 py-0.5 rounded-full">
-                {peoplePendingCount}
-              </span>
-            )}
-          </TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+          <TabsList className="inline-flex whitespace-nowrap">
+            <TabsTrigger value="businesses" className="gap-1.5">
+              <Building2 className="h-4 w-4 shrink-0" />
+              <span className="hidden sm:inline">Businesses</span>
+              <span className="sm:hidden">Biz</span>
+              {(businessPendingCount ?? 0) > 0 && (
+                <span className="ml-1 text-xs bg-amber-500/20 text-amber-600 px-1.5 py-0.5 rounded-full">
+                  {businessPendingCount}
+                </span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="people" className="gap-1.5">
+              <User className="h-4 w-4 shrink-0" />
+              People
+              {(peoplePendingCount ?? 0) > 0 && (
+                <span className="ml-1 text-xs bg-amber-500/20 text-amber-600 px-1.5 py-0.5 rounded-full">
+                  {peoplePendingCount}
+                </span>
+              )}
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="businesses" className="mt-6">
           <BusinessVerificationTab />

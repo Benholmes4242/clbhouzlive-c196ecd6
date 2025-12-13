@@ -152,7 +152,7 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
   return (
     <div className="space-y-4">
       {/* Search Bar */}
-      <div className="flex-1">
+      <div className="w-full">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
@@ -164,15 +164,15 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
         </div>
       </div>
 
-      {/* Cascading Dropdowns */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      {/* Cascading Dropdowns - Stack on mobile, row on desktop */}
+      <div className="flex flex-col gap-2 md:flex-row md:flex-wrap md:items-center md:gap-4">
         {/* Scope Filter (merged All Courses + Regions) */}
         <Select 
           value={regionalFilter.scope} 
           onValueChange={handleScopeChange}
           disabled={!!regionalFilter.top100List}
         >
-          <SelectTrigger className={`w-full sm:w-48 focus:ring-[#b66b41] focus:border-[#b66b41] bg-background border-border ${regionalFilter.top100List ? 'opacity-50' : ''}`}>
+          <SelectTrigger className={`w-full md:w-48 focus:ring-[#b66b41] focus:border-[#b66b41] bg-background border-border ${regionalFilter.top100List ? 'opacity-50' : ''}`}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="bg-popover border-border z-50">
@@ -189,7 +189,7 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
           value={regionalFilter.top100List || 'none'} 
           onValueChange={handleTop100ListChange}
         >
-          <SelectTrigger className="w-full sm:w-56 focus:ring-[#b66b41] focus:border-[#b66b41] bg-background border-border">
+          <SelectTrigger className="w-full md:w-56 focus:ring-[#b66b41] focus:border-[#b66b41] bg-background border-border">
             <SelectValue placeholder="Top 100 Courses" />
           </SelectTrigger>
           <SelectContent className="bg-popover border-border z-50">
@@ -209,7 +209,7 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
           value={regionalFilter.sortBy || 'name-asc'} 
           onValueChange={handleSortChange}
         >
-          <SelectTrigger className="w-full sm:w-60 focus:ring-[#b66b41] focus:border-[#b66b41] bg-background border-border">
+          <SelectTrigger className="w-full md:w-60 focus:ring-[#b66b41] focus:border-[#b66b41] bg-background border-border">
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="bg-popover border-border z-50">
@@ -228,7 +228,7 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
             value={regionalFilter.subCountry || ''} 
             onValueChange={handleSubCountryChange}
           >
-            <SelectTrigger className="w-full sm:w-48 focus:ring-[#b66b41] focus:border-[#b66b41] bg-background border-border">
+            <SelectTrigger className="w-full md:w-48 focus:ring-[#b66b41] focus:border-[#b66b41] bg-background border-border">
               <SelectValue placeholder={
                 regionalFilter.scope === 'usa' ? 'Select State' :
                 regionalFilter.scope === 'britain-ireland' ? 'Select Country' :
@@ -251,7 +251,7 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
             value={regionalFilter.county || ''} 
             onValueChange={handleCountyChange}
           >
-            <SelectTrigger className="w-full sm:w-48 focus:ring-[#b66b41] focus:border-[#b66b41] bg-background border-border">
+            <SelectTrigger className="w-full md:w-48 focus:ring-[#b66b41] focus:border-[#b66b41] bg-background border-border">
               <SelectValue placeholder="Select County" />
             </SelectTrigger>
             <SelectContent className="bg-popover border-border z-50 max-h-60 overflow-y-auto">
@@ -270,7 +270,7 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
             variant="outline"
             size="sm"
             onClick={clearFilters}
-            className="flex items-center gap-2 whitespace-nowrap"
+            className="flex items-center gap-2 whitespace-nowrap w-full md:w-auto"
           >
             <X className="h-4 w-4" />
             Clear Filters
