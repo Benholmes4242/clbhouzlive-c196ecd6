@@ -334,12 +334,14 @@ export type Database = {
           id: string
           is_deleted: boolean
           is_verified: boolean | null
+          last_verification_action: string | null
           location: string | null
           logo_url: string | null
           name: string
           phone: string | null
           slug: string | null
           updated_at: string | null
+          verification_cooldown_until: string | null
           verified_at: string | null
           verified_by: string | null
           website: string | null
@@ -354,12 +356,14 @@ export type Database = {
           id?: string
           is_deleted?: boolean
           is_verified?: boolean | null
+          last_verification_action?: string | null
           location?: string | null
           logo_url?: string | null
           name: string
           phone?: string | null
           slug?: string | null
           updated_at?: string | null
+          verification_cooldown_until?: string | null
           verified_at?: string | null
           verified_by?: string | null
           website?: string | null
@@ -374,12 +378,14 @@ export type Database = {
           id?: string
           is_deleted?: boolean
           is_verified?: boolean | null
+          last_verification_action?: string | null
           location?: string | null
           logo_url?: string | null
           name?: string
           phone?: string | null
           slug?: string | null
           updated_at?: string | null
+          verification_cooldown_until?: string | null
           verified_at?: string | null
           verified_by?: string | null
           website?: string | null
@@ -5419,6 +5425,39 @@ export type Database = {
           metadata?: Json | null
           reason?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      verification_audit_log: {
+        Row: {
+          action: string
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          metadata: Json | null
+          performed_by: string | null
+          reason: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          metadata?: Json | null
+          performed_by?: string | null
+          reason?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          metadata?: Json | null
+          performed_by?: string | null
+          reason?: string | null
         }
         Relationships: []
       }

@@ -26,12 +26,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { CheckCircle, XCircle, ExternalLink, Globe, Building2, Loader2, ShieldCheck, Mail, Users, Zap, ShieldOff } from 'lucide-react';
+import { CheckCircle, XCircle, ExternalLink, Globe, Building2, Loader2, ShieldCheck, Mail, Users, Zap, ShieldOff, ChevronDown, History } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useAdminVerificationQueueRealtime } from '@/hooks/useBusinessVerificationRealtime';
 import { useRequestDomainCheck } from '@/hooks/useDomainVerification';
 import { Input } from '@/components/ui/input';
+import { VerificationHistoryTimeline } from './VerificationHistoryTimeline';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface VerificationRequest {
   id: string;
@@ -149,6 +151,7 @@ const BusinessVerificationTab = () => {
   const pendingRequests = requests?.filter(r => r.status === 'pending') ?? [];
   const approvedRequests = requests?.filter(r => r.status === 'approved') ?? [];
   const rejectedRequests = requests?.filter(r => r.status === 'rejected') ?? [];
+  const revokedRequests = requests?.filter(r => r.status === 'revoked') ?? [];
 
   const submitReviewMutation = useMutation({
     mutationFn: async ({ requestId, decision, note }: { requestId: string; decision: string; note?: string }) => {
@@ -316,6 +319,8 @@ const BusinessVerificationTab = () => {
         return <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">Approved</Badge>;
       case 'rejected':
         return <Badge variant="secondary" className="bg-red-500/10 text-red-600 border-red-500/20">Rejected</Badge>;
+      case 'revoked':
+        return <Badge variant="secondary" className="bg-slate-500/10 text-slate-600 border-slate-500/20">Revoked</Badge>;
       default:
         return <Badge variant="outline">Unknown</Badge>;
     }
@@ -340,6 +345,13 @@ const BusinessVerificationTab = () => {
                   <Badge variant="secondary" className="bg-blue-500/10 text-blue-600 border-blue-500/20">
                     <CheckCircle className="h-3 w-3 mr-1" />
                     Verified
+                  </Badge>
+                )}
+                {/* Previously verified badge for revoked/pending requests */}
+                {request.status === 'revoked' && (
+                  <Badge variant="secondary" className="bg-slate-500/10 text-slate-600 border-slate-500/20">
+                    <History className="h-3 w-3 mr-1" />
+                    Previously verified
                   </Badge>
                 )}
               </div>
@@ -464,6 +476,22 @@ const BusinessVerificationTab = () => {
               </Button>
             </div>
           )}
+
+          {/* Verification History (admin-only, collapsible) */}
+          {business && (
+            <Collapsible>
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground hover:text-foreground w-full justify-start">
+                  <History className="h-4 w-4" />
+                  View verification history
+                  <ChevronDown className="h-3 w-3 ml-auto transition-transform group-data-[state=open]:rotate-180" />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="pt-3 border-t mt-3">
+                <VerificationHistoryTimeline businessId={business.id} />
+              </CollapsibleContent>
+            </Collapsible>
+          )}
         </div>
       </Card>
     );
@@ -487,6 +515,7 @@ const BusinessVerificationTab = () => {
           </TabsTrigger>
           <TabsTrigger value="approved">Approved ({approvedRequests.length})</TabsTrigger>
           <TabsTrigger value="rejected">Rejected ({rejectedRequests.length})</TabsTrigger>
+          <TabsTrigger value="revoked">Revoked ({revokedRequests.length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="pending" className="mt-4 space-y-4">
@@ -518,6 +547,16 @@ const BusinessVerificationTab = () => {
               <p className="text-muted-foreground text-sm mt-1">Rejected verifications will appear here.</p>
             </Card>
           ) : rejectedRequests.map(request => renderRequestCard(request, false))}
+        </TabsContent>
+
+        <TabsContent value="revoked" className="mt-4 space-y-4">
+          {revokedRequests.length === 0 ? (
+            <Card className="p-8 text-center">
+              <ShieldOff className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
+              <h3 className="font-medium text-lg">No revoked verifications</h3>
+              <p className="text-muted-foreground text-sm mt-1">Businesses that had verification removed will appear here.</p>
+            </Card>
+          ) : revokedRequests.map(request => renderRequestCard(request, false))}
         </TabsContent>
       </Tabs>
 
