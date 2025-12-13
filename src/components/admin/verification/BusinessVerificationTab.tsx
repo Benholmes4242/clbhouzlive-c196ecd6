@@ -35,6 +35,7 @@ import { useRequestDomainCheck } from '@/hooks/useDomainVerification';
 import { Input } from '@/components/ui/input';
 import { VerificationHistoryTimeline } from './VerificationHistoryTimeline';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ENABLE_VERIFICATION_BYPASS } from '@/lib/featureFlags';
 
 interface VerificationRequest {
   id: string;
@@ -649,18 +650,18 @@ const BusinessVerificationTab = () => {
                   Force approve
                 </Button>
               )}
-              {/* Bypass 2nd approval - DEV only, for system accounts after first approval */}
-              {import.meta.env.DEV && business?.is_system_account && hasAlreadyReviewed && myReview === 'approved' && approvalCount < requiredApprovals && (
+              {/* Bypass 2nd approval - Feature flag gated, for testing */}
+              {ENABLE_VERIFICATION_BYPASS && business && hasAlreadyReviewed && myReview === 'approved' && approvalCount < requiredApprovals && (
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => bypassSecondApprovalMutation.mutate({ requestId: request.id, businessId: business.id })}
                   disabled={processing}
-                  className="w-full md:w-auto gap-1.5 text-slate-600 border-slate-200 hover:bg-slate-50 text-xs md:text-sm"
-                  title="Test mode: simulates a second independent approval"
+                  className="w-full md:w-auto gap-1.5 text-orange-600 border-orange-200 hover:bg-orange-50 text-xs md:text-sm"
+                  title="Test mode: bypasses 2nd approval requirement"
                 >
                   <FastForward className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                  Bypass 2nd
+                  Bypass 2nd (Test)
                 </Button>
               )}
             </div>
@@ -713,15 +714,25 @@ const BusinessVerificationTab = () => {
   return (
     <div className="space-y-4">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-          <TabsList className="inline-flex whitespace-nowrap">
-            <TabsTrigger value="pending" className="gap-1.5">
+        {/* Status tabs - 2x2 grid on mobile, inline on desktop */}
+        <div className="grid grid-cols-2 gap-2 md:flex md:gap-2">
+          <TabsList className="col-span-2 grid grid-cols-2 gap-1.5 h-auto p-1 md:inline-flex md:h-10 md:gap-0 md:p-1">
+            <TabsTrigger value="pending" className="gap-1 text-xs md:text-sm justify-center py-2 md:py-1.5">
               Pending
-              {pendingRequests.length > 0 && <span className="ml-1 text-xs bg-amber-500/20 text-amber-600 px-1.5 py-0.5 rounded-full">{pendingRequests.length}</span>}
+              {pendingRequests.length > 0 && <span className="text-[10px] md:text-xs bg-amber-500/20 text-amber-600 px-1.5 py-0.5 rounded-full">{pendingRequests.length}</span>}
             </TabsTrigger>
-            <TabsTrigger value="approved">Approved ({approvedRequests.length})</TabsTrigger>
-            <TabsTrigger value="rejected">Rejected ({rejectedRequests.length})</TabsTrigger>
-            <TabsTrigger value="revoked">Revoked ({revokedRequests.length})</TabsTrigger>
+            <TabsTrigger value="approved" className="gap-1 text-xs md:text-sm justify-center py-2 md:py-1.5">
+              Approved
+              <span className="text-[10px] md:text-xs opacity-60">({approvedRequests.length})</span>
+            </TabsTrigger>
+            <TabsTrigger value="rejected" className="gap-1 text-xs md:text-sm justify-center py-2 md:py-1.5">
+              Rejected
+              <span className="text-[10px] md:text-xs opacity-60">({rejectedRequests.length})</span>
+            </TabsTrigger>
+            <TabsTrigger value="revoked" className="gap-1 text-xs md:text-sm justify-center py-2 md:py-1.5">
+              Revoked
+              <span className="text-[10px] md:text-xs opacity-60">({revokedRequests.length})</span>
+            </TabsTrigger>
           </TabsList>
         </div>
 
