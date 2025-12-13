@@ -26,7 +26,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { CheckCircle, XCircle, ExternalLink, Globe, Building2, Loader2, ShieldCheck, Mail, Users, Zap, ShieldOff, ChevronDown, History } from 'lucide-react';
+import { CheckCircle, XCircle, ExternalLink, Globe, Building2, Loader2, ShieldCheck, Mail, Users, Zap, ShieldOff, ChevronDown, History, FastForward } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useAdminVerificationQueueRealtime } from '@/hooks/useBusinessVerificationRealtime';
@@ -61,6 +61,7 @@ interface VerificationRequest {
     website: string | null;
     logo_url: string | null;
     is_verified: boolean;
+    is_system_account: boolean;
   } | null;
 }
 
@@ -118,7 +119,8 @@ const BusinessVerificationTab = () => {
             location,
             website,
             logo_url,
-            is_verified
+            is_verified,
+            is_system_account
           )
         `)
         .order('created_at', { ascending: false });
@@ -141,6 +143,30 @@ const BusinessVerificationTab = () => {
       return data as { request_id: string; decision: string }[];
     },
   });
+
+  // Fetch ALL reviews to get accurate approval counts per request
+  const { data: allReviews } = useQuery({
+    queryKey: ['admin-business-verification-all-reviews'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('business_verification_reviews')
+        .select('request_id, decision');
+
+      if (error) throw error;
+      return data as { request_id: string; decision: string }[];
+    },
+  });
+
+  // Compute approval counts from actual reviews (source of truth)
+  const approvalCountsByRequest = React.useMemo(() => {
+    const map = new Map<string, number>();
+    allReviews?.forEach(r => {
+      if (r.decision === 'approved') {
+        map.set(r.request_id, (map.get(r.request_id) || 0) + 1);
+      }
+    });
+    return map;
+  }, [allReviews]);
 
   const myReviewsByRequest = React.useMemo(() => {
     const map = new Map<string, string>();
@@ -178,6 +204,7 @@ const BusinessVerificationTab = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verifications-pending-count'] });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verification-my-reviews'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-business-verification-all-reviews'] });
       queryClient.invalidateQueries({ queryKey: ['verification-history'] });
       setApproveDialogOpen(false);
       setRejectModalOpen(false);
@@ -227,6 +254,7 @@ const BusinessVerificationTab = () => {
       toast.success('Business force approved for demo purposes.');
       queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verifications-pending-count'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-business-verification-all-reviews'] });
     },
     onError: (error: any) => {
       toast.error(error.message || 'Could not force approve. Please try again.');
@@ -252,6 +280,7 @@ const BusinessVerificationTab = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verifications-pending-count'] });
       queryClient.invalidateQueries({ queryKey: ['verification-history'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-business-verification-all-reviews'] });
       setRevokeModalOpen(false);
       setSelectedRequest(null);
       setRevokeReason('');
@@ -264,7 +293,70 @@ const BusinessVerificationTab = () => {
     },
   });
 
-  const processing = submitReviewMutation.isPending || requestDomainCheck.isPending || forceApproveMutation.isPending || revokeVerificationMutation.isPending;
+  // Mock approver ID for bypass functionality (simulates a second reviewer)
+  const MOCK_APPROVER_ID = '00000000-0000-0000-0000-000000000002';
+
+  // Bypass 2nd approval mutation - for system accounts only
+  const bypassSecondApprovalMutation = useMutation({
+    mutationFn: async ({ requestId, businessId }: { requestId: string; businessId: string }) => {
+      // Insert a synthetic second approval using mock approver ID
+      const { error: reviewError } = await supabase
+        .from('business_verification_reviews')
+        .insert({
+          request_id: requestId,
+          reviewer_id: MOCK_APPROVER_ID,
+          decision: 'approved',
+          note: 'Bypass approval for system account testing',
+        });
+
+      if (reviewError) throw reviewError;
+
+      // Update the verification request to approved
+      const { error: requestError } = await supabase
+        .from('business_verification_requests')
+        .update({
+          status: 'approved',
+          approval_count: 2,
+          reviewed_at: new Date().toISOString(),
+          reviewed_by: currentUser?.id,
+          admin_note: 'Approved via bypass for system account testing',
+          domain_confirmed: true,
+          domain_confirmed_at: new Date().toISOString(),
+        })
+        .eq('id', requestId);
+
+      if (requestError) throw requestError;
+
+      // Set the business as verified
+      const { error: businessError } = await supabase
+        .from('business_accounts')
+        .update({
+          is_verified: true,
+          verified_at: new Date().toISOString(),
+          verified_by: currentUser?.id,
+        })
+        .eq('id', businessId);
+
+      if (businessError) throw businessError;
+
+      return { success: true };
+    },
+    onSuccess: () => {
+      toast.success('2nd approval bypassed', {
+        description: 'Business has been verified (system account test mode).',
+      });
+      queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-business-verifications-pending-count'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-business-verification-all-reviews'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-business-verification-my-reviews'] });
+      queryClient.invalidateQueries({ queryKey: ['verification-history'] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Could not bypass approval. Please try again.');
+    },
+  });
+
+  const processing = submitReviewMutation.isPending || requestDomainCheck.isPending || forceApproveMutation.isPending || revokeVerificationMutation.isPending || bypassSecondApprovalMutation.isPending;
 
   const openRejectModal = (request: VerificationRequest) => {
     setSelectedRequest(request);
@@ -334,7 +426,8 @@ const BusinessVerificationTab = () => {
     const business = request.business;
     const myReview = myReviewsByRequest.get(request.id);
     const hasAlreadyReviewed = !!myReview;
-    const approvalCount = request.approval_count ?? 0;
+    // Use computed approval count from actual reviews (source of truth)
+    const approvalCount = approvalCountsByRequest.get(request.id) ?? 0;
     const requiredApprovals = request.required_approvals ?? 2;
     
     return (
@@ -460,6 +553,20 @@ const BusinessVerificationTab = () => {
                 >
                   <Zap className="h-4 w-4" />
                   Force approve (demo)
+                </Button>
+              )}
+              {/* Bypass 2nd approval - only for system accounts after first approval */}
+              {business?.is_system_account && hasAlreadyReviewed && myReview === 'approved' && approvalCount < requiredApprovals && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => bypassSecondApprovalMutation.mutate({ requestId: request.id, businessId: business.id })}
+                  disabled={processing}
+                  className="gap-1.5 text-slate-600 border-slate-200 hover:bg-slate-50"
+                  title="Test mode: simulates a second independent approval"
+                >
+                  <FastForward className="h-4 w-4" />
+                  Bypass 2nd approval
                 </Button>
               )}
             </div>
