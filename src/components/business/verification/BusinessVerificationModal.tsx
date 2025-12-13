@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check, Loader2, ExternalLink, ChevronRight } from 'lucide-react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -164,10 +164,10 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
         <div className="sticky top-0 z-10 bg-background border-b border-border/40 px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold">Get your business verified</h2>
-              <p className="text-sm text-muted-foreground mt-0.5">
+              <DialogTitle className="text-lg font-semibold">Get your business verified</DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground mt-0.5">
                 Verification confirms this account officially represents the business and helps golfers trust the profile.
-              </p>
+              </DialogDescription>
             </div>
             <button
               onClick={handleClose}
