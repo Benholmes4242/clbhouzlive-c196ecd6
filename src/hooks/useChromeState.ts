@@ -35,6 +35,8 @@ export const useChromeState = ({
   disableDirectionalReveal = false,
   progressiveImmersion = false,
 }: UseChromeStateOptions = {}) => {
+  // ⚠️ AUTO-HIDE DISABLED: Chrome is now always visible
+  // All hide logic is bypassed - the state is locked to 'visible'
   const [chromeState, setChromeState] = useState<ChromeState>('visible');
   const scrollMetricsRef = useRef<ScrollMetrics>({ deltaY: 0, scrollTop: 0, velocity: 0 });
   const lastScrollTop = useRef(0);
@@ -42,6 +44,9 @@ export const useChromeState = ({
   const revealTimer = useRef<number | null>(null);
   const hideTimer = useRef<number | null>(null);
   const forceHiddenRef = useRef(false);
+  
+  // DISABLED: Always keep chrome visible regardless of forceHidden prop
+  const CHROME_HIDE_DISABLED = true;
   
   // Progressive immersion: track if user has performed a meaningful interaction
   const hasHadMeaningfulInteraction = useRef(false);
@@ -68,8 +73,16 @@ export const useChromeState = ({
   }, []);
 
   // Handle forceHidden state changes
+  // ⚠️ DISABLED: Chrome no longer hides, even when overlays open
   useEffect(() => {
     forceHiddenRef.current = forceHidden;
+    
+    // DISABLED: Always keep chrome visible
+    if (CHROME_HIDE_DISABLED) {
+      hideReasonRef.current = 'none';
+      setChromeState('visible');
+      return;
+    }
     
     if (forceHidden) {
       // When overlay opens, hide chrome immediately
@@ -83,17 +96,10 @@ export const useChromeState = ({
   }, [forceHidden]);
 
   // Apply chrome state to body class
+  // ⚠️ DISABLED: Always remove chrome-hidden class
   useEffect(() => {
-    if (disabled) {
-      document.body.classList.remove('chrome-hidden');
-      return;
-    }
-    
-    if (chromeState === 'hidden') {
-      document.body.classList.add('chrome-hidden');
-    } else {
-      document.body.classList.remove('chrome-hidden');
-    }
+    // DISABLED: Always visible, never add chrome-hidden
+    document.body.classList.remove('chrome-hidden');
     
     return () => {
       document.body.classList.remove('chrome-hidden');
@@ -105,7 +111,11 @@ export const useChromeState = ({
     return scrollTop <= TOP_GUARD_PX;
   }, []);
 
+  // ⚠️ DISABLED: scheduleHide is now a no-op
   const scheduleHide = useCallback((ms: number, reason: HideReason = 'scroll') => {
+    // DISABLED: Chrome hiding is disabled
+    if (CHROME_HIDE_DISABLED) return;
+    
     if (forceHiddenRef.current || disabled) return;
     if (revealTimer.current) {
       clearTimeout(revealTimer.current);
@@ -160,7 +170,11 @@ export const useChromeState = ({
     setChromeState('visible');
   }, [disabled]);
   
+  // ⚠️ DISABLED: hideChromeImmediate is now a no-op
   const hideChromeImmediate = useCallback((reason: HideReason = 'scroll') => {
+    // DISABLED: Chrome hiding is disabled
+    if (CHROME_HIDE_DISABLED) return;
+    
     if (forceHiddenRef.current || disabled) return;
     if (hideTimer.current) clearTimeout(hideTimer.current);
     if (revealTimer.current) clearTimeout(revealTimer.current);
@@ -168,8 +182,11 @@ export const useChromeState = ({
     setChromeState('hidden');
   }, [disabled]);
 
-  // Progressive immersion: hide chrome after meaningful interaction
+  // ⚠️ DISABLED: Progressive immersion no longer hides chrome
   const triggerProgressiveHide = useCallback(() => {
+    // DISABLED: Chrome hiding is disabled
+    if (CHROME_HIDE_DISABLED) return;
+    
     if (!progressiveImmersion) return;
     if (forceHiddenRef.current || disabled) return;
     if (hasHadMeaningfulInteraction.current) return; // Only trigger once

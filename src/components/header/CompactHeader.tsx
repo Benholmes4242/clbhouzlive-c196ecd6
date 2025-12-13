@@ -23,14 +23,14 @@ interface CompactHeaderProps {
 const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isHidden: scrollHidden } = useScrollDirection();
+  // DISABLED: Scroll-based hiding removed - header is now always visible
+  // const { isHidden: scrollHidden } = useScrollDirection();
   const { user } = useSupabaseSession();
   const { hasUnread } = useUnreadNotifications();
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   
-  // On Clubhouse, use the chrome system (body.chrome-hidden .chrome-header)
-  // On other pages, use scroll direction
+  // Keep for reference but no longer used for hide/show logic
   const isClubhousePage = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
 
   const handleLogoClick = () => {
@@ -43,14 +43,13 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         data-chrome="header"
         className={cn(
           "compact-header",
-          // Add chrome-header class on Clubhouse for auto-hide system
+          // Keep chrome-header class for compatibility but no hide/show behavior
           isClubhousePage && "chrome-header",
           "fixed top-0 left-0 right-0 z-header",
           "h-14", // 56px
-          // On non-Clubhouse pages, use scroll direction transition + hide/show
-          // On Clubhouse, chrome-autohide.css handles the transition
-          !isClubhousePage && "transition-transform duration-200 ease-out",
-          !isClubhousePage && scrollHidden && "-translate-y-full",
+          // DISABLED: No slide animations - header always visible
+          // !isClubhousePage && "transition-transform duration-200 ease-out",
+          // !isClubhousePage && scrollHidden && "-translate-y-full",
           className
         )}
         style={{
