@@ -40,7 +40,7 @@ const Top100LeaderboardPanel = () => {
   };
 
   return (
-    <div className="w-full space-y-4 pb-6">
+    <div className="w-full space-y-4 pb-6 -mx-4">
       {/* Closest Goal Strip - full bleed */}
       {showGoalsBanner && (
         <div className="w-full">
@@ -87,7 +87,7 @@ const Top100LeaderboardPanel = () => {
       )}
 
       {/* Tabs - sticky once scrolled */}
-      <Tabs value={view} onValueChange={handleViewChange} className="w-full">
+      <Tabs value={view} onValueChange={handleViewChange} className="w-full px-4">
         <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm pb-2">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="players">Players</TabsTrigger>
