@@ -1,6 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { Menu } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useSidebar } from '@/components/ui/sidebar';
 import AdminSidebar from './AdminSidebar';
 import AdminOverview from './AdminOverview';
 import ExcelCourseImporter from '@/components/courses/ExcelCourseImporter';
@@ -102,10 +105,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ users, onRoleChange, us
         <AdminSidebar />
         <SidebarInset className="flex-1">
           <div className="p-6">
-            {/* Mobile sidebar trigger - floating button */}
-            <div className="md:hidden mb-4">
-              <SidebarTrigger className="h-10 w-10 border bg-card shadow-sm" />
-            </div>
             {renderContent()}
           </div>
         </SidebarInset>

@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, UserCheck, Shield, ShieldAlert, AlertCircle } from "lucide-react";
+import { Users, UserCheck, Shield, ShieldAlert, AlertCircle, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useSidebar } from "@/components/ui/sidebar";
 
 type Metrics = {
   total_users: number;
@@ -19,6 +20,7 @@ export function AdminOverviewPage() {
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { toggleSidebar } = useSidebar();
 
   useEffect(() => {
     loadMetrics();
@@ -49,9 +51,19 @@ export function AdminOverviewPage() {
   return (
     <div className="min-h-screen overflow-x-hidden">
       <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-          <p className="text-sm text-muted-foreground">System overview and metrics</p>
+        <div className="flex items-center gap-3">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="md:hidden h-10 w-10"
+            onClick={toggleSidebar}
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+            <p className="text-sm text-muted-foreground">System overview and metrics</p>
+          </div>
         </div>
 
         {/* Warning banners */}
