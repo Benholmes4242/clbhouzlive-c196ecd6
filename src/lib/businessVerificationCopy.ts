@@ -244,10 +244,32 @@ export const BUSINESS_VERIFICATION_COPY: Record<BusinessVerificationEvent, Verif
 };
 
 /**
- * Get copy for a specific verification event
+ * Fallback copy for unknown notification types (future-proofing)
  */
-export function getVerificationCopy(event: BusinessVerificationEvent): VerificationCopySet {
-  return BUSINESS_VERIFICATION_COPY[event];
+export const FALLBACK_VERIFICATION_COPY: VerificationCopySet = {
+  title: 'Update',
+  body: "There's an update on your account.",
+  push: 'Account update',
+  audit: 'Verification event occurred.',
+  email_subject: 'Account update',
+  email_body: "There's an update on your Clbhouz account. Open the app for details."
+};
+
+/**
+ * Get copy for a specific verification event (with safe fallback)
+ */
+export function getVerificationCopy(event: BusinessVerificationEvent | string): VerificationCopySet {
+  if (event in BUSINESS_VERIFICATION_COPY) {
+    return BUSINESS_VERIFICATION_COPY[event as BusinessVerificationEvent];
+  }
+  return FALLBACK_VERIFICATION_COPY;
+}
+
+/**
+ * Safely get event from notification type (with undefined fallback)
+ */
+export function getEventFromNotificationType(notificationType: string): BusinessVerificationEvent | undefined {
+  return NOTIFICATION_TYPE_TO_EVENT[notificationType];
 }
 
 /**
