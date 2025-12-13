@@ -8,11 +8,16 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { format } from 'date-fns';
+import { useBusinessVerificationRealtime, useVerificationNotificationsRealtime } from '@/hooks/useBusinessVerificationRealtime';
 
 const BusinessVerificationStatusPage = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { user } = useSupabaseSession();
+
+  // Enable realtime updates for instant status changes
+  useBusinessVerificationRealtime(id);
+  useVerificationNotificationsRealtime(user?.id);
 
   // Fetch business account
   const { data: business, isLoading: isLoadingBusiness } = useQuery({
