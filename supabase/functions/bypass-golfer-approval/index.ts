@@ -15,7 +15,7 @@ const supabaseAdmin = createClient(
 // Mock approver UUID for bypass testing
 const MOCK_APPROVER_ID = "00000000-0000-0000-0000-000000000002";
 
-async function isSuperAdmin(userId: string): Promise<boolean> {
+async function isAdmin(userId: string): Promise<boolean> {
   const { data, error } = await supabaseAdmin
     .from("admin_memberships")
     .select("role")
@@ -27,7 +27,8 @@ async function isSuperAdmin(userId: string): Promise<boolean> {
     return false;
   }
 
-  return !!data && ["super_admin", "admin", "moderator"].includes(data.role);
+  // Actual roles in DB are "full" and "limited"
+  return !!data && ["full", "limited"].includes(data.role);
 }
 
 serve(async (req) => {
@@ -58,7 +59,7 @@ serve(async (req) => {
 
     const adminUserId = userData.user.id;
     
-    if (!(await isSuperAdmin(adminUserId))) {
+    if (!(await isAdmin(adminUserId))) {
       return new Response(JSON.stringify({ ok: false, error: "Forbidden - Admin required" }), {
         status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
