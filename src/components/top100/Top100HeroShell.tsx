@@ -108,13 +108,6 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
             <div className="h-full w-full bg-gradient-to-br from-slate-800 to-slate-900" />
           )}
           
-          {/* Subtle bottom fade - only 64px tall, doesn't touch title */}
-          <div 
-            className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none"
-            style={{
-              background: 'linear-gradient(to bottom, rgba(47,58,74,0) 0%, rgba(47,58,74,0.7) 100%)'
-            }}
-          />
           
           {/* Back button */}
           {onBack && (
