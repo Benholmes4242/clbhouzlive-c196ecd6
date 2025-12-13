@@ -106,8 +106,16 @@ const MyBusinessesPage = () => {
         {!isLoading && hasBusinesses && (
           <div>
             {businesses.map((membership, index) => {
-              // Check if this business is the currently active actor
-              const isActive = activeActor?.type === 'business' && activeActor?.id === membership.business.id;
+              // Resilient Active pill logic:
+              // - If only 1 business → always show Active
+              // - If multiple businesses → show Active based on activeActor match
+              // - If no activeActor set → default to first business
+              const isSingleBusiness = businesses.length === 1;
+              const hasActiveActor = activeActor?.type === 'business' && activeActor?.id;
+              const isExactMatch = activeActor?.type === 'business' && activeActor?.id === membership.business.id;
+              const isFirstBusiness = index === 0;
+              
+              const isActive = isSingleBusiness || isExactMatch || (!hasActiveActor && isFirstBusiness);
               
               return (
                 <BusinessCommandCard
