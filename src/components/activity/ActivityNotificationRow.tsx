@@ -70,6 +70,10 @@ function getActorDisplayName(notification: ActivityNotification): string {
   if (notification.type?.startsWith('business_verification')) {
     const businessName = notification.data?.business_name;
     if (businessName) return businessName;
+    // Fallback to title which now contains business name
+    if (notification.title && notification.title !== 'Business verification removed') {
+      return notification.title;
+    }
   }
   
   // For system notifications, use Clbhouz Team
@@ -85,6 +89,15 @@ function getActorDisplayName(notification: ActivityNotification): string {
   
   // Default to Clbhouz Team for system-like notifications
   return 'Clbhouz Team';
+}
+
+function getActorAvatarUrl(notification: ActivityNotification): string | null {
+  // For business notifications, use business logo from data if available
+  if (notification.type?.startsWith('business_verification')) {
+    const businessLogo = notification.data?.business_logo_url;
+    if (businessLogo) return businessLogo;
+  }
+  return notification.actor_avatar_url;
 }
 
 function renderNotificationText(notification: ActivityNotification): string {
@@ -121,6 +134,8 @@ function renderNotificationText(notification: ActivityNotification): string {
       return 'Your business is verified';
     case 'business_verification_rejected':
       return 'Verification not approved';
+    case 'business_verification_revoked':
+      return 'Business verification removed';
     case 'business_verification_domain_required':
       return 'Action required: verify your business email domain';
     default:
@@ -134,20 +149,25 @@ interface AvatarWithBadgeProps {
   badgeIcon: React.ReactNode;
 }
 
-const AvatarWithBadge: React.FC<AvatarWithBadgeProps> = ({ notification, badgeIcon }) => (
-  <div className="relative shrink-0" style={{ width: 48, height: 50 }}>
-    <SquircleAvatar
-      src={notification.actor_avatar_url}
-      alt={notification.actor_display_name || 'User'}
-      size={48}
-      fallback={notification.actor_display_name?.charAt(0) || '?'}
-      ringColor={getRingColorForTotalPlayed(notification.data?.actor_total_top100_played || 0)}
-    />
-    <span className="absolute bottom-0 right-0 translate-x-1 translate-y-1 h-5 w-5 rounded-full border-2 border-background bg-background flex items-center justify-center shadow-sm">
-      {badgeIcon}
-    </span>
-  </div>
-);
+const AvatarWithBadge: React.FC<AvatarWithBadgeProps> = ({ notification, badgeIcon }) => {
+  const avatarUrl = getActorAvatarUrl(notification);
+  const displayName = getActorDisplayName(notification);
+  
+  return (
+    <div className="relative shrink-0" style={{ width: 48, height: 50 }}>
+      <SquircleAvatar
+        src={avatarUrl}
+        alt={displayName || 'User'}
+        size={48}
+        fallback={displayName?.charAt(0) || '?'}
+        ringColor={getRingColorForTotalPlayed(notification.data?.actor_total_top100_played || 0)}
+      />
+      <span className="absolute bottom-0 right-0 translate-x-1 translate-y-1 h-5 w-5 rounded-full border-2 border-background bg-background flex items-center justify-center shadow-sm">
+        {badgeIcon}
+      </span>
+    </div>
+  );
+};
 
 // LinkedIn-style flat row component
 interface FlatRowProps {
