@@ -7009,6 +7009,10 @@ export type Database = {
         Args: { review_id_param: string }
         Returns: undefined
       }
+      reinvite_golfer_verification_request: {
+        Args: { p_admin_id: string; p_note?: string; p_request_id: string }
+        Returns: Json
+      }
       reject_business_verification: {
         Args: { _admin_note: string; _request_id: string }
         Returns: undefined

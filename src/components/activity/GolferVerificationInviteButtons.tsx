@@ -54,7 +54,7 @@ export const GolferVerificationInviteButtons: React.FC<GolferVerificationInviteB
     return (
       <span className="inline-flex items-center gap-1 px-3 h-6 text-[11px] font-semibold rounded-sq-xs border border-emerald-500 bg-emerald-500/10 text-emerald-600">
         <Check className="h-3 w-3" />
-        Accepted
+        Request submitted
       </span>
     );
   }
@@ -63,7 +63,7 @@ export const GolferVerificationInviteButtons: React.FC<GolferVerificationInviteB
     return (
       <span className="inline-flex items-center gap-1 px-3 h-6 text-[11px] font-semibold rounded-sq-xs border border-muted-foreground/30 bg-muted text-muted-foreground">
         <X className="h-3 w-3" />
-        Declined
+        Invite declined
       </span>
     );
   }
