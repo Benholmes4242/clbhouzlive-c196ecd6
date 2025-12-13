@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
@@ -27,6 +28,10 @@ const BUSINESS_CATEGORIES_WITH_ICONS = [
   { value: 'Other', label: 'Other', icon: Building2 },
 ];
 
+/**
+ * Screen 3: "Business details" (Step 2 of 2)
+ * Reduced "gov form" feeling, clarified what's public, reduced anxiety
+ */
 const BusinessCreatePage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -162,45 +167,51 @@ const BusinessCreatePage = () => {
       {/* Header */}
       <header className="sticky top-0 z-20 border-b border-border/40 bg-background/95 backdrop-blur">
         <div className="mx-auto w-full max-w-3xl px-4 pt-3 pb-3">
-          {/* Back link */}
+          {/* Back link - slate color */}
           <button
             onClick={handleBack}
-            className="inline-flex items-center gap-1 text-xs text-primary hover:underline mb-2"
+            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors mb-2"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             <span>Back</span>
           </button>
 
-          {/* Step indicator + Title */}
+          {/* Step indicator - muted */}
           <div className="flex items-center justify-center gap-2">
-            <span className="text-[11px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-sq-pill">
+            <span className="text-[10px] font-medium text-muted-foreground/70">
               Step 2 of 2
             </span>
           </div>
-          <h1 className="text-xl font-semibold text-center mt-1">Business details</h1>
+          
+          {/* Title */}
+          <h1 className="text-xl font-semibold text-center mt-1 text-foreground">
+            Set up your business profile
+          </h1>
+          
+          {/* Subtitle */}
+          <p className="text-sm text-muted-foreground text-center mt-1">
+            This is how your business will appear to golfers on Clbhouz.
+          </p>
         </div>
       </header>
 
       {/* Content */}
       <main className="flex-1">
         <div className="mx-auto w-full max-w-3xl pb-28">
-          {/* Band A: Business Identity */}
+          {/* Section: Business Identity */}
           <motion.section
             custom={0}
             initial="hidden"
             animate="visible"
             variants={sectionVariants}
-            className="px-4 py-5 bg-background"
+            className="px-4 py-5 bg-background border-b border-border/30"
           >
             <div className="flex items-center gap-2 mb-1">
               <Building2 className="w-4 h-4 text-muted-foreground" />
               <h2 className="text-sm font-semibold text-foreground">Business identity</h2>
             </div>
-            <p className="text-xs text-muted-foreground mb-4">
-              How your business appears on Clbhouz.
-            </p>
 
-            <div className="space-y-4">
+            <div className="space-y-4 mt-4">
               <div className="space-y-1.5">
                 <Label htmlFor="businessName" className="text-xs text-muted-foreground">
                   Business Name <span className="text-destructive">*</span>
@@ -214,7 +225,7 @@ const BusinessCreatePage = () => {
                   autoCapitalize="words"
                 />
                 <p className="text-[11px] text-muted-foreground">
-                  This will appear publicly on your profile.
+                  This is shown publicly on your profile and in search.
                 </p>
               </div>
 
@@ -244,7 +255,7 @@ const BusinessCreatePage = () => {
                   </SelectContent>
                 </Select>
                 <p className="text-[11px] text-muted-foreground">
-                  Helps golfers find the right type of business.
+                  This helps golfers find the right type of business.
                 </p>
               </div>
 
@@ -266,30 +277,27 @@ const BusinessCreatePage = () => {
                   maxLength={500}
                 />
                 <p className="text-[11px] text-muted-foreground">
-                  Highlight what makes you different — facilities, coaching, events, or anything golfers should know.
+                  Tip: Mention what makes you different — facilities, coaching style, atmosphere, or events.
                 </p>
               </div>
             </div>
           </motion.section>
 
-          {/* Band B: Location & Contact */}
+          {/* Section: Location & Contact */}
           <motion.section
             custom={1}
             initial="hidden"
             animate="visible"
             variants={sectionVariants}
-            className="px-4 py-5 bg-muted/30"
+            className="px-4 py-5 bg-muted/30 border-b border-border/30"
           >
             <div className="flex items-center gap-2 mb-1">
               <MapPin className="w-4 h-4 text-muted-foreground" />
               <h2 className="text-sm font-semibold text-foreground">Location & contact</h2>
             </div>
-            <p className="text-xs text-muted-foreground mb-1">
-              Where you are and how golfers reach you.
-            </p>
             
             {!isValid && formData.businessName.trim().length > 0 && (
-              <p className="text-xs text-amber-700 mb-4">
+              <p className="text-xs text-muted-foreground mt-1">
                 Add a location and at least one contact method (website or email) to continue.
               </p>
             )}
@@ -309,7 +317,7 @@ const BusinessCreatePage = () => {
                   error={locationError || undefined}
                 />
                 <p className="text-[11px] text-muted-foreground">
-                  Choose the main location for your business.
+                  Choose your main base so golfers know where to find you.
                 </p>
               </div>
 
@@ -325,9 +333,6 @@ const BusinessCreatePage = () => {
                   placeholder="https://yourwebsite.com"
                   className="h-10"
                 />
-                <p className="text-[11px] text-muted-foreground">
-                  Use your main booking or information page.
-                </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -358,36 +363,48 @@ const BusinessCreatePage = () => {
                 </div>
               </div>
 
-              <p className="text-[11px] text-muted-foreground pt-2 border-t border-border/40">
-                We'll only use these details to help golfers contact you — we won't share them with third parties.
+              <p className="text-[11px] text-muted-foreground pt-3 border-t border-border/30">
+                We'll only use this to help golfers contact you — never shared with third parties.
               </p>
             </div>
+          </motion.section>
+
+          {/* Verification hint */}
+          <motion.section
+            custom={2}
+            initial="hidden"
+            animate="visible"
+            variants={sectionVariants}
+            className="px-4 py-4"
+          >
+            <p className="text-[11px] text-muted-foreground">
+              You can request verification once your profile is live.
+            </p>
           </motion.section>
         </div>
       </main>
 
       {/* Sticky Footer */}
-      <footer className="fixed inset-x-0 bottom-0 z-20 border-t bg-background/95 backdrop-blur">
+      <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-border/40 bg-background/95 backdrop-blur">
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-3">
+          {/* Secondary: text button */}
           <button
             type="button"
             onClick={handleBack}
             disabled={saving}
-            className="inline-flex h-10 flex-1 items-center justify-center rounded-full border border-input bg-background text-sm font-medium text-muted-foreground hover:bg-muted transition-colors"
+            className="flex-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2.5"
           >
             Cancel
           </button>
 
-          <button
-            type="button"
+          {/* Primary: slate button */}
+          <Button
+            variant="secondary"
             onClick={handleSubmit}
             disabled={saving || saveSuccess || !isValid}
             className={cn(
-              "inline-flex h-11 flex-[1.5] items-center justify-center rounded-full px-5 text-sm font-semibold transition-all",
-              "bg-amber-500 text-white shadow-sm",
-              "hover:bg-amber-600 active:scale-[0.99]",
-              "disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-amber-300",
-              saveSuccess && "bg-emerald-500"
+              "flex-[1.5] h-11",
+              saveSuccess && "bg-emerald-500 hover:bg-emerald-500 text-white"
             )}
           >
             <AnimatePresence mode="wait">
@@ -425,11 +442,11 @@ const BusinessCreatePage = () => {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 >
-                  Create Business
+                  Create business profile
                 </motion.span>
               )}
             </AnimatePresence>
-          </button>
+          </Button>
         </div>
       </footer>
     </PageRoot>
