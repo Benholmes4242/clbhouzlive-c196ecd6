@@ -40,7 +40,7 @@ const TeamManagement = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col gap-4 md:flex-row md:justify-between md:items-center">
         <div>
           <h2 className="text-2xl font-bold mb-2">Team Management</h2>
           <p className="text-muted-foreground">Manage your admin team members and their permissions</p>
@@ -64,33 +64,38 @@ const TeamManagement = () => {
           ) : (
             <div className="space-y-4">
               {adminProfiles.map((profile) => (
-                <div key={profile.id} className="flex items-center justify-between p-4 border rounded-sq-sm">
+                <div key={profile.id} className="flex flex-col gap-3 p-4 border rounded-sq-sm md:flex-row md:items-center md:justify-between">
+                  {/* Row 1: Avatar + Name */}
                   <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
                       <span className="text-sm font-medium text-primary">
                         {profile.first_name.charAt(0)}{profile.last_name.charAt(0)}
                       </span>
                     </div>
-                    <div>
-                      <div className="font-medium">{profile.first_name} {profile.last_name}</div>
-                      <div className="text-sm text-muted-foreground">{profile.email}</div>
+                    <div className="min-w-0">
+                      <div className="font-medium truncate">{profile.first_name} {profile.last_name}</div>
+                      <div className="text-sm text-muted-foreground truncate">{profile.email}</div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-4">
+                  
+                  {/* Row 2 (mobile) / inline (desktop): Role + Actions + Date */}
+                  <div className="flex flex-col gap-2 md:flex-row md:items-center md:space-x-4">
                     <AdminRoleDropdown 
                       profile={profile}
                       currentUserId={user?.id || ''}
                       onRoleChanged={refetch}
                     />
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setEditingProfile(profile)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <div className="text-sm text-muted-foreground">
-                      Joined {new Date(profile.created_at).toLocaleDateString()}
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setEditingProfile(profile)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <div className="text-sm text-muted-foreground whitespace-nowrap">
+                        Joined {new Date(profile.created_at).toLocaleDateString()}
+                      </div>
                     </div>
                   </div>
                 </div>

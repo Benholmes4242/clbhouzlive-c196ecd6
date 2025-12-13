@@ -17,7 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MapPin, Trophy, Edit, ExternalLink } from 'lucide-react';
 import { GolfCourse, Top100ListKey } from './types';
-import { formatDistanceToNow } from 'date-fns';
+import GolfCoursesMobileCard from './GolfCoursesMobileCard';
 
 interface GolfCoursesTableProps {
   courses: GolfCourse[];
@@ -254,49 +254,70 @@ const GolfCoursesTable: React.FC<GolfCoursesTableProps> = ({
   });
 
   return (
-    <div className="rounded-md border bg-background">
-      <Table>
-        <TableHeader className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead key={header.id} className="h-10">
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.original.id}
-                className="group cursor-pointer hover:bg-muted/50 h-16"
-                onClick={() => onEdit(row.original)}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="py-2">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
+    <>
+      {/* Mobile: Card layout */}
+      <div className="block md:hidden space-y-2">
+        {courses.length > 0 ? (
+          courses.map((course) => (
+            <GolfCoursesMobileCard
+              key={course.id}
+              course={course}
+              onEdit={onEdit}
+              activeTop100Filter={activeTop100Filter}
+            />
+          ))
+        ) : (
+          <div className="text-center py-8 text-muted-foreground">
+            No results.
+          </div>
+        )}
+      </div>
+
+      {/* Desktop: Table layout */}
+      <div className="hidden md:block rounded-md border bg-background">
+        <Table>
+          <TableHeader className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id} className="h-10">
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
                 ))}
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.original.id}
+                  className="group cursor-pointer hover:bg-muted/50 h-16"
+                  onClick={() => onEdit(row.original)}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className="py-2">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </>
   );
 };
 

@@ -9,14 +9,14 @@ export default function AdminLayout() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="flex h-screen w-full bg-background">
+    <div className="flex h-screen w-full max-w-full overflow-x-hidden bg-background">
       {/* Desktop sidebar */}
       <aside className="w-[260px] shrink-0 border-r border-border hidden md:block">
         <AdminSidebar />
       </aside>
 
       {/* Mobile header + drawer */}
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col min-w-0">
         <header className="flex h-14 items-center gap-4 border-b border-border px-4 md:hidden">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
@@ -29,11 +29,11 @@ export default function AdminLayout() {
               <AdminSidebar onNavigate={() => setOpen(false)} />
             </SheetContent>
           </Sheet>
-          <span className="font-semibold text-foreground">Admin Panel</span>
+          <span className="font-semibold text-foreground truncate">Admin Panel</span>
         </header>
 
-        <main className="flex-1 overflow-y-auto">
-          <div className="p-4 md:p-6">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden">
+          <div className="p-4 md:p-6 max-w-full pb-[calc(env(safe-area-inset-bottom)+16px)]">
             <Outlet />
           </div>
         </main>

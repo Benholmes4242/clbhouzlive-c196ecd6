@@ -680,15 +680,17 @@ const BusinessVerificationTab = () => {
   return (
     <div className="space-y-4">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="pending" className="gap-1.5">
-            Pending
-            {pendingRequests.length > 0 && <span className="ml-1 text-xs bg-amber-500/20 text-amber-600 px-1.5 py-0.5 rounded-full">{pendingRequests.length}</span>}
-          </TabsTrigger>
-          <TabsTrigger value="approved">Approved ({approvedRequests.length})</TabsTrigger>
-          <TabsTrigger value="rejected">Rejected ({rejectedRequests.length})</TabsTrigger>
-          <TabsTrigger value="revoked">Revoked ({revokedRequests.length})</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+          <TabsList className="inline-flex whitespace-nowrap">
+            <TabsTrigger value="pending" className="gap-1.5">
+              Pending
+              {pendingRequests.length > 0 && <span className="ml-1 text-xs bg-amber-500/20 text-amber-600 px-1.5 py-0.5 rounded-full">{pendingRequests.length}</span>}
+            </TabsTrigger>
+            <TabsTrigger value="approved">Approved ({approvedRequests.length})</TabsTrigger>
+            <TabsTrigger value="rejected">Rejected ({rejectedRequests.length})</TabsTrigger>
+            <TabsTrigger value="revoked">Revoked ({revokedRequests.length})</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="pending" className="mt-4 space-y-4">
           <p className="text-sm text-muted-foreground">Each request requires two independent approvals. Any single rejection immediately rejects the request.</p>

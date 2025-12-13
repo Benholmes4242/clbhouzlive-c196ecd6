@@ -193,125 +193,247 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, onRoleChange }) 
         <CardTitle>Users Management</CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Email</TableHead>
-              <TableHead>Display Name</TableHead>
-              <TableHead>Username</TableHead>
-              <TableHead>Home Club</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Last Sign In</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {localUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.email}</TableCell>
-                <TableCell>{user.display_name || '-'}</TableCell>
-                <TableCell>{user.username || '-'}</TableCell>
-                <TableCell>{user.home_club || '-'}</TableCell>
-                <TableCell>
-                  <Badge variant={getRoleBadgeVariant(user.role)}>
-                    {getRoleDisplayName(user.role)}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  {user.last_sign_in_at 
+        {/* Mobile: Card layout */}
+        <div className="block md:hidden space-y-3">
+          {localUsers.map((user) => (
+            <div key={user.id} className="border border-border rounded-sq-sm p-3 space-y-2">
+              {/* Row 1: Name + Role */}
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium truncate">{user.display_name || user.email}</div>
+                  <div className="text-xs text-muted-foreground truncate">{user.email}</div>
+                </div>
+                <Badge variant={getRoleBadgeVariant(user.role)} className="shrink-0">
+                  {getRoleDisplayName(user.role)}
+                </Badge>
+              </div>
+              
+              {/* Row 2: Meta info */}
+              <div className="text-xs text-muted-foreground space-y-0.5">
+                {user.username && <div>@{user.username}</div>}
+                {user.home_club && <div>{user.home_club}</div>}
+                <div>
+                  Last sign in: {user.last_sign_in_at 
                     ? new Date(user.last_sign_in_at).toLocaleDateString()
                     : 'Never'
                   }
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Select
-                      value={user.role || 'none'}
-                      onValueChange={(value) => handleRoleChange(user.id, value)}
-                      disabled={actionLoading === user.id}
-                    >
-                      <SelectTrigger className="w-36">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">No role</SelectItem>
-                        <SelectItem value="user">User</SelectItem>
-                        <SelectItem value="moderator">Moderator</SelectItem>
-                        <SelectItem value="limited_admin">Limited Admin</SelectItem>
-                        <SelectItem value="admin">Admin</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          disabled={actionLoading === user.id}
-                          className="text-blue-600 hover:text-blue-600"
+                </div>
+              </div>
+              
+              {/* Row 3: Actions */}
+              <div className="flex flex-col gap-2 pt-2 border-t border-border">
+                <Select
+                  value={user.role || 'none'}
+                  onValueChange={(value) => handleRoleChange(user.id, value)}
+                  disabled={actionLoading === user.id}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border-border z-50">
+                    <SelectItem value="none">No role</SelectItem>
+                    <SelectItem value="user">User</SelectItem>
+                    <SelectItem value="moderator">Moderator</SelectItem>
+                    <SelectItem value="limited_admin">Limited Admin</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <div className="flex items-center gap-2">
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={actionLoading === user.id}
+                        className="flex-1 text-blue-600 hover:text-blue-600"
+                      >
+                        <Mail className="w-4 h-4 mr-1" />
+                        Reset Password
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="max-h-[85vh] overflow-y-auto">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Send Password Reset</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will send a password reset email to <strong>{user.email}</strong>. 
+                          The user will receive an email with instructions to reset their password.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
+                        <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handlePasswordReset(user.id, user.email)}
+                          className="w-full sm:w-auto"
                         >
-                          <Mail className="w-4 h-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Send Password Reset</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This will send a password reset email to <strong>{user.email}</strong>. 
-                            The user will receive an email with instructions to reset their password.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handlePasswordReset(user.id, user.email)}
-                          >
-                            Send Reset Email
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                    
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          disabled={actionLoading === user.id}
-                          className="text-destructive hover:text-destructive"
+                          Send Reset Email
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                  
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={actionLoading === user.id}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="max-h-[85vh] overflow-y-auto">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete User</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete the user <strong>{user.email}</strong>? 
+                          This action cannot be undone and will permanently remove the user and all their data.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
+                        <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleDeleteUser(user.id, user.email)}
+                          className="w-full sm:w-auto bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete User</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete the user <strong>{user.email}</strong>? 
-                            This action cannot be undone and will permanently remove the user and all their data.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDeleteUser(user.id, user.email)}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                          >
-                            Delete User
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                    
-                    {actionLoading === user.id && (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    )}
-                  </div>
-                </TableCell>
+                          Delete User
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                  
+                  {actionLoading === user.id && (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop: Table layout */}
+        <div className="hidden md:block">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Email</TableHead>
+                <TableHead>Display Name</TableHead>
+                <TableHead>Username</TableHead>
+                <TableHead>Home Club</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead>Last Sign In</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {localUsers.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium">{user.email}</TableCell>
+                  <TableCell>{user.display_name || '-'}</TableCell>
+                  <TableCell>{user.username || '-'}</TableCell>
+                  <TableCell>{user.home_club || '-'}</TableCell>
+                  <TableCell>
+                    <Badge variant={getRoleBadgeVariant(user.role)}>
+                      {getRoleDisplayName(user.role)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {user.last_sign_in_at 
+                      ? new Date(user.last_sign_in_at).toLocaleDateString()
+                      : 'Never'
+                    }
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Select
+                        value={user.role || 'none'}
+                        onValueChange={(value) => handleRoleChange(user.id, value)}
+                        disabled={actionLoading === user.id}
+                      >
+                        <SelectTrigger className="w-36">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover border-border z-50">
+                          <SelectItem value="none">No role</SelectItem>
+                          <SelectItem value="user">User</SelectItem>
+                          <SelectItem value="moderator">Moderator</SelectItem>
+                          <SelectItem value="limited_admin">Limited Admin</SelectItem>
+                          <SelectItem value="admin">Admin</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={actionLoading === user.id}
+                            className="text-blue-600 hover:text-blue-600"
+                          >
+                            <Mail className="w-4 h-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Send Password Reset</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will send a password reset email to <strong>{user.email}</strong>. 
+                              The user will receive an email with instructions to reset their password.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handlePasswordReset(user.id, user.email)}
+                            >
+                              Send Reset Email
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                      
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={actionLoading === user.id}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete User</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete the user <strong>{user.email}</strong>? 
+                              This action cannot be undone and will permanently remove the user and all their data.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteUser(user.id, user.email)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Delete User
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                      
+                      {actionLoading === user.id && (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );
