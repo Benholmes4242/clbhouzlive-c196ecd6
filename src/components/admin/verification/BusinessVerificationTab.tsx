@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { AlertTriangle } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -356,11 +357,30 @@ const BusinessVerificationTab = () => {
     setDomainCheckModalOpen(true);
   };
 
+  // State for inline revoke error
+  const [revokeError, setRevokeError] = useState<string | null>(null);
+
   const openRevokeModal = (request: VerificationRequest) => {
     setSelectedRequest(request);
     setRevokeReason('');
     setRevokeConfirmed(false);
+    setRevokeError(null);
     setRevokeModalOpen(true);
+  };
+
+  const handleRevokeSubmit = async () => {
+    if (!selectedRequest?.business) return;
+    setRevokeError(null);
+    try {
+      await revokeVerificationMutation.mutateAsync({
+        businessId: selectedRequest.business.id,
+        reason: revokeReason,
+      });
+      // Success is handled by onSuccess callback
+    } catch (err: any) {
+      // Error is handled inline - don't close modal
+      setRevokeError(err?.message || 'Failed to remove verification. Please try again.');
+    }
   };
 
   const handleRequestDomainCheck = async () => {
@@ -787,7 +807,10 @@ const BusinessVerificationTab = () => {
       </Dialog>
 
       {/* Revoke Verification Modal */}
-      <Dialog open={revokeModalOpen} onOpenChange={setRevokeModalOpen}>
+      <Dialog open={revokeModalOpen} onOpenChange={(open) => {
+        if (!open) setRevokeError(null);
+        setRevokeModalOpen(open);
+      }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Remove business verification</DialogTitle>
@@ -803,6 +826,18 @@ const BusinessVerificationTab = () => {
               </span>
             </DialogDescription>
           </DialogHeader>
+          
+          {/* Inline error banner */}
+          {revokeError && (
+            <div className="bg-destructive/10 border border-destructive/30 rounded-sq-sm p-3 flex gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-destructive">Unable to remove verification</p>
+                <p className="text-xs text-destructive/80">{revokeError}</p>
+              </div>
+            </div>
+          )}
+          
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="revokeReason">Reason for removal (required)</Label>
@@ -812,6 +847,7 @@ const BusinessVerificationTab = () => {
                 onChange={(e) => setRevokeReason(e.target.value)}
                 placeholder="Briefly explain why verification is being removed…"
                 className="min-h-[100px]"
+                disabled={revokeVerificationMutation.isPending}
               />
               <p className="text-xs text-muted-foreground">
                 This note is stored for audit purposes and is only visible to admins.
@@ -824,6 +860,7 @@ const BusinessVerificationTab = () => {
                 className="mt-1 h-4 w-4 rounded border-border"
                 checked={revokeConfirmed}
                 onChange={(e) => setRevokeConfirmed(e.target.checked)}
+                disabled={revokeVerificationMutation.isPending}
               />
               <Label htmlFor="confirmRevoke" className="text-sm font-normal cursor-pointer">
                 I understand this action will immediately remove verification.
@@ -831,16 +868,24 @@ const BusinessVerificationTab = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRevokeModalOpen(false)} disabled={processing}>Cancel</Button>
+            <Button 
+              variant="outline" 
+              onClick={() => setRevokeModalOpen(false)} 
+              disabled={revokeVerificationMutation.isPending}
+            >
+              Cancel
+            </Button>
             <Button
               variant="destructive"
-              onClick={() => selectedRequest?.business && revokeVerificationMutation.mutate({
-                businessId: selectedRequest.business.id,
-                reason: revokeReason,
-              })}
-              disabled={processing || !revokeReason.trim() || !revokeConfirmed}
+              onClick={handleRevokeSubmit}
+              disabled={revokeVerificationMutation.isPending || !revokeReason.trim() || !revokeConfirmed}
             >
-              {processing ? 'Removing...' : 'Remove verification'}
+              {revokeVerificationMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Removing…
+                </>
+              ) : 'Remove verification'}
             </Button>
           </DialogFooter>
         </DialogContent>
