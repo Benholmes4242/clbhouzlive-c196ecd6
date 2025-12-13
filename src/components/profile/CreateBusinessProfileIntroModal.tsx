@@ -1,12 +1,10 @@
 import React from 'react';
-import { Building2, Globe, BarChart3, MapPin } from 'lucide-react';
+import { Building2, Search, Shield, BarChart3 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 
@@ -16,18 +14,27 @@ interface CreateBusinessProfileIntroModalProps {
   onContinue: () => void;
 }
 
-const BenefitRow = ({ icon: Icon, text }: { icon: React.ElementType; text: string }) => (
+interface BenefitItemProps {
+  icon: React.ElementType;
+  title: string;
+  body: string;
+}
+
+const BenefitItem = ({ icon: Icon, title, body }: BenefitItemProps) => (
   <div className="flex items-start gap-3">
     <div className="flex-shrink-0 mt-0.5">
-      <Icon className="h-4 w-4 text-primary" />
+      <Icon className="h-4 w-4 text-muted-foreground" />
     </div>
-    <span className="text-sm text-muted-foreground">{text}</span>
+    <div>
+      <p className="text-sm font-medium text-foreground">{title}</p>
+      <p className="text-[13px] text-muted-foreground leading-relaxed">{body}</p>
+    </div>
   </div>
 );
 
 /**
- * Intro modal shown when a personal user clicks "Create Business Profile"
- * Explains the benefits before opening the Edit Profile modal in business mode
+ * Screen 1: Entry screen for business profile creation
+ * Outcome-led value proposition with stronger CTA wording
  */
 export const CreateBusinessProfileIntroModal: React.FC<CreateBusinessProfileIntroModalProps> = ({
   open,
@@ -36,48 +43,63 @@ export const CreateBusinessProfileIntroModal: React.FC<CreateBusinessProfileIntr
 }) => {
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md rounded-none sm:rounded-sq-lg">
+      <DialogContent className="max-w-md rounded-none sm:rounded-sq-lg bg-background">
         <DialogHeader className="text-center sm:text-center">
-          <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <Building2 className="h-6 w-6 text-primary" />
+          {/* Subtle slate icon */}
+          <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-muted flex items-center justify-center">
+            <Building2 className="h-6 w-6 text-muted-foreground" />
           </div>
-          <DialogTitle className="text-xl">Create a Business Profile</DialogTitle>
-          <DialogDescription className="text-base mt-2">
-            Turn your golfer account into a business profile so golfers can discover your club, academy, shop or brand on Clbhouz.
-          </DialogDescription>
+          
+          {/* Title */}
+          <h2 className="text-xl font-semibold text-foreground">
+            Create your business presence on Clbhouz
+          </h2>
+          
+          {/* Subtitle */}
+          <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+            Be discovered by golfers, build credibility through reviews, and grow your brand inside the world's fastest-growing golf community.
+          </p>
         </DialogHeader>
 
-        <div className="mt-4 space-y-3">
-          <BenefitRow 
-            icon={Globe} 
-            text="Show up in the Business Directory" 
+        {/* Outcome-led benefits - no cards, just spacing */}
+        <div className="mt-6 space-y-4">
+          <BenefitItem
+            icon={Search}
+            title="Be discoverable"
+            body="Appear in Clbhouz search and the business directory where golfers are already exploring."
           />
-          <BenefitRow 
-            icon={MapPin} 
-            text="Add your website, contact info and location" 
+          <BenefitItem
+            icon={Shield}
+            title="Build trust"
+            body="Collect reviews and show real social proof from the golfing community."
           />
-          <BenefitRow 
-            icon={BarChart3} 
-            text="Access Business Insights (profile views, clicks, engagement)" 
+          <BenefitItem
+            icon={BarChart3}
+            title="Understand your reach"
+            body="Track profile views, clicks, and engagement with Business Insights."
           />
         </div>
 
-        <DialogFooter className="mt-6 flex flex-col-reverse sm:flex-row gap-3">
-          <Button 
-            variant="ghost" 
+        <DialogFooter className="mt-8 flex flex-col-reverse sm:flex-row gap-3">
+          {/* Secondary: text button */}
+          <button
+            type="button"
             onClick={onClose}
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
           >
             Not now
-          </Button>
+          </button>
+          
+          {/* Primary: slate button */}
           <Button
+            variant="secondary"
             onClick={() => {
               onContinue();
               onClose();
             }}
             className="w-full sm:w-auto"
           >
-            Continue
+            Set up my business profile
           </Button>
         </DialogFooter>
       </DialogContent>
