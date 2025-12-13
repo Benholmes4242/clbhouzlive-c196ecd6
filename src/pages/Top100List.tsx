@@ -13,17 +13,15 @@ import {
   Top100ListAchievementsPair,
   Top100ListFilterChips,
   Top100ListCourseCard,
-  Top100ListProgressHero,
   JourneyInsightCard,
   generateJourneyInsights,
   type Top100FilterChip,
 } from '@/components/top100/list';
-import { Top100RegionCard } from '@/components/top100/Top100RegionCard';
+import { Top100HeroShell } from '@/components/top100/Top100HeroShell';
 import { UnifiedPagination } from '@/components/ui/UnifiedPagination';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PageRoot } from '@/components/layout/PageRoot';
-
 const REGION_DISPLAY_NAMES: Record<string, string> = {
   global: 'Worldwide',
   'gb-i': 'Great Britain & Ireland',
@@ -337,28 +335,16 @@ const Top100List = () => {
   return (
     <PageRoot className="min-h-screen bg-background">
       <main>
-        {/* 1. Hero Section */}
+        {/* 1. Unified Hero + Progress Shell */}
         {listSummary && (
-          <section className="px-4">
-            <Top100RegionCard
-              list={listSummary}
-              showCta={false}
-              variant="hero"
-              onBack={() => navigate('/top100')}
-            />
-          </section>
-        )}
-
-        {/* 2. Progress Hero Module - mt-6 from hero */}
-        {session && (
-          <div className="mt-6">
-            <Top100ListProgressHero
-              playedCount={playedCount}
-              totalCount={totalCount}
-              listName={listDisplayName}
-              listSlug={slug}
-            />
-          </div>
+          <Top100HeroShell
+            list={listSummary}
+            playedCount={playedCount}
+            totalCount={totalCount}
+            listDisplayName={listDisplayName}
+            onBack={() => navigate('/top100')}
+            showProgress={!!session}
+          />
         )}
 
         {/* 3. Social Leaderboard - mt-4 from progress hero */}
