@@ -59,7 +59,7 @@ const AdminBusinessDirectoryPage = () => {
         <div>
           <h1 className="text-2xl font-semibold">Business Directory</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            View and manage all business profiles on Clbhouz
+            View and manage all business profiles on clbhouz
           </p>
         </div>
         <div className="text-sm text-muted-foreground">

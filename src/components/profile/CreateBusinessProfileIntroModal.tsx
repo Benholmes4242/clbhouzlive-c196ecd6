@@ -52,7 +52,7 @@ export const CreateBusinessProfileIntroModal: React.FC<CreateBusinessProfileIntr
           
           {/* Title */}
           <h2 className="text-xl font-semibold text-foreground">
-            Create your business presence on Clbhouz
+            Create your business presence on clbhouz
           </h2>
           
           {/* Subtitle */}
@@ -66,7 +66,7 @@ export const CreateBusinessProfileIntroModal: React.FC<CreateBusinessProfileIntr
           <BenefitItem
             icon={Search}
             title="Be discoverable"
-            body="Appear in Clbhouz search and the business directory where golfers are already exploring."
+            body="Appear in clbhouz search and the business directory where golfers are already exploring."
           />
           <BenefitItem
             icon={Shield}

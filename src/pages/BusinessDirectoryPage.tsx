@@ -72,12 +72,12 @@ const BusinessDirectoryPage = () => {
         <div className="flex items-center justify-between p-4 rounded-sq-md bg-muted/50 border border-border">
           <div>
             <h2 className="font-medium text-foreground">
-              {hasBusinesses ? 'Manage your business profiles' : 'List your golf business on Clbhouz'}
+              {hasBusinesses ? 'Manage your business profiles' : 'List your golf business on clbhouz'}
             </h2>
             <p className="text-sm text-muted-foreground">
               {hasBusinesses 
-                ? `You have ${businessCount} business${businessCount > 1 ? 'es' : ''} on Clbhouz.`
-                : 'Create a free business profile to reach more golfers, showcase your venue, and appear in the Clbhouz Business Directory.'}
+                ? `You have ${businessCount} business${businessCount > 1 ? 'es' : ''} on clbhouz.`
+                : 'Create a free business profile to reach more golfers, showcase your venue, and appear in the clbhouz Business Directory.'}
             </p>
           </div>
           <Button onClick={handleCreateBusinessProfile} className="gap-2 flex-shrink-0">
