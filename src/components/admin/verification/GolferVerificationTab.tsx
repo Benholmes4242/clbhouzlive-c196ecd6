@@ -227,42 +227,48 @@ const GolferVerificationTab = () => {
     const requiredApprovals = request.required_approvals ?? 2;
 
     return (
-      <Card key={request.id} className="p-5">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-12 w-12">
+      <Card key={request.id} className="p-4 md:p-5">
+        <div className="flex flex-col gap-3 md:gap-4">
+          {/* Header with avatar and name */}
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-center gap-2.5 md:gap-3 min-w-0 flex-1">
+              <Avatar className="h-10 w-10 md:h-12 md:w-12 shrink-0">
                 <AvatarImage src={profile?.profile_photo_url || undefined} />
-                <AvatarFallback>{(profile?.display_name || profile?.username || '?').charAt(0).toUpperCase()}</AvatarFallback>
+                <AvatarFallback className="text-sm">{(profile?.display_name || profile?.username || '?').charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-lg">{profile?.display_name || profile?.username || 'Unknown User'}</h3>
+              <div className="space-y-0.5 md:space-y-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
+                  <h3 className="font-semibold text-sm md:text-lg truncate">{profile?.display_name || profile?.username || 'Unknown User'}</h3>
                   {getStatusBadge(request.status)}
                   {profile?.is_verified_golfer && (
-                    <Badge variant="secondary" className="bg-blue-500/10 text-blue-600 border-blue-500/20">
-                      <CheckCircle className="h-3 w-3 mr-1" />
-                      Verified
+                    <Badge variant="secondary" className="bg-blue-500/10 text-blue-600 border-blue-500/20 text-xs">
+                      <CheckCircle className="h-3 w-3" />
                     </Badge>
                   )}
                 </div>
-                {profile?.username && <p className="text-sm text-muted-foreground">@{profile.username}</p>}
+                {profile?.username && <p className="text-xs md:text-sm text-muted-foreground truncate">@{profile.username}</p>}
               </div>
             </div>
             {profile?.username && (
-              <Link to={`/${profile.username}`} target="_blank" className="text-sm text-primary hover:underline flex items-center gap-1">
-                View Profile <ExternalLink className="h-3 w-3" />
+              <Link to={`/${profile.username}`} target="_blank" className="text-xs md:text-sm text-primary hover:underline flex items-center gap-1 shrink-0">
+                <span className="hidden sm:inline">View</span>
+                <ExternalLink className="h-3 w-3" />
               </Link>
             )}
           </div>
 
+          {/* Approval progress */}
           {request.status === 'pending' && (
-            <div className="flex items-center gap-2 text-sm">
-              <Users className="h-4 w-4 text-muted-foreground" />
+            <div className="flex flex-wrap items-center gap-1.5 md:gap-2 text-xs md:text-sm">
+              <Users className="h-3.5 w-3.5 md:h-4 md:w-4 text-muted-foreground shrink-0" />
               <span className="text-muted-foreground">
-                {approvalCount === 0 ? `Awaiting review (0 of ${requiredApprovals})` : `${approvalCount} of ${requiredApprovals} approvals received`}
+                {approvalCount} of {requiredApprovals} approvals
               </span>
-              {hasAlreadyReviewed && <Badge variant="outline" className="text-xs">You {myReview === 'approved' ? 'approved' : 'reviewed'}</Badge>}
+              {hasAlreadyReviewed && (
+                <Badge variant="outline" className="text-[10px] md:text-xs px-1.5 py-0 h-5">
+                  You {myReview === 'approved' ? 'approved' : 'reviewed'}
+                </Badge>
+              )}
             </div>
           )}
 
@@ -293,14 +299,26 @@ const GolferVerificationTab = () => {
             {request.reviewed_at && <span>Reviewed: {format(new Date(request.reviewed_at), 'MMM d, yyyy h:mm a')}</span>}
           </div>
 
+          {/* Actions - responsive */}
           {showActions && request.status === 'pending' && (
-            <div className="flex flex-wrap items-center gap-2 pt-2 border-t">
-              <Button size="sm" onClick={() => { setSelectedRequest(request); setApproveDialogOpen(true); }} disabled={processing || hasAlreadyReviewed} className="gap-1.5 bg-emerald-600 hover:bg-emerald-700">
-                <CheckCircle className="h-4 w-4" />
-                {hasAlreadyReviewed ? 'Already Reviewed' : 'Approve'}
+            <div className="flex gap-2 pt-3 md:pt-2 border-t">
+              <Button 
+                size="sm" 
+                onClick={() => { setSelectedRequest(request); setApproveDialogOpen(true); }} 
+                disabled={processing || hasAlreadyReviewed} 
+                className="flex-1 md:flex-none gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-xs md:text-sm"
+              >
+                <CheckCircle className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                {hasAlreadyReviewed ? 'Reviewed' : 'Approve'}
               </Button>
-              <Button size="sm" variant="outline" onClick={() => { setSelectedRequest(request); setRejectReason(''); setRejectModalOpen(true); }} disabled={processing || hasAlreadyReviewed} className="gap-1.5 text-red-600 border-red-200 hover:bg-red-50">
-                <XCircle className="h-4 w-4" />
+              <Button 
+                size="sm" 
+                variant="outline" 
+                onClick={() => { setSelectedRequest(request); setRejectReason(''); setRejectModalOpen(true); }} 
+                disabled={processing || hasAlreadyReviewed} 
+                className="flex-1 md:flex-none gap-1.5 text-red-600 border-red-200 hover:bg-red-50 text-xs md:text-sm"
+              >
+                <XCircle className="h-3.5 w-3.5 md:h-4 md:w-4" />
                 Reject
               </Button>
             </div>
@@ -320,31 +338,48 @@ const GolferVerificationTab = () => {
 
   return (
     <div className="space-y-4">
-      {/* Invite CTA */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          Golfer verification is invite-only. Search for golfers to invite them to request verification.
+      {/* Invite CTA - responsive */}
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <p className="text-xs md:text-sm text-muted-foreground">
+          Golfer verification is invite-only. Search for golfers to invite.
         </p>
-        <Button onClick={() => setInviteModalOpen(true)} className="gap-1.5">
-          <UserPlus className="h-4 w-4" />
+        <Button onClick={() => setInviteModalOpen(true)} className="gap-1.5 w-full md:w-auto" size="sm">
+          <UserPlus className="h-3.5 w-3.5 md:h-4 md:w-4" />
           Invite Golfer
         </Button>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="discover" className="gap-1.5">
-            <Radar className="h-4 w-4" />
-            Discover
-          </TabsTrigger>
-          <TabsTrigger value="pending" className="gap-1.5">
-            Pending
-            {pendingRequests.length > 0 && <span className="ml-1 text-xs bg-amber-500/20 text-amber-600 px-1.5 py-0.5 rounded-full">{pendingRequests.length}</span>}
-          </TabsTrigger>
-          <TabsTrigger value="invited">Invited ({invitedRequests.length})</TabsTrigger>
-          <TabsTrigger value="approved">Verified ({approvedRequests.length})</TabsTrigger>
-          <TabsTrigger value="rejected">Rejected ({rejectedRequests.length})</TabsTrigger>
-        </TabsList>
+        {/* Status tabs - horizontal scroll on mobile */}
+        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+          <TabsList className="inline-flex whitespace-nowrap h-9 md:h-10">
+            <TabsTrigger value="discover" className="gap-1 text-xs md:text-sm px-2.5 md:px-4">
+              <Radar className="h-3.5 w-3.5 md:h-4 md:w-4" />
+              <span className="hidden sm:inline">Discover</span>
+              <span className="sm:hidden">Find</span>
+            </TabsTrigger>
+            <TabsTrigger value="pending" className="gap-1 text-xs md:text-sm px-2.5 md:px-4">
+              Pending
+              {pendingRequests.length > 0 && (
+                <span className="ml-1 text-[10px] md:text-xs bg-amber-500/20 text-amber-600 px-1.5 py-0.5 rounded-full">
+                  {pendingRequests.length}
+                </span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="invited" className="text-xs md:text-sm px-2.5 md:px-4">
+              <span className="hidden sm:inline">Invited ({invitedRequests.length})</span>
+              <span className="sm:hidden">Inv ({invitedRequests.length})</span>
+            </TabsTrigger>
+            <TabsTrigger value="approved" className="text-xs md:text-sm px-2.5 md:px-4">
+              <span className="hidden sm:inline">Verified ({approvedRequests.length})</span>
+              <span className="sm:hidden">Ver ({approvedRequests.length})</span>
+            </TabsTrigger>
+            <TabsTrigger value="rejected" className="text-xs md:text-sm px-2.5 md:px-4">
+              <span className="hidden sm:inline">Rejected ({rejectedRequests.length})</span>
+              <span className="sm:hidden">Rej ({rejectedRequests.length})</span>
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="discover" className="mt-4">
           <GolferDiscoverTab />

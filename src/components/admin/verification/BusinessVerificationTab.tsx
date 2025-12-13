@@ -426,56 +426,64 @@ const BusinessVerificationTab = () => {
     const requiredApprovals = request.required_approvals ?? 2;
     
     return (
-      <Card key={request.id} className="p-5">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-start justify-between">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <h3 className="font-semibold text-lg">{business?.name || 'Unknown Business'}</h3>
+      <Card key={request.id} className="p-4 md:p-5">
+        <div className="flex flex-col gap-3 md:gap-4">
+          {/* Header: Name + Status */}
+          <div className="flex items-start justify-between gap-2">
+            <div className="space-y-1 min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
+                <h3 className="font-semibold text-base md:text-lg truncate">{business?.name || 'Unknown Business'}</h3>
                 {getStatusBadge(request.status)}
                 {business?.is_verified && (
-                  <Badge variant="secondary" className="bg-blue-500/10 text-blue-600 border-blue-500/20">
+                  <Badge variant="secondary" className="bg-blue-500/10 text-blue-600 border-blue-500/20 text-xs">
                     <CheckCircle className="h-3 w-3 mr-1" />
-                    Verified
+                    <span className="hidden sm:inline">Verified</span>
                   </Badge>
                 )}
                 {/* Previously verified badge for revoked/pending requests */}
                 {request.status === 'revoked' && (
-                  <Badge variant="secondary" className="bg-slate-500/10 text-slate-600 border-slate-500/20">
+                  <Badge variant="secondary" className="bg-slate-500/10 text-slate-600 border-slate-500/20 text-xs">
                     <History className="h-3 w-3 mr-1" />
-                    Previously verified
+                    <span className="hidden sm:inline">Previously verified</span>
                   </Badge>
                 )}
               </div>
-              {business?.category && <p className="text-sm text-muted-foreground">{business.category}</p>}
+              {business?.category && <p className="text-xs md:text-sm text-muted-foreground">{business.category}</p>}
             </div>
             {business?.slug && (
-              <Link to={`/business/${business.slug}`} target="_blank" className="text-sm text-primary hover:underline flex items-center gap-1">
-                View Profile <ExternalLink className="h-3 w-3" />
+              <Link to={`/business/${business.slug}`} target="_blank" className="text-xs md:text-sm text-primary hover:underline flex items-center gap-1 shrink-0">
+                <span className="hidden sm:inline">View Profile</span>
+                <ExternalLink className="h-3 w-3" />
               </Link>
             )}
           </div>
 
+          {/* Approval Progress */}
           {request.status === 'pending' && (
-            <div className="flex items-center gap-2 text-sm">
-              <Users className="h-4 w-4 text-muted-foreground" />
+            <div className="flex flex-wrap items-center gap-1.5 md:gap-2 text-xs md:text-sm">
+              <Users className="h-3.5 w-3.5 md:h-4 md:w-4 text-muted-foreground shrink-0" />
               <span className="text-muted-foreground">
-                {approvalCount === 0 ? `Awaiting review (0 of ${requiredApprovals})` : `${approvalCount} of ${requiredApprovals} approvals received`}
+                {approvalCount} of {requiredApprovals} approvals
               </span>
-              {hasAlreadyReviewed && <Badge variant="outline" className="text-xs">You {myReview === 'approved' ? 'approved' : 'reviewed'}</Badge>}
+              {hasAlreadyReviewed && (
+                <Badge variant="outline" className="text-[10px] md:text-xs px-1.5 py-0 h-5">
+                  You {myReview === 'approved' ? 'approved' : 'reviewed'}
+                </Badge>
+              )}
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+          {/* Meta: Location & Website - stacked on mobile */}
+          <div className="flex flex-col gap-1.5 md:grid md:grid-cols-2 md:gap-3 text-xs md:text-sm">
             {business?.location && (
               <div className="flex items-center gap-2 text-muted-foreground">
-                <Building2 className="h-4 w-4 shrink-0" />
-                <span>{business.location}</span>
+                <Building2 className="h-3.5 w-3.5 md:h-4 md:w-4 shrink-0" />
+                <span className="truncate">{business.location}</span>
               </div>
             )}
             {(request.website || business?.website) && (
               <div className="flex items-center gap-2 text-muted-foreground">
-                <Globe className="h-4 w-4 shrink-0" />
+                <Globe className="h-3.5 w-3.5 md:h-4 md:w-4 shrink-0" />
                 <button onClick={() => handleWebsiteClick(request.website || business?.website)} className="hover:text-primary hover:underline truncate text-left">
                   {request.website || business?.website}
                 </button>
@@ -587,22 +595,47 @@ const BusinessVerificationTab = () => {
             {request.reviewed_at && <span>Reviewed: {format(new Date(request.reviewed_at), 'MMM d, yyyy h:mm a')}</span>}
           </div>
 
+          {/* Actions - responsive layout */}
           {showActions && request.status === 'pending' && (
-            <div className="flex flex-wrap items-center gap-2 pt-2 border-t">
-              <Button size="sm" onClick={() => openApproveDialog(request)} disabled={processing || hasAlreadyReviewed || (request.requires_domain_check && !request.domain_confirmed)} className="gap-1.5 bg-emerald-600 hover:bg-emerald-700">
-                <CheckCircle className="h-4 w-4" />
-                {hasAlreadyReviewed ? 'Already Reviewed' : 'Approve'}
-              </Button>
-              <Button size="sm" variant="outline" onClick={() => openRejectModal(request)} disabled={processing || hasAlreadyReviewed} className="gap-1.5 text-red-600 border-red-200 hover:bg-red-50">
-                <XCircle className="h-4 w-4" />
-                Reject
-              </Button>
+            <div className="flex flex-col gap-2 pt-3 border-t md:flex-row md:flex-wrap md:items-center md:pt-2">
+              {/* Primary actions - full width on mobile, inline on desktop */}
+              <div className="flex gap-2 w-full md:w-auto">
+                <Button 
+                  size="sm" 
+                  onClick={() => openApproveDialog(request)} 
+                  disabled={processing || hasAlreadyReviewed || (request.requires_domain_check && !request.domain_confirmed)} 
+                  className="flex-1 md:flex-none gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-xs md:text-sm"
+                >
+                  <CheckCircle className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  {hasAlreadyReviewed ? 'Reviewed' : 'Approve'}
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={() => openRejectModal(request)} 
+                  disabled={processing || hasAlreadyReviewed} 
+                  className="flex-1 md:flex-none gap-1.5 text-red-600 border-red-200 hover:bg-red-50 text-xs md:text-sm"
+                >
+                  <XCircle className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  Reject
+                </Button>
+              </div>
+              
+              {/* Secondary actions */}
               {!request.requires_domain_check && (
-                <Button size="sm" variant="outline" onClick={() => openDomainCheckModal(request)} disabled={processing} className="gap-1.5">
-                  <Mail className="h-4 w-4" />
-                  Request Domain Check
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={() => openDomainCheckModal(request)} 
+                  disabled={processing} 
+                  className="w-full md:w-auto gap-1.5 text-xs md:text-sm"
+                >
+                  <Mail className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  <span className="md:hidden">Domain Check</span>
+                  <span className="hidden md:inline">Request Domain Check</span>
                 </Button>
               )}
+              
               {/* Demo-only force approve button - visible only in development */}
               {import.meta.env.DEV && business && (
                 <Button
@@ -610,10 +643,10 @@ const BusinessVerificationTab = () => {
                   variant="outline"
                   onClick={() => forceApproveMutation.mutate({ requestId: request.id, businessId: business.id })}
                   disabled={processing}
-                  className="gap-1.5 text-orange-600 border-orange-200 hover:bg-orange-50"
+                  className="w-full md:w-auto gap-1.5 text-orange-600 border-orange-200 hover:bg-orange-50 text-xs md:text-sm"
                 >
-                  <Zap className="h-4 w-4" />
-                  Force approve (demo)
+                  <Zap className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  Force approve
                 </Button>
               )}
               {/* Bypass 2nd approval - DEV only, for system accounts after first approval */}
@@ -623,11 +656,11 @@ const BusinessVerificationTab = () => {
                   variant="outline"
                   onClick={() => bypassSecondApprovalMutation.mutate({ requestId: request.id, businessId: business.id })}
                   disabled={processing}
-                  className="gap-1.5 text-slate-600 border-slate-200 hover:bg-slate-50"
+                  className="w-full md:w-auto gap-1.5 text-slate-600 border-slate-200 hover:bg-slate-50 text-xs md:text-sm"
                   title="Test mode: simulates a second independent approval"
                 >
-                  <FastForward className="h-4 w-4" />
-                  Bypass 2nd approval
+                  <FastForward className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  Bypass 2nd
                 </Button>
               )}
             </div>
@@ -635,15 +668,15 @@ const BusinessVerificationTab = () => {
 
           {/* Remove verification button for approved businesses */}
           {request.status === 'approved' && business?.is_verified && (
-            <div className="flex flex-wrap items-center gap-2 pt-2 border-t">
+            <div className="flex flex-wrap items-center gap-2 pt-3 md:pt-2 border-t">
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => openRevokeModal(request)}
                 disabled={processing}
-                className="gap-1.5 text-red-600 border-red-200 hover:bg-red-50"
+                className="w-full md:w-auto gap-1.5 text-red-600 border-red-200 hover:bg-red-50 text-xs md:text-sm"
               >
-                <ShieldOff className="h-4 w-4" />
+                <ShieldOff className="h-3.5 w-3.5 md:h-4 md:w-4" />
                 Remove verification
               </Button>
             </div>
