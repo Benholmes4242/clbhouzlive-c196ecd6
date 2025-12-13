@@ -242,8 +242,14 @@ const Top100CoursesHubPanel = () => {
             </div>
           </div>
 
-          {/* Club Status Card - controlled layout */}
-          <div className="rounded-sq-lg border border-border/60 bg-card shadow-sm p-4">
+          {/* Club Status Card - FULLY CLICKABLE */}
+          <button
+            type="button"
+            onClick={handleOpenTop100Club}
+            className="w-full rounded-sq-lg border border-border/60 bg-card shadow-sm p-4 text-left cursor-pointer hover:bg-muted/30 active:scale-[0.99] transition-all"
+            aria-label="Open Top 100 Club"
+            role="link"
+          >
             <div className="flex gap-4 items-stretch">
               {/* Left: Badge tile */}
               <div className="w-[150px] shrink-0">
@@ -274,20 +280,16 @@ const Top100CoursesHubPanel = () => {
                   </p>
                 </div>
 
-                {/* Row 2: CTA pinned bottom-right */}
+                {/* Row 2: CTA hint pinned bottom-right */}
                 <div className="flex justify-end mt-2">
-                  <button
-                    type="button"
-                    onClick={handleOpenTop100Club}
-                    className="group inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors py-1 -mr-1"
-                  >
+                  <span className="group inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
                     Visit Top 100 Club
-                    <ChevronRight className="h-3.5 w-3.5 ml-[2px] transition-transform group-hover:translate-x-0.5" />
-                  </button>
+                    <ChevronRight className="h-3.5 w-3.5 ml-[2px]" />
+                  </span>
                 </div>
               </div>
             </div>
-          </div>
+          </button>
         </section>
       )}
 
