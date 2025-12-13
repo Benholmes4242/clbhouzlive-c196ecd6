@@ -218,7 +218,7 @@ export function PlayersLeaderboardView() {
   }
 
   return (
-    <div className="w-full -mx-4" ref={listRef}>
+    <div className="w-full" ref={listRef}>
       {/* Your Position Status Strip - full bleed */}
       {meModel && (
         <LeaderboardStatusStrip user={meModel} />
