@@ -2390,6 +2390,89 @@ export type Database = {
         }
         Relationships: []
       }
+      golfer_verification_requests: {
+        Row: {
+          admin_note: string | null
+          approval_count: number
+          created_at: string
+          evidence_url: string | null
+          id: string
+          invited_by: string
+          note: string | null
+          requested_at: string | null
+          required_approvals: number
+          reviewed_at: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_note?: string | null
+          approval_count?: number
+          created_at?: string
+          evidence_url?: string | null
+          id?: string
+          invited_by: string
+          note?: string | null
+          requested_at?: string | null
+          required_approvals?: number
+          reviewed_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_note?: string | null
+          approval_count?: number
+          created_at?: string
+          evidence_url?: string | null
+          id?: string
+          invited_by?: string
+          note?: string | null
+          requested_at?: string | null
+          required_approvals?: number
+          reviewed_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      golfer_verification_reviews: {
+        Row: {
+          created_at: string
+          decision: string
+          id: string
+          note: string | null
+          request_id: string
+          reviewer_id: string
+        }
+        Insert: {
+          created_at?: string
+          decision: string
+          id?: string
+          note?: string | null
+          request_id: string
+          reviewer_id: string
+        }
+        Update: {
+          created_at?: string
+          decision?: string
+          id?: string
+          note?: string | null
+          request_id?: string
+          reviewer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "golfer_verification_reviews_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "golfer_verification_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invite_requests: {
         Row: {
           club: string | null
@@ -4682,6 +4765,8 @@ export type Database = {
           email_change_count: number | null
           email_change_requested_at: string | null
           email_change_token: string | null
+          golfer_verified_at: string | null
+          golfer_verified_by: string | null
           has_completed_onboarding: boolean | null
           has_profile_video: boolean | null
           header_photo_url: string | null
@@ -4693,6 +4778,7 @@ export type Database = {
           is_public: boolean | null
           is_test: boolean
           is_verified_business: boolean
+          is_verified_golfer: boolean
           last_notifications_seen_at: string | null
           last_rating_at: string | null
           location: string | null
@@ -4761,6 +4847,8 @@ export type Database = {
           email_change_count?: number | null
           email_change_requested_at?: string | null
           email_change_token?: string | null
+          golfer_verified_at?: string | null
+          golfer_verified_by?: string | null
           has_completed_onboarding?: boolean | null
           has_profile_video?: boolean | null
           header_photo_url?: string | null
@@ -4772,6 +4860,7 @@ export type Database = {
           is_public?: boolean | null
           is_test?: boolean
           is_verified_business?: boolean
+          is_verified_golfer?: boolean
           last_notifications_seen_at?: string | null
           last_rating_at?: string | null
           location?: string | null
@@ -4840,6 +4929,8 @@ export type Database = {
           email_change_count?: number | null
           email_change_requested_at?: string | null
           email_change_token?: string | null
+          golfer_verified_at?: string | null
+          golfer_verified_by?: string | null
           has_completed_onboarding?: boolean | null
           has_profile_video?: boolean | null
           header_photo_url?: string | null
@@ -4851,6 +4942,7 @@ export type Database = {
           is_public?: boolean | null
           is_test?: boolean
           is_verified_business?: boolean
+          is_verified_golfer?: boolean
           last_notifications_seen_at?: string | null
           last_rating_at?: string | null
           location?: string | null
@@ -6659,6 +6751,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      invite_golfer_to_verification: {
+        Args: { _note?: string; _user_id: string }
+        Returns: string
+      }
       is_admin: { Args: never; Returns: boolean }
       is_business_owner:
         | { Args: { _business_id: string }; Returns: boolean }
@@ -7391,6 +7487,14 @@ export type Database = {
       submit_business_verification_review: {
         Args: { _decision: string; _note?: string; _request_id: string }
         Returns: Json
+      }
+      submit_golfer_verification_request: {
+        Args: { _evidence_url?: string; _note?: string; _request_id: string }
+        Returns: undefined
+      }
+      submit_golfer_verification_review: {
+        Args: { _decision: string; _note?: string; _request_id: string }
+        Returns: undefined
       }
       test_echo_insert: { Args: never; Returns: string }
       test_lab_clear_notifications: {
