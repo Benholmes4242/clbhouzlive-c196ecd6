@@ -50,6 +50,11 @@ function getNotificationIcon(type: string) {
     case 'club_update':
     case 'course_update':
       return <Building2 className={cn(iconClass, "text-slate-500")} />;
+    // Business verification notifications
+    case 'business_verification_submitted':
+    case 'business_verification_approved':
+    case 'business_verification_rejected':
+      return <Building2 className={cn(iconClass, type === 'business_verification_approved' ? "text-emerald-500" : type === 'business_verification_rejected' ? "text-red-500" : "text-amber-500")} />;
     default:
       return <Bell className={cn(iconClass, "text-muted-foreground")} />;
   }
@@ -82,6 +87,13 @@ function renderNotificationText(notification: ActivityNotification): string {
     case 'system':
     case 'app_update':
       return title || 'New update available';
+    // Business verification notifications - use title directly
+    case 'business_verification_submitted':
+      return title || 'Verification request submitted';
+    case 'business_verification_approved':
+      return title || 'Your business is verified';
+    case 'business_verification_rejected':
+      return title || 'Verification not approved';
     default:
       return title || message || 'New notification';
   }
