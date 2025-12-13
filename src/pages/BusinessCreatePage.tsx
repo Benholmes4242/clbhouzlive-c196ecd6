@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Building2, MapPin, Globe, Mail, Phone, Check, Loader2, GraduationCap, ShoppingBag, Briefcase, Flag } from 'lucide-react';
+import { ArrowLeft, Building2, MapPin, Globe, Mail, Phone, Check, Loader2, GraduationCap, ShoppingBag, Briefcase, Flag, BadgeCheck } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -363,23 +363,55 @@ const BusinessCreatePage = () => {
                 </div>
               </div>
 
-              <p className="text-[11px] text-muted-foreground pt-3 border-t border-border/30">
-                We'll only use this to help golfers contact you - never shared with third parties.
+              <p className="text-[11px] text-muted-foreground pt-3">
+                Your contact details are only shown on your business profile.
               </p>
             </div>
           </motion.section>
 
-          {/* Verification hint */}
+          {/* Verification callout - aspirational, not blocking */}
           <motion.section
             custom={2}
             initial="hidden"
             animate="visible"
             variants={sectionVariants}
-            className="px-4 py-4"
+            className="px-4 py-5"
           >
-            <p className="text-[11px] text-muted-foreground">
-              You can request verification once your profile is live.
-            </p>
+            <div className="space-y-3">
+              {/* Header with badge icon */}
+              <div className="flex items-center gap-2">
+                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-100">
+                  <BadgeCheck className="h-3.5 w-3.5 text-slate-600" />
+                </div>
+                <h3 className="text-sm font-semibold text-foreground">Get verified on clbhouz</h3>
+              </div>
+              
+              {/* Body */}
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Once your profile is live, you can request verification to show golfers your business is authentic and trusted.
+              </p>
+              
+              {/* How it works bullets */}
+              <ul className="space-y-1.5 text-sm text-muted-foreground">
+                <li className="flex items-start gap-2">
+                  <span className="text-muted-foreground/60 mt-1.5">•</span>
+                  <span>Submit a verification request from your business profile</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-muted-foreground/60 mt-1.5">•</span>
+                  <span>We'll review your details</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-muted-foreground/60 mt-1.5">•</span>
+                  <span>Approved profiles receive a verified badge</span>
+                </li>
+              </ul>
+              
+              {/* Optional helper */}
+              <p className="text-[11px] text-muted-foreground/70">
+                Verification is optional and not required to use clbhouz.
+              </p>
+            </div>
           </motion.section>
         </div>
       </main>
