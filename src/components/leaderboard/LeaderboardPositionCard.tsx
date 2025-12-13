@@ -90,7 +90,7 @@ export function LeaderboardPositionCard({ user, variant = 'full' }: LeaderboardP
     <button
       type="button"
       onClick={() => navigate('/top100?tab=my-progress')}
-      className="w-full rounded-sq-md border border-border/70 bg-card px-3 py-3 shadow-sm active:scale-[0.99] transition-all hover:bg-muted/30"
+      className="w-full px-4 py-4 active:scale-[0.99] transition-all"
     >
       {/* 3-column layout: Avatar (fixed) + Main text (flex, truncates) + Next goal (fixed width) */}
       <div className="flex items-center gap-3">
@@ -107,17 +107,15 @@ export function LeaderboardPositionCard({ user, variant = 'full' }: LeaderboardP
 
         {/* Main text - flex with min-w-0 for truncation */}
         <div className="flex flex-col text-left flex-1 min-w-0">
-          <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
+          <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/70">
             Your position
           </span>
-          <span className="text-sm font-semibold truncate">
+          <span className="text-sm font-semibold text-foreground truncate">
             #{user.rank} · {user.total_top100_played} Top 100s
           </span>
-          {club.tierName && (
-            <span className="text-xs text-muted-foreground truncate">
-              {club.tierName}
-            </span>
-          )}
+          <span className="text-xs text-muted-foreground truncate mt-0.5">
+            {club.tierName ? `${club.tierName} · ` : ''}{helperCopy}
+          </span>
         </div>
 
         {/* Next goal - fixed width, no-wrap, right aligned */}
@@ -130,7 +128,7 @@ export function LeaderboardPositionCard({ user, variant = 'full' }: LeaderboardP
                 </span>
                 <div className="w-full h-1.5 rounded-full bg-muted overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-primary/60 transition-[width]"
+                    className="h-full rounded-full bg-amber-500 transition-[width]"
                     style={{ width: `${progressPct}%` }}
                   />
                 </div>
@@ -142,11 +140,6 @@ export function LeaderboardPositionCard({ user, variant = 'full' }: LeaderboardP
           <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
         </div>
       </div>
-
-      {/* Helper copy */}
-      <p className="text-xs text-muted-foreground mt-2 text-left">
-        {helperCopy}
-      </p>
     </button>
   );
 }

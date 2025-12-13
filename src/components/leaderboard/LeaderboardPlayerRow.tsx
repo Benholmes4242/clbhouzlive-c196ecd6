@@ -44,8 +44,8 @@ export function LeaderboardPlayerRow({ entry, isCurrentUser = false }: Leaderboa
       type="button"
       onClick={() => navigate(`/profile/${entry.user_id}?tab=top100`)}
       className={cn(
-        'w-full px-0 py-3 flex items-center gap-3 transition-colors',
-        isCurrentUser && 'bg-primary/5 -mx-4 px-4',
+        'w-full px-4 py-3 flex items-center gap-3 transition-colors',
+        isCurrentUser && 'bg-primary/5',
         'hover:bg-muted/20 active:bg-muted/30'
       )}
     >
