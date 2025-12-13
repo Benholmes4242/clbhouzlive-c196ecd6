@@ -40,10 +40,10 @@ const Top100LeaderboardPanel = () => {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-4 pb-6">
-      {/* Closest Goal Strip - modern status banner */}
+    <div className="w-full space-y-4 pb-6">
+      {/* Closest Goal Strip - full bleed */}
       {showGoalsBanner && (
-        <div className="w-full">
+        <div className="-mx-4 sm:-mx-6">
           {/* Goal Strip */}
           <div className="w-full bg-emerald-50/60 border-y border-emerald-100/80 px-4 py-2.5 flex items-center gap-3">
             {/* Left: Target icon */}
