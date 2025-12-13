@@ -124,9 +124,18 @@ const BusinessCreatePage = () => {
       
       toast.success('Business profile created!');
 
-      // Navigate to the new business profile immediately
+      // Navigate to success screen with business details
       setTimeout(() => {
-        navigate(`/business/${businessId}`);
+        navigate('/business/success', {
+          state: {
+            businessId: businessId,
+            businessName: formData.businessName,
+            category: formData.businessCategory || 'Business',
+            location: formattedLocation,
+            avatarUrl: undefined, // No avatar uploaded during creation
+            username: undefined, // Business accounts don't have usernames in this flow
+          },
+        });
       }, 600);
     } catch (error) {
       console.error('Error creating business profile:', error);
