@@ -6,12 +6,14 @@ import { CreateBusinessProfileIntroModal } from '@/components/profile/CreateBusi
 import { PageRoot } from '@/components/layout/PageRoot';
 import { BusinessCommandCard } from '@/components/business/BusinessCommandCard';
 import { AddBusinessCard } from '@/components/business/AddBusinessCard';
+import { useActiveActor } from '@/context/ActiveActorContext';
 import { motion } from 'framer-motion';
 
 const MyBusinessesPage = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useSupabaseSession();
   const { data: businesses, isLoading } = useMyBusinesses(user?.id);
+  const { activeActor } = useActiveActor();
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Redirect to auth if not logged in
@@ -64,32 +66,32 @@ const MyBusinessesPage = () => {
                 transition={{ delay: i * 0.1 }}
               >
                 {/* Business row skeleton */}
-                <div className="flex items-start gap-4 px-4 py-4">
-                  <div className="h-12 w-12 rounded-full bg-muted animate-pulse" />
+                <div className="flex items-start gap-3.5 px-4 py-3.5">
+                  <div className="h-11 w-11 rounded-full bg-muted animate-pulse" />
                   <div className="flex-1 space-y-2">
                     <div className="h-4 w-2/3 rounded bg-muted animate-pulse" />
                     <div className="h-3 w-1/2 rounded bg-muted animate-pulse" />
                   </div>
                 </div>
-                <div className="h-px bg-border/30 mx-4" />
+                <div className="h-px bg-border/20" />
                 
                 {/* Metrics skeleton */}
-                <div className="grid grid-cols-3 gap-4 px-4 py-4">
+                <div className="grid grid-cols-3 px-4 py-3.5">
                   {[1, 2, 3].map(j => (
-                    <div key={j} className="text-center">
-                      <div className="h-5 w-10 mx-auto bg-muted rounded animate-pulse mb-1" />
-                      <div className="h-3 w-12 mx-auto bg-muted rounded animate-pulse" />
+                    <div key={j} className="flex flex-col items-center">
+                      <div className="h-5 w-8 bg-muted rounded animate-pulse mb-1" />
+                      <div className="h-3 w-12 bg-muted rounded animate-pulse" />
                     </div>
                   ))}
                 </div>
-                <div className="h-px bg-border/30 mx-4" />
+                <div className="h-px bg-border/20" />
                 
                 {/* Actions skeleton */}
-                <div className="flex gap-3 px-4 py-4">
+                <div className="flex gap-3 px-4 py-3.5">
                   <div className="h-9 flex-1 rounded-sq-sm bg-muted animate-pulse" />
                   <div className="h-9 flex-1 rounded-sq-sm bg-muted animate-pulse" />
                 </div>
-                <div className="h-px bg-border/40" />
+                <div className="h-px bg-border/30" />
               </motion.div>
             ))}
           </div>
@@ -103,14 +105,20 @@ const MyBusinessesPage = () => {
         {/* Business list - flat layout */}
         {!isLoading && hasBusinesses && (
           <div>
-            {businesses.map((membership, index) => (
-              <BusinessCommandCard
-                key={membership.id}
-                membership={membership}
-                userId={user?.id || ''}
-                index={index}
-              />
-            ))}
+            {businesses.map((membership, index) => {
+              // Check if this business is the currently active actor
+              const isActive = activeActor?.type === 'business' && activeActor?.id === membership.business.id;
+              
+              return (
+                <BusinessCommandCard
+                  key={membership.id}
+                  membership={membership}
+                  userId={user?.id || ''}
+                  index={index}
+                  isActive={isActive}
+                />
+              );
+            })}
 
             {/* Add another business row */}
             <AddBusinessCard onClick={handleCreateBusiness} />
