@@ -27,11 +27,14 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { CheckCircle, XCircle, ExternalLink, User, Loader2, Users, Search, UserPlus, Radar, RotateCcw } from 'lucide-react';
+import { CheckCircle, XCircle, ExternalLink, User, Loader2, Users, Search, UserPlus, Radar, RotateCcw, FastForward } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import GolferDiscoverTab from './GolferDiscoverTab';
 import { format } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
+// Show bypass button in non-production environments
+const ENABLE_BYPASS = import.meta.env.MODE !== 'production';
 
 interface GolferVerificationRequest {
   id: string;
@@ -231,7 +234,48 @@ const GolferVerificationTab = () => {
     },
   });
 
-  const processing = submitReviewMutation.isPending || inviteMutation.isPending || reinviteMutation.isPending;
+  // Bypass 2nd approval mutation - calls edge function with service role
+  const bypassApprovalMutation = useMutation({
+    mutationFn: async ({ requestId }: { requestId: string }) => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('Not authenticated');
+
+      const response = await supabase.functions.invoke('bypass-golfer-approval', {
+        body: { request_id: requestId },
+      });
+
+      if (response.error) {
+        const errorMessage = response.error.message || 'Bypass failed';
+        console.error('[bypass-golfer-approval] Error:', response.error, 'Data:', response.data);
+        throw new Error(errorMessage);
+      }
+
+      if (!response.data?.ok) {
+        const errorMessage = response.data?.error || 'Bypass failed';
+        console.error('[bypass-golfer-approval] Not OK:', response.data);
+        throw new Error(errorMessage);
+      }
+
+      return response.data;
+    },
+    onSuccess: (data) => {
+      toast.success('Verification forced (test)', {
+        description: `Request now has ${data.approvals} approvals and is ${data.status}.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ['admin-golfer-verification-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-golfer-verifications-pending-count'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-golfer-verification-my-reviews'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+    onError: (error: any) => {
+      console.error('[bypass-golfer-approval] Mutation error:', error);
+      toast.error('Bypass failed', {
+        description: error.message || 'Could not bypass approval. Please try again.',
+      });
+    },
+  });
+
+  const processing = submitReviewMutation.isPending || inviteMutation.isPending || reinviteMutation.isPending || bypassApprovalMutation.isPending;
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -332,26 +376,45 @@ const GolferVerificationTab = () => {
 
           {/* Actions - responsive */}
           {showActions && request.status === 'pending' && (
-            <div className="flex gap-2 pt-3 md:pt-2 border-t">
-              <Button 
-                size="sm" 
-                onClick={() => { setSelectedRequest(request); setApproveDialogOpen(true); }} 
-                disabled={processing || hasAlreadyReviewed} 
-                className="flex-1 md:flex-none gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-xs md:text-sm"
-              >
-                <CheckCircle className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                {hasAlreadyReviewed ? 'Reviewed' : 'Approve'}
-              </Button>
-              <Button 
-                size="sm" 
-                variant="outline" 
-                onClick={() => { setSelectedRequest(request); setRejectReason(''); setRejectModalOpen(true); }} 
-                disabled={processing || hasAlreadyReviewed} 
-                className="flex-1 md:flex-none gap-1.5 text-red-600 border-red-200 hover:bg-red-50 text-xs md:text-sm"
-              >
-                <XCircle className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                Reject
-              </Button>
+            <div className="flex flex-col gap-2 pt-3 md:pt-2 border-t">
+              <div className="flex gap-2">
+                <Button 
+                  size="sm" 
+                  onClick={() => { setSelectedRequest(request); setApproveDialogOpen(true); }} 
+                  disabled={processing || hasAlreadyReviewed} 
+                  className="flex-1 md:flex-none gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-xs md:text-sm"
+                >
+                  <CheckCircle className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  {hasAlreadyReviewed ? 'Reviewed' : 'Approve'}
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={() => { setSelectedRequest(request); setRejectReason(''); setRejectModalOpen(true); }} 
+                  disabled={processing || hasAlreadyReviewed} 
+                  className="flex-1 md:flex-none gap-1.5 text-red-600 border-red-200 hover:bg-red-50 text-xs md:text-sm"
+                >
+                  <XCircle className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  Reject
+                </Button>
+              </div>
+              {/* Bypass button - only in non-production */}
+              {ENABLE_BYPASS && approvalCount >= 1 && (
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={() => bypassApprovalMutation.mutate({ requestId: request.id })}
+                  disabled={processing}
+                  className="w-full md:w-auto gap-1.5 text-orange-600 border-orange-200 hover:bg-orange-50 text-xs md:text-sm"
+                >
+                  {bypassApprovalMutation.isPending ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <FastForward className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  )}
+                  Bypass 2nd (Test)
+                </Button>
+              )}
             </div>
           )}
 
