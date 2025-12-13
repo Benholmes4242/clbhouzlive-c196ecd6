@@ -313,13 +313,24 @@ const BusinessVerificationTab = () => {
         body: { request_id: requestId },
       });
 
-      if (response.error) throw new Error(response.error.message || 'Bypass failed');
-      if (!response.data?.ok) throw new Error(response.data?.error || 'Bypass failed');
+      // Handle FunctionsHttpError - extract body message
+      if (response.error) {
+        // Try to get error details from the response
+        const errorMessage = response.error.message || 'Bypass failed';
+        console.error('[bypass-second-approval] Error:', response.error, 'Data:', response.data);
+        throw new Error(errorMessage);
+      }
+      
+      if (!response.data?.ok) {
+        const errorMessage = response.data?.error || 'Bypass failed';
+        console.error('[bypass-second-approval] Not OK:', response.data);
+        throw new Error(errorMessage);
+      }
 
       return response.data;
     },
     onSuccess: (data) => {
-      toast.success('Second approval bypassed for testing.', {
+      toast.success('Approved via bypass (test mode).', {
         description: `Business has been verified (${data.approvals} approvals).`,
       });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
@@ -329,7 +340,10 @@ const BusinessVerificationTab = () => {
       queryClient.invalidateQueries({ queryKey: ['verification-history'] });
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Could not bypass approval. Please try again.');
+      console.error('[bypass-second-approval] Mutation error:', error);
+      toast.error('Bypass failed', {
+        description: error.message || 'Could not bypass approval. Please try again.',
+      });
     },
   });
 
