@@ -154,11 +154,13 @@ const BusinessVerificationTab = () => {
   const revokedRequests = requests?.filter(r => r.status === 'revoked') ?? [];
 
   const submitReviewMutation = useMutation({
-    mutationFn: async ({ requestId, decision, note }: { requestId: string; decision: string; note?: string }) => {
+    mutationFn: async ({ requestId, decision, note, bypassCooldown = false }: { requestId: string; decision: string; note?: string; bypassCooldown?: boolean }) => {
       const { data, error } = await supabase.rpc('submit_business_verification_review', {
-        _request_id: requestId,
-        _decision: decision,
-        _note: note || null,
+        p_request_id: requestId,
+        p_reviewer_id: currentUser?.id,
+        p_decision: decision,
+        p_note: note || null,
+        p_bypass_cooldown: bypassCooldown,
       });
       if (error) throw error;
       const result = data as { success: boolean; error?: string; status?: string; approvals?: number; required?: number };
@@ -176,6 +178,7 @@ const BusinessVerificationTab = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verifications-pending-count'] });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verification-my-reviews'] });
+      queryClient.invalidateQueries({ queryKey: ['verification-history'] });
       setApproveDialogOpen(false);
       setRejectModalOpen(false);
       setSelectedRequest(null);
@@ -232,22 +235,23 @@ const BusinessVerificationTab = () => {
 
   // Revoke verification mutation
   const revokeVerificationMutation = useMutation({
-    mutationFn: async ({ businessId, reason }: { businessId: string; reason?: string }) => {
-      const { data, error } = await supabase.rpc('revoke_business_verification', {
-        _business_id: businessId,
-        _reason: reason || null,
+    mutationFn: async ({ businessId, reason, bypassCooldown = false }: { businessId: string; reason?: string; bypassCooldown?: boolean }) => {
+      const { error } = await supabase.rpc('revoke_business_verification', {
+        p_business_id: businessId,
+        p_admin_id: currentUser?.id,
+        p_reason: reason || null,
+        p_bypass_cooldown: bypassCooldown,
       });
       if (error) throw error;
-      const result = data as { success: boolean; error?: string; business_name?: string };
-      if (!result.success) throw new Error(result.error || 'Failed to revoke verification');
-      return result;
+      return { success: true };
     },
-    onSuccess: (result) => {
+    onSuccess: () => {
       toast.success('Verification removed', {
         description: 'The business will need to request verification again.',
       });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verifications-pending-count'] });
+      queryClient.invalidateQueries({ queryKey: ['verification-history'] });
       setRevokeModalOpen(false);
       setSelectedRequest(null);
       setRevokeReason('');
