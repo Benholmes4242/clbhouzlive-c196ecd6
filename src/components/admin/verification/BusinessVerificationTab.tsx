@@ -52,6 +52,9 @@ interface VerificationRequest {
   domain_confirmed_at: string | null;
   approval_count: number;
   required_approvals: number;
+  proof_method: string | null;
+  proof_value: string | null;
+  proof_metadata: Record<string, unknown> | null;
   business: {
     id: string;
     name: string;
@@ -111,6 +114,9 @@ const BusinessVerificationTab = () => {
           domain_confirmed_at,
           approval_count,
           required_approvals,
+          proof_method,
+          proof_value,
+          proof_metadata,
           business:business_accounts!business_id (
             id,
             name,
@@ -455,6 +461,72 @@ const BusinessVerificationTab = () => {
             )}
           </div>
 
+          {/* Proof provided section */}
+          {request.proof_method && request.proof_value && (
+            <div className="bg-blue-50 dark:bg-blue-950/20 rounded-sq-sm p-3 text-sm border border-blue-200 dark:border-blue-900">
+              <p className="text-xs font-medium text-blue-600 mb-2">Proof provided</p>
+              <div className="flex items-center gap-2 text-blue-700 dark:text-blue-400">
+                {request.proof_method === 'official_website' && (
+                  <>
+                    <Globe className="h-4 w-4 shrink-0" />
+                    <span className="font-medium">Website:</span>
+                    <button 
+                      onClick={() => handleWebsiteClick(request.proof_value)} 
+                      className="hover:underline truncate text-left"
+                    >
+                      {request.proof_value}
+                    </button>
+                  </>
+                )}
+                {request.proof_method === 'business_email' && (
+                  <>
+                    <Mail className="h-4 w-4 shrink-0" />
+                    <span className="font-medium">Email:</span>
+                    <span>{request.proof_value}</span>
+                  </>
+                )}
+                {request.proof_method === 'registered_business' && (
+                  <>
+                    <Building2 className="h-4 w-4 shrink-0" />
+                    <span className="font-medium">Registry:</span>
+                    <span>
+                      {(request.proof_metadata as Record<string, string>)?.registry?.replace('_', ' ') || 'Business register'} — {request.proof_value}
+                    </span>
+                    {(request.proof_metadata as Record<string, string>)?.registry_url && (
+                      <button 
+                        onClick={() => handleWebsiteClick((request.proof_metadata as Record<string, string>)?.registry_url)} 
+                        className="hover:underline"
+                      >
+                        (view)
+                      </button>
+                    )}
+                  </>
+                )}
+                {request.proof_method === 'creator_business' && (
+                  <>
+                    <Mail className="h-4 w-4 shrink-0" />
+                    <span className="font-medium">
+                      {(request.proof_metadata as Record<string, string>)?.contact_type === 'phone' ? 'Phone:' : 'Email:'}
+                    </span>
+                    <span>{request.proof_value}</span>
+                  </>
+                )}
+                {request.proof_method === 'golf_course' && (
+                  <>
+                    <Globe className="h-4 w-4 shrink-0" />
+                    <span className="font-medium">Course:</span>
+                    <button 
+                      onClick={() => handleWebsiteClick(request.proof_value)} 
+                      className="hover:underline truncate text-left"
+                    >
+                      {request.proof_value}
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
           {request.note && (
             <div className="bg-muted/30 rounded-sq-sm p-3 text-sm">
               <p className="text-xs font-medium text-muted-foreground mb-1">Note from requester</p>
@@ -522,8 +594,8 @@ const BusinessVerificationTab = () => {
                   Force approve (demo)
                 </Button>
               )}
-              {/* Bypass 2nd approval - only for system accounts after first approval */}
-              {business?.is_system_account && hasAlreadyReviewed && myReview === 'approved' && approvalCount < requiredApprovals && (
+              {/* Bypass 2nd approval - DEV only, for system accounts after first approval */}
+              {import.meta.env.DEV && business?.is_system_account && hasAlreadyReviewed && myReview === 'approved' && approvalCount < requiredApprovals && (
                 <Button
                   size="sm"
                   variant="outline"
