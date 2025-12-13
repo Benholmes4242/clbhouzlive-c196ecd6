@@ -1,0 +1,206 @@
+import React, { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { PageRoot } from '@/components/layout/PageRoot';
+import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { toast } from 'sonner';
+
+const BusinessVerificationRequestPage = () => {
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const { user } = useSupabaseSession();
+  const queryClient = useQueryClient();
+
+  const [website, setWebsite] = useState('');
+  const [note, setNote] = useState('');
+
+  // Fetch business profile
+  const { data: profile, isLoading } = useQuery({
+    queryKey: ['business-profile-for-verification', id],
+    enabled: !!id && !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('id, business_name, business_website, verification_status')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      
+      // Pre-fill website if available
+      if (data?.business_website) {
+        setWebsite(data.business_website);
+      }
+      
+      return data;
+    },
+  });
+
+  const submitMutation = useMutation({
+    mutationFn: async () => {
+      // Call the RPC to request verification
+      const { error } = await supabase.rpc('request_business_verification', {
+        p_profile_id: id,
+      });
+
+      if (error) throw error;
+
+      // Update website if changed
+      if (website && website !== profile?.business_website) {
+        const { error: updateError } = await supabase
+          .from('user_profiles')
+          .update({ business_website: website })
+          .eq('id', id);
+        
+        if (updateError) throw updateError;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['business-profile'] });
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      navigate(`/business/${id}/verification/submitted`);
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to submit verification request');
+    },
+  });
+
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  const handleSubmit = () => {
+    submitMutation.mutate();
+  };
+
+  if (isLoading) {
+    return (
+      <PageRoot className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </PageRoot>
+    );
+  }
+
+  // If already pending or verified, redirect
+  if (profile?.verification_status === 'pending_review') {
+    navigate(`/business/${id}/verification/status`, { replace: true });
+    return null;
+  }
+
+  if (profile?.verification_status === 'verified') {
+    navigate(`/business/${id}/verification/status`, { replace: true });
+    return null;
+  }
+
+  return (
+    <PageRoot className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border/40">
+        <div className="flex items-center gap-3 px-4 py-3">
+          <button
+            onClick={handleBack}
+            className="h-9 w-9 flex items-center justify-center rounded-sq-sm hover:bg-muted/50 transition-colors"
+            aria-label="Go back"
+          >
+            <ArrowLeft className="h-5 w-5 text-foreground" />
+          </button>
+          <h1 className="text-lg font-semibold text-foreground">Request verification</h1>
+        </div>
+      </header>
+
+      <main className="px-4 py-6 max-w-lg mx-auto pb-32">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-6"
+        >
+          {/* Intro */}
+          <div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              We'll review your business details to verify your profile. This usually takes a few days.
+            </p>
+          </div>
+
+          {/* Business name (read-only) */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-foreground">Business name</Label>
+            <Input
+              value={profile?.business_name || ''}
+              disabled
+              className="bg-muted/50"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              This is the name shown on your profile.
+            </p>
+          </div>
+
+          {/* Website */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-foreground">Website</Label>
+            <Input
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              placeholder="https://yourbusiness.com"
+              type="url"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              A website helps us verify your business is authentic.
+            </p>
+          </div>
+
+          {/* Optional note */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-foreground">
+              Additional information <span className="text-muted-foreground font-normal">(optional)</span>
+            </Label>
+            <Textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Anything else you'd like us to know..."
+              rows={3}
+              className="resize-none"
+            />
+          </div>
+        </motion.div>
+      </main>
+
+      {/* Footer CTAs */}
+      <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-border/40 bg-background/95 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-lg items-center justify-between gap-3 px-4 py-3">
+          <button
+            type="button"
+            onClick={handleBack}
+            disabled={submitMutation.isPending}
+            className="flex-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2.5"
+          >
+            Cancel
+          </button>
+          <Button
+            variant="secondary"
+            onClick={handleSubmit}
+            disabled={submitMutation.isPending}
+            className="flex-[1.5] h-11"
+          >
+            {submitMutation.isPending ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Submitting...
+              </span>
+            ) : (
+              'Submit request'
+            )}
+          </Button>
+        </div>
+      </footer>
+    </PageRoot>
+  );
+};
+
+export default BusinessVerificationRequestPage;

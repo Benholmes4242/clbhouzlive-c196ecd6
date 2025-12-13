@@ -1,0 +1,225 @@
+import React from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
+import { ArrowLeft, BadgeCheck, Clock, XCircle, ArrowRight, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { PageRoot } from '@/components/layout/PageRoot';
+import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { format } from 'date-fns';
+
+const BusinessVerificationStatusPage = () => {
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const { user } = useSupabaseSession();
+
+  const { data: profile, isLoading } = useQuery({
+    queryKey: ['business-verification-status', id],
+    enabled: !!id && !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select(`
+          id,
+          username,
+          verification_status,
+          verification_requested_at,
+          verification_reviewed_at,
+          verified_business_notes,
+          is_verified_business
+        `)
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  const handleViewProfile = () => {
+    if (profile?.username) {
+      navigate(`/profile/${profile.username}`);
+    } else {
+      navigate('/business/manage');
+    }
+  };
+
+  const handleUpdateDetails = () => {
+    navigate(`/business/${id}/edit`);
+  };
+
+  const handleRequestAgain = () => {
+    navigate(`/business/${id}/verification/about`);
+  };
+
+  if (isLoading) {
+    return (
+      <PageRoot className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </PageRoot>
+    );
+  }
+
+  const status = profile?.verification_status;
+  const isVerified = profile?.is_verified_business;
+  const requestedAt = profile?.verification_requested_at;
+  const reviewedAt = profile?.verification_reviewed_at;
+  const adminNotes = profile?.verified_business_notes;
+
+  return (
+    <PageRoot className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border/40">
+        <div className="flex items-center gap-3 px-4 py-3">
+          <button
+            onClick={handleBack}
+            className="h-9 w-9 flex items-center justify-center rounded-sq-sm hover:bg-muted/50 transition-colors"
+            aria-label="Go back"
+          >
+            <ArrowLeft className="h-5 w-5 text-foreground" />
+          </button>
+          <h1 className="text-lg font-semibold text-foreground">Verification status</h1>
+        </div>
+      </header>
+
+      <main className="px-4 py-6 max-w-lg mx-auto">
+        {/* Pending state */}
+        {status === 'pending_review' && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center"
+          >
+            <div className="h-16 w-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+              <Clock className="h-8 w-8 text-amber-600" />
+            </div>
+            <h2 className="text-xl font-bold text-foreground mb-2">
+              Verification pending
+            </h2>
+            <p className="text-muted-foreground text-sm mb-6">
+              We're reviewing your request. This usually takes a few days.
+            </p>
+            {requestedAt && (
+              <p className="text-xs text-muted-foreground/70">
+                Submitted {format(new Date(requestedAt), 'MMM d, yyyy')}
+              </p>
+            )}
+          </motion.div>
+        )}
+
+        {/* Verified state */}
+        {(status === 'verified' || isVerified) && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center"
+          >
+            <div className="h-16 w-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
+              <BadgeCheck className="h-8 w-8 text-emerald-600" />
+            </div>
+            <h2 className="text-xl font-bold text-foreground mb-2">
+              Your business is verified
+            </h2>
+            <p className="text-muted-foreground text-sm mb-6">
+              Your profile now shows a verified badge, helping golfers trust your business.
+            </p>
+            {reviewedAt && (
+              <p className="text-xs text-muted-foreground/70 mb-8">
+                Verified on {format(new Date(reviewedAt), 'MMM d, yyyy')}
+              </p>
+            )}
+            <Button
+              variant="secondary"
+              onClick={handleViewProfile}
+              className="gap-2"
+            >
+              View profile
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </motion.div>
+        )}
+
+        {/* Rejected state */}
+        {status === 'rejected' && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center"
+          >
+            <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+              <XCircle className="h-8 w-8 text-slate-500" />
+            </div>
+            <h2 className="text-xl font-bold text-foreground mb-2">
+              Verification not approved
+            </h2>
+            <p className="text-muted-foreground text-sm mb-4">
+              We couldn't verify your business at this time.
+            </p>
+            
+            {adminNotes && (
+              <div className="bg-muted/30 border border-border/50 rounded-sq-lg p-4 mb-6 text-left">
+                <p className="text-xs font-medium text-muted-foreground mb-1">Reason</p>
+                <p className="text-sm text-foreground">{adminNotes}</p>
+              </div>
+            )}
+            
+            {reviewedAt && (
+              <p className="text-xs text-muted-foreground/70 mb-8">
+                Reviewed on {format(new Date(reviewedAt), 'MMM d, yyyy')}
+              </p>
+            )}
+            
+            <div className="space-y-3 max-w-xs mx-auto">
+              <Button
+                variant="secondary"
+                onClick={handleUpdateDetails}
+                className="w-full"
+              >
+                Update details
+              </Button>
+              <button
+                type="button"
+                onClick={handleRequestAgain}
+                className="w-full text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2.5"
+              >
+                Request again
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* No request yet */}
+        {!status && !isVerified && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center"
+          >
+            <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+              <BadgeCheck className="h-8 w-8 text-slate-400" />
+            </div>
+            <h2 className="text-xl font-bold text-foreground mb-2">
+              Not yet verified
+            </h2>
+            <p className="text-muted-foreground text-sm mb-8">
+              Request verification to show golfers your business is authentic.
+            </p>
+            <Button
+              variant="secondary"
+              onClick={() => navigate(`/business/${id}/verification/about`)}
+            >
+              Request verification
+            </Button>
+          </motion.div>
+        )}
+      </main>
+    </PageRoot>
+  );
+};
+
+export default BusinessVerificationStatusPage;
