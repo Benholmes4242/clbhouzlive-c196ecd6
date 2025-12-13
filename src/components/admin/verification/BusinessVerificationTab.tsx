@@ -714,22 +714,22 @@ const BusinessVerificationTab = () => {
   return (
     <div className="space-y-4">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        {/* Status tabs - 2x2 grid on mobile, inline on desktop */}
-        <div className="grid grid-cols-2 gap-2 md:flex md:gap-2">
-          <TabsList className="col-span-2 grid grid-cols-2 gap-1.5 h-auto p-1 md:inline-flex md:h-10 md:gap-0 md:p-1">
-            <TabsTrigger value="pending" className="gap-1 text-xs md:text-sm justify-center py-2 md:py-1.5">
+        {/* Status tabs - single row with horizontal scroll */}
+        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+          <TabsList className="inline-flex w-full md:w-auto h-9 md:h-10 gap-1">
+            <TabsTrigger value="pending" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
               Pending
               {pendingRequests.length > 0 && <span className="text-[10px] md:text-xs bg-amber-500/20 text-amber-600 px-1.5 py-0.5 rounded-full">{pendingRequests.length}</span>}
             </TabsTrigger>
-            <TabsTrigger value="approved" className="gap-1 text-xs md:text-sm justify-center py-2 md:py-1.5">
+            <TabsTrigger value="approved" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
               Approved
               <span className="text-[10px] md:text-xs opacity-60">({approvedRequests.length})</span>
             </TabsTrigger>
-            <TabsTrigger value="rejected" className="gap-1 text-xs md:text-sm justify-center py-2 md:py-1.5">
+            <TabsTrigger value="rejected" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
               Rejected
               <span className="text-[10px] md:text-xs opacity-60">({rejectedRequests.length})</span>
             </TabsTrigger>
-            <TabsTrigger value="revoked" className="gap-1 text-xs md:text-sm justify-center py-2 md:py-1.5">
+            <TabsTrigger value="revoked" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
               Revoked
               <span className="text-[10px] md:text-xs opacity-60">({revokedRequests.length})</span>
             </TabsTrigger>

@@ -350,14 +350,14 @@ const GolferVerificationTab = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        {/* Status tabs - 2x2 grid on mobile for first 4 tabs, inline on desktop */}
-        <div className="grid grid-cols-2 gap-2 md:block">
-          <TabsList className="col-span-2 grid grid-cols-2 gap-1.5 h-auto p-1 md:inline-flex md:h-10 md:gap-0 md:p-1">
-            <TabsTrigger value="discover" className="gap-1 text-xs md:text-sm justify-center py-2 md:py-1.5 md:px-4">
+        {/* Status tabs - single row with horizontal scroll */}
+        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+          <TabsList className="inline-flex w-full md:w-auto h-9 md:h-10 gap-1">
+            <TabsTrigger value="discover" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
               <Radar className="h-3.5 w-3.5 md:h-4 md:w-4" />
               Discover
             </TabsTrigger>
-            <TabsTrigger value="pending" className="gap-1 text-xs md:text-sm justify-center py-2 md:py-1.5 md:px-4">
+            <TabsTrigger value="pending" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
               Pending
               {pendingRequests.length > 0 && (
                 <span className="text-[10px] md:text-xs bg-amber-500/20 text-amber-600 px-1.5 py-0.5 rounded-full">
@@ -365,27 +365,19 @@ const GolferVerificationTab = () => {
                 </span>
               )}
             </TabsTrigger>
-            <TabsTrigger value="invited" className="gap-1 text-xs md:text-sm justify-center py-2 md:py-1.5 md:px-4">
+            <TabsTrigger value="invited" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
               Invited
               <span className="text-[10px] md:text-xs opacity-60">({invitedRequests.length})</span>
             </TabsTrigger>
-            <TabsTrigger value="approved" className="gap-1 text-xs md:text-sm justify-center py-2 md:py-1.5 md:px-4">
+            <TabsTrigger value="approved" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
               Verified
               <span className="text-[10px] md:text-xs opacity-60">({approvedRequests.length})</span>
             </TabsTrigger>
-          </TabsList>
-          {/* Rejected tab as full-width on mobile */}
-          <TabsList className="col-span-2 h-auto p-1 md:hidden">
-            <TabsTrigger value="rejected" className="gap-1 text-xs justify-center py-2 w-full">
+            <TabsTrigger value="rejected" className="flex-1 md:flex-none gap-1 text-xs md:text-sm px-3 md:px-4">
               Rejected
-              <span className="text-[10px] opacity-60">({rejectedRequests.length})</span>
+              <span className="text-[10px] md:text-xs opacity-60">({rejectedRequests.length})</span>
             </TabsTrigger>
           </TabsList>
-          {/* Desktop rejected tab inline */}
-          <TabsTrigger value="rejected" className="hidden md:inline-flex gap-1 text-sm justify-center py-1.5 px-4">
-            Rejected
-            <span className="text-xs opacity-60">({rejectedRequests.length})</span>
-          </TabsTrigger>
         </div>
 
         <TabsContent value="discover" className="mt-4">
