@@ -12,6 +12,7 @@ import {
 import { BusinessMembership } from '@/hooks/useBusinessMembership';
 import { DeleteBusinessDialog } from './DeleteBusinessDialog';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import BusinessVerificationModal from './verification/BusinessVerificationModal';
 
 interface BusinessOwnerMenuProps {
   businessId: string;
@@ -33,6 +34,7 @@ export function BusinessOwnerMenu({
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [verificationModalOpen, setVerificationModalOpen] = useState(false);
 
   // Only show for owners/admins
   if (!membership?.canManage) {
@@ -48,8 +50,7 @@ export function BusinessOwnerMenu({
   const isRejected = status === 'rejected';
 
   const handleRequestVerification = () => {
-    // Navigate to the verification request flow
-    navigate(`/business/${businessId}/verification/about`);
+    setVerificationModalOpen(true);
   };
 
   return (
@@ -128,6 +129,13 @@ export function BusinessOwnerMenu({
           userId={user.id}
         />
       )}
+
+      <BusinessVerificationModal
+        open={verificationModalOpen}
+        onOpenChange={setVerificationModalOpen}
+        businessId={businessId}
+        isReapply={isRejected}
+      />
     </>
   );
 }
