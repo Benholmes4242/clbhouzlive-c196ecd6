@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Users } from 'lucide-react';
 
 interface FriendsSnapshotCardProps {
   timeframe: string;
@@ -74,14 +73,9 @@ const FriendsSnapshotCard: React.FC<FriendsSnapshotCardProps> = ({
   return (
     <section className="pt-3 pb-5">
       {/* Header */}
-      <div className="flex items-center gap-2.5 mb-6">
-        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
-          <Users className="w-4 h-4 text-primary" />
-        </div>
-        <div>
-          <h3 className="text-base font-semibold text-foreground">Friends Courses</h3>
-          <p className="text-sm text-muted-foreground">See where your friends have been playing</p>
-        </div>
+      <div className="text-center mb-6">
+        <h3 className="text-base font-semibold text-foreground">Friends Courses</h3>
+        <p className="text-sm text-muted-foreground">See where your friends have been playing</p>
       </div>
 
       {/* Stats Grid - 2×2 centered with soft background anchor */}
