@@ -1,5 +1,4 @@
 import React from 'react';
-import { Card } from '@/components/ui/card';
 import { Users } from 'lucide-react';
 
 interface FriendsSnapshotCardProps {
@@ -36,61 +35,62 @@ const FriendsSnapshotCard: React.FC<FriendsSnapshotCardProps> = ({
   };
 
   return (
-    <Card className="bg-card border border-border/60 rounded-xl shadow-sm overflow-hidden">
-      <div className="px-5 py-6 space-y-4">
-        {/* Header */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10">
-            <Users className="w-5 h-5 text-primary" />
+    <section className="pt-3 pb-5">
+      {/* Header */}
+      <div className="flex items-center gap-2.5 mb-4">
+        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
+          <Users className="w-4 h-4 text-primary" />
+        </div>
+        <div>
+          <h3 className="text-base font-semibold text-foreground">Friends Courses</h3>
+          <p className="text-sm text-muted-foreground">{getSubtitle()}</p>
+        </div>
+      </div>
+
+      {/* Stats Grid - 2×2 with subtle dividers */}
+      <div className="grid grid-cols-2 gap-y-3">
+        {/* Row 1 */}
+        <div className="text-center border-r border-border/40 pr-4">
+          <div className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground/70">
+            Courses
           </div>
-          <div>
-            <h3 className="text-base font-semibold text-foreground">Friends' Courses</h3>
-            <p className="text-sm text-muted-foreground">{getSubtitle()}</p>
+          <div className="mt-0.5 font-medium text-foreground">
+            {totalCourses} course{totalCourses !== 1 ? "s" : ""}
           </div>
         </div>
 
-        {/* Stats Grid - 2×2 centered layout */}
-        <div className="mt-6 grid grid-cols-2 gap-x-8 gap-y-4 text-center justify-items-center">
-          {/* Row 1: Courses / Regions */}
-          <div>
-            <div className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground/70">
-              Courses
-            </div>
-            <div className="mt-1 font-medium text-foreground">
-              {totalCourses} course{totalCourses !== 1 ? "s" : ""}
-            </div>
+        <div className="text-center pl-4">
+          <div className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground/70">
+            Regions
           </div>
-
-          <div>
-            <div className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground/70">
-              Regions
-            </div>
-            <div className="mt-1 font-medium text-foreground">
-              {totalRegions} region{totalRegions !== 1 ? "s" : ""}
-            </div>
+          <div className="mt-0.5 font-medium text-foreground">
+            {totalRegions} region{totalRegions !== 1 ? "s" : ""}
           </div>
+        </div>
 
-          {/* Row 2: Average rating / Rounds */}
-          <div>
-            <div className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground/70">
-              Average rating
-            </div>
-            <div className="mt-1 font-medium text-foreground">
-              {averageRating ? averageRating.toFixed(1) : "—"}
-            </div>
+        {/* Horizontal divider */}
+        <div className="col-span-2 border-t border-border/40 my-1" />
+
+        {/* Row 2 */}
+        <div className="text-center border-r border-border/40 pr-4">
+          <div className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground/70">
+            Average rating
           </div>
+          <div className="mt-0.5 font-medium text-foreground">
+            {averageRating ? averageRating.toFixed(1) : "—"}
+          </div>
+        </div>
 
-          <div>
-            <div className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground/70">
-              Rounds
-            </div>
-            <div className="mt-1 font-medium text-foreground">
-              {totalRounds} round{totalRounds !== 1 ? "s" : ""}
-            </div>
+        <div className="text-center pl-4">
+          <div className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground/70">
+            Rounds
+          </div>
+          <div className="mt-0.5 font-medium text-foreground">
+            {totalRounds} round{totalRounds !== 1 ? "s" : ""}
           </div>
         </div>
       </div>
-    </Card>
+    </section>
   );
 };
 
