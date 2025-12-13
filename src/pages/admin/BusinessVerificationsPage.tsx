@@ -169,7 +169,7 @@ const BusinessVerificationsPage = () => {
         <div>
           <h1 className="text-2xl font-semibold">Business Verification Requests</h1>
           <p className="text-muted-foreground">
-            Review and approve verification requests submitted by businesses on Clbhouz.
+            Review and approve verification requests submitted by businesses on clbhouz.
           </p>
         </div>
         {pendingCount > 0 && (
@@ -314,7 +314,7 @@ const BusinessVerificationsPage = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Approve this business?</AlertDialogTitle>
             <AlertDialogDescription>
-              This business will receive a verified badge and appear as verified across Clbhouz. Are you sure you want to approve this request?
+              This business will receive a verified badge and appear as verified across clbhouz. Are you sure you want to approve this request?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

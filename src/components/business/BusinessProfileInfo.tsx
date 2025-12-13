@@ -194,7 +194,7 @@ export function BusinessProfileInfo({ business }: BusinessProfileInfoProps) {
               </div>
               <div>
                 <p className="text-sm font-medium text-foreground">Verified Business</p>
-                <p className="text-xs text-muted-foreground">This business has been verified by Clbhouz</p>
+                <p className="text-xs text-muted-foreground">This business has been verified by clbhouz</p>
               </div>
             </div>
           )}

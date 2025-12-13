@@ -190,7 +190,7 @@ const BusinessCreatePage = () => {
           
           {/* Subtitle */}
           <p className="text-sm text-muted-foreground text-center mt-1">
-            This is how your business will appear to golfers on Clbhouz.
+            This is how your business will appear to golfers on clbhouz.
           </p>
         </div>
       </header>

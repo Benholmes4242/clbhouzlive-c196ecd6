@@ -215,7 +215,7 @@ const BusinessManagePage = () => {
               <h2 className="text-sm font-semibold text-foreground">Business identity</h2>
             </div>
             <p className="text-xs text-muted-foreground mb-4">
-              How your business appears across Clbhouz.
+              How your business appears across clbhouz.
             </p>
 
             <div className="space-y-4">
@@ -453,7 +453,7 @@ const BusinessManagePage = () => {
               <h2 className="text-sm font-semibold text-foreground">Visibility</h2>
             </div>
             <p className="text-xs text-muted-foreground mb-4">
-              Choose how your business appears across Clbhouz.
+              Choose how your business appears across clbhouz.
             </p>
 
             <div className="space-y-4">
@@ -522,7 +522,7 @@ const BusinessManagePage = () => {
               <div className="space-y-2">
                 <p className="text-xs font-medium text-foreground">Primary Owner</p>
                 <p className="text-xs text-muted-foreground">
-                  The person who created this business on Clbhouz.
+                  The person who created this business on clbhouz.
                 </p>
                 <div className="flex items-center gap-3 py-2">
                   <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center overflow-hidden">

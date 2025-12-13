@@ -441,7 +441,7 @@ const BusinessEditPage = () => {
           {/* Section 2: Business Identity */}
           <EditSection
             title="Business identity"
-            subtitle="This appears across Clbhouz wherever your business is shown."
+            subtitle="This appears across clbhouz wherever your business is shown."
             icon={Building2}
             index={1}
           >
@@ -614,7 +614,7 @@ const BusinessEditPage = () => {
                     Delete business profile
                   </h3>
                   <p className="text-xs text-muted-foreground mb-3">
-                    This permanently removes the business from Clbhouz. This cannot be undone.
+                    This permanently removes the business from clbhouz. This cannot be undone.
                   </p>
                   <Button
                     variant="outline"

@@ -25,7 +25,7 @@ export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardPro
           Create your first business profile
         </h3>
         <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto leading-relaxed">
-          Represent a golf club, coach, brand, or venue on Clbhouz.
+          Represent a golf club, coach, brand, or venue on clbhouz.
         </p>
         <Button onClick={onClick} size="lg" className="gap-2">
           <Plus className="h-4 w-4" />
