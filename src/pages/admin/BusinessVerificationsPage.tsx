@@ -26,7 +26,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { CheckCircle, XCircle, ExternalLink, Globe, Building2, Loader2, ShieldCheck, Mail } from 'lucide-react';
+import { CheckCircle, XCircle, ExternalLink, Globe, Building2, Loader2, ShieldCheck, Mail, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useAdminVerificationQueueRealtime } from '@/hooks/useBusinessVerificationRealtime';
@@ -48,6 +48,8 @@ interface VerificationRequest {
   domain: string | null;
   domain_confirmed: boolean;
   domain_confirmed_at: string | null;
+  approval_count: number;
+  required_approvals: number;
   business: {
     id: string;
     name: string;
@@ -58,6 +60,15 @@ interface VerificationRequest {
     logo_url: string | null;
     is_verified: boolean;
   } | null;
+}
+
+interface VerificationReview {
+  id: string;
+  request_id: string;
+  reviewer_id: string;
+  decision: string;
+  note: string | null;
+  created_at: string;
 }
 
 const BusinessVerificationsPage = () => {
@@ -73,6 +84,15 @@ const BusinessVerificationsPage = () => {
   // Enable realtime updates for instant queue refresh
   useAdminVerificationQueueRealtime();
   const requestDomainCheck = useRequestDomainCheck();
+
+  // Get current user ID for checking if already reviewed
+  const { data: currentUser } = useQuery({
+    queryKey: ['current-user'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      return user;
+    },
+  });
 
   // Fetch verification requests from new table
   const { data: requests, isLoading } = useQuery({
@@ -95,6 +115,8 @@ const BusinessVerificationsPage = () => {
           domain,
           domain_confirmed,
           domain_confirmed_at,
+          approval_count,
+          required_approvals,
           business:business_accounts!business_id (
             id,
             name,
@@ -113,55 +135,67 @@ const BusinessVerificationsPage = () => {
     },
   });
 
+  // Fetch all reviews for pending requests to check if current user already reviewed
+  const { data: myReviews } = useQuery({
+    queryKey: ['admin-verification-my-reviews', currentUser?.id],
+    enabled: !!currentUser?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('business_verification_reviews')
+        .select('request_id, decision')
+        .eq('reviewer_id', currentUser!.id);
+
+      if (error) throw error;
+      return data as { request_id: string; decision: string }[];
+    },
+  });
+
+  const myReviewsByRequest = React.useMemo(() => {
+    const map = new Map<string, string>();
+    myReviews?.forEach(r => map.set(r.request_id, r.decision));
+    return map;
+  }, [myReviews]);
+
   const pendingRequests = requests?.filter(r => r.status === 'pending') ?? [];
   const approvedRequests = requests?.filter(r => r.status === 'approved') ?? [];
   const rejectedRequests = requests?.filter(r => r.status === 'rejected') ?? [];
 
-  // Approve mutation using new RPC
-  const approveMutation = useMutation({
-    mutationFn: async (requestId: string) => {
-      const { error } = await supabase.rpc('approve_business_verification', {
+  // Submit review mutation using new RPC
+  const submitReviewMutation = useMutation({
+    mutationFn: async ({ requestId, decision, note }: { requestId: string; decision: string; note?: string }) => {
+      const { data, error } = await supabase.rpc('submit_business_verification_review', {
         _request_id: requestId,
+        _decision: decision,
+        _note: note || null,
       });
       if (error) throw error;
+      const result = data as { success: boolean; error?: string; status?: string; approvals?: number; required?: number };
+      if (!result.success) throw new Error(result.error || 'Failed to submit review');
+      return result;
     },
-    onSuccess: () => {
-      toast.success('Business verified successfully.');
+    onSuccess: (result) => {
+      if (result.status === 'approved') {
+        toast.success('Business verified successfully.');
+      } else if (result.status === 'rejected') {
+        toast.success('Verification request rejected.');
+      } else {
+        toast.success(`Approval recorded (${result.approvals} of ${result.required})`);
+      }
       queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verifications-count'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-verification-my-reviews'] });
       setApproveDialogOpen(false);
-      setSelectedRequest(null);
-    },
-    onError: (error: any) => {
-      console.error('Approve error:', error);
-      toast.error(error.message || 'Could not approve verification. Please try again.');
-    },
-  });
-
-  // Reject mutation using new RPC
-  const rejectMutation = useMutation({
-    mutationFn: async ({ requestId, adminNote }: { requestId: string; adminNote: string }) => {
-      const { error } = await supabase.rpc('reject_business_verification', {
-        _request_id: requestId,
-        _admin_note: adminNote || '',
-      });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success('Verification request rejected.');
-      queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
-      queryClient.invalidateQueries({ queryKey: ['admin-business-verifications-count'] });
       setRejectModalOpen(false);
       setSelectedRequest(null);
       setRejectReason('');
     },
     onError: (error: any) => {
-      console.error('Reject error:', error);
-      toast.error(error.message || 'Could not reject verification. Please try again.');
+      console.error('Review error:', error);
+      toast.error(error.message || 'Could not submit review. Please try again.');
     },
   });
 
-  const processing = approveMutation.isPending || rejectMutation.isPending || requestDomainCheck.isPending;
+  const processing = submitReviewMutation.isPending || requestDomainCheck.isPending;
 
   const openRejectModal = (request: VerificationRequest) => {
     setSelectedRequest(request);
@@ -221,6 +255,10 @@ const BusinessVerificationsPage = () => {
 
   const renderRequestCard = (request: VerificationRequest, showActions: boolean) => {
     const business = request.business;
+    const myReview = myReviewsByRequest.get(request.id);
+    const hasAlreadyReviewed = !!myReview;
+    const approvalCount = request.approval_count ?? 0;
+    const requiredApprovals = request.required_approvals ?? 2;
     
     return (
       <Card key={request.id} className="p-5">
@@ -254,6 +292,24 @@ const BusinessVerificationsPage = () => {
               </Link>
             )}
           </div>
+
+          {/* Approval Progress (for pending requests) */}
+          {request.status === 'pending' && (
+            <div className="flex items-center gap-2 text-sm">
+              <Users className="h-4 w-4 text-muted-foreground" />
+              <span className="text-muted-foreground">
+                {approvalCount === 0 
+                  ? `Awaiting review (0 of ${requiredApprovals})`
+                  : `${approvalCount} of ${requiredApprovals} approvals received`
+                }
+              </span>
+              {hasAlreadyReviewed && (
+                <Badge variant="outline" className="text-xs">
+                  You {myReview === 'approved' ? 'approved' : 'reviewed'}
+                </Badge>
+              )}
+            </div>
+          )}
 
           {/* Details */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -333,17 +389,17 @@ const BusinessVerificationsPage = () => {
               <Button
                 size="sm"
                 onClick={() => openApproveDialog(request)}
-                disabled={processing || (request.requires_domain_check && !request.domain_confirmed)}
+                disabled={processing || hasAlreadyReviewed || (request.requires_domain_check && !request.domain_confirmed)}
                 className="gap-1.5 bg-emerald-600 hover:bg-emerald-700"
               >
                 <CheckCircle className="h-4 w-4" />
-                Approve
+                {hasAlreadyReviewed ? 'Already Reviewed' : 'Approve'}
               </Button>
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => openRejectModal(request)}
-                disabled={processing}
+                disabled={processing || hasAlreadyReviewed}
                 className="gap-1.5 text-red-600 border-red-200 hover:bg-red-50"
               >
                 <XCircle className="h-4 w-4" />
@@ -385,7 +441,7 @@ const BusinessVerificationsPage = () => {
         <div>
           <h1 className="text-2xl font-semibold">Business Verification</h1>
           <p className="text-muted-foreground">
-            Review and approve verification requests submitted by businesses.
+            Review and verify businesses to help golfers identify authentic, trusted organisations.
           </p>
         </div>
         {pendingRequests.length > 0 && (
@@ -410,6 +466,9 @@ const BusinessVerificationsPage = () => {
         </TabsList>
 
         <TabsContent value="pending" className="mt-4 space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Each request requires two independent approvals. Any single rejection immediately rejects the request.
+          </p>
           {pendingRequests.length === 0 ? (
             <Card className="p-8 text-center">
               <Building2 className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
@@ -458,13 +517,24 @@ const BusinessVerificationsPage = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Approve this business?</AlertDialogTitle>
             <AlertDialogDescription>
-              <strong>{selectedRequest?.business?.name}</strong> will receive a verified badge and appear as verified across clbhouz.
+              Your approval will be recorded for <strong>{selectedRequest?.business?.name}</strong>.
+              {selectedRequest && (
+                <span className="block mt-2 text-muted-foreground">
+                  {(selectedRequest.approval_count ?? 0) === 0 
+                    ? 'This will be the first approval. One more is needed to verify.'
+                    : 'This will complete the verification and the business will receive a verified badge.'
+                  }
+                </span>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={processing}>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => selectedRequest && approveMutation.mutate(selectedRequest.id)}
+              onClick={() => selectedRequest && submitReviewMutation.mutate({ 
+                requestId: selectedRequest.id, 
+                decision: 'approved' 
+              })}
               disabled={processing}
               className="bg-emerald-600 hover:bg-emerald-700"
             >
@@ -480,12 +550,13 @@ const BusinessVerificationsPage = () => {
           <DialogHeader>
             <DialogTitle>Reject Verification Request</DialogTitle>
             <DialogDescription>
-              Rejecting the verification request for <strong>{selectedRequest?.business?.name}</strong>. You can provide a reason to help them improve.
+              Rejecting the verification request for <strong>{selectedRequest?.business?.name}</strong>. 
+              Provide a short reason to help the business improve their verification request.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="rejectReason">Reason for rejection (optional)</Label>
+              <Label htmlFor="rejectReason">Reason for rejection</Label>
               <Textarea
                 id="rejectReason"
                 value={rejectReason}
@@ -501,9 +572,10 @@ const BusinessVerificationsPage = () => {
             </Button>
             <Button
               variant="destructive"
-              onClick={() => selectedRequest && rejectMutation.mutate({ 
+              onClick={() => selectedRequest && submitReviewMutation.mutate({ 
                 requestId: selectedRequest.id, 
-                adminNote: rejectReason 
+                decision: 'rejected',
+                note: rejectReason 
               })}
               disabled={processing}
             >
