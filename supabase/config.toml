@@ -42,3 +42,6 @@ verify_jwt = true
 [functions.location-search]
 verify_jwt = false
 
+[functions.compute-golfer-eligibility-signals]
+verify_jwt = true
+

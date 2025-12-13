@@ -27,8 +27,9 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { CheckCircle, XCircle, ExternalLink, User, Loader2, Users, Search, UserPlus } from 'lucide-react';
+import { CheckCircle, XCircle, ExternalLink, User, Loader2, Users, Search, UserPlus, Radar } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import GolferDiscoverTab from './GolferDiscoverTab';
 import { format } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -69,7 +70,7 @@ const GolferVerificationTab = () => {
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<GolferVerificationRequest | null>(null);
   const [rejectReason, setRejectReason] = useState('');
-  const [activeTab, setActiveTab] = useState('pending');
+  const [activeTab, setActiveTab] = useState('discover');
   const [searchQuery, setSearchQuery] = useState('');
   const [inviteNote, setInviteNote] = useState('');
   const [selectedGolfer, setSelectedGolfer] = useState<SearchResult | null>(null);
@@ -332,6 +333,10 @@ const GolferVerificationTab = () => {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
+          <TabsTrigger value="discover" className="gap-1.5">
+            <Radar className="h-4 w-4" />
+            Discover
+          </TabsTrigger>
           <TabsTrigger value="pending" className="gap-1.5">
             Pending
             {pendingRequests.length > 0 && <span className="ml-1 text-xs bg-amber-500/20 text-amber-600 px-1.5 py-0.5 rounded-full">{pendingRequests.length}</span>}
@@ -340,6 +345,10 @@ const GolferVerificationTab = () => {
           <TabsTrigger value="approved">Verified ({approvedRequests.length})</TabsTrigger>
           <TabsTrigger value="rejected">Rejected ({rejectedRequests.length})</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="discover" className="mt-4">
+          <GolferDiscoverTab />
+        </TabsContent>
 
         <TabsContent value="pending" className="mt-4 space-y-4">
           <p className="text-sm text-muted-foreground">Each request requires two independent approvals. Any single rejection immediately rejects the request.</p>
