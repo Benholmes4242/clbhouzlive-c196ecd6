@@ -71,6 +71,7 @@ const BusinessVerificationTab = () => {
   const [selectedRequest, setSelectedRequest] = useState<VerificationRequest | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [revokeReason, setRevokeReason] = useState('');
+  const [revokeConfirmed, setRevokeConfirmed] = useState(false);
   const [domainInput, setDomainInput] = useState('');
   const [activeTab, setActiveTab] = useState('pending');
 
@@ -239,15 +240,20 @@ const BusinessVerificationTab = () => {
       return result;
     },
     onSuccess: (result) => {
-      toast.success(`Verification removed for ${result.business_name}.`);
+      toast.success('Verification removed', {
+        description: 'The business will need to request verification again.',
+      });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verifications-pending-count'] });
       setRevokeModalOpen(false);
       setSelectedRequest(null);
       setRevokeReason('');
+      setRevokeConfirmed(false);
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Could not revoke verification. Please try again.');
+      toast.error('Unable to remove verification', {
+        description: 'Please try again or contact support.',
+      });
     },
   });
 
@@ -279,6 +285,7 @@ const BusinessVerificationTab = () => {
   const openRevokeModal = (request: VerificationRequest) => {
     setSelectedRequest(request);
     setRevokeReason('');
+    setRevokeConfirmed(false);
     setRevokeModalOpen(true);
   };
 
@@ -587,23 +594,46 @@ const BusinessVerificationTab = () => {
 
       {/* Revoke Verification Modal */}
       <Dialog open={revokeModalOpen} onOpenChange={setRevokeModalOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Remove Verification</DialogTitle>
-            <DialogDescription>
-              Removing verification from <strong>{selectedRequest?.business?.name}</strong>. The business will need to go through verification again.
+            <DialogTitle>Remove business verification</DialogTitle>
+            <DialogDescription className="space-y-3">
+              <span className="block">
+                Removing verification will unverify this business and remove its verified badge across Clbhouz.
+              </span>
+              <span className="block">
+                The business will need to go through the verification process again to regain verified status.
+              </span>
+              <span className="block text-xs text-muted-foreground/80">
+                Use this if the business no longer meets verification requirements, ownership has changed, or verification was granted in error.
+              </span>
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="revokeReason">Reason for removal (optional)</Label>
+              <Label htmlFor="revokeReason">Reason for removal (required)</Label>
               <Textarea
                 id="revokeReason"
                 value={revokeReason}
                 onChange={(e) => setRevokeReason(e.target.value)}
-                placeholder="e.g., Ownership changed, policy violation, requested by business..."
+                placeholder="Briefly explain why verification is being removed…"
                 className="min-h-[100px]"
               />
+              <p className="text-xs text-muted-foreground">
+                This note is stored for audit purposes and is only visible to admins.
+              </p>
+            </div>
+            <div className="flex items-start gap-2">
+              <input
+                type="checkbox"
+                id="confirmRevoke"
+                className="mt-1 h-4 w-4 rounded border-border"
+                checked={revokeConfirmed}
+                onChange={(e) => setRevokeConfirmed(e.target.checked)}
+              />
+              <Label htmlFor="confirmRevoke" className="text-sm font-normal cursor-pointer">
+                I understand this action will immediately remove verification.
+              </Label>
             </div>
           </div>
           <DialogFooter>
@@ -612,11 +642,11 @@ const BusinessVerificationTab = () => {
               variant="destructive"
               onClick={() => selectedRequest?.business && revokeVerificationMutation.mutate({
                 businessId: selectedRequest.business.id,
-                reason: revokeReason || undefined,
+                reason: revokeReason,
               })}
-              disabled={processing}
+              disabled={processing || !revokeReason.trim() || !revokeConfirmed}
             >
-              {processing ? 'Removing...' : 'Remove Verification'}
+              {processing ? 'Removing...' : 'Remove verification'}
             </Button>
           </DialogFooter>
         </DialogContent>
