@@ -65,6 +65,28 @@ function getNotificationIcon(type: string) {
   }
 }
 
+function getActorDisplayName(notification: ActivityNotification): string {
+  // For business notifications, use business name from data if available
+  if (notification.type?.startsWith('business_verification')) {
+    const businessName = notification.data?.business_name;
+    if (businessName) return businessName;
+  }
+  
+  // For system notifications, use Clbhouz Team
+  if (notification.type === 'system' || notification.type === 'app_update') {
+    return 'Clbhouz Team';
+  }
+  
+  // Use actor display name, never fallback to "Someone" or "Unknown"
+  const name = notification.actor_display_name;
+  if (name && name !== 'Someone' && name !== 'Unknown User') {
+    return name;
+  }
+  
+  // Default to Clbhouz Team for system-like notifications
+  return 'Clbhouz Team';
+}
+
 function renderNotificationText(notification: ActivityNotification): string {
   const { type, message, title } = notification;
   
@@ -94,11 +116,13 @@ function renderNotificationText(notification: ActivityNotification): string {
       return title || 'New update available';
     // Business verification notifications - use title directly
     case 'business_verification_submitted':
-      return title || 'Verification request submitted';
+      return 'Verification request submitted';
     case 'business_verification_approved':
-      return title || 'Your business is verified';
+      return 'Your business is verified';
     case 'business_verification_rejected':
-      return title || 'Verification not approved';
+      return 'Verification not approved';
+    case 'business_verification_domain_required':
+      return 'Action required: verify your business email domain';
     default:
       return title || message || 'New notification';
   }
@@ -213,7 +237,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
 }) => {
   const cancelMutation = useCancelFriendRequest();
   const { type, data } = notification;
-  const actorName = notification.actor_display_name || 'Unknown User';
+  const actorName = getActorDisplayName(notification);
   const targetUserName = data?.target_user_name || actorName;
   const showOrange = isSessionNew || notification.is_unread;
   const friendRequestId = data?.request_id || notification.id;

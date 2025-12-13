@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
-  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, MapPin, ShieldCheck, Clock, CheckCircle
+  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, MapPin, ShieldCheck, Clock, CheckCircle, Mail
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -47,6 +47,9 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
   
   // Derive verification state
   const verificationState = deriveVerificationState(business.is_verified, verificationRequest);
+  
+  // Check if domain verification is required
+  const needsDomainVerification = verificationRequest?.requires_domain_check && !verificationRequest?.domain_confirmed;
 
   // Format stat display - show "-" for zero/empty with fixed width
   const formatStat = (value: number | undefined) => {
@@ -122,6 +125,13 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                 <MapPin className="h-3 w-3 flex-shrink-0" />
                 <span className="truncate">{business.location}</span>
               </div>
+            )}
+            
+            {/* Pending verification subtext */}
+            {verificationState === 'pending' && (
+              <p className="text-[10px] text-amber-600/80 mt-1">
+                {needsDomainVerification ? 'Action required: verify your domain' : 'Under review'}
+              </p>
             )}
           </div>
 
@@ -253,31 +263,49 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
 
         {/* Actions Row - flat buttons with refined styling */}
         <div className="flex items-center gap-3 px-4 py-3.5">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/business/${business.id}/edit`);
-            }}
-            className="gap-1.5 h-9 flex-1 border-border/40 hover:border-border/60 active:scale-[0.98] transition-all"
-          >
-            <Pencil className="h-3.5 w-3.5" />
-            Edit profile
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/business/${business.id}/insights`);
-            }}
-            className="gap-1.5 h-9 flex-1 border-border/40 hover:border-border/60 active:scale-[0.98] transition-all"
-          >
-            <BarChart3 className="h-3.5 w-3.5" />
-            Insights
-          </Button>
+          {needsDomainVerification ? (
+            // Show domain verification CTA when required
+            <Button
+              variant="default"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/business/${business.id}/verify-domain`);
+              }}
+              className="gap-1.5 h-9 flex-1 active:scale-[0.98] transition-all"
+            >
+              <Mail className="h-3.5 w-3.5" />
+              Verify domain now
+            </Button>
+          ) : (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/business/${business.id}/edit`);
+                }}
+                className="gap-1.5 h-9 flex-1 border-border/40 hover:border-border/60 active:scale-[0.98] transition-all"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                Edit profile
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/business/${business.id}/insights`);
+                }}
+                className="gap-1.5 h-9 flex-1 border-border/40 hover:border-border/60 active:scale-[0.98] transition-all"
+              >
+                <BarChart3 className="h-3.5 w-3.5" />
+                Insights
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Bottom divider for section separation */}

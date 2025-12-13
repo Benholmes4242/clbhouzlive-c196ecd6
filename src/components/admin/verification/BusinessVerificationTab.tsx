@@ -309,7 +309,7 @@ const BusinessVerificationTab = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      toast.success('2nd approval bypassed', {
+      toast.success('Second approval bypassed for testing.', {
         description: `Business has been verified (${data.approvals} approvals).`,
       });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
@@ -602,7 +602,8 @@ const BusinessVerificationTab = () => {
             <Card className="p-8 text-center">
               <Building2 className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
               <h3 className="font-medium text-lg">No pending requests</h3>
-              <p className="text-muted-foreground text-sm mt-1">All caught up! New requests will appear here.</p>
+              <p className="text-muted-foreground text-sm mt-1">All caught up!</p>
+              <p className="text-muted-foreground/60 text-xs mt-0.5">Last checked just now</p>
             </Card>
           ) : pendingRequests.map(request => renderRequestCard(request, true))}
         </TabsContent>
@@ -647,7 +648,9 @@ const BusinessVerificationTab = () => {
               Your approval will be recorded for <strong>{selectedRequest?.business?.name}</strong>.
               {selectedRequest && (
                 <span className="block mt-2 text-muted-foreground">
-                  {(selectedRequest.approval_count ?? 0) === 0 ? 'This will be the first approval. One more is needed to verify.' : 'This will complete the verification and the business will receive a verified badge.'}
+                  {(approvalCountsByRequest.get(selectedRequest.id) ?? 0) === 0 
+                    ? 'This will be the first approval. One more is needed to verify.' 
+                    : 'This will complete the verification and the business will receive a verified badge.'}
                 </span>
               )}
             </AlertDialogDescription>
