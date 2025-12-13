@@ -21,50 +21,78 @@ const BusinessVerificationRequestPage = () => {
   const [website, setWebsite] = useState('');
   const [note, setNote] = useState('');
 
-  // Fetch business profile
-  const { data: profile, isLoading } = useQuery({
-    queryKey: ['business-profile-for-verification', id],
+  // Fetch business account
+  const { data: business, isLoading: isLoadingBusiness } = useQuery({
+    queryKey: ['business-account-for-verification', id],
     enabled: !!id && !!user,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('user_profiles')
-        .select('id, business_name, business_website, verification_status')
+        .from('business_accounts')
+        .select('id, name, website, is_verified')
         .eq('id', id)
         .single();
 
       if (error) throw error;
       
       // Pre-fill website if available
-      if (data?.business_website) {
-        setWebsite(data.business_website);
+      if (data?.website) {
+        setWebsite(data.website);
       }
       
       return data;
     },
   });
 
+  // Check for existing pending request
+  const { data: existingRequest, isLoading: isLoadingRequest } = useQuery({
+    queryKey: ['business-verification-request', id],
+    enabled: !!id && !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('business_verification_requests')
+        .select('id, status')
+        .eq('business_id', id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const isLoading = isLoadingBusiness || isLoadingRequest;
+
   const submitMutation = useMutation({
     mutationFn: async () => {
-      // Call the RPC to request verification
-      const { error } = await supabase.rpc('request_business_verification', {
-        p_profile_id: id,
-      });
+      if (!user?.id) throw new Error('Not authenticated');
+      
+      // Insert verification request into new table
+      const { error } = await supabase
+        .from('business_verification_requests')
+        .insert({
+          business_id: id,
+          requested_by: user.id,
+          website: website || null,
+          note: note || null,
+          status: 'pending',
+        });
 
       if (error) throw error;
 
-      // Update website if changed
-      if (website && website !== profile?.business_website) {
+      // Update business website if changed
+      if (website && website !== business?.website) {
         const { error: updateError } = await supabase
-          .from('user_profiles')
-          .update({ business_website: website })
+          .from('business_accounts')
+          .update({ website })
           .eq('id', id);
         
         if (updateError) throw updateError;
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['business-profile'] });
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      queryClient.invalidateQueries({ queryKey: ['business-account'] });
+      queryClient.invalidateQueries({ queryKey: ['business-verification-request'] });
       navigate(`/business/${id}/verification/submitted`);
     },
     onError: (error: any) => {
@@ -89,12 +117,12 @@ const BusinessVerificationRequestPage = () => {
   }
 
   // If already pending or verified, redirect
-  if (profile?.verification_status === 'pending_review') {
+  if (existingRequest?.status === 'pending') {
     navigate(`/business/${id}/verification/status`, { replace: true });
     return null;
   }
 
-  if (profile?.verification_status === 'verified') {
+  if (business?.is_verified) {
     navigate(`/business/${id}/verification/status`, { replace: true });
     return null;
   }
@@ -132,7 +160,7 @@ const BusinessVerificationRequestPage = () => {
           <div className="space-y-2">
             <Label className="text-sm font-medium text-foreground">Business name</Label>
             <Input
-              value={profile?.business_name || ''}
+              value={business?.name || ''}
               disabled
               className="bg-muted/50"
             />

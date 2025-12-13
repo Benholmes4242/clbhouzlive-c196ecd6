@@ -14,21 +14,14 @@ const BusinessVerificationStatusPage = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useSupabaseSession();
 
-  const { data: profile, isLoading } = useQuery({
-    queryKey: ['business-verification-status', id],
+  // Fetch business account
+  const { data: business, isLoading: isLoadingBusiness } = useQuery({
+    queryKey: ['business-account-verification-status', id],
     enabled: !!id && !!user,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('user_profiles')
-        .select(`
-          id,
-          username,
-          verification_status,
-          verification_requested_at,
-          verification_reviewed_at,
-          verified_business_notes,
-          is_verified_business
-        `)
+        .from('business_accounts')
+        .select('id, name, slug, is_verified, verified_at')
         .eq('id', id)
         .single();
 
@@ -37,13 +30,33 @@ const BusinessVerificationStatusPage = () => {
     },
   });
 
+  // Fetch latest verification request
+  const { data: request, isLoading: isLoadingRequest } = useQuery({
+    queryKey: ['business-verification-request-status', id],
+    enabled: !!id && !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('business_verification_requests')
+        .select('id, status, created_at, reviewed_at, admin_note')
+        .eq('business_id', id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const isLoading = isLoadingBusiness || isLoadingRequest;
+
   const handleBack = () => {
     navigate(-1);
   };
 
   const handleViewProfile = () => {
-    if (profile?.username) {
-      navigate(`/profile/${profile.username}`);
+    if (business?.slug) {
+      navigate(`/business/${business.slug}`);
     } else {
       navigate('/business/manage');
     }
@@ -65,11 +78,11 @@ const BusinessVerificationStatusPage = () => {
     );
   }
 
-  const status = profile?.verification_status;
-  const isVerified = profile?.is_verified_business;
-  const requestedAt = profile?.verification_requested_at;
-  const reviewedAt = profile?.verification_reviewed_at;
-  const adminNotes = profile?.verified_business_notes;
+  const status = request?.status;
+  const isVerified = business?.is_verified;
+  const requestedAt = request?.created_at;
+  const reviewedAt = request?.reviewed_at;
+  const adminNotes = request?.admin_note;
 
   return (
     <PageRoot className="min-h-screen bg-background">
@@ -89,7 +102,7 @@ const BusinessVerificationStatusPage = () => {
 
       <main className="px-4 py-6 max-w-lg mx-auto">
         {/* Pending state */}
-        {status === 'pending_review' && (
+        {status === 'pending' && !isVerified && (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -113,7 +126,7 @@ const BusinessVerificationStatusPage = () => {
         )}
 
         {/* Verified state */}
-        {(status === 'verified' || isVerified) && (
+        {(status === 'approved' || isVerified) && (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -128,9 +141,9 @@ const BusinessVerificationStatusPage = () => {
             <p className="text-muted-foreground text-sm mb-6">
               Your profile now shows a verified badge, helping golfers trust your business.
             </p>
-            {reviewedAt && (
+            {(reviewedAt || business?.verified_at) && (
               <p className="text-xs text-muted-foreground/70 mb-8">
-                Verified on {format(new Date(reviewedAt), 'MMM d, yyyy')}
+                Verified on {format(new Date(reviewedAt || business?.verified_at!), 'MMM d, yyyy')}
               </p>
             )}
             <Button

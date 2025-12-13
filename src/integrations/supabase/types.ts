@@ -340,6 +340,8 @@ export type Database = {
           phone: string | null
           slug: string | null
           updated_at: string | null
+          verified_at: string | null
+          verified_by: string | null
           website: string | null
         }
         Insert: {
@@ -358,6 +360,8 @@ export type Database = {
           phone?: string | null
           slug?: string | null
           updated_at?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
           website?: string | null
         }
         Update: {
@@ -376,6 +380,8 @@ export type Database = {
           phone?: string | null
           slug?: string | null
           updated_at?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
           website?: string | null
         }
         Relationships: []
@@ -652,6 +658,56 @@ export type Database = {
             columns: ["business_profile_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_verification_requests: {
+        Row: {
+          admin_note: string | null
+          business_id: string
+          created_at: string
+          id: string
+          note: string | null
+          requested_by: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          admin_note?: string | null
+          business_id: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          requested_by: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          admin_note?: string | null
+          business_id?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          requested_by?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_verification_requests_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
             referencedColumns: ["id"]
           },
         ]
@@ -5649,6 +5705,10 @@ export type Database = {
         Args: { target_date?: string }
         Returns: undefined
       }
+      approve_business_verification: {
+        Args: { _request_id: string }
+        Returns: undefined
+      }
       are_users_blocked: {
         Args: { user_a: string; user_b: string }
         Returns: boolean
@@ -5663,6 +5723,7 @@ export type Database = {
         }[]
       }
       can_change_email: { Args: { user_id_param: string }; Returns: boolean }
+      can_manage_business: { Args: { _business_id: string }; Returns: boolean }
       can_view_game_participant_profile: {
         Args: { _profile_user_id: string; _viewer_id: string }
         Returns: boolean
@@ -6498,6 +6559,10 @@ export type Database = {
       postgis_wagyu_version: { Args: never; Returns: string }
       recalculate_review_vote_counts: {
         Args: { review_id_param: string }
+        Returns: undefined
+      }
+      reject_business_verification: {
+        Args: { _admin_note: string; _request_id: string }
         Returns: undefined
       }
       request_business_verification: {
