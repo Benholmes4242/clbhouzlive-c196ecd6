@@ -6619,10 +6619,12 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
-      is_business_owner: {
-        Args: { p_business_id: string; p_user_profile_id: string }
-        Returns: boolean
-      }
+      is_business_owner:
+        | { Args: { _business_id: string }; Returns: boolean }
+        | {
+            Args: { p_business_id: string; p_user_profile_id: string }
+            Returns: boolean
+          }
       is_host_of_game: {
         Args: { p_game_id: string; p_user_id: string }
         Returns: boolean
