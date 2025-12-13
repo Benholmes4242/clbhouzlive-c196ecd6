@@ -26,10 +26,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { CheckCircle, XCircle, ExternalLink, Globe, Building2, Loader2 } from 'lucide-react';
+import { CheckCircle, XCircle, ExternalLink, Globe, Building2, Loader2, ShieldCheck, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useAdminVerificationQueueRealtime } from '@/hooks/useBusinessVerificationRealtime';
+import { useRequestDomainCheck } from '@/hooks/useDomainVerification';
+import { Input } from '@/components/ui/input';
 
 interface VerificationRequest {
   id: string;
@@ -42,6 +44,10 @@ interface VerificationRequest {
   reviewed_by: string | null;
   reviewed_at: string | null;
   created_at: string;
+  requires_domain_check: boolean;
+  domain: string | null;
+  domain_confirmed: boolean;
+  domain_confirmed_at: string | null;
   business: {
     id: string;
     name: string;
@@ -58,12 +64,15 @@ const BusinessVerificationsPage = () => {
   const queryClient = useQueryClient();
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+  const [domainCheckModalOpen, setDomainCheckModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<VerificationRequest | null>(null);
   const [rejectReason, setRejectReason] = useState('');
+  const [domainInput, setDomainInput] = useState('');
   const [activeTab, setActiveTab] = useState('pending');
 
   // Enable realtime updates for instant queue refresh
   useAdminVerificationQueueRealtime();
+  const requestDomainCheck = useRequestDomainCheck();
 
   // Fetch verification requests from new table
   const { data: requests, isLoading } = useQuery({
@@ -82,6 +91,10 @@ const BusinessVerificationsPage = () => {
           reviewed_by,
           reviewed_at,
           created_at,
+          requires_domain_check,
+          domain,
+          domain_confirmed,
+          domain_confirmed_at,
           business:business_accounts!business_id (
             id,
             name,
@@ -148,7 +161,7 @@ const BusinessVerificationsPage = () => {
     },
   });
 
-  const processing = approveMutation.isPending || rejectMutation.isPending;
+  const processing = approveMutation.isPending || rejectMutation.isPending || requestDomainCheck.isPending;
 
   const openRejectModal = (request: VerificationRequest) => {
     setSelectedRequest(request);
@@ -159,6 +172,27 @@ const BusinessVerificationsPage = () => {
   const openApproveDialog = (request: VerificationRequest) => {
     setSelectedRequest(request);
     setApproveDialogOpen(true);
+  };
+
+  const openDomainCheckModal = (request: VerificationRequest) => {
+    setSelectedRequest(request);
+    // Try to extract domain from website
+    const website = request.website || request.business?.website || '';
+    try {
+      const url = new URL(website.startsWith('http') ? website : `https://${website}`);
+      setDomainInput(url.hostname.replace('www.', ''));
+    } catch {
+      setDomainInput('');
+    }
+    setDomainCheckModalOpen(true);
+  };
+
+  const handleRequestDomainCheck = async () => {
+    if (!selectedRequest || !domainInput.trim()) return;
+    await requestDomainCheck.mutateAsync({ requestId: selectedRequest.id, domain: domainInput.trim() });
+    setDomainCheckModalOpen(false);
+    setSelectedRequest(null);
+    setDomainInput('');
   };
 
   const handleWebsiteClick = (url: string | null) => {
@@ -258,6 +292,33 @@ const BusinessVerificationsPage = () => {
             </div>
           )}
 
+          {/* Domain verification status */}
+          {request.requires_domain_check && (
+            <div className={`rounded-sq-sm p-3 text-sm border ${
+              request.domain_confirmed 
+                ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900'
+                : 'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900'
+            }`}>
+              <div className="flex items-center gap-2">
+                {request.domain_confirmed ? (
+                  <>
+                    <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                    <span className="text-emerald-700 dark:text-emerald-400 font-medium">
+                      Domain verified: @{request.domain}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Mail className="h-4 w-4 text-amber-600" />
+                    <span className="text-amber-700 dark:text-amber-400 font-medium">
+                      Awaiting domain verification: @{request.domain}
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Timestamps */}
           <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
             <span>Requested: {format(new Date(request.created_at), 'MMM d, yyyy h:mm a')}</span>
@@ -268,11 +329,11 @@ const BusinessVerificationsPage = () => {
 
           {/* Actions */}
           {showActions && request.status === 'pending' && (
-            <div className="flex items-center gap-2 pt-2 border-t">
+            <div className="flex flex-wrap items-center gap-2 pt-2 border-t">
               <Button
                 size="sm"
                 onClick={() => openApproveDialog(request)}
-                disabled={processing}
+                disabled={processing || (request.requires_domain_check && !request.domain_confirmed)}
                 className="gap-1.5 bg-emerald-600 hover:bg-emerald-700"
               >
                 <CheckCircle className="h-4 w-4" />
@@ -288,6 +349,18 @@ const BusinessVerificationsPage = () => {
                 <XCircle className="h-4 w-4" />
                 Reject
               </Button>
+              {!request.requires_domain_check && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => openDomainCheckModal(request)}
+                  disabled={processing}
+                  className="gap-1.5"
+                >
+                  <Mail className="h-4 w-4" />
+                  Request Domain Check
+                </Button>
+              )}
             </div>
           )}
         </div>
@@ -435,6 +508,47 @@ const BusinessVerificationsPage = () => {
               disabled={processing}
             >
               {processing ? 'Rejecting...' : 'Reject Request'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Domain Check Modal */}
+      <Dialog open={domainCheckModalOpen} onOpenChange={setDomainCheckModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Request Domain Verification</DialogTitle>
+            <DialogDescription>
+              The business owner will need to verify access to an email at this domain before approval.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="domainInput">Domain to verify</Label>
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">@</span>
+                <Input
+                  id="domainInput"
+                  value={domainInput}
+                  onChange={(e) => setDomainInput(e.target.value.replace('@', ''))}
+                  placeholder="company.com"
+                  className="flex-1"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                The business owner will receive a code at an email ending in @{domainInput || 'domain.com'}
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDomainCheckModalOpen(false)} disabled={processing}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleRequestDomainCheck}
+              disabled={processing || !domainInput.trim()}
+            >
+              {processing ? 'Requesting...' : 'Request Domain Check'}
             </Button>
           </DialogFooter>
         </DialogContent>
