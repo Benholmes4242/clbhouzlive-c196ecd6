@@ -2519,6 +2519,10 @@ export type Database = {
           requested_at: string | null
           required_approvals: number
           reviewed_at: string | null
+          second_approval_bypass_note: string | null
+          second_approval_bypassed: boolean
+          second_approval_bypassed_at: string | null
+          second_approval_bypassed_by: string | null
           status: string
           updated_at: string
           user_id: string
@@ -2534,6 +2538,10 @@ export type Database = {
           requested_at?: string | null
           required_approvals?: number
           reviewed_at?: string | null
+          second_approval_bypass_note?: string | null
+          second_approval_bypassed?: boolean
+          second_approval_bypassed_at?: string | null
+          second_approval_bypassed_by?: string | null
           status?: string
           updated_at?: string
           user_id: string
@@ -2549,6 +2557,10 @@ export type Database = {
           requested_at?: string | null
           required_approvals?: number
           reviewed_at?: string | null
+          second_approval_bypass_note?: string | null
+          second_approval_bypassed?: boolean
+          second_approval_bypassed_at?: string | null
+          second_approval_bypassed_by?: string | null
           status?: string
           updated_at?: string
           user_id?: string
