@@ -26,7 +26,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { CheckCircle, XCircle, ExternalLink, Globe, Building2, Loader2, ShieldCheck, Mail, Users, Zap } from 'lucide-react';
+import { CheckCircle, XCircle, ExternalLink, Globe, Building2, Loader2, ShieldCheck, Mail, Users, Zap, ShieldOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useAdminVerificationQueueRealtime } from '@/hooks/useBusinessVerificationRealtime';
@@ -67,8 +67,10 @@ const BusinessVerificationTab = () => {
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [domainCheckModalOpen, setDomainCheckModalOpen] = useState(false);
+  const [revokeModalOpen, setRevokeModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<VerificationRequest | null>(null);
   const [rejectReason, setRejectReason] = useState('');
+  const [revokeReason, setRevokeReason] = useState('');
   const [domainInput, setDomainInput] = useState('');
   const [activeTab, setActiveTab] = useState('pending');
 
@@ -224,7 +226,32 @@ const BusinessVerificationTab = () => {
     },
   });
 
-  const processing = submitReviewMutation.isPending || requestDomainCheck.isPending || forceApproveMutation.isPending;
+  // Revoke verification mutation
+  const revokeVerificationMutation = useMutation({
+    mutationFn: async ({ businessId, reason }: { businessId: string; reason?: string }) => {
+      const { data, error } = await supabase.rpc('revoke_business_verification', {
+        _business_id: businessId,
+        _reason: reason || null,
+      });
+      if (error) throw error;
+      const result = data as { success: boolean; error?: string; business_name?: string };
+      if (!result.success) throw new Error(result.error || 'Failed to revoke verification');
+      return result;
+    },
+    onSuccess: (result) => {
+      toast.success(`Verification removed for ${result.business_name}.`);
+      queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-business-verifications-pending-count'] });
+      setRevokeModalOpen(false);
+      setSelectedRequest(null);
+      setRevokeReason('');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Could not revoke verification. Please try again.');
+    },
+  });
+
+  const processing = submitReviewMutation.isPending || requestDomainCheck.isPending || forceApproveMutation.isPending || revokeVerificationMutation.isPending;
 
   const openRejectModal = (request: VerificationRequest) => {
     setSelectedRequest(request);
@@ -247,6 +274,12 @@ const BusinessVerificationTab = () => {
       setDomainInput('');
     }
     setDomainCheckModalOpen(true);
+  };
+
+  const openRevokeModal = (request: VerificationRequest) => {
+    setSelectedRequest(request);
+    setRevokeReason('');
+    setRevokeModalOpen(true);
   };
 
   const handleRequestDomainCheck = async () => {
@@ -408,6 +441,22 @@ const BusinessVerificationTab = () => {
               )}
             </div>
           )}
+
+          {/* Remove verification button for approved businesses */}
+          {request.status === 'approved' && business?.is_verified && (
+            <div className="flex flex-wrap items-center gap-2 pt-2 border-t">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => openRevokeModal(request)}
+                disabled={processing}
+                className="gap-1.5 text-red-600 border-red-200 hover:bg-red-50"
+              >
+                <ShieldOff className="h-4 w-4" />
+                Remove verification
+              </Button>
+            </div>
+          )}
         </div>
       </Card>
     );
@@ -532,6 +581,43 @@ const BusinessVerificationTab = () => {
           <DialogFooter>
             <Button variant="outline" onClick={() => setDomainCheckModalOpen(false)} disabled={processing}>Cancel</Button>
             <Button onClick={handleRequestDomainCheck} disabled={processing || !domainInput.trim()}>{processing ? 'Requesting...' : 'Request Domain Check'}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Revoke Verification Modal */}
+      <Dialog open={revokeModalOpen} onOpenChange={setRevokeModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Remove Verification</DialogTitle>
+            <DialogDescription>
+              Removing verification from <strong>{selectedRequest?.business?.name}</strong>. The business will need to go through verification again.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="revokeReason">Reason for removal (optional)</Label>
+              <Textarea
+                id="revokeReason"
+                value={revokeReason}
+                onChange={(e) => setRevokeReason(e.target.value)}
+                placeholder="e.g., Ownership changed, policy violation, requested by business..."
+                className="min-h-[100px]"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRevokeModalOpen(false)} disabled={processing}>Cancel</Button>
+            <Button
+              variant="destructive"
+              onClick={() => selectedRequest?.business && revokeVerificationMutation.mutate({
+                businessId: selectedRequest.business.id,
+                reason: revokeReason || undefined,
+              })}
+              disabled={processing}
+            >
+              {processing ? 'Removing...' : 'Remove Verification'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

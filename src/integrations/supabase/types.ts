@@ -6966,6 +6966,10 @@ export type Database = {
         Args: { p_domain: string; p_request_id: string }
         Returns: Json
       }
+      revoke_business_verification: {
+        Args: { _business_id: string; _reason?: string }
+        Returns: Json
+      }
       search_golf_courses: {
         Args: {
           country_filter?: string
