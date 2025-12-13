@@ -33,13 +33,13 @@ const MyBusinessesPage = () => {
 
   return (
     <PageRoot className="min-h-screen bg-muted/30">
-      {/* Header - Global system parity */}
+      {/* Header - sticky */}
       <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50">
         <div className="mx-auto max-w-xl px-4 pt-3 pb-4">
           {/* Back CTA */}
           <button
             onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-0.5 text-sm text-slate-500 hover:text-slate-400 mb-2"
+            className="inline-flex items-center gap-0.5 text-sm text-muted-foreground hover:text-foreground mb-2"
           >
             ‹ Back
           </button>
@@ -52,39 +52,44 @@ const MyBusinessesPage = () => {
         </div>
       </header>
 
-      <main className="mx-auto max-w-xl px-4 py-6">
-        {/* Loading state - premium skeleton */}
+      <main className="mx-auto max-w-xl">
+        {/* Loading state - flat skeleton */}
         {isLoading && (
-          <div className="space-y-4">
+          <div>
             {[1, 2].map(i => (
               <motion.div 
                 key={i} 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: i * 0.1 }}
-                className="rounded-sq-lg border bg-card p-5 animate-pulse"
               >
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="h-14 w-14 rounded-full bg-muted" />
+                {/* Business row skeleton */}
+                <div className="flex items-start gap-4 px-4 py-4">
+                  <div className="h-12 w-12 rounded-full bg-muted animate-pulse" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 w-2/3 rounded bg-muted" />
-                    <div className="h-3 w-1/2 rounded bg-muted" />
+                    <div className="h-4 w-2/3 rounded bg-muted animate-pulse" />
+                    <div className="h-3 w-1/2 rounded bg-muted animate-pulse" />
                   </div>
                 </div>
-                <div className="h-px bg-border/50 -mx-5 mb-4" />
-                <div className="grid grid-cols-3 gap-4 mb-4">
+                <div className="h-px bg-border/30 mx-4" />
+                
+                {/* Metrics skeleton */}
+                <div className="grid grid-cols-3 gap-4 px-4 py-4">
                   {[1, 2, 3].map(j => (
                     <div key={j} className="text-center">
-                      <div className="h-6 w-10 mx-auto bg-muted rounded mb-1" />
-                      <div className="h-3 w-14 mx-auto bg-muted rounded" />
+                      <div className="h-5 w-10 mx-auto bg-muted rounded animate-pulse mb-1" />
+                      <div className="h-3 w-12 mx-auto bg-muted rounded animate-pulse" />
                     </div>
                   ))}
                 </div>
-                <div className="h-px bg-border/50 -mx-5 mb-4" />
-                <div className="flex gap-2">
-                  <div className="h-9 flex-1 rounded-sq-sm bg-muted" />
-                  <div className="h-9 flex-1 rounded-sq-sm bg-muted" />
+                <div className="h-px bg-border/30 mx-4" />
+                
+                {/* Actions skeleton */}
+                <div className="flex gap-3 px-4 py-4">
+                  <div className="h-9 flex-1 rounded-sq-sm bg-muted animate-pulse" />
+                  <div className="h-9 flex-1 rounded-sq-sm bg-muted animate-pulse" />
                 </div>
+                <div className="h-px bg-border/40" />
               </motion.div>
             ))}
           </div>
@@ -95,9 +100,9 @@ const MyBusinessesPage = () => {
           <AddBusinessCard onClick={handleCreateBusiness} isFirst />
         )}
 
-        {/* Business list */}
+        {/* Business list - flat layout */}
         {!isLoading && hasBusinesses && (
-          <div className="space-y-4">
+          <div>
             {businesses.map((membership, index) => (
               <BusinessCommandCard
                 key={membership.id}
@@ -107,7 +112,7 @@ const MyBusinessesPage = () => {
               />
             ))}
 
-            {/* Add another business CTA */}
+            {/* Add another business row */}
             <AddBusinessCard onClick={handleCreateBusiness} />
           </div>
         )}

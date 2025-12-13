@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Building2 } from 'lucide-react';
+import { Plus, Building2, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -36,33 +36,38 @@ export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardPro
     );
   }
 
-  // Growth-oriented CTA card for adding another business
+  // Flat add row - no card
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.15, duration: 0.25, ease: 'easeOut' }}
-      onClick={onClick}
-      className={cn(
-        "rounded-sq-lg border border-border/60 bg-card/50",
-        "p-5 cursor-pointer transition-all duration-200",
-        "hover:bg-muted/30 hover:border-border",
-        "active:scale-[0.99]"
-      )}
+      transition={{ delay: 0.15, duration: 0.2, ease: 'easeOut' }}
     >
-      <div className="flex items-center gap-4">
-        <div className="h-12 w-12 rounded-full bg-muted/60 flex items-center justify-center flex-shrink-0">
+      {/* Hairline divider above */}
+      <div className="h-px bg-border/30" />
+      
+      <button
+        onClick={onClick}
+        className="w-full flex items-center gap-4 px-4 py-4 hover:bg-muted/30 transition-colors active:bg-muted/40"
+      >
+        {/* Plus icon in circle */}
+        <div className="h-10 w-10 rounded-full bg-muted/60 flex items-center justify-center flex-shrink-0">
           <Plus className="h-5 w-5 text-muted-foreground" />
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="font-medium text-foreground mb-0.5">
+        
+        {/* Text */}
+        <div className="flex-1 min-w-0 text-left">
+          <p className="font-medium text-foreground text-sm">
             Add another business
           </p>
-          <p className="text-sm text-muted-foreground">
-            Manage multiple clubs, coaches, or golf brands from one place
+          <p className="text-xs text-muted-foreground">
+            Manage multiple clubs, coaches, or golf brands
           </p>
         </div>
-      </div>
+
+        {/* Chevron */}
+        <ChevronRight className="h-5 w-5 text-muted-foreground/50 flex-shrink-0" />
+      </button>
     </motion.div>
   );
 }
