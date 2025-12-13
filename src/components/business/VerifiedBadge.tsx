@@ -65,9 +65,8 @@ export function VerifiedBadge({
           side="top" 
           className="max-w-[200px] text-center"
         >
-          <p className="font-medium text-sm">Verified business</p>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            This profile has been reviewed and confirmed by Clbhouz.
+          <p className="text-sm">
+            This business has been verified by Clbhouz.
           </p>
         </TooltipContent>
       </Tooltip>

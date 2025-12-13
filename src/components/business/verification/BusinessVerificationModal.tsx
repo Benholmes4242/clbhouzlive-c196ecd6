@@ -144,16 +144,23 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
   };
 
   const stepIndicator = (
-    <div className="flex items-center justify-center gap-2 mb-6">
-      {[1, 2, 3].map((s) => (
-        <div
-          key={s}
-          className={cn(
-            'h-2 w-2 rounded-full transition-colors',
-            s === step ? 'bg-primary' : 'bg-muted'
-          )}
-        />
-      ))}
+    <div className="flex flex-col items-center gap-2 mb-6">
+      {/* Dots */}
+      <div className="flex items-center justify-center gap-2">
+        {[1, 2, 3].map((s) => (
+          <div
+            key={s}
+            className={cn(
+              'h-2.5 w-2.5 rounded-full transition-colors',
+              s === step ? 'bg-primary shadow-sm' : 'bg-muted/60'
+            )}
+          />
+        ))}
+      </div>
+      {/* Step text - desktop only */}
+      <span className="hidden md:block text-xs text-muted-foreground">
+        Step {step} of 3
+      </span>
     </div>
   );
 
@@ -194,7 +201,7 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
                 <div>
                   <h3 className="text-sm font-semibold text-foreground">1. Confirm your business details</h3>
                   <p className="text-xs text-muted-foreground mt-1">
-                    These details are pulled from your business profile. If anything is wrong, update it before submitting.
+                    These details are pulled from your business profile. If anything looks incorrect, update it before continuing.
                   </p>
                 </div>
 
@@ -254,27 +261,33 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
                 </div>
 
                 <div className="space-y-3">
-                  {PROOF_OPTIONS.map((option) => (
-                    <label
-                      key={option.id}
-                      className={cn(
-                        'flex items-start gap-3 p-3 rounded-sq-sm border cursor-pointer transition-colors',
-                        proofTypes.includes(option.id)
-                          ? 'border-primary bg-primary/5'
-                          : 'border-border hover:bg-muted/30'
-                      )}
-                    >
-                      <Checkbox
-                        checked={proofTypes.includes(option.id)}
-                        onCheckedChange={() => handleProofToggle(option.id)}
-                        className="mt-0.5"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground">{option.label}</p>
-                        <p className="text-xs text-muted-foreground">{option.helper}</p>
-                      </div>
-                    </label>
-                  ))}
+                  {PROOF_OPTIONS.map((option) => {
+                    const isSelected = proofTypes.includes(option.id);
+                    return (
+                      <label
+                        key={option.id}
+                        className={cn(
+                          'flex items-start gap-3 p-3 rounded-sq-sm border cursor-pointer transition-colors',
+                          isSelected
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border hover:bg-muted/30'
+                        )}
+                      >
+                        <Checkbox
+                          checked={isSelected}
+                          onCheckedChange={() => handleProofToggle(option.id)}
+                          className="mt-0.5"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground">{option.label}</p>
+                          <p className="text-xs text-muted-foreground">{option.helper}</p>
+                          {isSelected && (
+                            <p className="text-[10px] text-primary font-medium mt-1">Selected as primary proof</p>
+                          )}
+                        </div>
+                      </label>
+                    );
+                  })}
                 </div>
 
                 <div className="space-y-2">
@@ -289,7 +302,7 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
                     className="resize-none text-sm"
                   />
                   <p className="text-[11px] text-muted-foreground">
-                    Add 1–3 links (website/social/registry). One per line.
+                    Add up to 3 links that help us confirm this business (website, social profile, registry). One per line.
                   </p>
                 </div>
 
@@ -345,11 +358,16 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
                         ))}
                       </SelectContent>
                     </Select>
+                    {role === 'owner' && (
+                      <p className="text-[10px] text-emerald-600 font-medium">
+                        Owners are typically verified fastest.
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
                     <Label className="text-sm text-foreground">
-                      Tell us briefly <span className="text-muted-foreground font-normal">(max 500 characters)</span>
+                      Tell us briefly how you're connected to this business <span className="text-muted-foreground font-normal">(max 500 characters)</span>
                     </Label>
                     <Textarea
                       value={notes}

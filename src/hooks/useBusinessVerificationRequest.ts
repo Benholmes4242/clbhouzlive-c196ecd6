@@ -9,6 +9,9 @@ export interface BusinessVerificationRequest {
   created_at: string;
   reviewed_at: string | null;
   admin_note: string | null;
+  requires_domain_check: boolean;
+  domain: string | null;
+  domain_confirmed: boolean;
 }
 
 /**
@@ -23,7 +26,7 @@ export function useBusinessVerificationRequest(businessId: string | undefined) {
 
       const { data, error } = await supabase
         .from('business_verification_requests')
-        .select('id, business_id, status, requested_by, created_at, reviewed_at, admin_note')
+        .select('id, business_id, status, requested_by, created_at, reviewed_at, admin_note, requires_domain_check, domain, domain_confirmed')
         .eq('business_id', businessId)
         .order('created_at', { ascending: false })
         .limit(1)
