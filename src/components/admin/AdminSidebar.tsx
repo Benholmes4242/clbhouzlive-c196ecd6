@@ -64,16 +64,17 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate }) => {
   const { role, loading } = usePanelRole();
   const can = panelCan(role);
 
-  // Fetch pending verification count from new table
+  // Fetch total pending verification count (businesses + people)
   const { data: pendingVerificationCount } = useQuery({
-    queryKey: ['admin-business-verifications-count'],
+    queryKey: ['admin-verifications-count'],
     queryFn: async () => {
-      const { count, error } = await supabase
-        .from('business_verification_requests')
-        .select('id', { count: 'exact', head: true })
-        .eq('status', 'pending');
-      if (error) throw error;
-      return count ?? 0;
+      const [businessResult, golferResult] = await Promise.all([
+        supabase.from('business_verification_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+        supabase.from('golfer_verification_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+      ]);
+      const businessCount = businessResult.count ?? 0;
+      const golferCount = golferResult.count ?? 0;
+      return businessCount + golferCount;
     },
     enabled: can.manageAdmins,
     staleTime: 30 * 1000, // 30 seconds
@@ -85,7 +86,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate }) => {
     { to: "/admin/overview",      label: "Overview" },
     { to: "/admin/users",         label: "User Management" },
     { to: "/admin/businesses",    label: "Business Directory" },
-    { to: "/admin/business-verifications", label: "Business Verification", badge: pendingVerificationCount, tooltip: "There are verification requests awaiting review." },
+    { to: "/admin/verification", label: "Verification", badge: pendingVerificationCount, tooltip: "There are verification requests awaiting review." },
     { to: "/admin/golf-courses",  label: "Golf Courses" },
     { to: "/admin/logos",         label: "Logos" },
     { to: "/admin/country-flags", label: "Country Flags" },

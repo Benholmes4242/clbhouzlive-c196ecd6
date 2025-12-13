@@ -120,7 +120,7 @@ const AdminMembersPage = lazy(() => import("./pages/admin/AdminMembersPage").the
 const AdminOverviewPage = lazy(() => import("./pages/admin/AdminOverviewPage").then(m => ({ default: m.AdminOverviewPage })));
 const AdminInvitesPage = lazy(() => import("./pages/admin/AdminInvitesPage").then(m => ({ default: m.AdminInvitesPage })));
 const InviteAcceptPage = lazy(() => import("./pages/admin/InviteAcceptPage").then(m => ({ default: m.InviteAcceptPage })));
-const BusinessVerificationsPage = lazy(() => import("./pages/admin/BusinessVerificationsPage"));
+const VerificationsPage = lazy(() => import("./pages/admin/VerificationsPage"));
 const AdminBusinessDirectoryPage = lazy(() => import("./pages/admin/AdminBusinessDirectoryPage"));
 
 // Legacy admin pages
@@ -300,11 +300,13 @@ function AppRoutes() {
               <Suspense fallback={<GenericPageSkeleton />}><AdminInvitesPage /></Suspense>
             </PanelGuard>
           } />
-          <Route path="business-verifications" element={
+          <Route path="verification" element={
             <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><BusinessVerificationsPage /></Suspense>
+              <Suspense fallback={<GenericPageSkeleton />}><VerificationsPage /></Suspense>
             </PanelGuard>
           } />
+          {/* Redirect old route to new unified verification */}
+          <Route path="business-verifications" element={<Navigate to="/admin/verification?type=businesses" replace />} />
           <Route path="businesses" element={
             <PanelGuard need="admins">
               <Suspense fallback={<GenericPageSkeleton />}><AdminBusinessDirectoryPage /></Suspense>
