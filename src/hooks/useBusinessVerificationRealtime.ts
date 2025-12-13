@@ -74,6 +74,19 @@ export function useAdminVerificationQueueRealtime() {
           queryClient.invalidateQueries({ queryKey: ['admin-business-verifications-count'] });
         }
       )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'business_verification_reviews',
+        },
+        (payload) => {
+          console.log('[Realtime] New verification review:', payload);
+          queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
+          queryClient.invalidateQueries({ queryKey: ['admin-verification-my-reviews'] });
+        }
+      )
       .subscribe();
 
     return () => {

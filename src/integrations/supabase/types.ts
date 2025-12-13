@@ -795,6 +795,7 @@ export type Database = {
       business_verification_requests: {
         Row: {
           admin_note: string | null
+          approval_count: number
           business_id: string
           created_at: string
           domain: string | null
@@ -803,6 +804,7 @@ export type Database = {
           id: string
           note: string | null
           requested_by: string
+          required_approvals: number
           requires_domain_check: boolean
           reviewed_at: string | null
           reviewed_by: string | null
@@ -812,6 +814,7 @@ export type Database = {
         }
         Insert: {
           admin_note?: string | null
+          approval_count?: number
           business_id: string
           created_at?: string
           domain?: string | null
@@ -820,6 +823,7 @@ export type Database = {
           id?: string
           note?: string | null
           requested_by: string
+          required_approvals?: number
           requires_domain_check?: boolean
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -829,6 +833,7 @@ export type Database = {
         }
         Update: {
           admin_note?: string | null
+          approval_count?: number
           business_id?: string
           created_at?: string
           domain?: string | null
@@ -837,6 +842,7 @@ export type Database = {
           id?: string
           note?: string | null
           requested_by?: string
+          required_approvals?: number
           requires_domain_check?: boolean
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -850,6 +856,41 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_verification_reviews: {
+        Row: {
+          created_at: string
+          decision: string
+          id: string
+          note: string | null
+          request_id: string
+          reviewer_id: string
+        }
+        Insert: {
+          created_at?: string
+          decision: string
+          id?: string
+          note?: string | null
+          request_id: string
+          reviewer_id: string
+        }
+        Update: {
+          created_at?: string
+          decision?: string
+          id?: string
+          note?: string | null
+          request_id?: string
+          reviewer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_verification_reviews_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "business_verification_requests"
             referencedColumns: ["id"]
           },
         ]
@@ -7346,6 +7387,10 @@ export type Database = {
       st_wrapx: {
         Args: { geom: unknown; move: number; wrap: number }
         Returns: unknown
+      }
+      submit_business_verification_review: {
+        Args: { _decision: string; _note?: string; _request_id: string }
+        Returns: Json
       }
       test_echo_insert: { Args: never; Returns: string }
       test_lab_clear_notifications: {
