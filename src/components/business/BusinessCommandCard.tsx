@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
-  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, 
-  CheckCircle2, MapPin
+  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, MapPin
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,6 +15,7 @@ import {
 import { DeleteBusinessDialog } from './DeleteBusinessDialog';
 import { useBusinessStats7d } from '@/hooks/useBusinessStats7d';
 import { cn } from '@/lib/utils';
+import { VerifiedBadge } from './VerifiedBadge';
 import type { BusinessMembership } from '@/hooks/useMyBusinesses';
 
 interface BusinessCommandCardProps {
@@ -85,10 +85,10 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
           {/* Name & Meta */}
           <div className="flex-1 min-w-0">
             {/* Business name row */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <span className="font-semibold text-foreground truncate text-[15px]">{business.name}</span>
               {business.is_verified && (
-                <CheckCircle2 className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+                <VerifiedBadge size="sm" showTooltip={false} />
               )}
             </div>
             
