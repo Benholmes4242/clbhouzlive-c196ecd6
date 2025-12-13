@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 export interface BusinessVerificationRequest {
   id: string;
   business_id: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected' | 'revoked';
   requested_by: string;
   created_at: string;
   reviewed_at: string | null;
@@ -54,6 +54,8 @@ export function deriveVerificationState(
   if (!request) return 'none';
   if (request.status === 'pending') return 'pending';
   if (request.status === 'rejected') return 'rejected';
+  // Revoked status means unverified - show as 'none' to allow re-request
+  if (request.status === 'revoked') return 'none';
   if (request.status === 'approved') return 'verified';
   return 'none';
 }

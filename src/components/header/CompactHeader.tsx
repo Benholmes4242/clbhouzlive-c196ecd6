@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
-import { Search, Bell } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useScrollDirection } from '@/hooks/useScrollDirection';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
@@ -106,7 +106,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             })}
           </nav>
 
-          {/* Right: Search + Bell + Identity pill */}
+          {/* Right: Search + Identity pill */}
           <div className="flex items-center gap-1.5 sm:gap-2">
             {/* Search Button */}
             <Button
@@ -118,24 +118,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             >
               <Search className="h-5 w-5" />
             </Button>
-            
-            {/* Notifications Bell */}
-            {user && (
-              <div className="relative">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-white/70 hover:text-white hover:bg-white/10 h-10 w-10 p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-transform"
-                  onClick={() => navigate('/notificationmessages')}
-                  aria-label="Notifications"
-                >
-                  <Bell className="h-5 w-5" />
-                </Button>
-                {hasUnread && (
-                  <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-orange-500 ring-[1.5px] ring-[rgb(10,10,10)]" />
-                )}
-              </div>
-            )}
             
             {/* Identity pill (mobile only, logged in users) */}
             {user && (

@@ -281,14 +281,19 @@ const BusinessVerificationTab = () => {
       if (error) throw error;
       return { success: true };
     },
-    onSuccess: () => {
+    onSuccess: (_, { businessId }) => {
       toast.success('Verification removed', {
         description: 'The business will need to request verification again.',
       });
+      // Invalidate admin queries
       queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verifications-pending-count'] });
       queryClient.invalidateQueries({ queryKey: ['verification-history'] });
       queryClient.invalidateQueries({ queryKey: ['admin-business-verification-all-reviews'] });
+      // Invalidate user-facing queries so Business Profiles page updates immediately
+      queryClient.invalidateQueries({ queryKey: ['my-businesses'] });
+      queryClient.invalidateQueries({ queryKey: ['business-verification-request', businessId] });
+      queryClient.invalidateQueries({ queryKey: ['business-profile'] });
       setRevokeModalOpen(false);
       setSelectedRequest(null);
       setRevokeReason('');

@@ -1,6 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { User, Settings, Shield, Building2, Plus, Briefcase, Pencil } from 'lucide-react';
-import { IoMdNotificationsOutline } from "react-icons/io";
+import { User, Settings, Shield, Plus, Briefcase, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
@@ -8,7 +7,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdaptiveTextColor } from "@/hooks/useAdaptiveTextColor";
 import { useHeader } from "@/contexts/GlobalHeaderContext";
-import { useUnreadNotifications } from "@/hooks/useUnreadNotifications";
 import { useMyBusinesses, useHasBusinesses } from "@/hooks/useMyBusinesses";
 import { cn } from "@/lib/utils";
 import {
@@ -139,30 +137,10 @@ const HeaderNavigation = () => {
   };
 
   const hasAdminAccess = adminStatus?.isAdmin || adminStatus?.isLimitedAdmin;
-  const { hasUnread } = useUnreadNotifications();
 
   if (!user) {
     return (
       <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
-        {/* Notifications bell icon with unread badge */}
-        <div className="relative">
-          <Button
-            variant="ghost"
-            className={cn(
-              "p-2 md:p-3 flex-shrink-0 mt-3 transition-colors",
-              "bg-transparent hover:bg-transparent active:bg-transparent",
-              "focus:bg-transparent focus-visible:bg-transparent",
-              "data-[state=open]:bg-transparent",
-              "focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0",
-              "!bg-transparent",
-              getIconColorClass()
-            )}
-            onClick={() => navigate('/notificationmessages')}
-          >
-            <IoMdNotificationsOutline className="h-5 w-5" />
-          </Button>
-        </div>
-
         <Button data-action="profile" variant="ghost" className={cn("p-2 md:p-3 flex-shrink-0 mt-3 transition-colors", getIconColorClass())} onClick={handleProfileClick}>
           <User className="h-5 w-5" />
         </Button>
@@ -192,30 +170,6 @@ const HeaderNavigation = () => {
       {/* Identity Selector - only shown when user has multiple identities */}
       <div className="hidden sm:block">
         <IdentitySelector />
-      </div>
-      {/* Notifications bell icon with unread badge */}
-      <div className="relative">
-        <Button
-          variant="ghost"
-          className={cn(
-            "p-2 md:p-3 flex-shrink-0 mt-3 transition-colors",
-            "bg-transparent hover:bg-transparent active:bg-transparent",
-            "focus:bg-transparent focus-visible:bg-transparent",
-            "data-[state=open]:bg-transparent",
-            "focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0",
-            "!bg-transparent",
-            getIconColorClass()
-          )}
-          onClick={() => navigate('/notificationmessages')}
-        >
-          <IoMdNotificationsOutline className="h-5 w-5" />
-        </Button>
-        {/* Orange dot for unread notifications */}
-        {hasUnread && (
-          <span
-            className="absolute bottom-2 right-1 h-2 w-2 rounded-full bg-orange-500 border-2 border-background"
-          />
-        )}
       </div>
 
       <DropdownMenu>
