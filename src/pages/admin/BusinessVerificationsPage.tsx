@@ -29,6 +29,7 @@ import { toast } from 'sonner';
 import { CheckCircle, XCircle, ExternalLink, Globe, Building2, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
+import { useAdminVerificationQueueRealtime } from '@/hooks/useBusinessVerificationRealtime';
 
 interface VerificationRequest {
   id: string;
@@ -60,6 +61,9 @@ const BusinessVerificationsPage = () => {
   const [selectedRequest, setSelectedRequest] = useState<VerificationRequest | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [activeTab, setActiveTab] = useState('pending');
+
+  // Enable realtime updates for instant queue refresh
+  useAdminVerificationQueueRealtime();
 
   // Fetch verification requests from new table
   const { data: requests, isLoading } = useQuery({
