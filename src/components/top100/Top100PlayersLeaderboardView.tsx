@@ -218,7 +218,7 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
   }
 
   return (
-    <div className="space-y-4 -mx-4 sm:-mx-6">
+    <div className="space-y-4">
       {/* MODULE 1: Weekly Highlights Carousel */}
       <WeeklyHighlightsCarousel currentUserId={currentUser?.id} />
 
@@ -268,17 +268,16 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
         </div>
       )}
 
-      {/* Your Position Card - Full bleed, Tappable */}
+      {/* Your Position Section - No card, just page section */}
       {me && (
         <button
           type="button"
           onClick={() => navigate('/top100?tab=my-progress')}
-          className="w-full border-y border-border/70 bg-card/95 px-4 py-3 flex items-center justify-between gap-3 active:scale-[0.99] transition-all hover:bg-muted/30"
+          className="w-full px-4 py-4 flex items-center justify-between gap-3 active:scale-[0.99] transition-all"
         >
           <div className="flex items-center gap-3">
-            {/* Avatar with new squircle spec */}
             <SquircleAvatar
-              size={52}
+              size={48}
               src={currentUserProfile?.profile_photo_url || me.avatar_url}
               alt={me.display_name}
               fallback={me.display_name
@@ -291,17 +290,15 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
             />
 
             <div className="flex flex-col text-left">
-              <span className="text-[11px] font-medium text-muted-foreground">
+              <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/70">
                 Your position
               </span>
-              <span className="text-sm font-semibold">
+              <span className="text-sm font-semibold text-foreground">
                 #{me.rank} · {me.total_top100_played} Top 100 courses
               </span>
-              {meClub?.tierName && (
-                <span className="text-xs text-muted-foreground">
-                  {meClub.tierName}
-                </span>
-              )}
+              <span className="text-xs text-muted-foreground mt-0.5">
+                {meClub?.tierName ? `${meClub.tierName} · ` : ''}You're setting the pace.
+              </span>
             </div>
           </div>
 
