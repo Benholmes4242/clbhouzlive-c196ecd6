@@ -1,21 +1,18 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
+/**
+ * ⚠️ AUTO-HIDE DISABLED: TopBar is now always visible
+ * This hook previously hid the top bar after 2s of inactivity.
+ * Now it always returns isVisible: true and resetTimer is a no-op.
+ */
 export const useTopBarVisibility = () => {
-  const [isVisible, setIsVisible] = useState(true);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  // DISABLED: Always visible
+  const [isVisible] = useState(true);
 
+  // DISABLED: No timer logic - just a no-op function for API compatibility
   const resetTimer = useCallback(() => {
-    setIsVisible(true);
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => setIsVisible(false), 2000);
+    // No-op: TopBar visibility is now locked to visible
   }, []);
-
-  useEffect(() => {
-    resetTimer();
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, [resetTimer]);
 
   return { isVisible, resetTimer };
 };

@@ -1,6 +1,7 @@
 /* ⚠️ CRITICAL: Clubhouse Chrome Auto-Hide System ⚠️
  *
- * DO NOT MODIFY these CSS variables without testing all chrome-follow-top/bottom elements
+ * ⚠️ AUTO-HIDE DISABLED - Header and footer are now persistently visible
+ * The system is kept in place but all hide/show transitions are disabled
  * 
  * Dependencies:
  * - useChromeAnchors hook updates --chrome-top-h and --chrome-bottom-h
@@ -13,59 +14,50 @@
 /* Unified chrome transition tokens + dynamic anchors */
 :root {
   --chrome-ease: cubic-bezier(.22,.61,.36,1);
-  --chrome-trans-ms: 220ms;
-  --chrome-fade-ms: 220ms;
+  --chrome-trans-ms: 0ms; /* DISABLED - was 220ms */
+  --chrome-fade-ms: 0ms;  /* DISABLED - was 220ms */
   
   /* ⚠️ CRITICAL: These defaults are used until useChromeAnchors measures actual elements
    * DO NOT set to 0px - race conditions at mount mean followers need valid defaults */
   --chrome-top-h: 64px;     /* header height + safe-top */
   --chrome-bottom-h: 96px;  /* bottom-nav height + safe-bottom */
-  --chrome-top-shift: 0px;      /* 0 when visible, -var(--chrome-top-h) when hidden */
-  --chrome-bottom-shift: 0px;   /* 0 when visible,  var(--chrome-bottom-h) when hidden */
+  --chrome-top-shift: 0px;      /* Always 0 - no shifting */
+  --chrome-bottom-shift: 0px;   /* Always 0 - no shifting */
 }
 
-/* When the chrome is hidden we flip the shift amounts */
+/* AUTO-HIDE DISABLED: body.chrome-hidden no longer triggers hide
+ * Keeping the class for compatibility but it does nothing now */
 body.chrome-hidden {
-  --chrome-top-shift: calc(-1 * var(--chrome-top-h));
-  --chrome-bottom-shift: var(--chrome-bottom-h);
+  --chrome-top-shift: 0px;    /* DISABLED - was calc(-1 * var(--chrome-top-h)) */
+  --chrome-bottom-shift: 0px; /* DISABLED - was var(--chrome-bottom-h) */
 }
 
-/* Chrome elements with GPU transforms - smoother, cinematic timing */
+/* Chrome elements - GPU compositing only, no transitions */
 .chrome-header,
 .chrome-bottom-nav {
-  will-change: transform, opacity;
+  will-change: auto; /* DISABLED - was transform, opacity */
   transform: translateZ(0);
-  transition: 
-    transform 0.22s cubic-bezier(0.19, 1, 0.22, 1),
-    opacity 0.18s ease-out;
+  transition: none; /* DISABLED - no slide animations */
 }
 
-/* Hidden state transforms */
+/* DISABLED: Hidden state transforms - no longer applied */
 body.chrome-hidden .chrome-header {
-  transform: translateY(-100%) translateZ(0);
-  opacity: 0;
-  pointer-events: none;
+  transform: translateZ(0); /* DISABLED - was translateY(-100%) */
+  opacity: 1;               /* DISABLED - was 0 */
+  pointer-events: auto;     /* DISABLED - was none */
 }
 
 body.chrome-hidden .chrome-bottom-nav {
-  transform: translateY(100%) translateZ(0);
-  opacity: 0;
-  pointer-events: none;
+  transform: translateZ(0); /* DISABLED - was translateY(100%) */
+  opacity: 1;               /* DISABLED - was 0 */
+  pointer-events: auto;     /* DISABLED - was none */
 }
 
-/* Reduced motion support */
+/* Reduced motion support - keep for accessibility */
 @media (prefers-reduced-motion: reduce) {
   .chrome-header,
   .chrome-bottom-nav {
     transition: none !important;
-  }
-  
-  body.chrome-hidden .chrome-header {
-    transform: translateY(-100%) translateZ(0);
-  }
-  
-  body.chrome-hidden .chrome-bottom-nav {
-    transform: translateY(100%) translateZ(0);
   }
 }
 
@@ -78,53 +70,52 @@ body.chrome-hidden .chrome-bottom-nav {
 /* ========== Dynamic Re-Anchoring for Dependent UI ========== */
 /* ⚠️ CRITICAL: Follower elements that move with chrome auto-hide ⚠️
  * 
- * chrome-follow-top: Elements that slide UP when header hides (e.g., ClubTagPill)
- * chrome-follow-bottom: Elements that slide DOWN when bottom nav hides
- * 
- * DO NOT add transition-all or custom transform transitions to elements with these classes
- * The transform is managed by --chrome-top-shift and --chrome-bottom-shift variables
+ * AUTO-HIDE DISABLED: Followers no longer animate
+ * chrome-follow-top: Elements that would slide UP when header hides
+ * chrome-follow-bottom: Elements that would slide DOWN when bottom nav hides
  */
 
-/* Followers */
+/* Followers - DISABLED */
 .chrome-follow-top,
 .chrome-follow-bottom {
-  will-change: transform;
-  transition: transform 220ms cubic-bezier(.2,.7,.2,1);
+  will-change: auto; /* DISABLED */
+  transition: none;  /* DISABLED */
   transform: translate3d(0,0,0);
 }
 
-/* Top followers: move UP when header hides (negative shift) */
+/* Top followers: no longer move */
 .chrome-follow-top {
-  transform: translate3d(0, var(--chrome-top-shift), 0);
+  transform: translate3d(0, 0, 0); /* DISABLED - was var(--chrome-top-shift) */
 }
 
-/* Bottom followers: move DOWN when bottom nav hides (positive shift) */
+/* Bottom followers: no longer move */
 .chrome-follow-bottom {
-  transform: translate3d(0, var(--chrome-bottom-shift), 0);
+  transform: translate3d(0, 0, 0); /* DISABLED - was var(--chrome-bottom-shift) */
 }
 
 /* GPU optimization hints for animated HUD elements */
 .clubhouse-hud,
 .clubhouse-rail {
-  will-change: opacity, transform;
+  will-change: auto; /* DISABLED */
 }
 
-/* Clubhouse HUD + Rail: dynamic positioning based on chrome visibility */
+/* Clubhouse HUD + Rail: fixed positioning, no dynamic changes */
 .clubhouse-hud,
 .clubhouse-rail {
   bottom: calc(env(safe-area-inset-bottom) + var(--bottom-nav-height) + 16px);
-  transition: bottom 0.24s cubic-bezier(0.19, 1, 0.22, 1);
+  transition: none; /* DISABLED */
 }
 
+/* DISABLED: HUD no longer repositions when chrome hidden */
 body.chrome-hidden .clubhouse-hud,
 body.chrome-hidden .clubhouse-rail {
-  bottom: calc(env(safe-area-inset-bottom) + 22px);
+  bottom: calc(env(safe-area-inset-bottom) + var(--bottom-nav-height) + 16px); /* Same as visible */
 }
 
-/* Nav overlay: temporarily show chrome even when chrome-hidden is active */
+/* Nav overlay: no longer needed but kept for compatibility */
 body.chrome-hidden.chrome-nav-overlay .chrome-header,
 body.chrome-hidden.chrome-nav-overlay .chrome-bottom-nav {
-  transform: translateY(0) translateZ(0);
+  transform: translateZ(0);
   opacity: 1;
   pointer-events: auto;
 }
