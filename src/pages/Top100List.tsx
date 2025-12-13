@@ -335,7 +335,7 @@ const Top100List = () => {
   return (
     <PageRoot className="min-h-screen bg-background">
       <main>
-        {/* 1. Unified Hero + Progress Shell */}
+        {/* 1. Full-bleed Hero + Progress Slab */}
         {listSummary && (
           <Top100HeroShell
             list={listSummary}

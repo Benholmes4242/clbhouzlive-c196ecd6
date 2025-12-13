@@ -1,7 +1,6 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { getTop100Club } from '@/lib/top100Club';
 import { Top100RankBadge } from './Top100RankBadge';
 import type { Top100ListSummary } from '@/hooks/useTop100ListSummaries';
 
@@ -15,9 +14,9 @@ interface Top100HeroShellProps {
 }
 
 /**
- * Top100HeroShell - Unified hero image + docked progress panel
- * The hero and progress are siblings inside the same rounded container,
- * creating a "connected" visual effect with no gap or floating card.
+ * Top100HeroShell - Unified hero image + full-bleed attached progress slab
+ * No floating card look - hero and progress are visually connected edge-to-edge.
+ * Uses "Global – 25/50/75/100 Complete" milestone system, no club naming.
  */
 export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
   list,
@@ -36,14 +35,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
   // Progress calculation
   const percent = totalCount > 0 ? (playedCount / totalCount) * 100 : 0;
   
-  // Get current and next milestone
-  const currentClub = getTop100Club(playedCount);
-  const milestones = [5, 10, 20, 50, 100];
-  const nextMilestone = milestones.find(m => m > playedCount) || 100;
-  const nextClubName = `${nextMilestone} Club`;
-  const toNext = Math.max(0, nextMilestone - playedCount);
-  
-  // Map short labels to full display names
+  // Map short labels to full display names for hero title
   const getDisplayLabel = (shortLabel: string, slug: string) => {
     if (slug === 'global' || shortLabel === 'Global') return 'Worldwide Top 100';
     if (shortLabel === 'GB&I') return 'Great Britain & Ireland Top 100';
@@ -53,6 +45,41 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
   };
 
   const displayLabel = getDisplayLabel(list.short_label || list.name, list.slug);
+
+  // Milestone system: Global – 25/50/75/100 Complete
+  // Regional lists use same pattern with region name
+  const getMilestoneInfo = useMemo(() => {
+    const milestoneThresholds = [25, 50, 75, 100];
+    
+    // Get region prefix for milestone naming
+    const getRegionPrefix = () => {
+      switch (listSlug) {
+        case 'global': return 'Global';
+        case 'gb-i': return 'GB&I';
+        case 'usa': return 'USA';
+        case 'europe': return 'Europe';
+        default: return listDisplayName;
+      }
+    };
+    
+    const regionPrefix = getRegionPrefix();
+    
+    // Find next milestone
+    const nextMilestone = milestoneThresholds.find(t => t > playedCount);
+    const toNextMilestone = nextMilestone ? nextMilestone - playedCount : 0;
+    
+    // Build milestone label
+    const nextMilestoneLabel = nextMilestone 
+      ? `${regionPrefix} – ${nextMilestone} Complete`
+      : `${regionPrefix} – 100 Complete`;
+    
+    return {
+      nextMilestone,
+      toNextMilestone,
+      nextMilestoneLabel,
+      isComplete: playedCount >= 100,
+    };
+  }, [playedCount, listSlug, listDisplayName]);
   
   // Animate progress bar on mount
   useEffect(() => {
@@ -63,9 +90,9 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
   }, [percent]);
 
   return (
-    <div className="px-4 mt-4">
-      {/* ONE shared container with rounded corners */}
-      <div className="overflow-hidden rounded-2xl">
+    <div className="w-full">
+      {/* Full-bleed container - no rounded corners, no gap */}
+      <div className="overflow-hidden">
         
         {/* HERO IMAGE SECTION */}
         <div className="relative h-[240px]">
@@ -81,8 +108,8 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
             <div className="h-full w-full bg-gradient-to-br from-slate-800 to-slate-900" />
           )}
           
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
+          {/* Gradient overlay - blends into slab */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#2f3a4a] via-black/20 to-transparent" />
           
           {/* Back button */}
           {onBack && (
@@ -110,10 +137,13 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
           </div>
         </div>
 
-        {/* DOCKED PROGRESS PANEL - connected to hero, no gap */}
+        {/* FULL-BLEED PROGRESS SLAB - attached to hero, no rounded corners */}
         {showProgress && (
-          <div className="bg-slate-800/90 px-4 py-4">
-            {/* Top row: big count left, club + range right */}
+          <div 
+            className="w-full px-4 py-4"
+            style={{ background: '#2f3a4a' }}
+          >
+            {/* Top row: big count left, milestone info right */}
             <div className="flex items-start justify-between gap-4">
               <div className="text-white">
                 <motion.div
@@ -127,13 +157,19 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
                 </motion.div>
               </div>
 
+              {/* Right side: percentage + next milestone */}
               <div className="text-right text-white">
                 <div className="text-sm font-semibold">
-                  {currentClub?.shortLabel || 'Rookie'}
+                  {Math.round(percent)}% complete
                 </div>
-                {toNext > 0 && (
-                  <div className="text-xs text-white/70">
-                    {toNext} to {nextClubName}
+                {getMilestoneInfo.toNextMilestone > 0 && !getMilestoneInfo.isComplete && (
+                  <div className="text-xs text-white/70 mt-0.5">
+                    {getMilestoneInfo.toNextMilestone} to {getMilestoneInfo.nextMilestoneLabel}
+                  </div>
+                )}
+                {getMilestoneInfo.isComplete && (
+                  <div className="text-xs text-white/70 mt-0.5">
+                    {getMilestoneInfo.nextMilestoneLabel} ✓
                   </div>
                 )}
               </div>
@@ -153,7 +189,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
               {/* Labels below bar */}
               <div className="mt-2 flex items-center justify-between text-xs text-white/70">
                 <span>{listDisplayName} progress</span>
-                <span>{Math.round(percent)}% complete</span>
+                <span>Next milestone: {getMilestoneInfo.nextMilestone || 100}</span>
               </div>
             </div>
           </div>
