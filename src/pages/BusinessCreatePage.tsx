@@ -277,7 +277,7 @@ const BusinessCreatePage = () => {
                   maxLength={500}
                 />
                 <p className="text-[11px] text-muted-foreground">
-                  Tip: Mention what makes you different — facilities, coaching style, atmosphere, or events.
+                  Tip: Mention what makes you different - facilities, coaching style, atmosphere, or events.
                 </p>
               </div>
             </div>
@@ -364,7 +364,7 @@ const BusinessCreatePage = () => {
               </div>
 
               <p className="text-[11px] text-muted-foreground pt-3 border-t border-border/30">
-                We'll only use this to help golfers contact you — never shared with third parties.
+                We'll only use this to help golfers contact you - never shared with third parties.
               </p>
             </div>
           </motion.section>

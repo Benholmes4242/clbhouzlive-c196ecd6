@@ -148,7 +148,7 @@ export function BusinessProfileOverview({ business, membership }: BusinessProfil
         <div className="flex items-center gap-3 py-6">
           <p className="text-sm text-muted-foreground">
             {isOwner 
-              ? `No photos yet — post as this business to add some.`
+              ? 'No photos yet - post as this business to add some.'
               : 'No photos yet.'
             }
           </p>
@@ -159,7 +159,7 @@ export function BusinessProfileOverview({ business, membership }: BusinessProfil
       <section className="space-y-3">
         <h2 className="text-base font-semibold text-foreground">Reviews</h2>
         <p className="text-sm text-muted-foreground py-4">
-          Coming soon — you'll be able to see what golfers are saying about this business.
+          Coming soon - you'll be able to see what golfers are saying about this business.
         </p>
       </section>
     </div>

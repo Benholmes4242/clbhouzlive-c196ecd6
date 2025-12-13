@@ -40,14 +40,14 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
   const { business, role } = membership;
   const canDelete = role === 'owner';
 
-  // Format stat display - show "—" for zero/empty with fixed width
+  // Format stat display - show "-" for zero/empty with fixed width
   const formatStat = (value: number | undefined) => {
-    if (value === undefined || value === 0) return '—';
+    if (value === undefined || value === 0) return '-';
     return value.toLocaleString();
   };
 
   const formatFollowers = (value: number | undefined) => {
-    if (value === undefined || value === 0) return '—';
+    if (value === undefined || value === 0) return '-';
     return value >= 0 ? `+${value.toLocaleString()}` : value.toLocaleString();
   };
 
@@ -188,19 +188,19 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
           <div className="grid grid-cols-3 text-center">
             <div className="flex flex-col items-center justify-center">
               <p className="text-lg font-semibold text-foreground tabular-nums min-w-[2ch]">
-                {statsLoading ? <span className="opacity-0">—</span> : formatStat(stats?.visits)}
+                {statsLoading ? <span className="opacity-0">-</span> : formatStat(stats?.visits)}
               </p>
               <p className="text-[11px] text-muted-foreground/70 mt-0.5">Visits</p>
             </div>
             <div className="flex flex-col items-center justify-center">
               <p className="text-lg font-semibold text-foreground tabular-nums min-w-[2ch]">
-                {statsLoading ? <span className="opacity-0">—</span> : formatFollowers(stats?.followersGained)}
+                {statsLoading ? <span className="opacity-0">-</span> : formatFollowers(stats?.followersGained)}
               </p>
               <p className="text-[11px] text-muted-foreground/70 mt-0.5">Followers</p>
             </div>
             <div className="flex flex-col items-center justify-center">
               <p className="text-lg font-semibold text-foreground tabular-nums min-w-[2ch]">
-                {statsLoading ? <span className="opacity-0">—</span> : formatStat(stats?.impressions)}
+                {statsLoading ? <span className="opacity-0">-</span> : formatStat(stats?.impressions)}
               </p>
               <p className="text-[11px] text-muted-foreground/70 mt-0.5">Impressions</p>
             </div>

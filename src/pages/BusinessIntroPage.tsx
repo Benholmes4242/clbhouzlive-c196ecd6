@@ -77,7 +77,7 @@ const BusinessIntroPage: React.FC = () => {
         >
           <p className="text-sm font-semibold text-foreground">Why this matters</p>
           <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-            Your business profile helps golfers discover, trust, and follow your brand — even if they've never heard of you before.
+            Your business profile helps golfers discover, trust, and follow your brand, even if they've never heard of you before.
           </p>
         </motion.section>
 
@@ -106,6 +106,10 @@ const BusinessIntroPage: React.FC = () => {
               <div className="h-1 w-1 rounded-full bg-muted-foreground/60" />
               Brands, events, and golf organisations
             </li>
+            <li className="flex items-center gap-2">
+              <div className="h-1 w-1 rounded-full bg-muted-foreground/60" />
+              Content creators & influencers
+            </li>
           </ul>
         </motion.section>
 
@@ -118,7 +122,7 @@ const BusinessIntroPage: React.FC = () => {
         >
           <h3 className="text-sm font-semibold text-foreground">What you'll need</h3>
           <p className="mt-1 text-xs text-muted-foreground">
-            Have these ready — it usually takes less than 2 minutes.
+            Have these ready - it usually takes less than 2 minutes.
           </p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             <li className="flex items-center gap-2">
@@ -127,7 +131,7 @@ const BusinessIntroPage: React.FC = () => {
             </li>
             <li className="flex items-center gap-2">
               <CheckCircle2 className="h-3.5 w-3.5 text-muted-foreground" />
-              Website or booking link
+              Website
             </li>
             <li className="flex items-center gap-2">
               <CheckCircle2 className="h-3.5 w-3.5 text-muted-foreground" />
