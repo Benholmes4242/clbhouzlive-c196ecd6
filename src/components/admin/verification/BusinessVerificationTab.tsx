@@ -26,7 +26,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { CheckCircle, XCircle, ExternalLink, Globe, Building2, Loader2, ShieldCheck, Mail, Users } from 'lucide-react';
+import { CheckCircle, XCircle, ExternalLink, Globe, Building2, Loader2, ShieldCheck, Mail, Users, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useAdminVerificationQueueRealtime } from '@/hooks/useBusinessVerificationRealtime';
@@ -180,7 +180,48 @@ const BusinessVerificationTab = () => {
     },
   });
 
-  const processing = submitReviewMutation.isPending || requestDomainCheck.isPending;
+  // Force approve mutation for demo/testing purposes
+  const forceApproveMutation = useMutation({
+    mutationFn: async ({ requestId, businessId }: { requestId: string; businessId: string }) => {
+      // Update the verification request to approved
+      const { error: requestError } = await supabase
+        .from('business_verification_requests')
+        .update({
+          status: 'approved',
+          approval_count: 2, // Set to required threshold
+          reviewed_at: new Date().toISOString(),
+          reviewed_by: currentUser?.id,
+          admin_note: 'Force approved for demo/testing purposes',
+        })
+        .eq('id', requestId);
+
+      if (requestError) throw requestError;
+
+      // Set the business as verified
+      const { error: businessError } = await supabase
+        .from('business_accounts')
+        .update({
+          is_verified: true,
+          verified_at: new Date().toISOString(),
+          verified_by: currentUser?.id,
+        })
+        .eq('id', businessId);
+
+      if (businessError) throw businessError;
+
+      return { success: true };
+    },
+    onSuccess: () => {
+      toast.success('Business force approved for demo purposes.');
+      queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-business-verifications-pending-count'] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Could not force approve. Please try again.');
+    },
+  });
+
+  const processing = submitReviewMutation.isPending || requestDomainCheck.isPending || forceApproveMutation.isPending;
 
   const openRejectModal = (request: VerificationRequest) => {
     setSelectedRequest(request);
@@ -346,6 +387,19 @@ const BusinessVerificationTab = () => {
                 <Button size="sm" variant="outline" onClick={() => openDomainCheckModal(request)} disabled={processing} className="gap-1.5">
                   <Mail className="h-4 w-4" />
                   Request Domain Check
+                </Button>
+              )}
+              {/* Demo-only force approve button - visible only in development */}
+              {import.meta.env.DEV && business && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => forceApproveMutation.mutate({ requestId: request.id, businessId: business.id })}
+                  disabled={processing}
+                  className="gap-1.5 text-orange-600 border-orange-200 hover:bg-orange-50"
+                >
+                  <Zap className="h-4 w-4" />
+                  Force approve (demo)
                 </Button>
               )}
             </div>
