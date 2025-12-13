@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Users, Shield, Crown, Eye, PenLine, BarChart3, User, MoreHorizontal, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Users, Crown, MoreHorizontal, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
@@ -15,12 +15,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { formatDistanceToNow } from 'date-fns';
 
-const roleConfig = {
-  owner: { label: 'Owner', icon: Crown, description: 'Full control over business', color: 'text-amber-600' },
-  admin: { label: 'Admin', icon: Shield, description: 'Manage team and settings', color: 'text-blue-600' },
-  editor: { label: 'Editor', icon: PenLine, description: 'Create and edit content', color: 'text-green-600' },
-  analyst: { label: 'Analyst', icon: BarChart3, description: 'View insights only', color: 'text-purple-600' },
-  member: { label: 'Member', icon: User, description: 'Basic access', color: 'text-muted-foreground' },
+type RoleKey = 'owner' | 'admin' | 'member';
+
+const roleConfig: Record<RoleKey, { label: string; description: string }> = {
+  owner: { label: 'Owner', description: 'Full control over business' },
+  admin: { label: 'Admin', description: 'Manage team and settings' },
+  member: { label: 'Member', description: 'Can post content' },
 };
 
 export default function BusinessTeamPage() {
@@ -40,6 +40,11 @@ export default function BusinessTeamPage() {
 
   const pendingInvites = invites?.filter(i => i.status === 'pending') || [];
 
+  // Group team by role
+  const owners = team?.filter(m => m.role === 'owner') || [];
+  const admins = team?.filter(m => m.role === 'admin') || [];
+  const members = team?.filter(m => m.role === 'member') || [];
+
   const handleRemoveMember = async () => {
     if (!removeConfirm.member) return;
     await removeMember.mutateAsync(removeConfirm.member.user_profile_id);
@@ -52,6 +57,56 @@ export default function BusinessTeamPage() {
 
   if (!businessId) return null;
 
+  const MemberRow = ({ member, showActions = false }: { member: BusinessMember; showActions?: boolean }) => {
+    const profile = member.user_profile;
+    const role = roleConfig[member.role as RoleKey] || roleConfig.member;
+
+    return (
+      <div className="flex items-center gap-3 py-3">
+        <SquircleAvatar
+          src={profile?.profile_photo_url || undefined}
+          alt={profile?.display_name || 'Member'}
+          size={44}
+        />
+        <div className="flex-1 min-w-0">
+          <p className="font-medium text-[15px] truncate">{profile?.display_name || profile?.username || 'Unknown'}</p>
+          <p className="text-sm text-muted-foreground">{role.label}</p>
+        </div>
+
+        {showActions && isOwner && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wide">Change role</div>
+              {(['admin', 'member'] as const).map((r) => (
+                <DropdownMenuItem
+                  key={r}
+                  onClick={() => handleRoleChange(member, r)}
+                  disabled={member.role === r}
+                  className="text-sm"
+                >
+                  {roleConfig[r].label}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="text-destructive text-sm"
+                onClick={() => setRemoveConfirm({ open: true, member })}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Remove access
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -61,106 +116,77 @@ export default function BusinessTeamPage() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-lg font-semibold">Team</h1>
-            <p className="text-sm text-muted-foreground">{team?.length || 0} members</p>
+            <h1 className="text-lg font-semibold">Team & access</h1>
+            <p className="text-sm text-muted-foreground">Manage who can access this business</p>
           </div>
-          {canManage && (
-            <Button size="sm" onClick={() => navigate(`/business/${businessId}/team/invite`)}>
-              <Plus className="h-4 w-4 mr-1" />
-              Invite
-            </Button>
-          )}
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
-        {/* Team Members */}
+      <div className="max-w-lg mx-auto px-4 py-6 space-y-8">
+        {/* Owners Section */}
         <section>
-          <h2 className="text-sm font-medium text-muted-foreground mb-3">Team members</h2>
-          <div className="bg-card rounded-sq-lg border border-border divide-y divide-border">
+          <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Owner</h2>
+          <div className="divide-y divide-border">
             {teamLoading ? (
-              <div className="p-4 text-center text-muted-foreground">Loading...</div>
-            ) : team?.length === 0 ? (
-              <div className="p-4 text-center text-muted-foreground">No team members</div>
+              <div className="py-4 text-center text-muted-foreground text-sm">Loading...</div>
+            ) : owners.length === 0 ? (
+              <div className="py-4 text-center text-muted-foreground text-sm">No owner</div>
             ) : (
-              team?.map((member) => {
-                const role = roleConfig[member.role] || roleConfig.member;
-                const RoleIcon = role.icon;
-                const profile = member.user_profile;
-
-                return (
-                  <div key={member.id} className="flex items-center gap-3 p-4">
-                    <SquircleAvatar
-                      src={profile?.profile_photo_url || undefined}
-                      alt={profile?.display_name || 'Member'}
-                      size={44}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">{profile?.display_name || profile?.username || 'Unknown'}</p>
-                      <div className="flex items-center gap-1.5 text-sm">
-                        <RoleIcon className={`h-3.5 w-3.5 ${role.color}`} />
-                        <span className="text-muted-foreground">{role.label}</span>
-                      </div>
-                    </div>
-
-                    {isOwner && member.role !== 'owner' && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">Change role</div>
-                          {(['admin', 'editor', 'analyst', 'member'] as const).map((r) => (
-                            <DropdownMenuItem
-                              key={r}
-                              onClick={() => handleRoleChange(member, r)}
-                              disabled={member.role === r}
-                            >
-                              {roleConfig[r].label}
-                            </DropdownMenuItem>
-                          ))}
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={() => setRemoveConfirm({ open: true, member })}
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Remove
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                  </div>
-                );
-              })
+              owners.map((member) => (
+                <MemberRow key={member.id} member={member} showActions={false} />
+              ))
             )}
           </div>
+          <p className="text-xs text-muted-foreground mt-2">The owner has full control of this business.</p>
         </section>
+
+        {/* Admins Section */}
+        {admins.length > 0 && (
+          <section>
+            <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Admins</h2>
+            <div className="divide-y divide-border">
+              {admins.map((member) => (
+                <MemberRow key={member.id} member={member} showActions={true} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Members Section */}
+        {members.length > 0 && (
+          <section>
+            <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Members</h2>
+            <div className="divide-y divide-border">
+              {members.map((member) => (
+                <MemberRow key={member.id} member={member} showActions={true} />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Pending Invites */}
         {canManage && pendingInvites.length > 0 && (
           <section>
-            <h2 className="text-sm font-medium text-muted-foreground mb-3">Pending invitations</h2>
-            <div className="bg-card rounded-sq-lg border border-border divide-y divide-border">
+            <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Pending invitations</h2>
+            <div className="divide-y divide-border">
               {pendingInvites.map((invite) => {
-                const role = roleConfig[invite.role] || roleConfig.member;
+                const role = roleConfig[invite.role as RoleKey] || roleConfig.member;
 
                 return (
-                  <div key={invite.id} className="flex items-center gap-3 p-4">
+                  <div key={invite.id} className="flex items-center gap-3 py-3">
                     <div className="h-11 w-11 rounded-sq-md bg-muted flex items-center justify-center">
                       <Users className="h-5 w-5 text-muted-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">{invite.invitee_email}</p>
+                      <p className="font-medium text-[15px] truncate">{invite.invitee_email}</p>
                       <p className="text-sm text-muted-foreground">
-                        {role.label} · Invited {formatDistanceToNow(new Date(invite.created_at), { addSuffix: true })}
+                        {role.label} · Sent {formatDistanceToNow(new Date(invite.created_at), { addSuffix: true })}
                       </p>
                     </div>
                     <Button
                       variant="ghost"
                       size="sm"
+                      className="text-muted-foreground text-sm"
                       onClick={() => revokeInvite.mutate(invite.id)}
                       disabled={revokeInvite.isPending}
                     >
@@ -173,26 +199,16 @@ export default function BusinessTeamPage() {
           </section>
         )}
 
-        {/* Role Permissions */}
-        <section>
-          <h2 className="text-sm font-medium text-muted-foreground mb-3">Role permissions</h2>
-          <div className="bg-card rounded-sq-lg border border-border divide-y divide-border">
-            {Object.entries(roleConfig).map(([key, config]) => {
-              const Icon = config.icon;
-              return (
-                <div key={key} className="flex items-center gap-3 p-4">
-                  <div className={`h-9 w-9 rounded-sq-sm bg-muted flex items-center justify-center ${config.color}`}>
-                    <Icon className="h-4 w-4" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium">{config.label}</p>
-                    <p className="text-sm text-muted-foreground">{config.description}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
+        {/* Invite CTA */}
+        {canManage && (
+          <Button 
+            className="w-full" 
+            onClick={() => navigate(`/business/${businessId}/team/invite`)}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Invite teammate
+          </Button>
+        )}
       </div>
 
       {/* Remove Confirmation */}
@@ -201,7 +217,7 @@ export default function BusinessTeamPage() {
         onClose={() => setRemoveConfirm({ open: false, member: null })}
         onConfirm={handleRemoveMember}
         title="Remove team member"
-        message={`Are you sure you want to remove ${removeConfirm.member?.user_profile?.display_name || 'this member'} from the team?`}
+        message={`Are you sure you want to remove ${removeConfirm.member?.user_profile?.display_name || 'this member'} from the team? They will lose access to this business.`}
         confirmText="Remove"
         confirmVariant="destructive"
       />

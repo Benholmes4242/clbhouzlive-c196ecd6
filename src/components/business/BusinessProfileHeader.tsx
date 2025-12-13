@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, Globe, MapPin, BadgeCheck, BarChart2, Building2, Camera, Loader2 } from 'lucide-react';
+import { Phone, Globe, MapPin, BarChart2, Building2, Camera, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
@@ -13,6 +13,7 @@ import { BusinessHighlightsReel } from './BusinessHighlightsReel';
 import { BusinessImageActionSheet } from './BusinessImageActionSheet';
 import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 import { BusinessFollowButton } from './BusinessFollowButton';
+import { VerifiedBadge } from './VerifiedBadge';
 import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
 
 interface BusinessProfileHeaderProps {
@@ -165,12 +166,12 @@ export function BusinessProfileHeader({
           {/* TEXT META (name, handle, category · location) */}
           <div className="flex-1 flex flex-col items-center justify-center gap-1.5 md:gap-2">
             {/* Name + Verified badge */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-foreground text-center">
                 {business.name}
               </h1>
               {business.is_verified && (
-                <BadgeCheck className="h-5 w-5 text-blue-500" />
+                <VerifiedBadge size="lg" />
               )}
             </div>
 
@@ -181,12 +182,6 @@ export function BusinessProfileHeader({
                 <Building2 className="w-3 h-3" />
                 Business
               </span>
-              {business.is_verified && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-500">
-                  <BadgeCheck className="w-3 h-3" />
-                  Verified
-                </span>
-              )}
             </div>
 
             {/* Identity line: Category · Location */}
