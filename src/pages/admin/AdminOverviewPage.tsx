@@ -5,7 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Users, UserCheck, Shield, ShieldAlert, AlertCircle, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useSidebar } from "@/components/ui/sidebar";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { AdminSidebar } from "@/components/admin/AdminSidebar";
 
 type Metrics = {
   total_users: number;
@@ -19,8 +20,8 @@ type Metrics = {
 export function AdminOverviewPage() {
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const { toggleSidebar } = useSidebar();
 
   useEffect(() => {
     loadMetrics();
@@ -52,14 +53,20 @@ export function AdminOverviewPage() {
     <div className="min-h-screen overflow-x-hidden">
       <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
         <div className="flex items-center gap-3">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="md:hidden h-10 w-10"
-            onClick={toggleSidebar}
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="md:hidden h-10 w-10"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-72 p-0">
+              <AdminSidebar onNavigate={() => setMobileMenuOpen(false)} />
+            </SheetContent>
+          </Sheet>
           <div>
             <h1 className="text-2xl font-bold">Admin Dashboard</h1>
             <p className="text-sm text-muted-foreground">System overview and metrics</p>
