@@ -21,11 +21,11 @@ interface BenefitItemProps {
 }
 
 const BenefitItem = ({ icon: Icon, title, body }: BenefitItemProps) => (
-  <div className="flex flex-col items-center gap-2">
-    <div className="flex-shrink-0">
+  <div className="flex items-start gap-3">
+    <div className="flex-shrink-0 mt-0.5">
       <Icon className="h-4 w-4 text-muted-foreground" />
     </div>
-    <div className="text-center">
+    <div>
       <p className="text-sm font-medium text-foreground">{title}</p>
       <p className="text-[13px] text-muted-foreground leading-relaxed">{body}</p>
     </div>
@@ -51,8 +51,8 @@ export const CreateBusinessProfileIntroModal: React.FC<CreateBusinessProfileIntr
           </div>
           
           {/* Title */}
-          <h2 className="text-xl font-semibold text-foreground text-center">
-            Create Your Business Presence
+          <h2 className="text-xl font-semibold text-foreground">
+            Create your business presence on clbhouz
           </h2>
           
           {/* Subtitle */}
@@ -62,11 +62,11 @@ export const CreateBusinessProfileIntroModal: React.FC<CreateBusinessProfileIntr
         </DialogHeader>
 
         {/* Outcome-led benefits - no cards, just spacing */}
-        <div className="mt-6 space-y-4 text-center">
+        <div className="mt-6 space-y-4">
           <BenefitItem
             icon={Search}
             title="Be discoverable"
-            body="Appear in search and the business directory where golfers are already exploring."
+            body="Appear in clbhouz search and the business directory where golfers are already exploring."
           />
           <BenefitItem
             icon={Shield}

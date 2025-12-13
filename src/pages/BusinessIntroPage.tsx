@@ -73,7 +73,7 @@ const BusinessIntroPage: React.FC = () => {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="py-4 border-b border-border/30 text-center"
+          className="py-4 border-b border-border/30"
         >
           <p className="text-sm font-semibold text-foreground">Why this matters</p>
           <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
@@ -86,27 +86,27 @@ const BusinessIntroPage: React.FC = () => {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="py-4 border-b border-border/30 text-center"
+          className="py-4 border-b border-border/30"
         >
           <h3 className="text-sm font-semibold text-foreground">Who can create a business profile?</h3>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            <li className="flex items-center justify-center gap-2">
+            <li className="flex items-center gap-2">
               <div className="h-1 w-1 rounded-full bg-muted-foreground/60" />
               Golf clubs & resorts
             </li>
-            <li className="flex items-center justify-center gap-2">
+            <li className="flex items-center gap-2">
               <div className="h-1 w-1 rounded-full bg-muted-foreground/60" />
               Coaches & academies
             </li>
-            <li className="flex items-center justify-center gap-2">
+            <li className="flex items-center gap-2">
               <div className="h-1 w-1 rounded-full bg-muted-foreground/60" />
               Retail & online golf stores
             </li>
-            <li className="flex items-center justify-center gap-2">
+            <li className="flex items-center gap-2">
               <div className="h-1 w-1 rounded-full bg-muted-foreground/60" />
               Brands, events, and golf organisations
             </li>
-            <li className="flex items-center justify-center gap-2">
+            <li className="flex items-center gap-2">
               <div className="h-1 w-1 rounded-full bg-muted-foreground/60" />
               Content creators & influencers
             </li>
@@ -118,26 +118,26 @@ const BusinessIntroPage: React.FC = () => {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="py-4 text-center"
+          className="py-4"
         >
           <h3 className="text-sm font-semibold text-foreground">What you'll need</h3>
           <p className="mt-1 text-xs text-muted-foreground">
             Have these ready - it usually takes less than 2 minutes.
           </p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            <li className="flex items-center justify-center gap-2">
+            <li className="flex items-center gap-2">
               <CheckCircle2 className="h-3.5 w-3.5 text-muted-foreground" />
               Official business name
             </li>
-            <li className="flex items-center justify-center gap-2">
+            <li className="flex items-center gap-2">
               <CheckCircle2 className="h-3.5 w-3.5 text-muted-foreground" />
               Website
             </li>
-            <li className="flex items-center justify-center gap-2">
+            <li className="flex items-center gap-2">
               <CheckCircle2 className="h-3.5 w-3.5 text-muted-foreground" />
               Location (city & country)
             </li>
-            <li className="flex items-center justify-center gap-2">
+            <li className="flex items-center gap-2">
               <CheckCircle2 className="h-3.5 w-3.5 text-muted-foreground" />
               Contact email or phone
             </li>
