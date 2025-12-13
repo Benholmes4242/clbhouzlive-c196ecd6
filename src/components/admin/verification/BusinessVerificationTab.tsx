@@ -183,7 +183,7 @@ const BusinessVerificationTab = () => {
   // Force approve mutation for demo/testing purposes
   const forceApproveMutation = useMutation({
     mutationFn: async ({ requestId, businessId }: { requestId: string; businessId: string }) => {
-      // Update the verification request to approved
+      // Update the verification request to approved + clear domain pending states
       const { error: requestError } = await supabase
         .from('business_verification_requests')
         .update({
@@ -192,6 +192,9 @@ const BusinessVerificationTab = () => {
           reviewed_at: new Date().toISOString(),
           reviewed_by: currentUser?.id,
           admin_note: 'Force approved for demo/testing purposes',
+          // Clear domain pending states
+          domain_confirmed: true,
+          domain_confirmed_at: new Date().toISOString(),
         })
         .eq('id', requestId);
 
@@ -350,7 +353,8 @@ const BusinessVerificationTab = () => {
             </div>
           )}
 
-          {request.requires_domain_check && (
+          {/* Domain verification status - hide pending state if business is already verified */}
+          {request.requires_domain_check && !(business?.is_verified && request.status === 'approved') && (
             <div className={`rounded-sq-sm p-3 text-sm border ${request.domain_confirmed ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900' : 'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900'}`}>
               <div className="flex items-center gap-2">
                 {request.domain_confirmed ? (
