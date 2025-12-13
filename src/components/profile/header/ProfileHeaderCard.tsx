@@ -1,5 +1,5 @@
 import React from 'react';
-import { Globe, Pencil, Building2, MapPin, CheckCircle2 } from 'lucide-react';
+import { Globe, Pencil, Building2, MapPin, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { BUSINESS_CATEGORIES, BusinessCategory } from '@/types/profile';
 
 interface ProfileHeaderCardProps {
@@ -16,6 +16,7 @@ interface ProfileHeaderCardProps {
   businessCategory?: string | null;
   businessLocation?: string | null;
   isVerifiedBusiness?: boolean | null;
+  isVerifiedGolfer?: boolean | null;
   // Profile type
   isPersonal: boolean;
   isOwnProfile: boolean;
@@ -36,6 +37,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   businessCategory,
   businessLocation,
   isVerifiedBusiness,
+  isVerifiedGolfer,
   isPersonal,
   isOwnProfile,
   onCustomiseClick,
@@ -63,10 +65,21 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-1.5 md:gap-2">
-      {/* Row 1: Name */}
-      <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-foreground text-center">
-        {effectiveDisplayName}
-      </h1>
+      {/* Row 1: Name + Verified Golfer badge */}
+      <div className="flex items-center justify-center gap-1.5">
+        <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-foreground text-center">
+          {effectiveDisplayName}
+        </h1>
+        {/* Verified golfer badge - green glass tick for personal profiles */}
+        {isPersonal && isVerifiedGolfer && (
+          <span 
+            className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/20"
+            title="Verified golfer"
+          >
+            <ShieldCheck className="w-3 h-3 text-emerald-500" />
+          </span>
+        )}
+      </div>
 
       {/* Row 2: Username + Business indicators */}
       <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-slate-500">

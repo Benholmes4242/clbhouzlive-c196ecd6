@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X, MoreVertical, ShieldCheck } from 'lucide-react';
+import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X, MoreVertical, ShieldCheck, CheckCircle } from 'lucide-react';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
@@ -8,6 +8,10 @@ import { FollowBackButton } from './FollowBackButton';
 import { FriendRequestButtons } from './FriendRequestButtons';
 import { useCancelFriendRequest } from '@/hooks/useCancelFriendRequest';
 import { GolferVerificationInviteButtons } from './GolferVerificationInviteButtons';
+
+// Clbhouz logomark URL for system notifications
+const CLBHOUZ_LOGOMARK_URL = '/assets/logomark-orange.png';
+
 interface ActivityNotificationRowProps {
   notification: ActivityNotification;
   onClick: () => void;
@@ -24,7 +28,18 @@ function getFriendBadgeIcon(isActive: boolean) {
   return <Users className={cn("h-3 w-3", isActive ? "text-amber-500" : "text-muted-foreground")} />;
 }
 
-function getNotificationIcon(type: string) {
+// Check if notification is a system/Clbhouz notification type
+function isClbhouzSystemNotification(type: string): boolean {
+  return (
+    type === 'system' ||
+    type === 'app_update' ||
+    type.startsWith('golfer_verification_') ||
+    type.startsWith('business_verification_')
+  );
+}
+
+// Get the notification badge icon for the avatar overlay
+function getNotificationBadgeIcon(type: string) {
   const iconClass = "h-3 w-3";
   switch (type) {
     case 'like':
@@ -50,30 +65,25 @@ function getNotificationIcon(type: string) {
     case 'club_update':
     case 'course_update':
       return <Building2 className={cn(iconClass, "text-slate-500")} />;
-    // Business verification notifications (canonical + legacy types)
-    case 'business_verification_submitted':
+    // Business verification notifications - glass green tick for approved
     case 'business_verification_approved':
+      return <CheckCircle className={cn(iconClass, "text-emerald-500")} />;
+    case 'business_verification_submitted':
+    case 'business_verification_more_proof_requested':
+      return <Building2 className={cn(iconClass, "text-amber-500")} />;
     case 'business_verification_rejected':
     case 'business_verification_removed':
-    case 'business_verification_revoked': // Legacy support
-    case 'business_verification_more_proof_requested':
-      return <Building2 className={cn(iconClass, 
-        type === 'business_verification_approved' ? "text-emerald-500" : 
-        type === 'business_verification_rejected' || type === 'business_verification_removed' || type === 'business_verification_revoked' ? "text-red-500" : 
-        "text-amber-500"
-      )} />;
-    // Golfer verification notifications
+    case 'business_verification_revoked':
+      return <Building2 className={cn(iconClass, "text-red-500")} />;
+    // Golfer verification notifications - glass green tick for approved
+    case 'golfer_verification_approved':
+      return <CheckCircle className={cn(iconClass, "text-emerald-500")} />;
     case 'golfer_verification_invite':
     case 'golfer_verification_submitted':
-    case 'golfer_verification_approved':
+      return <CheckCircle className={cn(iconClass, "text-blue-500")} />;
     case 'golfer_verification_rejected':
     case 'golfer_verification_removed':
-      return <ShieldCheck className={cn(iconClass,
-        type === 'golfer_verification_approved' ? "text-emerald-500" :
-        type === 'golfer_verification_rejected' || type === 'golfer_verification_removed' ? "text-red-500" :
-        type === 'golfer_verification_invite' ? "text-blue-500" :
-        "text-amber-500"
-      )} />;
+      return <ShieldCheck className={cn(iconClass, "text-red-500")} />;
     default:
       return <Bell className={cn(iconClass, "text-muted-foreground")} />;
   }
@@ -106,6 +116,10 @@ function getActorDisplayName(notification: ActivityNotification): string {
 }
 
 function getActorAvatarUrl(notification: ActivityNotification): string | null {
+  // For Clbhouz system notifications (verification, app updates), use logo mark
+  if (isClbhouzSystemNotification(notification.type)) {
+    return CLBHOUZ_LOGOMARK_URL;
+  }
   // For business notifications, use business logo from data if available
   if (notification.type?.startsWith('business_verification')) {
     const businessLogo = notification.data?.business_logo_url;
@@ -177,6 +191,7 @@ interface AvatarWithBadgeProps {
 const AvatarWithBadge: React.FC<AvatarWithBadgeProps> = ({ notification, badgeIcon }) => {
   const avatarUrl = getActorAvatarUrl(notification);
   const displayName = getActorDisplayName(notification);
+  const isSystemNotification = isClbhouzSystemNotification(notification.type);
   
   return (
     <div className="relative shrink-0" style={{ width: 48, height: 50 }}>
@@ -185,9 +200,15 @@ const AvatarWithBadge: React.FC<AvatarWithBadgeProps> = ({ notification, badgeIc
         alt={displayName || 'User'}
         size={48}
         fallback={displayName?.charAt(0) || '?'}
-        ringColor={getRingColorForTotalPlayed(notification.data?.actor_total_top100_played || 0)}
+        ringColor={isSystemNotification ? undefined : getRingColorForTotalPlayed(notification.data?.actor_total_top100_played || 0)}
       />
-      <span className="absolute bottom-0 right-0 translate-x-1 translate-y-1 h-5 w-5 rounded-full border-2 border-background bg-background flex items-center justify-center shadow-sm">
+      <span className={cn(
+        "absolute bottom-0 right-0 translate-x-1 translate-y-1 h-5 w-5 rounded-full border-2 border-background flex items-center justify-center shadow-sm",
+        // Use glass green background for verification approved types
+        notification.type === 'golfer_verification_approved' || notification.type === 'business_verification_approved' 
+          ? "bg-emerald-500/20" 
+          : "bg-background"
+      )}>
         {badgeIcon}
       </span>
     </div>
@@ -511,7 +532,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
     case 'golfer_verification_invite': {
       const requestId = data?.request_id;
       const inviteStatus = data?.status || 'pending';
-      const statusIcon = getNotificationIcon(type);
+      const statusIcon = getNotificationBadgeIcon(type);
       
       return (
         <FlatRow
@@ -544,7 +565,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
      * 7) GOLFER VERIFICATION APPROVED
      */
     case 'golfer_verification_approved': {
-      const statusIcon = getNotificationIcon(type);
+      const statusIcon = getNotificationBadgeIcon(type);
       return (
         <FlatRow
           notification={notification}
@@ -573,7 +594,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
      * 8) GOLFER VERIFICATION REJECTED
      */
     case 'golfer_verification_rejected': {
-      const statusIcon = getNotificationIcon(type);
+      const statusIcon = getNotificationBadgeIcon(type);
       return (
         <FlatRow
           notification={notification}
@@ -601,7 +622,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
      * 9) DEFAULT – All other notification types (follow, like, comment, etc.)
      */
     default: {
-      const statusIcon = getNotificationIcon(type);
+      const statusIcon = getNotificationBadgeIcon(type);
       
       // Determine if we should show "Follow back" button
       const showFollowBack = 
