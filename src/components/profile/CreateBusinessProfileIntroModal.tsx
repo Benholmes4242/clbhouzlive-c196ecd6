@@ -52,7 +52,7 @@ export const CreateBusinessProfileIntroModal: React.FC<CreateBusinessProfileIntr
           
           {/* Title */}
           <h2 className="text-xl font-semibold text-foreground">
-            Create your business presence on clbhouz
+            Create your business presence
           </h2>
           
           {/* Subtitle */}
