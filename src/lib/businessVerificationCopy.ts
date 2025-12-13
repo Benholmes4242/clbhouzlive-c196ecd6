@@ -155,3 +155,62 @@ export const businessVerificationCopy = {
 // Type exports for TypeScript consumers
 export type BusinessVerificationCopy = typeof businessVerificationCopy;
 export type VerificationStatus = 'unverified' | 'pending' | 'verified' | 'rejected';
+
+/**
+ * Enum-based notification copy map (authoritative, future-proof)
+ * Single source of truth for all verification events across:
+ * - Edge functions (notifications + audit logs)
+ * - Frontend (title + body)
+ * - Push service (push string)
+ * - Audit logs (audit string)
+ */
+export type BusinessVerificationEvent = 
+  | 'verification_submitted'
+  | 'verification_approved'
+  | 'verification_removed';
+
+export interface VerificationCopySet {
+  title: string;
+  body: string;
+  push: string;
+  audit: string;
+}
+
+export const BUSINESS_VERIFICATION_COPY: Record<BusinessVerificationEvent, VerificationCopySet> = {
+  verification_submitted: {
+    title: 'Request received',
+    body: 'Your verification request is being reviewed by our team.',
+    push: 'Verification request received',
+    audit: 'Verification request submitted by business owner.'
+  },
+
+  verification_approved: {
+    title: "You're verified",
+    body: 'Your business profile has been successfully verified.',
+    push: 'Your business is now verified',
+    audit: 'Business verification approved.'
+  },
+
+  verification_removed: {
+    title: 'Verification status changed',
+    body: 'Your business verification has been removed.',
+    push: 'Business verification removed',
+    audit: 'Business verification removed by admin.'
+  }
+};
+
+/**
+ * Get copy for a specific verification event
+ */
+export function getVerificationCopy(event: BusinessVerificationEvent): VerificationCopySet {
+  return BUSINESS_VERIFICATION_COPY[event];
+}
+
+/**
+ * Notification type to event mapping (for frontend rendering)
+ */
+export const NOTIFICATION_TYPE_TO_EVENT: Record<string, BusinessVerificationEvent> = {
+  'business_verification_submitted': 'verification_submitted',
+  'business_verification_approved': 'verification_approved',
+  'business_verification_revoked': 'verification_removed'
+};
