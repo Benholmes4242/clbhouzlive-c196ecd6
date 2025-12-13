@@ -5,11 +5,12 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { LeaderboardStatusStrip } from './LeaderboardStatusStrip';
+import { LeaderboardSpotlightSection } from './LeaderboardSpotlightSection';
 import { LeaderboardPositionCard } from './LeaderboardPositionCard';
 import { LeaderboardSegmentedControl, LeaderboardSegment } from './LeaderboardSegmentedControl';
 import { LeaderboardPlayerRow } from './LeaderboardPlayerRow';
 import { LeaderboardEmptyState } from './LeaderboardEmptyState';
-import { LeaderboardInsightChip } from './LeaderboardInsightChip';
 import { getTop100Club } from '@/lib/top100Club';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import {
@@ -168,7 +169,7 @@ export function PlayersLeaderboardView() {
     }
   }, [allEntries, segment, myIndex]);
 
-  // Build user position model for card
+  // Build user position model for strip
   const meModel = USE_MOCK_LEADERBOARD_DATA
     ? mockData?.currentUser ? {
         user_id: mockData.currentUser.user_id,
@@ -204,7 +205,8 @@ export function PlayersLeaderboardView() {
   if (isLoading && !USE_MOCK_LEADERBOARD_DATA) {
     return (
       <div className="space-y-4">
-        <Skeleton className="h-20 w-full rounded-sq-md" />
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-32 w-full" />
         <Skeleton className="h-10 w-full rounded-sq-pill" />
         <div className="space-y-1">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
@@ -216,35 +218,28 @@ export function PlayersLeaderboardView() {
   }
 
   return (
-    <div className="space-y-4 -mx-4" ref={listRef}>
-      {/* Pinned Your Position Section - no card */}
+    <div className="w-full -mx-4" ref={listRef}>
+      {/* Your Position Status Strip - full bleed */}
       {meModel && (
-        <LeaderboardPositionCard user={meModel} variant="full" />
+        <LeaderboardStatusStrip user={meModel} />
+      )}
+
+      {/* Spotlight Section - Setting the Standard */}
+      {meModel && meModel.total_top100_played > 0 && (
+        <LeaderboardSpotlightSection />
       )}
 
       {/* New user encouragement */}
       {isNewUser && (
-        <div className="mx-4 rounded-sq-md border border-border/60 bg-card/80 px-4 py-3">
+        <div className="mx-4 my-4 rounded-sq-md border border-border/60 bg-card/80 px-4 py-3">
           <p className="text-sm text-muted-foreground">
             Rate your first Top 100 course to join the leaderboard and track your progress.
           </p>
         </div>
       )}
 
-      {/* Insight Chip */}
-      {meModel && meModel.total_top100_played > 0 && (
-        <div className="px-4">
-          <LeaderboardInsightChip
-            userRank={meModel.rank}
-            totalPlayed={meModel.total_top100_played}
-            friendsCount={segment === 'friends' ? entriesToRender.length : 0}
-            variant="players"
-          />
-        </div>
-      )}
-
       {/* Segmented Control - sticky */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm py-2 px-4">
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm py-3 px-4">
         <LeaderboardSegmentedControl
           value={segment}
           onChange={setSegment}
@@ -294,7 +289,7 @@ export function PlayersLeaderboardView() {
 
       {/* Pagination controls */}
       {USE_MOCK_LEADERBOARD_DATA && totalEntries > PAGE_SIZE && (
-        <div className="flex flex-col items-center gap-3 pt-2 pb-4">
+        <div className="flex flex-col items-center gap-3 pt-2 pb-4 px-4">
           <div className="flex items-center gap-3">
             {page > 1 && (
               <Button
