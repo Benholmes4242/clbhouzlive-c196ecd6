@@ -2390,6 +2390,105 @@ export type Database = {
         }
         Relationships: []
       }
+      golfer_candidate_overrides: {
+        Row: {
+          acted_by: string
+          action: string
+          created_at: string
+          id: string
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          acted_by: string
+          action: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          acted_by?: string
+          action?: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      golfer_eligibility_signals: {
+        Row: {
+          candidate_state: string
+          course_tags_30d: number
+          created_at: string
+          engagement_score_30d: number
+          followers_count: number
+          has_external_links: boolean
+          last_computed_at: string
+          mentions_30d: number
+          profile_completeness_score: number
+          top100_course_tags_30d: number
+          unique_mentioners_30d: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          candidate_state?: string
+          course_tags_30d?: number
+          created_at?: string
+          engagement_score_30d?: number
+          followers_count?: number
+          has_external_links?: boolean
+          last_computed_at?: string
+          mentions_30d?: number
+          profile_completeness_score?: number
+          top100_course_tags_30d?: number
+          unique_mentioners_30d?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          candidate_state?: string
+          course_tags_30d?: number
+          created_at?: string
+          engagement_score_30d?: number
+          followers_count?: number
+          has_external_links?: boolean
+          last_computed_at?: string
+          mentions_30d?: number
+          profile_completeness_score?: number
+          top100_course_tags_30d?: number
+          unique_mentioners_30d?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      golfer_verification_invites: {
+        Row: {
+          created_at: string
+          id: string
+          invited_by: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invited_by: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invited_by?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       golfer_verification_requests: {
         Row: {
           admin_note: string | null
@@ -6028,6 +6127,10 @@ export type Database = {
         Returns: undefined
       }
       disablelongtransactions: { Args: never; Returns: string }
+      dismiss_golfer_candidate: {
+        Args: { p_reason?: string; p_user_id: string }
+        Returns: Json
+      }
       dropgeometrycolumn:
         | {
             Args: {
@@ -6750,6 +6853,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      invite_golfer_from_discover: {
+        Args: { p_user_id: string }
+        Returns: Json
       }
       invite_golfer_to_verification: {
         Args: { _note?: string; _user_id: string }
