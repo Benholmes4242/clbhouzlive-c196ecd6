@@ -386,6 +386,41 @@ export type Database = {
         }
         Relationships: []
       }
+      business_activity_log: {
+        Row: {
+          actor_user_id: string | null
+          business_id: string
+          created_at: string
+          id: string
+          metadata: Json
+          type: string
+        }
+        Insert: {
+          actor_user_id?: string | null
+          business_id: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          type: string
+        }
+        Update: {
+          actor_user_id?: string | null
+          business_id?: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_activity_log_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_analytics_events: {
         Row: {
           action_type: string | null
@@ -486,6 +521,57 @@ export type Database = {
           },
         ]
       }
+      business_domain_verifications: {
+        Row: {
+          business_id: string
+          code_hash: string
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          request_id: string
+          status: string
+          verified_at: string | null
+        }
+        Insert: {
+          business_id: string
+          code_hash: string
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          request_id: string
+          status?: string
+          verified_at?: string | null
+        }
+        Update: {
+          business_id?: string
+          code_hash?: string
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          request_id?: string
+          status?: string
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_domain_verifications_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_domain_verifications_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "business_verification_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_follows: {
         Row: {
           business_id: string
@@ -525,6 +611,50 @@ export type Database = {
             columns: ["follower_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_invites: {
+        Row: {
+          business_id: string
+          created_at: string
+          expires_at: string
+          id: string
+          invited_by: string
+          invitee_email: string
+          role: string
+          status: string
+          token: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          invited_by: string
+          invitee_email: string
+          role?: string
+          status?: string
+          token?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string
+          invitee_email?: string
+          role?: string
+          status?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_invites_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
             referencedColumns: ["id"]
           },
         ]
@@ -667,9 +797,13 @@ export type Database = {
           admin_note: string | null
           business_id: string
           created_at: string
+          domain: string | null
+          domain_confirmed: boolean
+          domain_confirmed_at: string | null
           id: string
           note: string | null
           requested_by: string
+          requires_domain_check: boolean
           reviewed_at: string | null
           reviewed_by: string | null
           status: string
@@ -680,9 +814,13 @@ export type Database = {
           admin_note?: string | null
           business_id: string
           created_at?: string
+          domain?: string | null
+          domain_confirmed?: boolean
+          domain_confirmed_at?: string | null
           id?: string
           note?: string | null
           requested_by: string
+          requires_domain_check?: boolean
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
@@ -693,9 +831,13 @@ export type Database = {
           admin_note?: string | null
           business_id?: string
           created_at?: string
+          domain?: string | null
+          domain_confirmed?: boolean
+          domain_confirmed_at?: string | null
           id?: string
           note?: string | null
           requested_by?: string
+          requires_domain_check?: boolean
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
@@ -5589,6 +5731,7 @@ export type Database = {
         Returns: unknown
       }
       _st_within: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
+      accept_business_invite: { Args: { p_token: string }; Returns: Json }
       addauth: { Args: { "": string }; Returns: boolean }
       addgeometrycolumn:
         | {
@@ -6565,9 +6708,17 @@ export type Database = {
         Args: { _admin_note: string; _request_id: string }
         Returns: undefined
       }
+      remove_business_member: {
+        Args: { p_business_id: string; p_member_user_id: string }
+        Returns: Json
+      }
       request_business_verification: {
         Args: { p_profile_id: string }
         Returns: undefined
+      }
+      request_domain_verification: {
+        Args: { p_domain: string; p_request_id: string }
+        Returns: Json
       }
       search_golf_courses: {
         Args: {
@@ -7239,6 +7390,14 @@ export type Database = {
         Returns: undefined
       }
       unlockrows: { Args: { "": string }; Returns: number }
+      update_business_member_role: {
+        Args: {
+          p_business_id: string
+          p_member_user_id: string
+          p_new_role: string
+        }
+        Returns: Json
+      }
       update_business_verification_status: {
         Args: { p_notes?: string; p_profile_id: string; p_status: string }
         Returns: undefined
@@ -7274,6 +7433,10 @@ export type Database = {
       user_is_game_participant: {
         Args: { _game_id: string; _user_id: string }
         Returns: boolean
+      }
+      verify_domain_code: {
+        Args: { p_code: string; p_verification_id: string }
+        Returns: Json
       }
       viewer_shares_host_club: {
         Args: { _host_id: string; _viewer_id: string }
