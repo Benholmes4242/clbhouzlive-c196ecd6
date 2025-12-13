@@ -216,15 +216,15 @@ export function PlayersLeaderboardView() {
   }
 
   return (
-    <div className="space-y-4" ref={listRef}>
-      {/* Pinned Your Position Card */}
+    <div className="space-y-4 -mx-4" ref={listRef}>
+      {/* Pinned Your Position Section - no card */}
       {meModel && (
         <LeaderboardPositionCard user={meModel} variant="full" />
       )}
 
       {/* New user encouragement */}
       {isNewUser && (
-        <div className="rounded-sq-md border border-border/60 bg-card/80 px-4 py-3">
+        <div className="mx-4 rounded-sq-md border border-border/60 bg-card/80 px-4 py-3">
           <p className="text-sm text-muted-foreground">
             Rate your first Top 100 course to join the leaderboard and track your progress.
           </p>
@@ -233,16 +233,18 @@ export function PlayersLeaderboardView() {
 
       {/* Insight Chip */}
       {meModel && meModel.total_top100_played > 0 && (
-        <LeaderboardInsightChip
-          userRank={meModel.rank}
-          totalPlayed={meModel.total_top100_played}
-          friendsCount={segment === 'friends' ? entriesToRender.length : 0}
-          variant="players"
-        />
+        <div className="px-4">
+          <LeaderboardInsightChip
+            userRank={meModel.rank}
+            totalPlayed={meModel.total_top100_played}
+            friendsCount={segment === 'friends' ? entriesToRender.length : 0}
+            variant="players"
+          />
+        </div>
       )}
 
       {/* Segmented Control - sticky */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm py-2 -mx-4 px-4">
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm py-2 px-4">
         <LeaderboardSegmentedControl
           value={segment}
           onChange={setSegment}
@@ -250,7 +252,7 @@ export function PlayersLeaderboardView() {
         />
       </div>
 
-      {/* Player List - flat rows on page background */}
+      {/* Player List - full bleed rows */}
       <div className="w-full">
         {entriesToRender.length === 0 ? (
           <div className="py-6">
