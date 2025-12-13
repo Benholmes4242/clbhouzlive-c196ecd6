@@ -54,7 +54,12 @@ function getNotificationIcon(type: string) {
     case 'business_verification_submitted':
     case 'business_verification_approved':
     case 'business_verification_rejected':
-      return <Building2 className={cn(iconClass, type === 'business_verification_approved' ? "text-emerald-500" : type === 'business_verification_rejected' ? "text-red-500" : "text-amber-500")} />;
+    case 'business_verification_revoked':
+      return <Building2 className={cn(iconClass, 
+        type === 'business_verification_approved' ? "text-emerald-500" : 
+        type === 'business_verification_rejected' || type === 'business_verification_revoked' ? "text-red-500" : 
+        "text-amber-500"
+      )} />;
     default:
       return <Bell className={cn(iconClass, "text-muted-foreground")} />;
   }
