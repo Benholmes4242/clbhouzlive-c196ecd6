@@ -514,24 +514,33 @@ export const useActivityFeed = (tab: ActivityTabId, chipFilter: ChipFilterKind =
             ? (n.data as Record<string, any>) 
             : {};
           
+          // Business verification notifications: use entity_name/entity_avatar_url from data
+          const isBusinessVerification = n.type.startsWith('business_verification_');
+          
           // Prefer actor profile, fallback to data JSON fields for legacy notifications
-          const actorDisplayName = actor?.display_name 
-            || actor?.username 
-            || dataObj.follower_name 
-            || dataObj.tagger_name 
-            || dataObj.commenter_name
-            || dataObj.liker_name
-            || 'Someone';
+          // For business verification: use entity_name/entity_avatar_url from data
+          const actorDisplayName = isBusinessVerification 
+            ? (dataObj.entity_name || 'Your business')
+            : (actor?.display_name 
+                || actor?.username 
+                || dataObj.follower_name 
+                || dataObj.tagger_name 
+                || dataObj.commenter_name
+                || dataObj.liker_name
+                || 'Someone');
           
           const actorUsername = actor?.username || '';
           
           // Avatar: prefer actor profile, fallback to data JSON for legacy
-          const actorAvatarUrl = actor?.profile_photo_url 
-            || dataObj.follower_photo 
-            || dataObj.tagger_photo
-            || dataObj.commenter_photo
-            || dataObj.liker_photo
-            || null;
+          // For business verification: use entity_avatar_url from data
+          const actorAvatarUrl = isBusinessVerification
+            ? (dataObj.entity_avatar_url || null)
+            : (actor?.profile_photo_url 
+                || dataObj.follower_photo 
+                || dataObj.tagger_photo
+                || dataObj.commenter_photo
+                || dataObj.liker_photo
+                || null);
           
           // Instagram-style unseen logic:
           // 1) Anything created after last_notifications_seen_at is "new"
