@@ -812,6 +812,9 @@ export type Database = {
           domain_confirmed_at: string | null
           id: string
           note: string | null
+          proof_metadata: Json | null
+          proof_method: string | null
+          proof_value: string | null
           requested_by: string
           required_approvals: number
           requires_domain_check: boolean
@@ -831,6 +834,9 @@ export type Database = {
           domain_confirmed_at?: string | null
           id?: string
           note?: string | null
+          proof_metadata?: Json | null
+          proof_method?: string | null
+          proof_value?: string | null
           requested_by: string
           required_approvals?: number
           requires_domain_check?: boolean
@@ -850,6 +856,9 @@ export type Database = {
           domain_confirmed_at?: string | null
           id?: string
           note?: string | null
+          proof_metadata?: Json | null
+          proof_method?: string | null
+          proof_value?: string | null
           requested_by?: string
           required_approvals?: number
           requires_domain_check?: boolean

@@ -1,13 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, Loader2, ExternalLink, ChevronRight } from 'lucide-react';
+import { X, Check, Loader2, ExternalLink, ChevronRight, Globe, Mail, Building, Sparkles, MapPin } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Select,
   SelectContent,
@@ -30,12 +30,21 @@ interface BusinessVerificationModalProps {
 
 type Step = 1 | 2 | 3;
 
-const PROOF_OPTIONS = [
-  { id: 'website', label: 'Official website', helper: 'Your website should match your business name.' },
-  { id: 'social', label: 'Linked social account', helper: 'Instagram, X, TikTok, LinkedIn, YouTube, etc.' },
-  { id: 'registered', label: 'Registered business / organisation', helper: 'Companies House, charity register, etc.' },
-  { id: 'club_facility', label: 'Golf club / facility website', helper: 'For clubs, coaches, facilities and golf brands.' },
-] as const;
+type ProofMethod = 'official_website' | 'business_email' | 'registered_business' | 'creator_business' | 'golf_course';
+
+const PROOF_OPTIONS: { id: ProofMethod; label: string; subtitle: string; icon: React.ElementType }[] = [
+  { id: 'official_website', label: 'Official website', subtitle: 'Your main business website.', icon: Globe },
+  { id: 'business_email', label: 'Business email address', subtitle: 'An email address on your business domain.', icon: Mail },
+  { id: 'registered_business', label: 'Registered business (legal entity)', subtitle: 'Companies House, charity register, or equivalent.', icon: Building },
+  { id: 'creator_business', label: 'Creator / brand / influencer business', subtitle: 'For creator-led or personal brands.', icon: Sparkles },
+  { id: 'golf_course', label: 'Golf course / facility', subtitle: 'For golf courses, clubs, academies, and facilities.', icon: MapPin },
+];
+
+const REGISTRY_OPTIONS = [
+  { value: 'companies_house', label: 'Companies House' },
+  { value: 'charity_register', label: 'Charity Register' },
+  { value: 'other', label: 'Other' },
+];
 
 const ROLE_OPTIONS = [
   { value: 'owner', label: 'Owner' },
@@ -54,11 +63,26 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
   const queryClient = useQueryClient();
 
   const [step, setStep] = useState<Step>(1);
-  const [proofTypes, setProofTypes] = useState<string[]>([]);
-  const [proofLinks, setProofLinks] = useState('');
+  
+  // Step 2: Proof state
+  const [selectedProof, setSelectedProof] = useState<ProofMethod | ''>('');
+  const [proofWebsiteUrl, setProofWebsiteUrl] = useState('');
+  const [proofEmail, setProofEmail] = useState('');
+  const [proofRegistry, setProofRegistry] = useState('');
+  const [proofCompanyNumber, setProofCompanyNumber] = useState('');
+  const [proofRegistryUrl, setProofRegistryUrl] = useState('');
+  const [creatorContactType, setCreatorContactType] = useState<'email' | 'phone'>('email');
+  const [creatorEmail, setCreatorEmail] = useState('');
+  const [creatorPhone, setCreatorPhone] = useState('');
+  const [golfCourseWebsite, setGolfCourseWebsite] = useState('');
+  
+  // Step 3: Ownership state
   const [contactEmail, setContactEmail] = useState('');
   const [role, setRole] = useState('');
   const [notes, setNotes] = useState('');
+  
+  // Exclusivity error
+  const [exclusivityError, setExclusivityError] = useState('');
 
   // Fetch business details
   const { data: business, isLoading: isLoadingBusiness } = useQuery({
@@ -86,12 +110,79 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
   const missingEmail = !business?.email;
   const canProceedStep1 = !missingWebsite && !missingEmail;
 
-  const canProceedStep2 = proofTypes.length > 0;
+  // Validate Step 2 based on selected proof method
+  const validateStep2 = useMemo(() => {
+    if (!selectedProof) return false;
+    
+    switch (selectedProof) {
+      case 'official_website':
+        return !!proofWebsiteUrl.trim() && isValidUrl(proofWebsiteUrl);
+      case 'business_email':
+        return !!proofEmail.trim() && isValidEmail(proofEmail);
+      case 'registered_business':
+        return !!proofRegistry && (!!proofCompanyNumber.trim() || !!proofRegistryUrl.trim());
+      case 'creator_business':
+        return creatorContactType === 'email' 
+          ? !!creatorEmail.trim() && isValidEmail(creatorEmail)
+          : !!creatorPhone.trim();
+      case 'golf_course':
+        return !!golfCourseWebsite.trim() && isValidUrl(golfCourseWebsite);
+      default:
+        return false;
+    }
+  }, [selectedProof, proofWebsiteUrl, proofEmail, proofRegistry, proofCompanyNumber, proofRegistryUrl, creatorContactType, creatorEmail, creatorPhone, golfCourseWebsite]);
+
+  const canProceedStep2 = validateStep2;
   const canProceedStep3 = contactEmail.trim() && role;
+
+  // Get proof value and metadata for submission
+  const getProofData = () => {
+    switch (selectedProof) {
+      case 'official_website':
+        return { proof_value: proofWebsiteUrl.trim(), proof_metadata: {} };
+      case 'business_email':
+        return { proof_value: proofEmail.trim(), proof_metadata: {} };
+      case 'registered_business':
+        return { 
+          proof_value: proofCompanyNumber.trim() || proofRegistryUrl.trim(), 
+          proof_metadata: { registry: proofRegistry, registry_url: proofRegistryUrl.trim() || null } 
+        };
+      case 'creator_business':
+        return { 
+          proof_value: creatorContactType === 'email' ? creatorEmail.trim() : creatorPhone.trim(), 
+          proof_metadata: { contact_type: creatorContactType } 
+        };
+      case 'golf_course':
+        return { proof_value: golfCourseWebsite.trim(), proof_metadata: {} };
+      default:
+        return { proof_value: '', proof_metadata: {} };
+    }
+  };
 
   const submitMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error('Not authenticated');
+      if (!selectedProof) throw new Error('Please select a proof method');
+
+      const { proof_value, proof_metadata } = getProofData();
+      
+      if (!proof_value) throw new Error('Please complete the required proof details');
+
+      // Check for exclusivity conflicts
+      const { data: existingApproved, error: checkError } = await supabase
+        .from('business_verification_requests')
+        .select('id, business_id')
+        .eq('proof_method', selectedProof)
+        .eq('proof_value', proof_value)
+        .eq('status', 'approved')
+        .neq('business_id', businessId)
+        .limit(1);
+
+      if (checkError) throw checkError;
+      
+      if (existingApproved && existingApproved.length > 0) {
+        throw new Error('This proof is already associated with a verified business.');
+      }
 
       const { error } = await supabase
         .from('business_verification_requests')
@@ -101,6 +192,9 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
           website: business?.website || null,
           note: notes || null,
           status: 'pending',
+          proof_method: selectedProof,
+          proof_value: proof_value,
+          proof_metadata: proof_metadata,
         });
 
       if (error) throw error;
@@ -113,30 +207,38 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
       resetForm();
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to submit verification request');
+      const message = error.message || 'Failed to submit verification request';
+      if (message.includes('already associated')) {
+        setExclusivityError(message);
+        toast.error(message);
+      } else {
+        toast.error(message);
+      }
+      console.error('[Verification submit error]', error);
     },
   });
 
   const resetForm = () => {
     setStep(1);
-    setProofTypes([]);
-    setProofLinks('');
+    setSelectedProof('');
+    setProofWebsiteUrl('');
+    setProofEmail('');
+    setProofRegistry('');
+    setProofCompanyNumber('');
+    setProofRegistryUrl('');
+    setCreatorContactType('email');
+    setCreatorEmail('');
+    setCreatorPhone('');
+    setGolfCourseWebsite('');
     setContactEmail('');
     setRole('');
     setNotes('');
+    setExclusivityError('');
   };
 
   const handleClose = () => {
     onOpenChange(false);
     resetForm();
-  };
-
-  const handleProofToggle = (proofId: string) => {
-    setProofTypes(prev =>
-      prev.includes(proofId)
-        ? prev.filter(p => p !== proofId)
-        : [...prev, proofId]
-    );
   };
 
   const handleSubmit = () => {
@@ -152,7 +254,7 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
             key={s}
             className={cn(
               'h-2.5 w-2.5 rounded-full transition-colors',
-              s === step ? 'bg-primary shadow-sm' : 'bg-muted/60'
+              s === step ? 'bg-primary shadow-sm ring-2 ring-primary/20' : 'bg-muted-foreground/30'
             )}
           />
         ))}
@@ -163,6 +265,143 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
       </span>
     </div>
   );
+
+  const renderProofInputs = () => {
+    switch (selectedProof) {
+      case 'official_website':
+        return (
+          <div className="space-y-2 mt-4 pl-7">
+            <Label className="text-sm text-foreground">Website URL</Label>
+            <Input
+              value={proofWebsiteUrl}
+              onChange={(e) => setProofWebsiteUrl(e.target.value)}
+              placeholder="https://yourbusiness.com"
+              type="url"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Use the primary website that represents this business.
+            </p>
+          </div>
+        );
+      
+      case 'business_email':
+        return (
+          <div className="space-y-2 mt-4 pl-7">
+            <Label className="text-sm text-foreground">Business email</Label>
+            <Input
+              value={proofEmail}
+              onChange={(e) => setProofEmail(e.target.value)}
+              placeholder="name@yourbusiness.com"
+              type="email"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Must use the same domain as your website.
+            </p>
+          </div>
+        );
+      
+      case 'registered_business':
+        return (
+          <div className="space-y-4 mt-4 pl-7">
+            <div className="space-y-2">
+              <Label className="text-sm text-foreground">Register</Label>
+              <Select value={proofRegistry} onValueChange={setProofRegistry}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select register" />
+                </SelectTrigger>
+                <SelectContent>
+                  {REGISTRY_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-foreground">Company / registration number</Label>
+              <Input
+                value={proofCompanyNumber}
+                onChange={(e) => setProofCompanyNumber(e.target.value)}
+                placeholder="12345678"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-foreground">
+                Or registry URL <span className="text-muted-foreground font-normal">(alternative)</span>
+              </Label>
+              <Input
+                value={proofRegistryUrl}
+                onChange={(e) => setProofRegistryUrl(e.target.value)}
+                placeholder="https://find-and-update.company-information.service.gov.uk/..."
+                type="url"
+              />
+            </div>
+          </div>
+        );
+      
+      case 'creator_business':
+        return (
+          <div className="space-y-4 mt-4 pl-7">
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant={creatorContactType === 'email' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setCreatorContactType('email')}
+              >
+                Email
+              </Button>
+              <Button
+                type="button"
+                variant={creatorContactType === 'phone' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setCreatorContactType('phone')}
+              >
+                Phone
+              </Button>
+            </div>
+            {creatorContactType === 'email' ? (
+              <div className="space-y-2">
+                <Label className="text-sm text-foreground">Business email</Label>
+                <Input
+                  value={creatorEmail}
+                  onChange={(e) => setCreatorEmail(e.target.value)}
+                  placeholder="creator@brand.com"
+                  type="email"
+                />
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Label className="text-sm text-foreground">Business phone number</Label>
+                <Input
+                  value={creatorPhone}
+                  onChange={(e) => setCreatorPhone(e.target.value)}
+                  placeholder="+44 7xxx xxxxxx"
+                  type="tel"
+                />
+              </div>
+            )}
+          </div>
+        );
+      
+      case 'golf_course':
+        return (
+          <div className="space-y-2 mt-4 pl-7">
+            <Label className="text-sm text-foreground">Official course / facility website</Label>
+            <Input
+              value={golfCourseWebsite}
+              onChange={(e) => setGolfCourseWebsite(e.target.value)}
+              placeholder="https://yourgolfclub.com"
+              type="url"
+            />
+          </div>
+        );
+      
+      default:
+        return null;
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -244,7 +483,7 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
               </motion.div>
             )}
 
-            {/* Step 2: Proof */}
+            {/* Step 2: Proof of legitimacy */}
             {step === 2 && (
               <motion.div
                 key="step2"
@@ -256,59 +495,53 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
                 <div>
                   <h3 className="text-sm font-semibold text-foreground">2. Proof of legitimacy</h3>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Choose at least one. We use this to confirm your business is real and active.
+                    Choose one method below. This helps us confirm your business is real and active.
                   </p>
                 </div>
 
-                <div className="space-y-3">
+                <RadioGroup
+                  value={selectedProof}
+                  onValueChange={(value) => {
+                    setSelectedProof(value as ProofMethod);
+                    setExclusivityError('');
+                  }}
+                  className="space-y-3"
+                >
                   {PROOF_OPTIONS.map((option) => {
-                    const isSelected = proofTypes.includes(option.id);
+                    const isSelected = selectedProof === option.id;
+                    const Icon = option.icon;
                     return (
-                      <label
-                        key={option.id}
-                        className={cn(
-                          'flex items-start gap-3 p-3 rounded-sq-sm border cursor-pointer transition-colors',
-                          isSelected
-                            ? 'border-primary bg-primary/5'
-                            : 'border-border hover:bg-muted/30'
-                        )}
-                      >
-                        <Checkbox
-                          checked={isSelected}
-                          onCheckedChange={() => handleProofToggle(option.id)}
-                          className="mt-0.5"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground">{option.label}</p>
-                          <p className="text-xs text-muted-foreground">{option.helper}</p>
-                          {isSelected && (
-                            <p className="text-[10px] text-primary font-medium mt-1">Selected as primary proof</p>
+                      <div key={option.id}>
+                        <label
+                          className={cn(
+                            'flex items-start gap-3 p-3 rounded-sq-sm border cursor-pointer transition-colors',
+                            isSelected
+                              ? 'border-primary bg-primary/5'
+                              : 'border-border hover:bg-muted/30'
                           )}
-                        </div>
-                      </label>
+                        >
+                          <RadioGroupItem value={option.id} className="mt-0.5" />
+                          <Icon className="h-4 w-4 mt-0.5 text-muted-foreground shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-foreground">{option.label}</p>
+                            <p className="text-xs text-muted-foreground">{option.subtitle}</p>
+                          </div>
+                        </label>
+                        {isSelected && renderProofInputs()}
+                      </div>
                     );
                   })}
-                </div>
+                </RadioGroup>
 
-                <div className="space-y-2">
-                  <Label className="text-sm text-foreground">
-                    Proof links <span className="text-muted-foreground font-normal">(optional)</span>
-                  </Label>
-                  <Textarea
-                    value={proofLinks}
-                    onChange={(e) => setProofLinks(e.target.value)}
-                    placeholder="https://..."
-                    rows={3}
-                    className="resize-none text-sm"
-                  />
-                  <p className="text-[11px] text-muted-foreground">
-                    Add up to 3 links that help us confirm this business (website, social profile, registry). One per line.
+                {exclusivityError && (
+                  <p className="text-xs text-red-600 bg-red-50 p-3 rounded-sq-sm">
+                    {exclusivityError}
                   </p>
-                </div>
+                )}
 
-                {proofTypes.length === 0 && (
+                {!selectedProof && (
                   <p className="text-xs text-amber-600">
-                    Select at least one proof option to continue.
+                    Select a proof option to continue.
                   </p>
                 )}
               </motion.div>
@@ -462,6 +695,20 @@ function DetailRow({
       )}
     </div>
   );
+}
+
+// Validation helpers
+function isValidUrl(str: string): boolean {
+  try {
+    const url = new URL(str.startsWith('http') ? str : `https://${str}`);
+    return !!url.hostname;
+  } catch {
+    return false;
+  }
+}
+
+function isValidEmail(str: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str);
 }
 
 export default BusinessVerificationModal;
