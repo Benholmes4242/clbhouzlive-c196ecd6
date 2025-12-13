@@ -64,14 +64,14 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate }) => {
   const { role, loading } = usePanelRole();
   const can = panelCan(role);
 
-  // Fetch pending verification count
+  // Fetch pending verification count from new table
   const { data: pendingVerificationCount } = useQuery({
     queryKey: ['admin-business-verifications-count'],
     queryFn: async () => {
       const { count, error } = await supabase
-        .from('user_profiles')
+        .from('business_verification_requests')
         .select('id', { count: 'exact', head: true })
-        .eq('verification_status', 'pending_review');
+        .eq('status', 'pending');
       if (error) throw error;
       return count ?? 0;
     },
