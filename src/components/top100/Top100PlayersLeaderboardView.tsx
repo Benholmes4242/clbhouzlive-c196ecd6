@@ -218,7 +218,7 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 -mx-4 sm:-mx-6">
       {/* MODULE 1: Weekly Highlights Carousel */}
       <WeeklyHighlightsCarousel currentUserId={currentUser?.id} />
 
@@ -268,12 +268,12 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
         </div>
       )}
 
-      {/* Your Position Card - Tappable */}
+      {/* Your Position Card - Full bleed, Tappable */}
       {me && (
         <button
           type="button"
           onClick={() => navigate('/top100?tab=my-progress')}
-          className="w-full rounded-2xl border border-border/70 bg-card/95 px-4 py-3 flex items-center justify-between gap-3 shadow-xs active:scale-[0.99] transition-all hover:bg-muted/30"
+          className="w-full border-y border-border/70 bg-card/95 px-4 py-3 flex items-center justify-between gap-3 active:scale-[0.99] transition-all hover:bg-muted/30"
         >
           <div className="flex items-center gap-3">
             {/* Avatar with new squircle spec */}
@@ -393,10 +393,10 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
         </div>
       </div>
 
-      {/* Player Rows with slide animation */}
+      {/* Player Rows - full bleed with slide animation */}
       <div
         className={cn(
-          'space-y-2 transition-all duration-150 ease-out',
+          'transition-all duration-150 ease-out',
           slideDir === 'next' && '-translate-x-3 opacity-90',
           slideDir === 'prev' && 'translate-x-3 opacity-90'
         )}
@@ -428,7 +428,7 @@ export function Top100PlayersLeaderboardView({ filters }: Top100PlayersLeaderboa
               data-user-id={entry.user_id}
               type="button"
               onClick={() => navigate(`/profile/${entry.user_id}?tab=top100`)}
-              className="w-full rounded-2xl border border-border/60 bg-card/95 px-3.5 py-2.5 flex items-center justify-between gap-3 hover:bg-muted/50 hover:shadow-sm transition-colors"
+              className="w-full border-b border-border/40 bg-card/95 px-4 py-2.5 flex items-center justify-between gap-3 hover:bg-muted/50 transition-colors first:border-t"
             >
               {/* Left: avatar + text */}
               <div className="flex items-center gap-3 min-w-0">
