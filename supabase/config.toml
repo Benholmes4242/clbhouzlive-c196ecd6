@@ -54,3 +54,5 @@ verify_jwt = true
 [functions.bypass-second-approval]
 verify_jwt = true
 
+[functions.bypass-golfer-approval]
+verify_jwt = true
