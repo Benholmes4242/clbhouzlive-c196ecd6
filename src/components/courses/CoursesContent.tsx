@@ -149,7 +149,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
               value="friends-courses"
               className="rounded-sq-pill text-sm px-3 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-motion-fast ease-standard"
             >
-              Friends' Courses
+              Friends Courses
             </TabsTrigger>
           </TabsList>
 
