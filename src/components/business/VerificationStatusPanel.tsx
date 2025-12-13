@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ShieldCheck, Clock, XCircle, CheckCircle, AlertCircle } from 'lucide-react';
+import { ShieldCheck, Clock, XCircle, CheckCircle, AlertCircle, CalendarClock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
   Tooltip,
@@ -12,6 +12,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { format } from 'date-fns';
 
 interface VerificationStatusPanelProps {
   profile: {
@@ -26,14 +27,39 @@ interface VerificationStatusPanelProps {
     verification_requested_at?: string | null;
     is_business_verified?: boolean | null;
   };
+  businessId?: string; // Optional business account ID for checking cooldown
 }
 
-const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profile }) => {
+const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profile, businessId }) => {
   const queryClient = useQueryClient();
   const [isRequesting, setIsRequesting] = useState(false);
   
   const verificationStatus = profile.verification_status ?? 'unverified';
   const isVerified = profile.is_business_verified === true;
+
+  // Fetch business account cooldown data if businessId is provided
+  const { data: businessAccount } = useQuery({
+    queryKey: ['business-account-cooldown', businessId],
+    enabled: !!businessId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('business_accounts')
+        .select('verification_cooldown_until, last_verification_action')
+        .eq('id', businessId!)
+        .single();
+      
+      if (error) return null;
+      return data;
+    },
+    staleTime: 30_000,
+  });
+
+  // Check if cooldown is active
+  const cooldownUntil = businessAccount?.verification_cooldown_until 
+    ? new Date(businessAccount.verification_cooldown_until)
+    : null;
+  const isCooldownActive = cooldownUntil && cooldownUntil > new Date();
+  const lastAction = businessAccount?.last_verification_action;
 
   // Check if profile has minimum required fields for verification
   const canRequestVerification = Boolean(
@@ -44,6 +70,14 @@ const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profi
 
   const handleRequestVerification = async () => {
     if (!profile.id) return;
+
+    // Check for cooldown bypass attempt
+    if (isCooldownActive) {
+      toast.error('Verification unavailable', {
+        description: 'You\'ll be able to request verification again soon.',
+      });
+      return;
+    }
 
     try {
       setIsRequesting(true);
@@ -73,6 +107,7 @@ const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profi
       // Invalidate profile caches
       await queryClient.invalidateQueries({ queryKey: ['profile'] });
       await queryClient.invalidateQueries({ queryKey: ['user-profile'] });
+      await queryClient.invalidateQueries({ queryKey: ['business-account-cooldown'] });
 
       toast.success('Verification request submitted.');
     } catch (err) {
@@ -83,7 +118,106 @@ const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profi
     }
   };
 
-  // Unverified state
+  // Cooldown state after verification removal
+  if (isCooldownActive && lastAction === 'revoked') {
+    return (
+      <Card className="p-5 space-y-4 border-slate-200 bg-slate-50/50">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-foreground">
+            <CalendarClock className="w-4 h-4" />
+            <h3 className="font-medium">Verification temporarily unavailable</h3>
+          </div>
+          <Badge variant="secondary" className="bg-slate-500/10 text-slate-600 border-slate-500/20 gap-1">
+            <Clock className="h-3 w-3" />
+            Cooldown
+          </Badge>
+        </div>
+
+        <p className="text-sm text-muted-foreground">
+          Your business verification was recently removed.
+          You can request verification again in <strong>{Math.ceil((cooldownUntil.getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days</strong>.
+        </p>
+
+        <p className="text-xs text-muted-foreground">
+          Use this time to ensure your business details and proof are up to date.
+        </p>
+
+        <p className="text-xs text-muted-foreground border-t border-border/40 pt-3">
+          Available on <strong>{format(cooldownUntil, 'MMMM d, yyyy')}</strong>
+        </p>
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <Button disabled className="w-full" variant="outline">
+                  Request Verification
+                </Button>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Available on {format(cooldownUntil, 'MMMM d, yyyy')}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </Card>
+    );
+  }
+
+  // Cooldown state after rejection
+  if (isCooldownActive && lastAction === 'rejected') {
+    return (
+      <Card className="p-5 space-y-4 border-amber-200 bg-amber-50/50">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-foreground">
+            <CalendarClock className="w-4 h-4" />
+            <h3 className="font-medium">Verification request not approved</h3>
+          </div>
+          <Badge variant="secondary" className="bg-amber-500/10 text-amber-600 border-amber-500/20 gap-1">
+            <Clock className="h-3 w-3" />
+            Cooldown
+          </Badge>
+        </div>
+
+        <p className="text-sm text-muted-foreground">
+          Your previous verification request was not approved.
+          You can submit a new request in <strong>{Math.ceil((cooldownUntil.getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days</strong>.
+        </p>
+
+        <p className="text-xs text-muted-foreground">
+          Make sure your business details and proof clearly show you represent this organisation.
+        </p>
+
+        {profile.verification_notes && (
+          <div className="bg-amber-100/50 rounded-sq-sm p-3">
+            <p className="text-xs font-medium text-amber-700 mb-1">Reason provided:</p>
+            <p className="text-sm text-amber-700">{profile.verification_notes}</p>
+          </div>
+        )}
+
+        <p className="text-xs text-muted-foreground border-t border-border/40 pt-3">
+          Available on <strong>{format(cooldownUntil, 'MMMM d, yyyy')}</strong>
+        </p>
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <Button disabled className="w-full" variant="outline">
+                  Request Verification
+                </Button>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Available on {format(cooldownUntil, 'MMMM d, yyyy')}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </Card>
+    );
+  }
+
+  // Unverified state (no cooldown)
   if (verificationStatus === 'unverified') {
     return (
       <Card className="p-5 space-y-4">
@@ -132,13 +266,18 @@ const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profi
         </ul>
 
         {canRequestVerification ? (
-          <Button
-            onClick={handleRequestVerification}
-            disabled={isRequesting}
-            className="w-full"
-          >
-            {isRequesting ? 'Submitting...' : 'Request Verification'}
-          </Button>
+          <div className="space-y-2">
+            <Button
+              onClick={handleRequestVerification}
+              disabled={isRequesting}
+              className="w-full"
+            >
+              {isRequesting ? 'Submitting...' : 'Request Verification'}
+            </Button>
+            <p className="text-xs text-muted-foreground text-center">
+              Verification helps golfers identify trusted businesses.
+            </p>
+          </div>
         ) : (
           <TooltipProvider>
             <Tooltip>
@@ -228,7 +367,7 @@ const VerificationStatusPanel: React.FC<VerificationStatusPanelProps> = ({ profi
     );
   }
 
-  // Rejected state
+  // Rejected state (without active cooldown - show standard rejected UI)
   if (verificationStatus === 'rejected') {
     return (
       <Card className="p-5 space-y-4 border-red-200 bg-red-50/50">
