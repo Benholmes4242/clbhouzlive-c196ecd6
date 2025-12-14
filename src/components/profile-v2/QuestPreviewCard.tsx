@@ -18,6 +18,7 @@ interface QuestPreviewCardProps {
   totalTarget?: number;
   regions: RegionProgress[];
   nextMilestone?: string;
+  showNudge?: boolean;
   onContinue: () => void;
   className?: string;
 }
@@ -42,6 +43,7 @@ export const QuestPreviewCard: React.FC<QuestPreviewCardProps> = ({
   totalTarget = 100,
   regions,
   nextMilestone,
+  showNudge,
   onContinue,
   className,
 }) => {
@@ -104,6 +106,16 @@ export const QuestPreviewCard: React.FC<QuestPreviewCardProps> = ({
       {nextMilestone && (
         <p className="text-xs" style={{ color: 'var(--dgp-text-muted)' }}>
           Next unlock: <span style={{ color: 'var(--dgp-accent-gold)' }}>{nextMilestone}</span>
+        </p>
+      )}
+
+      {/* Nudge for users who left without acting */}
+      {showNudge && totalPlayed === 0 && (
+        <p
+          className="text-xs mt-2"
+          style={{ color: 'var(--dgp-accent-green)', fontStyle: 'italic' }}
+        >
+          Start your Quest by marking your first course
         </p>
       )}
     </button>

@@ -10,6 +10,7 @@ import { ArrowLeft, Trophy, ChevronRight, Lock, Play, Circle } from 'lucide-reac
 // Quest persistence keys
 const QUEST_REPLAY_VIEWED_KEY = 'quest_last_replay_viewed';
 const QUEST_REPLAY_BADGE_DAYS = 7; // Show badge if not viewed in X days
+
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTop100Overview } from '@/hooks/useTop100Overview';
@@ -19,7 +20,10 @@ import { RegionListSheet } from '@/components/profile-v2/RegionListSheet';
 import { JourneyMapPath, JourneyChapter } from '@/components/profile-v2/JourneyMapPath';
 import { NextTargetCard } from '@/components/profile-v2/NextTargetCard';
 import { MilestoneUnlockSheet } from '@/components/profile-v2/MilestoneUnlockSheet';
+import { QuestIntroOverlay } from '@/components/profile-v2/QuestIntroOverlay';
+import { QuestFirstCourseSheet } from '@/components/profile-v2/QuestFirstCourseSheet';
 import { useQuestRewards } from '@/hooks/useQuestRewards';
+import { useQuestOnboarding } from '@/hooks/useQuestOnboarding';
 
 // Milestone club type
 interface MilestoneClub {
@@ -93,7 +97,28 @@ const ProfileQuestView: React.FC = () => {
   // Get quest rewards for profile evolution
   const rewards = useQuestRewards(totalPlayed, 0);
 
-  // Journey chapters (regions)
+  // Quest onboarding state
+  const onboarding = useQuestOnboarding(totalPlayed);
+  const [showJourneyHint, setShowJourneyHint] = useState(false);
+
+  // Show journey hint after intro is dismissed
+  useEffect(() => {
+    if (onboarding.introSeen && onboarding.shouldShowJourneyHint) {
+      const timer = setTimeout(() => setShowJourneyHint(true), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [onboarding.introSeen, onboarding.shouldShowJourneyHint]);
+
+  // Auto-fade journey hint
+  useEffect(() => {
+    if (showJourneyHint) {
+      const timer = setTimeout(() => {
+        setShowJourneyHint(false);
+        onboarding.markJourneyHintSeen();
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [showJourneyHint, onboarding]);
   const chapters: JourneyChapter[] = useMemo(() => {
     const newByList = seasonStats?.new_by_list ?? {};
     const gbiPlayed = newByList['gbi'] ?? Math.floor(totalPlayed * 0.3);
@@ -284,10 +309,21 @@ const ProfileQuestView: React.FC = () => {
           suggestedRegion={suggestedRegion}
           suggestedFocus={nextMilestone?.name}
           onShare={() => {/* Share placeholder */}}
+          showHint={onboarding.shouldShowTargetHint}
+          onHintDismiss={onboarding.markTargetHintSeen}
         />
 
         {/* Journey Map */}
         <section>
+          {/* Journey hint whisper */}
+          {showJourneyHint && (
+            <p
+              className="text-xs mb-2 px-1 transition-opacity duration-500"
+              style={{ color: 'var(--dgp-text-muted)' }}
+            >
+              Your journey unfolds here
+            </p>
+          )}
           <h2
             className="text-sm font-semibold uppercase tracking-wider mb-4 px-1"
             style={{ color: 'var(--dgp-text-secondary)' }}
@@ -431,6 +467,20 @@ const ProfileQuestView: React.FC = () => {
 
       {/* Milestone Unlock Sheet */}
       <MilestoneUnlockSheet totalPlayed={totalPlayed} />
+
+      {/* Quest Intro Overlay */}
+      {onboarding.shouldShowIntro && (
+        <QuestIntroOverlay
+          onBegin={onboarding.markIntroSeen}
+          onSkip={onboarding.markIntroSeen}
+        />
+      )}
+
+      {/* First Course Celebration */}
+      <QuestFirstCourseSheet
+        open={onboarding.shouldShowFirstCourse}
+        onClose={onboarding.markFirstCourseSeen}
+      />
     </PageRoot>
   );
 };
