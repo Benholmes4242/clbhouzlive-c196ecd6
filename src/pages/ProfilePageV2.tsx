@@ -1,9 +1,9 @@
 /**
  * ProfilePageV2 - Dark Golf Passport Profile
- * Single-scroll cinematic profile experience
+ * Hero identity with tabbed content
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile.tsx';
@@ -11,20 +11,25 @@ import { useTop100Overview } from '@/hooks/useTop100Overview';
 import { useUserSeasonXP } from '@/hooks/useUserSeasonXP';
 import { useCurrentSeason } from '@/hooks/useCurrentSeason';
 import { useActivityPosts } from '@/components/profile/hooks/useActivityPosts';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
+import { supabase } from '@/integrations/supabase/client';
 import { Settings, ArrowLeft, Share2 } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import {
   HeroMedia,
   IdentityOverlay,
-  GolfDNACard,
-  GolfDNASheet,
-  MomentCard,
-  HandicapPreviewCard,
-  QuestPreviewCard,
-  GolfDNAStats,
-  MomentPost,
 } from '@/components/profile-v2';
+
+// Tab content components (reused from old profile)
+import ActivityFeed from '@/components/profile/ActivityFeed';
+import { ProfileCoursesTab } from '@/components/profile/ProfileCoursesTab';
+import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
+import AchievementsPane from '@/components/profile/AchievementsPane';
+import HandicapSection from '@/components/profile/HandicapSection';
+import ProfileAchievementsRail from '@/components/profile/ProfileAchievementsRail';
 
 const ProfilePageV2: React.FC = () => {
   const navigate = useNavigate();
@@ -34,34 +39,53 @@ const ProfilePageV2: React.FC = () => {
   const { data: currentSeason } = useCurrentSeason();
   const { data: seasonXP } = useUserSeasonXP(user?.id, currentSeason?.id);
   const { posts } = useActivityPosts(user?.id);
+  const isMobile = useIsMobile();
   
-  const [dnaSheetOpen, setDnaSheetOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('activity');
+  const [followersCount, setFollowersCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
+  const [friendsCount, setFriendsCount] = useState(0);
 
-  // Convert posts to moments
-  const moments: MomentPost[] = useMemo(() => {
-    return posts.slice(0, 20).map(post => ({
-      id: post.id,
-      mediaUrl: post.post_media?.[0]?.media_url || post.image || '',
-      mediaType: (post.post_media?.[0]?.media_type === 'video' ? 'video' : 'image') as 'image' | 'video',
-      posterUrl: undefined,
-      courseName: post.post_tags?.find(t => t.entity_type === 'golf_club')?.name,
-      courseId: post.post_tags?.find(t => t.entity_type === 'golf_club')?.entity_id,
-      caption: post.content,
-      date: post.created_at,
-      likesCount: post.likes || 0,
-      commentsCount: post.comments || 0,
-    })).filter(m => m.mediaUrl);
-  }, [posts]);
+  // Profile type detection
+  const profileTypeInfo = getProfileType(profile?.user_type);
+  const { isPersonal } = profileTypeInfo;
+  const tabs = getProfileTabs(profile?.user_type);
 
-  // Build Golf DNA stats (placeholder data for now)
-  const dnaStats: GolfDNAStats = useMemo(() => ({
-    handicapTrend: [18.2, 17.8, 17.5, 17.9, 17.2, 16.8, 16.5, 16.9, 16.4, 16.1],
-    roundsThisYear: 24,
-    coursesPlayed: 18,
-    top100Progress: top100Overview?.total_rated ?? 0,
-    currentHandicap: profile?.eg_handicap_index ?? undefined,
-    recentForm: ['74', '76', '73', '78', '75'],
-  }), [top100Overview, profile]);
+  // Fetch social stats
+  useEffect(() => {
+    const fetchStats = async () => {
+      if (!profile?.id) return;
+      
+      try {
+        const { count: followers } = await supabase
+          .from('user_follows')
+          .select('*', { count: 'exact', head: true })
+          .eq('following_id', profile.id);
+        setFollowersCount(followers || 0);
+
+        const { count: following } = await supabase
+          .from('user_follows')
+          .select('*', { count: 'exact', head: true })
+          .eq('follower_id', profile.id);
+        setFollowingCount(following || 0);
+
+        if (isPersonal) {
+          const { count: friends } = await supabase
+            .from('user_friends')
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'accepted')
+            .or(`user_id.eq.${profile.id},friend_id.eq.${profile.id}`);
+          setFriendsCount(friends || 0);
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      }
+    };
+    
+    fetchStats();
+  }, [profile?.id, isPersonal]);
+
+  const postsCount = posts.length;
 
   // Loading state
   if (authLoading || profileLoading) {
@@ -82,6 +106,53 @@ const ProfilePageV2: React.FC = () => {
   const username = profile?.username || 'user';
   const heroUrl = profile?.header_photo_url || profile?.profile_photo_url || '';
   const xpValue = seasonXP?.total_xp ?? 0;
+
+  // Get current content based on active section
+  const getCurrentContent = () => {
+    switch (activeSection) {
+      case 'activity':
+        return (
+          <ActivityFeed
+            userId={profile?.id || ''}
+            isOwnProfile={true}
+            profileDisplayName={profile?.display_name}
+            userHandicap={profile?.eg_handicap_index}
+            userProfilePhotoUrl={profile?.profile_photo_url}
+            onAchievementsClick={() => setActiveSection('achievements')}
+          />
+        );
+      case 'courses':
+        return (
+          <ProfileCoursesTab 
+            userId={profile?.id || ''}
+            isOwnProfile={true}
+          />
+        );
+      case 'top100':
+        return (
+          <Top100MyProgressPanel userId={profile?.id} />
+        );
+      case 'achievements':
+        return (
+          <AchievementsPane 
+            userId={profile?.id}
+            userDisplayName={profile?.display_name || 'User'}
+            userHandicap={profile?.eg_handicap_index}
+            userProfilePhotoUrl={profile?.profile_photo_url}
+            isCurrentUser={true}
+          />
+        );
+      case 'stats':
+        return (
+          <HandicapSection 
+            userId={profile?.id || ''}
+            profile={profile}
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <PageRoot className="dgp-page">
@@ -133,72 +204,100 @@ const ProfilePageV2: React.FC = () => {
         />
       </div>
 
-      {/* Content Sections */}
-      <div className="relative z-10 -mt-4 space-y-6 px-4 pb-32">
-        {/* Golf DNA Card */}
-        <GolfDNACard
-          stats={dnaStats}
-          onExpand={() => setDnaSheetOpen(true)}
-        />
-
-        {/* Handicap Preview Card */}
-        <HandicapPreviewCard
-          handicapIndex={profile?.eg_handicap_index ?? undefined}
-          trendData={dnaStats.handicapTrend}
-          roundsThisYear={dnaStats.roundsThisYear}
-          bestRound={72}
-          onOpenCockpit={() => navigate('/profile/handicap')}
-        />
-
-        {/* Quest Preview Card */}
-        <QuestPreviewCard
-          totalPlayed={top100Overview?.total_rated ?? 0}
-          regions={[
-            { name: 'GB & Ireland', shortName: 'GB&I', played: 3 },
-            { name: 'Europe', shortName: 'EUR', played: 2 },
-            { name: 'USA', shortName: 'USA', played: 4 },
-            { name: 'World', shortName: 'WLD', played: 1 },
-          ]}
-          nextMilestone={top100Overview?.club_label ? undefined : '5 Club'}
-          onContinue={() => navigate('/profile/quest')}
-        />
-
-        {/* Moments Timeline */}
-        <section>
-          <div className="dgp-section-header">
-            <h2 className="dgp-section-title">Moments</h2>
+      {/* Content below hero - dark styled */}
+      <div className="relative z-10 -mt-4">
+        {/* Stats Row - dark styled */}
+        <section className="mt-2 flex items-center justify-center gap-8 px-4 py-4">
+          <div className="flex flex-col items-center">
+            <span className="text-base font-semibold tabular-nums" style={{ color: 'var(--dgp-text-primary)' }}>
+              {postsCount}
+            </span>
+            <span className="mt-1 text-[11px] uppercase tracking-[0.06em]" style={{ color: 'var(--dgp-text-muted)' }}>
+              Posts
+            </span>
           </div>
           
-          <div className="space-y-4">
-            {moments.length > 0 ? (
-              moments.map(moment => (
-                <MomentCard
-                  key={moment.id}
-                  moment={moment}
-                  onClick={() => {/* Open fullscreen viewer */}}
-                />
-              ))
-            ) : (
-              <div
-                className="py-12 text-center rounded-2xl"
-                style={{ background: 'var(--dgp-glass-surface)' }}
-              >
-                <p style={{ color: 'var(--dgp-text-muted)' }}>
-                  No moments yet
-                </p>
-              </div>
-            )}
-          </div>
+          {isPersonal && (
+            <button 
+              onClick={() => navigate(`/profile/${username}/friends`)}
+              className="flex flex-col items-center hover:opacity-80 transition-opacity"
+            >
+              <span className="text-base font-semibold tabular-nums" style={{ color: 'var(--dgp-text-primary)' }}>
+                {friendsCount}
+              </span>
+              <span className="mt-1 text-[11px] uppercase tracking-[0.06em]" style={{ color: 'var(--dgp-text-muted)' }}>
+                Friends
+              </span>
+            </button>
+          )}
+          
+          <button 
+            onClick={() => navigate(`/profile/${username}/following`)}
+            className="flex flex-col items-center hover:opacity-80 transition-opacity"
+          >
+            <span className="text-base font-semibold tabular-nums" style={{ color: 'var(--dgp-text-primary)' }}>
+              {followingCount}
+            </span>
+            <span className="mt-1 text-[11px] uppercase tracking-[0.06em]" style={{ color: 'var(--dgp-text-muted)' }}>
+              Following
+            </span>
+          </button>
+          
+          <button 
+            onClick={() => navigate(`/profile/${username}/followers`)}
+            className="flex flex-col items-center hover:opacity-80 transition-opacity"
+          >
+            <span className="text-base font-semibold tabular-nums" style={{ color: 'var(--dgp-text-primary)' }}>
+              {followersCount}
+            </span>
+            <span className="mt-1 text-[11px] uppercase tracking-[0.06em]" style={{ color: 'var(--dgp-text-muted)' }}>
+              Followers
+            </span>
+          </button>
         </section>
-      </div>
 
-      {/* Golf DNA Sheet */}
-      <GolfDNASheet
-        isOpen={dnaSheetOpen}
-        onClose={() => setDnaSheetOpen(false)}
-        stats={dnaStats}
-        displayName={displayName}
-      />
+        {/* Achievements Rail - dark styled */}
+        {isPersonal && profile?.id && username && (
+          <ProfileAchievementsRail
+            userId={profile.id}
+            username={username}
+            className="mt-2"
+          />
+        )}
+
+        {/* Tabs - dark styled */}
+        <section className="mt-6 px-4">
+          <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
+            <TabsList 
+              className="grid w-full rounded-sq-md border px-2 py-[3px]"
+              style={{ 
+                gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`,
+                background: 'var(--dgp-glass-surface)',
+                borderColor: 'var(--dgp-glass-stroke)',
+              }}
+            >
+              {tabs.map((tab) => (
+                <TabsTrigger 
+                  key={tab.id}
+                  value={tab.id}
+                  className="rounded-sq-pill text-sm px-3 py-[6px] font-medium transition-all duration-150"
+                  style={{
+                    color: activeSection === tab.id ? 'var(--dgp-text-primary)' : 'var(--dgp-text-muted)',
+                    background: activeSection === tab.id ? 'var(--dgp-glass-hover)' : 'transparent',
+                  }}
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </section>
+
+        {/* Tab Content */}
+        <div className="pt-6 px-4 pb-32">
+          {getCurrentContent()}
+        </div>
+      </div>
     </PageRoot>
   );
 };
