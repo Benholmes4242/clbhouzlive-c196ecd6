@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X, MoreVertical, ShieldCheck, CheckCircle } from 'lucide-react';
+import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X, MoreVertical, ShieldCheck, CheckCircle, ShieldOff, MessageSquare } from 'lucide-react';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
@@ -72,9 +72,10 @@ function getNotificationBadgeIcon(type: string) {
     case 'business_verification_more_proof_requested':
       return <Building2 className={cn(iconClass, "text-amber-500")} />;
     case 'business_verification_rejected':
+      return <Building2 className={cn(iconClass, "text-amber-500")} />;
     case 'business_verification_removed':
     case 'business_verification_revoked':
-      return <Building2 className={cn(iconClass, "text-red-500")} />;
+      return <ShieldOff className={cn(iconClass, "text-red-500")} />;
     // Golfer verification notifications - glass green tick for approved
     case 'golfer_verification_approved':
       return <CheckCircle className={cn(iconClass, "text-emerald-500")} />;
@@ -163,7 +164,8 @@ function renderNotificationText(notification: ActivityNotification): string {
     case 'business_verification_rejected':
       return 'Verification not approved';
     case 'business_verification_revoked':
-      return 'Business verification removed';
+    case 'business_verification_removed':
+      return 'Verification revoked';
     case 'business_verification_domain_required':
       return 'Action required: verify your business email domain';
     // Golfer verification notifications
@@ -202,13 +204,7 @@ const AvatarWithBadge: React.FC<AvatarWithBadgeProps> = ({ notification, badgeIc
         fallback={displayName?.charAt(0) || '?'}
         ringColor={isSystemNotification ? undefined : getRingColorForTotalPlayed(notification.data?.actor_total_top100_played || 0)}
       />
-      <span className={cn(
-        "absolute bottom-0 right-0 translate-x-1 translate-y-1 h-5 w-5 rounded-full border-2 border-background flex items-center justify-center shadow-sm",
-        // Use glass green background for verification approved types
-        notification.type === 'golfer_verification_approved' || notification.type === 'business_verification_approved' 
-          ? "bg-emerald-500/20" 
-          : "bg-background"
-      )}>
+      <span className="absolute bottom-0 right-0 translate-x-1 translate-y-1 h-5 w-5 rounded-full border-2 border-background bg-white flex items-center justify-center shadow-sm">
         {badgeIcon}
       </span>
     </div>
@@ -619,7 +615,62 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
     }
 
     /**
-     * 9) DEFAULT – All other notification types (follow, like, comment, etc.)
+     * 9) BUSINESS VERIFICATION REVOKED/REMOVED
+     *    – Shows revoked message with reason (if provided) and support CTA
+     */
+    case 'business_verification_removed':
+    case 'business_verification_revoked': {
+      const statusIcon = <ShieldOff className="h-3 w-3 text-red-500" />;
+      const businessName = data?.business_name || data?.entity_name || 'your business';
+      const reason = data?.reason || data?.admin_note;
+      
+      const handleSupportChat = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        // Navigate to Echo support with pre-filled context
+        window.location.href = `/echo?topic=verification&message=${encodeURIComponent(
+          `Hi team — my business verification was revoked. Can you tell me why and what I need to do to restore it?`
+        )}`;
+      };
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <div className="space-y-1">
+              <div>
+                <span className={cn(showOrange ? "font-semibold" : "font-medium")}>Verification revoked</span>
+              </div>
+              <div className="text-muted-foreground font-normal text-xs">
+                Your business verification for {businessName} has been revoked.
+              </div>
+              {reason && (
+                <div className="text-xs text-muted-foreground/80 mt-1">
+                  <span className="font-medium">Reason:</span> {reason}
+                </div>
+              )}
+            </div>
+          }
+          meta={notification.time_ago}
+          actions={
+            <button
+              type="button"
+              onClick={handleSupportChat}
+              className={cn(basePillClass, "border-primary bg-primary/10 text-primary gap-1 cursor-pointer hover:bg-primary/20")}
+            >
+              <MessageSquare className="h-3 w-3" />
+              Chat with support
+            </button>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 10) DEFAULT – All other notification types (follow, like, comment, etc.)
      */
     default: {
       const statusIcon = getNotificationBadgeIcon(type);

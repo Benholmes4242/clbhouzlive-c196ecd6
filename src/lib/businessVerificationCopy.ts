@@ -225,12 +225,12 @@ export const BUSINESS_VERIFICATION_COPY: Record<BusinessVerificationEvent, Verif
   },
 
   removed: {
-    title: 'Verification status changed',
-    body: 'Your business verification has been removed.',
-    push: 'Business verification removed',
+    title: 'Verification revoked',
+    body: 'Your business verification has been revoked.',
+    push: 'Business verification revoked',
     audit: 'Business verification removed by admin.',
     email_subject: 'Verification status update',
-    email_body: 'Your business verification has been removed. Contact support if you have questions.'
+    email_body: 'Your business verification has been revoked. Contact support if you have questions.'
   },
 
   more_proof_requested: {
