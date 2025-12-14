@@ -12,6 +12,7 @@
 @import './styles/studio-filters.css';
 @import './styles/social-dock.css';
 @import './styles/vertical-spacing.css';
+@import './styles/dark-golf-passport.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
