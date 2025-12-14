@@ -38,10 +38,10 @@ const SDS_AVATAR_BORDER_RADIUS = '34%';
 const SDS_AVATAR_ASPECT_RATIO = 1 / 1.05; // ≈0.952
 
 const SIZES = {
-  sm: { avatar: 48, ringPadding: 3 },
-  md: { avatar: 64, ringPadding: 4 },
-  lg: { avatar: 88, ringPadding: 6 },
-  xl: { avatar: 108, ringPadding: 7 },
+  sm: { avatar: 48, ringPadding: 2 },
+  md: { avatar: 64, ringPadding: 3 },
+  lg: { avatar: 88, ringPadding: 4 },
+  xl: { avatar: 108, ringPadding: 5 },
 };
 
 // Tier-aware glow intensity multipliers
