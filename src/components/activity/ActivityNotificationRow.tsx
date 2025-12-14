@@ -624,12 +624,11 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
       const businessName = data?.business_name || data?.entity_name || 'your business';
       const reason = data?.reason || data?.admin_note;
       
+      // TODO: Wire this CTA to Support DM once messaging is implemented
       const handleSupportChat = (e: React.MouseEvent) => {
+        e.preventDefault();
         e.stopPropagation();
-        // Navigate to Echo support with pre-filled context
-        window.location.href = `/echo?topic=verification&message=${encodeURIComponent(
-          `Hi team — my business verification was revoked. Can you tell me why and what I need to do to restore it?`
-        )}`;
+        // No-op until support messaging is built
       };
       
       return (
