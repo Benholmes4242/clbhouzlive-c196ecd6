@@ -7033,6 +7033,10 @@ export type Database = {
         Args: { p_business_id: string; p_member_user_id: string }
         Returns: Json
       }
+      remove_golfer_verification: {
+        Args: { p_note?: string; p_user_id: string }
+        Returns: undefined
+      }
       request_business_verification: {
         Args: { p_profile_id: string }
         Returns: undefined
@@ -7040,6 +7044,10 @@ export type Database = {
       request_domain_verification: {
         Args: { p_domain: string; p_request_id: string }
         Returns: Json
+      }
+      reset_golfer_verification_test_user: {
+        Args: { p_user_id: string }
+        Returns: undefined
       }
       revoke_business_verification:
         | { Args: { _business_id: string; _reason?: string }; Returns: Json }
