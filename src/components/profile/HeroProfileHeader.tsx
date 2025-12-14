@@ -368,10 +368,10 @@ const HeroProfileHeader = ({
 
   return (
     <SwipeToReturnZone onSwipeDown={reopenImmersive}>
-      {/* Premium Golf Profile Layout - Seamless blend */}
+      {/* Premium Dark Glass Profile Layout */}
       <section className="relative w-full">
         
-        {/* HERO IMAGE with seamless fade into page */}
+        {/* HERO IMAGE with seamless dark fade into page */}
         <div className="profile-header relative w-full h-[280px] overflow-hidden">
           {heroSrc ? (
             <img 
@@ -381,60 +381,58 @@ const HeroProfileHeader = ({
               loading="eager"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
+            <div className="w-full h-full bg-gradient-to-br from-[#0B0E0C] via-[#101412] to-[#0B0E0C]" />
           )}
           
           {/* Top scrim for header icons readability */}
           <div
             className="pointer-events-none absolute top-0 left-0 right-0 h-[90px] z-[4]"
             style={{
-              background: 'linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0))',
+              background: 'linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0))',
             }}
           />
           
           {/* Global vignette - subtle side darkening for cinematic feel */}
           <div
-            className="pointer-events-none absolute inset-0 mix-blend-multiply opacity-60 z-[3]"
+            className="pointer-events-none absolute inset-0 mix-blend-multiply opacity-70 z-[3]"
             style={{
-              background: 'radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.25) 100%)',
+              background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.35) 100%)',
             }}
           />
           
-          {/* Bottom fade gradient - seamless blend into page background */}
+          {/* Bottom fade gradient - seamless blend into dark page background */}
           <div
-            className="pointer-events-none absolute bottom-0 left-0 right-0 h-[140px] z-[5]"
+            className="pointer-events-none absolute bottom-0 left-0 right-0 h-[160px] z-[5]"
             style={{
-              background: 'linear-gradient(to bottom, hsl(var(--background) / 0) 0%, hsl(var(--background) / 0.65) 55%, hsl(var(--background)) 100%)',
+              background: 'linear-gradient(to bottom, rgba(7,10,8,0) 0%, rgba(7,10,8,0.65) 55%, rgba(7,10,8,1) 100%)',
             }}
           />
         </div>
 
-        {/* AVATAR - Overlapping bridge between hero and content */}
+        {/* AVATAR with Premium Orange Glowing Ring */}
         <div 
           className="relative z-10 flex justify-center"
           style={{ marginTop: '-52px' }}
         >
-          <div className="avatar-wrap">
-            <ProfileAvatarRing
-              photoUrl={profile?.profile_photo_url}
-              displayName={displayName}
-              totalTop100Played={totalTop100Played}
-              isPersonal={isPersonal}
-              isOwnProfile={isOwnProfile}
-              size="lg"
-              onClick={() => openImmersive?.(0)}
-              animateOnFirstView={true}
-              className="shadow-[0_10px_30px_rgba(0,0,0,0.18)]"
-            />
-          </div>
+          <ProfileAvatarRing
+            photoUrl={profile?.profile_photo_url}
+            displayName={displayName}
+            totalTop100Played={totalTop100Played}
+            isPersonal={isPersonal}
+            isOwnProfile={isOwnProfile}
+            size="lg"
+            onClick={() => openImmersive?.(0)}
+            animateOnFirstView={true}
+            premiumRing={true}
+          />
         </div>
 
-        {/* META BLOCK - Profile surface (no heavy card styling) */}
+        {/* META BLOCK - Dark glass surface */}
         <div
           ref={profileCardRef}
           className="relative pt-3 pb-2"
         >
-          {/* Profile info - centered layout */}
+          {/* Profile info - centered layout with dark theme text */}
           <div className="flex flex-col items-center text-center px-4 md:px-6">
             <ProfileHeaderCard
               displayName={displayName}
@@ -453,6 +451,7 @@ const HeroProfileHeader = ({
               isOwnProfile={isOwnProfile}
               onCustomiseClick={isOwnProfile ? () => navigate('/edit-profile') : undefined}
               centered={true}
+              darkTheme={true}
             />
           </div>
         </div>
@@ -505,10 +504,11 @@ const HeroProfileHeader = ({
         )}
 
         {/* Faint divider between header and achievements */}
+        {/* Faint divider between header and achievements - dark theme */}
         <div 
           className="mt-4 h-px w-full"
           style={{
-            background: 'linear-gradient(90deg, transparent 0%, hsl(var(--foreground) / 0.05) 20%, hsl(var(--foreground) / 0.05) 80%, transparent 100%)',
+            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 20%, rgba(255,255,255,0.08) 80%, transparent 100%)',
           }}
         />
 
@@ -532,6 +532,7 @@ const HeroProfileHeader = ({
           onFollowersClick={handleOpenFollowers}
           onFollowingClick={handleOpenFollowing}
           onFriendsClick={handleOpenFriends}
+          darkTheme={true}
         />
 
         {/* Tab Navigation - outside constrained container for full width */}
@@ -541,6 +542,7 @@ const HeroProfileHeader = ({
           onTabChange={handleTabChange}
           isMobile={isMobile}
           disabled={transitionState !== 'idle'}
+          darkTheme={true}
         />
       </section>
 

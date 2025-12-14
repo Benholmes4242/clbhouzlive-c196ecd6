@@ -19,6 +19,7 @@ interface ProfileAvatarRingProps {
   onClick?: () => void;
   animateOnFirstView?: boolean;
   className?: string;
+  premiumRing?: boolean;
 }
 
 // Width configurations for each size
@@ -46,6 +47,7 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
   onClick,
   animateOnFirstView = true,
   className,
+  premiumRing = false,
 }) => {
   const width = SIZES[size];
   const ref = useRef<HTMLDivElement>(null);
@@ -138,7 +140,38 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
       )}
       onClick={onClick}
     >
-      {showRing ? (
+      {premiumRing ? (
+        // Premium orange glowing ring
+        <div
+          className="avatar-ring-premium"
+          style={{
+            padding: '5px',
+            borderRadius: '999px',
+            background: 'linear-gradient(180deg, rgba(255,193,92,1) 0%, rgba(255,145,56,1) 100%)',
+            boxShadow: '0 0 0 4px rgba(0,0,0,0.65), 0 10px 30px rgba(0,0,0,0.45), 0 0 22px rgba(255,150,60,0.35)',
+          }}
+        >
+          <div
+            className="avatar-ring-premium-inner"
+            style={{
+              background: 'rgba(10,12,11,0.95)',
+              borderRadius: '999px',
+              padding: '3px',
+            }}
+          >
+            <div
+              className="relative overflow-hidden"
+              style={{
+                width: `${width}px`,
+                aspectRatio: '1 / 1.05',
+                borderRadius: '34%',
+              }}
+            >
+              {avatarInner}
+            </div>
+          </div>
+        </div>
+      ) : showRing ? (
         // Achievement state: colored ring directly on avatar (no grey ring)
         <div
           className="relative overflow-hidden"
