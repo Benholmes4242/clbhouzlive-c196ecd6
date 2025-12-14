@@ -2509,9 +2509,11 @@ export type Database = {
       }
       golfer_verification_requests: {
         Row: {
+          accepted_at: string | null
           admin_note: string | null
           approval_count: number
           created_at: string
+          declined_at: string | null
           evidence_url: string | null
           id: string
           invited_by: string
@@ -2528,9 +2530,11 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          accepted_at?: string | null
           admin_note?: string | null
           approval_count?: number
           created_at?: string
+          declined_at?: string | null
           evidence_url?: string | null
           id?: string
           invited_by: string
@@ -2547,9 +2551,11 @@ export type Database = {
           user_id: string
         }
         Update: {
+          accepted_at?: string | null
           admin_note?: string | null
           approval_count?: number
           created_at?: string
+          declined_at?: string | null
           evidence_url?: string | null
           id?: string
           invited_by?: string
@@ -6191,7 +6197,7 @@ export type Database = {
       current_auth_uid: { Args: never; Returns: string }
       decline_golfer_verification_invite: {
         Args: { p_note?: string; p_request_id: string }
-        Returns: undefined
+        Returns: Json
       }
       decrement_slots_if_available: {
         Args: { p_game_id: string }

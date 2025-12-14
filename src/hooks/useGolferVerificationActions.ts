@@ -43,7 +43,7 @@ export function useAcceptGolferInvite() {
 }
 
 /**
- * Hook to decline a golfer verification invite
+ * Hook to decline a golfer verification invite (idempotent)
  */
 export function useDeclineGolferInvite() {
   const queryClient = useQueryClient();
@@ -56,18 +56,34 @@ export function useDeclineGolferInvite() {
       requestId: string;
       note?: string;
     }) => {
-      const { error } = await supabase.rpc('decline_golfer_verification_invite', {
+      const { data, error } = await supabase.rpc('decline_golfer_verification_invite', {
         p_request_id: requestId,
         p_note: note || null,
       });
 
       if (error) throw error;
+      
+      // Parse the response and check for business logic error
+      const result = data as { status: string; already_declined?: boolean; error?: string } | null;
+      if (result?.error) {
+        throw new Error(result.error);
+      }
+      
+      return result;
     },
-    onSuccess: () => {
-      toast.success("No worries — you can accept later if you change your mind.");
+    onSuccess: (data) => {
+      if (data?.already_declined) {
+        toast.info("Invite already declined.");
+      } else {
+        toast.success("No worries — you can accept later if you change your mind.");
+      }
+      // Invalidate all relevant queries
       queryClient.invalidateQueries({ queryKey: ['golfer-verification-request'] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       queryClient.invalidateQueries({ queryKey: ['activity-notifications'] });
+      // Also invalidate admin queries so admin panel updates
+      queryClient.invalidateQueries({ queryKey: ['admin-golfer-verification-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-golfer-verifications-pending-count'] });
     },
     onError: (error: any) => {
       toast.error('Failed to decline invite', {
