@@ -508,7 +508,38 @@ const GolferVerificationTab = () => {
             </div>
           )}
 
-          {/* Actions for approved (verified) golfers */}
+          {/* Restore action for removed (revoked) golfers */}
+          {request.status === 'removed' && (
+            <div className="flex gap-2 pt-3 md:pt-2 border-t">
+              <Button 
+                size="sm" 
+                onClick={() => reinviteMutation.mutate({ requestId: request.id })} 
+                disabled={processing} 
+                className="flex-1 md:flex-none gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-xs md:text-sm"
+              >
+                {reinviteMutation.isPending ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <RotateCcw className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                )}
+                Restore
+              </Button>
+              {profile?.username && (
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  asChild
+                  className="flex-1 md:flex-none gap-1.5 text-xs md:text-sm"
+                >
+                  <Link to={`/${profile.username}`} target="_blank">
+                    <ExternalLink className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                    View profile
+                  </Link>
+                </Button>
+              )}
+            </div>
+          )}
+
           {request.status === 'approved' && (
             <div className="flex flex-col gap-2 pt-3 md:pt-2 border-t">
               <div className="flex gap-2">
