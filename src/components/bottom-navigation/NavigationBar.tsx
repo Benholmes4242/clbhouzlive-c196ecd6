@@ -38,7 +38,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
                 isActive 
                   ? "text-primary" 
                   : isDimmed 
-                    ? "text-[var(--clubhouse-chrome-icon)]" 
+                    ? "text-[rgba(255,255,255,0.55)]" 
                     : "text-white/70"
               )}
             />
@@ -49,10 +49,10 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
                 "text-[11px] leading-none transition-colors duration-300",
                 isActive 
                   ? isDimmed 
-                    ? "text-[var(--clubhouse-chrome-icon-active)]" 
+                    ? "text-[rgba(255,255,255,0.78)]" 
                     : "text-white"
                   : isDimmed 
-                    ? "text-[var(--clubhouse-chrome-label)]" 
+                    ? "text-[rgba(255,255,255,0.42)]" 
                     : "text-white/60"
               )}
             >
