@@ -27,7 +27,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { CheckCircle, XCircle, ExternalLink, User, Loader2, Users, Search, UserPlus, Radar, RotateCcw, FastForward } from 'lucide-react';
+import { CheckCircle, XCircle, ExternalLink, User, Loader2, Users, Search, UserPlus, Radar, RotateCcw, FastForward, Trash2, RefreshCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import GolferDiscoverTab from './GolferDiscoverTab';
 import { format } from 'date-fns';
@@ -66,13 +66,18 @@ interface SearchResult {
   is_verified_golfer: boolean;
 }
 
+// Benjamin Holmes test user ID - allowed for infinite testing
+const BENJAMIN_HOLMES_USER_ID = '6a5bcbb9-c22c-4655-ad8e-088b2858ca3e';
+
 const GolferVerificationTab = () => {
   const queryClient = useQueryClient();
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [removeModalOpen, setRemoveModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<GolferVerificationRequest | null>(null);
   const [rejectReason, setRejectReason] = useState('');
+  const [removeNote, setRemoveNote] = useState('');
   const [activeTab, setActiveTab] = useState('discover');
   const [searchQuery, setSearchQuery] = useState('');
   const [inviteNote, setInviteNote] = useState('');
@@ -275,7 +280,55 @@ const GolferVerificationTab = () => {
     },
   });
 
-  const processing = submitReviewMutation.isPending || inviteMutation.isPending || reinviteMutation.isPending || bypassApprovalMutation.isPending;
+  // Remove golfer verification mutation
+  const removeVerificationMutation = useMutation({
+    mutationFn: async ({ userId, note }: { userId: string; note?: string }) => {
+      const { error } = await supabase.rpc('remove_golfer_verification', {
+        p_user_id: userId,
+        p_note: note || null,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Verification removed');
+      queryClient.invalidateQueries({ queryKey: ['admin-golfer-verification-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-golfer-verifications-pending-count'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['activity-notifications'] });
+      setRemoveModalOpen(false);
+      setSelectedRequest(null);
+      setRemoveNote('');
+    },
+    onError: (error: any) => {
+      toast.error('Could not remove verification', {
+        description: error.message || 'Please try again.',
+      });
+    },
+  });
+
+  // Reset test user verification (Benjamin Holmes only)
+  const resetTestUserMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const { error } = await supabase.rpc('reset_golfer_verification_test_user', {
+        p_user_id: userId,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Test user reset', {
+        description: 'Benjamin Holmes can now be verified again.',
+      });
+      queryClient.invalidateQueries({ queryKey: ['admin-golfer-verification-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-golfer-verifications-pending-count'] });
+    },
+    onError: (error: any) => {
+      toast.error('Could not reset test user', {
+        description: error.message || 'Please try again.',
+      });
+    },
+  });
+
+  const processing = submitReviewMutation.isPending || inviteMutation.isPending || reinviteMutation.isPending || bypassApprovalMutation.isPending || removeVerificationMutation.isPending || resetTestUserMutation.isPending;
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -448,6 +501,54 @@ const GolferVerificationTab = () => {
                     <ExternalLink className="h-3.5 w-3.5 md:h-4 md:w-4" />
                     View profile
                   </Link>
+                </Button>
+              )}
+            </div>
+          )}
+
+          {/* Actions for approved (verified) golfers */}
+          {request.status === 'approved' && (
+            <div className="flex flex-col gap-2 pt-3 md:pt-2 border-t">
+              <div className="flex gap-2">
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => { setSelectedRequest(request); setRemoveNote(''); setRemoveModalOpen(true); }} 
+                  disabled={processing} 
+                  className="flex-1 md:flex-none gap-1.5 text-red-600 border-red-200 hover:bg-red-50 text-xs md:text-sm"
+                >
+                  <Trash2 className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  Remove verification
+                </Button>
+                {profile?.username && (
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    asChild
+                    className="flex-1 md:flex-none gap-1.5 text-xs md:text-sm"
+                  >
+                    <Link to={`/${profile.username}`} target="_blank">
+                      <ExternalLink className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                      View profile
+                    </Link>
+                  </Button>
+                )}
+              </div>
+              {/* Reset test button - only for Benjamin Holmes */}
+              {ENABLE_BYPASS && request.user_id === BENJAMIN_HOLMES_USER_ID && (
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={() => resetTestUserMutation.mutate(request.user_id)}
+                  disabled={processing}
+                  className="w-full md:w-auto gap-1.5 text-orange-600 border-orange-200 hover:bg-orange-50 text-xs md:text-sm"
+                >
+                  {resetTestUserMutation.isPending ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <RefreshCcw className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  )}
+                  Reset (Test)
                 </Button>
               )}
             </div>
@@ -738,6 +839,40 @@ const GolferVerificationTab = () => {
             <Button variant="outline" onClick={() => setRejectModalOpen(false)} disabled={processing}>Cancel</Button>
             <Button variant="destructive" onClick={() => selectedRequest && submitReviewMutation.mutate({ requestId: selectedRequest.id, decision: 'rejected', note: rejectReason })} disabled={processing}>
               {processing ? 'Rejecting...' : 'Reject Request'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Remove Verification Modal */}
+      <Dialog open={removeModalOpen} onOpenChange={setRemoveModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Remove verification?</DialogTitle>
+            <DialogDescription>
+              This will remove the verified badge from <strong>@{selectedRequest?.user_profile?.username || 'this user'}</strong>.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="removeNote">Internal note (optional)</Label>
+              <Textarea 
+                id="removeNote" 
+                value={removeNote} 
+                onChange={(e) => setRemoveNote(e.target.value)} 
+                placeholder="e.g., Verification removed due to..." 
+                className="min-h-[80px]" 
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRemoveModalOpen(false)} disabled={processing}>Cancel</Button>
+            <Button 
+              variant="destructive" 
+              onClick={() => selectedRequest && removeVerificationMutation.mutate({ userId: selectedRequest.user_id, note: removeNote })} 
+              disabled={processing}
+            >
+              {removeVerificationMutation.isPending ? 'Removing...' : 'Remove'}
             </Button>
           </DialogFooter>
         </DialogContent>
