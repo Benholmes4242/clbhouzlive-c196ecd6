@@ -60,6 +60,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           isClubhouseRoute && "chrome-header",
           "fixed top-0 left-0 right-0 z-header",
           "h-14",
+          "transition-colors duration-300 ease-out",
           className
         )}
         style={{
@@ -73,7 +74,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             ? '1px solid var(--clubhouse-chrome-border)' 
             : '1px solid rgba(255, 255, 255, 0.06)',
           boxShadow: isDimmed ? 'none' : undefined,
-          transition: 'background-color 800ms var(--clubhouse-cinema-ease), color 800ms var(--clubhouse-cinema-ease), border-color 800ms var(--clubhouse-cinema-ease)',
         }}
       >
         <div className="mx-auto flex h-full items-center justify-between px-3 sm:px-4 max-w-5xl">
