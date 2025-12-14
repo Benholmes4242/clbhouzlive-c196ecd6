@@ -5,7 +5,7 @@
  * One page, two systems: Milestone Clubs + Top 100 List Completions.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ChevronLeft, Trophy, MapPin, ChevronRight, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -25,6 +25,26 @@ import {
 import { DEBUG_UNLOCK_ALL_ACHIEVEMENTS, DEBUG_ACHIEVEMENTS_USER_EMAIL } from '@/utils/featureFlags';
 import { cn } from '@/lib/utils';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { 
+  DarkGlassAchievementDetailModal,
+  DarkAchievementType,
+  DarkAchievementStatus,
+} from './DarkGlassAchievementDetailModal';
+
+// Modal state type
+interface ModalState {
+  isOpen: boolean;
+  type: DarkAchievementType;
+  status: DarkAchievementStatus;
+  title: string;
+  subtitle?: string;
+  description?: string;
+  progressCurrent: number;
+  progressTarget: number;
+  threshold?: number;
+  regionKey?: RegionKey;
+  listSlug?: string;
+}
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 // DARK GLASS STYLES
@@ -178,6 +198,7 @@ interface DarkMilestoneBadgeProps {
   unlocked: boolean;
   remaining?: number;
   isCurrent?: boolean;
+  onClick?: () => void;
 }
 
 const DarkMilestoneBadge: React.FC<DarkMilestoneBadgeProps> = ({
@@ -187,13 +208,15 @@ const DarkMilestoneBadge: React.FC<DarkMilestoneBadgeProps> = ({
   unlocked,
   remaining,
   isCurrent,
+  onClick,
 }) => {
   const theme = MILESTONE_THEMES[threshold as MilestoneTier];
   
   return (
-    <div
+    <button
+      onClick={onClick}
       className={cn(
-        "rounded-sq-md p-4 relative overflow-hidden cursor-pointer",
+        "rounded-sq-md p-4 relative overflow-hidden cursor-pointer text-left w-full",
         "transition-all duration-[220ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
         "active:scale-[0.98]"
       )}
@@ -263,7 +286,7 @@ const DarkMilestoneBadge: React.FC<DarkMilestoneBadgeProps> = ({
           </span>
         )}
       </div>
-    </div>
+    </button>
   );
 };
 
@@ -384,11 +407,70 @@ const DarkGlassAchievementsPage: React.FC = () => {
   const nextClub = getNextTop100Club(totalTop100Played);
   const hasClub = totalTop100Played >= 5;
   
-  // Calculate total unique courses across all lists
-  const totalUniqueCourses = progressData?.lists?.reduce((sum, l) => sum + l.total, 0) ?? 400;
+  // Modal state
+  const [modalState, setModalState] = useState<ModalState | null>(null);
   
   const handleBack = () => {
     navigate(-1);
+  };
+  
+  // Open milestone modal
+  const openMilestoneModal = (
+    threshold: number,
+    label: string,
+    shortLabel: string,
+    unlocked: boolean,
+    remaining: number
+  ) => {
+    const status: DarkAchievementStatus = unlocked 
+      ? 'unlocked' 
+      : totalTop100Played > 0 
+        ? 'in_progress' 
+        : 'locked';
+    
+    setModalState({
+      isOpen: true,
+      type: 'milestone',
+      status,
+      title: shortLabel,
+      subtitle: label,
+      description: `Unlock when you've played ${threshold} Top 100 courses.`,
+      progressCurrent: totalTop100Played,
+      progressTarget: threshold,
+      threshold,
+    });
+  };
+  
+  // Open list modal
+  const openListModal = (
+    regionKey: RegionKey,
+    label: string,
+    played: number,
+    total: number,
+    slug: string
+  ) => {
+    const isComplete = played >= total && total > 0;
+    const status: DarkAchievementStatus = isComplete 
+      ? 'complete' 
+      : played > 0 
+        ? 'in_progress' 
+        : 'locked';
+    
+    setModalState({
+      isOpen: true,
+      type: 'list',
+      status,
+      title: label,
+      description: `Complete all ${total} courses in the ${label} Top 100 list.`,
+      progressCurrent: played,
+      progressTarget: total,
+      regionKey,
+      listSlug: slug,
+    });
+  };
+  
+  const closeModal = () => {
+    setModalState(null);
   };
   
   // Map list IDs to region keys and slugs
@@ -467,6 +549,13 @@ const DarkGlassAchievementsPage: React.FC = () => {
                       unlocked={isUnlocked}
                       remaining={isUnlocked ? undefined : remaining}
                       isCurrent={isCurrent}
+                      onClick={() => openMilestoneModal(
+                        threshold,
+                        milestone.label,
+                        milestone.shortLabel,
+                        isUnlocked,
+                        remaining
+                      )}
                     />
                   );
                 })}
@@ -511,6 +600,24 @@ const DarkGlassAchievementsPage: React.FC = () => {
           </>
         )}
       </div>
+      
+      {/* Achievement Detail Modal */}
+      {modalState && (
+        <DarkGlassAchievementDetailModal
+          isOpen={modalState.isOpen}
+          onClose={closeModal}
+          type={modalState.type}
+          status={modalState.status}
+          title={modalState.title}
+          subtitle={modalState.subtitle}
+          description={modalState.description}
+          progressCurrent={modalState.progressCurrent}
+          progressTarget={modalState.progressTarget}
+          threshold={modalState.threshold}
+          regionKey={modalState.regionKey}
+          listSlug={modalState.listSlug}
+        />
+      )}
     </PageRoot>
   );
 };
