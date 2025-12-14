@@ -10,6 +10,7 @@ import { PostingAsPill } from './PostingAsPill';
 import { PostingAsMenu } from './PostingAsMenu';
 import { SearchOverlay } from './SearchOverlay';
 import { cn } from '@/lib/utils';
+import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 
 interface CompactHeaderProps {
   className?: string;
@@ -23,18 +24,31 @@ interface CompactHeaderProps {
 const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  // DISABLED: Scroll-based hiding removed - header is now always visible
-  // const { isHidden: scrollHidden } = useScrollDirection();
   const { user } = useSupabaseSession();
   const { hasUnread } = useUnreadNotifications();
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   
-  // Keep for reference but no longer used for hide/show logic
-  const isClubhousePage = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
+  // Cinema Dim context
+  const { cinemaDim, bumpChrome, isClubhousePage } = useCinemaDimContext();
+  const isDimmed = isClubhousePage && cinemaDim;
+  
+  // Keep for reference
+  const isClubhouseRoute = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
 
   const handleLogoClick = () => {
+    bumpChrome();
     navigate('/clubhouse');
+  };
+  
+  const handleSearchClick = () => {
+    bumpChrome();
+    setSearchOpen(true);
+  };
+  
+  const handleMenuClick = () => {
+    bumpChrome();
+    setMenuOpen(v => !v);
   };
 
   return (
@@ -42,22 +56,24 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
       <header
         data-chrome="header"
         className={cn(
-          "compact-header",
-          // Keep chrome-header class for compatibility but no hide/show behavior
-          isClubhousePage && "chrome-header",
+          "compact-header clubhouse-header",
+          isClubhouseRoute && "chrome-header",
           "fixed top-0 left-0 right-0 z-header",
-          "h-14", // 56px
-          // DISABLED: No slide animations - header always visible
-          // !isClubhousePage && "transition-transform duration-200 ease-out",
-          // !isClubhousePage && scrollHidden && "-translate-y-full",
+          "h-14",
+          "transition-colors duration-300 ease-out",
           className
         )}
         style={{
-          background: 'rgba(10, 10, 10, 0.95)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
+          background: isDimmed 
+            ? 'var(--clubhouse-chrome-bg)' 
+            : 'rgba(10, 10, 10, 0.95)',
+          backdropFilter: isDimmed ? 'none' : 'blur(20px)',
+          WebkitBackdropFilter: isDimmed ? 'none' : 'blur(20px)',
           paddingTop: 'env(safe-area-inset-top)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+          borderBottom: isDimmed 
+            ? '1px solid var(--clubhouse-chrome-border)' 
+            : '1px solid rgba(255, 255, 255, 0.06)',
+          boxShadow: isDimmed ? 'none' : undefined,
         }}
       >
         <div className="mx-auto flex h-full items-center justify-between px-3 sm:px-4 max-w-5xl">
@@ -71,10 +87,16 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             <img
               src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
               alt="clbhouz"
-              className="h-9 w-9 object-contain hover:opacity-80 transition-opacity"
+              className={cn(
+                "h-9 w-9 object-contain transition-opacity",
+                isDimmed ? "opacity-55" : "hover:opacity-80"
+              )}
             />
             {/* Wordmark - desktop only */}
-            <span className="hidden md:inline text-white font-semibold text-lg tracking-tight">
+            <span 
+              className="hidden md:inline font-semibold text-lg tracking-tight transition-colors duration-300"
+              style={{ color: isDimmed ? 'var(--clubhouse-chrome-icon)' : 'white' }}
+            >
               clbhouz
             </span>
           </button>
@@ -92,13 +114,25 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               return (
                 <button
                   key={item.path}
-                  onClick={() => navigate(item.path)}
+                  onClick={() => {
+                    bumpChrome();
+                    navigate(item.path);
+                  }}
                   className={cn(
-                    "px-3 py-1.5 text-sm font-medium rounded-sq-sm transition-colors",
+                    "px-3 py-1.5 text-sm font-medium rounded-sq-sm transition-colors duration-300",
                     isActive 
-                      ? "text-white bg-white/10" 
-                      : "text-white/60 hover:text-white hover:bg-white/5"
+                      ? isDimmed 
+                        ? "bg-white/5" 
+                        : "text-white bg-white/10"
+                      : isDimmed
+                        ? "hover:bg-white/5"
+                        : "text-white/60 hover:text-white hover:bg-white/5"
                   )}
+                  style={{
+                    color: isDimmed 
+                      ? (isActive ? 'var(--clubhouse-chrome-icon-active)' : 'var(--clubhouse-chrome-icon)')
+                      : undefined
+                  }}
                 >
                   {item.label}
                 </button>
@@ -112,8 +146,14 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             <Button
               variant="ghost"
               size="icon"
-              className="text-white/70 hover:text-white hover:bg-white/10 h-10 w-10 p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-transform"
-              onClick={() => setSearchOpen(true)}
+              className={cn(
+                "h-10 w-10 p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all duration-300",
+                isDimmed 
+                  ? "hover:bg-white/5" 
+                  : "text-white/70 hover:text-white hover:bg-white/10"
+              )}
+              style={{ color: isDimmed ? 'var(--clubhouse-chrome-icon)' : undefined }}
+              onClick={handleSearchClick}
               aria-label="Search"
             >
               <Search className="h-5 w-5" />
@@ -123,7 +163,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             {user && (
               <div className="sm:hidden">
                 <PostingAsPill 
-                  onClick={() => setMenuOpen(v => !v)} 
+                  onClick={handleMenuClick} 
                   isOpen={menuOpen}
                   hasUnread={hasUnread}
                 />
@@ -132,7 +172,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             
             {/* Desktop: Full navigation (notifications, profile, settings) */}
             <div className="hidden sm:flex items-center">
-              <HeaderNavigation />
+              <HeaderNavigation onInteraction={bumpChrome} />
             </div>
           </div>
         </div>

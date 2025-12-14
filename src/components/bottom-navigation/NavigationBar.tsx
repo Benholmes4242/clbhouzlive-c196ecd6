@@ -6,9 +6,10 @@ interface NavigationBarProps {
   activeTab: string;
   onTabClick: (tab: { id: string; path: string | null; isAction?: boolean }) => void;
   variant?: 'default' | 'clubhouse';
+  isDimmed?: boolean;
 }
 
-const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, variant = 'default' }) => {
+const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, variant = 'default', isDimmed = false }) => {
   return (
     <nav className="w-full h-14 flex items-center justify-around">
       {navigationTabs.map((tab) => {
@@ -33,16 +34,28 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
           >
             <Icon 
               className={cn(
-                "h-7 w-7",
-                isActive ? "text-primary" : "text-white/70"
+                "h-7 w-7 transition-colors duration-300",
+                isActive 
+                  ? "text-primary" 
+                  : isDimmed 
+                    ? "text-[var(--clubhouse-chrome-icon)]" 
+                    : "text-white/70"
               )}
             />
             
             {/* Label */}
-            <span className={cn(
-              "text-[11px] leading-none",
-              isActive ? "text-white" : "text-white/60"
-            )}>
+            <span 
+              className={cn(
+                "text-[11px] leading-none transition-colors duration-300",
+                isActive 
+                  ? isDimmed 
+                    ? "text-[var(--clubhouse-chrome-icon-active)]" 
+                    : "text-white"
+                  : isDimmed 
+                    ? "text-[var(--clubhouse-chrome-label)]" 
+                    : "text-white/60"
+              )}
+            >
               {tab.label}
             </span>
           </button>

@@ -6,6 +6,7 @@ import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useModalState } from '@/hooks/useModalDetector';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { useModalContext } from '@/contexts/ModalContext';
+import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
 import PostSubmissionHandler from './bottom-navigation/PostSubmissionHandler';
@@ -36,11 +37,15 @@ interface GlobalBottomNavigationProps {
 const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeState = 'visible' }) => {
   const location = useLocation();
   const { isVisible, setNavRef } = useBottomNavigation();
-  const { shouldHideHeader } = useModalContext(); // Removed shouldHideBottomNav - ECM now uses chrome auto-hide system
+  const { shouldHideHeader } = useModalContext();
+  const { cinemaDim, bumpChrome, isClubhousePage } = useCinemaDimContext();
   const { activeTab, handleTabClick } = useNavigationHandlers();
   const isDesktop = useIsDesktop();
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
+  
+  // Determine dim state
+  const isDimmed = isClubhousePage && cinemaDim;
   
   // Check if drawer is active (for clubhouse mini profile or comments)
   const [isDrawerActive, setIsDrawerActive] = useState(false);
@@ -167,6 +172,9 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
 
   // Handle tab clicks including camera action
   const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
+    // Bump chrome on any interaction
+    bumpChrome();
+    
     if (tab.isAction && tab.id === 'post') {
       // Open composer directly with empty state
       openComposerWithFiles([]);
@@ -200,10 +208,18 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 navRef.current = el;
                 setNavRef(el);
               }}
-              className="chrome-bottom-nav backdrop-blur-xl border-t border-white/10"
+              className={cn(
+                "chrome-bottom-nav clubhouse-footer border-t transition-colors duration-300 ease-out",
+                isDimmed 
+                  ? "border-[var(--clubhouse-chrome-border)]" 
+                  : "border-white/10 backdrop-blur-xl"
+              )}
               data-chrome="bottom-nav"
               style={{
-                background: 'var(--header-bg)',
+                background: isDimmed 
+                  ? 'var(--clubhouse-chrome-bg)' 
+                  : 'var(--header-bg)',
+                backdropFilter: isDimmed ? 'none' : undefined,
                 paddingBottom: 'env(safe-area-inset-bottom, 0px)',
               }}
             >
@@ -211,6 +227,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 activeTab={activeTab}
                 onTabClick={handleTabClickWithCamera}
                 variant={isClubhouseRoute ? 'clubhouse' : 'default'}
+                isDimmed={isDimmed}
               />
             </div>
           </motion.div>
