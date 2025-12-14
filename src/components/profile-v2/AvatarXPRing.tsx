@@ -146,25 +146,31 @@ export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
         }}
       />
 
-      {/* Avatar container with hairline separator - squircle shape */}
-      <div
-        className="absolute overflow-hidden"
-        style={{
-          width: dimensions.avatar,
-          height: avatarHeight,
-          borderRadius: SDS_AVATAR_BORDER_RADIUS,
-          boxShadow: '0 0 0 0.5px rgba(0, 0, 0, 0.9)',
-        }}
-      >
-        <SquircleAvatar
+      {/* Avatar - directly positioned, no wrapper gap */}
+      {avatarUrl ? (
+        <img
           src={avatarUrl}
           alt={displayName}
-          fallback={displayName.charAt(0).toUpperCase()}
-          size={dimensions.avatar}
-          hideRing
-          className="w-full h-full"
+          className="absolute object-cover"
+          style={{
+            width: dimensions.avatar,
+            height: avatarHeight,
+            borderRadius: SDS_AVATAR_BORDER_RADIUS,
+          }}
         />
-      </div>
+      ) : (
+        <div
+          className="absolute flex items-center justify-center bg-muted text-muted-foreground font-semibold"
+          style={{
+            width: dimensions.avatar,
+            height: avatarHeight,
+            borderRadius: SDS_AVATAR_BORDER_RADIUS,
+            fontSize: `${Math.round(dimensions.avatar * 0.38)}px`,
+          }}
+        >
+          {displayName.charAt(0).toUpperCase()}
+        </div>
+      )}
     </button>
   );
 };
