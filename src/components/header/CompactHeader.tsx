@@ -51,6 +51,13 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
     setMenuOpen(v => !v);
   };
 
+  // Hardcoded RGBA values for reliable iOS rendering (no CSS variable resolution issues)
+  const DIM_BG = 'rgba(15, 15, 15, 0.10)';
+  const DIM_BORDER = 'rgba(255, 255, 255, 0.06)';
+  const STANDARD_BG = 'rgba(10, 10, 10, 0.95)';
+  const STANDARD_BORDER = 'rgba(255, 255, 255, 0.06)';
+  const CINEMA_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+
   return (
     <>
       <header
@@ -63,17 +70,13 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           className
         )}
         style={{
-          background: isDimmed 
-            ? 'var(--clubhouse-chrome-bg)' 
-            : 'rgba(10, 10, 10, 0.95)',
+          background: isDimmed ? DIM_BG : STANDARD_BG,
           backdropFilter: isDimmed ? 'none' : 'blur(20px)',
           WebkitBackdropFilter: isDimmed ? 'none' : 'blur(20px)',
           paddingTop: 'env(safe-area-inset-top)',
-          borderBottom: isDimmed 
-            ? '1px solid var(--clubhouse-chrome-border)' 
-            : '1px solid rgba(255, 255, 255, 0.06)',
+          borderBottom: `1px solid ${isDimmed ? DIM_BORDER : STANDARD_BORDER}`,
           boxShadow: isDimmed ? 'none' : undefined,
-          transition: 'background-color 800ms var(--clubhouse-cinema-ease), color 800ms var(--clubhouse-cinema-ease), border-color 800ms var(--clubhouse-cinema-ease)',
+          transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}`,
         }}
       >
         <div className="mx-auto flex h-full items-center justify-between px-3 sm:px-4 max-w-5xl">
@@ -95,7 +98,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             {/* Wordmark - desktop only */}
             <span 
               className="hidden md:inline font-semibold text-lg tracking-tight transition-colors duration-300"
-              style={{ color: isDimmed ? 'var(--clubhouse-chrome-icon)' : 'white' }}
+              style={{ color: isDimmed ? 'rgba(255, 255, 255, 0.55)' : 'white' }}
             >
               clbhouz
             </span>
@@ -130,7 +133,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                   )}
                   style={{
                     color: isDimmed 
-                      ? (isActive ? 'var(--clubhouse-chrome-icon-active)' : 'var(--clubhouse-chrome-icon)')
+                      ? (isActive ? 'rgba(255, 255, 255, 0.78)' : 'rgba(255, 255, 255, 0.55)')
                       : undefined
                   }}
                 >
@@ -152,7 +155,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                   ? "hover:bg-white/5" 
                   : "text-white/70 hover:text-white hover:bg-white/10"
               )}
-              style={{ color: isDimmed ? 'var(--clubhouse-chrome-icon)' : undefined }}
+              style={{ color: isDimmed ? 'rgba(255, 255, 255, 0.55)' : undefined }}
               onClick={handleSearchClick}
               aria-label="Search"
             >
