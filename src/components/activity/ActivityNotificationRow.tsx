@@ -76,12 +76,11 @@ function getNotificationBadgeIcon(type: string) {
     case 'business_verification_removed':
     case 'business_verification_revoked':
       return <ShieldOff className={cn(iconClass, "text-red-500")} />;
-    // Golfer verification notifications - glass green tick for approved
+    // Golfer verification notifications - use same green icon as business verification
     case 'golfer_verification_approved':
-      return <CheckCircle className={cn(iconClass, "text-emerald-500")} />;
     case 'golfer_verification_invite':
     case 'golfer_verification_submitted':
-      return <CheckCircle className={cn(iconClass, "text-blue-500")} />;
+      return <ShieldCheck className={cn(iconClass, "text-emerald-500")} />;
     case 'golfer_verification_rejected':
     case 'golfer_verification_removed':
       return <ShieldCheck className={cn(iconClass, "text-red-500")} />;
@@ -170,7 +169,7 @@ function renderNotificationText(notification: ActivityNotification): string {
       return 'Action required: verify your business email domain';
     // Golfer verification notifications
     case 'golfer_verification_invite':
-      return "You're eligible for verification";
+      return "Clbhouz would like to verify your account";
     case 'golfer_verification_submitted':
       return 'Verification request submitted';
     case 'golfer_verification_approved':
@@ -528,6 +527,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
     case 'golfer_verification_invite': {
       const requestId = data?.request_id;
       const inviteStatus = data?.status || 'pending';
+      const reason = data?.reason;
       const statusIcon = getNotificationBadgeIcon(type);
       
       return (
@@ -538,19 +538,33 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
           title={
             <>
-              <span className={cn(showOrange ? "font-semibold" : "font-medium")}>Clbhouz Team</span>{' '}
-              <span className="font-normal text-muted-foreground">invited you to get verified</span>
+              <span className={cn(showOrange ? "font-semibold" : "font-medium")}>Clbhouz</span>{' '}
+              <span className="font-normal text-muted-foreground">would like to verify your account</span>
             </>
           }
           meta={notification.time_ago}
           actions={
-            requestId ? (
-              <GolferVerificationInviteButtons
-                requestId={requestId}
-                initialStatus={inviteStatus === 'accepted' ? 'accepted' : inviteStatus === 'declined' ? 'declined' : 'pending'}
-                isMock={notification.is_mock}
-              />
-            ) : undefined
+            <div className="flex flex-col gap-2">
+              {reason && (
+                <p className="text-xs text-muted-foreground">
+                  Reason: {reason}
+                </p>
+              )}
+              {requestId ? (
+                <GolferVerificationInviteButtons
+                  requestId={requestId}
+                  initialStatus={inviteStatus === 'accepted' ? 'accepted' : inviteStatus === 'declined' ? 'declined' : 'pending'}
+                  isMock={notification.is_mock}
+                />
+              ) : null}
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); /* TODO: wire to support DM */ }}
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2 text-left"
+              >
+                Chat with support
+              </button>
+            </div>
           }
           isSessionNew={isSessionNew}
         />

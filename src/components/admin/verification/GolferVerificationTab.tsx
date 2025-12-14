@@ -81,6 +81,7 @@ const GolferVerificationTab = () => {
   const [activeTab, setActiveTab] = useState('discover');
   const [searchQuery, setSearchQuery] = useState('');
   const [inviteNote, setInviteNote] = useState('');
+  const [inviteReason, setInviteReason] = useState('');
   const [selectedGolfer, setSelectedGolfer] = useState<SearchResult | null>(null);
 
   const { data: currentUser } = useQuery({
@@ -167,10 +168,11 @@ const GolferVerificationTab = () => {
 
   // Invite golfer mutation
   const inviteMutation = useMutation({
-    mutationFn: async ({ userId, note }: { userId: string; note?: string }) => {
+    mutationFn: async ({ userId, note, inviteReason }: { userId: string; note?: string; inviteReason?: string }) => {
       const { data, error } = await supabase.rpc('invite_golfer_to_verification', {
         _user_id: userId,
         _note: note || null,
+        _invite_reason: inviteReason || null,
       });
       if (error) throw error;
       return data;
@@ -182,6 +184,7 @@ const GolferVerificationTab = () => {
       setInviteModalOpen(false);
       setSelectedGolfer(null);
       setInviteNote('');
+      setInviteReason('');
       setSearchQuery('');
     },
     onError: (error: any) => {
@@ -815,12 +818,24 @@ const GolferVerificationTab = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="inviteNote">Internal note (optional)</Label>
+                  <Label htmlFor="inviteReason">Invite reason (shown to user)</Label>
+                  <Textarea 
+                    id="inviteReason" 
+                    value={inviteReason} 
+                    onChange={(e) => setInviteReason(e.target.value)} 
+                    placeholder="e.g., Recognised tour profile, Active community member..." 
+                    className="min-h-[60px]" 
+                  />
+                  <p className="text-xs text-muted-foreground">This reason will be visible to the user in their notification.</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="inviteNote">Internal note (admin only, optional)</Label>
                   <Textarea 
                     id="inviteNote" 
                     value={inviteNote} 
                     onChange={(e) => setInviteNote(e.target.value)} 
-                    placeholder="e.g., Pro golfer, verified via tour profile..." 
+                    placeholder="e.g., Found via PGA tour database..." 
                     className="min-h-[60px]" 
                   />
                 </div>
@@ -832,13 +847,13 @@ const GolferVerificationTab = () => {
           <div className="shrink-0 px-6 py-4 border-t bg-background/95 backdrop-blur-sm flex gap-2 justify-end" style={{ paddingBottom: 'calc(16px + env(safe-area-inset-bottom, 0px))' }}>
             <Button 
               variant="outline" 
-              onClick={() => { setInviteModalOpen(false); setSelectedGolfer(null); setSearchQuery(''); setInviteNote(''); }} 
+              onClick={() => { setInviteModalOpen(false); setSelectedGolfer(null); setSearchQuery(''); setInviteNote(''); setInviteReason(''); }} 
               disabled={processing}
             >
               Cancel
             </Button>
             <Button 
-              onClick={() => selectedGolfer && inviteMutation.mutate({ userId: selectedGolfer.id, note: inviteNote })} 
+              onClick={() => selectedGolfer && inviteMutation.mutate({ userId: selectedGolfer.id, note: inviteNote, inviteReason })} 
               disabled={processing || !selectedGolfer || selectedGolfer.is_verified_golfer}
             >
               {processing ? 'Inviting...' : 'Send Invite'}
