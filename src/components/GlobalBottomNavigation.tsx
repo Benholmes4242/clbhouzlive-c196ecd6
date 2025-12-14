@@ -14,6 +14,7 @@ import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers
 import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandlers';
 import { cn } from '@/lib/utils';
 import { auditComponentMount, markPerformance } from '@/utils/clubhouseAudit';
+import { CINEMA_DIM, CINEMA_STANDARD, getFooterDimStyles } from '@/lib/clubhouseCinemaDimStyles';
 
 // Routes where bottom navigation should be hidden
 const HIDDEN_ROUTES = [
@@ -211,18 +212,13 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
               className={cn(
                 "chrome-bottom-nav clubhouse-footer border-t",
                 isDimmed 
-                  ? "border-[rgba(255,255,255,0.06)] backdrop-blur-0" 
+                  ? `border-[${CINEMA_DIM.border}] backdrop-blur-0` 
                   : "border-white/10 backdrop-blur-xl"
               )}
               data-chrome="bottom-nav"
               style={{
-                background: isDimmed 
-                  ? 'rgba(15, 15, 15, 0.10)' 
-                  : 'rgba(15, 15, 15, 0.95)',
-                backdropFilter: isDimmed ? 'none' : undefined,
-                WebkitBackdropFilter: isDimmed ? 'none' : undefined,
+                ...getFooterDimStyles(isDimmed),
                 paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-                transition: 'background-color 800ms cubic-bezier(0.22, 1, 0.36, 1), color 800ms cubic-bezier(0.22, 1, 0.36, 1), border-color 800ms cubic-bezier(0.22, 1, 0.36, 1)',
               }}
             >
               <NavigationBar
