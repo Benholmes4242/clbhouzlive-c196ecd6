@@ -116,6 +116,8 @@ const GolferVerificationTab = () => {
         user_profile: profileMap.get(r.user_id) || null,
       })) as GolferVerificationRequest[];
     },
+    refetchOnWindowFocus: true,
+    staleTime: 10_000, // Consider data stale after 10 seconds for quicker updates
   });
 
   // Fetch my reviews for golfer verifications
