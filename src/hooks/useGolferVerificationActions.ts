@@ -27,8 +27,8 @@ export function useAcceptGolferInvite() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Verification request submitted', {
-        description: "We'll review your request and notify you once a decision is made.",
+      toast.success('Verification in progress', {
+        description: "Our team is reviewing your verification. We'll notify you once it's complete.",
       });
       queryClient.invalidateQueries({ queryKey: ['golfer-verification-request'] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });

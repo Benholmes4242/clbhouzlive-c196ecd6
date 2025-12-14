@@ -2516,6 +2516,7 @@ export type Database = {
           declined_at: string | null
           evidence_url: string | null
           id: string
+          invite_reason: string | null
           invited_by: string
           note: string | null
           requested_at: string | null
@@ -2537,6 +2538,7 @@ export type Database = {
           declined_at?: string | null
           evidence_url?: string | null
           id?: string
+          invite_reason?: string | null
           invited_by: string
           note?: string | null
           requested_at?: string | null
@@ -2558,6 +2560,7 @@ export type Database = {
           declined_at?: string | null
           evidence_url?: string | null
           id?: string
+          invite_reason?: string | null
           invited_by?: string
           note?: string | null
           requested_at?: string | null
@@ -6935,10 +6938,12 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: Json
       }
-      invite_golfer_to_verification: {
-        Args: { _note?: string; _user_id: string }
-        Returns: string
-      }
+      invite_golfer_to_verification:
+        | { Args: { _note?: string; _user_id: string }; Returns: string }
+        | {
+            Args: { _invite_reason?: string; _note?: string; _user_id: string }
+            Returns: string
+          }
       is_admin: { Args: never; Returns: boolean }
       is_business_owner:
         | { Args: { _business_id: string }; Returns: boolean }
@@ -7027,10 +7032,20 @@ export type Database = {
         Args: { review_id_param: string }
         Returns: undefined
       }
-      reinvite_golfer_verification_request: {
-        Args: { p_admin_id: string; p_note?: string; p_request_id: string }
-        Returns: Json
-      }
+      reinvite_golfer_verification_request:
+        | {
+            Args: { p_admin_id: string; p_note?: string; p_request_id: string }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_admin_id: string
+              p_invite_reason?: string
+              p_note?: string
+              p_request_id: string
+            }
+            Returns: Json
+          }
       reject_business_verification: {
         Args: { _admin_note: string; _request_id: string }
         Returns: undefined
