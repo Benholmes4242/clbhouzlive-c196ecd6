@@ -1,25 +1,18 @@
-import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { InlineSpinner } from '@/components/ui/InlineSpinner';
 import CompactHeader from '@/components/header/CompactHeader';
-import NavigationBar from '@/components/bottom-navigation/NavigationBar';
 import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
 import SnapToast from '@/components/snap/SnapToast';
 import { useNavigationHandlers } from '@/components/bottom-navigation/useNavigationHandlers';
 import { useSnapModal } from '@/hooks/useSnapModal';
-import { useChromeState } from '@/hooks/useChromeState';
-import { useChromeAnchors } from '@/hooks/useChromeAnchors';
 import { PageRoot } from '@/components/layout/PageRoot';
-
 import { useInfiniteClubhouseShorts } from '@/hooks/useInfiniteFollowedPosts';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useToast } from '@/hooks/use-toast';
-// CommentsModal removed - now using cinematic CommentsPage inside the feed
 import { NewSeasonBanner } from '@/components/feed/NewSeasonBanner';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
@@ -42,16 +35,10 @@ const Clubhouse = () => {
   } = useInfiniteClubhouseShorts();
 
   // Navigation handlers
-  const { activeTab, handleTabClick } = useNavigationHandlers();
+  const { handleTabClick } = useNavigationHandlers();
   
   // Track active video for progress HUD
   const activeVideoRef = useRef<HTMLVideoElement | null>(null);
-  
-  // Route guard: only show progress bar on /clubhouse and when no overlay is active
-  const state = location.state as { backgroundLocation?: Location } | null;
-  const isOverlayActive = !!state?.backgroundLocation;
-  const isClubhouseRoute = location.pathname.startsWith('/clubhouse') || location.pathname === '/';
-  const showProgressBar = isClubhouseRoute && !isOverlayActive;
   
   // Composer state management
   const {
@@ -74,12 +61,8 @@ const Clubhouse = () => {
   } = useSnapModal();
 
 
-  const [headerActiveTab, setHeaderActiveTab] = useState('Following');
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
   const [localSelectedTags, setLocalSelectedTags] = useState<any[]>([]);
-  const [commentsModalOpen, setCommentsModalOpen] = useState(false);
-  const [selectedPostId, setSelectedPostId] = useState<string>('');
-  const isMobile = useIsMobile();
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
 
@@ -96,93 +79,9 @@ const Clubhouse = () => {
   // Track overlay states
   const [isCommentsDrawerOpen, setIsCommentsDrawerOpen] = useState(false);
   
-  // Top zone (first post) state for auto-hide timer
-  const [isAtTopZone, setIsAtTopZone] = useState(true); // On first load, we're at top
-  const autoHideTimerRef = useRef<number | null>(null);
-  const AUTO_HIDE_DELAY_MS = 4000; // 4s initial timer before first hide
-  
-  // Chrome auto-hide state - force hidden when any overlay is open
-  // Progressive immersion enabled: hide after first meaningful interaction
-  const isAnyOverlayOpen = isCommentsDrawerOpen || isComposerOpen;
-  const chromeControls = useChromeState({
-    forceHidden: isAnyOverlayOpen,
-    disabled: false,
-    disableDirectionalReveal: true, // Clubhouse only - swipe between posts should not toggle chrome
-    progressiveImmersion: true, // Enable progressive immersion
-  });
-  
-  // Clear the auto-hide timer
-  const clearAutoHideTimer = useCallback(() => {
-    if (autoHideTimerRef.current !== null) {
-      window.clearTimeout(autoHideTimerRef.current);
-      autoHideTimerRef.current = null;
-    }
-  }, []);
-  
-  // Schedule auto-hide after entry timer (only if no user engagement yet)
-  const scheduleAutoHide = useCallback(() => {
-    // Only when at top, chrome is visible, and no overlay is forcing hidden
-    if (!isAtTopZone) return;
-    if (chromeControls.chromeState !== 'visible') return;
-    if (isAnyOverlayOpen) return;
-    
-    clearAutoHideTimer();
-    
-    autoHideTimerRef.current = window.setTimeout(() => {
-      // Use progressive hide which marks the reason as 'interaction'
-      chromeControls.triggerProgressiveHide();
-    }, AUTO_HIDE_DELAY_MS);
-  }, [isAtTopZone, chromeControls, isAnyOverlayOpen, clearAutoHideTimer]);
-  
-  // Handle top zone changes from feed
-  const handleTopZoneChange = useCallback((atTop: boolean) => {
-    setIsAtTopZone(atTop);
-    
-    if (atTop) {
-      // Coming back to the top: show chrome and start idle timer
-      chromeControls.showChromeImmediate();
-      // Use setTimeout to ensure state has updated before scheduling
-      setTimeout(() => scheduleAutoHide(), 0);
-    } else {
-      // Leaving the top zone: no idle behaviour
-      clearAutoHideTimer();
-    }
-  }, [chromeControls, scheduleAutoHide, clearAutoHideTimer]);
-  
-  // Initial load: start the 5s timer when component mounts
-  useEffect(() => {
-    if (isAtTopZone && chromeControls.chromeState === 'visible' && !isAnyOverlayOpen) {
-      scheduleAutoHide();
-    }
-    
-    return clearAutoHideTimer; // Cleanup on unmount
-  }, [isAtTopZone, chromeControls.chromeState, isAnyOverlayOpen, scheduleAutoHide, clearAutoHideTimer]);
-  
-  // Reset timer on any activity while at top zone
-  const handleClubhouseScroll = useCallback((scrollTop: number) => {
-    chromeControls.handleScroll(scrollTop);
-    
-    // While at the top, any scroll movement counts as "activity" and resets timer
-    if (isAtTopZone && chromeControls.chromeState === 'visible') {
-      scheduleAutoHide();
-    }
-  }, [chromeControls, isAtTopZone, scheduleAutoHide]);
-  
-  // Navigation pill tap handler - directly reveals chrome
-  const showNavOverlay = useCallback(() => {
-    chromeControls.showChrome();
-    // Reset timer when nav overlay is triggered
-    if (isAtTopZone) {
-      scheduleAutoHide();
-    }
-  }, [chromeControls, isAtTopZone, scheduleAutoHide]);
-  
-  const hideNavOverlay = useCallback(() => {
-    // No-op now since we're not using overlay state
-  }, []);
-  
-  // Chrome anchors for dynamic re-positioning
-  useChromeAnchors();
+  // ⚠️ HEADER/FOOTER AUTO-HIDE DISABLED
+  // Chrome is always visible on Clubhouse - no hide logic, no timers, no animations
+  // Glass creator capsule + right-hand action rail are out of scope
 
   // Check which posts the user has liked
   const { data: likedPosts } = useQuery({
@@ -272,39 +171,10 @@ const Clubhouse = () => {
     setCurrentPostIndex(index);
   };
 
-  const handleComment = (postId: string) => {
-    setSelectedPostId(postId);
-    setCommentsModalOpen(true);
-  };
-
-  const handleShare = () => {
-    console.log('Share clicked');
-  };
-
-  // Handle tab clicks including camera action
-  const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
-    console.log('[DEBUG] Clubhouse: handleTabClickWithCamera called with:', tab);
-    
-    if (tab.isAction && tab.id === 'post') {
-      // Open composer directly with empty state
-      console.log('[DEBUG] Clubhouse: Opening composer directly');
-      openComposerWithFiles([]);
-    } else {
-      // Handle regular navigation
-      console.log('[DEBUG] Clubhouse: Handling regular navigation');
-      handleTabClick(tab);
-    }
-  };
-
   const handleCloseComposer = () => {
     closeComposer();
     setLocalSelectedTags([]);
   };
-
-  // Debug logging for Clubhouse page
-  useEffect(() => {
-    console.log("[DEBUG] Clubhouse page mounted, headerActiveTab:", headerActiveTab);
-  }, [headerActiveTab]);
 
   // Mark body for Clubhouse-specific CSS overrides
   useEffect(() => {
@@ -321,14 +191,6 @@ const Clubhouse = () => {
       <div id="clubhouse-sentinel" className="h-1 w-px absolute top-0 left-0" />
       
       <CompactHeader />
-
-      {/* Edge gradients when chrome is hidden (Apple-level polish) */}
-      {chromeControls.chromeState === 'hidden' && (
-        <>
-          <div className="pointer-events-none fixed inset-x-0 top-0 h-12 bg-gradient-to-b from-black/40 via-black/10 to-transparent z-[45]" />
-          <div className="pointer-events-none fixed inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 via-black/10 to-transparent z-[45]" />
-        </>
-      )}
 
       {/* Main Content - Fullscreen Vertical Feed */}
       <div className="clubhouse-scroll">
@@ -347,20 +209,11 @@ const Clubhouse = () => {
             hasMore={hasMore}
             isLoadingMore={isLoadingMore}
             onCurrentPostChange={handleCurrentPostChange}
-            onScroll={handleClubhouseScroll}
-            onTouchStart={chromeControls.handleTouchStart}
-            onTouchMove={chromeControls.handleTouchMove}
-            onTouchEnd={chromeControls.handleTouchEnd}
             onActiveVideoRefChange={(ref) => {
               activeVideoRef.current = ref;
             }}
             onCommentsOpenChange={setIsCommentsDrawerOpen}
-            chromeState={chromeControls.chromeState}
             onPostDetailsOpen={() => console.log('Post details opened')}
-            onDismissNavOverlay={hideNavOverlay}
-            onNavOverlayRequest={showNavOverlay}
-            onTopZoneChange={handleTopZoneChange}
-            onMeaningfulInteraction={chromeControls.triggerProgressiveHide}
           />
         ) : isLoading ? (
           <div className="flex items-center justify-center min-h-screen">
