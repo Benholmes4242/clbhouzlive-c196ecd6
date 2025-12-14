@@ -11,6 +11,13 @@
   --header-h: 56px;
   --footer-bg: var(--header-bg);
   
+  /* Clubhouse cinematic dim tokens */
+  --clubhouse-chrome-bg: rgba(15, 15, 15, 0.18);
+  --clubhouse-chrome-border: rgba(255, 255, 255, 0.06);
+  --clubhouse-chrome-icon: rgba(255, 255, 255, 0.55);
+  --clubhouse-chrome-label: rgba(255, 255, 255, 0.42);
+  --clubhouse-chrome-icon-active: rgba(255, 255, 255, 0.78);
+  
   /* Glass surfaces */
   --glass-bg: rgba(255, 255, 255, 0.08);
   --glass-border: rgba(255, 255, 255, 0.15);

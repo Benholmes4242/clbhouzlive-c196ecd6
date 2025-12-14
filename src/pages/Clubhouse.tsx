@@ -16,10 +16,20 @@ import { useToast } from '@/hooks/use-toast';
 import { NewSeasonBanner } from '@/components/feed/NewSeasonBanner';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
+import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
+import { cn } from '@/lib/utils';
 
 const Clubhouse = () => {
   // Set header variant for clubhouse (glass-dark)
   useHeaderVariant('glass-dark');
+  
+  // Cinema Dim: register this page as Clubhouse
+  const { setIsClubhousePage, cinemaDim } = useCinemaDimContext();
+  
+  useEffect(() => {
+    setIsClubhousePage(true);
+    return () => setIsClubhousePage(false);
+  }, [setIsClubhousePage]);
   
   const location = useLocation();
   const clubhouseRootRef = useRef<HTMLDivElement>(null);
@@ -186,7 +196,11 @@ const Clubhouse = () => {
   // if (isLoading && posts.length === 0) return null;
 
   return (
-    <PageRoot ref={clubhouseRootRef} className="clubhouse-root" style={{ position: 'relative', isolation: 'isolate', zIndex: 0 }}>
+    <PageRoot 
+      ref={clubhouseRootRef} 
+      className={cn("clubhouse-root", cinemaDim && "cinema-dim")} 
+      style={{ position: 'relative', isolation: 'isolate', zIndex: 0 }}
+    >
       {/* Intersection sentinel for header fade-away */}
       <div id="clubhouse-sentinel" className="h-1 w-px absolute top-0 left-0" />
       

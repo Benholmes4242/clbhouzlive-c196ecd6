@@ -27,6 +27,7 @@ import { Top100DebugProvider } from '@/context/Top100DebugContext';
 import { UIProvider } from '@/contexts/UIContext';
 import { ModalProvider } from '@/contexts/ModalContext';
 import { BottomNavigationProvider } from '@/contexts/BottomNavigationContext';
+import { CinemaDimProvider } from '@/contexts/CinemaDimContext';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
 import { FLAGS } from '@/config/flags';
 import { FEATURE_FLAGS } from '@/config/featureFlags';
@@ -536,8 +537,9 @@ const AppInner: React.FC = () => {
         <HeaderProvider>
           <ModalProvider>
             <BottomNavigationProvider>
-              <UIProvider>
-                <ToastHost>
+              <CinemaDimProvider>
+                <UIProvider>
+                  <ToastHost>
                   <BrowserRouter>
                     <HubProvider>
                       <ActiveActorProvider>
@@ -569,8 +571,9 @@ const AppInner: React.FC = () => {
                       </ActiveActorProvider>
                     </HubProvider>
                   </BrowserRouter>
-                </ToastHost>
-              </UIProvider>
+                  </ToastHost>
+                </UIProvider>
+              </CinemaDimProvider>
             </BottomNavigationProvider>
           </ModalProvider>
         </HeaderProvider>

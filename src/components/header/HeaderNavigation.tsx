@@ -19,11 +19,21 @@ import {
 import { CreateBusinessProfileIntroModal } from '@/components/profile/CreateBusinessProfileIntroModal';
 import { IdentitySelector } from '@/components/identity/IdentitySelector';
 
-const HeaderNavigation = () => {
+interface HeaderNavigationProps {
+  onInteraction?: () => void;
+}
+
+const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useSupabaseSession();
   const { variant } = useHeader();
+  
+  // Wrap navigation actions to trigger interaction callback
+  const handleNavigation = (path: string) => {
+    onInteraction?.();
+    navigate(path);
+  };
   
   // Create refs for adaptive text color detection
   const navigationRef = useRef<HTMLDivElement>(null);
@@ -76,6 +86,7 @@ const HeaderNavigation = () => {
   const [showBusinessIntroModal, setShowBusinessIntroModal] = useState(false);
 
   const handleProfileClick = () => {
+    onInteraction?.();
     if (!user) {
       navigate('/auth');
     } else {
@@ -84,7 +95,7 @@ const HeaderNavigation = () => {
   };
 
   const handleCreateBusinessProfile = () => {
-    // Navigate to business intro page first
+    onInteraction?.();
     navigate('/business/intro');
   };
 
@@ -94,6 +105,7 @@ const HeaderNavigation = () => {
   };
 
   const handleAdminClick = () => {
+    onInteraction?.();
     const hasAdminAccess = adminStatus?.isAdmin || adminStatus?.isLimitedAdmin;
     
     if (!hasAdminAccess) {
@@ -104,7 +116,13 @@ const HeaderNavigation = () => {
     navigate('/admin', { replace: true });
   };
 
+  const handleSettingsClick = () => {
+    onInteraction?.();
+    navigate('/settings');
+  };
+
   const handleLogout = async () => {
+    onInteraction?.();
     try {
       console.log('Starting logout process...');
       
