@@ -16,6 +16,8 @@ interface NextTargetCardProps {
   suggestedRegion?: string;
   suggestedFocus?: string;
   onShare?: () => void;
+  showHint?: boolean;
+  onHintDismiss?: () => void;
   className?: string;
 }
 
@@ -26,8 +28,22 @@ export const NextTargetCard: React.FC<NextTargetCardProps> = ({
   suggestedRegion,
   suggestedFocus,
   onShare,
+  showHint,
+  onHintDismiss,
   className,
 }) => {
+  const [hintVisible, setHintVisible] = React.useState(showHint);
+
+  // Auto-fade hint after first interaction or timeout
+  React.useEffect(() => {
+    if (showHint && hintVisible) {
+      const timer = setTimeout(() => {
+        setHintVisible(false);
+        onHintDismiss?.();
+      }, 6000);
+      return () => clearTimeout(timer);
+    }
+  }, [showHint, hintVisible, onHintDismiss]);
   const remaining = nextMilestone ? nextMilestone.threshold - totalPlayed : 0;
   const progressPercent = nextMilestone
     ? (totalPlayed / nextMilestone.threshold) * 100
@@ -144,6 +160,15 @@ export const NextTargetCard: React.FC<NextTargetCardProps> = ({
           >
             {totalPlayed} / {nextMilestone.threshold} courses
           </p>
+          {/* Onboarding hint */}
+          {hintVisible && (
+            <p
+              className="text-xs mt-2 transition-opacity duration-500"
+              style={{ color: 'var(--dgp-text-muted)', fontStyle: 'italic' }}
+            >
+              This updates as you play more courses
+            </p>
+          )}
         </div>
       )}
 

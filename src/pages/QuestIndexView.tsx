@@ -3,8 +3,9 @@
  * Phase 3: Real data + interactive actions
  */
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { ArrowLeft, Search, MapPin, CheckCircle, Star, ChevronDown, Bookmark, BookmarkCheck } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Input } from '@/components/ui/input';
@@ -17,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useQuestCourses, QuestCourse } from '@/hooks/useQuestCourses';
+import { useQuestOnboarding } from '@/hooks/useQuestOnboarding';
 
 // Filter types
 type StatusFilter = 'all' | 'played' | 'unplayed' | 'wishlist';
@@ -222,12 +224,45 @@ const RatingSheet: React.FC<{
 const QuestIndexView: React.FC = () => {
   const navigate = useNavigate();
   const { courses, isLoading, totalPlayed, markPlayed, toggleWishlist } = useQuestCourses();
+  const onboarding = useQuestOnboarding(totalPlayed);
   
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [regionFilter, setRegionFilter] = useState('All Regions');
   const [sortBy, setSortBy] = useState<SortOption>('recent');
   const [ratingCourse, setRatingCourse] = useState<QuestCourse | null>(null);
+
+  // Track user interaction for idle hint
+  const hasInteracted = useRef(false);
+  const [showIdleHint, setShowIdleHint] = useState(false);
+
+  // Show idle hint after 8 seconds if no interaction
+  useEffect(() => {
+    if (!onboarding.shouldShowIndexHint || hasInteracted.current) return;
+    
+    const timer = setTimeout(() => {
+      if (!hasInteracted.current) {
+        setShowIdleHint(true);
+        toast('Mark a course played or add it to your wishlist', {
+          duration: 4000,
+          position: 'bottom-center',
+          style: {
+            background: 'rgba(11, 15, 13, 0.95)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            color: 'rgba(255,255,255,0.8)',
+          },
+        });
+        onboarding.markIndexHintSeen();
+      }
+    }, 8000);
+
+    return () => clearTimeout(timer);
+  }, [onboarding]);
+
+  // Track any course interaction
+  const handleInteraction = useCallback(() => {
+    hasInteracted.current = true;
+  }, []);
 
   // Filter and sort courses
   const filteredCourses = useMemo(() => {
@@ -277,8 +312,9 @@ const QuestIndexView: React.FC = () => {
   }), [courses]);
 
   const handleRate = useCallback((course: QuestCourse) => {
+    handleInteraction();
     setRatingCourse(course);
-  }, []);
+  }, [handleInteraction]);
 
   const handleSubmitRating = useCallback((courseId: string, rating: number) => {
     // For now, mark as played when rating (rating requires playing)
@@ -455,8 +491,14 @@ const QuestIndexView: React.FC = () => {
               <CourseRow
                 key={course.id}
                 course={course}
-                onMarkPlayed={markPlayed}
-                onToggleWishlist={toggleWishlist}
+                onMarkPlayed={(id, played) => {
+                  handleInteraction();
+                  markPlayed(id, played);
+                }}
+                onToggleWishlist={(id, wishlist) => {
+                  handleInteraction();
+                  toggleWishlist(id, wishlist);
+                }}
                 onRate={handleRate}
               />
             ))
