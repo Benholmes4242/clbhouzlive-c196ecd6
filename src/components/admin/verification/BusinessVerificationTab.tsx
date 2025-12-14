@@ -656,8 +656,8 @@ const BusinessVerificationTab = () => {
                 </Button>
               )}
               
-              {/* Demo-only force approve button - visible only in development */}
-              {import.meta.env.DEV && business && (
+              {/* Force approve button - Feature flag gated */}
+              {ENABLE_VERIFICATION_BYPASS && business && (
                 <Button
                   size="sm"
                   variant="outline"
