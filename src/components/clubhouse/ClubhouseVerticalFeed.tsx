@@ -1337,9 +1337,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         />
       )}
 
-      {/* Top Bar */}
-      <TopBar isVisible={topBarVisible} />
-
       {/* Cinematic Overlay System - Right Action Rail */}
       {filteredPosts[currentIndex] && (
         <CinematicActionRail
