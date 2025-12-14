@@ -1,27 +1,12 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { PageRoot } from '@/components/layout/PageRoot';
-import { MilestonesAndAchievementsContent } from '@/components/achievements/MilestonesAndAchievementsContent';
+import DarkGlassAchievementsPage from '@/components/achievements/DarkGlassAchievementsPage';
 
 /**
- * Standalone Achievements Page
- * Uses PageRoot wrapper for iOS Safari text rendering fix
+ * Achievements Page
+ * Dark glass redesign matching Profile and Quest aesthetic
  */
 const AchievementsPage: React.FC = () => {
-  const navigate = useNavigate();
-
-  const handleBack = () => {
-    navigate(-1);
-  };
-
-  return (
-    <PageRoot className="bg-muted/40">
-      <MilestonesAndAchievementsContent 
-        onBack={handleBack}
-        backLabel="Back"
-      />
-    </PageRoot>
-  );
+  return <DarkGlassAchievementsPage />;
 };
 
 export default AchievementsPage;
