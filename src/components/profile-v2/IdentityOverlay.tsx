@@ -44,14 +44,16 @@ export const IdentityOverlay: React.FC<IdentityOverlayProps> = ({
       )}
     >
       {/* Avatar with Achievement Ring */}
-      <AvatarXPRing
-        avatarUrl={avatarUrl}
-        displayName={displayName}
-        top100Count={top100Count}
-        size="xl"
-        onClick={onAvatarClick}
-        animateOnFirstView={true}
-      />
+      <div className="mt-4">
+        <AvatarXPRing
+          avatarUrl={avatarUrl}
+          displayName={displayName}
+          top100Count={top100Count}
+          size="xl"
+          onClick={onAvatarClick}
+          animateOnFirstView={true}
+        />
+      </div>
 
       {/* Name + Verified Badge */}
       <div className="flex items-center gap-2 mt-4">
