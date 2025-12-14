@@ -32,9 +32,9 @@ export const MilestonesEarnedRow: React.FC<MilestonesEarnedRowProps> = ({ totalP
             key={m.threshold}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0"
             style={{
-              background: 'rgba(200, 176, 106, 0.2)',
-              color: 'var(--dgp-accent-gold)',
-              border: '1px solid rgba(200, 176, 106, 0.3)',
+              background: 'rgba(210, 180, 97, 0.18)',
+              color: 'var(--quest-accent-gold)',
+              border: '1px solid rgba(210, 180, 97, 0.35)',
             }}
           >
             <Check className="w-3 h-3" />
@@ -47,9 +47,9 @@ export const MilestonesEarnedRow: React.FC<MilestonesEarnedRowProps> = ({ totalP
           <div
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0"
             style={{
-              background: 'var(--dgp-glass-surface)',
-              color: 'var(--dgp-text-muted)',
-              border: '1px solid var(--dgp-glass-stroke)',
+              background: 'var(--quest-chip-bg)',
+              color: 'var(--quest-text-secondary)',
+              border: '1px solid var(--quest-chip-stroke)',
             }}
           >
             {nextMilestone.name}

@@ -1,6 +1,7 @@
 /**
  * MilestoneLadder - Vertical timeline showing milestone progression (5→400 Club)
  * This is the "Journey Map" showing ONLY milestones, not regional lists
+ * Light theme version
  */
 
 import React from 'react';
@@ -46,12 +47,12 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
       {/* Connecting line */}
       {!isLast && (
         <div
-          className="absolute left-5 top-10 w-0.5 h-full"
+          className="absolute left-5 top-10 w-0.5 h-full journey-rail"
           style={{
             background: isUnlocked
-              ? `linear-gradient(to bottom, ${ringColor}, var(--dgp-divider))`
-              : 'var(--dgp-divider)',
-            opacity: isUnlocked ? 0.8 : 0.3,
+              ? `linear-gradient(to bottom, ${ringColor}, rgba(12, 14, 13, 0.12))`
+              : 'rgba(12, 14, 13, 0.12)',
+            opacity: isUnlocked ? 0.7 : 0.5,
           }}
         />
       )}
@@ -59,48 +60,48 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
       {/* Node indicator */}
       <button
         onClick={onClick}
-      className={cn(
-        'relative z-10 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300',
-        isUnlocked && 'ring-2 ring-offset-2 ring-offset-[#0B0F0D]',
-        isCurrent && !isUnlocked && 'ring-1 ring-offset-1 ring-offset-[#0B0F0D]',
-      )}
-      style={{
-        background: isUnlocked
-          ? ringColor
-          : isCurrent
-          ? 'var(--dgp-accent-green)'
-          : 'var(--dgp-glass-surface)',
-        border: `2px solid ${
-          isUnlocked
+        className={cn(
+          'relative z-10 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300',
+          isUnlocked && 'ring-2 ring-offset-2 ring-offset-[#EEF1F0]',
+          isCurrent && !isUnlocked && 'ring-1 ring-offset-1 ring-offset-[#EEF1F0]',
+        )}
+        style={{
+          background: isUnlocked
             ? ringColor
             : isCurrent
-            ? 'var(--dgp-accent-green)'
-            : 'var(--dgp-glass-stroke)'
-        }`,
-        boxShadow: isUnlocked
-          ? `0 0 20px ${ringColor}40`
-          : isCurrent
-          ? 'var(--dgp-shadow-glow-green)'
-          : 'none',
-        // @ts-expect-error CSS custom property for ring color
-        '--tw-ring-color': isUnlocked ? ringColor : isCurrent ? 'var(--dgp-accent-green)' : undefined,
-      }}
-    >
+            ? 'var(--quest-accent-green)'
+            : 'var(--quest-surface)',
+          border: `2px solid ${
+            isUnlocked
+              ? ringColor
+              : isCurrent
+              ? 'var(--quest-accent-green)'
+              : 'var(--quest-stroke)'
+          }`,
+          boxShadow: isUnlocked
+            ? `0 0 15px ${ringColor}35`
+            : isCurrent
+            ? '0 0 12px rgba(110, 146, 119, 0.2)'
+            : 'var(--quest-shadow-sm)',
+          // @ts-expect-error CSS custom property for ring color
+          '--tw-ring-color': isUnlocked ? ringColor : isCurrent ? 'var(--quest-accent-green)' : undefined,
+        }}
+      >
         {isUnlocked ? (
-          <Check className="w-5 h-5 text-black" />
+          <Check className="w-5 h-5 text-white" />
         ) : isCurrent ? (
-          <Trophy className="w-4 h-4" style={{ color: 'var(--dgp-text-primary)' }} />
+          <Trophy className="w-4 h-4 text-white" />
         ) : (
-          <Lock className="w-4 h-4" style={{ color: 'var(--dgp-text-muted)' }} />
+          <Lock className="w-4 h-4" style={{ color: 'var(--quest-text-tertiary)' }} />
         )}
 
-        {/* Pulse for current */}
+        {/* Pulse for current - reduced for light theme */}
         {isCurrent && !isUnlocked && (
           <div
-            className="absolute inset-0 rounded-full animate-ping"
+            className="absolute inset-0 rounded-full animate-ping journey-node-glow"
             style={{
-              background: 'var(--dgp-accent-green)',
-              opacity: 0.25,
+              background: 'var(--quest-accent-green)',
+              opacity: 0.15,
               animationDuration: '2s',
             }}
           />
@@ -111,22 +112,24 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
       <button
         onClick={onClick}
         className={cn(
-          'flex-1 dgp-glass p-4 rounded-xl text-left transition-all duration-200 mb-4',
-          'hover:border-white/15 active:scale-[0.98]',
-          !isUnlocked && !isCurrent && 'opacity-50',
+          'flex-1 p-4 rounded-xl text-left transition-all duration-200 mb-4',
+          'hover:shadow-md active:scale-[0.98]',
+          !isUnlocked && !isCurrent && 'opacity-60',
         )}
         style={{
+          background: 'var(--quest-surface)',
+          border: '1px solid var(--quest-stroke)',
           boxShadow: isUnlocked
-            ? `0 0 20px ${ringColor}20`
+            ? `0 0 15px ${ringColor}15`
             : isCurrent
-            ? '0 0 15px rgba(110, 146, 119, 0.15)'
-            : 'none',
+            ? '0 0 12px rgba(110, 146, 119, 0.1)'
+            : 'var(--quest-shadow-sm)',
         }}
       >
         <div className="flex items-center justify-between mb-2">
           <span
             className="text-sm font-semibold"
-            style={{ color: 'var(--dgp-text-primary)' }}
+            style={{ color: 'var(--quest-text-primary)' }}
           >
             {name}
           </span>
@@ -134,15 +137,20 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
             className="text-xs px-2 py-0.5 rounded-full"
             style={{
               background: isUnlocked
-                ? `${ringColor}33`
+                ? `${ringColor}20`
                 : isCurrent
-                ? 'rgba(110, 146, 119, 0.2)'
-                : 'var(--dgp-glass-surface)',
+                ? 'rgba(110, 146, 119, 0.15)'
+                : 'var(--quest-chip-bg)',
+              border: isUnlocked
+                ? `1px solid ${ringColor}40`
+                : isCurrent
+                ? '1px solid rgba(110, 146, 119, 0.25)'
+                : '1px solid var(--quest-chip-stroke)',
               color: isUnlocked
                 ? ringColor
                 : isCurrent
-                ? 'var(--dgp-accent-green)'
-                : 'var(--dgp-text-muted)',
+                ? 'var(--quest-accent-green)'
+                : 'var(--quest-text-tertiary)',
             }}
           >
             {isUnlocked ? 'Unlocked' : isCurrent ? 'In Progress' : 'Locked'}
@@ -151,7 +159,7 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
 
         <p
           className="text-xs mb-3"
-          style={{ color: 'var(--dgp-text-muted)' }}
+          style={{ color: 'var(--quest-text-tertiary)' }}
         >
           {tierName}
         </p>
@@ -162,16 +170,16 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
             <div className="flex items-baseline justify-between mb-2">
               <span
                 className="text-lg font-bold"
-                style={{ color: 'var(--dgp-text-primary)' }}
+                style={{ color: 'var(--quest-text-primary)' }}
               >
                 {totalPlayed}
-                <span className="text-sm font-normal" style={{ color: 'var(--dgp-text-muted)' }}>
+                <span className="text-sm font-normal" style={{ color: 'var(--quest-text-tertiary)' }}>
                   {' '}/ {threshold}
                 </span>
               </span>
               <span
                 className="text-xs"
-                style={{ color: 'var(--dgp-accent-green)' }}
+                style={{ color: 'var(--quest-accent-green)' }}
               >
                 {remaining} to go
               </span>
@@ -180,13 +188,13 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
             {/* Progress bar */}
             <div
               className="h-1.5 rounded-full overflow-hidden"
-              style={{ background: 'var(--dgp-glass-surface)' }}
+              style={{ background: 'var(--quest-track)' }}
             >
               <div
                 className="h-full rounded-full transition-all duration-500"
                 style={{
                   width: `${progressPercent}%`,
-                  background: 'linear-gradient(90deg, var(--dgp-accent-green), var(--dgp-accent-gold))',
+                  background: 'linear-gradient(90deg, var(--quest-accent-green), var(--quest-accent-gold))',
                 }}
               />
             </div>
@@ -197,7 +205,7 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
         {isUnlocked && (
           <div
             className="h-1.5 rounded-full overflow-hidden"
-            style={{ background: 'var(--dgp-glass-surface)' }}
+            style={{ background: 'var(--quest-track)' }}
           >
             <div
               className="h-full rounded-full"
@@ -232,7 +240,7 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
     <section>
       <h2
         className="text-sm font-semibold uppercase tracking-wider mb-4 px-1"
-        style={{ color: 'var(--dgp-text-secondary)' }}
+        style={{ color: 'var(--quest-text-secondary)' }}
       >
         Journey Map
       </h2>
@@ -240,8 +248,8 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
       <div className="relative pl-2">
         {/* Background path line */}
         <div
-          className="absolute left-7 top-0 bottom-0 w-0.5"
-          style={{ background: 'var(--dgp-divider)' }}
+          className="absolute left-7 top-0 bottom-0 w-0.5 journey-rail"
+          style={{ background: 'rgba(12, 14, 13, 0.12)' }}
         />
 
         <div className="space-y-0">
