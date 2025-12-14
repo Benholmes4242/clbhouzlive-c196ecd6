@@ -45,9 +45,20 @@ interface UnifiedCourseCardProps {
 function getRegionalBadgeSlug(course: CourseCardModel): 'usa' | 'gb-i' | 'europe' | null {
   if (course.ranks?.usa) return 'usa';
   if (course.ranks?.regional) {
-    // Determine region based on country
-    const gbCountries = ['England', 'Scotland', 'Wales', 'Ireland', 'Northern Ireland'];
-    if (course.country && gbCountries.includes(course.country)) {
+    // Determine region based on country - check both individual countries and region names
+    const gbCountries = [
+      'England', 'Scotland', 'Wales', 'Ireland', 'Northern Ireland',
+      'Britain & Ireland', 'Great Britain', 'United Kingdom', 'UK', 'GB'
+    ];
+    const country = course.country?.trim() || '';
+    if (gbCountries.some(c => country.toLowerCase() === c.toLowerCase())) {
+      return 'gb-i';
+    }
+    // Also check if locationText contains GB&I region indicators
+    const locationText = course.locationText?.toLowerCase() || '';
+    if (locationText.includes('britain') || locationText.includes('ireland') || 
+        locationText.includes('scotland') || locationText.includes('england') ||
+        locationText.includes('wales') || locationText.includes('northern ireland')) {
       return 'gb-i';
     }
     return 'europe';
