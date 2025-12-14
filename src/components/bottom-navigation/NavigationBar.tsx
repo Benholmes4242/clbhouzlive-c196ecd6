@@ -1,7 +1,7 @@
 import React from 'react';
 import { navigationTabs } from './navigationTabs';
 import { cn } from '@/lib/utils';
-
+import { CINEMA_DIM } from '@/lib/clubhouseCinemaDimStyles';
 interface NavigationBarProps {
   activeTab: string;
   onTabClick: (tab: { id: string; path: string | null; isAction?: boolean }) => void;
@@ -38,7 +38,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
                 isActive 
                   ? "text-primary" 
                   : isDimmed 
-                    ? "text-[rgba(255,255,255,0.55)]" 
+                    ? `text-[${CINEMA_DIM.iconColor}]` 
                     : "text-white/70"
               )}
             />
@@ -49,10 +49,10 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
                 "text-[11px] leading-none transition-colors duration-300",
                 isActive 
                   ? isDimmed 
-                    ? "text-[rgba(255,255,255,0.78)]" 
+                    ? `text-[${CINEMA_DIM.activeColor}]` 
                     : "text-white"
                   : isDimmed 
-                    ? "text-[rgba(255,255,255,0.42)]" 
+                    ? `text-[${CINEMA_DIM.labelColor}]` 
                     : "text-white/60"
               )}
             >
