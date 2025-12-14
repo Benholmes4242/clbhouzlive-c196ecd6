@@ -1,10 +1,5 @@
 /**
  * IdentityOverlay - Name, Club, HCP displayed over hero
- * 
- * V1 Polish Pass:
- * - Tighter name → identity row spacing
- * - Club + HCP inline as single identity row
- * - Calm motion: 220ms cubic-bezier(0.4, 0.0, 0.2, 1)
  */
 
 import React from 'react';
@@ -27,9 +22,6 @@ interface IdentityOverlayProps {
   className?: string;
 }
 
-// V1 Polish: Calm motion easing
-const POLISH_TRANSITION = 'all 220ms cubic-bezier(0.4, 0.0, 0.2, 1)';
-
 export const IdentityOverlay: React.FC<IdentityOverlayProps> = ({
   displayName,
   username,
@@ -42,8 +34,6 @@ export const IdentityOverlay: React.FC<IdentityOverlayProps> = ({
   onAvatarClick,
   className,
 }) => {
-  const hasClubOrHcp = clubName || (handicapIndex !== undefined && handicapIndex !== null);
-  
   return (
     <div
       className={cn(
@@ -52,7 +42,6 @@ export const IdentityOverlay: React.FC<IdentityOverlayProps> = ({
         'pb-6 pt-12',
         className
       )}
-      style={{ transition: POLISH_TRANSITION }}
     >
       {/* Avatar with Achievement Ring */}
       <AvatarXPRing
@@ -64,11 +53,8 @@ export const IdentityOverlay: React.FC<IdentityOverlayProps> = ({
         animateOnFirstView={true}
       />
 
-      {/* Name + Verified Badge - strongest hierarchy */}
-      <div 
-        className="flex items-center gap-2 mt-3"
-        style={{ transition: POLISH_TRANSITION }}
-      >
+      {/* Name + Verified Badge */}
+      <div className="flex items-center gap-2 mt-4">
         <h1
           className="text-[28px] font-semibold tracking-tight"
           style={{ color: 'var(--dgp-text-primary)' }}
@@ -83,41 +69,38 @@ export const IdentityOverlay: React.FC<IdentityOverlayProps> = ({
         )}
       </div>
 
-      {/* Club + HCP Inline Identity Row - secondary hierarchy, tighter spacing */}
-      {hasClubOrHcp && (
-        <div 
-          className="flex items-center gap-2 mt-1"
-          style={{ transition: POLISH_TRANSITION }}
-        >
-          {clubName && (
-            <span
-              className="text-sm font-medium"
-              style={{ color: 'var(--dgp-text-secondary)' }}
-            >
-              {clubName}
-            </span>
-          )}
-          
-          {handicapIndex !== undefined && handicapIndex !== null && (
-            <>
-              {clubName && (
-                <span
-                  className="text-sm font-medium"
-                  style={{ color: 'var(--dgp-text-muted)' }}
-                >
-                  ·
-                </span>
-              )}
+      {/* Club + HCP Row */}
+      <div className="flex items-center gap-3 mt-1.5">
+        {clubName && (
+          <span
+            className="text-sm font-medium"
+            style={{ color: 'var(--dgp-text-secondary)' }}
+          >
+            {clubName}
+          </span>
+        )}
+        
+        {handicapIndex !== undefined && handicapIndex !== null && (
+          <>
+            {clubName && (
               <span
-                className="text-sm font-medium"
-                style={{ color: 'var(--dgp-text-secondary)' }}
-              >
-                {handicapIndex.toFixed(1)} HCP
-              </span>
-            </>
-          )}
-        </div>
-      )}
+                className="w-1 h-1 rounded-full"
+                style={{ background: 'var(--dgp-text-muted)' }}
+              />
+            )}
+            <span
+              className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+              style={{
+                background: 'var(--dgp-glass-surface)',
+                color: 'var(--dgp-text-secondary)',
+                border: '1px solid var(--dgp-glass-stroke)',
+              }}
+            >
+              HCP {handicapIndex.toFixed(1)}
+            </span>
+          </>
+        )}
+      </div>
     </div>
   );
 };

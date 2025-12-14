@@ -135,75 +135,39 @@ const ActivityMediaGrid: React.FC<ActivityMediaGridProps> = ({
     );
   }
 
-  // V1 Polish: Rounded-edge squares for thumbnails (not circles, not sharp)
-  const THUMBNAIL_RADIUS = '12px';
-  const POLISH_TRANSITION = 'all 220ms cubic-bezier(0.4, 0.0, 0.2, 1)';
-
   return (
     <div className="px-0 pb-16">
-      <div 
-        className="grid grid-cols-2 gap-[2px]" 
-        style={{ 
-          gridAutoFlow: 'row dense',
-          // Apply rounded edges to grid items
-          '--thumbnail-radius': THUMBNAIL_RADIUS,
-        } as React.CSSProperties}
-      >
+      <div className="grid grid-cols-2 gap-[2px]" style={{ gridAutoFlow: 'row dense' }}>
         {layoutRows.map((row, index) => {
           if (row.type === 'hero') {
             return (
-              <div 
+              <HeroPostTile
                 key={`hero-${row.post.id}-${index}`}
-                className="col-span-2"
-                style={{ 
-                  borderRadius: THUMBNAIL_RADIUS,
-                  overflow: 'hidden',
-                  transition: POLISH_TRANSITION,
-                }}
-              >
-                <HeroPostTile
-                  item={row.post}
-                  onPress={onPostPress}
-                  registerVideo={registerVideo}
-                  isPlaying={playingIds.has(row.post.postId)}
-                />
-              </div>
+                item={row.post}
+                onPress={onPostPress}
+                registerVideo={registerVideo}
+                isPlaying={playingIds.has(row.post.postId)}
+              />
             );
           }
 
           return (
             <React.Fragment key={`pair-${index}`}>
-              <div 
-                style={{ 
-                  borderRadius: THUMBNAIL_RADIUS, 
-                  overflow: 'hidden',
-                  transition: POLISH_TRANSITION,
-                }}
-              >
+              <StandardPostTile 
+                item={row.left} 
+                onPress={onPostPress}
+                registerVideo={registerVideo}
+                isPlaying={playingIds.has(row.left.postId)}
+              />
+              {row.right ? (
                 <StandardPostTile 
-                  item={row.left} 
+                  item={row.right} 
                   onPress={onPostPress}
                   registerVideo={registerVideo}
-                  isPlaying={playingIds.has(row.left.postId)}
+                  isPlaying={playingIds.has(row.right.postId)}
                 />
-              </div>
-              {row.right ? (
-                <div 
-                  style={{ 
-                    borderRadius: THUMBNAIL_RADIUS, 
-                    overflow: 'hidden',
-                    transition: POLISH_TRANSITION,
-                  }}
-                >
-                  <StandardPostTile 
-                    item={row.right} 
-                    onPress={onPostPress}
-                    registerVideo={registerVideo}
-                    isPlaying={playingIds.has(row.right.postId)}
-                  />
-                </div>
               ) : (
-                <div className="aspect-[3/4]" style={{ borderRadius: THUMBNAIL_RADIUS }} />
+                <div className="aspect-[3/4]" /> // empty spacer if odd
               )}
             </React.Fragment>
           );
