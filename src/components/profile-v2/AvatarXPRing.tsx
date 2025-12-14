@@ -1,6 +1,7 @@
 /**
  * AvatarXPRing - Premium avatar with animated tier-based achievement ring
  * Ring color derived from user's Top 100 courses played count
+ * Uses global SDS squircle design: 34% border-radius, 1/1.05 aspect ratio
  */
 
 import React, { useState, useEffect } from 'react';
@@ -26,6 +27,10 @@ interface AvatarXPRingProps {
   animateOnFirstView?: boolean;
   className?: string;
 }
+
+// SDS squircle constants
+const SQUIRCLE_BORDER_RADIUS = '34%';
+const SQUIRCLE_ASPECT_RATIO = '1 / 1.05';
 
 const SIZES = {
   sm: { avatar: 48, ring: 56, ringWidth: 3 },
@@ -82,6 +87,10 @@ export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
   const accentBright = hasAchievement ? lightenHex(tokens.accent, 15) : '#D1D5DB';
   const ringBgDark = hasAchievement ? tokens.bgDark : '#D1D5DB';
 
+  // Calculate ring height with squircle aspect ratio (1.05x taller)
+  const ringHeight = dimensions.ring * 1.05;
+  const avatarHeight = dimensions.avatar * 1.05;
+
   return (
     <button
       onClick={onClick}
@@ -92,16 +101,17 @@ export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
       )}
       style={{
         width: dimensions.ring,
-        height: dimensions.ring,
+        height: ringHeight,
       }}
       aria-label={`${displayName}'s profile`}
     >
-      {/* Outer glow halo (only for achievement tiers) */}
+      {/* Outer glow halo (only for achievement tiers) - squircle shape */}
       {hasAchievement && (
         <div
-          className="absolute rounded-full pointer-events-none"
+          className="absolute pointer-events-none"
           style={{
             inset: '-14px',
+            borderRadius: SQUIRCLE_BORDER_RADIUS,
             background: `radial-gradient(circle, ${glowSoft} 0%, transparent 65%)`,
             filter: 'blur(10px)',
             opacity: hasAnimated ? 1 : 0,
@@ -110,11 +120,12 @@ export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
         />
       )}
 
-      {/* Achievement ring with gradient + glow only (no solid outline) */}
+      {/* Achievement ring with gradient + glow only - squircle shape */}
       <div
-        className="absolute rounded-full pointer-events-none"
+        className="absolute pointer-events-none"
         style={{
           inset: 0,
+          borderRadius: SQUIRCLE_BORDER_RADIUS,
           background: hasAchievement 
             ? `linear-gradient(180deg, ${accentBright} 0%, ${ringBgDark} 100%)`
             : ringBgDark,
@@ -126,12 +137,13 @@ export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
         }}
       />
 
-      {/* Avatar with hairline separator */}
+      {/* Avatar with hairline separator - squircle shape */}
       <div
-        className="absolute rounded-full overflow-hidden"
+        className="absolute overflow-hidden"
         style={{
           width: dimensions.avatar,
-          height: dimensions.avatar,
+          height: avatarHeight,
+          borderRadius: SQUIRCLE_BORDER_RADIUS,
           boxShadow: '0 0 0 0.5px rgba(0, 0, 0, 0.9)',
         }}
       >
