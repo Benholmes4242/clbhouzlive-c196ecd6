@@ -20,6 +20,8 @@ import {
   GolfDNACard,
   GolfDNASheet,
   MomentCard,
+  HandicapPreviewCard,
+  QuestPreviewCard,
   GolfDNAStats,
   MomentPost,
 } from '@/components/profile-v2';
@@ -137,6 +139,28 @@ const ProfilePageV2: React.FC = () => {
         <GolfDNACard
           stats={dnaStats}
           onExpand={() => setDnaSheetOpen(true)}
+        />
+
+        {/* Handicap Preview Card */}
+        <HandicapPreviewCard
+          handicapIndex={profile?.eg_handicap_index ?? undefined}
+          trendData={dnaStats.handicapTrend}
+          roundsThisYear={dnaStats.roundsThisYear}
+          bestRound={72}
+          onOpenCockpit={() => navigate('/profile/handicap')}
+        />
+
+        {/* Quest Preview Card */}
+        <QuestPreviewCard
+          totalPlayed={top100Overview?.total_rated ?? 0}
+          regions={[
+            { name: 'GB & Ireland', shortName: 'GB&I', played: 3 },
+            { name: 'Europe', shortName: 'EUR', played: 2 },
+            { name: 'USA', shortName: 'USA', played: 4 },
+            { name: 'World', shortName: 'WLD', played: 1 },
+          ]}
+          nextMilestone={top100Overview?.club_label ? undefined : '5 Club'}
+          onContinue={() => navigate('/profile/quest')}
         />
 
         {/* Moments Timeline */}
