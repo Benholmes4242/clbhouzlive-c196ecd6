@@ -14,6 +14,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trophy } from 'lucide-react';
 
+import '@/styles/quest-theme.css';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQuestCourses } from '@/hooks/useQuestCourses';
@@ -124,11 +125,11 @@ const ProfileQuestView: React.FC = () => {
 
   if (isLoading) {
     return (
-      <PageRoot className="dgp-page">
+      <PageRoot className="quest-theme-light min-h-screen" style={{ background: 'var(--quest-bg)' }}>
         <div className="flex items-center justify-center min-h-screen">
           <div
             className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin"
-            style={{ borderColor: 'var(--dgp-accent-gold)', borderTopColor: 'transparent' }}
+            style={{ borderColor: 'var(--quest-accent-gold)', borderTopColor: 'transparent' }}
           />
         </div>
       </PageRoot>
@@ -136,31 +137,43 @@ const ProfileQuestView: React.FC = () => {
   }
 
   return (
-    <PageRoot className="dgp-page">
+    <PageRoot className="quest-theme-light min-h-screen" style={{ background: 'var(--quest-bg)' }}>
       {/* Background texture for unlocked rewards */}
       {rewards.hasBackgroundTexture && (
         <div
-          className="fixed inset-0 pointer-events-none opacity-30"
+          className="fixed inset-0 pointer-events-none opacity-20"
           style={{
-            background: 'radial-gradient(ellipse at 50% 0%, rgba(110, 146, 119, 0.08) 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse at 50% 0%, rgba(110, 146, 119, 0.12) 0%, transparent 70%)',
           }}
         />
       )}
 
-      {/* Header */}
-      <div className="sticky top-0 z-50 safe-top" style={{ background: 'rgba(11, 15, 13, 0.9)', backdropFilter: 'blur(12px)' }}>
+      {/* Header - Light theme */}
+      <div 
+        className="sticky top-0 z-50 safe-top" 
+        style={{ 
+          background: 'var(--quest-surface-strong)', 
+          backdropFilter: 'blur(12px)',
+          borderBottom: '1px solid var(--quest-stroke)',
+          boxShadow: 'var(--quest-shadow-sm)',
+        }}
+      >
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate(-1)}
-              className="dgp-nav-button"
+              className="w-9 h-9 rounded-full flex items-center justify-center transition-colors hover:bg-black/5"
+              style={{ 
+                background: 'var(--quest-surface-strong)',
+                border: '1px solid var(--quest-stroke)',
+              }}
               aria-label="Go back"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-5 h-5" style={{ color: 'var(--quest-text-primary)' }} />
             </button>
             <h1
               className="text-lg font-semibold"
-              style={{ color: 'var(--dgp-text-primary)' }}
+              style={{ color: 'var(--quest-text-primary)' }}
             >
               The Quest
             </h1>
@@ -230,14 +243,14 @@ const ProfileQuestView: React.FC = () => {
         onClose={() => setSelectedRegion(null)}
       />
 
-      {/* Milestone Club Sheet */}
+      {/* Milestone Club Sheet - Light theme */}
       <Sheet open={!!selectedClub} onOpenChange={() => setSelectedClub(null)}>
         <SheetContent
           side="bottom"
           className="rounded-t-3xl border-t"
           style={{
-            background: 'var(--dgp-bg-surface)',
-            borderColor: 'var(--dgp-glass-stroke)',
+            background: 'var(--quest-surface-strong)',
+            borderColor: 'var(--quest-stroke)',
           }}
         >
           {selectedClub && (
@@ -247,46 +260,46 @@ const ProfileQuestView: React.FC = () => {
                   <div
                     className="w-16 h-16 rounded-2xl flex items-center justify-center"
                     style={{
-                      background: 'var(--dgp-glass-surface)',
-                      border: '1px solid var(--dgp-glass-stroke)',
-                      boxShadow: selectedClub.isUnlocked ? 'var(--dgp-shadow-glow-gold)' : 'none',
-                      opacity: selectedClub.isUnlocked ? 1 : 0.4,
+                      background: 'var(--quest-surface)',
+                      border: '1px solid var(--quest-stroke)',
+                      boxShadow: selectedClub.isUnlocked ? '0 0 20px rgba(210, 180, 97, 0.25)' : 'var(--quest-shadow-sm)',
+                      opacity: selectedClub.isUnlocked ? 1 : 0.6,
                     }}
                   >
                     <Trophy
                       className="w-6 h-6"
-                      style={{ color: 'var(--dgp-accent-gold)' }}
+                      style={{ color: 'var(--quest-accent-gold)' }}
                     />
                   </div>
                 </div>
-                <SheetTitle style={{ color: 'var(--dgp-text-primary)' }}>
+                <SheetTitle style={{ color: 'var(--quest-text-primary)' }}>
                   {selectedClub.name}
                 </SheetTitle>
               </SheetHeader>
               <div className="text-center space-y-4 pb-8">
-                <p style={{ color: 'var(--dgp-text-secondary)' }}>
+                <p style={{ color: 'var(--quest-text-secondary)' }}>
                   {selectedClub.description}
                 </p>
                 
                 {/* Progress */}
                 <div className="px-8">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm" style={{ color: 'var(--dgp-text-muted)' }}>
+                    <span className="text-sm" style={{ color: 'var(--quest-text-tertiary)' }}>
                       Progress
                     </span>
-                    <span className="text-sm font-medium" style={{ color: 'var(--dgp-text-primary)' }}>
+                    <span className="text-sm font-medium" style={{ color: 'var(--quest-text-primary)' }}>
                       {totalPlayed} / {selectedClub.threshold}
                     </span>
                   </div>
                   <div
                     className="h-2 rounded-full overflow-hidden"
-                    style={{ background: 'var(--dgp-glass-surface)' }}
+                    style={{ background: 'var(--quest-track)' }}
                   >
                     <div
                       className="h-full rounded-full transition-all"
                       style={{
                         width: `${Math.min((totalPlayed / selectedClub.threshold) * 100, 100)}%`,
-                        background: 'var(--dgp-accent-gold)',
+                        background: 'var(--quest-accent-gold)',
                       }}
                     />
                   </div>
@@ -296,11 +309,14 @@ const ProfileQuestView: React.FC = () => {
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm"
                   style={{
                     background: selectedClub.isUnlocked
-                      ? 'rgba(200, 176, 106, 0.2)'
-                      : 'var(--dgp-glass-surface)',
+                      ? 'rgba(210, 180, 97, 0.18)'
+                      : 'var(--quest-chip-bg)',
+                    border: selectedClub.isUnlocked
+                      ? '1px solid rgba(210, 180, 97, 0.35)'
+                      : '1px solid var(--quest-chip-stroke)',
                     color: selectedClub.isUnlocked
-                      ? 'var(--dgp-accent-gold)'
-                      : 'var(--dgp-text-muted)',
+                      ? 'var(--quest-accent-gold)'
+                      : 'var(--quest-text-secondary)',
                   }}
                 >
                   {selectedClub.isUnlocked ? '✓ Unlocked' : `${selectedClub.remaining} more to unlock`}

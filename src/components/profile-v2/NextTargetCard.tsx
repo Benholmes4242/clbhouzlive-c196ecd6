@@ -1,5 +1,6 @@
 /**
  * NextTargetCard - Smart guidance module for Quest
+ * Light theme version
  */
 
 import React from 'react';
@@ -54,34 +55,35 @@ export const NextTargetCard: React.FC<NextTargetCardProps> = ({
     return (
       <div
         className={cn(
-          'dgp-glass p-5 rounded-2xl',
+          'p-5 rounded-2xl',
           className
         )}
         style={{
-          boxShadow: '0 0 30px rgba(200, 176, 106, 0.2)',
-          border: '1px solid rgba(200, 176, 106, 0.3)',
+          background: 'var(--quest-surface)',
+          boxShadow: '0 0 20px rgba(210, 180, 97, 0.15)',
+          border: '1px solid rgba(210, 180, 97, 0.25)',
         }}
       >
         <div className="flex items-center gap-3 mb-3">
           <div
             className="w-10 h-10 rounded-xl flex items-center justify-center"
             style={{
-              background: 'rgba(200, 176, 106, 0.2)',
-              border: '1px solid var(--dgp-accent-gold)',
+              background: 'rgba(210, 180, 97, 0.15)',
+              border: '1px solid rgba(210, 180, 97, 0.3)',
             }}
           >
-            <Trophy className="w-5 h-5" style={{ color: 'var(--dgp-accent-gold)' }} />
+            <Trophy className="w-5 h-5" style={{ color: 'var(--quest-accent-gold)' }} />
           </div>
           <div>
             <p
               className="text-xs uppercase tracking-wider"
-              style={{ color: 'var(--dgp-accent-gold)' }}
+              style={{ color: 'var(--quest-accent-gold)' }}
             >
               Unlocked
             </p>
             <p
               className="text-lg font-bold"
-              style={{ color: 'var(--dgp-text-primary)' }}
+              style={{ color: 'var(--quest-text-primary)' }}
             >
               {recentlyUnlocked}
             </p>
@@ -92,8 +94,9 @@ export const NextTargetCard: React.FC<NextTargetCardProps> = ({
           onClick={onShare}
           className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl transition-colors"
           style={{
-            background: 'rgba(200, 176, 106, 0.15)',
-            color: 'var(--dgp-accent-gold)',
+            background: 'rgba(210, 180, 97, 0.12)',
+            border: '1px solid rgba(210, 180, 97, 0.2)',
+            color: 'var(--quest-accent-gold)',
           }}
         >
           <Share2 className="w-4 h-4" />
@@ -107,16 +110,21 @@ export const NextTargetCard: React.FC<NextTargetCardProps> = ({
   return (
     <div
       className={cn(
-        'dgp-glass p-5 rounded-2xl',
+        'p-5 rounded-2xl',
         className
       )}
+      style={{
+        background: 'var(--quest-surface)',
+        border: '1px solid var(--quest-stroke)',
+        boxShadow: 'var(--quest-shadow)',
+      }}
     >
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
-        <Target className="w-4 h-4" style={{ color: 'var(--dgp-accent-green)' }} />
+        <Target className="w-4 h-4" style={{ color: 'var(--quest-accent-green)' }} />
         <span
           className="text-xs font-semibold uppercase tracking-wider"
-          style={{ color: 'var(--dgp-text-secondary)' }}
+          style={{ color: 'var(--quest-text-secondary)' }}
         >
           Next Target
         </span>
@@ -128,13 +136,13 @@ export const NextTargetCard: React.FC<NextTargetCardProps> = ({
           <div className="flex items-baseline justify-between mb-2">
             <span
               className="text-lg font-bold"
-              style={{ color: 'var(--dgp-text-primary)' }}
+              style={{ color: 'var(--quest-text-primary)' }}
             >
               {nextMilestone.name}
             </span>
             <span
               className="text-sm"
-              style={{ color: 'var(--dgp-accent-green)' }}
+              style={{ color: 'var(--quest-accent-green)' }}
             >
               {remaining} to go
             </span>
@@ -143,20 +151,20 @@ export const NextTargetCard: React.FC<NextTargetCardProps> = ({
           {/* Progress bar */}
           <div
             className="h-2 rounded-full overflow-hidden"
-            style={{ background: 'var(--dgp-glass-surface)' }}
+            style={{ background: 'var(--quest-track)' }}
           >
             <div
               className="h-full rounded-full transition-all duration-500"
               style={{
                 width: `${Math.min(progressPercent, 100)}%`,
-                background: 'linear-gradient(90deg, var(--dgp-accent-green), var(--dgp-accent-gold))',
+                background: 'linear-gradient(90deg, var(--quest-accent-green), var(--quest-accent-gold))',
               }}
             />
           </div>
           
           <p
             className="text-xs mt-2"
-            style={{ color: 'var(--dgp-text-muted)' }}
+            style={{ color: 'var(--quest-text-tertiary)' }}
           >
             {totalPlayed} / {nextMilestone.threshold} courses
           </p>
@@ -164,7 +172,7 @@ export const NextTargetCard: React.FC<NextTargetCardProps> = ({
           {hintVisible && (
             <p
               className="text-xs mt-2 transition-opacity duration-500"
-              style={{ color: 'var(--dgp-text-muted)', fontStyle: 'italic' }}
+              style={{ color: 'var(--quest-text-tertiary)', fontStyle: 'italic' }}
             >
               This updates as you play more courses
             </p>
@@ -177,17 +185,20 @@ export const NextTargetCard: React.FC<NextTargetCardProps> = ({
         {suggestedRegion && (
           <div
             className="flex items-center justify-between py-2 px-3 rounded-lg"
-            style={{ background: 'var(--dgp-glass-surface)' }}
+            style={{ 
+              background: 'var(--quest-chip-bg)',
+              border: '1px solid var(--quest-chip-stroke)',
+            }}
           >
             <div className="flex items-center gap-2">
-              <Compass className="w-4 h-4" style={{ color: 'var(--dgp-accent-blue)' }} />
-              <span className="text-xs" style={{ color: 'var(--dgp-text-muted)' }}>
+              <Compass className="w-4 h-4" style={{ color: 'var(--quest-accent-green)' }} />
+              <span className="text-xs" style={{ color: 'var(--quest-text-tertiary)' }}>
                 Suggested region
               </span>
             </div>
             <span
               className="text-xs font-medium"
-              style={{ color: 'var(--dgp-text-primary)' }}
+              style={{ color: 'var(--quest-text-primary)' }}
             >
               {suggestedRegion}
             </span>
@@ -197,17 +208,20 @@ export const NextTargetCard: React.FC<NextTargetCardProps> = ({
         {suggestedFocus && (
           <div
             className="flex items-center justify-between py-2 px-3 rounded-lg"
-            style={{ background: 'var(--dgp-glass-surface)' }}
+            style={{ 
+              background: 'var(--quest-chip-bg)',
+              border: '1px solid var(--quest-chip-stroke)',
+            }}
           >
             <div className="flex items-center gap-2">
-              <Target className="w-4 h-4" style={{ color: 'var(--dgp-accent-gold)' }} />
-              <span className="text-xs" style={{ color: 'var(--dgp-text-muted)' }}>
+              <Target className="w-4 h-4" style={{ color: 'var(--quest-accent-gold)' }} />
+              <span className="text-xs" style={{ color: 'var(--quest-text-tertiary)' }}>
                 Focus on
               </span>
             </div>
             <span
               className="text-xs font-medium"
-              style={{ color: 'var(--dgp-text-primary)' }}
+              style={{ color: 'var(--quest-text-primary)' }}
             >
               {suggestedFocus}
             </span>

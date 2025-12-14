@@ -1,0 +1,46 @@
+/* Quest Light Theme (scoped) */
+.quest-theme-light {
+  /* Global background */
+  --quest-bg: #EEF1F0;
+
+  /* Surfaces */
+  --quest-surface: rgba(255, 255, 255, 0.72);
+  --quest-surface-strong: rgba(255, 255, 255, 0.88);
+  --quest-surface-muted: rgba(255, 255, 255, 0.55);
+
+  /* Strokes + dividers */
+  --quest-stroke: rgba(20, 24, 22, 0.10);
+  --quest-stroke-strong: rgba(20, 24, 22, 0.16);
+  --quest-divider: rgba(20, 24, 22, 0.08);
+
+  /* Text */
+  --quest-text-primary: rgba(12, 14, 13, 0.92);
+  --quest-text-secondary: rgba(12, 14, 13, 0.62);
+  --quest-text-tertiary: rgba(12, 14, 13, 0.42);
+
+  /* Chips/pills */
+  --quest-chip-bg: rgba(255, 255, 255, 0.70);
+  --quest-chip-active-bg: rgba(12, 14, 13, 0.06);
+  --quest-chip-stroke: rgba(12, 14, 13, 0.10);
+
+  /* Progress track */
+  --quest-track: rgba(12, 14, 13, 0.10);
+
+  /* Shadows (subtle elevation on light) */
+  --quest-shadow: 0 10px 30px rgba(0, 0, 0, 0.10);
+  --quest-shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+
+  /* Keep your brand accents */
+  --quest-accent-green: #6e9277;
+  --quest-accent-gold: #D2B461;
+}
+
+/* Quest Light - Journey rail styles */
+.quest-theme-light .journey-rail {
+  background: rgba(12, 14, 13, 0.12);
+}
+
+.quest-theme-light .journey-node-glow {
+  filter: blur(10px);
+  opacity: 0.35;
+}
