@@ -41,7 +41,7 @@ const ProfilePageV2: React.FC = () => {
       id: post.id,
       mediaUrl: post.post_media?.[0]?.media_url || post.image || '',
       mediaType: (post.post_media?.[0]?.media_type === 'video' ? 'video' : 'image') as 'image' | 'video',
-      posterUrl: post.post_media?.[0]?.poster_url,
+      posterUrl: undefined,
       courseName: post.post_tags?.find(t => t.entity_type === 'golf_club')?.name,
       courseId: post.post_tags?.find(t => t.entity_type === 'golf_club')?.entity_id,
       caption: post.content,
