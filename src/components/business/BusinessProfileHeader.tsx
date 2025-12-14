@@ -13,7 +13,7 @@ import { BusinessHighlightsReel } from './BusinessHighlightsReel';
 import { BusinessImageActionSheet } from './BusinessImageActionSheet';
 import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 import { BusinessFollowButton } from './BusinessFollowButton';
-import { VerifiedBadge } from './VerifiedBadge';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
 
 interface BusinessProfileHeaderProps {

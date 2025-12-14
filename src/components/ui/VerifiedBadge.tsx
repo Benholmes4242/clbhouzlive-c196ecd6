@@ -1,72 +1,55 @@
-import { BadgeCheck } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { businessVerificationCopy } from '@/lib/businessVerificationCopy';
 
 interface VerifiedBadgeProps {
-  /** Size of the badge */
-  size?: 'sm' | 'md' | 'lg';
-  /** Show tooltip on hover */
-  showTooltip?: boolean;
-  /** Custom class name */
+  /** Size of the badge: sm (14px), md (16px), lg (18px), xl (20px) */
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  /** Placement context for styling adjustments */
+  placement?: 'inline' | 'avatar-corner';
+  /** Additional class names */
   className?: string;
-  /** Whether this is a business badge (green) or personal (blue) */
-  variant?: 'business' | 'personal';
-  /** Verification status for tooltip copy */
-  status?: 'verified' | 'pending' | 'rejected';
 }
 
-const sizeClasses = {
-  sm: 'h-3.5 w-3.5',
-  md: 'h-4 w-4',
-  lg: 'h-5 w-5',
+const sizeConfig = {
+  sm: { disk: 'w-[14px] h-[14px]', icon: 'w-2 h-2' },
+  md: { disk: 'w-4 h-4', icon: 'w-2.5 h-2.5' },
+  lg: { disk: 'w-[18px] h-[18px]', icon: 'w-3 h-3' },
+  xl: { disk: 'w-5 h-5', icon: 'w-3.5 h-3.5' },
 };
 
-const variantClasses = {
-  business: 'text-emerald-500',
-  personal: 'text-blue-500',
-};
-
-const statusClasses = {
-  verified: 'text-emerald-500',
-  pending: 'text-amber-500',
-  rejected: 'text-muted-foreground',
-};
-
+/**
+ * Unified Verified Badge - Frosted glass disk with green tick
+ * Used across personal profiles, business profiles, notifications, and lists.
+ */
 export function VerifiedBadge({ 
   size = 'md', 
-  showTooltip = true, 
+  placement = 'inline',
   className,
-  variant = 'business',
-  status = 'verified',
 }: VerifiedBadgeProps) {
-  const colorClass = status === 'verified' 
-    ? variantClasses[variant] 
-    : statusClasses[status];
-
-  const badge = (
-    <BadgeCheck 
-      className={cn(sizeClasses[size], colorClass, className)} 
-      aria-label="Verified"
-    />
-  );
-
-  if (!showTooltip) {
-    return badge;
-  }
-
-  const tooltipCopy = businessVerificationCopy.badgeTooltips[status];
-
+  const config = sizeConfig[size];
+  
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <span className="inline-flex">{badge}</span>
-      </TooltipTrigger>
-      <TooltipContent side="top" className="text-xs max-w-[200px]">
-        <p className="font-medium">{tooltipCopy.title}</p>
-        <p className="text-muted-foreground">{tooltipCopy.body}</p>
-      </TooltipContent>
-    </Tooltip>
+    <span
+      className={cn(
+        // Frosted glass disk
+        'inline-flex items-center justify-center rounded-full',
+        'bg-white/72 backdrop-blur-[6px]',
+        'border border-white/40',
+        'shadow-[0_2px_10px_rgba(0,0,0,0.08)]',
+        // Avatar corner placement may need extra outline for busy backgrounds
+        placement === 'avatar-corner' && 'ring-2 ring-background',
+        config.disk,
+        className
+      )}
+      title="Verified"
+      aria-label="Verified"
+    >
+      {/* Green tick - crisp, no glass effect */}
+      <CheckCircle 
+        className={cn(config.icon, 'text-emerald-500')} 
+        strokeWidth={2.5}
+      />
+    </span>
   );
 }
 

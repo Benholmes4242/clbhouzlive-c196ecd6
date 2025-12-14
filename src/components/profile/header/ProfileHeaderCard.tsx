@@ -1,6 +1,7 @@
 import React from 'react';
-import { Globe, Pencil, Building2, MapPin, CheckCircle2, CheckCircle } from 'lucide-react';
+import { Globe, Pencil, Building2, MapPin, CheckCircle2 } from 'lucide-react';
 import { BUSINESS_CATEGORIES, BusinessCategory } from '@/types/profile';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 interface ProfileHeaderCardProps {
   displayName: string;
@@ -70,14 +71,9 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
         <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-foreground text-center">
           {effectiveDisplayName}
         </h1>
-        {/* Verified golfer badge - white circular background with green tick */}
+        {/* Verified golfer badge - frosted glass disk with green tick */}
         {isPersonal && isVerifiedGolfer && (
-          <span 
-            className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white border border-emerald-500/30 shadow-sm"
-            title="Verified golfer"
-          >
-            <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-          </span>
+          <VerifiedBadge size="lg" placement="inline" />
         )}
       </div>
 
@@ -93,7 +89,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
             </span>
             {isVerifiedBusiness && (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-500">
-                <CheckCircle2 className="w-3 h-3" />
+                <VerifiedBadge size="sm" placement="inline" className="mr-0.5" />
                 Verified
               </span>
             )}
