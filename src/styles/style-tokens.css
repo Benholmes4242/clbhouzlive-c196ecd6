@@ -12,14 +12,12 @@
   --footer-bg: var(--header-bg);
   
   /* Clubhouse cinematic dim tokens */
+  --clubhouse-chrome-bg: rgba(15, 15, 15, 0.10);
   --clubhouse-chrome-border: rgba(255, 255, 255, 0.06);
   --clubhouse-chrome-icon: rgba(255, 255, 255, 0.55);
   --clubhouse-chrome-label: rgba(255, 255, 255, 0.42);
   --clubhouse-chrome-icon-active: rgba(255, 255, 255, 0.78);
-  
-  /* Option B gradients */
-  --clubhouse-header-dim-gradient: linear-gradient(to bottom, rgba(15,15,15,0.16), rgba(15,15,15,0.06));
-  --clubhouse-footer-dim-gradient: linear-gradient(to top, rgba(15,15,15,0.16), rgba(15,15,15,0.06));
+  --clubhouse-cinema-ease: cubic-bezier(0.22, 1, 0.36, 1);
   
   /* Glass surfaces */
   --glass-bg: rgba(255, 255, 255, 0.08);
@@ -137,49 +135,4 @@
 
 .safe-right {
   padding-right: calc(var(--page-gutter) + var(--safe-right));
-}
-
-/* Clubhouse cinema dim transition - slow and natural (800ms) */
-.clubhouse-cinema-transition {
-  transition: background 800ms cubic-bezier(0.22, 1, 0.36, 1),
-              background-color 800ms cubic-bezier(0.22, 1, 0.36, 1),
-              color 800ms cubic-bezier(0.22, 1, 0.36, 1),
-              border-color 800ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* Cinema dim header - Option B ultra-light gradient (top to bottom) */
-.clubhouse.cinema-dim .clubhouse-header {
-  background: var(--clubhouse-header-dim-gradient) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow: none !important;
-  border-bottom: 1px solid var(--clubhouse-chrome-border) !important;
-}
-
-/* Cinema dim footer - Option B ultra-light gradient (bottom to top, frames content inward) */
-.clubhouse.cinema-dim .clubhouse-footer {
-  background: var(--clubhouse-footer-dim-gradient) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow: none !important;
-  border-top: 1px solid var(--clubhouse-chrome-border) !important;
-}
-
-/* Cinema dim icon/label contrast */
-.clubhouse.cinema-dim .clubhouse-header .header-icon,
-.clubhouse.cinema-dim .clubhouse-header .header-text {
-  color: var(--clubhouse-chrome-icon) !important;
-}
-
-.clubhouse.cinema-dim .clubhouse-footer .nav-icon {
-  color: var(--clubhouse-chrome-icon) !important;
-}
-
-.clubhouse.cinema-dim .clubhouse-footer .nav-label {
-  color: var(--clubhouse-chrome-label) !important;
-}
-
-.clubhouse.cinema-dim .clubhouse-footer .nav-active .nav-icon,
-.clubhouse.cinema-dim .clubhouse-footer .nav-active .nav-label {
-  color: var(--clubhouse-chrome-icon-active) !important;
 }

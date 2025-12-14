@@ -209,13 +209,19 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 setNavRef(el);
               }}
               className={cn(
-                "chrome-bottom-nav clubhouse-footer clubhouse-cinema-transition border-t",
-                "border-white/10 backdrop-blur-xl"
+                "chrome-bottom-nav clubhouse-footer border-t",
+                isDimmed 
+                  ? "border-[var(--clubhouse-chrome-border)]" 
+                  : "border-white/10 backdrop-blur-xl"
               )}
               data-chrome="bottom-nav"
               style={{
-                background: 'var(--header-bg)',
+                background: isDimmed 
+                  ? 'var(--clubhouse-chrome-bg)' 
+                  : 'var(--header-bg)',
+                backdropFilter: isDimmed ? 'none' : undefined,
                 paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+                transition: 'background-color 800ms var(--clubhouse-cinema-ease), color 800ms var(--clubhouse-cinema-ease), border-color 800ms var(--clubhouse-cinema-ease)',
               }}
             >
               <NavigationBar

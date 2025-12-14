@@ -56,18 +56,24 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
       <header
         data-chrome="header"
         className={cn(
-          "compact-header clubhouse-header clubhouse-cinema-transition",
+          "compact-header clubhouse-header",
           isClubhouseRoute && "chrome-header",
           "fixed top-0 left-0 right-0 z-header",
           "h-14",
           className
         )}
         style={{
-          background: 'rgba(10, 10, 10, 0.95)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
+          background: isDimmed 
+            ? 'var(--clubhouse-chrome-bg)' 
+            : 'rgba(10, 10, 10, 0.95)',
+          backdropFilter: isDimmed ? 'none' : 'blur(20px)',
+          WebkitBackdropFilter: isDimmed ? 'none' : 'blur(20px)',
           paddingTop: 'env(safe-area-inset-top)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+          borderBottom: isDimmed 
+            ? '1px solid var(--clubhouse-chrome-border)' 
+            : '1px solid rgba(255, 255, 255, 0.06)',
+          boxShadow: isDimmed ? 'none' : undefined,
+          transition: 'background-color 800ms var(--clubhouse-cinema-ease), color 800ms var(--clubhouse-cinema-ease), border-color 800ms var(--clubhouse-cinema-ease)',
         }}
       >
         <div className="mx-auto flex h-full items-center justify-between px-3 sm:px-4 max-w-5xl">
