@@ -1,6 +1,12 @@
 /**
  * Dark Golf Passport - Profile Theme Tokens
  * Premium cinematic dark theme for the new profile experience
+ * 
+ * V1 Polish Pass:
+ * - Calm motion: 220ms cubic-bezier(0.4, 0.0, 0.2, 1)
+ * - One hero accent (XP/achievement), one functional accent (CTAs)
+ * - Reduced orange saturation
+ * - All animations ≤400ms on first load
  */
 
 :root {
@@ -28,14 +34,15 @@
   --dgp-divider: rgba(255, 255, 255, 0.08);
   --dgp-border-subtle: rgba(255, 255, 255, 0.06);
   
-  /* Accent Colors */
-  --dgp-accent-green: #6e9277;      /* Grey-green signature */
+  /* Accent Colors - V1 Polish: reduced orange saturation */
+  --dgp-accent-green: #6e9277;      /* Grey-green signature (hero accent) */
   --dgp-accent-gold: #C8B06A;       /* Trophy/Top 100 gold */
   --dgp-accent-blue: #4A9EE3;       /* Info accent */
+  --dgp-accent-cta: #7A9A82;        /* Functional CTA accent (muted green) */
   --dgp-danger: #D26A6A;            /* Error/danger */
   
-  /* XP Ring Tiers */
-  --dgp-ring-bronze: #CD7F32;
+  /* XP Ring Tiers - softer, more ambient */
+  --dgp-ring-bronze: #B8956E;
   --dgp-ring-silver: #B8C4D0;
   --dgp-ring-gold: #C8B06A;
   --dgp-ring-blue: #4A9EE3;
@@ -45,14 +52,17 @@
   --dgp-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
   --dgp-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
   --dgp-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-  --dgp-shadow-glow-green: 0 0 20px rgba(110, 146, 119, 0.3);
-  --dgp-shadow-glow-gold: 0 0 20px rgba(200, 176, 106, 0.3);
+  --dgp-shadow-glow-green: 0 0 20px rgba(110, 146, 119, 0.25);
+  --dgp-shadow-glow-gold: 0 0 20px rgba(200, 176, 106, 0.25);
   
   /* Spacing */
   --dgp-radius-sm: 12px;
   --dgp-radius-md: 16px;
   --dgp-radius-lg: 20px;
   --dgp-radius-xl: 24px;
+  
+  /* V1 Polish: Calm motion */
+  --dgp-transition-calm: all 220ms cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 /* ========================================
@@ -66,6 +76,7 @@
   border: 1px solid var(--dgp-glass-stroke);
   border-radius: var(--dgp-radius-lg);
   box-shadow: var(--dgp-shadow-md);
+  transition: var(--dgp-transition-calm);
 }
 
 .dgp-glass:hover {
@@ -90,7 +101,7 @@
 }
 
 /* ========================================
-   XP RING ANIMATIONS
+   XP RING ANIMATIONS - Calm, ambient
    ======================================== */
 
 @keyframes dgp-ring-pulse {
@@ -98,37 +109,28 @@
     box-shadow: 0 0 0 0 var(--ring-color);
   }
   50% {
-    box-shadow: 0 0 12px 3px var(--ring-color);
+    box-shadow: 0 0 10px 2px var(--ring-color);
   }
 }
 
 @keyframes dgp-ring-shimmer {
   0% {
-    opacity: 0.7;
+    opacity: 0.8;
   }
   50% {
     opacity: 1;
   }
   100% {
-    opacity: 0.7;
-  }
-}
-
-@keyframes dgp-ring-rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
+    opacity: 0.8;
   }
 }
 
 .dgp-ring-animated {
-  animation: dgp-ring-shimmer 6s ease-in-out infinite;
+  animation: dgp-ring-shimmer 8s ease-in-out infinite;
 }
 
 .dgp-ring-glow {
-  animation: dgp-ring-pulse 4s ease-in-out infinite;
+  animation: dgp-ring-pulse 6s ease-in-out infinite;
 }
 
 /* ========================================
@@ -163,6 +165,7 @@
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--dgp-glass-stroke);
   border-radius: var(--dgp-radius-xl);
+  transition: var(--dgp-transition-calm);
 }
 
 .dgp-dna-stat {
@@ -195,7 +198,7 @@
   border: 1px solid var(--dgp-border-subtle);
   border-radius: var(--dgp-radius-xl);
   overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: var(--dgp-transition-calm);
 }
 
 .dgp-moment-card:hover {
@@ -219,6 +222,7 @@
   gap: 8px;
   padding: 12px;
   min-width: 72px;
+  transition: var(--dgp-transition-calm);
 }
 
 .dgp-trophy-icon {
@@ -230,11 +234,13 @@
   border-radius: 12px;
   background: var(--dgp-glass-surface);
   border: 1px solid var(--dgp-glass-stroke);
+  transition: var(--dgp-transition-calm);
 }
 
+/* V1 Polish: Locked achievements - 25% opacity + frosted blur */
 .dgp-trophy-locked {
-  opacity: 0.35;
-  filter: grayscale(100%);
+  opacity: 0.25;
+  filter: grayscale(100%) blur(1px);
 }
 
 .dgp-trophy-rare {
@@ -266,16 +272,16 @@
   border: 1px solid var(--dgp-glass-stroke);
   border-radius: 50%;
   color: var(--dgp-text-primary);
-  transition: all 0.2s ease;
+  transition: var(--dgp-transition-calm);
 }
 
 .dgp-nav-button:hover {
   background: var(--dgp-glass-hover);
-  transform: scale(1.05);
+  transform: scale(1.03);
 }
 
 .dgp-nav-button:active {
-  transform: scale(0.95);
+  transform: scale(0.97);
 }
 
 /* ========================================
@@ -294,7 +300,7 @@
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--dgp-divider);
   transform: translateY(-100%);
-  transition: transform 0.3s ease;
+  transition: transform 220ms cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 .dgp-sticky-header.visible {
@@ -327,6 +333,11 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  transition: var(--dgp-transition-calm);
+}
+
+.dgp-section-action:hover {
+  opacity: 0.8;
 }
 
 /* ========================================
@@ -354,4 +365,56 @@
   background: var(--dgp-bg-primary);
   min-height: 100vh;
   color: var(--dgp-text-primary);
+}
+
+/* ========================================
+   V1 POLISH: PLINTH CONTAINERS
+   Soft, reduced radius, no heavy borders
+   ======================================== */
+
+.dgp-plinth {
+  background: var(--dgp-glass-surface);
+  border: 1px solid var(--dgp-border-subtle);
+  border-radius: var(--dgp-radius-sm);
+  transition: var(--dgp-transition-calm);
+}
+
+.dgp-plinth-elevated {
+  background: var(--dgp-bg-elevated);
+  border: 1px solid var(--dgp-border-subtle);
+  border-radius: var(--dgp-radius-sm);
+  box-shadow: var(--dgp-shadow-sm);
+  transition: var(--dgp-transition-calm);
+}
+
+/* ========================================
+   V1 POLISH: TAP TARGETS ≥44px
+   ======================================== */
+
+.dgp-tap-target {
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ========================================
+   V1 POLISH: MEDIA THUMBNAILS
+   Rounded-edge squares (not circles, not sharp)
+   ======================================== */
+
+.dgp-thumbnail {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: var(--dgp-transition-calm);
+}
+
+.dgp-thumbnail:hover {
+  transform: scale(1.02);
+  box-shadow: var(--dgp-shadow-md);
+}
+
+.dgp-thumbnail:active {
+  transform: scale(0.98);
 }

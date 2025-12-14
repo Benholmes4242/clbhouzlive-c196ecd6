@@ -31,6 +31,66 @@ import AchievementsPane from '@/components/profile/AchievementsPane';
 import HandicapSection from '@/components/profile/HandicapSection';
 import ProfileAchievementsRail from '@/components/profile/ProfileAchievementsRail';
 
+// V1 Polish: Calm motion easing
+const POLISH_TRANSITION = 'all 220ms cubic-bezier(0.4, 0.0, 0.2, 1)';
+
+// Stats block with tap animation (lift + soft glow)
+interface StatBlockProps {
+  value: number;
+  label: string;
+  onClick?: () => void;
+}
+
+const StatBlock: React.FC<StatBlockProps> = ({ value, label, onClick }) => {
+  const [isTapped, setIsTapped] = React.useState(false);
+  
+  const handleTap = () => {
+    if (!onClick) return;
+    setIsTapped(true);
+    setTimeout(() => setIsTapped(false), 220);
+    onClick();
+  };
+  
+  const content = (
+    <div 
+      className="flex flex-col items-center py-2 px-3 rounded-sq-sm"
+      style={{
+        transition: POLISH_TRANSITION,
+        transform: isTapped ? 'translateY(-2px)' : 'translateY(0)',
+        boxShadow: isTapped ? '0 6px 18px rgba(0,0,0,0.2)' : 'none',
+      }}
+    >
+      <span 
+        className="text-lg font-semibold tabular-nums" 
+        style={{ color: 'var(--dgp-text-primary)' }}
+      >
+        {value}
+      </span>
+      <span 
+        className="mt-0.5 text-[11px] uppercase tracking-[0.06em]" 
+        style={{ color: 'var(--dgp-text-muted)' }}
+      >
+        {label}
+      </span>
+    </div>
+  );
+  
+  if (onClick) {
+    return (
+      <button 
+        type="button" 
+        onClick={handleTap}
+        className="focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-sq-sm"
+        style={{ transition: POLISH_TRANSITION }}
+      >
+        {content}
+      </button>
+    );
+  }
+  
+  return content;
+};
+
 const ProfilePageV2: React.FC = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useSupabaseSession();
@@ -206,89 +266,83 @@ const ProfilePageV2: React.FC = () => {
 
       {/* Content below hero - dark styled */}
       <div className="relative z-10 -mt-4">
-        {/* Stats Row - dark styled */}
-        <section className="mt-2 flex items-center justify-center gap-8 px-4 py-4">
-          <div className="flex flex-col items-center">
-            <span className="text-base font-semibold tabular-nums" style={{ color: 'var(--dgp-text-primary)' }}>
-              {postsCount}
-            </span>
-            <span className="mt-1 text-[11px] uppercase tracking-[0.06em]" style={{ color: 'var(--dgp-text-muted)' }}>
-              Posts
-            </span>
-          </div>
+        {/* Stats Row - +30-40% vertical padding, equal spacing, tap animation */}
+        <section className="mt-4 flex items-center justify-center gap-10 px-4 py-6">
+          <StatBlock value={postsCount} label="Posts" />
           
           {isPersonal && (
-            <button 
+            <StatBlock 
+              value={friendsCount} 
+              label="Friends" 
               onClick={() => navigate(`/profile/${username}/friends`)}
-              className="flex flex-col items-center hover:opacity-80 transition-opacity"
-            >
-              <span className="text-base font-semibold tabular-nums" style={{ color: 'var(--dgp-text-primary)' }}>
-                {friendsCount}
-              </span>
-              <span className="mt-1 text-[11px] uppercase tracking-[0.06em]" style={{ color: 'var(--dgp-text-muted)' }}>
-                Friends
-              </span>
-            </button>
+            />
           )}
           
-          <button 
+          <StatBlock 
+            value={followingCount} 
+            label="Following" 
             onClick={() => navigate(`/profile/${username}/following`)}
-            className="flex flex-col items-center hover:opacity-80 transition-opacity"
-          >
-            <span className="text-base font-semibold tabular-nums" style={{ color: 'var(--dgp-text-primary)' }}>
-              {followingCount}
-            </span>
-            <span className="mt-1 text-[11px] uppercase tracking-[0.06em]" style={{ color: 'var(--dgp-text-muted)' }}>
-              Following
-            </span>
-          </button>
+          />
           
-          <button 
+          <StatBlock 
+            value={followersCount} 
+            label="Followers" 
             onClick={() => navigate(`/profile/${username}/followers`)}
-            className="flex flex-col items-center hover:opacity-80 transition-opacity"
-          >
-            <span className="text-base font-semibold tabular-nums" style={{ color: 'var(--dgp-text-primary)' }}>
-              {followersCount}
-            </span>
-            <span className="mt-1 text-[11px] uppercase tracking-[0.06em]" style={{ color: 'var(--dgp-text-muted)' }}>
-              Followers
-            </span>
-          </button>
+          />
         </section>
 
-        {/* Achievements Rail - dark styled */}
+        {/* Achievements Rail - overlaps slightly into hero area */}
         {isPersonal && profile?.id && username && (
           <ProfileAchievementsRail
             userId={profile.id}
             username={username}
-            className="mt-2"
+            className="-mt-2"
           />
         )}
 
-        {/* Tabs - dark styled */}
-        <section className="mt-6 px-4">
+        {/* Tabs - taller for touch comfort, glass highlight + underline glow */}
+        <section className="mt-8 px-4">
           <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
             <TabsList 
-              className="grid w-full rounded-sq-md border px-2 py-[3px]"
+              className="grid w-full rounded-sq-md border px-2 py-2"
               style={{ 
                 gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`,
                 background: 'var(--dgp-glass-surface)',
                 borderColor: 'var(--dgp-glass-stroke)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                minHeight: '48px',
               }}
             >
-              {tabs.map((tab) => (
-                <TabsTrigger 
-                  key={tab.id}
-                  value={tab.id}
-                  className="rounded-sq-pill text-sm px-3 py-[6px] font-medium transition-all duration-150"
-                  style={{
-                    color: activeSection === tab.id ? 'var(--dgp-text-primary)' : 'var(--dgp-text-muted)',
-                    background: activeSection === tab.id ? 'var(--dgp-glass-hover)' : 'transparent',
-                  }}
-                >
-                  {tab.label}
-                </TabsTrigger>
-              ))}
+              {tabs.map((tab) => {
+                const isActive = activeSection === tab.id;
+                return (
+                  <TabsTrigger 
+                    key={tab.id}
+                    value={tab.id}
+                    className="relative rounded-sq-pill text-sm px-3 py-2 font-medium"
+                    style={{
+                      color: isActive ? 'var(--dgp-text-primary)' : 'var(--dgp-text-muted)',
+                      background: isActive ? 'var(--dgp-glass-hover)' : 'transparent',
+                      boxShadow: isActive ? '0 0 12px rgba(110, 146, 119, 0.25)' : 'none',
+                      transition: 'all 220ms cubic-bezier(0.4, 0.0, 0.2, 1)',
+                    }}
+                  >
+                    {tab.label}
+                    {/* Underline glow for active tab */}
+                    {isActive && (
+                      <span 
+                        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-0.5 rounded-full"
+                        style={{
+                          background: 'var(--dgp-accent-green)',
+                          opacity: 0.6,
+                          boxShadow: '0 0 8px var(--dgp-accent-green)',
+                        }}
+                      />
+                    )}
+                  </TabsTrigger>
+                );
+              })}
             </TabsList>
           </Tabs>
         </section>
