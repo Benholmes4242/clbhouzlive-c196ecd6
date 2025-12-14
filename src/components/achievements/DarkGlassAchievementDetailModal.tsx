@@ -62,7 +62,7 @@ const StatusPill: React.FC<{ status: DarkAchievementStatus }> = ({ status }) => 
     },
     in_progress: { 
       icon: null, 
-      label: 'In Progress', 
+      label: 'In progress', 
       bg: 'bg-amber-500/20', 
       text: 'text-amber-400/80' 
     },
@@ -74,7 +74,7 @@ const StatusPill: React.FC<{ status: DarkAchievementStatus }> = ({ status }) => 
     },
     complete: { 
       icon: Check, 
-      label: 'Complete', 
+      label: 'Completed', 
       bg: 'bg-emerald-500/20', 
       text: 'text-emerald-400' 
     },
@@ -91,6 +91,73 @@ const StatusPill: React.FC<{ status: DarkAchievementStatus }> = ({ status }) => 
       <span>{label}</span>
     </div>
   );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+// MICROCOPY HELPERS
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+
+const getMilestoneCopy = (status: DarkAchievementStatus, progressCurrent: number, progressTarget: number, title: string) => {
+  const remaining = Math.max(0, progressTarget - progressCurrent);
+  
+  if (status === 'locked' && progressCurrent === 0) {
+    return {
+      description: 'Unlock this club by playing Top 100 courses.',
+      helperText: 'Start your journey to this milestone.',
+      primaryCta: 'Explore Top 100 courses',
+      secondaryCta: null,
+    };
+  }
+  
+  if (status === 'in_progress' || (status === 'locked' && progressCurrent > 0)) {
+    return {
+      description: `This club is unlocked by reaching ${progressTarget} Top 100 courses.`,
+      helperText: `${remaining} more to unlock this club.`,
+      primaryCta: 'View unplayed courses',
+      secondaryCta: 'View my progress',
+    };
+  }
+  
+  // Unlocked
+  return {
+    description: "You've unlocked this milestone club.",
+    helperText: 'This club is now part of your profile.',
+    rewardText: 'Club badge added to your profile',
+    primaryCta: 'Share achievement',
+    secondaryCta: 'View next milestone',
+  };
+};
+
+const getListCopy = (status: DarkAchievementStatus, progressCurrent: number, progressTarget: number) => {
+  const remaining = Math.max(0, progressTarget - progressCurrent);
+  
+  if (status === 'complete') {
+    return {
+      description: "You've completed the Top 100 courses for this region.",
+      helperText: 'Completion added to your achievements.',
+      rewardText: 'Region completion badge',
+      primaryCta: 'Share achievement',
+      secondaryCta: 'View journey replay',
+    };
+  }
+  
+  // Early progress (under ~30%)
+  if (progressCurrent < progressTarget * 0.3) {
+    return {
+      description: 'Track your progress through the Top 100 courses in this region.',
+      helperText: `${remaining} courses remaining.`,
+      primaryCta: 'Open Top 100 list',
+      secondaryCta: 'View played courses',
+    };
+  }
+  
+  // Mid progress
+  return {
+    description: "You're building progress across this region's Top 100 courses.",
+    helperText: 'Keep going to complete this list.',
+    primaryCta: 'View unplayed courses',
+    secondaryCta: 'See journey map',
+  };
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
@@ -131,6 +198,11 @@ export const DarkGlassAchievementDetailModal: React.FC<DarkGlassAchievementDetai
     ? { light: theme.bgLight, dark: theme.bgDark }
     : { light: '#22c55e', dark: '#16a34a' };
   
+  // Get microcopy based on type and status
+  const copy = type === 'milestone' 
+    ? getMilestoneCopy(status, progressCurrent, progressTarget, title)
+    : getListCopy(status, progressCurrent, progressTarget);
+  
   // CTAs
   const handlePrimaryCta = () => {
     onClose();
@@ -143,7 +215,9 @@ export const DarkGlassAchievementDetailModal: React.FC<DarkGlassAchievementDetai
   
   const handleSecondaryCta = () => {
     onClose();
-    if (type === 'list' && listSlug) {
+    if (type === 'milestone') {
+      navigate('/top100?tab=my-progress');
+    } else if (type === 'list' && listSlug) {
       navigate(`/top100/${listSlug}?filter=played`);
     }
   };
@@ -264,6 +338,13 @@ export const DarkGlassAchievementDetailModal: React.FC<DarkGlassAchievementDetai
             <StatusPill status={status} />
           </div>
           
+          {/* Description */}
+          <div className="px-5 py-4 border-t border-white/5">
+            <p className="text-sm text-white/60 leading-relaxed">
+              {copy.description}
+            </p>
+          </div>
+          
           {/* Progress Block */}
           <div className="px-5 py-4 border-t border-white/5">
             {/* Progress numbers */}
@@ -279,12 +360,10 @@ export const DarkGlassAchievementDetailModal: React.FC<DarkGlassAchievementDetai
               </span>
             </div>
             
-            {/* Remaining text */}
-            {remaining > 0 && (
-              <p className="text-center text-sm text-white/50 mb-4">
-                {remaining} more to {status === 'locked' ? 'unlock' : 'complete'}
-              </p>
-            )}
+            {/* Helper text */}
+            <p className="text-center text-sm text-white/50 mb-4">
+              {copy.helperText}
+            </p>
             
             {/* Progress bar */}
             <div className="h-2 rounded-full bg-white/10 overflow-hidden">
@@ -303,58 +382,24 @@ export const DarkGlassAchievementDetailModal: React.FC<DarkGlassAchievementDetai
               <span>
                 {type === 'milestone' ? 'Milestone Club' : 'Top 100 List'}
               </span>
-              <span>
-                {/* Rarity placeholder for future */}
-              </span>
             </div>
           </div>
           
-          {/* Description */}
-          {description && (
+          {/* Rewards Section - only show for unlocked/complete */}
+          {(status === 'unlocked' || status === 'complete') && 'rewardText' in copy && (
             <div className="px-5 py-4 border-t border-white/5">
-              <p className="text-sm text-white/60 leading-relaxed">
-                {description}
-              </p>
-            </div>
-          )}
-          
-          {/* Rewards Section */}
-          <div className="px-5 py-4 border-t border-white/5">
-            <h3 className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/40 mb-3">
-              What you get
-            </h3>
-            
-            <div className="space-y-2">
+              <h3 className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/40 mb-3">
+                Reward
+              </h3>
+              
               <div className="flex items-center gap-3 text-sm text-white/70">
                 <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
                   <Trophy className="w-3.5 h-3.5 text-white/60" />
                 </div>
-                <span>
-                  {type === 'milestone' 
-                    ? 'Club badge on profile' 
-                    : 'Region completion badge'}
-                </span>
+                <span>{(copy as any).rewardText}</span>
               </div>
-              
-              {type === 'milestone' && (
-                <div className="flex items-center gap-3 text-sm text-white/70">
-                  <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
-                    <div className="w-3 h-3 rounded-full border-2 border-white/50" />
-                  </div>
-                  <span>Ring tier progress</span>
-                </div>
-              )}
-              
-              {type === 'list' && (
-                <div className="flex items-center gap-3 text-sm text-white/70">
-                  <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
-                    <MapPin className="w-3.5 h-3.5 text-white/60" />
-                  </div>
-                  <span>Adds to your Journey Map</span>
-                </div>
-              )}
             </div>
-          </div>
+          )}
           
           {/* CTAs */}
           <div className="px-5 pt-4 pb-2 space-y-3">
@@ -373,18 +418,18 @@ export const DarkGlassAchievementDetailModal: React.FC<DarkGlassAchievementDetai
               {status === 'unlocked' || status === 'complete' ? (
                 <>
                   <Share2 className="w-4 h-4" />
-                  Share achievement
+                  {copy.primaryCta}
                 </>
               ) : (
                 <>
-                  {type === 'milestone' ? 'View eligible courses' : 'Open this Top 100 list'}
+                  {copy.primaryCta}
                   <ChevronRight className="w-4 h-4" />
                 </>
               )}
             </button>
             
             {/* Secondary CTA */}
-            {type === 'list' && (
+            {copy.secondaryCta && (
               <button
                 onClick={handleSecondaryCta}
                 className={cn(
@@ -393,21 +438,7 @@ export const DarkGlassAchievementDetailModal: React.FC<DarkGlassAchievementDetai
                   "transition-all duration-200"
                 )}
               >
-                See played courses
-              </button>
-            )}
-            
-            {/* Explore CTA for locked milestones with 0 progress */}
-            {type === 'milestone' && status === 'locked' && progressCurrent === 0 && (
-              <button
-                onClick={() => { onClose(); navigate('/top100'); }}
-                className={cn(
-                  "w-full py-3 rounded-sq-md text-sm font-medium",
-                  "text-white/60 hover:text-white/80 hover:bg-white/5",
-                  "transition-all duration-200"
-                )}
-              >
-                Explore Top 100 courses
+                {copy.secondaryCta}
               </button>
             )}
           </div>
