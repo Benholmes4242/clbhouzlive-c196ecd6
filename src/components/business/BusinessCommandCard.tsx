@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
@@ -38,6 +38,14 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
   const navigate = useNavigate();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
+
+  // CRITICAL: Close modals on unmount to prevent stuck overlay
+  useEffect(() => {
+    return () => {
+      setShowDeleteDialog(false);
+      setShowVerificationModal(false);
+    };
+  }, []);
   const { data: stats, isLoading: statsLoading } = useBusinessStats7d(membership.business.id);
   const { data: verificationRequest } = useBusinessVerificationRequest(membership.business.id);
 
