@@ -18,6 +18,7 @@ interface ProfileAvatarRingProps {
   size?: 'sm' | 'md' | 'lg';
   onClick?: () => void;
   animateOnFirstView?: boolean;
+  className?: string;
 }
 
 // Width configurations for each size
@@ -44,6 +45,7 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
   size = 'lg',
   onClick,
   animateOnFirstView = true,
+  className,
 }) => {
   const width = SIZES[size];
   const ref = useRef<HTMLDivElement>(null);
@@ -131,7 +133,8 @@ const ProfileAvatarRing: React.FC<ProfileAvatarRingProps> = ({
       className={cn(
         'relative flex items-center justify-center transition-transform duration-200',
         onClick && 'cursor-pointer hover:scale-[1.02] active:scale-[0.98]',
-        shouldAnimate && 'animate-ring-pulse'
+        shouldAnimate && 'animate-ring-pulse',
+        className
       )}
       onClick={onClick}
     >

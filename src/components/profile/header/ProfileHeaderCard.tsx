@@ -22,6 +22,8 @@ interface ProfileHeaderCardProps {
   isPersonal: boolean;
   isOwnProfile: boolean;
   onCustomiseClick?: () => void;
+  // Layout options
+  centered?: boolean;
 }
 
 /**
@@ -42,6 +44,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   isPersonal,
   isOwnProfile,
   onCustomiseClick,
+  centered = false,
 }) => {
   // Format website URL for display
   const formatWebsiteUrl = (url: string) => {
