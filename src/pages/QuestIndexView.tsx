@@ -1,30 +1,22 @@
 /**
- * QuestIndexView - Full course index with search and filters
+ * QuestIndexView - Full course index with search, filters, and actions
+ * Phase 3: Real data + interactive actions
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, MapPin, CheckCircle, Star, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Search, MapPin, CheckCircle, Star, ChevronDown, Bookmark, BookmarkCheck } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Input } from '@/components/ui/input';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
-// Course type
-interface QuestCourse {
-  id: string;
-  name: string;
-  region: string;
-  country: string;
-  isPlayed: boolean;
-  isWishlist?: boolean;
-  dateAdded?: string;
-  rating?: number;
-}
+import { useQuestCourses, QuestCourse } from '@/hooks/useQuestCourses';
 
 // Filter types
 type StatusFilter = 'all' | 'played' | 'unplayed' | 'wishlist';
@@ -32,33 +24,16 @@ type SortOption = 'recent' | 'alphabetical' | 'rating';
 
 const REGIONS = ['All Regions', 'GB & Ireland', 'Continental Europe', 'USA', 'Worldwide'];
 
-// Demo courses
-const DEMO_COURSES: QuestCourse[] = [
-  { id: '1', name: 'Royal County Down', region: 'GB & Ireland', country: 'Northern Ireland', isPlayed: true, dateAdded: 'Dec 8', rating: 4.9 },
-  { id: '2', name: 'St Andrews Old Course', region: 'GB & Ireland', country: 'Scotland', isPlayed: true, dateAdded: 'Oct 15', rating: 4.8 },
-  { id: '3', name: 'Muirfield', region: 'GB & Ireland', country: 'Scotland', isPlayed: true, dateAdded: 'Aug 18', rating: 4.7 },
-  { id: '4', name: 'Royal Portrush', region: 'GB & Ireland', country: 'Northern Ireland', isPlayed: false, isWishlist: true },
-  { id: '5', name: 'Carnoustie', region: 'GB & Ireland', country: 'Scotland', isPlayed: false },
-  { id: '6', name: 'Royal Birkdale', region: 'GB & Ireland', country: 'England', isPlayed: false },
-  { id: '7', name: 'Pebble Beach', region: 'USA', country: 'California', isPlayed: true, dateAdded: 'Nov 22', rating: 4.9 },
-  { id: '8', name: 'Augusta National', region: 'USA', country: 'Georgia', isPlayed: false, isWishlist: true },
-  { id: '9', name: 'Pine Valley', region: 'USA', country: 'New Jersey', isPlayed: false },
-  { id: '10', name: 'Cypress Point', region: 'USA', country: 'California', isPlayed: false },
-  { id: '11', name: 'Valderrama', region: 'Continental Europe', country: 'Spain', isPlayed: true, dateAdded: 'Jul 5', rating: 4.5 },
-  { id: '12', name: 'Le Golf National', region: 'Continental Europe', country: 'France', isPlayed: false },
-  { id: '13', name: 'Royal Melbourne West', region: 'Worldwide', country: 'Australia', isPlayed: true, dateAdded: 'Sep 3', rating: 4.8 },
-  { id: '14', name: 'Cape Kidnappers', region: 'Worldwide', country: 'New Zealand', isPlayed: false, isWishlist: true },
-];
-
 // Filter pill component
 const FilterPill: React.FC<{
   label: string;
   isActive: boolean;
   onClick: () => void;
-}> = ({ label, isActive, onClick }) => (
+  count?: number;
+}> = ({ label, isActive, onClick, count }) => (
   <button
     onClick={onClick}
-    className="px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap"
+    className="px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap flex items-center gap-1.5"
     style={{
       background: isActive ? 'var(--dgp-accent-green)' : 'var(--dgp-glass-surface)',
       color: isActive ? '#000' : 'var(--dgp-text-secondary)',
@@ -67,11 +42,26 @@ const FilterPill: React.FC<{
     }}
   >
     {label}
+    {count !== undefined && (
+      <span
+        className="text-[10px] px-1.5 py-0.5 rounded-full"
+        style={{
+          background: isActive ? 'rgba(0,0,0,0.2)' : 'var(--dgp-glass-stroke)',
+        }}
+      >
+        {count}
+      </span>
+    )}
   </button>
 );
 
-// Course row component
-const CourseRow: React.FC<{ course: QuestCourse }> = ({ course }) => (
+// Course row component with actions
+const CourseRow: React.FC<{
+  course: QuestCourse;
+  onMarkPlayed: (courseId: string, played: boolean) => void;
+  onToggleWishlist: (courseId: string, wishlist: boolean) => void;
+  onRate: (course: QuestCourse) => void;
+}> = ({ course, onMarkPlayed, onToggleWishlist, onRate }) => (
   <div
     className="flex items-center gap-3 py-3 border-b"
     style={{ borderColor: 'var(--dgp-divider)' }}
@@ -95,7 +85,7 @@ const CourseRow: React.FC<{ course: QuestCourse }> = ({ course }) => (
           <div className="flex items-center gap-0.5 flex-shrink-0">
             <Star className="w-3 h-3 fill-current" style={{ color: 'var(--dgp-accent-gold)' }} />
             <span className="text-xs" style={{ color: 'var(--dgp-accent-gold)' }}>
-              {course.rating}
+              {course.rating.toFixed(1)}
             </span>
           </div>
         )}
@@ -105,33 +95,143 @@ const CourseRow: React.FC<{ course: QuestCourse }> = ({ course }) => (
       </p>
     </div>
     
-    <div className="flex items-center gap-2 flex-shrink-0">
-      {course.dateAdded && (
-        <span className="text-xs" style={{ color: 'var(--dgp-text-muted)' }}>
-          {course.dateAdded}
-        </span>
-      )}
-      {course.isPlayed && (
-        <CheckCircle
-          className="w-5 h-5"
-          style={{ color: 'var(--dgp-accent-green)' }}
+    {/* Actions */}
+    <div className="flex items-center gap-1 flex-shrink-0">
+      {/* Wishlist toggle */}
+      <button
+        onClick={() => onToggleWishlist(course.id, !course.isWishlist)}
+        className="p-2 rounded-lg transition-colors"
+        style={{
+          background: course.isWishlist ? 'rgba(200, 176, 106, 0.2)' : 'transparent',
+        }}
+        aria-label={course.isWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+      >
+        {course.isWishlist ? (
+          <BookmarkCheck className="w-4 h-4" style={{ color: 'var(--dgp-accent-gold)' }} />
+        ) : (
+          <Bookmark className="w-4 h-4" style={{ color: 'var(--dgp-text-muted)' }} />
+        )}
+      </button>
+      
+      {/* Rate button */}
+      <button
+        onClick={() => onRate(course)}
+        className="p-2 rounded-lg transition-colors"
+        style={{
+          background: course.rating ? 'rgba(200, 176, 106, 0.2)' : 'transparent',
+        }}
+        aria-label="Rate course"
+      >
+        <Star
+          className={`w-4 h-4 ${course.rating ? 'fill-current' : ''}`}
+          style={{ color: course.rating ? 'var(--dgp-accent-gold)' : 'var(--dgp-text-muted)' }}
         />
-      )}
+      </button>
+      
+      {/* Played toggle */}
+      <button
+        onClick={() => onMarkPlayed(course.id, !course.isPlayed)}
+        className="p-2 rounded-lg transition-colors"
+        style={{
+          background: course.isPlayed ? 'rgba(110, 146, 119, 0.2)' : 'transparent',
+        }}
+        aria-label={course.isPlayed ? 'Mark as not played' : 'Mark as played'}
+      >
+        <CheckCircle
+          className={`w-4 h-4 ${course.isPlayed ? 'fill-current' : ''}`}
+          style={{ color: course.isPlayed ? 'var(--dgp-accent-green)' : 'var(--dgp-text-muted)' }}
+        />
+      </button>
     </div>
   </div>
 );
 
+// Simple rating sheet
+const RatingSheet: React.FC<{
+  course: QuestCourse | null;
+  onClose: () => void;
+  onRate: (courseId: string, rating: number) => void;
+}> = ({ course, onClose, onRate }) => {
+  const [selectedRating, setSelectedRating] = useState(course?.rating || 0);
+
+  const handleSubmit = () => {
+    if (course && selectedRating > 0) {
+      onRate(course.id, selectedRating);
+      onClose();
+    }
+  };
+
+  return (
+    <Sheet open={!!course} onOpenChange={onClose}>
+      <SheetContent
+        side="bottom"
+        className="rounded-t-3xl border-t"
+        style={{
+          background: 'var(--dgp-bg-surface)',
+          borderColor: 'var(--dgp-glass-stroke)',
+        }}
+      >
+        {course && (
+          <div className="py-6">
+            <SheetHeader className="text-center mb-6">
+              <SheetTitle style={{ color: 'var(--dgp-text-primary)' }}>
+                Rate {course.name}
+              </SheetTitle>
+            </SheetHeader>
+            
+            {/* Star rating */}
+            <div className="flex justify-center gap-2 mb-6">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  onClick={() => setSelectedRating(star)}
+                  className="p-2"
+                >
+                  <Star
+                    className={`w-8 h-8 transition-all ${
+                      star <= selectedRating ? 'fill-current scale-110' : ''
+                    }`}
+                    style={{
+                      color: star <= selectedRating ? 'var(--dgp-accent-gold)' : 'var(--dgp-text-muted)',
+                    }}
+                  />
+                </button>
+              ))}
+            </div>
+            
+            <div className="px-4">
+              <Button
+                className="w-full"
+                onClick={handleSubmit}
+                disabled={selectedRating === 0}
+                style={{
+                  background: 'var(--dgp-accent-green)',
+                  color: '#000',
+                }}
+              >
+                Submit Rating
+              </Button>
+            </div>
+          </div>
+        )}
+      </SheetContent>
+    </Sheet>
+  );
+};
+
 const QuestIndexView: React.FC = () => {
   const navigate = useNavigate();
+  const { courses, isLoading, totalPlayed, markPlayed, toggleWishlist } = useQuestCourses();
   
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [regionFilter, setRegionFilter] = useState('All Regions');
   const [sortBy, setSortBy] = useState<SortOption>('recent');
+  const [ratingCourse, setRatingCourse] = useState<QuestCourse | null>(null);
 
   // Filter and sort courses
   const filteredCourses = useMemo(() => {
-    let result = [...DEMO_COURSES];
+    let result = [...courses];
 
     // Search filter
     if (searchQuery) {
@@ -166,9 +266,37 @@ const QuestIndexView: React.FC = () => {
     // 'recent' keeps original order (already sorted by date)
 
     return result;
-  }, [searchQuery, statusFilter, regionFilter, sortBy]);
+  }, [courses, searchQuery, statusFilter, regionFilter, sortBy]);
 
-  const playedCount = DEMO_COURSES.filter((c) => c.isPlayed).length;
+  // Counts for filter pills
+  const counts = useMemo(() => ({
+    all: courses.length,
+    played: courses.filter(c => c.isPlayed).length,
+    unplayed: courses.filter(c => !c.isPlayed).length,
+    wishlist: courses.filter(c => c.isWishlist).length,
+  }), [courses]);
+
+  const handleRate = useCallback((course: QuestCourse) => {
+    setRatingCourse(course);
+  }, []);
+
+  const handleSubmitRating = useCallback((courseId: string, rating: number) => {
+    // For now, mark as played when rating (rating requires playing)
+    markPlayed(courseId, true);
+    // TODO: Save rating to course_ratings table
+  }, [markPlayed]);
+
+  if (isLoading) {
+    return (
+      <PageRoot className="dgp-page">
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin"
+            style={{ borderColor: 'var(--dgp-accent-gold)', borderTopColor: 'transparent' }}
+          />
+        </div>
+      </PageRoot>
+    );
+  }
 
   return (
     <PageRoot className="dgp-page">
@@ -190,7 +318,7 @@ const QuestIndexView: React.FC = () => {
               Quest Index
             </h1>
             <p className="text-xs" style={{ color: 'var(--dgp-text-muted)' }}>
-              {playedCount} of {DEMO_COURSES.length} courses played
+              {totalPlayed} of {courses.length} courses played
             </p>
           </div>
         </div>
@@ -222,21 +350,25 @@ const QuestIndexView: React.FC = () => {
             label="All"
             isActive={statusFilter === 'all'}
             onClick={() => setStatusFilter('all')}
+            count={counts.all}
           />
           <FilterPill
             label="Played"
             isActive={statusFilter === 'played'}
             onClick={() => setStatusFilter('played')}
+            count={counts.played}
           />
           <FilterPill
             label="Unplayed"
             isActive={statusFilter === 'unplayed'}
             onClick={() => setStatusFilter('unplayed')}
+            count={counts.unplayed}
           />
           <FilterPill
             label="Wishlist"
             isActive={statusFilter === 'wishlist'}
             onClick={() => setStatusFilter('wishlist')}
+            count={counts.wishlist}
           />
         </div>
 
@@ -320,7 +452,13 @@ const QuestIndexView: React.FC = () => {
         <div className="dgp-glass rounded-xl p-4">
           {filteredCourses.length > 0 ? (
             filteredCourses.map((course) => (
-              <CourseRow key={course.id} course={course} />
+              <CourseRow
+                key={course.id}
+                course={course}
+                onMarkPlayed={markPlayed}
+                onToggleWishlist={toggleWishlist}
+                onRate={handleRate}
+              />
             ))
           ) : (
             <div className="py-12 text-center">
@@ -331,6 +469,13 @@ const QuestIndexView: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Rating sheet */}
+      <RatingSheet
+        course={ratingCourse}
+        onClose={() => setRatingCourse(null)}
+        onRate={handleSubmitRating}
+      />
     </PageRoot>
   );
 };

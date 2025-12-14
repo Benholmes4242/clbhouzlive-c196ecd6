@@ -7,6 +7,7 @@ export { AvatarXPRing } from './AvatarXPRing';
 export { HeroMedia } from './HeroMedia';
 export { IdentityOverlay } from './IdentityOverlay';
 export { GolfDNACard } from './GolfDNACard';
+export { MilestoneUnlockSheet } from './MilestoneUnlockSheet';
 export { GolfDNASheet } from './GolfDNASheet';
 export { MomentCard } from './MomentCard';
 export { MomentsTimeline } from './MomentsTimeline';

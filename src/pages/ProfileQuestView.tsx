@@ -1,11 +1,11 @@
 /**
  * ProfileQuestView - Fullscreen Top 100 Quest Experience
- * Phase 2: Journey Map with path nodes and smart guidance
+ * Phase 3: Journey Map with path nodes, smart guidance, and milestone unlocks
  */
 
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trophy, ChevronRight, Lock } from 'lucide-react';
+import { ArrowLeft, Trophy, ChevronRight, Lock, Play } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTop100Overview } from '@/hooks/useTop100Overview';
@@ -14,6 +14,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { RegionListSheet } from '@/components/profile-v2/RegionListSheet';
 import { JourneyMapPath, JourneyChapter } from '@/components/profile-v2/JourneyMapPath';
 import { NextTargetCard } from '@/components/profile-v2/NextTargetCard';
+import { MilestoneUnlockSheet } from '@/components/profile-v2/MilestoneUnlockSheet';
 import { useQuestRewards } from '@/hooks/useQuestRewards';
 
 // Milestone club type
@@ -179,20 +180,36 @@ const ProfileQuestView: React.FC = () => {
 
       {/* Header */}
       <div className="sticky top-0 z-50 safe-top" style={{ background: 'rgba(11, 15, 13, 0.9)', backdropFilter: 'blur(12px)' }}>
-        <div className="flex items-center gap-4 p-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="dgp-nav-button"
-            aria-label="Go back"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <h1
-            className="text-lg font-semibold"
-            style={{ color: 'var(--dgp-text-primary)' }}
-          >
-            The Quest
-          </h1>
+        <div className="flex items-center justify-between p-4">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate(-1)}
+              className="dgp-nav-button"
+              aria-label="Go back"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <h1
+              className="text-lg font-semibold"
+              style={{ color: 'var(--dgp-text-primary)' }}
+            >
+              The Quest
+            </h1>
+          </div>
+          {totalPlayed >= 5 && (
+            <button
+              onClick={() => navigate('/profile/quest/replay')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium"
+              style={{
+                background: 'var(--dgp-glass-surface)',
+                border: '1px solid var(--dgp-glass-stroke)',
+                color: 'var(--dgp-text-secondary)',
+              }}
+            >
+              <Play className="w-3 h-3" />
+              Replay
+            </button>
+          )}
         </div>
       </div>
 
@@ -385,6 +402,9 @@ const ProfileQuestView: React.FC = () => {
           )}
         </SheetContent>
       </Sheet>
+
+      {/* Milestone Unlock Sheet */}
+      <MilestoneUnlockSheet totalPlayed={totalPlayed} />
     </PageRoot>
   );
 };
