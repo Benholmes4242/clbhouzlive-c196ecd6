@@ -58,13 +58,20 @@ const ActivityPage: React.FC = () => {
     const markSeen = async () => {
       const now = new Date().toISOString();
       
-      // 1) Update last_notifications_seen_at to now
+      // 1) OPTIMISTICALLY update user profile cache with new timestamp FIRST
+      // This ensures the unread count query key changes immediately
+      queryClient.setQueryData(['user-profile', user.id], (old: any) => {
+        if (!old) return old;
+        return { ...old, last_notifications_seen_at: now };
+      });
+      
+      // 2) Update last_notifications_seen_at in database
       await supabase
         .from('user_profiles')
         .update({ last_notifications_seen_at: now })
         .eq('id', user.id);
       
-      // 2) Mark all existing notifications as read at that moment
+      // 3) Mark all existing notifications as read at that moment
       await supabase
         .from('notifications')
         .update({ is_read: true })
@@ -73,9 +80,8 @@ const ActivityPage: React.FC = () => {
       
       hasMarkedSeen.current = true;
       
-      // Clear bell count only - do NOT invalidate activity-feed to keep "New" visible
+      // 4) Invalidate unread count - now uses new timestamp from optimistic update
       queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
-      queryClient.invalidateQueries({ queryKey: ['user-profile', user.id] });
     };
     
     void markSeen();
