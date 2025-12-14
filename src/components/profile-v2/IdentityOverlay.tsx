@@ -39,21 +39,19 @@ export const IdentityOverlay: React.FC<IdentityOverlayProps> = ({
       className={cn(
         'absolute bottom-0 left-0 right-0 z-10',
         'flex flex-col items-center',
-        'pb-3 pt-12',
+        'pb-6 pt-12',
         className
       )}
     >
       {/* Avatar with Achievement Ring */}
-      <div className="mt-4">
-        <AvatarXPRing
-          avatarUrl={avatarUrl}
-          displayName={displayName}
-          top100Count={top100Count}
-          size="xl"
-          onClick={onAvatarClick}
-          animateOnFirstView={true}
-        />
-      </div>
+      <AvatarXPRing
+        avatarUrl={avatarUrl}
+        displayName={displayName}
+        top100Count={top100Count}
+        size="xl"
+        onClick={onAvatarClick}
+        animateOnFirstView={true}
+      />
 
       {/* Name + Verified Badge */}
       <div className="flex items-center gap-2 mt-4">
