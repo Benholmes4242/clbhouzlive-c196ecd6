@@ -10,6 +10,7 @@ import {
   getTierFromTop100Count, 
   RING_TOKENS, 
   hexToRgba,
+  lightenHex,
   type AchievementRingTier 
 } from '@/lib/achievementRingTokens';
 
@@ -33,6 +34,19 @@ const SIZES = {
   xl: { avatar: 108, ring: 128, ringWidth: 4.5 },
 };
 
+// Tier-aware glow intensity multipliers
+const GLOW_MULTIPLIER: Record<AchievementRingTier, number> = {
+  NONE: 0,
+  FAIR: 0.9,
+  MILD: 1.0,
+  STEADY: 1.05,
+  RESPECTABLE: 1.1,
+  GOOD: 1.15,
+  VERY_GOOD: 1.2,
+  EXCELLENT: 1.25,
+  OUTSTANDING: 1.35,
+};
+
 export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
   avatarUrl,
   displayName,
@@ -50,6 +64,7 @@ export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
   const tier = getTierFromTop100Count(top100Count);
   const tokens = RING_TOKENS[tier];
   const hasAchievement = tier !== 'NONE';
+  const glowMultiplier = GLOW_MULTIPLIER[tier];
 
   useEffect(() => {
     if (animateOnFirstView && !hasAnimated) {
@@ -58,10 +73,14 @@ export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
     }
   }, [animateOnFirstView, hasAnimated]);
 
-  // Default grey for users with no achievements
-  const ringColor = hasAchievement ? tokens.accent : '#D1D5DB';
+  // Multi-layer glow colors with tier-aware intensity
+  const glowCore = hasAchievement ? hexToRgba(tokens.accent, 0.85 * glowMultiplier) : 'transparent';
+  const glowMid = hasAchievement ? hexToRgba(tokens.accent, 0.55 * glowMultiplier) : 'transparent';
+  const glowSoft = hasAchievement ? hexToRgba(tokens.accent, 0.35 * glowMultiplier) : 'transparent';
+  
+  // Compute a slightly brighter accent for the top of the gradient
+  const accentBright = hasAchievement ? lightenHex(tokens.accent, 15) : '#D1D5DB';
   const ringBgDark = hasAchievement ? tokens.bgDark : '#D1D5DB';
-  const glowColor = hasAchievement ? hexToRgba(tokens.accent, 0.4) : 'transparent';
 
   return (
     <button
@@ -80,28 +99,28 @@ export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
       {/* Outer glow halo (only for achievement tiers) */}
       {hasAchievement && (
         <div
-          className="absolute inset-0 rounded-full pointer-events-none"
+          className="absolute rounded-full pointer-events-none"
           style={{
-            background: `radial-gradient(circle, ${hexToRgba(tokens.accent, 0.2)} 0%, transparent 70%)`,
-            filter: 'blur(8px)',
-            transform: 'scale(1.2)',
-            opacity: hasAnimated ? 0.9 : 0,
+            inset: '-14px',
+            background: `radial-gradient(circle, ${glowSoft} 0%, transparent 65%)`,
+            filter: 'blur(10px)',
+            opacity: hasAnimated ? 1 : 0,
             transition: 'opacity 0.6s ease',
           }}
         />
       )}
 
-      {/* Ring border with gradient */}
+      {/* Ring border with gradient + multi-layer glow */}
       <div
         className="absolute rounded-full"
         style={{
           inset: dimensions.ringWidth / 2,
           background: hasAchievement 
-            ? `linear-gradient(180deg, ${tokens.accent} 0%, ${tokens.bgDark} 100%)`
-            : ringColor,
+            ? `linear-gradient(180deg, ${accentBright} 0%, ${ringBgDark} 100%)`
+            : ringBgDark,
           padding: dimensions.ringWidth,
           boxShadow: hasAchievement 
-            ? `0 0 0 3px rgba(0,0,0,0.5), 0 8px 20px rgba(0,0,0,0.3), 0 0 16px ${glowColor}`
+            ? `0 0 0 4px rgba(0,0,0,0.7), 0 0 8px ${glowCore}, 0 0 18px ${glowMid}, 0 0 32px ${glowSoft}, 0 10px 30px rgba(0,0,0,0.5)`
             : `0 0 0 2px rgba(0,0,0,0.3)`,
           opacity: hasAnimated ? 1 : 0,
           transition: 'opacity 0.6s ease',

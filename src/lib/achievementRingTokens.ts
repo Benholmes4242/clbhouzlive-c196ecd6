@@ -74,3 +74,20 @@ export function hexToRgba(hex: string, alpha: number): string {
   const b = parseInt(hex.slice(5, 7), 16);
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
+
+/**
+ * Lighten a hex color by a percentage (0-100)
+ */
+export function lightenHex(hex: string, percent: number): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  
+  const lighten = (channel: number) => Math.min(255, Math.round(channel + (255 - channel) * (percent / 100)));
+  
+  const rNew = lighten(r).toString(16).padStart(2, '0');
+  const gNew = lighten(g).toString(16).padStart(2, '0');
+  const bNew = lighten(b).toString(16).padStart(2, '0');
+  
+  return `#${rNew}${gNew}${bNew}`;
+}
