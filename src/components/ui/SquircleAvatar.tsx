@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { getDirectImageUrl } from '@/utils/r2ImageUtils';
+import { 
+  getTierFromTop100Count, 
+  RING_TOKENS, 
+  hexToRgba,
+  type AchievementRingTier 
+} from '@/lib/achievementRingTokens';
 
 /**
  * 🎯 GLOBAL SQUIRCLE AVATAR - SINGLE SOURCE OF TRUTH 🎯
@@ -11,7 +17,7 @@ import { getDirectImageUrl } from '@/utils/r2ImageUtils';
  * - overflow: hidden
  * - object-fit: cover for images
  * 
- * All avatars use 2.5px ring thickness (grey for normal, colored for achievement)
+ * All avatars use 2.5px ring thickness with data-driven tier colors
  */
 
 // Size variants mapping
@@ -33,8 +39,10 @@ export interface SquircleAvatarProps {
   src?: string | null;
   /** Alt text for image */
   alt?: string;
-  /** Achievement ring color (e.g., '#8CE06A' for Founder). If provided, shows outer colored ring */
+  /** Achievement ring color (hex). If provided, shows outer colored ring with glow */
   ringColor?: string | null;
+  /** Top 100 courses played count - used to derive tier-based ring color */
+  top100Count?: number;
   /** Hide ring entirely (no grey or colored ring) */
   hideRing?: boolean;
   /** Fallback text (e.g., initials) */
@@ -49,15 +57,20 @@ export interface SquircleAvatarProps {
   children?: React.ReactNode;
   /** Click handler */
   onClick?: () => void;
+  /** Enable premium glow effect for achievement rings */
+  enableGlow?: boolean;
 }
 
 /**
  * SquircleAvatar - The new global avatar component
  * 
- * @example Normal avatar (1px grey ring)
+ * @example Normal avatar (grey ring)
  * <SquircleAvatar src={user.avatar} size="md" />
  * 
- * @example Achievement avatar (colored outer ring + grey inner ring)
+ * @example Achievement avatar with top100Count (auto tier-based color + glow)
+ * <SquircleAvatar src={user.avatar} size="lg" top100Count={55} enableGlow />
+ * 
+ * @example Achievement avatar with explicit ringColor
  * <SquircleAvatar src={user.avatar} size="lg" ringColor="#8CE06A" />
  */
 export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
@@ -65,6 +78,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   src,
   alt = '',
   ringColor,
+  top100Count,
   hideRing = false,
   fallback,
   className,
@@ -72,6 +86,7 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   priority = false,
   children,
   onClick,
+  enableGlow = false,
 }) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [showFallback, setShowFallback] = useState(false);
@@ -79,6 +94,19 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
 
   // Convert size variant to pixel value
   const pixelSize = typeof size === 'string' ? SIZE_MAP[size] : size;
+
+  // Derive tier and colors from top100Count if provided
+  const tier: AchievementRingTier = top100Count !== undefined 
+    ? getTierFromTop100Count(top100Count) 
+    : 'NONE';
+  
+  // Determine effective ring color: explicit ringColor takes precedence, then top100Count-derived
+  const effectiveRingColor = ringColor ?? (top100Count !== undefined && tier !== 'NONE' 
+    ? RING_TOKENS[tier].accent 
+    : null);
+  
+  const hasAchievementRing = Boolean(effectiveRingColor);
+  const tierTokens = tier !== 'NONE' ? RING_TOKENS[tier] : null;
 
   // Optimize image URL
   useEffect(() => {
@@ -118,8 +146,6 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
   // Calculate fallback font size based on avatar size
   const fallbackFontSize = Math.round(pixelSize * 0.38);
 
-  const hasAchievementRing = Boolean(ringColor);
-
   // Inner avatar content (image or fallback)
   const avatarContent = (
     <>
@@ -148,24 +174,43 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
     </>
   );
 
-  // Achievement state: colored ring directly on avatar (no grey ring)
+  // Achievement state: colored ring with optional premium glow
   if (hasAchievementRing) {
+    // Build premium glow box-shadow if enabled
+    const glowShadow = enableGlow && tierTokens
+      ? `0 0 0 3px rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.35), 0 0 18px ${hexToRgba(tierTokens.accent, 0.4)}`
+      : undefined;
+
     return (
       <div
         className={cn(
-          'inline-flex items-center justify-center flex-shrink-0',
+          'inline-flex items-center justify-center flex-shrink-0 relative',
           onClick && 'cursor-pointer',
           className
         )}
         onClick={onClick}
       >
+        {/* Outer glow halo (only when enableGlow) */}
+        {enableGlow && tierTokens && (
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              borderRadius: '34%',
+              background: `radial-gradient(circle, ${hexToRgba(tierTokens.accent, 0.18)} 0%, transparent 70%)`,
+              filter: 'blur(6px)',
+              transform: 'scale(1.15)',
+              opacity: 0.85,
+            }}
+          />
+        )}
         <div
           className="relative overflow-hidden"
           style={{
             width: `${pixelSize}px`,
             aspectRatio: '1 / 1.05',
             borderRadius: '34%',
-            border: `2.5px solid ${ringColor}`,
+            border: `2.5px solid ${effectiveRingColor}`,
+            boxShadow: glowShadow,
           }}
         >
           {avatarContent}
