@@ -1,0 +1,357 @@
+/**
+ * Dark Golf Passport - Profile Theme Tokens
+ * Premium cinematic dark theme for the new profile experience
+ */
+
+:root {
+  /* ========================================
+     DARK GOLF PASSPORT - CORE PALETTE
+     ======================================== */
+  
+  /* Backgrounds */
+  --dgp-bg-primary: #0B0F0D;        /* Near-black green charcoal */
+  --dgp-bg-surface: #101614;        /* Card surface */
+  --dgp-bg-elevated: #151A18;       /* Elevated surfaces */
+  
+  /* Glass Morphism */
+  --dgp-glass-surface: rgba(255, 255, 255, 0.06);
+  --dgp-glass-stroke: rgba(255, 255, 255, 0.10);
+  --dgp-glass-hover: rgba(255, 255, 255, 0.09);
+  --dgp-glass-blur: 16px;
+  
+  /* Typography */
+  --dgp-text-primary: rgba(255, 255, 255, 0.92);
+  --dgp-text-secondary: rgba(255, 255, 255, 0.68);
+  --dgp-text-muted: rgba(255, 255, 255, 0.45);
+  
+  /* Dividers & Borders */
+  --dgp-divider: rgba(255, 255, 255, 0.08);
+  --dgp-border-subtle: rgba(255, 255, 255, 0.06);
+  
+  /* Accent Colors */
+  --dgp-accent-green: #6e9277;      /* Grey-green signature */
+  --dgp-accent-gold: #C8B06A;       /* Trophy/Top 100 gold */
+  --dgp-accent-blue: #4A9EE3;       /* Info accent */
+  --dgp-danger: #D26A6A;            /* Error/danger */
+  
+  /* XP Ring Tiers */
+  --dgp-ring-bronze: #CD7F32;
+  --dgp-ring-silver: #B8C4D0;
+  --dgp-ring-gold: #C8B06A;
+  --dgp-ring-blue: #4A9EE3;
+  --dgp-ring-green: #6e9277;
+  
+  /* Shadows */
+  --dgp-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --dgp-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --dgp-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --dgp-shadow-glow-green: 0 0 20px rgba(110, 146, 119, 0.3);
+  --dgp-shadow-glow-gold: 0 0 20px rgba(200, 176, 106, 0.3);
+  
+  /* Spacing */
+  --dgp-radius-sm: 12px;
+  --dgp-radius-md: 16px;
+  --dgp-radius-lg: 20px;
+  --dgp-radius-xl: 24px;
+}
+
+/* ========================================
+   GLASS CARD COMPONENT
+   ======================================== */
+
+.dgp-glass {
+  background: var(--dgp-glass-surface);
+  backdrop-filter: blur(var(--dgp-glass-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--dgp-glass-blur)) saturate(180%);
+  border: 1px solid var(--dgp-glass-stroke);
+  border-radius: var(--dgp-radius-lg);
+  box-shadow: var(--dgp-shadow-md);
+}
+
+.dgp-glass:hover {
+  background: var(--dgp-glass-hover);
+}
+
+/* Glass card with inner glow */
+.dgp-glass-glow {
+  position: relative;
+}
+
+.dgp-glass-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.06), transparent);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* ========================================
+   XP RING ANIMATIONS
+   ======================================== */
+
+@keyframes dgp-ring-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--ring-color);
+  }
+  50% {
+    box-shadow: 0 0 12px 3px var(--ring-color);
+  }
+}
+
+@keyframes dgp-ring-shimmer {
+  0% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes dgp-ring-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.dgp-ring-animated {
+  animation: dgp-ring-shimmer 6s ease-in-out infinite;
+}
+
+.dgp-ring-glow {
+  animation: dgp-ring-pulse 4s ease-in-out infinite;
+}
+
+/* ========================================
+   HERO SCRIM GRADIENTS
+   ======================================== */
+
+.dgp-hero-scrim-top {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.65) 0%,
+    rgba(0, 0, 0, 0.3) 40%,
+    transparent 100%
+  );
+}
+
+.dgp-hero-scrim-bottom {
+  background: linear-gradient(
+    to top,
+    var(--dgp-bg-primary) 0%,
+    rgba(11, 15, 13, 0.8) 30%,
+    transparent 100%
+  );
+}
+
+/* ========================================
+   GOLF DNA CARD STYLES
+   ======================================== */
+
+.dgp-dna-card {
+  background: var(--dgp-glass-surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--dgp-glass-stroke);
+  border-radius: var(--dgp-radius-xl);
+}
+
+.dgp-dna-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dgp-dna-stat-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--dgp-text-primary);
+  line-height: 1.1;
+}
+
+.dgp-dna-stat-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--dgp-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ========================================
+   MOMENT CARD STYLES
+   ======================================== */
+
+.dgp-moment-card {
+  background: var(--dgp-bg-surface);
+  border: 1px solid var(--dgp-border-subtle);
+  border-radius: var(--dgp-radius-xl);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dgp-moment-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--dgp-shadow-lg);
+}
+
+.dgp-moment-card:active {
+  transform: scale(0.98);
+}
+
+/* ========================================
+   TROPHY CABINET STYLES
+   ======================================== */
+
+.dgp-trophy {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  min-width: 72px;
+}
+
+.dgp-trophy-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: var(--dgp-glass-surface);
+  border: 1px solid var(--dgp-glass-stroke);
+}
+
+.dgp-trophy-locked {
+  opacity: 0.35;
+  filter: grayscale(100%);
+}
+
+.dgp-trophy-rare {
+  box-shadow: var(--dgp-shadow-glow-gold);
+}
+
+.dgp-trophy-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--dgp-text-muted);
+  text-align: center;
+  max-width: 64px;
+  line-height: 1.2;
+}
+
+/* ========================================
+   NAVIGATION GLASS BUTTONS
+   ======================================== */
+
+.dgp-nav-button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--dgp-glass-surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--dgp-glass-stroke);
+  border-radius: 50%;
+  color: var(--dgp-text-primary);
+  transition: all 0.2s ease;
+}
+
+.dgp-nav-button:hover {
+  background: var(--dgp-glass-hover);
+  transform: scale(1.05);
+}
+
+.dgp-nav-button:active {
+  transform: scale(0.95);
+}
+
+/* ========================================
+   STICKY MINI HEADER
+   ======================================== */
+
+.dgp-sticky-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  padding: 8px 16px;
+  background: rgba(11, 15, 13, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--dgp-divider);
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+}
+
+.dgp-sticky-header.visible {
+  transform: translateY(0);
+}
+
+/* ========================================
+   SECTION HEADERS
+   ======================================== */
+
+.dgp-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  margin-bottom: 16px;
+}
+
+.dgp-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--dgp-text-primary);
+  letter-spacing: -0.01em;
+}
+
+.dgp-section-action {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--dgp-accent-green);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ========================================
+   SPARKLINE CHART
+   ======================================== */
+
+.dgp-sparkline {
+  stroke: var(--dgp-accent-green);
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dgp-sparkline-area {
+  fill: url(#sparkline-gradient);
+  opacity: 0.3;
+}
+
+/* ========================================
+   PAGE BACKGROUND
+   ======================================== */
+
+.dgp-page {
+  background: var(--dgp-bg-primary);
+  min-height: 100vh;
+  color: var(--dgp-text-primary);
+}

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Globe, Pencil, Building2, MapPin, CheckCircle2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { BUSINESS_CATEGORIES, BusinessCategory } from '@/types/profile';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
@@ -23,9 +22,6 @@ interface ProfileHeaderCardProps {
   isPersonal: boolean;
   isOwnProfile: boolean;
   onCustomiseClick?: () => void;
-  // Layout options
-  centered?: boolean;
-  darkTheme?: boolean;
 }
 
 /**
@@ -46,8 +42,6 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
   isPersonal,
   isOwnProfile,
   onCustomiseClick,
-  centered = false,
-  darkTheme = false,
 }) => {
   // Format website URL for display
   const formatWebsiteUrl = (url: string) => {
@@ -74,10 +68,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
     <div className="flex-1 flex flex-col items-center justify-center gap-1.5 md:gap-2">
       {/* Row 1: Name + Verified Golfer badge */}
       <div className="flex items-center justify-center gap-1.5">
-        <h1 className={cn(
-          "text-xl md:text-2xl font-semibold tracking-tight text-center",
-          darkTheme ? "text-white/92" : "text-foreground"
-        )}>
+        <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-foreground text-center">
           {effectiveDisplayName}
         </h1>
         {/* Verified golfer badge - frosted glass disk with green tick */}
@@ -87,20 +78,12 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
       </div>
 
       {/* Row 2: Username + Business indicators */}
-      <div className={cn(
-        "flex flex-wrap items-center justify-center gap-2 text-sm",
-        darkTheme ? "text-white/55" : "text-slate-500"
-      )}>
+      <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-slate-500">
         <span>@{username}</span>
         
         {!isPersonal && (
           <>
-            <span className={cn(
-              "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs",
-              darkTheme 
-                ? "border-white/10 text-white/55" 
-                : "border-border text-muted-foreground"
-            )}>
+            <span className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground">
               <Building2 className="w-3 h-3" />
               Business
             </span>
@@ -111,12 +94,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
               </span>
             )}
             {businessCategory && (
-              <span className={cn(
-                "rounded-full px-2 py-0.5 text-xs",
-                darkTheme 
-                  ? "bg-white/8 text-white/55" 
-                  : "bg-muted text-muted-foreground"
-              )}>
+              <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
                 {getCategoryLabel(businessCategory)}
               </span>
             )}
@@ -127,28 +105,20 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
       {/* Row 3: Club (personal) or Location (business) */}
       {isPersonal && homeClub && (
         <div className="text-sm text-center">
-          <span className={cn(
-            "font-semibold",
-            darkTheme ? "text-white/85" : "text-slate-800"
-          )}>{homeClub}</span>
+          <span className="font-semibold text-slate-800">{homeClub}</span>
         </div>
       )}
       {!isPersonal && effectiveLocation && (
         <div className="flex items-center gap-1 text-sm text-center">
-          <MapPin className={cn("w-3.5 h-3.5", darkTheme ? "text-white/55" : "text-slate-500")} />
-          <span className={darkTheme ? "text-white/65" : "text-slate-600"}>{effectiveLocation}</span>
+          <MapPin className="w-3.5 h-3.5 text-slate-500" />
+          <span className="text-slate-600">{effectiveLocation}</span>
         </div>
       )}
 
       {/* Row 4: HCP pill centered + edit button on right (personal only) */}
       {isPersonal && handicap != null && (
         <div className="relative w-full flex justify-center items-center">
-          <span className={cn(
-            "inline-flex items-center px-3 py-1 rounded-full text-[11px] md:text-xs font-semibold uppercase tracking-wide",
-            darkTheme 
-              ? "bg-white/8 border border-white/10 text-white/75" 
-              : "bg-muted text-muted-foreground"
-          )}>
+          <span className="inline-flex items-center px-3 py-1 rounded-full bg-muted text-[11px] md:text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             HCP {handicap.toFixed(1)}
           </span>
           
@@ -157,12 +127,7 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
               type="button"
               onClick={onCustomiseClick}
               aria-label="Edit profile"
-              className={cn(
-                "absolute right-0 inline-flex items-center justify-center h-7 w-7 rounded-full shadow-sm transition",
-                darkTheme 
-                  ? "bg-white/8 border border-white/10 text-white/75 hover:bg-white/12" 
-                  : "bg-white/80 text-slate-600 hover:bg-white"
-              )}
+              className="absolute right-0 inline-flex items-center justify-center h-7 w-7 rounded-full bg-white/80 text-slate-600 hover:bg-white shadow-sm transition"
             >
               <Pencil className="h-3.5 w-3.5" />
             </button>
