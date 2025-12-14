@@ -28,15 +28,20 @@ interface AvatarXPRingProps {
   className?: string;
 }
 
-// SDS squircle constants
-const SQUIRCLE_BORDER_RADIUS = '34%';
-const SQUIRCLE_ASPECT_RATIO = '1 / 1.05';
+/**
+ * SDS Avatar Squircle Constants
+ * - Border radius: 34% creates continuous soft squircle curves
+ * - Aspect ratio: 1/1.05 makes avatar slightly taller than wide
+ * These match the global SquircleAvatar component spec
+ */
+const SDS_AVATAR_BORDER_RADIUS = '34%';
+const SDS_AVATAR_ASPECT_RATIO = 1 / 1.05; // ≈0.952
 
 const SIZES = {
-  sm: { avatar: 48, ring: 56, ringWidth: 3 },
-  md: { avatar: 64, ring: 76, ringWidth: 3.5 },
-  lg: { avatar: 88, ring: 104, ringWidth: 4 },
-  xl: { avatar: 108, ring: 128, ringWidth: 4.5 },
+  sm: { avatar: 48, ringPadding: 4 },
+  md: { avatar: 64, ringPadding: 6 },
+  lg: { avatar: 88, ringPadding: 8 },
+  xl: { avatar: 108, ringPadding: 10 },
 };
 
 // Tier-aware glow intensity multipliers
@@ -65,6 +70,11 @@ export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
   const [hasAnimated, setHasAnimated] = useState(!animateOnFirstView);
   const dimensions = SIZES[size];
   
+  // Calculate ring dimensions maintaining squircle aspect ratio
+  const ringWidth = dimensions.avatar + (dimensions.ringPadding * 2);
+  const ringHeight = ringWidth / SDS_AVATAR_ASPECT_RATIO;
+  const avatarHeight = dimensions.avatar / SDS_AVATAR_ASPECT_RATIO;
+  
   // Get tier-based ring colors from Top 100 count
   const tier = getTierFromTop100Count(top100Count);
   const tokens = RING_TOKENS[tier];
@@ -87,10 +97,6 @@ export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
   const accentBright = hasAchievement ? lightenHex(tokens.accent, 15) : '#D1D5DB';
   const ringBgDark = hasAchievement ? tokens.bgDark : '#D1D5DB';
 
-  // Calculate ring height with squircle aspect ratio (1.05x taller)
-  const ringHeight = dimensions.ring * 1.05;
-  const avatarHeight = dimensions.avatar * 1.05;
-
   return (
     <button
       onClick={onClick}
@@ -100,7 +106,7 @@ export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
         className
       )}
       style={{
-        width: dimensions.ring,
+        width: ringWidth,
         height: ringHeight,
       }}
       aria-label={`${displayName}'s profile`}
@@ -111,7 +117,7 @@ export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
           className="absolute pointer-events-none"
           style={{
             inset: '-14px',
-            borderRadius: SQUIRCLE_BORDER_RADIUS,
+            borderRadius: SDS_AVATAR_BORDER_RADIUS,
             background: `radial-gradient(circle, ${glowSoft} 0%, transparent 65%)`,
             filter: 'blur(10px)',
             opacity: hasAnimated ? 1 : 0,
@@ -124,8 +130,11 @@ export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
       <div
         className="absolute pointer-events-none"
         style={{
-          inset: 0,
-          borderRadius: SQUIRCLE_BORDER_RADIUS,
+          top: 0,
+          left: 0,
+          width: ringWidth,
+          height: ringHeight,
+          borderRadius: SDS_AVATAR_BORDER_RADIUS,
           background: hasAchievement 
             ? `linear-gradient(180deg, ${accentBright} 0%, ${ringBgDark} 100%)`
             : ringBgDark,
@@ -137,13 +146,13 @@ export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
         }}
       />
 
-      {/* Avatar with hairline separator - squircle shape */}
+      {/* Avatar container with hairline separator - squircle shape */}
       <div
         className="absolute overflow-hidden"
         style={{
           width: dimensions.avatar,
           height: avatarHeight,
-          borderRadius: SQUIRCLE_BORDER_RADIUS,
+          borderRadius: SDS_AVATAR_BORDER_RADIUS,
           boxShadow: '0 0 0 0.5px rgba(0, 0, 0, 0.9)',
         }}
       >
