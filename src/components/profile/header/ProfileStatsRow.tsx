@@ -11,6 +11,7 @@ interface ProfileStatsRowProps {
   onFollowersClick: () => void;
   onFollowingClick: () => void;
   onFriendsClick: () => void;
+  darkTheme?: boolean;
 }
 
 interface StatItemProps {
@@ -18,20 +19,28 @@ interface StatItemProps {
   label: string;
   onClick?: () => void;
   isClickable?: boolean;
+  darkTheme?: boolean;
 }
 
 const StatItem: React.FC<StatItemProps> = ({ 
   value, 
   label, 
   onClick, 
-  isClickable = false
+  isClickable = false,
+  darkTheme = false
 }) => {
   const content = (
     <div className="flex flex-col items-center">
-      <span className="text-base font-semibold text-foreground tabular-nums">
+      <span className={cn(
+        "text-base font-semibold tabular-nums",
+        darkTheme ? "text-white/92" : "text-foreground"
+      )}>
         {value}
       </span>
-      <span className="mt-1 text-[11px] uppercase tracking-[0.06em] text-muted-foreground">
+      <span className={cn(
+        "mt-1 text-[11px] uppercase tracking-[0.06em]",
+        darkTheme ? "text-white/55" : "text-muted-foreground"
+      )}>
         {label}
       </span>
     </div>
@@ -66,11 +75,12 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
   isMobile,
   onFollowersClick,
   onFollowingClick,
-  onFriendsClick
+  onFriendsClick,
+  darkTheme = false
 }) => {
   return (
     <section className="mt-5 flex items-center justify-center gap-8 px-4">
-      <StatItem value={postsCount} label="Posts" />
+      <StatItem value={postsCount} label="Posts" darkTheme={darkTheme} />
       
       {isPersonal && (
         <StatItem 
@@ -78,6 +88,7 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
           label="Friends" 
           onClick={onFriendsClick}
           isClickable
+          darkTheme={darkTheme}
         />
       )}
       
@@ -86,6 +97,7 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
         label="Following" 
         onClick={onFollowingClick}
         isClickable
+        darkTheme={darkTheme}
       />
       
       <StatItem 
@@ -93,6 +105,7 @@ const ProfileStatsRow: React.FC<ProfileStatsRowProps> = ({
         label="Followers" 
         onClick={onFollowersClick}
         isClickable
+        darkTheme={darkTheme}
       />
     </section>
   );

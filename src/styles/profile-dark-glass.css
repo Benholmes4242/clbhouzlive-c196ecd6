@@ -1,0 +1,98 @@
+/**
+ * Profile Dark Glass Theme
+ * Premium glassy black aesthetic for profile pages
+ */
+
+/* Dark glass page background */
+.profile-page-dark {
+  background: 
+    radial-gradient(
+      1200px 600px at 50% -10%,
+      rgba(255,255,255,0.04),
+      rgba(0,0,0,0)
+    ),
+    linear-gradient(180deg, #0B0E0C 0%, #070A08 100%);
+  color: rgba(255,255,255,0.92);
+}
+
+/* Text hierarchy for dark theme */
+.profile-page-dark .profile-text-primary {
+  color: rgba(255,255,255,0.92);
+}
+
+.profile-page-dark .profile-text-secondary {
+  color: rgba(255,255,255,0.65);
+}
+
+.profile-page-dark .profile-text-muted {
+  color: rgba(255,255,255,0.45);
+}
+
+/* Dark glass surface for cards */
+.profile-glass-surface {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+/* Pills and buttons in dark theme */
+.profile-page-dark .profile-pill {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.75);
+}
+
+.profile-page-dark .profile-edit-button {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.75);
+}
+
+.profile-page-dark .profile-edit-button:hover {
+  background: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.92);
+}
+
+/* Premium orange glowing avatar ring */
+.avatar-ring-premium {
+  position: relative;
+  padding: 5px;
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    rgba(255,193,92,1) 0%,
+    rgba(255,145,56,1) 100%
+  );
+  box-shadow:
+    0 0 0 4px rgba(0,0,0,0.65),
+    0 10px 30px rgba(0,0,0,0.45),
+    0 0 22px rgba(255,150,60,0.35);
+}
+
+.avatar-ring-premium-inner {
+  background: rgba(10,12,11,0.95);
+  border-radius: 999px;
+  padding: 3px;
+}
+
+/* Dark theme tab styling */
+.profile-page-dark [data-state="active"] {
+  background: rgba(255,255,255,0.10) !important;
+  color: rgba(255,255,255,0.92) !important;
+}
+
+.profile-page-dark [role="tablist"] {
+  background: rgba(255,255,255,0.04) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+/* Stats row dark theme */
+.profile-page-dark .stat-value {
+  color: rgba(255,255,255,0.92);
+}
+
+.profile-page-dark .stat-label {
+  color: rgba(255,255,255,0.55);
+}
