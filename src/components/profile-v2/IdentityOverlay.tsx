@@ -39,7 +39,7 @@ export const IdentityOverlay: React.FC<IdentityOverlayProps> = ({
       className={cn(
         'absolute bottom-0 left-0 right-0 z-10',
         'flex flex-col items-center',
-        'pb-6 pt-12',
+        'pb-3 pt-12',
         className
       )}
     >
