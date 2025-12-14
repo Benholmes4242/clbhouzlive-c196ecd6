@@ -110,37 +110,29 @@ export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
         />
       )}
 
-      {/* Ring border with gradient + multi-layer glow */}
+      {/* Achievement ring with gradient + glow only (no solid outline) */}
       <div
-        className="absolute rounded-full"
+        className="absolute rounded-full pointer-events-none"
         style={{
-          inset: dimensions.ringWidth / 2,
+          inset: 0,
           background: hasAchievement 
             ? `linear-gradient(180deg, ${accentBright} 0%, ${ringBgDark} 100%)`
             : ringBgDark,
-          padding: dimensions.ringWidth,
           boxShadow: hasAchievement 
-            ? `0 0 0 4px rgba(0,0,0,0.7), 0 0 8px ${glowCore}, 0 0 18px ${glowMid}, 0 0 32px ${glowSoft}, 0 10px 30px rgba(0,0,0,0.5)`
-            : `0 0 0 2px rgba(0,0,0,0.3)`,
+            ? `0 0 8px ${glowCore}, 0 0 18px ${glowMid}, 0 0 32px ${glowSoft}`
+            : 'none',
           opacity: hasAnimated ? 1 : 0,
           transition: 'opacity 0.6s ease',
         }}
-      >
-        {/* Inner dark circle (gap between ring and avatar) */}
-        <div
-          className="w-full h-full rounded-full"
-          style={{
-            background: 'var(--dgp-bg-primary)',
-          }}
-        />
-      </div>
+      />
 
-      {/* Avatar */}
+      {/* Avatar with hairline separator */}
       <div
         className="absolute rounded-full overflow-hidden"
         style={{
           width: dimensions.avatar,
           height: dimensions.avatar,
+          boxShadow: '0 0 0 0.5px rgba(0, 0, 0, 0.9)',
         }}
       >
         <SquircleAvatar
