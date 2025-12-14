@@ -15,5 +15,8 @@ export { TrophyCabinet } from './TrophyCabinet';
 export { TrophyDetailSheet } from './TrophyDetailSheet';
 export { CoursesWorldPreview } from './CoursesWorldPreview';
 export { StickyMiniHeader } from './StickyMiniHeader';
+export { HandicapPreviewCard } from './HandicapPreviewCard';
+export { QuestPreviewCard } from './QuestPreviewCard';
+export { RegionListSheet } from './RegionListSheet';
 
 export * from './types';
