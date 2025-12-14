@@ -183,51 +183,64 @@ const ChapterNode: React.FC<{
   );
 };
 
-// Milestone checkpoint component
+// Milestone checkpoint component with unlock animation
 const MilestoneCheckpoint: React.FC<{
   milestone: { threshold: number; name: string; isUnlocked: boolean };
   onClick: () => void;
-}> = ({ milestone, onClick }) => (
-  <button
-    onClick={onClick}
-    className="flex items-center gap-3 py-2"
-  >
-    <div
-      className={cn(
-        'w-8 h-8 rounded-full flex items-center justify-center ml-1 transition-all',
-        milestone.isUnlocked && 'ring-2 ring-offset-1 ring-offset-[#0B0F0D] ring-[#C8B06A]',
-      )}
-      style={{
-        background: milestone.isUnlocked
-          ? 'var(--dgp-accent-gold)'
-          : 'var(--dgp-glass-surface)',
-        border: `1px solid ${
-          milestone.isUnlocked ? 'var(--dgp-accent-gold)' : 'var(--dgp-glass-stroke)'
-        }`,
-        boxShadow: milestone.isUnlocked ? 'var(--dgp-shadow-glow-gold)' : 'none',
-        opacity: milestone.isUnlocked ? 1 : 0.4,
-      }}
+}> = ({ milestone, onClick }) => {
+  const [hasAnimated, setHasAnimated] = React.useState(false);
+
+  // Trigger one-time "lift" animation when unlocked
+  React.useEffect(() => {
+    if (milestone.isUnlocked && !hasAnimated) {
+      const timer = setTimeout(() => setHasAnimated(true), 600);
+      return () => clearTimeout(timer);
+    }
+  }, [milestone.isUnlocked, hasAnimated]);
+
+  return (
+    <button
+      onClick={onClick}
+      className="flex items-center gap-3 py-2"
     >
-      <span
-        className="text-xs font-bold"
-        style={{ color: milestone.isUnlocked ? '#000' : 'var(--dgp-text-muted)' }}
+      <div
+        className={cn(
+          'w-8 h-8 rounded-full flex items-center justify-center ml-1 transition-all duration-500',
+          milestone.isUnlocked && 'ring-2 ring-offset-1 ring-offset-[#0B0F0D] ring-[#C8B06A]',
+          milestone.isUnlocked && !hasAnimated && 'scale-105',
+        )}
+        style={{
+          background: milestone.isUnlocked
+            ? 'var(--dgp-accent-gold)'
+            : 'var(--dgp-glass-surface)',
+          border: `1px solid ${
+            milestone.isUnlocked ? 'var(--dgp-accent-gold)' : 'var(--dgp-glass-stroke)'
+          }`,
+          boxShadow: milestone.isUnlocked ? 'var(--dgp-shadow-glow-gold)' : 'none',
+          opacity: milestone.isUnlocked ? 1 : 0.4,
+        }}
       >
-        {milestone.threshold}
+        <span
+          className="text-xs font-bold"
+          style={{ color: milestone.isUnlocked ? '#000' : 'var(--dgp-text-muted)' }}
+        >
+          {milestone.threshold}
+        </span>
+      </div>
+      <span
+        className="text-xs font-medium"
+        style={{
+          color: milestone.isUnlocked ? 'var(--dgp-accent-gold)' : 'var(--dgp-text-muted)',
+        }}
+      >
+        {milestone.name}
       </span>
-    </div>
-    <span
-      className="text-xs font-medium"
-      style={{
-        color: milestone.isUnlocked ? 'var(--dgp-accent-gold)' : 'var(--dgp-text-muted)',
-      }}
-    >
-      {milestone.name}
-    </span>
-    {milestone.isUnlocked && (
-      <Check className="w-3 h-3" style={{ color: 'var(--dgp-accent-gold)' }} />
-    )}
-  </button>
-);
+      {milestone.isUnlocked && (
+        <Check className="w-3 h-3" style={{ color: 'var(--dgp-accent-gold)' }} />
+      )}
+    </button>
+  );
+};
 
 export const JourneyMapPath: React.FC<JourneyMapPathProps> = ({
   chapters,

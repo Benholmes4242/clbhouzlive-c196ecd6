@@ -3,9 +3,13 @@
  * Phase 3: Journey Map with path nodes, smart guidance, and milestone unlocks
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trophy, ChevronRight, Lock, Play } from 'lucide-react';
+import { ArrowLeft, Trophy, ChevronRight, Lock, Play, Circle } from 'lucide-react';
+
+// Quest persistence keys
+const QUEST_REPLAY_VIEWED_KEY = 'quest_last_replay_viewed';
+const QUEST_REPLAY_BADGE_DAYS = 7; // Show badge if not viewed in X days
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTop100Overview } from '@/hooks/useTop100Overview';
@@ -70,6 +74,21 @@ const ProfileQuestView: React.FC = () => {
   const [selectedClub, setSelectedClub] = useState<MilestoneClub | null>(null);
 
   const totalPlayed = overview?.total_rated ?? 0;
+
+  // Check if replay badge should show (not viewed in X days)
+  const showReplayBadge = useMemo(() => {
+    if (totalPlayed < 5) return false;
+    const lastViewed = localStorage.getItem(QUEST_REPLAY_VIEWED_KEY);
+    if (!lastViewed) return true;
+    const daysSinceViewed = (Date.now() - parseInt(lastViewed, 10)) / (1000 * 60 * 60 * 24);
+    return daysSinceViewed >= QUEST_REPLAY_BADGE_DAYS;
+  }, [totalPlayed]);
+
+  // Mark replay as viewed when navigating to it
+  const handleReplayClick = () => {
+    localStorage.setItem(QUEST_REPLAY_VIEWED_KEY, Date.now().toString());
+    navigate('/profile/quest/replay');
+  };
 
   // Get quest rewards for profile evolution
   const rewards = useQuestRewards(totalPlayed, 0);
@@ -198,8 +217,8 @@ const ProfileQuestView: React.FC = () => {
           </div>
           {totalPlayed >= 5 && (
             <button
-              onClick={() => navigate('/profile/quest/replay')}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium"
+              onClick={handleReplayClick}
+              className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium"
               style={{
                 background: 'var(--dgp-glass-surface)',
                 border: '1px solid var(--dgp-glass-stroke)',
@@ -208,6 +227,13 @@ const ProfileQuestView: React.FC = () => {
             >
               <Play className="w-3 h-3" />
               Replay
+              {/* Whisper badge */}
+              {showReplayBadge && (
+                <span
+                  className="absolute -top-1 -right-1 w-2 h-2 rounded-full"
+                  style={{ background: 'var(--dgp-accent-gold)' }}
+                />
+              )}
             </button>
           )}
         </div>

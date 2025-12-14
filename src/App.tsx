@@ -85,6 +85,7 @@ const EditProfilePage = lazy(() => import("./pages/EditProfilePage"));
 const ProfileHandicapView = lazy(() => import("./pages/ProfileHandicapView"));
 const ProfileQuestView = lazy(() => import("./pages/ProfileQuestView"));
 const QuestIndexView = lazy(() => import("./pages/QuestIndexView"));
+const QuestReplayView = lazy(() => import("./pages/QuestReplayView"));
 const AdminBackfill = lazy(() => import("./pages/AdminBackfill"));
 const UserProfilePage = lazy(() => import("./pages/UserProfilePage"));
 const UserReviewsPage = lazy(() => import("./pages/UserReviewsPage"));
@@ -228,6 +229,7 @@ function AppRoutes() {
         <Route path="/profile/handicap" element={<Suspense fallback={<ProfileSkeleton />}><ProfileHandicapView /></Suspense>} />
         <Route path="/profile/quest" element={<Suspense fallback={<ProfileSkeleton />}><ProfileQuestView /></Suspense>} />
         <Route path="/profile/quest/index" element={<Suspense fallback={<ProfileSkeleton />}><QuestIndexView /></Suspense>} />
+        <Route path="/profile/quest/replay" element={<Suspense fallback={<ProfileSkeleton />}><QuestReplayView /></Suspense>} />
         <Route path="/edit-profile" element={<Suspense fallback={<ProfileSkeleton />}><EditProfilePage /></Suspense>} />
         <Route path="/profile-test" element={<Suspense fallback={<ProfileSkeleton />}><ProfileTestPage /></Suspense>} />
         <Route path="/profile/:username" element={<Suspense fallback={<ProfileSkeleton />}><UserProfilePage /></Suspense>} />
