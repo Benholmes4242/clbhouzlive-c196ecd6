@@ -9,6 +9,8 @@ interface NavigationBarProps {
 }
 
 const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, variant = 'default' }) => {
+  const isQuietChrome = variant === 'clubhouse';
+  
   return (
     <nav className="w-full h-14 flex items-center justify-around">
       {navigationTabs.map((tab) => {
@@ -34,14 +36,24 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
             <Icon 
               className={cn(
                 "h-7 w-7",
-                isActive ? "text-primary" : "text-white/70"
+                isActive 
+                  ? "text-primary" 
+                  : isQuietChrome 
+                    ? "text-[var(--quiet-chrome-text-dim)]" 
+                    : "text-white/70"
               )}
             />
             
             {/* Label */}
             <span className={cn(
               "text-[11px] leading-none",
-              isActive ? "text-white" : "text-white/60"
+              isActive 
+                ? isQuietChrome 
+                  ? "text-[var(--quiet-chrome-active)]" 
+                  : "text-white"
+                : isQuietChrome 
+                  ? "text-[var(--quiet-chrome-label)]" 
+                  : "text-white/60"
             )}>
               {tab.label}
             </span>
