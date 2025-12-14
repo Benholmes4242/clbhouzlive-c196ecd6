@@ -653,7 +653,7 @@ const GolferVerificationTab = () => {
           <div className="grid grid-cols-2 gap-1.5">
             <TabsList className="h-auto p-0 bg-transparent">
               <TabsTrigger value="rejected" className="w-full gap-1 text-xs md:text-sm px-2 md:px-3 py-2 data-[state=active]:bg-muted data-[state=active]:font-semibold">
-                Rejected
+                Declined
                 <span className="text-[10px] md:text-xs opacity-60">({rejectedRequests.length})</span>
               </TabsTrigger>
             </TabsList>
@@ -706,8 +706,8 @@ const GolferVerificationTab = () => {
           {rejectedRequests.length === 0 ? (
             <Card className="p-8 text-center">
               <XCircle className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
-              <h3 className="font-medium text-lg">No rejected requests</h3>
-              <p className="text-muted-foreground text-sm mt-1">Rejected requests will appear here.</p>
+              <h3 className="font-medium text-lg">No declined golfers</h3>
+              <p className="text-muted-foreground text-sm mt-1">Golfers who declined verification will appear here.</p>
             </Card>
           ) : rejectedRequests.map(request => renderRequestCard(request, false))}
         </TabsContent>
