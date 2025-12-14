@@ -580,8 +580,9 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); /* TODO: wire to support DM */ }}
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
+                className={cn(basePillClass, "border-primary bg-primary/10 text-primary gap-1 cursor-pointer hover:bg-primary/20")}
               >
+                <MessageSquare className="h-3 w-3" />
                 Chat with support
               </button>
             </div>
