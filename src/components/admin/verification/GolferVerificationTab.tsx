@@ -160,7 +160,7 @@ const GolferVerificationTab = () => {
   const invitedRequests = requests?.filter(r => r.status === 'invited') ?? [];
   const approvedRequests = requests?.filter(r => r.status === 'approved') ?? [];
   const rejectedRequests = requests?.filter(r => r.status === 'rejected') ?? [];
-  const declinedRequests = requests?.filter(r => r.status === 'declined') ?? [];
+  const revokedRequests = requests?.filter(r => r.status === 'removed') ?? [];
 
   // Invite golfer mutation
   const inviteMutation = useMutation({
@@ -340,6 +340,8 @@ const GolferVerificationTab = () => {
         return <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">Verified</Badge>;
       case 'rejected':
         return <Badge variant="secondary" className="bg-red-500/10 text-red-600 border-red-500/20">Rejected</Badge>;
+      case 'removed':
+        return <Badge variant="secondary" className="bg-slate-500/10 text-slate-600 border-slate-500/20">Revoked</Badge>;
       case 'declined':
         return <Badge variant="secondary" className="bg-slate-500/10 text-slate-600 border-slate-500/20">Declined</Badge>;
       default:
@@ -580,37 +582,51 @@ const GolferVerificationTab = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        {/* Status tabs - contained width with horizontal scroll, no overflow */}
-        <div className="w-full overflow-hidden">
-          <div className="overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
-            <TabsList className="inline-flex w-max min-w-full h-9 md:h-10 gap-1 p-1">
-              <TabsTrigger value="discover" className="shrink-0 gap-1 text-xs md:text-sm px-3 md:px-4">
+        {/* Status tabs - two-row grid layout, no horizontal scroll */}
+        <div className="space-y-2">
+          {/* Top row: 4 tabs */}
+          <div className="grid grid-cols-4 gap-1.5">
+            <TabsList className="h-auto p-0 bg-transparent">
+              <TabsTrigger value="discover" className="w-full gap-1 text-xs md:text-sm px-2 md:px-3 py-2 data-[state=active]:bg-muted data-[state=active]:font-semibold">
                 <Radar className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                Discover
+                <span className="hidden sm:inline">Discover</span>
               </TabsTrigger>
-              <TabsTrigger value="pending" className="shrink-0 gap-1 text-xs md:text-sm px-3 md:px-4">
+            </TabsList>
+            <TabsList className="h-auto p-0 bg-transparent">
+              <TabsTrigger value="pending" className="w-full gap-1 text-xs md:text-sm px-2 md:px-3 py-2 data-[state=active]:bg-muted data-[state=active]:font-semibold">
                 Pending
                 {pendingRequests.length > 0 && (
-                  <span className="text-[10px] md:text-xs bg-amber-500/20 text-amber-600 px-1.5 py-0.5 rounded-full">
+                  <span className="text-[10px] md:text-xs bg-amber-500/20 text-amber-600 px-1 py-0.5 rounded-full">
                     {pendingRequests.length}
                   </span>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="invited" className="shrink-0 gap-1 text-xs md:text-sm px-3 md:px-4">
+            </TabsList>
+            <TabsList className="h-auto p-0 bg-transparent">
+              <TabsTrigger value="invited" className="w-full gap-1 text-xs md:text-sm px-2 md:px-3 py-2 data-[state=active]:bg-muted data-[state=active]:font-semibold">
                 Invited
                 <span className="text-[10px] md:text-xs opacity-60">({invitedRequests.length})</span>
               </TabsTrigger>
-              <TabsTrigger value="approved" className="shrink-0 gap-1 text-xs md:text-sm px-3 md:px-4">
+            </TabsList>
+            <TabsList className="h-auto p-0 bg-transparent">
+              <TabsTrigger value="approved" className="w-full gap-1 text-xs md:text-sm px-2 md:px-3 py-2 data-[state=active]:bg-muted data-[state=active]:font-semibold">
                 Verified
                 <span className="text-[10px] md:text-xs opacity-60">({approvedRequests.length})</span>
               </TabsTrigger>
-              <TabsTrigger value="rejected" className="shrink-0 gap-1 text-xs md:text-sm px-3 md:px-4">
+            </TabsList>
+          </div>
+          {/* Bottom row: 2 tabs */}
+          <div className="grid grid-cols-2 gap-1.5">
+            <TabsList className="h-auto p-0 bg-transparent">
+              <TabsTrigger value="rejected" className="w-full gap-1 text-xs md:text-sm px-2 md:px-3 py-2 data-[state=active]:bg-muted data-[state=active]:font-semibold">
                 Rejected
                 <span className="text-[10px] md:text-xs opacity-60">({rejectedRequests.length})</span>
               </TabsTrigger>
-              <TabsTrigger value="declined" className="shrink-0 gap-1 text-xs md:text-sm px-3 md:px-4">
-                Declined
-                <span className="text-[10px] md:text-xs opacity-60">({declinedRequests.length})</span>
+            </TabsList>
+            <TabsList className="h-auto p-0 bg-transparent">
+              <TabsTrigger value="revoked" className="w-full gap-1 text-xs md:text-sm px-2 md:px-3 py-2 data-[state=active]:bg-muted data-[state=active]:font-semibold">
+                Revoked
+                <span className="text-[10px] md:text-xs opacity-60">({revokedRequests.length})</span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -662,15 +678,15 @@ const GolferVerificationTab = () => {
           ) : rejectedRequests.map(request => renderRequestCard(request, false))}
         </TabsContent>
 
-        <TabsContent value="declined" className="mt-4 space-y-4">
-          <p className="text-sm text-muted-foreground">Golfers who declined their invite. They can be re-invited later.</p>
-          {declinedRequests.length === 0 ? (
+        <TabsContent value="revoked" className="mt-4 space-y-4">
+          <p className="text-sm text-muted-foreground">Golfers whose verification has been removed by an admin.</p>
+          {revokedRequests.length === 0 ? (
             <Card className="p-8 text-center">
-              <User className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
-              <h3 className="font-medium text-lg">No declined invites</h3>
-              <p className="text-muted-foreground text-sm mt-1">Golfers who decline their invites will appear here.</p>
+              <Trash2 className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
+              <h3 className="font-medium text-lg">No revoked verifications</h3>
+              <p className="text-muted-foreground text-sm mt-1">Golfers whose verification was removed will appear here.</p>
             </Card>
-          ) : declinedRequests.map(request => renderRequestCard(request, false))}
+          ) : revokedRequests.map(request => renderRequestCard(request, false))}
         </TabsContent>
       </Tabs>
 
