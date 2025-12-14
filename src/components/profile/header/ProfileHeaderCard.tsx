@@ -1,5 +1,5 @@
 import React from 'react';
-import { Globe, Pencil, Building2, MapPin, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { Globe, Pencil, Building2, MapPin, CheckCircle2, CheckCircle } from 'lucide-react';
 import { BUSINESS_CATEGORIES, BusinessCategory } from '@/types/profile';
 
 interface ProfileHeaderCardProps {
@@ -70,13 +70,13 @@ const ProfileHeaderCard: React.FC<ProfileHeaderCardProps> = ({
         <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-foreground text-center">
           {effectiveDisplayName}
         </h1>
-        {/* Verified golfer badge - green glass tick for personal profiles */}
+        {/* Verified golfer badge - white circular background with green tick */}
         {isPersonal && isVerifiedGolfer && (
           <span 
-            className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/20"
+            className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white border border-emerald-500/30 shadow-sm"
             title="Verified golfer"
           >
-            <ShieldCheck className="w-3 h-3 text-emerald-500" />
+            <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
           </span>
         )}
       </div>
