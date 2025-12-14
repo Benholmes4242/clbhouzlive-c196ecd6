@@ -159,7 +159,8 @@ const GolferVerificationTab = () => {
   const pendingRequests = requests?.filter(r => r.status === 'pending') ?? [];
   const invitedRequests = requests?.filter(r => r.status === 'invited') ?? [];
   const approvedRequests = requests?.filter(r => r.status === 'approved') ?? [];
-  const rejectedRequests = requests?.filter(r => r.status === 'rejected') ?? [];
+  // Include both 'rejected' (admin rejection) and 'declined' (user declined invite) in rejected tab
+  const rejectedRequests = requests?.filter(r => r.status === 'rejected' || r.status === 'declined') ?? [];
   const revokedRequests = requests?.filter(r => r.status === 'removed') ?? [];
 
   // Invite golfer mutation
