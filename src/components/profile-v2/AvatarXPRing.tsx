@@ -1,16 +1,25 @@
 /**
- * AvatarXPRing - Premium avatar with animated XP tier ring
+ * AvatarXPRing - Premium avatar with animated tier-based achievement ring
+ * Ring color derived from user's Top 100 courses played count
  */
 
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { getXPTier, XPTier } from './types';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { 
+  getTierFromTop100Count, 
+  RING_TOKENS, 
+  hexToRgba,
+  type AchievementRingTier 
+} from '@/lib/achievementRingTokens';
 
 interface AvatarXPRingProps {
   avatarUrl?: string;
   displayName: string;
-  xpValue: number;
+  /** Top 100 courses played count - determines ring tier color */
+  top100Count?: number;
+  /** Legacy xpValue prop (ignored, kept for backwards compatibility) */
+  xpValue?: number;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   onClick?: () => void;
   animateOnFirstView?: boolean;
@@ -27,15 +36,20 @@ const SIZES = {
 export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
   avatarUrl,
   displayName,
-  xpValue,
+  top100Count = 0,
+  xpValue, // kept for backwards compat but unused
   size = 'lg',
   onClick,
   animateOnFirstView = true,
   className,
 }) => {
   const [hasAnimated, setHasAnimated] = useState(!animateOnFirstView);
-  const tierConfig = getXPTier(xpValue);
   const dimensions = SIZES[size];
+  
+  // Get tier-based ring colors from Top 100 count
+  const tier = getTierFromTop100Count(top100Count);
+  const tokens = RING_TOKENS[tier];
+  const hasAchievement = tier !== 'NONE';
 
   useEffect(() => {
     if (animateOnFirstView && !hasAnimated) {
@@ -44,12 +58,10 @@ export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
     }
   }, [animateOnFirstView, hasAnimated]);
 
-  // Calculate ring progress (for potential future use)
-  const getNextTierThreshold = () => {
-    const tiers = [0, 10000, 20000, 30000, 40000, 50000];
-    const nextTier = tiers.find(t => t > xpValue) ?? 50000;
-    return nextTier;
-  };
+  // Default grey for users with no achievements
+  const ringColor = hasAchievement ? tokens.accent : '#D1D5DB';
+  const ringBgDark = hasAchievement ? tokens.bgDark : '#D1D5DB';
+  const glowColor = hasAchievement ? hexToRgba(tokens.accent, 0.4) : 'transparent';
 
   return (
     <button
@@ -65,38 +77,44 @@ export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
       }}
       aria-label={`${displayName}'s profile`}
     >
-      {/* XP Ring - Outer glow layer */}
-      <div
-        className={cn(
-          'absolute inset-0 rounded-full dgp-ring-animated',
-          hasAnimated && 'dgp-ring-glow'
-        )}
-        style={{
-          '--ring-color': tierConfig.glowColor,
-          background: `conic-gradient(from 0deg, ${tierConfig.color}, ${tierConfig.color}80, ${tierConfig.color})`,
-          opacity: hasAnimated ? 1 : 0,
-          transition: 'opacity 0.6s ease',
-        } as React.CSSProperties}
-      />
+      {/* Outer glow halo (only for achievement tiers) */}
+      {hasAchievement && (
+        <div
+          className="absolute inset-0 rounded-full pointer-events-none"
+          style={{
+            background: `radial-gradient(circle, ${hexToRgba(tokens.accent, 0.2)} 0%, transparent 70%)`,
+            filter: 'blur(8px)',
+            transform: 'scale(1.2)',
+            opacity: hasAnimated ? 0.9 : 0,
+            transition: 'opacity 0.6s ease',
+          }}
+        />
+      )}
 
-      {/* Ring border */}
+      {/* Ring border with gradient */}
       <div
         className="absolute rounded-full"
         style={{
           inset: dimensions.ringWidth / 2,
-          border: `${dimensions.ringWidth}px solid ${tierConfig.color}`,
-          boxShadow: `0 0 16px ${tierConfig.glowColor}`,
+          background: hasAchievement 
+            ? `linear-gradient(180deg, ${tokens.accent} 0%, ${tokens.bgDark} 100%)`
+            : ringColor,
+          padding: dimensions.ringWidth,
+          boxShadow: hasAchievement 
+            ? `0 0 0 3px rgba(0,0,0,0.5), 0 8px 20px rgba(0,0,0,0.3), 0 0 16px ${glowColor}`
+            : `0 0 0 2px rgba(0,0,0,0.3)`,
+          opacity: hasAnimated ? 1 : 0,
+          transition: 'opacity 0.6s ease',
         }}
-      />
-
-      {/* Inner dark circle (gap between ring and avatar) */}
-      <div
-        className="absolute rounded-full"
-        style={{
-          inset: dimensions.ringWidth + 2,
-          background: 'var(--dgp-bg-primary)',
-        }}
-      />
+      >
+        {/* Inner dark circle (gap between ring and avatar) */}
+        <div
+          className="w-full h-full rounded-full"
+          style={{
+            background: 'var(--dgp-bg-primary)',
+          }}
+        />
+      </div>
 
       {/* Avatar */}
       <div
@@ -111,6 +129,7 @@ export const AvatarXPRing: React.FC<AvatarXPRingProps> = ({
           alt={displayName}
           fallback={displayName.charAt(0).toUpperCase()}
           size={dimensions.avatar}
+          hideRing
           className="w-full h-full"
         />
       </div>

@@ -105,7 +105,7 @@ const ProfilePageV2: React.FC = () => {
   const displayName = profile?.display_name || 'Golfer';
   const username = profile?.username || 'user';
   const heroUrl = profile?.header_photo_url || profile?.profile_photo_url || '';
-  const xpValue = seasonXP?.total_xp ?? 0;
+  const top100Count = top100Overview?.total_played ?? 0;
 
   // Get current content based on active section
   const getCurrentContent = () => {
@@ -198,7 +198,7 @@ const ProfilePageV2: React.FC = () => {
           clubName={profile?.home_club ?? undefined}
           handicapIndex={profile?.eg_handicap_index ?? undefined}
           avatarUrl={profile?.profile_photo_url ?? undefined}
-          xpValue={xpValue}
+          top100Count={top100Count}
           isVerified={profile?.is_verified_golfer ?? false}
           onAvatarClick={() => {/* Open immersive view */}}
         />

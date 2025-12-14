@@ -13,7 +13,10 @@ interface IdentityOverlayProps {
   clubName?: string;
   handicapIndex?: number;
   avatarUrl?: string;
-  xpValue: number;
+  /** Top 100 courses played count - determines ring tier color */
+  top100Count?: number;
+  /** Legacy xpValue prop (kept for compatibility) */
+  xpValue?: number;
   isVerified?: boolean;
   onAvatarClick?: () => void;
   className?: string;
@@ -25,6 +28,7 @@ export const IdentityOverlay: React.FC<IdentityOverlayProps> = ({
   clubName,
   handicapIndex,
   avatarUrl,
+  top100Count = 0,
   xpValue,
   isVerified,
   onAvatarClick,
@@ -39,11 +43,11 @@ export const IdentityOverlay: React.FC<IdentityOverlayProps> = ({
         className
       )}
     >
-      {/* Avatar with XP Ring */}
+      {/* Avatar with Achievement Ring */}
       <AvatarXPRing
         avatarUrl={avatarUrl}
         displayName={displayName}
-        xpValue={xpValue}
+        top100Count={top100Count}
         size="xl"
         onClick={onAvatarClick}
         animateOnFirstView={true}
