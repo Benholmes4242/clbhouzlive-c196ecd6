@@ -18,5 +18,7 @@ export { StickyMiniHeader } from './StickyMiniHeader';
 export { HandicapPreviewCard } from './HandicapPreviewCard';
 export { QuestPreviewCard } from './QuestPreviewCard';
 export { RegionListSheet } from './RegionListSheet';
+export { JourneyMapPath } from './JourneyMapPath';
+export { NextTargetCard } from './NextTargetCard';
 
 export * from './types';

@@ -1,26 +1,20 @@
 /**
  * ProfileQuestView - Fullscreen Top 100 Quest Experience
- * Dark glass premium experience
+ * Phase 2: Journey Map with path nodes and smart guidance
  */
 
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trophy, MapPin, ChevronRight, Lock } from 'lucide-react';
+import { ArrowLeft, Trophy, ChevronRight, Lock } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTop100Overview } from '@/hooks/useTop100Overview';
 import { useTop100SeasonStats } from '@/hooks/useTop100SeasonStats';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { RegionListSheet } from '@/components/profile-v2/RegionListSheet';
-
-// Region data type
-interface RegionData {
-  id: string;
-  name: string;
-  shortName: string;
-  played: number;
-  total: number;
-}
+import { JourneyMapPath, JourneyChapter } from '@/components/profile-v2/JourneyMapPath';
+import { NextTargetCard } from '@/components/profile-v2/NextTargetCard';
+import { useQuestRewards } from '@/hooks/useQuestRewards';
 
 // Milestone club type
 interface MilestoneClub {
@@ -40,84 +34,15 @@ interface RecentCourse {
   dateAdded?: string;
 }
 
-// Region progress card
-const RegionCard: React.FC<{
-  region: RegionData;
-  onClick: () => void;
-}> = ({ region, onClick }) => {
-  const progressPercent = region.total > 0 ? (region.played / region.total) * 100 : 0;
-
-  return (
-    <button
-      onClick={onClick}
-      className="dgp-glass p-4 rounded-xl text-left transition-all hover:border-white/15 active:scale-[0.98]"
-    >
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-medium" style={{ color: 'var(--dgp-text-primary)' }}>
-          {region.name}
-        </span>
-        <ChevronRight className="w-4 h-4" style={{ color: 'var(--dgp-text-muted)' }} />
-      </div>
-      <div className="flex items-baseline gap-1 mb-2">
-        <span className="text-2xl font-bold" style={{ color: 'var(--dgp-text-primary)' }}>
-          {region.played}
-        </span>
-        <span className="text-sm" style={{ color: 'var(--dgp-text-muted)' }}>
-          / {region.total}
-        </span>
-      </div>
-      {/* Progress bar */}
-      <div
-        className="h-1 rounded-full overflow-hidden"
-        style={{ background: 'var(--dgp-glass-surface)' }}
-      >
-        <div
-          className="h-full rounded-full transition-all"
-          style={{
-            width: `${progressPercent}%`,
-            background: 'var(--dgp-accent-gold)',
-          }}
-        />
-      </div>
-    </button>
-  );
-};
-
-// Milestone club item
-const MilestoneClubItem: React.FC<{
-  club: MilestoneClub;
-  onClick: () => void;
-}> = ({ club, onClick }) => (
-  <button
-    onClick={onClick}
-    className="flex-shrink-0 dgp-trophy"
-    style={{ opacity: club.isUnlocked ? 1 : 0.4 }}
-  >
-    <div
-      className="dgp-trophy-icon"
-      style={{
-        boxShadow: club.isUnlocked ? 'var(--dgp-shadow-glow-gold)' : 'none',
-      }}
-    >
-      {club.isUnlocked ? (
-        <Trophy className="w-5 h-5" style={{ color: 'var(--dgp-accent-gold)' }} />
-      ) : (
-        <Lock className="w-4 h-4" style={{ color: 'var(--dgp-text-muted)' }} />
-      )}
-    </div>
-    <span className="dgp-trophy-label">{club.name}</span>
-    {!club.isUnlocked && club.remaining !== undefined && (
-      <span className="text-[10px]" style={{ color: 'var(--dgp-text-muted)' }}>
-        {club.remaining} to go
-      </span>
-    )}
-  </button>
-);
-
 // Recent course row
 const RecentCourseRow: React.FC<{ course: RecentCourse }> = ({ course }) => (
   <div className="flex items-center gap-3 py-3 border-b" style={{ borderColor: 'var(--dgp-divider)' }}>
-    <MapPin className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--dgp-accent-gold)' }} />
+    <div
+      className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+      style={{ background: 'var(--dgp-glass-surface)' }}
+    >
+      <Trophy className="w-4 h-4" style={{ color: 'var(--dgp-accent-gold)' }} />
+    </div>
     <div className="flex-1 min-w-0">
       <p className="text-sm font-medium truncate" style={{ color: 'var(--dgp-text-primary)' }}>
         {course.name}
@@ -140,19 +65,55 @@ const ProfileQuestView: React.FC = () => {
   const { data: overview } = useTop100Overview(user?.id);
   const { data: seasonStats } = useTop100SeasonStats({ userId: user?.id });
 
-  const [selectedRegion, setSelectedRegion] = useState<RegionData | null>(null);
+  const [selectedRegion, setSelectedRegion] = useState<JourneyChapter | null>(null);
   const [selectedClub, setSelectedClub] = useState<MilestoneClub | null>(null);
 
   const totalPlayed = overview?.total_rated ?? 0;
 
-  // Regions data (placeholder totals)
-  const regions: RegionData[] = useMemo(() => {
+  // Get quest rewards for profile evolution
+  const rewards = useQuestRewards(totalPlayed, 0);
+
+  // Journey chapters (regions)
+  const chapters: JourneyChapter[] = useMemo(() => {
     const newByList = seasonStats?.new_by_list ?? {};
+    const gbiPlayed = newByList['gbi'] ?? Math.floor(totalPlayed * 0.3);
+    const eurPlayed = newByList['europe'] ?? Math.floor(totalPlayed * 0.2);
+    const usaPlayed = newByList['usa'] ?? Math.floor(totalPlayed * 0.25);
+    const worldPlayed = newByList['world'] ?? Math.floor(totalPlayed * 0.25);
+
     return [
-      { id: 'gbi', name: 'GB & Ireland', shortName: 'GB&I', played: newByList['gbi'] ?? Math.floor(totalPlayed * 0.3), total: 100 },
-      { id: 'europe', name: 'Continental Europe', shortName: 'EUR', played: newByList['europe'] ?? Math.floor(totalPlayed * 0.2), total: 100 },
-      { id: 'usa', name: 'USA', shortName: 'USA', played: newByList['usa'] ?? Math.floor(totalPlayed * 0.25), total: 100 },
-      { id: 'world', name: 'Worldwide', shortName: 'WLD', played: newByList['world'] ?? Math.floor(totalPlayed * 0.25), total: 100 },
+      {
+        id: 'gbi',
+        name: 'GB & Ireland',
+        shortName: 'GB&I',
+        played: gbiPlayed,
+        total: 100,
+        status: gbiPlayed >= 100 ? 'completed' : gbiPlayed > 0 ? 'in-progress' : 'locked',
+      },
+      {
+        id: 'europe',
+        name: 'Continental Europe',
+        shortName: 'EUR',
+        played: eurPlayed,
+        total: 100,
+        status: eurPlayed >= 100 ? 'completed' : eurPlayed > 0 ? 'in-progress' : 'locked',
+      },
+      {
+        id: 'usa',
+        name: 'USA',
+        shortName: 'USA',
+        played: usaPlayed,
+        total: 100,
+        status: usaPlayed >= 100 ? 'completed' : usaPlayed > 0 ? 'in-progress' : 'locked',
+      },
+      {
+        id: 'world',
+        name: 'Worldwide',
+        shortName: 'WLD',
+        played: worldPlayed,
+        total: 100,
+        status: worldPlayed >= 100 ? 'completed' : worldPlayed > 0 ? 'in-progress' : 'locked',
+      },
     ];
   }, [seasonStats, totalPlayed]);
 
@@ -172,8 +133,25 @@ const ProfileQuestView: React.FC = () => {
     }));
   }, [totalPlayed]);
 
+  // Milestone data for journey map
+  const journeyMilestones = milestoneClubs.map((m) => ({
+    threshold: m.threshold,
+    name: m.name,
+    isUnlocked: m.isUnlocked,
+  }));
+
   // Next milestone
-  const nextMilestone = milestoneClubs.find((c) => !c.isUnlocked)?.name;
+  const nextMilestone = milestoneClubs.find((c) => !c.isUnlocked);
+
+  // Suggested region (lowest completion)
+  const suggestedRegion = useMemo(() => {
+    const inProgress = chapters.filter((c) => c.status === 'in-progress' || c.status === 'locked');
+    if (inProgress.length === 0) return undefined;
+    const lowest = inProgress.reduce((prev, curr) =>
+      (curr.played / curr.total) < (prev.played / prev.total) ? curr : prev
+    );
+    return lowest.name;
+  }, [chapters]);
 
   // Recently added (placeholder)
   const recentCourses: RecentCourse[] = useMemo(() => [
@@ -184,10 +162,23 @@ const ProfileQuestView: React.FC = () => {
     { id: '5', name: 'Muirfield', region: 'Scotland', dateAdded: 'Aug 18' },
   ], []);
 
+  // Count completed regions
+  const regionsCompleted = chapters.filter((c) => c.status === 'completed').length;
+
   return (
     <PageRoot className="dgp-page">
+      {/* Background texture for unlocked rewards */}
+      {rewards.hasBackgroundTexture && (
+        <div
+          className="fixed inset-0 pointer-events-none opacity-30"
+          style={{
+            background: 'radial-gradient(ellipse at 50% 0%, rgba(110, 146, 119, 0.08) 0%, transparent 70%)',
+          }}
+        />
+      )}
+
       {/* Header */}
-      <div className="sticky top-0 z-50 safe-top">
+      <div className="sticky top-0 z-50 safe-top" style={{ background: 'rgba(11, 15, 13, 0.9)', backdropFilter: 'blur(12px)' }}>
         <div className="flex items-center gap-4 p-4">
           <button
             onClick={() => navigate(-1)}
@@ -210,7 +201,16 @@ const ProfileQuestView: React.FC = () => {
         {/* Quest Header */}
         <section className="text-center py-6">
           <div className="flex justify-center mb-3">
-            <Trophy className="w-8 h-8" style={{ color: 'var(--dgp-accent-gold)' }} />
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center"
+              style={{
+                background: 'rgba(200, 176, 106, 0.15)',
+                border: '1px solid var(--dgp-accent-gold)',
+                boxShadow: rewards.hasPremiumAccent ? 'var(--dgp-shadow-glow-gold)' : 'none',
+              }}
+            >
+              <Trophy className="w-7 h-7" style={{ color: 'var(--dgp-accent-gold)' }} />
+            </div>
           </div>
           <div className="flex items-baseline justify-center gap-2 mb-1">
             <span
@@ -234,42 +234,32 @@ const ProfileQuestView: React.FC = () => {
           </p>
         </section>
 
-        {/* Region Progress Grid */}
-        <section>
-          <h2
-            className="text-sm font-semibold uppercase tracking-wider mb-4 px-1"
-            style={{ color: 'var(--dgp-text-secondary)' }}
-          >
-            Region Progress
-          </h2>
-          <div className="grid grid-cols-2 gap-3">
-            {regions.map((region) => (
-              <RegionCard
-                key={region.id}
-                region={region}
-                onClick={() => setSelectedRegion(region)}
-              />
-            ))}
-          </div>
-        </section>
+        {/* Next Target Card */}
+        <NextTargetCard
+          totalPlayed={totalPlayed}
+          nextMilestone={nextMilestone ? { name: nextMilestone.name, threshold: nextMilestone.threshold } : undefined}
+          suggestedRegion={suggestedRegion}
+          suggestedFocus={nextMilestone?.name}
+          onShare={() => {/* Share placeholder */}}
+        />
 
-        {/* Milestone Clubs Shelf */}
+        {/* Journey Map */}
         <section>
           <h2
             className="text-sm font-semibold uppercase tracking-wider mb-4 px-1"
             style={{ color: 'var(--dgp-text-secondary)' }}
           >
-            Milestone Clubs
+            Journey Map
           </h2>
-          <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-            {milestoneClubs.map((club) => (
-              <MilestoneClubItem
-                key={club.id}
-                club={club}
-                onClick={() => setSelectedClub(club)}
-              />
-            ))}
-          </div>
+          <JourneyMapPath
+            chapters={chapters}
+            milestones={journeyMilestones}
+            onChapterClick={(chapter) => setSelectedRegion(chapter)}
+            onMilestoneClick={(m) => {
+              const club = milestoneClubs.find((c) => c.threshold === m.threshold);
+              if (club) setSelectedClub(club);
+            }}
+          />
         </section>
 
         {/* Recently Added */}
@@ -282,14 +272,21 @@ const ProfileQuestView: React.FC = () => {
               Recently Added
             </h2>
             <button
+              onClick={() => navigate('/profile/quest/index')}
               className="text-xs font-medium flex items-center gap-1"
               style={{ color: 'var(--dgp-accent-green)' }}
             >
               See all <ChevronRight className="w-3 h-3" />
             </button>
           </div>
-          <div className="dgp-glass rounded-xl p-4">
-            {recentCourses.map((course, i) => (
+          <div
+            className="dgp-glass rounded-xl p-4"
+            style={{
+              boxShadow: rewards.hasGoldTrim ? '0 0 20px rgba(200, 176, 106, 0.1)' : 'none',
+              border: rewards.hasGoldTrim ? '1px solid rgba(200, 176, 106, 0.2)' : undefined,
+            }}
+          >
+            {recentCourses.map((course) => (
               <RecentCourseRow key={course.id} course={course} />
             ))}
           </div>
@@ -298,7 +295,13 @@ const ProfileQuestView: React.FC = () => {
 
       {/* Region List Sheet */}
       <RegionListSheet
-        region={selectedRegion}
+        region={selectedRegion ? {
+          id: selectedRegion.id,
+          name: selectedRegion.name,
+          shortName: selectedRegion.shortName,
+          played: selectedRegion.played,
+          total: selectedRegion.total,
+        } : null}
         onClose={() => setSelectedRegion(null)}
       />
 
