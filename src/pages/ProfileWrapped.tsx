@@ -1,16 +1,16 @@
 import React, { useEffect } from 'react';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
-import ProfilePageV2 from './ProfilePageV2';
+import ProfilePage from './ProfilePage';
 
 const ProfileWrapped = () => {
   const { setVariant } = useHeader();
 
   useEffect(() => {
-    // Profile V2 uses dark theme
-    setVariant('glass-dark');
+    // Profile pages use light liquid glass
+    setVariant('solid-light');
   }, [setVariant]);
 
-  return <ProfilePageV2 />;
+  return <ProfilePage />;
 };
 
 export default ProfileWrapped;
