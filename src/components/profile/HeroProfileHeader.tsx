@@ -368,11 +368,11 @@ const HeroProfileHeader = ({
 
   return (
     <SwipeToReturnZone onSwipeDown={reopenImmersive}>
-      {/* Premium Golf Profile Layout - No card, seamless gradient */}
+      {/* Premium Golf Profile Layout - Seamless blend */}
       <section className="relative w-full">
         
-        {/* HERO IMAGE */}
-        <div className="relative w-full h-[250px] overflow-hidden">
+        {/* HERO IMAGE with seamless fade into page */}
+        <div className="profile-header relative w-full h-[280px] overflow-hidden">
           {heroSrc ? (
             <img 
               src={heroSrc}
@@ -384,57 +384,75 @@ const HeroProfileHeader = ({
             <div className="w-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
           )}
           
-          {/* Global vignette - subtle top + bottom darkening */}
+          {/* Top scrim for header icons readability */}
           <div
-            className="pointer-events-none absolute inset-0 mix-blend-multiply opacity-70"
+            className="pointer-events-none absolute top-0 left-0 right-0 h-[90px] z-[4]"
             style={{
-              background: 'radial-gradient(circle at top, rgba(0,0,0,0.22), transparent 55%), radial-gradient(circle at bottom, rgba(0,0,0,0.18), transparent 55%)',
+              background: 'linear-gradient(to bottom, rgba(0,0,0,0.35), rgba(0,0,0,0))',
             }}
           />
           
+          {/* Global vignette - subtle side darkening for cinematic feel */}
+          <div
+            className="pointer-events-none absolute inset-0 mix-blend-multiply opacity-60 z-[3]"
+            style={{
+              background: 'radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.25) 100%)',
+            }}
+          />
+          
+          {/* Bottom fade gradient - seamless blend into page background */}
+          <div
+            className="pointer-events-none absolute bottom-0 left-0 right-0 h-[140px] z-[5]"
+            style={{
+              background: 'linear-gradient(to bottom, hsl(var(--background) / 0) 0%, hsl(var(--background) / 0.65) 55%, hsl(var(--background)) 100%)',
+            }}
+          />
         </div>
 
-        {/* META BLOCK - Glass panel with avatar + text */}
+        {/* AVATAR - Overlapping bridge between hero and content */}
+        <div 
+          className="relative z-10 flex justify-center"
+          style={{ marginTop: '-52px' }}
+        >
+          <div className="avatar-wrap">
+            <ProfileAvatarRing
+              photoUrl={profile?.profile_photo_url}
+              displayName={displayName}
+              totalTop100Played={totalTop100Played}
+              isPersonal={isPersonal}
+              isOwnProfile={isOwnProfile}
+              size="lg"
+              onClick={() => openImmersive?.(0)}
+              animateOnFirstView={true}
+              className="shadow-[0_10px_30px_rgba(0,0,0,0.18)]"
+            />
+          </div>
+        </div>
+
+        {/* META BLOCK - Profile surface (no heavy card styling) */}
         <div
           ref={profileCardRef}
-          className="relative"
-          style={{ marginTop: '-40px' }}
+          className="relative pt-3 pb-2"
         >
-          {/* Glass panel - full bleed */}
-          <div
-            className="relative flex items-center gap-4 md:gap-6 rounded-3xl bg-muted/0 backdrop-blur-xl px-4 md:px-6 py-4 md:py-5"
-          >
-              {/* AVATAR – Left column */}
-              <div className="flex-shrink-0 z-20">
-                <ProfileAvatarRing
-                  photoUrl={profile?.profile_photo_url}
-                  displayName={displayName}
-                  totalTop100Played={totalTop100Played}
-                  isPersonal={isPersonal}
-                  isOwnProfile={isOwnProfile}
-                  size="lg"
-                  onClick={() => openImmersive?.(0)}
-                  animateOnFirstView={true}
-                />
-              </div>
-
-              {/* TEXT META (name, @handle, HCP, club) */}
-              <ProfileHeaderCard
-                displayName={displayName}
-                username={username}
-                homeClub={isPersonal ? homeClub : undefined}
-                handicap={isPersonal ? profile?.eg_handicap_index : undefined}
-                websiteUrl={isBusiness ? profile?.business_website : profile?.website}
-                location={profile?.location}
-                userType={profile?.user_type}
-                businessName={profile?.business_name}
-                businessCategory={profile?.business_category}
-                businessLocation={profile?.business_location}
-                isVerifiedBusiness={profile?.is_verified_business}
-                isVerifiedGolfer={profile?.is_verified_golfer}
-                isPersonal={isPersonal}
-                isOwnProfile={isOwnProfile}
-                onCustomiseClick={isOwnProfile ? () => navigate('/edit-profile') : undefined}
+          {/* Profile info - centered layout */}
+          <div className="flex flex-col items-center text-center px-4 md:px-6">
+            <ProfileHeaderCard
+              displayName={displayName}
+              username={username}
+              homeClub={isPersonal ? homeClub : undefined}
+              handicap={isPersonal ? profile?.eg_handicap_index : undefined}
+              websiteUrl={isBusiness ? profile?.business_website : profile?.website}
+              location={profile?.location}
+              userType={profile?.user_type}
+              businessName={profile?.business_name}
+              businessCategory={profile?.business_category}
+              businessLocation={profile?.business_location}
+              isVerifiedBusiness={profile?.is_verified_business}
+              isVerifiedGolfer={profile?.is_verified_golfer}
+              isPersonal={isPersonal}
+              isOwnProfile={isOwnProfile}
+              onCustomiseClick={isOwnProfile ? () => navigate('/edit-profile') : undefined}
+              centered={true}
             />
           </div>
         </div>
