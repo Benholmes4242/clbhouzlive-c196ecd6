@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
+import { CINEMA_TIMERS } from '@/lib/clubhouseCinemaDimStyles';
 
-const ENTER_DIM_DELAY = 4000;
-const REVERT_DIM_DELAY = 6000;
+const ENTER_DIM_DELAY = CINEMA_TIMERS.enterDimDelayMs;
+const REVERT_DIM_DELAY = CINEMA_TIMERS.revertDimDelayMs;
 
 interface CinemaDimContextType {
   cinemaDim: boolean;
