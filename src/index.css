@@ -93,23 +93,6 @@ html.lightbox-open {
   --radius-tile: 18px;
   
   /* ========================================
-     CLUBHOUSE "QUIET CHROME" DESIGN TOKENS
-     ======================================== */
-  
-  /* 
-   * Quiet chrome = visually de-emphasised header/footer
-   * so glass rail + capsule read as primary UI.
-   * NO animations, NO auto-hide - just softer styling.
-   */
-  --quiet-chrome-header-bg: rgba(0, 0, 0, 0.25);
-  --quiet-chrome-footer-bg: rgba(0, 0, 0, 0.28);
-  --quiet-chrome-text: rgba(255, 255, 255, 0.78);
-  --quiet-chrome-text-dim: rgba(255, 255, 255, 0.70);
-  --quiet-chrome-label: rgba(255, 255, 255, 0.60);
-  --quiet-chrome-border: rgba(255, 255, 255, 0.06);
-  --quiet-chrome-active: rgba(255, 255, 255, 0.95);
-  
-  /* ========================================
      GLOBAL VERTICAL SPACING SYSTEM
      ======================================== */
   

@@ -37,24 +37,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
     navigate('/clubhouse');
   };
 
-  // Quiet chrome styling for Clubhouse - de-emphasised header
-  const headerStyle = isClubhousePage 
-    ? {
-        background: 'var(--quiet-chrome-header-bg)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        paddingTop: 'env(safe-area-inset-top)',
-        borderBottom: '1px solid var(--quiet-chrome-border)',
-        boxShadow: 'none',
-      }
-    : {
-        background: 'rgba(10, 10, 10, 0.95)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        paddingTop: 'env(safe-area-inset-top)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
-      };
-
   return (
     <>
       <header
@@ -62,13 +44,21 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         className={cn(
           "compact-header",
           // Keep chrome-header class for compatibility but no hide/show behavior
-          isClubhousePage && "chrome-header clubhouse-quiet-chrome",
+          isClubhousePage && "chrome-header",
           "fixed top-0 left-0 right-0 z-header",
           "h-14", // 56px
           // DISABLED: No slide animations - header always visible
+          // !isClubhousePage && "transition-transform duration-200 ease-out",
+          // !isClubhousePage && scrollHidden && "-translate-y-full",
           className
         )}
-        style={headerStyle}
+        style={{
+          background: 'rgba(10, 10, 10, 0.95)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          paddingTop: 'env(safe-area-inset-top)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+        }}
       >
         <div className="mx-auto flex h-full items-center justify-between px-3 sm:px-4 max-w-5xl">
           {/* Left: Logo icon (mobile) + wordmark (desktop) */}
@@ -106,12 +96,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                   className={cn(
                     "px-3 py-1.5 text-sm font-medium rounded-sq-sm transition-colors",
                     isActive 
-                      ? isClubhousePage 
-                        ? "text-[var(--quiet-chrome-active)] bg-white/8" 
-                        : "text-white bg-white/10"
-                      : isClubhousePage
-                        ? "text-[var(--quiet-chrome-text)] hover:text-[var(--quiet-chrome-active)] hover:bg-white/5"
-                        : "text-white/60 hover:text-white hover:bg-white/5"
+                      ? "text-white bg-white/10" 
+                      : "text-white/60 hover:text-white hover:bg-white/5"
                   )}
                 >
                   {item.label}
@@ -126,12 +112,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             <Button
               variant="ghost"
               size="icon"
-              className={cn(
-                "h-10 w-10 p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-transform",
-                isClubhousePage 
-                  ? "text-[var(--quiet-chrome-text)] hover:text-[var(--quiet-chrome-active)] hover:bg-white/8"
-                  : "text-white/70 hover:text-white hover:bg-white/10"
-              )}
+              className="text-white/70 hover:text-white hover:bg-white/10 h-10 w-10 p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-transform"
               onClick={() => setSearchOpen(true)}
               aria-label="Search"
             >
