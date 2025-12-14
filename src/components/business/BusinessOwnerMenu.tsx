@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MoreHorizontal, Pencil, BarChart2, Building2, Trash2, ShieldCheck, Clock, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -35,6 +35,14 @@ export function BusinessOwnerMenu({
   const { user } = useSupabaseSession();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [verificationModalOpen, setVerificationModalOpen] = useState(false);
+
+  // CRITICAL: Close modals on unmount to prevent stuck overlay
+  useEffect(() => {
+    return () => {
+      setDeleteDialogOpen(false);
+      setVerificationModalOpen(false);
+    };
+  }, []);
 
   // Only show for owners/admins
   if (!membership?.canManage) {

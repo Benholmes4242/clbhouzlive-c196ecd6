@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check, Loader2, ExternalLink, ChevronRight, Globe, Mail, Building, Sparkles, MapPin } from 'lucide-react';
@@ -83,6 +83,20 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
   
   // Exclusivity error
   const [exclusivityError, setExclusivityError] = useState('');
+
+  // CRITICAL: Clean up on unmount to prevent stuck overlay/scroll lock
+  // This ensures navigation away closes the modal properly
+  useEffect(() => {
+    return () => {
+      // Force close on unmount - this releases Radix scroll lock and removes overlay
+      if (open) {
+        onOpenChange(false);
+      }
+      // Ensure body scroll is restored (belt-and-suspenders)
+      document.body.style.overflow = '';
+      document.body.style.pointerEvents = '';
+    };
+  }, [open, onOpenChange]);
 
   // Fetch business details
   const { data: business, isLoading: isLoadingBusiness } = useQuery({
