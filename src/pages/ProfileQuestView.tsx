@@ -1,31 +1,40 @@
 /**
- * ProfileQuestView - Fullscreen Top 100 Quest Experience
- * Phase 3: Journey Map with path nodes, smart guidance, and milestone unlocks
+ * ProfileQuestView - Unified Quest Page
+ * 
+ * Single page with clean narrative:
+ * 1. Overall progress (Top 100 courses played)
+ * 2. Milestones earned (quick recognition)
+ * 3. Next target (forward momentum)
+ * 4. Journey Map = Milestone ladder only (5→400 Club)
+ * 5. Journey Summary = Regional list progress (GB&I / Europe / USA / Worldwide)
+ * 6. Recently Added (grounded in real activity)
  */
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trophy, ChevronRight, Lock, Play, Circle } from 'lucide-react';
-
-// Quest persistence keys
-const QUEST_REPLAY_VIEWED_KEY = 'quest_last_replay_viewed';
-const QUEST_REPLAY_BADGE_DAYS = 7; // Show badge if not viewed in X days
+import { ArrowLeft, Trophy } from 'lucide-react';
 
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useTop100Overview } from '@/hooks/useTop100Overview';
-import { useTop100SeasonStats } from '@/hooks/useTop100SeasonStats';
+import { useQuestCourses } from '@/hooks/useQuestCourses';
+import { useQuestRewards } from '@/hooks/useQuestRewards';
+import { useQuestOnboarding } from '@/hooks/useQuestOnboarding';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { RegionListSheet } from '@/components/profile-v2/RegionListSheet';
-import { JourneyMapPath, JourneyChapter } from '@/components/profile-v2/JourneyMapPath';
-import { NextTargetCard } from '@/components/profile-v2/NextTargetCard';
 import { MilestoneUnlockSheet } from '@/components/profile-v2/MilestoneUnlockSheet';
 import { QuestIntroOverlay } from '@/components/profile-v2/QuestIntroOverlay';
 import { QuestFirstCourseSheet } from '@/components/profile-v2/QuestFirstCourseSheet';
-import { useQuestRewards } from '@/hooks/useQuestRewards';
-import { useQuestOnboarding } from '@/hooks/useQuestOnboarding';
 
-// Milestone club type
+// New modular Quest components
+import { QuestHero } from '@/components/quest/QuestHero';
+import { MilestonesEarnedRow } from '@/components/quest/MilestonesEarnedRow';
+import { NextTargetCard } from '@/components/profile-v2/NextTargetCard';
+import { MilestoneLadder } from '@/components/quest/MilestoneLadder';
+import { RegionalJourneySummary, RegionProgress } from '@/components/quest/RegionalJourneySummary';
+import { RecentlyAddedSection } from '@/components/quest/RecentlyAddedSection';
+import { CLUB_STEPS } from '@/lib/top100Club';
+
+// Milestone club type for sheet
 interface MilestoneClub {
   id: string;
   name: string;
@@ -35,64 +44,13 @@ interface MilestoneClub {
   remaining?: number;
 }
 
-// Recently played course
-interface RecentCourse {
-  id: string;
-  name: string;
-  region: string;
-  dateAdded?: string;
-}
-
-// Recent course row
-const RecentCourseRow: React.FC<{ course: RecentCourse }> = ({ course }) => (
-  <div className="flex items-center gap-3 py-3 border-b" style={{ borderColor: 'var(--dgp-divider)' }}>
-    <div
-      className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-      style={{ background: 'var(--dgp-glass-surface)' }}
-    >
-      <Trophy className="w-4 h-4" style={{ color: 'var(--dgp-accent-gold)' }} />
-    </div>
-    <div className="flex-1 min-w-0">
-      <p className="text-sm font-medium truncate" style={{ color: 'var(--dgp-text-primary)' }}>
-        {course.name}
-      </p>
-      <p className="text-xs" style={{ color: 'var(--dgp-text-muted)' }}>
-        {course.region}
-      </p>
-    </div>
-    {course.dateAdded && (
-      <span className="text-xs flex-shrink-0" style={{ color: 'var(--dgp-text-muted)' }}>
-        {course.dateAdded}
-      </span>
-    )}
-  </div>
-);
-
 const ProfileQuestView: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const { data: overview } = useTop100Overview(user?.id);
-  const { data: seasonStats } = useTop100SeasonStats({ userId: user?.id });
+  const { totalPlayed, regionProgress, recentlyPlayed, isLoading } = useQuestCourses();
 
-  const [selectedRegion, setSelectedRegion] = useState<JourneyChapter | null>(null);
+  const [selectedRegion, setSelectedRegion] = useState<RegionProgress | null>(null);
   const [selectedClub, setSelectedClub] = useState<MilestoneClub | null>(null);
-
-  const totalPlayed = overview?.total_rated ?? 0;
-
-  // Check if replay badge should show (not viewed in X days)
-  const showReplayBadge = useMemo(() => {
-    if (totalPlayed < 5) return false;
-    const lastViewed = localStorage.getItem(QUEST_REPLAY_VIEWED_KEY);
-    if (!lastViewed) return true;
-    const daysSinceViewed = (Date.now() - parseInt(lastViewed, 10)) / (1000 * 60 * 60 * 24);
-    return daysSinceViewed >= QUEST_REPLAY_BADGE_DAYS;
-  }, [totalPlayed]);
-
-  // Mark replay as viewed when navigating to it
-  const handleReplayClick = () => {
-    localStorage.setItem(QUEST_REPLAY_VIEWED_KEY, Date.now().toString());
-    navigate('/profile/quest/replay');
-  };
 
   // Get quest rewards for profile evolution
   const rewards = useQuestRewards(totalPlayed, 0);
@@ -119,96 +77,63 @@ const ProfileQuestView: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [showJourneyHint, onboarding]);
-  const chapters: JourneyChapter[] = useMemo(() => {
-    const newByList = seasonStats?.new_by_list ?? {};
-    const gbiPlayed = newByList['gbi'] ?? Math.floor(totalPlayed * 0.3);
-    const eurPlayed = newByList['europe'] ?? Math.floor(totalPlayed * 0.2);
-    const usaPlayed = newByList['usa'] ?? Math.floor(totalPlayed * 0.25);
-    const worldPlayed = newByList['world'] ?? Math.floor(totalPlayed * 0.25);
 
-    return [
-      {
-        id: 'gbi',
-        name: 'GB & Ireland',
-        shortName: 'GB&I',
-        played: gbiPlayed,
-        total: 100,
-        status: gbiPlayed >= 100 ? 'completed' : gbiPlayed > 0 ? 'in-progress' : 'locked',
-      },
-      {
-        id: 'europe',
-        name: 'Continental Europe',
-        shortName: 'EUR',
-        played: eurPlayed,
-        total: 100,
-        status: eurPlayed >= 100 ? 'completed' : eurPlayed > 0 ? 'in-progress' : 'locked',
-      },
-      {
-        id: 'usa',
-        name: 'USA',
-        shortName: 'USA',
-        played: usaPlayed,
-        total: 100,
-        status: usaPlayed >= 100 ? 'completed' : usaPlayed > 0 ? 'in-progress' : 'locked',
-      },
-      {
-        id: 'world',
-        name: 'Worldwide',
-        shortName: 'WLD',
-        played: worldPlayed,
-        total: 100,
-        status: worldPlayed >= 100 ? 'completed' : worldPlayed > 0 ? 'in-progress' : 'locked',
-      },
-    ];
-  }, [seasonStats, totalPlayed]);
-
-  // Milestone clubs
+  // Build milestone clubs for sheet display
   const milestoneClubs: MilestoneClub[] = useMemo(() => {
-    const thresholds = [
-      { id: '5-club', name: '5 Club', threshold: 5, description: 'Play 5 Top 100 courses' },
-      { id: '10-club', name: '10 Club', threshold: 10, description: 'Play 10 Top 100 courses' },
-      { id: '20-club', name: '20 Club', threshold: 20, description: 'Play 20 Top 100 courses' },
-      { id: '50-club', name: '50 Club', threshold: 50, description: 'Play 50 Top 100 courses' },
-      { id: '100-club', name: 'Century Club', threshold: 100, description: 'Play all 100 Top 100 courses' },
-    ];
-    return thresholds.map((t) => ({
-      ...t,
-      isUnlocked: totalPlayed >= t.threshold,
-      remaining: totalPlayed < t.threshold ? t.threshold - totalPlayed : undefined,
+    return CLUB_STEPS.map((step) => ({
+      id: `${step.threshold}-club`,
+      name: `${step.threshold} Club`,
+      threshold: step.threshold,
+      description: `Play ${step.threshold} Top 100 courses`,
+      isUnlocked: totalPlayed >= step.threshold,
+      remaining: totalPlayed < step.threshold ? step.threshold - totalPlayed : undefined,
     }));
   }, [totalPlayed]);
 
-  // Milestone data for journey map
-  const journeyMilestones = milestoneClubs.map((m) => ({
-    threshold: m.threshold,
-    name: m.name,
-    isUnlocked: m.isUnlocked,
-  }));
-
-  // Next milestone
+  // Next milestone for target card
   const nextMilestone = milestoneClubs.find((c) => !c.isUnlocked);
 
   // Suggested region (lowest completion)
   const suggestedRegion = useMemo(() => {
-    const inProgress = chapters.filter((c) => c.status === 'in-progress' || c.status === 'locked');
+    const inProgress = regionProgress.filter((c) => c.played < c.total);
     if (inProgress.length === 0) return undefined;
     const lowest = inProgress.reduce((prev, curr) =>
       (curr.played / curr.total) < (prev.played / prev.total) ? curr : prev
     );
     return lowest.name;
-  }, [chapters]);
+  }, [regionProgress]);
 
-  // Recently added (placeholder)
-  const recentCourses: RecentCourse[] = useMemo(() => [
-    { id: '1', name: 'Royal County Down', region: 'Northern Ireland', dateAdded: 'Dec 8' },
-    { id: '2', name: 'Pebble Beach', region: 'USA', dateAdded: 'Nov 22' },
-    { id: '3', name: 'St Andrews Old Course', region: 'Scotland', dateAdded: 'Oct 15' },
-    { id: '4', name: 'Royal Melbourne West', region: 'Australia', dateAdded: 'Sep 3' },
-    { id: '5', name: 'Muirfield', region: 'Scotland', dateAdded: 'Aug 18' },
-  ], []);
+  // Transform recently played for component
+  const recentCourses = recentlyPlayed.map(course => ({
+    id: course.id,
+    name: course.name,
+    region: course.region,
+    dateAdded: course.dateAdded,
+  }));
 
-  // Count completed regions
-  const regionsCompleted = chapters.filter((c) => c.status === 'completed').length;
+  // Handle milestone click
+  const handleMilestoneClick = (milestone: { threshold: number; name: string; isUnlocked: boolean }) => {
+    const club = milestoneClubs.find((c) => c.threshold === milestone.threshold);
+    if (club) setSelectedClub(club);
+  };
+
+  // Handle region click
+  const handleRegionClick = (region: RegionProgress) => {
+    setSelectedRegion(region);
+  };
+
+  if (isLoading) {
+    return (
+      <PageRoot className="dgp-page">
+        <div className="flex items-center justify-center min-h-screen">
+          <div
+            className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin"
+            style={{ borderColor: 'var(--dgp-accent-gold)', borderTopColor: 'transparent' }}
+          />
+        </div>
+      </PageRoot>
+    );
+  }
 
   return (
     <PageRoot className="dgp-page">
@@ -240,69 +165,22 @@ const ProfileQuestView: React.FC = () => {
               The Quest
             </h1>
           </div>
-          {totalPlayed >= 5 && (
-            <button
-              onClick={handleReplayClick}
-              className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium"
-              style={{
-                background: 'var(--dgp-glass-surface)',
-                border: '1px solid var(--dgp-glass-stroke)',
-                color: 'var(--dgp-text-secondary)',
-              }}
-            >
-              <Play className="w-3 h-3" />
-              Replay
-              {/* Whisper badge */}
-              {showReplayBadge && (
-                <span
-                  className="absolute -top-1 -right-1 w-2 h-2 rounded-full"
-                  style={{ background: 'var(--dgp-accent-gold)' }}
-                />
-              )}
-            </button>
-          )}
         </div>
       </div>
 
       {/* Content */}
       <div className="px-4 pb-32 space-y-8">
-        {/* Quest Header */}
-        <section className="text-center py-6">
-          <div className="flex justify-center mb-3">
-            <div
-              className="w-14 h-14 rounded-2xl flex items-center justify-center"
-              style={{
-                background: 'rgba(200, 176, 106, 0.15)',
-                border: '1px solid var(--dgp-accent-gold)',
-                boxShadow: rewards.hasPremiumAccent ? 'var(--dgp-shadow-glow-gold)' : 'none',
-              }}
-            >
-              <Trophy className="w-7 h-7" style={{ color: 'var(--dgp-accent-gold)' }} />
-            </div>
-          </div>
-          <div className="flex items-baseline justify-center gap-2 mb-1">
-            <span
-              className="text-5xl font-bold"
-              style={{ color: 'var(--dgp-text-primary)' }}
-            >
-              {totalPlayed}
-            </span>
-            <span
-              className="text-2xl"
-              style={{ color: 'var(--dgp-text-muted)' }}
-            >
-              / 100
-            </span>
-          </div>
-          <p
-            className="text-sm"
-            style={{ color: 'var(--dgp-text-secondary)' }}
-          >
-            Top 100 Courses Played
-          </p>
-        </section>
+        {/* Section 1: Hero - Overall Progress */}
+        <QuestHero
+          totalPlayed={totalPlayed}
+          target={100}
+          hasPremiumAccent={rewards.hasPremiumAccent}
+        />
 
-        {/* Next Target Card */}
+        {/* Section 2: Milestones Earned Row */}
+        <MilestonesEarnedRow totalPlayed={totalPlayed} />
+
+        {/* Section 3: Next Target Card */}
         <NextTargetCard
           totalPlayed={totalPlayed}
           nextMilestone={nextMilestone ? { name: nextMilestone.name, threshold: nextMilestone.threshold } : undefined}
@@ -313,63 +191,31 @@ const ProfileQuestView: React.FC = () => {
           onHintDismiss={onboarding.markTargetHintSeen}
         />
 
-        {/* Journey Map */}
-        <section>
-          {/* Journey hint whisper */}
-          {showJourneyHint && (
-            <p
-              className="text-xs mb-2 px-1 transition-opacity duration-500"
-              style={{ color: 'var(--dgp-text-muted)' }}
-            >
-              Your journey unfolds here
-            </p>
-          )}
-          <h2
-            className="text-sm font-semibold uppercase tracking-wider mb-4 px-1"
-            style={{ color: 'var(--dgp-text-secondary)' }}
+        {/* Section 4: Journey Map (Milestone Ladder ONLY) */}
+        {showJourneyHint && (
+          <p
+            className="text-xs px-1 transition-opacity duration-500"
+            style={{ color: 'var(--dgp-text-muted)' }}
           >
-            Journey Map
-          </h2>
-          <JourneyMapPath
-            chapters={chapters}
-            milestones={journeyMilestones}
-            onChapterClick={(chapter) => setSelectedRegion(chapter)}
-            onMilestoneClick={(m) => {
-              const club = milestoneClubs.find((c) => c.threshold === m.threshold);
-              if (club) setSelectedClub(club);
-            }}
-          />
-        </section>
+            Your journey unfolds here
+          </p>
+        )}
+        <MilestoneLadder
+          totalPlayed={totalPlayed}
+          onMilestoneClick={handleMilestoneClick}
+        />
 
-        {/* Recently Added */}
-        <section>
-          <div className="flex items-center justify-between mb-4 px-1">
-            <h2
-              className="text-sm font-semibold uppercase tracking-wider"
-              style={{ color: 'var(--dgp-text-secondary)' }}
-            >
-              Recently Added
-            </h2>
-            <button
-              onClick={() => navigate('/profile/quest/index')}
-              className="text-xs font-medium flex items-center gap-1"
-              style={{ color: 'var(--dgp-accent-green)' }}
-            >
-              See all <ChevronRight className="w-3 h-3" />
-            </button>
-          </div>
-          <div
-            className="dgp-glass rounded-xl p-4"
-            style={{
-              boxShadow: rewards.hasGoldTrim ? '0 0 20px rgba(200, 176, 106, 0.1)' : 'none',
-              border: rewards.hasGoldTrim ? '1px solid rgba(200, 176, 106, 0.2)' : undefined,
-            }}
-          >
-            {recentCourses.map((course) => (
-              <RecentCourseRow key={course.id} course={course} />
-            ))}
-          </div>
-        </section>
+        {/* Section 5: Journey Summary (Regional Lists ONLY) */}
+        <RegionalJourneySummary
+          regions={regionProgress}
+          onRegionClick={handleRegionClick}
+        />
+
+        {/* Section 6: Recently Added */}
+        <RecentlyAddedSection
+          courses={recentCourses}
+          hasGoldTrim={rewards.hasGoldTrim}
+        />
       </div>
 
       {/* Region List Sheet */}
@@ -476,7 +322,7 @@ const ProfileQuestView: React.FC = () => {
         />
       )}
 
-      {/* First Course Celebration */}
+      {/* First Course Celebration Sheet */}
       <QuestFirstCourseSheet
         open={onboarding.shouldShowFirstCourse}
         onClose={onboarding.markFirstCourseSeen}
