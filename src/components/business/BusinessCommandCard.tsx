@@ -15,7 +15,7 @@ import {
 import { DeleteBusinessDialog } from './DeleteBusinessDialog';
 import { useBusinessStats7d } from '@/hooks/useBusinessStats7d';
 import { cn } from '@/lib/utils';
-import { VerifiedBadge } from './VerifiedBadge';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import BusinessVerificationModal from './verification/BusinessVerificationModal';
 import { useBusinessVerificationRequest, deriveVerificationState } from '@/hooks/useBusinessVerificationRequest';
 import type { BusinessMembership } from '@/hooks/useMyBusinesses';
@@ -99,7 +99,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
             <div className="flex items-center gap-1.5">
               <span className="font-semibold text-foreground truncate text-[15px]">{business.name}</span>
               {business.is_verified && (
-                <VerifiedBadge size="sm" showTooltip={false} />
+                <VerifiedBadge size="sm" />
               )}
             </div>
             
