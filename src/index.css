@@ -607,8 +607,8 @@ html, body, #root {
   --region-usa: 197 68 59;          /* warm red */
   --region-europe: 101 84 192;      /* violet / indigo */
   
-  /* Create Moment composer tokens - compact to fit on one screen */
-  --composer-height: 380px;
+  /* Create Moment composer tokens */
+  --composer-height: 440px;
 }
 
 /* Sheet animations */
@@ -729,7 +729,7 @@ html, body, #root {
 
 @media (min-width: 768px) {
   :root {
-    --composer-height: 440px;
+    --composer-height: 510px;
   }
 }
 

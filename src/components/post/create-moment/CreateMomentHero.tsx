@@ -31,14 +31,14 @@ export default function CreateMomentHero({
   return (
     <div className="h-full w-full flex items-center justify-center bg-transparent pointer-events-none">
       <motion.div 
-        className="text-center px-6 max-w-[520px] flex flex-col items-center"
+        className="text-center px-5 max-w-[520px] flex flex-col items-center"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.25, ease: "easeOut" }}
       >
         {/* Camera Icon - reduced size */}
         <Camera 
-          className="w-12 h-12 mb-3 opacity-80" 
+          className="w-12 h-12 mb-2 opacity-80" 
           strokeWidth={1.5}
           aria-hidden="true"
           style={{ color: 'white' }}
@@ -59,7 +59,7 @@ export default function CreateMomentHero({
         </AnimatePresence>
         
         {/* Spacer - reduced */}
-        <div className="h-4" />
+        <div className="h-3" />
         
         {/* CTA Buttons - Camera primary, Gallery secondary */}
         <div className="pointer-events-auto flex items-center justify-center gap-3 z-10">
