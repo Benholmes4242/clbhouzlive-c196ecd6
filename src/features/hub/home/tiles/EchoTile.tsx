@@ -75,7 +75,7 @@ export function EchoTile() {
         {/* Top section */}
         <div>
           {/* Title */}
-          <h3 className="text-[20px] font-semibold text-center -mt-2" style={{ color: 'var(--hub-light-text-primary)' }}>
+          <h3 className="text-[20px] font-semibold text-center -mt-2" style={{ color: 'var(--hub-text-bright)' }}>
             Echo
           </h3>
 
@@ -96,11 +96,11 @@ export function EchoTile() {
                   height: '40px',
                   borderRadius: '14px',
                   padding: '0 44px 0 14px',
-                  background: 'var(--hub-light-input-bg)',
-                  border: '1px solid var(--hub-light-input-border)',
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.08)',
                   outline: 0,
                   fontSize: '15px',
-                  color: 'var(--hub-light-text-primary)',
+                  color: 'var(--hub-text)',
                 }}
               />
               <button
@@ -117,14 +117,13 @@ export function EchoTile() {
                   height: '34px',
                   borderRadius: '12px',
                   border: 0,
-                  background: 'var(--hub-light-pill-bg)',
+                  background: 'rgba(255,255,255,0.08)',
                   fontSize: '16px',
                   cursor: input.trim() ? 'pointer' : 'default',
                   opacity: input.trim() ? 1 : 0.4,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'var(--hub-light-text-primary)',
                 }}
               >
                 <Send size={16} />
@@ -135,7 +134,7 @@ export function EchoTile() {
           {/* Sample question */}
           <p 
             className="mt-2 text-[12px] leading-snug line-clamp-2 cursor-pointer text-center"
-            style={{ color: 'var(--hub-light-text-tertiary)' }}
+            style={{ color: 'var(--hub-text-muted)' }}
             onClick={(e) => { e.stopPropagation(); sendTip(tips[tipIdx]); }}
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
@@ -154,7 +153,8 @@ export function EchoTile() {
             e.stopPropagation(); 
             navigateFromHub('/hub/echo/history'); 
           }}
-          className="hub-light-card-link mt-3 self-end text-[15px] font-medium inline-flex items-center gap-1"
+          className="mt-3 self-end text-[15px] font-medium inline-flex items-center gap-1"
+          style={{ color: 'var(--hub-text-bright)' }}
         >
           View Chats
           <span aria-hidden>→</span>

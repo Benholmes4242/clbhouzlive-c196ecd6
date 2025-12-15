@@ -160,22 +160,24 @@ export function YourGamesTile() {
       title={
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <h3 style={{ color: 'var(--hub-light-text-primary)' }}>Games</h3>
+            <h3>Games</h3>
             {totalPendingRequests > 0 && (
-              <div 
-                className="hub-light-count-pill"
-                style={{
-                  fontSize: '12px',
-                  padding: '4px 8px',
-                }}
-              >
+              <div className="yourGamesTile__badge">
                 Requests · {totalPendingRequests}
               </div>
             )}
           </div>
           <button
             onClick={openCreateGame}
-            className="hub-light-primary-cta"
+            className="text-[15px] font-medium transition"
+            style={{ 
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--hub-text-body)',
+              padding: 0,
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
             aria-label="Create a Game"
           >
             Create a Game +
@@ -187,7 +189,15 @@ export function YourGamesTile() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <button
               onClick={openSearchGames}
-              className="hub-light-card-link text-[15px] font-medium transition"
+              className="text-[15px] font-medium transition"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--hub-text-body)',
+                padding: 0,
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
               aria-label="Search Games"
             >
               ← Search Games
@@ -195,7 +205,15 @@ export function YourGamesTile() {
             <button
               ref={viewAllRef}
               onClick={openYourGames}
-              className="hub-light-card-link text-[15px] font-medium transition"
+              className="text-[15px] font-medium transition"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--hub-text-body)',
+                padding: 0,
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
               aria-label="View all your games"
               disabled={!hasAny && isLoading}
             >
@@ -224,19 +242,19 @@ export function YourGamesTile() {
               key={i} 
               className="h-12 animate-pulse" 
               style={{ 
-                background: 'var(--hub-light-pill-bg)',
-                borderBottom: '1px solid var(--hub-light-divider)',
+                background: 'transparent',
+                borderBottom: '1px solid rgba(255,255,255,0.12)',
               }} 
             />
           ))}
 
           {isError && (
-            <div className="text-[13px] space-y-2" style={{ color: 'var(--hub-light-text-secondary)' }}>
+            <div className="text-[13px] space-y-2" style={{ color: 'var(--hub-text-sub)' }}>
               <div>Couldn't load games</div>
               <button 
                 onClick={() => refetch()}
                 className="text-[13px] underline underline-offset-2"
-                style={{ color: 'var(--hub-light-accent)' }}
+                style={{ color: 'var(--hub-accent-orange)' }}
               >
                 Retry
               </button>
@@ -244,12 +262,12 @@ export function YourGamesTile() {
           )}
           
           {!isLoading && !isError && games.length === 0 && (
-            <div className="text-[14px]" style={{ color: 'var(--hub-light-text-secondary)' }}>
+            <div className="text-[14px]" style={{ color: 'var(--hub-text-sub)' }}>
               No games yet.{' '}
               <button 
                 onClick={openCreateGame}
                 className="underline underline-offset-2"
-                style={{ color: 'var(--hub-light-accent)' }}
+                style={{ color: 'var(--hub-accent-orange)' }}
               >
                 Create one
               </button>
