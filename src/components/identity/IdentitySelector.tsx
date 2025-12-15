@@ -1,5 +1,6 @@
 import { ChevronDown, Check, Building2, User } from 'lucide-react';
 import { useActiveActor, ActiveActor } from '@/context/ActiveActorContext';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,23 +27,17 @@ export function IdentitySelector({ compact = false, variant = 'light' }: Identit
   const getInitials = (name: string) => name.charAt(0).toUpperCase();
 
   const renderAvatar = (actor: ActiveActor, size: 'sm' | 'md' = 'sm') => {
-    const sizeClass = size === 'sm' ? 'h-6 w-6' : 'h-8 w-8';
-    const textSize = size === 'sm' ? 'text-[10px]' : 'text-xs';
-
-    if (actor.avatarUrl) {
-      return (
-        <img
-          src={actor.avatarUrl}
-          alt={actor.name}
-          className={`${sizeClass} rounded-full object-cover`}
-        />
-      );
-    }
+    // Use SDS squircle avatar - matches Clubhouse header PostingAsPill
+    const sizePixels = size === 'sm' ? 24 : 32;
 
     return (
-      <div className={`${sizeClass} rounded-full bg-muted flex items-center justify-center ${textSize} font-medium`}>
-        {getInitials(actor.name)}
-      </div>
+      <SquircleAvatar
+        size={sizePixels}
+        src={actor.avatarUrl}
+        alt={actor.name}
+        fallback={getInitials(actor.name)}
+        hideRing
+      />
     );
   };
 
