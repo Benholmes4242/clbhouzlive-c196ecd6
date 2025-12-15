@@ -8,6 +8,7 @@ import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { ActivityPost as LocalActivityPost } from './types/ActivityTypes';
 import { ActivityPost } from './activity/types';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import { CreatorProfileSection } from './CreatorProfileSection';
 
 interface ActivityFeedProps {
   userId: string;
@@ -132,6 +133,13 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
 
   return (
     <>
+      {/* Creator Profile Section - shows only for creators */}
+      <CreatorProfileSection
+        userId={userId}
+        isOwnProfile={isOwnProfile}
+        className="mb-6"
+      />
+
       {/* Filter button row */}
       <div>
         <div className="flex justify-end">
