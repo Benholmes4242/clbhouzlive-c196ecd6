@@ -129,7 +129,8 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           'pointer-events-auto'
         )}
         style={{
-          bottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)',
+          // Shared bottom anchor with CinematicActionRail
+          bottom: 'calc(16px + env(safe-area-inset-bottom, 0px))',
         }}
       >
         <motion.div
