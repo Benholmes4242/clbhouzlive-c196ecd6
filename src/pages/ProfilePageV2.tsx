@@ -11,7 +11,7 @@ import { useTop100Overview } from '@/hooks/useTop100Overview';
 import { useActivityPosts } from '@/components/profile/hooks/useActivityPosts';
 import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import { supabase } from '@/integrations/supabase/client';
-import { Settings, ArrowLeft, Share2, Trophy, ChevronRight, MoreHorizontal, Send } from 'lucide-react';
+import { Trophy, ChevronRight, MoreHorizontal, Send } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
@@ -22,6 +22,9 @@ import { ProfileCoursesTab } from '@/components/profile/ProfileCoursesTab';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import AchievementsPane from '@/components/profile/AchievementsPane';
 import HandicapSection from '@/components/profile/HandicapSection';
+
+// Background color - bluey grey
+const BG_COLOR = '#E8EBF0';
 
 const ProfilePageV2: React.FC = () => {
   const navigate = useNavigate();
@@ -77,9 +80,15 @@ const ProfilePageV2: React.FC = () => {
   const postsCount = posts.length;
   const unlockedAchievements = achievements || [];
 
+  // Format handicap with 1 decimal place
+  const formatHandicap = (hcp: number | null | undefined): string => {
+    if (hcp == null) return '–';
+    return hcp.toFixed(1);
+  };
+
   if (authLoading || profileLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#F4F5F7' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: BG_COLOR }}>
         <div className="w-8 h-8 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
       </div>
     );
@@ -143,7 +152,7 @@ const ProfilePageV2: React.FC = () => {
   };
 
   return (
-    <PageRoot className="min-h-screen" style={{ background: '#F4F5F7' }}>
+    <PageRoot className="min-h-screen" style={{ background: BG_COLOR }}>
       {/* Hero Section - tall, full bleed */}
       <div className="relative">
         {/* Hero Image */}
@@ -157,106 +166,87 @@ const ProfilePageV2: React.FC = () => {
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-slate-300 to-slate-400" />
           )}
-          {/* Subtle fade at very bottom only */}
+          {/* More gradual fade at bottom */}
           <div 
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'linear-gradient(to bottom, transparent 0%, transparent 70%, rgba(244,245,247,0.5) 90%, #F4F5F7 100%)'
+              background: `linear-gradient(to bottom, transparent 0%, transparent 50%, ${BG_COLOR}40 70%, ${BG_COLOR}90 85%, ${BG_COLOR} 100%)`
             }}
           />
         </div>
-        
-        {/* Navigation buttons - dark glass style */}
-        <div className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between p-4 safe-top">
-          <button
-            onClick={() => navigate(-1)}
-            className="w-9 h-9 rounded-md flex items-center justify-center bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors"
-            aria-label="Go back"
-          >
-            <ArrowLeft className="w-5 h-5 text-white" />
-          </button>
-          
-          <div className="flex items-center gap-2">
-            <button
-              className="w-9 h-9 rounded-md flex items-center justify-center bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors"
-              aria-label="Share profile"
-            >
-              <Share2 className="w-5 h-5 text-white" />
-            </button>
-            <button
-              onClick={() => navigate('/settings')}
-              className="w-9 h-9 rounded-md flex items-center justify-center bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors"
-              aria-label="Settings"
-            >
-              <Settings className="w-5 h-5 text-white" />
-            </button>
-          </div>
-        </div>
 
-        {/* Avatar - squircle with tan/brown ring, SDS radius */}
-        <div className="absolute left-1/2 -translate-x-1/2 -bottom-16 z-20">
+        {/* Avatar - squircle with tan/brown ring, using global squircle design */}
+        <div className="absolute left-1/2 -translate-x-1/2 -bottom-12 z-20">
+          {/* Achievement ring - squircle */}
           <div 
-            className="w-[120px] h-[120px] rounded-sq-lg overflow-hidden"
+            className="clbhouz-squircle relative w-[124px] h-[124px] flex items-center justify-center"
             style={{
-              border: '2.5px solid #8B7355',
-              boxShadow: '0 12px 30px rgba(15,15,15,0.22)'
+              background: '#8B7355',
             }}
           >
-            {profile?.profile_photo_url ? (
-              <img 
-                src={profile.profile_photo_url} 
-                alt={displayName}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-slate-200 flex items-center justify-center text-3xl font-bold text-slate-600">
-                {displayName.charAt(0)}
-              </div>
-            )}
+            {/* Inner avatar - squircle */}
+            <div 
+              className="clbhouz-squircle w-[119px] h-[119px] overflow-hidden relative"
+              style={{
+                boxShadow: '0 12px 30px rgba(15,15,15,0.22)'
+              }}
+            >
+              {profile?.profile_photo_url ? (
+                <img 
+                  src={profile.profile_photo_url} 
+                  alt={displayName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-slate-200 flex items-center justify-center text-3xl font-bold text-slate-600">
+                  {displayName.charAt(0)}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Identity Stack */}
-      <div className="pt-20 px-4 text-center">
-        {/* Name - larger, not bold */}
-        <h1 className="text-[36px] font-normal text-[#0F0F0F]">
+      {/* Identity Stack - reduced spacing */}
+      <div className="pt-14 px-4 text-center">
+        {/* Name - smaller, more bold */}
+        <h1 className="text-[28px] font-semibold text-[#0F0F0F]">
           {displayName}
         </h1>
         
-        {/* Home club - larger, semi-bold */}
-        {profile?.home_club && (
-          <p className="mt-1 text-lg font-semibold text-[#0F0F0F]">
-            {profile.home_club}
-          </p>
-        )}
-        
-        {/* HCP pill - rounded full, no border */}
-        {profile?.eg_handicap_index != null && (
-          <div className="mt-2 flex items-center justify-center">
+        {/* Home club + HCP pill inline */}
+        <div className="mt-1 flex items-center justify-center gap-2">
+          {profile?.home_club && (
+            <p className="text-base font-medium text-[#0F0F0F]">
+              {profile.home_club}
+            </p>
+          )}
+          
+          {/* HCP pill - white, on right of home club */}
+          {profile?.eg_handicap_index != null && (
             <span 
-              className="px-4 py-1.5 text-sm font-semibold rounded-full text-[#0F0F0F]"
-              style={{ background: 'rgba(15,15,15,0.06)' }}
+              className="px-3 py-1 text-sm font-semibold rounded-full text-[#0F0F0F]"
+              style={{ background: '#FFFFFF' }}
             >
-              HCP {profile.eg_handicap_index}
+              HCP {formatHandicap(profile.eg_handicap_index)}
             </span>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
-      {/* Action Buttons - 50% smaller */}
+      {/* Action Buttons - longer buttons */}
       <div className="mt-5 px-4 flex items-center justify-center gap-2">
-        {/* Follow - blue filled pill */}
+        {/* Follow - blue filled pill, longer */}
         <button 
-          className="h-8 px-4 rounded-full text-xs font-semibold text-white flex items-center justify-center"
+          className="h-8 px-8 rounded-full text-xs font-semibold text-white flex items-center justify-center"
           style={{ background: '#0066FF' }}
         >
           Follow
         </button>
         
-        {/* Message - white outline pill */}
+        {/* Message - white outline pill, longer */}
         <button 
-          className="h-8 px-4 rounded-full text-xs font-semibold text-[#0F0F0F] flex items-center justify-center gap-1.5"
+          className="h-8 px-6 rounded-full text-xs font-semibold text-[#0F0F0F] flex items-center justify-center gap-1.5"
           style={{
             background: '#fff',
             border: '1px solid #E0E0E0'
@@ -278,23 +268,23 @@ const ProfilePageV2: React.FC = () => {
         </button>
       </div>
 
-      {/* Mini-nav row: Posts | Followers | Friends - counts on right */}
+      {/* Mini-nav row: Posts | Followers | Friends - increased gap between title and number */}
       <div className="mt-6 px-4">
-        <div className="flex items-center justify-between border-b border-[#E8E8E8]">
+        <div className="flex items-center justify-between border-b border-[#D0D4DB]">
           {/* Posts */}
           <button
             onClick={() => setActiveMiniNav('posts')}
             className="relative pb-3 px-2"
           >
-            <span className={`text-base font-medium ${activeMiniNav === 'posts' ? 'text-[#0F0F0F]' : 'text-[#0F0F0F]'}`}>
-              Posts <span className="font-semibold">{postsCount}</span>
+            <span className={`text-base font-medium text-[#0F0F0F]`}>
+              Posts<span className="ml-2 font-semibold">{postsCount}</span>
             </span>
             {activeMiniNav === 'posts' && (
               <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#0F0F0F] rounded-full" />
             )}
           </button>
           
-          {/* Followers - count on right */}
+          {/* Followers */}
           <button
             onClick={() => {
               setActiveMiniNav('followers');
@@ -303,14 +293,14 @@ const ProfilePageV2: React.FC = () => {
             className="relative pb-3 px-2"
           >
             <span className={`text-base font-medium text-[#0F0F0F]`}>
-              Followers <span className="font-semibold">{followersCount}</span>
+              Followers<span className="ml-2 font-semibold">{followersCount}</span>
             </span>
             {activeMiniNav === 'followers' && (
               <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#0F0F0F] rounded-full" />
             )}
           </button>
           
-          {/* Friends - count on right */}
+          {/* Friends */}
           {isPersonal && (
             <button
               onClick={() => {
@@ -320,7 +310,7 @@ const ProfilePageV2: React.FC = () => {
               className="relative pb-3 px-2"
             >
               <span className={`text-base font-medium text-[#0F0F0F]`}>
-                Friends <span className="font-semibold">{friendsCount}</span>
+                Friends<span className="ml-2 font-semibold">{friendsCount}</span>
               </span>
               {activeMiniNav === 'friends' && (
                 <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#0F0F0F] rounded-full" />
@@ -332,7 +322,7 @@ const ProfilePageV2: React.FC = () => {
 
       {/* White content sheet */}
       <div className="bg-white pt-5 pb-32 min-h-[60vh]">
-        {/* About section - all text black */}
+        {/* About section */}
         <section className="px-5 mb-6">
           <h3 className="text-xl font-bold text-[#0F0F0F] mb-2">About</h3>
           <p className="text-base text-[#0F0F0F] leading-relaxed font-medium">
@@ -345,7 +335,7 @@ const ProfilePageV2: React.FC = () => {
           </div>
         </section>
 
-        {/* Golf Snapshot - all text black */}
+        {/* Golf Snapshot */}
         <section className="px-5 mb-6">
           <h3 className="text-xl font-bold text-[#0F0F0F] mb-3">Golf Snapshot</h3>
           <div className="grid grid-cols-2 gap-3">
@@ -356,7 +346,7 @@ const ProfilePageV2: React.FC = () => {
             >
               <div className="flex items-center justify-between px-4 py-3 border-b border-[#E8E8E8]">
                 <span className="text-sm text-[#0F0F0F]">Handicap</span>
-                <span className="text-sm font-semibold text-[#0F0F0F]">{profile?.eg_handicap_index ?? '–'}</span>
+                <span className="text-sm font-semibold text-[#0F0F0F]">{formatHandicap(profile?.eg_handicap_index)}</span>
               </div>
               <div className="flex items-center justify-between px-4 py-3">
                 <span className="text-sm text-[#0F0F0F]">Home Club</span>
@@ -385,7 +375,7 @@ const ProfilePageV2: React.FC = () => {
           </div>
         </section>
 
-        {/* Achievements - all text black */}
+        {/* Achievements */}
         {isPersonal && unlockedAchievements.length > 0 && (
           <section className="px-5 mb-6">
             <div className="flex items-center justify-between mb-3">
@@ -422,7 +412,7 @@ const ProfilePageV2: React.FC = () => {
           </section>
         )}
 
-        {/* Tabs - all text black */}
+        {/* Tabs */}
         <section className="px-5">
           <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
             <TabsList 
@@ -454,6 +444,9 @@ const ProfilePageV2: React.FC = () => {
           {getCurrentContent()}
         </div>
       </div>
+
+      {/* Bottom Navigation Spacer */}
+      <div className="h-20" />
     </PageRoot>
   );
 };
