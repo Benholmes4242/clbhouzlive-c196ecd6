@@ -1,8 +1,8 @@
 import React from 'react';
 import { Check, X, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { useAcceptGolferInvite, useDeclineGolferInvite } from '@/hooks/useGolferVerificationActions';
 import { cn } from '@/lib/utils';
+import { getNotificationButtonClass } from '@/components/ui/NotificationCard';
 
 interface GolferVerificationInviteButtonsProps {
   requestId: string;
@@ -52,7 +52,7 @@ export const GolferVerificationInviteButtons: React.FC<GolferVerificationInviteB
   // Already responded (either optimistically or from server)
   if (displayStatus === 'accepted') {
     return (
-      <span className="inline-flex items-center gap-1 px-3 h-6 text-[11px] font-semibold rounded-sq-xs border border-emerald-500 bg-emerald-500/10 text-emerald-600">
+      <span className={getNotificationButtonClass('statusSuccess')}>
         <Check className="h-3 w-3" />
         Verification in progress
       </span>
@@ -61,7 +61,7 @@ export const GolferVerificationInviteButtons: React.FC<GolferVerificationInviteB
 
   if (displayStatus === 'declined') {
     return (
-      <span className="inline-flex items-center gap-1 px-3 h-6 text-[11px] font-semibold rounded-sq-xs border border-muted-foreground/30 bg-muted text-muted-foreground">
+      <span className={getNotificationButtonClass('statusMuted')}>
         <X className="h-3 w-3" />
         Invite declined
       </span>
@@ -71,32 +71,34 @@ export const GolferVerificationInviteButtons: React.FC<GolferVerificationInviteB
   // Pending - show action buttons
   return (
     <div className="flex items-center gap-2">
-      <Button
-        variant="default"
-        size="sm"
-        className="h-7 px-3 text-xs"
+      <button
         onClick={handleAccept}
         disabled={isPending}
+        className={cn(
+          getNotificationButtonClass('primary'),
+          "disabled:opacity-60 disabled:cursor-not-allowed"
+        )}
       >
         {acceptMutation.isPending ? (
           <Loader2 className="h-3 w-3 animate-spin" />
         ) : (
           'Accept verification'
         )}
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="h-7 px-3 text-xs text-muted-foreground hover:text-foreground"
+      </button>
+      <button
         onClick={handleDecline}
         disabled={isPending}
+        className={cn(
+          getNotificationButtonClass('secondary'),
+          "disabled:opacity-60 disabled:cursor-not-allowed"
+        )}
       >
         {declineMutation.isPending ? (
           <Loader2 className="h-3 w-3 animate-spin" />
         ) : (
           'Not now'
         )}
-      </Button>
+      </button>
     </div>
   );
 };
