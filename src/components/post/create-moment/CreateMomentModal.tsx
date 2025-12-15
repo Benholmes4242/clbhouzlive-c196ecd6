@@ -399,14 +399,14 @@ export default function CreateMomentModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999]">
-      {/* Main sheet */}
+    <div className="fixed inset-0 z-[9999] overflow-hidden">
+      {/* Main sheet - flex column layout */}
       <div 
         ref={wrapperRef}
         role="dialog"
         aria-modal="true"
         aria-label="Create a Moment"
-        className="ecm-glass-sheet fixed inset-0"
+        className="ecm-glass-sheet fixed inset-0 flex flex-col overflow-hidden"
         style={{
           background: 'rgba(15, 15, 15, 0.95)',
           backdropFilter: 'blur(24px)',
@@ -419,22 +419,25 @@ export default function CreateMomentModal({
               : isExiting
                 ? `transform ${ECM_EXIT_DURATION}ms ${ECM_EXIT_EASING}`
                 : `transform ${ECM_ENTRY_DURATION}ms ${ECM_ENTRY_EASING}`,
+          paddingTop: 'env(safe-area-inset-top, 0px)',
         }}
         onTouchStart={handleSheetTouchStart}
         onTouchMove={handleSheetTouchMove}
         onTouchEnd={handleSheetTouchEnd}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Grabber bar */}
-        {!hasMedia && <div className="hub-grabber" />}
+        {/* Zone 1: Drag handle (fixed, tiny) */}
+        <div className="flex-shrink-0 h-6 flex items-center justify-center">
+          {!hasMedia && <div className="w-9 h-1 rounded-full bg-white/20" />}
+        </div>
 
-        {/* Media Stage */}
+        {/* Zone 2: Hero/Media Stage (FLEXIBLE - takes remaining space) */}
         <section
           id="media" 
-          className="absolute inset-x-0 overflow-hidden z-[1002]"
+          className="flex-1 min-h-0 overflow-hidden"
           style={{ 
-            top: 'env(safe-area-inset-top, 0px)',
-            bottom: 'var(--composer-height)'
+            minHeight: '180px',
+            maxHeight: '42vh'
           }}
         >
           {hasMedia ? (
@@ -459,19 +462,18 @@ export default function CreateMomentModal({
           )}
         </section>
 
-        {/* Composer Panel */}
+        {/* Zone 3: Composer Panel (FIXED - never clips, no internal scroll) */}
         <section 
-          className="composer absolute bottom-0 left-0 right-0 z-[1003] rounded-t-none flex flex-col"
+          className="flex-shrink-0 flex flex-col overflow-hidden"
           style={{ 
-            height: 'var(--composer-height)',
             background: 'rgba(15, 15, 15, 0.95)',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
             borderTop: '1px solid rgba(255, 255, 255, 0.1)'
           }}
         >
-          {/* Scrollable content area */}
-          <div className="flex-1 min-h-0 overflow-hidden">
+          {/* 12px top padding to divider */}
+          <div className="pt-3 overflow-hidden">
             <CreateMomentComposerPanel
               hasMedia={hasMedia}
               caption={caption}
@@ -488,11 +490,11 @@ export default function CreateMomentModal({
             />
           </div>
 
-          {/* Share Bar - sticky at bottom, safe-area aware */}
+          {/* Share Bar - fixed row (not overlay), 12px above it to Enhance */}
           <div 
-            className="flex-shrink-0 px-4 pt-2 border-t border-white/8"
+            className="flex-shrink-0 px-4 pt-3 border-t border-white/6"
             style={{ 
-              paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)',
+              paddingBottom: 'max(env(safe-area-inset-bottom), 12px)',
               background: 'rgba(15, 15, 15, 0.98)'
             }}
           >
