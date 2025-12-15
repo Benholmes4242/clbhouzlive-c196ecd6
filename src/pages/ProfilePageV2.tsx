@@ -204,7 +204,7 @@ const ProfilePageV2: React.FC = () => {
           {/* HCP pill - white */}
           {profile?.eg_handicap_index != null && (
             <span 
-              className="px-3 py-1.5 text-sm font-semibold rounded-full text-[#0F0F0F]"
+              className="px-2.5 py-1 text-xs font-semibold rounded-full text-[#0F0F0F]"
               style={{ 
                 background: '#FFFFFF',
                 boxShadow: '0 2px 8px rgba(31, 36, 40, 0.08)'
@@ -214,14 +214,14 @@ const ProfilePageV2: React.FC = () => {
             </span>
           )}
           
-          {/* Golfer pill - green glass */}
+          {/* Golfer pill - transparent green glass */}
           <span 
-            className="px-3 py-1.5 text-sm font-semibold rounded-full text-white flex items-center gap-1.5"
+            className="px-2.5 py-1 text-xs font-semibold rounded-full text-emerald-700 flex items-center gap-1.5"
             style={{ 
-              background: 'rgba(52, 199, 89, 0.9)',
+              background: 'rgba(52, 199, 89, 0.15)',
               backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)',
-              boxShadow: '0 2px 8px rgba(52, 199, 89, 0.25)'
+              border: '1px solid rgba(52, 199, 89, 0.3)'
             }}
           >
             Golfer
