@@ -29,26 +29,18 @@ export type Top100LeaderboardResponse = {
   current_user_entry: Top100LeaderboardEntry | null;
 };
 
-// Internal RPC types
-type LeaderboardRpcEntry = {
+// Internal RPC types - flat array returned from RPC
+type LeaderboardRpcRow = {
   user_id: string;
-  rank: number;
+  username: string;
   display_name: string | null;
-  avatar_url: string | null;
+  profile_photo_url: string | null;
   home_club: string | null;
-  total_top100_played: number;
-  milestone_label: string | null;
+  top100_courses_played: number;
+  global_rank: number;
+  regional_rank: number;
   is_friend: boolean;
-};
-
-type LeaderboardRpcPayload = {
-  // IMPORTANT:
-  // - total_count and current_user_entry are for the FULL dataset
-  //   (not just this page of entries).
-  // - entries is the paginated slice.
-  entries: LeaderboardRpcEntry[];
-  total_count: number;
-  current_user_entry: LeaderboardRpcEntry | null;
+  last_activity_at: string | null;
 };
 
 export function useTop100Leaderboard(args: UseTop100LeaderboardArgs) {
@@ -61,42 +53,55 @@ export function useTop100Leaderboard(args: UseTop100LeaderboardArgs) {
       const { data: { user } } = await supabase.auth.getUser();
       const currentUserId = user?.id || null;
 
+      // Map frontend scope to RPC scope
+      const scopeMap: Record<LeaderboardScope, string> = {
+        'worldwide': 'worldwide',
+        'global-top-100': 'worldwide',
+        'gb-i-top-100': 'gbi',
+        'usa-top-100': 'usa',
+        'europe-top-100': 'europe',
+      };
+
       const { data, error } = await supabase.rpc('get_top100_leaderboard', {
-        scope_param: scope,
+        scope_param: scopeMap[scope] || 'worldwide',
         time_range_param: timeRange,
         limit_param: pageSize,
-        offset_param: pageParam * pageSize,
+        offset_param: (pageParam as number) * pageSize,
         current_user_id: currentUserId,
       });
 
       if (error) throw error;
 
-      const parsed = data as LeaderboardRpcPayload;
+      const rows = (data || []) as LeaderboardRpcRow[];
 
-      const mapEntry = (e: LeaderboardRpcEntry): Top100LeaderboardEntry => ({
-        user_id: e.user_id,
-        rank: e.rank,
-        display_name: e.display_name || 'Anonymous',
-        avatar_url: e.avatar_url || null,
-        home_club: e.home_club || null,
+      const entries: Top100LeaderboardEntry[] = rows.map((row, index): Top100LeaderboardEntry => ({
+        user_id: row.user_id,
+        rank: row.global_rank || ((pageParam as number) * pageSize + index + 1),
+        display_name: row.display_name || row.username || 'Anonymous',
+        avatar_url: row.profile_photo_url || null,
+        home_club: row.home_club || null,
         country: null,
-        total_top100_played: e.total_top100_played,
+        total_top100_played: row.top100_courses_played,
         lists_completed: [],
-        milestone_label: e.milestone_label || null,
-        is_friend: e.is_friend ?? false,
-      });
+        milestone_label: null,
+        is_friend: row.is_friend ?? false,
+      }));
+
+      // Find current user entry
+      const currentUserEntry = currentUserId 
+        ? entries.find(e => e.user_id === currentUserId) || null
+        : null;
 
       return {
-        entries: (parsed.entries || []).map(mapEntry),
-        total_count: parsed.total_count || 0,
-        current_user_entry: parsed.current_user_entry
-          ? mapEntry(parsed.current_user_entry)
-          : null,
+        entries,
+        total_count: entries.length > 0 ? entries.length + (pageParam as number) * pageSize : 0,
+        current_user_entry: currentUserEntry,
       };
     },
     getNextPageParam: (lastPage, allPages) => {
+      // If we got fewer than pageSize, we've reached the end
       const loadedCount = allPages.reduce((sum, page) => sum + page.entries.length, 0);
-      return loadedCount < lastPage.total_count ? allPages.length : undefined;
+      return lastPage.entries.length < pageSize ? undefined : allPages.length;
     },
     staleTime: 2 * 60 * 1000,
   });

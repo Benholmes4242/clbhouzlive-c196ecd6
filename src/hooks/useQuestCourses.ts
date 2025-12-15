@@ -35,26 +35,30 @@ export function useQuestCourses() {
   const queryClient = useQueryClient();
   const userId = user?.id;
 
-  // Fetch all Top 100 courses with user status (RATINGS-ONLY)
+  // Fetch Top 100 courses via course_top100_memberships (same source as My Progress page)
   const { data: courses = [], isLoading } = useQuery({
     queryKey: ['quest-courses', userId],
     queryFn: async () => {
       if (!userId) return [];
 
-      // Get all Top 100 courses
-      const { data: allCourses, error: coursesError } = await supabase
-        .from('golf_courses')
-        .select('id, name, country, region, continent, global_rank, regional_rank, usa_rank, thumbnail_image')
-        .or('global_rank.not.is.null,regional_rank.not.is.null')
-        .order('global_rank', { nullsFirst: false });
+      // Get all Top 100 courses with their list memberships (single source of truth)
+      const { data: memberships, error: membershipError } = await supabase
+        .from('course_top100_memberships')
+        .select(`
+          course_id,
+          rank,
+          list:top100_lists!inner(id, slug, name),
+          course:golf_courses!inner(id, name, country, region, continent, thumbnail_image)
+        `);
 
-      if (coursesError) throw coursesError;
+      if (membershipError) throw membershipError;
 
       // Get user's ratings (SINGLE SOURCE OF TRUTH for "played")
       const { data: ratingsData } = await supabase
         .from('course_ratings')
         .select('course_id, rating, created_at')
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .eq('is_mock', false);
 
       // Get user's shortlisted courses (wishlist)
       const { data: shortlistData } = await supabase
@@ -63,44 +67,47 @@ export function useQuestCourses() {
         .eq('user_id', userId);
 
       const ratingsMap = new Map(
-        (ratingsData || []).map(r => [r.course_id, r])
+        (ratingsData || []).filter(r => r.rating !== null).map(r => [r.course_id, r])
       );
       const shortlistSet = new Set(
         (shortlistData || []).map(s => s.course_id)
       );
 
+      // Map list slug to region name
+      const listToRegion: Record<string, string> = {
+        'world': 'Worldwide',
+        'worldwide': 'Worldwide',
+        'gbi': 'GB & Ireland',
+        'usa': 'USA',
+        'europe': 'Continental Europe',
+      };
+
       // Map to QuestCourse format
-      return (allCourses || []).map((course): QuestCourse => {
-        const rating = ratingsMap.get(course.id);
+      return (memberships || []).map((m: any): QuestCourse => {
+        const rating = ratingsMap.get(m.course_id);
         
         // RATINGS-ONLY: isPlayed = has a rating
         const isRated = !!rating;
         const isPlayed = isRated;
         
-        // Determine region based on country/ranking
-        let region = 'Worldwide';
-        if (course.country === 'USA' || course.usa_rank) {
-          region = 'USA';
-        } else if (['England', 'Scotland', 'Wales', 'Ireland', 'Northern Ireland'].includes(course.country)) {
-          region = 'GB & Ireland';
-        } else if (course.continent === 'Europe') {
-          region = 'Continental Europe';
-        }
+        // Get region from list slug
+        const listSlug = m.list?.slug || 'world';
+        const region = listToRegion[listSlug] || 'Worldwide';
 
         const dateAdded = rating?.created_at;
 
         return {
-          id: course.id,
-          name: course.name,
+          id: m.course_id,
+          name: m.course?.name || 'Unknown Course',
           region,
-          country: course.country,
-          rank: course.global_rank || course.regional_rank,
+          country: m.course?.country || '',
+          rank: m.rank,
           isPlayed,
           isRated,
-          isWishlist: shortlistSet.has(course.id) && !isPlayed,
+          isWishlist: shortlistSet.has(m.course_id) && !isPlayed,
           dateAdded: dateAdded ? new Date(dateAdded).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : undefined,
           rating: rating?.rating,
-          imageUrl: course.thumbnail_image || undefined,
+          imageUrl: m.course?.thumbnail_image || undefined,
         };
       });
     },
