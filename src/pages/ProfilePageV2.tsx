@@ -170,28 +170,18 @@ const ProfilePageV2: React.FC = () => {
 
         {/* Avatar - squircle, left-aligned with About title (px-5), 50% over hero / 50% below */}
         <div className="absolute left-5 -bottom-[62px] z-20">
-          {/*
-            NOTE: .clbhouz-squircle forces direct children to 100% width/height.
-            To preserve ring thickness, we use layered absolute squircles (no nested sizing).
-          */}
-          <div className="relative w-[128px] h-[128px]">
-            {/* 2px "gap" ring (same as bluey-grey background) */}
+          <div className="relative w-[124px] h-[124px]">
+            {/* 2px bluey-grey ring (matches background) */}
             <div
               className="clbhouz-squircle absolute inset-0"
               style={{ background: BG_COLOR }}
-            />
-
-            {/* Achievement ring */}
-            <div
-              className="clbhouz-squircle absolute"
-              style={{ inset: '2px', background: '#8B7355' }}
             />
 
             {/* Avatar */}
             <div
               className="clbhouz-squircle absolute overflow-hidden"
               style={{
-                inset: '7px',
+                inset: '2px',
                 boxShadow: '0 12px 30px rgba(15,15,15,0.22)',
               }}
             >
