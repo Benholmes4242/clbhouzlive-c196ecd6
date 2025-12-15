@@ -76,13 +76,12 @@ export default function CreateMomentShareBar({
         )}
       </AnimatePresence>
 
-      {/* Share button - fixed 48px height */}
+      {/* Share button - slimmer 44px height */}
       <button
         disabled={!canPost || isUploading}
         onClick={onPost}
-        className="w-full rounded-xl shadow-sm font-semibold text-sm transition-all duration-200 active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-white/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="w-full h-11 rounded-xl shadow-sm font-semibold text-sm transition-all duration-200 active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-white/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         style={{
-          height: '48px',
           background: isSuccess 
             ? 'rgba(34, 197, 94, 0.25)' 
             : 'rgba(255, 255, 255, 0.18)',
