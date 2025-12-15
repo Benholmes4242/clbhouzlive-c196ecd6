@@ -36,10 +36,10 @@ export function useQuestCourses() {
   const userId = user?.id;
 
   // Fetch Top 100 courses via course_top100_memberships (same source as My Progress page)
-  const { data: courses = [], isLoading } = useQuery({
+  const { data: questData, isLoading } = useQuery({
     queryKey: ['quest-courses', userId],
     queryFn: async () => {
-      if (!userId) return [];
+      if (!userId) return { courses: [], listProgress: {} };
 
       // Get all Top 100 courses with their list memberships (single source of truth)
       const { data: memberships, error: membershipError } = await supabase
@@ -81,23 +81,50 @@ export function useQuestCourses() {
         'europe': 'Continental Europe',
       };
 
-      // Deduplicate courses by course_id (a course can be on multiple lists)
+      // Calculate list progress FIRST (before deduplication)
+      // This ensures each list gets its own accurate count
+      const listProgress: Record<string, { played: number; total: number }> = {
+        'global': { played: 0, total: 0 },
+        'gb-i': { played: 0, total: 0 },
+        'usa': { played: 0, total: 0 },
+        'europe': { played: 0, total: 0 },
+      };
+
+      // Count per list (courses can be on multiple lists)
+      const listCourses: Record<string, Set<string>> = {
+        'global': new Set(),
+        'gb-i': new Set(),
+        'usa': new Set(),
+        'europe': new Set(),
+      };
+
+      for (const m of memberships || []) {
+        const listSlug = (m.list as any)?.slug;
+        if (!listSlug || !listProgress[listSlug]) continue;
+
+        // Only count each course once per list
+        if (!listCourses[listSlug].has(m.course_id)) {
+          listCourses[listSlug].add(m.course_id);
+          listProgress[listSlug].total++;
+          
+          const rating = ratingsMap.get(m.course_id);
+          if (rating) {
+            listProgress[listSlug].played++;
+          }
+        }
+      }
+
+      // Deduplicate courses for the flat list (for totalPlayed and recently played)
       const courseMap = new Map<string, QuestCourse>();
       
       for (const m of memberships || []) {
         const rating = ratingsMap.get(m.course_id);
-        
-        // RATINGS-ONLY: isPlayed = has a rating
         const isRated = !!rating;
         const isPlayed = isRated;
-        
-        // Get region from list slug
-        const listSlug = (m.list as any)?.slug || 'world';
+        const listSlug = (m.list as any)?.slug || 'global';
         const region = listToRegion[listSlug] || 'Worldwide';
-
         const dateAdded = rating?.created_at;
 
-        // Only add if not already in map, or if this is a more specific region
         if (!courseMap.has(m.course_id)) {
           courseMap.set(m.course_id, {
             id: m.course_id,
@@ -115,41 +142,47 @@ export function useQuestCourses() {
         }
       }
       
-      return Array.from(courseMap.values());
+      return {
+        courses: Array.from(courseMap.values()),
+        listProgress,
+      };
     },
     enabled: !!userId,
     staleTime: 5 * 60 * 1000,
   });
 
-  // Calculate region progress (RATINGS-ONLY counts)
+  const courses = questData?.courses || [];
+  const listProgress = questData?.listProgress || {};
+
+  // Calculate region progress from pre-calculated listProgress (matches Top 100 list page exactly)
   const regionProgress: RegionProgress[] = [
     {
-      id: 'gbi',
+      id: 'gb-i',
       name: 'GB & Ireland',
       shortName: 'GB&I',
-      played: courses.filter(c => c.region === 'GB & Ireland' && c.isRated).length,
-      total: courses.filter(c => c.region === 'GB & Ireland').length,
+      played: listProgress['gb-i']?.played || 0,
+      total: listProgress['gb-i']?.total || 0,
     },
     {
       id: 'europe',
       name: 'Continental Europe',
       shortName: 'EUR',
-      played: courses.filter(c => c.region === 'Continental Europe' && c.isRated).length,
-      total: courses.filter(c => c.region === 'Continental Europe').length,
+      played: listProgress['europe']?.played || 0,
+      total: listProgress['europe']?.total || 0,
     },
     {
       id: 'usa',
       name: 'USA',
       shortName: 'USA',
-      played: courses.filter(c => c.region === 'USA' && c.isRated).length,
-      total: courses.filter(c => c.region === 'USA').length,
+      played: listProgress['usa']?.played || 0,
+      total: listProgress['usa']?.total || 0,
     },
     {
-      id: 'world',
+      id: 'global',
       name: 'Worldwide',
       shortName: 'WLD',
-      played: courses.filter(c => c.region === 'Worldwide' && c.isRated).length,
-      total: courses.filter(c => c.region === 'Worldwide').length,
+      played: listProgress['global']?.played || 0,
+      total: listProgress['global']?.total || 0,
     },
   ];
 
