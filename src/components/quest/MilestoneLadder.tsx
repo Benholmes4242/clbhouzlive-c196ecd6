@@ -50,8 +50,8 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
           className="absolute left-5 top-10 w-0.5 h-full journey-rail"
           style={{
             background: isUnlocked
-              ? `linear-gradient(to bottom, ${ringColor}, rgba(12, 14, 13, 0.12))`
-              : 'rgba(12, 14, 13, 0.12)',
+              ? `linear-gradient(to bottom, ${ringColor}, rgba(31, 36, 40, 0.16))`
+              : 'rgba(31, 36, 40, 0.16)',
             opacity: isUnlocked ? 0.7 : 0.5,
           }}
         />
@@ -62,15 +62,15 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
         onClick={onClick}
         className={cn(
           'relative z-10 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300',
-          isUnlocked && 'ring-2 ring-offset-2 ring-offset-[#EEF1F0]',
-          isCurrent && !isUnlocked && 'ring-1 ring-offset-1 ring-offset-[#EEF1F0]',
+          isUnlocked && 'ring-2 ring-offset-2 ring-offset-[#F4F5F7]',
+          isCurrent && !isUnlocked && 'ring-1 ring-offset-1 ring-offset-[#F4F5F7]',
         )}
         style={{
           background: isUnlocked
             ? ringColor
             : isCurrent
             ? 'var(--quest-accent-green)'
-            : 'var(--quest-surface)',
+            : 'var(--quest-card)',
           border: `2px solid ${
             isUnlocked
               ? ringColor
@@ -79,9 +79,9 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
               : 'var(--quest-stroke)'
           }`,
           boxShadow: isUnlocked
-            ? `0 0 15px ${ringColor}35`
+            ? `0 0 12px ${ringColor}25`
             : isCurrent
-            ? '0 0 12px rgba(110, 146, 119, 0.2)'
+            ? '0 0 10px rgba(110, 146, 119, 0.15)'
             : 'var(--quest-shadow-sm)',
           // @ts-expect-error CSS custom property for ring color
           '--tw-ring-color': isUnlocked ? ringColor : isCurrent ? 'var(--quest-accent-green)' : undefined,
@@ -101,7 +101,7 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
             className="absolute inset-0 rounded-full animate-ping journey-node-glow"
             style={{
               background: 'var(--quest-accent-green)',
-              opacity: 0.15,
+              opacity: 0.12,
               animationDuration: '2s',
             }}
           />
@@ -117,12 +117,12 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
           !isUnlocked && !isCurrent && 'opacity-60',
         )}
         style={{
-          background: 'var(--quest-surface)',
+          background: 'var(--quest-card)',
           border: '1px solid var(--quest-stroke)',
           boxShadow: isUnlocked
-            ? `0 0 15px ${ringColor}15`
+            ? `0 0 12px ${ringColor}10`
             : isCurrent
-            ? '0 0 12px rgba(110, 146, 119, 0.1)'
+            ? '0 0 10px rgba(110, 146, 119, 0.08)'
             : 'var(--quest-shadow-sm)',
         }}
       >
@@ -137,19 +137,19 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
             className="text-xs px-2 py-0.5 rounded-full"
             style={{
               background: isUnlocked
-                ? `${ringColor}20`
+                ? `${ringColor}18`
                 : isCurrent
-                ? 'rgba(110, 146, 119, 0.15)'
-                : 'var(--quest-chip-bg)',
+                ? 'rgba(247, 147, 30, 0.16)'
+                : 'var(--quest-pill-inactive)',
               border: isUnlocked
-                ? `1px solid ${ringColor}40`
+                ? `1px solid ${ringColor}35`
                 : isCurrent
-                ? '1px solid rgba(110, 146, 119, 0.25)'
-                : '1px solid var(--quest-chip-stroke)',
+                ? '1px solid rgba(247, 147, 30, 0.26)'
+                : '1px solid var(--quest-stroke)',
               color: isUnlocked
                 ? ringColor
                 : isCurrent
-                ? 'var(--quest-accent-green)'
+                ? 'var(--quest-text-primary)'
                 : 'var(--quest-text-tertiary)',
             }}
           >
@@ -239,7 +239,7 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
   return (
     <section>
       <h2
-        className="text-sm font-semibold uppercase tracking-wider mb-4 px-1"
+        className="text-sm font-semibold uppercase tracking-wider mb-4 px-1 quest-section-title"
         style={{ color: 'var(--quest-text-secondary)' }}
       >
         Journey Map
@@ -249,7 +249,7 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
         {/* Background path line */}
         <div
           className="absolute left-7 top-0 bottom-0 w-0.5 journey-rail"
-          style={{ background: 'rgba(12, 14, 13, 0.12)' }}
+          style={{ background: 'rgba(31, 36, 40, 0.16)' }}
         />
 
         <div className="space-y-0">

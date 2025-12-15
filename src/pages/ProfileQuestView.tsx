@@ -125,7 +125,7 @@ const ProfileQuestView: React.FC = () => {
 
   if (isLoading) {
     return (
-      <PageRoot className="quest-theme-light min-h-screen" style={{ background: 'var(--quest-bg)' }}>
+      <PageRoot className="quest-theme-light min-h-screen">
         <div className="flex items-center justify-center min-h-screen">
           <div
             className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin"
@@ -137,13 +137,13 @@ const ProfileQuestView: React.FC = () => {
   }
 
   return (
-    <PageRoot className="quest-theme-light min-h-screen" style={{ background: 'var(--quest-bg)' }}>
+    <PageRoot className="quest-theme-light min-h-screen">
       {/* Background texture for unlocked rewards */}
       {rewards.hasBackgroundTexture && (
         <div
-          className="fixed inset-0 pointer-events-none opacity-20"
+          className="fixed inset-0 pointer-events-none opacity-10"
           style={{
-            background: 'radial-gradient(ellipse at 50% 0%, rgba(110, 146, 119, 0.12) 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse at 50% 0%, rgba(110, 146, 119, 0.15) 0%, transparent 70%)',
           }}
         />
       )}
@@ -152,27 +152,26 @@ const ProfileQuestView: React.FC = () => {
       <div 
         className="sticky top-0 z-50 safe-top" 
         style={{ 
-          background: 'var(--quest-surface-strong)', 
-          backdropFilter: 'blur(12px)',
-          borderBottom: '1px solid var(--quest-stroke)',
-          boxShadow: 'var(--quest-shadow-sm)',
+          background: 'var(--quest-page)', 
+          borderBottom: '1px solid var(--quest-hairline)',
         }}
       >
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate(-1)}
-              className="w-9 h-9 rounded-full flex items-center justify-center transition-colors hover:bg-black/5"
+              className="w-9 h-9 rounded-full flex items-center justify-center transition-colors hover:bg-black/[0.04]"
               style={{ 
-                background: 'var(--quest-surface-strong)',
+                background: 'var(--quest-card)',
                 border: '1px solid var(--quest-stroke)',
+                boxShadow: 'var(--quest-shadow-sm)',
               }}
               aria-label="Go back"
             >
               <ArrowLeft className="w-5 h-5" style={{ color: 'var(--quest-text-primary)' }} />
             </button>
             <h1
-              className="text-lg font-semibold"
+              className="text-lg font-bold"
               style={{ color: 'var(--quest-text-primary)' }}
             >
               The Quest
@@ -208,7 +207,7 @@ const ProfileQuestView: React.FC = () => {
         {showJourneyHint && (
           <p
             className="text-xs px-1 transition-opacity duration-500"
-            style={{ color: 'var(--dgp-text-muted)' }}
+            style={{ color: 'var(--quest-text-tertiary)' }}
           >
             Your journey unfolds here
           </p>
@@ -249,7 +248,7 @@ const ProfileQuestView: React.FC = () => {
           side="bottom"
           className="rounded-t-3xl border-t"
           style={{
-            background: 'var(--quest-surface-strong)',
+            background: 'var(--quest-card)',
             borderColor: 'var(--quest-stroke)',
           }}
         >
@@ -260,15 +259,18 @@ const ProfileQuestView: React.FC = () => {
                   <div
                     className="w-16 h-16 rounded-2xl flex items-center justify-center"
                     style={{
-                      background: 'var(--quest-surface)',
-                      border: '1px solid var(--quest-stroke)',
-                      boxShadow: selectedClub.isUnlocked ? '0 0 20px rgba(210, 180, 97, 0.25)' : 'var(--quest-shadow-sm)',
-                      opacity: selectedClub.isUnlocked ? 1 : 0.6,
+                      background: selectedClub.isUnlocked 
+                        ? 'rgba(210, 180, 97, 0.12)' 
+                        : 'var(--quest-pill-inactive)',
+                      border: selectedClub.isUnlocked 
+                        ? '1px solid rgba(210, 180, 97, 0.3)' 
+                        : '1px solid var(--quest-stroke)',
+                      boxShadow: selectedClub.isUnlocked ? '0 0 20px rgba(210, 180, 97, 0.2)' : 'var(--quest-shadow-sm)',
                     }}
                   >
                     <Trophy
                       className="w-6 h-6"
-                      style={{ color: 'var(--quest-accent-gold)' }}
+                      style={{ color: selectedClub.isUnlocked ? 'var(--quest-accent-gold)' : 'var(--quest-text-tertiary)' }}
                     />
                   </div>
                 </div>
