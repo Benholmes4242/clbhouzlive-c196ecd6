@@ -8,6 +8,7 @@ import ThemeToggle from '@/components/ui/theme-toggle';
 import { useProfileData } from '@/hooks/useProfileData';
 import { NearbyTestToolsPanel } from '@/features/nearby/components/NearbyTestToolsPanel';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { CreatorModeToggle } from '@/components/settings/CreatorModeToggle';
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -73,6 +74,9 @@ const Settings = () => {
     return null;
   }
 
+  // Check if user is a personal profile (not business) - only personal profiles can enable Creator Mode
+  const isPersonalProfile = profile?.profile_type !== 'business';
+
   return (
     <PageRoot className="min-h-screen bg-background pb-28">
       <CompactHeader />
@@ -82,6 +86,14 @@ const Settings = () => {
         <NotificationSettings />
         
         <ThemeToggle />
+        
+        {/* Creator Mode Toggle - Only for personal profiles */}
+        {isPersonalProfile && user && (
+          <CreatorModeToggle 
+            userId={user.id} 
+            isCreator={(profile as any)?.is_creator || false} 
+          />
+        )}
         
         <NearbyTestToolsPanel />
         
