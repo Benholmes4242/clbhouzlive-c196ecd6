@@ -1,10 +1,11 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Check, ArrowRight, BadgeCheck, Megaphone, BarChart3 } from 'lucide-react';
+import { Check, ArrowRight, Megaphone, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 interface LocationState {
   businessId: string;
@@ -125,7 +126,7 @@ const BusinessProfileLiveSuccessPage = () => {
             </div>
             <div className="flex items-start gap-3">
               <div className="h-8 w-8 rounded-sq-sm bg-slate-100 flex items-center justify-center shrink-0">
-                <BadgeCheck className="h-4 w-4 text-slate-600" />
+                <VerifiedBadge size="sm" />
               </div>
               <div>
                 <p className="text-sm font-medium text-foreground">Request verification</p>
