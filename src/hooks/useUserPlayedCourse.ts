@@ -26,36 +26,31 @@ export function useUserPlayedCourse(courseId: string | undefined, userId: string
     },
   });
 
-  const togglePlayedMutation = useMutation({
-    mutationFn: async ({ played }: { played: boolean }) => {
+  const removeRatingMutation = useMutation({
+    mutationFn: async () => {
       if (!courseId || !userId) throw new Error('Missing courseId or userId');
 
-      if (played) {
-        // In ratings-only system, marking as played requires creating a rating
-        // This is typically done through the rating modal, not directly here
-        throw new Error('Use PostPlayRatingModal to add courses');
-      } else {
-        // Remove rating to mark as not played
-        const { error } = await supabase
-          .from('course_ratings')
-          .delete()
-          .eq('course_id', courseId)
-          .eq('user_id', userId);
-        if (error) throw error;
-      }
+      // Remove rating to mark as not played (ratings-only system)
+      const { error } = await supabase
+        .from('course_ratings')
+        .delete()
+        .eq('course_id', courseId)
+        .eq('user_id', userId);
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-played-course', courseId, userId] });
       queryClient.invalidateQueries({ queryKey: ['user-course-activity', userId] });
-      queryClient.invalidateQueries({ queryKey: ['user-top100-courses', userId] });
+      queryClient.invalidateQueries({ queryKey: ['userTop100Courses', userId] });
       queryClient.invalidateQueries({ queryKey: ['course-ratings'] });
+      queryClient.invalidateQueries({ queryKey: ['quest-courses'] });
     },
   });
 
   return {
     hasPlayed: hasPlayed || false,
     isLoading,
-    togglePlayed: togglePlayedMutation.mutate,
-    isToggling: togglePlayedMutation.isPending,
+    removeRating: removeRatingMutation.mutate,
+    isRemoving: removeRatingMutation.isPending,
   };
 }
