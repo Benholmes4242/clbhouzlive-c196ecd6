@@ -32,7 +32,7 @@ const ProfilePageV2: React.FC = () => {
   const { data: achievements } = useProfileAchievements(user?.id);
   
   const [activeSection, setActiveSection] = useState('activity');
-  const [activeMiniNav, setActiveMiniNav] = useState('about');
+  const [activeMiniNav, setActiveMiniNav] = useState('posts');
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
   const [friendsCount, setFriendsCount] = useState(0);
@@ -193,12 +193,12 @@ const ProfilePageV2: React.FC = () => {
           </div>
         </div>
 
-        {/* Avatar - squircle with tan/brown ring */}
+        {/* Avatar - squircle with tan/brown ring, SDS radius */}
         <div className="absolute left-1/2 -translate-x-1/2 -bottom-16 z-20">
           <div 
-            className="w-[120px] h-[120px] rounded-[24px] overflow-hidden"
+            className="w-[120px] h-[120px] rounded-sq-lg overflow-hidden"
             style={{
-              border: '4px solid #8B7355',
+              border: '2.5px solid #8B7355',
               boxShadow: '0 12px 30px rgba(15,15,15,0.22)'
             }}
           >
@@ -219,39 +219,36 @@ const ProfilePageV2: React.FC = () => {
 
       {/* Identity Stack */}
       <div className="pt-20 px-4 text-center">
-        {/* Name */}
-        <h1 className="text-[32px] font-bold text-[#0F0F0F]">
+        {/* Name - larger, not bold */}
+        <h1 className="text-[36px] font-normal text-[#0F0F0F]">
           {displayName}
         </h1>
         
-        {/* Headline row: Golfer · Club   HCP pill */}
-        <div className="mt-2 flex items-center justify-center gap-3">
-          <span className="text-base text-[#4A4A4A]">
-            Golfer
-            {profile?.home_club && (
-              <> · {profile.home_club}</>
-            )}
-          </span>
-          {profile?.eg_handicap_index != null && (
+        {/* Home club - larger, semi-bold */}
+        {profile?.home_club && (
+          <p className="mt-1 text-lg font-semibold text-[#0F0F0F]">
+            {profile.home_club}
+          </p>
+        )}
+        
+        {/* HCP pill - rounded full, no border */}
+        {profile?.eg_handicap_index != null && (
+          <div className="mt-2 flex items-center justify-center">
             <span 
-              className="px-3 py-1 text-sm font-semibold rounded-md"
-              style={{
-                background: '#fff',
-                border: '1px solid #E0E0E0',
-                color: '#1F1F1F'
-              }}
+              className="px-4 py-1.5 text-sm font-semibold rounded-full text-[#0F0F0F]"
+              style={{ background: 'rgba(15,15,15,0.06)' }}
             >
               HCP {profile.eg_handicap_index}
             </span>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
-      {/* Action Buttons - exact match */}
-      <div className="mt-5 px-4 flex items-center justify-center gap-3">
+      {/* Action Buttons - 50% smaller */}
+      <div className="mt-5 px-4 flex items-center justify-center gap-2">
         {/* Follow - blue filled pill */}
         <button 
-          className="flex-1 max-w-[180px] h-12 px-6 rounded-full text-base font-semibold text-white flex items-center justify-center"
+          className="h-8 px-4 rounded-full text-xs font-semibold text-white flex items-center justify-center"
           style={{ background: '#0066FF' }}
         >
           Follow
@@ -259,45 +256,45 @@ const ProfilePageV2: React.FC = () => {
         
         {/* Message - white outline pill */}
         <button 
-          className="flex-1 max-w-[180px] h-12 px-6 rounded-full text-base font-semibold text-[#1F1F1F] flex items-center justify-center gap-2"
+          className="h-8 px-4 rounded-full text-xs font-semibold text-[#0F0F0F] flex items-center justify-center gap-1.5"
           style={{
             background: '#fff',
             border: '1px solid #E0E0E0'
           }}
         >
-          <Send className="w-4 h-4" />
+          <Send className="w-3 h-3" />
           Message
         </button>
         
         {/* More - circular */}
         <button 
-          className="w-12 h-12 rounded-full flex items-center justify-center"
+          className="w-8 h-8 rounded-full flex items-center justify-center"
           style={{
             background: '#fff',
             border: '1px solid #E0E0E0'
           }}
         >
-          <MoreHorizontal className="w-5 h-5 text-[#1F1F1F]" />
+          <MoreHorizontal className="w-4 h-4 text-[#0F0F0F]" />
         </button>
       </div>
 
-      {/* Mini-nav row: About | 57 Followers | 9 Friends */}
+      {/* Mini-nav row: Posts | Followers | Friends - counts on right */}
       <div className="mt-6 px-4">
         <div className="flex items-center justify-between border-b border-[#E8E8E8]">
-          {/* About */}
+          {/* Posts */}
           <button
-            onClick={() => setActiveMiniNav('about')}
+            onClick={() => setActiveMiniNav('posts')}
             className="relative pb-3 px-2"
           >
-            <span className={`text-base font-medium ${activeMiniNav === 'about' ? 'text-[#0F0F0F]' : 'text-[#6B6B6B]'}`}>
-              About
+            <span className={`text-base font-medium ${activeMiniNav === 'posts' ? 'text-[#0F0F0F]' : 'text-[#0F0F0F]'}`}>
+              Posts <span className="font-semibold">{postsCount}</span>
             </span>
-            {activeMiniNav === 'about' && (
+            {activeMiniNav === 'posts' && (
               <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#0F0F0F] rounded-full" />
             )}
           </button>
           
-          {/* Followers with count */}
+          {/* Followers - count on right */}
           <button
             onClick={() => {
               setActiveMiniNav('followers');
@@ -305,16 +302,15 @@ const ProfilePageV2: React.FC = () => {
             }}
             className="relative pb-3 px-2"
           >
-            <span className={`text-base ${activeMiniNav === 'followers' ? 'text-[#0F0F0F]' : 'text-[#6B6B6B]'}`}>
-              <span className="font-semibold">{followersCount}</span>
-              <span className="font-medium ml-1">Followers</span>
+            <span className={`text-base font-medium text-[#0F0F0F]`}>
+              Followers <span className="font-semibold">{followersCount}</span>
             </span>
             {activeMiniNav === 'followers' && (
               <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#0F0F0F] rounded-full" />
             )}
           </button>
           
-          {/* Friends with count */}
+          {/* Friends - count on right */}
           {isPersonal && (
             <button
               onClick={() => {
@@ -323,9 +319,8 @@ const ProfilePageV2: React.FC = () => {
               }}
               className="relative pb-3 px-2"
             >
-              <span className={`text-base ${activeMiniNav === 'friends' ? 'text-[#0F0F0F]' : 'text-[#6B6B6B]'}`}>
-                <span className="font-semibold">{friendsCount}</span>
-                <span className="font-medium ml-1">Friends</span>
+              <span className={`text-base font-medium text-[#0F0F0F]`}>
+                Friends <span className="font-semibold">{friendsCount}</span>
               </span>
               {activeMiniNav === 'friends' && (
                 <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#0F0F0F] rounded-full" />
@@ -337,10 +332,10 @@ const ProfilePageV2: React.FC = () => {
 
       {/* White content sheet */}
       <div className="bg-white pt-5 pb-32 min-h-[60vh]">
-        {/* About section */}
+        {/* About section - all text black */}
         <section className="px-5 mb-6">
           <h3 className="text-xl font-bold text-[#0F0F0F] mb-2">About</h3>
-          <p className="text-base text-[#4A4A4A] leading-relaxed">
+          <p className="text-base text-[#0F0F0F] leading-relaxed font-medium">
             {profile?.bio || 'Passionate golfer with a love for links courses. Always working to improve my game and explore new courses.'}
           </p>
           <div className="flex justify-end mt-2">
@@ -350,7 +345,7 @@ const ProfilePageV2: React.FC = () => {
           </div>
         </section>
 
-        {/* Golf Snapshot */}
+        {/* Golf Snapshot - all text black */}
         <section className="px-5 mb-6">
           <h3 className="text-xl font-bold text-[#0F0F0F] mb-3">Golf Snapshot</h3>
           <div className="grid grid-cols-2 gap-3">
@@ -360,11 +355,11 @@ const ProfilePageV2: React.FC = () => {
               style={{ border: '1px solid #E0E0E0' }}
             >
               <div className="flex items-center justify-between px-4 py-3 border-b border-[#E8E8E8]">
-                <span className="text-sm text-[#4A4A4A]">Handicap</span>
+                <span className="text-sm text-[#0F0F0F]">Handicap</span>
                 <span className="text-sm font-semibold text-[#0F0F0F]">{profile?.eg_handicap_index ?? '–'}</span>
               </div>
               <div className="flex items-center justify-between px-4 py-3">
-                <span className="text-sm text-[#4A4A4A]">Home Club</span>
+                <span className="text-sm text-[#0F0F0F]">Home Club</span>
                 <span className="text-sm font-semibold text-[#0F0F0F] truncate max-w-[100px]">
                   {profile?.home_club ? profile.home_club.split(' ')[0] : '–'}
                 </span>
@@ -377,20 +372,20 @@ const ProfilePageV2: React.FC = () => {
               style={{ border: '1px solid #E0E0E0' }}
             >
               <div className="flex items-center justify-between px-4 py-3 border-b border-[#E8E8E8]">
-                <span className="text-sm text-[#4A4A4A]">Home Club</span>
+                <span className="text-sm text-[#0F0F0F]">Home Club</span>
                 <span className="text-sm font-semibold text-[#0F0F0F] truncate max-w-[100px]">
                   {profile?.home_club ? profile.home_club.split(' ')[0] : '–'}
                 </span>
               </div>
               <div className="flex items-center justify-between px-4 py-3">
-                <span className="text-sm text-[#4A4A4A]">Rounds Logged</span>
+                <span className="text-sm text-[#0F0F0F]">Rounds Logged</span>
                 <span className="text-sm font-semibold text-[#0F0F0F]">{roundsLogged}</span>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Achievements */}
+        {/* Achievements - all text black */}
         {isPersonal && unlockedAchievements.length > 0 && (
           <section className="px-5 mb-6">
             <div className="flex items-center justify-between mb-3">
@@ -420,14 +415,14 @@ const ProfilePageV2: React.FC = () => {
                     <Trophy className="w-4 h-4" style={{ color: '#8B7355' }} />
                   </div>
                   <div className="text-sm font-semibold text-[#0F0F0F]">{achievement.label}</div>
-                  <div className="text-xs text-[#6B6B6B]">{achievement.shortLabel}</div>
+                  <div className="text-xs text-[#0F0F0F]">{achievement.shortLabel}</div>
                 </div>
               ))}
             </div>
           </section>
         )}
 
-        {/* Tabs */}
+        {/* Tabs - all text black */}
         <section className="px-5">
           <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
             <TabsList 
@@ -444,7 +439,7 @@ const ProfilePageV2: React.FC = () => {
                   value={tab.id}
                   className="rounded-full text-sm px-3 py-1.5 font-medium transition-all duration-150 data-[state=active]:bg-white data-[state=active]:shadow-sm"
                   style={{
-                    color: activeSection === tab.id ? '#0F0F0F' : '#6B6B6B'
+                    color: '#0F0F0F'
                   }}
                 >
                   {tab.label}
