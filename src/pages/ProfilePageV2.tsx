@@ -156,7 +156,7 @@ const ProfilePageV2: React.FC = () => {
       {/* Hero Section - tall, full bleed */}
       <div className="relative">
         {/* Hero Image */}
-        <div className="relative h-[250px] w-full overflow-hidden">
+        <div className="relative h-[240px] w-full overflow-hidden">
           {heroUrl ? (
             <img 
               src={heroUrl} 
@@ -166,17 +166,10 @@ const ProfilePageV2: React.FC = () => {
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-slate-300 to-slate-400" />
           )}
-          {/* More gradual fade at bottom */}
-          <div 
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: `linear-gradient(to bottom, transparent 0%, transparent 50%, ${BG_COLOR}40 70%, ${BG_COLOR}90 85%, ${BG_COLOR} 100%)`
-            }}
-          />
         </div>
 
-        {/* Avatar - squircle with tan/brown ring, positioned higher over hero */}
-        <div className="absolute left-1/2 -translate-x-1/2 -bottom-4 z-20">
+        {/* Avatar - squircle, left-aligned with About title (px-5), 50% over hero / 50% below */}
+        <div className="absolute left-5 -bottom-[62px] z-20">
           {/* Achievement ring - squircle */}
           <div 
             className="clbhouz-squircle relative w-[124px] h-[124px] flex items-center justify-center"
@@ -207,15 +200,15 @@ const ProfilePageV2: React.FC = () => {
         </div>
       </div>
 
-      {/* Identity Stack - adjusted for higher avatar position */}
-      <div className="pt-6 px-4 text-center">
+      {/* Identity Stack - adjusted for left-aligned avatar */}
+      <div className="pt-[70px] px-5 text-left">
         {/* Name - smaller, more bold */}
         <h1 className="text-[28px] font-semibold text-[#0F0F0F]">
           {displayName}
         </h1>
         
         {/* Home club + HCP pill inline */}
-        <div className="mt-1 flex items-center justify-center gap-2">
+        <div className="mt-1 flex items-center gap-2">
           {profile?.home_club && (
             <p className="text-base font-medium text-[#0F0F0F]">
               {profile.home_club}
