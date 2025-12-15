@@ -148,21 +148,10 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
         });
       }
 
-      // Fetch recent rounds with course details
+      // Fetch recent rounds (view doesn't support joins, so fetch separately)
       const { data: recentActivity, error: recentError } = await supabase
-        .from('user_course_activity')
-        .select(`
-          course_id,
-          last_played_at,
-          rating_value,
-          golf_courses!inner (
-            id,
-            name,
-            country,
-            sub_country,
-            thumbnail_image
-          )
-        `)
+        .from('user_course_activity' as any)
+        .select('course_id, last_played_at, rating_value')
         .eq('user_id', userId)
         .eq('is_top100', true)
         .order('last_played_at', { ascending: false, nullsFirst: false })
@@ -170,9 +159,23 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
 
       if (recentError) throw recentError;
 
+      // Fetch course details separately
+      const recentCourseIds = (recentActivity || []).map((a: any) => a.course_id);
+      const { data: recentCourses, error: coursesError } = await supabase
+        .from('golf_courses')
+        .select('id, name, country, sub_country, thumbnail_image')
+        .in('id', recentCourseIds);
+
+      if (coursesError) throw coursesError;
+
+      const courseMap = new Map((recentCourses || []).map(c => [c.id, c]));
+
       // Build recent rounds with all list memberships and real ranks
       const recentRounds: Top100RecentRound[] = [];
-      for (const activity of recentActivity || []) {
+      for (const activity of (recentActivity || []) as any[]) {
+        const course = courseMap.get(activity.course_id);
+        if (!course) continue;
+        
         const courseMemberships = (memberships || [])
           .filter((m: any) => m.course_id === activity.course_id);
         
@@ -186,13 +189,13 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
 
         recentRounds.push({
           course_id: activity.course_id,
-          course_name: (activity as any).golf_courses.name,
-          country: (activity as any).golf_courses.country,
-          sub_country: (activity as any).golf_courses.sub_country,
+          course_name: course.name,
+          country: course.country,
+          sub_country: course.sub_country,
           list_slugs: courseListSlugs,
           played_at: activity.last_played_at || new Date().toISOString(),
           rating: activity.rating_value,
-          image_url: (activity as any).golf_courses.thumbnail_image ?? null,
+          image_url: course.thumbnail_image ?? null,
           global_rank: globalMembership?.rank ?? null,
           regional_rank: gbMembership?.rank ?? europeMembership?.rank ?? null,
           usa_rank: usaMembership?.rank ?? null,
