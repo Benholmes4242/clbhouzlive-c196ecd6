@@ -6,8 +6,8 @@ const ProfileWrapped = () => {
   const { setVariant } = useHeader();
 
   useEffect(() => {
-    // Profile V2 uses dark theme
-    setVariant('glass-dark');
+    // Profile now uses light theme
+    setVariant('solid-light');
   }, [setVariant]);
 
   return <ProfilePageV2 />;
