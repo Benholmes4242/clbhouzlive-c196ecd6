@@ -408,11 +408,10 @@ export default function CreateMomentModal({
         aria-label="Create a Moment"
         className="ecm-glass-sheet fixed inset-0"
         style={{
-          background: 'rgba(0, 0, 0, 0.65)',
-          backdropFilter: 'blur(22px)',
-          WebkitBackdropFilter: 'blur(22px)',
-          border: '1px solid rgba(255, 255, 255, 0.06)',
-          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.45), 0 0 1px rgba(255, 255, 255, 0.16)',
+          background: 'rgba(15, 15, 15, 0.95)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
           transform: `translateY(${translateY}px)`,
           transition:
             isDragging || !hasEntered || prefersReduced()
@@ -462,13 +461,13 @@ export default function CreateMomentModal({
 
         {/* Composer Panel */}
         <section 
-          className="composer absolute bottom-0 left-0 right-0 z-[1003] rounded-t-none border-t border-white/35"
+          className="composer absolute bottom-0 left-0 right-0 z-[1003] rounded-t-none"
           style={{ 
             height: 'var(--composer-height)',
-            background: 'var(--ecm-glass)',
-            backdropFilter: 'blur(var(--ecm-blur))',
-            WebkitBackdropFilter: 'blur(var(--ecm-blur))',
-            boxShadow: '0 -1px 0 0 rgba(255,255,255,0.35), 0 10px 40px rgba(0,0,0,0.15)'
+            background: 'rgba(15, 15, 15, 0.95)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.1)'
           }}
         >
           <CreateMomentComposerPanel
