@@ -31,38 +31,6 @@ import AchievementsPane from '@/components/profile/AchievementsPane';
 import HandicapSection from '@/components/profile/HandicapSection';
 import ProfileAchievementsRail from '@/components/profile/ProfileAchievementsRail';
 
-// Stat item component for stats row
-function StatItem({ 
-  label, 
-  value, 
-  onClick 
-}: { 
-  label: string; 
-  value: number; 
-  onClick?: () => void;
-}) {
-  const Component = onClick ? 'button' : 'div';
-  return (
-    <Component
-      onClick={onClick}
-      className={onClick ? 'flex flex-col items-center hover:opacity-80 transition-opacity' : 'flex flex-col items-center'}
-    >
-      <span 
-        className="text-lg font-semibold tabular-nums" 
-        style={{ color: 'var(--dgp-text-primary)' }}
-      >
-        {value.toLocaleString()}
-      </span>
-      <span 
-        className="mt-0.5 text-[11px] uppercase tracking-[0.06em]" 
-        style={{ color: 'var(--dgp-text-muted)' }}
-      >
-        {label}
-      </span>
-    </Component>
-  );
-}
-
 const ProfilePageV2: React.FC = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useSupabaseSession();
@@ -236,47 +204,72 @@ const ProfilePageV2: React.FC = () => {
         />
       </div>
 
-      {/* Content below hero */}
+      {/* Content below hero - dark styled */}
       <div className="relative z-10 -mt-4">
-        {/* Stats Row */}
-        <section className="flex items-center justify-center gap-10 px-4 py-5">
-          <StatItem label="Posts" value={postsCount} />
+        {/* Stats Row - dark styled */}
+        <section className="mt-2 flex items-center justify-center gap-8 px-4 py-4">
+          <div className="flex flex-col items-center">
+            <span className="text-base font-semibold tabular-nums" style={{ color: 'var(--dgp-text-primary)' }}>
+              {postsCount}
+            </span>
+            <span className="mt-1 text-[11px] uppercase tracking-[0.06em]" style={{ color: 'var(--dgp-text-muted)' }}>
+              Posts
+            </span>
+          </div>
           
           {isPersonal && (
-            <StatItem 
-              label="Friends" 
-              value={friendsCount} 
+            <button 
               onClick={() => navigate(`/profile/${username}/friends`)}
-            />
+              className="flex flex-col items-center hover:opacity-80 transition-opacity"
+            >
+              <span className="text-base font-semibold tabular-nums" style={{ color: 'var(--dgp-text-primary)' }}>
+                {friendsCount}
+              </span>
+              <span className="mt-1 text-[11px] uppercase tracking-[0.06em]" style={{ color: 'var(--dgp-text-muted)' }}>
+                Friends
+              </span>
+            </button>
           )}
           
-          <StatItem 
-            label="Following" 
-            value={followingCount} 
+          <button 
             onClick={() => navigate(`/profile/${username}/following`)}
-          />
+            className="flex flex-col items-center hover:opacity-80 transition-opacity"
+          >
+            <span className="text-base font-semibold tabular-nums" style={{ color: 'var(--dgp-text-primary)' }}>
+              {followingCount}
+            </span>
+            <span className="mt-1 text-[11px] uppercase tracking-[0.06em]" style={{ color: 'var(--dgp-text-muted)' }}>
+              Following
+            </span>
+          </button>
           
-          <StatItem 
-            label="Followers" 
-            value={followersCount} 
+          <button 
             onClick={() => navigate(`/profile/${username}/followers`)}
-          />
+            className="flex flex-col items-center hover:opacity-80 transition-opacity"
+          >
+            <span className="text-base font-semibold tabular-nums" style={{ color: 'var(--dgp-text-primary)' }}>
+              {followersCount}
+            </span>
+            <span className="mt-1 text-[11px] uppercase tracking-[0.06em]" style={{ color: 'var(--dgp-text-muted)' }}>
+              Followers
+            </span>
+          </button>
         </section>
 
-        {/* Achievements Rail */}
+        {/* Achievements Rail - dark styled */}
         {isPersonal && profile?.id && username && (
           <ProfileAchievementsRail
             userId={profile.id}
             username={username}
-            className="mt-1"
+            className="mt-2"
           />
         )}
 
-        {/* Tab Navigation */}
+        {/* Tabs - dark styled */}
         <section className="mt-6 px-4">
           <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
             <TabsList 
-              className="grid w-full rounded-sq-md border p-1"
+              className="grid w-full rounded-sq-md border px-2 py-[3px]"
               style={{ 
                 gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`,
                 background: 'var(--dgp-glass-surface)',
@@ -287,7 +280,7 @@ const ProfilePageV2: React.FC = () => {
                 <TabsTrigger 
                   key={tab.id}
                   value={tab.id}
-                  className="rounded-sq-sm text-sm py-2 font-medium transition-all duration-150"
+                  className="rounded-sq-pill text-sm px-3 py-[6px] font-medium transition-all duration-150"
                   style={{
                     color: activeSection === tab.id ? 'var(--dgp-text-primary)' : 'var(--dgp-text-muted)',
                     background: activeSection === tab.id ? 'var(--dgp-glass-hover)' : 'transparent',
