@@ -170,33 +170,42 @@ const ProfilePageV2: React.FC = () => {
 
         {/* Avatar - squircle, left-aligned with About title (px-5), 50% over hero / 50% below */}
         <div className="absolute left-5 -bottom-[62px] z-20">
-          {/* 2px ring in bluey-grey color around achievement ring */}
-          <div 
-            className="clbhouz-squircle relative w-[124px] h-[124px] flex items-center justify-center"
-            style={{
-              background: '#8B7355',
-              outline: `2px solid ${BG_COLOR}`,
-              outlineOffset: '0px',
-            }}
-          >
-              {/* Inner avatar - squircle */}
-              <div 
-                className="clbhouz-squircle w-[119px] h-[119px] overflow-hidden relative"
-                style={{
-                  boxShadow: '0 12px 30px rgba(15,15,15,0.22)'
-                }}
-              >
-                {profile?.profile_photo_url ? (
-                  <img 
-                    src={profile.profile_photo_url} 
-                    alt={displayName}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-slate-200 flex items-center justify-center text-3xl font-bold text-slate-600">
-                    {displayName.charAt(0)}
-                  </div>
-                )}
+          {/*
+            NOTE: .clbhouz-squircle forces direct children to 100% width/height.
+            To preserve ring thickness, we use layered absolute squircles (no nested sizing).
+          */}
+          <div className="relative w-[128px] h-[128px]">
+            {/* 2px "gap" ring (same as bluey-grey background) */}
+            <div
+              className="clbhouz-squircle absolute inset-0"
+              style={{ background: BG_COLOR }}
+            />
+
+            {/* Achievement ring */}
+            <div
+              className="clbhouz-squircle absolute"
+              style={{ inset: '2px', background: '#8B7355' }}
+            />
+
+            {/* Avatar */}
+            <div
+              className="clbhouz-squircle absolute overflow-hidden"
+              style={{
+                inset: '7px',
+                boxShadow: '0 12px 30px rgba(15,15,15,0.22)',
+              }}
+            >
+              {profile?.profile_photo_url ? (
+                <img
+                  src={profile.profile_photo_url}
+                  alt={displayName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-slate-200 flex items-center justify-center text-3xl font-bold text-slate-600">
+                  {displayName.charAt(0)}
+                </div>
+              )}
             </div>
           </div>
         </div>
