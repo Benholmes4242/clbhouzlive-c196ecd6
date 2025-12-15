@@ -29,10 +29,26 @@ export const getProfileType = (userType: string | null | undefined): ProfileType
 };
 
 /**
+ * Flag to hide Achievements tab (hidden, not deleted)
+ */
+const HIDE_ACHIEVEMENTS_TAB = true;
+
+/**
  * Personal profile tabs - all features available
- * Achievements is a core identity + progression surface, always visible
+ * Note: Achievements tab is hidden via flag
  */
 export const PERSONAL_TABS = [
+  { id: 'activity', label: 'Activity' },
+  { id: 'courses', label: 'Courses' },
+  { id: 'top100', label: 'Top 100' },
+  // { id: 'achievements', label: 'Achievements' }, // Hidden via HIDE_ACHIEVEMENTS_TAB flag
+  { id: 'stats', label: 'Handicap' }
+];
+
+/**
+ * Personal profile tabs with Achievements (for when flag is false)
+ */
+export const PERSONAL_TABS_WITH_ACHIEVEMENTS = [
   { id: 'activity', label: 'Activity' },
   { id: 'courses', label: 'Courses' },
   { id: 'top100', label: 'Top 100' },
@@ -52,5 +68,6 @@ export const BUSINESS_TABS = [
  */
 export const getProfileTabs = (userType: string | null | undefined) => {
   const { isPersonal } = getProfileType(userType);
-  return isPersonal ? PERSONAL_TABS : BUSINESS_TABS;
+  if (!isPersonal) return BUSINESS_TABS;
+  return HIDE_ACHIEVEMENTS_TAB ? PERSONAL_TABS : PERSONAL_TABS_WITH_ACHIEVEMENTS;
 };

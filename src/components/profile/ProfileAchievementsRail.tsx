@@ -92,7 +92,7 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
   const showGhostCard = nudge && visible.length > 0;
 
   const handleViewAll = () => {
-    navigate('/profile/quest');
+    navigate('/achievements');
   };
 
   if (isLoading || (visible.length === 0 && !nudge)) return null;
