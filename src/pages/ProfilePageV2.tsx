@@ -340,45 +340,6 @@ const ProfilePageV2: React.FC = () => {
           )}
         </section>
 
-        {/* Golf Snapshot */}
-        <section className="px-5 mb-6">
-          <h3 className="text-xl font-semibold text-[#0F0F0F] mb-3">Golf Snapshot</h3>
-          <div className="grid grid-cols-2 gap-3">
-            {/* Left card */}
-            <div 
-              className="rounded-xl overflow-hidden"
-              style={{ border: '1px solid #E0E0E0' }}
-            >
-              <div className="flex items-center justify-between px-4 py-3 border-b border-[#E8E8E8]">
-                <span className="text-sm text-[#0F0F0F]">Handicap</span>
-                <span className="text-sm font-semibold text-[#0F0F0F]">{formatHandicap(profile?.eg_handicap_index)}</span>
-              </div>
-              <div className="flex items-center justify-between px-4 py-3">
-                <span className="text-sm text-[#0F0F0F]">Home Club</span>
-                <span className="text-sm font-semibold text-[#0F0F0F] truncate max-w-[100px]">
-                  {profile?.home_club ? profile.home_club.split(' ')[0] : '–'}
-                </span>
-              </div>
-            </div>
-
-            {/* Right card */}
-            <div 
-              className="rounded-xl overflow-hidden"
-              style={{ border: '1px solid #E0E0E0' }}
-            >
-              <div className="flex items-center justify-between px-4 py-3 border-b border-[#E8E8E8]">
-                <span className="text-sm text-[#0F0F0F]">Home Club</span>
-                <span className="text-sm font-semibold text-[#0F0F0F] truncate max-w-[100px]">
-                  {profile?.home_club ? profile.home_club.split(' ')[0] : '–'}
-                </span>
-              </div>
-              <div className="flex items-center justify-between px-4 py-3">
-                <span className="text-sm text-[#0F0F0F]">Rounds Logged</span>
-                <span className="text-sm font-semibold text-[#0F0F0F]">{roundsLogged}</span>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* Achievements */}
         {isPersonal && unlockedAchievements.length > 0 && (
