@@ -57,34 +57,11 @@ function regionMatch(country: string | null, continent: string | null, globalRan
   return false;
 }
 
+/**
+ * Ratings-only: fetch courses user has rated
+ */
 async function fetchPlayedWithAverages(userId: string) {
-  // ✅ Fetch from user_top100_courses
-  const { data: top100Data, error: top100Error } = await supabase
-    .from("user_top100_courses")
-    .select(`
-      course_id,
-      played_date,
-      golf_courses (
-        id,
-        name,
-        country,
-        region,
-        sub_country,
-        continent,
-        global_rank,
-        regional_rank,
-        usa_rank,
-        description,
-        thumbnail_image,
-        course_rating_stats(average_rating)
-      )
-    `)
-    .eq("user_id", userId)
-    .eq("played", true);
-    
-  if (top100Error) throw top100Error;
-  
-  // ✅ Also fetch from course_ratings to get Continental Europe courses
+  // Ratings-only: fetch from course_ratings only
   const { data: ratingsData, error: ratingsError } = await supabase
     .from("course_ratings")
     .select(`
@@ -109,21 +86,14 @@ async function fetchPlayedWithAverages(userId: string) {
     
   if (ratingsError) throw ratingsError;
   
-  // Combine and normalize both datasets
-  const combined = [
-    ...(top100Data ?? []).map(d => ({
-      course_id: d.course_id,
-      played_date: d.played_date,
-      golf_courses: d.golf_courses
-    })),
-    ...(ratingsData ?? []).map(d => ({
-      course_id: d.course_id,
-      played_date: d.created_at, // Use rating date as played date
-      golf_courses: d.golf_courses
-    }))
-  ];
+  // Map to expected structure
+  const courses = (ratingsData ?? []).map(d => ({
+    course_id: d.course_id,
+    played_date: d.created_at,
+    golf_courses: d.golf_courses
+  }));
   
-  return combined as RawPlayedRow[];
+  return courses as RawPlayedRow[];
 }
 
 async function fetchViewerRatings(userId: string) {

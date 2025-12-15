@@ -85,25 +85,8 @@ const CourseDetailModal = ({
     enabled: !!(viewingUserId || currentUser?.id) && !!course?.id,
   });
 
-  // Check if course is in user's Top 100 courses
-  const { data: userTop100Course } = useQuery({
-    queryKey: ['user-top100-course', course?.id, viewingUserId || currentUser?.id],
-    queryFn: async () => {
-      const userId = viewingUserId || currentUser?.id;
-      if (!userId || !course?.id) return null;
-
-      const { data, error } = await supabase
-        .from('user_top100_courses')
-        .select('*')
-        .eq('course_id', course.id)
-        .eq('user_id', userId)
-        .maybeSingle();
-
-      if (error && error.code !== 'PGRST116') throw error;
-      return data;
-    },
-    enabled: !!(viewingUserId || currentUser?.id) && !!course?.id,
-  });
+  // In ratings-only system, we use userRatingData to determine if played
+  // No need for separate userTop100Course query
 
   // Use unified rating aggregates hook
   const { data: ratingAggregates } = useCourseRatingAggregates(course?.id);
@@ -144,8 +127,8 @@ const CourseDetailModal = ({
     setShowRatingModal(true);
   };
 
-  // Determine if course is already played based on multiple sources
-  const isAlreadyPlayed = isFromUserCoursesPage || userCourse?.played || userTop100Course?.played;
+  // Ratings-only: played = has rating
+  const isAlreadyPlayed = isFromUserCoursesPage || userCourse?.played || !!userRatingData;
   const canModify = user && !isViewingOtherUser;
 
   if (!course) return null;

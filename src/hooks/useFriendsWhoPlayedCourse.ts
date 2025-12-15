@@ -15,6 +15,9 @@ export interface FriendCourseActivity {
   };
 }
 
+/**
+ * Ratings-only: friends who have rated this course
+ */
 export function useFriendsWhoPlayedCourse(userId: string | undefined, courseId: string | undefined) {
   return useQuery({
     queryKey: ['friends-who-played-course', userId, courseId],
@@ -32,17 +35,15 @@ export function useFriendsWhoPlayedCourse(userId: string | undefined, courseId: 
       const friendIds = (relationships || []).map((r: any) => r.following_id);
       if (friendIds.length === 0) return [];
 
-      // Get their activity for this course with profile data in one query
-      const { data: activity, error: actError } = await supabase
-        .from('user_course_activity' as any)
+      // Get friends who have rated this course (ratings-only)
+      const { data: ratings, error: ratingsError } = await supabase
+        .from('course_ratings')
         .select(`
           user_id,
-          course_id,
-          first_played_at,
-          last_played_at,
-          has_review,
-          has_rating,
-          user_profiles (
+          rating,
+          review,
+          created_at,
+          user_profiles!course_ratings_user_id_fkey (
             id,
             username,
             display_name,
@@ -52,18 +53,18 @@ export function useFriendsWhoPlayedCourse(userId: string | undefined, courseId: 
         .eq('course_id', courseId)
         .in('user_id', friendIds);
 
-      if (actError) throw actError;
-      if (!activity || activity.length === 0) return [];
+      if (ratingsError) throw ratingsError;
+      if (!ratings || ratings.length === 0) return [];
 
       // Map to the expected interface
-      return activity
-        .map((a: any) => ({
-          user_id: a.user_id,
-          first_played_at: a.first_played_at,
-          last_played_at: a.last_played_at,
-          has_review: a.has_review,
-          has_rating: a.has_rating,
-          profile: a.user_profiles,
+      return ratings
+        .map((r: any) => ({
+          user_id: r.user_id,
+          first_played_at: r.created_at,
+          last_played_at: r.created_at,
+          has_review: !!r.review,
+          has_rating: r.rating != null,
+          profile: r.user_profiles,
         }))
         .filter((a: any) => a.profile) as FriendCourseActivity[];
     },
