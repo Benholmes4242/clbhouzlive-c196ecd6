@@ -149,7 +149,7 @@ const CourseTagInput = ({
               onChange={handleInputChange}
               onFocus={handleInputFocus}
               onBlur={handleInputBlur}
-              placeholder={placeholder}
+              placeholder="Search course name / region / country"
             />
             {isLoading && searchQuery.length >= 2 && (
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2">

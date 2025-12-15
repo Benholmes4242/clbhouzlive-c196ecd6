@@ -128,15 +128,17 @@ export default function CreateMomentComposerPanel({
             maxLength={2200}
           />
           
-          {/* Character count */}
+          {/* Helper row */}
           <div className="flex items-center justify-between mt-1.5">
             <div className="flex items-center gap-1 text-xs text-white/40">
               <AtSign className="w-3 h-3" />
               <span>Tag someone with @</span>
             </div>
-            <span className={`text-xs ${caption.length > 2000 ? 'text-amber-400' : 'text-white/40'}`}>
-              {caption.length}/2200
-            </span>
+            {(caption.length > 0 || caption.length > 2000) && (
+              <span className={`text-xs ${caption.length > 2000 ? 'text-amber-400' : 'text-white/40'}`}>
+                {caption.length}/2200
+              </span>
+            )}
           </div>
 
           {/* Mentions dropdown */}
@@ -193,7 +195,7 @@ export default function CreateMomentComposerPanel({
               <div className="text-xs text-white/60">
                 {currentFilter && currentFilter !== 'normal' 
                   ? `Filter: ${currentFilter}` 
-                  : 'Add filters, text & more'}
+                  : 'Add filters'}
               </div>
             </div>
           </div>
