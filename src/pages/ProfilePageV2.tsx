@@ -202,10 +202,10 @@ const ProfilePageV2: React.FC = () => {
 
         {/* HCP + Golfer pills - right side, just below header photo */}
         <div className="absolute right-5 top-full mt-3 z-20 flex items-center gap-2">
-          {/* HCP pill - white */}
+          {/* HCP pill - white, bigger size */}
           {profile?.eg_handicap_index != null && (
             <span 
-              className="px-2.5 py-1 text-xs font-semibold rounded-full text-[#0F0F0F]"
+              className="px-4 py-1.5 text-sm font-semibold rounded-full text-[#0F0F0F] flex items-center justify-center"
               style={{ 
                 background: '#FFFFFF',
                 boxShadow: '0 2px 8px rgba(31, 36, 40, 0.08)'
@@ -215,9 +215,9 @@ const ProfilePageV2: React.FC = () => {
             </span>
           )}
           
-          {/* Golfer pill - transparent green glass */}
+          {/* Golfer pill - transparent green glass, bigger size */}
           <span 
-            className="px-2.5 py-1 text-xs font-semibold rounded-full text-emerald-700 flex items-center gap-1.5"
+            className="px-4 py-1.5 text-sm font-semibold rounded-full text-emerald-700 flex items-center justify-center"
             style={{ 
               background: 'rgba(52, 199, 89, 0.15)',
               backdropFilter: 'blur(8px)',
@@ -245,31 +245,31 @@ const ProfilePageV2: React.FC = () => {
         )}
       </div>
 
-      {/* Action Buttons - left aligned with home club */}
+      {/* Action Buttons - full width from avatar left edge to Golfer pill right edge */}
       <div className="mt-5 px-5 flex items-center gap-2">
-        {/* Follow - mid-slate filled pill */}
+        {/* Follow - mid-slate filled pill, flex-1 to fill space */}
         <button 
-          className="h-8 px-8 rounded-full text-xs font-semibold text-white flex items-center justify-center"
+          className="h-9 flex-1 rounded-full text-sm font-semibold text-white flex items-center justify-center"
           style={{ background: '#64748b' }}
         >
           Follow
         </button>
         
-        {/* Message - white outline pill */}
+        {/* Message - white outline pill, flex-1 to fill space */}
         <button 
-          className="h-8 px-6 rounded-full text-xs font-semibold text-[#0F0F0F] flex items-center justify-center gap-1.5"
+          className="h-9 flex-1 rounded-full text-sm font-semibold text-[#0F0F0F] flex items-center justify-center gap-1.5"
           style={{
             background: '#fff',
             border: '1px solid #E0E0E0'
           }}
         >
-          <Send className="w-3 h-3" />
+          <Send className="w-3.5 h-3.5" />
           Message
         </button>
         
-        {/* More - circular */}
+        {/* More - circular, fixed size */}
         <button 
-          className="w-8 h-8 rounded-full flex items-center justify-center"
+          className="w-9 h-9 flex-shrink-0 rounded-full flex items-center justify-center"
           style={{
             background: '#fff',
             border: '1px solid #E0E0E0'
@@ -279,17 +279,16 @@ const ProfilePageV2: React.FC = () => {
         </button>
       </div>
 
-      {/* Mini-nav row: Posts | Followers | Friends - no underlines */}
+      {/* Mini-nav row: Posts | Followers | Friends - evenly distributed across full width */}
       <div className="mt-6 px-5">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center justify-between">
           {/* Posts */}
           <button
             onClick={() => setActiveMiniNav('posts')}
-            className="pb-3"
+            className="pb-3 flex flex-col items-center"
           >
-            <span className="text-base font-medium text-[#0F0F0F]">
-              Posts<span className="ml-2 font-semibold">{postsCount}</span>
-            </span>
+            <span className="text-lg font-semibold text-[#0F0F0F]">{postsCount}</span>
+            <span className="text-sm text-slate-500">Posts</span>
           </button>
           
           {/* Followers */}
@@ -298,11 +297,10 @@ const ProfilePageV2: React.FC = () => {
               setActiveMiniNav('followers');
               navigate(`/profile/${username}/followers`);
             }}
-            className="pb-3"
+            className="pb-3 flex flex-col items-center"
           >
-            <span className="text-base font-medium text-[#0F0F0F]">
-              Followers<span className="ml-2 font-semibold">{followersCount}</span>
-            </span>
+            <span className="text-lg font-semibold text-[#0F0F0F]">{followersCount}</span>
+            <span className="text-sm text-slate-500">Followers</span>
           </button>
           
           {/* Friends */}
@@ -312,11 +310,10 @@ const ProfilePageV2: React.FC = () => {
                 setActiveMiniNav('friends');
                 navigate(`/profile/${username}/friends`);
               }}
-              className="pb-3"
+              className="pb-3 flex flex-col items-center"
             >
-              <span className="text-base font-medium text-[#0F0F0F]">
-                Friends<span className="ml-2 font-semibold">{friendsCount}</span>
-              </span>
+              <span className="text-lg font-semibold text-[#0F0F0F]">{friendsCount}</span>
+              <span className="text-sm text-slate-500">Friends</span>
             </button>
           )}
         </div>
