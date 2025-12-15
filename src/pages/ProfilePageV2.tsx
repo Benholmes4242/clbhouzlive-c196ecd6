@@ -176,7 +176,7 @@ const ProfilePageV2: React.FC = () => {
         </div>
 
         {/* Avatar - squircle with tan/brown ring, positioned higher over hero */}
-        <div className="absolute left-1/2 -translate-x-1/2 -bottom-8 z-20">
+        <div className="absolute left-1/2 -translate-x-1/2 -bottom-4 z-20">
           {/* Achievement ring - squircle */}
           <div 
             className="clbhouz-squircle relative w-[124px] h-[124px] flex items-center justify-center"
@@ -208,7 +208,7 @@ const ProfilePageV2: React.FC = () => {
       </div>
 
       {/* Identity Stack - adjusted for higher avatar position */}
-      <div className="pt-10 px-4 text-center">
+      <div className="pt-6 px-4 text-center">
         {/* Name - smaller, more bold */}
         <h1 className="text-[28px] font-semibold text-[#0F0F0F]">
           {displayName}
