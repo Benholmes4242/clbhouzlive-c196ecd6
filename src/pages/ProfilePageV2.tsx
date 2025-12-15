@@ -23,8 +23,8 @@ import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import AchievementsPane from '@/components/profile/AchievementsPane';
 import HandicapSection from '@/components/profile/HandicapSection';
 
-// Background color - bluey grey
-const BG_COLOR = '#E8EBF0';
+// Background color - matches course details page (slate-50)
+const BG_COLOR = '#f8fafc'; // slate-50
 
 const ProfilePageV2: React.FC = () => {
   const navigate = useNavigate();
@@ -175,8 +175,8 @@ const ProfilePageV2: React.FC = () => {
           />
         </div>
 
-        {/* Avatar - squircle with tan/brown ring, using global squircle design */}
-        <div className="absolute left-1/2 -translate-x-1/2 -bottom-12 z-20">
+        {/* Avatar - squircle with tan/brown ring, positioned higher over hero */}
+        <div className="absolute left-1/2 -translate-x-1/2 -bottom-8 z-20">
           {/* Achievement ring - squircle */}
           <div 
             className="clbhouz-squircle relative w-[124px] h-[124px] flex items-center justify-center"
@@ -207,8 +207,8 @@ const ProfilePageV2: React.FC = () => {
         </div>
       </div>
 
-      {/* Identity Stack - reduced spacing */}
-      <div className="pt-14 px-4 text-center">
+      {/* Identity Stack - adjusted for higher avatar position */}
+      <div className="pt-10 px-4 text-center">
         {/* Name - smaller, more bold */}
         <h1 className="text-[28px] font-semibold text-[#0F0F0F]">
           {displayName}
