@@ -38,13 +38,22 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
         ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length 
         : null;
 
-      // Get Top 100 courses played count
+      // Get Top 100 courses played count by joining activity with Top 100 memberships
       const { data: activity } = await supabase
         .from('user_course_activity' as any)
-        .select('is_top100')
+        .select('course_id')
         .eq('user_id', userId);
 
-      const top100Count = (activity || []).filter((a: any) => a.is_top100).length;
+      const courseIds = (activity || []).map((a: any) => a.course_id);
+      
+      // Check which of these are Top 100 courses
+      const { data: top100Memberships } = await supabase
+        .from('course_top100_memberships')
+        .select('course_id')
+        .in('course_id', courseIds);
+
+      const top100Set = new Set((top100Memberships || []).map(m => m.course_id));
+      const top100Count = courseIds.filter(id => top100Set.has(id)).length;
 
       return { avgRating, top100Count };
     },

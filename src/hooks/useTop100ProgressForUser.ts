@@ -148,19 +148,23 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
         });
       }
 
-      // Fetch recent rounds (view doesn't support joins, so fetch separately)
+      // Fetch recent rounds - get all activity then filter to Top 100 courses
       const { data: recentActivity, error: recentError } = await supabase
         .from('user_course_activity' as any)
-        .select('course_id, last_played_at, rating_value')
+        .select('course_id, last_activity_at, rating_value')
         .eq('user_id', userId)
-        .eq('is_top100', true)
-        .order('last_played_at', { ascending: false, nullsFirst: false })
-        .limit(10);
+        .order('last_activity_at', { ascending: false, nullsFirst: false })
+        .limit(50); // Get more to filter
 
       if (recentError) throw recentError;
 
+      // Filter to only Top 100 courses (those that are in playedTop100Courses set)
+      const recentTop100Activity = (recentActivity || [])
+        .filter((a: any) => playedTop100Courses.has(a.course_id))
+        .slice(0, 10);
+
       // Fetch course details separately
-      const recentCourseIds = (recentActivity || []).map((a: any) => a.course_id);
+      const recentCourseIds = recentTop100Activity.map((a: any) => a.course_id);
       const { data: recentCourses, error: coursesError } = await supabase
         .from('golf_courses')
         .select('id, name, country, sub_country, thumbnail_image')
@@ -172,7 +176,7 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
 
       // Build recent rounds with all list memberships and real ranks
       const recentRounds: Top100RecentRound[] = [];
-      for (const activity of (recentActivity || []) as any[]) {
+      for (const activity of recentTop100Activity as any[]) {
         const course = courseMap.get(activity.course_id);
         if (!course) continue;
         
@@ -193,7 +197,7 @@ export function useTop100ProgressForUser(userId: string | undefined | null) {
           country: course.country,
           sub_country: course.sub_country,
           list_slugs: courseListSlugs,
-          played_at: activity.last_played_at || new Date().toISOString(),
+          played_at: activity.last_activity_at || new Date().toISOString(),
           rating: activity.rating_value,
           image_url: course.thumbnail_image ?? null,
           global_rank: globalMembership?.rank ?? null,
