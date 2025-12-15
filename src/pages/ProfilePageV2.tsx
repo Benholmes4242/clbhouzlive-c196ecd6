@@ -359,8 +359,7 @@ const ProfilePageV2: React.FC = () => {
               {unlockedAchievements.slice(0, 3).map((achievement) => (
                 <div 
                   key={achievement.id}
-                  className="flex-shrink-0 w-[140px]"
-                  style={{ transform: 'scale(0.78)', transformOrigin: 'top left', marginRight: '-40px' }}
+                  className="flex-shrink-0 w-[140px] h-[72px] overflow-hidden rounded-sq-md"
                 >
                   <AchievementBadgeCard
                     tier={(achievement.threshold?.toString() || achievement.id.replace('list_', '').toUpperCase()) as AchievementTier}
