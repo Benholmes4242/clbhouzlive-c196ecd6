@@ -49,11 +49,14 @@ interface MilestoneClub {
 const ProfileQuestView: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const { totalPlayed, recentlyPlayed, isLoading: questLoading } = useQuestCourses();
+  const { recentlyPlayed, isLoading: questLoading } = useQuestCourses();
   
-  // Use the SAME hook as Top 100 list page for region progress (single source of truth)
+  // Use the SAME hook as Top 100 list page for ALL progress data (single source of truth)
   const { data: progressData, isLoading: progressLoading } = useTop100ProgressForUser(user?.id);
   const isLoading = questLoading || progressLoading;
+  
+  // Use totalTop100Played from the single source of truth
+  const totalPlayed = progressData?.totalTop100Played ?? 0;
   
   // Map Top100ProgressForUser list data to RegionProgress format for Journey Summary
   const regionProgress: RegionProgress[] = useMemo(() => {
