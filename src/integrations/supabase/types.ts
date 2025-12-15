@@ -5811,6 +5811,7 @@ export type Database = {
         Row: {
           course_id: string | null
           first_played_at: string | null
+          has_played: boolean | null
           has_rating: boolean | null
           has_review: boolean | null
           in_top_ten: boolean | null
@@ -5819,29 +5820,7 @@ export type Database = {
           rating_value: number | null
           user_id: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "course_ratings_course_id_fkey"
-            columns: ["course_id"]
-            isOneToOne: false
-            referencedRelation: "golf_courses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "course_ratings_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "course_ratings_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_friend_pairs: {
         Row: {
@@ -5890,28 +5869,14 @@ export type Database = {
       user_top100_progress_view: {
         Row: {
           courses_played_in_list: number | null
+          courses_rated_in_list: number | null
           list_id: string | null
           list_name: string | null
           list_slug: string | null
           total_courses_in_list: number | null
           user_id: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "course_ratings_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "public_profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "course_ratings_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_top100_rated_courses: {
         Row: {
