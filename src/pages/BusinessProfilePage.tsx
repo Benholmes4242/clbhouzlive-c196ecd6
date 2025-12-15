@@ -98,34 +98,34 @@ const BusinessProfilePage = () => {
         followersCount={followersCount}
       />
 
-      {/* Tab Navigation - matches personal profile styling */}
+      {/* Tab Navigation */}
       <section className="mt-6 px-4">
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as BusinessTab)} className="w-full">
           <TabsList 
-            className="grid w-full rounded-sq-md bg-muted/70 border border-border/60 px-2 py-[3px]"
+            className="grid w-full rounded-sq-md bg-muted/50 border border-border/40 p-1"
             style={{ gridTemplateColumns: 'repeat(4, minmax(0, 1fr))' }}
           >
             <TabsTrigger 
               value="overview"
-              className="rounded-sq-pill text-sm px-2 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all"
+              className="rounded-sq-sm text-sm py-2 font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground transition-all"
             >
               Overview
             </TabsTrigger>
             <TabsTrigger 
               value="posts"
-              className="rounded-sq-pill text-sm px-2 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all"
+              className="rounded-sq-sm text-sm py-2 font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground transition-all"
             >
               Posts
             </TabsTrigger>
             <TabsTrigger 
               value="golfers"
-              className="rounded-sq-pill text-sm px-2 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all"
+              className="rounded-sq-sm text-sm py-2 font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground transition-all"
             >
               Golfers
             </TabsTrigger>
             <TabsTrigger 
               value="info"
-              className="rounded-sq-pill text-sm px-2 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all"
+              className="rounded-sq-sm text-sm py-2 font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground transition-all"
             >
               Info
             </TabsTrigger>
