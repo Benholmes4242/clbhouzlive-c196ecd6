@@ -217,7 +217,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
               data-chrome="bottom-nav"
               style={{
                 background: isDimmed 
-                  ? 'rgba(15, 15, 15, 0.10)' 
+                  ? 'rgba(15, 15, 15, 0.05)' 
                   : 'rgba(15, 15, 15, 0.95)',
                 backdropFilter: isDimmed ? 'none' : undefined,
                 WebkitBackdropFilter: isDimmed ? 'none' : undefined,
