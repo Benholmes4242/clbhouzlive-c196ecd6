@@ -461,7 +461,7 @@ export default function CreateMomentModal({
 
         {/* Composer Panel */}
         <section 
-          className="composer absolute bottom-0 left-0 right-0 z-[1003] rounded-t-none"
+          className="composer absolute bottom-0 left-0 right-0 z-[1003] rounded-t-none flex flex-col"
           style={{ 
             height: 'var(--composer-height)',
             background: 'rgba(15, 15, 15, 0.95)',
@@ -470,25 +470,31 @@ export default function CreateMomentModal({
             borderTop: '1px solid rgba(255, 255, 255, 0.1)'
           }}
         >
-          <CreateMomentComposerPanel
-            hasMedia={hasMedia}
-            caption={caption}
-            onCaptionChange={setCaption}
-            selectedCourse={course}
-            onCourseSelect={(c) => {
-              setSelectedCourse(c);
-              onCourseSelect?.(c);
-            }}
-            onOpenStudio={openStudio}
-            availableActorsCount={availableActors.length}
-            currentFilter={currentFilter}
-            onTypingStateChange={setIsTyping}
-          />
+          {/* Scrollable content area */}
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <CreateMomentComposerPanel
+              hasMedia={hasMedia}
+              caption={caption}
+              onCaptionChange={setCaption}
+              selectedCourse={course}
+              onCourseSelect={(c) => {
+                setSelectedCourse(c);
+                onCourseSelect?.(c);
+              }}
+              onOpenStudio={openStudio}
+              availableActorsCount={availableActors.length}
+              currentFilter={currentFilter}
+              onTypingStateChange={setIsTyping}
+            />
+          </div>
 
-          {/* Share Bar - safe-area aware */}
+          {/* Share Bar - sticky at bottom, safe-area aware */}
           <div 
-            className="px-4 pt-2"
-            style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 16px), 16px)' }}
+            className="flex-shrink-0 px-4 pt-3 border-t border-white/10"
+            style={{ 
+              paddingBottom: 'max(env(safe-area-inset-bottom, 16px), 16px)',
+              background: 'rgba(15, 15, 15, 0.98)'
+            }}
           >
             <CreateMomentShareBar
               canPost={canPost}
