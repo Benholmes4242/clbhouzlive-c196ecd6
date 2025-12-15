@@ -129,6 +129,6 @@ export function useLeaderboardSpotlight() {
 
       return spotlights.slice(0, 3);
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 60 * 1000, // 1 minute - reduced to refresh more often
   });
 }
