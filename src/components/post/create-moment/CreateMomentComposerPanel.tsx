@@ -96,9 +96,9 @@ export default function CreateMomentComposerPanel({
 
   return (
     <div 
-      className={`composer-scroll flex h-full flex-col px-4 gap-2.5 overflow-y-auto ${hasMedia ? '' : 'pt-3'}`}
+      className="composer-scroll flex h-full flex-col px-4 pt-3 gap-2.5 overflow-y-auto"
       style={{
-        paddingBottom: '8px',
+        paddingBottom: '12px', // Enforced 12px gap between enhance button and ShareBar divider
         overscrollBehavior: 'contain',
         WebkitOverflowScrolling: 'touch',
         touchAction: 'pan-y'
