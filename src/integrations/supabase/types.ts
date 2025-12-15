@@ -5957,17 +5957,64 @@ export type Database = {
       user_course_activity: {
         Row: {
           course_id: string | null
-          first_played_at: string | null
+          first_activity_at: string | null
           has_played: boolean | null
           has_rating: boolean | null
           has_review: boolean | null
-          in_top_ten: boolean | null
-          is_top100: boolean | null
-          last_played_at: string | null
+          last_activity_at: string | null
           rating_value: number | null
           user_id: string | null
         }
-        Relationships: []
+        Insert: {
+          course_id?: string | null
+          first_activity_at?: string | null
+          has_played?: never
+          has_rating?: never
+          has_review?: never
+          last_activity_at?: string | null
+          rating_value?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          course_id?: string | null
+          first_activity_at?: string | null
+          has_played?: never
+          has_rating?: never
+          has_review?: never
+          last_activity_at?: string | null
+          rating_value?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_ratings_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_top100_progress_view"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       user_friend_pairs: {
         Row: {
