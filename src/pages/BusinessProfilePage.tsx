@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { ChevronLeft, AlertCircle } from 'lucide-react';
+import { ArrowLeft, AlertCircle } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -67,26 +67,22 @@ const BusinessProfilePage = () => {
 
   return (
     <PageRoot className="min-h-screen" style={{ background: '#F4F5F7' }}>
-      {/* Back button - fixed top left */}
-      <div className="absolute top-4 left-4 z-20">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate(-1)}
-          className="h-10 w-10 bg-white/90 backdrop-blur-sm shadow-sm hover:bg-white"
-          style={{ border: '1px solid rgba(31,36,40,0.08)' }}
-        >
-          <ChevronLeft className="h-5 w-5 text-[#1F2428]" />
-        </Button>
-      </div>
+      {/* Back button - dark glass container matching course detail page */}
+      <button
+        onClick={() => navigate(-1)}
+        className="absolute top-3 left-3 md:top-4 md:left-4 z-20 h-9 w-9 bg-black/20 backdrop-blur-sm rounded-sq-sm flex items-center justify-center hover:bg-black/40 transition-colors focus:outline-none"
+        aria-label="Go back"
+      >
+        <ArrowLeft className="!h-5 !w-5 text-white" />
+      </button>
 
-      {/* Owner menu - fixed top right */}
-      <div className="absolute top-4 right-4 z-20">
+      {/* Owner menu - dark glass container matching course detail page */}
+      <div className="absolute top-3 right-3 md:top-4 md:right-4 z-20">
         <BusinessOwnerMenu 
           businessId={business.id}
           businessName={business.name}
           membership={membership ?? null}
-          className="h-10 w-10 bg-white/90 backdrop-blur-sm shadow-sm"
+          className="h-9 w-9 bg-black/20 backdrop-blur-sm rounded-sq-sm hover:bg-black/40 transition-colors text-white border-0"
           isBusinessVerified={business.is_verified}
           verificationStatus={verificationRequest?.status}
         />
