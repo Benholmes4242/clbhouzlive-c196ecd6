@@ -96,16 +96,14 @@ export default function CreateMomentComposerPanel({
 
   return (
     <div 
-      className="composer-scroll flex h-full flex-col px-4 pt-3 gap-2.5 overflow-y-auto"
+      className="flex flex-col px-4 pt-3 gap-2.5"
       style={{
         paddingBottom: '12px', // Enforced 12px gap between enhance button and ShareBar divider
-        overscrollBehavior: 'contain',
-        WebkitOverflowScrolling: 'touch',
         touchAction: 'pan-y'
       }}
       data-ecm-scroll-container="true"
     >
-      <div className="flex flex-col gap-2.5 flex-1">
+      <div className="flex flex-col gap-2.5">
         {/* Posting As Selector - compressed single row */}
         {availableActorsCount > 1 && (
           <div className="flex items-center justify-between py-1">
