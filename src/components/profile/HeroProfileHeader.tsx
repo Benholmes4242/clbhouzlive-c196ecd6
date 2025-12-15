@@ -368,11 +368,11 @@ const HeroProfileHeader = ({
 
   return (
     <SwipeToReturnZone onSwipeDown={reopenImmersive}>
-      {/* Premium Golf Profile Layout - No card, seamless gradient */}
-      <section className="relative w-full">
+      {/* Premium Golf Profile Layout - Light Grey Theme */}
+      <section className="profile-theme-light relative w-full min-h-screen">
         
-        {/* HERO IMAGE */}
-        <div className="relative w-full h-[250px] overflow-hidden">
+        {/* HERO IMAGE with light gradient fade */}
+        <div className="profile-hero relative w-full h-[250px] overflow-hidden">
           {heroSrc ? (
             <img 
               src={heroSrc}
@@ -381,28 +381,19 @@ const HeroProfileHeader = ({
               loading="eager"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
+            <div className="w-full h-full bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200" />
           )}
-          
-          {/* Global vignette - subtle top + bottom darkening */}
-          <div
-            className="pointer-events-none absolute inset-0 mix-blend-multiply opacity-70"
-            style={{
-              background: 'radial-gradient(circle at top, rgba(0,0,0,0.22), transparent 55%), radial-gradient(circle at bottom, rgba(0,0,0,0.18), transparent 55%)',
-            }}
-          />
-          
         </div>
 
-        {/* META BLOCK - Glass panel with avatar + text */}
+        {/* META BLOCK - Light glass panel with avatar + text */}
         <div
           ref={profileCardRef}
           className="relative"
           style={{ marginTop: '-40px' }}
         >
-          {/* Glass panel - full bleed */}
+          {/* Light glass panel */}
           <div
-            className="relative flex items-center gap-4 md:gap-6 rounded-3xl bg-muted/0 backdrop-blur-xl px-4 md:px-6 py-4 md:py-5"
+            className="profile-meta-card relative flex items-center gap-4 md:gap-6 px-4 md:px-6 py-4 md:py-5"
           >
               {/* AVATAR – Left column */}
               <div className="flex-shrink-0 z-20">
@@ -442,7 +433,7 @@ const HeroProfileHeader = ({
         {/* BIO - Full width below glass panel */}
         {profile?.bio && (
           <div className="mt-4 md:mt-5 px-6 md:px-8">
-            <p className="mx-auto max-w-3xl text-center text-sm md:text-[15px] leading-relaxed text-muted-foreground">
+            <p className="profile-bio mx-auto max-w-3xl text-center text-sm md:text-[15px] leading-relaxed">
               {profile.bio}
             </p>
           </div>
@@ -460,7 +451,7 @@ const HeroProfileHeader = ({
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/60 hover:bg-muted text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  className="profile-website-pill inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
                 >
                   <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -487,12 +478,7 @@ const HeroProfileHeader = ({
         )}
 
         {/* Faint divider between header and achievements */}
-        <div 
-          className="mt-4 h-px w-full"
-          style={{
-            background: 'linear-gradient(90deg, transparent 0%, hsl(var(--foreground) / 0.05) 20%, hsl(var(--foreground) / 0.05) 80%, transparent 100%)',
-          }}
-        />
+        <div className="profile-divider mt-4 h-px w-full" />
 
         {/* Achievements Rail - outside constrained container for full width */}
         {isPersonal && profile?.id && username && (
@@ -527,7 +513,7 @@ const HeroProfileHeader = ({
       </section>
 
       {/* Content sections with slide transitions */}
-      <div className="relative overflow-hidden">
+      <div className="profile-content-area relative overflow-hidden">
         {transitionState === 'transitioning' ? (
           <>
             <div className={`absolute inset-0 w-full ${getContentTransitionClass(true)}`}>
