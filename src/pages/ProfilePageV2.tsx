@@ -170,31 +170,39 @@ const ProfilePageV2: React.FC = () => {
 
         {/* Avatar - squircle, left-aligned with About title (px-5), 50% over hero / 50% below */}
         <div className="absolute left-5 -bottom-[62px] z-20">
-          {/* Achievement ring - squircle */}
+          {/* 1px ring in bluey-grey color */}
           <div 
-            className="clbhouz-squircle relative w-[124px] h-[124px] flex items-center justify-center"
+            className="clbhouz-squircle relative w-[126px] h-[126px] flex items-center justify-center"
             style={{
-              background: '#8B7355',
+              background: BG_COLOR,
             }}
           >
-            {/* Inner avatar - squircle */}
+            {/* Achievement ring - squircle */}
             <div 
-              className="clbhouz-squircle w-[119px] h-[119px] overflow-hidden relative"
+              className="clbhouz-squircle relative w-[124px] h-[124px] flex items-center justify-center"
               style={{
-                boxShadow: '0 12px 30px rgba(15,15,15,0.22)'
+                background: '#8B7355',
               }}
             >
-              {profile?.profile_photo_url ? (
-                <img 
-                  src={profile.profile_photo_url} 
-                  alt={displayName}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-slate-200 flex items-center justify-center text-3xl font-bold text-slate-600">
-                  {displayName.charAt(0)}
-                </div>
-              )}
+              {/* Inner avatar - squircle */}
+              <div 
+                className="clbhouz-squircle w-[119px] h-[119px] overflow-hidden relative"
+                style={{
+                  boxShadow: '0 12px 30px rgba(15,15,15,0.22)'
+                }}
+              >
+                {profile?.profile_photo_url ? (
+                  <img 
+                    src={profile.profile_photo_url} 
+                    alt={displayName}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-slate-200 flex items-center justify-center text-3xl font-bold text-slate-600">
+                    {displayName.charAt(0)}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -244,17 +252,17 @@ const ProfilePageV2: React.FC = () => {
         )}
       </div>
 
-      {/* Action Buttons - longer buttons */}
-      <div className="mt-5 px-4 flex items-center justify-center gap-2">
-        {/* Follow - blue filled pill, longer */}
+      {/* Action Buttons - left aligned with home club */}
+      <div className="mt-5 px-5 flex items-center gap-2">
+        {/* Follow - mid-slate filled pill */}
         <button 
           className="h-8 px-8 rounded-full text-xs font-semibold text-white flex items-center justify-center"
-          style={{ background: '#0066FF' }}
+          style={{ background: '#64748b' }}
         >
           Follow
         </button>
         
-        {/* Message - white outline pill, longer */}
+        {/* Message - white outline pill */}
         <button 
           className="h-8 px-6 rounded-full text-xs font-semibold text-[#0F0F0F] flex items-center justify-center gap-1.5"
           style={{
@@ -278,20 +286,17 @@ const ProfilePageV2: React.FC = () => {
         </button>
       </div>
 
-      {/* Mini-nav row: Posts | Followers | Friends - increased gap between title and number */}
-      <div className="mt-6 px-4">
-        <div className="flex items-center justify-between border-b border-[#D0D4DB]">
+      {/* Mini-nav row: Posts | Followers | Friends - no underlines */}
+      <div className="mt-6 px-5">
+        <div className="flex items-center gap-6">
           {/* Posts */}
           <button
             onClick={() => setActiveMiniNav('posts')}
-            className="relative pb-3 px-2"
+            className="pb-3"
           >
-            <span className={`text-base font-medium text-[#0F0F0F]`}>
+            <span className="text-base font-medium text-[#0F0F0F]">
               Posts<span className="ml-2 font-semibold">{postsCount}</span>
             </span>
-            {activeMiniNav === 'posts' && (
-              <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#0F0F0F] rounded-full" />
-            )}
           </button>
           
           {/* Followers */}
@@ -300,14 +305,11 @@ const ProfilePageV2: React.FC = () => {
               setActiveMiniNav('followers');
               navigate(`/profile/${username}/followers`);
             }}
-            className="relative pb-3 px-2"
+            className="pb-3"
           >
-            <span className={`text-base font-medium text-[#0F0F0F]`}>
+            <span className="text-base font-medium text-[#0F0F0F]">
               Followers<span className="ml-2 font-semibold">{followersCount}</span>
             </span>
-            {activeMiniNav === 'followers' && (
-              <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#0F0F0F] rounded-full" />
-            )}
           </button>
           
           {/* Friends */}
@@ -317,14 +319,11 @@ const ProfilePageV2: React.FC = () => {
                 setActiveMiniNav('friends');
                 navigate(`/profile/${username}/friends`);
               }}
-              className="relative pb-3 px-2"
+              className="pb-3"
             >
-              <span className={`text-base font-medium text-[#0F0F0F]`}>
+              <span className="text-base font-medium text-[#0F0F0F]">
                 Friends<span className="ml-2 font-semibold">{friendsCount}</span>
               </span>
-              {activeMiniNav === 'friends' && (
-                <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#0F0F0F] rounded-full" />
-              )}
             </button>
           )}
         </div>
@@ -334,20 +333,26 @@ const ProfilePageV2: React.FC = () => {
       <div className="bg-white pt-5 pb-32 min-h-[60vh]">
         {/* About section */}
         <section className="px-5 mb-6">
-          <h3 className="text-xl font-bold text-[#0F0F0F] mb-2">About</h3>
-          <p className="text-base text-[#0F0F0F] leading-relaxed font-medium">
+          <h3 className="text-xl font-semibold text-[#0F0F0F] mb-2">About</h3>
+          <p className="text-base text-[#0F0F0F] leading-relaxed">
             {profile?.bio || 'Passionate golfer with a love for links courses. Always working to improve my game and explore new courses.'}
           </p>
-          <div className="flex justify-end mt-2">
-            <button className="text-base font-medium" style={{ color: '#0066FF' }}>
-              See more
-            </button>
-          </div>
+          {/* Website link if available */}
+          {profile?.website && (
+            <a 
+              href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 mt-3 text-sm font-medium text-slate-600 hover:text-slate-800"
+            >
+              🔗 {profile.website.replace(/^https?:\/\//, '')}
+            </a>
+          )}
         </section>
 
         {/* Golf Snapshot */}
         <section className="px-5 mb-6">
-          <h3 className="text-xl font-bold text-[#0F0F0F] mb-3">Golf Snapshot</h3>
+          <h3 className="text-xl font-semibold text-[#0F0F0F] mb-3">Golf Snapshot</h3>
           <div className="grid grid-cols-2 gap-3">
             {/* Left card */}
             <div 
@@ -389,7 +394,7 @@ const ProfilePageV2: React.FC = () => {
         {isPersonal && unlockedAchievements.length > 0 && (
           <section className="px-5 mb-6">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xl font-bold text-[#0F0F0F]">Achievements</h3>
+              <h3 className="text-xl font-semibold text-[#0F0F0F]">Achievements</h3>
               <button 
                 onClick={() => navigate('/profile/quest')}
                 className="text-base font-medium flex items-center gap-1"
