@@ -339,7 +339,7 @@ const ProfilePageV2: React.FC = () => {
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-slate-900">Achievements</h3>
             <button 
-              onClick={() => navigate(`/profile/${username}/achievements`)}
+              onClick={() => navigate('/achievement')}
               className="text-sm font-semibold flex items-center gap-1"
               style={{ color: '#F7931E' }}
             >
