@@ -20,11 +20,19 @@ export function useLeaderboardSpotlight() {
       const thirtyDaysAgo = subDays(new Date(), 30).toISOString();
       const spotlights: SpotlightPlayer[] = [];
 
-      // 1. Most courses rated in last 30 days
+      // 1. Most TOP 100 courses rated in last 30 days
+      // First get all Top 100 course IDs
+      const { data: top100Courses } = await supabase
+        .from('course_top100_memberships')
+        .select('course_id');
+      
+      const top100CourseIds = new Set(top100Courses?.map(c => c.course_id) || []);
+
       const { data: mostPlayed } = await supabase
         .from('course_ratings')
         .select(`
           user_id,
+          course_id,
           user_profiles!course_ratings_user_id_fkey (
             display_name,
             profile_photo_url,
@@ -35,10 +43,13 @@ export function useLeaderboardSpotlight() {
         .not('user_id', 'is', null);
 
       if (mostPlayed && mostPlayed.length > 0) {
-        // Count ratings per user
+        // Count TOP 100 ratings per user (filter to only Top 100 courses)
         const userCounts: Record<string, { count: number; profile: any }> = {};
         for (const rating of mostPlayed) {
           if (!rating.user_id) continue;
+          // Only count if course is a Top 100 course
+          if (!top100CourseIds.has(rating.course_id)) continue;
+          
           const profile = rating.user_profiles;
           if (!userCounts[rating.user_id]) {
             userCounts[rating.user_id] = { count: 0, profile };
@@ -46,10 +57,10 @@ export function useLeaderboardSpotlight() {
           userCounts[rating.user_id].count++;
         }
 
-        // Find user with most ratings
+        // Find user with most Top 100 ratings
         const topUser = Object.entries(userCounts)
           .sort((a, b) => b[1].count - a[1].count)
-          .find(([_, data]) => data.count >= 2);
+          .find(([_, data]) => data.count >= 1);
 
         if (topUser) {
           spotlights.push({
