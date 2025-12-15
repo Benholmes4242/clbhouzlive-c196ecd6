@@ -485,8 +485,11 @@ export default function CreateMomentModal({
             onTypingStateChange={setIsTyping}
           />
 
-          {/* Share Bar */}
-          <div className="px-4 pb-4">
+          {/* Share Bar - safe-area aware */}
+          <div 
+            className="px-4 pt-2"
+            style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 16px), 16px)' }}
+          >
             <CreateMomentShareBar
               canPost={canPost}
               uploadProgress={uploadProgress}
