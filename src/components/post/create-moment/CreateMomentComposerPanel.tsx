@@ -96,9 +96,9 @@ export default function CreateMomentComposerPanel({
 
   return (
     <div 
-      className="flex flex-col px-4 pt-3 gap-2.5"
+      className="flex flex-col px-4 pt-2 gap-2.5"
       style={{
-        paddingBottom: '12px', // Enforced 12px gap between enhance button and ShareBar divider
+        paddingBottom: '8px',
         touchAction: 'pan-y'
       }}
       data-ecm-scroll-container="true"
