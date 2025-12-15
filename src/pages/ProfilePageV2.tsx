@@ -175,31 +175,20 @@ const ProfilePageV2: React.FC = () => {
           />
         </div>
 
-        {/* Avatar with achievement ring - using global squircle design */}
+        {/* Avatar - squircle with tan/brown ring, using global squircle design */}
         <div className="absolute left-1/2 -translate-x-1/2 -bottom-12 z-20">
-          {/* Achievement ring container */}
+          {/* Achievement ring - squircle */}
           <div 
-            className="relative"
+            className="clbhouz-squircle relative w-[124px] h-[124px] flex items-center justify-center"
             style={{
-              width: '124px',
-              height: '124px',
-              boxShadow: '0 12px 30px rgba(15,15,15,0.22)'
+              background: '#8B7355',
             }}
           >
-            {/* Ring background - squircle shape */}
+            {/* Inner avatar - squircle */}
             <div 
-              className="clbhouz-squircle absolute inset-0"
-              style={{ background: '#8B7355' }}
-            />
-            {/* Inner avatar - squircle shape, positioned with ring gap */}
-            <div 
-              className="clbhouz-squircle absolute"
+              className="clbhouz-squircle w-[119px] h-[119px] overflow-hidden relative"
               style={{
-                top: '2.5px',
-                left: '2.5px',
-                right: '2.5px',
-                bottom: '2.5px',
-                overflow: 'hidden'
+                boxShadow: '0 12px 30px rgba(15,15,15,0.22)'
               }}
             >
               {profile?.profile_photo_url ? (
@@ -207,13 +196,9 @@ const ProfilePageV2: React.FC = () => {
                   src={profile.profile_photo_url} 
                   alt={displayName}
                   className="w-full h-full object-cover"
-                  style={{ position: 'absolute', inset: 0 }}
                 />
               ) : (
-                <div 
-                  className="w-full h-full bg-slate-200 flex items-center justify-center text-3xl font-bold text-slate-600"
-                  style={{ position: 'absolute', inset: 0 }}
-                >
+                <div className="w-full h-full bg-slate-200 flex items-center justify-center text-3xl font-bold text-slate-600">
                   {displayName.charAt(0)}
                 </div>
               )}
