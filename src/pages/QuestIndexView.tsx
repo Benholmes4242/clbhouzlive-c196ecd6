@@ -57,13 +57,12 @@ const FilterPill: React.FC<{
   </button>
 );
 
-// Course row component with actions
+// Course row component with actions (RATINGS-ONLY: "played" toggle opens rating modal)
 const CourseRow: React.FC<{
   course: QuestCourse;
-  onMarkPlayed: (courseId: string, played: boolean) => void;
   onToggleWishlist: (courseId: string, wishlist: boolean) => void;
   onRate: (course: QuestCourse) => void;
-}> = ({ course, onMarkPlayed, onToggleWishlist, onRate }) => (
+}> = ({ course, onToggleWishlist, onRate }) => (
   <div
     className="flex items-center gap-3 py-3 border-b"
     style={{ borderColor: 'var(--dgp-divider)' }}
@@ -115,33 +114,18 @@ const CourseRow: React.FC<{
         )}
       </button>
       
-      {/* Rate button */}
+      {/* Rate button - RATINGS-ONLY: this is now the primary way to "play" a course */}
       <button
         onClick={() => onRate(course)}
         className="p-2 rounded-lg transition-colors"
         style={{
-          background: course.rating ? 'rgba(200, 176, 106, 0.2)' : 'transparent',
+          background: course.isRated ? 'rgba(110, 146, 119, 0.2)' : 'transparent',
         }}
-        aria-label="Rate course"
+        aria-label={course.isRated ? 'Edit rating' : 'Rate this course'}
       >
         <Star
-          className={`w-4 h-4 ${course.rating ? 'fill-current' : ''}`}
-          style={{ color: course.rating ? 'var(--dgp-accent-gold)' : 'var(--dgp-text-muted)' }}
-        />
-      </button>
-      
-      {/* Played toggle */}
-      <button
-        onClick={() => onMarkPlayed(course.id, !course.isPlayed)}
-        className="p-2 rounded-lg transition-colors"
-        style={{
-          background: course.isPlayed ? 'rgba(110, 146, 119, 0.2)' : 'transparent',
-        }}
-        aria-label={course.isPlayed ? 'Mark as not played' : 'Mark as played'}
-      >
-        <CheckCircle
-          className={`w-4 h-4 ${course.isPlayed ? 'fill-current' : ''}`}
-          style={{ color: course.isPlayed ? 'var(--dgp-accent-green)' : 'var(--dgp-text-muted)' }}
+          className={`w-4 h-4 ${course.isRated ? 'fill-current' : ''}`}
+          style={{ color: course.isRated ? 'var(--dgp-accent-green)' : 'var(--dgp-text-muted)' }}
         />
       </button>
     </div>
@@ -223,7 +207,7 @@ const RatingSheet: React.FC<{
 
 const QuestIndexView: React.FC = () => {
   const navigate = useNavigate();
-  const { courses, isLoading, totalPlayed, markPlayed, toggleWishlist } = useQuestCourses();
+  const { courses, isLoading, totalPlayed, toggleWishlist } = useQuestCourses();
   const onboarding = useQuestOnboarding(totalPlayed);
   
   const [searchQuery, setSearchQuery] = useState('');
@@ -316,11 +300,10 @@ const QuestIndexView: React.FC = () => {
     setRatingCourse(course);
   }, [handleInteraction]);
 
-  const handleSubmitRating = useCallback((courseId: string, rating: number) => {
-    // For now, mark as played when rating (rating requires playing)
-    markPlayed(courseId, true);
-    // TODO: Save rating to course_ratings table
-  }, [markPlayed]);
+  // RATINGS-ONLY: Rating submission handled by modal, no separate markPlayed needed
+  const handleCloseRatingModal = useCallback(() => {
+    setRatingCourse(null);
+  }, []);
 
   if (isLoading) {
     return (
@@ -491,10 +474,6 @@ const QuestIndexView: React.FC = () => {
               <CourseRow
                 key={course.id}
                 course={course}
-                onMarkPlayed={(id, played) => {
-                  handleInteraction();
-                  markPlayed(id, played);
-                }}
                 onToggleWishlist={(id, wishlist) => {
                   handleInteraction();
                   toggleWishlist(id, wishlist);
@@ -515,8 +494,8 @@ const QuestIndexView: React.FC = () => {
       {/* Rating sheet */}
       <RatingSheet
         course={ratingCourse}
-        onClose={() => setRatingCourse(null)}
-        onRate={handleSubmitRating}
+        onClose={handleCloseRatingModal}
+        onRate={handleCloseRatingModal}
       />
     </PageRoot>
   );

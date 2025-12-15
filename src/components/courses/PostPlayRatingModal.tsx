@@ -144,86 +144,24 @@ const PostPlayRatingModal = ({
     });
   }, [isOpen, course, isEditMode]);
 
-  const markAsPlayedMutation = useMutation({
+  // RATINGS-ONLY: Badge checking after rating (no user_top100_courses writes)
+  const checkBadgesMutation = useMutation({
     mutationFn: async () => {
       const { data: userResponse } = await supabase.auth.getUser();
-      if (!userResponse.user || !course) throw new Error('Not authenticated or no course');
+      if (!userResponse.user) throw new Error('Not authenticated');
 
-      // Get course ranking data to check if it's a top 100 course
-      const { data: courseData, error: courseError } = await supabase
-        .from('golf_courses')
-        .select('global_rank, regional_rank, usa_rank')
-        .eq('id', course.id)
-        .single();
-
-      if (courseError) throw courseError;
-
-      const isTop100Course = courseData?.global_rank || courseData?.regional_rank || courseData?.usa_rank;
-
-      // Check if already in user_courses
-      const { data: existingCourse, error: checkError } = await supabase
-        .from('user_courses')
-        .select('id')
-        .eq('course_id', course.id)
-        .eq('user_id', userResponse.user.id)
-        .maybeSingle();
-
-      if (checkError && checkError.code !== 'PGRST116') throw checkError;
-
-      if (!existingCourse) {
-        const { error } = await supabase
-          .from('user_courses')
-          .insert({
-            course_id: course.id,
-            user_id: userResponse.user.id,
-            played: true,
-          });
-        
-        if (error) throw error;
-      }
-
-      // If it's a top 100 course, also add to user_top100_courses
-      if (isTop100Course) {
-        const { error: top100Error } = await supabase
-          .from('user_top100_courses')
-          .upsert({
-            course_id: course.id,
-            user_id: userResponse.user.id,
-            played: true,
-            played_date: new Date().toISOString().split('T')[0],
-          }, {
-            onConflict: 'user_id,course_id'
-          });
-        if (top100Error) throw top100Error;
-      }
+      // Trigger badge checking for the user
+      await supabase.rpc('check_and_award_badges', { user_id_param: userResponse.user.id });
     },
-    onSuccess: async () => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-course', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['my-courses'] });
       queryClient.invalidateQueries({ queryKey: ['trackerStats'] });
-      queryClient.invalidateQueries({ queryKey: ['user-top100-course', course?.id] });
-      queryClient.invalidateQueries({ queryKey: ['top100-courses'] });
       queryClient.invalidateQueries({ queryKey: ['user-played-course', course?.id] });
-      
-      // Trigger badge checking for the user
-      try {
-        const { data: userResponse } = await supabase.auth.getUser();
-        if (userResponse.user) {
-          await supabase.rpc('check_and_award_badges', { user_id_param: userResponse.user.id });
-        }
-      } catch (error) {
-        console.error('Error checking badges:', error);
-      }
     },
     onError: (error: any) => {
-      console.error('[Rating] Error marking course as played:', error);
-      console.error('[Rating] Played marking error details:', {
-        code: error?.code,
-        message: error?.message,
-        details: error?.details
-      });
-      // Don't show user error - they already got success toast for rating
-      // This is a secondary operation that shouldn't block the primary success
+      console.error('[Rating] Badge checking failed:', error);
+      // Non-blocking - rating already succeeded
     },
   });
 
@@ -349,14 +287,14 @@ const PostPlayRatingModal = ({
         facilities: facilitiesScore || undefined,
       });
 
-      // Mark as played after successful rating (only if not in edit mode)
-      // Don't let achievements failures block the rating success
+      // Check badges after successful rating (only if not in edit mode)
+      // RATINGS-ONLY: No user_top100_courses writes - rating IS the played status
       if (!isEditMode) {
         try {
-          await markAsPlayedMutation.mutateAsync();
-        } catch (achievementError) {
-          console.error('[Rating] Achievements failed but rating succeeded:', achievementError);
-          // Continue - rating is still successful even if achievements fail
+          await checkBadgesMutation.mutateAsync();
+        } catch (badgeError) {
+          console.error('[Rating] Badge check failed but rating succeeded:', badgeError);
+          // Continue - rating is still successful even if badge check fails
         }
       }
       
@@ -481,17 +419,8 @@ const PostPlayRatingModal = ({
         console.error('[Delete Rating] User courses deletion error:', courseError);
       }
       
-      // Also try to remove from user_top100_courses (might be in both tables)
-      const { error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .update({ played: false, played_date: null })
-        .eq('user_id', userResponse.user.id)
-        .eq('course_id', course.id);
-      
-      // Don't throw error if not found in top100 courses
-      if (top100Error && top100Error.code !== 'PGRST116') {
-        console.warn('[Delete Rating] Top100 courses update error:', top100Error);
-      }
+      // RATINGS-ONLY: No need to update user_top100_courses
+      // Deleting the rating is sufficient - rating IS the played status
 
       console.log('[Delete Rating] Result:', { status: 'success' });
     },

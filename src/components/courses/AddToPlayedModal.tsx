@@ -1,9 +1,12 @@
+/**
+ * AddToPlayedModal - RATINGS-ONLY: Renamed to "Rate Course" modal
+ * No longer writes to user_top100_courses - rating IS the played status
+ */
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
 import { Upload, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -34,42 +37,12 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const submitPlayedCourse = useMutation({
+  // RATINGS-ONLY: Only write to course_ratings - no user_top100_courses
+  const submitRatingMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error('Not authenticated');
 
-      // First, mark course as played
-      const { error: courseError } = await supabase
-        .from('user_courses')
-        .upsert({
-          course_id: course.id,
-          user_id: user.id,
-          played: true,
-          played_date: new Date().toISOString().split('T')[0],
-        });
-
-      if (courseError) throw courseError;
-
-      // Check if it's a Top 100 course and add to tracker
-      const { data: courseData } = await supabase
-        .from('golf_courses')
-        .select('global_rank, regional_rank, usa_rank')
-        .eq('id', course.id)
-        .single();
-
-      if (courseData?.global_rank || courseData?.regional_rank || courseData?.usa_rank) {
-        const { error: top100Error } = await supabase
-          .from('user_top100_courses')
-          .upsert({
-            course_id: course.id,
-            user_id: user.id,
-            played: true,
-            played_date: new Date().toISOString().split('T')[0],
-          });
-        if (top100Error) throw top100Error;
-      }
-
-      // Add rating and review
+      // Add rating (this IS marking as played in ratings-only system)
       const { data: ratingData, error: ratingError } = await supabase
         .from('course_ratings')
         .upsert({
@@ -87,14 +60,12 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
       // Upload media files if any
       if (uploadedFiles.length > 0) {
         for (const file of uploadedFiles) {
-          // Upload to Cloudflare R2 instead of Supabase storage
           const uploadResult = await uploadToCloudflareR2(file, 'clbhouz-review-images', file.name);
           
           if (!uploadResult.success || !uploadResult.publicUrl) {
             throw new Error(uploadResult.error || 'Upload failed');
           }
 
-          // Save media record
           await supabase
             .from('course_review_media')
             .insert({
@@ -117,12 +88,14 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-course'] });
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats'] });
-      queryClient.invalidateQueries({ queryKey: ['user-top100-course'] });
+      queryClient.invalidateQueries({ queryKey: ['user-played-course'] });
       queryClient.invalidateQueries({ queryKey: ['my-courses'] });
+      queryClient.invalidateQueries({ queryKey: ['quest-courses'] });
+      queryClient.invalidateQueries({ queryKey: ['userTop100Courses'] });
       
       toast({
-        title: "Course added to played!",
-        description: `${course.name} has been added to your played courses.`,
+        title: "Rating submitted!",
+        description: `${course.name} has been added to your rated courses.`,
       });
       
       onSuccess();
@@ -132,10 +105,10 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
       setUploadedFiles([]);
     },
     onError: (error) => {
-      console.error('Error adding course:', error);
+      console.error('Error adding rating:', error);
       toast({
         title: "Error",
-        description: "Failed to add course. Please try again.",
+        description: "Failed to submit rating. Please try again.",
         variant: "destructive",
       });
     },
@@ -143,7 +116,7 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    await submitPlayedCourse.mutateAsync();
+    await submitRatingMutation.mutateAsync();
     setIsSubmitting(false);
   };
 
@@ -152,11 +125,10 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
     const validFiles = files.filter(file => {
       const isImage = file.type.startsWith('image/');
       const isVideo = file.type.startsWith('video/');
-      // No size limit - users can upload files of any size
       return (isImage || isVideo);
     });
     
-    setUploadedFiles(prev => [...prev, ...validFiles].slice(0, 5)); // Max 5 files
+    setUploadedFiles(prev => [...prev, ...validFiles].slice(0, 5));
   };
 
   const removeFile = (index: number) => {
@@ -167,7 +139,7 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add {course.name} to Played</DialogTitle>
+          <DialogTitle>Rate {course.name}</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-6">
@@ -210,7 +182,7 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
 
           {/* Review */}
           <div className="space-y-3">
-            <Label htmlFor="review" className="text-base font-medium">Review</Label>
+            <Label htmlFor="review" className="text-base font-medium">Review (optional)</Label>
             <Textarea
               id="review"
               placeholder="Write your review..."
@@ -268,7 +240,7 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
             className="w-full bg-muted hover:bg-muted/80 active:bg-muted/60 text-muted-foreground hover:text-foreground transition-all duration-200"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Adding Course...' : 'Add to Played'}
+            {isSubmitting ? 'Submitting Rating...' : 'Submit Rating'}
           </Button>
         </div>
       </DialogContent>

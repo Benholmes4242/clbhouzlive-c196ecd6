@@ -657,32 +657,7 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
   const recentlyPlayedLoader = useSectionLoader(useCallback(async () => {
     if (!userId) return [];
 
-    // Get courses from user_top100_courses table
-    const { data: top100Data, error: top100Error } = await supabase
-      .from('user_top100_courses')
-      .select(`
-        course_id,
-        played_date,
-        golf_courses (
-          id,
-          name,
-          country,
-          region,
-          sub_country,
-          continent,
-          global_rank,
-          regional_rank,
-          usa_rank,
-          description,
-          thumbnail_image
-        )
-      `)
-      .eq('user_id', userId)
-      .eq('played', true);
-
-    if (top100Error) throw top100Error;
-
-    // Get courses from course_ratings table
+    // RATINGS-ONLY: Get courses from course_ratings table only
     const { data: ratedData, error: ratedError } = await supabase
       .from('course_ratings')
       .select(`
@@ -703,43 +678,16 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
           thumbnail_image
         )
       `)
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
 
     if (ratedError) throw ratedError;
 
-    // Combine and deduplicate, ensuring consistent structure
-    const combinedCourses = [
-      ...(top100Data || []).map(course => ({
-        ...course,
-        rating: null, // Add rating field for consistency
-        id: `top100-${course.course_id}` // Unique ID for deduplication
-      })),
-      ...(ratedData || []).map(course => ({
-        ...course,
-        played_date: course.created_at, // Use rating date as played date
-        id: `rating-${course.course_id}` // Unique ID for deduplication
-      }))
-    ];
-
-    // Remove duplicates based on course_id, preferring rated courses over top100 courses
-    const uniqueCoursesMap = new Map();
-    
-    combinedCourses.forEach(course => {
-      const courseId = course.course_id;
-      const existing = uniqueCoursesMap.get(courseId);
-      
-      if (!existing) {
-        uniqueCoursesMap.set(courseId, course);
-      } else {
-        // Prefer courses with ratings over those without
-        if (course.rating !== null && course.rating !== undefined && 
-            (existing.rating === null || existing.rating === undefined)) {
-          uniqueCoursesMap.set(courseId, course);
-        }
-      }
-    });
-
-    const rawCourses = Array.from(uniqueCoursesMap.values());
+    // Map to expected format with played_date from created_at
+    const rawCourses = (ratedData || []).map(course => ({
+      ...course,
+      played_date: course.created_at,
+    }));
     
     // Apply sorting here to ensure proper order
     return getSortedUserCourses(rawCourses, 'recent');
@@ -785,11 +733,11 @@ const RecentlyPlayedSection: React.FC<RecentlyPlayedSectionProps> = ({
   }
 
   return (
-    <section className="w-full fullbleed md:mx-auto md:px-0 pt-4 pb-4" data-section="recently-played">
+    <section className="w-full fullbleed md:mx-auto md:px-0 pt-4 pb-4" data-section="recently-rated">
       <div className="max-w-none md:max-w-6xl md:mx-auto">
         <div className="flex items-center justify-between px-4 md:px-0">
           <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-2xl text-foreground">
-            Recently Played
+            Recently Rated
           </h3>
           <div className="flex gap-2">
             {canScrollLeft && (

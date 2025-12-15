@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Target } from 'lucide-react';
+import { Star } from 'lucide-react';
 
 interface CoursePlayedButtonProps {
   isPlayed: boolean;
@@ -15,8 +15,8 @@ const CoursePlayedButton = ({ isPlayed, onAddToPlayed }: CoursePlayedButtonProps
         className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border-0 text-white font-medium px-4 py-2 rounded-full transition-all duration-200"
       >
         <>
-          <Target className="h-4 w-4 mr-2" />
-          {isPlayed ? 'Played' : 'Add to Played'}
+          <Star className="h-4 w-4 mr-2" />
+          {isPlayed ? 'Rated' : 'Rate this course'}
         </>
       </Button>
     </div>
