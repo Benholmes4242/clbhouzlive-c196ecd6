@@ -237,9 +237,12 @@ const ProfilePageV2: React.FC = () => {
             </p>
           )}
           
-          {/* HCP - no background, just text */}
+          {/* HCP pill - white, on right of home club */}
           {profile?.eg_handicap_index != null && (
-            <span className="text-sm font-medium text-[#6B7280]">
+            <span 
+              className="px-3 py-1 text-sm font-semibold rounded-full text-[#0F0F0F]"
+              style={{ background: '#FFFFFF' }}
+            >
               HCP {formatHandicap(profile.eg_handicap_index)}
             </span>
           )}
