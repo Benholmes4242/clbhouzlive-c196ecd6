@@ -10,7 +10,7 @@ export const golferVerificationCopy = {
   golferVerification: {
     // Notification titles
     invite: {
-      title: "Clubhouse would like to verify your account",
+      title: "clbhouz would like to verify your account",
       body: "Based on your activity, you're eligible for verified golfer status.",
       reasonLabel: "Reason:"
     },
@@ -58,7 +58,7 @@ export const golferVerificationCopy = {
   tooltips: {
     verified: {
       title: "Verified Golfer",
-      body: "This golfer has been verified by Clbhouz."
+      body: "This golfer has been verified by clbhouz."
     }
   }
 } as const;
@@ -83,7 +83,7 @@ export interface GolferVerificationCopySet {
 
 export const GOLFER_VERIFICATION_COPY: Record<GolferVerificationEvent, GolferVerificationCopySet> = {
   invited: {
-    title: 'Clubhouse would like to verify your account',
+    title: 'clbhouz would like to verify your account',
     body: 'Based on your activity, you\'re eligible for verified golfer status.',
     push: 'You\'re invited to become a verified golfer',
     audit: 'Golfer verification invite sent.'
