@@ -156,7 +156,7 @@ const ProfilePageV2: React.FC = () => {
       {/* Hero Section - tall, full bleed */}
       <div className="relative">
         {/* Hero Image */}
-        <div className="relative h-[240px] w-full overflow-hidden">
+        <div className="relative h-[250px] w-full overflow-hidden">
           {heroUrl ? (
             <img 
               src={heroUrl} 
