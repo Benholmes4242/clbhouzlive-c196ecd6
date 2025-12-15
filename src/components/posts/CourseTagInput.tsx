@@ -1,5 +1,4 @@
-
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { X, MapPin, Loader2 } from 'lucide-react';
 import '@/features/nearby/GamesTab.css';
@@ -17,16 +16,34 @@ interface CourseTagInputProps {
   placeholder?: string;
 }
 
+// Simple in-memory cache for search results
+const searchCache = new Map<string, { data: GolfCourse[]; timestamp: number }>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 const CourseTagInput = ({ 
   selectedCourse, 
   onCourseSelect, 
-  placeholder = "Start typing to find a course..." 
+  placeholder = "Where was this played?" 
 }: CourseTagInputProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<GolfCourse[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Check cache for results
+  const getCachedResults = useCallback((query: string): GolfCourse[] | null => {
+    const cached = searchCache.get(query.toLowerCase());
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      return cached.data;
+    }
+    return null;
+  }, []);
+
+  // Save results to cache
+  const setCachedResults = useCallback((query: string, data: GolfCourse[]) => {
+    searchCache.set(query.toLowerCase(), { data, timestamp: Date.now() });
+  }, []);
 
   useEffect(() => {
     const searchCourses = async () => {
@@ -36,17 +53,27 @@ const CourseTagInput = ({
         return;
       }
 
+      // Check cache first
+      const cached = getCachedResults(searchQuery);
+      if (cached) {
+        setSuggestions(cached);
+        setShowSuggestions(true);
+        return;
+      }
+
       setIsLoading(true);
       try {
         const { data, error } = await supabase
           .from('golf_courses')
           .select('id, name, country, region')
           .or(`name.ilike.%${searchQuery}%,country.ilike.%${searchQuery}%,region.ilike.%${searchQuery}%`)
-          .limit(6);
+          .limit(10); // Increased from 6 to 10
 
         if (error) throw error;
         
-        setSuggestions(data || []);
+        const results = data || [];
+        setSuggestions(results);
+        setCachedResults(searchQuery, results);
         setShowSuggestions(true);
       } catch (error) {
         console.error('Error searching courses:', error);
@@ -58,7 +85,7 @@ const CourseTagInput = ({
 
     const debounceTimer = setTimeout(searchCourses, 300);
     return () => clearTimeout(debounceTimer);
-  }, [searchQuery]);
+  }, [searchQuery, getCachedResults, setCachedResults]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -87,7 +114,7 @@ const CourseTagInput = ({
 
   return (
     <div className="space-y-2">
-      <label className="findLabel">Select a golf club</label>
+      <label className="findLabel">Where was this played?</label>
       
       {selectedCourse ? (
         // Show selected course pill matching Create Game styling
@@ -122,7 +149,7 @@ const CourseTagInput = ({
               onChange={handleInputChange}
               onFocus={handleInputFocus}
               onBlur={handleInputBlur}
-              placeholder="Tag a golf club..."
+              placeholder={placeholder}
             />
             {isLoading && searchQuery.length >= 2 && (
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
