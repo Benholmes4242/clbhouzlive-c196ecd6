@@ -11,9 +11,11 @@ import {
 interface IdentitySelectorProps {
   /** Compact mode for mobile/modal use */
   compact?: boolean;
+  /** Visual variant - 'light' for light backgrounds, 'dark' for dark/glass backgrounds */
+  variant?: 'light' | 'dark';
 }
 
-export function IdentitySelector({ compact = false }: IdentitySelectorProps) {
+export function IdentitySelector({ compact = false, variant = 'light' }: IdentitySelectorProps) {
   const { activeActor, setActiveActor, availableActors, isLoading } = useActiveActor();
 
   // Don't show if only personal identity available
@@ -52,23 +54,35 @@ export function IdentitySelector({ compact = false }: IdentitySelectorProps) {
     );
   };
 
+  // Style variants
+  const triggerStyles = variant === 'dark' 
+    ? {
+        background: 'rgba(255, 255, 255, 0.08)',
+        border: '1px solid rgba(255, 255, 255, 0.12)',
+      }
+    : undefined;
+
+  const triggerClasses = variant === 'dark'
+    ? `inline-flex items-center gap-2 ${compact ? 'px-2 py-1' : 'px-3 py-1.5'} rounded-sq-pill transition-colors hover:bg-white/12`
+    : `inline-flex items-center gap-2 ${compact ? 'px-2 py-1' : 'px-3 py-1.5'} rounded-sq-pill border border-border/60 bg-background/60 hover:bg-background/80 transition-colors`;
+
+  const textClasses = variant === 'dark'
+    ? `${compact ? 'text-xs' : 'text-sm'} font-medium truncate max-w-[120px] text-white`
+    : `${compact ? 'text-xs' : 'text-sm'} font-medium truncate max-w-[120px]`;
+
+  const chevronClasses = variant === 'dark'
+    ? 'h-3 w-3 text-white/50'
+    : 'h-3 w-3 text-muted-foreground';
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button
-          className={`
-            inline-flex items-center gap-2 
-            ${compact ? 'px-2 py-1' : 'px-3 py-1.5'} 
-            rounded-sq-pill border border-border/60 
-            bg-background/60 hover:bg-background/80
-            transition-colors
-          `}
-        >
+        <button className={triggerClasses} style={triggerStyles}>
           {renderAvatar(activeActor)}
-          <span className={`${compact ? 'text-xs' : 'text-sm'} font-medium truncate max-w-[120px]`}>
+          <span className={textClasses}>
             {activeActor.name}
           </span>
-          <ChevronDown className="h-3 w-3 text-muted-foreground" />
+          <ChevronDown className={chevronClasses} />
         </button>
       </DropdownMenuTrigger>
 

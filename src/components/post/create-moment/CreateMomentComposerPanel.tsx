@@ -110,7 +110,7 @@ export default function CreateMomentComposerPanel({
         {availableActorsCount > 1 && (
           <div className="flex items-center justify-between py-1">
             <span className="text-[11px] text-white/50">Posting as</span>
-            <IdentitySelector compact />
+            <IdentitySelector compact variant="dark" />
           </div>
         )}
 
