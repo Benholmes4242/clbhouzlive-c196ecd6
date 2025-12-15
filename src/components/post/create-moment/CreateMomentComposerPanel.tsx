@@ -118,7 +118,7 @@ export default function CreateMomentComposerPanel({
           
           <textarea
             ref={textareaRef}
-            className="caption-input w-full rounded-xl px-3 py-2.5 text-[14px] leading-snug resize-none text-white placeholder:text-white/50 focus:outline-none focus:ring-0 transition-all duration-200"
+            className="caption-input w-full rounded-xl px-3 py-2.5 text-[14px] leading-snug resize-none text-white placeholder:text-white/50 focus:outline-none focus:ring-0 focus:border-transparent"
             style={{
               background: 'rgba(255, 255, 255, 0.06)',
               backdropFilter: 'blur(10px)',
@@ -126,7 +126,10 @@ export default function CreateMomentComposerPanel({
               border: '1px solid rgba(255, 255, 255, 0.08)',
               minHeight: '48px',
               maxHeight: '100px',
-              boxShadow: 'none'
+              boxShadow: 'none',
+              outline: 'none',
+              WebkitTapHighlightColor: 'transparent',
+              WebkitAppearance: 'none'
             }}
             placeholder="Write a caption..."
             value={caption}
