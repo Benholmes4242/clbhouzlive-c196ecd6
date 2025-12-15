@@ -74,15 +74,15 @@ const CoursePickerModal: React.FC<CoursePickerModalProps> = ({
     enabled: isOpen,
   });
 
-  // Get user's played courses
+  // Get user's played courses (ratings-only: single source of truth)
   const { data: playedCourses = [] } = useQuery({
     queryKey: ['userPlayedCourses', userId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('user_top100_courses')
+        .from('course_ratings')
         .select('course_id')
         .eq('user_id', userId)
-        .eq('played', true);
+        .not('rating', 'is', null);
 
       if (error) throw error;
       return data?.map(pc => pc.course_id) || [];
@@ -123,22 +123,25 @@ const CoursePickerModal: React.FC<CoursePickerModalProps> = ({
 
     setIsSubmitting(true);
     try {
-      const coursesToInsert = Array.from(selectedCourses).map(courseId => ({
+      // RATINGS-ONLY: Insert to course_ratings instead of user_top100_courses
+      // Each course gets a default rating that the user can edit later
+      const ratingsToInsert = Array.from(selectedCourses).map(courseId => ({
         user_id: userId,
         course_id: courseId,
-        played: true,
-        played_date: new Date().toISOString().split('T')[0]
+        rating: 7.0, // Default neutral rating - user can edit later
+        review: null,
+        is_mock: false
       }));
 
       const { error } = await supabase
-        .from('user_top100_courses')
-        .insert(coursesToInsert);
+        .from('course_ratings')
+        .upsert(ratingsToInsert, { onConflict: 'user_id,course_id' });
 
       if (error) throw error;
 
       toast({
         title: "Courses Added!",
-        description: `Added ${selectedCourses.size} course${selectedCourses.size > 1 ? 's' : ''} to your played list. Want to leave a review later?`,
+        description: `Added ${selectedCourses.size} course${selectedCourses.size > 1 ? 's' : ''} with default rating. Tap to edit your rating.`,
       });
 
       onCoursesAdded();

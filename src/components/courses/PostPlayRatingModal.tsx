@@ -335,6 +335,13 @@ const PostPlayRatingModal = ({
       queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['top100-course-leaderboard'], exact: false });
       
+      // RATINGS-ONLY FIX: Invalidate Top 100 progress and Quest queries to update counts instantly
+      queryClient.invalidateQueries({ queryKey: ['top100-progress-for-user'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['quest-courses'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['top100-leaderboard'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['user-top100-courses'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['userPlayedCourses'], exact: false });
+      
       // Show "Added!" text for 1.5 seconds
       setButtonText('Added!');
       setTimeout(() => {
@@ -461,6 +468,13 @@ const PostPlayRatingModal = ({
       queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['top100-course-leaderboard'], exact: false });
+      
+      // RATINGS-ONLY FIX: Invalidate Top 100 progress and Quest queries to update counts instantly
+      queryClient.invalidateQueries({ queryKey: ['top100-progress-for-user'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['quest-courses'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['top100-leaderboard'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['user-top100-courses'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['userPlayedCourses'], exact: false });
       
       // Trigger badge checking for the user (non-blocking)
       try {

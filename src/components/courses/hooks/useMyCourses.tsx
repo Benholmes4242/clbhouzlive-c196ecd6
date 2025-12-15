@@ -131,11 +131,11 @@ export const useMyCourses = () => {
     enabled: !!user?.id,
   });
 
-  // Add source property to Top 100 courses
+  // Add source property to Top 100 courses (ratings-only)
   const top100Courses = React.useMemo(() => {
     const coursesWithSource = top100CoursesRaw.map(course => ({
       ...course,
-      source: 'user_top100_courses' as const
+      source: 'course_ratings' as const
     }));
     
     // Apply custom sorting to Top 100 courses
@@ -143,6 +143,7 @@ export const useMyCourses = () => {
   }, [top100CoursesRaw]);
 
   // Combine all played courses from both tables, removing duplicates
+  // RATINGS-ONLY: course_ratings is the single source of truth
   const allPlayedCourses = React.useMemo(() => {
     const courseMap = new Map();
     
@@ -156,12 +157,12 @@ export const useMyCourses = () => {
       }
     });
     
-    // Add courses from user_top100_courses table (will overwrite if duplicate)
+    // Add courses from course_ratings (ratings-only, single source of truth)
     top100CoursesRaw.forEach(userCourse => {
       if (userCourse.golf_courses) {
         courseMap.set(userCourse.golf_courses.id, {
           ...userCourse,
-          source: 'user_top100_courses'
+          source: 'course_ratings'
         });
       }
     });
