@@ -104,13 +104,14 @@ const ProfileAchievementsRail: React.FC<ProfileAchievementsRailProps> = ({
     >
       {/* Title row */}
       <div className="mb-2 flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-foreground">
+        <h2 className="text-sm font-semibold" style={{ color: 'var(--dgp-text-primary, hsl(var(--foreground)))' }}>
           Achievements
         </h2>
         <button
           type="button"
           onClick={handleViewAll}
-          className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80"
+          className="inline-flex items-center gap-1 text-xs font-medium"
+          style={{ color: 'var(--dgp-accent-amber, hsl(var(--primary)))' }}
         >
           View all
           <ChevronRight className="h-3 w-3" />
