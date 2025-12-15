@@ -208,12 +208,11 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 navRef.current = el;
                 setNavRef(el);
               }}
-              className={cn(
-                "chrome-bottom-nav clubhouse-footer border-t",
-                isDimmed 
-                  ? "border-[rgba(255,255,255,0.06)] backdrop-blur-0" 
-                  : "border-white/10 backdrop-blur-xl"
-              )}
+            className={cn(
+              "chrome-bottom-nav clubhouse-footer border-t",
+              "border-[rgba(255,255,255,0.06)] backdrop-blur-xl",
+              isDimmed && "backdrop-blur-0"
+            )}
               data-chrome="bottom-nav"
               style={{
                 background: isDimmed 
