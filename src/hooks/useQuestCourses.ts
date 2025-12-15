@@ -73,11 +73,10 @@ export function useQuestCourses() {
         (shortlistData || []).map(s => s.course_id)
       );
 
-      // Map list slug to region name
+      // Map list slug to region name (must match actual slugs from top100_lists table)
       const listToRegion: Record<string, string> = {
-        'world': 'Worldwide',
-        'worldwide': 'Worldwide',
-        'gbi': 'GB & Ireland',
+        'global': 'Worldwide',
+        'gb-i': 'GB & Ireland',
         'usa': 'USA',
         'europe': 'Continental Europe',
       };
