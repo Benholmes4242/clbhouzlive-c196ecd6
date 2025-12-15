@@ -198,6 +198,35 @@ const ProfilePageV2: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* HCP + Golfer pills - right side, just below header photo */}
+        <div className="absolute right-5 -bottom-5 z-20 flex items-center gap-2">
+          {/* HCP pill - white */}
+          {profile?.eg_handicap_index != null && (
+            <span 
+              className="px-3 py-1.5 text-sm font-semibold rounded-full text-[#0F0F0F]"
+              style={{ 
+                background: '#FFFFFF',
+                boxShadow: '0 2px 8px rgba(31, 36, 40, 0.08)'
+              }}
+            >
+              HCP {formatHandicap(profile.eg_handicap_index)}
+            </span>
+          )}
+          
+          {/* Golfer pill - green glass */}
+          <span 
+            className="px-3 py-1.5 text-sm font-semibold rounded-full text-white flex items-center gap-1.5"
+            style={{ 
+              background: 'rgba(52, 199, 89, 0.9)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              boxShadow: '0 2px 8px rgba(52, 199, 89, 0.25)'
+            }}
+          >
+            Golfer
+          </span>
+        </div>
       </div>
 
       {/* Identity Stack - adjusted for left-aligned avatar */}
@@ -207,24 +236,12 @@ const ProfilePageV2: React.FC = () => {
           {displayName}
         </h1>
         
-        {/* Home club + HCP pill inline */}
-        <div className="mt-1 flex items-center gap-2">
-          {profile?.home_club && (
-            <p className="text-base font-medium text-[#0F0F0F]">
-              {profile.home_club}
-            </p>
-          )}
-          
-          {/* HCP pill - white, on right of home club */}
-          {profile?.eg_handicap_index != null && (
-            <span 
-              className="px-3 py-1 text-sm font-semibold rounded-full text-[#0F0F0F]"
-              style={{ background: '#FFFFFF' }}
-            >
-              HCP {formatHandicap(profile.eg_handicap_index)}
-            </span>
-          )}
-        </div>
+        {/* Home club */}
+        {profile?.home_club && (
+          <p className="mt-1 text-base font-medium text-[#0F0F0F]">
+            {profile.home_club}
+          </p>
+        )}
       </div>
 
       {/* Action Buttons - longer buttons */}
