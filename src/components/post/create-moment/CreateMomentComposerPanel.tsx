@@ -135,18 +135,12 @@ export default function CreateMomentComposerPanel({
             maxLength={2200}
           />
           
-          {/* Helper row - only show on focus or when typing */}
-          {(isFocused || caption.length > 0) && (
-            <div className="flex items-center justify-between mt-1">
-              <div className="flex items-center gap-1 text-[10px] text-white/35">
-                <AtSign className="w-2.5 h-2.5" />
-                <span>Tag with @</span>
-              </div>
-              {caption.length > 0 && (
-                <span className={`text-[10px] ${caption.length > 2000 ? 'text-amber-400' : 'text-white/35'}`}>
-                  {caption.length}/2200
-                </span>
-              )}
+          {/* Character count - only show when typing */}
+          {caption.length > 0 && (
+            <div className="flex items-center justify-end mt-1">
+              <span className={`text-[10px] ${caption.length > 2000 ? 'text-amber-400' : 'text-white/35'}`}>
+                {caption.length}/2200
+              </span>
             </div>
           )}
 
