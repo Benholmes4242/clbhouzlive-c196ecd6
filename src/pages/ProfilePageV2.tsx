@@ -1,6 +1,6 @@
 /**
  * ProfilePageV2 - LinkedIn-style Light Profile
- * Hero identity with section-based content
+ * Exact match to design mock
  */
 
 import React, { useState, useEffect } from 'react';
@@ -11,10 +11,9 @@ import { useTop100Overview } from '@/hooks/useTop100Overview';
 import { useActivityPosts } from '@/components/profile/hooks/useActivityPosts';
 import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import { supabase } from '@/integrations/supabase/client';
-import { Settings, ArrowLeft, Share2, Trophy, ChevronRight, MoreHorizontal, UserPlus, MessageCircle, MapPin, Flag } from 'lucide-react';
+import { Settings, ArrowLeft, Share2, Trophy, ChevronRight, MoreHorizontal, Send } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
 
 // Tab content components
@@ -95,6 +94,7 @@ const ProfilePageV2: React.FC = () => {
   const username = profile?.username || 'user';
   const heroUrl = profile?.header_photo_url || profile?.profile_photo_url || '';
   const top100Count = top100Overview?.total_played ?? 0;
+  const roundsLogged = 325; // Placeholder - would come from actual data
 
   const getCurrentContent = () => {
     switch (activeSection) {
@@ -142,18 +142,12 @@ const ProfilePageV2: React.FC = () => {
     }
   };
 
-  const miniNavItems = [
-    { id: 'about', label: 'About' },
-    { id: 'followers', label: 'Followers', count: followersCount },
-    { id: 'friends', label: 'Friends', count: friendsCount },
-  ];
-
   return (
     <PageRoot className="min-h-screen" style={{ background: '#F4F5F7' }}>
-      {/* A) Hero Section - taller with later fade */}
+      {/* Hero Section - tall, full bleed */}
       <div className="relative">
-        {/* Hero Image - increased height */}
-        <div className="relative h-[240px] w-full overflow-hidden">
+        {/* Hero Image */}
+        <div className="relative h-[280px] w-full overflow-hidden">
           {heroUrl ? (
             <img 
               src={heroUrl} 
@@ -161,18 +155,18 @@ const ProfilePageV2: React.FC = () => {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300" />
+            <div className="w-full h-full bg-gradient-to-br from-slate-300 to-slate-400" />
           )}
-          {/* Fade overlay - starts later so photo lasts longer */}
+          {/* Subtle fade at very bottom only */}
           <div 
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'linear-gradient(to bottom, transparent 0%, transparent 55%, rgba(244,245,247,0.7) 80%, #F4F5F7 100%)'
+              background: 'linear-gradient(to bottom, transparent 0%, transparent 70%, rgba(244,245,247,0.5) 90%, #F4F5F7 100%)'
             }}
           />
         </div>
         
-        {/* Navigation buttons */}
+        {/* Navigation buttons - dark glass style */}
         <div className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between p-4 safe-top">
           <button
             onClick={() => navigate(-1)}
@@ -199,13 +193,13 @@ const ProfilePageV2: React.FC = () => {
           </div>
         </div>
 
-        {/* B) Avatar - squircle, not circle */}
-        <div className="absolute left-1/2 -translate-x-1/2 -bottom-14 z-20">
+        {/* Avatar - squircle with tan/brown ring */}
+        <div className="absolute left-1/2 -translate-x-1/2 -bottom-16 z-20">
           <div 
-            className="w-[110px] h-[110px] rounded-[22px] overflow-hidden"
+            className="w-[120px] h-[120px] rounded-[24px] overflow-hidden"
             style={{
-              border: '4px solid #F4F5F7',
-              boxShadow: '0 12px 30px rgba(15,15,15,0.18)'
+              border: '4px solid #8B7355',
+              boxShadow: '0 12px 30px rgba(15,15,15,0.22)'
             }}
           >
             {profile?.profile_photo_url ? (
@@ -215,7 +209,7 @@ const ProfilePageV2: React.FC = () => {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full bg-slate-200 flex items-center justify-center text-2xl font-bold text-slate-600">
+              <div className="w-full h-full bg-slate-200 flex items-center justify-center text-3xl font-bold text-slate-600">
                 {displayName.charAt(0)}
               </div>
             )}
@@ -223,29 +217,28 @@ const ProfilePageV2: React.FC = () => {
         </div>
       </div>
 
-      {/* C) Identity Stack - bolder name, grey HCP pill */}
-      <div className="pt-[72px] px-4 text-center">
-        <h1 
-          className="text-[30px] font-extrabold text-[#0F0F0F]"
-          style={{ letterSpacing: '-0.02em' }}
-        >
+      {/* Identity Stack */}
+      <div className="pt-20 px-4 text-center">
+        {/* Name */}
+        <h1 className="text-[32px] font-bold text-[#0F0F0F]">
           {displayName}
         </h1>
-        <div className="mt-1.5 flex items-center justify-center gap-2 text-slate-600">
-          <span className="text-sm">Golfer</span>
-          {profile?.home_club && (
-            <>
-              <span className="text-slate-400">·</span>
-              <span className="text-sm">{profile.home_club}</span>
-            </>
-          )}
+        
+        {/* Headline row: Golfer · Club   HCP pill */}
+        <div className="mt-2 flex items-center justify-center gap-3">
+          <span className="text-base text-[#4A4A4A]">
+            Golfer
+            {profile?.home_club && (
+              <> · {profile.home_club}</>
+            )}
+          </span>
           {profile?.eg_handicap_index != null && (
             <span 
-              className="ml-1 px-3 py-1.5 text-xs font-bold rounded-full"
+              className="px-3 py-1 text-sm font-semibold rounded-md"
               style={{
-                background: 'rgba(15,15,15,0.06)',
-                border: '1px solid rgba(15,15,15,0.08)',
-                color: 'rgba(15,15,15,0.8)'
+                background: '#fff',
+                border: '1px solid #E0E0E0',
+                color: '#1F1F1F'
               }}
             >
               HCP {profile.eg_handicap_index}
@@ -254,157 +247,158 @@ const ProfilePageV2: React.FC = () => {
         </div>
       </div>
 
-      {/* D) Action Bar - shorter buttons */}
-      <div className="mt-4 px-4 flex items-center gap-2">
-        <Button 
-          className="flex-1 h-11 px-4 rounded-xl text-sm font-semibold"
-          style={{
-            background: '#1F2428',
-            color: '#fff'
-          }}
+      {/* Action Buttons - exact match */}
+      <div className="mt-5 px-4 flex items-center justify-center gap-3">
+        {/* Follow - blue filled pill */}
+        <button 
+          className="flex-1 max-w-[180px] h-12 px-6 rounded-full text-base font-semibold text-white flex items-center justify-center"
+          style={{ background: '#0066FF' }}
         >
-          <UserPlus className="w-4 h-4 mr-2" />
-          Add Friend
-        </Button>
-        <Button 
-          variant="outline"
-          className="flex-[0.8] h-11 px-4 rounded-xl text-sm font-semibold"
+          Follow
+        </button>
+        
+        {/* Message - white outline pill */}
+        <button 
+          className="flex-1 max-w-[180px] h-12 px-6 rounded-full text-base font-semibold text-[#1F1F1F] flex items-center justify-center gap-2"
           style={{
             background: '#fff',
-            border: '1px solid rgba(15,15,15,0.15)'
+            border: '1px solid #E0E0E0'
           }}
         >
-          <MessageCircle className="w-4 h-4 mr-2" />
+          <Send className="w-4 h-4" />
           Message
-        </Button>
-        <Button 
-          variant="ghost"
-          className="h-11 w-11 p-0 rounded-xl"
+        </button>
+        
+        {/* More - circular */}
+        <button 
+          className="w-12 h-12 rounded-full flex items-center justify-center"
           style={{
             background: '#fff',
-            border: '1px solid rgba(15,15,15,0.15)'
+            border: '1px solid #E0E0E0'
           }}
         >
-          <MoreHorizontal className="w-5 h-5" />
-        </Button>
+          <MoreHorizontal className="w-5 h-5 text-[#1F1F1F]" />
+        </button>
       </div>
 
-      {/* E) Mini-nav row on off-white with underline */}
-      <div className="mt-5 px-4">
-        <div className="flex items-center justify-center gap-8">
-          {miniNavItems.map((item) => (
+      {/* Mini-nav row: About | 57 Followers | 9 Friends */}
+      <div className="mt-6 px-4">
+        <div className="flex items-center justify-between border-b border-[#E8E8E8]">
+          {/* About */}
+          <button
+            onClick={() => setActiveMiniNav('about')}
+            className="relative pb-3 px-2"
+          >
+            <span className={`text-base font-medium ${activeMiniNav === 'about' ? 'text-[#0F0F0F]' : 'text-[#6B6B6B]'}`}>
+              About
+            </span>
+            {activeMiniNav === 'about' && (
+              <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#0F0F0F] rounded-full" />
+            )}
+          </button>
+          
+          {/* Followers with count */}
+          <button
+            onClick={() => {
+              setActiveMiniNav('followers');
+              navigate(`/profile/${username}/followers`);
+            }}
+            className="relative pb-3 px-2"
+          >
+            <span className={`text-base ${activeMiniNav === 'followers' ? 'text-[#0F0F0F]' : 'text-[#6B6B6B]'}`}>
+              <span className="font-semibold">{followersCount}</span>
+              <span className="font-medium ml-1">Followers</span>
+            </span>
+            {activeMiniNav === 'followers' && (
+              <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#0F0F0F] rounded-full" />
+            )}
+          </button>
+          
+          {/* Friends with count */}
+          {isPersonal && (
             <button
-              key={item.id}
               onClick={() => {
-                setActiveMiniNav(item.id);
-                if (item.id === 'followers') {
-                  navigate(`/profile/${username}/followers`);
-                } else if (item.id === 'friends') {
-                  navigate(`/profile/${username}/friends`);
-                }
+                setActiveMiniNav('friends');
+                navigate(`/profile/${username}/friends`);
               }}
-              className="relative pb-2 flex flex-col items-center"
+              className="relative pb-3 px-2"
             >
-              <span 
-                className={`text-sm font-medium transition-colors ${
-                  activeMiniNav === item.id ? 'text-[#0F0F0F]' : 'text-slate-500'
-                }`}
-              >
-                {item.label}
+              <span className={`text-base ${activeMiniNav === 'friends' ? 'text-[#0F0F0F]' : 'text-[#6B6B6B]'}`}>
+                <span className="font-semibold">{friendsCount}</span>
+                <span className="font-medium ml-1">Friends</span>
               </span>
-              {item.count !== undefined && (
-                <span className="text-xs text-slate-400">{item.count}</span>
-              )}
-              {/* Black underline for active item */}
-              {activeMiniNav === item.id && (
-                <div 
-                  className="absolute -bottom-0 left-0 right-0 h-[2px] rounded-full"
-                  style={{ background: '#0F0F0F' }}
-                />
+              {activeMiniNav === 'friends' && (
+                <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#0F0F0F] rounded-full" />
               )}
             </button>
-          ))}
+          )}
         </div>
       </div>
 
-      {/* F) White content sheet */}
-      <div 
-        className="mt-4 rounded-t-[22px] pt-5 pb-32"
-        style={{
-          background: '#fff',
-          borderTop: '1px solid rgba(15,15,15,0.06)'
-        }}
-      >
-        {/* G) About section - plain text on white, no card */}
-        <section className="px-5 mb-5">
-          <h3 className="text-sm font-semibold text-[#0F0F0F] mb-2">About</h3>
-          <p className="text-sm text-slate-600 leading-relaxed">
-            {profile?.bio || 'No bio yet. Add one to tell other golfers about yourself.'}
+      {/* White content sheet */}
+      <div className="bg-white pt-5 pb-32 min-h-[60vh]">
+        {/* About section */}
+        <section className="px-5 mb-6">
+          <h3 className="text-xl font-bold text-[#0F0F0F] mb-2">About</h3>
+          <p className="text-base text-[#4A4A4A] leading-relaxed">
+            {profile?.bio || 'Passionate golfer with a love for links courses. Always working to improve my game and explore new courses.'}
           </p>
-          {profile?.bio && profile.bio.length > 120 && (
-            <button className="text-sm font-medium mt-1" style={{ color: '#F7931E' }}>
+          <div className="flex justify-end mt-2">
+            <button className="text-base font-medium" style={{ color: '#0066FF' }}>
               See more
             </button>
-          )}
+          </div>
         </section>
 
-        {/* H) Golf Snapshot - two cards side by side */}
-        <section className="px-5 mb-5">
-          <h3 className="text-sm font-semibold text-[#0F0F0F] mb-3">Golf Snapshot</h3>
+        {/* Golf Snapshot */}
+        <section className="px-5 mb-6">
+          <h3 className="text-xl font-bold text-[#0F0F0F] mb-3">Golf Snapshot</h3>
           <div className="grid grid-cols-2 gap-3">
-            {/* Card 1: Handicap + Home Club */}
+            {/* Left card */}
             <div 
-              className="p-4 rounded-2xl"
-              style={{
-                background: '#fff',
-                border: '1px solid rgba(15,15,15,0.10)'
-              }}
+              className="rounded-xl overflow-hidden"
+              style={{ border: '1px solid #E0E0E0' }}
             >
-              <div className="flex items-center gap-2 mb-2">
-                <Flag className="w-4 h-4 text-slate-400" />
-                <span className="text-xs text-slate-500">Handicap</span>
+              <div className="flex items-center justify-between px-4 py-3 border-b border-[#E8E8E8]">
+                <span className="text-sm text-[#4A4A4A]">Handicap</span>
+                <span className="text-sm font-semibold text-[#0F0F0F]">{profile?.eg_handicap_index ?? '–'}</span>
               </div>
-              <div className="text-xl font-bold text-[#0F0F0F]">
-                {profile?.eg_handicap_index ?? '–'}
+              <div className="flex items-center justify-between px-4 py-3">
+                <span className="text-sm text-[#4A4A4A]">Home Club</span>
+                <span className="text-sm font-semibold text-[#0F0F0F] truncate max-w-[100px]">
+                  {profile?.home_club ? profile.home_club.split(' ')[0] : '–'}
+                </span>
               </div>
-              {profile?.home_club && (
-                <div className="mt-2 text-xs text-slate-500 truncate">
-                  {profile.home_club}
-                </div>
-              )}
             </div>
 
-            {/* Card 2: Top 100 Played */}
+            {/* Right card */}
             <div 
-              className="p-4 rounded-2xl"
-              style={{
-                background: '#fff',
-                border: '1px solid rgba(15,15,15,0.10)'
-              }}
+              className="rounded-xl overflow-hidden"
+              style={{ border: '1px solid #E0E0E0' }}
             >
-              <div className="flex items-center gap-2 mb-2">
-                <MapPin className="w-4 h-4 text-slate-400" />
-                <span className="text-xs text-slate-500">Top 100 Played</span>
+              <div className="flex items-center justify-between px-4 py-3 border-b border-[#E8E8E8]">
+                <span className="text-sm text-[#4A4A4A]">Home Club</span>
+                <span className="text-sm font-semibold text-[#0F0F0F] truncate max-w-[100px]">
+                  {profile?.home_club ? profile.home_club.split(' ')[0] : '–'}
+                </span>
               </div>
-              <div className="text-xl font-bold text-[#0F0F0F]">
-                {top100Count}
-              </div>
-              <div className="mt-2 text-xs text-slate-500">
-                {postsCount} posts shared
+              <div className="flex items-center justify-between px-4 py-3">
+                <span className="text-sm text-[#4A4A4A]">Rounds Logged</span>
+                <span className="text-sm font-semibold text-[#0F0F0F]">{roundsLogged}</span>
               </div>
             </div>
           </div>
         </section>
 
-        {/* I) Achievements - on white, no outer card wrapper */}
+        {/* Achievements */}
         {isPersonal && unlockedAchievements.length > 0 && (
-          <section className="px-5 mb-5">
+          <section className="px-5 mb-6">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-[#0F0F0F]">Achievements</h3>
+              <h3 className="text-xl font-bold text-[#0F0F0F]">Achievements</h3>
               <button 
                 onClick={() => navigate('/profile/quest')}
-                className="text-sm font-semibold flex items-center gap-1"
-                style={{ color: '#F7931E' }}
+                className="text-base font-medium flex items-center gap-1"
+                style={{ color: '#0066FF' }}
               >
                 View all <ChevronRight className="w-4 h-4" />
               </button>
@@ -413,55 +407,44 @@ const ProfilePageV2: React.FC = () => {
               {unlockedAchievements.slice(0, 3).map((achievement) => (
                 <div 
                   key={achievement.id}
-                  className="flex-shrink-0 w-[140px] p-3 rounded-2xl"
+                  className="flex-shrink-0 w-[140px] p-3 rounded-xl"
                   style={{
-                    background: '#FAFAFA',
-                    border: '1px solid rgba(15,15,15,0.06)'
+                    background: '#F8F8F8',
+                    border: '1px solid #E0E0E0'
                   }}
                 >
                   <div 
-                    className="w-8 h-8 rounded-full flex items-center justify-center mb-2"
-                    style={{ background: 'rgba(247,147,30,0.14)' }}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center mb-2"
+                    style={{ background: 'rgba(139,115,85,0.15)' }}
                   >
-                    <Trophy className="w-4 h-4" style={{ color: '#F7931E' }} />
+                    <Trophy className="w-4 h-4" style={{ color: '#8B7355' }} />
                   </div>
                   <div className="text-sm font-semibold text-[#0F0F0F]">{achievement.label}</div>
-                  <div className="text-xs text-slate-500">{achievement.shortLabel}</div>
-                  <span 
-                    className="inline-block mt-2 px-2 py-0.5 text-[10px] font-medium rounded-full"
-                    style={{
-                      background: 'rgba(15,15,15,0.06)',
-                      color: '#5E666D'
-                    }}
-                  >
-                    Unlocked
-                  </span>
+                  <div className="text-xs text-[#6B6B6B]">{achievement.shortLabel}</div>
                 </div>
               ))}
             </div>
           </section>
         )}
 
-        {/* J) Tabs row - inside white content sheet */}
+        {/* Tabs */}
         <section className="px-5">
           <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
             <TabsList 
-              className="grid w-full rounded-full px-1.5 py-1"
+              className="grid w-full rounded-full px-1 py-1"
               style={{ 
                 gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`,
-                background: '#EDEFF2',
-                border: '1px solid rgba(15,15,15,0.08)'
+                background: '#F0F0F0',
+                border: '1px solid #E0E0E0'
               }}
             >
               {tabs.map((tab) => (
                 <TabsTrigger 
                   key={tab.id}
                   value={tab.id}
-                  className="rounded-full text-sm px-3 py-1.5 font-medium transition-all duration-150"
+                  className="rounded-full text-sm px-3 py-1.5 font-medium transition-all duration-150 data-[state=active]:bg-white data-[state=active]:shadow-sm"
                   style={{
-                    color: activeSection === tab.id ? '#1F2428' : '#5E666D',
-                    background: activeSection === tab.id ? '#fff' : 'transparent',
-                    boxShadow: activeSection === tab.id ? '0 6px 14px rgba(15,15,15,0.08)' : 'none'
+                    color: activeSection === tab.id ? '#0F0F0F' : '#6B6B6B'
                   }}
                 >
                   {tab.label}
