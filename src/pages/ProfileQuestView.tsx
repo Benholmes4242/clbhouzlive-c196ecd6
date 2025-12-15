@@ -18,6 +18,7 @@ import '@/styles/quest-theme.css';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQuestCourses } from '@/hooks/useQuestCourses';
+import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
 import { useQuestRewards } from '@/hooks/useQuestRewards';
 import { useQuestOnboarding } from '@/hooks/useQuestOnboarding';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -48,7 +49,42 @@ interface MilestoneClub {
 const ProfileQuestView: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const { totalPlayed, regionProgress, recentlyPlayed, isLoading } = useQuestCourses();
+  const { totalPlayed, recentlyPlayed, isLoading: questLoading } = useQuestCourses();
+  
+  // Use the SAME hook as Top 100 list page for region progress (single source of truth)
+  const { data: progressData, isLoading: progressLoading } = useTop100ProgressForUser(user?.id);
+  const isLoading = questLoading || progressLoading;
+  
+  // Map Top100ProgressForUser list data to RegionProgress format for Journey Summary
+  const regionProgress: RegionProgress[] = useMemo(() => {
+    if (!progressData?.lists) return [];
+    
+    const slugToRegion: Record<string, { name: string; shortName: string }> = {
+      'gb-i': { name: 'GB & Ireland', shortName: 'GB&I' },
+      'europe': { name: 'Continental Europe', shortName: 'EUR' },
+      'usa': { name: 'USA', shortName: 'USA' },
+      'global': { name: 'Worldwide', shortName: 'WLD' },
+    };
+    
+    // Order: GB&I, Europe, USA, Worldwide
+    const orderedSlugs = ['gb-i', 'europe', 'usa', 'global'];
+    
+    return orderedSlugs
+      .map(slug => {
+        const list = progressData.lists.find(l => l.listSlug === slug);
+        const region = slugToRegion[slug];
+        if (!list || !region) return null;
+        
+        return {
+          id: slug,
+          name: region.name,
+          shortName: region.shortName,
+          played: list.played,
+          total: list.total,
+        };
+      })
+      .filter((r): r is RegionProgress => r !== null);
+  }, [progressData?.lists]);
 
   const [selectedRegion, setSelectedRegion] = useState<RegionProgress | null>(null);
   const [selectedClub, setSelectedClub] = useState<MilestoneClub | null>(null);
