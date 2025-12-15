@@ -73,9 +73,9 @@ export function GolfersHereTab({ businessId, businessName, businessLocation }: G
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-3 gap-0.5">
+      <div className="grid grid-cols-3 gap-1">
         {Array.from({ length: 9 }).map((_, i) => (
-          <div key={i} className="aspect-square bg-muted animate-pulse" />
+          <div key={i} className="aspect-square rounded-sq-xs animate-pulse" style={{ background: '#EDEFF2' }} />
         ))}
       </div>
     );
@@ -84,10 +84,13 @@ export function GolfersHereTab({ businessId, businessName, businessLocation }: G
   if (!taggedPosts || taggedPosts.length === 0) {
     return (
       <div className="py-16 text-center">
-        <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
-          <Users className="h-8 w-8 text-muted-foreground/50" />
+        <div 
+          className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+          style={{ background: '#EDEFF2' }}
+        >
+          <Users className="h-8 w-8 text-[#97A1AA]" />
         </div>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-[#5E666D]">
           No followers yet.
         </p>
       </div>
@@ -98,13 +101,13 @@ export function GolfersHereTab({ businessId, businessName, businessLocation }: G
     <div className="space-y-4">
       {/* Header with count */}
       <div className="flex items-center justify-between px-1">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-[#5E666D]">
           {taggedPosts.length} post{taggedPosts.length !== 1 ? 's' : ''} from golfers
         </p>
       </div>
 
       {/* Grid of tagged posts */}
-      <div className="grid grid-cols-3 gap-0.5">
+      <div className="grid grid-cols-3 gap-1">
         {taggedPosts.map((post) => (
           <PostTile key={post.id} post={post} />
         ))}
@@ -119,7 +122,7 @@ function PostTile({ post }: { post: TaggedPost }) {
   const thumbnailUrl = isVideo ? primaryMedia?.poster_url : primaryMedia?.media_url;
 
   return (
-    <div className="group relative aspect-square bg-muted overflow-hidden cursor-pointer">
+    <div className="group relative aspect-square overflow-hidden cursor-pointer rounded-sq-xs" style={{ background: '#EDEFF2' }}>
       {thumbnailUrl ? (
         <img
           src={thumbnailUrl}
@@ -127,8 +130,8 @@ function PostTile({ post }: { post: TaggedPost }) {
           className="w-full h-full object-cover transition-transform group-hover:scale-105"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-slate-100">
-          <ImageIcon className="h-8 w-8 text-muted-foreground opacity-50" />
+        <div className="w-full h-full flex items-center justify-center">
+          <ImageIcon className="h-8 w-8 text-[#97A1AA]" />
         </div>
       )}
 
