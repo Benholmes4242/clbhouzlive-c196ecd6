@@ -18,17 +18,27 @@ export function useTop100Badges(userId?: string | null) {
     queryFn: async (): Promise<Top100Badge[]> => {
       if (!userId) return [];
 
-      // 1) Get total Top 100 courses played (distinct)
-      const { data: activity, error: activityError } = await supabase
-        .from('user_course_activity')
+      // 1) Get user's rated courses (ratings-only: single source of truth)
+      const { data: ratings, error: ratingsError } = await supabase
+        .from('course_ratings')
         .select('course_id')
-        .eq('user_id', userId)
-        .eq('is_top100', true);
+        .eq('user_id', userId);
 
-      if (activityError) throw activityError;
+      if (ratingsError) throw ratingsError;
 
+      const ratedCourseIds = new Set((ratings || []).map(r => r.course_id));
+
+      // 2) Get Top 100 course memberships to filter rated courses
+      const { data: memberships, error: membershipsError } = await supabase
+        .from('course_top100_memberships')
+        .select('course_id')
+        .in('course_id', Array.from(ratedCourseIds));
+
+      if (membershipsError) throw membershipsError;
+
+      // Distinct Top 100 courses the user has rated
       const distinctCourseIds = Array.from(
-        new Set((activity || []).map(a => a.course_id))
+        new Set((memberships || []).map(m => m.course_id))
       );
       const totalTop100 = distinctCourseIds.length;
 
@@ -55,7 +65,7 @@ export function useTop100Badges(userId?: string | null) {
         }
       });
 
-      // 2) List completion badges (100/100 per list)
+      // 3) List completion badges (100/100 per list)
       const { data: lists, error: listsError } = await supabase
         .from('top100_lists')
         .select('id, slug, name')
@@ -63,16 +73,16 @@ export function useTop100Badges(userId?: string | null) {
 
       if (listsError) throw listsError;
 
-      const { data: memberships, error: membershipsError } = await supabase
+      const { data: allMemberships, error: allMembershipsError } = await supabase
         .from('course_top100_memberships')
         .select('course_id, list_id');
 
-      if (membershipsError) throw membershipsError;
+      if (allMembershipsError) throw allMembershipsError;
 
       const playedSet = new Set(distinctCourseIds);
 
       (lists || []).forEach(list => {
-        const courseIdsForList = (memberships || [])
+        const courseIdsForList = (allMemberships || [])
           .filter(m => m.list_id === list.id)
           .map(m => m.course_id);
 

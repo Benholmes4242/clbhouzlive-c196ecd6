@@ -37,12 +37,11 @@ export const useOptimizedProfileData = (userId: string | undefined) => {
           .eq('id', userId)
           .single(),
         
-        // Courses played count
+        // Courses rated count (ratings-only: the single source of truth)
         supabase
-          .from('user_top100_courses')
+          .from('course_ratings')
           .select('course_id', { count: 'exact' })
-          .eq('user_id', userId)
-          .eq('played', true),
+          .eq('user_id', userId),
         
         // Course ratings with average
         supabase
@@ -99,7 +98,7 @@ export const useOptimizedProfileData = (userId: string | undefined) => {
 
       return {
         profile: profileResult.data,
-        coursesPlayed: coursesPlayedResult.count || 0,
+        coursesPlayed: ratings.length, // ratings-only: coursesPlayed = coursesRated
         coursesRated: ratings.length,
         averageRating: averageRating ? Number(averageRating.toFixed(1)) : null,
         followersCount: followersResult.count || 0,

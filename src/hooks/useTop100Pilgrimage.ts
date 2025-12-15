@@ -52,17 +52,28 @@ export function useTop100Pilgrimage(userId?: string | null) {
       const seasonYear = now.getFullYear();
       const seasonStart = startOfYear(now).toISOString();
 
-      // 1) Fetch all Top 100 activity for this user
-      const { data: activity, error } = await supabase
-        .from('user_course_activity')
-        .select('course_id, first_played_at, last_played_at, is_top100')
+      // 1) Fetch user's rated courses that are Top 100 (ratings-only source)
+      const { data: ratings, error: ratingsError } = await supabase
+        .from('course_ratings')
+        .select('course_id, created_at')
         .eq('user_id', userId)
-        .eq('is_top100', true)
-        .order('first_played_at', { ascending: false, nullsFirst: false });
+        .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (ratingsError) throw ratingsError;
 
-      const records = (activity || []).filter(a => a.first_played_at);
+      // Get Top 100 memberships to filter
+      const ratedCourseIds = (ratings || []).map(r => r.course_id);
+      const { data: top100Memberships, error: membershipsError } = await supabase
+        .from('course_top100_memberships')
+        .select('course_id')
+        .in('course_id', ratedCourseIds);
+
+      if (membershipsError) throw membershipsError;
+
+      const top100CourseIds = new Set((top100Memberships || []).map(m => m.course_id));
+      const records = (ratings || [])
+        .filter(r => top100CourseIds.has(r.course_id))
+        .map(r => ({ course_id: r.course_id, first_played_at: r.created_at }));
 
       // Track first-time plays
       const seenAllTime = new Set<string>();
@@ -70,7 +81,7 @@ export function useTop100Pilgrimage(userId?: string | null) {
       const firstSeenMap = new Map<string, Date>();
 
       for (const a of records) {
-        const playedAt = new Date(a.first_played_at!);
+        const playedAt = new Date(a.first_played_at);
         
         if (!seenAllTime.has(a.course_id)) {
           seenAllTime.add(a.course_id);

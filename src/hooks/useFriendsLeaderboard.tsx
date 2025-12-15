@@ -44,24 +44,7 @@ export const useFriendsLeaderboard = (userId?: string) => {
       // Get course data for all friends
       const leaderboardEntries = await Promise.all(
         profiles?.map(async (profile) => {
-          // Get Top 100 courses played
-          const { data: top100Data } = await supabase
-            .from('user_top100_courses')
-            .select(`
-              course_id,
-              played_date,
-              golf_courses (
-                country,
-                continent,
-                global_rank,
-                regional_rank,
-                usa_rank
-              )
-            `)
-            .eq('user_id', profile.id)
-            .eq('played', true);
-
-          // Get rated courses
+          // Get rated courses (ratings-only: the single source of truth)
           const { data: ratedData } = await supabase
             .from('course_ratings')
             .select(`
@@ -77,11 +60,7 @@ export const useFriendsLeaderboard = (userId?: string) => {
             `)
             .eq('user_id', profile.id);
 
-          // Combine and deduplicate courses
-          const allCourses = [...(top100Data || []), ...(ratedData || [])];
-          const uniqueCourses = allCourses.filter((course, index, self) => 
-            index === self.findIndex(c => c.course_id === course.course_id)
-          );
+          const uniqueCourses = ratedData || [];
 
           let britainIrelandCompleted = 0;
           let europeCompleted = 0;
@@ -93,8 +72,8 @@ export const useFriendsLeaderboard = (userId?: string) => {
             const course = courseData.golf_courses;
             if (!course) return;
 
-            // Get the most recent date
-            const courseDate = (courseData as any).played_date || (courseData as any).created_at;
+            // Get the most recent date (ratings use created_at)
+            const courseDate = (courseData as any).created_at;
             if (courseDate && (!lastPlayedDate || courseDate > lastPlayedDate)) {
               lastPlayedDate = courseDate;
             }

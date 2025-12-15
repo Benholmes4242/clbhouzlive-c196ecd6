@@ -49,23 +49,23 @@ export function useTop100ListSummaries(userId: string | undefined) {
 
           if (countError) throw countError;
 
-          // Get user's played count for this list
+          // Get user's played count for this list (ratings-only)
           let playedCount = 0;
           if (userId) {
-            const { data: userActivity, error: activityError } = await supabase
-              .from('user_course_activity')
+            // Get user's rated courses
+            const { data: userRatings, error: ratingsError } = await supabase
+              .from('course_ratings')
               .select('course_id')
-              .eq('user_id', userId)
-              .eq('is_top100', true);
+              .eq('user_id', userId);
 
-            if (!activityError && userActivity) {
-              const playedCourseIds = new Set(userActivity.map(a => a.course_id));
+            if (!ratingsError && userRatings) {
+              const ratedCourseIds = new Set(userRatings.map(r => r.course_id));
 
               const { data: listMemberships, error: membershipsError } = await supabase
                 .from('course_top100_memberships')
                 .select('course_id')
                 .eq('list_id', list.id)
-                .in('course_id', Array.from(playedCourseIds));
+                .in('course_id', Array.from(ratedCourseIds));
 
               if (!membershipsError && listMemberships) {
                 playedCount = listMemberships.length;

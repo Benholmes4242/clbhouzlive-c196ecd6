@@ -74,40 +74,38 @@ export const useMyCourses = () => {
     enabled: !!user?.id,
   });
 
-  // Fetch user's Top 100 courses with ratings
+  // Fetch user's Top 100 courses with ratings (ratings-only: single source of truth)
   const { data: top100CoursesRaw = [], isLoading: isLoadingTop100 } = useQuery({
     queryKey: ['user-top100-courses', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
       
-      const { data: courses, error: coursesError } = await supabase
-        .from('user_top100_courses')
+      // Get rated courses with golf_courses data
+      const { data: ratings, error: ratingsError } = await supabase
+        .from('course_ratings')
         .select(`
-          *,
+          course_id,
+          rating,
+          created_at,
           golf_courses (*)
         `)
         .eq('user_id', user.id)
-        .eq('played', true)
-        .order('played_date', { ascending: false });
-
-      if (coursesError) throw coursesError;
-
-      const { data: ratings, error: ratingsError } = await supabase
-        .from('course_ratings')
-        .select('course_id, rating')
-        .eq('user_id', user.id);
+        .order('created_at', { ascending: false });
 
       if (ratingsError) throw ratingsError;
 
-      const ratingsMap = new Map();
-      ratings?.forEach(rating => {
-        ratingsMap.set(rating.course_id, rating.rating);
+      // Filter for Top 100 courses only
+      const top100Courses = (ratings || []).filter(r => {
+        const gc = r.golf_courses;
+        return gc && (gc.regional_rank || gc.usa_rank || gc.global_rank);
       });
 
-      const coursesWithRatings = courses?.map(course => ({
-        ...course,
-        rating: ratingsMap.get(course.course_id) || null
-      })) || [];
+      const coursesWithRatings = top100Courses.map(r => ({
+        course_id: r.course_id,
+        played_date: r.created_at,
+        golf_courses: r.golf_courses,
+        rating: r.rating
+      }));
 
       return coursesWithRatings;
     },

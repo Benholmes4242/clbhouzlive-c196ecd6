@@ -7,32 +7,11 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
   const [regionProgress, setRegionProgress] = useState<Record<string, { played: number; total: number }>>({});
   const queryClient = useQueryClient();
 
-  // Query to get the user's played courses from both user_top100_courses and course_ratings
+  // Query to get the user's rated courses (ratings-only: single source of truth)
   const { data: playedCoursesData, isLoading } = useQuery({
     queryKey: ['userTop100Courses', userId],
     queryFn: async () => {
-      // Get courses from user_top100_courses table
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          course_id,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank
-          )
-        `)
-        .eq('user_id', userId)
-        .eq('played', true);
-
-      if (top100Error) throw top100Error;
-
-      // Get courses from course_ratings table (courses that have been rated are considered played)
+      // Get courses from course_ratings table (ratings = played)
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
         .select(`
@@ -52,14 +31,8 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
 
       if (ratedError) throw ratedError;
 
-      // Combine both datasets and remove duplicates
-      const allPlayedCourses = [...(top100Data || []), ...(ratedData || [])];
-      const uniqueCourses = allPlayedCourses.filter((course, index, self) => 
-        index === self.findIndex(c => c.course_id === course.course_id)
-      );
-
-      console.log('All played courses for user:', userId, uniqueCourses);
-      return uniqueCourses || [];
+      console.log('All rated courses for user:', userId, ratedData);
+      return ratedData || [];
     },
     enabled: !!userId,
   });
