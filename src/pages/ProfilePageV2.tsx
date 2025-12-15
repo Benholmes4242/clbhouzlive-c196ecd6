@@ -11,7 +11,8 @@ import { useTop100Overview } from '@/hooks/useTop100Overview';
 import { useActivityPosts } from '@/components/profile/hooks/useActivityPosts';
 import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import { supabase } from '@/integrations/supabase/client';
-import { Trophy, ChevronRight, MoreHorizontal, Send } from 'lucide-react';
+import { ChevronRight, MoreHorizontal, Send } from 'lucide-react';
+import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
@@ -358,20 +359,15 @@ const ProfilePageV2: React.FC = () => {
               {unlockedAchievements.slice(0, 3).map((achievement) => (
                 <div 
                   key={achievement.id}
-                  className="flex-shrink-0 w-[140px] p-3 rounded-xl"
-                  style={{
-                    background: '#F8F8F8',
-                    border: '1px solid #E0E0E0'
-                  }}
+                  className="flex-shrink-0 w-[140px]"
+                  style={{ transform: 'scale(0.78)', transformOrigin: 'top left', marginRight: '-40px' }}
                 >
-                  <div 
-                    className="w-8 h-8 rounded-lg flex items-center justify-center mb-2"
-                    style={{ background: 'rgba(139,115,85,0.15)' }}
-                  >
-                    <Trophy className="w-4 h-4" style={{ color: '#8B7355' }} />
-                  </div>
-                  <div className="text-sm font-semibold text-[#0F0F0F]">{achievement.label}</div>
-                  <div className="text-xs text-[#0F0F0F]">{achievement.shortLabel}</div>
+                  <AchievementBadgeCard
+                    tier={(achievement.threshold?.toString() || achievement.id.replace('list_', '').toUpperCase()) as AchievementTier}
+                    title={achievement.shortLabel}
+                    subtitle={achievement.label}
+                    unlocked={true}
+                  />
                 </div>
               ))}
             </div>
