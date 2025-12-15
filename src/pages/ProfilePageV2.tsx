@@ -285,10 +285,10 @@ const ProfilePageV2: React.FC = () => {
           {/* Posts */}
           <button
             onClick={() => setActiveMiniNav('posts')}
-            className="pb-3 flex flex-col items-center"
+            className="pb-3 flex items-center gap-2"
           >
-            <span className="text-lg font-semibold text-[#0F0F0F]">{postsCount}</span>
             <span className="text-sm text-slate-500">Posts</span>
+            <span className="text-lg font-semibold text-[#0F0F0F]">{postsCount}</span>
           </button>
           
           {/* Followers */}
@@ -297,10 +297,10 @@ const ProfilePageV2: React.FC = () => {
               setActiveMiniNav('followers');
               navigate(`/profile/${username}/followers`);
             }}
-            className="pb-3 flex flex-col items-center"
+            className="pb-3 flex items-center gap-2"
           >
-            <span className="text-lg font-semibold text-[#0F0F0F]">{followersCount}</span>
             <span className="text-sm text-slate-500">Followers</span>
+            <span className="text-lg font-semibold text-[#0F0F0F]">{followersCount}</span>
           </button>
           
           {/* Friends */}
@@ -310,10 +310,10 @@ const ProfilePageV2: React.FC = () => {
                 setActiveMiniNav('friends');
                 navigate(`/profile/${username}/friends`);
               }}
-              className="pb-3 flex flex-col items-center"
+              className="pb-3 flex items-center gap-2"
             >
-              <span className="text-lg font-semibold text-[#0F0F0F]">{friendsCount}</span>
               <span className="text-sm text-slate-500">Friends</span>
+              <span className="text-lg font-semibold text-[#0F0F0F]">{friendsCount}</span>
             </button>
           )}
         </div>
