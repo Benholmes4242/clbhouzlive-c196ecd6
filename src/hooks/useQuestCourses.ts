@@ -83,9 +83,9 @@ export function useQuestCourses() {
         const played = playedMap.get(course.id);
         const rating = ratingsMap.get(course.id);
         
-        // STRICT SEPARATION: played = explicit flag only, rated = has rating
-        const isPlayed = !!played?.played;  // Canonical: played flag ONLY
-        const isRated = !!rating;           // Separate: has rating
+        // LEGACY BEHAVIOR: rated implies played
+        const isRated = !!rating;
+        const isPlayed = !!played?.played || isRated;  // played = explicit flag OR has rating
         
         // Determine region based on country/ranking
         let region = 'Worldwide';
