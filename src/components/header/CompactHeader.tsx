@@ -52,7 +52,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   };
 
   // Hardcoded RGBA values for reliable iOS rendering (no CSS variable resolution issues)
-  const DIM_BG = 'rgba(15, 15, 15, 0.05)';
+  const DIM_BG = 'rgba(15, 15, 15, 0.02)';
   const DIM_BORDER = 'rgba(255, 255, 255, 0.06)';
   const STANDARD_BG = 'rgba(10, 10, 10, 0.95)';
   const STANDARD_BORDER = 'rgba(255, 255, 255, 0.06)';
