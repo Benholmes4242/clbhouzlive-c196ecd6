@@ -16,7 +16,6 @@ import { useActivityPosts } from './hooks/useActivityPosts';
 import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import { toast } from 'sonner';
 import { trackBusinessEvent } from '@/analytics/businessAnalytics';
-import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 // Modular header components
 import {
@@ -369,11 +368,11 @@ const HeroProfileHeader = ({
 
   return (
     <SwipeToReturnZone onSwipeDown={reopenImmersive}>
-      {/* LinkedIn-style Golfer Profile Layout */}
+      {/* Premium Golf Profile Layout - Light Grey Theme */}
       <section className="profile-theme-light relative w-full min-h-screen">
         
         {/* HERO IMAGE with light gradient fade */}
-        <div className="profile-hero relative w-full" style={{ height: 'clamp(180px, 24vw, 220px)' }}>
+        <div className="profile-hero relative w-full h-[250px] overflow-hidden">
           {heroSrc ? (
             <img 
               src={heroSrc}
@@ -386,263 +385,131 @@ const HeroProfileHeader = ({
           )}
         </div>
 
-        {/* CENTERED IDENTITY STACK - LinkedIn style */}
+        {/* META BLOCK - Light glass panel with avatar + text */}
         <div
           ref={profileCardRef}
-          className="relative flex flex-col items-center"
-          style={{ marginTop: '-56px' }}
+          className="relative"
+          style={{ marginTop: '-40px' }}
         >
-          {/* Avatar - centered, overlapping hero */}
-          <div 
-            className="relative z-20"
-            style={{ 
-              boxShadow: '0 10px 30px rgba(15,15,15,0.18)',
-              borderRadius: '22%',
-            }}
+          {/* Light glass panel */}
+          <div
+            className="profile-meta-card relative flex items-center gap-4 md:gap-6 px-4 md:px-6 py-4 md:py-5"
           >
-            <div 
-              className="bg-[#F4F5F7] p-1"
-              style={{ borderRadius: '22%' }}
-            >
-              <ProfileAvatarRing
-                photoUrl={profile?.profile_photo_url}
-                displayName={displayName}
-                totalTop100Played={totalTop100Played}
-                isPersonal={isPersonal}
-                isOwnProfile={isOwnProfile}
-                size="lg"
-                onClick={() => openImmersive?.(0)}
-                animateOnFirstView={true}
-              />
-            </div>
-          </div>
-
-          {/* Name - largest text */}
-          <h1 className="mt-4 text-[26px] md:text-[30px] font-extrabold tracking-tight text-center" style={{ color: '#1F2428' }}>
-            {displayName}
-          </h1>
-
-          {/* Headline: Golfer · Home Club + HCP pill */}
-          <div className="mt-1.5 flex flex-wrap items-center justify-center gap-2" style={{ color: 'rgba(31, 36, 40, 0.75)' }}>
-            <span className="text-sm md:text-[15px]">
-              Golfer {homeClub && <>· {homeClub}</>}
-            </span>
-            {isPersonal && profile?.eg_handicap_index != null && (
-              <span 
-                className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold"
-                style={{
-                  background: 'rgba(15,15,15,0.06)',
-                  border: '1px solid rgba(15,15,15,0.08)',
-                  color: '#1F2428'
-                }}
-              >
-                HCP {profile.eg_handicap_index.toFixed(1)}
-              </span>
-            )}
-          </div>
-
-          {/* Credibility row - verified, country, creator badges */}
-          {(isPersonal && (profile?.is_verified_golfer)) && (
-            <div className="mt-2 flex items-center gap-2">
-              {profile?.is_verified_golfer && (
-                <VerifiedBadge size="md" placement="inline" />
-              )}
-            </div>
-          )}
-
-          {/* Action Bar - Follow, Message, More */}
-          {!isOwnProfile && user?.id && profile?.id && (
-            <div className="mt-4 w-full px-4 max-w-[400px] mx-auto">
-              <div className="flex items-center gap-2">
-                <ProfileActionsRow
-                  currentUserId={user.id}
-                  profileUserId={profile.id}
+              {/* AVATAR – Left column */}
+              <div className="flex-shrink-0 z-20">
+                <ProfileAvatarRing
+                  photoUrl={profile?.profile_photo_url}
+                  displayName={displayName}
+                  totalTop100Played={totalTop100Played}
                   isPersonal={isPersonal}
-                  isMobile={isMobile}
-                  websiteUrl={profile?.website}
-                  businessWebsite={profile?.business_website}
+                  isOwnProfile={isOwnProfile}
+                  size="lg"
+                  onClick={() => openImmersive?.(0)}
+                  animateOnFirstView={true}
                 />
               </div>
-            </div>
-          )}
 
-          {/* Edit button for own profile */}
-          {isOwnProfile && (
-            <button
-              onClick={() => navigate('/edit-profile')}
-              className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-full transition"
-              style={{
-                background: 'rgba(15,15,15,0.06)',
-                border: '1px solid rgba(15,15,15,0.08)',
-                color: '#1F2428'
-              }}
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-              </svg>
-              Edit profile
-            </button>
-          )}
-        </div>
-
-        {/* Stats Row - horizontal strip with dividers */}
-        <div className="mt-5 border-y" style={{ borderColor: 'rgba(15,15,15,0.08)' }}>
-          <div className="flex items-stretch justify-center">
-            {/* About / Posts */}
-            <button 
-              onClick={() => onSectionChange?.('activity')}
-              className="flex-1 py-3 flex flex-col items-center gap-0.5 transition hover:bg-[rgba(0,0,0,0.02)]"
-              style={{ 
-                borderBottom: activeSection === 'activity' ? '2px solid #1F2428' : '2px solid transparent',
-                marginBottom: '-1px'
-              }}
-            >
-              <span className="text-xs font-medium" style={{ color: '#5E666D' }}>About</span>
-            </button>
-            
-            <div className="w-px self-stretch my-2" style={{ background: 'rgba(15,15,15,0.08)' }} />
-            
-            <button 
-              onClick={handleOpenFollowers}
-              className="flex-1 py-3 flex flex-col items-center gap-0.5 transition hover:bg-[rgba(0,0,0,0.02)]"
-            >
-              <span className="text-base font-semibold tabular-nums" style={{ color: '#1F2428' }}>{followersCount}</span>
-              <span className="text-xs font-medium" style={{ color: '#5E666D' }}>Followers</span>
-            </button>
-            
-            <div className="w-px self-stretch my-2" style={{ background: 'rgba(15,15,15,0.08)' }} />
-            
-            <button 
-              onClick={handleOpenFollowing}
-              className="flex-1 py-3 flex flex-col items-center gap-0.5 transition hover:bg-[rgba(0,0,0,0.02)]"
-            >
-              <span className="text-base font-semibold tabular-nums" style={{ color: '#1F2428' }}>{followingCount}</span>
-              <span className="text-xs font-medium" style={{ color: '#5E666D' }}>Following</span>
-            </button>
-            
-            {isPersonal && (
-              <>
-                <div className="w-px self-stretch my-2" style={{ background: 'rgba(15,15,15,0.08)' }} />
-                <button 
-                  onClick={handleOpenFriends}
-                  className="flex-1 py-3 flex flex-col items-center gap-0.5 transition hover:bg-[rgba(0,0,0,0.02)]"
-                >
-                  <span className="text-xs font-medium" style={{ color: '#5E666D' }}>Friends</span>
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* CONTENT SECTIONS - LinkedIn-style white cards */}
-        <div className="px-4 py-3 space-y-3" style={{ background: '#F4F5F7' }}>
-          
-          {/* About Section */}
-          {profile?.bio && (
-            <div 
-              className="p-4"
-              style={{
-                background: '#FFFFFF',
-                border: '1px solid rgba(15,15,15,0.08)',
-                borderRadius: '14px',
-                boxShadow: '0 6px 18px rgba(15,15,15,0.06)'
-              }}
-            >
-              <h2 className="text-base font-semibold mb-2" style={{ color: '#1F2428' }}>About</h2>
-              <p className="text-sm leading-relaxed" style={{ color: '#5E666D' }}>
-                {profile.bio}
-              </p>
-            </div>
-          )}
-
-          {/* Golf Snapshot Section */}
-          <div 
-            className="p-4"
-            style={{
-              background: '#FFFFFF',
-              border: '1px solid rgba(15,15,15,0.08)',
-              borderRadius: '14px',
-              boxShadow: '0 6px 18px rgba(15,15,15,0.06)'
-            }}
-          >
-            <h2 className="text-base font-semibold mb-3" style={{ color: '#1F2428' }}>Golf Snapshot</h2>
-            <div className="grid grid-cols-2 gap-px" style={{ background: 'rgba(15,15,15,0.08)', borderRadius: '8px', overflow: 'hidden' }}>
-              {profile?.eg_handicap_index != null && (
-                <div className="p-3 bg-white flex justify-between items-center">
-                  <span className="text-sm" style={{ color: '#5E666D' }}>Handicap</span>
-                  <span className="text-sm font-semibold" style={{ color: '#1F2428' }}>{profile.eg_handicap_index.toFixed(1)}</span>
-                </div>
-              )}
-              {homeClub && (
-                <div className="p-3 bg-white flex justify-between items-center">
-                  <span className="text-sm" style={{ color: '#5E666D' }}>Home Club</span>
-                  <span className="text-sm font-semibold text-right" style={{ color: '#1F2428', maxWidth: '60%' }}>{homeClub}</span>
-                </div>
-              )}
-              {postsCount > 0 && (
-                <div className="p-3 bg-white flex justify-between items-center">
-                  <span className="text-sm" style={{ color: '#5E666D' }}>Posts</span>
-                  <span className="text-sm font-semibold" style={{ color: '#1F2428' }}>{postsCount}</span>
-                </div>
-              )}
-              {isPersonal && totalTop100Played > 0 && (
-                <div className="p-3 bg-white flex justify-between items-center">
-                  <span className="text-sm" style={{ color: '#5E666D' }}>Top 100 Played</span>
-                  <span className="text-sm font-semibold" style={{ color: '#1F2428' }}>{totalTop100Played}</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Achievements Section */}
-          {isPersonal && profile?.id && username && (
-            <div 
-              className="p-4"
-              style={{
-                background: '#FFFFFF',
-                border: '1px solid rgba(15,15,15,0.08)',
-                borderRadius: '14px',
-                boxShadow: '0 6px 18px rgba(15,15,15,0.06)'
-              }}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-base font-semibold" style={{ color: '#1F2428' }}>Achievements</h2>
-                <button 
-                  onClick={() => navigate(`/profile/${username}/achievements`)}
-                  className="text-sm font-medium flex items-center gap-1"
-                  style={{ color: '#F7931E' }}
-                >
-                  View all
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
-              <ProfileAchievementsRail
-                userId={profile.id}
+              {/* TEXT META (name, @handle, HCP, club) */}
+              <ProfileHeaderCard
+                displayName={displayName}
                 username={username}
-                className=""
-              />
-            </div>
-          )}
+                homeClub={isPersonal ? homeClub : undefined}
+                handicap={isPersonal ? profile?.eg_handicap_index : undefined}
+                websiteUrl={isBusiness ? profile?.business_website : profile?.website}
+                location={profile?.location}
+                userType={profile?.user_type}
+                businessName={profile?.business_name}
+                businessCategory={profile?.business_category}
+                businessLocation={profile?.business_location}
+                isVerifiedBusiness={profile?.is_verified_business}
+                isVerifiedGolfer={profile?.is_verified_golfer}
+                isPersonal={isPersonal}
+                isOwnProfile={isOwnProfile}
+                onCustomiseClick={isOwnProfile ? () => navigate('/edit-profile') : undefined}
+            />
+          </div>
         </div>
 
-        {/* Tab Navigation - white background with light styling */}
-        <div 
-          className="sticky top-0 z-30"
-          style={{ 
-            background: '#FFFFFF',
-            borderBottom: '1px solid rgba(15,15,15,0.08)'
-          }}
-        >
-          <ProfileTabsNav
-            userType={profile?.user_type}
-            activeSection={activeSection}
-            onTabChange={handleTabChange}
-            isMobile={isMobile}
-            disabled={transitionState !== 'idle'}
+        {/* BIO - Full width below glass panel */}
+        {profile?.bio && (
+          <div className="mt-4 md:mt-5 px-6 md:px-8">
+            <p className="profile-bio mx-auto max-w-3xl text-center text-sm md:text-[15px] leading-relaxed">
+              {profile.bio}
+            </p>
+          </div>
+        )}
+
+        {/* Websites - Capsule buttons below bio (personal profiles) */}
+        {isPersonal && profile?.websites && profile.websites.length > 0 && (
+          <div className="mt-3 px-6 md:px-8 flex flex-wrap justify-center gap-2">
+            {profile.websites.map((url, index) => {
+              const displayUrl = url.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '');
+              const href = url.startsWith('http') ? url : `https://${url}`;
+              return (
+                <a
+                  key={index}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="profile-website-pill inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
+                >
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                  {displayUrl}
+                </a>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Social Actions - Only for other users' profiles */}
+        {!isOwnProfile && user?.id && profile?.id && (
+          <div className="px-4 mt-3 md:mx-auto md:max-w-[600px]">
+            <ProfileActionsRow
+              currentUserId={user.id}
+              profileUserId={profile.id}
+              isPersonal={isPersonal}
+              isMobile={isMobile}
+              websiteUrl={profile?.website}
+              businessWebsite={profile?.business_website}
+            />
+          </div>
+        )}
+
+        {/* Faint divider between header and achievements */}
+        <div className="profile-divider mt-4 h-px w-full" />
+
+        {/* Achievements Rail - outside constrained container for full width */}
+        {isPersonal && profile?.id && username && (
+          <ProfileAchievementsRail
+            userId={profile.id}
+            username={username}
+            className="mt-4"
           />
-        </div>
+        )}
+
+        {/* Stats Row - outside constrained container */}
+        <ProfileStatsRow
+          postsCount={postsCount}
+          followersCount={followersCount}
+          followingCount={followingCount}
+          friendsCount={friendsCount}
+          isPersonal={isPersonal}
+          isMobile={isMobile}
+          onFollowersClick={handleOpenFollowers}
+          onFollowingClick={handleOpenFollowing}
+          onFriendsClick={handleOpenFriends}
+        />
+
+        {/* Tab Navigation - outside constrained container for full width */}
+        <ProfileTabsNav
+          userType={profile?.user_type}
+          activeSection={activeSection}
+          onTabChange={handleTabChange}
+          isMobile={isMobile}
+          disabled={transitionState !== 'idle'}
+        />
       </section>
 
       {/* Content sections with slide transitions */}

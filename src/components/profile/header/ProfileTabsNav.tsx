@@ -35,30 +35,30 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   };
 
   return (
-    <div 
-      className="px-4 py-2"
+    <section 
+      className="mt-6 px-4"
       onPointerDown={handlePointerDown}
     >
-      <div className="flex items-center justify-center gap-1">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => handleValueChange(tab.id)}
-            disabled={disabled}
-            className={`
-              px-4 py-2 text-sm font-medium rounded-full transition-all
-              disabled:pointer-events-none disabled:opacity-50
-              ${activeSection === tab.id 
-                ? 'bg-[rgba(15,15,15,0.06)] text-[#1F2428]' 
-                : 'text-[#5E666D] hover:bg-[rgba(0,0,0,0.03)]'
-              }
-            `}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-    </div>
+      <Tabs value={activeSection} onValueChange={handleValueChange} className="w-full">
+        <TabsList 
+          className="profile-tabs-container grid w-full"
+          style={{ 
+            gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`
+          }}
+        >
+          {tabs.map((tab) => (
+            <TabsTrigger 
+              key={tab.id}
+              value={tab.id}
+              disabled={disabled}
+              className="rounded-full text-sm px-3 py-[6px] font-medium transition-all duration-motion-fast ease-standard disabled:pointer-events-none disabled:opacity-50 data-[state=active]:profile-tab-active data-[state=inactive]:profile-tab-inactive"
+            >
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+    </section>
   );
 };
 
