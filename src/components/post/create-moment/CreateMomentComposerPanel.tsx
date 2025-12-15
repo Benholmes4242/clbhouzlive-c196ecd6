@@ -41,8 +41,8 @@ export default function CreateMomentComposerPanel({
     const textarea = textareaRef.current;
     if (textarea) {
       textarea.style.height = 'auto';
-      // Min 48px (2 lines), max 100px
-      textarea.style.height = `${Math.max(48, Math.min(textarea.scrollHeight, 100))}px`;
+      // Min 40px, max 72px
+      textarea.style.height = `${Math.max(40, Math.min(textarea.scrollHeight, 72))}px`;
     }
   }, [caption]);
 
@@ -96,8 +96,8 @@ export default function CreateMomentComposerPanel({
 
   return (
     <div 
-      className="flex flex-col px-4 gap-2 overflow-hidden"
-      style={{ touchAction: 'none' }}
+      className="flex flex-col px-4 overflow-hidden"
+      style={{ touchAction: 'none', gap: '10px' }}
     >
       {/* Posting As Row - fixed 44px */}
       {availableActorsCount > 1 && (
@@ -110,19 +110,19 @@ export default function CreateMomentComposerPanel({
         </div>
       )}
 
-      {/* Caption Field - fixed 56px collapsed, auto-expands when typing */}
-      <div className="flex flex-col relative flex-shrink-0">
+      {/* Caption Section - label + input */}
+      <div className="flex flex-col flex-shrink-0">
+        <label className="text-[11px] text-white/60 mb-1">Add a caption</label>
         <textarea
           ref={textareaRef}
-          className="caption-input w-full rounded-xl px-3 py-2 text-[14px] leading-snug resize-none text-white placeholder:text-white/50 focus:outline-none"
+          className="caption-input w-full rounded-xl px-3 py-2 text-[14px] leading-snug resize-none text-white placeholder:text-white/40 focus:outline-none"
           style={{
             background: 'rgba(255, 255, 255, 0.06)',
             border: '1px solid rgba(255, 255, 255, 0.08)',
-            height: '56px',
-            minHeight: '56px',
-            maxHeight: '80px'
+            minHeight: '40px',
+            maxHeight: '72px'
           }}
-          placeholder="Add a caption..."
+          placeholder="Write a caption..."
           value={caption}
           onChange={handleCaptionInput}
           onFocus={handleFocus}
@@ -147,11 +147,13 @@ export default function CreateMomentComposerPanel({
 
         {/* Mentions dropdown */}
         {showMentions && (
-          <MentionSuggestions
-            query={mentionQuery}
-            onSelect={handleMentionSelect}
-            onClose={() => setShowMentions(false)}
-          />
+          <div className="relative">
+            <MentionSuggestions
+              query={mentionQuery}
+              onSelect={handleMentionSelect}
+              onClose={() => setShowMentions(false)}
+            />
+          </div>
         )}
       </div>
 
@@ -164,7 +166,7 @@ export default function CreateMomentComposerPanel({
         />
       </div>
 
-      {/* Enhance Card - compact single line, fixed 52px */}
+      {/* Enhance Card - normal document flow, fixed 52px */}
       <button
         onClick={onOpenStudio}
         disabled={!hasMedia}
