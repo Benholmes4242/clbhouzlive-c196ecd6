@@ -35,20 +35,23 @@ export function useQuestCourses() {
   const queryClient = useQueryClient();
   const userId = user?.id;
 
-  // Fetch Top 100 courses and region progress (same source as My Progress page)
-  const { data, isLoading } = useQuery({
+  // Fetch Top 100 courses via course_top100_memberships (same source as My Progress page)
+  const { data: courses = [], isLoading } = useQuery({
     queryKey: ['quest-courses', userId],
     queryFn: async () => {
-      if (!userId) return { courses: [], regionProgress: [] };
+      if (!userId) return [];
 
-      // Get all active Top 100 lists with their course counts
-      const { data: lists, error: listsError } = await supabase
-        .from('top100_lists')
-        .select('id, slug, name')
-        .eq('is_active', true)
-        .order('sort_order');
+      // Get all Top 100 courses with their list memberships (single source of truth)
+      const { data: memberships, error: membershipError } = await supabase
+        .from('course_top100_memberships')
+        .select(`
+          course_id,
+          rank,
+          list:top100_lists!inner(id, slug, name),
+          course:golf_courses!inner(id, name, country, region, continent, thumbnail_image)
+        `);
 
-      if (listsError) throw listsError;
+      if (membershipError) throw membershipError;
 
       // Get user's ratings (SINGLE SOURCE OF TRUTH for "played")
       const { data: ratingsData } = await supabase
@@ -57,102 +60,99 @@ export function useQuestCourses() {
         .eq('user_id', userId)
         .eq('is_mock', false);
 
-      const ratingsMap = new Map(
-        (ratingsData || []).filter(r => r.rating !== null).map(r => [r.course_id, r])
-      );
-      const ratedCourseIds = new Set(ratingsMap.keys());
-
       // Get user's shortlisted courses (wishlist)
       const { data: shortlistData } = await supabase
         .from('course_shortlists')
-        .select('course_id')
+        .select('course_id, created_at')
         .eq('user_id', userId);
 
-      const shortlistSet = new Set((shortlistData || []).map(s => s.course_id));
+      const ratingsMap = new Map(
+        (ratingsData || []).filter(r => r.rating !== null).map(r => [r.course_id, r])
+      );
+      const shortlistSet = new Set(
+        (shortlistData || []).map(s => s.course_id)
+      );
 
-      // Build region progress per-list (same approach as useTop100ProgressForUser)
-      const regionProgress: RegionProgress[] = [];
-      const allCourses: QuestCourse[] = [];
-      const seenCourseIds = new Set<string>();
-
-      // Map list slug to display names
-      const slugToNames: Record<string, { name: string; shortName: string }> = {
-        'gb-i': { name: 'GB & Ireland', shortName: 'GB&I' },
-        'europe': { name: 'Continental Europe', shortName: 'EUR' },
-        'usa': { name: 'USA', shortName: 'USA' },
-        'global': { name: 'Worldwide', shortName: 'WLD' },
+      // Map list slug to region name
+      const listToRegion: Record<string, string> = {
+        'world': 'Worldwide',
+        'worldwide': 'Worldwide',
+        'gbi': 'GB & Ireland',
+        'usa': 'USA',
+        'europe': 'Continental Europe',
       };
 
-      for (const list of lists || []) {
-        // Get total courses in this list
-        const { count: totalInList } = await supabase
-          .from('course_top100_memberships')
-          .select('*', { count: 'exact', head: true })
-          .eq('list_id', list.id);
+      // Deduplicate courses by course_id (a course can be on multiple lists)
+      const courseMap = new Map<string, QuestCourse>();
+      
+      for (const m of memberships || []) {
+        const rating = ratingsMap.get(m.course_id);
+        
+        // RATINGS-ONLY: isPlayed = has a rating
+        const isRated = !!rating;
+        const isPlayed = isRated;
+        
+        // Get region from list slug
+        const listSlug = (m.list as any)?.slug || 'world';
+        const region = listToRegion[listSlug] || 'Worldwide';
 
-        // Get all courses in this list with details
-        const { data: memberships } = await supabase
-          .from('course_top100_memberships')
-          .select(`
-            course_id,
-            rank,
-            golf_courses!inner(id, name, country, thumbnail_image)
-          `)
-          .eq('list_id', list.id);
+        const dateAdded = rating?.created_at;
 
-        // Count rated courses in this list
-        let ratedInList = 0;
-        for (const m of memberships || []) {
-          if (ratedCourseIds.has(m.course_id)) {
-            ratedInList++;
-          }
-
-          // Add to courses list (dedupe across lists)
-          if (!seenCourseIds.has(m.course_id)) {
-            seenCourseIds.add(m.course_id);
-            const rating = ratingsMap.get(m.course_id);
-            const isRated = !!rating;
-            const displayNames = slugToNames[list.slug] || { name: 'Worldwide', shortName: 'WLD' };
-
-            allCourses.push({
-              id: m.course_id,
-              name: (m.golf_courses as any)?.name || 'Unknown Course',
-              region: displayNames.name,
-              country: (m.golf_courses as any)?.country || '',
-              rank: m.rank,
-              isPlayed: isRated,
-              isRated,
-              isWishlist: shortlistSet.has(m.course_id) && !isRated,
-              dateAdded: rating?.created_at 
-                ? new Date(rating.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) 
-                : undefined,
-              rating: rating?.rating,
-              imageUrl: (m.golf_courses as any)?.thumbnail_image || undefined,
-            });
-          }
-        }
-
-        const displayNames = slugToNames[list.slug];
-        if (displayNames) {
-          regionProgress.push({
-            id: list.slug,
-            name: displayNames.name,
-            shortName: displayNames.shortName,
-            played: ratedInList,
-            total: totalInList || 0,
+        // Only add if not already in map, or if this is a more specific region
+        if (!courseMap.has(m.course_id)) {
+          courseMap.set(m.course_id, {
+            id: m.course_id,
+            name: (m.course as any)?.name || 'Unknown Course',
+            region,
+            country: (m.course as any)?.country || '',
+            rank: m.rank,
+            isPlayed,
+            isRated,
+            isWishlist: shortlistSet.has(m.course_id) && !isPlayed,
+            dateAdded: dateAdded ? new Date(dateAdded).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : undefined,
+            rating: rating?.rating,
+            imageUrl: (m.course as any)?.thumbnail_image || undefined,
           });
         }
       }
-
-      return { courses: allCourses, regionProgress };
+      
+      return Array.from(courseMap.values());
     },
     enabled: !!userId,
     staleTime: 5 * 60 * 1000,
   });
 
-  const courses = data?.courses || [];
-
-  const regionProgress = data?.regionProgress || [];
+  // Calculate region progress (RATINGS-ONLY counts)
+  const regionProgress: RegionProgress[] = [
+    {
+      id: 'gbi',
+      name: 'GB & Ireland',
+      shortName: 'GB&I',
+      played: courses.filter(c => c.region === 'GB & Ireland' && c.isRated).length,
+      total: courses.filter(c => c.region === 'GB & Ireland').length,
+    },
+    {
+      id: 'europe',
+      name: 'Continental Europe',
+      shortName: 'EUR',
+      played: courses.filter(c => c.region === 'Continental Europe' && c.isRated).length,
+      total: courses.filter(c => c.region === 'Continental Europe').length,
+    },
+    {
+      id: 'usa',
+      name: 'USA',
+      shortName: 'USA',
+      played: courses.filter(c => c.region === 'USA' && c.isRated).length,
+      total: courses.filter(c => c.region === 'USA').length,
+    },
+    {
+      id: 'world',
+      name: 'Worldwide',
+      shortName: 'WLD',
+      played: courses.filter(c => c.region === 'Worldwide' && c.isRated).length,
+      total: courses.filter(c => c.region === 'Worldwide').length,
+    },
+  ];
 
   const totalPlayed = courses.filter(c => c.isRated).length;
   const recentlyPlayed = courses
