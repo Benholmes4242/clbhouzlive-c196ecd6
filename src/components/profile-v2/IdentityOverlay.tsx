@@ -1,5 +1,6 @@
 /**
  * IdentityOverlay - Name, Club, HCP displayed over hero
+ * Premium styling with verified badge + achievement ring
  */
 
 import React from 'react';
@@ -39,7 +40,7 @@ export const IdentityOverlay: React.FC<IdentityOverlayProps> = ({
       className={cn(
         'absolute bottom-0 left-0 right-0 z-10',
         'flex flex-col items-center',
-        'pb-6 pt-12',
+        'pb-8 pt-16',
         className
       )}
     >
@@ -56,7 +57,7 @@ export const IdentityOverlay: React.FC<IdentityOverlayProps> = ({
       {/* Name + Verified Badge */}
       <div className="flex items-center gap-2 mt-4">
         <h1
-          className="text-[28px] font-semibold tracking-tight"
+          className="text-[26px] md:text-[28px] font-semibold tracking-tight"
           style={{ color: 'var(--dgp-text-primary)' }}
         >
           {displayName}
@@ -66,8 +67,16 @@ export const IdentityOverlay: React.FC<IdentityOverlayProps> = ({
         )}
       </div>
 
+      {/* Username */}
+      <span 
+        className="text-sm mt-1"
+        style={{ color: 'var(--dgp-text-muted)' }}
+      >
+        @{username}
+      </span>
+
       {/* Club + HCP Row */}
-      <div className="flex items-center gap-3 mt-1.5">
+      <div className="flex items-center gap-3 mt-2">
         {clubName && (
           <span
             className="text-sm font-medium"
@@ -86,7 +95,7 @@ export const IdentityOverlay: React.FC<IdentityOverlayProps> = ({
               />
             )}
             <span
-              className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+              className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
               style={{
                 background: 'var(--dgp-glass-surface)',
                 color: 'var(--dgp-text-secondary)',
