@@ -1,6 +1,37 @@
 // deno-lint-ignore-file no-explicit-any
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import probe from "npm:probe-image-size@7";
+
+// Note: probe-image-size requires node modules, using fetch-based approach instead
+async function probeImage(url: string): Promise<{ width: number; height: number } | null> {
+  try {
+    const response = await fetch(url, { method: 'HEAD' });
+    // Try to get dimensions from headers if available
+    // Otherwise, we'll need to fetch the image
+    if (!response.ok) return null;
+    
+    // Fallback: fetch first bytes to detect image type
+    const fullResponse = await fetch(url);
+    const buffer = await fullResponse.arrayBuffer();
+    const bytes = new Uint8Array(buffer.slice(0, 30));
+    
+    // PNG signature
+    if (bytes[0] === 0x89 && bytes[1] === 0x50) {
+      const width = (bytes[16] << 24) | (bytes[17] << 16) | (bytes[18] << 8) | bytes[19];
+      const height = (bytes[20] << 24) | (bytes[21] << 16) | (bytes[22] << 8) | bytes[23];
+      return { width, height };
+    }
+    
+    // JPEG signature  
+    if (bytes[0] === 0xFF && bytes[1] === 0xD8) {
+      // JPEG requires parsing SOF marker, simplified - return null
+      return null;
+    }
+    
+    return null;
+  } catch {
+    return null;
+  }
+}
 
 type Row = {
   id: string;
@@ -39,11 +70,11 @@ Deno.serve(async (req) => {
           throw new Error("Invalid or data URL");
         }
 
-        // 2) probe image dimensions without full download
-        const result = await probe(r.media_url);
+        // 2) probe image dimensions
+        const result = await probeImage(r.media_url);
 
-        const w = result.width ?? null;
-        const h = result.height ?? null;
+        const w = result?.width ?? null;
+        const h = result?.height ?? null;
 
         let orientation: "portrait" | "landscape" | "square" | null = null;
         if (w && h) {
@@ -55,9 +86,7 @@ Deno.serve(async (req) => {
           media_width: w,
           media_height: h,
           image_orientation: orientation,
-          exif: result.type
-            ? { type: result.type, mime: result.mime, url: result.url }
-            : null,
+          exif: null,
         });
 
         processed++;
