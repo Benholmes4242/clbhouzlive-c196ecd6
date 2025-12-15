@@ -490,9 +490,9 @@ export default function CreateMomentModal({
 
           {/* Share Bar - sticky at bottom, safe-area aware */}
           <div 
-            className="flex-shrink-0 px-4 pt-3 border-t border-white/10"
+            className="flex-shrink-0 px-4 pt-2 border-t border-white/8"
             style={{ 
-              paddingBottom: 'max(env(safe-area-inset-bottom, 16px), 16px)',
+              paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)',
               background: 'rgba(15, 15, 15, 0.98)'
             }}
           >
