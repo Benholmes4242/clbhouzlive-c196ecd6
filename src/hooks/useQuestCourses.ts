@@ -14,7 +14,8 @@ export interface QuestCourse {
   region: string;
   country: string;
   rank?: number;
-  isPlayed: boolean;
+  isPlayed: boolean;  // Canonical: from user_top100_courses.played ONLY
+  isRated: boolean;   // Separate: has a course_ratings entry
   isWishlist: boolean;
   dateAdded?: string;
   rating?: number;
@@ -81,7 +82,10 @@ export function useQuestCourses() {
       return (allCourses || []).map((course): QuestCourse => {
         const played = playedMap.get(course.id);
         const rating = ratingsMap.get(course.id);
-        const isPlayed = played?.played || !!rating;
+        
+        // STRICT SEPARATION: played = explicit flag only, rated = has rating
+        const isPlayed = !!played?.played;  // Canonical: played flag ONLY
+        const isRated = !!rating;           // Separate: has rating
         
         // Determine region based on country/ranking
         let region = 'Worldwide';
@@ -102,6 +106,7 @@ export function useQuestCourses() {
           country: course.country,
           rank: course.global_rank || course.regional_rank,
           isPlayed,
+          isRated,
           isWishlist: shortlistSet.has(course.id) && !isPlayed,
           dateAdded: dateAdded ? new Date(dateAdded).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : undefined,
           rating: rating?.rating,
