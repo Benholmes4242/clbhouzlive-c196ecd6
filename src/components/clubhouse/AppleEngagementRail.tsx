@@ -114,7 +114,6 @@ const AppleEngagementRailBase = ({
         !isActive && 'pointer-events-none',
         className
       )}
-      style={{ bottom }}
       data-active={isActive ? 'true' : 'false'}
     >
       {/* Mute Button (video only) */}
