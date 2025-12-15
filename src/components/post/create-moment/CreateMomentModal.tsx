@@ -406,7 +406,7 @@ export default function CreateMomentModal({
         role="dialog"
         aria-modal="true"
         aria-label="Create a Moment"
-        className="ecm-glass-sheet fixed inset-0 overflow-hidden"
+        className="ecm-glass-sheet fixed inset-0"
         style={{
           background: 'rgba(15, 15, 15, 0.95)',
           backdropFilter: 'blur(24px)',
@@ -432,18 +432,10 @@ export default function CreateMomentModal({
         <section
           id="media" 
           className="absolute inset-x-0 overflow-hidden z-[1002]"
-          style={
-            hasMedia
-              ? {
-                  top: 'env(safe-area-inset-top, 0px)',
-                  bottom: 'var(--composer-height)',
-                }
-              : {
-                  top: 'env(safe-area-inset-top, 0px)',
-                  height: 'clamp(200px, 34vh, 260px)',
-                  overflow: 'hidden',
-                }
-          }
+          style={{ 
+            top: 'env(safe-area-inset-top, 0px)',
+            bottom: 'var(--composer-height)'
+          }}
         >
           {hasMedia ? (
             <CreateMomentMediaStage
@@ -469,7 +461,7 @@ export default function CreateMomentModal({
 
         {/* Composer Panel */}
         <section 
-          className="composer absolute bottom-0 left-0 right-0 z-[1003] rounded-t-none flex flex-col overflow-hidden"
+          className="composer absolute bottom-0 left-0 right-0 z-[1003] rounded-t-none flex flex-col"
           style={{ 
             height: 'var(--composer-height)',
             background: 'rgba(15, 15, 15, 0.95)',
@@ -478,7 +470,7 @@ export default function CreateMomentModal({
             borderTop: '1px solid rgba(255, 255, 255, 0.1)'
           }}
         >
-          {/* Fixed content area (no internal scroll) */}
+          {/* Scrollable content area */}
           <div className="flex-1 min-h-0 overflow-hidden">
             <CreateMomentComposerPanel
               hasMedia={hasMedia}
@@ -496,7 +488,7 @@ export default function CreateMomentModal({
             />
           </div>
 
-          {/* Share Bar - reserved row at bottom, safe-area aware */}
+          {/* Share Bar - sticky at bottom, safe-area aware */}
           <div 
             className="flex-shrink-0 px-4 pt-2 border-t border-white/8"
             style={{ 

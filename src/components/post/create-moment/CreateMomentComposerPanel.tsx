@@ -96,24 +96,27 @@ export default function CreateMomentComposerPanel({
 
   return (
     <div 
-      className={`composer-scroll flex h-full flex-col px-4 gap-2 overflow-hidden ${hasMedia ? '' : 'pt-2.5'}`}
+      className={`composer-scroll flex h-full flex-col px-4 gap-2.5 overflow-y-auto ${hasMedia ? '' : 'pt-3'}`}
       style={{
-        paddingBottom: '0px',
+        paddingBottom: '8px',
+        overscrollBehavior: 'contain',
+        WebkitOverflowScrolling: 'touch',
+        touchAction: 'pan-y'
       }}
       data-ecm-scroll-container="true"
     >
-      <div className="flex flex-col gap-2 flex-1 min-h-0">
+      <div className="flex flex-col gap-2.5 flex-1">
         {/* Posting As Selector - compressed single row */}
         {availableActorsCount > 1 && (
-          <div className="flex items-center justify-between py-0.5">
-            <span className="text-[10px] text-white/50">Posting as</span>
+          <div className="flex items-center justify-between py-1">
+            <span className="text-[11px] text-white/50">Posting as</span>
             <IdentitySelector compact variant="dark" />
           </div>
         )}
 
         {/* Caption Section - compact */}
         <div className="flex flex-col relative">
-          <label className="block text-sm font-semibold text-white mb-1">Add a caption</label>
+          <label className="block text-sm font-semibold text-white mb-1.5">Add a caption</label>
           
           <textarea
             ref={textareaRef}
@@ -175,7 +178,7 @@ export default function CreateMomentComposerPanel({
         <button
           onClick={onOpenStudio}
           disabled={!hasMedia}
-          className="w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all duration-200"
+          className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200"
           style={{
             background: 'linear-gradient(135deg, rgba(255, 147, 30, 0.10) 0%, rgba(255, 200, 100, 0.06) 100%)',
             backdropFilter: 'blur(12px) saturate(150%)',
