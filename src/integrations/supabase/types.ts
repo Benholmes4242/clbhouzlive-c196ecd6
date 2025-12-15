@@ -6844,7 +6844,18 @@ export type Database = {
           scope_param?: string
           time_range_param?: string
         }
-        Returns: Json
+        Returns: {
+          display_name: string
+          global_rank: number
+          home_club: string
+          is_friend: boolean
+          last_activity_at: string
+          profile_photo_url: string
+          regional_rank: number
+          top100_courses_played: number
+          user_id: string
+          username: string
+        }[]
       }
       get_top100_lists_with_hero_courses: {
         Args: { target_user_id?: string }
