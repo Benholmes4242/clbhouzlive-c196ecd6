@@ -10,6 +10,8 @@ import { useCancelFriendRequest } from '@/hooks/useCancelFriendRequest';
 import { GolferVerificationInviteButtons } from './GolferVerificationInviteButtons';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { NotificationCard, getNotificationButtonClass } from '@/components/ui/NotificationCard';
+import { GOLFER_VERIFICATION_COPY } from '@/lib/golferVerificationCopy';
+import { BUSINESS_VERIFICATION_COPY } from '@/lib/businessVerificationCopy';
 
 // Clbhouz logomark URL for system notifications
 const CLBHOUZ_LOGOMARK_URL = '/assets/logomark-orange.png';
@@ -158,29 +160,29 @@ function renderNotificationText(notification: ActivityNotification): string {
     case 'system':
     case 'app_update':
       return title || 'New update available';
-    // Business verification notifications - use title directly
+    // Business verification notifications - use centralized copy
     case 'business_verification_submitted':
-      return 'Verification request submitted';
+      return BUSINESS_VERIFICATION_COPY.submitted.title;
     case 'business_verification_approved':
-      return 'Your business is verified';
+      return BUSINESS_VERIFICATION_COPY.approved.title;
     case 'business_verification_rejected':
-      return 'Verification not approved';
+      return BUSINESS_VERIFICATION_COPY.rejected.title;
     case 'business_verification_revoked':
     case 'business_verification_removed':
-      return 'Verification revoked';
-    case 'business_verification_domain_required':
-      return 'Action required: verify your business email domain';
-    // Golfer verification notifications
+      return BUSINESS_VERIFICATION_COPY.removed.title;
+    case 'business_verification_more_proof_requested':
+      return BUSINESS_VERIFICATION_COPY.more_proof_requested.title;
+    // Golfer verification notifications - use centralized copy
     case 'golfer_verification_invite':
-      return "Clbhouz would like to verify your account";
+      return GOLFER_VERIFICATION_COPY.invited.title;
     case 'golfer_verification_submitted':
-      return 'Verification request submitted';
+      return GOLFER_VERIFICATION_COPY.accepted.title;
     case 'golfer_verification_approved':
-      return "You're now a verified golfer";
+      return GOLFER_VERIFICATION_COPY.approved.title;
     case 'golfer_verification_rejected':
-      return 'Verification request not approved';
+      return GOLFER_VERIFICATION_COPY.rejected.title;
     case 'golfer_verification_removed':
-      return 'Golfer verification removed';
+      return GOLFER_VERIFICATION_COPY.removed.title;
     default:
       return title || message || 'New notification';
   }
@@ -496,10 +498,10 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
       const isAccepted = inviteStatus === 'accepted' || inviteStatus === 'pending_review';
       const isDeclined = inviteStatus === 'declined';
       
-      // Build subtext based on state
+      // Build subtext based on state using centralized copy
       let subtextContent: React.ReactNode = null;
       if (isAccepted) {
-        subtextContent = "We're reviewing your verification.";
+        subtextContent = GOLFER_VERIFICATION_COPY.accepted.body;
       } else if (reason && !isDeclined) {
         subtextContent = <><span className="font-medium">Reason:</span> {reason}</>;
       }
@@ -512,7 +514,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
           title={
             <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
-              Clbhouz would like to verify your account
+              {GOLFER_VERIFICATION_COPY.invited.title}
             </span>
           }
           subtext={subtextContent}
@@ -540,7 +542,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
               )}
               <button
                 type="button"
-                onClick={(e) => { e.stopPropagation(); /* TODO: wire to support DM */ }}
+                onClick={(e) => { e.stopPropagation(); }}
                 className={getNotificationButtonClass('support')}
               >
                 <MessageSquare className="h-3 w-3" />
@@ -566,10 +568,10 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
           title={
             <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
-              You're now a verified golfer
+              {GOLFER_VERIFICATION_COPY.approved.title}
             </span>
           }
-          subtext="Your profile now shows a verified badge."
+          subtext={GOLFER_VERIFICATION_COPY.approved.body}
           meta={notification.time_ago}
           actions={
             <span className={cn(basePillClass, "border-emerald-500 bg-emerald-500/10 text-emerald-600")}>
@@ -597,12 +599,12 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
           title={
             <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
-              Verification not approved
+              {GOLFER_VERIFICATION_COPY.rejected.title}
             </span>
           }
           subtext={
             <>
-              Your verification request was reviewed but not approved at this time.
+              {GOLFER_VERIFICATION_COPY.rejected.body}
               {reason && (
                 <span className="block mt-1 text-muted-foreground/80">
                   <span className="font-medium">Reason:</span> {reason}
@@ -641,12 +643,12 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
           title={
             <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
-              Golfer verification removed
+              {GOLFER_VERIFICATION_COPY.removed.title}
             </span>
           }
           subtext={
             <>
-              Your golfer verification has been removed.
+              {GOLFER_VERIFICATION_COPY.removed.body}
               {reason && (
                 <span className="block mt-1 text-muted-foreground/80">
                   <span className="font-medium">Reason:</span> {reason}
