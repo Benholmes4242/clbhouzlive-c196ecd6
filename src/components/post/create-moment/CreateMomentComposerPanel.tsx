@@ -88,10 +88,9 @@ export default function CreateMomentComposerPanel({
 
   return (
     <div 
-      className={`composer-scroll flex h-full flex-col px-4 gap-4 overflow-auto ${hasMedia ? '' : 'pt-4'}`}
+      className={`composer-scroll flex h-full flex-col px-4 gap-4 overflow-y-auto ${hasMedia ? '' : 'pt-4'}`}
       style={{
         paddingBottom: '12px',
-        maxHeight: 'var(--composer-height)',
         overscrollBehavior: 'contain',
         WebkitOverflowScrolling: 'touch',
         touchAction: 'pan-y'
