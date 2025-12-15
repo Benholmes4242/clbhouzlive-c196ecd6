@@ -154,9 +154,9 @@ const ProfilePageV2: React.FC = () => {
   return (
     <PageRoot className="min-h-screen" style={{ background: BG_COLOR }}>
       {/* Hero Section - tall, full bleed */}
-      <div className="relative">
-        {/* Hero Image */}
-        <div className="relative h-[264px] w-full overflow-hidden">
+      <div className="relative pt-3">
+        {/* Hero Image - 240px + 5% bottom = 252px, with 12px (5%) top padding above */}
+        <div className="relative h-[252px] w-full overflow-hidden">
           {heroUrl ? (
             <img 
               src={heroUrl} 
