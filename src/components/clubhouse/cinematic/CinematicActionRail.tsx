@@ -166,7 +166,8 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         'pointer-events-auto'
       )}
       style={{
-        bottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)',
+        top: '50%',
+        transform: 'translateY(-50%)',
         gap: GAP,
         height: totalHeight,
       }}
