@@ -148,35 +148,32 @@ const ProfileQuestView: React.FC = () => {
         />
       )}
 
-      {/* Header - Light theme */}
-      <div 
-        className="sticky top-0 z-50 safe-top" 
-        style={{ 
-          background: 'var(--quest-page)', 
-          borderBottom: '1px solid var(--quest-hairline)',
-        }}
-      >
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate(-1)}
-              className="w-9 h-9 rounded-full flex items-center justify-center transition-colors hover:bg-black/[0.04]"
-              style={{ 
-                background: 'var(--quest-card)',
-                border: '1px solid var(--quest-stroke)',
-                boxShadow: 'var(--quest-shadow-sm)',
-              }}
-              aria-label="Go back"
-            >
-              <ArrowLeft className="w-5 h-5" style={{ color: 'var(--quest-text-primary)' }} />
-            </button>
-            <h1
-              className="text-lg font-bold"
-              style={{ color: 'var(--quest-text-primary)' }}
-            >
-              The Quest
-            </h1>
-          </div>
+      {/* Header - Back CTA top left, centered title + subtitle */}
+      <div className="safe-top px-4 pt-4">
+        {/* Back link */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-1 text-sm transition-colors hover:opacity-70 mb-4"
+          style={{ color: 'var(--quest-text-secondary)' }}
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back</span>
+        </button>
+
+        {/* Centered title + subtitle */}
+        <div className="text-center mb-2">
+          <h1
+            className="text-2xl font-bold mb-1"
+            style={{ color: 'var(--quest-text-primary)' }}
+          >
+            The Quest
+          </h1>
+          <p
+            className="text-sm"
+            style={{ color: 'var(--quest-text-secondary)' }}
+          >
+            Your journey across the world's greatest courses
+          </p>
         </div>
       </div>
 
