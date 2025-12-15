@@ -406,7 +406,7 @@ export default function CreateMomentModal({
         role="dialog"
         aria-modal="true"
         aria-label="Create a Moment"
-        className="ecm-glass-sheet fixed inset-0"
+        className="ecm-glass-sheet fixed inset-0 flex flex-col"
         style={{
           background: 'rgba(15, 15, 15, 0.95)',
           backdropFilter: 'blur(24px)',
@@ -431,11 +431,8 @@ export default function CreateMomentModal({
         {/* Media Stage */}
         <section
           id="media" 
-          className="absolute inset-x-0 overflow-hidden z-[1002]"
-          style={{ 
-            top: 'env(safe-area-inset-top, 0px)',
-            bottom: 'var(--composer-height)'
-          }}
+          className="relative flex-1 min-h-0 overflow-hidden z-[1002]"
+          style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
         >
           {hasMedia ? (
             <CreateMomentMediaStage
@@ -459,41 +456,37 @@ export default function CreateMomentModal({
           )}
         </section>
 
-        {/* Composer Panel */}
-        <section 
-          className="composer absolute bottom-0 left-0 right-0 z-[1003] rounded-t-none flex flex-col"
-          style={{ 
-            height: 'var(--composer-height)',
+        {/* Composer Panel (no internal scroll; hero shrinks/grows) */}
+        <section
+          className="composer relative z-[1003] flex flex-col"
+          style={{
             background: 'rgba(15, 15, 15, 0.95)',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
-            borderTop: '1px solid rgba(255, 255, 255, 0.1)'
+            borderTop: '1px solid rgba(255, 255, 255, 0.1)',
           }}
         >
-          {/* Scrollable content area */}
-          <div className="flex-1 min-h-0 overflow-hidden">
-            <CreateMomentComposerPanel
-              hasMedia={hasMedia}
-              caption={caption}
-              onCaptionChange={setCaption}
-              selectedCourse={course}
-              onCourseSelect={(c) => {
-                setSelectedCourse(c);
-                onCourseSelect?.(c);
-              }}
-              onOpenStudio={openStudio}
-              availableActorsCount={availableActors.length}
-              currentFilter={currentFilter}
-              onTypingStateChange={setIsTyping}
-            />
-          </div>
+          <CreateMomentComposerPanel
+            hasMedia={hasMedia}
+            caption={caption}
+            onCaptionChange={setCaption}
+            selectedCourse={course}
+            onCourseSelect={(c) => {
+              setSelectedCourse(c);
+              onCourseSelect?.(c);
+            }}
+            onOpenStudio={openStudio}
+            availableActorsCount={availableActors.length}
+            currentFilter={currentFilter}
+            onTypingStateChange={setIsTyping}
+          />
 
           {/* Share Bar - sticky at bottom, safe-area aware */}
-          <div 
+          <div
             className="flex-shrink-0 px-4 pt-2 border-t border-white/8"
-            style={{ 
+            style={{
               paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)',
-              background: 'rgba(15, 15, 15, 0.98)'
+              background: 'rgba(15, 15, 15, 0.98)',
             }}
           >
             <CreateMomentShareBar
