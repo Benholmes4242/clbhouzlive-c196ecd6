@@ -1,5 +1,6 @@
 /**
  * MilestonesEarnedRow - Horizontal pill row showing unlocked milestone clubs
+ * Light theme version
  */
 
 import React from 'react';
@@ -32,9 +33,9 @@ export const MilestonesEarnedRow: React.FC<MilestonesEarnedRowProps> = ({ totalP
             key={m.threshold}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0"
             style={{
-              background: 'rgba(210, 180, 97, 0.18)',
-              color: 'var(--quest-accent-gold)',
-              border: '1px solid rgba(210, 180, 97, 0.35)',
+              background: 'rgba(210, 180, 97, 0.14)',
+              color: '#8A7A42',
+              border: '1px solid rgba(210, 180, 97, 0.30)',
             }}
           >
             <Check className="w-3 h-3" />
@@ -47,9 +48,9 @@ export const MilestonesEarnedRow: React.FC<MilestonesEarnedRowProps> = ({ totalP
           <div
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0"
             style={{
-              background: 'var(--quest-chip-bg)',
-              color: 'var(--quest-text-secondary)',
-              border: '1px solid var(--quest-chip-stroke)',
+              background: 'var(--quest-pill-inactive)',
+              color: 'var(--quest-text-tertiary)',
+              border: '1px solid var(--quest-stroke)',
             }}
           >
             {nextMilestone.name}

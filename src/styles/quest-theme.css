@@ -1,46 +1,112 @@
-/* Quest Light Theme (scoped) */
-.quest-theme-light {
-  /* Global background */
-  --quest-bg: #EEF1F0;
+/**
+ * Quest Light Theme - Scoped to Quest pages only
+ * Uses global light grey tokens for consistency
+ */
 
-  /* Surfaces */
-  --quest-surface: rgba(255, 255, 255, 0.72);
-  --quest-surface-strong: rgba(255, 255, 255, 0.88);
-  --quest-surface-muted: rgba(255, 255, 255, 0.55);
+.quest-theme-light {
+  /* Page background */
+  --quest-page: #F4F5F7;
+
+  /* Card surfaces */
+  --quest-card: #FFFFFF;
+  --quest-card-2: #F9FAFB;
+  --quest-surface: #FFFFFF;
+  --quest-surface-strong: rgba(255, 255, 255, 0.98);
+  --quest-surface-muted: #F9FAFB;
+
+  /* Shadows */
+  --quest-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+  --quest-shadow-sm: 0 6px 18px rgba(0, 0, 0, 0.10);
 
   /* Strokes + dividers */
-  --quest-stroke: rgba(20, 24, 22, 0.10);
-  --quest-stroke-strong: rgba(20, 24, 22, 0.16);
-  --quest-divider: rgba(20, 24, 22, 0.08);
+  --quest-stroke: rgba(31, 36, 40, 0.10);
+  --quest-stroke-strong: rgba(31, 36, 40, 0.16);
+  --quest-hairline: rgba(31, 36, 40, 0.08);
+  --quest-divider: rgba(31, 36, 40, 0.08);
 
   /* Text */
-  --quest-text-primary: rgba(12, 14, 13, 0.92);
-  --quest-text-secondary: rgba(12, 14, 13, 0.62);
-  --quest-text-tertiary: rgba(12, 14, 13, 0.42);
+  --quest-text-primary: #1F2428;
+  --quest-text-secondary: #5E666D;
+  --quest-text-tertiary: #97A1AA;
 
-  /* Chips/pills */
-  --quest-chip-bg: rgba(255, 255, 255, 0.70);
-  --quest-chip-active-bg: rgba(12, 14, 13, 0.06);
-  --quest-chip-stroke: rgba(12, 14, 13, 0.10);
+  /* Pills/chips */
+  --quest-pill-inactive: #EDEFF2;
+  --quest-pill-hover: #E8EAEC;
+  --quest-pill-active: #3A3F46;
+  --quest-chip-bg: #EDEFF2;
+  --quest-chip-stroke: rgba(31, 36, 40, 0.10);
+  --quest-chip-active-bg: rgba(31, 36, 40, 0.06);
 
   /* Progress track */
-  --quest-track: rgba(12, 14, 13, 0.10);
+  --quest-track: rgba(31, 36, 40, 0.10);
+  --quest-track-2: rgba(31, 36, 40, 0.06);
 
-  /* Shadows (subtle elevation on light) */
-  --quest-shadow: 0 10px 30px rgba(0, 0, 0, 0.10);
-  --quest-shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
-
-  /* Keep your brand accents */
+  /* Brand accents */
+  --quest-accent-primary: #F7931E;
   --quest-accent-green: #6e9277;
   --quest-accent-gold: #D2B461;
+
+  /* Apply to page */
+  background: var(--quest-page);
+  color: var(--quest-text-primary);
 }
 
 /* Quest Light - Journey rail styles */
 .quest-theme-light .journey-rail {
-  background: rgba(12, 14, 13, 0.12);
+  background: rgba(31, 36, 40, 0.16);
 }
 
 .quest-theme-light .journey-node-glow {
   filter: blur(10px);
-  opacity: 0.35;
+  opacity: 0.25;
+}
+
+/* Quest card class */
+.quest-theme-light .quest-card {
+  background: var(--quest-card);
+  border: 1px solid var(--quest-stroke);
+  box-shadow: var(--quest-shadow);
+  border-radius: 18px;
+}
+
+/* Quest section titles */
+.quest-theme-light .quest-section-title {
+  color: var(--quest-text-secondary);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Quest status pills */
+.quest-theme-light .quest-status-pill {
+  background: var(--quest-pill-inactive);
+  color: var(--quest-text-secondary);
+  border: 1px solid rgba(31, 36, 40, 0.10);
+}
+
+.quest-theme-light .quest-status-pill.is-active {
+  background: var(--quest-pill-active);
+  color: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.quest-theme-light .quest-status-pill.is-in-progress {
+  background: rgba(247, 147, 30, 0.16);
+  border-color: rgba(247, 147, 30, 0.26);
+  color: var(--quest-text-primary);
+}
+
+.quest-theme-light .quest-status-pill.is-unlocked {
+  background: rgba(58, 63, 70, 0.10);
+  border-color: rgba(58, 63, 70, 0.18);
+  color: var(--quest-text-primary);
+}
+
+/* Quest progress elements */
+.quest-theme-light .quest-progress-track {
+  background: rgba(31, 36, 40, 0.10);
+}
+
+.quest-theme-light .quest-progress-fill {
+  background: var(--quest-accent-primary);
 }
