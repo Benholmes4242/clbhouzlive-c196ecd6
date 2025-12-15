@@ -55,19 +55,15 @@ export function IdentitySelector({ compact = false, variant = 'light' }: Identit
   };
 
   // Style variants
-  const triggerStyles = variant === 'dark' 
-    ? {
-        background: 'rgba(255, 255, 255, 0.08)',
-        border: '1px solid rgba(255, 255, 255, 0.12)',
-      }
-    : undefined;
+  // 'dark' matches the Clubhouse header PostingAsPill styling
+  const triggerStyles = undefined;
 
   const triggerClasses = variant === 'dark'
-    ? `inline-flex items-center gap-2 ${compact ? 'px-2 py-1' : 'px-3 py-1.5'} rounded-sq-pill transition-colors hover:bg-white/12`
+    ? `inline-flex items-center gap-2 ${compact ? 'pl-1.5 pr-2.5 py-1' : 'pl-2 pr-3 py-1.5'} rounded-sq-pill bg-white/5 border border-white/10 hover:bg-white/10 active:bg-white/15 transition-colors`
     : `inline-flex items-center gap-2 ${compact ? 'px-2 py-1' : 'px-3 py-1.5'} rounded-sq-pill border border-border/60 bg-background/60 hover:bg-background/80 transition-colors`;
 
   const textClasses = variant === 'dark'
-    ? `${compact ? 'text-xs' : 'text-sm'} font-medium truncate max-w-[120px] text-white`
+    ? `${compact ? 'text-xs' : 'text-sm'} font-medium truncate max-w-[120px] text-white leading-none`
     : `${compact ? 'text-xs' : 'text-sm'} font-medium truncate max-w-[120px]`;
 
   const chevronClasses = variant === 'dark'
