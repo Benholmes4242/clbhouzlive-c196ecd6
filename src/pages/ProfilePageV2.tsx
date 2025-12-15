@@ -200,7 +200,7 @@ const ProfilePageV2: React.FC = () => {
         </div>
 
         {/* HCP + Golfer pills - right side, just below header photo */}
-        <div className="absolute right-5 -bottom-5 z-20 flex items-center gap-2">
+        <div className="absolute right-5 top-full mt-3 z-20 flex items-center gap-2">
           {/* HCP pill - white */}
           {profile?.eg_handicap_index != null && (
             <span 
