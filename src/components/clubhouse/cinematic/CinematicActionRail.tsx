@@ -162,12 +162,12 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
       transition={{ duration: 0.2, ease: 'easeOut' }}
       className={cn(
         'fixed right-4 z-40',
-        'flex flex-col items-center',
+        'flex flex-col items-center justify-end',
         'pointer-events-auto'
       )}
       style={{
-        top: '50%',
-        transform: 'translateY(-50%)',
+        // Shared bottom anchor with CreatorCapsule
+        bottom: 'calc(16px + env(safe-area-inset-bottom, 0px))',
         gap: GAP,
         height: totalHeight,
       }}
