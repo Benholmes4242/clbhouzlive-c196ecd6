@@ -170,20 +170,15 @@ const ProfilePageV2: React.FC = () => {
 
         {/* Avatar - squircle, left-aligned with About title (px-5), 50% over hero / 50% below */}
         <div className="absolute left-5 -bottom-[62px] z-20">
-          {/* 2px ring in bluey-grey color */}
+          {/* 2px ring in bluey-grey color around achievement ring */}
           <div 
-            className="clbhouz-squircle relative w-[128px] h-[128px] flex items-center justify-center"
+            className="clbhouz-squircle relative w-[124px] h-[124px] flex items-center justify-center"
             style={{
-              background: BG_COLOR,
+              background: '#8B7355',
+              outline: `2px solid ${BG_COLOR}`,
+              outlineOffset: '0px',
             }}
           >
-            {/* Achievement ring - squircle */}
-            <div 
-              className="clbhouz-squircle relative w-[124px] h-[124px] flex items-center justify-center"
-              style={{
-                background: '#8B7355',
-              }}
-            >
               {/* Inner avatar - squircle */}
               <div 
                 className="clbhouz-squircle w-[119px] h-[119px] overflow-hidden relative"
@@ -202,7 +197,6 @@ const ProfilePageV2: React.FC = () => {
                     {displayName.charAt(0)}
                   </div>
                 )}
-              </div>
             </div>
           </div>
         </div>
