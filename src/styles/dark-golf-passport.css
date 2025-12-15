@@ -1,37 +1,38 @@
 /**
- * Dark Golf Passport - Profile Theme Tokens
- * Premium cinematic dark theme for the new profile experience
+ * Golf Passport - Profile Theme Tokens
+ * Premium light grey theme for the new profile experience
  */
 
 :root {
   /* ========================================
-     DARK GOLF PASSPORT - CORE PALETTE
+     GOLF PASSPORT - LIGHT PALETTE
      ======================================== */
   
   /* Backgrounds */
-  --dgp-bg-primary: #0B0F0D;        /* Near-black green charcoal */
-  --dgp-bg-surface: #101614;        /* Card surface */
-  --dgp-bg-elevated: #151A18;       /* Elevated surfaces */
+  --dgp-bg-primary: #F4F5F7;        /* Light grey page background */
+  --dgp-bg-surface: #FFFFFF;        /* White card surface */
+  --dgp-bg-elevated: #FFFFFF;       /* White elevated surfaces */
   
   /* Glass Morphism */
-  --dgp-glass-surface: rgba(255, 255, 255, 0.06);
-  --dgp-glass-stroke: rgba(255, 255, 255, 0.10);
-  --dgp-glass-hover: rgba(255, 255, 255, 0.09);
+  --dgp-glass-surface: rgba(255, 255, 255, 0.92);
+  --dgp-glass-stroke: rgba(31, 36, 40, 0.10);
+  --dgp-glass-hover: rgba(255, 255, 255, 1);
   --dgp-glass-blur: 16px;
   
   /* Typography */
-  --dgp-text-primary: rgba(255, 255, 255, 0.92);
-  --dgp-text-secondary: rgba(255, 255, 255, 0.68);
-  --dgp-text-muted: rgba(255, 255, 255, 0.45);
+  --dgp-text-primary: #1F2428;
+  --dgp-text-secondary: #5E666D;
+  --dgp-text-muted: #97A1AA;
   
   /* Dividers & Borders */
-  --dgp-divider: rgba(255, 255, 255, 0.08);
-  --dgp-border-subtle: rgba(255, 255, 255, 0.06);
+  --dgp-divider: rgba(31, 36, 40, 0.08);
+  --dgp-border-subtle: rgba(31, 36, 40, 0.08);
   
   /* Accent Colors */
   --dgp-accent-green: #6e9277;      /* Grey-green signature */
   --dgp-accent-gold: #C8B06A;       /* Trophy/Top 100 gold */
   --dgp-accent-blue: #4A9EE3;       /* Info accent */
+  --dgp-accent-orange: #F7931E;     /* Primary accent */
   --dgp-danger: #D26A6A;            /* Error/danger */
   
   /* XP Ring Tiers */
@@ -42,9 +43,9 @@
   --dgp-ring-green: #6e9277;
   
   /* Shadows */
-  --dgp-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --dgp-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-  --dgp-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --dgp-shadow-sm: 0 2px 8px rgba(31, 36, 40, 0.06);
+  --dgp-shadow-md: 0 4px 16px rgba(31, 36, 40, 0.08);
+  --dgp-shadow-lg: 0 8px 32px rgba(31, 36, 40, 0.12);
   --dgp-shadow-glow-green: 0 0 20px rgba(110, 146, 119, 0.3);
   --dgp-shadow-glow-gold: 0 0 20px rgba(200, 176, 106, 0.3);
   
@@ -138,8 +139,8 @@
 .dgp-hero-scrim-top {
   background: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0.65) 0%,
-    rgba(0, 0, 0, 0.3) 40%,
+    rgba(244, 245, 247, 0.05) 0%,
+    rgba(244, 245, 247, 0.2) 40%,
     transparent 100%
   );
 }
@@ -147,8 +148,9 @@
 .dgp-hero-scrim-bottom {
   background: linear-gradient(
     to top,
-    var(--dgp-bg-primary) 0%,
-    rgba(11, 15, 13, 0.8) 30%,
+    #F4F5F7 0%,
+    rgba(244, 245, 247, 0.85) 30%,
+    rgba(244, 245, 247, 0.5) 60%,
     transparent 100%
   );
 }
@@ -260,17 +262,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--dgp-glass-surface);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--dgp-glass-stroke);
+  border: 1px solid rgba(31, 36, 40, 0.10);
   border-radius: 50%;
-  color: var(--dgp-text-primary);
+  color: #1F2428;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(31, 36, 40, 0.08);
 }
 
 .dgp-nav-button:hover {
-  background: var(--dgp-glass-hover);
+  background: rgba(255, 255, 255, 1);
   transform: scale(1.05);
 }
 
@@ -289,7 +292,7 @@
   right: 0;
   z-index: 50;
   padding: 8px 16px;
-  background: rgba(11, 15, 13, 0.85);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--dgp-divider);
