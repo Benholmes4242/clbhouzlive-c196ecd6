@@ -43,32 +43,33 @@ export function useLeaderboardSpotlight() {
         .not('user_id', 'is', null);
 
       if (mostPlayed && mostPlayed.length > 0) {
-        // Count TOP 100 ratings per user (filter to only Top 100 courses)
-        const userCounts: Record<string, { count: number; profile: any }> = {};
+        // Count unique TOP 100 courses per user (filter to only Top 100 courses)
+        const userCourses: Record<string, { courses: Set<string>; profile: any }> = {};
         for (const rating of mostPlayed) {
           if (!rating.user_id) continue;
           // Only count if course is a Top 100 course
           if (!top100CourseIds.has(rating.course_id)) continue;
           
           const profile = rating.user_profiles;
-          if (!userCounts[rating.user_id]) {
-            userCounts[rating.user_id] = { count: 0, profile };
+          if (!userCourses[rating.user_id]) {
+            userCourses[rating.user_id] = { courses: new Set(), profile };
           }
-          userCounts[rating.user_id].count++;
+          userCourses[rating.user_id].courses.add(rating.course_id);
         }
 
-        // Find user with most Top 100 ratings
-        const topUser = Object.entries(userCounts)
-          .sort((a, b) => b[1].count - a[1].count)
-          .find(([_, data]) => data.count >= 1);
+        // Find user with most unique Top 100 courses
+        const topUser = Object.entries(userCourses)
+          .map(([userId, data]) => ({ userId, count: data.courses.size, profile: data.profile }))
+          .sort((a, b) => b.count - a.count)
+          .find((u) => u.count >= 1);
 
         if (topUser) {
           spotlights.push({
-            user_id: topUser[0],
-            display_name: topUser[1].profile?.display_name || 'Anonymous',
-            avatar_url: topUser[1].profile?.profile_photo_url || null,
-            home_club: topUser[1].profile?.home_club || null,
-            metric_value: topUser[1].count,
+            user_id: topUser.userId,
+            display_name: topUser.profile?.display_name || 'Anonymous',
+            avatar_url: topUser.profile?.profile_photo_url || null,
+            home_club: topUser.profile?.home_club || null,
+            metric_value: topUser.count,
             spotlight_type: 'most_played',
           });
         }
