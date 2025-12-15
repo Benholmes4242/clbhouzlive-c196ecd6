@@ -14,6 +14,7 @@ import { QuickActionsTile } from '../home/tiles/QuickActionsTile';
 import { NearbyGolfersTile } from '../home/tiles/NearbyGolfersTile';
 import { YourGamesTile } from '../home/tiles/YourGamesTile';
 import '../home/hubTheme.css';
+import '../home/hub-light.css';
 
 // Animation constants - matches expanded map sheet
 const HUB_ENTRY_DURATION = 500; // ms – buttery smooth slide-up
@@ -190,16 +191,12 @@ export function HubHomePage() {
 
   return (
     <div className="fixed inset-0 z-[9999]">
-      {/* Glass Sheet - unified background and backdrop */}
+      {/* Light Page Container */}
       <div 
         ref={sheetRef}
-        className="hub-glass-page fixed inset-0"
+        className="hub-light-page fixed inset-0"
         style={{
-          background: 'rgba(0, 0, 0, 0.65)',
-          backdropFilter: 'blur(22px)',
-          WebkitBackdropFilter: 'blur(22px)',
-          border: '1px solid rgba(255, 255, 255, 0.06)',
-          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.45), 0 0 1px rgba(255, 255, 255, 0.16)',
+          background: 'var(--hub-light-bg)',
           transform: `translateY(${translateY}px)`,
           transition:
             // no transition while dragging or before first frame
@@ -213,8 +210,8 @@ export function HubHomePage() {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Grabber bar */}
-        <div className="hub-grabber" />
+        {/* Light Grabber bar */}
+        <div className="hub-light-grabber" />
 
       {/* Hub Dashboard */}
       <main className="w-full overflow-y-auto h-screen pt-[env(safe-area-inset-top,0px)] px-3.5">

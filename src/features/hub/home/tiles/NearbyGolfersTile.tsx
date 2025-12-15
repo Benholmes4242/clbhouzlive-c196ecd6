@@ -47,13 +47,10 @@ export function NearbyGolfersTile({ limit = 20 }: NearbyGolfersTileProps) {
   return (
     <Tile title={
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
-        <h3>Nearby Golfers</h3>
+        <h3 style={{ color: 'var(--hub-light-text-primary)' }}>Nearby Golfers</h3>
         <button
           onClick={(e) => { e.stopPropagation(); navigateFromHub('/hub/golfers'); }}
-          className="text-[15px] font-medium transition"
-          style={{ background: 'transparent', border: 'none', color: 'var(--hub-text-body)', padding: 0 }}
-          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
-          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
+          className="hub-light-card-link text-[15px] font-medium transition"
         >
           See all →
         </button>
@@ -61,9 +58,16 @@ export function NearbyGolfersTile({ limit = 20 }: NearbyGolfersTileProps) {
     }>
       <div ref={scrollRef} className="h-full overflow-y-auto ng-scroll" style={{ scrollSnapType: 'y mandatory' }}>
         <div className="ng-tiles">
-          {isLoading && <div className="text-white/70 p-3">Loading...</div>}
+          {isLoading && <div style={{ color: 'var(--hub-light-text-secondary)', padding: '12px' }}>Loading...</div>}
           {!isLoading && golfers.slice(0, 5).map(g => (
-            <button key={g.id} className="ng-row py-[10px]" onClick={() => nav(`/profile/${g.id}`)}>
+            <button 
+              key={g.id} 
+              className="ng-row py-[10px]" 
+              onClick={() => nav(`/profile/${g.id}`)}
+              style={{ background: 'transparent' }}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-light-pill-bg-hover)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+            >
               <div className="shrink-0">
                 <SquircleAvatar
                   size={42}
@@ -73,18 +77,18 @@ export function NearbyGolfersTile({ limit = 20 }: NearbyGolfersTileProps) {
                 />
               </div>
               <div className="ng-main">
-                <div className="hub-ellipsis-fade ng-name text-white/90 font-semibold">{g.display_name}</div>
+                <div className="hub-ellipsis-fade ng-name font-semibold" style={{ color: 'var(--hub-light-text-primary)' }}>{g.display_name}</div>
                 <div className="h-[2px]" />
-                <div className="ng-distance text-white/70 hub-ellipsis-fade">
+                <div className="ng-distance hub-ellipsis-fade" style={{ color: 'var(--hub-light-text-secondary)' }}>
                   {formatDistanceHcpClub(g.distance_km ? g.distance_km * 1000 : undefined, g.handicap, g.home_club)}
                 </div>
               </div>
             </button>
           ))}
           {!isLoading && golfers.length === 0 && (
-            <div className="flex flex-col items-center text-center mt-8 px-4">
-              <h2 className="text-body-lg font-semibold leading-snug mb-1" style={{ color: 'var(--hub-text)' }}>No golfers in range</h2>
-              <p className="text-body-md font-normal leading-relaxed" style={{ color: 'var(--hub-text-muted)' }}>Try increasing your distance or checking back later.</p>
+            <div className="hub-light-empty flex flex-col items-center text-center mt-8 px-4">
+              <h2 className="hub-light-empty-title text-body-lg font-semibold leading-snug mb-1">No golfers in range</h2>
+              <p className="hub-light-empty-body text-body-md font-normal leading-relaxed">Try increasing your distance or checking back later.</p>
             </div>
           )}
         </div>
