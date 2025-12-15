@@ -101,6 +101,7 @@ const AppleHUDOverlayBase = ({
           !isActive && 'pointer-events-none',
           isActive && 'pointer-events-auto'
         )}
+        style={{ bottom: HUD_BOTTOM }}
         data-active={isActive ? 'true' : 'false'}
       >
         <div className="flex flex-col gap-2 w-[260px] max-w-[80vw]">
