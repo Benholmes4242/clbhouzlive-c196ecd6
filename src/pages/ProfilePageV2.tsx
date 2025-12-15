@@ -170,9 +170,9 @@ const ProfilePageV2: React.FC = () => {
 
         {/* Avatar - squircle, left-aligned with About title (px-5), 50% over hero / 50% below */}
         <div className="absolute left-5 -bottom-[62px] z-20">
-          {/* 1px ring in bluey-grey color */}
+          {/* 2px ring in bluey-grey color */}
           <div 
-            className="clbhouz-squircle relative w-[126px] h-[126px] flex items-center justify-center"
+            className="clbhouz-squircle relative w-[128px] h-[128px] flex items-center justify-center"
             style={{
               background: BG_COLOR,
             }}
