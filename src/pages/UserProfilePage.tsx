@@ -42,58 +42,19 @@ const UserProfilePage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background pb-28 relative overflow-hidden">
-      {/* Critical profile assets preload with optimized sizes */}
-      {profile?.profile_photo_url && (
-        <>
-          <link 
-            rel="preload" 
-            as="image" 
-            href={`${profile.profile_photo_url}?quality=95&format=auto&width=256&height=256&fit=cover`}
-            fetchPriority="high"
+    <>
+      <UserProfileLoader isLoading={isLoading} profile={profile} />
+      
+      {profile && (
+        <FadeInContent>
+          <UserProfileContent
+            profile={profile}
+            currentUser={currentUser}
+            relationshipStatus={relationshipStatus}
           />
-          <link 
-            rel="preload" 
-            as="image" 
-            href={`${profile.profile_photo_url}?quality=90&format=auto&width=1280&height=720&fit=cover`}
-            fetchPriority="high"
-          />
-          <link 
-            rel="prefetch" 
-            as="image" 
-            href={`${profile.profile_photo_url}?quality=85&format=auto&width=2048&height=2048&fit=cover`}
-          />
-        </>
+        </FadeInContent>
       )}
-      
-      {/* Preload common achievement badges */}
-      <link rel="preload" as="image" href="https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/birdie-blitz-badge.png" />
-      <link rel="preload" as="image" href="https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/20-club-badge.png" />
-      <link rel="preload" as="image" href="https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/50-club-badge.png" />
-      
-      {/* Glass Header - overlays the hero photo */}
-      <ClubhouseHeaderNew />
-      
-      {/* Spacer for fixed header */}
-      <div className="h-16 md:h-18" />
-      
-      {/* Content flows naturally without fixed positioning */}
-      <div className="relative">
-        <UserProfileLoader isLoading={isLoading} profile={profile} />
-        
-        {profile && (
-          <FadeInContent>
-            <UserProfileContent
-              profile={profile}
-              currentUser={currentUser}
-              relationshipStatus={relationshipStatus}
-            />
-          </FadeInContent>
-        )}
-      </div>
-      
-      
-    </div>
+    </>
   );
 };
 
