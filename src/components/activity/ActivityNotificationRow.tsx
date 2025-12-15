@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X, MoreVertical, ShieldOff, MessageSquare, Clock } from 'lucide-react';
+import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X, ShieldOff, MessageSquare, Clock } from 'lucide-react';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
@@ -9,6 +9,7 @@ import { FriendRequestButtons } from './FriendRequestButtons';
 import { useCancelFriendRequest } from '@/hooks/useCancelFriendRequest';
 import { GolferVerificationInviteButtons } from './GolferVerificationInviteButtons';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { NotificationCard, getNotificationButtonClass } from '@/components/ui/NotificationCard';
 
 // Clbhouz logomark URL for system notifications
 const CLBHOUZ_LOGOMARK_URL = '/assets/logomark-orange.png';
@@ -21,8 +22,8 @@ interface ActivityNotificationRowProps {
   isSessionNew?: boolean;
 }
 
-// Shared base pill class for unified styling - SDS corners, 30% shorter height
-const basePillClass = "inline-flex items-center justify-center rounded-sq-xs border px-3 h-6 text-[11px] font-semibold transition-colors";
+// Shared base pill class for unified styling - SDS corners
+const basePillClass = "inline-flex items-center justify-center rounded-sq-xs border px-3 h-7 text-xs font-medium transition-colors gap-1.5";
 
 // Icon variants for different friend request states
 function getFriendBadgeIcon(isActive: boolean) {
@@ -212,13 +213,14 @@ const AvatarWithBadge: React.FC<AvatarWithBadgeProps> = ({ notification, badgeIc
   );
 };
 
-// LinkedIn-style flat row component
+// Row wrapper using NotificationCard - maintains existing interface for easy migration
 interface FlatRowProps {
   notification: ActivityNotification;
   onClick: () => void;
   onOpenActionsSheet: () => void;
   avatar: React.ReactNode;
   title: React.ReactNode;
+  subtext?: React.ReactNode;
   meta: string;
   actions?: React.ReactNode;
   isSessionNew?: boolean;
@@ -229,65 +231,25 @@ const FlatRow: React.FC<FlatRowProps> = ({
   onClick, 
   onOpenActionsSheet,
   avatar, 
-  title, 
+  title,
+  subtext,
   meta, 
   actions,
   isSessionNew
 }) => {
-  // Use session-based "new" status for orange styling (persists until user leaves page)
   const showOrange = isSessionNew || notification.is_unread;
   
   return (
-    <div
-      className={cn(
-        "flex items-center gap-3 px-4 py-3 transition-colors",
-        showOrange 
-          ? "bg-amber-500/[0.06]" 
-          : "bg-transparent hover:bg-muted/30"
-      )}
-    >
-      {/* Unread dot indicator */}
-      <div className="w-2 shrink-0 flex items-center justify-center">
-        {showOrange && (
-          <span className="w-2 h-2 rounded-full bg-amber-500" />
-        )}
-      </div>
-
-      {/* Main clickable area */}
-      <button
-        onClick={onClick}
-        className="flex-1 flex items-center gap-3 text-left min-w-0"
-      >
-        {avatar}
-        <div className="flex-1 min-w-0">
-          <p className={cn(
-            "text-sm leading-snug",
-            showOrange ? "text-foreground" : "text-foreground/90"
-          )}>
-            {title}
-          </p>
-          <p className="mt-0.5 text-xs text-muted-foreground">{meta}</p>
-          {actions && (
-            <div className="mt-2 flex items-center justify-end gap-2">
-              {actions}
-            </div>
-          )}
-        </div>
-      </button>
-
-      {/* 3-dot menu */}
-      <button
-        type="button"
-        className="shrink-0 p-2 -mr-2 rounded-full hover:bg-muted/50 active:scale-95 transition-all"
-        onClick={(e) => {
-          e.stopPropagation();
-          onOpenActionsSheet();
-        }}
-        aria-label="More options"
-      >
-        <MoreVertical className="h-4 w-4 text-muted-foreground" />
-      </button>
-    </div>
+    <NotificationCard
+      avatar={avatar}
+      title={title}
+      subtext={subtext}
+      actions={actions}
+      timestamp={meta}
+      isNew={showOrange}
+      onClick={onClick}
+      onMenuClick={onOpenActionsSheet}
+    />
   );
 };
 
@@ -534,6 +496,14 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
       const isAccepted = inviteStatus === 'accepted' || inviteStatus === 'pending_review';
       const isDeclined = inviteStatus === 'declined';
       
+      // Build subtext based on state
+      let subtextContent: React.ReactNode = null;
+      if (isAccepted) {
+        subtextContent = "We're reviewing your verification.";
+      } else if (reason && !isDeclined) {
+        subtextContent = <><span className="font-medium">Reason:</span> {reason}</>;
+      }
+      
       return (
         <FlatRow
           notification={notification}
@@ -541,40 +511,29 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           onOpenActionsSheet={onOpenActionsSheet}
           avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
           title={
-            <div className="space-y-1">
-              <div>
-                <span className={cn(showOrange ? "font-semibold" : "font-medium")}>Clbhouz would like to verify your account</span>
-              </div>
-              {isAccepted && (
-                <p className="text-xs text-muted-foreground">We're reviewing your verification.</p>
-              )}
-              {reason && !isAccepted && !isDeclined && (
-                <p className="text-xs text-muted-foreground">
-                  <span className="font-medium">Reason:</span> {reason}
-                </p>
-              )}
-            </div>
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              Clbhouz would like to verify your account
+            </span>
           }
+          subtext={subtextContent}
           meta={notification.time_ago}
           actions={
-            <div className="flex items-center justify-end gap-2 flex-wrap">
-              {requestId && !isAccepted && !isDeclined ? (
-                <>
-                  <GolferVerificationInviteButtons
-                    requestId={requestId}
-                    initialStatus="pending"
-                    isMock={notification.is_mock}
-                  />
-                </>
-              ) : null}
+            <div className="flex items-center gap-2 flex-wrap">
+              {requestId && !isAccepted && !isDeclined && (
+                <GolferVerificationInviteButtons
+                  requestId={requestId}
+                  initialStatus="pending"
+                  isMock={notification.is_mock}
+                />
+              )}
               {isAccepted && (
-                <span className={cn(basePillClass, "border-emerald-500 bg-emerald-500/10 text-emerald-600 gap-1")}>
-                  <VerifiedBadge size="sm" className="mr-0.5" />
+                <span className={cn(basePillClass, "border-emerald-500 bg-emerald-500/10 text-emerald-600")}>
+                  <VerifiedBadge size="sm" />
                   Verification in progress
                 </span>
               )}
               {isDeclined && (
-                <span className={cn(basePillClass, "border-muted-foreground/30 bg-muted text-muted-foreground gap-1")}>
+                <span className={cn(basePillClass, "border-muted-foreground/30 bg-muted text-muted-foreground")}>
                   <X className="h-3 w-3" />
                   Invite declined
                 </span>
@@ -582,7 +541,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); /* TODO: wire to support DM */ }}
-                className={cn(basePillClass, "border-primary bg-primary/10 text-primary gap-1 cursor-pointer hover:bg-primary/20")}
+                className={getNotificationButtonClass('support')}
               >
                 <MessageSquare className="h-3 w-3" />
                 Chat with support
@@ -606,17 +565,15 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           onOpenActionsSheet={onOpenActionsSheet}
           avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
           title={
-            <div className="space-y-1">
-              <div>
-                <span className={cn(showOrange ? "font-semibold" : "font-medium")}>You're now a verified golfer</span>
-              </div>
-              <p className="text-xs text-muted-foreground">Your profile now shows a verified badge.</p>
-            </div>
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              You're now a verified golfer
+            </span>
           }
+          subtext="Your profile now shows a verified badge."
           meta={notification.time_ago}
           actions={
-            <span className={cn(basePillClass, "border-emerald-500 bg-emerald-500/10 text-emerald-600 gap-1")}>
-              <VerifiedBadge size="sm" className="mr-0.5" />
+            <span className={cn(basePillClass, "border-emerald-500 bg-emerald-500/10 text-emerald-600")}>
+              <VerifiedBadge size="sm" />
               Verified
             </span>
           }
@@ -639,24 +596,26 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           onOpenActionsSheet={onOpenActionsSheet}
           avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
           title={
-            <div className="space-y-1">
-              <div>
-                <span className={cn(showOrange ? "font-semibold" : "font-medium")}>Verification not approved</span>
-              </div>
-              <p className="text-xs text-muted-foreground">Your verification request was reviewed but not approved at this time.</p>
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              Verification not approved
+            </span>
+          }
+          subtext={
+            <>
+              Your verification request was reviewed but not approved at this time.
               {reason && (
-                <p className="text-xs text-muted-foreground/80">
+                <span className="block mt-1 text-muted-foreground/80">
                   <span className="font-medium">Reason:</span> {reason}
-                </p>
+                </span>
               )}
-            </div>
+            </>
           }
           meta={notification.time_ago}
           actions={
             <button
               type="button"
-              onClick={(e) => { e.stopPropagation(); /* TODO: wire to support DM */ }}
-              className={cn(basePillClass, "border-primary bg-primary/10 text-primary gap-1 cursor-pointer hover:bg-primary/20")}
+              onClick={(e) => { e.stopPropagation(); }}
+              className={getNotificationButtonClass('support')}
             >
               <MessageSquare className="h-3 w-3" />
               Chat with support
@@ -681,24 +640,26 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           onOpenActionsSheet={onOpenActionsSheet}
           avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
           title={
-            <div className="space-y-1">
-              <div>
-                <span className={cn(showOrange ? "font-semibold" : "font-medium")}>Golfer verification removed</span>
-              </div>
-              <p className="text-xs text-muted-foreground">Your golfer verification has been removed.</p>
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              Golfer verification removed
+            </span>
+          }
+          subtext={
+            <>
+              Your golfer verification has been removed.
               {reason && (
-                <p className="text-xs text-muted-foreground/80">
+                <span className="block mt-1 text-muted-foreground/80">
                   <span className="font-medium">Reason:</span> {reason}
-                </p>
+                </span>
               )}
-            </div>
+            </>
           }
           meta={notification.time_ago}
           actions={
             <button
               type="button"
-              onClick={(e) => { e.stopPropagation(); /* TODO: wire to support DM */ }}
-              className={cn(basePillClass, "border-primary bg-primary/10 text-primary gap-1 cursor-pointer hover:bg-primary/20")}
+              onClick={(e) => { e.stopPropagation(); }}
+              className={getNotificationButtonClass('support')}
             >
               <MessageSquare className="h-3 w-3" />
               Chat with support
@@ -711,20 +672,12 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
 
     /**
      * 9) BUSINESS VERIFICATION REVOKED/REMOVED
-     *    – Shows revoked message with reason (if provided) and support CTA
      */
     case 'business_verification_removed':
     case 'business_verification_revoked': {
       const statusIcon = <ShieldOff className="h-3 w-3 text-red-500" />;
       const businessName = data?.business_name || data?.entity_name || 'your business';
       const reason = data?.reason || data?.admin_note;
-      
-      // TODO: Wire this CTA to Support DM once messaging is implemented
-      const handleSupportChat = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        // No-op until support messaging is built
-      };
       
       return (
         <FlatRow
@@ -733,26 +686,26 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           onOpenActionsSheet={onOpenActionsSheet}
           avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
           title={
-            <div className="space-y-1">
-              <div>
-                <span className={cn(showOrange ? "font-semibold" : "font-medium")}>Verification revoked</span>
-              </div>
-              <div className="text-muted-foreground font-normal text-xs">
-                Your business verification for {businessName} has been revoked.
-              </div>
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              Verification revoked
+            </span>
+          }
+          subtext={
+            <>
+              Your business verification for {businessName} has been revoked.
               {reason && (
-                <div className="text-xs text-muted-foreground/80 mt-1">
+                <span className="block mt-1 text-muted-foreground/80">
                   <span className="font-medium">Reason:</span> {reason}
-                </div>
+                </span>
               )}
-            </div>
+            </>
           }
           meta={notification.time_ago}
           actions={
             <button
               type="button"
-              onClick={handleSupportChat}
-              className={cn(basePillClass, "border-primary bg-primary/10 text-primary gap-1 cursor-pointer hover:bg-primary/20")}
+              onClick={(e) => { e.stopPropagation(); }}
+              className={getNotificationButtonClass('support')}
             >
               <MessageSquare className="h-3 w-3" />
               Chat with support
