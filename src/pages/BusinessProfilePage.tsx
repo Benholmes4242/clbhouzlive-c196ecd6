@@ -70,7 +70,7 @@ const BusinessProfilePage = () => {
       {/* Back button - dark glass container matching course detail page */}
       <button
         onClick={() => navigate(-1)}
-        className="absolute top-3 left-3 md:top-4 md:left-4 z-20 h-9 w-9 bg-black/20 backdrop-blur-sm rounded-sq-sm flex items-center justify-center hover:bg-black/40 transition-colors focus:outline-none"
+        className="absolute top-3 left-3 md:top-4 md:left-4 z-20 h-9 w-9 bg-black/20 backdrop-blur-sm rounded-md flex items-center justify-center hover:bg-black/40 transition-colors focus:outline-none"
         aria-label="Go back"
       >
         <ArrowLeft className="!h-5 !w-5 text-white" />
@@ -82,7 +82,7 @@ const BusinessProfilePage = () => {
           businessId={business.id}
           businessName={business.name}
           membership={membership ?? null}
-          className="h-9 w-9 bg-black/20 backdrop-blur-sm rounded-sq-sm hover:bg-black/40 transition-colors text-white border-0"
+          className="h-9 w-9 bg-black/20 backdrop-blur-sm rounded-md hover:bg-black/40 transition-colors text-white border-0"
           isBusinessVerified={business.is_verified}
           verificationStatus={verificationRequest?.status}
         />
