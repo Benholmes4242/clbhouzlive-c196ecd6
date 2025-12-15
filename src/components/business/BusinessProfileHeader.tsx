@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, Globe, MapPin, BarChart2, Building2, Camera, Loader2 } from 'lucide-react';
+import { Phone, Globe, MapPin, Camera, Loader2, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
@@ -8,13 +8,10 @@ import { useNavigate } from 'react-router-dom';
 import { trackBusinessAction } from '@/lib/businessAnalyticsTracking';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { cn } from '@/lib/utils';
-import { BusinessAchievementsStrip } from './BusinessAchievementsStrip';
-import { BusinessHighlightsReel } from './BusinessHighlightsReel';
 import { BusinessImageActionSheet } from './BusinessImageActionSheet';
 import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 import { BusinessFollowButton } from './BusinessFollowButton';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
-import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
 
 interface BusinessProfileHeaderProps {
   business: BusinessProfile;
@@ -65,10 +62,6 @@ export function BusinessProfileHeader({
     }
   };
 
-  const handleViewInsights = () => {
-    navigate(`/business/${business.id}/insights`);
-  };
-
   // Generate initials from business name
   const initials = business.name
     .split(' ')
@@ -82,13 +75,10 @@ export function BusinessProfileHeader({
     return url.replace(/^https?:\/\//, '').replace(/\/$/, '');
   };
 
-  // Format identity line: Category · Location
-  const identityLine = [business.category, business.location].filter(Boolean).join(' · ');
-
   return (
-    <section className="relative w-full">
-      {/* HERO IMAGE - Same as personal profile */}
-      <div className="relative w-full h-[250px] overflow-hidden">
+    <section className="relative w-full bg-[#F4F5F7]">
+      {/* COVER IMAGE - Light UI with subtle overlay for readability */}
+      <div className="relative w-full h-[220px] overflow-hidden">
         {business.cover_image_url ? (
           <img
             src={business.cover_image_url}
@@ -97,14 +87,14 @@ export function BusinessProfileHeader({
             loading="eager"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
+          <div className="w-full h-full bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200" />
         )}
         
-        {/* Global vignette - subtle top + bottom darkening */}
+        {/* Subtle gradient overlay for light UI readability */}
         <div
-          className="pointer-events-none absolute inset-0 mix-blend-multiply opacity-70"
+          className="pointer-events-none absolute inset-0"
           style={{
-            background: 'radial-gradient(circle at top, rgba(0,0,0,0.22), transparent 55%), radial-gradient(circle at bottom, rgba(0,0,0,0.18), transparent 55%)',
+            background: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.15) 100%)',
           }}
         />
 
@@ -112,7 +102,8 @@ export function BusinessProfileHeader({
         {canEditImages && (
           <button
             onClick={() => setCoverSheetOpen(true)}
-            className="absolute bottom-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-sm text-white text-xs font-medium hover:bg-black/60 transition-colors"
+            className="absolute bottom-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-sm text-slate-700 text-xs font-medium hover:bg-white transition-colors shadow-sm"
+            style={{ border: '1px solid rgba(31,36,40,0.08)' }}
           >
             {uploadingCover ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -124,181 +115,144 @@ export function BusinessProfileHeader({
         )}
       </div>
 
-      {/* META BLOCK - Glass panel with avatar + text (matches personal profile) */}
-      <div className="relative" style={{ marginTop: '-40px' }}>
-        <div className="relative flex items-center gap-4 md:gap-6 rounded-3xl bg-muted/0 backdrop-blur-xl px-4 md:px-6 py-4 md:py-5">
-          {/* AVATAR with camera badge for owners */}
-          <div className="flex-shrink-0 z-20 relative">
-            <button
-              onClick={canEditImages ? () => setLogoSheetOpen(true) : undefined}
-              className={cn(
-                "relative",
-                canEditImages && "cursor-pointer"
-              )}
-              disabled={!canEditImages}
-            >
-              {business.logo_url ? (
-                <SquircleAvatar
-                  src={business.logo_url}
-                  alt={business.name}
-                  size={80}
-                  className="border-[2.5px] border-white shadow-lg"
-                />
-              ) : (
-                <div className="w-20 h-20 rounded-sq-md bg-white flex items-center justify-center text-xl font-bold text-slate-700 border-[2.5px] border-white shadow-lg">
-                  {initials}
-                </div>
-              )}
-              
-              {/* Camera badge - bottom right of avatar */}
-              {canEditImages && (
-                <span className="absolute -bottom-1 -right-1 flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground shadow-md">
-                  {uploadingLogo ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <Camera className="h-3.5 w-3.5" />
-                  )}
+      {/* WHITE CARD META BLOCK - Avatar + Identity */}
+      <div className="relative bg-white mx-4 -mt-12 rounded-sq-lg shadow-sm" style={{ border: '1px solid rgba(31,36,40,0.08)' }}>
+        <div className="px-5 pt-5 pb-5">
+          {/* Avatar row */}
+          <div className="flex items-start gap-4">
+            {/* AVATAR with camera badge for owners */}
+            <div className="flex-shrink-0 -mt-14 relative">
+              <button
+                onClick={canEditImages ? () => setLogoSheetOpen(true) : undefined}
+                className={cn(
+                  "relative",
+                  canEditImages && "cursor-pointer"
+                )}
+                disabled={!canEditImages}
+              >
+                {business.logo_url ? (
+                  <SquircleAvatar
+                    src={business.logo_url}
+                    alt={business.name}
+                    size={88}
+                    className="border-[3px] border-white shadow-lg"
+                  />
+                ) : (
+                  <div className="w-[88px] h-[88px] rounded-sq-md bg-white flex items-center justify-center text-2xl font-bold text-slate-600 border-[3px] border-white shadow-lg" style={{ background: '#F4F5F7' }}>
+                    {initials}
+                  </div>
+                )}
+                
+                {/* Camera badge - bottom right of avatar */}
+                {canEditImages && (
+                  <span className="absolute -bottom-1 -right-1 flex items-center justify-center w-7 h-7 rounded-full bg-[#F7931E] text-white shadow-md">
+                    {uploadingLogo ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Camera className="h-3.5 w-3.5" />
+                    )}
+                  </span>
+                )}
+              </button>
+            </div>
+
+            {/* TEXT META (name, verified, category pill) */}
+            <div className="flex-1 min-w-0 pt-1">
+              {/* Name + Verified badge */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <h1 className="text-xl font-semibold tracking-tight text-[#1F2428] truncate">
+                  {business.name}
+                </h1>
+                {business.is_verified && (
+                  <VerifiedBadge size="lg" />
+                )}
+              </div>
+
+              {/* Category pill */}
+              {business.category && (
+                <span className="inline-flex items-center mt-1.5 px-2.5 py-1 rounded-full text-xs font-medium text-[#5E666D]" style={{ background: '#EDEFF2' }}>
+                  {business.category}
                 </span>
               )}
-            </button>
-          </div>
 
-          {/* TEXT META (name, handle, category · location) */}
-          <div className="flex-1 flex flex-col items-center justify-center gap-1.5 md:gap-2">
-            {/* Name + Verified badge */}
-            <div className="flex items-center gap-1.5">
-              <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-foreground text-center">
-                {business.name}
-              </h1>
-              {business.is_verified && (
-                <VerifiedBadge size="lg" />
+              {/* Location */}
+              {business.location && (
+                <div className="flex items-center gap-1 mt-2 text-sm text-[#5E666D]">
+                  <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+                  <span className="truncate">{business.location}</span>
+                </div>
               )}
             </div>
+          </div>
 
-            {/* Business badge + Category */}
-            <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-slate-500">
-              {business.slug && <span>@{business.slug}</span>}
-              <span className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground">
-                <Building2 className="w-3 h-3" />
-                Business
-              </span>
-            </div>
+          {/* BIO / Tagline */}
+          {business.description && (
+            <p className="mt-4 text-sm text-[#5E666D] leading-relaxed line-clamp-2">
+              {business.description}
+            </p>
+          )}
 
-            {/* Identity line: Category · Location */}
-            {identityLine && (
-              <p className="text-sm text-muted-foreground text-center">
-                {identityLine}
-              </p>
+          {/* PRIMARY ACTIONS ROW */}
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            {/* Follow button for non-owners */}
+            {!membership?.canManage && (
+              <BusinessFollowButton 
+                businessId={business.id} 
+                className="rounded-full px-5"
+              />
             )}
-
-            {/* Website link pill */}
+            
             {business.website && (
-              <a
-                href={business.website.startsWith('http') ? business.website : `https://${business.website}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/60 hover:bg-muted text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleWebsite}
+                className="rounded-full px-4 text-[#1F2428] border-[#1F2428]/10 hover:bg-[#EDEFF2]"
               >
-                <Globe className="w-3 h-3" />
-                {formatWebsiteUrl(business.website)}
-              </a>
+                <Globe className="h-4 w-4 mr-1.5" />
+                Website
+                <ExternalLink className="h-3 w-3 ml-1 opacity-50" />
+              </Button>
+            )}
+            
+            {business.phone && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleCall}
+                className="rounded-full px-4 text-[#1F2428] border-[#1F2428]/10 hover:bg-[#EDEFF2]"
+              >
+                <Phone className="h-4 w-4 mr-1.5" />
+                Call
+              </Button>
+            )}
+            
+            {business.location && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleDirections}
+                className="rounded-full px-4 text-[#1F2428] border-[#1F2428]/10 hover:bg-[#EDEFF2]"
+              >
+                <MapPin className="h-4 w-4 mr-1.5" />
+                Directions
+              </Button>
             )}
           </div>
         </div>
-      </div>
 
-      {/* BIO / Tagline - Full width below glass panel */}
-      {business.description && (
-        <div className="mt-4 md:mt-5 px-6 md:px-8">
-          <p className="mx-auto max-w-3xl text-center text-sm md:text-[15px] leading-relaxed text-muted-foreground line-clamp-2">
-            {business.description}
-          </p>
+        {/* SIGNALS BAR - Subtle row with key metrics */}
+        <div 
+          className="flex items-center justify-around py-3 border-t"
+          style={{ borderColor: 'rgba(31,36,40,0.06)' }}
+        >
+          <SignalItem label="Followers" value={followersCount} />
+          <div className="w-px h-6 bg-[#1F2428]/6" />
+          <SignalItem label="Posts" value={postsCount} />
+          <div className="w-px h-6 bg-[#1F2428]/6" />
+          <SignalItem label="Rating" value="–" />
         </div>
-      )}
-
-      {/* Stories-Style Highlights Reel */}
-      <BusinessHighlightsReel 
-        businessId={business.id}
-        isOwner={membership?.canManage || false}
-        className="mt-4"
-      />
-
-      {/* Actions Row - Tight row of pill buttons */}
-      <div className="mt-4 px-4 flex flex-wrap justify-center gap-2">
-        {/* Follow button for non-owners */}
-        {!membership?.canManage && (
-          <BusinessFollowButton 
-            businessId={business.id} 
-            className="rounded-full px-4"
-          />
-        )}
-        {membership?.canViewInsights && (
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={handleViewInsights}
-            className="gap-1.5 rounded-full px-4"
-          >
-            <BarChart2 className="h-4 w-4" />
-            Insights
-          </Button>
-        )}
-        {business.phone && (
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleCall}
-            className="rounded-full px-4"
-          >
-            <Phone className="h-4 w-4 mr-1.5" />
-            Call
-          </Button>
-        )}
-        {business.website && (
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleWebsite}
-            className="rounded-full px-4"
-          >
-            <Globe className="h-4 w-4 mr-1.5" />
-            Website
-          </Button>
-        )}
-        {business.location && (
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleDirections}
-            className="rounded-full px-4"
-          >
-            <MapPin className="h-4 w-4 mr-1.5" />
-            Directions
-          </Button>
-        )}
       </div>
-
-      {/* Business Achievements Strip */}
-      <BusinessAchievementsStrip 
-        followersCount={followersCount}
-        postsCount={postsCount}
-        className="mt-4"
-      />
-
-      {/* Stats Row - Matches personal profile styling */}
-      <section className="mt-5 flex items-center justify-center gap-8 px-4">
-        <StatItem label="Posts" value={postsCount} />
-        <StatItem label="Followers" value={followersCount} />
-        <StatItem label="Rating" value="–" />
-      </section>
-
-      {/* Faint divider */}
-      <div 
-        className="mt-5 h-px w-full"
-        style={{
-          background: 'linear-gradient(90deg, transparent 0%, hsl(var(--foreground) / 0.05) 20%, hsl(var(--foreground) / 0.05) 80%, transparent 100%)',
-        }}
-      />
 
       {/* Image Action Sheets */}
       <BusinessImageActionSheet
@@ -323,14 +277,14 @@ export function BusinessProfileHeader({
   );
 }
 
-function StatItem({ label, value }: { label: string; value: number | string }) {
+function SignalItem({ label, value }: { label: string; value: number | string }) {
   const displayValue = typeof value === 'number' ? value.toLocaleString() : value;
   return (
-    <div className="flex flex-col items-center">
-      <span className="text-base font-semibold text-foreground tabular-nums">
+    <div className="flex flex-col items-center px-4">
+      <span className="text-base font-semibold text-[#1F2428] tabular-nums">
         {displayValue}
       </span>
-      <span className="mt-1 text-[11px] uppercase tracking-[0.06em] text-muted-foreground">
+      <span className="mt-0.5 text-[11px] text-[#5E666D]">
         {label}
       </span>
     </div>

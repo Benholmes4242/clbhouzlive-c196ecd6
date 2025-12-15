@@ -106,7 +106,7 @@ export function BusinessProfilePosts({ businessId, businessName, membership }: B
   const CreatePostButton = membership?.canManage ? (
     <Button 
       onClick={handleCreatePost}
-      className="w-full rounded-sq-md mb-4"
+      className="w-full rounded-sq-md mb-4 bg-[#F7931E] hover:bg-[#E07D0A] text-white"
     >
       <Plus className="h-4 w-4 mr-2" />
       Create post as {businessName || 'this business'}
@@ -116,14 +116,23 @@ export function BusinessProfilePosts({ businessId, businessName, membership }: B
   if (!posts || posts.length === 0) {
     return (
       <div className="py-12 text-center">
-        <ImageIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-40" />
-        <p className="text-sm text-muted-foreground mb-4">
+        <div 
+          className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+          style={{ background: '#EDEFF2' }}
+        >
+          <ImageIcon className="h-8 w-8 text-[#97A1AA]" />
+        </div>
+        <p className="text-sm text-[#5E666D] mb-4">
           {membership?.canManage 
             ? "No posts yet. Post as this business to share updates, photos and offers."
             : `No posts yet from ${businessName || 'this business'}.`}
         </p>
         {membership?.canManage && (
-          <Button variant="outline" className="rounded-full" onClick={handleCreatePost}>
+          <Button 
+            variant="outline" 
+            className="rounded-full text-[#1F2428] border-[#1F2428]/10 hover:bg-[#EDEFF2]" 
+            onClick={handleCreatePost}
+          >
             Create post as {businessName || 'this business'}
           </Button>
         )}
@@ -171,7 +180,7 @@ function PostTile({ post }: { post: BusinessPost }) {
   const thumbnailUrl = isVideo ? primaryMedia?.poster_url : primaryMedia?.media_url;
 
   return (
-    <div className="group relative aspect-square bg-muted overflow-hidden cursor-pointer">
+    <div className="group relative aspect-square overflow-hidden cursor-pointer rounded-sq-xs" style={{ background: '#EDEFF2' }}>
       {thumbnailUrl ? (
         <img
           src={thumbnailUrl}
@@ -179,8 +188,8 @@ function PostTile({ post }: { post: BusinessPost }) {
           className="w-full h-full object-cover transition-transform group-hover:scale-105"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-slate-100">
-          <ImageIcon className="h-8 w-8 text-muted-foreground opacity-50" />
+        <div className="w-full h-full flex items-center justify-center">
+          <ImageIcon className="h-8 w-8 text-[#97A1AA]" />
         </div>
       )}
 

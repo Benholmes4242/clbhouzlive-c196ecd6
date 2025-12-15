@@ -19,14 +19,15 @@ import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton'
 import { trackBusinessProfileVisit } from '@/lib/businessAnalyticsTracking';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
-type BusinessTab = 'overview' | 'posts' | 'golfers' | 'info';
+type BusinessTab = 'content' | 'overview' | 'golfers' | 'info';
 type SourceType = 'search' | 'content' | 'course_page' | 'share' | 'direct';
 
 const BusinessProfilePage = () => {
   const { idOrSlug } = useParams<{ idOrSlug: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<BusinessTab>('overview');
+  // Content tab is now the default (content-first approach)
+  const [activeTab, setActiveTab] = useState<BusinessTab>('content');
   const { user } = useSupabaseSession();
 
   const { data: business, isLoading, error } = useBusinessProfile(idOrSlug);
@@ -65,16 +66,17 @@ const BusinessProfilePage = () => {
   }
 
   return (
-    <PageRoot className="min-h-screen bg-background">
+    <PageRoot className="min-h-screen" style={{ background: '#F4F5F7' }}>
       {/* Back button - fixed top left */}
       <div className="absolute top-4 left-4 z-20">
         <Button
-          variant="glass"
+          variant="ghost"
           size="icon"
           onClick={() => navigate(-1)}
-          className="h-10 w-10"
+          className="h-10 w-10 bg-white/90 backdrop-blur-sm shadow-sm hover:bg-white"
+          style={{ border: '1px solid rgba(31,36,40,0.08)' }}
         >
-          <ChevronLeft className="h-5 w-5" />
+          <ChevronLeft className="h-5 w-5 text-[#1F2428]" />
         </Button>
       </div>
 
@@ -84,13 +86,13 @@ const BusinessProfilePage = () => {
           businessId={business.id}
           businessName={business.name}
           membership={membership ?? null}
-          className="h-10 w-10"
+          className="h-10 w-10 bg-white/90 backdrop-blur-sm shadow-sm"
           isBusinessVerified={business.is_verified}
           verificationStatus={verificationRequest?.status}
         />
       </div>
 
-      {/* Hero header - now matches personal profile structure */}
+      {/* Hero header - Light UI with white card */}
       <BusinessProfileHeader
         business={business}
         membership={membership ?? null}
@@ -98,34 +100,38 @@ const BusinessProfilePage = () => {
         followersCount={followersCount}
       />
 
-      {/* Tab Navigation - matches personal profile styling */}
+      {/* Tab Navigation - Light UI with Content as default */}
       <section className="mt-6 px-4">
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as BusinessTab)} className="w-full">
           <TabsList 
-            className="grid w-full rounded-sq-md bg-muted/70 border border-border/60 px-2 py-[3px]"
-            style={{ gridTemplateColumns: 'repeat(4, minmax(0, 1fr))' }}
+            className="grid w-full rounded-sq-md px-1.5 py-1"
+            style={{ 
+              gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+              background: '#EDEFF2',
+              border: '1px solid rgba(31,36,40,0.06)'
+            }}
           >
             <TabsTrigger 
+              value="content"
+              className="rounded-sq-pill text-sm px-2 py-[6px] font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#1F2428] text-[#5E666D] hover:text-[#1F2428] transition-all"
+            >
+              Content
+            </TabsTrigger>
+            <TabsTrigger 
               value="overview"
-              className="rounded-sq-pill text-sm px-2 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all"
+              className="rounded-sq-pill text-sm px-2 py-[6px] font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#1F2428] text-[#5E666D] hover:text-[#1F2428] transition-all"
             >
               Overview
             </TabsTrigger>
             <TabsTrigger 
-              value="posts"
-              className="rounded-sq-pill text-sm px-2 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all"
-            >
-              Posts
-            </TabsTrigger>
-            <TabsTrigger 
               value="golfers"
-              className="rounded-sq-pill text-sm px-2 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all"
+              className="rounded-sq-pill text-sm px-2 py-[6px] font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#1F2428] text-[#5E666D] hover:text-[#1F2428] transition-all"
             >
               Golfers
             </TabsTrigger>
             <TabsTrigger 
               value="info"
-              className="rounded-sq-pill text-sm px-2 py-[6px] font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all"
+              className="rounded-sq-pill text-sm px-2 py-[6px] font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#1F2428] text-[#5E666D] hover:text-[#1F2428] transition-all"
             >
               Info
             </TabsTrigger>
@@ -133,22 +139,25 @@ const BusinessProfilePage = () => {
         </Tabs>
       </section>
 
-      {/* Tab Content - with padding matching personal profile */}
+      {/* Tab Content */}
       <div className="pt-6 px-4 sm:px-6 lg:px-8 pb-6">
         <div className="md:max-w-[1150px] md:mx-auto">
-          {activeTab === 'overview' && (
-            <BusinessProfileOverview 
-              business={business} 
-              membership={membership}
-            />
-          )}
-          {activeTab === 'posts' && (
+          {/* Content tab (default) - mixed media grid */}
+          {activeTab === 'content' && (
             <BusinessProfilePosts 
               businessId={business.id}
               businessName={business.name}
               membership={membership ?? null} 
             />
           )}
+          {/* Overview tab - deeper LinkedIn-style info */}
+          {activeTab === 'overview' && (
+            <BusinessProfileOverview 
+              business={business} 
+              membership={membership}
+            />
+          )}
+          {/* Golfers tab - followers list */}
           {activeTab === 'golfers' && (
             <GolfersHereTab 
               businessId={business.id}
@@ -156,6 +165,7 @@ const BusinessProfilePage = () => {
               businessLocation={business.location || undefined}
             />
           )}
+          {/* Info tab - contact and details */}
           {activeTab === 'info' && (
             <BusinessProfileInfo business={business} />
           )}

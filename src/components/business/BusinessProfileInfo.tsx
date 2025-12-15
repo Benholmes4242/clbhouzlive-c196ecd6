@@ -55,32 +55,38 @@ export function BusinessProfileInfo({ business }: BusinessProfileInfoProps) {
   ].filter(Boolean);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* About - Full text without truncation */}
       {business.description && (
-        <section className="space-y-3">
-          <h2 className="text-base font-semibold text-foreground">About</h2>
-          <p className="text-sm text-muted-foreground leading-[1.7] whitespace-pre-wrap">
+        <section 
+          className="rounded-sq-lg p-4 space-y-3"
+          style={{ background: 'white', border: '1px solid rgba(31,36,40,0.08)' }}
+        >
+          <h2 className="text-base font-semibold text-[#1F2428]">About</h2>
+          <p className="text-sm text-[#5E666D] leading-[1.7] whitespace-pre-wrap">
             {business.description}
           </p>
         </section>
       )}
 
       {/* Contact */}
-      <section className="space-y-3">
-        <h2 className="text-base font-semibold text-foreground">Contact</h2>
-        <div className="space-y-3">
+      <section 
+        className="rounded-sq-lg p-4 space-y-3"
+        style={{ background: 'white', border: '1px solid rgba(31,36,40,0.08)' }}
+      >
+        <h2 className="text-base font-semibold text-[#1F2428]">Contact</h2>
+        <div className="space-y-2">
           {business.phone && (
             <button 
               onClick={handleCall}
-              className="flex items-center gap-3 w-full text-left hover:bg-muted/50 rounded-sq-sm p-2 -m-2 transition-colors"
+              className="flex items-center gap-3 w-full text-left hover:bg-[#F4F5F7] rounded-sq-sm p-2.5 transition-colors"
             >
-              <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                <Phone className="h-4 w-4 text-muted-foreground" />
+              <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ background: '#EDEFF2' }}>
+                <Phone className="h-4 w-4 text-[#5E666D]" />
               </div>
               <div>
-                <p className="text-sm font-medium text-foreground">{business.phone}</p>
-                <p className="text-xs text-muted-foreground">Phone</p>
+                <p className="text-sm font-medium text-[#1F2428]">{business.phone}</p>
+                <p className="text-xs text-[#97A1AA]">Phone</p>
               </div>
             </button>
           )}
@@ -88,14 +94,14 @@ export function BusinessProfileInfo({ business }: BusinessProfileInfoProps) {
           {business.email && (
             <button 
               onClick={handleEmail}
-              className="flex items-center gap-3 w-full text-left hover:bg-muted/50 rounded-sq-sm p-2 -m-2 transition-colors"
+              className="flex items-center gap-3 w-full text-left hover:bg-[#F4F5F7] rounded-sq-sm p-2.5 transition-colors"
             >
-              <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                <Mail className="h-4 w-4 text-muted-foreground" />
+              <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ background: '#EDEFF2' }}>
+                <Mail className="h-4 w-4 text-[#5E666D]" />
               </div>
               <div>
-                <p className="text-sm font-medium text-foreground">{business.email}</p>
-                <p className="text-xs text-muted-foreground">Email</p>
+                <p className="text-sm font-medium text-[#1F2428]">{business.email}</p>
+                <p className="text-xs text-[#97A1AA]">Email</p>
               </div>
             </button>
           )}
@@ -103,65 +109,72 @@ export function BusinessProfileInfo({ business }: BusinessProfileInfoProps) {
           {business.website && (
             <button 
               onClick={handleWebsite}
-              className="flex items-center gap-3 w-full text-left hover:bg-muted/50 rounded-sq-sm p-2 -m-2 transition-colors"
+              className="flex items-center gap-3 w-full text-left hover:bg-[#F4F5F7] rounded-sq-sm p-2.5 transition-colors"
             >
-              <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                <Globe className="h-4 w-4 text-muted-foreground" />
+              <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ background: '#EDEFF2' }}>
+                <Globe className="h-4 w-4 text-[#5E666D]" />
               </div>
               <div>
-                <p className="text-sm font-medium text-foreground">
+                <p className="text-sm font-medium text-[#1F2428]">
                   {business.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
                 </p>
-                <p className="text-xs text-muted-foreground">Website</p>
+                <p className="text-xs text-[#97A1AA]">Website</p>
               </div>
             </button>
           )}
 
           {!business.phone && !business.email && !business.website && (
-            <p className="text-sm text-muted-foreground italic">No contact information available.</p>
+            <p className="text-sm text-[#97A1AA] italic">No contact information available.</p>
           )}
         </div>
       </section>
 
       {/* Location */}
-      <section className="space-y-3">
-        <h2 className="text-base font-semibold text-foreground">Location</h2>
+      <section 
+        className="rounded-sq-lg p-4 space-y-3"
+        style={{ background: 'white', border: '1px solid rgba(31,36,40,0.08)' }}
+      >
+        <h2 className="text-base font-semibold text-[#1F2428]">Location</h2>
         {business.location ? (
           <div className="space-y-4">
             <div className="flex items-start gap-3">
-              <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                <MapPin className="h-4 w-4 text-muted-foreground" />
+              <div className="h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: '#EDEFF2' }}>
+                <MapPin className="h-4 w-4 text-[#5E666D]" />
               </div>
               <div>
-                <p className="text-sm font-medium text-foreground">{business.location}</p>
-                <p className="text-xs text-muted-foreground">Address</p>
+                <p className="text-sm font-medium text-[#1F2428]">{business.location}</p>
+                <p className="text-xs text-[#97A1AA]">Address</p>
               </div>
             </div>
             
             <Button 
               variant="outline" 
               onClick={handleDirections} 
-              className="rounded-full w-full sm:w-auto"
+              className="rounded-full w-full sm:w-auto text-[#1F2428] border-[#1F2428]/10 hover:bg-[#EDEFF2]"
             >
               <MapPin className="h-4 w-4 mr-2" />
               Get directions
             </Button>
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground italic">No location information available.</p>
+          <p className="text-sm text-[#97A1AA] italic">No location information available.</p>
         )}
       </section>
 
       {/* Highlights */}
-      <section className="space-y-3">
-        <h2 className="text-base font-semibold text-foreground">Highlights</h2>
+      <section 
+        className="rounded-sq-lg p-4 space-y-3"
+        style={{ background: 'white', border: '1px solid rgba(31,36,40,0.08)' }}
+      >
+        <h2 className="text-base font-semibold text-[#1F2428]">Highlights</h2>
         <div className="flex flex-wrap gap-2">
           {highlights.map((highlight, idx) => {
             const Icon = HIGHLIGHT_ICONS[highlight as string] || Flag;
             return (
               <span 
                 key={idx} 
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted text-sm text-muted-foreground"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm text-[#5E666D]"
+                style={{ background: '#EDEFF2' }}
               >
                 <Icon className="h-3.5 w-3.5" />
                 {highlight}
@@ -172,43 +185,46 @@ export function BusinessProfileInfo({ business }: BusinessProfileInfoProps) {
       </section>
 
       {/* Business Details */}
-      <section className="space-y-3">
-        <h2 className="text-base font-semibold text-foreground">Business Details</h2>
-        <div className="space-y-3">
+      <section 
+        className="rounded-sq-lg p-4 space-y-3"
+        style={{ background: 'white', border: '1px solid rgba(31,36,40,0.08)' }}
+      >
+        <h2 className="text-base font-semibold text-[#1F2428]">Business Details</h2>
+        <div className="space-y-2">
           {business.category && (
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                <Building2 className="h-4 w-4 text-muted-foreground" />
+            <div className="flex items-center gap-3 p-2.5">
+              <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ background: '#EDEFF2' }}>
+                <Building2 className="h-4 w-4 text-[#5E666D]" />
               </div>
               <div>
-                <p className="text-sm font-medium text-foreground">{business.category}</p>
-                <p className="text-xs text-muted-foreground">Category</p>
+                <p className="text-sm font-medium text-[#1F2428]">{business.category}</p>
+                <p className="text-xs text-[#97A1AA]">Category</p>
               </div>
             </div>
           )}
           
           {business.is_verified && (
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                <BadgeCheck className="h-4 w-4 text-emerald-500" />
+            <div className="flex items-center gap-3 p-2.5">
+              <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                <BadgeCheck className="h-4 w-4 text-emerald-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-foreground">Verified Business</p>
-                <p className="text-xs text-muted-foreground">This business has been verified by clbhouz</p>
+                <p className="text-sm font-medium text-[#1F2428]">Verified Business</p>
+                <p className="text-xs text-[#97A1AA]">This business has been verified by clbhouz</p>
               </div>
             </div>
           )}
           
           {business.created_at && (
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
+            <div className="flex items-center gap-3 p-2.5">
+              <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ background: '#EDEFF2' }}>
+                <Calendar className="h-4 w-4 text-[#5E666D]" />
               </div>
               <div>
-                <p className="text-sm font-medium text-foreground">
+                <p className="text-sm font-medium text-[#1F2428]">
                   {format(new Date(business.created_at), 'MMMM yyyy')}
                 </p>
-                <p className="text-xs text-muted-foreground">Member since</p>
+                <p className="text-xs text-[#97A1AA]">Member since</p>
               </div>
             </div>
           )}
