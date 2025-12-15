@@ -219,24 +219,7 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
 
       if (coursesError) throw coursesError;
 
-      // Get user's played courses data from BOTH sources (like working carousel)
-      const [userTop100Data, userRatingsData] = await Promise.all([
-        supabase
-          .from('user_top100_courses')
-          .select('course_id, played, created_at')
-          .eq('user_id', userId)
-          .eq('played', true),
-        
-        supabase
-          .from('course_ratings')
-          .select('course_id, created_at')
-          .eq('user_id', userId)
-      ]);
-
-      if (userTop100Data.error) throw userTop100Data.error;
-      if (userRatingsData.error) throw userRatingsData.error;
-
-      // Get user's ratings
+      // Ratings-only: get user's ratings
       const { data: userRatings, error: ratingsError } = await supabase
         .from('course_ratings')
         .select('course_id, rating, created_at')
@@ -244,41 +227,18 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
 
       if (ratingsError) throw ratingsError;
 
-      // Combine played courses from both sources
-      const allPlayedCourseIds = new Set([
-        ...(userTop100Data.data?.map(p => p.course_id) || []),
-        ...(userRatingsData.data?.map(r => r.course_id) || [])
-      ]);
-
-      // Create lookup maps
-      const playedMap = new Map();
-      // Add from user_top100_courses
-      userTop100Data.data?.forEach(p => {
-        playedMap.set(p.course_id, p);
-      });
-      // Add from course_ratings (if not already present from top100)
-      userRatingsData.data?.forEach(r => {
-        if (!playedMap.has(r.course_id)) {
-          playedMap.set(r.course_id, { 
-            course_id: r.course_id, 
-            played: true, 
-            created_at: r.created_at 
-          });
-        }
-      });
-
+      // Create ratings map
       const ratingsMap = new Map(userRatings?.map(r => [r.course_id, r]) || []);
 
-      // Combine all data
+      // Combine all data (ratings-only: played = has rating)
       const combinedCourses = allCourses?.map(course => {
-        const playedData = playedMap.get(course.id);
         const ratingData = ratingsMap.get(course.id);
         
         return {
           course_id: course.id,
           golf_courses: course,
-          userPlayed: allPlayedCourseIds.has(course.id),
-          lastPlayedAt: playedData?.created_at,
+          userPlayed: ratingsMap.has(course.id),
+          lastPlayedAt: ratingData?.created_at,
           rating: ratingData?.rating,
           created_at: ratingData?.created_at
         };
@@ -330,39 +290,13 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  // Mark as played mutation
-  const markAsPlayedMutation = useMutation({
-    mutationFn: async ({ courseId }: { courseId: string }) => {
-      const { error } = await supabase
-        .from('user_top100_courses')
-        .upsert({
-          user_id: userId!,
-          course_id: courseId,
-          played: true,
-          created_at: new Date().toISOString()
-        });
-      
-      if (error) throw error;
-      return courseId;
-    },
-    onSuccess: (courseId) => {
-      queryClient.invalidateQueries({ queryKey: ['allRegionCourses'] });
-      toast.success('Course marked as played!', {
-        action: {
-          label: 'Add Review',
-          onClick: () => {
-            const course = allRegionCourses.find(c => c.golf_courses.id === courseId);
-            if (course) {
-              setReviewModalCourse(course.golf_courses);
-            }
-          }
-        }
-      });
-    },
-    onError: () => {
-      toast.error('Failed to mark course as played');
+  // Mark as played - in ratings-only system, open rating modal instead
+  const handleMarkAsPlayed = (courseId: string) => {
+    const course = allRegionCourses.find(c => c.golf_courses.id === courseId);
+    if (course) {
+      setReviewModalCourse(course.golf_courses);
     }
-  });
+  };
 
   // Reset search when modal opens/closes  
   useEffect(() => {
@@ -738,12 +672,11 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                         variant="ghost"
                         onClick={(e) => {
                           e.stopPropagation();
-                          markAsPlayedMutation.mutate({ courseId: course.golf_courses.id });
+                          handleMarkAsPlayed(course.golf_courses.id);
                         }}
-                        disabled={markAsPlayedMutation.isPending}
                         className="z-20 relative bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground border-muted"
                       >
-                        {markAsPlayedMutation.isPending ? 'Adding...' : 'Mark as Played'}
+                        Add Rating
                        </Button>
                      )}
                      </div>
@@ -773,22 +706,21 @@ const EnhancedRegionalCoursesModal: React.FC<EnhancedRegionalCoursesModalProps> 
                   {!course.userPlayed && (
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/30 to-muted/50 rounded-none z-20 backdrop-blur-[2px]">
                       <Lock className="absolute top-2 right-2 w-5 h-5 text-muted-foreground" />
-                      {isOwnProfile && (
-                        <div className="absolute bottom-2 left-2 right-2">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              markAsPlayedMutation.mutate({ courseId: course.golf_courses.id });
-                            }}
-                            disabled={markAsPlayedMutation.isPending}
-                            className="w-full text-xs bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground border-muted"
-                          >
-                            {markAsPlayedMutation.isPending ? 'Adding...' : 'Mark as Played'}
-                          </Button>
-                        </div>
-                      )}
+                        {isOwnProfile && (
+                          <div className="absolute bottom-2 left-2 right-2">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMarkAsPlayed(course.golf_courses.id);
+                              }}
+                              className="w-full text-xs bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground border-muted"
+                            >
+                              Add Rating
+                            </Button>
+                          </div>
+                        )}
                     </div>
                   )}
 

@@ -133,37 +133,13 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
   // Fetch milestone unlock dates
   const { data: milestoneUnlockDates = {} } = useMilestoneUnlockDates(targetUserId);
 
-  // Query to get all played courses (from both tables) for filtering
+  // Query to get all played courses (ratings-only)
   const { data: allPlayedCourses = [] } = useQuery({
     queryKey: ['allPlayedCourses', targetUserId],
     queryFn: async () => {
       if (!targetUserId) return [];
 
-      // Get courses from user_top100_courses table
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', targetUserId)
-        .eq('played', true);
-
-      if (top100Error) throw top100Error;
-
-      // Get courses from course_ratings table
+      // Ratings-only: get all rated courses
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
         .select(`
@@ -187,46 +163,19 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
 
       if (ratedError) throw ratedError;
 
-      // Combine and deduplicate, ensuring consistent structure
-      const combinedCourses = [
-        ...(top100Data || []).map(course => ({
-          ...course,
-          rating: null, // Add rating field for consistency
-          id: `top100-${course.course_id}` // Unique ID for deduplication
-        })),
-        ...(ratedData || []).map(course => ({
-          ...course,
-          played_date: course.created_at, // Use rating date as played date
-          id: `rating-${course.course_id}` // Unique ID for deduplication
-        }))
-      ];
+      // Map to expected structure
+      const courses = (ratedData || []).map(course => ({
+        ...course,
+        played_date: course.created_at,
+        id: `rating-${course.course_id}`
+      }));
 
-      // Remove duplicates based on course_id, preferring rated courses over top100 courses
-      const uniqueCoursesMap = new Map();
-      
-      combinedCourses.forEach(course => {
-        const courseId = course.course_id;
-        const existing = uniqueCoursesMap.get(courseId);
-        
-        if (!existing) {
-          uniqueCoursesMap.set(courseId, course);
-        } else {
-          // Prefer courses with ratings over those without
-          if (course.rating !== null && course.rating !== undefined && 
-              (existing.rating === null || existing.rating === undefined)) {
-            uniqueCoursesMap.set(courseId, course);
-          }
-        }
-      });
-
-      const rawCourses = Array.from(uniqueCoursesMap.values());
-      console.log('Raw combined courses before sorting:', rawCourses.map(c => ({ 
+      console.log('Rated courses:', courses.map(c => ({ 
         name: c.golf_courses?.name, 
         rating: c.rating 
       })));
       
-      // Apply sorting here to ensure proper order
-      return getSortedUserCourses(rawCourses, 'rank-desc');
+      return getSortedUserCourses(courses, 'rank-desc');
     },
     enabled: !!targetUserId,
   });

@@ -123,42 +123,31 @@ export const useFriendData = (userId: string | undefined, selectedFriendId: stri
     enabled: !!selectedFriendId,
   });
 
-  // Fetch selected friend's Top 100 courses with their ratings
+  // Fetch selected friend's rated courses (ratings-only)
   const { data: friendTop100CoursesRaw = [], isLoading: isLoadingTop100 } = useQuery({
     queryKey: ['friend-top100-courses', selectedFriendId],
     queryFn: async () => {
       if (!selectedFriendId) return [];
       
-      // First get the courses
-      const { data: courses, error: coursesError } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          *,
-          golf_courses (*)
-        `)
-        .eq('user_id', selectedFriendId)
-        .eq('played', true);
-
-      if (coursesError) throw coursesError;
-      
-      // Then get ratings for these courses
+      // Get all rated courses (ratings-only system)
       const { data: ratings, error: ratingsError } = await supabase
         .from('course_ratings')
-        .select('course_id, rating')
+        .select(`
+          course_id,
+          rating,
+          created_at,
+          golf_courses (*)
+        `)
         .eq('user_id', selectedFriendId);
 
       if (ratingsError) throw ratingsError;
       
-      // Create a map of ratings by course_id
-      const ratingsMap = new Map();
-      ratings?.forEach(rating => {
-        ratingsMap.set(rating.course_id, rating.rating);
-      });
-      
-      // Add ratings to courses
-      const coursesWithRatings = courses?.map(course => ({
-        ...course,
-        rating: ratingsMap.get(course.course_id) || null
+      // Map to expected structure
+      const coursesWithRatings = ratings?.map(r => ({
+        course_id: r.course_id,
+        played_date: r.created_at,
+        golf_courses: r.golf_courses,
+        rating: r.rating
       })) || [];
       
       return getSortedUserCourses(coursesWithRatings);

@@ -55,9 +55,9 @@ export function useFriendsOnTop100Journey(userId: string | undefined) {
         userTop100CountMap.set(row.user_id, (userTop100CountMap.get(row.user_id) || 0) + 1);
       }
 
-      // Step 4: Get most recent activity timestamp per user
+      // Step 4: Get most recent rating timestamp per user (ratings-only)
       const { data: activityData, error: activityError } = await supabase
-        .from('user_top100_courses')
+        .from('course_ratings')
         .select('user_id, updated_at')
         .in('user_id', followingIds)
         .order('updated_at', { ascending: false });

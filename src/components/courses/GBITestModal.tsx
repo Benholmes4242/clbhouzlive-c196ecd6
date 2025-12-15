@@ -66,24 +66,24 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
     gcTime: 30 * 60 * 1000, // 30 minutes garbage collection
   });
 
-  // Query to get user's played courses with better caching
+  // Query to get user's rated courses (ratings-only)
   const { data: userPlayedCourses = [] } = useQuery({
-    queryKey: ['userTop100CoursesGBI', user?.id],
+    queryKey: ['userRatedCoursesGBI', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
       
+      // Ratings-only: played = has rating
       const { data, error } = await supabase
-        .from('user_top100_courses')
+        .from('course_ratings')
         .select('course_id')
-        .eq('user_id', user.id)
-        .eq('played', true);
+        .eq('user_id', user.id);
 
       if (error) throw error;
       return data || [];
     },
     enabled: isOpen && !!user?.id,
-    staleTime: 2 * 60 * 1000, // 2 minutes - user data changes less frequently
-    gcTime: 10 * 60 * 1000, // 10 minutes garbage collection
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 
   // Query to get community ratings for courses

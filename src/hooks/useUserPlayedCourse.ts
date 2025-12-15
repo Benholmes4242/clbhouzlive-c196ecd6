@@ -1,6 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+/**
+ * Ratings-only hook: "played" = has a rating in course_ratings
+ */
 export function useUserPlayedCourse(courseId: string | undefined, userId: string | undefined) {
   const queryClient = useQueryClient();
 
@@ -10,14 +13,15 @@ export function useUserPlayedCourse(courseId: string | undefined, userId: string
     queryFn: async () => {
       if (!courseId || !userId) return false;
 
+      // Check if user has a rating for this course (ratings-only system)
       const { data, error } = await supabase
-        .from('user_top100_courses')
+        .from('course_ratings')
         .select('id')
         .eq('course_id', courseId)
         .eq('user_id', userId)
         .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "not found"
+      if (error && error.code !== 'PGRST116') throw error;
       return !!data;
     },
   });
@@ -27,19 +31,13 @@ export function useUserPlayedCourse(courseId: string | undefined, userId: string
       if (!courseId || !userId) throw new Error('Missing courseId or userId');
 
       if (played) {
-        // Add to played courses
-        const { error } = await supabase
-          .from('user_top100_courses')
-          .insert({
-            course_id: courseId,
-            user_id: userId,
-            played_date: new Date().toISOString(),
-          });
-        if (error) throw error;
+        // In ratings-only system, marking as played requires creating a rating
+        // This is typically done through the rating modal, not directly here
+        throw new Error('Use PostPlayRatingModal to add courses');
       } else {
-        // Remove from played courses
+        // Remove rating to mark as not played
         const { error } = await supabase
-          .from('user_top100_courses')
+          .from('course_ratings')
           .delete()
           .eq('course_id', courseId)
           .eq('user_id', userId);
@@ -50,6 +48,7 @@ export function useUserPlayedCourse(courseId: string | undefined, userId: string
       queryClient.invalidateQueries({ queryKey: ['user-played-course', courseId, userId] });
       queryClient.invalidateQueries({ queryKey: ['user-course-activity', userId] });
       queryClient.invalidateQueries({ queryKey: ['user-top100-courses', userId] });
+      queryClient.invalidateQueries({ queryKey: ['course-ratings'] });
     },
   });
 

@@ -64,28 +64,20 @@ export function useCourseSearch(query: string, options: UseCourseSearchOptions =
         if (userId) {
           const courseIds = courses.map(c => c.id);
           
-          // Get user ratings
+          // Get user ratings (ratings-only: rated = played)
           const { data: ratings } = await supabase
             .from('course_ratings')
             .select('course_id, rating')
             .eq('user_id', userId)
             .in('course_id', courseIds);
 
-          // Get played status
-          const { data: playedCourses } = await supabase
-            .from('user_top100_courses')
-            .select('course_id')
-            .eq('user_id', userId)
-            .eq('played', true)
-            .in('course_id', courseIds);
-
           const ratingsMap = new Map(ratings?.map(r => [r.course_id, r.rating]) || []);
-          const playedSet = new Set(playedCourses?.map(p => p.course_id) || []);
 
+          // In ratings-only system, played = has rating
           enrichedResults = courses.map(course => ({
             ...course,
             rating: ratingsMap.get(course.id),
-            played: playedSet.has(course.id)
+            played: ratingsMap.has(course.id)
           }));
         }
 
@@ -105,23 +97,25 @@ export function useCourseSearch(query: string, options: UseCourseSearchOptions =
   return { data, loading, error };
 }
 
+/**
+ * Ratings-only: suggestions based on course_ratings
+ */
 export async function getSuggestions(userId?: string): Promise<SearchResult[]> {
   if (!userId) return [];
 
   try {
-    // Get recently played courses
-    const { data: recentlyPlayed } = await supabase
-      .from('user_top100_courses')
+    // Get recently rated courses (ratings-only: most recent ratings)
+    const { data: recentlyRated } = await supabase
+      .from('course_ratings')
       .select(`
-        course_id,
+        course_id, rating, created_at,
         golf_courses!inner(
           id, name, country, sub_country, region, thumbnail_image,
           global_rank, regional_rank, usa_rank
         )
       `)
       .eq('user_id', userId)
-      .eq('played', true)
-      .order('played_date', { ascending: false })
+      .order('created_at', { ascending: false })
       .limit(5);
 
     // Get highest rated courses by user
@@ -139,33 +133,15 @@ export async function getSuggestions(userId?: string): Promise<SearchResult[]> {
       .limit(5);
 
     const suggestions: SearchResult[] = [];
-    const allCourseIds: string[] = [];
 
-    // Collect all course IDs for rating lookup
-    if (recentlyPlayed) {
-      allCourseIds.push(...recentlyPlayed.map(item => item.golf_courses.id));
-    }
-    if (highestRated) {
-      allCourseIds.push(...highestRated.map(item => item.golf_courses.id));
-    }
-
-    // Get all ratings for these courses in one query
-    const { data: allRatings } = await supabase
-      .from('course_ratings')
-      .select('course_id, rating')
-      .eq('user_id', userId)
-      .in('course_id', allCourseIds);
-
-    const ratingsMap = new Map(allRatings?.map(r => [r.course_id, r.rating]) || []);
-
-    // Add recently played with their ratings
-    if (recentlyPlayed) {
-      recentlyPlayed.forEach(item => {
+    // Add recently rated
+    if (recentlyRated) {
+      recentlyRated.forEach(item => {
         const course = item.golf_courses;
         suggestions.push({
           ...course,
           played: true,
-          rating: ratingsMap.get(course.id)
+          rating: item.rating
         });
       });
     }
@@ -178,13 +154,14 @@ export async function getSuggestions(userId?: string): Promise<SearchResult[]> {
         if (!existingIds.has(course.id)) {
           suggestions.push({
             ...course,
+            played: true,
             rating: item.rating
           });
         }
       });
     }
 
-    return suggestions.slice(0, 8); // Limit to 8 suggestions
+    return suggestions.slice(0, 8);
   } catch (error) {
     console.error('Error fetching suggestions:', error);
     return [];

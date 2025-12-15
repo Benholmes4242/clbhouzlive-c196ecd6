@@ -85,34 +85,21 @@ export const useUserCoursesData = (username?: string) => {
   const targetUserId = isOwnProfile ? currentUser?.id : targetUserProfile?.id;
   const displayName = isOwnProfile ? 'My' : (targetUserProfile?.display_name || targetUserProfile?.username || 'User\'s');
 
-  // Fetch user's Top 100 courses with ratings
+  // Fetch user's rated courses (ratings-only)
   const { data: top100CoursesRaw = [], isLoading: isLoadingTop100 } = useQuery({
     queryKey: ['user-top100-courses', targetUserId],
     queryFn: async () => {
       if (!targetUserId) return [];
       
-      // First, get all courses the user has played from user_top100_courses
-      const { data: playedCourses, error: playedError } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (*)
-        `)
-        .eq('user_id', targetUserId)
-        .eq('played', true);
-
-      if (playedError) {
-        console.error('Error fetching played courses:', playedError);
-        throw playedError;
-      }
-
-      console.log('Played courses from user_top100_courses:', playedCourses);
-      
-      // Then, get all ratings for this user
+      // Ratings-only: get all rated courses
       const { data: userRatings, error: ratingsError } = await supabase
         .from('course_ratings')
-        .select('course_id, rating')
+        .select(`
+          course_id,
+          rating,
+          created_at,
+          golf_courses (*)
+        `)
         .eq('user_id', targetUserId);
 
       if (ratingsError) {
@@ -122,18 +109,12 @@ export const useUserCoursesData = (username?: string) => {
 
       console.log('User ratings:', userRatings);
       
-      // Create a map of course ratings
-      const ratingsMap = new Map();
-      userRatings?.forEach(rating => {
-        ratingsMap.set(rating.course_id, rating.rating);
-      });
-      
-      console.log('Ratings map:', Array.from(ratingsMap.entries()));
-      
-      // Combine played courses with their ratings
-      const coursesWithRatings = playedCourses?.map(course => ({
-        ...course,
-        rating: ratingsMap.get(course.course_id) || null
+      // Map to expected structure
+      const coursesWithRatings = userRatings?.map(r => ({
+        course_id: r.course_id,
+        played_date: r.created_at,
+        golf_courses: r.golf_courses,
+        rating: r.rating
       })) || [];
       
       console.log('Raw courses with ratings before sorting:', coursesWithRatings.map(c => ({ 
