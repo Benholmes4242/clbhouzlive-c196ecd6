@@ -82,8 +82,10 @@ export function useQuestCourses() {
         'europe': 'Continental Europe',
       };
 
-      // Map to QuestCourse format
-      return (memberships || []).map((m: any): QuestCourse => {
+      // Deduplicate courses by course_id (a course can be on multiple lists)
+      const courseMap = new Map<string, QuestCourse>();
+      
+      for (const m of memberships || []) {
         const rating = ratingsMap.get(m.course_id);
         
         // RATINGS-ONLY: isPlayed = has a rating
@@ -91,25 +93,30 @@ export function useQuestCourses() {
         const isPlayed = isRated;
         
         // Get region from list slug
-        const listSlug = m.list?.slug || 'world';
+        const listSlug = (m.list as any)?.slug || 'world';
         const region = listToRegion[listSlug] || 'Worldwide';
 
         const dateAdded = rating?.created_at;
 
-        return {
-          id: m.course_id,
-          name: m.course?.name || 'Unknown Course',
-          region,
-          country: m.course?.country || '',
-          rank: m.rank,
-          isPlayed,
-          isRated,
-          isWishlist: shortlistSet.has(m.course_id) && !isPlayed,
-          dateAdded: dateAdded ? new Date(dateAdded).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : undefined,
-          rating: rating?.rating,
-          imageUrl: m.course?.thumbnail_image || undefined,
-        };
-      });
+        // Only add if not already in map, or if this is a more specific region
+        if (!courseMap.has(m.course_id)) {
+          courseMap.set(m.course_id, {
+            id: m.course_id,
+            name: (m.course as any)?.name || 'Unknown Course',
+            region,
+            country: (m.course as any)?.country || '',
+            rank: m.rank,
+            isPlayed,
+            isRated,
+            isWishlist: shortlistSet.has(m.course_id) && !isPlayed,
+            dateAdded: dateAdded ? new Date(dateAdded).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : undefined,
+            rating: rating?.rating,
+            imageUrl: (m.course as any)?.thumbnail_image || undefined,
+          });
+        }
+      }
+      
+      return Array.from(courseMap.values());
     },
     enabled: !!userId,
     staleTime: 5 * 60 * 1000,
