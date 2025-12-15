@@ -23,8 +23,8 @@ import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import AchievementsPane from '@/components/profile/AchievementsPane';
 import HandicapSection from '@/components/profile/HandicapSection';
 
-// Background color - correct #F4F5F7
-const BG_COLOR = '#F4F5F7';
+// Background color - bluey grey
+const BG_COLOR = '#E8EBF0';
 
 const ProfilePageV2: React.FC = () => {
   const navigate = useNavigate();
@@ -35,7 +35,7 @@ const ProfilePageV2: React.FC = () => {
   const { data: achievements } = useProfileAchievements(user?.id);
   
   const [activeSection, setActiveSection] = useState('activity');
-  const [activeMiniNav, setActiveMiniNav] = useState('about');
+  const [activeMiniNav, setActiveMiniNav] = useState('posts');
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
   const [friendsCount, setFriendsCount] = useState(0);
@@ -153,7 +153,7 @@ const ProfilePageV2: React.FC = () => {
 
   return (
     <PageRoot className="min-h-screen" style={{ background: BG_COLOR }}>
-      {/* Hero Section - 280px, fades into #F4F5F7 */}
+      {/* Hero Section - tall, full bleed */}
       <div className="relative">
         {/* Hero Image */}
         <div className="relative h-[280px] w-full overflow-hidden">
@@ -166,28 +166,30 @@ const ProfilePageV2: React.FC = () => {
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-slate-300 to-slate-400" />
           )}
-          {/* Gradient overlay - starts at 60%, ends at 100% */}
+          {/* More gradual fade at bottom */}
           <div 
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'linear-gradient(to bottom, rgba(244,245,247,0) 60%, rgba(244,245,247,1) 100%)'
+              background: `linear-gradient(to bottom, transparent 0%, transparent 50%, ${BG_COLOR}40 70%, ${BG_COLOR}90 85%, ${BG_COLOR} 100%)`
             }}
           />
         </div>
 
-        {/* Avatar - squircle with tan ring #8B7355 */}
-        <div className="absolute left-1/2 -translate-x-1/2 -bottom-14 z-20">
-          {/* Achievement ring - squircle w-[120px] h-[120px] */}
+        {/* Avatar - squircle with tan/brown ring, using global squircle design */}
+        <div className="absolute left-1/2 -translate-x-1/2 -bottom-12 z-20">
+          {/* Achievement ring - squircle */}
           <div 
-            className="clbhouz-squircle relative w-[120px] h-[120px] flex items-center justify-center"
+            className="clbhouz-squircle relative w-[124px] h-[124px] flex items-center justify-center"
             style={{
               background: '#8B7355',
-              boxShadow: '0 12px 30px rgba(15,15,15,0.18)'
             }}
           >
-            {/* Inner avatar - squircle, 4px ring means inner is 112px */}
+            {/* Inner avatar - squircle */}
             <div 
-              className="clbhouz-squircle w-[112px] h-[112px] overflow-hidden"
+              className="clbhouz-squircle w-[119px] h-[119px] overflow-hidden relative"
+              style={{
+                boxShadow: '0 12px 30px rgba(15,15,15,0.22)'
+              }}
             >
               {profile?.profile_photo_url ? (
                 <img 
@@ -205,34 +207,26 @@ const ProfilePageV2: React.FC = () => {
         </div>
       </div>
 
-      {/* Identity Stack */}
-      <div className="pt-16 px-4 text-center">
-        {/* Name - 32px font-extrabold */}
-        <h1 
-          className="text-[32px] font-extrabold tracking-[-0.02em]"
-          style={{ color: '#0F0F0F' }}
-        >
+      {/* Identity Stack - reduced spacing */}
+      <div className="pt-14 px-4 text-center">
+        {/* Name - smaller, more bold */}
+        <h1 className="text-[28px] font-semibold text-[#0F0F0F]">
           {displayName}
         </h1>
         
-        {/* Subtitle: Golfer · Club */}
+        {/* Home club + HCP pill inline */}
         <div className="mt-1 flex items-center justify-center gap-2">
-          <p 
-            className="text-[16px]"
-            style={{ color: 'rgba(15,15,15,0.65)' }}
-          >
-            Golfer · {profile?.home_club || 'Golf Club'}
-          </p>
+          {profile?.home_club && (
+            <p className="text-base font-medium text-[#0F0F0F]">
+              {profile.home_club}
+            </p>
+          )}
           
-          {/* HCP pill - grey with border */}
+          {/* HCP pill - white, on right of home club */}
           {profile?.eg_handicap_index != null && (
             <span 
-              className="px-3 py-1.5 text-[14px] font-bold rounded-full"
-              style={{ 
-                background: 'rgba(15,15,15,0.06)',
-                border: '1px solid rgba(15,15,15,0.10)',
-                color: 'rgba(15,15,15,0.8)'
-              }}
+              className="px-3 py-1 text-sm font-semibold rounded-full text-[#0F0F0F]"
+              style={{ background: '#FFFFFF' }}
             >
               HCP {formatHandicap(profile.eg_handicap_index)}
             </span>
@@ -240,70 +234,55 @@ const ProfilePageV2: React.FC = () => {
         </div>
       </div>
 
-      {/* Action Buttons - 44px tall */}
+      {/* Action Buttons - longer buttons */}
       <div className="mt-5 px-4 flex items-center justify-center gap-2">
-        {/* Follow - blue filled pill, h-[44px] min-w-[150px] */}
+        {/* Follow - blue filled pill, longer */}
         <button 
-          className="h-[44px] min-w-[150px] px-10 rounded-full text-sm font-semibold text-white flex items-center justify-center"
+          className="h-8 px-8 rounded-full text-xs font-semibold text-white flex items-center justify-center"
           style={{ background: '#0066FF' }}
         >
           Follow
         </button>
         
-        {/* Message - white with blue outline, h-[44px] */}
+        {/* Message - white outline pill, longer */}
         <button 
-          className="h-[44px] px-8 rounded-full text-sm font-semibold flex items-center justify-center gap-2"
+          className="h-8 px-6 rounded-full text-xs font-semibold text-[#0F0F0F] flex items-center justify-center gap-1.5"
           style={{
-            background: '#FFFFFF',
-            border: '2px solid #0066FF',
-            color: '#0066FF'
+            background: '#fff',
+            border: '1px solid #E0E0E0'
           }}
         >
-          <Send className="w-4 h-4" />
+          <Send className="w-3 h-3" />
           Message
         </button>
         
-        {/* More - circular 44px */}
+        {/* More - circular */}
         <button 
-          className="w-[44px] h-[44px] rounded-full flex items-center justify-center"
+          className="w-8 h-8 rounded-full flex items-center justify-center"
           style={{
-            background: '#FFFFFF',
-            border: '1px solid rgba(15,15,15,0.08)'
+            background: '#fff',
+            border: '1px solid #E0E0E0'
           }}
         >
-          <MoreHorizontal className="w-5 h-5" style={{ color: '#0F0F0F' }} />
+          <MoreHorizontal className="w-4 h-4 text-[#0F0F0F]" />
         </button>
       </div>
 
-      {/* Mini-nav row: About 57 Followers 9 Friends - on #F4F5F7, no card */}
+      {/* Mini-nav row: Posts | Followers | Friends - increased gap between title and number */}
       <div className="mt-6 px-4">
-        <div className="flex items-center justify-center">
-          {/* About */}
+        <div className="flex items-center justify-between border-b border-[#D0D4DB]">
+          {/* Posts */}
           <button
-            onClick={() => setActiveMiniNav('about')}
-            className="relative px-3 pb-3"
+            onClick={() => setActiveMiniNav('posts')}
+            className="relative pb-3 px-2"
           >
-            <span 
-              className="text-[15px] font-semibold"
-              style={{ color: '#0F0F0F' }}
-            >
-              About
+            <span className={`text-base font-medium text-[#0F0F0F]`}>
+              Posts<span className="ml-2 font-semibold">{postsCount}</span>
             </span>
-            {activeMiniNav === 'about' && (
-              <div 
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] w-[52px] rounded-full"
-                style={{ background: '#0F0F0F' }}
-              />
+            {activeMiniNav === 'posts' && (
+              <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#0F0F0F] rounded-full" />
             )}
           </button>
-          
-          {/* Posts count */}
-          <span 
-            className="text-[15px] font-semibold px-3"
-            style={{ color: '#0F0F0F' }}
-          >
-            {postsCount}
-          </span>
           
           {/* Followers */}
           <button
@@ -311,75 +290,42 @@ const ProfilePageV2: React.FC = () => {
               setActiveMiniNav('followers');
               navigate(`/profile/${username}/followers`);
             }}
-            className="relative px-3 pb-3"
+            className="relative pb-3 px-2"
           >
-            <span 
-              className="text-[15px] font-semibold"
-              style={{ color: '#0F0F0F' }}
-            >
-              Followers
+            <span className={`text-base font-medium text-[#0F0F0F]`}>
+              Followers<span className="ml-2 font-semibold">{followersCount}</span>
             </span>
             {activeMiniNav === 'followers' && (
-              <div 
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] w-[52px] rounded-full"
-                style={{ background: '#0F0F0F' }}
-              />
+              <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#0F0F0F] rounded-full" />
             )}
           </button>
           
-          {/* Followers count */}
-          <span 
-            className="text-[15px] font-semibold px-3"
-            style={{ color: '#0F0F0F' }}
-          >
-            {followersCount}
-          </span>
-          
           {/* Friends */}
           {isPersonal && (
-            <>
-              <button
-                onClick={() => {
-                  setActiveMiniNav('friends');
-                  navigate(`/profile/${username}/friends`);
-                }}
-                className="relative px-3 pb-3"
-              >
-                <span 
-                  className="text-[15px] font-semibold"
-                  style={{ color: '#0F0F0F' }}
-                >
-                  Friends
-                </span>
-                {activeMiniNav === 'friends' && (
-                  <div 
-                    className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] w-[52px] rounded-full"
-                    style={{ background: '#0F0F0F' }}
-                  />
-                )}
-              </button>
-            </>
+            <button
+              onClick={() => {
+                setActiveMiniNav('friends');
+                navigate(`/profile/${username}/friends`);
+              }}
+              className="relative pb-3 px-2"
+            >
+              <span className={`text-base font-medium text-[#0F0F0F]`}>
+                Friends<span className="ml-2 font-semibold">{friendsCount}</span>
+              </span>
+              {activeMiniNav === 'friends' && (
+                <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#0F0F0F] rounded-full" />
+              )}
+            </button>
           )}
         </div>
       </div>
 
-      {/* White content sheet - rounded-t-[22px], starts immediately after mini-nav */}
-      <div 
-        className="bg-white pt-5 pb-32 min-h-[60vh]"
-        style={{ borderRadius: '22px 22px 0 0' }}
-      >
-        {/* About section - directly on white, no card */}
+      {/* White content sheet */}
+      <div className="bg-white pt-5 pb-32 min-h-[60vh]">
+        {/* About section */}
         <section className="px-5 mb-6">
-          <h3 
-            className="text-xl font-bold mb-2"
-            style={{ color: '#0F0F0F' }}
-          >
-            About
-          </h3>
-          <p 
-            className="text-base leading-relaxed"
-            style={{ color: '#0F0F0F' }}
-          >
+          <h3 className="text-xl font-bold text-[#0F0F0F] mb-2">About</h3>
+          <p className="text-base text-[#0F0F0F] leading-relaxed font-medium">
             {profile?.bio || 'Passionate golfer with a love for links courses. Always working to improve my game and explore new courses.'}
           </p>
           <div className="flex justify-end mt-2">
@@ -389,32 +335,22 @@ const ProfilePageV2: React.FC = () => {
           </div>
         </section>
 
-        {/* Golf Snapshot - table-style cards */}
+        {/* Golf Snapshot */}
         <section className="px-5 mb-6">
-          <h3 
-            className="text-xl font-bold mb-3"
-            style={{ color: '#0F0F0F' }}
-          >
-            Golf Snapshot
-          </h3>
+          <h3 className="text-xl font-bold text-[#0F0F0F] mb-3">Golf Snapshot</h3>
           <div className="grid grid-cols-2 gap-3">
             {/* Left card */}
             <div 
-              className="rounded-2xl overflow-hidden bg-white"
-              style={{ border: '1px solid rgba(15,15,15,0.10)' }}
+              className="rounded-xl overflow-hidden"
+              style={{ border: '1px solid #E0E0E0' }}
             >
-              <div 
-                className="flex items-center justify-between px-4 py-3"
-                style={{ borderBottom: '1px solid rgba(15,15,15,0.08)' }}
-              >
-                <span className="text-sm" style={{ color: '#0F0F0F' }}>Handicap</span>
-                <span className="text-sm font-semibold" style={{ color: '#0F0F0F' }}>
-                  {formatHandicap(profile?.eg_handicap_index)}
-                </span>
+              <div className="flex items-center justify-between px-4 py-3 border-b border-[#E8E8E8]">
+                <span className="text-sm text-[#0F0F0F]">Handicap</span>
+                <span className="text-sm font-semibold text-[#0F0F0F]">{formatHandicap(profile?.eg_handicap_index)}</span>
               </div>
               <div className="flex items-center justify-between px-4 py-3">
-                <span className="text-sm" style={{ color: '#0F0F0F' }}>Home Club</span>
-                <span className="text-sm font-semibold truncate max-w-[100px]" style={{ color: '#0F0F0F' }}>
+                <span className="text-sm text-[#0F0F0F]">Home Club</span>
+                <span className="text-sm font-semibold text-[#0F0F0F] truncate max-w-[100px]">
                   {profile?.home_club ? profile.home_club.split(' ')[0] : '–'}
                 </span>
               </div>
@@ -422,36 +358,28 @@ const ProfilePageV2: React.FC = () => {
 
             {/* Right card */}
             <div 
-              className="rounded-2xl overflow-hidden bg-white"
-              style={{ border: '1px solid rgba(15,15,15,0.10)' }}
+              className="rounded-xl overflow-hidden"
+              style={{ border: '1px solid #E0E0E0' }}
             >
-              <div 
-                className="flex items-center justify-between px-4 py-3"
-                style={{ borderBottom: '1px solid rgba(15,15,15,0.08)' }}
-              >
-                <span className="text-sm" style={{ color: '#0F0F0F' }}>Top 100</span>
-                <span className="text-sm font-semibold" style={{ color: '#0F0F0F' }}>
-                  {top100Count}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-[#E8E8E8]">
+                <span className="text-sm text-[#0F0F0F]">Home Club</span>
+                <span className="text-sm font-semibold text-[#0F0F0F] truncate max-w-[100px]">
+                  {profile?.home_club ? profile.home_club.split(' ')[0] : '–'}
                 </span>
               </div>
               <div className="flex items-center justify-between px-4 py-3">
-                <span className="text-sm" style={{ color: '#0F0F0F' }}>Rounds</span>
-                <span className="text-sm font-semibold" style={{ color: '#0F0F0F' }}>{roundsLogged}</span>
+                <span className="text-sm text-[#0F0F0F]">Rounds Logged</span>
+                <span className="text-sm font-semibold text-[#0F0F0F]">{roundsLogged}</span>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Achievements - directly on white, no outer card */}
+        {/* Achievements */}
         {isPersonal && unlockedAchievements.length > 0 && (
           <section className="px-5 mb-6">
             <div className="flex items-center justify-between mb-3">
-              <h3 
-                className="text-xl font-bold"
-                style={{ color: '#0F0F0F' }}
-              >
-                Achievements
-              </h3>
+              <h3 className="text-xl font-bold text-[#0F0F0F]">Achievements</h3>
               <button 
                 onClick={() => navigate('/profile/quest')}
                 className="text-base font-medium flex items-center gap-1"
@@ -467,7 +395,7 @@ const ProfilePageV2: React.FC = () => {
                   className="flex-shrink-0 w-[140px] p-3 rounded-xl"
                   style={{
                     background: '#F8F8F8',
-                    border: '1px solid rgba(15,15,15,0.10)'
+                    border: '1px solid #E0E0E0'
                   }}
                 >
                   <div 
@@ -476,12 +404,8 @@ const ProfilePageV2: React.FC = () => {
                   >
                     <Trophy className="w-4 h-4" style={{ color: '#8B7355' }} />
                   </div>
-                  <div className="text-sm font-semibold" style={{ color: '#0F0F0F' }}>
-                    {achievement.label}
-                  </div>
-                  <div className="text-xs" style={{ color: '#0F0F0F' }}>
-                    {achievement.shortLabel}
-                  </div>
+                  <div className="text-sm font-semibold text-[#0F0F0F]">{achievement.label}</div>
+                  <div className="text-xs text-[#0F0F0F]">{achievement.shortLabel}</div>
                 </div>
               ))}
             </div>
@@ -496,7 +420,7 @@ const ProfilePageV2: React.FC = () => {
               style={{ 
                 gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`,
                 background: '#F0F0F0',
-                border: '1px solid rgba(15,15,15,0.10)'
+                border: '1px solid #E0E0E0'
               }}
             >
               {tabs.map((tab) => (
@@ -504,7 +428,9 @@ const ProfilePageV2: React.FC = () => {
                   key={tab.id}
                   value={tab.id}
                   className="rounded-full text-sm px-3 py-1.5 font-medium transition-all duration-150 data-[state=active]:bg-white data-[state=active]:shadow-sm"
-                  style={{ color: '#0F0F0F' }}
+                  style={{
+                    color: '#0F0F0F'
+                  }}
                 >
                   {tab.label}
                 </TabsTrigger>
