@@ -1,6 +1,7 @@
 import React from 'react';
 import { SquircleAvatar } from '../ui/SquircleAvatar';
-import { Heart, BadgeCheck } from 'lucide-react';
+import { Heart } from 'lucide-react';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 // Creator-First metadata block
 type Props = {
@@ -52,11 +53,7 @@ export default function ShortsCardMeta({
         <div className="scm__nameRow">
           <span className="scm__name scm__name--black">{author.name}</span>
           {author.verified && (
-            <BadgeCheck 
-              className="scm__verified" 
-              aria-label="Verified" 
-              size={14}
-            />
+            <VerifiedBadge size="sm" />
           )}
         </div>
 

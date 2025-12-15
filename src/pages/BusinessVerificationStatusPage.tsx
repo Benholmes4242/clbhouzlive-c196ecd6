@@ -2,13 +2,14 @@ import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ArrowLeft, BadgeCheck, Clock, XCircle, ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowLeft, Clock, XCircle, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { format } from 'date-fns';
 import { useBusinessVerificationRealtime, useVerificationNotificationsRealtime } from '@/hooks/useBusinessVerificationRealtime';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 const BusinessVerificationStatusPage = () => {
   const navigate = useNavigate();
@@ -138,7 +139,7 @@ const BusinessVerificationStatusPage = () => {
             className="text-center"
           >
             <div className="h-16 w-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
-              <BadgeCheck className="h-8 w-8 text-emerald-600" />
+              <VerifiedBadge size="xl" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-2">
               Your business is verified
@@ -218,8 +219,8 @@ const BusinessVerificationStatusPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
-            <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-              <BadgeCheck className="h-8 w-8 text-slate-400" />
+            <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4 opacity-50">
+              <VerifiedBadge size="xl" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-2">
               Not yet verified

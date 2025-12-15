@@ -1,8 +1,9 @@
 import React from 'react';
-import { BadgeCheck, Building2 } from 'lucide-react';
+import { Building2 } from 'lucide-react';
 import { OptimizedImage } from '@/components/ui/optimized-image';
 import { getOptimizedImageUrl } from '@/utils/imageOptimization';
 import CoursePostBadge from '../../CoursePostBadge';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 interface GolfCourse {
   id: string;
@@ -91,7 +92,7 @@ export const UserInfoOverlay: React.FC<UserInfoOverlayProps> = ({
                     {displayName}
                   </span>
                   {isVerified && (
-                    <BadgeCheck className="h-4 w-4 text-emerald-400" />
+                    <VerifiedBadge size="sm" />
                   )}
                   {isBusinessPost && (
                     <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-white/20 text-[10px] font-medium text-white/80">

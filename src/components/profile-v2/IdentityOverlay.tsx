@@ -5,7 +5,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { AvatarXPRing } from './AvatarXPRing';
-import { ShieldCheck } from 'lucide-react';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 interface IdentityOverlayProps {
   displayName: string;
@@ -62,10 +62,7 @@ export const IdentityOverlay: React.FC<IdentityOverlayProps> = ({
           {displayName}
         </h1>
         {isVerified && (
-          <ShieldCheck
-            className="w-5 h-5"
-            style={{ color: 'var(--dgp-accent-green)' }}
-          />
+          <VerifiedBadge size="lg" />
         )}
       </div>
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ShieldCheck, Clock, XCircle, CheckCircle, CalendarClock } from 'lucide-react';
+import { Clock, XCircle, CalendarClock } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Tooltip,
@@ -13,6 +13,7 @@ import {
 import { format } from 'date-fns';
 import { useGolferVerificationRequest, useGolferCooldown, deriveGolferVerificationState } from '@/hooks/useGolferVerificationRequest';
 import GolferVerificationModal from './GolferVerificationModal';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 interface GolferVerificationStatusPanelProps {
   userId: string;
@@ -155,11 +156,11 @@ const GolferVerificationStatusPanel: React.FC<GolferVerificationStatusPanelProps
       <Card className="p-5 space-y-4 border-emerald-200 bg-emerald-50/50">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-foreground">
-            <ShieldCheck className="w-4 h-4" />
+            <VerifiedBadge size="sm" />
             <h3 className="font-medium">You're Verified</h3>
           </div>
           <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 gap-1">
-            <CheckCircle className="h-3 w-3" />
+            <VerifiedBadge size="sm" />
             Verified
           </Badge>
         </div>
@@ -177,7 +178,7 @@ const GolferVerificationStatusPanel: React.FC<GolferVerificationStatusPanelProps
       <Card className="p-5 space-y-4 border-amber-200 bg-amber-50/50">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-foreground">
-            <ShieldCheck className="w-4 h-4" />
+            <Clock className="w-4 h-4 text-amber-500" />
             <h3 className="font-medium">Verification in Progress</h3>
           </div>
           <Badge variant="secondary" className="bg-amber-500/10 text-amber-600 border-amber-500/20 gap-1">
@@ -225,7 +226,7 @@ const GolferVerificationStatusPanel: React.FC<GolferVerificationStatusPanelProps
         <Card className="p-5 space-y-4 border-red-200 bg-red-50/50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-foreground">
-              <ShieldCheck className="w-4 h-4" />
+              <XCircle className="w-4 h-4 text-red-500" />
               <h3 className="font-medium">Verification Not Approved</h3>
             </div>
             <Badge variant="secondary" className="bg-red-500/10 text-red-600 border-red-500/20 gap-1">
@@ -265,7 +266,7 @@ const GolferVerificationStatusPanel: React.FC<GolferVerificationStatusPanelProps
       <Card className="p-5 space-y-4 border-slate-200 bg-slate-50/50">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-foreground">
-            <ShieldCheck className="w-4 h-4" />
+            <VerifiedBadge size="sm" className="opacity-50" />
             <h3 className="font-medium">Golfer Verification</h3>
           </div>
           <Badge variant="secondary" className="bg-slate-500/10 text-slate-600 border-slate-500/20">
@@ -285,7 +286,7 @@ const GolferVerificationStatusPanel: React.FC<GolferVerificationStatusPanelProps
     <>
       <Card className="p-5 space-y-4">
         <div className="flex items-center gap-2 text-foreground">
-          <ShieldCheck className="w-4 h-4" />
+          <VerifiedBadge size="sm" className="opacity-50" />
           <h3 className="font-medium">Golfer Verification</h3>
         </div>
 

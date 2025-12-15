@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X, MoreVertical, ShieldCheck, CheckCircle, ShieldOff, MessageSquare } from 'lucide-react';
+import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X, MoreVertical, ShieldOff, MessageSquare, Clock } from 'lucide-react';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
@@ -8,6 +8,7 @@ import { FollowBackButton } from './FollowBackButton';
 import { FriendRequestButtons } from './FriendRequestButtons';
 import { useCancelFriendRequest } from '@/hooks/useCancelFriendRequest';
 import { GolferVerificationInviteButtons } from './GolferVerificationInviteButtons';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 // Clbhouz logomark URL for system notifications
 const CLBHOUZ_LOGOMARK_URL = '/assets/logomark-orange.png';
@@ -65,25 +66,26 @@ function getNotificationBadgeIcon(type: string) {
     case 'club_update':
     case 'course_update':
       return <Building2 className={cn(iconClass, "text-slate-500")} />;
-    // Business verification notifications - glass green tick for approved
+    // Business verification notifications - use unified VerifiedBadge for approved
     case 'business_verification_approved':
-      return <CheckCircle className={cn(iconClass, "text-emerald-500")} />;
+      return <VerifiedBadge size="sm" />;
     case 'business_verification_submitted':
     case 'business_verification_more_proof_requested':
-      return <Building2 className={cn(iconClass, "text-amber-500")} />;
+      return <Clock className={cn(iconClass, "text-amber-500")} />;
     case 'business_verification_rejected':
       return <Building2 className={cn(iconClass, "text-amber-500")} />;
     case 'business_verification_removed':
     case 'business_verification_revoked':
       return <ShieldOff className={cn(iconClass, "text-red-500")} />;
-    // Golfer verification notifications - use same circular green tick as business verification
+    // Golfer verification notifications - use unified VerifiedBadge for approved
     case 'golfer_verification_approved':
+      return <VerifiedBadge size="sm" />;
     case 'golfer_verification_invite':
     case 'golfer_verification_submitted':
-      return <CheckCircle className={cn(iconClass, "text-emerald-500")} />;
+      return <Clock className={cn(iconClass, "text-amber-500")} />;
     case 'golfer_verification_rejected':
     case 'golfer_verification_removed':
-      return <CheckCircle className={cn(iconClass, "text-red-500")} />;
+      return <ShieldOff className={cn(iconClass, "text-red-500")} />;
     default:
       return <Bell className={cn(iconClass, "text-muted-foreground")} />;
   }
@@ -567,7 +569,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
               ) : null}
               {isAccepted && (
                 <span className={cn(basePillClass, "border-emerald-500 bg-emerald-500/10 text-emerald-600 gap-1")}>
-                  <CheckCircle className="h-3 w-3" />
+                  <VerifiedBadge size="sm" className="mr-0.5" />
                   Verification in progress
                 </span>
               )}
@@ -614,7 +616,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           meta={notification.time_ago}
           actions={
             <span className={cn(basePillClass, "border-emerald-500 bg-emerald-500/10 text-emerald-600 gap-1")}>
-              <CheckCircle className="h-3 w-3" />
+              <VerifiedBadge size="sm" className="mr-0.5" />
               Verified
             </span>
           }

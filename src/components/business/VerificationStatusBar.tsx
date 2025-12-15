@@ -1,6 +1,7 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { ShieldCheck, Clock, XCircle, CheckCircle } from 'lucide-react';
+import { Clock, XCircle } from 'lucide-react';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 interface VerificationStatusBarProps {
   profile: {
@@ -24,7 +25,7 @@ const VerificationStatusBar: React.FC<VerificationStatusBarProps> = ({ profile }
       <div className="px-4 py-3 bg-muted/50 border-b border-border/40">
         <div className="flex items-center gap-3">
           <Badge variant="secondary" className="bg-slate-500/10 text-slate-600 border-slate-500/20 gap-1 shrink-0">
-            <ShieldCheck className="h-3 w-3" />
+            <VerifiedBadge size="sm" className="opacity-50" />
             Unverified
           </Badge>
           <p className="text-xs text-muted-foreground flex-1">
@@ -58,7 +59,7 @@ const VerificationStatusBar: React.FC<VerificationStatusBarProps> = ({ profile }
       <div className="px-4 py-3 bg-emerald-50/50 border-b border-emerald-100/60">
         <div className="flex items-center gap-3">
           <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 gap-1 shrink-0">
-            <CheckCircle className="h-3 w-3" />
+            <VerifiedBadge size="sm" />
             Verified
           </Badge>
           <p className="text-xs text-emerald-900/70 flex-1">

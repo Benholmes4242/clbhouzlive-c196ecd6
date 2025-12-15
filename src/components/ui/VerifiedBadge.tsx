@@ -1,4 +1,4 @@
-import { CheckCircle } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface VerifiedBadgeProps {
@@ -11,15 +11,22 @@ interface VerifiedBadgeProps {
 }
 
 const sizeConfig = {
-  sm: { disk: 'w-[14px] h-[14px]', icon: 'w-2 h-2' },
-  md: { disk: 'w-4 h-4', icon: 'w-2.5 h-2.5' },
-  lg: { disk: 'w-[18px] h-[18px]', icon: 'w-3 h-3' },
-  xl: { disk: 'w-5 h-5', icon: 'w-3.5 h-3.5' },
+  sm: { disk: 'w-[14px] h-[14px]', ring: 'w-[10px] h-[10px]', icon: 8 },
+  md: { disk: 'w-4 h-4', ring: 'w-3 h-3', icon: 10 },
+  lg: { disk: 'w-[18px] h-[18px]', ring: 'w-[14px] h-[14px]', icon: 11 },
+  xl: { disk: 'w-5 h-5', ring: 'w-4 h-4', icon: 13 },
 };
 
 /**
- * Unified Verified Badge - Frosted glass disk with green tick
+ * Unified Verified Badge - Frosted glass disk with green ring and tick
+ * 
+ * Visual spec (light UI):
+ * - Base: rgba(255,255,255,0.85) with backdrop-blur(8px)
+ * - Border: 1px solid rgba(31,36,40,0.10)
+ * - Inner: Green ring (#34C759) with white tick inside
+ * 
  * Used across personal profiles, business profiles, notifications, and lists.
+ * This is the ONLY verified badge component - no shields, no variations.
  */
 export function VerifiedBadge({ 
   size = 'md', 
@@ -31,24 +38,37 @@ export function VerifiedBadge({
   return (
     <span
       className={cn(
-        // Frosted glass disk
-        'inline-flex items-center justify-center rounded-full',
-        'bg-white/72 backdrop-blur-[6px]',
-        'border border-white/40',
-        'shadow-[0_2px_10px_rgba(0,0,0,0.08)]',
+        // Frosted glass disk base
+        'inline-flex items-center justify-center rounded-full shrink-0',
         // Avatar corner placement may need extra outline for busy backgrounds
         placement === 'avatar-corner' && 'ring-2 ring-background',
         config.disk,
         className
       )}
+      style={{
+        background: 'rgba(255, 255, 255, 0.85)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        border: '1px solid rgba(31, 36, 40, 0.10)',
+        boxShadow: '0 2px 8px rgba(31, 36, 40, 0.06)',
+      }}
       title="Verified"
       aria-label="Verified"
     >
-      {/* Green tick - crisp, no glass effect */}
-      <CheckCircle 
-        className={cn(config.icon, 'text-emerald-500')} 
-        strokeWidth={2.5}
-      />
+      {/* Green ring with white tick inside */}
+      <span
+        className={cn(
+          'inline-flex items-center justify-center rounded-full',
+          config.ring
+        )}
+        style={{ backgroundColor: '#34C759' }}
+      >
+        <Check 
+          size={config.icon}
+          className="text-white" 
+          strokeWidth={3}
+        />
+      </span>
     </span>
   );
 }
