@@ -4903,6 +4903,7 @@ export type Database = {
           email_change_count: number | null
           email_change_requested_at: string | null
           email_change_token: string | null
+          featured_post_id: string | null
           golfer_verified_at: string | null
           golfer_verified_by: string | null
           has_completed_onboarding: boolean | null
@@ -4934,6 +4935,7 @@ export type Database = {
           pending_email: string | null
           phone: string | null
           pinned_achievement_ids: string[] | null
+          pinned_post_ids: string[] | null
           profile_photo_url: string | null
           profile_type: string | null
           profile_video_thumbnail_url: string | null
@@ -4986,6 +4988,7 @@ export type Database = {
           email_change_count?: number | null
           email_change_requested_at?: string | null
           email_change_token?: string | null
+          featured_post_id?: string | null
           golfer_verified_at?: string | null
           golfer_verified_by?: string | null
           has_completed_onboarding?: boolean | null
@@ -5017,6 +5020,7 @@ export type Database = {
           pending_email?: string | null
           phone?: string | null
           pinned_achievement_ids?: string[] | null
+          pinned_post_ids?: string[] | null
           profile_photo_url?: string | null
           profile_type?: string | null
           profile_video_thumbnail_url?: string | null
@@ -5069,6 +5073,7 @@ export type Database = {
           email_change_count?: number | null
           email_change_requested_at?: string | null
           email_change_token?: string | null
+          featured_post_id?: string | null
           golfer_verified_at?: string | null
           golfer_verified_by?: string | null
           has_completed_onboarding?: boolean | null
@@ -5100,6 +5105,7 @@ export type Database = {
           pending_email?: string | null
           phone?: string | null
           pinned_achievement_ids?: string[] | null
+          pinned_post_ids?: string[] | null
           profile_photo_url?: string | null
           profile_type?: string | null
           profile_video_thumbnail_url?: string | null
@@ -5130,6 +5136,13 @@ export type Database = {
             columns: ["home_club_id"]
             isOneToOne: false
             referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_profiles_featured_post_id_fkey"
+            columns: ["featured_post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
             referencedColumns: ["id"]
           },
         ]
