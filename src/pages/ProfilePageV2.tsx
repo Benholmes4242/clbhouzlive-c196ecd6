@@ -11,10 +11,9 @@ import { useTop100Overview } from '@/hooks/useTop100Overview';
 import { useActivityPosts } from '@/components/profile/hooks/useActivityPosts';
 import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import { supabase } from '@/integrations/supabase/client';
-import { Settings, ArrowLeft, Share2, Trophy, ChevronRight, MoreHorizontal, UserPlus, MessageCircle } from 'lucide-react';
+import { Settings, ArrowLeft, Share2, Trophy, ChevronRight, MoreHorizontal, UserPlus, MessageCircle, MapPin, Flag } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
 
@@ -34,6 +33,7 @@ const ProfilePageV2: React.FC = () => {
   const { data: achievements } = useProfileAchievements(user?.id);
   
   const [activeSection, setActiveSection] = useState('activity');
+  const [activeMiniNav, setActiveMiniNav] = useState('about');
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
   const [friendsCount, setFriendsCount] = useState(0);
@@ -142,12 +142,18 @@ const ProfilePageV2: React.FC = () => {
     }
   };
 
+  const miniNavItems = [
+    { id: 'about', label: 'About' },
+    { id: 'followers', label: 'Followers', count: followersCount },
+    { id: 'friends', label: 'Friends', count: friendsCount },
+  ];
+
   return (
     <PageRoot className="min-h-screen" style={{ background: '#F4F5F7' }}>
-      {/* Hero Section with fade to light */}
+      {/* A) Hero Section - taller with later fade */}
       <div className="relative">
-        {/* Hero Image */}
-        <div className="relative h-[200px] w-full overflow-hidden">
+        {/* Hero Image - increased height */}
+        <div className="relative h-[240px] w-full overflow-hidden">
           {heroUrl ? (
             <img 
               src={heroUrl} 
@@ -157,11 +163,11 @@ const ProfilePageV2: React.FC = () => {
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300" />
           )}
-          {/* Fade overlay to light */}
+          {/* Fade overlay - starts later so photo lasts longer */}
           <div 
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'linear-gradient(to bottom, rgba(244,245,247,0) 30%, rgba(244,245,247,1) 100%)'
+              background: 'linear-gradient(to bottom, transparent 0%, transparent 55%, rgba(244,245,247,0.7) 80%, #F4F5F7 100%)'
             }}
           />
         </div>
@@ -170,65 +176,62 @@ const ProfilePageV2: React.FC = () => {
         <div className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between p-4 safe-top">
           <button
             onClick={() => navigate(-1)}
-            className="w-10 h-10 rounded-full flex items-center justify-center"
-            style={{
-              background: 'rgba(255,255,255,0.92)',
-              border: '1px solid rgba(31,36,40,0.10)',
-              backdropFilter: 'blur(6px)'
-            }}
+            className="w-9 h-9 rounded-md flex items-center justify-center bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors"
             aria-label="Go back"
           >
-            <ArrowLeft className="w-5 h-5 text-slate-700" />
+            <ArrowLeft className="w-5 h-5 text-white" />
           </button>
           
           <div className="flex items-center gap-2">
             <button
-              className="w-10 h-10 rounded-full flex items-center justify-center"
-              style={{
-                background: 'rgba(255,255,255,0.92)',
-                border: '1px solid rgba(31,36,40,0.10)',
-                backdropFilter: 'blur(6px)'
-              }}
+              className="w-9 h-9 rounded-md flex items-center justify-center bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors"
               aria-label="Share profile"
             >
-              <Share2 className="w-5 h-5 text-slate-700" />
+              <Share2 className="w-5 h-5 text-white" />
             </button>
             <button
               onClick={() => navigate('/settings')}
-              className="w-10 h-10 rounded-full flex items-center justify-center"
-              style={{
-                background: 'rgba(255,255,255,0.92)',
-                border: '1px solid rgba(31,36,40,0.10)',
-                backdropFilter: 'blur(6px)'
-              }}
+              className="w-9 h-9 rounded-md flex items-center justify-center bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors"
               aria-label="Settings"
             >
-              <Settings className="w-5 h-5 text-slate-700" />
+              <Settings className="w-5 h-5 text-white" />
             </button>
           </div>
         </div>
 
-        {/* Avatar - overlapping hero */}
-        <div className="absolute left-1/2 -translate-x-1/2 -bottom-12 z-20">
-          <Avatar 
-            className="w-[100px] h-[100px]"
+        {/* B) Avatar - squircle, not circle */}
+        <div className="absolute left-1/2 -translate-x-1/2 -bottom-14 z-20">
+          <div 
+            className="w-[110px] h-[110px] rounded-[22px] overflow-hidden"
             style={{
               border: '4px solid #F4F5F7',
-              boxShadow: '0 10px 30px rgba(15,15,15,0.18)'
+              boxShadow: '0 12px 30px rgba(15,15,15,0.18)'
             }}
           >
-            <AvatarImage src={profile?.profile_photo_url || ''} alt={displayName} />
-            <AvatarFallback className="text-2xl bg-slate-200 text-slate-600">
-              {displayName.charAt(0)}
-            </AvatarFallback>
-          </Avatar>
+            {profile?.profile_photo_url ? (
+              <img 
+                src={profile.profile_photo_url} 
+                alt={displayName}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-slate-200 flex items-center justify-center text-2xl font-bold text-slate-600">
+                {displayName.charAt(0)}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Identity Stack */}
-      <div className="pt-16 px-4 text-center">
-        <h1 className="text-[26px] font-extrabold text-slate-900">{displayName}</h1>
-        <div className="mt-1 flex items-center justify-center gap-2 text-slate-600">
+      {/* C) Identity Stack - bolder name, grey HCP pill */}
+      <div className="pt-[72px] px-4 text-center">
+        <h1 
+          className="text-[30px] font-extrabold text-[#0F0F0F]"
+          style={{ letterSpacing: '-0.02em' }}
+        >
+          {displayName}
+        </h1>
+        <div className="mt-1.5 flex items-center justify-center gap-2 text-slate-600">
           <span className="text-sm">Golfer</span>
           {profile?.home_club && (
             <>
@@ -238,10 +241,11 @@ const ProfilePageV2: React.FC = () => {
           )}
           {profile?.eg_handicap_index != null && (
             <span 
-              className="ml-1 px-2.5 py-1 text-xs font-bold rounded-full"
+              className="ml-1 px-3 py-1.5 text-xs font-bold rounded-full"
               style={{
                 background: 'rgba(15,15,15,0.06)',
-                border: '1px solid rgba(15,15,15,0.08)'
+                border: '1px solid rgba(15,15,15,0.08)',
+                color: 'rgba(15,15,15,0.8)'
               }}
             >
               HCP {profile.eg_handicap_index}
@@ -250,10 +254,10 @@ const ProfilePageV2: React.FC = () => {
         </div>
       </div>
 
-      {/* Action Bar */}
+      {/* D) Action Bar - shorter buttons */}
       <div className="mt-4 px-4 flex items-center gap-2">
         <Button 
-          className="flex-1 rounded-sq-md"
+          className="flex-1 h-11 px-4 rounded-xl text-sm font-semibold"
           style={{
             background: '#1F2428',
             color: '#fff'
@@ -264,7 +268,7 @@ const ProfilePageV2: React.FC = () => {
         </Button>
         <Button 
           variant="outline"
-          className="flex-[0.8] rounded-sq-md"
+          className="flex-[0.8] h-11 px-4 rounded-xl text-sm font-semibold"
           style={{
             background: '#fff',
             border: '1px solid rgba(15,15,15,0.15)'
@@ -275,8 +279,7 @@ const ProfilePageV2: React.FC = () => {
         </Button>
         <Button 
           variant="ghost"
-          size="icon"
-          className="rounded-sq-md"
+          className="h-11 w-11 p-0 rounded-xl"
           style={{
             background: '#fff',
             border: '1px solid rgba(15,15,15,0.15)'
@@ -286,131 +289,192 @@ const ProfilePageV2: React.FC = () => {
         </Button>
       </div>
 
-      {/* Stats Row */}
-      <section 
-        className="mt-4 mx-4 py-3 flex items-center justify-around rounded-sq-md"
+      {/* E) Mini-nav row on off-white with underline */}
+      <div className="mt-5 px-4">
+        <div className="flex items-center justify-center gap-8">
+          {miniNavItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => {
+                setActiveMiniNav(item.id);
+                if (item.id === 'followers') {
+                  navigate(`/profile/${username}/followers`);
+                } else if (item.id === 'friends') {
+                  navigate(`/profile/${username}/friends`);
+                }
+              }}
+              className="relative pb-2 flex flex-col items-center"
+            >
+              <span 
+                className={`text-sm font-medium transition-colors ${
+                  activeMiniNav === item.id ? 'text-[#0F0F0F]' : 'text-slate-500'
+                }`}
+              >
+                {item.label}
+              </span>
+              {item.count !== undefined && (
+                <span className="text-xs text-slate-400">{item.count}</span>
+              )}
+              {/* Black underline for active item */}
+              {activeMiniNav === item.id && (
+                <div 
+                  className="absolute -bottom-0 left-0 right-0 h-[2px] rounded-full"
+                  style={{ background: '#0F0F0F' }}
+                />
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* F) White content sheet */}
+      <div 
+        className="mt-4 rounded-t-[22px] pt-5 pb-32"
         style={{
           background: '#fff',
-          border: '1px solid rgba(15,15,15,0.08)'
+          borderTop: '1px solid rgba(15,15,15,0.06)'
         }}
       >
-        <button className="flex flex-col items-center">
-          <span className="text-base font-bold text-slate-900 tabular-nums">{postsCount}</span>
-          <span className="text-[11px] uppercase tracking-wider text-slate-500">Posts</span>
-        </button>
-        
-        {isPersonal && (
-          <button 
-            onClick={() => navigate(`/profile/${username}/friends`)}
-            className="flex flex-col items-center"
-          >
-            <span className="text-base font-bold text-slate-900 tabular-nums">{friendsCount}</span>
-            <span className="text-[11px] uppercase tracking-wider text-slate-500">Friends</span>
-          </button>
-        )}
-        
-        <button 
-          onClick={() => navigate(`/profile/${username}/following`)}
-          className="flex flex-col items-center"
-        >
-          <span className="text-base font-bold text-slate-900 tabular-nums">{followingCount}</span>
-          <span className="text-[11px] uppercase tracking-wider text-slate-500">Following</span>
-        </button>
-        
-        <button 
-          onClick={() => navigate(`/profile/${username}/followers`)}
-          className="flex flex-col items-center"
-        >
-          <span className="text-base font-bold text-slate-900 tabular-nums">{followersCount}</span>
-          <span className="text-[11px] uppercase tracking-wider text-slate-500">Followers</span>
-        </button>
-      </section>
-
-      {/* Achievements Section */}
-      {isPersonal && unlockedAchievements.length > 0 && (
-        <section 
-          className="mt-3 mx-4 p-4 rounded-sq-md"
-          style={{
-            background: '#fff',
-            border: '1px solid rgba(15,15,15,0.08)',
-            boxShadow: '0 6px 18px rgba(15,15,15,0.06)'
-          }}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-slate-900">Achievements</h3>
-            <button 
-              onClick={() => navigate('/profile/quest')}
-              className="text-sm font-semibold flex items-center gap-1"
-              style={{ color: '#F7931E' }}
-            >
-              View all <ChevronRight className="w-4 h-4" />
+        {/* G) About section - plain text on white, no card */}
+        <section className="px-5 mb-5">
+          <h3 className="text-sm font-semibold text-[#0F0F0F] mb-2">About</h3>
+          <p className="text-sm text-slate-600 leading-relaxed">
+            {profile?.bio || 'No bio yet. Add one to tell other golfers about yourself.'}
+          </p>
+          {profile?.bio && profile.bio.length > 120 && (
+            <button className="text-sm font-medium mt-1" style={{ color: '#F7931E' }}>
+              See more
             </button>
-          </div>
-          <div className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1">
-            {unlockedAchievements.slice(0, 3).map((achievement) => (
-              <div 
-                key={achievement.id}
-                className="flex-shrink-0 w-[140px] p-3 rounded-sq-md"
-                style={{
-                  background: '#FAFAFA',
-                  border: '1px solid rgba(15,15,15,0.06)'
-                }}
-              >
-                <div 
-                  className="w-8 h-8 rounded-full flex items-center justify-center mb-2"
-                  style={{ background: 'rgba(247,147,30,0.14)' }}
-                >
-                  <Trophy className="w-4 h-4" style={{ color: '#F7931E' }} />
-                </div>
-                <div className="text-sm font-semibold text-slate-900">{achievement.label}</div>
-                <div className="text-xs text-slate-500">{achievement.shortLabel}</div>
-                <span 
-                  className="inline-block mt-2 px-2 py-0.5 text-[10px] font-medium rounded-full"
-                  style={{
-                    background: 'rgba(15,15,15,0.06)',
-                    color: '#5E666D'
-                  }}
-                >
-                  Unlocked
-                </span>
+          )}
+        </section>
+
+        {/* H) Golf Snapshot - two cards side by side */}
+        <section className="px-5 mb-5">
+          <h3 className="text-sm font-semibold text-[#0F0F0F] mb-3">Golf Snapshot</h3>
+          <div className="grid grid-cols-2 gap-3">
+            {/* Card 1: Handicap + Home Club */}
+            <div 
+              className="p-4 rounded-2xl"
+              style={{
+                background: '#fff',
+                border: '1px solid rgba(15,15,15,0.10)'
+              }}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <Flag className="w-4 h-4 text-slate-400" />
+                <span className="text-xs text-slate-500">Handicap</span>
               </div>
-            ))}
+              <div className="text-xl font-bold text-[#0F0F0F]">
+                {profile?.eg_handicap_index ?? '–'}
+              </div>
+              {profile?.home_club && (
+                <div className="mt-2 text-xs text-slate-500 truncate">
+                  {profile.home_club}
+                </div>
+              )}
+            </div>
+
+            {/* Card 2: Top 100 Played */}
+            <div 
+              className="p-4 rounded-2xl"
+              style={{
+                background: '#fff',
+                border: '1px solid rgba(15,15,15,0.10)'
+              }}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <MapPin className="w-4 h-4 text-slate-400" />
+                <span className="text-xs text-slate-500">Top 100 Played</span>
+              </div>
+              <div className="text-xl font-bold text-[#0F0F0F]">
+                {top100Count}
+              </div>
+              <div className="mt-2 text-xs text-slate-500">
+                {postsCount} posts shared
+              </div>
+            </div>
           </div>
         </section>
-      )}
 
-      {/* Tabs */}
-      <section className="mt-4 px-4">
-        <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
-          <TabsList 
-            className="grid w-full rounded-full px-1.5 py-1"
-            style={{ 
-              gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`,
-              background: '#EDEFF2',
-              border: '1px solid rgba(15,15,15,0.08)'
-            }}
-          >
-            {tabs.map((tab) => (
-              <TabsTrigger 
-                key={tab.id}
-                value={tab.id}
-                className="rounded-full text-sm px-3 py-1.5 font-medium transition-all duration-150"
-                style={{
-                  color: activeSection === tab.id ? '#1F2428' : '#5E666D',
-                  background: activeSection === tab.id ? '#fff' : 'transparent',
-                  boxShadow: activeSection === tab.id ? '0 6px 14px rgba(15,15,15,0.08)' : 'none'
-                }}
+        {/* I) Achievements - on white, no outer card wrapper */}
+        {isPersonal && unlockedAchievements.length > 0 && (
+          <section className="px-5 mb-5">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-[#0F0F0F]">Achievements</h3>
+              <button 
+                onClick={() => navigate('/profile/quest')}
+                className="text-sm font-semibold flex items-center gap-1"
+                style={{ color: '#F7931E' }}
               >
-                {tab.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
-      </section>
+                View all <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1">
+              {unlockedAchievements.slice(0, 3).map((achievement) => (
+                <div 
+                  key={achievement.id}
+                  className="flex-shrink-0 w-[140px] p-3 rounded-2xl"
+                  style={{
+                    background: '#FAFAFA',
+                    border: '1px solid rgba(15,15,15,0.06)'
+                  }}
+                >
+                  <div 
+                    className="w-8 h-8 rounded-full flex items-center justify-center mb-2"
+                    style={{ background: 'rgba(247,147,30,0.14)' }}
+                  >
+                    <Trophy className="w-4 h-4" style={{ color: '#F7931E' }} />
+                  </div>
+                  <div className="text-sm font-semibold text-[#0F0F0F]">{achievement.label}</div>
+                  <div className="text-xs text-slate-500">{achievement.shortLabel}</div>
+                  <span 
+                    className="inline-block mt-2 px-2 py-0.5 text-[10px] font-medium rounded-full"
+                    style={{
+                      background: 'rgba(15,15,15,0.06)',
+                      color: '#5E666D'
+                    }}
+                  >
+                    Unlocked
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
-      {/* Tab Content */}
-      <div className="pt-4 px-4 pb-32">
-        {getCurrentContent()}
+        {/* J) Tabs row - inside white content sheet */}
+        <section className="px-5">
+          <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
+            <TabsList 
+              className="grid w-full rounded-full px-1.5 py-1"
+              style={{ 
+                gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`,
+                background: '#EDEFF2',
+                border: '1px solid rgba(15,15,15,0.08)'
+              }}
+            >
+              {tabs.map((tab) => (
+                <TabsTrigger 
+                  key={tab.id}
+                  value={tab.id}
+                  className="rounded-full text-sm px-3 py-1.5 font-medium transition-all duration-150"
+                  style={{
+                    color: activeSection === tab.id ? '#1F2428' : '#5E666D',
+                    background: activeSection === tab.id ? '#fff' : 'transparent',
+                    boxShadow: activeSection === tab.id ? '0 6px 14px rgba(15,15,15,0.08)' : 'none'
+                  }}
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </section>
+
+        {/* Tab Content */}
+        <div className="pt-4 px-5">
+          {getCurrentContent()}
+        </div>
       </div>
     </PageRoot>
   );
