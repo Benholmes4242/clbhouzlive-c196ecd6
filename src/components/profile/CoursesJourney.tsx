@@ -837,18 +837,19 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Query to get courses from user's top 100 courses
+  // Query to get courses from user's ratings (ratings-only: single source of truth)
   const { data: allPlayedCourses = [] } = useQuery({
     queryKey: ['highlightReelCourses', userId],
     queryFn: async () => {
       if (!userId) return [];
 
-      // Get courses from user_top100_courses table
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
+      // RATINGS-ONLY: Get courses from course_ratings table
+      const { data: ratingsData, error: ratingsError } = await supabase
+        .from('course_ratings')
         .select(`
           course_id,
-          played_date,
+          created_at,
+          rating,
           golf_courses (
             id,
             name,
@@ -864,17 +865,19 @@ const HighlightReelSection: React.FC<HighlightReelSectionProps> = ({
           )
         `)
         .eq('user_id', userId)
-        .eq('played', true)
-        .order('played_date', { ascending: false })
+        .not('rating', 'is', null)
+        .order('created_at', { ascending: false })
         .limit(10);
 
-      if (top100Error) throw top100Error;
+      if (ratingsError) throw ratingsError;
 
       // Transform to course format
-      return (top100Data || []).map(course => ({
-        ...course,
-        id: `course-${course.course_id}`,
-        golf_courses: course.golf_courses
+      return (ratingsData || []).map(rating => ({
+        course_id: rating.course_id,
+        played_date: rating.created_at,
+        rating: rating.rating,
+        id: `course-${rating.course_id}`,
+        golf_courses: rating.golf_courses
       }));
     },
     enabled: !!userId,
@@ -1318,36 +1321,13 @@ const GreatBritainIrelandNavigation: React.FC<GreatBritainIrelandNavigationProps
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
 
-  // Same query as the main section to get the data for the modal
+  // Same query as the main section to get the data for the modal (ratings-only)
   const { data: gbIrelandCourses = [] } = useQuery({
     queryKey: ['gbIrelandCourses', userId],
     queryFn: async () => {
       if (!userId) return [];
 
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image
-          )
-        `)
-        .eq('user_id', userId)
-        .eq('played', true);
-
-      if (top100Error) throw top100Error;
-
+      // RATINGS-ONLY: Get only from course_ratings
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
         .select(`
@@ -1368,24 +1348,18 @@ const GreatBritainIrelandNavigation: React.FC<GreatBritainIrelandNavigationProps
             thumbnail_image
           )
         `)
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .not('rating', 'is', null);
 
       if (ratedError) throw ratedError;
 
-      const combinedCourses = [
-        ...(top100Data || []).map(course => ({
-          ...course,
-          rating: null,
-          id: `top100-${course.course_id}`
-        })),
-        ...(ratedData || []).map(course => ({
-          ...course,
-          played_date: course.created_at,
-          id: `rating-${course.course_id}`
-        }))
-      ];
+      const coursesWithFormat = (ratedData || []).map(course => ({
+        ...course,
+        played_date: course.created_at,
+        id: `rating-${course.course_id}`
+      }));
 
-      const gbIrelandCourses = combinedCourses.filter((userCourse) => {
+      const gbIrelandCourses = coursesWithFormat.filter((userCourse) => {
         const course = userCourse.golf_courses;
         return course && course.country === 'Britain & Ireland';
       });
@@ -1394,15 +1368,8 @@ const GreatBritainIrelandNavigation: React.FC<GreatBritainIrelandNavigationProps
       
       gbIrelandCourses.forEach(course => {
         const courseId = course.course_id;
-        const existing = uniqueCoursesMap.get(courseId);
-        
-        if (!existing) {
+        if (!uniqueCoursesMap.has(courseId)) {
           uniqueCoursesMap.set(courseId, course);
-        } else {
-          if (course.rating !== null && course.rating !== undefined && 
-              (existing.rating === null || existing.rating === undefined)) {
-            uniqueCoursesMap.set(courseId, course);
-          }
         }
       });
 
@@ -1567,31 +1534,7 @@ const WorldwideNavigation: React.FC<WorldwideNavigationProps> = ({
     queryFn: async () => {
       if (!userId) return [];
 
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image,
-            course_rating_stats(average_rating)
-          )
-        `)
-        .eq('user_id', userId)
-        .eq('played', true);
-
-      if (top100Error) throw top100Error;
-
+      // RATINGS-ONLY: Get only from course_ratings
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
         .select(`
@@ -1612,33 +1555,23 @@ const WorldwideNavigation: React.FC<WorldwideNavigationProps> = ({
             thumbnail_image
           )
         `)
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .not('rating', 'is', null);
 
       if (ratedError) throw ratedError;
 
-      const combinedCourses = [
-        ...(top100Data || []).map(course => ({
-          ...course,
-          rating: null,
-          id: `top100-${course.course_id}`,
-          golf_courses: {
-            ...course.golf_courses,
-            average_rating: null
-          }
-        })),
-        ...(ratedData || []).map(course => ({
-          ...course,
-          played_date: course.created_at,
-          id: `rating-${course.course_id}`,
-          golf_courses: {
-            ...course.golf_courses,
-            average_rating: null
-          }
-        }))
-      ];
+      const coursesWithFormat = (ratedData || []).map(course => ({
+        ...course,
+        played_date: course.created_at,
+        id: `rating-${course.course_id}`,
+        golf_courses: {
+          ...course.golf_courses,
+          average_rating: null
+        }
+      }));
 
       // Filter for courses with global ranking (worldwide)
-      const worldwideCourses = combinedCourses.filter((userCourse) => {
+      const worldwideCourses = coursesWithFormat.filter((userCourse) => {
         const course = userCourse.golf_courses;
         return course && course.global_rank && course.global_rank <= 100;
       });
@@ -1647,15 +1580,8 @@ const WorldwideNavigation: React.FC<WorldwideNavigationProps> = ({
       
       worldwideCourses.forEach(course => {
         const courseId = course.course_id;
-        const existing = uniqueCoursesMap.get(courseId);
-        
-        if (!existing) {
+        if (!uniqueCoursesMap.has(courseId)) {
           uniqueCoursesMap.set(courseId, course);
-        } else {
-          if (course.rating !== null && course.rating !== undefined && 
-              (existing.rating === null || existing.rating === undefined)) {
-            uniqueCoursesMap.set(courseId, course);
-          }
         }
       });
 
@@ -1819,33 +1745,7 @@ const USANavigation: React.FC<USANavigationProps> = ({
     queryFn: async () => {
       if (!userId) return [];
 
-      // Get courses from user_top100_courses table for USA
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          course_id,
-          played_date,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            sub_country,
-            continent,
-            global_rank,
-            regional_rank,
-            usa_rank,
-            description,
-            thumbnail_image,
-            course_rating_stats(average_rating)
-          )
-        `)
-        .eq('user_id', userId)
-        .eq('played', true);
-
-      if (top100Error) throw top100Error;
-
-      // Get courses from course_ratings table for USA
+      // RATINGS-ONLY: Get only from course_ratings
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
         .select(`
@@ -1867,49 +1767,32 @@ const USANavigation: React.FC<USANavigationProps> = ({
             course_rating_stats(average_rating)
           )
         `)
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .not('rating', 'is', null);
 
       if (ratedError) throw ratedError;
 
-      // Combine and deduplicate courses
-      const combinedCourses = [
-        ...(top100Data || []).map(course => ({
-          ...course,
-          rating: null,
-          id: `top100-${course.course_id}`,
-          averageRating: course.golf_courses?.course_rating_stats?.[0]?.average_rating || null,
-          userRating: null
-        })),
-        ...(ratedData || []).map(course => ({
-          ...course,
-          played_date: course.created_at,
-          id: `rating-${course.course_id}`,
-          averageRating: course.golf_courses?.course_rating_stats?.[0]?.average_rating || null,
-          userRating: course.rating
-        }))
-      ];
+      const coursesWithFormat = (ratedData || []).map(course => ({
+        ...course,
+        played_date: course.created_at,
+        id: `rating-${course.course_id}`,
+        averageRating: course.golf_courses?.course_rating_stats?.[0]?.average_rating || null,
+        userRating: course.rating
+      }));
 
       // Filter for USA courses only
-      const usaCourses = combinedCourses.filter((userCourse) => {
+      const usaCourses = coursesWithFormat.filter((userCourse) => {
         const course = userCourse.golf_courses;
         return course && course.country === 'USA';
       });
 
-      // Remove duplicates based on course_id, preferring rated courses
+      // Remove duplicates based on course_id
       const uniqueCoursesMap = new Map();
       
       usaCourses.forEach(course => {
         const courseId = course.course_id;
-        const existing = uniqueCoursesMap.get(courseId);
-        
-        if (!existing) {
+        if (!uniqueCoursesMap.has(courseId)) {
           uniqueCoursesMap.set(courseId, course);
-        } else {
-          // Prefer courses with user ratings
-          if (course.userRating !== null && course.userRating !== undefined && 
-              (existing.userRating === null || existing.userRating === undefined)) {
-            uniqueCoursesMap.set(courseId, course);
-          }
         }
       });
 
@@ -2222,31 +2105,18 @@ const WorldwideConditionalSection: React.FC<ConditionalSectionProps> = ({ userId
     queryFn: async () => {
       if (!userId) return [];
 
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`golf_courses!inner(global_rank)`)
-        .eq('user_id', userId)
-        .eq('played', true)
-        .not('golf_courses.global_rank', 'is', null)
-        .lte('golf_courses.global_rank', 100);
-
-      if (top100Error) throw top100Error;
-
+      // RATINGS-ONLY: Get only from course_ratings
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
         .select(`golf_courses!inner(global_rank)`)
         .eq('user_id', userId)
+        .not('rating', 'is', null)
         .not('golf_courses.global_rank', 'is', null)
         .lte('golf_courses.global_rank', 100);
 
       if (ratedError) throw ratedError;
 
-      const combinedCourses = [
-        ...(top100Data || []),
-        ...(ratedData || [])
-      ];
-
-      return combinedCourses;
+      return ratedData || [];
     },
     enabled: !!userId,
   });
@@ -2288,29 +2158,17 @@ const USAConditionalSection: React.FC<ConditionalSectionProps> = ({ userId, isOw
     queryFn: async () => {
       if (!userId) return [];
       
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`golf_courses!inner(country)`)
-        .eq('user_id', userId)
-        .eq('played', true)
-        .eq('golf_courses.country', 'USA');
-
-      if (top100Error) throw top100Error;
-
+      // RATINGS-ONLY: Get only from course_ratings
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
         .select(`golf_courses!inner(country)`)
         .eq('user_id', userId)
+        .not('rating', 'is', null)
         .eq('golf_courses.country', 'USA');
 
       if (ratedError) throw ratedError;
 
-      const combinedCourses = [
-        ...(top100Data || []),
-        ...(ratedData || [])
-      ];
-
-      return combinedCourses;
+      return ratedData || [];
     },
     enabled: !!userId,
   });
@@ -2352,29 +2210,17 @@ const GreatBritainIrelandConditionalSection: React.FC<ConditionalSectionProps> =
     queryFn: async () => {
       if (!userId) return [];
       
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`golf_courses!inner(country)`)
-        .eq('user_id', userId)
-        .eq('played', true)
-        .eq('golf_courses.country', 'Britain & Ireland');
-
-      if (top100Error) throw top100Error;
-
+      // RATINGS-ONLY: Get only from course_ratings
       const { data: ratedData, error: ratedError } = await supabase
         .from('course_ratings')
         .select(`golf_courses!inner(country)`)
         .eq('user_id', userId)
+        .not('rating', 'is', null)
         .eq('golf_courses.country', 'Britain & Ireland');
 
       if (ratedError) throw ratedError;
 
-      const combinedCourses = [
-        ...(top100Data || []),
-        ...(ratedData || [])
-      ];
-
-      return combinedCourses;
+      return ratedData || [];
     },
     enabled: !!userId,
   });
