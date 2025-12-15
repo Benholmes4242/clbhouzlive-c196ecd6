@@ -1,8 +1,9 @@
 import React from 'react';
-import { Phone, Mail, Globe, MapPin, Building2, BadgeCheck, Calendar, Flag, CircleDot, ShoppingBag, Grip } from 'lucide-react';
+import { Phone, Mail, Globe, MapPin, Building2, Calendar, Flag, CircleDot, ShoppingBag, Grip } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
 import { format } from 'date-fns';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 interface BusinessProfileInfoProps {
   business: BusinessProfile;
@@ -206,7 +207,7 @@ export function BusinessProfileInfo({ business }: BusinessProfileInfoProps) {
           {business.is_verified && (
             <div className="flex items-center gap-3 p-2.5">
               <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                <BadgeCheck className="h-4 w-4 text-emerald-600" />
+                <VerifiedBadge size="lg" />
               </div>
               <div>
                 <p className="text-sm font-medium text-[#1F2428]">Verified Business</p>

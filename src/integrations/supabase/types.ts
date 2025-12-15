@@ -4912,6 +4912,7 @@ export type Database = {
           home_club_id: string | null
           id: string
           is_business_verified: boolean | null
+          is_creator: boolean
           is_official_club: boolean | null
           is_public: boolean | null
           is_test: boolean
@@ -4994,6 +4995,7 @@ export type Database = {
           home_club_id?: string | null
           id: string
           is_business_verified?: boolean | null
+          is_creator?: boolean
           is_official_club?: boolean | null
           is_public?: boolean | null
           is_test?: boolean
@@ -5076,6 +5078,7 @@ export type Database = {
           home_club_id?: string | null
           id?: string
           is_business_verified?: boolean | null
+          is_creator?: boolean
           is_official_club?: boolean | null
           is_public?: boolean | null
           is_test?: boolean

@@ -36,6 +36,9 @@ export interface UserProfileData {
   location?: string | null;
   is_public?: boolean | null;
   
+  // Creator Mode flag (Phase 3.1)
+  is_creator?: boolean | null;
+  
   // Business-only fields
   business_name?: string | null;
   business_category?: BusinessCategory | null;
