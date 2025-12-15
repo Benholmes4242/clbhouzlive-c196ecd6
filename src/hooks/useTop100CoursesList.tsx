@@ -65,15 +65,14 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
     enabled: !!region,
   });
 
-  // Query to get user's played courses and ratings
+  // Query to get user's rated courses (ratings-only: single source of truth)
   const { data: userPlayedCourses = [], isLoading: isLoadingPlayed } = useQuery({
-    queryKey: ['userTop100CoursesInRegion', userId, region],
+    queryKey: ['userRatedCoursesInRegion', userId, region],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('user_top100_courses')
+        .from('course_ratings')
         .select('course_id')
-        .eq('user_id', userId)
-        .eq('played', true);
+        .eq('user_id', userId);
 
       if (error) throw error;
       return data || [];
@@ -104,49 +103,13 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
     setPlayedCourses(playedSet);
   }, [userPlayedCourses]);
 
+  // Toggle course requires rating - redirect to rating flow instead of toggle
   const toggleCourse = async (courseId: string) => {
     if (!isOwnProfile) return;
-
-    const isCurrentlyPlayed = playedCourses.has(courseId);
     
-    // Optimistically update UI
-    const newPlayedCourses = new Set(playedCourses);
-    if (isCurrentlyPlayed) {
-      newPlayedCourses.delete(courseId);
-    } else {
-      newPlayedCourses.add(courseId);
-    }
-    setPlayedCourses(newPlayedCourses);
-
-    try {
-      if (isCurrentlyPlayed) {
-        // Remove the course
-        await supabase
-          .from('user_top100_courses')
-          .delete()
-          .eq('user_id', userId)
-          .eq('course_id', courseId);
-      } else {
-        // Add the course
-        await supabase
-          .from('user_top100_courses')
-          .insert({
-            user_id: userId,
-            course_id: courseId,
-            played: true,
-            played_date: new Date().toISOString().split('T')[0]
-          });
-      }
-
-      // Invalidate relevant queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['userTop100Courses', userId] });
-      queryClient.invalidateQueries({ queryKey: ['userTop100CoursesInRegion', userId, region] });
-      
-    } catch (error) {
-      console.error('Error toggling course:', error);
-      // Revert optimistic update on error
-      setPlayedCourses(playedCourses);
-    }
+    // With ratings-only system, "toggle" should navigate to rating page
+    // This function is kept for backwards compatibility but should be deprecated
+    console.warn('toggleCourse is deprecated in ratings-only system. Use rating flow instead.');
   };
 
   // Helper function to get user rating for a specific course

@@ -34,31 +34,13 @@ const Top100AchievementsList: React.FC<Top100AchievementsListProps> = ({
 }) => {
   const { badgeProgress, isLoading } = useBadges(userId);
 
-  // Get real user's Top 100 course progress across all regional lists
+  // Get real user's Top 100 course progress across all regional lists (ratings-only)
   const { data: userProgress = 0 } = useQuery({
     queryKey: ['userTop100Progress', userId],
     queryFn: async () => {
       if (!userId) return 0;
       
-      // Get courses from user_top100_courses table
-      const { data: top100Data, error: top100Error } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          course_id,
-          golf_courses (
-            regional_rank,
-            usa_rank,
-            global_rank
-          )
-        `)
-        .eq('user_id', userId)
-        .eq('played', true);
-      
-      if (top100Error) {
-        console.error('Error fetching user_top100_courses:', top100Error);
-      }
-      
-      // Get courses from course_ratings table
+      // Get courses from course_ratings table (ratings-only: single source of truth)
       const { data: ratingsData, error: ratingsError } = await supabase
         .from('course_ratings')
         .select(`
@@ -73,17 +55,12 @@ const Top100AchievementsList: React.FC<Top100AchievementsListProps> = ({
       
       if (ratingsError) {
         console.error('Error fetching course_ratings:', ratingsError);
+        return 0;
       }
-      
-      // Combine all courses and filter for Top 100
-      const allCourses = [
-        ...(top100Data || []),
-        ...(ratingsData || [])
-      ];
       
       // Get unique course IDs and filter for Top 100 ranked courses
       const uniqueCourseIds = new Set();
-      const uniqueTop100Courses = allCourses.filter(course => {
+      const uniqueTop100Courses = (ratingsData || []).filter(course => {
         const gc = course.golf_courses;
         const isTop100 = gc && (
           (gc.regional_rank && gc.regional_rank <= 100) ||

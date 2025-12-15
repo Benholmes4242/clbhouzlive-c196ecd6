@@ -34,36 +34,47 @@ export function useTop100SharedJourney(myUserId?: string | null, otherUserId?: s
         };
       }
 
-      // Fetch both users' Top 100 activity
-      const { data: activities, error: activitiesError } = await supabase
-        .from('user_course_activity')
-        .select('user_id, course_id, last_played_at')
-        .eq('is_top100', true)
+      // Fetch both users' rated courses (ratings-only source)
+      const { data: ratings, error: ratingsError } = await supabase
+        .from('course_ratings')
+        .select('user_id, course_id, created_at, updated_at')
         .in('user_id', [myUserId, otherUserId]);
 
-      if (activitiesError) throw activitiesError;
+      if (ratingsError) throw ratingsError;
 
-      // Build sets of course IDs per user
+      // Get Top 100 course IDs to filter
+      const ratedCourseIds = (ratings || []).map(r => r.course_id);
+      const { data: top100Memberships } = await supabase
+        .from('course_top100_memberships')
+        .select('course_id')
+        .in('course_id', ratedCourseIds);
+
+      const top100CourseIds = new Set((top100Memberships || []).map(m => m.course_id));
+
+      // Build sets of course IDs per user (filtered to Top 100 only)
       const myCourses = new Map<string, { first: string | null; last: string | null }>();
       const theirCourses = new Map<string, { first: string | null; last: string | null }>();
 
-      for (const activity of activities || []) {
-        const targetMap = activity.user_id === myUserId ? myCourses : theirCourses;
-        const existing = targetMap.get(activity.course_id);
+      for (const rating of (ratings || [])) {
+        if (!top100CourseIds.has(rating.course_id)) continue;
+        
+        const targetMap = rating.user_id === myUserId ? myCourses : theirCourses;
+        const existing = targetMap.get(rating.course_id);
+        const activityDate = rating.updated_at || rating.created_at;
         
         if (!existing) {
-          targetMap.set(activity.course_id, {
-            first: activity.last_played_at,
-            last: activity.last_played_at,
+          targetMap.set(rating.course_id, {
+            first: activityDate,
+            last: activityDate,
           });
         } else {
           // Update first and last if needed
-          if (activity.last_played_at) {
-            if (!existing.first || activity.last_played_at < existing.first) {
-              existing.first = activity.last_played_at;
+          if (activityDate) {
+            if (!existing.first || activityDate < existing.first) {
+              existing.first = activityDate;
             }
-            if (!existing.last || activity.last_played_at > existing.last) {
-              existing.last = activity.last_played_at;
+            if (!existing.last || activityDate > existing.last) {
+              existing.last = activityDate;
             }
           }
         }
