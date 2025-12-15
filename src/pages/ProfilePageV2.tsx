@@ -156,12 +156,12 @@ const ProfilePageV2: React.FC = () => {
       {/* Hero Section - tall, full bleed */}
       <div className="relative">
         {/* Hero Image */}
-        <div className="relative h-[280px] w-full overflow-hidden">
+        <div className="relative h-[250px] w-full overflow-hidden">
           {heroUrl ? (
             <img 
               src={heroUrl} 
               alt="Profile cover" 
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover object-bottom"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-slate-300 to-slate-400" />
