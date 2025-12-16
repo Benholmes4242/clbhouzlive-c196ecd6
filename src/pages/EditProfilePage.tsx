@@ -126,6 +126,12 @@ const EditProfilePage: React.FC = () => {
 
   const isUsernameSet = profile?.username && profile.username.trim() !== '';
 
+  // Section order for sequential movement
+  const sectionOrder = ['photos', 'basic', 'info', 'bio', 'links'];
+  
+  // Track if we're programmatically scrolling (from click)
+  const isScrollingFromClick = useRef(false);
+
   // Intersection observer for active section (scrollspy)
   useEffect(() => {
     // Wait for profile to load so sections are rendered
@@ -135,15 +141,32 @@ const EditProfilePage: React.FC = () => {
     const timeoutId = setTimeout(() => {
       const observer = new IntersectionObserver(
         (entries) => {
+          // Skip if we're scrolling from a click (let handleSectionClick control state)
+          if (isScrollingFromClick.current) return;
+          
           // Find the entry with highest intersection ratio that's visible
           const visible = entries
             .filter((e) => e.isIntersecting)
             .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
 
           if (visible) {
-            const id = visible.target.id;
-            if (id) {
-              setActiveSection(id);
+            const newSectionId = visible.target.id;
+            if (newSectionId) {
+              setActiveSection(prev => {
+                const currentIndex = sectionOrder.indexOf(prev);
+                const newIndex = sectionOrder.indexOf(newSectionId);
+                
+                // Only move to adjacent section (sequential movement)
+                if (Math.abs(newIndex - currentIndex) <= 1 || currentIndex === -1) {
+                  return newSectionId;
+                }
+                // If not adjacent, move one step toward the new section
+                if (newIndex > currentIndex) {
+                  return sectionOrder[currentIndex + 1];
+                } else {
+                  return sectionOrder[currentIndex - 1];
+                }
+              });
             }
           }
         },
@@ -172,6 +195,9 @@ const EditProfilePage: React.FC = () => {
 
   // Scroll to section
   const handleSectionClick = useCallback((sectionId: string) => {
+    // Mark that we're scrolling from a click (disables sequential constraint)
+    isScrollingFromClick.current = true;
+    
     // Immediately update active state for instant feedback
     setActiveSection(sectionId);
     
@@ -179,6 +205,11 @@ const EditProfilePage: React.FC = () => {
     if (ref) {
       ref.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+    
+    // Re-enable observer after scroll animation completes
+    setTimeout(() => {
+      isScrollingFromClick.current = false;
+    }, 600);
   }, []);
 
   // Handle field changes
