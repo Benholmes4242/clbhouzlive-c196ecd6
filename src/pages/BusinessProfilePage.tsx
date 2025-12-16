@@ -191,6 +191,8 @@ const BusinessProfilePage: React.FC = () => {
           <BusinessProfilePosts 
             businessId={business?.id || ''}
             businessName={business?.name || ''}
+            businessLogo={business?.logo_url}
+            followerCount={followersCount}
             membership={membership ?? null} 
           />
         );

@@ -2,7 +2,18 @@ import React, { useState, useCallback } from 'react';
 import { useBusinessPosts, BusinessPost } from '@/hooks/useBusinessPosts';
 import { useRealtimeBusinessPosts } from '@/hooks/useRealtimeBusinessPosts';
 import { BusinessMembership } from '@/hooks/useBusinessMembership';
-import { Play, Heart, MessageCircle, Image as ImageIcon, Plus } from 'lucide-react';
+import { 
+  Play, 
+  ThumbsUp, 
+  MessageSquare, 
+  Repeat2, 
+  Send, 
+  MoreHorizontal, 
+  Globe, 
+  Image as ImageIcon, 
+  Plus,
+  Video
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import EnhancedCreateMomentModalCinematic from '@/components/post/EnhancedCreateMomentModal.cinematic';
@@ -11,37 +22,51 @@ import { useOptimisticPostSubmission } from '@/hooks/useOptimisticPostSubmission
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
 import { getStreamPoster } from '@/utils/stream';
+import { formatDistanceToNow } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 interface BusinessProfilePostsProps {
   businessId: string;
   businessName?: string;
+  businessLogo?: string | null;
+  followerCount?: number;
   membership: BusinessMembership | null;
 }
 
-export function BusinessProfilePosts({ businessId, businessName, membership }: BusinessProfilePostsProps) {
+type FilterType = 'all' | 'videos' | 'images';
+
+const FILTER_OPTIONS: { key: FilterType; label: string }[] = [
+  { key: 'all', label: 'Posts' },
+  { key: 'videos', label: 'Videos' },
+  { key: 'images', label: 'Images' },
+];
+
+export function BusinessProfilePosts({ 
+  businessId, 
+  businessName, 
+  businessLogo,
+  followerCount = 0,
+  membership 
+}: BusinessProfilePostsProps) {
   const { data: posts, isLoading, error } = useBusinessPosts(businessId);
-  useRealtimeBusinessPosts(businessId); // Enable realtime updates
+  useRealtimeBusinessPosts(businessId);
   const { setActiveActor, availableActors } = useActiveActor();
   const { submitPost } = useOptimisticPostSubmission();
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
   
-  // Create post modal state
+  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [isComposerOpen, setIsComposerOpen] = useState(false);
   const [composerMedia, setComposerMedia] = useState<ComposerMediaItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Open composer with business pre-selected (no file picker first)
   const handleCreatePost = useCallback(() => {
-    // Pre-select this business in the active actor context
     const businessActor = availableActors.find(
       a => a.type === 'business' && a.id === businessId
     );
     if (businessActor) {
       setActiveActor(businessActor);
     }
-    
-    // Open modal directly without file picker
     setIsComposerOpen(true);
   }, [businessId, availableActors, setActiveActor]);
 
@@ -64,7 +89,6 @@ export function BusinessProfilePosts({ businessId, businessName, membership }: B
         setIsComposerOpen(false);
         setComposerMedia([]);
         setIsSubmitting(false);
-        // Refresh business posts
         queryClient.invalidateQueries({ queryKey: ['business-posts', businessId] });
         queryClient.invalidateQueries({ queryKey: ['business-posts-count', businessId] });
       },
@@ -79,11 +103,40 @@ export function BusinessProfilePosts({ businessId, businessName, membership }: B
     setComposerMedia([]);
   }, []);
 
+  // Filter posts based on active filter
+  const filteredPosts = posts?.filter(post => {
+    if (activeFilter === 'all') return true;
+    const hasVideo = post.post_media?.some(m => m.media_type === 'video');
+    const hasImage = post.post_media?.some(m => m.media_type === 'image');
+    if (activeFilter === 'videos') return hasVideo;
+    if (activeFilter === 'images') return hasImage;
+    return true;
+  });
+
   if (isLoading) {
     return (
-      <div className="grid grid-cols-3 gap-0.5">
-        {Array.from({ length: 9 }).map((_, i) => (
-          <div key={i} className="aspect-square bg-muted animate-pulse" />
+      <div className="space-y-4 px-4">
+        {/* Filter pills skeleton */}
+        <div className="flex gap-2 overflow-x-auto py-2 -mx-4 px-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-8 w-20 bg-muted animate-pulse rounded-full flex-shrink-0" />
+          ))}
+        </div>
+        {/* Post cards skeleton */}
+        {[1, 2].map((i) => (
+          <div key={i} className="bg-white rounded-sq-md border border-border/50 overflow-hidden">
+            <div className="p-4 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 rounded-full bg-muted animate-pulse" />
+                <div className="space-y-2">
+                  <div className="h-4 w-32 bg-muted animate-pulse rounded" />
+                  <div className="h-3 w-24 bg-muted animate-pulse rounded" />
+                </div>
+              </div>
+              <div className="h-16 bg-muted animate-pulse rounded" />
+            </div>
+            <div className="h-64 bg-muted animate-pulse" />
+          </div>
         ))}
       </div>
     );
@@ -91,69 +144,80 @@ export function BusinessProfilePosts({ businessId, businessName, membership }: B
 
   if (error) {
     return (
-      <div className="text-center py-12">
+      <div className="text-center py-12 px-4">
         <p className="text-muted-foreground">Failed to load posts.</p>
       </div>
     );
   }
 
-  // Show create post button for owners/admins (slate color)
-  const CreatePostButton = membership?.canManage ? (
-    <Button 
-      onClick={handleCreatePost}
-      className="w-full rounded-sq-md mb-4 bg-slate-700 hover:bg-slate-800 text-white"
-    >
-      <Plus className="h-4 w-4 mr-2" />
-      Create post as {businessName || 'this business'}
-    </Button>
-  ) : null;
-
-  if (!posts || posts.length === 0) {
-    return (
-      <div className="py-12 text-center">
-        <div 
-          className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
-          style={{ background: '#EDEFF2' }}
-        >
-          <ImageIcon className="h-8 w-8 text-[#97A1AA]" />
-        </div>
-        <p className="text-sm text-[#5E666D] mb-4">
-          {membership?.canManage 
-            ? "No posts yet. Post as this business to share updates, photos and offers."
-            : `No posts yet from ${businessName || 'this business'}.`}
-        </p>
-        {membership?.canManage && (
-          <Button 
-            className="rounded-full bg-slate-700 hover:bg-slate-800 text-white" 
-            onClick={handleCreatePost}
-          >
-            Create post as {businessName || 'this business'}
-          </Button>
-        )}
-        
-        {/* Composer Modal */}
-        <EnhancedCreateMomentModalCinematic
-          isOpen={isComposerOpen}
-          onClose={handleComposerClose}
-          onSubmit={handleComposerSubmit}
-          isSubmitting={isSubmitting}
-          mediaItems={composerMedia}
-          onMediaChange={setComposerMedia}
-        />
-      </div>
-    );
-  }
-
-  // Instagram-style 3-column grid with no gap (matches personal Activity)
   return (
-    <div>
-      {CreatePostButton}
-      
-      <div className="grid grid-cols-3 gap-0.5">
-        {posts.map((post) => (
-          <PostTile key={post.id} post={post} />
+    <div className="space-y-3">
+      {/* Filter pills - horizontal scrollable */}
+      <div className="flex gap-2 overflow-x-auto py-2 -mx-4 px-4 no-scrollbar">
+        {FILTER_OPTIONS.map(({ key, label }) => (
+          <button
+            key={key}
+            onClick={() => setActiveFilter(key)}
+            className={cn(
+              "flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-colors",
+              activeFilter === key
+                ? "bg-[#01754F] text-white"
+                : "bg-white text-foreground border border-border hover:bg-muted/50"
+            )}
+          >
+            {label}
+          </button>
         ))}
       </div>
+
+      {/* Create post button for admins */}
+      {membership?.canManage && (
+        <Button 
+          onClick={handleCreatePost}
+          variant="outline"
+          className="w-full rounded-sq-md border-border/50 bg-white hover:bg-muted/50"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Create post
+        </Button>
+      )}
+
+      {/* Posts feed */}
+      {!filteredPosts || filteredPosts.length === 0 ? (
+        <div className="py-12 text-center">
+          <div 
+            className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+            style={{ background: '#EDEFF2' }}
+          >
+            <ImageIcon className="h-8 w-8 text-[#97A1AA]" />
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            {membership?.canManage 
+              ? "No posts yet. Share updates, photos and offers."
+              : `No posts yet from ${businessName || 'this business'}.`}
+          </p>
+          {membership?.canManage && (
+            <Button 
+              className="rounded-full bg-[#01754F] hover:bg-[#016544] text-white" 
+              onClick={handleCreatePost}
+            >
+              Create your first post
+            </Button>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {filteredPosts.map((post) => (
+            <LinkedInPostCard 
+              key={post.id} 
+              post={post} 
+              businessName={businessName}
+              businessLogo={businessLogo}
+              followerCount={followerCount}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Composer Modal */}
       <EnhancedCreateMomentModalCinematic
@@ -168,47 +232,180 @@ export function BusinessProfilePosts({ businessId, businessName, membership }: B
   );
 }
 
-function PostTile({ post }: { post: BusinessPost }) {
+interface LinkedInPostCardProps {
+  post: BusinessPost;
+  businessName?: string;
+  businessLogo?: string | null;
+  followerCount?: number;
+}
+
+function LinkedInPostCard({ post, businessName, businessLogo, followerCount = 0 }: LinkedInPostCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const primaryMedia = post.post_media?.[0];
   const isVideo = primaryMedia?.media_type === 'video';
+  const hasMultipleMedia = (post.post_media?.length || 0) > 1;
   
-  // For videos: use poster_url if available, otherwise generate from Stream URL
+  // Format timestamp like LinkedIn (1d, 2w, etc.)
+  const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: false })
+    .replace('about ', '')
+    .replace(' days', 'd')
+    .replace(' day', 'd')
+    .replace(' hours', 'h')
+    .replace(' hour', 'h')
+    .replace(' minutes', 'm')
+    .replace(' minute', 'm')
+    .replace(' weeks', 'w')
+    .replace(' week', 'w')
+    .replace(' months', 'mo')
+    .replace(' month', 'mo');
+
+  // Truncate content if longer than 150 chars
+  const content = post.content || '';
+  const shouldTruncate = content.length > 150 && !isExpanded;
+  const displayContent = shouldTruncate ? content.slice(0, 150) : content;
+
+  // Get thumbnail for video
   const thumbnailUrl = isVideo 
     ? (primaryMedia?.poster_url || getStreamPoster(primaryMedia?.media_url || '', '1s', 600))
     : primaryMedia?.media_url;
 
   return (
-    <div className="group relative aspect-square overflow-hidden cursor-pointer rounded-sq-xs" style={{ background: '#EDEFF2' }}>
-      {thumbnailUrl ? (
-        <img
-          src={thumbnailUrl}
-          alt=""
-          className="w-full h-full object-cover transition-transform group-hover:scale-105"
-        />
-      ) : (
-        <div className="w-full h-full flex items-center justify-center">
-          <ImageIcon className="h-8 w-8 text-[#97A1AA]" />
-        </div>
-      )}
-
-      {/* Video indicator */}
-      {isVideo && (
-        <div className="absolute top-2 right-2">
-          <Play className="h-5 w-5 text-white drop-shadow-lg" fill="white" />
-        </div>
-      )}
-
-      {/* Hover overlay with stats */}
-      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 text-white">
-        <div className="flex items-center gap-1">
-          <Heart className="h-5 w-5" />
-          <span className="text-sm font-medium">–</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <MessageCircle className="h-5 w-5" />
-          <span className="text-sm font-medium">–</span>
+    <div className="bg-white rounded-sq-md border border-border/40 overflow-hidden">
+      {/* Post header */}
+      <div className="p-3 pb-2">
+        <div className="flex items-start justify-between">
+          <div className="flex gap-3">
+            {/* Business avatar */}
+            <div className="w-12 h-12 rounded-full overflow-hidden bg-muted flex-shrink-0">
+              {businessLogo ? (
+                <img src={businessLogo} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-muted-foreground text-lg font-semibold">
+                  {businessName?.charAt(0) || 'B'}
+                </div>
+              )}
+            </div>
+            
+            {/* Business info */}
+            <div className="min-w-0">
+              <p className="font-semibold text-foreground text-sm leading-tight">
+                {businessName || 'Business'}
+              </p>
+              <p className="text-xs text-muted-foreground leading-tight">
+                {followerCount.toLocaleString()} followers
+              </p>
+              <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
+                <span>{timeAgo}</span>
+                <span>•</span>
+                <Globe className="h-3 w-3" />
+              </div>
+            </div>
+          </div>
+          
+          {/* More menu */}
+          <button className="p-1 hover:bg-muted/50 rounded-full transition-colors">
+            <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
+          </button>
         </div>
       </div>
+
+      {/* Post content */}
+      {content && (
+        <div className="px-3 pb-2">
+          <p className="text-sm text-foreground whitespace-pre-wrap">
+            {displayContent}
+            {shouldTruncate && (
+              <>
+                {'... '}
+                <button 
+                  onClick={() => setIsExpanded(true)}
+                  className="text-muted-foreground hover:text-foreground hover:underline"
+                >
+                  more
+                </button>
+              </>
+            )}
+          </p>
+        </div>
+      )}
+
+      {/* Media */}
+      {primaryMedia && (
+        <div className="relative">
+          {isVideo ? (
+            <div className="relative aspect-[4/5] bg-muted">
+              <img
+                src={thumbnailUrl || ''}
+                alt=""
+                className="w-full h-full object-cover"
+              />
+              {/* Play button overlay */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-black/60 flex items-center justify-center">
+                  <Play className="h-8 w-8 text-white ml-1" fill="white" />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <img
+              src={primaryMedia.media_url}
+              alt=""
+              className="w-full object-cover"
+              style={{ maxHeight: '500px' }}
+            />
+          )}
+          
+          {/* Multiple media indicator */}
+          {hasMultipleMedia && (
+            <div className="absolute bottom-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded">
+              +{post.post_media!.length - 1}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Social proof line */}
+      <div className="px-3 py-2 flex items-center justify-between text-xs text-muted-foreground border-b border-border/30">
+        <div className="flex items-center gap-1">
+          <div className="flex -space-x-1">
+            <div className="w-4 h-4 rounded-full bg-[#0A66C2] flex items-center justify-center">
+              <ThumbsUp className="h-2.5 w-2.5 text-white" />
+            </div>
+          </div>
+          <span className="ml-1">—</span>
+        </div>
+        <span>—</span>
+      </div>
+
+      {/* Action bar */}
+      <div className="px-1 py-1 flex items-center justify-around">
+        <ActionButton icon={ThumbsUp} label="Like" />
+        <ActionButton icon={MessageSquare} label="Comment" />
+        <ActionButton icon={Repeat2} label="Repost" />
+        <ActionButton icon={Send} label="Send" />
+      </div>
     </div>
+  );
+}
+
+interface ActionButtonProps {
+  icon: React.ElementType;
+  label: string;
+  isActive?: boolean;
+  onClick?: () => void;
+}
+
+function ActionButton({ icon: Icon, label, isActive, onClick }: ActionButtonProps) {
+  return (
+    <button 
+      onClick={onClick}
+      className={cn(
+        "flex flex-col items-center gap-0.5 py-2 px-3 rounded-md transition-colors hover:bg-muted/50",
+        isActive ? "text-[#0A66C2]" : "text-muted-foreground"
+      )}
+    >
+      <Icon className="h-5 w-5" />
+      <span className="text-xs font-medium">{label}</span>
+    </button>
   );
 }
