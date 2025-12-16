@@ -5,18 +5,23 @@ interface Course {
 }
 
 /**
- * Formats the course location in a consistent order across the app.
- * Order: country, sub_country, region
- * Example: "Britain & Ireland, Northern Ireland, Down"
+ * Formats the course location in City/Region, Country format.
+ * Matches business location display rules.
+ * 
+ * Order: most local (sub_country or region), then country
+ * Example: "Northern Ireland, Britain & Ireland" or "California, United States"
  */
 export function formatCourseLocation(course: Course | null | undefined): string {
   if (!course) return '';
 
-  const parts = [
-    course.country,
-    course.sub_country,
-    course.region
-  ].filter(Boolean);
+  // Get the most local part (sub_country preferred, then region)
+  const localPart = course.sub_country || course.region;
+  const countryPart = course.country;
 
-  return parts.join(', ');
+  if (localPart && countryPart) {
+    return `${localPart}, ${countryPart}`;
+  }
+  
+  // Fallback to whatever we have
+  return localPart || countryPart || '';
 }
