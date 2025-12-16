@@ -10,13 +10,13 @@ import { useBusinessPostsCount } from '@/hooks/useBusinessPosts';
 import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
 import { useBusinessVerificationRequest } from '@/hooks/useBusinessVerificationRequest';
 import { BusinessProfileHeader } from '@/components/business/BusinessProfileHeader';
+import { BusinessLocationCard } from '@/components/business/BusinessLocationCard';
 import { BusinessProfileOverview } from '@/components/business/BusinessProfileOverview';
 import { BusinessProfilePosts } from '@/components/business/BusinessProfilePosts';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
 import { GolfersHereTab } from '@/components/business/GolfersHereTab';
-import { BusinessOwnerMenu } from '@/components/business/BusinessOwnerMenu';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
-import { trackBusinessProfileVisit } from '@/lib/businessAnalyticsTracking';
+import { trackBusinessProfileVisit, trackBusinessAction } from '@/lib/businessAnalyticsTracking';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 type BusinessTab = 'content' | 'overview' | 'golfers' | 'info';
@@ -43,6 +43,12 @@ const BusinessProfilePage = () => {
       trackBusinessProfileVisit(business.id, user?.id, source);
     }
   }, [business?.id, user?.id, searchParams]);
+
+  const handleDirections = () => {
+    if (business?.location) {
+      trackBusinessAction(business.id, 'directions', user?.id);
+    }
+  };
 
   if (isLoading) {
     return <GenericPageSkeleton />;
@@ -76,25 +82,25 @@ const BusinessProfilePage = () => {
         <ArrowLeft className="!h-5 !w-5 text-white" />
       </button>
 
-      {/* Owner menu - dark glass container matching course detail page */}
-      <div className="absolute top-3 right-3 md:top-4 md:right-4 z-20">
-        <BusinessOwnerMenu 
-          businessId={business.id}
-          businessName={business.name}
-          membership={membership ?? null}
-          className="h-9 w-9 bg-black/20 backdrop-blur-sm rounded-md hover:bg-black/40 transition-colors text-white border-0"
-          isBusinessVerified={business.is_verified}
-          verificationStatus={verificationRequest?.status}
-        />
-      </div>
-
       {/* Hero header - Light UI with white card */}
       <BusinessProfileHeader
         business={business}
         membership={membership ?? null}
         postsCount={postsCount}
         followersCount={followersCount}
+        followingCount={0}
       />
+
+      {/* Location Card - only when address exists */}
+      {business.location && (
+        <BusinessLocationCard
+          location={business.location}
+          lat={null}
+          lng={null}
+          businessName={business.name}
+          onDirections={handleDirections}
+        />
+      )}
 
       {/* Tab Navigation - matches personal profile page */}
       <section className="mt-6 px-5">
