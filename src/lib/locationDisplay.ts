@@ -14,15 +14,23 @@ interface LocationFields {
 const REGION_COUNTRIES = ['United States', 'US', 'USA', 'Canada', 'CA', 'Australia', 'AU'];
 
 /**
+ * Normalize city name by removing common prefixes
+ * e.g., "City of London" → "London"
+ */
+function normalizeCity(city: string): string {
+  return city.replace(/^City of\s+/i, '').trim();
+}
+
+/**
  * Get city-only display (for pills/badges)
  * Fallback chain: city → locality from location → region → null
  */
 export function getCityOnly(fields: LocationFields): string | null {
   const { city, region, location } = fields;
   
-  // 1. Use city if available
+  // 1. Use city if available (with normalization)
   if (city?.trim()) {
-    return city.trim();
+    return normalizeCity(city);
   }
   
   // 2. Try to extract first part from location string (usually city/locality)
@@ -32,11 +40,11 @@ export function getCityOnly(fields: LocationFields): string | null {
       // Return first part if it doesn't look like a street address (no numbers at start)
       const first = parts[0];
       if (first && !/^\d/.test(first)) {
-        return first;
+        return normalizeCity(first);
       }
       // If first part is a street, try second part
       if (parts.length > 1 && !/^\d/.test(parts[1])) {
-        return parts[1];
+        return normalizeCity(parts[1]);
       }
     }
   }
@@ -60,14 +68,18 @@ export function getCityCountry(fields: LocationFields): string | null {
   const countryPart = country?.trim();
   
   if (!cityPart && !countryPart) {
-    // Last resort: try to parse location string
+    // Last resort: try to parse location string for city + country
     if (location) {
       const parts = location.split(',').map(p => p.trim()).filter(Boolean);
       if (parts.length >= 2) {
-        // Return first and last parts (city and country)
-        return `${parts[0]}, ${parts[parts.length - 1]}`;
+        // Find first non-street part (city) and last part (country)
+        const cityIndex = parts.findIndex(p => !/^\d/.test(p));
+        if (cityIndex !== -1) {
+          const city = normalizeCity(parts[cityIndex]);
+          const country = parts[parts.length - 1];
+          return `${city}, ${country}`;
+        }
       }
-      return parts[0] || null;
     }
     return null;
   }

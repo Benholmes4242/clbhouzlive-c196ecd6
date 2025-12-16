@@ -10,6 +10,9 @@ export interface BusinessMembership {
     slug: string | null;
     category: string | null;
     location: string | null;
+    city: string | null;
+    region: string | null;
+    country: string | null;
     logo_url: string | null;
     is_verified: boolean;
   };
@@ -35,6 +38,9 @@ export function useMyBusinesses(userProfileId?: string) {
             slug,
             category,
             location,
+            city,
+            region,
+            country,
             logo_url,
             cover_image_url,
             is_verified,
