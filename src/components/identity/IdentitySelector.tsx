@@ -77,7 +77,7 @@ export function IdentitySelector({ compact = false, variant = 'light' }: Identit
         </button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="w-56 z-[10000] bg-popover">
+      <DropdownMenuContent align="end" className="w-56">
         <div className="px-2 py-1.5 text-xs text-muted-foreground font-medium">
           Posting as
         </div>
