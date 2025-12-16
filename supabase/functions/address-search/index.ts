@@ -5,8 +5,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2xiaG91eiIsImEiOiJjbTVyejIzMXcxemx2MmpzZDU3YjkxNjNkIn0.H_w9d-UAvvMRkJ_9DoVQ-A'
-
 serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -14,26 +12,38 @@ serve(async (req) => {
   }
 
   try {
+    const MAPBOX_TOKEN = Deno.env.get('MAPBOX_TOKEN')
+    if (!MAPBOX_TOKEN) {
+      console.error('MAPBOX_TOKEN not configured')
+      return new Response(
+        JSON.stringify({ features: [], error: 'Search service not configured' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      )
+    }
+
     const url = new URL(req.url)
     const query = url.searchParams.get('q')
     
-    if (!query || query.length < 2) {
+    // Minimum query length for rate limiting
+    if (!query || query.length < 3) {
       return new Response(
-        JSON.stringify({ features: [], error: 'Query must be at least 2 characters' }),
+        JSON.stringify({ features: [], error: 'Query must be at least 3 characters' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
     // Use Mapbox Geocoding API with address-focused types
-    // Include address, poi, postcode, place to get better results for addresses
     const types = url.searchParams.get('types') || 'address,poi,postcode,place'
     
     const mapboxUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&types=${types}&limit=8&language=en`
     
+    console.log('[address-search] Querying Mapbox for:', query)
+    
     const response = await fetch(mapboxUrl)
     
     if (!response.ok) {
-      console.error('Mapbox API error:', response.status, await response.text())
+      const errorText = await response.text()
+      console.error('[address-search] Mapbox API error:', response.status, errorText)
       return new Response(
         JSON.stringify({ features: [], error: 'Search service unavailable' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 502 }
@@ -41,6 +51,7 @@ serve(async (req) => {
     }
     
     const data = await response.json()
+    console.log('[address-search] Returning', data.features?.length || 0, 'results')
     
     return new Response(
       JSON.stringify(data),
@@ -48,7 +59,7 @@ serve(async (req) => {
     )
     
   } catch (error) {
-    console.error('Address search error:', error)
+    console.error('[address-search] Error:', error)
     return new Response(
       JSON.stringify({ features: [], error: 'Internal server error' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
