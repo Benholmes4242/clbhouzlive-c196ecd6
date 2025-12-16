@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { arrayMove } from "@dnd-kit/sortable";
 import { prefersReduced } from '@/lib/ui/motion';
@@ -107,13 +108,41 @@ export default function CreateMomentModal({
   useImmersiveHeader(Boolean(isOpen));
   useChromeState({ forceHidden: isOpen, disabled: false });
 
-  // Body class for global styles
+  // Body scroll lock and class for global styles
+  const scrollPositionRef = useRef({ x: 0, y: 0 });
+  
   useEffect(() => {
     if (isOpen) {
+      // Save scroll position
+      scrollPositionRef.current = {
+        x: window.scrollX,
+        y: window.scrollY,
+      };
+      
+      // Lock body scroll
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollPositionRef.current.y}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.width = '100%';
+      document.documentElement.style.overflow = 'hidden';
       document.body.classList.add('ecm-open');
     }
     return () => {
+      // Restore scroll
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.width = '';
+      document.documentElement.style.overflow = '';
       document.body.classList.remove('ecm-open');
+      
+      if (scrollPositionRef.current.y > 0) {
+        window.scrollTo(scrollPositionRef.current.x, scrollPositionRef.current.y);
+      }
     };
   }, [isOpen]);
 
@@ -398,8 +427,17 @@ export default function CreateMomentModal({
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-[9999]">
+  const modalContent = (
+    <div 
+      className="fixed inset-0 z-[9999]"
+      style={{ touchAction: 'none' }}
+    >
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-black/60"
+        onClick={animateAndClose}
+      />
+      
       {/* Main sheet */}
       <div 
         ref={wrapperRef}
@@ -552,4 +590,6 @@ export default function CreateMomentModal({
       />
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
