@@ -299,8 +299,7 @@ const BusinessProfilePage: React.FC = () => {
                 className="px-4 py-1.5 text-sm font-semibold rounded-full text-[#0F0F0F] flex items-center gap-1.5"
                 style={{ 
                   background: '#FFFFFF',
-                  boxShadow: '0 2px 8px rgba(31, 36, 40, 0.08)',
-                  border: '1px solid transparent'
+                  boxShadow: '0 2px 8px rgba(31, 36, 40, 0.08)'
                 }}
               >
                 <MapPin className="w-3.5 h-3.5" />
@@ -315,9 +314,7 @@ const BusinessProfilePage: React.FC = () => {
               className="px-4 py-1.5 text-sm font-semibold rounded-full text-emerald-700 flex items-center gap-1.5"
               style={{ 
                 background: 'rgba(52, 199, 89, 0.15)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-                border: '1px solid rgba(52, 199, 89, 0.3)'
+                boxShadow: '0 2px 8px rgba(31, 36, 40, 0.08)'
               }}
             >
               <BadgeCheck className="w-3.5 h-3.5" />
