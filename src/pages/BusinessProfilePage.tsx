@@ -95,8 +95,8 @@ const BusinessProfilePage = () => {
       {business.location && (
         <BusinessLocationCard
           location={business.location}
-          lat={null}
-          lng={null}
+          lat={business.lat}
+          lng={business.lng}
           businessName={business.name}
           onDirections={handleDirections}
         />

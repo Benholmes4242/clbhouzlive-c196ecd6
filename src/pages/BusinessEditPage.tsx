@@ -213,6 +213,8 @@ const BusinessEditPage = () => {
           name: formData.businessName,
           category: formData.businessCategory || null,
           location: formattedLocation,
+          lat: location.lat || null,
+          lng: location.lng || null,
           website: formData.businessWebsite || null,
           email: formData.businessContactEmail || null,
           phone: phone?.fullNumber || null,

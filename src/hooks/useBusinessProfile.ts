@@ -7,6 +7,8 @@ export interface BusinessProfile {
   slug: string | null;
   category: string | null;
   location: string | null;
+  lat: number | null;
+  lng: number | null;
   description: string | null;
   website: string | null;
   email: string | null;
