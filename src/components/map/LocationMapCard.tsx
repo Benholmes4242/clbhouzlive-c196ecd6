@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { MapPin } from 'lucide-react';
 import { MapPreview } from './MapPreview';
 import { MapExpandedView } from './MapExpandedView';
@@ -25,10 +25,6 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
 }) => {
   const [expanded, setExpanded] = useState(false);
 
-  // Prevent accidental open when user is scrolling (esp. iOS Safari)
-  const downRef = useRef<{ x: number; y: number } | null>(null);
-  const openExpanded = () => setExpanded(true);
-
   // Validate coordinates
   const hasValidCoords = lat != null && lng != null && Number.isFinite(lat) && Number.isFinite(lng);
 
@@ -54,28 +50,10 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
   return (
     <>
       {/* Map card - identical styling for Course and Business */}
-      <div
+      <div 
         key={`map-${lat}-${lng}`}
         className="relative w-full rounded-sq-md overflow-hidden border border-slate-200 cursor-pointer group"
-        role="button"
-        tabIndex={0}
-        onClick={openExpanded}
-        onPointerDown={(e) => {
-          downRef.current = { x: e.clientX, y: e.clientY };
-        }}
-        onPointerUp={(e) => {
-          const start = downRef.current;
-          downRef.current = null;
-          if (!start) return openExpanded();
-          const dist = Math.hypot(e.clientX - start.x, e.clientY - start.y);
-          if (dist < 10) openExpanded();
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            openExpanded();
-          }
-        }}
+        onClick={() => setExpanded(true)}
       >
         <MapPreview
           lat={lat}
@@ -83,9 +61,9 @@ export const LocationMapCard: React.FC<LocationMapCardProps> = ({
           name={name}
           height={200}
           showExpandButton={true}
-          onExpand={openExpanded}
+          onExpand={() => setExpanded(true)}
         />
-
+        
         {/* Location meta footer */}
         <div className="px-3 py-2.5 bg-white border-t border-slate-100">
           <div className="flex items-center gap-2">
