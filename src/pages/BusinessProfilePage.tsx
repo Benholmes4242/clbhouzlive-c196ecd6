@@ -3,7 +3,7 @@
  * Only content substitutions, not layout changes
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
@@ -33,7 +33,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 // Tab content components
-import { BusinessActivityTab } from '@/components/business/BusinessActivityTab';
+import { BusinessProfilePosts } from '@/components/business/BusinessProfilePosts';
 import { BusinessProfileOverview } from '@/components/business/BusinessProfileOverview';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
 import { GolfersHereTab } from '@/components/business/GolfersHereTab';
@@ -42,7 +42,7 @@ import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton'
 // Background color - matches personal profile page (slate-50)
 const BG_COLOR = '#f8fafc';
 
-type BusinessTab = 'activity' | 'overview' | 'golfers' | 'info';
+type BusinessTab = 'content' | 'overview' | 'golfers' | 'info';
 
 const BusinessProfilePage: React.FC = () => {
   const navigate = useNavigate();
@@ -56,11 +56,11 @@ const BusinessProfilePage: React.FC = () => {
   const { data: isFollowingStatus, isLoading: statusLoading } = useIsFollowingBusiness(business?.id, user?.id);
   const { follow, unfollow, isFollowing: followPending, isUnfollowing: unfollowPending } = useBusinessFollowMutation(business?.id || '', user?.id);
 
-  const [activeTab, setActiveTab] = useState<BusinessTab>('activity');
+  const [activeTab, setActiveTab] = useState<BusinessTab>('content');
   const [activeMiniNav, setActiveMiniNav] = useState('posts');
   const [followingCount, setFollowingCount] = useState(0);
   const [bioExpanded, setBioExpanded] = useState(false);
-  
+
   // Check ownership
   const isOwner = membership?.canManage;
 
@@ -178,7 +178,7 @@ const BusinessProfilePage: React.FC = () => {
     .toUpperCase() || 'B';
 
   const tabs = [
-    { id: 'activity', label: 'Activity' },
+    { id: 'content', label: 'Content' },
     { id: 'overview', label: 'Overview' },
     { id: 'golfers', label: 'Golfers' },
     { id: 'info', label: 'Info' },
@@ -186,12 +186,11 @@ const BusinessProfilePage: React.FC = () => {
 
   const getCurrentContent = () => {
     switch (activeTab) {
-      case 'activity':
+      case 'content':
         return (
-          <BusinessActivityTab 
+          <BusinessProfilePosts 
             businessId={business?.id || ''}
             businessName={business?.name || ''}
-            businessLogo={business?.logo_url}
             membership={membership ?? null} 
           />
         );
@@ -352,10 +351,7 @@ const BusinessProfilePage: React.FC = () => {
         <button 
           className="h-9 flex-1 rounded-full text-sm font-semibold text-white flex items-center justify-center gap-1.5 disabled:opacity-60"
           style={{ background: isFollowing ? '#334155' : '#64748b' }}
-          onClick={() => {
-            alert('Follow button tapped! z-index working');
-            handleFollowToggle();
-          }}
+          onClick={handleFollowToggle}
           disabled={followBusy}
         >
           {followBusy ? (
@@ -555,7 +551,6 @@ const BusinessProfilePage: React.FC = () => {
 
       {/* Bottom Navigation Spacer */}
       <div className="h-20" />
-      
     </PageRoot>
   );
 };

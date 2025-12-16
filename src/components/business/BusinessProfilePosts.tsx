@@ -137,17 +137,15 @@ export function BusinessProfilePosts({ businessId, businessName, membership }: B
           </Button>
         )}
         
-        {/* Composer Modal - only render when open to prevent pointer event interception on mobile */}
-        {isComposerOpen && (
-          <EnhancedCreateMomentModalCinematic
-            isOpen={isComposerOpen}
-            onClose={handleComposerClose}
-            onSubmit={handleComposerSubmit}
-            isSubmitting={isSubmitting}
-            mediaItems={composerMedia}
-            onMediaChange={setComposerMedia}
-          />
-        )}
+        {/* Composer Modal */}
+        <EnhancedCreateMomentModalCinematic
+          isOpen={isComposerOpen}
+          onClose={handleComposerClose}
+          onSubmit={handleComposerSubmit}
+          isSubmitting={isSubmitting}
+          mediaItems={composerMedia}
+          onMediaChange={setComposerMedia}
+        />
       </div>
     );
   }
@@ -163,17 +161,15 @@ export function BusinessProfilePosts({ businessId, businessName, membership }: B
         ))}
       </div>
 
-      {/* Composer Modal - only render when open to prevent pointer event interception on mobile */}
-      {isComposerOpen && (
-        <EnhancedCreateMomentModalCinematic
-          isOpen={isComposerOpen}
-          onClose={handleComposerClose}
-          onSubmit={handleComposerSubmit}
-          isSubmitting={isSubmitting}
-          mediaItems={composerMedia}
-          onMediaChange={setComposerMedia}
-        />
-      )}
+      {/* Composer Modal */}
+      <EnhancedCreateMomentModalCinematic
+        isOpen={isComposerOpen}
+        onClose={handleComposerClose}
+        onSubmit={handleComposerSubmit}
+        isSubmitting={isSubmitting}
+        mediaItems={composerMedia}
+        onMediaChange={setComposerMedia}
+      />
     </div>
   );
 }
