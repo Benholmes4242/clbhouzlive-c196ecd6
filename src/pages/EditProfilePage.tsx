@@ -128,42 +128,54 @@ const EditProfilePage: React.FC = () => {
 
   const isUsernameSet = profile?.username && profile.username.trim() !== '';
 
-  // Intersection observer for active section (scrollspy)
+  // Active section scroll tracking (scrollspy)
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        // Skip updates during programmatic scroll
-        if (isProgrammaticScroll.current) return;
-        
-        // Throttle updates (max 1 per 100ms)
-        const now = Date.now();
-        if (now - lastUpdateTime.current < 100) return;
-        
-        // Find the entry with highest intersection ratio that's visible
-        const visible = entries
-          .filter((e) => e.isIntersecting && e.intersectionRatio >= 0.3)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+    const offsetPx = 140; // stable activation line (header + breathing room)
+    let rafId: number | null = null;
 
-        if (visible) {
-          const id = visible.target.id;
-          if (id) {
-            lastUpdateTime.current = now;
-            setActiveSection(prev => prev !== id ? id : prev);
-          }
+    const computeActiveSection = () => {
+      if (isProgrammaticScroll.current) return;
+
+      const now = Date.now();
+      if (now - lastUpdateTime.current < 100) return;
+
+      const ids = SECTIONS.map((s) => s.id);
+      let next = ids[0];
+
+      // Because sections are in DOM order, we can walk top-down and break early.
+      for (const id of ids) {
+        const el = sectionRefs.current[id];
+        if (!el) continue;
+
+        const top = el.getBoundingClientRect().top;
+        if (top <= offsetPx) {
+          next = id;
+        } else {
+          break;
         }
-      },
-      {
-        root: null,
-        threshold: [0.3, 0.4, 0.5, 0.6, 0.7],
-        rootMargin: '-20% 0px -60% 0px', // More stable switching
       }
-    );
 
-    Object.values(sectionRefs.current).forEach((ref) => {
-      if (ref) observer.observe(ref);
-    });
+      lastUpdateTime.current = now;
+      setActiveSection((prev) => (prev !== next ? next : prev));
+    };
 
-    return () => observer.disconnect();
+    const onScroll = () => {
+      if (rafId !== null) return;
+      rafId = window.requestAnimationFrame(() => {
+        rafId = null;
+        computeActiveSection();
+      });
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    // Initial calculation after layout settles
+    setTimeout(computeActiveSection, 0);
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (rafId !== null) window.cancelAnimationFrame(rafId);
+    };
   }, []);
 
   // Scroll to section

@@ -38,37 +38,40 @@ export const SectionJumpStrip: React.FC<SectionJumpStripProps> = ({
   }, [activeSection]);
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className="relative flex items-center gap-1.5 overflow-x-auto scrollbar-hide py-1"
     >
       {/* Animated background indicator */}
       <div
-        className="absolute top-1 h-[calc(100%-8px)] bg-slate-900 rounded-full pointer-events-none"
+        className="absolute top-1 h-[calc(100%-8px)] bg-foreground rounded-sq-pill pointer-events-none"
         style={{
           left: indicatorStyle.left,
           width: indicatorStyle.width,
-          transition: 'transform 220ms ease-out, width 220ms ease-out, left 220ms ease-out',
+          transition: 'width 220ms ease-out, left 220ms ease-out',
+          willChange: 'left, width',
         }}
       />
-      
+
       {sections.map((section, index) => (
         <React.Fragment key={section.id}>
           <button
-            ref={(el) => { buttonRefs.current[section.id] = el; }}
+            ref={(el) => {
+              buttonRefs.current[section.id] = el;
+            }}
             type="button"
             onClick={() => onSectionClick(section.id)}
             className={cn(
-              "relative z-10 text-xs whitespace-nowrap px-3 py-1.5 rounded-full transition-colors duration-220",
+              'relative z-10 text-xs whitespace-nowrap px-3 py-1.5 rounded-sq-pill transition-colors duration-200',
               activeSection === section.id
-                ? "text-white font-medium"
-                : "text-slate-500 hover:text-slate-700"
+                ? 'text-background font-medium'
+                : 'text-muted-foreground hover:text-foreground'
             )}
           >
             {section.label}
           </button>
           {index < sections.length - 1 && (
-            <span className="relative z-10 text-slate-300 text-xs">·</span>
+            <span className="relative z-10 text-muted-foreground/40 text-xs">·</span>
           )}
         </React.Fragment>
       ))}
