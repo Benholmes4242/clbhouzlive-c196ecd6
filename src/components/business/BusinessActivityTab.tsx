@@ -190,7 +190,7 @@ export function BusinessActivityTab({
         {membership?.canManage && (
           <Button 
             onClick={handleCreatePost}
-            className="mt-4 rounded-full bg-[#F7931E] hover:bg-[#E07D0A] text-white"
+            className="mt-4 rounded-full bg-slate-700 hover:bg-slate-800 text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
             Create post as {businessName}
@@ -233,7 +233,7 @@ export function BusinessActivityTab({
       {membership?.canManage && (
         <Button 
           onClick={handleCreatePost}
-          className="w-full rounded-sq-md bg-[#F7931E] hover:bg-[#E07D0A] text-white"
+          className="w-full rounded-sq-md bg-slate-700 hover:bg-slate-800 text-white"
         >
           <Plus className="h-4 w-4 mr-2" />
           Create post as {businessName}
