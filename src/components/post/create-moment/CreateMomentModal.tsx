@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { arrayMove } from "@dnd-kit/sortable";
 import { prefersReduced } from '@/lib/ui/motion';
@@ -107,13 +108,37 @@ export default function CreateMomentModal({
   useImmersiveHeader(Boolean(isOpen));
   useChromeState({ forceHidden: isOpen, disabled: false });
 
-  // Body class for global styles
+  // Body scroll lock - prevents background page from scrolling
   useEffect(() => {
-    if (isOpen) {
-      document.body.classList.add('ecm-open');
-    }
+    if (!isOpen) return;
+    
+    // Save current scroll position
+    const scrollY = window.scrollY;
+    const scrollX = window.scrollX;
+    
+    // Lock body scroll
+    document.body.classList.add('ecm-open');
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+    document.documentElement.style.overflow = 'hidden';
+    
     return () => {
+      // Restore body scroll
       document.body.classList.remove('ecm-open');
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.width = '';
+      document.documentElement.style.overflow = '';
+      
+      // Restore scroll position
+      window.scrollTo(scrollX, scrollY);
     };
   }, [isOpen]);
 
@@ -398,8 +423,15 @@ export default function CreateMomentModal({
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-[9999]">
+  // Use portal to render at document root, above all other content
+  return createPortal(
+    <div className="fixed inset-0 z-[9999]" style={{ touchAction: 'none' }}>
+      {/* Backdrop */}
+      <div 
+        className="fixed inset-0 bg-black/60" 
+        style={{ touchAction: 'none' }}
+        onClick={animateAndClose}
+      />
       {/* Main sheet */}
       <div 
         ref={wrapperRef}
@@ -550,6 +582,7 @@ export default function CreateMomentModal({
         updateEdits={(patch) => updateEdits(media[activeIndex]?.id || '', patch)}
         clearEdits={() => clearEdits(media[activeIndex]?.id || '')}
       />
-    </div>
+    </div>,
+    document.body
   );
 }
