@@ -4,8 +4,8 @@
  */
 
 export const MAP_CONFIG = {
-  /** Premium satellite-streets style used everywhere */
-  STYLE_URL: 'mapbox://styles/mapbox/satellite-streets-v12',
+  /** Clean streets style used everywhere */
+  STYLE_URL: 'mapbox://styles/mapbox/streets-v12',
   
   /** Token from environment */
   TOKEN: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string,
