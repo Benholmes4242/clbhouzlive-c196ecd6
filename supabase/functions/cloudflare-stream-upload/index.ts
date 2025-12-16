@@ -42,9 +42,10 @@ interface CloudflareStreamResponse {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
+  // Handle CORS preflight requests - MUST return 200 with headers
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    console.log('🔄 Handling CORS preflight request');
+    return new Response('ok', { status: 200, headers: corsHeaders });
   }
 
   try {
