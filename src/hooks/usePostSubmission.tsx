@@ -75,114 +75,123 @@ export const usePostSubmission = () => {
 
       console.log('Post created:', postData);
 
-      // Upload media files with error handling for each file
-      let uploadErrors: string[] = [];
+      // Upload media files with concurrency cap and retry logic
       if (mediaFiles.length > 0) {
-        const uploadPromises = mediaFiles.map(async (file, index) => {
-          try {
-            const fileName = `${Date.now()}-${index}-${Math.random().toString(36).substring(2, 15)}`;
-            const fileExtension = file.name.split('.').pop();
-            const fullFileName = `${fileName}.${fileExtension}`;
-            
-            console.log(`Uploading file ${index + 1}/${mediaFiles.length}: ${file.name} (${file.size} bytes)`);
-            
-            // For videos, try Cloudflare Stream first, then fallback to R2
-            if (file.type.startsWith('video/')) {
-              try {
-                // Create FormData for Cloudflare Stream upload
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('metadata', JSON.stringify({
-                  title: `Post video - ${Date.now()}`,
-                  description: 'Video uploaded from post'
-                }));
-                
-                const streamData = await edgePost('cloudflare-stream-upload', formData);
-                
-                if (streamData?.success && streamData.videoId) {
-                  const hlsUrl = generateStreamHlsUrl(streamData.videoId);
-                  
-                  console.log(`Successfully uploaded video to Cloudflare Stream: ${hlsUrl}`);
-                  
-                  // Create media record for video with dimensions for vertical-only filtering
-                  const mediaRecord: any = {
-                    post_id: postData.id,
-                    media_type: 'video',
-                    media_url: hlsUrl,
-                    stream_id: streamData.videoId,
-                  };
-
-                  // Include dimensions if available (enables vertical-only gate immediately)
-                  // AR = width / height, clamped to 4 decimals
-                  if (streamData.width && streamData.height) {
-                    mediaRecord.width = streamData.width;
-                    mediaRecord.height = streamData.height;
-                    mediaRecord.aspect_ratio = streamData.aspect_ratio 
-                      ? parseFloat(streamData.aspect_ratio.toFixed(4))
-                      : parseFloat((streamData.width / streamData.height).toFixed(4));
-                    console.log(`📐 Storing dimensions: ${streamData.width}x${streamData.height}, AR=${mediaRecord.aspect_ratio}`);
-                  } else {
-                    console.warn('⚠️ Video uploaded but dimensions missing - will need backfill for Clubhouse eligibility');
-                  }
-
-                  if (streamData.duration_seconds) {
-                    mediaRecord.duration_seconds = streamData.duration_seconds;
-                  }
-
-                  const { error: mediaError } = await supabase
-                    .from('post_media')
-                    .insert(mediaRecord);
-
-                  if (mediaError) throw mediaError;
-                  return { success: true, fileName: file.name };
-                }
-                console.log('Cloudflare Stream upload failed, trying R2 fallback');
-              } catch (streamError) {
-                console.log('Cloudflare Stream error, falling back to R2:', streamError);
-              }
-            }
-            
-            // Upload to Cloudflare R2 (for images or video fallback)
-            const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
-            const uploadResult = await uploadToCloudflareR2(file, 'clbhouz-post-images', fullFileName);
-
-            if (!uploadResult.success || !uploadResult.publicUrl) {
-              throw new Error(uploadResult.error || 'Upload failed');
-            }
-
-            const publicUrl = uploadResult.publicUrl;
-
-            console.log(`Successfully uploaded ${file.name}, public URL: ${publicUrl}`);
-
-            // Create media record
-            const { error: mediaError } = await supabase
-              .from('post_media')
-              .insert({
-                post_id: postData.id,
-                media_type: file.type.startsWith('image/') ? 'image' : 'video',
-                media_url: publicUrl
-              });
-
-            if (mediaError) {
-              console.error(`Media record error for file ${file.name}:`, mediaError);
-              throw mediaError;
-            }
-
-            return { success: true, fileName: file.name };
-          } catch (error) {
-            console.error(`Failed to process file ${file.name}:`, error);
-            return { success: false, fileName: file.name, error };
-          }
-        });
-
-        // Wait for all uploads to complete
-        const uploadResults = await Promise.all(uploadPromises);
-        const failedUploads = uploadResults.filter(result => !result.success);
+        const CONCURRENCY_CAP = 3;
+        const MAX_RETRIES = 3;
         
+        // Upload a single file with retry logic
+        const uploadFileWithRetry = async (file: File, index: number): Promise<{ success: boolean; fileName: string; error?: any }> => {
+          const fileName = `${Date.now()}-${index}-${Math.random().toString(36).substring(2, 15)}`;
+          const fileExtension = file.name.split('.').pop();
+          const fullFileName = `${fileName}.${fileExtension}`;
+          
+          console.log(`Uploading file ${index + 1}/${mediaFiles.length}: ${file.name} (${file.size} bytes)`);
+          
+          for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            try {
+              // For videos, try Cloudflare Stream first, then fallback to R2
+              if (file.type.startsWith('video/')) {
+                try {
+                  const formData = new FormData();
+                  formData.append('file', file);
+                  formData.append('metadata', JSON.stringify({
+                    title: `Post video - ${Date.now()}`,
+                    description: 'Video uploaded from post'
+                  }));
+                  
+                  const streamData = await edgePost('cloudflare-stream-upload', formData);
+                  
+                  if (streamData?.success && streamData.videoId) {
+                    const hlsUrl = generateStreamHlsUrl(streamData.videoId);
+                    console.log(`Successfully uploaded video to Cloudflare Stream: ${hlsUrl}`);
+                    
+                    const mediaRecord: any = {
+                      post_id: postData.id,
+                      media_type: 'video',
+                      media_url: hlsUrl,
+                      stream_id: streamData.videoId,
+                    };
+
+                    if (streamData.width && streamData.height) {
+                      mediaRecord.width = streamData.width;
+                      mediaRecord.height = streamData.height;
+                      mediaRecord.aspect_ratio = streamData.aspect_ratio 
+                        ? parseFloat(streamData.aspect_ratio.toFixed(4))
+                        : parseFloat((streamData.width / streamData.height).toFixed(4));
+                      console.log(`📐 Storing dimensions: ${streamData.width}x${streamData.height}, AR=${mediaRecord.aspect_ratio}`);
+                    }
+
+                    if (streamData.duration_seconds) {
+                      mediaRecord.duration_seconds = streamData.duration_seconds;
+                    }
+
+                    const { error: mediaError } = await supabase
+                      .from('post_media')
+                      .insert(mediaRecord);
+
+                    if (mediaError) throw mediaError;
+                    return { success: true, fileName: file.name };
+                  }
+                  console.log('Cloudflare Stream upload failed, trying R2 fallback');
+                } catch (streamError) {
+                  console.log('Cloudflare Stream error, falling back to R2:', streamError);
+                }
+              }
+              
+              // Upload to Cloudflare R2 (for images or video fallback)
+              const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
+              const uploadResult = await uploadToCloudflareR2(file, 'clbhouz-post-images', fullFileName);
+
+              if (!uploadResult.success || !uploadResult.publicUrl) {
+                throw new Error(uploadResult.error || 'Upload failed');
+              }
+
+              console.log(`Successfully uploaded ${file.name}, public URL: ${uploadResult.publicUrl}`);
+
+              const { error: mediaError } = await supabase
+                .from('post_media')
+                .insert({
+                  post_id: postData.id,
+                  media_type: file.type.startsWith('image/') ? 'image' : 'video',
+                  media_url: uploadResult.publicUrl
+                });
+
+              if (mediaError) throw mediaError;
+              return { success: true, fileName: file.name };
+              
+            } catch (error: any) {
+              const isTransient = error?.status >= 500 || error?.message?.includes('Network') || error?.message?.includes('fetch');
+              
+              if (isTransient && attempt < MAX_RETRIES) {
+                const backoffMs = Math.min(1000 * Math.pow(2, attempt - 1) + Math.random() * 500, 8000);
+                console.warn(`⚠️ Upload attempt ${attempt} failed, retrying in ${backoffMs}ms...`, error);
+                await new Promise(resolve => setTimeout(resolve, backoffMs));
+                continue;
+              }
+              
+              console.error(`Failed to process file ${file.name} after ${attempt} attempts:`, error);
+              return { success: false, fileName: file.name, error };
+            }
+          }
+          
+          return { success: false, fileName: file.name, error: new Error('Max retries exceeded') };
+        };
+        
+        // Process uploads with concurrency limit
+        const results: { success: boolean; fileName: string; error?: any }[] = [];
+        for (let i = 0; i < mediaFiles.length; i += CONCURRENCY_CAP) {
+          const batch = mediaFiles.slice(i, i + CONCURRENCY_CAP);
+          const batchResults = await Promise.all(
+            batch.map((file, batchIndex) => uploadFileWithRetry(file, i + batchIndex))
+          );
+          results.push(...batchResults);
+        }
+        
+        const failedUploads = results.filter(r => !r.success);
         if (failedUploads.length > 0) {
           console.error('Some uploads failed:', failedUploads);
-          const failedFileNames = failedUploads.map(f => f.fileName).join(', ');
-          throw new Error(`Failed to upload: ${failedFileNames}`);
+          throw new Error(`Failed to upload: ${failedUploads.map(f => f.fileName).join(', ')}`);
         }
 
         console.log('All media files uploaded successfully');
