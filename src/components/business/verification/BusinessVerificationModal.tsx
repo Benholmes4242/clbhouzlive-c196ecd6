@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, Loader2, ExternalLink, ChevronRight, Globe, Mail, Building, Sparkles, MapPin } from 'lucide-react';
+import { ChevronLeft, X, Loader2, ExternalLink, ChevronRight, Globe, Mail, Building, Sparkles, MapPin } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -20,6 +20,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
+import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
 interface BusinessVerificationModalProps {
   open: boolean;
@@ -61,6 +62,17 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
 }) => {
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
+  const { setVisible: setBottomNavVisible } = useBottomNavigation();
+
+  // Hide bottom nav when modal is open, restore on close
+  useEffect(() => {
+    if (open) {
+      setBottomNavVisible(false);
+    } else {
+      setBottomNavVisible(true);
+    }
+    return () => setBottomNavVisible(true);
+  }, [open, setBottomNavVisible]);
 
   const [step, setStep] = useState<Step>(1);
   
@@ -417,18 +429,29 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
     }
   };
 
+  // Handle back button - step 1 exits, steps 2/3 go to previous step
+  const handleBack = () => {
+    if (step === 1) {
+      handleClose();
+    } else {
+      setStep((s) => (s - 1) as Step);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto p-0">
-        {/* Header */}
-        <div className="sticky top-0 z-10 bg-background border-b border-border/40 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <DialogTitle className="text-lg font-semibold">Get your business verified</DialogTitle>
-              <DialogDescription className="text-sm text-muted-foreground mt-0.5">
-                Verification confirms this account officially represents the business and helps golfers trust the profile.
-              </DialogDescription>
-            </div>
+      <DialogContent className="sm:max-w-md w-full max-w-full overflow-x-hidden max-h-[100dvh] overflow-y-auto p-0 box-border">
+        {/* Header - Top 100 style: back top-left, centered title */}
+        <div className="sticky top-0 z-10 bg-background border-b border-border/40 px-4 py-3 w-full max-w-full overflow-hidden">
+          {/* Back button row */}
+          <div className="flex items-center justify-between mb-3">
+            <button
+              onClick={handleBack}
+              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span>Back</span>
+            </button>
             <button
               onClick={handleClose}
               className="h-8 w-8 flex items-center justify-center rounded-sq-sm hover:bg-muted/50 transition-colors shrink-0"
@@ -436,9 +459,16 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
               <X className="h-4 w-4" />
             </button>
           </div>
+          {/* Centered title and subtitle */}
+          <div className="text-center">
+            <DialogTitle className="text-lg font-semibold">Get your business verified</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground mt-0.5">
+              Verification confirms this account officially represents the business.
+            </DialogDescription>
+          </div>
         </div>
 
-        <div className="px-6 py-5">
+        <div className="px-4 py-5 w-full max-w-full overflow-x-hidden box-border">
           {stepIndicator}
 
           <AnimatePresence mode="wait">
@@ -449,7 +479,7 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                className="space-y-5"
+                className="space-y-5 w-full max-w-full overflow-x-hidden"
               >
                 <div>
                   <h3 className="text-sm font-semibold text-foreground">1. Confirm your business details</h3>
@@ -463,7 +493,7 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
                     <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-3 w-full max-w-full overflow-hidden">
                     <DetailRow label="Business name" value={business?.name} />
                     <DetailRow label="Category" value={business?.category} />
                     <DetailRow label="Location" value={business?.location} />
@@ -504,7 +534,7 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                className="space-y-5"
+                className="space-y-5 w-full max-w-full overflow-x-hidden"
               >
                 <div>
                   <h3 className="text-sm font-semibold text-foreground">2. Proof of legitimacy</h3>
@@ -568,7 +598,7 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                className="space-y-5"
+                className="space-y-5 w-full max-w-full overflow-x-hidden"
               >
                 <div>
                   <h3 className="text-sm font-semibold text-foreground">3. Confirm you represent this business</h3>
@@ -638,7 +668,7 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 z-10 bg-background border-t border-border/40 px-6 py-4">
+        <div className="sticky bottom-0 z-10 bg-background border-t border-border/40 px-4 py-4">
           <div className="flex items-center justify-between gap-3">
             {step === 1 ? (
               <Button
@@ -687,7 +717,7 @@ const BusinessVerificationModal: React.FC<BusinessVerificationModalProps> = ({
   );
 };
 
-// Helper component for detail rows
+// Helper component for detail rows - mobile-safe two-column layout with truncation
 function DetailRow({
   label,
   value,
@@ -700,12 +730,14 @@ function DetailRow({
   missingMessage?: string;
 }) {
   return (
-    <div className="flex items-start justify-between gap-4 py-2 border-b border-border/30 last:border-0">
-      <span className="text-sm text-muted-foreground shrink-0">{label}</span>
+    <div className="flex items-start gap-3 py-2 border-b border-border/30 last:border-0 w-full max-w-full overflow-hidden">
+      <span className="text-sm text-muted-foreground shrink-0 w-[100px]">{label}</span>
       {missing ? (
-        <span className="text-xs text-red-600 text-right">{missingMessage}</span>
+        <span className="text-xs text-red-600 flex-1 min-w-0 text-right break-words">{missingMessage}</span>
       ) : (
-        <span className="text-sm text-foreground text-right truncate">{value || '—'}</span>
+        <span className="text-sm text-foreground flex-1 min-w-0 text-right overflow-hidden text-ellipsis whitespace-nowrap">
+          {value || '—'}
+        </span>
       )}
     </div>
   );
