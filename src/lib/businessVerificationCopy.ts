@@ -198,8 +198,8 @@ export interface VerificationCopySet {
  */
 export const BUSINESS_VERIFICATION_COPY: Record<BusinessVerificationEvent, VerificationCopySet> = {
   submitted: {
-    title: 'Request received',
-    body: 'Your verification request is being reviewed by our team.',
+    title: 'Request Received',
+    body: 'Your request for verification has been received.',
     push: 'Verification request received',
     audit: 'Verification request submitted by business owner.',
     email_subject: "We've received your verification request",
