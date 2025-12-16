@@ -3,7 +3,7 @@
  * NO grid, NO masonry, NO personal profile patterns
  */
 import React, { useState, useCallback } from 'react';
-import { useBusinessPosts, BusinessPost } from '@/hooks/useBusinessPosts';
+import { useBusinessPosts, BusinessPost, isMockModeActive } from '@/hooks/useBusinessPosts';
 import { BusinessMembership } from '@/hooks/useBusinessMembership';
 import { BusinessActivityCard, BusinessActivityPost } from './BusinessActivityCard';
 import { Plus, FileText } from 'lucide-react';
@@ -63,7 +63,12 @@ export function BusinessActivityTab({
     content: post.content,
     created_at: post.created_at,
     post_type: (post as any).post_type || 'standard',
-    post_media: post.post_media,
+    post_media: post.post_media.map(m => ({
+      id: m.id,
+      media_url: m.media_url,
+      media_type: m.media_type,
+      poster_url: m.poster_url ?? null,
+    })),
     likes_count: (post as any).likes_count ?? 0,
     comments_count: (post as any).comments_count ?? 0,
     location: (post as any).location ?? null,
@@ -205,8 +210,17 @@ export function BusinessActivityTab({
     );
   }
 
+  const mockActive = isMockModeActive(businessId);
+
   return (
     <div className="space-y-4">
+      {/* Mock mode indicator (dev only) */}
+      {mockActive && (
+        <div className="px-3 py-2 rounded-sq-sm bg-amber-100 border border-amber-300 text-amber-800 text-xs font-medium">
+          ⚠️ Mock activity enabled (dev only)
+        </div>
+      )}
+
       {/* Filter Pills */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1">
         {filters.map((filter) => (
