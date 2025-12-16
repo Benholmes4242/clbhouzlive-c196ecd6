@@ -37,38 +37,15 @@ const BUSINESS_CATEGORIES_WITH_ICONS = [
   { value: 'Other', label: 'Other', icon: Building2 },
 ];
 
-// Card-based section component
-function EditSection({ 
-  children, 
-  title, 
-  subtitle,
-  icon: Icon,
-  index = 0 
-}: { 
-  children: React.ReactNode; 
-  title: string; 
-  subtitle?: string;
-  icon?: React.ElementType;
-  index?: number;
-}) {
+// Section header component (no card - matches personal profile)
+function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05, duration: 0.25, ease: 'easeOut' }}
-      className="rounded-sq-lg bg-card border border-border/50 p-5 shadow-sm"
-    >
-      <div className="mb-4">
-        <div className="flex items-center gap-2 mb-1">
-          {Icon && <Icon className="w-4 h-4 text-muted-foreground" />}
-          <h2 className="text-sm font-semibold text-foreground">{title}</h2>
-        </div>
-        {subtitle && (
-          <p className="text-xs text-muted-foreground">{subtitle}</p>
-        )}
-      </div>
-      {children}
-    </motion.section>
+    <div className="mb-4">
+      <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+      {subtitle && (
+        <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
+      )}
+    </div>
   );
 }
 
@@ -307,18 +284,17 @@ const BusinessEditPage = () => {
         </div>
       </header>
 
-      {/* Content */}
+      {/* Content - no cards, directly on background like personal profile */}
       <main className="flex-1 pb-28">
-        <div className="mx-auto w-full max-w-xl px-4 py-6 space-y-4">
+        <div className="mx-auto w-full max-w-xl">
           
-          {/* Section 1: Brand & Visuals */}
-          <EditSection
-            title="Brand & visuals"
-            subtitle="Your logo and cover photo help golfers recognise your business instantly."
-            icon={ImageIcon}
-            index={0}
-          >
-            <div className="space-y-5">
+          {/* Section 1: Photos (alternating band A) */}
+          <section className="px-4 py-6 bg-muted/30">
+            <SectionHeader 
+              title="Brand & visuals" 
+              subtitle="Your logo and cover photo help golfers recognise your business instantly."
+            />
+            <div className="space-y-6">
               {/* Logo */}
               <div>
                 <Label className="text-xs text-muted-foreground mb-2 block">Logo</Label>
@@ -383,7 +359,7 @@ const BusinessEditPage = () => {
                 </div>
               </div>
 
-              {/* Header photo - matches personal profile exactly */}
+              {/* Header photo */}
               <div>
                 <div className="mb-2 flex items-center justify-between">
                   <div>
@@ -417,7 +393,6 @@ const BusinessEditPage = () => {
                         alt="Header preview"
                         className="h-full w-full object-cover object-bottom"
                       />
-                      {/* Hover overlay */}
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <div className="flex items-center gap-2 text-white text-sm font-medium">
                           <Camera className="w-4 h-4" />
@@ -452,15 +427,14 @@ const BusinessEditPage = () => {
                 />
               </div>
             </div>
-          </EditSection>
+          </section>
 
-          {/* Section 2: Business Identity */}
-          <EditSection
-            title="Business identity"
-            subtitle="This appears across clbhouz wherever your business is shown."
-            icon={Building2}
-            index={1}
-          >
+          {/* Section 2: Business Identity (band B) */}
+          <section className="px-4 py-6">
+            <SectionHeader 
+              title="Business identity" 
+              subtitle="This appears across clbhouz wherever your business is shown."
+            />
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="businessName" className="text-xs text-muted-foreground">
@@ -488,11 +462,11 @@ const BusinessEditPage = () => {
                   </SelectTrigger>
                   <SelectContent>
                     {BUSINESS_CATEGORIES_WITH_ICONS.map((category) => {
-                      const Icon = category.icon;
+                      const IconComp = category.icon;
                       return (
                         <SelectItem key={category.value} value={category.value}>
                           <span className="flex items-center gap-2">
-                            <Icon className="h-4 w-4 text-muted-foreground" />
+                            <IconComp className="h-4 w-4 text-muted-foreground" />
                             <span>{category.label}</span>
                           </span>
                         </SelectItem>
@@ -502,14 +476,14 @@ const BusinessEditPage = () => {
                 </Select>
               </div>
             </div>
-          </EditSection>
+          </section>
 
-          {/* Section 3: About */}
-          <EditSection
-            title="About"
-            subtitle="Tell golfers what you do, who you help, and what makes you different."
-            index={2}
-          >
+          {/* Section 3: About (band A) */}
+          <section className="px-4 py-6 bg-muted/30">
+            <SectionHeader 
+              title="About" 
+              subtitle="Tell golfers what you do, who you help, and what makes you different."
+            />
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <Label htmlFor="businessBio" className="text-xs text-muted-foreground">
@@ -528,15 +502,14 @@ const BusinessEditPage = () => {
                 maxLength={500}
               />
             </div>
-          </EditSection>
+          </section>
 
-          {/* Section 4: Location & Contact */}
-          <EditSection
-            title="Location & contact"
-            subtitle="Where you are and how golfers reach you."
-            icon={MapPin}
-            index={3}
-          >
+          {/* Section 4: Location & Contact (band B) */}
+          <section className="px-4 py-6">
+            <SectionHeader 
+              title="Location & contact" 
+              subtitle="Where you are and how golfers reach you."
+            />
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground">
@@ -613,16 +586,11 @@ const BusinessEditPage = () => {
                 </div>
               </div>
             </div>
-          </EditSection>
+          </section>
 
-          {/* Section 5: Delete (Owner only) */}
+          {/* Section 5: Delete (Owner only, band A) */}
           {isOwner && (
-            <motion.section
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.25, ease: 'easeOut' }}
-              className="rounded-sq-lg border border-destructive/30 bg-destructive/5 p-5"
-            >
+            <section className="px-4 py-6 bg-muted/30">
               <div className="flex items-start gap-3">
                 <Trash2 className="w-5 h-5 text-destructive/70 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
@@ -642,7 +610,7 @@ const BusinessEditPage = () => {
                   </Button>
                 </div>
               </div>
-            </motion.section>
+            </section>
           )}
         </div>
       </main>
