@@ -635,56 +635,53 @@ const BusinessEditPage = () => {
         </div>
       </main>
 
-      {/* Sticky Save Bar - Only shows when dirty */}
-      <AnimatePresence>
-        {isDirty && (
-          <motion.footer
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed inset-x-0 bottom-0 z-20 border-t bg-background/95 backdrop-blur shadow-lg"
-          >
-            <div className="mx-auto flex w-full max-w-xl items-center justify-between gap-3 px-4 py-3">
-              <span className="text-sm text-muted-foreground">Unsaved changes</span>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleCancel}
-                  disabled={saving}
-                  className="h-9"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={handleSubmit}
-                  disabled={saving || saveSuccess || !isValid}
-                  className={cn(
-                    "h-9 min-w-[100px]",
-                    saveSuccess && "bg-emerald-500 hover:bg-emerald-500"
-                  )}
-                >
-                  {saving ? (
-                    <span className="flex items-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Saving…
-                    </span>
-                  ) : saveSuccess ? (
-                    <span className="flex items-center gap-2">
-                      <Check className="w-4 h-4" />
-                      Saved
-                    </span>
-                  ) : (
-                    'Save changes'
-                  )}
-                </Button>
-              </div>
-            </div>
-          </motion.footer>
-        )}
-      </AnimatePresence>
+      {/* Sticky Save Bar - Always visible */}
+      <footer
+        className="fixed inset-x-0 bottom-0 z-20 border-t bg-background/95 backdrop-blur shadow-lg"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
+        <div className="mx-auto flex w-full max-w-xl items-center justify-between gap-3 px-4 py-3">
+          <span className="text-sm text-muted-foreground">
+            {isDirty ? 'Unsaved changes' : ''}
+          </span>
+          <div className="flex items-center gap-2">
+            {isDirty && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCancel}
+                disabled={saving}
+                className="h-9"
+              >
+                Cancel
+              </Button>
+            )}
+            <Button
+              size="sm"
+              onClick={handleSubmit}
+              disabled={saving || saveSuccess || !isValid || !isDirty}
+              className={cn(
+                "h-9 min-w-[100px]",
+                saveSuccess && "bg-emerald-500 hover:bg-emerald-500"
+              )}
+            >
+              {saving ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Saving…
+                </span>
+              ) : saveSuccess ? (
+                <span className="flex items-center gap-2">
+                  <Check className="w-4 h-4" />
+                  Saved
+                </span>
+              ) : (
+                'Save'
+              )}
+            </Button>
+          </div>
+        </div>
+      </footer>
 
       {/* Delete Dialog */}
       {id && user?.id && (
