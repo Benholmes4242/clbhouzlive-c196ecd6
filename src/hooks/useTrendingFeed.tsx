@@ -43,6 +43,7 @@ export const useTrendingFeed = () => {
       if (allConnectedUserIds.length === 0) return [];
 
       // Single optimized query with all required data and filter for media posts only
+      // Exclude business posts - only show personal posts in trending feed
       const { data: posts, error: postsError } = await supabase
         .from('posts')
         .select(`
@@ -50,9 +51,11 @@ export const useTrendingFeed = () => {
           content,
           created_at,
           user_id,
+          actor_type,
           post_media!inner(id, media_type, media_url)
         `)
         .in('user_id', allConnectedUserIds)
+        .or('actor_type.eq.personal,actor_type.is.null') // Only personal posts, treat null as personal legacy
         .order('created_at', { ascending: false })
         .limit(6); // Optimized limit for performance
 
