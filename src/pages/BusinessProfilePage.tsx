@@ -299,7 +299,8 @@ const BusinessProfilePage: React.FC = () => {
                 className="px-4 py-1.5 text-sm font-semibold rounded-full text-[#0F0F0F] flex items-center gap-1.5"
                 style={{ 
                   background: '#FFFFFF',
-                  boxShadow: '0 2px 8px rgba(31, 36, 40, 0.08)'
+                  boxShadow: '0 2px 8px rgba(31, 36, 40, 0.08)',
+                  border: '1px solid transparent'
                 }}
               >
                 <MapPin className="w-3.5 h-3.5" />
