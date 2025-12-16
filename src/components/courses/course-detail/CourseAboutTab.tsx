@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, ChevronDown, ChevronUp, MapPin, Trophy, Users, Globe, Loader2 } from 'lucide-react';
+import { ExternalLink, ChevronDown, ChevronUp, MapPin, Loader2 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AboutMediaStrip from './AboutMediaStrip';
 import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
@@ -128,38 +128,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
     navigate(`/courses/${course.id}/rate`);
   };
 
-  // Build Quick Facts data
-  const quickFacts = [];
-  
-  // Region/Country
-  if (course.sub_country || course.region) {
-    quickFacts.push({
-      icon: MapPin,
-      label: course.sub_country || course.region,
-    });
-  }
-  
-  // Top 100 presence
-  const hasTop100 = course.global_rank || course.regional_rank || course.usa_rank;
-  if (hasTop100) {
-    const top100Label = course.global_rank 
-      ? 'Top 100: Global' 
-      : course.usa_rank 
-        ? 'Top 100: USA'
-        : 'Top 100: GB&I';
-    quickFacts.push({
-      icon: Trophy,
-      label: top100Label,
-    });
-  }
-  
-  // Total ratings count
-  if (ratingAggregates?.review_count) {
-    quickFacts.push({
-      icon: Users,
-      label: `${ratingAggregates.review_count} ${ratingAggregates.review_count === 1 ? 'rating' : 'ratings'}`,
-    });
-  }
 
   // B1: Contextual button label
   const rateButtonLabel = userRating ? 'Edit Your Rating' : 'Rate this course';
@@ -172,26 +140,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {/* 1. Location Breadcrumb & Quick Filters (Explore more + See Top 100 in) */}
       <CourseLocationBreadcrumb course={course} />
 
-      {/* Quick Facts Strip - compact, centered block below breadcrumb */}
-      {quickFacts.length > 0 && (
-        <section className="px-4 pt-3 pb-4 bg-slate-50 md:px-6">
-          <div className="flex justify-center">
-            <div className="inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-sm text-slate-600">
-              {quickFacts.map((fact, index) => (
-                <React.Fragment key={fact.label}>
-                  <div className="flex items-center gap-1.5">
-                    <fact.icon className="h-3.5 w-3.5 text-slate-400" />
-                    <span>{fact.label}</span>
-                  </div>
-                  {index < quickFacts.length - 1 && (
-                    <span className="text-slate-300">·</span>
-                  )}
-                </React.Fragment>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
       
       {/* 2. Community Score Section - Card-based design */}
       <section className="px-4 pt-5 pb-5 bg-slate-100 md:px-6 md:pt-7 space-y-4">

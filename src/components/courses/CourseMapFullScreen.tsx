@@ -5,6 +5,7 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { MapPin } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
+import { createGlassyMarkerElement } from '@/components/map/MapMarker';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-streets-v12';
@@ -95,8 +96,9 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
       // Navigation controls
       map.addControl(new mapboxgl.NavigationControl({ visualizePitch: false }), 'top-right');
 
-      // Marker
-      new mapboxgl.Marker({ color: '#ffffff' })
+      // Glassy orange marker (same as Business maps)
+      const markerEl = createGlassyMarkerElement('md');
+      new mapboxgl.Marker({ element: markerEl, anchor: 'bottom' })
         .setLngLat([longitude, latitude])
         .addTo(map);
 
