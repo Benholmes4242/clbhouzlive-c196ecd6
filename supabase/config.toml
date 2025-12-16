@@ -1,5 +1,8 @@
 project_id = "ybxkehyomcakqjvuhnna"
 
+[functions.address-search]
+verify_jwt = false
+
 [functions.admin-invite-manage]
 verify_jwt = true
 
