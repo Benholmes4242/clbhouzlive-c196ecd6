@@ -7,8 +7,7 @@ import { ExternalLink, ChevronDown, ChevronUp, MapPin, Loader2 } from 'lucide-re
 import { useIsMobile } from '@/hooks/use-mobile';
 import AboutMediaStrip from './AboutMediaStrip';
 import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
-import CourseMapPreview from '@/components/courses/CourseMapPreview';
-import CourseMapFullScreen from '@/components/courses/CourseMapFullScreen';
+import { LocationMapCard } from '@/components/map';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import { useCourseRatingDistribution } from '@/hooks/useCourseRatingDistribution';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -60,7 +59,6 @@ const formatDescription = (description: string) => {
 
 const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
-  const [mapOpen, setMapOpen] = useState(false);
   const [websiteLoading, setWebsiteLoading] = useState(false);
   const isMobile = useIsMobile();
   const { user } = useSupabaseSession();
@@ -241,41 +239,26 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           </p>
         </div>
         
-        {/* Map preview - full bleed on mobile (0px gaps), with padding on desktop */}
-        {!coords && coordsLoading && (
-          <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 sm:px-0 md:px-4">
-            <div className="w-full h-[280px] sm:h-64 bg-surface-alt animate-pulse rounded-none sm:rounded-xl border border-border/60 sm:border-border/40" />
+        {/* Map card - unified with Business profile */}
+        {coordsLoading && (
+          <div className="px-5 md:px-4">
+            <div className="w-full h-[200px] bg-surface-alt animate-pulse rounded-sq-md border border-slate-200" />
           </div>
         )}
 
         {coords && (
-          <>
-            {!mapOpen && (
-              <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 sm:px-0 md:px-4">
-                <CourseMapPreview
-                  latitude={coords.lat}
-                  longitude={coords.lng}
-                  courseName={course.name}
-                  onOpenFullMap={() => setMapOpen(true)}
-                />
-              </div>
-            )}
-
-            {mapOpen && (
-              <CourseMapFullScreen
-                open={mapOpen}
-                onOpenChange={setMapOpen}
-                latitude={coords.lat}
-                longitude={coords.lng}
-                courseName={course.name}
-                locationText={formatCourseLocation(course)}
-              />
-            )}
-          </>
+          <div className="px-5 md:px-4">
+            <LocationMapCard
+              lat={coords.lat}
+              lng={coords.lng}
+              name={course.name}
+              locationText={formatCourseLocation(course)}
+            />
+          </div>
         )}
 
         {!coords && !coordsLoading && (
-          <div className="px-4">
+          <div className="px-5">
             <p className="text-base text-muted-foreground">
               Location data isn't available for this course yet.
             </p>
