@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -24,6 +24,14 @@ import { LocationAutocomplete, LocationValue } from '@/components/business/Locat
 import { PhoneInputWithDialCode, PhoneValue } from '@/components/business/PhoneInputWithDialCode';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { DeleteBusinessDialog } from '@/components/business/DeleteBusinessDialog';
+import { SectionJumpStrip } from '@/components/profile/edit-v2/SectionJumpStrip';
+
+const SECTIONS = [
+  { id: 'photos', label: 'Photos' },
+  { id: 'identity', label: 'Business Identity' },
+  { id: 'about', label: 'About' },
+  { id: 'location', label: 'Location' },
+];
 
 // Categories with icons
 const BUSINESS_CATEGORIES_WITH_ICONS = [
@@ -61,6 +69,11 @@ const BusinessEditPage = () => {
   
   const logoInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
+  
+  // Section refs for scroll-to
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+  const [activeSection, setActiveSection] = useState('photos');
+  const isScrollingFromClick = useRef(false);
   
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -156,6 +169,78 @@ const BusinessEditPage = () => {
       navigate(`/business/${id}`);
     }
   }, [membershipLoading, membership, canEdit, id, navigate]);
+
+  // Section order for sequential movement
+  const sectionOrder = ['photos', 'identity', 'about', 'location'];
+
+  // Intersection observer for active section (scrollspy)
+  useEffect(() => {
+    if (businessLoading) return;
+
+    const timeoutId = setTimeout(() => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (isScrollingFromClick.current) return;
+          
+          const visible = entries
+            .filter((e) => e.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+          if (visible) {
+            const newSectionId = visible.target.id;
+            if (newSectionId) {
+              setActiveSection(prev => {
+                const currentIndex = sectionOrder.indexOf(prev);
+                const newIndex = sectionOrder.indexOf(newSectionId);
+                
+                if (Math.abs(newIndex - currentIndex) <= 1 || currentIndex === -1) {
+                  return newSectionId;
+                }
+                if (newIndex > currentIndex) {
+                  return sectionOrder[currentIndex + 1];
+                } else {
+                  return sectionOrder[currentIndex - 1];
+                }
+              });
+            }
+          }
+        },
+        {
+          root: null,
+          threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5],
+          rootMargin: '-120px 0px -40% 0px',
+        }
+      );
+
+      Object.values(sectionRefs.current).forEach((ref) => {
+        if (ref) observer.observe(ref);
+      });
+
+      (window as any).__businessEditObserver = observer;
+    }, 100);
+
+    return () => {
+      clearTimeout(timeoutId);
+      if ((window as any).__businessEditObserver) {
+        (window as any).__businessEditObserver.disconnect();
+      }
+    };
+  }, [businessLoading]);
+
+  // Scroll to section
+  const handleSectionClick = useCallback((sectionId: string) => {
+    isScrollingFromClick.current = true;
+    setActiveSection(sectionId);
+    
+    const ref = sectionRefs.current[sectionId];
+    if (ref) {
+      ref.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    setTimeout(() => {
+      isScrollingFromClick.current = false;
+    }, 600);
+  }, []);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -275,12 +360,19 @@ const BusinessEditPage = () => {
             <span>Back to profile</span>
           </button>
 
-          <div className="text-center">
+          <div className="text-center mb-4">
             <h1 className="text-xl font-semibold text-foreground">Edit business profile</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
               Everything golfers see about your business
             </p>
           </div>
+
+          {/* Section Jump Strip */}
+          <SectionJumpStrip
+            sections={SECTIONS}
+            activeSection={activeSection}
+            onSectionClick={handleSectionClick}
+          />
         </div>
       </header>
 
@@ -289,7 +381,11 @@ const BusinessEditPage = () => {
         <div className="mx-auto w-full max-w-xl">
           
           {/* Section 1: Photos (alternating band A) */}
-          <section className="px-4 py-6 bg-muted/30">
+          <section 
+            id="photos"
+            ref={(el) => { sectionRefs.current['photos'] = el; }}
+            className="px-4 py-6 bg-muted/30"
+          >
             <SectionHeader 
               title="Brand & visuals" 
               subtitle="Your logo and cover photo help golfers recognise your business instantly."
@@ -430,7 +526,11 @@ const BusinessEditPage = () => {
           </section>
 
           {/* Section 2: Business Identity (band B) */}
-          <section className="px-4 py-6">
+          <section 
+            id="identity"
+            ref={(el) => { sectionRefs.current['identity'] = el; }}
+            className="px-4 py-6"
+          >
             <SectionHeader 
               title="Business identity" 
               subtitle="This appears across clbhouz wherever your business is shown."
@@ -479,7 +579,11 @@ const BusinessEditPage = () => {
           </section>
 
           {/* Section 3: About (band A) */}
-          <section className="px-4 py-6 bg-muted/30">
+          <section 
+            id="about"
+            ref={(el) => { sectionRefs.current['about'] = el; }}
+            className="px-4 py-6 bg-muted/30"
+          >
             <SectionHeader 
               title="About" 
               subtitle="Tell golfers what you do, who you help, and what makes you different."
@@ -505,7 +609,11 @@ const BusinessEditPage = () => {
           </section>
 
           {/* Section 4: Location & Contact (band B) */}
-          <section className="px-4 py-6">
+          <section 
+            id="location"
+            ref={(el) => { sectionRefs.current['location'] = el; }}
+            className="px-4 py-6"
+          >
             <SectionHeader 
               title="Location & contact" 
               subtitle="Where you are and how golfers reach you."
