@@ -1,16 +1,17 @@
 /**
- * ProfileQuestView - Unified Quest Page
+ * ProfileQuestView - Quest Page v2
  * 
- * Single page with clean narrative:
- * 1. Overall progress (Top 100 courses played)
- * 2. Milestones earned (quick recognition)
- * 3. Next target (forward momentum)
- * 4. Journey Map = Milestone ladder only (5→400 Club)
- * 5. Journey Summary = Regional list progress (GB&I / Europe / USA / Worldwide)
- * 6. Recently Added (grounded in real activity)
+ * Story × Passport × Mission
+ * 
+ * Structure:
+ * 1. Narrative Hero (Story)
+ * 2. Current Quest Focus (Mission)
+ * 3. Journey Map (Progression Spine)
+ * 4. Your Golf Passport (Regional Progress)
+ * 5. Recent Memories (Journal)
  */
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trophy } from 'lucide-react';
 
@@ -27,13 +28,12 @@ import { MilestoneUnlockSheet } from '@/components/profile-v2/MilestoneUnlockShe
 import { QuestIntroOverlay } from '@/components/profile-v2/QuestIntroOverlay';
 import { QuestFirstCourseSheet } from '@/components/profile-v2/QuestFirstCourseSheet';
 
-// New modular Quest components
-import { QuestHero } from '@/components/quest/QuestHero';
-import { MilestonesEarnedRow } from '@/components/quest/MilestonesEarnedRow';
-import { NextTargetCard } from '@/components/profile-v2/NextTargetCard';
+// New Quest v2 components
+import { NarrativeHero } from '@/components/quest/NarrativeHero';
+import { CurrentFocusCard } from '@/components/quest/CurrentFocusCard';
 import { MilestoneLadder } from '@/components/quest/MilestoneLadder';
-import { RegionalJourneySummary, RegionProgress } from '@/components/quest/RegionalJourneySummary';
-import { RecentlyAddedSection } from '@/components/quest/RecentlyAddedSection';
+import { GolfPassport, RegionProgress } from '@/components/quest/GolfPassport';
+import { RecentMemories } from '@/components/quest/RecentMemories';
 import { CLUB_STEPS } from '@/lib/top100Club';
 
 // Milestone club type for sheet
@@ -50,6 +50,7 @@ const ProfileQuestView: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { recentlyPlayed, isLoading: questLoading } = useQuestCourses();
+  const journeyMapRef = useRef<HTMLDivElement>(null);
   
   // Use the SAME hook as Top 100 list page for ALL progress data (single source of truth)
   const { data: progressData, isLoading: progressLoading } = useTop100ProgressForUser(user?.id);
@@ -58,7 +59,7 @@ const ProfileQuestView: React.FC = () => {
   // Use totalTop100Played from the single source of truth
   const totalPlayed = progressData?.totalTop100Played ?? 0;
   
-  // Map Top100ProgressForUser list data to RegionProgress format for Journey Summary
+  // Map Top100ProgressForUser list data to RegionProgress format
   const regionProgress: RegionProgress[] = useMemo(() => {
     if (!progressData?.lists) return [];
     
@@ -97,26 +98,6 @@ const ProfileQuestView: React.FC = () => {
 
   // Quest onboarding state
   const onboarding = useQuestOnboarding(totalPlayed);
-  const [showJourneyHint, setShowJourneyHint] = useState(false);
-
-  // Show journey hint after intro is dismissed
-  useEffect(() => {
-    if (onboarding.introSeen && onboarding.shouldShowJourneyHint) {
-      const timer = setTimeout(() => setShowJourneyHint(true), 800);
-      return () => clearTimeout(timer);
-    }
-  }, [onboarding.introSeen, onboarding.shouldShowJourneyHint]);
-
-  // Auto-fade journey hint
-  useEffect(() => {
-    if (showJourneyHint) {
-      const timer = setTimeout(() => {
-        setShowJourneyHint(false);
-        onboarding.markJourneyHintSeen();
-      }, 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [showJourneyHint, onboarding]);
 
   // Build milestone clubs for sheet display
   const milestoneClubs: MilestoneClub[] = useMemo(() => {
@@ -129,9 +110,6 @@ const ProfileQuestView: React.FC = () => {
       remaining: totalPlayed < step.threshold ? step.threshold - totalPlayed : undefined,
     }));
   }, [totalPlayed]);
-
-  // Next milestone for target card
-  const nextMilestone = milestoneClubs.find((c) => !c.isUnlocked);
 
   // Suggested region (lowest completion)
   const suggestedRegion = useMemo(() => {
@@ -162,6 +140,11 @@ const ProfileQuestView: React.FC = () => {
     setSelectedRegion(region);
   };
 
+  // Handle Current Focus card click - scroll to Journey Map
+  const handleFocusCardClick = () => {
+    journeyMapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   if (isLoading) {
     return (
       <PageRoot className="quest-theme-light min-h-screen">
@@ -187,82 +170,50 @@ const ProfileQuestView: React.FC = () => {
         />
       )}
 
-      {/* Header - Back CTA top left, centered title + subtitle */}
+      {/* Back navigation */}
       <div className="safe-top px-4 pt-4">
-        {/* Back link */}
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-1 text-sm transition-colors hover:opacity-70 mb-3 quest-animate-fade-up"
+          className="flex items-center gap-1 text-sm transition-colors hover:opacity-70 quest-animate-fade-up"
           style={{ color: 'var(--quest-text-secondary)' }}
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back</span>
         </button>
-
-        {/* Centered title + subtitle with staggered animation */}
-        <div className="text-center mb-1">
-          <h1
-            className="text-2xl font-bold mb-0.5 quest-animate-fade-up quest-delay-1"
-            style={{ color: 'var(--quest-text-primary)' }}
-          >
-            The Quest
-          </h1>
-          <p
-            className="text-sm quest-animate-fade-up quest-delay-2"
-            style={{ color: 'var(--quest-text-secondary)' }}
-          >
-            Your journey across the world's greatest courses
-          </p>
-        </div>
       </div>
 
       {/* Content */}
-      <div className="px-4 pb-32 space-y-8">
-        {/* Section 1: Hero - Overall Progress */}
-        <QuestHero
+      <div className="px-4 pb-32 space-y-10">
+        {/* Section 1: Narrative Hero */}
+        <NarrativeHero
           totalPlayed={totalPlayed}
           target={100}
-          hasPremiumAccent={rewards.hasPremiumAccent}
         />
 
-        {/* Section 2: Milestones Earned Row */}
-        <MilestonesEarnedRow totalPlayed={totalPlayed} />
-
-        {/* Section 3: Next Target Card */}
-        <NextTargetCard
+        {/* Section 2: Current Quest Focus */}
+        <CurrentFocusCard
           totalPlayed={totalPlayed}
-          nextMilestone={nextMilestone ? { name: nextMilestone.name, threshold: nextMilestone.threshold } : undefined}
           suggestedRegion={suggestedRegion}
-          suggestedFocus={nextMilestone?.name}
-          onShare={() => {/* Share placeholder */}}
-          showHint={onboarding.shouldShowTargetHint}
-          onHintDismiss={onboarding.markTargetHintSeen}
+          onCardClick={handleFocusCardClick}
         />
 
-        {/* Section 4: Journey Map (Milestone Ladder ONLY) */}
-        {showJourneyHint && (
-          <p
-            className="text-xs px-1 transition-opacity duration-500"
-            style={{ color: 'var(--quest-text-tertiary)' }}
-          >
-            Your journey unfolds here
-          </p>
-        )}
-        <MilestoneLadder
-          totalPlayed={totalPlayed}
-          onMilestoneClick={handleMilestoneClick}
-        />
+        {/* Section 3: Journey Map */}
+        <div ref={journeyMapRef}>
+          <MilestoneLadder
+            totalPlayed={totalPlayed}
+            onMilestoneClick={handleMilestoneClick}
+          />
+        </div>
 
-        {/* Section 5: Journey Summary (Regional Lists ONLY) */}
-        <RegionalJourneySummary
+        {/* Section 4: Your Golf Passport */}
+        <GolfPassport
           regions={regionProgress}
           onRegionClick={handleRegionClick}
         />
 
-        {/* Section 6: Recently Added */}
-        <RecentlyAddedSection
+        {/* Section 5: Recent Memories */}
+        <RecentMemories
           courses={recentCourses}
-          hasGoldTrim={rewards.hasGoldTrim}
         />
       </div>
 

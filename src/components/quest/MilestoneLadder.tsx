@@ -271,7 +271,7 @@ export const MilestoneLadder: React.FC<MilestoneLadderProps> = ({
     <section>
       <h2
         className={cn(
-          "quest-section-title mb-4 px-1",
+          "quest-section-title mb-6 px-1",
           isVisible && !prefersReducedMotion && "quest-animate-fade-up"
         )}
         style={{ animationDelay: '150ms' }}
