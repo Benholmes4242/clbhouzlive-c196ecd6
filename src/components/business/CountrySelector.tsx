@@ -2,77 +2,118 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Search, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// Common countries for golf businesses, sorted by likely usage
-const COUNTRIES = [
-  { code: 'GB', name: 'United Kingdom' },
-  { code: 'US', name: 'United States' },
-  { code: 'IE', name: 'Ireland' },
-  { code: 'CA', name: 'Canada' },
-  { code: 'AU', name: 'Australia' },
-  { code: 'NZ', name: 'New Zealand' },
-  { code: 'ES', name: 'Spain' },
-  { code: 'PT', name: 'Portugal' },
-  { code: 'FR', name: 'France' },
-  { code: 'DE', name: 'Germany' },
-  { code: 'IT', name: 'Italy' },
-  { code: 'NL', name: 'Netherlands' },
-  { code: 'BE', name: 'Belgium' },
-  { code: 'AT', name: 'Austria' },
-  { code: 'CH', name: 'Switzerland' },
-  { code: 'SE', name: 'Sweden' },
-  { code: 'DK', name: 'Denmark' },
-  { code: 'NO', name: 'Norway' },
-  { code: 'FI', name: 'Finland' },
-  { code: 'JP', name: 'Japan' },
-  { code: 'KR', name: 'South Korea' },
-  { code: 'TH', name: 'Thailand' },
-  { code: 'AE', name: 'United Arab Emirates' },
-  { code: 'ZA', name: 'South Africa' },
-  { code: 'MX', name: 'Mexico' },
-  { code: 'AR', name: 'Argentina' },
-  { code: 'BR', name: 'Brazil' },
-  { code: 'CL', name: 'Chile' },
-  { code: 'SG', name: 'Singapore' },
-  { code: 'MY', name: 'Malaysia' },
-  { code: 'ID', name: 'Indonesia' },
-  { code: 'PH', name: 'Philippines' },
-  { code: 'VN', name: 'Vietnam' },
-  { code: 'IN', name: 'India' },
-  { code: 'CN', name: 'China' },
-  { code: 'TW', name: 'Taiwan' },
-  { code: 'HK', name: 'Hong Kong' },
-  { code: 'TR', name: 'Turkey' },
-  { code: 'GR', name: 'Greece' },
-  { code: 'CY', name: 'Cyprus' },
-  { code: 'MA', name: 'Morocco' },
-  { code: 'EG', name: 'Egypt' },
-  { code: 'DO', name: 'Dominican Republic' },
-  { code: 'JM', name: 'Jamaica' },
-  { code: 'BB', name: 'Barbados' },
-  { code: 'BS', name: 'Bahamas' },
-  { code: 'PR', name: 'Puerto Rico' },
-  { code: 'CR', name: 'Costa Rica' },
-  { code: 'PA', name: 'Panama' },
-  { code: 'CZ', name: 'Czech Republic' },
-  { code: 'PL', name: 'Poland' },
-  { code: 'HU', name: 'Hungary' },
-  { code: 'RO', name: 'Romania' },
-  { code: 'BG', name: 'Bulgaria' },
-  { code: 'HR', name: 'Croatia' },
-  { code: 'SI', name: 'Slovenia' },
-  { code: 'SK', name: 'Slovakia' },
-  { code: 'LV', name: 'Latvia' },
-  { code: 'LT', name: 'Lithuania' },
-  { code: 'EE', name: 'Estonia' },
-  { code: 'IS', name: 'Iceland' },
-  { code: 'MT', name: 'Malta' },
-  { code: 'LU', name: 'Luxembourg' },
-  { code: 'MC', name: 'Monaco' },
+// Country data with UI labels, ISO codes, and groupings
+const COUNTRY_GROUPS = [
+  {
+    label: "Great Britain & Ireland",
+    countries: [
+      { name: "England", code: "GB" },
+      { name: "Scotland", code: "GB" },
+      { name: "Wales", code: "GB" },
+      { name: "Northern Ireland", code: "GB" },
+      { name: "Ireland", code: "IE" },
+    ]
+  },
+  {
+    label: "Rest of World",
+    countries: [
+      { name: "United States", code: "US" },
+      { name: "Canada", code: "CA" },
+      { name: "United Arab Emirates", code: "AE" },
+      { name: "Saudi Arabia", code: "SA" },
+      { name: "South Africa", code: "ZA" },
+      { name: "Australia", code: "AU" },
+      { name: "New Zealand", code: "NZ" },
+    ]
+  },
+  {
+    label: "Europe",
+    countries: [
+      { name: "Albania", code: "AL" },
+      { name: "Andorra", code: "AD" },
+      { name: "Austria", code: "AT" },
+      { name: "Belarus", code: "BY" },
+      { name: "Belgium", code: "BE" },
+      { name: "Bosnia and Herzegovina", code: "BA" },
+      { name: "Bulgaria", code: "BG" },
+      { name: "Croatia", code: "HR" },
+      { name: "Cyprus", code: "CY" },
+      { name: "Czech Republic", code: "CZ" },
+      { name: "Denmark", code: "DK" },
+      { name: "Estonia", code: "EE" },
+      { name: "Finland", code: "FI" },
+      { name: "France", code: "FR" },
+      { name: "Germany", code: "DE" },
+      { name: "Greece", code: "GR" },
+      { name: "Hungary", code: "HU" },
+      { name: "Iceland", code: "IS" },
+      { name: "Italy", code: "IT" },
+      { name: "Kosovo", code: "XK" },
+      { name: "Latvia", code: "LV" },
+      { name: "Liechtenstein", code: "LI" },
+      { name: "Lithuania", code: "LT" },
+      { name: "Luxembourg", code: "LU" },
+      { name: "Malta", code: "MT" },
+      { name: "Moldova", code: "MD" },
+      { name: "Monaco", code: "MC" },
+      { name: "Montenegro", code: "ME" },
+      { name: "Netherlands", code: "NL" },
+      { name: "North Macedonia", code: "MK" },
+      { name: "Norway", code: "NO" },
+      { name: "Poland", code: "PL" },
+      { name: "Portugal", code: "PT" },
+      { name: "Romania", code: "RO" },
+      { name: "San Marino", code: "SM" },
+      { name: "Serbia", code: "RS" },
+      { name: "Slovakia", code: "SK" },
+      { name: "Slovenia", code: "SI" },
+      { name: "Spain", code: "ES" },
+      { name: "Sweden", code: "SE" },
+      { name: "Switzerland", code: "CH" },
+      { name: "Turkey", code: "TR" },
+      { name: "Ukraine", code: "UA" },
+      { name: "Vatican City", code: "VA" },
+    ]
+  }
 ];
+
+// Flat list for lookup
+const ALL_COUNTRIES = COUNTRY_GROUPS.flatMap(g => g.countries);
+
+// Get country name from stored value (handles both name and code)
+export function getCountryDisplayName(value: string | null): string {
+  if (!value) return '';
+  // First try to find by name (for GB&I split)
+  const byName = ALL_COUNTRIES.find(c => c.name === value);
+  if (byName) return byName.name;
+  
+  // Then try by code (legacy support)
+  const byCode = ALL_COUNTRIES.find(c => c.code === value);
+  if (byCode) return byCode.name;
+  
+  return value;
+}
+
+// Get ISO code for Mapbox API
+export function getCountryCode(value: string | null): string {
+  if (!value) return '';
+  // First try to find by name (for GB&I split)
+  const byName = ALL_COUNTRIES.find(c => c.name === value);
+  if (byName) return byName.code;
+  
+  // Then try by code
+  const byCode = ALL_COUNTRIES.find(c => c.code === value);
+  if (byCode) return byCode.code;
+  
+  // Return as-is if it looks like an ISO code
+  if (value.length === 2) return value.toUpperCase();
+  
+  return '';
+}
 
 interface CountrySelectorProps {
   value: string | null;
-  onChange: (code: string) => void;
+  onChange: (name: string) => void; // Returns country name (e.g., "England")
   disabled?: boolean;
   className?: string;
 }
@@ -88,16 +129,19 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Get selected country name
-  const selectedCountry = COUNTRIES.find(c => c.code === value);
+  // Get selected country display name
+  const displayValue = getCountryDisplayName(value);
 
   // Filter countries based on search
-  const filteredCountries = searchQuery
-    ? COUNTRIES.filter(c =>
-        c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        c.code.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : COUNTRIES;
+  const filteredGroups = searchQuery
+    ? COUNTRY_GROUPS.map(group => ({
+        ...group,
+        countries: group.countries.filter(c =>
+          c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          c.code.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      })).filter(g => g.countries.length > 0)
+    : COUNTRY_GROUPS;
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -118,8 +162,8 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
     }
   }, [isOpen]);
 
-  const handleSelect = (code: string) => {
-    onChange(code);
+  const handleSelect = (countryName: string) => {
+    onChange(countryName);
     setIsOpen(false);
     setSearchQuery('');
   };
@@ -139,9 +183,9 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
       >
         <span className={cn(
           "text-sm",
-          !selectedCountry && "text-muted-foreground"
+          !displayValue && "text-muted-foreground"
         )}>
-          {selectedCountry ? selectedCountry.name : 'Select country...'}
+          {displayValue || 'Select country'}
         </span>
         <ChevronDown className={cn(
           "h-4 w-4 text-muted-foreground transition-transform",
@@ -160,30 +204,37 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search countries..."
+                placeholder="Search country…"
                 className="w-full h-8 pl-8 pr-3 text-sm rounded-sq-xs border bg-background focus:outline-none focus:ring-1 focus:ring-ring"
               />
             </div>
           </div>
 
-          {/* Country list */}
+          {/* Grouped country list */}
           <div className="max-h-60 overflow-auto py-1">
-            {filteredCountries.length > 0 ? (
-              filteredCountries.map((country) => (
-                <button
-                  key={country.code}
-                  type="button"
-                  onClick={() => handleSelect(country.code)}
-                  className={cn(
-                    "w-full px-3 py-2 text-left text-sm flex items-center justify-between hover:bg-muted transition-colors",
-                    value === country.code && "bg-muted"
-                  )}
-                >
-                  <span>{country.name}</span>
-                  {value === country.code && (
-                    <Check className="h-4 w-4 text-primary" />
-                  )}
-                </button>
+            {filteredGroups.length > 0 ? (
+              filteredGroups.map((group) => (
+                <div key={group.label}>
+                  <div className="px-3 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50 sticky top-0">
+                    {group.label}
+                  </div>
+                  {group.countries.map((country) => (
+                    <button
+                      key={`${country.name}-${country.code}`}
+                      type="button"
+                      onClick={() => handleSelect(country.name)}
+                      className={cn(
+                        "w-full px-3 py-2 text-left text-sm flex items-center justify-between hover:bg-muted transition-colors",
+                        value === country.name && "bg-muted"
+                      )}
+                    >
+                      <span>{country.name}</span>
+                      {value === country.name && (
+                        <Check className="h-4 w-4 text-primary" />
+                      )}
+                    </button>
+                  ))}
+                </div>
               ))
             ) : (
               <p className="px-3 py-2 text-sm text-muted-foreground text-center">

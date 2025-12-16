@@ -23,7 +23,7 @@ import { cn } from '@/lib/utils';
 import { AddressAutocomplete, AddressValue } from '@/components/business/AddressAutocomplete';
 import { PinDropModal } from '@/components/business/PinDropModal';
 import { PhoneInputWithDialCode, PhoneValue } from '@/components/business/PhoneInputWithDialCode';
-import { CountrySelector } from '@/components/business/CountrySelector';
+import { CountrySelector, getCountryCode, getCountryDisplayName } from '@/components/business/CountrySelector';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { DeleteBusinessDialog } from '@/components/business/DeleteBusinessDialog';
 import { SectionJumpStrip } from '@/components/profile/edit-v2/SectionJumpStrip';
@@ -83,7 +83,7 @@ const BusinessEditPage = () => {
   const [showPinDropModal, setShowPinDropModal] = useState(false);
   const [address, setAddress] = useState<AddressValue | null>(null);
   const [addressError, setAddressError] = useState<string | null>(null);
-  const [countryCode, setCountryCode] = useState<string>('GB'); // Default to GB
+  const [countrySelection, setCountrySelection] = useState<string | null>(null); // Stores country name (e.g., "England")
   const [phone, setPhone] = useState<PhoneValue | null>(null);
   const [formData, setFormData] = useState({
     businessName: '',
@@ -97,7 +97,7 @@ const BusinessEditPage = () => {
   const [initialValues, setInitialValues] = useState<{
     formData: typeof formData;
     address: AddressValue | null;
-    countryCode: string;
+    countrySelection: string | null;
     phone: PhoneValue | null;
   } | null>(null);
 
@@ -115,7 +115,6 @@ const BusinessEditPage = () => {
       
       // Set address from existing data
       let newAddress: AddressValue | null = null;
-      let newCountryCode = 'GB'; // Default
       
       if (business.address_label || business.location) {
         newAddress = {
@@ -135,20 +134,28 @@ const BusinessEditPage = () => {
         setAddress(newAddress);
       }
       
-      // Set country code from existing address or try to infer
+      // Set country selection - try to infer from business.country
+      let newCountrySelection: string | null = null;
       if (business.country) {
-        // Try to map full country name to ISO code
-        const countryMap: Record<string, string> = {
-          'United Kingdom': 'GB',
-          'United States': 'US',
-          'Ireland': 'IE',
-          'Canada': 'CA',
-          'Australia': 'AU',
-          // Add more as needed
+        // Map common country names to our selection values
+        const countryNameMap: Record<string, string> = {
+          'United Kingdom': 'England', // Default to England for UK
+          'UK': 'England',
+          'GB': 'England',
+          'Ireland': 'Ireland',
+          'IE': 'Ireland',
+          'United States': 'United States',
+          'US': 'United States',
+          'USA': 'United States',
+          'Canada': 'Canada',
+          'CA': 'Canada',
+          'Australia': 'Australia',
+          'AU': 'Australia',
+          // If business.country is already a valid selection name, use it
         };
-        newCountryCode = countryMap[business.country] || business.country?.slice(0, 2).toUpperCase() || 'GB';
+        newCountrySelection = countryNameMap[business.country] || business.country;
       }
-      setCountryCode(newCountryCode);
+      setCountrySelection(newCountrySelection);
       
       // Set phone from existing data
       let newPhone: PhoneValue | null = null;
@@ -165,7 +172,7 @@ const BusinessEditPage = () => {
       setInitialValues({
         formData: newFormData,
         address: newAddress,
-        countryCode: newCountryCode,
+        countrySelection: newCountrySelection,
         phone: newPhone,
       });
     }
@@ -177,11 +184,11 @@ const BusinessEditPage = () => {
     
     const formChanged = JSON.stringify(formData) !== JSON.stringify(initialValues.formData);
     const addressChanged = JSON.stringify(address) !== JSON.stringify(initialValues.address);
-    const countryChanged = countryCode !== initialValues.countryCode;
+    const countryChanged = countrySelection !== initialValues.countrySelection;
     const phoneChanged = JSON.stringify(phone) !== JSON.stringify(initialValues.phone);
     
     return formChanged || addressChanged || countryChanged || phoneChanged;
-  }, [formData, address, countryCode, phone, initialValues]);
+  }, [formData, address, countrySelection, phone, initialValues]);
 
   // Redirect to auth if not logged in
   useEffect(() => {
@@ -337,7 +344,7 @@ const BusinessEditPage = () => {
       setInitialValues({
         formData: { ...formData },
         address,
-        countryCode,
+        countrySelection,
         phone,
       });
 
@@ -357,7 +364,7 @@ const BusinessEditPage = () => {
     if (initialValues) {
       setFormData(initialValues.formData);
       setAddress(initialValues.address);
-      setCountryCode(initialValues.countryCode);
+      setCountrySelection(initialValues.countrySelection);
       setPhone(initialValues.phone);
     }
   };
@@ -673,11 +680,11 @@ const BusinessEditPage = () => {
                   Country <span className="text-destructive">*</span>
                 </Label>
                 <CountrySelector
-                  value={countryCode}
-                  onChange={(code) => {
-                    setCountryCode(code);
+                  value={countrySelection}
+                  onChange={(name) => {
+                    setCountrySelection(name);
                     // Clear address when country changes
-                    if (address && address.countryCode !== code) {
+                    if (address) {
                       setAddress(null);
                     }
                   }}
@@ -696,7 +703,8 @@ const BusinessEditPage = () => {
                     setAddressError(null);
                   }}
                   onDropPinClick={() => setShowPinDropModal(true)}
-                  countryCode={countryCode}
+                  countryCode={getCountryCode(countrySelection)}
+                  countryDisplayName={getCountryDisplayName(countrySelection)}
                   placeholder="Start typing street, postcode/ZIP, or area…"
                   error={addressError || undefined}
                 />
