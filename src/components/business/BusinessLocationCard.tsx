@@ -36,9 +36,12 @@ export function BusinessLocationCard({
     window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
   };
 
+  // Mapbox public token
+  const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2xiaG91eiIsImEiOiJjbTVyejIzMXcxemx2MmpzZDU3YjkxNjNkIn0.H_w9d-UAvvMRkJ_9DoVQ-A';
+  
   // Generate static map URL (if we have coordinates)
   const mapUrl = lat && lng
-    ? `https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+F7931E(${lng},${lat})/${lng},${lat},13,0/400x200@2x?access_token=${import.meta.env.VITE_MAPBOX_TOKEN || ''}`
+    ? `https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+F7931E(${lng},${lat})/${lng},${lat},13,0/400x200@2x?access_token=${MAPBOX_TOKEN}`
     : null;
 
   return (
