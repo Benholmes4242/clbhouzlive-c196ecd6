@@ -151,9 +151,9 @@ export function BusinessProfilePosts({
   }
 
   return (
-    <div className="space-y-3">
+    <div>
       {/* Filter pills - horizontal scrollable */}
-      <div className="flex gap-2 overflow-x-auto py-2 -mx-4 px-4 no-scrollbar">
+      <div className="flex gap-2 overflow-x-auto py-3 px-4 no-scrollbar">
         {FILTER_OPTIONS.map(({ key, label }) => (
           <button
             key={key}
@@ -172,19 +172,21 @@ export function BusinessProfilePosts({
 
       {/* Create post button for admins */}
       {membership?.canManage && (
-        <Button 
-          onClick={handleCreatePost}
-          variant="outline"
-          className="w-full rounded-sq-md border-border/50 bg-white hover:bg-muted/50"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Create post
-        </Button>
+        <div className="px-4 pb-3">
+          <Button 
+            onClick={handleCreatePost}
+            variant="outline"
+            className="w-full rounded-sq-md border-border/50 bg-white hover:bg-muted/50"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create post
+          </Button>
+        </div>
       )}
 
       {/* Posts feed */}
       {!filteredPosts || filteredPosts.length === 0 ? (
-        <div className="py-12 text-center">
+        <div className="py-12 text-center px-4">
           <div 
             className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
             style={{ background: '#EDEFF2' }}
@@ -206,7 +208,7 @@ export function BusinessProfilePosts({
           )}
         </div>
       ) : (
-        <div className="space-y-2">
+        <div>
           {filteredPosts.map((post) => (
             <LinkedInPostCard 
               key={post.id} 
@@ -270,9 +272,9 @@ function LinkedInPostCard({ post, businessName, businessLogo, followerCount = 0 
     : primaryMedia?.media_url;
 
   return (
-    <div className="bg-white rounded-sq-md border border-border/40 overflow-hidden">
+    <div className="border-b border-border/30 pb-2">
       {/* Post header */}
-      <div className="p-3 pb-2">
+      <div className="px-4 py-3 pb-2">
         <div className="flex items-start justify-between">
           <div className="flex gap-3">
             {/* Business avatar */}
@@ -311,7 +313,7 @@ function LinkedInPostCard({ post, businessName, businessLogo, followerCount = 0 
 
       {/* Post content */}
       {content && (
-        <div className="px-3 pb-2">
+        <div className="px-4 pb-2">
           <p className="text-sm text-foreground whitespace-pre-wrap">
             {displayContent}
             {shouldTruncate && (
@@ -329,7 +331,7 @@ function LinkedInPostCard({ post, businessName, businessLogo, followerCount = 0 
         </div>
       )}
 
-      {/* Media */}
+      {/* Media - full bleed */}
       {primaryMedia && (
         <div className="relative">
           {isVideo ? (
@@ -365,7 +367,7 @@ function LinkedInPostCard({ post, businessName, businessLogo, followerCount = 0 
       )}
 
       {/* Social proof line */}
-      <div className="px-3 py-2 flex items-center justify-between text-xs text-muted-foreground border-b border-border/30">
+      <div className="px-4 py-2 flex items-center justify-between text-xs text-muted-foreground">
         <div className="flex items-center gap-1">
           <div className="flex -space-x-1">
             <div className="w-4 h-4 rounded-full bg-[#0A66C2] flex items-center justify-center">
@@ -378,7 +380,7 @@ function LinkedInPostCard({ post, businessName, businessLogo, followerCount = 0 
       </div>
 
       {/* Action bar */}
-      <div className="px-1 py-1 flex items-center justify-around">
+      <div className="px-4 py-1 flex items-center justify-around">
         <ActionButton icon={ThumbsUp} label="Like" />
         <ActionButton icon={MessageSquare} label="Comment" />
         <ActionButton icon={Repeat2} label="Repost" />
