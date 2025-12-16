@@ -1,13 +1,28 @@
 /**
  * Location display utilities for consistent City/Country formatting
- * Used across Business Profile, Maps, and other location displays
+ * 
+ * DISPLAY RULES (LOCKED IN):
+ * 
+ * Mode A - cityOnly (getCityOnly):
+ *   - Returns: "London" | "Austin" | "Dubai"
+ *   - Used ONLY for: top-right location pill
+ * 
+ * Mode B - cityWithCountry (getCityCountry) - DEFAULT:
+ *   - Returns: "London, United Kingdom" | "Austin, United States"
+ *   - Used for: under business name, map thumbnail meta, expanded map, 
+ *     Business Profiles management page, any future business cards/lists
+ * 
+ * NORMALIZATION RULES:
+ *   - "City of London" → "London" (strip "City of " prefix)
+ *   - NEVER show: street names, building numbers, postcodes/ZIPs
+ *   - US/CA/AU include region: "Austin, TX, United States"
  */
 
 interface LocationFields {
   city?: string | null;
   region?: string | null;
   country?: string | null;
-  location?: string | null; // Fallback full address string
+  location?: string | null; // Fallback full address string (internal use only)
 }
 
 // Countries where we include region (state/province)
