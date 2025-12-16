@@ -128,33 +128,47 @@ const EditProfilePage: React.FC = () => {
 
   // Intersection observer for active section (scrollspy)
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        // Find the entry with highest intersection ratio that's visible
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+    // Wait for profile to load so sections are rendered
+    if (isLoading) return;
 
-        if (visible) {
-          const id = visible.target.id;
-          if (id) {
-            setActiveSection(id);
+    // Small delay to ensure refs are populated after render
+    const timeoutId = setTimeout(() => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          // Find the entry with highest intersection ratio that's visible
+          const visible = entries
+            .filter((e) => e.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+          if (visible) {
+            const id = visible.target.id;
+            if (id) {
+              setActiveSection(id);
+            }
           }
+        },
+        {
+          root: null,
+          threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5],
+          rootMargin: '-120px 0px -40% 0px', // Account for sticky header
         }
-      },
-      {
-        root: null,
-        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5],
-        rootMargin: '-120px 0px -40% 0px', // Account for sticky header
+      );
+
+      Object.values(sectionRefs.current).forEach((ref) => {
+        if (ref) observer.observe(ref);
+      });
+
+      // Store observer for cleanup
+      (window as any).__editProfileObserver = observer;
+    }, 100);
+
+    return () => {
+      clearTimeout(timeoutId);
+      if ((window as any).__editProfileObserver) {
+        (window as any).__editProfileObserver.disconnect();
       }
-    );
-
-    Object.values(sectionRefs.current).forEach((ref) => {
-      if (ref) observer.observe(ref);
-    });
-
-    return () => observer.disconnect();
-  }, []); // Remove activeSection from deps to prevent observer recreation
+    };
+  }, [isLoading]); // Re-run when loading state changes
 
   // Scroll to section
   const handleSectionClick = useCallback((sectionId: string) => {
