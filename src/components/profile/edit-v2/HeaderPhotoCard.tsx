@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
-import { Camera, ImageIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Camera } from 'lucide-react';
+import { ProfileHeaderMedia, HEADER_HEIGHT } from '@/components/profile/shared/ProfileHeaderMedia';
 
 interface HeaderPhotoCardProps {
   currentUrl?: string | null;
@@ -46,22 +46,15 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
         )}
       </div>
 
+      {/* Uses exact same component as Profile page for identical crop */}
       <button
         type="button"
         onClick={handleClick}
-        className={cn(
-          "relative w-full overflow-hidden rounded-xl border border-dashed border-border/70",
-          "bg-muted/40 aspect-[16/6] flex items-center justify-center",
-          "hover:bg-muted/60 transition-colors group"
-        )}
+        className="relative w-full overflow-hidden rounded-xl border border-dashed border-border/70 group"
       >
         {displayUrl ? (
           <>
-            <img
-              src={displayUrl}
-              alt="Header preview"
-              className="h-full w-full object-cover"
-            />
+            <ProfileHeaderMedia headerUrl={displayUrl} />
             {/* Hover overlay */}
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               <div className="flex items-center gap-2 text-white text-sm font-medium">
@@ -71,9 +64,14 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
             </div>
           </>
         ) : (
-          <span className="text-xs text-muted-foreground">
-            Tap to upload a header photo
-          </span>
+          <div 
+            className="w-full bg-muted/40 flex items-center justify-center hover:bg-muted/60 transition-colors"
+            style={{ height: HEADER_HEIGHT }}
+          >
+            <span className="text-xs text-muted-foreground">
+              Tap to upload a header photo
+            </span>
+          </div>
         )}
       </button>
 
