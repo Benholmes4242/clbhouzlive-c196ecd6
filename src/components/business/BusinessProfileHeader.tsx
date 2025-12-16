@@ -77,13 +77,13 @@ export function BusinessProfileHeader({
 
   return (
     <section className="relative w-full bg-[#F4F5F7]">
-      {/* COVER IMAGE - Light UI with subtle overlay for readability */}
-      <div className="relative w-full h-[220px] overflow-hidden">
+      {/* COVER IMAGE - Light UI with contain to match Edit preview */}
+      <div className="relative w-full h-[220px] overflow-hidden" style={{ background: '#F4F5F7' }}>
         {business.cover_image_url ? (
           <img
             src={business.cover_image_url}
             alt={`${business.name} cover`}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
             loading="eager"
           />
         ) : (
@@ -135,10 +135,10 @@ export function BusinessProfileHeader({
                     src={business.logo_url}
                     alt={business.name}
                     size={88}
-                    className="border-[3px] border-white shadow-lg"
+                    className="shadow-lg"
                   />
                 ) : (
-                  <div className="w-[88px] h-[88px] rounded-sq-md bg-white flex items-center justify-center text-2xl font-bold text-slate-600 border-[3px] border-white shadow-lg" style={{ background: '#F4F5F7' }}>
+                  <div className="w-[88px] h-[88px] rounded-sq-md flex items-center justify-center text-2xl font-bold text-slate-600 shadow-lg" style={{ background: '#F4F5F7' }}>
                     {initials}
                   </div>
                 )}

@@ -296,10 +296,12 @@ const BusinessEditPage = () => {
             <span>Back to profile</span>
           </button>
 
-          <h1 className="text-xl font-semibold text-foreground">Edit business profile</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Everything golfers see about your business
-          </p>
+          <div className="text-center">
+            <h1 className="text-xl font-semibold text-foreground">Edit business profile</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Everything golfers see about your business
+            </p>
+          </div>
         </div>
       </header>
 
@@ -325,10 +327,10 @@ const BusinessEditPage = () => {
                         src={business.logo_url}
                         alt={business.name}
                         size={72}
-                        className="border-2 border-border"
+                        className=""
                       />
                     ) : (
-                      <div className="w-[72px] h-[72px] rounded-sq-md bg-muted flex items-center justify-center text-2xl font-bold text-muted-foreground border-2 border-border">
+                      <div className="w-[72px] h-[72px] rounded-sq-md bg-muted flex items-center justify-center text-2xl font-bold text-muted-foreground">
                         {business?.name?.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()}
                       </div>
                     )}
