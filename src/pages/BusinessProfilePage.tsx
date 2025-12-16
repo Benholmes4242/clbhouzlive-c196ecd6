@@ -13,7 +13,7 @@ import { useBusinessFollowersCount, useIsFollowingBusiness, useBusinessFollowMut
 import { supabase } from '@/integrations/supabase/client';
 import { 
   Phone, Globe, MapPin, MoreHorizontal, Send, Check, ExternalLink, Loader2, 
-  ChevronRight, Share2, Link2, Camera, AlertCircle
+  ChevronRight, Share2, Link2, AlertCircle
 } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -21,8 +21,6 @@ import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { BusinessLocationCard } from '@/components/business/BusinessLocationCard';
-import { BusinessImageActionSheet } from '@/components/business/BusinessImageActionSheet';
-import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 import { trackBusinessProfileVisit, trackBusinessAction } from '@/lib/businessAnalyticsTracking';
 import { toast } from 'sonner';
 import {
@@ -62,14 +60,8 @@ const BusinessProfilePage: React.FC = () => {
   const [followingCount, setFollowingCount] = useState(0);
   const [bioExpanded, setBioExpanded] = useState(false);
 
-  // Image editing state
-  const [logoSheetOpen, setLogoSheetOpen] = useState(false);
-  const [coverSheetOpen, setCoverSheetOpen] = useState(false);
-  const { uploadLogo, removeLogo, uploadCover, removeCover, uploadingLogo, uploadingCover } = useBusinessImageUpload(business?.id || '');
-
   // Check ownership
   const isOwner = membership?.canManage;
-  const canEditImages = membership?.role === 'owner' || membership?.role === 'admin';
 
   // Compute follow state
   const isFollowing = isFollowingStatus === true;
@@ -262,21 +254,6 @@ const BusinessProfilePage: React.FC = () => {
             <div className="w-full h-full bg-gradient-to-br from-slate-300 to-slate-400" />
           )}
           
-          {/* Edit cover button - for owners/admins only */}
-          {canEditImages && (
-            <button
-              onClick={() => setCoverSheetOpen(true)}
-              className="absolute bottom-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-sm text-slate-700 text-xs font-medium hover:bg-white transition-colors shadow-sm"
-              style={{ border: '1px solid rgba(31,36,40,0.08)' }}
-            >
-              {uploadingCover ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              ) : (
-                <Camera className="h-3.5 w-3.5" />
-              )}
-              <span>Change cover</span>
-            </button>
-          )}
         </div>
 
         {/* Avatar - squircle, left-aligned matching personal profile */}
@@ -289,15 +266,12 @@ const BusinessProfilePage: React.FC = () => {
             />
 
             {/* Avatar */}
-            <button
-              onClick={canEditImages ? () => setLogoSheetOpen(true) : undefined}
+            <div
               className="clbhouz-squircle absolute overflow-hidden"
               style={{
                 inset: '2px',
                 boxShadow: '0 12px 30px rgba(15,15,15,0.22)',
-                cursor: canEditImages ? 'pointer' : 'default',
               }}
-              disabled={!canEditImages}
             >
               {business.logo_url ? (
                 <img
@@ -310,18 +284,7 @@ const BusinessProfilePage: React.FC = () => {
                   {initials}
                 </div>
               )}
-              
-              {/* Camera badge for owners */}
-              {canEditImages && (
-                <span className="absolute bottom-1 right-1 flex items-center justify-center w-7 h-7 rounded-full bg-[#F7931E] text-white shadow-md">
-                  {uploadingLogo ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <Camera className="h-3.5 w-3.5" />
-                  )}
-                </span>
-              )}
-            </button>
+            </div>
           </div>
         </div>
 
@@ -368,11 +331,24 @@ const BusinessProfilePage: React.FC = () => {
           {business.is_verified && <VerifiedBadge size="lg" />}
         </div>
         
-        {/* Location (replaces home club) */}
+        {/* Location with mini map */}
         {business.location && (
-          <p className="mt-1 text-base font-medium text-[#0F0F0F]">
-            {business.location}
-          </p>
+          <div className="mt-2 flex items-center gap-3">
+            {/* Mini map preview */}
+            {business.lat && business.lng && (
+              <div 
+                className="w-10 h-10 rounded-sq-sm overflow-hidden flex-shrink-0 border border-slate-200"
+                style={{
+                  backgroundImage: `url(https://api.mapbox.com/styles/v1/mapbox/light-v11/static/${business.lng},${business.lat},13,0/80x80@2x?access_token=pk.eyJ1IjoiY2xiaG91eiIsImEiOiJjbTVyejIzMXcxemx2MmpzZDU3YjkxNjNkIn0.H_w9d-UAvvMRkJ_9DoVQ-A)`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }}
+              />
+            )}
+            <p className="text-base font-medium text-[#0F0F0F]">
+              {business.location}
+            </p>
+          </div>
         )}
       </div>
 
@@ -488,8 +464,7 @@ const BusinessProfilePage: React.FC = () => {
               {shouldTruncateBio && (
                 <button
                   onClick={() => setBioExpanded(!bioExpanded)}
-                  className="text-sm font-medium mt-1 hover:underline"
-                  style={{ color: '#0066FF' }}
+                  className="text-sm font-medium mt-1 hover:underline text-slate-500"
                 >
                   {bioExpanded ? 'Show less' : 'More'}
                 </button>
@@ -580,26 +555,6 @@ const BusinessProfilePage: React.FC = () => {
 
       {/* Bottom Navigation Spacer */}
       <div className="h-20" />
-
-      {/* Image Action Sheets */}
-      <BusinessImageActionSheet
-        open={logoSheetOpen}
-        onOpenChange={setLogoSheetOpen}
-        type="logo"
-        hasImage={!!business.logo_url}
-        uploading={uploadingLogo}
-        onUpload={async (file) => { await uploadLogo(file); }}
-        onRemove={async () => { await removeLogo(); }}
-      />
-      <BusinessImageActionSheet
-        open={coverSheetOpen}
-        onOpenChange={setCoverSheetOpen}
-        type="cover"
-        hasImage={!!business.cover_image_url}
-        uploading={uploadingCover}
-        onUpload={async (file) => { await uploadCover(file); }}
-        onRemove={async () => { await removeCover(); }}
-      />
     </PageRoot>
   );
 };
