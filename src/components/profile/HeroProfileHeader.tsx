@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { supabase } from '@/integrations/supabase/client';
 import { useTabSlideTransition, TransitionDirection, PROFILE_TAB_TRANSITION_MS } from '@/hooks/useTabSlideTransition';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useProfileAnalytics } from '@/hooks/useProfileAnalytics';
@@ -16,6 +15,8 @@ import { useActivityPosts } from './hooks/useActivityPosts';
 import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import { toast } from 'sonner';
 import { trackBusinessEvent } from '@/analytics/businessAnalytics';
+import { useSocialCounts } from '@/hooks/useSocialCounts';
+import { useRealtimeSocialCounts } from '@/hooks/useRealtimeSocialCounts';
 
 // Modular header components
 import {
@@ -107,10 +108,17 @@ const HeroProfileHeader = ({
   const { isPersonal, isBusiness } = profileTypeInfo;
   const tabs = getProfileTabs(profile?.user_type);
 
-  // State
-  const [followersCount, setFollowersCount] = useState(0);
-  const [followingCount, setFollowingCount] = useState(0);
-  const [friendsCount, setFriendsCount] = useState(0);
+  // Social counts from single source of truth (React Query)
+  const { data: socialCounts } = useSocialCounts(profile?.id);
+  const followersCount = socialCounts?.followers ?? 0;
+  const followingCount = socialCounts?.following ?? 0;
+  const friendsCount = isPersonal ? (socialCounts?.friends ?? 0) : 0;
+  
+  // Enable real-time updates for social counts
+  useRealtimeSocialCounts({
+    viewerUserId: user?.id ?? null,
+    profileUserId: profile?.id ?? null,
+  });
   
   // Hooks
   const { uploadVideo, uploading: videoUploading } = useCloudflareStream();
@@ -221,44 +229,7 @@ const HeroProfileHeader = ({
     }
   }, [shouldAutoOpen, immersiveLoading, openImmersive, hasImmersiveMedia]);
 
-  // Fetch social stats
-  useEffect(() => {
-    const fetchStats = async () => {
-      if (!profile?.id) return;
-      
-      try {
-        // Fetch followers count
-        const { count: followers } = await supabase
-          .from('user_follows')
-          .select('*', { count: 'exact', head: true })
-          .eq('following_id', profile.id);
-        setFollowersCount(followers || 0);
-
-        // Fetch following count
-        const { count: following } = await supabase
-          .from('user_follows')
-          .select('*', { count: 'exact', head: true })
-          .eq('follower_id', profile.id);
-        setFollowingCount(following || 0);
-
-        // Fetch friends count - only for personal profiles
-        if (isPersonal) {
-          const { count: friends } = await supabase
-            .from('user_friends')
-            .select('*', { count: 'exact', head: true })
-            .eq('status', 'accepted')
-            .or(`user_id.eq.${profile.id},friend_id.eq.${profile.id}`);
-          setFriendsCount(friends || 0);
-        } else {
-          setFriendsCount(0);
-        }
-      } catch (error) {
-        console.error('Error fetching stats:', error);
-      }
-    };
-    
-    fetchStats();
-  }, [profile?.id, isPersonal]);
+  // Social counts are now fetched via useSocialCounts hook with real-time updates via useRealtimeSocialCounts
 
   // Track business profile views
   useEffect(() => {
