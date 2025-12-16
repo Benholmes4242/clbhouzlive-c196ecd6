@@ -20,7 +20,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { cn } from '@/lib/utils';
-import { LocationAutocomplete, LocationValue } from '@/components/business/LocationAutocomplete';
+import { AddressAutocomplete, AddressValue } from '@/components/business/AddressAutocomplete';
+import { PinDropModal } from '@/components/business/PinDropModal';
 import { PhoneInputWithDialCode, PhoneValue } from '@/components/business/PhoneInputWithDialCode';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { DeleteBusinessDialog } from '@/components/business/DeleteBusinessDialog';
@@ -78,8 +79,9 @@ const BusinessEditPage = () => {
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [location, setLocation] = useState<LocationValue | null>(null);
-  const [locationError, setLocationError] = useState<string | null>(null);
+  const [showPinDropModal, setShowPinDropModal] = useState(false);
+  const [address, setAddress] = useState<AddressValue | null>(null);
+  const [addressError, setAddressError] = useState<string | null>(null);
   const [phone, setPhone] = useState<PhoneValue | null>(null);
   const [formData, setFormData] = useState({
     businessName: '',
@@ -92,7 +94,7 @@ const BusinessEditPage = () => {
   // Track initial values for dirty detection
   const [initialValues, setInitialValues] = useState<{
     formData: typeof formData;
-    location: LocationValue | null;
+    address: AddressValue | null;
     phone: PhoneValue | null;
   } | null>(null);
 
@@ -108,17 +110,23 @@ const BusinessEditPage = () => {
       };
       setFormData(newFormData);
       
-      // Set location from existing data
-      let newLocation: LocationValue | null = null;
-      if (business.location) {
-        const parts = business.location.split(',').map(p => p.trim());
-        newLocation = {
-          label: business.location,
-          city: parts[0] || '',
-          country: parts[1] || '',
-          countryCode: '',
+      // Set address from existing data
+      let newAddress: AddressValue | null = null;
+      if (business.address_label || business.location) {
+        newAddress = {
+          label: business.address_label || business.location || '',
+          addressLine1: business.address_line1 || undefined,
+          addressLine2: business.address_line2 || undefined,
+          city: business.city || undefined,
+          region: business.region || undefined,
+          postcode: business.postcode || undefined,
+          country: business.country || undefined,
+          lat: business.lat || undefined,
+          lng: business.lng || undefined,
+          mapboxPlaceId: business.mapbox_place_id || undefined,
+          precision: business.location_precision || 'city',
         };
-        setLocation(newLocation);
+        setAddress(newAddress);
       }
       
       // Set phone from existing data
@@ -135,7 +143,7 @@ const BusinessEditPage = () => {
       // Store initial values for dirty detection
       setInitialValues({
         formData: newFormData,
-        location: newLocation,
+        address: newAddress,
         phone: newPhone,
       });
     }
@@ -146,11 +154,11 @@ const BusinessEditPage = () => {
     if (!initialValues) return false;
     
     const formChanged = JSON.stringify(formData) !== JSON.stringify(initialValues.formData);
-    const locationChanged = JSON.stringify(location) !== JSON.stringify(initialValues.location);
+    const addressChanged = JSON.stringify(address) !== JSON.stringify(initialValues.address);
     const phoneChanged = JSON.stringify(phone) !== JSON.stringify(initialValues.phone);
     
-    return formChanged || locationChanged || phoneChanged;
-  }, [formData, location, phone, initialValues]);
+    return formChanged || addressChanged || phoneChanged;
+  }, [formData, address, phone, initialValues]);
 
   // Redirect to auth if not logged in
   useEffect(() => {
@@ -249,13 +257,13 @@ const BusinessEditPage = () => {
   // Validation
   const isValid =
     formData.businessName.trim().length > 0 &&
-    location !== null &&
+    address !== null &&
     (formData.businessWebsite.trim().length > 0 ||
       formData.businessContactEmail.trim().length > 0);
 
   const handleSubmit = async () => {
-    if (!location) {
-      setLocationError('Please select a location from the list');
+    if (!address) {
+      setAddressError('Please select an address');
       return;
     }
     
@@ -265,18 +273,27 @@ const BusinessEditPage = () => {
     setSaveSuccess(false);
 
     try {
-      const formattedLocation = location.country 
-        ? `${location.city}, ${location.country}`
-        : location.label;
-
       const { error: updateError } = await supabase
         .from('business_accounts')
         .update({
           name: formData.businessName,
           category: formData.businessCategory || null,
-          location: formattedLocation,
-          lat: location.lat || null,
-          lng: location.lng || null,
+          // Legacy location field for backwards compatibility
+          location: address.label,
+          // New address fields
+          address_label: address.label,
+          address_line1: address.addressLine1 || null,
+          address_line2: address.addressLine2 || null,
+          city: address.city || null,
+          region: address.region || null,
+          postcode: address.postcode || null,
+          country: address.country || null,
+          lat: address.lat || null,
+          lng: address.lng || null,
+          mapbox_place_id: address.mapboxPlaceId || null,
+          location_precision: address.precision || null,
+          location_updated_at: new Date().toISOString(),
+          // Other fields
           website: formData.businessWebsite || null,
           email: formData.businessContactEmail || null,
           phone: phone?.fullNumber || null,
@@ -296,7 +313,7 @@ const BusinessEditPage = () => {
       // Update initial values so form is no longer dirty
       setInitialValues({
         formData: { ...formData },
-        location,
+        address,
         phone,
       });
 
@@ -315,9 +332,15 @@ const BusinessEditPage = () => {
     // Reset to initial values
     if (initialValues) {
       setFormData(initialValues.formData);
-      setLocation(initialValues.location);
+      setAddress(initialValues.address);
       setPhone(initialValues.phone);
     }
+  };
+
+  // Handle pin drop confirmation
+  const handlePinDropConfirm = (value: AddressValue) => {
+    setAddress(value);
+    setAddressError(null);
   };
 
   const handleBack = () => {
@@ -621,18 +644,46 @@ const BusinessEditPage = () => {
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground">
-                  Location <span className="text-destructive">*</span>
+                  Business address <span className="text-destructive">*</span>
                 </Label>
-                <LocationAutocomplete
-                  value={location}
+                <AddressAutocomplete
+                  value={address}
                   onChange={(val) => {
-                    setLocation(val);
-                    setLocationError(null);
+                    setAddress(val);
+                    setAddressError(null);
                   }}
-                  placeholder="Search for a city…"
-                  error={locationError || undefined}
+                  onDropPinClick={() => setShowPinDropModal(true)}
+                  placeholder="Start typing street, postcode/ZIP, or area…"
+                  error={addressError || undefined}
                 />
               </div>
+
+              {/* Map preview when we have coordinates */}
+              {address?.lat && address?.lng && (
+                <div className="rounded-sq-md border overflow-hidden">
+                  <div className="relative w-full h-[140px] bg-muted">
+                    <img
+                      src={`https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+F7931E(${address.lng},${address.lat})/${address.lng},${address.lat},14,0/400x140@2x?access_token=pk.eyJ1IjoiY2xiaG91eiIsImEiOiJjbTVyejIzMXcxemx2MmpzZDU3YjkxNjNkIn0.H_w9d-UAvvMRkJ_9DoVQ-A`}
+                      alt="Map preview"
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="px-3 py-2 flex items-center justify-between bg-muted/30">
+                    <div className="flex items-center gap-2 text-sm">
+                      <MapPin className="h-4 w-4 text-primary" />
+                      <span className="truncate">{address.label}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowPinDropModal(true)}
+                      className="text-xs text-primary hover:underline flex-shrink-0"
+                    >
+                      Adjust pin
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-1.5">
                 <Label htmlFor="businessWebsite" className="text-xs text-muted-foreground flex items-center gap-1.5">
@@ -781,6 +832,14 @@ const BusinessEditPage = () => {
           userId={user.id}
         />
       )}
+
+      {/* Pin Drop Modal */}
+      <PinDropModal
+        open={showPinDropModal}
+        onOpenChange={setShowPinDropModal}
+        onConfirm={handlePinDropConfirm}
+        initialCenter={address?.lat && address?.lng ? { lat: address.lat, lng: address.lng } : undefined}
+      />
     </PageRoot>
   );
 };
