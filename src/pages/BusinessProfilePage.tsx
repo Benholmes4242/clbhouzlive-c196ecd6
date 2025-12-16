@@ -1,182 +1,605 @@
+/**
+ * BusinessProfilePage - Mirrors PersonalProfile layout exactly
+ * Only content substitutions, not layout changes
+ */
+
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, AlertCircle } from 'lucide-react';
-import { PageRoot } from '@/components/layout/PageRoot';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessPostsCount } from '@/hooks/useBusinessPosts';
-import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
-import { useBusinessVerificationRequest } from '@/hooks/useBusinessVerificationRequest';
-import { BusinessProfileHeader } from '@/components/business/BusinessProfileHeader';
+import { useBusinessFollowersCount, useIsFollowingBusiness, useBusinessFollowMutation } from '@/hooks/useBusinessFollow';
+import { supabase } from '@/integrations/supabase/client';
+import { 
+  Phone, Globe, MapPin, MoreHorizontal, Send, Check, ExternalLink, Loader2, 
+  ChevronRight, Share2, Link2, Camera, AlertCircle
+} from 'lucide-react';
+import { PageRoot } from '@/components/layout/PageRoot';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { BusinessLocationCard } from '@/components/business/BusinessLocationCard';
-import { BusinessProfileOverview } from '@/components/business/BusinessProfileOverview';
+import { BusinessImageActionSheet } from '@/components/business/BusinessImageActionSheet';
+import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
+import { trackBusinessProfileVisit, trackBusinessAction } from '@/lib/businessAnalyticsTracking';
+import { toast } from 'sonner';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
+// Tab content components
 import { BusinessProfilePosts } from '@/components/business/BusinessProfilePosts';
+import { BusinessProfileOverview } from '@/components/business/BusinessProfileOverview';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
 import { GolfersHereTab } from '@/components/business/GolfersHereTab';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
-import { trackBusinessProfileVisit, trackBusinessAction } from '@/lib/businessAnalyticsTracking';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+
+// Background color - matches personal profile page (slate-50)
+const BG_COLOR = '#f8fafc';
 
 type BusinessTab = 'content' | 'overview' | 'golfers' | 'info';
-type SourceType = 'search' | 'content' | 'course_page' | 'share' | 'direct';
 
-const BusinessProfilePage = () => {
-  const { idOrSlug } = useParams<{ idOrSlug: string }>();
-  const [searchParams] = useSearchParams();
+const BusinessProfilePage: React.FC = () => {
   const navigate = useNavigate();
-  // Content tab is now the default (content-first approach)
-  const [activeTab, setActiveTab] = useState<BusinessTab>('content');
-  const { user } = useSupabaseSession();
+  const { idOrSlug } = useParams<{ idOrSlug: string }>();
+  const { user, loading: authLoading } = useSupabaseSession();
 
   const { data: business, isLoading, error } = useBusinessProfile(idOrSlug);
   const { data: membership } = useBusinessMembership(business?.id);
   const { data: postsCount = 0 } = useBusinessPostsCount(business?.id);
   const { data: followersCount = 0 } = useBusinessFollowersCount(business?.id);
-  const { data: verificationRequest } = useBusinessVerificationRequest(business?.id);
+  const { data: isFollowingStatus, isLoading: statusLoading } = useIsFollowingBusiness(business?.id, user?.id);
+  const { follow, unfollow, isFollowing: followPending, isUnfollowing: unfollowPending } = useBusinessFollowMutation(business?.id || '', user?.id);
+
+  const [activeTab, setActiveTab] = useState<BusinessTab>('content');
+  const [activeMiniNav, setActiveMiniNav] = useState('posts');
+  const [followingCount, setFollowingCount] = useState(0);
+  const [bioExpanded, setBioExpanded] = useState(false);
+
+  // Image editing state
+  const [logoSheetOpen, setLogoSheetOpen] = useState(false);
+  const [coverSheetOpen, setCoverSheetOpen] = useState(false);
+  const { uploadLogo, removeLogo, uploadCover, removeCover, uploadingLogo, uploadingCover } = useBusinessImageUpload(business?.id || '');
+
+  // Check ownership
+  const isOwner = membership?.canManage;
+  const canEditImages = membership?.role === 'owner' || membership?.role === 'admin';
+
+  // Compute follow state
+  const isFollowing = isFollowingStatus === true;
+  const followBusy = followPending || unfollowPending || statusLoading;
+  
+  const handleFollowToggle = () => {
+    if (!user) return;
+    if (isFollowing) {
+      unfollow();
+    } else {
+      follow();
+    }
+  };
 
   // Track profile visit
   useEffect(() => {
     if (business?.id) {
-      const source = (searchParams.get('source') as SourceType) || 'direct';
-      trackBusinessProfileVisit(business.id, user?.id, source);
+      trackBusinessProfileVisit(business.id, user?.id, 'direct');
     }
-  }, [business?.id, user?.id, searchParams]);
+  }, [business?.id, user?.id]);
 
-  const handleDirections = () => {
-    if (business?.location) {
-      trackBusinessAction(business.id, 'directions', user?.id);
+  // Fetch following count
+  useEffect(() => {
+    const fetchFollowingCount = async () => {
+      if (!business?.id) return;
+      try {
+        // Business accounts don't have a following count in the current schema
+        // This would need to be implemented if businesses can follow others
+        setFollowingCount(0);
+      } catch (error) {
+        console.error('Error fetching following count:', error);
+      }
+    };
+    fetchFollowingCount();
+  }, [business?.id]);
+
+  const handleCall = () => {
+    if (business?.phone) {
+      trackBusinessAction(business.id, 'call', user?.id);
+      window.location.href = `tel:${business.phone}`;
     }
   };
 
-  if (isLoading) {
+  const handleWebsite = () => {
+    if (business?.website) {
+      trackBusinessAction(business.id, 'website', user?.id);
+      const url = business.website.startsWith('http') 
+        ? business.website 
+        : `https://${business.website}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  const handleDirections = () => {
+    if (business?.location && business?.lat && business?.lng) {
+      trackBusinessAction(business.id, 'directions', user?.id);
+      window.open(
+        `https://www.google.com/maps/dir/?api=1&destination=${business.lat},${business.lng}`,
+        '_blank'
+      );
+    }
+  };
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: business?.name, url });
+      } catch {}
+    } else {
+      await navigator.clipboard.writeText(url);
+      toast.success('Link copied to clipboard');
+    }
+  };
+
+  const handleCopyLink = async () => {
+    await navigator.clipboard.writeText(window.location.href);
+    toast.success('Link copied');
+  };
+
+  const handleMessage = () => {
+    // Message functionality - could open a DM or contact form
+    toast.info('Messaging coming soon');
+  };
+
+  // Format URL for display
+  const formatUrlForDisplay = (url: string): string => {
+    if (!url) return '';
+    try {
+      const urlObj = new URL(url.startsWith('http') ? url : `https://${url}`);
+      return urlObj.hostname.replace('www.', '');
+    } catch {
+      return url.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '');
+    }
+  };
+
+  const ensureProtocol = (url: string): string => {
+    if (!url) return '';
+    return url.startsWith('http') ? url : `https://${url}`;
+  };
+
+  // Bio truncation
+  const bioText = business?.description || '';
+  const shouldTruncateBio = bioText.length > 200;
+  const displayBio = shouldTruncateBio && !bioExpanded ? bioText.slice(0, 200) + '…' : bioText;
+
+  // Generate initials
+  const initials = business?.name
+    ?.split(' ')
+    .slice(0, 2)
+    .map(word => word[0])
+    .join('')
+    .toUpperCase() || 'B';
+
+  const tabs = [
+    { id: 'content', label: 'Content' },
+    { id: 'overview', label: 'Overview' },
+    { id: 'golfers', label: 'Golfers' },
+    { id: 'info', label: 'Info' },
+  ];
+
+  const getCurrentContent = () => {
+    switch (activeTab) {
+      case 'content':
+        return (
+          <BusinessProfilePosts 
+            businessId={business?.id || ''}
+            businessName={business?.name || ''}
+            membership={membership ?? null} 
+          />
+        );
+      case 'overview':
+        return (
+          <BusinessProfileOverview 
+            business={business!} 
+            membership={membership}
+          />
+        );
+      case 'golfers':
+        return (
+          <GolfersHereTab 
+            businessId={business?.id || ''}
+            businessName={business?.name || ''}
+            businessLocation={business?.location || undefined}
+          />
+        );
+      case 'info':
+        return (
+          <BusinessProfileInfo business={business!} />
+        );
+      default:
+        return null;
+    }
+  };
+
+  if (authLoading || isLoading) {
     return <GenericPageSkeleton />;
   }
 
   if (error || !business) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ background: BG_COLOR }}>
         <div className="max-w-md text-center">
           <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
           <h1 className="text-2xl font-semibold mb-2">Business not found</h1>
           <p className="text-muted-foreground mb-6">
             This business may have been removed or is no longer available.
           </p>
-          <Button onClick={() => navigate(-1)}>
-            Go back
-          </Button>
+          <Button onClick={() => navigate(-1)}>Go back</Button>
         </div>
       </div>
     );
   }
 
+  const heroUrl = business.cover_image_url || '';
+
   return (
-    <PageRoot className="min-h-screen" style={{ background: '#F4F5F7' }}>
-      {/* Back button - dark glass container matching course detail page */}
-      <button
-        onClick={() => navigate(-1)}
-        className="absolute top-3 left-3 md:top-4 md:left-4 z-20 h-9 w-9 bg-black/20 backdrop-blur-sm rounded-md flex items-center justify-center hover:bg-black/40 transition-colors focus:outline-none"
-        aria-label="Go back"
-      >
-        <ArrowLeft className="!h-5 !w-5 text-white" />
-      </button>
-
-      {/* Hero header - Light UI with white card */}
-      <BusinessProfileHeader
-        business={business}
-        membership={membership ?? null}
-        postsCount={postsCount}
-        followersCount={followersCount}
-        followingCount={0}
-      />
-
-      {/* Location Card - only when address exists */}
-      {business.location && (
-        <BusinessLocationCard
-          location={business.location}
-          lat={business.lat}
-          lng={business.lng}
-          businessName={business.name}
-          onDirections={handleDirections}
-        />
-      )}
-
-      {/* Tab Navigation - matches personal profile page */}
-      <section className="mt-6 px-5">
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as BusinessTab)} className="w-full">
-          <TabsList 
-            className="grid w-full rounded-full px-1 py-1"
-            style={{ 
-              gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-              background: '#F0F0F0',
-              border: '1px solid #E0E0E0'
-            }}
-          >
-            <TabsTrigger 
-              value="content"
-              className="rounded-full text-sm px-3 py-1.5 font-medium transition-all duration-150 data-[state=active]:bg-white data-[state=active]:shadow-sm"
-              style={{ color: '#0F0F0F' }}
-            >
-              Content
-            </TabsTrigger>
-            <TabsTrigger 
-              value="overview"
-              className="rounded-full text-sm px-3 py-1.5 font-medium transition-all duration-150 data-[state=active]:bg-white data-[state=active]:shadow-sm"
-              style={{ color: '#0F0F0F' }}
-            >
-              Overview
-            </TabsTrigger>
-            <TabsTrigger 
-              value="golfers"
-              className="rounded-full text-sm px-3 py-1.5 font-medium transition-all duration-150 data-[state=active]:bg-white data-[state=active]:shadow-sm"
-              style={{ color: '#0F0F0F' }}
-            >
-              Golfers
-            </TabsTrigger>
-            <TabsTrigger 
-              value="info"
-              className="rounded-full text-sm px-3 py-1.5 font-medium transition-all duration-150 data-[state=active]:bg-white data-[state=active]:shadow-sm"
-              style={{ color: '#0F0F0F' }}
-            >
-              Info
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </section>
-
-      {/* Tab Content */}
-      <div className="pt-6 px-4 sm:px-6 lg:px-8 pb-6">
-        <div className="md:max-w-[1150px] md:mx-auto">
-          {/* Content tab (default) - mixed media grid */}
-          {activeTab === 'content' && (
-            <BusinessProfilePosts 
-              businessId={business.id}
-              businessName={business.name}
-              membership={membership ?? null} 
+    <PageRoot className="min-h-screen" style={{ background: BG_COLOR }}>
+      {/* Hero Section - identical to PersonalProfile */}
+      <div className="relative">
+        {/* Hero Image */}
+        <div className="relative h-[250px] w-full overflow-hidden">
+          {heroUrl ? (
+            <img 
+              src={heroUrl} 
+              alt="Business cover" 
+              className="w-full h-full object-cover object-bottom"
             />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-slate-300 to-slate-400" />
           )}
-          {/* Overview tab - deeper LinkedIn-style info */}
-          {activeTab === 'overview' && (
-            <BusinessProfileOverview 
-              business={business} 
-              membership={membership}
+          
+          {/* Edit cover button - for owners/admins only */}
+          {canEditImages && (
+            <button
+              onClick={() => setCoverSheetOpen(true)}
+              className="absolute bottom-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-sm text-slate-700 text-xs font-medium hover:bg-white transition-colors shadow-sm"
+              style={{ border: '1px solid rgba(31,36,40,0.08)' }}
+            >
+              {uploadingCover ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Camera className="h-3.5 w-3.5" />
+              )}
+              <span>Change cover</span>
+            </button>
+          )}
+        </div>
+
+        {/* Avatar - squircle, left-aligned matching personal profile */}
+        <div className="absolute left-5 -bottom-[62px] z-20">
+          <div className="relative w-[124px] h-[124px]">
+            {/* 2px background ring */}
+            <div
+              className="clbhouz-squircle absolute inset-0"
+              style={{ background: BG_COLOR }}
             />
+
+            {/* Avatar */}
+            <button
+              onClick={canEditImages ? () => setLogoSheetOpen(true) : undefined}
+              className="clbhouz-squircle absolute overflow-hidden"
+              style={{
+                inset: '2px',
+                boxShadow: '0 12px 30px rgba(15,15,15,0.22)',
+                cursor: canEditImages ? 'pointer' : 'default',
+              }}
+              disabled={!canEditImages}
+            >
+              {business.logo_url ? (
+                <img
+                  src={business.logo_url}
+                  alt={business.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-slate-200 flex items-center justify-center text-3xl font-bold text-slate-600">
+                  {initials}
+                </div>
+              )}
+              
+              {/* Camera badge for owners */}
+              {canEditImages && (
+                <span className="absolute bottom-1 right-1 flex items-center justify-center w-7 h-7 rounded-full bg-[#F7931E] text-white shadow-md">
+                  {uploadingLogo ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Camera className="h-3.5 w-3.5" />
+                  )}
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Pills row - right side, just below header (matching personal profile position) */}
+        <div className="absolute right-5 top-full mt-3 z-20 flex items-center gap-2">
+          {/* Location pill - white (replaces HCP) */}
+          {business.location && (
+            <span 
+              className="px-4 py-1.5 text-sm font-semibold rounded-full text-[#0F0F0F] flex items-center gap-1.5"
+              style={{ 
+                background: '#FFFFFF',
+                boxShadow: '0 2px 8px rgba(31, 36, 40, 0.08)'
+              }}
+            >
+              <MapPin className="w-3.5 h-3.5" />
+              {business.location.split(',')[0]}
+            </span>
           )}
-          {/* Golfers tab - followers list */}
-          {activeTab === 'golfers' && (
-            <GolfersHereTab 
-              businessId={business.id}
-              businessName={business.name}
-              businessLocation={business.location || undefined}
-            />
-          )}
-          {/* Info tab - contact and details */}
-          {activeTab === 'info' && (
-            <BusinessProfileInfo business={business} />
+          
+          {/* Category pill - transparent green glass (replaces Golfer) */}
+          {business.category && (
+            <span 
+              className="px-4 py-1.5 text-sm font-semibold rounded-full text-emerald-700 flex items-center justify-center"
+              style={{ 
+                background: 'rgba(52, 199, 89, 0.15)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+                border: '1px solid rgba(52, 199, 89, 0.3)'
+              }}
+            >
+              {business.category}
+            </span>
           )}
         </div>
       </div>
+
+      {/* Identity Stack - matching personal profile */}
+      <div className="pt-[70px] px-5 text-left">
+        {/* Name + Verified */}
+        <div className="flex items-center gap-1.5">
+          <h1 className="text-[28px] font-semibold text-[#0F0F0F]">
+            {business.name}
+          </h1>
+          {business.is_verified && <VerifiedBadge size="lg" />}
+        </div>
+        
+        {/* Location (replaces home club) */}
+        {business.location && (
+          <p className="mt-1 text-base font-medium text-[#0F0F0F]">
+            {business.location}
+          </p>
+        )}
+      </div>
+
+      {/* Action Buttons - matching personal profile exactly */}
+      <div className="mt-5 px-5 flex items-center gap-2">
+        {/* Follow button */}
+        <button 
+          className="h-9 flex-1 rounded-full text-sm font-semibold text-white flex items-center justify-center gap-1.5 disabled:opacity-60"
+          style={{ background: isFollowing ? '#334155' : '#64748b' }}
+          onClick={handleFollowToggle}
+          disabled={followBusy}
+        >
+          {followBusy ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          ) : isFollowing ? (
+            <>
+              <Check className="w-3.5 h-3.5" />
+              Following
+            </>
+          ) : (
+            'Follow'
+          )}
+        </button>
+        
+        {/* Message button (replaces Add Friend) */}
+        <button 
+          className="h-9 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5"
+          style={{
+            background: '#fff',
+            border: '1px solid #E0E0E0',
+            color: '#0F0F0F'
+          }}
+          onClick={handleMessage}
+        >
+          <Send className="w-3.5 h-3.5" />
+          Message
+        </button>
+        
+        {/* Owner-only menu (⋯) */}
+        {isOwner && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button 
+                className="w-9 h-9 flex-shrink-0 rounded-full flex items-center justify-center"
+                style={{
+                  background: '#fff',
+                  border: '1px solid #E0E0E0'
+                }}
+              >
+                <MoreHorizontal className="w-4 h-4 text-[#0F0F0F]" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => navigate(`/business/${business.id}/edit`)}>
+                Edit business profile
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleShare}>
+                <Share2 className="h-4 w-4 mr-2" />
+                Share profile
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleCopyLink}>
+                <Link2 className="h-4 w-4 mr-2" />
+                Copy link
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </div>
+
+      {/* Mini-nav row: Posts | Followers | Following - identical to personal profile */}
+      <div className="mt-6 px-5">
+        <div className="flex items-center justify-between">
+          {/* Posts */}
+          <button
+            onClick={() => setActiveMiniNav('posts')}
+            className="pb-3 flex items-center gap-2"
+          >
+            <span className="text-sm text-slate-500">Posts</span>
+            <span className="text-base font-semibold text-[#0F0F0F]">{postsCount}</span>
+          </button>
+          
+          {/* Followers */}
+          <button
+            onClick={() => setActiveMiniNav('followers')}
+            className="pb-3 flex items-center gap-2"
+          >
+            <span className="text-sm text-slate-500">Followers</span>
+            <span className="text-base font-semibold text-[#0F0F0F]">{followersCount}</span>
+          </button>
+          
+          {/* Following (replaces Friends) */}
+          <button
+            onClick={() => setActiveMiniNav('following')}
+            className="pb-3 flex items-center gap-2"
+          >
+            <span className="text-sm text-slate-500">Following</span>
+            <span className="text-base font-semibold text-[#0F0F0F]">{followingCount}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* White content sheet */}
+      <div className="bg-white pt-5 pb-32 min-h-[60vh]">
+        {/* About section - identical to personal profile */}
+        <section className="px-5 mb-6">
+          <h3 className="text-xl font-semibold text-[#0F0F0F] mb-2">About</h3>
+          {bioText ? (
+            <div>
+              <p className="text-base text-[#0F0F0F] leading-relaxed whitespace-pre-wrap" style={{ overflowWrap: 'anywhere' }}>
+                {displayBio}
+              </p>
+              {shouldTruncateBio && (
+                <button
+                  onClick={() => setBioExpanded(!bioExpanded)}
+                  className="text-sm font-medium mt-1 hover:underline"
+                  style={{ color: '#0066FF' }}
+                >
+                  {bioExpanded ? 'Show less' : 'More'}
+                </button>
+              )}
+            </div>
+          ) : (
+            <p className="text-base text-slate-400 italic">No description provided</p>
+          )}
+        </section>
+
+        {/* Business-specific section: Website, Call, Location (replaces Achievements) */}
+        <section className="px-5 mb-6">
+          {/* Website pill */}
+          {business.website && (
+            <a
+              href={ensureProtocol(business.website)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors mr-2 mb-2"
+              style={{
+                background: '#f1f5f9',
+                border: '1px solid #e2e8f0'
+              }}
+              onClick={() => trackBusinessAction(business.id, 'website', user?.id)}
+            >
+              <Globe className="w-3.5 h-3.5" />
+              {formatUrlForDisplay(business.website)}
+            </a>
+          )}
+          
+          {/* Call pill */}
+          {business.phone && (
+            <button
+              onClick={handleCall}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors mr-2 mb-2"
+              style={{
+                background: '#f1f5f9',
+                border: '1px solid #e2e8f0'
+              }}
+            >
+              <Phone className="w-3.5 h-3.5" />
+              Call
+            </button>
+          )}
+          
+          {/* Location Card - only when address exists */}
+          {business.location && business.lat && business.lng && (
+            <BusinessLocationCard
+              location={business.location}
+              lat={business.lat}
+              lng={business.lng}
+              businessName={business.name}
+              onDirections={handleDirections}
+            />
+          )}
+        </section>
+
+        {/* Tabs - identical styling to personal profile */}
+        <section className="px-5">
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as BusinessTab)} className="w-full">
+            <TabsList 
+              className="grid w-full rounded-full px-1 py-1"
+              style={{ 
+                gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`,
+                background: '#F0F0F0',
+                border: '1px solid #E0E0E0'
+              }}
+            >
+              {tabs.map((tab) => (
+                <TabsTrigger 
+                  key={tab.id}
+                  value={tab.id}
+                  className="rounded-full text-sm px-3 py-1.5 font-medium transition-all duration-150 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                  style={{ color: '#0F0F0F' }}
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </section>
+
+        {/* Tab Content */}
+        <div className="pt-4 px-5">
+          {getCurrentContent()}
+        </div>
+      </div>
+
+      {/* Bottom Navigation Spacer */}
+      <div className="h-20" />
+
+      {/* Image Action Sheets */}
+      <BusinessImageActionSheet
+        open={logoSheetOpen}
+        onOpenChange={setLogoSheetOpen}
+        type="logo"
+        hasImage={!!business.logo_url}
+        uploading={uploadingLogo}
+        onUpload={async (file) => { await uploadLogo(file); }}
+        onRemove={async () => { await removeLogo(); }}
+      />
+      <BusinessImageActionSheet
+        open={coverSheetOpen}
+        onOpenChange={setCoverSheetOpen}
+        type="cover"
+        hasImage={!!business.cover_image_url}
+        uploading={uploadingCover}
+        onUpload={async (file) => { await uploadCover(file); }}
+        onRemove={async () => { await removeCover(); }}
+      />
     </PageRoot>
   );
 };
