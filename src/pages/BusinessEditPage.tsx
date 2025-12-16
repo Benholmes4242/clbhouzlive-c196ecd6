@@ -383,56 +383,68 @@ const BusinessEditPage = () => {
                 </div>
               </div>
 
-              {/* Cover photo */}
+              {/* Header photo - matches personal profile exactly */}
               <div>
-                <Label className="text-xs text-muted-foreground mb-2 block">Cover photo</Label>
-                <div className="relative w-full h-28 rounded-sq-md overflow-hidden border border-border mb-2">
-                  {business?.cover_image_url ? (
-                    <img
-                      src={business.cover_image_url}
-                      alt="Cover"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200" />
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => coverInputRef.current?.click()}
-                    disabled={uploadingCover}
-                    className="text-xs h-8"
-                  >
-                    {uploadingCover ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      'Change'
-                    )}
-                  </Button>
+                <div className="mb-2 flex items-center justify-between">
+                  <div>
+                    <h2 className="text-sm font-medium">Header photo</h2>
+                    <p className="text-xs text-muted-foreground">
+                      This image appears at the top of your profile. Use a wide, landscape photo.
+                    </p>
+                  </div>
                   {business?.cover_image_url && (
                     <button
-                      onClick={() => removeCover()}
+                      type="button"
+                      onClick={() => coverInputRef.current?.click()}
                       disabled={uploadingCover}
-                      className="text-xs text-muted-foreground hover:text-destructive transition-colors"
+                      className="text-sm font-medium text-slate-600 hover:text-slate-500"
                     >
-                      Remove
+                      {uploadingCover ? 'Uploading...' : 'Change photo'}
                     </button>
                   )}
                 </div>
-                <p className="text-[11px] text-muted-foreground mt-1.5">
-                  Landscape image, 3:1 ratio recommended
+
+                <button
+                  type="button"
+                  onClick={() => coverInputRef.current?.click()}
+                  disabled={uploadingCover}
+                  className="relative w-full overflow-hidden rounded-xl border border-dashed border-border/70 bg-muted/40 h-[200px] flex items-center justify-center hover:bg-muted/60 transition-colors group"
+                >
+                  {business?.cover_image_url ? (
+                    <>
+                      <img
+                        src={business.cover_image_url}
+                        alt="Header preview"
+                        className="h-full w-full object-cover object-bottom"
+                      />
+                      {/* Hover overlay */}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <div className="flex items-center gap-2 text-white text-sm font-medium">
+                          <Camera className="w-4 h-4" />
+                          Change photo
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">
+                      {uploadingCover ? 'Uploading...' : 'Tap to upload a header photo'}
+                    </span>
+                  )}
+                </button>
+
+                <p className="mt-2 text-[11px] text-muted-foreground">
+                  Recommended: 1600×600px or larger. JPG, PNG, or WebP.
                 </p>
+
                 <input
                   ref={coverInputRef}
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/png,image/webp"
                   onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (file) {
                       await uploadCover(file);
-                      toast.success('Cover photo updated');
+                      toast.success('Header photo updated');
                     }
                     if (coverInputRef.current) coverInputRef.current.value = '';
                   }}
