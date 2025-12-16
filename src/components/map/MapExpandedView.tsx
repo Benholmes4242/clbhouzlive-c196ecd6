@@ -5,26 +5,28 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { MapPin } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
-import { createGlassyMarkerElement } from '@/components/map/MapMarker';
+import { createGlassyMarkerElement } from './MapMarker';
+import { MAP_CONFIG } from '@/config/maps';
 
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
-const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-streets-v12';
-
-interface CourseMapFullScreenProps {
+interface MapExpandedViewProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  latitude: number;
-  longitude: number;
-  courseName: string;
+  lat: number;
+  lng: number;
+  name: string;
   locationText?: string;
 }
 
-const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
+/**
+ * Unified expanded map view used by both Course Details and Business Profile.
+ * Features satellite-streets, glassy orange marker, zoom controls, Apple/Google Maps buttons.
+ */
+export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
   open,
   onOpenChange,
-  latitude,
-  longitude,
-  courseName,
+  lat,
+  lng,
+  name,
   locationText,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -32,24 +34,24 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
   const initTimeoutRef = useRef<number | null>(null);
   const mountedRef = useRef(true);
 
-  // Detect iOS
+  // Detect iOS for Apple Maps button
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
-  // Swipe down to close handlers (only for header area)
+  // Swipe down to close (header area only)
   const swipeHandlers = useSwipeable({
     onSwipedDown: () => onOpenChange(false),
     preventScrollOnSwipe: false,
     trackMouse: false,
   });
 
-  // Generate deep link URLs
-  const appleMapsUrl = `maps://maps.apple.com/?q=${encodeURIComponent(courseName)}&ll=${latitude},${longitude}&z=13`;
-  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+  // Deep link URLs
+  const appleMapsUrl = `maps://maps.apple.com/?q=${encodeURIComponent(name)}&ll=${lat},${lng}&z=13`;
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
 
   useEffect(() => {
     mountedRef.current = true;
 
-    // When sheet is closed, clean up map
+    // Clean up when closed
     if (!open) {
       if (initTimeoutRef.current != null) {
         window.clearTimeout(initTimeoutRef.current);
@@ -62,30 +64,30 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
       return;
     }
 
-    if (!MAPBOX_TOKEN) return;
-    if (!latitude || !longitude) return;
+    if (!MAP_CONFIG.TOKEN) return;
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
 
-    // If map already exists, just recenter + resize
+    // Recenter if map already exists
     if (mapRef.current) {
-      mapRef.current.setCenter([longitude, latitude]);
+      mapRef.current.setCenter([lng, lat]);
       mapRef.current.resize();
       return;
     }
 
-    // Delay initialization to allow Sheet to fully render
+    // Delay init for sheet animation
     initTimeoutRef.current = window.setTimeout(() => {
       if (!mountedRef.current || !mapContainerRef.current) return;
 
-      mapboxgl.accessToken = MAPBOX_TOKEN;
+      mapboxgl.accessToken = MAP_CONFIG.TOKEN;
 
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
-        style: MAPBOX_STYLE,
-        center: [longitude, latitude],
-        zoom: 13,
+        style: MAP_CONFIG.STYLE_URL,
+        center: [lng, lat],
+        zoom: MAP_CONFIG.ZOOM.EXPANDED,
         interactive: true,
-        maxZoom: 17,
-        minZoom: 2,
+        maxZoom: MAP_CONFIG.ZOOM.MAX,
+        minZoom: MAP_CONFIG.ZOOM.MIN,
         dragRotate: false,
         pitchWithRotate: false,
         touchPitch: false,
@@ -96,21 +98,19 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
       // Navigation controls
       map.addControl(new mapboxgl.NavigationControl({ visualizePitch: false }), 'top-right');
 
-      // Glassy orange marker (same as Business maps)
+      // Glassy orange marker
       const markerEl = createGlassyMarkerElement('md');
       new mapboxgl.Marker({ element: markerEl, anchor: 'bottom' })
-        .setLngLat([longitude, latitude])
+        .setLngLat([lng, lat])
         .addTo(map);
 
-      // Ensure correct size once everything is loaded
       map.on('load', () => {
         map.resize();
       });
 
-      // Guard against WebGL issues
       map.on('error', (e) => {
         if ((e as any)?.error?.message?.includes('WebGL')) {
-          console.error('[Mapbox] WebGL error, removing map instance', e);
+          console.error('[MapExpandedView] WebGL error, removing map', e);
           map.remove();
           mapRef.current = null;
         }
@@ -128,7 +128,7 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
         mapRef.current = null;
       }
     };
-  }, [open, latitude, longitude]);
+  }, [open, lat, lng]);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -138,12 +138,11 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
       >
         {/* Header - swipe to close area */}
         <div {...swipeHandlers} className="px-4 pt-3">
-          {/* Header */}
           <div className="flex items-start justify-between mb-4">
             <div>
               <h2 className="text-base font-semibold flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
-                {courseName}
+                {name}
               </h2>
               {locationText && (
                 <p className="text-xs text-muted-foreground mt-0.5">
@@ -155,10 +154,10 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
         </div>
         
         <div className="flex flex-col flex-1 pb-5 gap-4">
-          {/* Map - Full bleed with borders */}
+          {/* Map - full bleed on mobile, rounded on desktop */}
           <div 
             className="relative h-[calc(100vh-300px)] max-h-[52vh] rounded-none overflow-hidden border border-border/60 sm:border-border/40 bg-surface-alt w-[100vw] left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 sm:rounded-2xl sm:mx-4" 
-            style={{ minHeight: '320px' }}
+            style={{ minHeight: `${MAP_CONFIG.HEIGHT.EXPANDED_MIN}px` }}
           >
             <div ref={mapContainerRef} className="w-full h-full" />
           </div>
@@ -187,4 +186,4 @@ const CourseMapFullScreen: React.FC<CourseMapFullScreenProps> = ({
   );
 };
 
-export default CourseMapFullScreen;
+export default MapExpandedView;

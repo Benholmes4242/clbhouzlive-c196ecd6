@@ -3,9 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Maximize2 } from 'lucide-react';
 import { createGlassyMarkerElement } from './MapMarker';
-
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
-const MAPBOX_STYLE = 'mapbox://styles/mapbox/streets-v12';
+import { MAP_CONFIG } from '@/config/maps';
 
 interface MapPreviewProps {
   lat: number;
@@ -27,9 +25,9 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
   lat,
   lng,
   name = 'Location',
-  height = 160,
-  zoom = 14,
-  markerColor = '#F7931E',
+  height = MAP_CONFIG.HEIGHT.PREVIEW,
+  zoom = MAP_CONFIG.ZOOM.PREVIEW,
+  markerColor = MAP_CONFIG.MARKER_COLOR,
   showExpandButton = true,
   onExpand,
   interactive = false,
@@ -47,7 +45,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
   useEffect(() => {
     mountedRef.current = true;
 
-    if (!MAPBOX_TOKEN) {
+    if (!MAP_CONFIG.TOKEN) {
       console.warn('[MapPreview] VITE_MAPBOX_ACCESS_TOKEN not configured');
       return;
     }
@@ -59,11 +57,11 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
       if (!mountedRef.current || !mapContainerRef.current) return;
       if (mapRef.current) return;
 
-      mapboxgl.accessToken = MAPBOX_TOKEN;
+      mapboxgl.accessToken = MAP_CONFIG.TOKEN;
 
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
-        style: MAPBOX_STYLE,
+        style: MAP_CONFIG.STYLE_URL,
         center: [lng, lat],
         zoom,
         interactive,
