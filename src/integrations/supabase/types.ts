@@ -336,6 +336,8 @@ export type Database = {
           is_system_account: boolean
           is_verified: boolean | null
           last_verification_action: string | null
+          lat: number | null
+          lng: number | null
           location: string | null
           logo_url: string | null
           name: string
@@ -359,6 +361,8 @@ export type Database = {
           is_system_account?: boolean
           is_verified?: boolean | null
           last_verification_action?: string | null
+          lat?: number | null
+          lng?: number | null
           location?: string | null
           logo_url?: string | null
           name: string
@@ -382,6 +386,8 @@ export type Database = {
           is_system_account?: boolean
           is_verified?: boolean | null
           last_verification_action?: string | null
+          lat?: number | null
+          lng?: number | null
           location?: string | null
           logo_url?: string | null
           name?: string
