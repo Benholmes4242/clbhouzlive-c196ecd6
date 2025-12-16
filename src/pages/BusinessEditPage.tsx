@@ -381,10 +381,10 @@ const BusinessEditPage = () => {
                 </div>
               </div>
 
-              {/* Cover photo - 3:1 aspect ratio to match profile */}
+              {/* Cover photo */}
               <div>
                 <Label className="text-xs text-muted-foreground mb-2 block">Cover photo</Label>
-                <div className="relative w-full overflow-hidden rounded-sq-md border border-border mb-2" style={{ aspectRatio: '3 / 1' }}>
+                <div className="relative w-full h-28 rounded-sq-md overflow-hidden border border-border mb-2">
                   {business?.cover_image_url ? (
                     <img
                       src={business.cover_image_url}
