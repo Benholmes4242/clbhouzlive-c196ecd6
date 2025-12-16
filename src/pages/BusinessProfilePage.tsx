@@ -3,7 +3,7 @@
  * Only content substitutions, not layout changes
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
@@ -352,10 +352,7 @@ const BusinessProfilePage: React.FC = () => {
         <button 
           className="h-9 flex-1 rounded-full text-sm font-semibold text-white flex items-center justify-center gap-1.5 disabled:opacity-60"
           style={{ background: isFollowing ? '#334155' : '#64748b' }}
-          onClick={() => {
-            alert('Follow button tapped! z-index working');
-            handleFollowToggle();
-          }}
+          onClick={handleFollowToggle}
           disabled={followBusy}
         >
           {followBusy ? (
