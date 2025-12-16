@@ -62,6 +62,7 @@ export function useBusinessProfile(idOrSlug: string | undefined) {
 
       return data as BusinessProfile;
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 30 * 1000, // 30 seconds - shorter for fresher verification status
+    refetchOnWindowFocus: true, // Refetch when user returns to tab
   });
 }
