@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, Globe, MapPin, Camera, Loader2, ExternalLink } from 'lucide-react';
+import { Phone, Globe, MapPin, Camera, Loader2, MoreHorizontal, Check, Share2, Link2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
@@ -12,12 +12,21 @@ import { BusinessImageActionSheet } from './BusinessImageActionSheet';
 import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 import { BusinessFollowButton } from './BusinessFollowButton';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { toast } from 'sonner';
 
 interface BusinessProfileHeaderProps {
   business: BusinessProfile;
   membership: BusinessMembership | null;
   postsCount: number;
   followersCount: number;
+  followingCount?: number;
 }
 
 export function BusinessProfileHeader({
@@ -25,6 +34,7 @@ export function BusinessProfileHeader({
   membership,
   postsCount,
   followersCount,
+  followingCount = 0,
 }: BusinessProfileHeaderProps) {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
@@ -34,8 +44,12 @@ export function BusinessProfileHeader({
   const [coverSheetOpen, setCoverSheetOpen] = useState(false);
   const { uploadLogo, removeLogo, uploadCover, removeCover, uploadingLogo, uploadingCover } = useBusinessImageUpload(business.id);
   
+  // Bio expand state
+  const [bioExpanded, setBioExpanded] = useState(false);
+  
   // Check if user can edit images
   const canEditImages = membership?.role === 'owner' || membership?.role === 'admin';
+  const isOwner = membership?.canManage;
 
   const handleCall = () => {
     if (business.phone) {
@@ -54,12 +68,27 @@ export function BusinessProfileHeader({
     }
   };
 
-  const handleDirections = () => {
-    if (business.location) {
-      trackBusinessAction(business.id, 'directions', user?.id);
-      const query = encodeURIComponent(business.location);
-      window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
+  const handleShare = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: business.name,
+          url: url,
+        });
+      } catch {
+        // User cancelled or error
+      }
+    } else {
+      await navigator.clipboard.writeText(url);
+      toast.success('Link copied to clipboard');
     }
+  };
+
+  const handleCopyLink = async () => {
+    const url = window.location.href;
+    await navigator.clipboard.writeText(url);
+    toast.success('Link copied');
   };
 
   // Generate initials from business name
@@ -70,14 +99,16 @@ export function BusinessProfileHeader({
     .join('')
     .toUpperCase();
 
-  // Format website URL for display
-  const formatWebsiteUrl = (url: string) => {
-    return url.replace(/^https?:\/\//, '').replace(/\/$/, '');
-  };
+  // Bio truncation logic
+  const bioText = business.description || '';
+  const shouldTruncateBio = bioText.length > 180;
+  const displayBio = shouldTruncateBio && !bioExpanded 
+    ? bioText.slice(0, 180) + '…' 
+    : bioText;
 
   return (
     <section className="relative w-full bg-[#F4F5F7]">
-      {/* COVER IMAGE - Light UI with contain to match Edit preview */}
+      {/* COVER IMAGE */}
       <div className="relative w-full h-[220px] overflow-hidden" style={{ background: '#F4F5F7' }}>
         {business.cover_image_url ? (
           <img
@@ -90,7 +121,7 @@ export function BusinessProfileHeader({
           <div className="w-full h-full bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200" />
         )}
         
-        {/* Subtle gradient overlay for light UI readability */}
+        {/* Subtle gradient overlay */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
@@ -115,7 +146,7 @@ export function BusinessProfileHeader({
         )}
       </div>
 
-      {/* WHITE CARD META BLOCK - Avatar + Identity */}
+      {/* WHITE CARD META BLOCK */}
       <div className="relative bg-white mx-4 -mt-12 rounded-sq-lg shadow-sm" style={{ border: '1px solid rgba(31,36,40,0.08)' }}>
         <div className="px-5 pt-5 pb-5">
           {/* Avatar row */}
@@ -143,7 +174,7 @@ export function BusinessProfileHeader({
                   </div>
                 )}
                 
-                {/* Camera badge - bottom right of avatar */}
+                {/* Camera badge */}
                 {canEditImages && (
                   <span className="absolute -bottom-1 -right-1 flex items-center justify-center w-7 h-7 rounded-full bg-[#F7931E] text-white shadow-md">
                     {uploadingLogo ? (
@@ -156,7 +187,7 @@ export function BusinessProfileHeader({
               </button>
             </div>
 
-            {/* TEXT META (name, verified, category pill) */}
+            {/* TEXT META */}
             <div className="flex-1 min-w-0 pt-1">
               {/* Name + Verified badge */}
               <div className="flex items-center gap-1.5 flex-wrap">
@@ -185,74 +216,116 @@ export function BusinessProfileHeader({
             </div>
           </div>
 
-          {/* BIO / Tagline */}
-          {business.description && (
-            <p className="mt-4 text-sm text-[#5E666D] leading-relaxed line-clamp-2">
-              {business.description}
-            </p>
-          )}
-
-          {/* PRIMARY ACTIONS ROW */}
-          <div className="mt-4 flex flex-wrap items-center gap-2">
+          {/* ACTIONS ROW - Match personal profile pattern */}
+          <div className="mt-4 flex items-center gap-2">
             {/* Follow button for non-owners */}
-            {!membership?.canManage && (
-              <BusinessFollowButton 
-                businessId={business.id} 
-                className="rounded-full px-5"
-              />
-            )}
+            <BusinessFollowButton 
+              businessId={business.id} 
+              className="h-9 flex-1 rounded-full px-5"
+            />
             
-            {business.website && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleWebsite}
-                className="rounded-full px-4 text-[#1F2428] border-[#1F2428]/10 hover:bg-[#EDEFF2]"
-              >
-                <Globe className="h-4 w-4 mr-1.5" />
-                Website
-                <ExternalLink className="h-3 w-3 ml-1 opacity-50" />
-              </Button>
-            )}
-            
-            {business.phone && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleCall}
-                className="rounded-full px-4 text-[#1F2428] border-[#1F2428]/10 hover:bg-[#EDEFF2]"
-              >
-                <Phone className="h-4 w-4 mr-1.5" />
-                Call
-              </Button>
-            )}
-            
-            {business.location && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleDirections}
-                className="rounded-full px-4 text-[#1F2428] border-[#1F2428]/10 hover:bg-[#EDEFF2]"
-              >
-                <MapPin className="h-4 w-4 mr-1.5" />
-                Directions
-              </Button>
+            {/* Owner-only menu (⋯) */}
+            {isOwner && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button 
+                    className="w-9 h-9 flex-shrink-0 rounded-full flex items-center justify-center"
+                    style={{
+                      background: '#fff',
+                      border: '1px solid #E0E0E0'
+                    }}
+                  >
+                    <MoreHorizontal className="w-4 h-4 text-[#0F0F0F]" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => navigate(`/business/${business.id}/edit`)}>
+                    Edit business profile
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleShare}>
+                    <Share2 className="h-4 w-4 mr-2" />
+                    Share profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleCopyLink}>
+                    <Link2 className="h-4 w-4 mr-2" />
+                    Copy link
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
-        </div>
 
-        {/* SIGNALS BAR - Subtle row with key metrics */}
-        <div 
-          className="flex items-center justify-around py-3 border-t"
-          style={{ borderColor: 'rgba(31,36,40,0.06)' }}
-        >
-          <SignalItem label="Followers" value={followersCount} />
-          <div className="w-px h-6 bg-[#1F2428]/6" />
-          <SignalItem label="Posts" value={postsCount} />
-          <div className="w-px h-6 bg-[#1F2428]/6" />
-          <SignalItem label="Rating" value="–" />
+          {/* Mini-nav row: Posts | Followers | Following - matching personal profile */}
+          <div className="mt-5 flex items-center justify-between">
+            <button className="pb-2 flex items-center gap-2">
+              <span className="text-sm text-slate-500">Posts</span>
+              <span className="text-base font-semibold text-[#0F0F0F]">{postsCount}</span>
+            </button>
+            
+            <button className="pb-2 flex items-center gap-2">
+              <span className="text-sm text-slate-500">Followers</span>
+              <span className="text-base font-semibold text-[#0F0F0F]">{followersCount}</span>
+            </button>
+            
+            <button className="pb-2 flex items-center gap-2">
+              <span className="text-sm text-slate-500">Following</span>
+              <span className="text-base font-semibold text-[#0F0F0F]">{followingCount}</span>
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* WHITE CONTENT SHEET - About section */}
+      <div className="bg-white mx-4 mt-3 rounded-sq-lg shadow-sm" style={{ border: '1px solid rgba(31,36,40,0.08)' }}>
+        <div className="px-5 py-4">
+          <h3 className="text-base font-semibold text-[#0F0F0F] mb-2">About</h3>
+          {bioText ? (
+            <div>
+              <p className="text-sm text-[#5E666D] leading-relaxed whitespace-pre-wrap" style={{ overflowWrap: 'anywhere' }}>
+                {displayBio}
+              </p>
+              {shouldTruncateBio && (
+                <button
+                  onClick={() => setBioExpanded(!bioExpanded)}
+                  className="text-sm font-medium text-[#F7931E] mt-1 hover:underline"
+                >
+                  {bioExpanded ? 'Show less' : 'More'}
+                </button>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-[#97A1AA] italic">No description provided</p>
+          )}
+        </div>
+      </div>
+
+      {/* PRIMARY BUTTONS ROW - Website + Call only */}
+      {(business.website || business.phone) && (
+        <div className="mx-4 mt-3 flex items-center gap-2">
+          {business.website && (
+            <Button 
+              variant="outline" 
+              onClick={handleWebsite}
+              className="flex-1 h-10 rounded-full text-[#1F2428] border-[#1F2428]/10 hover:bg-[#EDEFF2]"
+            >
+              <Globe className="h-4 w-4 mr-1.5" />
+              Website
+            </Button>
+          )}
+          
+          {business.phone && (
+            <Button 
+              variant="outline" 
+              onClick={handleCall}
+              className="flex-1 h-10 rounded-full text-[#1F2428] border-[#1F2428]/10 hover:bg-[#EDEFF2]"
+            >
+              <Phone className="h-4 w-4 mr-1.5" />
+              Call
+            </Button>
+          )}
+        </div>
+      )}
 
       {/* Image Action Sheets */}
       <BusinessImageActionSheet
@@ -274,19 +347,5 @@ export function BusinessProfileHeader({
         onRemove={async () => { await removeCover(); }}
       />
     </section>
-  );
-}
-
-function SignalItem({ label, value }: { label: string; value: number | string }) {
-  const displayValue = typeof value === 'number' ? value.toLocaleString() : value;
-  return (
-    <div className="flex flex-col items-center px-4">
-      <span className="text-base font-semibold text-[#1F2428] tabular-nums">
-        {displayValue}
-      </span>
-      <span className="mt-0.5 text-[11px] text-[#5E666D]">
-        {label}
-      </span>
-    </div>
   );
 }
