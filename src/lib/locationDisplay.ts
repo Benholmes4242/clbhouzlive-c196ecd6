@@ -80,22 +80,17 @@ export function getCityCountry(fields: LocationFields): string | null {
   const { city, region, country, location } = fields;
   
   const cityPart = getCityOnly(fields);
-  const countryPart = country?.trim();
+  let countryPart = country?.trim() || null;
+  
+  // If no structured country but we have location string, extract country (last part)
+  if (!countryPart && location) {
+    const parts = location.split(',').map(p => p.trim()).filter(Boolean);
+    if (parts.length >= 2) {
+      countryPart = parts[parts.length - 1];
+    }
+  }
   
   if (!cityPart && !countryPart) {
-    // Last resort: try to parse location string for city + country
-    if (location) {
-      const parts = location.split(',').map(p => p.trim()).filter(Boolean);
-      if (parts.length >= 2) {
-        // Find first non-street part (city) and last part (country)
-        const cityIndex = parts.findIndex(p => !/^\d/.test(p));
-        if (cityIndex !== -1) {
-          const city = normalizeCity(parts[cityIndex]);
-          const country = parts[parts.length - 1];
-          return `${city}, ${country}`;
-        }
-      }
-    }
     return null;
   }
   
@@ -107,9 +102,9 @@ export function getCityCountry(fields: LocationFields): string | null {
     return countryPart;
   }
   
-  // Check if we should include region
+  // Check if we should include region (US/CA/AU)
   const includeRegion = REGION_COUNTRIES.some(c => 
-    countryPart.toLowerCase() === c.toLowerCase()
+    countryPart!.toLowerCase() === c.toLowerCase()
   );
   
   if (includeRegion && region?.trim()) {
