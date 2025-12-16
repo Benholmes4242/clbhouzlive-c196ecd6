@@ -490,7 +490,7 @@ const BusinessProfilePage: React.FC = () => {
               }}
               onClick={() => trackBusinessAction(business.id, 'website', user?.id)}
             >
-              <Globe className="w-3.5 h-3.5" />
+              <ExternalLink className="w-3.5 h-3.5" />
               {formatUrlForDisplay(business.website)}
             </a>
           )}
