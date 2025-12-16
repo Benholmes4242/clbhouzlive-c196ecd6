@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Maximize2 } from 'lucide-react';
+import { createGlassyMarkerElement } from './MapMarker';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/streets-v12';
@@ -35,6 +36,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
+  const markerRef = useRef<mapboxgl.Marker | null>(null);
   const mountedRef = useRef(true);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const [mapInitialized, setMapInitialized] = useState(false);
@@ -76,8 +78,9 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
         }
       });
 
-      // Add marker
-      new mapboxgl.Marker({ color: markerColor })
+      // Add glassy orange marker
+      const markerEl = createGlassyMarkerElement('md');
+      markerRef.current = new mapboxgl.Marker({ element: markerEl, anchor: 'bottom' })
         .setLngLat([lng, lat])
         .addTo(map);
     };
@@ -116,6 +119,9 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
   useEffect(() => {
     if (mapRef.current && hasValidCoords) {
       mapRef.current.setCenter([lng, lat]);
+      if (markerRef.current) {
+        markerRef.current.setLngLat([lng, lat]);
+      }
     }
   }, [lat, lng, hasValidCoords]);
 

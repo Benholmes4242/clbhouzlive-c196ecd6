@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { MapPin, ExternalLink } from 'lucide-react';
 import { MapPreview } from '@/components/map/MapPreview';
+import { getCityCountry } from '@/lib/locationDisplay';
 
 interface BusinessLocationCardProps {
   location: string;
@@ -11,36 +12,6 @@ interface BusinessLocationCardProps {
   country?: string | null;
   region?: string | null;
   isOwner?: boolean;
-}
-
-// Format location for display: City, Country (or City, Region, Country for US/CA)
-function formatDisplayLocation(props: {
-  city?: string | null;
-  region?: string | null;
-  country?: string | null;
-  location: string;
-}): string {
-  const { city, region, country, location } = props;
-  
-  // Try to build from structured data
-  if (city && country) {
-    // For US/CA, include region (state/province)
-    if ((country === 'United States' || country === 'Canada' || country === 'US' || country === 'CA') && region) {
-      return `${city}, ${region}, ${country}`;
-    }
-    return `${city}, ${country}`;
-  }
-  
-  // Fallback: extract first part of location (usually city) + last part (country)
-  if (location) {
-    const parts = location.split(',').map(p => p.trim()).filter(Boolean);
-    if (parts.length >= 2) {
-      return `${parts[0]}, ${parts[parts.length - 1]}`;
-    }
-    return parts[0] || location;
-  }
-  
-  return location;
 }
 
 export function BusinessLocationCard({
@@ -78,7 +49,7 @@ export function BusinessLocationCard({
     return null;
   }
   
-  const displayLocation = formatDisplayLocation({ city, region, country, location });
+  const displayLocation = getCityCountry({ city, region, country, location }) || location;
 
   const handleOpenAppleMaps = () => {
     window.open(`https://maps.apple.com/?ll=${lat},${lng}&q=${encodeURIComponent(businessName)}`, '_blank');
