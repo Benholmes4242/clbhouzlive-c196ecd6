@@ -719,7 +719,108 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
     }
 
     /**
-     * 10) DEFAULT – All other notification types (follow, like, comment, etc.)
+     * 10) BUSINESS VERIFICATION SUBMITTED
+     */
+    case 'business_verification_submitted': {
+      const statusIcon = getNotificationBadgeIcon(type);
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              {BUSINESS_VERIFICATION_COPY.submitted.title}
+            </span>
+          }
+          subtext={BUSINESS_VERIFICATION_COPY.submitted.body}
+          meta={notification.time_ago}
+          actions={
+            <span className={cn(basePillClass, "border-amber-400 bg-amber-500/10 text-amber-600")}>
+              Pending
+            </span>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 11) BUSINESS VERIFICATION APPROVED
+     */
+    case 'business_verification_approved': {
+      const statusIcon = getNotificationBadgeIcon(type);
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              {BUSINESS_VERIFICATION_COPY.approved.title}
+            </span>
+          }
+          subtext={BUSINESS_VERIFICATION_COPY.approved.body}
+          meta={notification.time_ago}
+          actions={
+            <span className={cn(basePillClass, "border-emerald-500 bg-emerald-500/10 text-emerald-600")}>
+              <VerifiedBadge size="sm" />
+              Verified
+            </span>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 12) BUSINESS VERIFICATION REJECTED
+     */
+    case 'business_verification_rejected': {
+      const statusIcon = getNotificationBadgeIcon(type);
+      const reason = data?.reason || data?.admin_note;
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              {BUSINESS_VERIFICATION_COPY.rejected.title}
+            </span>
+          }
+          subtext={
+            <>
+              {BUSINESS_VERIFICATION_COPY.rejected.body}
+              {reason && (
+                <span className="block mt-1 text-muted-foreground/80">
+                  <span className="font-medium">Reason:</span> {reason}
+                </span>
+              )}
+            </>
+          }
+          meta={notification.time_ago}
+          actions={
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); }}
+              className={getNotificationButtonClass('support')}
+            >
+              <MessageSquare className="h-3 w-3" />
+              Chat with support
+            </button>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 13) DEFAULT – All other notification types (follow, like, comment, etc.)
      */
     default: {
       const statusIcon = getNotificationBadgeIcon(type);
