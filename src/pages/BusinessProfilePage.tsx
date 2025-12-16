@@ -13,7 +13,7 @@ import { useBusinessFollowersCount, useIsFollowingBusiness, useBusinessFollowMut
 import { supabase } from '@/integrations/supabase/client';
 import { 
   Phone, Globe, MapPin, MoreHorizontal, Send, Check, ExternalLink, Loader2, 
-  ChevronRight, Share2, Link2, AlertCircle
+  ChevronRight, Share2, Link2, AlertCircle, BadgeCheck
 } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -308,10 +308,10 @@ const BusinessProfilePage: React.FC = () => {
             ) : null;
           })()}
           
-          {/* Category pill - transparent green glass (replaces Golfer) */}
-          {business.category && (
+          {/* Verified pill - only shows if verified (replaces category) */}
+          {business.is_verified && (
             <span 
-              className="px-4 py-1.5 text-sm font-semibold rounded-full text-emerald-700 flex items-center justify-center"
+              className="px-4 py-1.5 text-sm font-semibold rounded-full text-emerald-700 flex items-center gap-1.5"
               style={{ 
                 background: 'rgba(52, 199, 89, 0.15)',
                 backdropFilter: 'blur(8px)',
@@ -319,7 +319,8 @@ const BusinessProfilePage: React.FC = () => {
                 border: '1px solid rgba(52, 199, 89, 0.3)'
               }}
             >
-              {business.category}
+              <BadgeCheck className="w-3.5 h-3.5" />
+              Verified
             </span>
           )}
         </div>
