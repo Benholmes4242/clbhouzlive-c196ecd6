@@ -230,16 +230,22 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         )}
       </div>
 
-      {/* Helper text */}
+      {/* Helper text - cleaner copy */}
       {!showError && !showPrecisionWarning && countryCode && (
-        <p className="text-xs text-muted-foreground mt-1.5">
-          Use your full address (street + postcode/ZIP) for an accurate map pin.
-          {countryDisplayName && <> Search is limited to <strong>{countryDisplayName}</strong>.</>}
-        </p>
+        <div className="mt-2 space-y-1">
+          <p className="text-xs text-muted-foreground">
+            Add your street address and postcode/ZIP so your map pin is accurate.
+          </p>
+          {countryDisplayName && (
+            <p className="text-[11px] text-muted-foreground/70">
+              Searching within {countryDisplayName}.
+            </p>
+          )}
+        </div>
       )}
       
       {!countryCode && (
-        <p className="text-xs text-muted-foreground mt-1.5">
+        <p className="text-xs text-muted-foreground mt-2">
           Select a country first to enable address search.
         </p>
       )}

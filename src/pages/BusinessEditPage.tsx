@@ -710,32 +710,46 @@ const BusinessEditPage = () => {
                 />
               </div>
 
-              {/* Map preview when we have coordinates */}
-              {address?.lat && address?.lng && (
-                <div className="rounded-sq-md border overflow-hidden">
-                  <div className="relative w-full h-[140px] bg-muted">
-                    <img
-                      src={`https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+F7931E(${address.lng},${address.lat})/${address.lng},${address.lat},14,0/400x140@2x?access_token=pk.eyJ1IjoiY2xiaG91eiIsImEiOiJjbTVyejIzMXcxemx2MmpzZDU3YjkxNjNkIn0.H_w9d-UAvvMRkJ_9DoVQ-A`}
-                      alt="Map preview"
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                  <div className="px-3 py-2 flex items-center justify-between bg-muted/30">
-                    <div className="flex items-center gap-2 text-sm">
-                      <MapPin className="h-4 w-4 text-primary" />
-                      <span className="truncate">{address.label}</span>
+              {/* Map preview - shows immediately when address selected */}
+              <div className="mt-3">
+                {address?.lat && address?.lng ? (
+                  <div 
+                    key={`${address.lat}-${address.lng}`} 
+                    className="rounded-sq-md border border-slate-200 overflow-hidden"
+                  >
+                    <div className="relative w-full h-[160px] bg-slate-100">
+                      <img
+                        src={`https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+F7931E(${address.lng},${address.lat})/${address.lng},${address.lat},14,0/400x160@2x?access_token=pk.eyJ1IjoiY2xiaG91eiIsImEiOiJjbTVyejIzMXcxemx2MmpzZDU3YjkxNjNkIn0.H_w9d-UAvvMRkJ_9DoVQ-A`}
+                        alt="Map preview"
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => setShowPinDropModal(true)}
-                      className="text-xs text-primary hover:underline flex-shrink-0"
-                    >
-                      Adjust pin
-                    </button>
+                    <div className="px-3 py-2.5 flex items-center justify-between bg-white border-t border-slate-100">
+                      <div className="flex items-center gap-2 text-sm min-w-0">
+                        <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                        <span className="truncate text-slate-700">{address.city && address.country ? `${address.city}, ${address.country}` : address.label}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowPinDropModal(true)}
+                        className="text-xs text-primary hover:underline flex-shrink-0 ml-2"
+                      >
+                        Adjust pin
+                      </button>
+                    </div>
                   </div>
-                </div>
-              )}
+                ) : (
+                  <div className="rounded-sq-md border border-dashed border-slate-200 bg-slate-50 p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-sq-sm bg-slate-100 flex items-center justify-center flex-shrink-0">
+                        <MapPin className="h-5 w-5 text-slate-400" />
+                      </div>
+                      <p className="text-sm text-slate-500">Select an address to preview your map pin.</p>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               <div className="space-y-1.5">
                 <Label htmlFor="businessWebsite" className="text-xs text-muted-foreground flex items-center gap-1.5">

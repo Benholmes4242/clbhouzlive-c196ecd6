@@ -517,7 +517,10 @@ const BusinessProfilePage: React.FC = () => {
               lat={business.lat}
               lng={business.lng}
               businessName={business.name}
-              onDirections={handleDirections}
+              city={business.city}
+              country={business.country}
+              region={business.region}
+              isOwner={isOwner}
             />
           )}
         </section>
