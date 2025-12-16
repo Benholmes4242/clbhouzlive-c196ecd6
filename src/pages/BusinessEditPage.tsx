@@ -27,6 +27,7 @@ import { CountrySelector, getCountryCode, getCountryDisplayName } from '@/compon
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { DeleteBusinessDialog } from '@/components/business/DeleteBusinessDialog';
 import { SectionJumpStrip } from '@/components/profile/edit-v2/SectionJumpStrip';
+import { MapPreview } from '@/components/map/MapPreview';
 
 const SECTIONS = [
   { id: 'photos', label: 'Photos' },
@@ -712,19 +713,20 @@ const BusinessEditPage = () => {
 
               {/* Map preview - shows immediately when address selected */}
               <div className="mt-3">
-                {address?.lat && address?.lng ? (
+                {address?.lat != null && address?.lng != null && Number.isFinite(address.lat) && Number.isFinite(address.lng) ? (
                   <div 
-                    key={`${address.lat}-${address.lng}`} 
+                    key={`preview-${address.lat}-${address.lng}`} 
                     className="rounded-sq-md border border-slate-200 overflow-hidden"
                   >
-                    <div className="relative w-full h-[160px] bg-slate-100">
-                      <img
-                        src={`https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+F7931E(${address.lng},${address.lat})/${address.lng},${address.lat},14,0/400x160@2x?access_token=pk.eyJ1IjoiY2xiaG91eiIsImEiOiJjbTVyejIzMXcxemx2MmpzZDU3YjkxNjNkIn0.H_w9d-UAvvMRkJ_9DoVQ-A`}
-                        alt="Map preview"
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    </div>
+                    <MapPreview
+                      lat={address.lat}
+                      lng={address.lng}
+                      name={formData.businessName || 'Business location'}
+                      height={160}
+                      zoom={14}
+                      markerColor="#F7931E"
+                      showExpandButton={false}
+                    />
                     <div className="px-3 py-2.5 flex items-center justify-between bg-white border-t border-slate-100">
                       <div className="flex items-center gap-2 text-sm min-w-0">
                         <MapPin className="h-4 w-4 text-primary flex-shrink-0" />

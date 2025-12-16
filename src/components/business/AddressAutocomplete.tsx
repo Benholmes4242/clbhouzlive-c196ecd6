@@ -41,6 +41,10 @@ interface AddressResult {
   precision: string;
   primary: string;
   secondary: string;
+  city?: string | null;
+  region?: string | null;
+  country?: string | null;
+  postcode?: string | null;
 }
 
 interface AddressSearchResponse {
@@ -169,6 +173,11 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       mapboxPlaceId: result.place_id,
       precision: result.precision as LocationPrecision,
       countryCode: countryCode,
+      // Use structured data from edge function
+      city: result.city || undefined,
+      region: result.region || undefined,
+      country: result.country || undefined,
+      postcode: result.postcode || undefined,
     };
 
     onChange(addressValue);

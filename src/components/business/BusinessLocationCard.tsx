@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { MapPin, Maximize2, ExternalLink } from 'lucide-react';
+import { MapPin, ExternalLink } from 'lucide-react';
+import { MapPreview } from '@/components/map/MapPreview';
 
 interface BusinessLocationCardProps {
   location: string;
@@ -11,9 +12,6 @@ interface BusinessLocationCardProps {
   region?: string | null;
   isOwner?: boolean;
 }
-
-// Mapbox public token
-const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2xiaG91eiIsImEiOiJjbTVyejIzMXcxemx2MmpzZDU3YjkxNjNkIn0.H_w9d-UAvvMRkJ_9DoVQ-A';
 
 // Format location for display: City, Country (or City, Region, Country for US/CA)
 function formatDisplayLocation(props: {
@@ -37,7 +35,6 @@ function formatDisplayLocation(props: {
   if (location) {
     const parts = location.split(',').map(p => p.trim()).filter(Boolean);
     if (parts.length >= 2) {
-      // Return first and last part
       return `${parts[0]}, ${parts[parts.length - 1]}`;
     }
     return parts[0] || location;
@@ -59,7 +56,7 @@ export function BusinessLocationCard({
   const [expanded, setExpanded] = useState(false);
 
   // Don't render if no valid coordinates
-  const hasValidCoords = lat != null && lng != null && !isNaN(lat) && !isNaN(lng);
+  const hasValidCoords = lat != null && lng != null && Number.isFinite(lat) && Number.isFinite(lng);
   
   if (!hasValidCoords) {
     // Show owner-only prompt
@@ -78,16 +75,10 @@ export function BusinessLocationCard({
         </div>
       );
     }
-    return null; // Don't show anything for non-owners if no coords
+    return null;
   }
   
   const displayLocation = formatDisplayLocation({ city, region, country, location });
-  
-  // Generate static map URL
-  const mapUrl = `https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+F7931E(${lng},${lat})/${lng},${lat},14,0/400x200@2x?access_token=${MAPBOX_TOKEN}`;
-  
-  // Expanded map URL (larger)
-  const expandedMapUrl = `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l+F7931E(${lng},${lat})/${lng},${lat},15,0/800x400@2x?access_token=${MAPBOX_TOKEN}`;
 
   const handleOpenAppleMaps = () => {
     window.open(`https://maps.apple.com/?ll=${lat},${lng}&q=${encodeURIComponent(businessName)}`, '_blank');
@@ -99,33 +90,22 @@ export function BusinessLocationCard({
 
   return (
     <div className="mt-4">
-      {/* Map thumbnail card */}
+      {/* Map card */}
       <div 
+        key={`map-${lat}-${lng}`}
         className="relative w-full rounded-sq-md overflow-hidden border border-slate-200 cursor-pointer group"
         onClick={() => setExpanded(!expanded)}
       >
-        <div className={`relative w-full ${expanded ? 'h-[280px]' : 'h-[160px]'} transition-all duration-300`}>
-          <img
-            src={expanded ? expandedMapUrl : mapUrl}
-            alt={`Map of ${businessName}`}
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
-          
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
-          
-          {/* Expand pill - only show when collapsed */}
-          {!expanded && (
-            <button
-              type="button"
-              className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/70 backdrop-blur-sm text-white text-xs font-medium shadow-lg group-hover:bg-black/80 transition-colors"
-            >
-              <Maximize2 className="h-3 w-3" />
-              <span>Tap to expand</span>
-            </button>
-          )}
-        </div>
+        <MapPreview
+          lat={lat}
+          lng={lng}
+          name={businessName}
+          height={expanded ? 280 : 160}
+          zoom={expanded ? 15 : 14}
+          markerColor="#F7931E"
+          showExpandButton={!expanded}
+          onExpand={() => setExpanded(true)}
+        />
         
         {/* Location label inside card */}
         <div className="px-3 py-2.5 bg-white border-t border-slate-100">
