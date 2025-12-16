@@ -9,12 +9,16 @@ export interface BusinessPost {
   user_id: string;
   actor_type: string | null;
   actor_id: string | null;
+  post_type?: string | null;
+  location?: string | null;
   post_media: Array<{
     id: string;
     media_url: string;
     media_type: string;
     poster_url: string | null;
   }>;
+  likes_count: number;
+  comments_count: number;
 }
 
 export function useBusinessPosts(businessId?: string) {
@@ -22,7 +26,8 @@ export function useBusinessPosts(businessId?: string) {
     queryKey: ['business-posts', businessId],
     enabled: !!businessId,
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Fetch posts with media
+      const { data: postsData, error: postsError } = await supabase
         .from('posts')
         .select(`
           id,
@@ -43,12 +48,50 @@ export function useBusinessPosts(businessId?: string) {
         .eq('actor_id', businessId!)
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('[useBusinessPosts] error', error);
-        throw error;
+      if (postsError) {
+        console.error('[useBusinessPosts] error', postsError);
+        throw postsError;
       }
 
-      return (data ?? []) as BusinessPost[];
+      if (!postsData || postsData.length === 0) {
+        return [] as BusinessPost[];
+      }
+
+      // Fetch likes counts for all posts
+      const postIds = postsData.map(p => p.id);
+      const { data: likesData } = await supabase
+        .from('post_likes')
+        .select('post_id')
+        .in('post_id', postIds);
+
+      // Fetch comments counts for all posts
+      const { data: commentsData } = await supabase
+        .from('post_comments')
+        .select('post_id')
+        .in('post_id', postIds);
+
+      // Count likes and comments per post
+      const likesCountMap = new Map<string, number>();
+      const commentsCountMap = new Map<string, number>();
+      
+      likesData?.forEach(like => {
+        likesCountMap.set(like.post_id, (likesCountMap.get(like.post_id) || 0) + 1);
+      });
+      
+      commentsData?.forEach(comment => {
+        commentsCountMap.set(comment.post_id, (commentsCountMap.get(comment.post_id) || 0) + 1);
+      });
+
+      // Merge counts into posts
+      const postsWithCounts: BusinessPost[] = postsData.map(post => ({
+        ...post,
+        post_type: null, // Can be extended when post_type column exists
+        location: null, // Can be extended when location column exists
+        likes_count: likesCountMap.get(post.id) || 0,
+        comments_count: commentsCountMap.get(post.id) || 0,
+      }));
+
+      return postsWithCounts;
     },
     staleTime: 60_000,
   });

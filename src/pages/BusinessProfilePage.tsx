@@ -33,7 +33,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 // Tab content components
-import { BusinessProfilePosts } from '@/components/business/BusinessProfilePosts';
+import { BusinessActivityTab } from '@/components/business/BusinessActivityTab';
 import { BusinessProfileOverview } from '@/components/business/BusinessProfileOverview';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
 import { GolfersHereTab } from '@/components/business/GolfersHereTab';
@@ -42,7 +42,7 @@ import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton'
 // Background color - matches personal profile page (slate-50)
 const BG_COLOR = '#f8fafc';
 
-type BusinessTab = 'content' | 'overview' | 'golfers' | 'info';
+type BusinessTab = 'activity' | 'overview' | 'golfers' | 'info';
 
 const BusinessProfilePage: React.FC = () => {
   const navigate = useNavigate();
@@ -56,7 +56,7 @@ const BusinessProfilePage: React.FC = () => {
   const { data: isFollowingStatus, isLoading: statusLoading } = useIsFollowingBusiness(business?.id, user?.id);
   const { follow, unfollow, isFollowing: followPending, isUnfollowing: unfollowPending } = useBusinessFollowMutation(business?.id || '', user?.id);
 
-  const [activeTab, setActiveTab] = useState<BusinessTab>('content');
+  const [activeTab, setActiveTab] = useState<BusinessTab>('activity');
   const [activeMiniNav, setActiveMiniNav] = useState('posts');
   const [followingCount, setFollowingCount] = useState(0);
   const [bioExpanded, setBioExpanded] = useState(false);
@@ -178,7 +178,7 @@ const BusinessProfilePage: React.FC = () => {
     .toUpperCase() || 'B';
 
   const tabs = [
-    { id: 'content', label: 'Content' },
+    { id: 'activity', label: 'Activity' },
     { id: 'overview', label: 'Overview' },
     { id: 'golfers', label: 'Golfers' },
     { id: 'info', label: 'Info' },
@@ -186,11 +186,12 @@ const BusinessProfilePage: React.FC = () => {
 
   const getCurrentContent = () => {
     switch (activeTab) {
-      case 'content':
+      case 'activity':
         return (
-          <BusinessProfilePosts 
+          <BusinessActivityTab 
             businessId={business?.id || ''}
             businessName={business?.name || ''}
+            businessLogo={business?.logo_url}
             membership={membership ?? null} 
           />
         );
