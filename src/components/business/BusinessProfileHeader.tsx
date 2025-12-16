@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, Globe, MapPin, Camera, Loader2, ExternalLink } from 'lucide-react';
+import { Phone, Globe, MapPin, Camera, Loader2, MoreHorizontal, Check, Share2, Link2, Pencil, BarChart2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { BusinessProfile } from '@/hooks/useBusinessProfile';
@@ -12,6 +12,15 @@ import { BusinessImageActionSheet } from './BusinessImageActionSheet';
 import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 import { BusinessFollowButton } from './BusinessFollowButton';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { BusinessLocationCard } from './BusinessLocationCard';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { toast } from 'sonner';
 
 interface BusinessProfileHeaderProps {
   business: BusinessProfile;
@@ -32,10 +41,12 @@ export function BusinessProfileHeader({
   // Image editing state
   const [logoSheetOpen, setLogoSheetOpen] = useState(false);
   const [coverSheetOpen, setCoverSheetOpen] = useState(false);
+  const [bioExpanded, setBioExpanded] = useState(false);
   const { uploadLogo, removeLogo, uploadCover, removeCover, uploadingLogo, uploadingCover } = useBusinessImageUpload(business.id);
   
-  // Check if user can edit images
+  // Check if user can edit images / is owner
   const canEditImages = membership?.role === 'owner' || membership?.role === 'admin';
+  const isOwner = membership?.canManage;
 
   const handleCall = () => {
     if (business.phone) {
@@ -54,12 +65,24 @@ export function BusinessProfileHeader({
     }
   };
 
-  const handleDirections = () => {
-    if (business.location) {
-      trackBusinessAction(business.id, 'directions', user?.id);
-      const query = encodeURIComponent(business.location);
-      window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
+  const handleShare = async () => {
+    const url = `${window.location.origin}/business/${business.slug || business.id}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: business.name, url });
+      } catch (e) {
+        // User cancelled
+      }
+    } else {
+      await navigator.clipboard.writeText(url);
+      toast.success('Link copied to clipboard');
     }
+  };
+
+  const handleCopyLink = async () => {
+    const url = `${window.location.origin}/business/${business.slug || business.id}`;
+    await navigator.clipboard.writeText(url);
+    toast.success('Link copied to clipboard');
   };
 
   // Generate initials from business name
@@ -70,27 +93,27 @@ export function BusinessProfileHeader({
     .join('')
     .toUpperCase();
 
-  // Format website URL for display
-  const formatWebsiteUrl = (url: string) => {
-    return url.replace(/^https?:\/\//, '').replace(/\/$/, '');
-  };
+  // Bio display logic
+  const bio = business.description || '';
+  const bioIsTruncatable = bio.length > 200;
+  const displayedBio = bioExpanded || !bioIsTruncatable ? bio : bio.slice(0, 200) + '...';
 
   return (
     <section className="relative w-full bg-[#F4F5F7]">
-      {/* COVER IMAGE - Light UI with contain to match Edit preview */}
-      <div className="relative w-full h-[220px] overflow-hidden" style={{ background: '#F4F5F7' }}>
+      {/* COVER IMAGE - 3:1 aspect ratio */}
+      <div className="relative w-full overflow-hidden" style={{ aspectRatio: '3 / 1', background: '#F4F5F7' }}>
         {business.cover_image_url ? (
           <img
             src={business.cover_image_url}
             alt={`${business.name} cover`}
-            className="w-full h-full object-contain"
+            className="w-full h-full object-cover"
             loading="eager"
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200" />
         )}
         
-        {/* Subtle gradient overlay for light UI readability */}
+        {/* Subtle gradient overlay */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
@@ -115,12 +138,12 @@ export function BusinessProfileHeader({
         )}
       </div>
 
-      {/* WHITE CARD META BLOCK - Avatar + Identity */}
+      {/* WHITE CARD META BLOCK */}
       <div className="relative bg-white mx-4 -mt-12 rounded-sq-lg shadow-sm" style={{ border: '1px solid rgba(31,36,40,0.08)' }}>
         <div className="px-5 pt-5 pb-5">
           {/* Avatar row */}
           <div className="flex items-start gap-4">
-            {/* AVATAR with camera badge for owners */}
+            {/* AVATAR */}
             <div className="flex-shrink-0 -mt-14 relative">
               <button
                 onClick={canEditImages ? () => setLogoSheetOpen(true) : undefined}
@@ -143,7 +166,7 @@ export function BusinessProfileHeader({
                   </div>
                 )}
                 
-                {/* Camera badge - bottom right of avatar */}
+                {/* Camera badge */}
                 {canEditImages && (
                   <span className="absolute -bottom-1 -right-1 flex items-center justify-center w-7 h-7 rounded-full bg-[#F7931E] text-white shadow-md">
                     {uploadingLogo ? (
@@ -156,7 +179,7 @@ export function BusinessProfileHeader({
               </button>
             </div>
 
-            {/* TEXT META (name, verified, category pill) */}
+            {/* TEXT META */}
             <div className="flex-1 min-w-0 pt-1">
               {/* Name + Verified badge */}
               <div className="flex items-center gap-1.5 flex-wrap">
@@ -185,74 +208,122 @@ export function BusinessProfileHeader({
             </div>
           </div>
 
-          {/* BIO / Tagline */}
-          {business.description && (
-            <p className="mt-4 text-sm text-[#5E666D] leading-relaxed line-clamp-2">
-              {business.description}
-            </p>
-          )}
-
-          {/* PRIMARY ACTIONS ROW */}
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            {/* Follow button for non-owners */}
-            {!membership?.canManage && (
-              <BusinessFollowButton 
-                businessId={business.id} 
-                className="rounded-full px-5"
-              />
-            )}
+          {/* ACTIONS ROW - Follow + ⋯ (owner only) */}
+          <div className="mt-4 flex items-center gap-2">
+            <BusinessFollowButton 
+              businessId={business.id} 
+              className="flex-1 rounded-full"
+            />
             
-            {business.website && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleWebsite}
-                className="rounded-full px-4 text-[#1F2428] border-[#1F2428]/10 hover:bg-[#EDEFF2]"
-              >
-                <Globe className="h-4 w-4 mr-1.5" />
-                Website
-                <ExternalLink className="h-3 w-3 ml-1 opacity-50" />
-              </Button>
-            )}
-            
-            {business.phone && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleCall}
-                className="rounded-full px-4 text-[#1F2428] border-[#1F2428]/10 hover:bg-[#EDEFF2]"
-              >
-                <Phone className="h-4 w-4 mr-1.5" />
-                Call
-              </Button>
-            )}
-            
-            {business.location && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleDirections}
-                className="rounded-full px-4 text-[#1F2428] border-[#1F2428]/10 hover:bg-[#EDEFF2]"
-              >
-                <MapPin className="h-4 w-4 mr-1.5" />
-                Directions
-              </Button>
+            {/* Owner-only menu */}
+            {isOwner && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-10 w-10 rounded-full border-[#1F2428]/10 hover:bg-[#EDEFF2]"
+                  >
+                    <MoreHorizontal className="h-5 w-5 text-[#1F2428]" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52">
+                  <DropdownMenuItem onClick={() => navigate(`/business/${business.id}/edit`)}>
+                    <Pencil className="h-4 w-4 mr-2" />
+                    Edit business profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleShare}>
+                    <Share2 className="h-4 w-4 mr-2" />
+                    Share profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleCopyLink}>
+                    <Link2 className="h-4 w-4 mr-2" />
+                    Copy link
+                  </DropdownMenuItem>
+                  {membership?.canViewInsights && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => navigate(`/business/${business.id}/insights`)}>
+                        <BarChart2 className="h-4 w-4 mr-2" />
+                        Insights
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
+
+          {/* ABOUT SECTION */}
+          {bio && (
+            <div className="mt-5 pt-4 border-t" style={{ borderColor: 'rgba(31,36,40,0.06)' }}>
+              <h3 className="text-base font-semibold text-[#1F2428] mb-2">About</h3>
+              <p className="text-sm text-[#5E666D] leading-relaxed whitespace-pre-wrap">
+                {displayedBio}
+              </p>
+              {bioIsTruncatable && (
+                <button
+                  onClick={() => setBioExpanded(!bioExpanded)}
+                  className="text-sm font-medium text-[#F7931E] mt-1 hover:underline"
+                >
+                  {bioExpanded ? 'Show less' : 'More'}
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* PRIMARY ACTION BUTTONS - Website + Call */}
+          {(business.website || business.phone) && (
+            <div className="mt-4 flex items-center gap-2">
+              {business.website && (
+                <Button 
+                  variant="outline" 
+                  className="flex-1 rounded-full text-[#1F2428] border-[#1F2428]/10 hover:bg-[#EDEFF2]"
+                  onClick={handleWebsite}
+                >
+                  <Globe className="h-4 w-4 mr-1.5" />
+                  Website
+                </Button>
+              )}
+              
+              {business.phone && (
+                <Button 
+                  variant="outline" 
+                  className="flex-1 rounded-full text-[#1F2428] border-[#1F2428]/10 hover:bg-[#EDEFF2]"
+                  onClick={handleCall}
+                >
+                  <Phone className="h-4 w-4 mr-1.5" />
+                  Call
+                </Button>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* SIGNALS BAR - Subtle row with key metrics */}
+        {/* STATS ROW - Posts | Followers | Following */}
         <div 
           className="flex items-center justify-around py-3 border-t"
           style={{ borderColor: 'rgba(31,36,40,0.06)' }}
         >
-          <SignalItem label="Followers" value={followersCount} />
-          <div className="w-px h-6 bg-[#1F2428]/6" />
           <SignalItem label="Posts" value={postsCount} />
           <div className="w-px h-6 bg-[#1F2428]/6" />
-          <SignalItem label="Rating" value="–" />
+          <SignalItem label="Followers" value={followersCount} />
+          <div className="w-px h-6 bg-[#1F2428]/6" />
+          <SignalItem label="Following" value={0} />
         </div>
       </div>
+
+      {/* LOCATION CARD - Only show if address exists */}
+      {business.location && (
+        <div className="mx-4 mt-4">
+          <BusinessLocationCard
+            location={business.location}
+            businessName={business.name}
+            lat={null}
+            lng={null}
+          />
+        </div>
+      )}
 
       {/* Image Action Sheets */}
       <BusinessImageActionSheet

@@ -3,18 +3,16 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, AlertCircle } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessPostsCount } from '@/hooks/useBusinessPosts';
 import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
-import { useBusinessVerificationRequest } from '@/hooks/useBusinessVerificationRequest';
 import { BusinessProfileHeader } from '@/components/business/BusinessProfileHeader';
 import { BusinessProfileOverview } from '@/components/business/BusinessProfileOverview';
 import { BusinessProfilePosts } from '@/components/business/BusinessProfilePosts';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
 import { GolfersHereTab } from '@/components/business/GolfersHereTab';
-import { BusinessOwnerMenu } from '@/components/business/BusinessOwnerMenu';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 import { trackBusinessProfileVisit } from '@/lib/businessAnalyticsTracking';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -34,7 +32,6 @@ const BusinessProfilePage = () => {
   const { data: membership } = useBusinessMembership(business?.id);
   const { data: postsCount = 0 } = useBusinessPostsCount(business?.id);
   const { data: followersCount = 0 } = useBusinessFollowersCount(business?.id);
-  const { data: verificationRequest } = useBusinessVerificationRequest(business?.id);
 
   // Track profile visit
   useEffect(() => {
@@ -75,18 +72,6 @@ const BusinessProfilePage = () => {
       >
         <ArrowLeft className="!h-5 !w-5 text-white" />
       </button>
-
-      {/* Owner menu - dark glass container matching course detail page */}
-      <div className="absolute top-3 right-3 md:top-4 md:right-4 z-20">
-        <BusinessOwnerMenu 
-          businessId={business.id}
-          businessName={business.name}
-          membership={membership ?? null}
-          className="h-9 w-9 bg-black/20 backdrop-blur-sm rounded-md hover:bg-black/40 transition-colors text-white border-0"
-          isBusinessVerified={business.is_verified}
-          verificationStatus={verificationRequest?.status}
-        />
-      </div>
 
       {/* Hero header - Light UI with white card */}
       <BusinessProfileHeader
