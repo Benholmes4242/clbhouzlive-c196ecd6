@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+export type LocationPrecision = 'address' | 'poi' | 'postcode' | 'city' | 'region' | 'country' | 'pin';
+
 export interface BusinessProfile {
   id: string;
   name: string;
@@ -9,6 +11,18 @@ export interface BusinessProfile {
   location: string | null;
   lat: number | null;
   lng: number | null;
+  // New address fields
+  address_label: string | null;
+  address_line1: string | null;
+  address_line2: string | null;
+  city: string | null;
+  region: string | null;
+  postcode: string | null;
+  country: string | null;
+  mapbox_place_id: string | null;
+  location_precision: LocationPrecision | null;
+  location_updated_at: string | null;
+  // Other fields
   description: string | null;
   website: string | null;
   email: string | null;

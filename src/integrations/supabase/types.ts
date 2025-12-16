@@ -325,7 +325,12 @@ export type Database = {
       }
       business_accounts: {
         Row: {
+          address_label: string | null
+          address_line1: string | null
+          address_line2: string | null
           category: string | null
+          city: string | null
+          country: string | null
           cover_image_url: string | null
           created_at: string | null
           deleted_at: string | null
@@ -339,9 +344,14 @@ export type Database = {
           lat: number | null
           lng: number | null
           location: string | null
+          location_precision: string | null
+          location_updated_at: string | null
           logo_url: string | null
+          mapbox_place_id: string | null
           name: string
           phone: string | null
+          postcode: string | null
+          region: string | null
           slug: string | null
           updated_at: string | null
           verification_cooldown_until: string | null
@@ -350,7 +360,12 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          address_label?: string | null
+          address_line1?: string | null
+          address_line2?: string | null
           category?: string | null
+          city?: string | null
+          country?: string | null
           cover_image_url?: string | null
           created_at?: string | null
           deleted_at?: string | null
@@ -364,9 +379,14 @@ export type Database = {
           lat?: number | null
           lng?: number | null
           location?: string | null
+          location_precision?: string | null
+          location_updated_at?: string | null
           logo_url?: string | null
+          mapbox_place_id?: string | null
           name: string
           phone?: string | null
+          postcode?: string | null
+          region?: string | null
           slug?: string | null
           updated_at?: string | null
           verification_cooldown_until?: string | null
@@ -375,7 +395,12 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          address_label?: string | null
+          address_line1?: string | null
+          address_line2?: string | null
           category?: string | null
+          city?: string | null
+          country?: string | null
           cover_image_url?: string | null
           created_at?: string | null
           deleted_at?: string | null
@@ -389,9 +414,14 @@ export type Database = {
           lat?: number | null
           lng?: number | null
           location?: string | null
+          location_precision?: string | null
+          location_updated_at?: string | null
           logo_url?: string | null
+          mapbox_place_id?: string | null
           name?: string
           phone?: string | null
+          postcode?: string | null
+          region?: string | null
           slug?: string | null
           updated_at?: string | null
           verification_cooldown_until?: string | null
