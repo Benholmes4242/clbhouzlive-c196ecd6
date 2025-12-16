@@ -89,17 +89,56 @@ serve(async (req) => {
     
     const data = await response.json()
     
+    // Helper to extract context values from Mapbox response
+    function extractContext(feature: any): { city?: string; region?: string; country?: string; postcode?: string } {
+      const context: { city?: string; region?: string; country?: string; postcode?: string } = {};
+      
+      // Check feature.context array for structured data
+      if (feature.context && Array.isArray(feature.context)) {
+        for (const ctx of feature.context) {
+          const id = ctx.id || '';
+          if (id.startsWith('place.') || id.startsWith('locality.')) {
+            context.city = ctx.text;
+          } else if (id.startsWith('region.')) {
+            context.region = ctx.short_code?.replace(/^[A-Z]{2}-/, '') || ctx.text;
+          } else if (id.startsWith('country.')) {
+            context.country = ctx.text;
+          } else if (id.startsWith('postcode.')) {
+            context.postcode = ctx.text;
+          }
+        }
+      }
+      
+      // If the feature itself is a place/locality, use it as city
+      if (!context.city && feature.place_type?.includes('place')) {
+        context.city = feature.text;
+      }
+      if (!context.city && feature.place_type?.includes('locality')) {
+        context.city = feature.text;
+      }
+      
+      return context;
+    }
+    
     // Transform to consistent structure
-    const results = (data.features || []).map((feature: any) => ({
-      label: feature.place_name,
-      lat: feature.center[1],
-      lng: feature.center[0],
-      place_id: feature.id,
-      precision: getPrecision(feature.place_type || []),
-      // Extract components for display
-      primary: feature.text,
-      secondary: feature.place_name.replace(feature.text + ', ', '').replace(feature.text, ''),
-    }))
+    const results = (data.features || []).map((feature: any) => {
+      const contextData = extractContext(feature);
+      return {
+        label: feature.place_name,
+        lat: feature.center[1],
+        lng: feature.center[0],
+        place_id: feature.id,
+        precision: getPrecision(feature.place_type || []),
+        // Extract components for display
+        primary: feature.text,
+        secondary: feature.place_name.replace(feature.text + ', ', '').replace(feature.text, ''),
+        // Structured location data
+        city: contextData.city || null,
+        region: contextData.region || null,
+        country: contextData.country || null,
+        postcode: contextData.postcode || null,
+      };
+    })
     
     console.log('[address-search] Returning', results.length, 'results')
     
