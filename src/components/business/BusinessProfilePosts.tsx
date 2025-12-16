@@ -10,6 +10,7 @@ import { ComposerMediaItem } from '@/hooks/useSnapModal';
 import { useOptimisticPostSubmission } from '@/hooks/useOptimisticPostSubmission';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
+import { getStreamPoster } from '@/utils/stream';
 
 interface BusinessProfilePostsProps {
   businessId: string;
@@ -170,7 +171,11 @@ export function BusinessProfilePosts({ businessId, businessName, membership }: B
 function PostTile({ post }: { post: BusinessPost }) {
   const primaryMedia = post.post_media?.[0];
   const isVideo = primaryMedia?.media_type === 'video';
-  const thumbnailUrl = isVideo ? primaryMedia?.poster_url : primaryMedia?.media_url;
+  
+  // For videos: use poster_url if available, otherwise generate from Stream URL
+  const thumbnailUrl = isVideo 
+    ? (primaryMedia?.poster_url || getStreamPoster(primaryMedia?.media_url || '', '1s', 600))
+    : primaryMedia?.media_url;
 
   return (
     <div className="group relative aspect-square overflow-hidden cursor-pointer rounded-sq-xs" style={{ background: '#EDEFF2' }}>
