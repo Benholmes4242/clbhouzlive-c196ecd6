@@ -76,8 +76,8 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
         }
       });
 
-      // Add glassy orange marker
-      const markerEl = createGlassyMarkerElement('md');
+      // Add glassy orange marker (sm size for preview/expanded maps)
+      const markerEl = createGlassyMarkerElement('sm');
       markerRef.current = new mapboxgl.Marker({ element: markerEl, anchor: 'bottom' })
         .setLngLat([lng, lat])
         .addTo(map);
