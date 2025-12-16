@@ -402,10 +402,10 @@ html.lightbox-open {
 .activity-page-root {
   position: relative;
   
-  /* REMOVED: transform: translateZ(0) was creating a new stacking context on iOS Safari
-     which caused fixed-positioned modals to trap touch events even when invisible.
-     GPU compositing moved to specific components that need it (videos, carousels).
-     See: architecture/mobile/ios-touch-interception-stacking-context-bug */
+  /* Force GPU compositing layer - fixes iOS Safari text render bug */
+  transform: translateZ(0);
+  -webkit-transform: translate3d(0, 0, 0);
+  will-change: transform;
 }
 
 /* Activity-specific styles (backward compat) */
