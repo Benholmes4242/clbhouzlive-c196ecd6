@@ -137,7 +137,7 @@ const EditProfilePage: React.FC = () => {
 
         if (visible) {
           const id = visible.target.id;
-          if (id && id !== activeSection) {
+          if (id) {
             setActiveSection(id);
           }
         }
@@ -154,10 +154,13 @@ const EditProfilePage: React.FC = () => {
     });
 
     return () => observer.disconnect();
-  }, [activeSection]);
+  }, []); // Remove activeSection from deps to prevent observer recreation
 
   // Scroll to section
   const handleSectionClick = useCallback((sectionId: string) => {
+    // Immediately update active state for instant feedback
+    setActiveSection(sectionId);
+    
     const ref = sectionRefs.current[sectionId];
     if (ref) {
       ref.scrollIntoView({ behavior: 'smooth', block: 'start' });
