@@ -2,18 +2,21 @@ import { supabase } from '@/integrations/supabase/client';
 
 const EDGE_BASE = "https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1";
 
-async function withAuthHeaders(init: RequestInit = {}) {
+async function withAuthHeaders(init: RequestInit = {}, isFormData = false) {
   const { data: { session } } = await supabase.auth.getSession();
   const headers = new Headers(init.headers || {});
-  headers.set('Content-Type', 'application/json');
+  // IMPORTANT: Do NOT set Content-Type for FormData - browser sets it with boundary
+  if (!isFormData) {
+    headers.set('Content-Type', 'application/json');
+  }
   if (session?.access_token) headers.set('Authorization', `Bearer ${session.access_token}`);
   // IMPORTANT: do NOT include credentials for cross-origin edge calls (breaks CORS when origin is *)
   return { ...init, headers };
 }
 
 /** Call any Supabase Edge function with a one-time silent retry on 401 */
-export async function callEdge(path: string, init: RequestInit = {}, retry = true) {
-  const req = await withAuthHeaders(init);
+export async function callEdge(path: string, init: RequestInit = {}, retry = true, isFormData = false) {
+  const req = await withAuthHeaders(init, isFormData);
   const url = `${EDGE_BASE}/${path}`;
   const res = await fetch(url, req);
 
@@ -38,7 +41,7 @@ export async function callEdge(path: string, init: RequestInit = {}, retry = tru
     console.warn(`[callEdge] 401 from ${path} → refreshing session & retrying once`);
     const { error } = await supabase.auth.refreshSession();
     if (!error) {
-      const req2 = await withAuthHeaders(init);
+      const req2 = await withAuthHeaders(init, isFormData);
       const res2 = await fetch(url, req2);
       
       let bodyText2 = '';
@@ -100,5 +103,7 @@ export async function callEdge(path: string, init: RequestInit = {}, retry = tru
 
 // Optional convenience wrappers
 export const edgeGet  = (path: string, init?: RequestInit) => callEdge(path, { ...init, method: 'GET' });
-export const edgePost = (path: string, body?: unknown, init?: RequestInit) =>
-  callEdge(path, { ...init, method: 'POST', body: body instanceof FormData ? body : JSON.stringify(body) });
+export const edgePost = (path: string, body?: unknown, init?: RequestInit) => {
+  const isFormData = body instanceof FormData;
+  return callEdge(path, { ...init, method: 'POST', body: isFormData ? body : JSON.stringify(body) }, true, isFormData);
+};
