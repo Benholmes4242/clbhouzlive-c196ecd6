@@ -50,8 +50,10 @@ export const useUserPosts = () => {
           id,
           content,
           created_at,
-          user_id
+          user_id,
+          actor_type
         `)
+        .or('actor_type.eq.personal,actor_type.is.null') // Exclude business posts
         .order('created_at', { ascending: false })
         .limit(10); // Limit initial load for performance
 

@@ -50,7 +50,7 @@ export function useBusinessPosts(businessId?: string) {
 
       return (data ?? []) as BusinessPost[];
     },
-    staleTime: 60_000,
+    staleTime: 5_000, // Low staleTime since realtime handles updates
   });
 }
 

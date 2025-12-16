@@ -50,9 +50,11 @@ export const useTrendingFeed = () => {
           content,
           created_at,
           user_id,
+          actor_type,
           post_media!inner(id, media_type, media_url)
         `)
         .in('user_id', allConnectedUserIds)
+        .or('actor_type.eq.personal,actor_type.is.null') // Exclude business posts
         .order('created_at', { ascending: false })
         .limit(6); // Optimized limit for performance
 

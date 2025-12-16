@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useBusinessPosts, BusinessPost } from '@/hooks/useBusinessPosts';
+import { useRealtimeBusinessPosts } from '@/hooks/useRealtimeBusinessPosts';
 import { BusinessMembership } from '@/hooks/useBusinessMembership';
 import { Play, Heart, MessageCircle, Image as ImageIcon, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,7 @@ interface BusinessProfilePostsProps {
 
 export function BusinessProfilePosts({ businessId, businessName, membership }: BusinessProfilePostsProps) {
   const { data: posts, isLoading, error } = useBusinessPosts(businessId);
+  useRealtimeBusinessPosts(businessId); // Enable realtime updates
   const { setActiveActor, availableActors } = useActiveActor();
   const { submitPost } = useOptimisticPostSubmission();
   const { user } = useSupabaseSession();
