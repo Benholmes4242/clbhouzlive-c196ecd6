@@ -1,58 +1,31 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { mockBusinessActivityPosts, MOCK_BUSINESS_ID } from '@/mocks/mockBusinessActivity';
-
-// Check if mock mode is enabled (dev/preview only)
-// Enable by default for development testing - set to false for production
-const MOCK_MODE_ENABLED = import.meta.env.VITE_MOCK_BUSINESS_ACTIVITY !== 'false';
 
 export interface BusinessPost {
   id: string;
   content: string | null;
   created_at: string;
-  updated_at?: string;
+  updated_at: string;
   user_id: string;
-  actor_type?: string | null;
-  actor_id?: string | null;
+  actor_type: string | null;
+  actor_id: string | null;
   post_type?: string | null;
   location?: string | null;
   post_media: Array<{
     id: string;
     media_url: string;
     media_type: string;
-    poster_url?: string | null;
-    width?: number;
-    height?: number;
-    duration?: number;
+    poster_url: string | null;
   }>;
   likes_count: number;
   comments_count: number;
 }
 
-// Helper to check if mock mode should apply for this business
-export function isMockModeActive(businessId?: string): boolean {
-  return MOCK_MODE_ENABLED && businessId === MOCK_BUSINESS_ID;
-}
-
 export function useBusinessPosts(businessId?: string) {
-  const mockActive = isMockModeActive(businessId);
-
   return useQuery({
-    queryKey: ['business-posts', businessId, mockActive ? 'mock' : 'real'],
+    queryKey: ['business-posts', businessId],
     enabled: !!businessId,
     queryFn: async () => {
-      // If mock mode active, return mock data directly
-      if (mockActive) {
-        console.log('[useBusinessPosts] Mock mode active - returning mock data');
-        return mockBusinessActivityPosts.map(post => ({
-          ...post,
-          content: post.content,
-          updated_at: post.created_at,
-          actor_type: 'business',
-          actor_id: post.business_id,
-        })) as BusinessPost[];
-      }
-
       // Fetch posts with media
       const { data: postsData, error: postsError } = await supabase
         .from('posts')
