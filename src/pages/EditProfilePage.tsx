@@ -21,7 +21,7 @@ import { ProfileSnapshotPreview } from '@/components/profile/edit-v2/ProfileSnap
 import { SectionJumpStrip } from '@/components/profile/edit-v2/SectionJumpStrip';
 import { ProfileCompletenessChip } from '@/components/profile/edit-v2/ProfileCompletenessChip';
 
-const BIO_MAX_LENGTH = 150;
+const BIO_MAX_LENGTH = 300;
 
 const SECTIONS = [
   { id: 'photos', label: 'Photos' },

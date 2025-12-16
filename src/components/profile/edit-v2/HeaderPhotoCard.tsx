@@ -46,12 +46,13 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
         )}
       </div>
 
+      {/* Preview container matches ProfilePageV2 hero exactly: h-[250px], object-cover object-bottom */}
       <button
         type="button"
         onClick={handleClick}
         className={cn(
           "relative w-full overflow-hidden rounded-xl border border-dashed border-border/70",
-          "bg-muted/40 aspect-[16/6] flex items-center justify-center",
+          "bg-muted/40 h-[200px] flex items-center justify-center",
           "hover:bg-muted/60 transition-colors group"
         )}
       >
@@ -60,7 +61,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
             <img
               src={displayUrl}
               alt="Header preview"
-              className="h-full w-full object-cover"
+              className="h-full w-full object-cover object-bottom"
             />
             {/* Hover overlay */}
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
