@@ -192,23 +192,23 @@ const ProfileQuestView: React.FC = () => {
         {/* Back link */}
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-1 text-sm transition-colors hover:opacity-70 mb-4"
+          className="flex items-center gap-1 text-sm transition-colors hover:opacity-70 mb-3 quest-animate-fade-up"
           style={{ color: 'var(--quest-text-secondary)' }}
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back</span>
         </button>
 
-        {/* Centered title + subtitle */}
-        <div className="text-center mb-2">
+        {/* Centered title + subtitle with staggered animation */}
+        <div className="text-center mb-1">
           <h1
-            className="text-2xl font-bold mb-1"
+            className="text-2xl font-bold mb-0.5 quest-animate-fade-up quest-delay-1"
             style={{ color: 'var(--quest-text-primary)' }}
           >
             The Quest
           </h1>
           <p
-            className="text-sm"
+            className="text-sm quest-animate-fade-up quest-delay-2"
             style={{ color: 'var(--quest-text-secondary)' }}
           >
             Your journey across the world's greatest courses
