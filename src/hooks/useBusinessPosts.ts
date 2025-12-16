@@ -93,7 +93,8 @@ export function useBusinessPosts(businessId?: string) {
 
       return postsWithCounts;
     },
-    staleTime: 60_000,
+    staleTime: 5_000, // Reduced from 60s - realtime handles freshness now
+    refetchOnWindowFocus: true,
   });
 }
 

@@ -4,6 +4,7 @@
  */
 import React, { useState, useCallback } from 'react';
 import { useBusinessPosts, BusinessPost } from '@/hooks/useBusinessPosts';
+import { useRealtimeBusinessPosts } from '@/hooks/useRealtimeBusinessPosts';
 import { BusinessMembership } from '@/hooks/useBusinessMembership';
 import { BusinessActivityCard, BusinessActivityPost } from './BusinessActivityCard';
 import { Plus, FileText } from 'lucide-react';
@@ -31,6 +32,10 @@ export function BusinessActivityTab({
   membership 
 }: BusinessActivityTabProps) {
   const { data: posts, isLoading, error } = useBusinessPosts(businessId);
+  
+  // Subscribe to realtime updates for this business's posts
+  useRealtimeBusinessPosts(businessId);
+  
   const { setActiveActor, availableActors } = useActiveActor();
   const { submitPost } = useOptimisticPostSubmission();
   const { user } = useSupabaseSession();
@@ -192,15 +197,17 @@ export function BusinessActivityTab({
           </Button>
         )}
         
-        {/* Composer Modal */}
-        <EnhancedCreateMomentModalCinematic
-          isOpen={isComposerOpen}
-          onClose={handleComposerClose}
-          onSubmit={handleComposerSubmit}
-          isSubmitting={isSubmitting}
-          mediaItems={composerMedia}
-          onMediaChange={setComposerMedia}
-        />
+        {/* Composer Modal - only render when open to prevent pointer event interception */}
+        {isComposerOpen && (
+          <EnhancedCreateMomentModalCinematic
+            isOpen={isComposerOpen}
+            onClose={handleComposerClose}
+            onSubmit={handleComposerSubmit}
+            isSubmitting={isSubmitting}
+            mediaItems={composerMedia}
+            onMediaChange={setComposerMedia}
+          />
+        )}
       </div>
     );
   }
@@ -260,15 +267,17 @@ export function BusinessActivityTab({
         </div>
       )}
 
-      {/* Composer Modal */}
-      <EnhancedCreateMomentModalCinematic
-        isOpen={isComposerOpen}
-        onClose={handleComposerClose}
-        onSubmit={handleComposerSubmit}
-        isSubmitting={isSubmitting}
-        mediaItems={composerMedia}
-        onMediaChange={setComposerMedia}
-      />
+      {/* Composer Modal - only render when open to prevent pointer event interception */}
+      {isComposerOpen && (
+        <EnhancedCreateMomentModalCinematic
+          isOpen={isComposerOpen}
+          onClose={handleComposerClose}
+          onSubmit={handleComposerSubmit}
+          isSubmitting={isSubmitting}
+          mediaItems={composerMedia}
+          onMediaChange={setComposerMedia}
+        />
+      )}
     </div>
   );
 }

@@ -43,15 +43,17 @@ export const useUserPosts = () => {
     }
 
     try {
-      // Fetch only recent posts for faster loading
+      // Fetch only recent personal posts for faster loading (exclude business posts)
       const { data: postsData, error } = await supabase
         .from('posts')
         .select(`
           id,
           content,
           created_at,
-          user_id
+          user_id,
+          actor_type
         `)
+        .or('actor_type.eq.personal,actor_type.is.null') // Only personal posts, treat null as personal legacy
         .order('created_at', { ascending: false })
         .limit(10); // Limit initial load for performance
 
