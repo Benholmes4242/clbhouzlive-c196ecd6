@@ -135,6 +135,7 @@ export function BusinessProfileHeader({
                     src={business.logo_url}
                     alt={business.name}
                     size={88}
+                    hideRing
                     className="shadow-lg"
                   />
                 ) : (
