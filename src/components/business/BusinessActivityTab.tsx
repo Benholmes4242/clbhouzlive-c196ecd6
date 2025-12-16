@@ -9,8 +9,6 @@ import { BusinessActivityCard, BusinessActivityPost } from './BusinessActivityCa
 import { Plus, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { normalizeFilesToMediaItems } from '@/lib/mediaUtils';
-import { openMediaPicker } from '@/utils/openMediaPicker';
 import EnhancedCreateMomentModalCinematic from '@/components/post/EnhancedCreateMomentModal.cinematic';
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
 import { useOptimisticPostSubmission } from '@/hooks/useOptimisticPostSubmission';
@@ -71,8 +69,9 @@ export function BusinessActivityTab({
     location: (post as any).location ?? null,
   });
 
-  // Open composer with business pre-selected
+  // Open Create a Moment modal with business pre-selected
   const handleCreatePost = useCallback(() => {
+    // Set the active actor to this business
     const businessActor = availableActors.find(
       a => a.type === 'business' && a.id === businessId
     );
@@ -80,13 +79,9 @@ export function BusinessActivityTab({
       setActiveActor(businessActor);
     }
     
-    openMediaPicker(async (files) => {
-      if (files.length > 0) {
-        const items = await normalizeFilesToMediaItems(files);
-        setComposerMedia(items);
-        setIsComposerOpen(true);
-      }
-    }, 10);
+    // Open the composer modal directly (no file picker required)
+    setComposerMedia([]);
+    setIsComposerOpen(true);
   }, [businessId, availableActors, setActiveActor]);
 
   const handleComposerSubmit = useCallback(async (data: any) => {
