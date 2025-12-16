@@ -3,7 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { mockBusinessActivityPosts, MOCK_BUSINESS_ID } from '@/mocks/mockBusinessActivity';
 
 // Check if mock mode is enabled (dev/preview only)
-const MOCK_MODE_ENABLED = import.meta.env.VITE_MOCK_BUSINESS_ACTIVITY === 'true';
+// Enable by default for development testing - set to false for production
+const MOCK_MODE_ENABLED = import.meta.env.VITE_MOCK_BUSINESS_ACTIVITY !== 'false';
 
 export interface BusinessPost {
   id: string;
