@@ -3,7 +3,7 @@
  * Only content substitutions, not layout changes
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
@@ -60,6 +60,43 @@ const BusinessProfilePage: React.FC = () => {
   const [activeMiniNav, setActiveMiniNav] = useState('posts');
   const [followingCount, setFollowingCount] = useState(0);
   const [bioExpanded, setBioExpanded] = useState(false);
+  
+  // Debug hit-test state
+  const [debugMode, setDebugMode] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<string | null>(null);
+  
+  // Hit-test debug handler
+  const handleDebugTap = useCallback((e: React.TouchEvent | React.MouseEvent) => {
+    if (!debugMode) return;
+    
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    
+    // Temporarily hide debug overlay to get real element
+    const debugOverlay = document.getElementById('debug-hit-overlay');
+    if (debugOverlay) debugOverlay.style.pointerEvents = 'none';
+    
+    const el = document.elementFromPoint(clientX, clientY) as HTMLElement;
+    
+    if (debugOverlay) debugOverlay.style.pointerEvents = 'auto';
+    
+    if (el) {
+      const styles = window.getComputedStyle(el);
+      const info = [
+        `Tag: ${el.tagName}`,
+        `Class: ${el.className?.toString().slice(0, 80) || '(none)'}`,
+        `ID: ${el.id || '(none)'}`,
+        `z-index: ${styles.zIndex}`,
+        `position: ${styles.position}`,
+        `pointer-events: ${styles.pointerEvents}`,
+        `opacity: ${styles.opacity}`,
+        `visibility: ${styles.visibility}`,
+        `display: ${styles.display}`,
+        `Rect: ${Math.round(el.getBoundingClientRect().width)}x${Math.round(el.getBoundingClientRect().height)}`,
+      ].join('\n');
+      setDebugInfo(info);
+    }
+  }, [debugMode]);
 
   // Check ownership
   const isOwner = membership?.canManage;
@@ -552,6 +589,40 @@ const BusinessProfilePage: React.FC = () => {
 
       {/* Bottom Navigation Spacer */}
       <div className="h-20" />
+      
+      {/* DEBUG: Hit-test overlay */}
+      {debugMode && (
+        <div 
+          id="debug-hit-overlay"
+          className="fixed inset-0 z-[99999]"
+          style={{ background: 'rgba(255,0,0,0.05)' }}
+          onTouchStart={handleDebugTap}
+          onClick={handleDebugTap}
+        />
+      )}
+      
+      {/* DEBUG: Info panel */}
+      {debugInfo && (
+        <div 
+          className="fixed top-20 left-4 right-4 z-[100000] bg-black/90 text-white text-xs p-3 rounded-lg font-mono whitespace-pre-wrap"
+          onClick={() => setDebugInfo(null)}
+        >
+          <div className="font-bold mb-1 text-yellow-400">TAP TO DISMISS</div>
+          {debugInfo}
+        </div>
+      )}
+      
+      {/* DEBUG: Toggle button */}
+      <button
+        className="fixed bottom-24 right-4 z-[100000] w-12 h-12 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg"
+        style={{ background: debugMode ? '#ef4444' : '#3b82f6' }}
+        onClick={() => {
+          setDebugMode(d => !d);
+          setDebugInfo(null);
+        }}
+      >
+        {debugMode ? 'OFF' : 'DBG'}
+      </button>
     </PageRoot>
   );
 };
