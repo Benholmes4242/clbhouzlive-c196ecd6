@@ -23,6 +23,7 @@ import { cn } from '@/lib/utils';
 import { AddressAutocomplete, AddressValue } from '@/components/business/AddressAutocomplete';
 import { PinDropModal } from '@/components/business/PinDropModal';
 import { PhoneInputWithDialCode, PhoneValue } from '@/components/business/PhoneInputWithDialCode';
+import { CountrySelector } from '@/components/business/CountrySelector';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { DeleteBusinessDialog } from '@/components/business/DeleteBusinessDialog';
 import { SectionJumpStrip } from '@/components/profile/edit-v2/SectionJumpStrip';
@@ -82,6 +83,7 @@ const BusinessEditPage = () => {
   const [showPinDropModal, setShowPinDropModal] = useState(false);
   const [address, setAddress] = useState<AddressValue | null>(null);
   const [addressError, setAddressError] = useState<string | null>(null);
+  const [countryCode, setCountryCode] = useState<string>('GB'); // Default to GB
   const [phone, setPhone] = useState<PhoneValue | null>(null);
   const [formData, setFormData] = useState({
     businessName: '',
@@ -95,6 +97,7 @@ const BusinessEditPage = () => {
   const [initialValues, setInitialValues] = useState<{
     formData: typeof formData;
     address: AddressValue | null;
+    countryCode: string;
     phone: PhoneValue | null;
   } | null>(null);
 
@@ -112,6 +115,8 @@ const BusinessEditPage = () => {
       
       // Set address from existing data
       let newAddress: AddressValue | null = null;
+      let newCountryCode = 'GB'; // Default
+      
       if (business.address_label || business.location) {
         newAddress = {
           label: business.address_label || business.location || '',
@@ -121,6 +126,7 @@ const BusinessEditPage = () => {
           region: business.region || undefined,
           postcode: business.postcode || undefined,
           country: business.country || undefined,
+          countryCode: business.country || undefined,
           lat: business.lat || undefined,
           lng: business.lng || undefined,
           mapboxPlaceId: business.mapbox_place_id || undefined,
@@ -128,6 +134,21 @@ const BusinessEditPage = () => {
         };
         setAddress(newAddress);
       }
+      
+      // Set country code from existing address or try to infer
+      if (business.country) {
+        // Try to map full country name to ISO code
+        const countryMap: Record<string, string> = {
+          'United Kingdom': 'GB',
+          'United States': 'US',
+          'Ireland': 'IE',
+          'Canada': 'CA',
+          'Australia': 'AU',
+          // Add more as needed
+        };
+        newCountryCode = countryMap[business.country] || business.country?.slice(0, 2).toUpperCase() || 'GB';
+      }
+      setCountryCode(newCountryCode);
       
       // Set phone from existing data
       let newPhone: PhoneValue | null = null;
@@ -144,6 +165,7 @@ const BusinessEditPage = () => {
       setInitialValues({
         formData: newFormData,
         address: newAddress,
+        countryCode: newCountryCode,
         phone: newPhone,
       });
     }
@@ -155,10 +177,11 @@ const BusinessEditPage = () => {
     
     const formChanged = JSON.stringify(formData) !== JSON.stringify(initialValues.formData);
     const addressChanged = JSON.stringify(address) !== JSON.stringify(initialValues.address);
+    const countryChanged = countryCode !== initialValues.countryCode;
     const phoneChanged = JSON.stringify(phone) !== JSON.stringify(initialValues.phone);
     
-    return formChanged || addressChanged || phoneChanged;
-  }, [formData, address, phone, initialValues]);
+    return formChanged || addressChanged || countryChanged || phoneChanged;
+  }, [formData, address, countryCode, phone, initialValues]);
 
   // Redirect to auth if not logged in
   useEffect(() => {
@@ -314,6 +337,7 @@ const BusinessEditPage = () => {
       setInitialValues({
         formData: { ...formData },
         address,
+        countryCode,
         phone,
       });
 
@@ -333,6 +357,7 @@ const BusinessEditPage = () => {
     if (initialValues) {
       setFormData(initialValues.formData);
       setAddress(initialValues.address);
+      setCountryCode(initialValues.countryCode);
       setPhone(initialValues.phone);
     }
   };
@@ -642,6 +667,24 @@ const BusinessEditPage = () => {
               subtitle="Where you are and how golfers reach you."
             />
             <div className="space-y-4">
+              {/* Country selector */}
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">
+                  Country <span className="text-destructive">*</span>
+                </Label>
+                <CountrySelector
+                  value={countryCode}
+                  onChange={(code) => {
+                    setCountryCode(code);
+                    // Clear address when country changes
+                    if (address && address.countryCode !== code) {
+                      setAddress(null);
+                    }
+                  }}
+                />
+              </div>
+              
+              {/* Business address */}
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground">
                   Business address <span className="text-destructive">*</span>
@@ -653,6 +696,7 @@ const BusinessEditPage = () => {
                     setAddressError(null);
                   }}
                   onDropPinClick={() => setShowPinDropModal(true)}
+                  countryCode={countryCode}
                   placeholder="Start typing street, postcode/ZIP, or area…"
                   error={addressError || undefined}
                 />

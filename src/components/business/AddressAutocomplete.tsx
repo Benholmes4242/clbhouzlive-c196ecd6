@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-export type LocationPrecision = 'address' | 'poi' | 'postcode' | 'city' | 'region' | 'country' | 'pin';
+export type LocationPrecision = 'address' | 'poi' | 'postcode' | 'city' | 'region' | 'country' | 'pin' | 'unknown';
 
 export interface AddressValue {
   label: string;
@@ -25,45 +25,26 @@ interface AddressAutocompleteProps {
   value?: AddressValue | null;
   onChange: (value: AddressValue | null) => void;
   onDropPinClick?: () => void;
+  countryCode: string; // Required - ISO2 code
   placeholder?: string;
   className?: string;
   disabled?: boolean;
   error?: string;
 }
 
-interface MapboxFeature {
-  id: string;
-  place_name: string;
-  text: string;
-  place_type: string[];
-  context?: Array<{
-    id: string;
-    text: string;
-    short_code?: string;
-  }>;
-  center: [number, number];
-  properties?: {
-    address?: string;
-  };
-  address?: string;
+interface AddressResult {
+  label: string;
+  lat: number;
+  lng: number;
+  place_id: string;
+  precision: string;
+  primary: string;
+  secondary: string;
 }
 
-interface MapboxResponse {
-  type: string;
-  features: MapboxFeature[];
-  attribution?: string;
+interface AddressSearchResponse {
+  results: AddressResult[];
   error?: string;
-}
-
-// Determine precision from Mapbox place_type
-function determinePrecision(placeTypes: string[]): LocationPrecision {
-  if (placeTypes.includes('address')) return 'address';
-  if (placeTypes.includes('poi')) return 'poi';
-  if (placeTypes.includes('postcode')) return 'postcode';
-  if (placeTypes.includes('place') || placeTypes.includes('locality')) return 'city';
-  if (placeTypes.includes('region')) return 'region';
-  if (placeTypes.includes('country')) return 'country';
-  return 'city';
 }
 
 // Check if precision is precise enough
@@ -75,13 +56,14 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   value,
   onChange,
   onDropPinClick,
+  countryCode,
   placeholder = 'Start typing street, postcode/ZIP, or area…',
   className,
   disabled = false,
   error,
 }) => {
   const [query, setQuery] = useState('');
-  const [suggestions, setSuggestions] = useState<MapboxFeature[]>([]);
+  const [suggestions, setSuggestions] = useState<AddressResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
@@ -101,9 +83,14 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   }, []);
 
   const searchLocations = async (searchQuery: string) => {
-    if (searchQuery.length < 2) {
+    if (searchQuery.length < 3) {
       setSuggestions([]);
       setSearchError(null);
+      return;
+    }
+
+    if (!countryCode) {
+      setSearchError('Please select a country first');
       return;
     }
 
@@ -111,9 +98,8 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     setSearchError(null);
     
     try {
-      // Use address-specific search for better results
       const response = await fetch(
-        `https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/address-search?q=${encodeURIComponent(searchQuery)}`,
+        `https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/address-search?q=${encodeURIComponent(searchQuery)}&country=${countryCode}`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -122,39 +108,22 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       );
       
       if (!response.ok) {
-        // Fallback to location-search if address-search doesn't exist
-        const fallbackResponse = await fetch(
-          `https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/location-search?q=${encodeURIComponent(searchQuery)}&types=address,poi,postcode,place`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-        
-        if (!fallbackResponse.ok) {
-          throw new Error(`API error: ${fallbackResponse.status}`);
-        }
-        
-        const fallbackData: MapboxResponse = await fallbackResponse.json();
-        if (fallbackData.features && Array.isArray(fallbackData.features)) {
-          setSuggestions(fallbackData.features);
-          setShowDropdown(true);
-        }
-        return;
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `API error: ${response.status}`);
       }
       
-      const responseData: MapboxResponse = await response.json();
+      const data: AddressSearchResponse = await response.json();
       
-      if (responseData.error) {
-        throw new Error(responseData.error);
+      if (data.error) {
+        throw new Error(data.error);
       }
       
-      if (responseData.features && Array.isArray(responseData.features)) {
-        setSuggestions(responseData.features);
-        setShowDropdown(true);
-      } else {
-        setSuggestions([]);
+      setSuggestions(data.results || []);
+      setShowDropdown(true);
+      
+      if (data.results?.length === 0) {
+        // No results, but not an error
+        setSearchError(null);
       }
     } catch (err) {
       console.error('Address search error:', err);
@@ -180,74 +149,28 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       clearTimeout(debounceRef.current);
     }
     
-    if (newQuery.length >= 2) {
+    if (newQuery.length >= 3) {
       debounceRef.current = setTimeout(() => {
         searchLocations(newQuery);
-      }, 300);
+      }, 400); // 400ms debounce
     } else {
       setSuggestions([]);
       setShowDropdown(false);
     }
   };
 
-  const handleSelect = (feature: MapboxFeature) => {
-    // Parse the Mapbox feature into our AddressValue format
-    let addressLine1: string | undefined;
-    let city: string | undefined;
-    let region: string | undefined;
-    let postcode: string | undefined;
-    let country: string | undefined;
-    let countryCode: string | undefined;
-
-    // Try to extract street address from feature
-    if (feature.address) {
-      addressLine1 = `${feature.address} ${feature.text}`;
-    } else if (feature.properties?.address) {
-      addressLine1 = feature.properties.address;
-    }
-
-    // Parse context for location components
-    if (feature.context) {
-      for (const ctx of feature.context) {
-        if (ctx.id.startsWith('place') || ctx.id.startsWith('locality')) {
-          city = ctx.text;
-        }
-        if (ctx.id.startsWith('region')) {
-          region = ctx.text;
-        }
-        if (ctx.id.startsWith('postcode')) {
-          postcode = ctx.text;
-        }
-        if (ctx.id.startsWith('country')) {
-          country = ctx.text;
-          countryCode = ctx.short_code?.toUpperCase();
-        }
-      }
-    }
-
-    // If the feature itself is a place type, use it as city
-    if (!city && (feature.place_type.includes('place') || feature.place_type.includes('locality'))) {
-      city = feature.text;
-    }
-
-    const precision = determinePrecision(feature.place_type);
-
+  const handleSelect = (result: AddressResult) => {
     const addressValue: AddressValue = {
-      label: feature.place_name,
-      addressLine1,
-      city,
-      region,
-      postcode,
-      country,
-      countryCode,
-      lng: feature.center[0],
-      lat: feature.center[1],
-      mapboxPlaceId: feature.id,
-      precision,
+      label: result.label,
+      lat: result.lat,
+      lng: result.lng,
+      mapboxPlaceId: result.place_id,
+      precision: result.precision as LocationPrecision,
+      countryCode: countryCode,
     };
 
     onChange(addressValue);
-    setQuery(feature.place_name);
+    setQuery(result.label);
     setShowDropdown(false);
     setSuggestions([]);
     setSearchError(null);
@@ -272,14 +195,6 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   const showError = error || (searchError && !loading);
   const showPrecisionWarning = value && !isPreciseEnough(value.precision);
 
-  // Format suggestion for display
-  const formatSuggestion = (feature: MapboxFeature) => {
-    const parts = feature.place_name.split(', ');
-    const primary = parts[0];
-    const secondary = parts.slice(1).join(', ');
-    return { primary, secondary };
-  };
-
   return (
     <div ref={containerRef} className={cn('relative', className)}>
       <div className="relative">
@@ -297,7 +212,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
             value && "text-foreground",
             showError && "border-destructive focus-visible:ring-destructive"
           )}
-          disabled={disabled}
+          disabled={disabled || !countryCode}
         />
         {loading && (
           <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
@@ -314,9 +229,15 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       </div>
 
       {/* Helper text */}
-      {!showError && !showPrecisionWarning && (
+      {!showError && !showPrecisionWarning && countryCode && (
         <p className="text-xs text-muted-foreground mt-1.5">
-          Use your full address (street + postcode/ZIP) so golfers can find you.
+          Search is limited to your selected country.
+        </p>
+      )}
+      
+      {!countryCode && (
+        <p className="text-xs text-muted-foreground mt-1.5">
+          Select a country first to enable address search.
         </p>
       )}
 
@@ -366,7 +287,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       )}
 
       {/* Drop pin link */}
-      {!value && onDropPinClick && (
+      {!value && onDropPinClick && countryCode && (
         <button
           type="button"
           onClick={onDropPinClick}
@@ -379,16 +300,14 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       {/* Suggestions dropdown */}
       {showDropdown && suggestions.length > 0 && (
         <div className="absolute z-50 mt-1 w-full rounded-sq-md border bg-background shadow-lg max-h-60 overflow-auto">
-          {suggestions.map((feature) => {
-            const { primary, secondary } = formatSuggestion(feature);
-            const precision = determinePrecision(feature.place_type);
-            const isPrecise = isPreciseEnough(precision);
+          {suggestions.map((result) => {
+            const isPrecise = isPreciseEnough(result.precision as LocationPrecision);
             
             return (
               <button
-                key={feature.id}
+                key={result.place_id}
                 type="button"
-                onClick={() => handleSelect(feature)}
+                onClick={() => handleSelect(result)}
                 className="w-full px-3 py-2.5 text-left hover:bg-muted transition-colors flex items-start gap-2"
               >
                 <MapPin className={cn(
@@ -396,9 +315,9 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
                   isPrecise ? "text-emerald-600" : "text-muted-foreground"
                 )} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{primary}</p>
-                  {secondary && (
-                    <p className="text-xs text-muted-foreground truncate">{secondary}</p>
+                  <p className="text-sm font-medium truncate">{result.primary}</p>
+                  {result.secondary && (
+                    <p className="text-xs text-muted-foreground truncate">{result.secondary}</p>
                   )}
                 </div>
               </button>
@@ -408,14 +327,14 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       )}
 
       {/* No results state */}
-      {showDropdown && query.length >= 2 && suggestions.length === 0 && !loading && !searchError && (
+      {showDropdown && query.length >= 3 && suggestions.length === 0 && !loading && !searchError && (
         <div className="absolute z-50 mt-1 w-full rounded-sq-md border bg-background shadow-lg p-3">
           <p className="text-sm text-muted-foreground text-center">
-            No addresses found for "{query}"
+            No results — try adding postcode/ZIP
           </p>
-          <p className="text-xs text-muted-foreground/70 text-center mt-1">
-            Try a different search term or{' '}
-            {onDropPinClick && (
+          {onDropPinClick && (
+            <p className="text-xs text-muted-foreground/70 text-center mt-1">
+              Or{' '}
               <button
                 type="button"
                 onClick={onDropPinClick}
@@ -423,8 +342,8 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
               >
                 drop a pin on the map
               </button>
-            )}
-          </p>
+            </p>
+          )}
         </div>
       )}
     </div>
