@@ -136,10 +136,9 @@ export function BusinessProfileHeader({
                     alt={business.name}
                     size={88}
                     hideRing
-                    className="shadow-lg"
                   />
                 ) : (
-                  <div className="w-[88px] h-[88px] rounded-sq-md flex items-center justify-center text-2xl font-bold text-slate-600 shadow-lg" style={{ background: '#F4F5F7' }}>
+                  <div className="w-[88px] h-[88px] rounded-sq-md flex items-center justify-center text-2xl font-bold text-slate-600" style={{ background: '#F4F5F7' }}>
                     {initials}
                   </div>
                 )}
