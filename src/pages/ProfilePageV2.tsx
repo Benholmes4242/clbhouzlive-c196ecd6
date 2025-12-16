@@ -474,7 +474,7 @@ const ProfilePageV2: React.FC = () => {
         {/* About section */}
         <section className="px-5 mb-6">
           <h3 className="text-xl font-semibold text-[#0F0F0F] mb-2">About</h3>
-          <p className="text-base text-[#0F0F0F] leading-relaxed">
+          <p className="text-base text-[#0F0F0F] leading-relaxed whitespace-pre-wrap" style={{ overflowWrap: 'anywhere' }}>
             {profile?.bio || 'Passionate golfer with a love for links courses. Always working to improve my game and explore new courses.'}
           </p>
           
