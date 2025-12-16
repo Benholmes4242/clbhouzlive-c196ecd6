@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Maximize2 } from 'lucide-react';
+import { createGlassyMarkerElement } from '@/components/map/MapMarker';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-streets-v12';
@@ -21,6 +22,7 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
+  const markerRef = useRef<mapboxgl.Marker | null>(null);
   const mountedRef = useRef(true);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const [mapInitialized, setMapInitialized] = useState(false);
@@ -66,7 +68,9 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
         }
       });
 
-      new mapboxgl.Marker({ color: '#ffffff' })
+      // Add glassy orange marker (same as Business maps)
+      const markerEl = createGlassyMarkerElement('lg');
+      markerRef.current = new mapboxgl.Marker({ element: markerEl, anchor: 'bottom' })
         .setLngLat([longitude, latitude])
         .addTo(map);
     };

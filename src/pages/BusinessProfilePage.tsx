@@ -22,6 +22,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { BusinessLocationCard } from '@/components/business/BusinessLocationCard';
 import { trackBusinessProfileVisit, trackBusinessAction } from '@/lib/businessAnalyticsTracking';
+import { getCityOnly, getCityCountry } from '@/lib/locationDisplay';
 import { toast } from 'sonner';
 import {
   DropdownMenu,
@@ -290,19 +291,22 @@ const BusinessProfilePage: React.FC = () => {
 
         {/* Pills row - right side, just below header (matching personal profile position) */}
         <div className="absolute right-5 top-full mt-3 z-20 flex items-center gap-2">
-          {/* Location pill - white (replaces HCP) */}
-          {business.location && (
-            <span 
-              className="px-4 py-1.5 text-sm font-semibold rounded-full text-[#0F0F0F] flex items-center gap-1.5"
-              style={{ 
-                background: '#FFFFFF',
-                boxShadow: '0 2px 8px rgba(31, 36, 40, 0.08)'
-              }}
-            >
-              <MapPin className="w-3.5 h-3.5" />
-              {business.location.split(',')[0]}
-            </span>
-          )}
+          {/* Location pill - city only (white) */}
+          {(() => {
+            const cityDisplay = getCityOnly({ city: business.city, region: business.region, country: business.country, location: business.location });
+            return cityDisplay ? (
+              <span 
+                className="px-4 py-1.5 text-sm font-semibold rounded-full text-[#0F0F0F] flex items-center gap-1.5"
+                style={{ 
+                  background: '#FFFFFF',
+                  boxShadow: '0 2px 8px rgba(31, 36, 40, 0.08)'
+                }}
+              >
+                <MapPin className="w-3.5 h-3.5" />
+                {cityDisplay}
+              </span>
+            ) : null;
+          })()}
           
           {/* Category pill - transparent green glass (replaces Golfer) */}
           {business.category && (
@@ -331,25 +335,15 @@ const BusinessProfilePage: React.FC = () => {
           {business.is_verified && <VerifiedBadge size="lg" />}
         </div>
         
-        {/* Location with mini map */}
-        {business.location && (
-          <div className="mt-2 flex items-center gap-3">
-            {/* Mini map preview */}
-            {business.lat && business.lng && (
-              <div 
-                className="w-10 h-10 rounded-sq-sm overflow-hidden flex-shrink-0 border border-slate-200"
-                style={{
-                  backgroundImage: `url(https://api.mapbox.com/styles/v1/mapbox/light-v11/static/${business.lng},${business.lat},13,0/80x80@2x?access_token=pk.eyJ1IjoiY2xiaG91eiIsImEiOiJjbTVyejIzMXcxemx2MmpzZDU3YjkxNjNkIn0.H_w9d-UAvvMRkJ_9DoVQ-A)`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
-              />
-            )}
-            <p className="text-base font-medium text-[#0F0F0F]">
-              {business.location}
+        {/* Location - City + Country only (no mini map squircle) */}
+        {(() => {
+          const locationDisplay = getCityCountry({ city: business.city, region: business.region, country: business.country, location: business.location });
+          return locationDisplay ? (
+            <p className="mt-2 text-base font-medium text-slate-600">
+              {locationDisplay}
             </p>
-          </div>
-        )}
+          ) : null;
+        })()}
       </div>
 
       {/* Action Buttons - matching personal profile exactly */}
