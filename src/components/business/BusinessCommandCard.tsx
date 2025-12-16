@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import BusinessVerificationModal from './verification/BusinessVerificationModal';
 import { useBusinessVerificationRequest, deriveVerificationState } from '@/hooks/useBusinessVerificationRequest';
+import { getCityCountry } from '@/lib/locationDisplay';
 import type { BusinessMembership } from '@/hooks/useMyBusinesses';
 
 interface BusinessCommandCardProps {
@@ -127,13 +128,21 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
               )}
             </div>
 
-            {/* Location */}
-            {business.location && (
-              <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground/60">
-                <MapPin className="h-3 w-3 flex-shrink-0" />
-                <span className="truncate">{business.location}</span>
-              </div>
-            )}
+            {/* Location - City + Country only */}
+            {(() => {
+              const locationDisplay = getCityCountry({
+                city: business.city,
+                region: business.region,
+                country: business.country,
+                location: business.location
+              });
+              return locationDisplay ? (
+                <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground/60">
+                  <MapPin className="h-3 w-3 flex-shrink-0" />
+                  <span className="truncate">{locationDisplay}</span>
+                </div>
+              ) : null;
+            })()}
             
             {/* Pending verification subtext */}
             {verificationState === 'pending' && (
