@@ -1,4 +1,87 @@
 /**
+ * Quest Theme v2 - Story × Passport × Mission
+ * Premium, calm, narrative-driven
+ */
+
+/* ================================
+   DECORATIVE TROPHY ANIMATIONS
+   ================================ */
+
+/* Ambient glow that pulses every ~20s */
+@keyframes quest-trophy-ambient {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+.quest-trophy-ambient-glow {
+  animation: quest-trophy-ambient 20s ease-in-out infinite;
+}
+
+.quest-decorative-trophy {
+  animation: quest-trophy-ambient 20s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+/* Slower progress highlight for Current Focus card */
+@keyframes quest-highlight-sweep-slow {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.quest-progress-highlight-slow {
+  background-size: 200% 100%;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 100%
+  );
+  animation: quest-highlight-sweep-slow 12s ease-in-out infinite;
+}
+
+/* Fade in animation */
+@keyframes quest-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.quest-animate-fade-in {
+  animation: quest-fade-in 600ms ease-out forwards;
+  opacity: 0;
+}
+
+/* ================================
+   REDUCED MOTION
+   ================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .quest-trophy-ambient-glow,
+  .quest-decorative-trophy,
+  .quest-progress-highlight-slow {
+    animation: none !important;
+  }
+  
+  .quest-animate-fade-in {
+    animation: none !important;
+    opacity: 1;
+  }
+}
+
+/**
  * Quest Light Theme - Premium Gamified Experience
  * Uses global light grey tokens for consistency
  */
