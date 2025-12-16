@@ -139,7 +139,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
       className={`relative w-full overflow-hidden ${onExpand ? 'cursor-pointer' : ''}`}
       style={{ height }}
     >
-      <div ref={mapContainerRef} className={`w-full h-full ${!interactive ? 'pointer-events-none' : ''}`} />
+      <div ref={mapContainerRef} className="w-full h-full" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
 
       {showExpandButton && onExpand && (
