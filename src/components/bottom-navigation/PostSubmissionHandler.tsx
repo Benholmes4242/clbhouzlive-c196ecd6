@@ -120,6 +120,11 @@ const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
     }
   };
 
+  // CRITICAL: Only render modal when open to prevent touch interception on iOS Safari
+  // The transform on .page-root creates a new stacking context, and always-mounted
+  // modals (even with isOpen=false) can intercept touches on mobile
+  if (!isComposerOpen) return null;
+
   return (
     <EnhancedCreateMomentModal
       isOpen={isComposerOpen}
