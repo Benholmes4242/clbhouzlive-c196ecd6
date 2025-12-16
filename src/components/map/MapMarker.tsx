@@ -6,11 +6,12 @@
 import React from 'react';
 
 interface MapMarkerProps {
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
   className?: string;
 }
 
 const SIZES = {
+  xs: { width: 18, height: 23 },
   sm: { width: 22, height: 28 },
   md: { width: 26, height: 33 },
   lg: { width: 32, height: 41 },
@@ -80,7 +81,7 @@ export const MapMarkerSVG: React.FC<MapMarkerProps> = ({
 /**
  * Create a custom Mapbox marker element using the glassy orange pin
  */
-export function createGlassyMarkerElement(size: 'sm' | 'md' | 'lg' = 'md'): HTMLElement {
+export function createGlassyMarkerElement(size: 'xs' | 'sm' | 'md' | 'lg' = 'md'): HTMLElement {
   const { width, height } = SIZES[size];
   
   const el = document.createElement('div');
