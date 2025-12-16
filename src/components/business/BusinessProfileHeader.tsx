@@ -100,8 +100,8 @@ export function BusinessProfileHeader({
 
   return (
     <section className="relative w-full bg-[#F4F5F7]">
-      {/* COVER IMAGE - 3:1 aspect ratio */}
-      <div className="relative w-full overflow-hidden" style={{ aspectRatio: '3 / 1', background: '#F4F5F7' }}>
+      {/* COVER IMAGE - fixed height */}
+      <div className="relative w-full h-[220px] overflow-hidden" style={{ background: '#F4F5F7' }}>
         {business.cover_image_url ? (
           <img
             src={business.cover_image_url}
