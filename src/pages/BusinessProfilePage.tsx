@@ -510,8 +510,8 @@ const BusinessProfilePage: React.FC = () => {
             </button>
           )}
           
-          {/* Location Card - only when address exists */}
-          {business.location && business.lat && business.lng && (
+          {/* Location Card - shows when location exists */}
+          {business.location && (
             <BusinessLocationCard
               location={business.location}
               lat={business.lat}
