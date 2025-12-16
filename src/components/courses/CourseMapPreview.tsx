@@ -68,8 +68,8 @@ const CourseMapPreview: React.FC<CourseMapPreviewProps> = ({
         }
       });
 
-      // Add glassy orange marker (same as Business maps)
-      const markerEl = createGlassyMarkerElement('lg');
+      // Add glassy orange marker (same size as Business maps)
+      const markerEl = createGlassyMarkerElement('md');
       markerRef.current = new mapboxgl.Marker({ element: markerEl, anchor: 'bottom' })
         .setLngLat([longitude, latitude])
         .addTo(map);
