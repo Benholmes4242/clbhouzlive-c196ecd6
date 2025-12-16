@@ -26,6 +26,7 @@ interface AddressAutocompleteProps {
   onChange: (value: AddressValue | null) => void;
   onDropPinClick?: () => void;
   countryCode: string; // Required - ISO2 code
+  countryDisplayName?: string; // For helper text
   placeholder?: string;
   className?: string;
   disabled?: boolean;
@@ -57,6 +58,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   onChange,
   onDropPinClick,
   countryCode,
+  countryDisplayName,
   placeholder = 'Start typing street, postcode/ZIP, or area…',
   className,
   disabled = false,
@@ -231,7 +233,8 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       {/* Helper text */}
       {!showError && !showPrecisionWarning && countryCode && (
         <p className="text-xs text-muted-foreground mt-1.5">
-          Search is limited to your selected country.
+          Use your full address (street + postcode/ZIP) for an accurate map pin.
+          {countryDisplayName && <> Search is limited to <strong>{countryDisplayName}</strong>.</>}
         </p>
       )}
       
