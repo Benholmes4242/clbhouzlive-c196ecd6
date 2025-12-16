@@ -136,10 +136,23 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
   return (
     <div
       onClick={handleClick}
+      onKeyDown={(e) => {
+        if ((e.key === 'Enter' || e.key === ' ') && onExpand) {
+          e.preventDefault();
+          onExpand();
+        }
+      }}
+      role={onExpand ? 'button' : undefined}
+      tabIndex={onExpand ? 0 : undefined}
       className={`relative w-full overflow-hidden ${onExpand ? 'cursor-pointer' : ''}`}
       style={{ height }}
     >
-      <div ref={mapContainerRef} className="w-full h-full" />
+      {/* Map container - pointer-events none so clicks pass to wrapper */}
+      <div 
+        ref={mapContainerRef} 
+        className="w-full h-full" 
+        style={{ pointerEvents: 'none' }}
+      />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
 
       {showExpandButton && onExpand && (
