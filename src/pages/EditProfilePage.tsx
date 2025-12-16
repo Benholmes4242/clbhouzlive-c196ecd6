@@ -55,6 +55,8 @@ const EditProfilePage: React.FC = () => {
   // Section refs for scroll-to
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const [activeSection, setActiveSection] = useState('photos');
+  const isProgrammaticScroll = useRef(false);
+  const lastUpdateTime = useRef(0);
 
   // Determine back destination
   const getBackDestination = () => {
@@ -130,22 +132,30 @@ const EditProfilePage: React.FC = () => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
+        // Skip updates during programmatic scroll
+        if (isProgrammaticScroll.current) return;
+        
+        // Throttle updates (max 1 per 100ms)
+        const now = Date.now();
+        if (now - lastUpdateTime.current < 100) return;
+        
         // Find the entry with highest intersection ratio that's visible
         const visible = entries
-          .filter((e) => e.isIntersecting)
+          .filter((e) => e.isIntersecting && e.intersectionRatio >= 0.3)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
 
         if (visible) {
           const id = visible.target.id;
           if (id) {
-            setActiveSection(id);
+            lastUpdateTime.current = now;
+            setActiveSection(prev => prev !== id ? id : prev);
           }
         }
       },
       {
         root: null,
-        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5],
-        rootMargin: '-120px 0px -40% 0px', // Account for sticky header
+        threshold: [0.3, 0.4, 0.5, 0.6, 0.7],
+        rootMargin: '-20% 0px -60% 0px', // More stable switching
       }
     );
 
@@ -154,17 +164,25 @@ const EditProfilePage: React.FC = () => {
     });
 
     return () => observer.disconnect();
-  }, []); // Remove activeSection from deps to prevent observer recreation
+  }, []);
 
   // Scroll to section
   const handleSectionClick = useCallback((sectionId: string) => {
     // Immediately update active state for instant feedback
     setActiveSection(sectionId);
     
+    // Set programmatic scroll flag to prevent observer interference
+    isProgrammaticScroll.current = true;
+    
     const ref = sectionRefs.current[sectionId];
     if (ref) {
       ref.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+    
+    // Reset flag after scroll settles
+    setTimeout(() => {
+      isProgrammaticScroll.current = false;
+    }, 600);
   }, []);
 
   // Handle field changes
