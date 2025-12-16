@@ -1,13 +1,11 @@
 /**
- * RecentlyAddedSection - Premium record of recently played courses
- * Features: Clear row separation, enhanced styling
+ * RecentlyAddedSection - Shows recently played Top 100 courses
+ * Light theme version
  */
 
-import React, { useEffect, useState } from 'react';
-import { Trophy, ChevronRight, Plus } from 'lucide-react';
+import React from 'react';
+import { Trophy, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useReducedMotion } from '@/hooks/useReducedMotion';
-import { cn } from '@/lib/utils';
 
 interface RecentCourse {
   id: string;
@@ -24,58 +22,37 @@ interface RecentlyAddedSectionProps {
 
 const RecentCourseRow: React.FC<{
   course: RecentCourse;
-  index: number;
   onClick?: () => void;
-}> = ({ course, index, onClick }) => {
-  const prefersReducedMotion = useReducedMotion();
-
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "w-full flex items-center gap-3 py-3.5 text-left transition-colors quest-recent-row",
-        !prefersReducedMotion && "quest-animate-fade-up"
-      )}
-      style={{ animationDelay: prefersReducedMotion ? '0ms' : `${400 + index * 60}ms` }}
+}> = ({ course, onClick }) => (
+  <button
+    onClick={onClick}
+    className="w-full flex items-center gap-3 py-3 border-b text-left transition-colors hover:bg-black/[0.02]"
+    style={{ borderColor: 'var(--quest-divider)' }}
+  >
+    <div
+      className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+      style={{ 
+        background: 'rgba(210, 180, 97, 0.12)',
+        border: '1px solid rgba(210, 180, 97, 0.2)',
+      }}
     >
-      <div
-        className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-        style={{ 
-          background: 'rgba(210, 180, 97, 0.10)',
-          border: '1px solid rgba(210, 180, 97, 0.18)',
-        }}
-      >
-        <Trophy className="w-4 h-4" style={{ color: 'var(--quest-accent-gold)' }} />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate" style={{ color: 'var(--quest-text-primary)' }}>
-          {course.name}
-        </p>
-        <div className="flex items-center gap-2">
-          <p className="text-xs" style={{ color: 'var(--quest-text-tertiary)' }}>
-            {course.region}
-          </p>
-          <span className="text-xs" style={{ color: 'var(--quest-text-tertiary)', opacity: 0.5 }}>•</span>
-          <span 
-            className="text-xs px-1.5 py-0.5 rounded"
-            style={{ 
-              background: 'rgba(110, 146, 119, 0.08)',
-              color: 'var(--quest-accent-green)',
-            }}
-          >
-            Added to Quest
-          </span>
-        </div>
-      </div>
-      {course.dateAdded && (
-        <span className="text-xs flex-shrink-0 tabular-nums" style={{ color: 'var(--quest-text-tertiary)' }}>
-          {course.dateAdded}
-        </span>
-      )}
-      <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--quest-text-tertiary)' }} />
-    </button>
-  );
-};
+      <Trophy className="w-4 h-4" style={{ color: 'var(--quest-accent-gold)' }} />
+    </div>
+    <div className="flex-1 min-w-0">
+      <p className="text-sm font-medium truncate" style={{ color: 'var(--quest-text-primary)' }}>
+        {course.name}
+      </p>
+      <p className="text-xs" style={{ color: 'var(--quest-text-tertiary)' }}>
+        {course.region}
+      </p>
+    </div>
+    {course.dateAdded && (
+      <span className="text-xs flex-shrink-0" style={{ color: 'var(--quest-text-tertiary)' }}>
+        {course.dateAdded}
+      </span>
+    )}
+  </button>
+);
 
 export const RecentlyAddedSection: React.FC<RecentlyAddedSectionProps> = ({
   courses,
@@ -83,31 +60,21 @@ export const RecentlyAddedSection: React.FC<RecentlyAddedSectionProps> = ({
   onCourseClick,
 }) => {
   const navigate = useNavigate();
-  const prefersReducedMotion = useReducedMotion();
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
 
   if (courses.length === 0) return null;
 
   return (
     <section>
-      <div 
-        className={cn(
-          "flex items-center justify-between mb-4 px-1",
-          isVisible && !prefersReducedMotion && "quest-animate-fade-up"
-        )}
-        style={{ animationDelay: '350ms' }}
-      >
-        <h2 className="quest-section-title">
+      <div className="flex items-center justify-between mb-4 px-1">
+        <h2
+          className="text-sm font-semibold uppercase tracking-wider"
+          style={{ color: 'var(--quest-text-secondary)' }}
+        >
           Recently Added
         </h2>
         <button
           onClick={() => navigate('/top100?tab=my-progress')}
-          className="text-xs font-medium flex items-center gap-1 transition-opacity hover:opacity-70"
+          className="text-xs font-medium flex items-center gap-1"
           style={{ color: 'var(--quest-accent-green)' }}
         >
           See all <ChevronRight className="w-3 h-3" />
@@ -115,37 +82,30 @@ export const RecentlyAddedSection: React.FC<RecentlyAddedSectionProps> = ({
       </div>
 
       <div
-        className={cn(
-          "rounded-xl overflow-hidden",
-          isVisible && !prefersReducedMotion && "quest-animate-scale-in"
-        )}
+        className="rounded-xl p-4"
         style={{
           background: 'var(--quest-surface)',
           border: hasGoldTrim 
-            ? '1px solid rgba(210, 180, 97, 0.2)' 
+            ? '1px solid rgba(210, 180, 97, 0.25)' 
             : '1px solid var(--quest-stroke)',
           boxShadow: hasGoldTrim 
-            ? 'var(--quest-shadow-glow)' 
+            ? '0 0 15px rgba(210, 180, 97, 0.1)' 
             : 'var(--quest-shadow)',
-          animationDelay: '380ms',
         }}
       >
-        <div className="px-4">
-          {courses.map((course, index) => (
-            <RecentCourseRow
-              key={course.id}
-              course={course}
-              index={index}
-              onClick={() => {
-                if (onCourseClick) {
-                  onCourseClick(course);
-                } else {
-                  navigate(`/courses/${course.id}`);
-                }
-              }}
-            />
-          ))}
-        </div>
+        {courses.map((course) => (
+          <RecentCourseRow
+            key={course.id}
+            course={course}
+            onClick={() => {
+              if (onCourseClick) {
+                onCourseClick(course);
+              } else {
+                navigate(`/courses/${course.id}`);
+              }
+            }}
+          />
+        ))}
       </div>
     </section>
   );

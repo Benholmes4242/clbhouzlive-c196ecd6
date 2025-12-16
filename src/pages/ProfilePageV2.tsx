@@ -1,30 +1,20 @@
 /**
  * ProfilePageV2 - LinkedIn-style Light Profile
- * Supports viewing own profile and other users' profiles
+ * Exact match to design mock
  */
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile.tsx';
 import { useTop100Overview } from '@/hooks/useTop100Overview';
 import { useActivityPosts } from '@/components/profile/hooks/useActivityPosts';
 import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
-import { useRelationshipStatus } from '@/hooks/useRelationshipStatus';
 import { supabase } from '@/integrations/supabase/client';
-import { Trophy, ChevronRight, MoreHorizontal, Send, UserPlus, Check, Clock } from 'lucide-react';
+import { Trophy, ChevronRight, MoreHorizontal, Send } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
-import { ProfileHeaderMedia } from '@/components/profile/shared/ProfileHeaderMedia';
-import { WebsitePills } from '@/components/profile/shared/WebsitePills';
-import { toast } from 'sonner';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 
 // Tab content components
 import ActivityFeed from '@/components/profile/ActivityFeed';
@@ -38,76 +28,21 @@ const BG_COLOR = '#f8fafc'; // slate-50
 
 const ProfilePageV2: React.FC = () => {
   const navigate = useNavigate();
-  const { username: routeUsername } = useParams<{ username?: string }>();
   const { user, loading: authLoading } = useSupabaseSession();
-  
-  // Determine which profile to show
-  const [profileUserId, setProfileUserId] = useState<string | null>(null);
-  const [loadingProfileId, setLoadingProfileId] = useState(false);
-  
-  // Fetch profile ID from username if viewing another user
-  useEffect(() => {
-    const fetchProfileId = async () => {
-      if (routeUsername) {
-        setLoadingProfileId(true);
-        const { data, error } = await supabase
-          .from('user_profiles')
-          .select('id')
-          .eq('username', routeUsername)
-          .single();
-        
-        if (data && !error) {
-          setProfileUserId(data.id);
-        } else {
-          setProfileUserId(null);
-        }
-        setLoadingProfileId(false);
-      } else if (user?.id) {
-        setProfileUserId(user.id);
-      }
-    };
-    
-    fetchProfileId();
-  }, [routeUsername, user?.id]);
-  
-  const { data: profile, isLoading: profileLoading } = useUserProfile(profileUserId);
-  const { data: top100Overview } = useTop100Overview(profileUserId);
-  const { posts } = useActivityPosts(profileUserId);
-  const { data: achievements } = useProfileAchievements(profileUserId);
-  const { data: relationshipStatus } = useRelationshipStatus(profileUserId);
-  
-  // Determine if viewing own profile
-  const isSelf = user?.id === profileUserId;
+  const { data: profile, isLoading: profileLoading } = useUserProfile(user?.id);
+  const { data: top100Overview } = useTop100Overview(user?.id);
+  const { posts } = useActivityPosts(user?.id);
+  const { data: achievements } = useProfileAchievements(user?.id);
   
   const [activeSection, setActiveSection] = useState('activity');
   const [activeMiniNav, setActiveMiniNav] = useState('posts');
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
   const [friendsCount, setFriendsCount] = useState(0);
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [followLoading, setFollowLoading] = useState(false);
-  const [friendRequestLoading, setFriendRequestLoading] = useState(false);
-  const [friendStatus, setFriendStatus] = useState<'none' | 'friends' | 'requested' | 'incoming'>('none');
 
   const profileTypeInfo = getProfileType(profile?.user_type);
   const { isPersonal } = profileTypeInfo;
   const tabs = getProfileTabs(profile?.user_type);
-
-  // Update relationship states from hook
-  useEffect(() => {
-    if (relationshipStatus) {
-      setIsFollowing(relationshipStatus.isFollowing);
-      if (relationshipStatus.isFriend) {
-        setFriendStatus('friends');
-      } else if (relationshipStatus.hasPendingFriendRequestToThem) {
-        setFriendStatus('requested');
-      } else if (relationshipStatus.hasPendingFriendRequestFromThem) {
-        setFriendStatus('incoming');
-      } else {
-        setFriendStatus('none');
-      }
-    }
-  }, [relationshipStatus]);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -151,90 +86,7 @@ const ProfilePageV2: React.FC = () => {
     return hcp.toFixed(1);
   };
 
-  // Handle follow/unfollow
-  const handleFollowToggle = async () => {
-    if (!user?.id || !profileUserId || isSelf) return;
-    
-    setFollowLoading(true);
-    try {
-      if (isFollowing) {
-        // Unfollow
-        await supabase
-          .from('user_follows')
-          .delete()
-          .eq('follower_id', user.id)
-          .eq('following_id', profileUserId);
-        setIsFollowing(false);
-        setFollowersCount(prev => Math.max(0, prev - 1));
-      } else {
-        // Follow
-        await supabase
-          .from('user_follows')
-          .insert({ follower_id: user.id, following_id: profileUserId });
-        setIsFollowing(true);
-        setFollowersCount(prev => prev + 1);
-      }
-    } catch (error) {
-      console.error('Error toggling follow:', error);
-      toast.error('Failed to update follow status');
-    } finally {
-      setFollowLoading(false);
-    }
-  };
-
-  // Handle friend request
-  const handleFriendRequest = async () => {
-    if (!user?.id || !profileUserId || isSelf) return;
-    
-    setFriendRequestLoading(true);
-    try {
-      if (friendStatus === 'none') {
-        // Send friend request
-        await supabase
-          .from('user_friends')
-          .insert({ 
-            user_id: user.id, 
-            friend_id: profileUserId,
-            status: 'pending'
-          });
-        setFriendStatus('requested');
-        toast.success('Friend request sent');
-      } else if (friendStatus === 'incoming') {
-        // Accept incoming request
-        await supabase
-          .from('user_friends')
-          .update({ status: 'accepted' })
-          .eq('user_id', profileUserId)
-          .eq('friend_id', user.id);
-        setFriendStatus('friends');
-        setFriendsCount(prev => prev + 1);
-        toast.success('Friend request accepted');
-      }
-    } catch (error) {
-      console.error('Error with friend request:', error);
-      toast.error('Failed to send friend request');
-    } finally {
-      setFriendRequestLoading(false);
-    }
-  };
-
-  // Get friend button label and icon
-  const getFriendButtonContent = () => {
-    switch (friendStatus) {
-      case 'friends':
-        return { label: 'Friends', icon: Check, disabled: true };
-      case 'requested':
-        return { label: 'Requested', icon: Clock, disabled: true };
-      case 'incoming':
-        return { label: 'Accept', icon: UserPlus, disabled: false };
-      default:
-        return { label: 'Add Friend', icon: UserPlus, disabled: false };
-    }
-  };
-
-  const friendButtonContent = getFriendButtonContent();
-
-  if (authLoading || profileLoading || loadingProfileId) {
+  if (authLoading || profileLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: BG_COLOR }}>
         <div className="w-8 h-8 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
@@ -247,17 +99,11 @@ const ProfilePageV2: React.FC = () => {
     return null;
   }
 
-  if (!profile) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: BG_COLOR }}>
-        <p className="text-slate-500">Profile not found</p>
-      </div>
-    );
-  }
-
   const displayName = profile?.display_name || 'Golfer';
   const username = profile?.username || 'user';
   const heroUrl = profile?.header_photo_url || profile?.profile_photo_url || '';
+  const top100Count = top100Overview?.total_played ?? 0;
+  const roundsLogged = 325; // Placeholder - would come from actual data
 
   const getCurrentContent = () => {
     switch (activeSection) {
@@ -265,7 +111,7 @@ const ProfilePageV2: React.FC = () => {
         return (
           <ActivityFeed
             userId={profile?.id || ''}
-            isOwnProfile={isSelf}
+            isOwnProfile={true}
             profileDisplayName={profile?.display_name}
             userHandicap={profile?.eg_handicap_index}
             userProfilePhotoUrl={profile?.profile_photo_url}
@@ -276,7 +122,7 @@ const ProfilePageV2: React.FC = () => {
         return (
           <ProfileCoursesTab 
             userId={profile?.id || ''}
-            isOwnProfile={isSelf}
+            isOwnProfile={true}
           />
         );
       case 'top100':
@@ -290,7 +136,7 @@ const ProfilePageV2: React.FC = () => {
             userDisplayName={profile?.display_name || 'User'}
             userHandicap={profile?.eg_handicap_index}
             userProfilePhotoUrl={profile?.profile_photo_url}
-            isCurrentUser={isSelf}
+            isCurrentUser={true}
           />
         );
       case 'stats':
@@ -309,8 +155,18 @@ const ProfilePageV2: React.FC = () => {
     <PageRoot className="min-h-screen" style={{ background: BG_COLOR }}>
       {/* Hero Section - tall, full bleed */}
       <div className="relative">
-        {/* Hero Image - uses shared component for consistent crop */}
-        <ProfileHeaderMedia headerUrl={heroUrl} />
+        {/* Hero Image */}
+        <div className="relative h-[250px] w-full overflow-hidden">
+          {heroUrl ? (
+            <img 
+              src={heroUrl} 
+              alt="Profile cover" 
+              className="w-full h-full object-cover object-bottom"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-slate-300 to-slate-400" />
+          )}
+        </div>
 
         {/* Avatar - squircle, left-aligned with About title (px-5), 50% over hero / 50% below */}
         <div className="absolute left-5 -bottom-[62px] z-20">
@@ -391,88 +247,36 @@ const ProfilePageV2: React.FC = () => {
 
       {/* Action Buttons - full width from avatar left edge to Golfer pill right edge */}
       <div className="mt-5 px-5 flex items-center gap-2">
-        {isSelf ? (
-          <>
-            {/* Own profile: disabled Follow + disabled Friend Request + dots with Edit Profile */}
-            <button 
-              disabled
-              className="h-9 flex-1 rounded-full text-sm font-semibold text-white/60 flex items-center justify-center cursor-not-allowed"
-              style={{ background: '#94a3b8' }}
-            >
-              Follow
-            </button>
-            
-            <button 
-              disabled
-              className="h-9 flex-1 rounded-full text-sm font-semibold text-slate-400 flex items-center justify-center gap-1.5 cursor-not-allowed"
-              style={{
-                background: '#f8fafc',
-                border: '1px solid #E0E0E0'
-              }}
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              Add Friend
-            </button>
-            
-            {/* Three dots menu - only for self */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button 
-                  className="w-9 h-9 flex-shrink-0 rounded-full flex items-center justify-center"
-                  style={{
-                    background: '#fff',
-                    border: '1px solid #E0E0E0'
-                  }}
-                >
-                  <MoreHorizontal className="w-4 h-4 text-[#0F0F0F]" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => navigate('/edit-profile')}>
-                  Edit Profile
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
-        ) : (
-          <>
-            {/* Other user's profile: active Follow + Friend Request, no dots */}
-            <button 
-              onClick={handleFollowToggle}
-              disabled={followLoading}
-              className="h-9 flex-1 rounded-full text-sm font-semibold text-white flex items-center justify-center"
-              style={{ background: isFollowing ? '#334155' : '#64748b' }}
-            >
-              {followLoading ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                isFollowing ? 'Following' : 'Follow'
-              )}
-            </button>
-            
-            <button 
-              onClick={handleFriendRequest}
-              disabled={friendRequestLoading || friendButtonContent.disabled}
-              className="h-9 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5"
-              style={{
-                background: friendStatus === 'friends' ? '#f0fdf4' : '#fff',
-                border: `1px solid ${friendStatus === 'friends' ? '#86efac' : '#E0E0E0'}`,
-                color: friendStatus === 'friends' ? '#166534' : '#0F0F0F',
-                cursor: friendButtonContent.disabled ? 'default' : 'pointer',
-                opacity: friendButtonContent.disabled && friendStatus !== 'friends' ? 0.6 : 1
-              }}
-            >
-              {friendRequestLoading ? (
-                <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
-              ) : (
-                <>
-                  <friendButtonContent.icon className="w-3.5 h-3.5" />
-                  {friendButtonContent.label}
-                </>
-              )}
-            </button>
-          </>
-        )}
+        {/* Follow - mid-slate filled pill, flex-1 to fill space */}
+        <button 
+          className="h-9 flex-1 rounded-full text-sm font-semibold text-white flex items-center justify-center"
+          style={{ background: '#64748b' }}
+        >
+          Follow
+        </button>
+        
+        {/* Message - white outline pill, flex-1 to fill space */}
+        <button 
+          className="h-9 flex-1 rounded-full text-sm font-semibold text-[#0F0F0F] flex items-center justify-center gap-1.5"
+          style={{
+            background: '#fff',
+            border: '1px solid #E0E0E0'
+          }}
+        >
+          <Send className="w-3.5 h-3.5" />
+          Message
+        </button>
+        
+        {/* More - circular, fixed size */}
+        <button 
+          className="w-9 h-9 flex-shrink-0 rounded-full flex items-center justify-center"
+          style={{
+            background: '#fff',
+            border: '1px solid #E0E0E0'
+          }}
+        >
+          <MoreHorizontal className="w-4 h-4 text-[#0F0F0F]" />
+        </button>
       </div>
 
       {/* Mini-nav row: Posts | Followers | Friends - evenly distributed across full width */}
@@ -523,9 +327,16 @@ const ProfilePageV2: React.FC = () => {
           <p className="text-base text-[#0F0F0F] leading-relaxed">
             {profile?.bio || 'Passionate golfer with a love for links courses. Always working to improve my game and explore new courses.'}
           </p>
-          {/* Website pills directly under bio */}
-          {profile?.websites && profile.websites.length > 0 && (
-            <WebsitePills websites={profile.websites} />
+          {/* Website link if available */}
+          {profile?.website && (
+            <a 
+              href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 mt-3 text-sm font-medium text-slate-600 hover:text-slate-800"
+            >
+              🔗 {profile.website.replace(/^https?:\/\//, '')}
+            </a>
           )}
         </section>
 

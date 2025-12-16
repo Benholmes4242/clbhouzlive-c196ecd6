@@ -1,13 +1,11 @@
 /**
- * RegionalJourneySummary - Regional list progress as mini-quests
- * Features: Flag icons, animated progress bars
+ * RegionalJourneySummary - Shows regional list progress (GB&I/Europe/USA/Worldwide)
+ * This is the "Journey Summary" showing ONLY regions, not milestones
  */
 
-import React, { useEffect, useState } from 'react';
-import { ChevronRight, Globe, Flag } from 'lucide-react';
+import React from 'react';
+import { ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useReducedMotion } from '@/hooks/useReducedMotion';
-import { cn } from '@/lib/utils';
 
 export interface RegionProgress {
   id: string;
@@ -22,108 +20,70 @@ interface RegionalJourneySummaryProps {
   onRegionClick?: (region: RegionProgress) => void;
 }
 
-// Region icon mapping
-const getRegionIcon = (id: string) => {
-  switch (id) {
-    case 'gb-i':
-      return '🇬🇧';
-    case 'europe':
-      return '🇪🇺';
-    case 'usa':
-      return '🇺🇸';
-    case 'global':
-      return '🌍';
-    default:
-      return '🏌️';
-  }
-};
-
 const RegionRow: React.FC<{
   region: RegionProgress;
-  index: number;
   onClick?: () => void;
-}> = ({ region, index, onClick }) => {
-  const prefersReducedMotion = useReducedMotion();
-  const [animatedWidth, setAnimatedWidth] = useState(0);
-  
+}> = ({ region, onClick }) => {
   const progressPercent = region.total > 0 ? (region.played / region.total) * 100 : 0;
   const isComplete = region.played >= region.total && region.total > 0;
-
-  // Animate progress bar on mount
-  useEffect(() => {
-    if (!prefersReducedMotion) {
-      const timer = setTimeout(() => {
-        setAnimatedWidth(progressPercent);
-      }, 400 + index * 100);
-      return () => clearTimeout(timer);
-    } else {
-      setAnimatedWidth(progressPercent);
-    }
-  }, [progressPercent, prefersReducedMotion, index]);
 
   return (
     <button
       onClick={onClick}
-      className={cn(
-        "w-full text-left py-3.5 transition-colors hover:bg-black/[0.02] -mx-2 px-2 rounded-lg",
-        !prefersReducedMotion && "quest-animate-fade-up"
-      )}
-      style={{ animationDelay: prefersReducedMotion ? '0ms' : `${300 + index * 80}ms` }}
+      className="w-full text-left py-3 transition-colors hover:bg-black/[0.03] -mx-2 px-2 rounded-lg"
     >
-      <div className="flex items-center gap-3 mb-2.5">
-        {/* Region icon */}
-        <span className="text-lg">{getRegionIcon(region.id)}</span>
-        
-        <span className="text-sm font-medium flex-1" style={{ color: 'var(--quest-text-primary)' }}>
+      <div className="flex items-center justify-between mb-2">
+        <span
+          className="text-sm font-medium"
+          style={{ color: 'var(--quest-text-primary)' }}
+        >
           {region.name}
         </span>
-        
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
           <span
-            className="text-xs px-2.5 py-1 rounded-full font-medium"
+            className="text-xs px-2 py-0.5 rounded-full"
             style={{
               background: isComplete
-                ? 'rgba(210, 180, 97, 0.14)'
+                ? 'rgba(210, 180, 97, 0.18)'
                 : region.played > 0
-                ? 'rgba(110, 146, 119, 0.12)'
+                ? 'rgba(247, 147, 30, 0.16)'
                 : 'var(--quest-pill-inactive)',
               border: isComplete
-                ? '1px solid rgba(210, 180, 97, 0.3)'
+                ? '1px solid rgba(210, 180, 97, 0.35)'
                 : region.played > 0
-                ? '1px solid rgba(110, 146, 119, 0.2)'
+                ? '1px solid rgba(247, 147, 30, 0.26)'
                 : '1px solid var(--quest-stroke)',
               color: isComplete
-                ? '#8A7A42'
+                ? '#B8A053'
                 : region.played > 0
-                ? 'var(--quest-accent-green)'
+                ? 'var(--quest-text-primary)'
                 : 'var(--quest-text-tertiary)',
             }}
           >
             {isComplete ? 'Complete' : region.played > 0 ? 'In progress' : 'Not started'}
           </span>
-          <span className="text-sm tabular-nums" style={{ color: 'var(--quest-text-secondary)' }}>
+          <span
+            className="text-sm"
+            style={{ color: 'var(--quest-text-tertiary)' }}
+          >
             {region.played} / {region.total}
           </span>
           <ChevronRight className="w-4 h-4" style={{ color: 'var(--quest-text-tertiary)' }} />
         </div>
       </div>
 
-      {/* Animated progress bar */}
+      {/* Progress bar */}
       <div
         className="h-1.5 rounded-full overflow-hidden"
         style={{ background: 'var(--quest-track)' }}
       >
         <div
-          className={cn(
-            "h-full rounded-full transition-all ease-out",
-            region.played > 0 && !prefersReducedMotion && "quest-progress-highlight"
-          )}
+          className="h-full rounded-full transition-all duration-500"
           style={{
-            width: `${animatedWidth}%`,
+            width: `${progressPercent}%`,
             background: isComplete
               ? 'var(--quest-accent-gold)'
               : 'var(--quest-accent-green)',
-            transitionDuration: '650ms',
           }}
         />
       </div>
@@ -136,18 +96,12 @@ export const RegionalJourneySummary: React.FC<RegionalJourneySummaryProps> = ({
   onRegionClick,
 }) => {
   const navigate = useNavigate();
-  const prefersReducedMotion = useReducedMotion();
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleRegionClick = (region: RegionProgress) => {
     if (onRegionClick) {
       onRegionClick(region);
     } else {
+      // Default: navigate to Top 100 list filtered to that region
       navigate(`/top100?tab=my-progress&region=${region.id}`);
     }
   };
@@ -155,33 +109,25 @@ export const RegionalJourneySummary: React.FC<RegionalJourneySummaryProps> = ({
   return (
     <section>
       <h2
-        className={cn(
-          "quest-section-title mb-4 px-1",
-          isVisible && !prefersReducedMotion && "quest-animate-fade-up"
-        )}
-        style={{ animationDelay: '200ms' }}
+        className="text-sm font-semibold uppercase tracking-wider mb-4 px-1 quest-section-title"
+        style={{ color: 'var(--quest-text-secondary)' }}
       >
         Journey Summary
       </h2>
 
       <div 
-        className={cn(
-          "quest-card rounded-xl p-4",
-          isVisible && !prefersReducedMotion && "quest-animate-scale-in"
-        )}
+        className="quest-card rounded-xl p-4"
         style={{
           background: 'var(--quest-card)',
           border: '1px solid var(--quest-stroke)',
           boxShadow: 'var(--quest-shadow)',
-          animationDelay: '250ms',
         }}
       >
         <div className="divide-y" style={{ borderColor: 'var(--quest-hairline)' }}>
-          {regions.map((region, index) => (
+          {regions.map(region => (
             <RegionRow
               key={region.id}
               region={region}
-              index={index}
               onClick={() => handleRegionClick(region)}
             />
           ))}

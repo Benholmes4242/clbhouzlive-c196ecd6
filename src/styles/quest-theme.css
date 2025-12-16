@@ -1,88 +1,5 @@
 /**
- * Quest Theme v2 - Story × Passport × Mission
- * Premium, calm, narrative-driven
- */
-
-/* ================================
-   DECORATIVE TROPHY ANIMATIONS
-   ================================ */
-
-/* Ambient glow that pulses every ~20s */
-@keyframes quest-trophy-ambient {
-  0%, 100% {
-    opacity: 0.6;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.05);
-  }
-}
-
-.quest-trophy-ambient-glow {
-  animation: quest-trophy-ambient 20s ease-in-out infinite;
-}
-
-.quest-decorative-trophy {
-  animation: quest-trophy-ambient 20s ease-in-out infinite;
-  animation-delay: 2s;
-}
-
-/* Slower progress highlight for Current Focus card */
-@keyframes quest-highlight-sweep-slow {
-  0% {
-    background-position: -200% center;
-  }
-  100% {
-    background-position: 200% center;
-  }
-}
-
-.quest-progress-highlight-slow {
-  background-size: 200% 100%;
-  background-image: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.15) 50%,
-    transparent 100%
-  );
-  animation: quest-highlight-sweep-slow 12s ease-in-out infinite;
-}
-
-/* Fade in animation */
-@keyframes quest-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.quest-animate-fade-in {
-  animation: quest-fade-in 600ms ease-out forwards;
-  opacity: 0;
-}
-
-/* ================================
-   REDUCED MOTION
-   ================================ */
-
-@media (prefers-reduced-motion: reduce) {
-  .quest-trophy-ambient-glow,
-  .quest-decorative-trophy,
-  .quest-progress-highlight-slow {
-    animation: none !important;
-  }
-  
-  .quest-animate-fade-in {
-    animation: none !important;
-    opacity: 1;
-  }
-}
-
-/**
- * Quest Light Theme - Premium Gamified Experience
+ * Quest Light Theme - Scoped to Quest pages only
  * Uses global light grey tokens for consistency
  */
 
@@ -97,15 +14,14 @@
   --quest-surface-strong: rgba(255, 255, 255, 0.98);
   --quest-surface-muted: #F9FAFB;
 
-  /* Unified shadow token - consistent elevation */
-  --quest-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
-  --quest-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --quest-shadow-glow: 0 0 20px rgba(210, 180, 97, 0.15);
+  /* Shadows */
+  --quest-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+  --quest-shadow-sm: 0 6px 18px rgba(0, 0, 0, 0.10);
 
   /* Strokes + dividers */
   --quest-stroke: rgba(31, 36, 40, 0.10);
   --quest-stroke-strong: rgba(31, 36, 40, 0.16);
-  --quest-hairline: rgba(31, 36, 40, 0.06);
+  --quest-hairline: rgba(31, 36, 40, 0.08);
   --quest-divider: rgba(31, 36, 40, 0.08);
 
   /* Text */
@@ -117,262 +33,27 @@
   --quest-pill-inactive: #EDEFF2;
   --quest-pill-hover: #E8EAEC;
   --quest-pill-active: #3A3F46;
-  --quest-chip-bg: #F5F6F8;
-  --quest-chip-stroke: rgba(31, 36, 40, 0.08);
+  --quest-chip-bg: #EDEFF2;
+  --quest-chip-stroke: rgba(31, 36, 40, 0.10);
   --quest-chip-active-bg: rgba(31, 36, 40, 0.06);
 
   /* Progress track */
-  --quest-track: rgba(31, 36, 40, 0.08);
-  --quest-track-2: rgba(31, 36, 40, 0.04);
+  --quest-track: rgba(31, 36, 40, 0.10);
+  --quest-track-2: rgba(31, 36, 40, 0.06);
 
   /* Brand accents */
   --quest-accent-primary: #F7931E;
   --quest-accent-green: #6e9277;
   --quest-accent-gold: #D2B461;
-  --quest-accent-gold-bright: #E5C86E;
-
-  /* Glass effect */
-  --quest-glass-bg: rgba(255, 255, 255, 0.85);
-  --quest-glass-blur: blur(12px);
-  --quest-glass-border: rgba(255, 255, 255, 0.6);
-
-  /* Animation timing defaults - premium feel */
-  --quest-duration-fast: 200ms;
-  --quest-duration-normal: 350ms;
-  --quest-duration-slow: 650ms;
-  --quest-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --quest-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   /* Apply to page */
   background: var(--quest-page);
   color: var(--quest-text-primary);
 }
 
-/* ============================================
-   ANIMATION KEYFRAMES
-   ============================================ */
-
-/* Entrance animations */
-@keyframes quest-fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes quest-scale-in {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes quest-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* Ambient pulse for trophy */
-@keyframes quest-ambient-pulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(210, 180, 97, 0);
-  }
-  50% {
-    transform: scale(1.02);
-    box-shadow: 0 0 20px 4px rgba(210, 180, 97, 0.15);
-  }
-}
-
-/* Shimmer sweep for active milestone */
-@keyframes quest-shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(200%);
-  }
-}
-
-/* Progress bar highlight */
-@keyframes quest-progress-highlight {
-  0% {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  50% {
-    opacity: 0.6;
-  }
-  100% {
-    transform: translateX(200%);
-    opacity: 0;
-  }
-}
-
-/* Unlock celebration sweep */
-@keyframes quest-unlock-sweep {
-  0% {
-    transform: translateX(-100%) skewX(-20deg);
-    opacity: 0;
-  }
-  50% {
-    opacity: 0.4;
-  }
-  100% {
-    transform: translateX(200%) skewX(-20deg);
-    opacity: 0;
-  }
-}
-
-/* Node pulse */
-@keyframes quest-node-pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 0.4;
-  }
-  50% {
-    transform: scale(1.5);
-    opacity: 0;
-  }
-}
-
-/* ============================================
-   UTILITY ANIMATION CLASSES
-   ============================================ */
-
-.quest-animate-fade-up {
-  animation: quest-fade-up var(--quest-duration-normal) var(--quest-ease-out) forwards;
-  opacity: 0;
-}
-
-.quest-animate-scale-in {
-  animation: quest-scale-in var(--quest-duration-normal) var(--quest-ease-out) forwards;
-  opacity: 0;
-}
-
-.quest-animate-fade-in {
-  animation: quest-fade-in var(--quest-duration-normal) var(--quest-ease-out) forwards;
-  opacity: 0;
-}
-
-/* Stagger delays */
-.quest-delay-1 { animation-delay: 60ms; }
-.quest-delay-2 { animation-delay: 120ms; }
-.quest-delay-3 { animation-delay: 180ms; }
-.quest-delay-4 { animation-delay: 240ms; }
-.quest-delay-5 { animation-delay: 300ms; }
-.quest-delay-6 { animation-delay: 360ms; }
-.quest-delay-7 { animation-delay: 420ms; }
-.quest-delay-8 { animation-delay: 480ms; }
-
-/* Ambient pulse (every 12-18s) */
-.quest-ambient-pulse {
-  animation: quest-ambient-pulse 15s ease-in-out infinite;
-}
-
-/* Active shimmer (every 15-25s) */
-.quest-shimmer-active {
-  position: relative;
-  overflow: hidden;
-}
-
-.quest-shimmer-active::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.4) 50%,
-    transparent 100%
-  );
-  animation: quest-shimmer 20s ease-in-out infinite;
-  pointer-events: none;
-}
-
-/* Progress highlight (every 8-14s) */
-.quest-progress-highlight {
-  position: relative;
-  overflow: hidden;
-}
-
-.quest-progress-highlight::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 40%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.5) 50%,
-    transparent 100%
-  );
-  animation: quest-progress-highlight 11s ease-in-out infinite;
-  pointer-events: none;
-}
-
-/* ============================================
-   REDUCED MOTION SUPPORT
-   ============================================ */
-
-@media (prefers-reduced-motion: reduce) {
-  .quest-animate-fade-up,
-  .quest-animate-scale-in,
-  .quest-animate-fade-in {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
-
-  .quest-ambient-pulse {
-    animation: none;
-  }
-
-  .quest-shimmer-active::after,
-  .quest-progress-highlight::after {
-    animation: none;
-    display: none;
-  }
-
-  .quest-theme-light * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* ============================================
-   COMPONENT STYLES
-   ============================================ */
-
-/* Journey rail styles */
+/* Quest Light - Journey rail styles */
 .quest-theme-light .journey-rail {
-  background: linear-gradient(
-    to bottom,
-    rgba(31, 36, 40, 0.12) 0%,
-    rgba(31, 36, 40, 0.04) 100%
-  );
-}
-
-.quest-theme-light .journey-rail-completed {
-  background: linear-gradient(
-    to bottom,
-    var(--quest-accent-green) 0%,
-    rgba(110, 146, 119, 0.3) 100%
-  );
+  background: rgba(31, 36, 40, 0.16);
 }
 
 .quest-theme-light .journey-node-glow {
@@ -391,72 +72,12 @@
 /* Quest section titles */
 .quest-theme-light .quest-section-title {
   color: var(--quest-text-secondary);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   font-weight: 600;
-  font-size: 0.75rem;
 }
 
-/* Glass badge styling */
-.quest-glass-badge {
-  background: var(--quest-glass-bg);
-  backdrop-filter: var(--quest-glass-blur);
-  -webkit-backdrop-filter: var(--quest-glass-blur);
-  border: 1px solid var(--quest-glass-border);
-  box-shadow: 
-    0 0 0 1px rgba(210, 180, 97, 0.15) inset,
-    var(--quest-shadow-glow);
-}
-
-/* Premium trophy container */
-.quest-trophy-container {
-  background: rgba(210, 180, 97, 0.08);
-  border: 1px solid rgba(210, 180, 97, 0.2);
-  box-shadow: 
-    0 0 0 1px rgba(210, 180, 97, 0.1) inset,
-    0 0 30px rgba(210, 180, 97, 0.12);
-}
-
-/* Milestone pill states */
-.quest-pill-unlocked {
-  background: rgba(210, 180, 97, 0.14);
-  border: 1px solid rgba(210, 180, 97, 0.30);
-  color: #8A7A42;
-}
-
-.quest-pill-active {
-  background: rgba(247, 147, 30, 0.12);
-  border: 2px solid rgba(247, 147, 30, 0.4);
-  color: var(--quest-text-primary);
-  position: relative;
-  overflow: hidden;
-}
-
-.quest-pill-active::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(247, 147, 30, 0.2) 50%,
-    transparent 100%
-  );
-  animation: quest-shimmer 18s ease-in-out infinite;
-  pointer-events: none;
-}
-
-.quest-pill-locked {
-  background: var(--quest-pill-inactive);
-  border: 1px solid var(--quest-stroke);
-  color: var(--quest-text-tertiary);
-  opacity: 0.7;
-}
-
-/* Status pills */
+/* Quest status pills */
 .quest-theme-light .quest-status-pill {
   background: var(--quest-pill-inactive);
   color: var(--quest-text-secondary);
@@ -470,42 +91,22 @@
 }
 
 .quest-theme-light .quest-status-pill.is-in-progress {
-  background: rgba(247, 147, 30, 0.12);
-  border: 1px solid rgba(247, 147, 30, 0.3);
+  background: rgba(247, 147, 30, 0.16);
+  border-color: rgba(247, 147, 30, 0.26);
   color: var(--quest-text-primary);
 }
 
 .quest-theme-light .quest-status-pill.is-unlocked {
-  background: rgba(110, 146, 119, 0.12);
-  border: 1px solid rgba(110, 146, 119, 0.25);
-  color: var(--quest-accent-green);
+  background: rgba(58, 63, 70, 0.10);
+  border-color: rgba(58, 63, 70, 0.18);
+  color: var(--quest-text-primary);
 }
 
-/* Progress track */
+/* Quest progress elements */
 .quest-theme-light .quest-progress-track {
-  background: var(--quest-track);
+  background: rgba(31, 36, 40, 0.10);
 }
 
 .quest-theme-light .quest-progress-fill {
-  background: linear-gradient(90deg, var(--quest-accent-green), var(--quest-accent-gold));
-}
-
-/* Insight card */
-.quest-insight-card {
-  background: linear-gradient(135deg, rgba(110, 146, 119, 0.06) 0%, rgba(210, 180, 97, 0.04) 100%);
-  border: 1px solid rgba(110, 146, 119, 0.15);
-}
-
-/* Recently added row */
-.quest-recent-row {
-  border-bottom: 1px solid var(--quest-hairline);
-  transition: background-color var(--quest-duration-fast) ease;
-}
-
-.quest-recent-row:hover {
-  background-color: rgba(0, 0, 0, 0.02);
-}
-
-.quest-recent-row:last-child {
-  border-bottom: none;
+  background: var(--quest-accent-primary);
 }
