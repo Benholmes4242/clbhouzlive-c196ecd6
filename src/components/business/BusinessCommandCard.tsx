@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { DeleteBusinessDialog } from './DeleteBusinessDialog';
 import { useBusinessStats7d } from '@/hooks/useBusinessStats7d';
+import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
 import { cn } from '@/lib/utils';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import BusinessVerificationModal from './verification/BusinessVerificationModal';
@@ -47,10 +48,17 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
       setShowVerificationModal(false);
     };
   }, []);
-  const { data: stats, isLoading: statsLoading } = useBusinessStats7d(membership.business.id);
-  const { data: verificationRequest } = useBusinessVerificationRequest(membership.business.id);
-
+  
   const { business, role } = membership;
+  
+  // Fetch 7-day stats for visits/impressions
+  const { data: stats, isLoading: statsLoading } = useBusinessStats7d(business.id);
+  
+  // Fetch TOTAL followers count (source of truth)
+  const { data: totalFollowers, isLoading: followersLoading } = useBusinessFollowersCount(business.id);
+  
+  const { data: verificationRequest } = useBusinessVerificationRequest(business.id);
+
   const canDelete = role === 'owner';
   const canManage = role === 'owner' || role === 'admin';
   
@@ -66,8 +74,9 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
     return value.toLocaleString();
   };
 
-  const formatFollowers = (value: number | undefined) => {
-    if (value === undefined || value === 0) return '-';
+  // Format 7-day delta with +/- prefix
+  const formatDelta = (value: number | undefined) => {
+    if (value === undefined || value === 0) return '+0';
     return value >= 0 ? `+${value.toLocaleString()}` : value.toLocaleString();
   };
 
@@ -255,24 +264,28 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
               <p className="text-lg font-semibold text-foreground tabular-nums min-w-[2ch]">
                 {statsLoading ? <span className="opacity-0">-</span> : formatStat(stats?.visits)}
               </p>
-              <p className="text-[11px] text-muted-foreground/70 mt-0.5">Visits</p>
+              <p className="text-[11px] text-muted-foreground/70 mt-0.5">Visits (7d)</p>
             </div>
             <div className="flex flex-col items-center justify-center">
+              {/* TOTAL followers from source of truth */}
               <p className="text-lg font-semibold text-foreground tabular-nums min-w-[2ch]">
-                {statsLoading ? <span className="opacity-0">-</span> : formatFollowers(stats?.followersGained)}
+                {followersLoading ? <span className="opacity-0">-</span> : formatStat(totalFollowers)}
               </p>
-              <p className="text-[11px] text-muted-foreground/70 mt-0.5">Followers</p>
+              <p className="text-[11px] text-muted-foreground/70 mt-0.5">
+                Followers
+                {/* Show 7-day delta as secondary info */}
+                {!statsLoading && stats?.followersGained !== undefined && stats.followersGained !== 0 && (
+                  <span className="ml-1 text-muted-foreground/50">({formatDelta(stats.followersGained)})</span>
+                )}
+              </p>
             </div>
             <div className="flex flex-col items-center justify-center">
               <p className="text-lg font-semibold text-foreground tabular-nums min-w-[2ch]">
                 {statsLoading ? <span className="opacity-0">-</span> : formatStat(stats?.impressions)}
               </p>
-              <p className="text-[11px] text-muted-foreground/70 mt-0.5">Impressions</p>
+              <p className="text-[11px] text-muted-foreground/70 mt-0.5">Impressions (7d)</p>
             </div>
           </div>
-          <p className="text-[10px] text-muted-foreground/40 text-center mt-2.5">
-            Last 7 days
-          </p>
         </div>
 
         {/* Hairline divider below metrics */}
