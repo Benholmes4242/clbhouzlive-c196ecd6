@@ -4,8 +4,6 @@ import { BusinessMembership } from '@/hooks/useBusinessMembership';
 import { Play, Heart, MessageCircle, Image as ImageIcon, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { normalizeFilesToMediaItems } from '@/lib/mediaUtils';
-import { openMediaPicker } from '@/utils/openMediaPicker';
 import EnhancedCreateMomentModalCinematic from '@/components/post/EnhancedCreateMomentModal.cinematic';
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
 import { useOptimisticPostSubmission } from '@/hooks/useOptimisticPostSubmission';
@@ -30,7 +28,7 @@ export function BusinessProfilePosts({ businessId, businessName, membership }: B
   const [composerMedia, setComposerMedia] = useState<ComposerMediaItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Open composer with business pre-selected
+  // Open composer with business pre-selected (no file picker first)
   const handleCreatePost = useCallback(() => {
     // Pre-select this business in the active actor context
     const businessActor = availableActors.find(
@@ -40,14 +38,8 @@ export function BusinessProfilePosts({ businessId, businessName, membership }: B
       setActiveActor(businessActor);
     }
     
-    // Open media picker
-    openMediaPicker(async (files) => {
-      if (files.length > 0) {
-        const items = await normalizeFilesToMediaItems(files);
-        setComposerMedia(items);
-        setIsComposerOpen(true);
-      }
-    }, 10);
+    // Open modal directly without file picker
+    setIsComposerOpen(true);
   }, [businessId, availableActors, setActiveActor]);
 
   const handleComposerSubmit = useCallback(async (data: any) => {
@@ -102,11 +94,11 @@ export function BusinessProfilePosts({ businessId, businessName, membership }: B
     );
   }
 
-  // Show create post button for owners/admins
+  // Show create post button for owners/admins (slate color)
   const CreatePostButton = membership?.canManage ? (
     <Button 
       onClick={handleCreatePost}
-      className="w-full rounded-sq-md mb-4 bg-[#F7931E] hover:bg-[#E07D0A] text-white"
+      className="w-full rounded-sq-md mb-4 bg-slate-700 hover:bg-slate-800 text-white"
     >
       <Plus className="h-4 w-4 mr-2" />
       Create post as {businessName || 'this business'}
@@ -129,8 +121,7 @@ export function BusinessProfilePosts({ businessId, businessName, membership }: B
         </p>
         {membership?.canManage && (
           <Button 
-            variant="outline" 
-            className="rounded-full text-[#1F2428] border-[#1F2428]/10 hover:bg-[#EDEFF2]" 
+            className="rounded-full bg-slate-700 hover:bg-slate-800 text-white" 
             onClick={handleCreatePost}
           >
             Create post as {businessName || 'this business'}

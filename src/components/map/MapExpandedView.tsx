@@ -98,8 +98,8 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
       // Navigation controls
       map.addControl(new mapboxgl.NavigationControl({ visualizePitch: false }), 'top-right');
 
-      // Glassy orange marker
-      const markerEl = createGlassyMarkerElement('md');
+      // Glassy orange marker (xs size)
+      const markerEl = createGlassyMarkerElement('xs');
       new mapboxgl.Marker({ element: markerEl, anchor: 'bottom' })
         .setLngLat([lng, lat])
         .addTo(map);
