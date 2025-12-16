@@ -96,38 +96,42 @@ const BusinessProfilePage = () => {
         followersCount={followersCount}
       />
 
-      {/* Tab Navigation - Light UI with Content as default */}
-      <section className="mt-6 px-4">
+      {/* Tab Navigation - matches personal profile page */}
+      <section className="mt-6 px-5">
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as BusinessTab)} className="w-full">
           <TabsList 
-            className="grid w-full rounded-sq-md px-1.5 py-1"
+            className="grid w-full rounded-full px-1 py-1"
             style={{ 
               gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-              background: '#EDEFF2',
-              border: '1px solid rgba(31,36,40,0.06)'
+              background: '#F0F0F0',
+              border: '1px solid #E0E0E0'
             }}
           >
             <TabsTrigger 
               value="content"
-              className="rounded-sq-pill text-sm px-2 py-[6px] font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#1F2428] text-[#5E666D] hover:text-[#1F2428] transition-all"
+              className="rounded-full text-sm px-3 py-1.5 font-medium transition-all duration-150 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+              style={{ color: '#0F0F0F' }}
             >
               Content
             </TabsTrigger>
             <TabsTrigger 
               value="overview"
-              className="rounded-sq-pill text-sm px-2 py-[6px] font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#1F2428] text-[#5E666D] hover:text-[#1F2428] transition-all"
+              className="rounded-full text-sm px-3 py-1.5 font-medium transition-all duration-150 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+              style={{ color: '#0F0F0F' }}
             >
               Overview
             </TabsTrigger>
             <TabsTrigger 
               value="golfers"
-              className="rounded-sq-pill text-sm px-2 py-[6px] font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#1F2428] text-[#5E666D] hover:text-[#1F2428] transition-all"
+              className="rounded-full text-sm px-3 py-1.5 font-medium transition-all duration-150 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+              style={{ color: '#0F0F0F' }}
             >
               Golfers
             </TabsTrigger>
             <TabsTrigger 
               value="info"
-              className="rounded-sq-pill text-sm px-2 py-[6px] font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#1F2428] text-[#5E666D] hover:text-[#1F2428] transition-all"
+              className="rounded-full text-sm px-3 py-1.5 font-medium transition-all duration-150 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+              style={{ color: '#0F0F0F' }}
             >
               Info
             </TabsTrigger>
