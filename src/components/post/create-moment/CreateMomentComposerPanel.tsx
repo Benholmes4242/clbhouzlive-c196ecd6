@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { ChevronRight, Sparkles, AtSign } from "lucide-react";
+import { ChevronRight, Sparkles, AtSign, X } from "lucide-react";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
 import { IdentitySelector } from "@/components/identity/IdentitySelector";
 import CourseTagInput from "@/components/posts/CourseTagInput";
 import { StudioEdits } from "@/types/studio";
 import { GolfCourse, TaggableEntity } from "./types";
 import MentionSuggestions from "./MentionSuggestions";
+import { useNavigate } from "react-router-dom";
 
 interface CreateMomentComposerPanelProps {
   hasMedia: boolean;
@@ -155,6 +156,28 @@ export default function CreateMomentComposerPanel({
               <span className={`text-[10px] ${caption.length > 2000 ? 'text-amber-400' : 'text-white/35'}`}>
                 {caption.length}/2200
               </span>
+            </div>
+          )}
+
+          {/* Tagged entities confirmation chips */}
+          {selectedTags.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5 mt-2">
+              <span className="text-[11px] text-white/50">Tagged:</span>
+              {selectedTags.map(tag => (
+                <button
+                  key={tag.id}
+                  onClick={() => onTagsChange(selectedTags.filter(t => t.id !== tag.id))}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors"
+                  style={{
+                    background: 'rgba(255, 147, 30, 0.15)',
+                    color: 'hsl(var(--primary))',
+                    border: '1px solid rgba(255, 147, 30, 0.25)',
+                  }}
+                >
+                  @{tag.username || tag.name}
+                  <X className="w-3 h-3 opacity-60 hover:opacity-100" />
+                </button>
+              ))}
             </div>
           )}
 

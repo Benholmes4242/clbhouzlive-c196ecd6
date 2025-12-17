@@ -47,12 +47,12 @@ const TaggedText: React.FC<TaggedTextProps> = ({ text, tags, className = '' }) =
       }
     };
 
-    // Add the tagged link
+    // Add the tagged link with accent styling
     parts.push(
       <Link
         key={`tag-${index}`}
         to={getEntityLink(tag)}
-        className="text-blue-600 hover:text-blue-800 hover:underline font-medium cursor-pointer"
+        className="text-primary hover:text-primary/80 hover:underline font-medium cursor-pointer"
         onClick={(e) => {
           e.stopPropagation(); // Prevent parent click handlers
         }}

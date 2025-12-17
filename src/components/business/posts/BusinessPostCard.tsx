@@ -4,7 +4,7 @@
  * Action bar: Like / Comment / Reshare / Send (via global PostActionBar)
  */
 
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { BusinessPost } from '@/hooks/useBusinessPosts';
 import {
   MoreHorizontal,
@@ -30,6 +30,7 @@ import { usePinPost } from '@/hooks/usePinnedPost';
 import { PostInsightsModal } from './PostInsightsModal';
 import { PinDurationPicker } from './PinDurationPicker';
 import { toast } from 'sonner';
+import TaggedText from '@/components/posts/TaggedText';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -96,6 +97,20 @@ export default function BusinessPostCard({
   const content = post.content || '';
   const shouldTruncate = content.length > 150 && !isExpanded;
   const displayContent = shouldTruncate ? content.slice(0, 150) : content;
+
+  // Transform post_tags into TaggedText format
+  const tags = useMemo(() => {
+    return (post.post_tags || [])
+      .filter(tag => tag.taggable_entities && tag.start_index !== null && tag.end_index !== null)
+      .map(tag => ({
+        id: tag.id,
+        entity_type: tag.taggable_entities!.entity_type,
+        entity_id: tag.taggable_entities!.entity_id,
+        name: tag.taggable_entities!.username || tag.taggable_entities!.name,
+        start_index: tag.start_index!,
+        end_index: tag.end_index!,
+      }));
+  }, [post.post_tags]);
 
   // Get video HLS URL and poster
   const streamId = isVideo ? getStreamIdFromUrl(primaryMedia?.media_url || '') : null;
@@ -270,8 +285,8 @@ export default function BusinessPostCard({
         {/* Caption block - consistent padding below header */}
         {content && (
           <div style={{ padding: '0 16px 10px 16px' }}>
-            <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
-              {displayContent}
+            <div className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
+              <TaggedText text={displayContent} tags={tags} />
               {shouldTruncate && (
                 <>
                   {'... '}
@@ -283,7 +298,7 @@ export default function BusinessPostCard({
                   </button>
                 </>
               )}
-            </p>
+            </div>
           </div>
         )}
 
