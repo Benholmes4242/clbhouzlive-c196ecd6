@@ -168,10 +168,6 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         'backdrop-blur-[16px] backdrop-saturate-[140%]',
         // Subtle border for floating effect
         'border border-white/[0.18]',
-        // Soft shadow - lifted feel
-        unlocked && !isGhost
-          ? 'shadow-[0_8px_30px_rgba(0,0,0,0.25)]' 
-          : 'shadow-[0_4px_20px_rgba(0,0,0,0.15)]',
         // Smooth micro-interactions
         'transition-all duration-200 ease-out',
         'active:scale-[0.98]',
