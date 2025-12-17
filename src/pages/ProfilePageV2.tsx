@@ -18,6 +18,7 @@ import { Trophy, ChevronRight, MoreHorizontal, Send, UserPlus, Check, ExternalLi
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
+import { AchievementBadgeCard, AchievementTier } from '@/components/achievements/AchievementBadgeCard';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -517,25 +518,33 @@ const ProfilePageV2: React.FC = () => {
               </button>
             </div>
             <div className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1">
-              {unlockedAchievements.slice(0, 3).map((achievement) => (
-                <div 
-                  key={achievement.id}
-                  className="flex-shrink-0 w-[140px] p-3 rounded-xl"
-                  style={{
-                    background: '#F8F8F8',
-                    border: '1px solid #E0E0E0'
-                  }}
-                >
-                  <div 
-                    className="w-8 h-8 rounded-lg flex items-center justify-center mb-2"
-                    style={{ background: 'rgba(139,115,85,0.15)' }}
-                  >
-                    <Trophy className="w-4 h-4" style={{ color: '#8B7355' }} />
+              {unlockedAchievements.slice(0, 3).map((achievement) => {
+                // Map achievement to tier for AchievementBadgeCard
+                const getTier = (): AchievementTier => {
+                  if (achievement.type === 'milestone' && achievement.threshold) {
+                    return achievement.threshold.toString() as AchievementTier;
+                  }
+                  // Map list completion IDs to region tiers
+                  const listTierMap: Record<string, AchievementTier> = {
+                    'list_gb_ireland': 'GBI',
+                    'list_europe': 'EU',
+                    'list_usa': 'USA',
+                    'list_worldwide': 'WORLD',
+                  };
+                  return listTierMap[achievement.id] || '5';
+                };
+
+                return (
+                  <div key={achievement.id} className="flex-shrink-0">
+                    <AchievementBadgeCard
+                      tier={getTier()}
+                      title={achievement.shortLabel}
+                      subtitle={achievement.label}
+                      unlocked={true}
+                    />
                   </div>
-                  <div className="text-sm font-semibold text-[#0F0F0F]">{achievement.label}</div>
-                  <div className="text-xs text-[#0F0F0F]">{achievement.shortLabel}</div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
         )}
