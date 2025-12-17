@@ -792,6 +792,51 @@ export type Database = {
           },
         ]
       }
+      business_tag_visibility: {
+        Row: {
+          business_id: string
+          created_at: string
+          hidden_at: string | null
+          hidden_by: string | null
+          id: string
+          is_hidden: boolean
+          post_id: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          hidden_at?: string | null
+          hidden_by?: string | null
+          id?: string
+          is_hidden?: boolean
+          post_id: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          hidden_at?: string | null
+          hidden_by?: string | null
+          id?: string
+          is_hidden?: boolean
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_tag_visibility_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_tag_visibility_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_verification_events: {
         Row: {
           action: string
@@ -3355,6 +3400,35 @@ export type Database = {
           },
         ]
       }
+      post_views: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          viewer_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          viewer_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          viewer_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_views_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           achievement_id: string | null
@@ -3363,6 +3437,10 @@ export type Database = {
           content: string | null
           created_at: string
           id: string
+          is_pinned: boolean | null
+          pinned_at: string | null
+          pinned_by: string | null
+          pinned_until: string | null
           updated_at: string
           user_id: string
         }
@@ -3373,6 +3451,10 @@ export type Database = {
           content?: string | null
           created_at?: string
           id?: string
+          is_pinned?: boolean | null
+          pinned_at?: string | null
+          pinned_by?: string | null
+          pinned_until?: string | null
           updated_at?: string
           user_id: string
         }
@@ -3383,6 +3465,10 @@ export type Database = {
           content?: string | null
           created_at?: string
           id?: string
+          is_pinned?: boolean | null
+          pinned_at?: string | null
+          pinned_by?: string | null
+          pinned_until?: string | null
           updated_at?: string
           user_id?: string
         }

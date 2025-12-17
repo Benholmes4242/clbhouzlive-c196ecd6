@@ -10,6 +10,9 @@ export interface BusinessPost {
   user_id: string;
   actor_type: string | null;
   actor_id: string | null;
+  is_pinned: boolean | null;
+  pinned_until: string | null;
+  pinned_at: string | null;
   post_media: Array<{
     id: string;
     media_url: string;
@@ -37,6 +40,9 @@ export function useBusinessPosts(businessId?: string) {
           user_id,
           actor_type,
           actor_id,
+          is_pinned,
+          pinned_until,
+          pinned_at,
           post_media (
             id,
             media_url,

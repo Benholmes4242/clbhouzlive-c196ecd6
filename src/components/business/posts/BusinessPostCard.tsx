@@ -14,6 +14,7 @@ import {
   Pencil,
   Eye,
   Pin,
+  PinOff,
   BarChart2,
   Trash2,
 } from 'lucide-react';
@@ -25,6 +26,9 @@ import CommentsPage from '@/components/clubhouse/cinematic/CommentsPage';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { PostActionBar } from '@/components/posts/PostActionBar';
+import { usePinPost } from '@/hooks/usePinnedPost';
+import { PostInsightsModal } from './PostInsightsModal';
+import { PinDurationPicker } from './PinDurationPicker';
 import { toast } from 'sonner';
 import {
   DropdownMenu,
@@ -37,6 +41,7 @@ import { RegisterVideoFn } from '@/hooks/useGridAutoplay';
 
 interface BusinessPostCardProps {
   post: BusinessPost;
+  businessId: string;
   businessName?: string;
   businessLogo?: string | null;
   followerCount?: number;
@@ -48,6 +53,7 @@ interface BusinessPostCardProps {
 
 export default function BusinessPostCard({
   post,
+  businessId,
   businessName,
   businessLogo,
   followerCount = 0,
@@ -58,7 +64,12 @@ export default function BusinessPostCard({
 }: BusinessPostCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
+  const [insightsOpen, setInsightsOpen] = useState(false);
+  const [pinPickerOpen, setPinPickerOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  
+  const { pin, unpin, isPinning } = usePinPost(businessId);
+  const isPinned = post.is_pinned && (!post.pinned_until || new Date(post.pinned_until) > new Date());
   
   const primaryMedia = post.post_media?.[0];
   const isVideo = primaryMedia?.media_type === 'video';
@@ -146,11 +157,15 @@ export default function BusinessPostCard({
   }, []);
 
   const handlePinToTop = useCallback(() => {
-    toast.info('Pin to top coming soon');
-  }, []);
+    if (isPinned) {
+      unpin(post.id);
+    } else {
+      setPinPickerOpen(true);
+    }
+  }, [isPinned, post.id, unpin]);
 
   const handleViewInsights = useCallback(() => {
-    toast.info('Insights coming soon');
+    setInsightsOpen(true);
   }, []);
 
   const handleDeletePost = useCallback(() => {
@@ -161,11 +176,21 @@ export default function BusinessPostCard({
     <>
       {/* Post tile - full width with border gutter */}
       <div
-        className="bg-white overflow-hidden border-x border-border/40"
+        className={cn(
+          "bg-white overflow-hidden border-x border-border/40",
+          isPinned && "ring-1 ring-amber-200"
+        )}
         style={{
-          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+          boxShadow: isPinned ? '0 2px 8px rgba(251,191,36,0.15)' : '0 1px 3px rgba(0,0,0,0.04)',
         }}
       >
+        {/* Pinned indicator */}
+        {isPinned && (
+          <div className="flex items-center gap-1.5 px-4 py-1.5 bg-amber-50 border-b border-amber-100">
+            <Pin className="h-3.5 w-3.5 text-amber-600" />
+            <span className="text-xs font-medium text-amber-700">Pinned</span>
+          </div>
+        )}
         {/* Post header - 3 column layout: avatar / meta / actions */}
         <div className="flex items-start gap-3" style={{ padding: '12px 16px 8px 16px' }}>
           {/* Left: Avatar (fixed) */}
@@ -223,9 +248,9 @@ export default function BusinessPostCard({
                     <Eye className="h-4 w-4 mr-2" />
                     Change visibility
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handlePinToTop}>
-                    <Pin className="h-4 w-4 mr-2" />
-                    Pin to top
+                  <DropdownMenuItem onClick={handlePinToTop} disabled={isPinning}>
+                    {isPinned ? <PinOff className="h-4 w-4 mr-2" /> : <Pin className="h-4 w-4 mr-2" />}
+                    {isPinned ? 'Unpin' : 'Pin to top'}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleViewInsights}>
                     <BarChart2 className="h-4 w-4 mr-2" />
@@ -340,6 +365,20 @@ export default function BusinessPostCard({
         creatorName={businessName}
         creatorAvatar={businessLogo || undefined}
         theme="light"
+      />
+
+      {/* Insights Modal */}
+      <PostInsightsModal
+        isOpen={insightsOpen}
+        onClose={() => setInsightsOpen(false)}
+        postId={post.id}
+      />
+
+      {/* Pin Duration Picker */}
+      <PinDurationPicker
+        isOpen={pinPickerOpen}
+        onClose={() => setPinPickerOpen(false)}
+        onSelect={(duration) => pin(post.id, duration)}
       />
     </>
   );
