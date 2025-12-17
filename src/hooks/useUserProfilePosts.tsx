@@ -55,7 +55,7 @@ export const useUserProfilePosts = (userId: string | null) => {
         setError(null);
         setLoading(true);
 
-        // Fetch posts for specific user
+        // Fetch personal posts for this profile (actor-scoped, not user_id)
         const { data: postsData, error: postsError } = await supabase
           .from('posts')
           .select(`
@@ -63,7 +63,8 @@ export const useUserProfilePosts = (userId: string | null) => {
             content,
             created_at
           `)
-          .eq('user_id', userId)
+          .eq('actor_type', 'personal')
+          .eq('actor_id', userId)
           .order('created_at', { ascending: false })
           .limit(9); // Show latest 9 posts
 
