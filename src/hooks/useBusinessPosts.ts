@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { postKeys } from '@/queryKeys/posts';
 
 export interface BusinessPost {
   id: string;
@@ -18,29 +18,13 @@ export interface BusinessPost {
   }>;
 }
 
+/**
+ * Fetches posts for a business profile.
+ * Cache invalidation is handled globally by PostEventsBridge.
+ */
 export function useBusinessPosts(businessId?: string) {
-  const queryClient = useQueryClient();
-
-  // Listen for postCompleted events to invalidate immediately
-  useEffect(() => {
-    if (!businessId) return;
-
-    const handlePostCompleted = (event: CustomEvent<{ realPost?: { actor_type?: string; actor_id?: string } }>) => {
-      const post = event.detail?.realPost;
-      if (post?.actor_type === 'business' && post?.actor_id === businessId) {
-        queryClient.invalidateQueries({ queryKey: ['actor-posts', 'business', businessId] });
-        queryClient.invalidateQueries({ queryKey: ['actor-posts-count', 'business', businessId] });
-      }
-    };
-
-    window.addEventListener('postCompleted', handlePostCompleted as EventListener);
-    return () => {
-      window.removeEventListener('postCompleted', handlePostCompleted as EventListener);
-    };
-  }, [businessId, queryClient]);
-
   return useQuery({
-    queryKey: ['actor-posts', 'business', businessId],
+    queryKey: postKeys.actorPosts('business', businessId ?? ''),
     enabled: !!businessId,
     queryFn: async () => {
       const { data, error } = await supabase
@@ -75,9 +59,13 @@ export function useBusinessPosts(businessId?: string) {
   });
 }
 
+/**
+ * Fetches post count for a business profile.
+ * Cache invalidation is handled globally by PostEventsBridge.
+ */
 export function useBusinessPostsCount(businessId?: string) {
   return useQuery({
-    queryKey: ['actor-posts-count', 'business', businessId],
+    queryKey: postKeys.actorPostsCount('business', businessId ?? ''),
     enabled: !!businessId,
     queryFn: async () => {
       const { count, error } = await supabase

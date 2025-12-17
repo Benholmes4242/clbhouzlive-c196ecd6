@@ -28,6 +28,7 @@ import { UIProvider } from '@/contexts/UIContext';
 import { ModalProvider } from '@/contexts/ModalContext';
 import { BottomNavigationProvider } from '@/contexts/BottomNavigationContext';
 import { CinemaDimProvider } from '@/contexts/CinemaDimContext';
+import { PostEventsBridge } from '@/events/PostEventsBridge';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
 import { FLAGS } from '@/config/flags';
 import { FEATURE_FLAGS } from '@/config/featureFlags';
@@ -598,7 +599,9 @@ const App: React.FC = () => {
       <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
         <Top100DebugProvider>
           <QueryClientProvider client={queryClient}>
-            <AppInner />
+            <PostEventsBridge>
+              <AppInner />
+            </PostEventsBridge>
           </QueryClientProvider>
         </Top100DebugProvider>
       </ThemeProvider>

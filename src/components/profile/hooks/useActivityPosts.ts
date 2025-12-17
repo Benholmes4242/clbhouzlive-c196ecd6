@@ -1,17 +1,16 @@
 
-import { useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { ActivityPost } from '../types/ActivityTypes';
+import { postKeys } from '@/queryKeys/posts';
 
-export const actorPostsKey = (actorType: 'personal' | 'business', actorId?: string) =>
-  ['actor-posts', actorType, actorId] as const;
-
+/**
+ * Fetches activity posts for a personal profile.
+ * Cache invalidation is handled globally by PostEventsBridge.
+ */
 export const useActivityPosts = (actorId?: string) => {
-  const qc = useQueryClient();
-
   const query = useQuery({
-    queryKey: actorPostsKey('personal', actorId),
+    queryKey: postKeys.actorPosts('personal', actorId ?? ''),
     enabled: !!actorId,
     queryFn: async (): Promise<ActivityPost[]> => {
       if (!actorId) return [];
@@ -120,28 +119,6 @@ export const useActivityPosts = (actorId?: string) => {
     staleTime: 30_000,
     gcTime: 5 * 60 * 1000,
   });
-
-  // Also respond to legacy event-driven refreshes
-  useEffect(() => {
-    const handlePostCompleted = (e: any) => {
-      const realPost = e?.detail?.realPost;
-      if (!actorId) return;
-
-      // If we have actor identity in the event, only refresh when it matches.
-      if (realPost?.actor_type && realPost?.actor_id) {
-        if (realPost.actor_type === 'personal' && realPost.actor_id === actorId) {
-          qc.invalidateQueries({ queryKey: actorPostsKey('personal', actorId) });
-        }
-        return;
-      }
-
-      // Fallback: refetch
-      query.refetch();
-    };
-
-    window.addEventListener('postCompleted', handlePostCompleted as EventListener);
-    return () => window.removeEventListener('postCompleted', handlePostCompleted as EventListener);
-  }, [actorId, qc, query]);
 
   return {
     posts: query.data ?? [],
