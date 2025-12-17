@@ -97,11 +97,18 @@ async function processJob(jobId: string): Promise<void> {
         let publicUrl = '';
         const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
 
+        // Track stream_id and poster_url for videos
+        let streamId: string | null = null;
+        let posterUrl: string | null = null;
+
         // Upload based on file type
         if (file.type.startsWith('video/')) {
           const result = await uploadVideo(file);
           if (result.success && result.videoUrl) {
             publicUrl = result.videoUrl;
+            streamId = result.streamId || null;
+            posterUrl = result.posterUrl || null;
+            console.log(`[uploadPipeline] Video uploaded, streamId: ${streamId}`);
           } else {
             throw new Error(result.error || 'Video upload failed');
           }
@@ -120,7 +127,7 @@ async function processJob(jobId: string): Promise<void> {
         const edits = mediaId ? job.studioEditsByMediaId?.[mediaId] : undefined;
         const filterId = edits?.filter ?? null;
 
-        // Create media record
+        // Create media record with stream_id and poster_url for videos
         const { error: mediaError } = await supabase
           .from('post_media')
           .insert({
@@ -130,6 +137,8 @@ async function processJob(jobId: string): Promise<void> {
             display_order: index,
             studio_edits: edits || null,
             filter_id: filterId,
+            stream_id: streamId,
+            poster_url: posterUrl,
           });
 
         if (mediaError) {
