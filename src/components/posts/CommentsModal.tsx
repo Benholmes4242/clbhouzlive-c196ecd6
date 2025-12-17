@@ -12,13 +12,14 @@ interface CommentsModalProps {
   isOpen: boolean;
   onClose: () => void;
   postId: string;
+  theme?: 'dark' | 'grey';
 }
 
 // Animation constants - matches expanded map sheet
 const ENTRY_DURATION = 500;
 const EXIT_DURATION = 500;
 
-const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }) => {
+const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId, theme = 'dark' }) => {
   const [newComment, setNewComment] = useState('');
   const [isClosing, setIsClosing] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
@@ -73,16 +74,19 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
         onClick={handleClose}
       />
       
-      {/* Comments Sheet - Dark Glass */}
+      {/* Comments Sheet - Supports dark and grey themes */}
       <div 
         className="absolute inset-x-0 bottom-0 flex items-end justify-center"
         style={{ zIndex: Z.sheet }}
       >
         <div 
           className={cn(
-            "clubhouse-comments-sheet glass-dark rounded-t-[24px] flex flex-col w-full",
+            "clubhouse-comments-sheet rounded-t-[24px] flex flex-col w-full",
             "transition-all ease-in-out",
-            hasEntered && !isClosing ? "duration-500 translate-y-0 opacity-100" : "duration-500 translate-y-4 opacity-0"
+            hasEntered && !isClosing ? "duration-500 translate-y-0 opacity-100" : "duration-500 translate-y-4 opacity-0",
+            theme === 'grey' 
+              ? "bg-[#FAFAFB] border-t border-border/30" 
+              : "glass-dark"
           )}
           style={{ 
             paddingBottom: 'env(safe-area-inset-bottom)',
@@ -94,12 +98,12 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
         >
           {/* Handle */}
           <div className="flex justify-center pt-3 pb-2">
-            <div className="w-12 h-1 bg-white/30 rounded-full" />
+            <div className={cn("w-12 h-1 rounded-full", theme === 'grey' ? "bg-border" : "bg-white/30")} />
           </div>
 
           {/* Header */}
-          <div className="flex items-center justify-center px-4 md:px-6 pb-3 border-b border-white/5">
-            <h2 className="text-[14px] font-semibold text-white">Comments</h2>
+          <div className={cn("flex items-center justify-center px-4 md:px-6 pb-3 border-b", theme === 'grey' ? "border-border/50" : "border-white/5")}>
+            <h2 className={cn("text-[14px] font-semibold", theme === 'grey' ? "text-foreground" : "text-white")}>Comments</h2>
           </div>
 
           {/* Comments List - Scrollable */}
@@ -112,11 +116,11 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
           >
             {commentsLoading ? (
               <div className="flex items-center justify-center py-8">
-                <div className="text-white/50 text-sm">Loading comments...</div>
+                <div className={cn("text-sm", theme === 'grey' ? "text-muted-foreground" : "text-white/50")}>Loading comments...</div>
               </div>
             ) : comments.length === 0 ? (
               <div className="flex items-center justify-center py-8">
-                <div className="text-white/50 text-sm">No comments yet. Be the first!</div>
+                <div className={cn("text-sm", theme === 'grey' ? "text-muted-foreground" : "text-white/50")}>No comments yet. Be the first!</div>
               </div>
             ) : (
               comments.map((comment) => (
@@ -130,13 +134,13 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
                     }}
                   />
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 text-[13px] text-white font-semibold">
+                    <div className={cn("flex items-center gap-2 text-[13px] font-semibold", theme === 'grey' ? "text-foreground" : "text-white")}>
                       <span className="truncate">{comment.user_name}</span>
-                      <span className="text-[11px] text-white/50 whitespace-nowrap">
+                      <span className={cn("text-[11px] whitespace-nowrap", theme === 'grey' ? "text-muted-foreground" : "text-white/50")}>
                         {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
                       </span>
                     </div>
-                    <p className="mt-0.5 text-[13px] leading-snug text-white/85">
+                    <p className={cn("mt-0.5 text-[13px] leading-snug", theme === 'grey' ? "text-foreground/85" : "text-white/85")}>
                       {comment.content}
                     </p>
                   </div>
