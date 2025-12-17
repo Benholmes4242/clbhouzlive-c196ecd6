@@ -178,17 +178,17 @@ export default function BusinessPostCard({
       <div
         className={cn(
           "bg-white overflow-hidden border-x border-border/40",
-          isPinned && "ring-1 ring-amber-200"
+          isPinned && "ring-1 ring-border/60"
         )}
         style={{
-          boxShadow: isPinned ? '0 2px 8px rgba(251,191,36,0.15)' : '0 1px 3px rgba(0,0,0,0.04)',
+          boxShadow: isPinned ? '0 2px 8px rgba(0,0,0,0.08)' : '0 1px 3px rgba(0,0,0,0.04)',
         }}
       >
-        {/* Pinned indicator */}
+        {/* Pinned indicator - subtle pill */}
         {isPinned && (
-          <div className="flex items-center gap-1.5 px-4 py-1.5 bg-amber-50 border-b border-amber-100">
-            <Pin className="h-3.5 w-3.5 text-amber-600" />
-            <span className="text-xs font-medium text-amber-700">Pinned</span>
+          <div className="flex items-center gap-1.5 px-4 py-1.5 bg-muted/30 border-b border-border/30">
+            <Pin className="h-3.5 w-3.5 text-muted-foreground" />
+            <span className="text-xs font-medium text-muted-foreground">Pinned</span>
           </div>
         )}
         {/* Post header - 3 column layout: avatar / meta / actions */}
@@ -356,7 +356,7 @@ export default function BusinessPostCard({
         />
       </div>
 
-      {/* Comments - use Clubhouse slide-in panel with light theme */}
+      {/* Comments - use Clubhouse slide-in panel with grey theme */}
       <CommentsPage
         isOpen={commentsOpen}
         onClose={() => setCommentsOpen(false)}
@@ -364,7 +364,7 @@ export default function BusinessPostCard({
         videoThumbnail={thumbnailUrl || undefined}
         creatorName={businessName}
         creatorAvatar={businessLogo || undefined}
-        theme="light"
+        theme="grey"
       />
 
       {/* Insights Modal */}
