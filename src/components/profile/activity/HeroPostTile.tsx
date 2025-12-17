@@ -66,8 +66,11 @@ const HeroPostTile: React.FC<HeroPostTileProps> = ({
   const handleCanPlay = useCallback(() => {
     setIsVideoReady(true);
 
-    // Fallback: derive duration from media metadata if DB value is missing
-    if (!item.durationSeconds && videoRef.current) {
+    // Fallback: derive duration from media metadata if DB value is missing/invalid
+    const dbDuration = item.durationSeconds;
+    const hasValidDbDuration = typeof dbDuration === 'number' && Number.isFinite(dbDuration) && dbDuration > 0;
+    
+    if (!hasValidDbDuration && videoRef.current) {
       const d = videoRef.current.duration;
       if (Number.isFinite(d) && d > 0 && d !== Infinity) {
         setResolvedDurationSeconds(d);

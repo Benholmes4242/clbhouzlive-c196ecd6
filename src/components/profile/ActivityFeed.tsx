@@ -191,14 +191,16 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
         onChange={setFilters}
       />
 
-      {/* Fullscreen Media Modal */}
-      <FullscreenMediaModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        mediaUrl={allMediaData.urls}
-        mediaType={allMediaData.types}
-        initialIndex={modalStartIndex}
-      />
+      {/* Fullscreen Media Modal - only mount when open to prevent pauseAllAndSetActive on initial render */}
+      {modalOpen && (
+        <FullscreenMediaModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          mediaUrl={allMediaData.urls}
+          mediaType={allMediaData.types}
+          initialIndex={modalStartIndex}
+        />
+      )}
 
       {/* Achievements Modal */}
       <ClbhouzAchievementsModal
