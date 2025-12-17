@@ -166,8 +166,8 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         'min-w-[180px] h-[92px] px-3 py-2.5',
         // Glassmorphism backdrop blur
         'backdrop-blur-[16px] backdrop-saturate-[140%]',
-        // Subtle border for floating effect
-        'border border-white/[0.18]',
+        // Subtle border for floating effect - dark for light backgrounds
+        'border border-slate-200/80',
         // Smooth micro-interactions
         'transition-all duration-200 ease-out',
         'active:scale-[0.98]',
@@ -176,14 +176,14 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         isGhost && 'border-dashed'
       )}
       style={{
-        // Translucent glass background
+        // Frosted glass background - dark tint for light backgrounds
         background: unlocked && !isGhost
-          ? 'rgba(255, 255, 255, 0.12)'
-          : 'rgba(255, 255, 255, 0.06)',
+          ? 'rgba(30, 41, 59, 0.85)'  // slate-800 with transparency
+          : 'rgba(30, 41, 59, 0.5)',
         // Inner highlight gradient for Apple feel
         backgroundImage: unlocked && !isGhost
-          ? 'linear-gradient(to bottom, rgba(255,255,255,0.25) 0%, transparent 40%)'
-          : 'linear-gradient(to bottom, rgba(255,255,255,0.12) 0%, transparent 40%)',
+          ? 'linear-gradient(to bottom, rgba(255,255,255,0.12) 0%, transparent 40%)'
+          : 'linear-gradient(to bottom, rgba(255,255,255,0.06) 0%, transparent 40%)',
         transform: isPrimary ? 'translateY(-2px)' : undefined,
         opacity: isGhost ? 0.7 : (!unlocked ? 0.6 : 1),
       }}
