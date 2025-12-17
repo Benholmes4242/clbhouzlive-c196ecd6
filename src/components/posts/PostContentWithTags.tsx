@@ -38,7 +38,7 @@ const PostContentWithTags: React.FC<PostContentWithTagsProps> = ({
         navigate(`/profile/${entity.entity_id}`);
       }
     } else if (entity.entity_type === 'golf_club') {
-      navigate(`/course/${entity.entity_id}`);
+      navigate(`/courses/${entity.entity_id}`);
     } else if (entity.entity_type === 'business') {
       navigate(`/business/${entity.entity_id}`);
     }

@@ -39,7 +39,7 @@ const TaggedText: React.FC<TaggedTextProps> = ({ text, tags, className = '' }) =
         case 'user':
           return `/profile/${tag.entity_id}`;
         case 'golf_club':
-          return `/course/${tag.entity_id}`;
+          return `/courses/${tag.entity_id}`;
         case 'business':
           return `/business/${tag.entity_id}`;
         default:
