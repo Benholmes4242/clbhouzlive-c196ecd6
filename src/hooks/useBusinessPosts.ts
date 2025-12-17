@@ -1,4 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface BusinessPost {
@@ -18,6 +19,26 @@ export interface BusinessPost {
 }
 
 export function useBusinessPosts(businessId?: string) {
+  const queryClient = useQueryClient();
+
+  // Listen for postCompleted events to invalidate immediately
+  useEffect(() => {
+    if (!businessId) return;
+
+    const handlePostCompleted = (event: CustomEvent<{ realPost?: { actor_type?: string; actor_id?: string } }>) => {
+      const post = event.detail?.realPost;
+      if (post?.actor_type === 'business' && post?.actor_id === businessId) {
+        queryClient.invalidateQueries({ queryKey: ['actor-posts', 'business', businessId] });
+        queryClient.invalidateQueries({ queryKey: ['actor-posts-count', 'business', businessId] });
+      }
+    };
+
+    window.addEventListener('postCompleted', handlePostCompleted as EventListener);
+    return () => {
+      window.removeEventListener('postCompleted', handlePostCompleted as EventListener);
+    };
+  }, [businessId, queryClient]);
+
   return useQuery({
     queryKey: ['actor-posts', 'business', businessId],
     enabled: !!businessId,
@@ -50,7 +71,7 @@ export function useBusinessPosts(businessId?: string) {
 
       return (data ?? []) as BusinessPost[];
     },
-    staleTime: 5_000, // Low staleTime since realtime handles updates
+    staleTime: 5_000,
   });
 }
 

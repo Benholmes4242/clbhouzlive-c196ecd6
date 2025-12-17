@@ -43,10 +43,8 @@ export const BadgeShareModal: React.FC<BadgeShareModalProps> = ({
       const { error } = await supabase.from('posts').insert({
         user_id: user.id,
         content: `🏅 Just unlocked the "${badge.display_name}" badge! ${badge.emoji}\n\n${badge.description}`,
-        media_urls: [],
-        media_types: [],
-        is_story: true,
-        story_expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours
+        actor_type: 'personal',
+        actor_id: user.id,
       });
 
       if (error) throw error;

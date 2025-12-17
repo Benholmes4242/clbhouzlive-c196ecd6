@@ -66,7 +66,9 @@ export const usePostSubmission = () => {
         .from('posts')
         .insert({
           user_id: user.id,
-          content: content || null
+          content: content || null,
+          actor_type: 'personal',
+          actor_id: user.id,
         })
         .select()
         .single();
