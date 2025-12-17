@@ -29,7 +29,7 @@ export default function MentionSuggestions({ query, onSelect, onClose }: Mention
 
       setIsLoading(true);
       try {
-        // Search users
+        // Search users from user_profiles
         const { data: users, error: usersError } = await supabase
           .from('user_profiles')
           .select('id, display_name, username, profile_photo_url')
@@ -39,7 +39,17 @@ export default function MentionSuggestions({ query, onSelect, onClose }: Mention
 
         if (usersError) throw usersError;
 
-        const formattedSuggestions: MentionSuggestion[] = (users || []).map(user => ({
+        // Search businesses from taggable_entities
+        const { data: businesses, error: businessesError } = await supabase
+          .from('taggable_entities')
+          .select('entity_id, name, username, profile_image_url')
+          .eq('entity_type', 'business')
+          .or(`name.ilike.%${query}%,username.ilike.%${query}%`)
+          .limit(6);
+
+        if (businessesError) throw businessesError;
+
+        const userSuggestions: MentionSuggestion[] = (users || []).map(user => ({
           id: user.id,
           name: user.display_name || user.username || 'Unknown',
           username: user.username || '',
@@ -47,7 +57,16 @@ export default function MentionSuggestions({ query, onSelect, onClose }: Mention
           type: 'user' as const
         }));
 
-        setSuggestions(formattedSuggestions);
+        const businessSuggestions: MentionSuggestion[] = (businesses || []).map(business => ({
+          id: business.entity_id,
+          name: business.name || 'Unknown',
+          username: business.username || business.name?.toLowerCase().replace(/\s+/g, '') || '',
+          avatar_url: business.profile_image_url,
+          type: 'business' as const
+        }));
+
+        // Combine and limit to 8 total results
+        setSuggestions([...userSuggestions, ...businessSuggestions].slice(0, 8));
       } catch (error) {
         console.error('Error fetching mention suggestions:', error);
         setSuggestions([]);
