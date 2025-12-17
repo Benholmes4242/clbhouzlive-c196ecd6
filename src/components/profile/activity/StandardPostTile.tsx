@@ -26,6 +26,9 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({
 }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [resolvedDurationSeconds, setResolvedDurationSeconds] = useState<number | null | undefined>(
+    item.durationSeconds
+  );
   
   const handleClick = useCallback(() => {
     onPress?.(item.postId);
@@ -33,7 +36,11 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({
 
   const isVideo = item.type === 'video';
   const isAutoplayCandidate = item.isAutoplayCandidate ?? false;
-  
+
+  useEffect(() => {
+    setResolvedDurationSeconds(item.durationSeconds);
+  }, [item.durationSeconds]);
+
   // Force consistent aspect ratio for all grid tiles to prevent gaps
   const aspectClass = 'aspect-[3/4]';
 
@@ -61,7 +68,15 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({
 
   const handleCanPlay = useCallback(() => {
     setIsVideoReady(true);
-  }, []);
+
+    // Fallback: derive duration from media metadata if DB value is missing
+    if (!item.durationSeconds && videoRef.current) {
+      const d = videoRef.current.duration;
+      if (Number.isFinite(d) && d > 0 && d !== Infinity) {
+        setResolvedDurationSeconds(d);
+      }
+    }
+  }, [item.durationSeconds]);
 
   const thumbnailSrc = item.thumbnailUrl || item.url;
 
@@ -99,10 +114,10 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({
 
       {/* Video overlay with play/pause icon and duration */}
       {isVideo && (
-        <VideoOverlay
-          durationSeconds={item.durationSeconds}
-          isPlaying={isAutoplayCandidate && isPlaying}
-        />
+          <VideoOverlay
+            durationSeconds={resolvedDurationSeconds}
+            isPlaying={isAutoplayCandidate && isPlaying}
+          />
       )}
 
       {/* Multi-media indicator - top-right */}

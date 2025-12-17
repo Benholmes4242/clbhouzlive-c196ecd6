@@ -26,6 +26,9 @@ const HeroPostTile: React.FC<HeroPostTileProps> = ({
 }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [resolvedDurationSeconds, setResolvedDurationSeconds] = useState<number | null | undefined>(
+    item.durationSeconds
+  );
   
   const handleClick = useCallback(() => {
     onPress?.(item.postId);
@@ -33,6 +36,10 @@ const HeroPostTile: React.FC<HeroPostTileProps> = ({
 
   const isVideo = item.type === 'video';
   const isAutoplayCandidate = item.isAutoplayCandidate ?? false;
+
+  useEffect(() => {
+    setResolvedDurationSeconds(item.durationSeconds);
+  }, [item.durationSeconds]);
 
   // Register video with autoplay hook
   useEffect(() => {
@@ -58,7 +65,15 @@ const HeroPostTile: React.FC<HeroPostTileProps> = ({
 
   const handleCanPlay = useCallback(() => {
     setIsVideoReady(true);
-  }, []);
+
+    // Fallback: derive duration from media metadata if DB value is missing
+    if (!item.durationSeconds && videoRef.current) {
+      const d = videoRef.current.duration;
+      if (Number.isFinite(d) && d > 0 && d !== Infinity) {
+        setResolvedDurationSeconds(d);
+      }
+    }
+  }, [item.durationSeconds]);
 
   const thumbnailSrc = item.thumbnailUrl || item.url;
   
@@ -104,7 +119,7 @@ const HeroPostTile: React.FC<HeroPostTileProps> = ({
       {/* Video overlay with play/pause icon and duration */}
       {isVideo && (
         <VideoOverlay
-          durationSeconds={item.durationSeconds}
+          durationSeconds={resolvedDurationSeconds}
           isPlaying={isAutoplayCandidate && isPlaying}
         />
       )}

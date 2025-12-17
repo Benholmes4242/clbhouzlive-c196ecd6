@@ -136,13 +136,21 @@ export function useGridAutoplay(
           if (!record || record.hasBeenPreloaded) return;
 
           if (entry.isIntersecting) {
-            // Near viewport → upgrade preload and start buffering
+            // Near viewport → upgrade preload. Avoid calling load() for HLS.js-backed videos
+            // (calling video.load() can reset the media element and break MSE attachment).
             target.preload = 'auto';
-            try {
-              target.load();
-            } catch {
-              // Some browsers may not like explicit load()
+            const usesHlsJs = target.dataset.gridUsesHlsJs === '1';
+            const src = target.dataset.gridVideoSrc || target.currentSrc || target.src || '';
+            const isHlsManifest = src.includes('.m3u8');
+
+            if (!usesHlsJs && !isHlsManifest) {
+              try {
+                target.load();
+              } catch {
+                // Some browsers may not like explicit load()
+              }
             }
+
             record.hasBeenPreloaded = true;
             videosRef.current.set(id, record);
           }
