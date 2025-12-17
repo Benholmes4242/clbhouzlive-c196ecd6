@@ -11,9 +11,13 @@ export interface ActiveActor {
   avatarUrl?: string | null;
 }
 
+export interface SetActorOptions {
+  persist?: boolean; // Default true - set false for session-only override
+}
+
 interface ActiveActorContextValue {
   activeActor: ActiveActor | null;
-  setActiveActor: (actor: ActiveActor) => void;
+  setActiveActor: (actor: ActiveActor, options?: SetActorOptions) => void;
   availableActors: ActiveActor[];
   isLoading: boolean;
 }
@@ -111,20 +115,31 @@ export function ActiveActorProvider({ children }: { children: ReactNode }) {
     }
   }, [availableActors, activeActor, initialized]);
 
-  // Persist to localStorage
+  // Track if current selection should be persisted
+  const [shouldPersist, setShouldPersist] = useState(true);
+
+  // Persist to localStorage only when shouldPersist is true
   useEffect(() => {
-    if (activeActor) {
+    if (activeActor && shouldPersist) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(activeActor));
     }
-  }, [activeActor]);
+  }, [activeActor, shouldPersist]);
 
-  const setActiveActor = (actor: ActiveActor) => {
+  const setActiveActor = (actor: ActiveActor, options?: SetActorOptions) => {
+    const persist = options?.persist !== false; // Default to true
+    
     // Validate actor is in available list
     const isValid = availableActors.some(
       a => a.type === actor.type && a.id === actor.id
     );
     if (isValid) {
+      setShouldPersist(persist);
       setActiveActorState(actor);
+      
+      // If persisting, update localStorage immediately
+      if (persist) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(actor));
+      }
     }
   };
 

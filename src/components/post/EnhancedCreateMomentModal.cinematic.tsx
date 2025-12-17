@@ -3,6 +3,7 @@
 
 import { CreateMomentModal } from "./create-moment";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
+import { ActorRef } from "./create-moment/types";
 
 type Props = { 
   theme?: "dark" | "light";
@@ -15,6 +16,8 @@ type Props = {
   selectedCourse?: any;
   onCourseSelect?: (course: any) => void;
   onMediaChange?: (items: ComposerMediaItem[]) => void;
+  /** One-time actor override - applies on mount without persisting */
+  initialActorOverride?: ActorRef;
 };
 
 export default function EnhancedCreateMomentModalCinematic(props: Props) {
@@ -28,6 +31,7 @@ export default function EnhancedCreateMomentModalCinematic(props: Props) {
       selectedCourse={props.selectedCourse}
       onCourseSelect={props.onCourseSelect}
       onMediaChange={props.onMediaChange}
+      initialActorOverride={props.initialActorOverride}
     />
   );
 }

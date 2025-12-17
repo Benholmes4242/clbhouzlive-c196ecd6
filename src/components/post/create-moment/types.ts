@@ -8,6 +8,12 @@ export interface GolfCourse {
   region?: string;
 }
 
+// Actor reference for overrides
+export interface ActorRef {
+  type: 'personal' | 'business';
+  id: string;
+}
+
 export interface CreateMomentProps {
   isOpen: boolean;
   onClose: () => void;
@@ -17,6 +23,8 @@ export interface CreateMomentProps {
   selectedCourse?: GolfCourse | null;
   onCourseSelect?: (course: GolfCourse | null) => void;
   onMediaChange?: (items: ComposerMediaItem[]) => void;
+  /** One-time actor override - applies on mount without persisting to localStorage */
+  initialActorOverride?: ActorRef;
 }
 
 export interface CreateMomentSubmitData {
