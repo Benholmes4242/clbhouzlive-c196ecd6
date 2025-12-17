@@ -41,30 +41,30 @@ export function UploadCenterPanel({ isOpen, onClose }: UploadCenterPanelProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed top-16 right-4 w-80 max-h-[70vh] bg-background border border-border rounded-sq-lg shadow-xl z-[61] overflow-hidden"
+            className="fixed top-16 right-4 w-80 max-h-[70vh] bg-white border border-slate-200 rounded-sq-lg shadow-xl z-[61] overflow-hidden"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">
               <div className="flex items-center gap-2">
-                <Cloud className="w-4 h-4 text-muted-foreground" />
-                <span className="font-medium text-sm">Uploads</span>
+                <Cloud className="w-4 h-4 text-slate-500" />
+                <span className="font-medium text-sm text-slate-900">Uploads</span>
               </div>
               <button
                 onClick={onClose}
-                className="p-1 rounded-full hover:bg-muted transition-colors"
+                className="p-1 rounded-full hover:bg-slate-100 transition-colors"
               >
-                <X className="w-4 h-4 text-muted-foreground" />
+                <X className="w-4 h-4 text-slate-500" />
               </button>
             </div>
 
             {/* Content */}
             <div className="overflow-y-auto max-h-[calc(70vh-56px)]">
               {visibleJobs.length === 0 ? (
-                <div className="px-4 py-8 text-center text-muted-foreground text-sm">
+                <div className="px-4 py-8 text-center text-slate-500 text-sm">
                   No uploads
                 </div>
               ) : (
-                <div className="divide-y divide-border">
+                <div className="divide-y divide-slate-200">
                   {visibleJobs.map(job => (
                     <UploadJobRow
                       key={job.jobId}
@@ -114,10 +114,10 @@ function UploadJobRow({
       {/* Top row: caption preview + status */}
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-foreground truncate">
+          <p className="text-sm font-medium text-slate-900 truncate">
             {job.caption || '(No caption)'}
           </p>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5">
             {job.actorType === 'business' ? 'Business post' : 'Personal post'}
           </p>
         </div>
@@ -125,13 +125,13 @@ function UploadJobRow({
         {/* Status icon */}
         <div className="flex-shrink-0">
           {isPending && (
-            <Loader2 className="w-4 h-4 text-primary animate-spin" />
+            <Loader2 className="w-4 h-4 text-orange-500 animate-spin" />
           )}
           {isComplete && (
             <Check className="w-4 h-4 text-green-500" />
           )}
           {isFailed && (
-            <AlertCircle className="w-4 h-4 text-destructive" />
+            <AlertCircle className="w-4 h-4 text-red-500" />
           )}
         </div>
       </div>
@@ -140,13 +140,13 @@ function UploadJobRow({
       {isPending && job.progress.totalFiles > 0 && (
         <div className="mb-2">
           <div className="flex items-center gap-2">
-            <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+            <div className="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-primary rounded-full transition-all duration-300"
+                className="h-full bg-orange-500 rounded-full transition-all duration-300"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <span className="text-[10px] text-muted-foreground tabular-nums">
+            <span className="text-[10px] text-slate-500 tabular-nums">
               {job.progress.uploadedFiles}/{job.progress.totalFiles}
             </span>
           </div>
@@ -155,7 +155,7 @@ function UploadJobRow({
 
       {/* Status label + actions */}
       <div className="flex items-center justify-between">
-        <span className={`text-xs ${isFailed ? 'text-destructive' : 'text-muted-foreground'}`}>
+        <span className={`text-xs ${isFailed ? 'text-red-500' : 'text-slate-500'}`}>
           {statusLabel}
         </span>
 
@@ -163,7 +163,7 @@ function UploadJobRow({
           {isFailed && job.files.length > 0 && (
             <button
               onClick={onRetry}
-              className="flex items-center gap-1 px-2 py-1 text-xs text-primary hover:bg-muted rounded-sq-sm transition-colors"
+              className="flex items-center gap-1 px-2 py-1 text-xs text-orange-600 hover:bg-slate-100 rounded-sq-sm transition-colors"
             >
               <RotateCcw className="w-3 h-3" />
               Retry
@@ -173,7 +173,7 @@ function UploadJobRow({
           {(isComplete || isFailed) && (
             <button
               onClick={onDismiss}
-              className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded-sq-sm transition-colors"
+              className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-sq-sm transition-colors"
             >
               <Trash2 className="w-3 h-3" />
             </button>
@@ -183,7 +183,7 @@ function UploadJobRow({
 
       {/* Error message */}
       {isFailed && job.error && (
-        <p className="mt-1.5 text-xs text-destructive/80">
+        <p className="mt-1.5 text-xs text-red-500/80">
           {job.error}
         </p>
       )}
