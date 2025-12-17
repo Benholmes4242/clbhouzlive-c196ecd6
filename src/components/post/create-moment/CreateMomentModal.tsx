@@ -13,6 +13,7 @@ import { openMediaPicker } from "@/utils/openMediaPicker";
 import { normalizeFilesToMediaItems } from "@/lib/mediaUtils";
 import StudioShelf from "@/components/studio/StudioShelf";
 import PostSuccessOverlay from '../PostSuccessOverlay';
+import { OverlayPortalProvider } from "@/context/OverlayPortalContext";
 
 import CreateMomentHero from "./CreateMomentHero";
 import CreateMomentMediaStage from "./CreateMomentMediaStage";
@@ -41,7 +42,8 @@ export default function CreateMomentModal({
   const { setCreateMomentModalOpen } = useModalContext();
   const { activeActor, availableActors } = useActiveActor();
   const wrapperRef = useRef<HTMLDivElement>(null);
-  
+  const overlayRootRef = useRef<HTMLDivElement>(null);
+  const [overlayRoot, setOverlayRoot] = useState<HTMLElement | null>(null);
   // Animation state
   const [translateY, setTranslateY] = useState(() => {
     if (typeof window === 'undefined') return 0;
@@ -103,6 +105,15 @@ export default function CreateMomentModal({
   useEffect(() => {
     setCreateMomentModalOpen(isOpen);
   }, [isOpen, setCreateMomentModalOpen]);
+
+  // Set overlay root for portal-based components (dropdowns, popovers)
+  useEffect(() => {
+    if (isOpen && overlayRootRef.current) {
+      setOverlayRoot(overlayRootRef.current);
+    } else {
+      setOverlayRoot(null);
+    }
+  }, [isOpen]);
 
   // Header hiding
   useImmersiveHeader(Boolean(isOpen));
@@ -504,20 +515,22 @@ export default function CreateMomentModal({
             borderTop: '1px solid rgba(255, 255, 255, 0.1)',
           }}
         >
-          <CreateMomentComposerPanel
-            hasMedia={hasMedia}
-            caption={caption}
-            onCaptionChange={setCaption}
-            selectedCourse={course}
-            onCourseSelect={(c) => {
-              setSelectedCourse(c);
-              onCourseSelect?.(c);
-            }}
-            onOpenStudio={openStudio}
-            availableActorsCount={availableActors.length}
-            currentFilter={currentFilter}
-            onTypingStateChange={setIsTyping}
-          />
+          <OverlayPortalProvider container={overlayRoot}>
+            <CreateMomentComposerPanel
+              hasMedia={hasMedia}
+              caption={caption}
+              onCaptionChange={setCaption}
+              selectedCourse={course}
+              onCourseSelect={(c) => {
+                setSelectedCourse(c);
+                onCourseSelect?.(c);
+              }}
+              onOpenStudio={openStudio}
+              availableActorsCount={availableActors.length}
+              currentFilter={currentFilter}
+              onTypingStateChange={setIsTyping}
+            />
+          </OverlayPortalProvider>
 
           {/* Share Bar - sticky at bottom, safe-area aware */}
           <div
@@ -535,6 +548,13 @@ export default function CreateMomentModal({
             />
           </div>
         </section>
+
+        {/* Overlay root for dropdowns/popovers inside the modal */}
+        <div
+          ref={overlayRootRef}
+          id="create-moment-overlay-root"
+          className="pointer-events-none absolute inset-0 z-[1010]"
+        />
 
         {/* Draft prompt */}
         <AnimatePresence>
