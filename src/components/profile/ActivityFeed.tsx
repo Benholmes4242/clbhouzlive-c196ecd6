@@ -2,6 +2,7 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { IoFilter } from 'react-icons/io5';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 import { useActivityPosts } from './hooks/useActivityPosts';
+import { useRealtimePersonalPosts } from '@/hooks/useRealtimePersonalPosts';
 import { ActivityMediaGrid } from './activity';
 import ActivityFiltersSheet, { ActivityFilters, ActivityFilterType } from './ActivityFiltersSheet';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
@@ -9,7 +10,6 @@ import { ActivityPost as LocalActivityPost } from './types/ActivityTypes';
 import { ActivityPost } from './activity/types';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { CreatorProfileSection } from './CreatorProfileSection';
-
 interface ActivityFeedProps {
   userId: string;
   isOwnProfile: boolean;
@@ -55,6 +55,10 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   onAchievementsClick
 }) => {
   const { posts, loading } = useActivityPosts(userId);
+  
+  // Realtime subscription for post_media inserts - secondary safety net
+  useRealtimePersonalPosts(userId);
+  
   const [modalOpen, setModalOpen] = useState(false);
   const [modalStartIndex, setModalStartIndex] = useState(0);
   const [filtersOpen, setFiltersOpen] = useState(false);

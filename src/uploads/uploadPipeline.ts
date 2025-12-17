@@ -1,4 +1,5 @@
 // Upload pipeline - processes jobs asynchronously
+// Includes stream asset tracking for orphan cleanup
 
 import { supabase } from '@/integrations/supabase/client';
 import { uploadManager } from './UploadManager';
@@ -33,6 +34,49 @@ export function enqueuePostUpload(input: UploadJobInput): string {
 }
 
 /**
+ * Clean up orphaned Cloudflare Stream assets
+ */
+async function cleanupStreamAssets(streamUids: string[]): Promise<void> {
+  for (const uid of streamUids) {
+    try {
+      console.log(`[uploadPipeline] Cleaning up orphaned stream asset: ${uid}`);
+      const { error } = await supabase.functions.invoke('cloudflare-stream-delete', {
+        body: { uid },
+      });
+      if (error) {
+        console.warn(`[uploadPipeline] Failed to cleanup stream asset ${uid}:`, error);
+      } else {
+        console.log(`[uploadPipeline] Cleaned up stream asset: ${uid}`);
+      }
+    } catch (err) {
+      console.warn(`[uploadPipeline] Error cleaning up stream asset ${uid}:`, err);
+    }
+  }
+}
+
+/**
+ * Mark stream assets as attached after successful post creation
+ */
+async function markStreamAssetsAttached(streamUids: string[], postId: string): Promise<void> {
+  for (const uid of streamUids) {
+    try {
+      const { error } = await supabase
+        .from('stream_assets')
+        .update({ status: 'attached', post_id: postId })
+        .eq('uid', uid);
+      
+      if (error) {
+        console.warn(`[uploadPipeline] Failed to mark stream asset ${uid} as attached:`, error);
+      } else {
+        console.log(`[uploadPipeline] Marked stream asset ${uid} as attached`);
+      }
+    } catch (err) {
+      console.warn(`[uploadPipeline] Error marking stream asset ${uid} as attached:`, err);
+    }
+  }
+}
+
+/**
  * Process a single upload job
  */
 async function processJob(jobId: string): Promise<void> {
@@ -56,6 +100,9 @@ async function processJob(jobId: string): Promise<void> {
   }
 
   console.log(`[uploadPipeline] Processing job ${jobId}`);
+
+  // Track uploaded stream UIDs for cleanup on failure
+  const uploadedStreamUids: string[] = [];
 
   try {
     // Phase A: Create post shell
@@ -108,6 +155,12 @@ async function processJob(jobId: string): Promise<void> {
             publicUrl = result.videoUrl;
             streamId = result.streamId || null;
             posterUrl = result.posterUrl || null;
+            
+            // Track for potential cleanup
+            if (streamId) {
+              uploadedStreamUids.push(streamId);
+            }
+            
             console.log(`[uploadPipeline] Video uploaded, streamId: ${streamId}`);
           } else {
             throw new Error(result.error || 'Video upload failed');
@@ -195,12 +248,23 @@ async function processJob(jobId: string): Promise<void> {
       }
     }
 
+    // Mark stream assets as attached (success path)
+    if (uploadedStreamUids.length > 0) {
+      await markStreamAssetsAttached(uploadedStreamUids, postId);
+    }
+
     // Mark complete
     uploadManager.markComplete(jobId, postId);
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Upload failed';
     uploadManager.markFailed(jobId, errorMessage);
+
+    // Clean up orphaned Cloudflare Stream assets
+    if (uploadedStreamUids.length > 0) {
+      console.log(`[uploadPipeline] Cleaning up ${uploadedStreamUids.length} orphaned stream assets...`);
+      await cleanupStreamAssets(uploadedStreamUids);
+    }
 
     // Try to clean up partial post if we got one created
     const job = uploadManager.getJob(jobId);

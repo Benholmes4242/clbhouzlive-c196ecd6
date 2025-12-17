@@ -1,5 +1,6 @@
 // Cloudflare Stream upload utility (standalone, non-hook)
 // Uses Pattern A: Direct Creator Upload
+// Includes stream_assets tracking for orphan cleanup
 
 import { supabase } from '@/integrations/supabase/client';
 import { CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN } from '@/config/cloudflare';
@@ -30,7 +31,23 @@ export async function uploadToCloudflareStream(file: File): Promise<StreamUpload
     const { uploadURL, uid } = uploadData;
     console.log('[CloudflareStream] Got upload URL, uid:', uid);
 
-    // Step 2: Upload file directly to Cloudflare
+    // Step 2: Reserve the stream asset in DB for cleanup tracking
+    // This happens client-side so RLS works
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { error: reserveError } = await supabase
+        .from('stream_assets')
+        .insert({ uid, user_id: user.id, status: 'reserved' });
+      
+      if (reserveError) {
+        console.warn('[CloudflareStream] Failed to reserve stream asset (non-fatal):', reserveError);
+        // Continue anyway - worst case we have an orphan
+      } else {
+        console.log('[CloudflareStream] Reserved stream asset:', uid);
+      }
+    }
+
+    // Step 3: Upload file directly to Cloudflare
     // Do NOT set Content-Type - browser handles multipart/form-data boundary automatically
     const formData = new FormData();
     formData.append('file', file);
@@ -40,7 +57,7 @@ export async function uploadToCloudflareStream(file: File): Promise<StreamUpload
       body: formData,
     });
 
-    // Step 3: Check response - we only care if it succeeded
+    // Step 4: Check response - we only care if it succeeded
     // The uid from step 1 is our canonical identifier regardless of response body
     if (!uploadResponse.ok) {
       const errorText = await uploadResponse.text().catch(() => '');
@@ -50,7 +67,7 @@ export async function uploadToCloudflareStream(file: File): Promise<StreamUpload
 
     console.log('[CloudflareStream] Upload successful, uid:', uid);
 
-    // Step 4: Construct URLs using the uid we already have
+    // Step 5: Construct URLs using the uid we already have
     const videoUrl = `https://${CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN}.cloudflarestream.com/${uid}/manifest/video.m3u8`;
     const posterUrl = getStreamPoster(uid, '1s') || undefined;
 

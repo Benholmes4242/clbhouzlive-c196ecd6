@@ -4049,6 +4049,38 @@ export type Database = {
           },
         ]
       }
+      stream_assets: {
+        Row: {
+          created_at: string
+          post_id: string | null
+          status: string
+          uid: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          post_id?: string | null
+          status?: string
+          uid: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          post_id?: string | null
+          status?: string
+          uid?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stream_assets_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       swing_coach_outreach: {
         Row: {
           city: string | null
