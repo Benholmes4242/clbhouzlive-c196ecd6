@@ -170,10 +170,15 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         isGhost && 'border-dashed border-slate-300'
       )}
       style={{
-        // Exact same green as Golfer pill - emerald with slight transparency
+        // Exact same styling as Golfer pill in ProfilePageV2
         background: unlocked && !isGhost 
-          ? 'rgba(16, 185, 129, 0.15)' // emerald-500 at 15% opacity
+          ? 'rgba(52, 199, 89, 0.15)' // Apple green #34C759 at 15% opacity
           : '#f1f5f9', // slate-100 for locked
+        backdropFilter: unlocked && !isGhost ? 'blur(8px)' : undefined,
+        WebkitBackdropFilter: unlocked && !isGhost ? 'blur(8px)' : undefined,
+        border: unlocked && !isGhost 
+          ? '1px solid rgba(52, 199, 89, 0.3)' 
+          : '1px solid rgba(148, 163, 184, 0.3)',
         transform: isPrimary ? 'translateY(-2px)' : undefined,
         opacity: isGhost ? 0.7 : (!unlocked ? 0.85 : 1),
       }}
@@ -184,10 +189,10 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
           src={emblemSrc}
           alt=""
           aria-hidden="true"
-        className="pointer-events-none select-none absolute inset-y-0 right-0 h-full w-auto translate-x-4 scale-125 opacity-[0.15]"
+        className="pointer-events-none select-none absolute inset-y-0 right-0 h-full w-auto translate-x-4 scale-125 opacity-[0.12]"
         style={{ 
           filter: unlocked && !isGhost 
-            ? 'brightness(0) saturate(100%) invert(56%) sepia(52%) saturate(5000%) hue-rotate(131deg) brightness(95%) contrast(93%)' // emerald color filter
+            ? 'brightness(0) saturate(100%) invert(50%) sepia(88%) saturate(533%) hue-rotate(100deg) brightness(94%) contrast(91%)' // Apple green #34C759 filter
             : 'brightness(0)',
         }}
         />
@@ -203,25 +208,25 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         <div 
           className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
           style={{ 
-            backgroundColor: unlocked && !isGhost ? 'rgba(16, 185, 129, 0.2)' : 'rgba(148,163,184,0.12)' 
+            backgroundColor: unlocked && !isGhost ? 'rgba(52, 199, 89, 0.2)' : 'rgba(148,163,184,0.12)' 
           }}
         >
-          {/* Trophy emerald when unlocked */}
+          {/* Trophy - emerald-700 when unlocked (same as Golfer pill text) */}
           <Trophy 
             className="w-3.5 h-3.5"
-            style={{ color: unlocked && !isGhost ? '#059669' : '#94a3b8' }} 
+            style={{ color: unlocked && !isGhost ? '#047857' : '#94a3b8' }} 
           />
         </div>
         <div className="flex-1 min-w-0 overflow-hidden text-left">
           <div 
             className="font-semibold leading-tight truncate text-[13px]"
-            style={{ color: unlocked && !isGhost ? '#059669' : '#0f172a' }}
+            style={{ color: unlocked && !isGhost ? '#047857' : '#0f172a' }}
           >
             {isMilestone ? `${threshold} Club` : title}
           </div>
           <div 
             className="text-[11px] truncate"
-            style={{ color: unlocked && !isGhost ? '#10b981' : '#64748b' }}
+            style={{ color: unlocked && !isGhost ? '#15803d' : '#64748b' }}
           >
             {isMilestone ? clubName : subtitle}
           </div>
@@ -233,8 +238,8 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         <div 
           className="inline-flex items-center px-2 py-0.5 rounded-sq-xs text-[10px] font-medium"
           style={{
-            backgroundColor: unlocked && !isGhost ? 'rgba(16, 185, 129, 0.2)' : 'rgba(148,163,184,0.2)',
-            color: unlocked && !isGhost ? '#059669' : '#64748b'
+            backgroundColor: unlocked && !isGhost ? 'rgba(52, 199, 89, 0.2)' : 'rgba(148,163,184,0.2)',
+            color: unlocked && !isGhost ? '#047857' : '#64748b'
           }}
         >
           {statusLabel}
