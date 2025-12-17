@@ -164,12 +164,8 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         'rounded-sq-md flex flex-col justify-between transition-all duration-150 relative overflow-hidden',
         // Fixed global size for ALL achievement badges site-wide
         'min-w-[180px] h-[92px] px-3 py-2.5',
-        unlocked && !isGhost
-          ? 'shadow-[0_6px_20px_rgba(15,23,42,0.10)]' 
-          : 'shadow-sm',
         // Micro-interactions
         'active:scale-[0.98]',
-        unlocked && !isGhost && 'hover:shadow-[0_10px_28px_rgba(16,185,129,0.15)]',
         // Ghost styling
         isGhost && 'border border-dashed border-white/60'
       )}
