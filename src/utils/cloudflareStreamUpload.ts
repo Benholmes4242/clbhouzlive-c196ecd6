@@ -1,11 +1,15 @@
 // Cloudflare Stream upload utility (standalone, non-hook)
+// Uses Pattern A: Direct Creator Upload
 
 import { supabase } from '@/integrations/supabase/client';
+import { CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN } from '@/config/cloudflare';
+import { getStreamPoster } from '@/utils/stream';
 
 interface StreamUploadResult {
   success: boolean;
   videoUrl?: string;
   streamId?: string;
+  posterUrl?: string;
   error?: string;
 }
 
@@ -13,62 +17,48 @@ export async function uploadToCloudflareStream(file: File): Promise<StreamUpload
   console.log('[CloudflareStream] Starting upload for:', file.name, `(${(file.size / 1024 / 1024).toFixed(2)}MB)`);
 
   try {
-    // Get upload URL from edge function
+    // Step 1: Get one-time upload URL from edge function
     const { data: uploadData, error: uploadError } = await supabase.functions.invoke('cloudflare-stream-upload', {
       body: { fileName: file.name, fileSize: file.size },
     });
 
-    if (uploadError || !uploadData?.uploadURL) {
+    if (uploadError || !uploadData?.uploadURL || !uploadData?.uid) {
       console.error('[CloudflareStream] Failed to get upload URL:', uploadError);
       return { success: false, error: uploadError?.message || 'Failed to get upload URL' };
     }
 
-    console.log('[CloudflareStream] Got upload URL, uploading file...');
+    const { uploadURL, uid } = uploadData;
+    console.log('[CloudflareStream] Got upload URL, uid:', uid);
 
-    // Upload file to Cloudflare Stream
+    // Step 2: Upload file directly to Cloudflare
+    // Do NOT set Content-Type - browser handles multipart/form-data boundary automatically
     const formData = new FormData();
     formData.append('file', file);
 
-    const uploadResponse = await fetch(uploadData.uploadURL, {
+    const uploadResponse = await fetch(uploadURL, {
       method: 'POST',
       body: formData,
     });
 
+    // Step 3: Check response - we only care if it succeeded
+    // The uid from step 1 is our canonical identifier regardless of response body
     if (!uploadResponse.ok) {
-      const errorText = await uploadResponse.text();
+      const errorText = await uploadResponse.text().catch(() => '');
       console.error('[CloudflareStream] Upload failed:', uploadResponse.status, errorText);
       return { success: false, error: `Upload failed: ${uploadResponse.status}` };
     }
 
-    const rawBody = await uploadResponse.text();
-    let result: any = null;
+    console.log('[CloudflareStream] Upload successful, uid:', uid);
 
-    if (rawBody) {
-      try {
-        result = JSON.parse(rawBody);
-      } catch {
-        console.warn('[CloudflareStream] Upload response was not JSON; continuing with uid from upload URL.', {
-          contentType: uploadResponse.headers.get('content-type'),
-          rawBody,
-        });
-      }
-    }
-
-    console.log('[CloudflareStream] Upload successful:', result ?? '[no response body]');
-
-    // Extract video URL
-    const streamId = result?.result?.uid || result?.uid || uploadData.uid;
-    if (!streamId) {
-      return { success: false, error: 'No stream ID returned' };
-    }
-
-    // Construct HLS URL
-    const videoUrl = `https://customer-9p8qw7hk8dxqwnx6.cloudflarestream.com/${streamId}/manifest/video.m3u8`;
+    // Step 4: Construct URLs using the uid we already have
+    const videoUrl = `https://${CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN}.cloudflarestream.com/${uid}/manifest/video.m3u8`;
+    const posterUrl = getStreamPoster(uid, '1s') || undefined;
 
     return {
       success: true,
       videoUrl,
-      streamId,
+      streamId: uid,
+      posterUrl,
     };
   } catch (error) {
     console.error('[CloudflareStream] Upload error:', error);

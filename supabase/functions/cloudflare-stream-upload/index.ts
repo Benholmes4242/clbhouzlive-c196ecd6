@@ -63,6 +63,9 @@ serve(async (req) => {
         )}MB)`,
       );
 
+      // Max video duration - configurable constant
+      const MAX_VIDEO_DURATION_SECONDS = 3600; // 1 hour
+
       const cfResp = await fetch(
         `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/direct_upload`,
         {
@@ -72,7 +75,7 @@ serve(async (req) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            maxDurationSeconds: 3600, // 1 hour max video length
+            maxDurationSeconds: MAX_VIDEO_DURATION_SECONDS,
             meta: { name: fileName },
           }),
         },
