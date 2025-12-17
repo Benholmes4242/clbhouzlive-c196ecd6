@@ -12,22 +12,18 @@ interface CommentsModalProps {
   isOpen: boolean;
   onClose: () => void;
   postId: string;
-  variant?: 'dark' | 'grey';
 }
 
 // Animation constants - matches expanded map sheet
 const ENTRY_DURATION = 500;
 const EXIT_DURATION = 500;
 
-const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId, variant = 'dark' }) => {
+const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }) => {
   const [newComment, setNewComment] = useState('');
   const [isClosing, setIsClosing] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
   
   const { comments, commentsLoading, addComment, isAddingComment } = usePostEngagement(postId);
-  
-  // Theme-aware styling
-  const isGrey = variant === 'grey';
 
   const handleSubmitComment = () => {
     if (!newComment.trim() || isAddingComment) return;
@@ -71,24 +67,21 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId, 
       {/* Backdrop */}
       <div 
         className={cn(
-          "absolute inset-0 backdrop-blur-md transition-opacity ease-in-out",
-          isGrey ? "bg-black/40" : "bg-black/60",
+          "absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity ease-in-out",
           hasEntered && !isClosing ? "opacity-100 duration-500" : "opacity-0 duration-500"
         )}
         onClick={handleClose}
       />
       
-      {/* Comments Sheet - Theme-aware */}
+      {/* Comments Sheet - Dark Glass */}
       <div 
         className="absolute inset-x-0 bottom-0 flex items-end justify-center"
         style={{ zIndex: Z.sheet }}
       >
         <div 
           className={cn(
-            "rounded-t-[24px] flex flex-col w-full transition-all ease-in-out",
-            isGrey 
-              ? "bg-white border-t border-border/20" 
-              : "clubhouse-comments-sheet glass-dark",
+            "clubhouse-comments-sheet glass-dark rounded-t-[24px] flex flex-col w-full",
+            "transition-all ease-in-out",
             hasEntered && !isClosing ? "duration-500 translate-y-0 opacity-100" : "duration-500 translate-y-4 opacity-0"
           )}
           style={{ 
@@ -96,26 +89,17 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId, 
             maxHeight: '72vh',
             width: '100%',
             maxWidth: '100vw',
-            boxShadow: isGrey ? '0 -4px 20px rgba(0,0,0,0.1)' : 'none'
+            boxShadow: 'none'
           }}
         >
           {/* Handle */}
           <div className="flex justify-center pt-3 pb-2">
-            <div className={cn(
-              "w-12 h-1 rounded-full",
-              isGrey ? "bg-muted-foreground/30" : "bg-white/30"
-            )} />
+            <div className="w-12 h-1 bg-white/30 rounded-full" />
           </div>
 
           {/* Header */}
-          <div className={cn(
-            "flex items-center justify-center px-4 md:px-6 pb-3 border-b",
-            isGrey ? "border-border/30" : "border-white/5"
-          )}>
-            <h2 className={cn(
-              "text-[14px] font-semibold",
-              isGrey ? "text-foreground" : "text-white"
-            )}>Comments</h2>
+          <div className="flex items-center justify-center px-4 md:px-6 pb-3 border-b border-white/5">
+            <h2 className="text-[14px] font-semibold text-white">Comments</h2>
           </div>
 
           {/* Comments List - Scrollable */}
@@ -128,17 +112,11 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId, 
           >
             {commentsLoading ? (
               <div className="flex items-center justify-center py-8">
-                <div className={cn(
-                  "text-sm",
-                  isGrey ? "text-muted-foreground" : "text-white/50"
-                )}>Loading comments...</div>
+                <div className="text-white/50 text-sm">Loading comments...</div>
               </div>
             ) : comments.length === 0 ? (
               <div className="flex items-center justify-center py-8">
-                <div className={cn(
-                  "text-sm",
-                  isGrey ? "text-muted-foreground" : "text-white/50"
-                )}>No comments yet. Be the first!</div>
+                <div className="text-white/50 text-sm">No comments yet. Be the first!</div>
               </div>
             ) : (
               comments.map((comment) => (
@@ -152,22 +130,13 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId, 
                     }}
                   />
                   <div className="flex-1 min-w-0">
-                    <div className={cn(
-                      "flex items-center gap-2 text-[13px] font-semibold",
-                      isGrey ? "text-foreground" : "text-white"
-                    )}>
+                    <div className="flex items-center gap-2 text-[13px] text-white font-semibold">
                       <span className="truncate">{comment.user_name}</span>
-                      <span className={cn(
-                        "text-[11px] whitespace-nowrap",
-                        isGrey ? "text-muted-foreground" : "text-white/50"
-                      )}>
+                      <span className="text-[11px] text-white/50 whitespace-nowrap">
                         {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
                       </span>
                     </div>
-                    <p className={cn(
-                      "mt-0.5 text-[13px] leading-snug",
-                      isGrey ? "text-foreground/85" : "text-white/85"
-                    )}>
+                    <p className="mt-0.5 text-[13px] leading-snug text-white/85">
                       {comment.content}
                     </p>
                   </div>
@@ -177,12 +146,7 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId, 
           </div>
 
           {/* Comment Input - Fixed Bottom */}
-          <div className={cn(
-            "border-t backdrop-blur-xl px-4 md:px-6 py-3",
-            isGrey 
-              ? "border-border/30 bg-muted/50" 
-              : "border-white/5 bg-black/40"
-          )}>
+          <div className="border-t border-white/5 bg-black/40 backdrop-blur-xl px-4 md:px-6 py-3">
             <div className="flex items-center gap-2">
               {/* User avatar */}
               <img
@@ -193,47 +157,27 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId, 
               
               {/* Input pill */}
               <div className="flex-1">
-                <div className={cn(
-                  "flex items-center gap-2 rounded-full px-3 py-2",
-                  isGrey 
-                    ? "bg-background border border-border" 
-                    : "bg-white/5 border border-white/15"
-                )}>
+                <div className="flex items-center gap-2 rounded-full bg-white/5 border border-white/15 px-3 py-2">
                   <input
                     type="text"
                     placeholder="Add a comment..."
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                     onKeyDown={handleKeyPress}
-                    className={cn(
-                      "flex-1 bg-transparent text-[13px] outline-none border-none",
-                      isGrey 
-                        ? "text-foreground placeholder:text-muted-foreground" 
-                        : "text-white placeholder:text-white/50"
-                    )}
-                    style={{ caretColor: isGrey ? 'currentColor' : 'white' }}
+                    className="flex-1 bg-transparent text-[13px] text-white placeholder:text-white/50 outline-none border-none"
+                    style={{ caretColor: 'white' }}
                   />
-                  <button className={cn(
-                    "transition-colors",
-                    isGrey 
-                      ? "text-muted-foreground hover:text-foreground" 
-                      : "text-white/50 hover:text-white"
-                  )}>
+                  <button className="text-white/50 hover:text-white transition-colors">
                     <Smile className="w-4 h-4" />
                   </button>
                 </div>
               </div>
               
-              {/* Send button */}
+              {/* Send button - Frosted White */}
               <button
                 onClick={handleSubmitComment}
                 disabled={!newComment.trim() || isAddingComment}
-                className={cn(
-                  "px-4 py-1.5 text-[13px] font-semibold rounded-full transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed",
-                  isGrey 
-                    ? "bg-[#01754F] text-white hover:bg-[#016544] active:bg-[#015a3a]" 
-                    : "btn-frosted-white bg-white/16 backdrop-blur-[18px] border border-white/45 text-white shadow-[0_0_12px_rgba(0,0,0,0.35)] hover:bg-white/22 hover:-translate-y-px hover:shadow-[0_6px_14px_rgba(0,0,0,0.45)] active:translate-y-0 active:shadow-[0_2px_8px_rgba(0,0,0,0.35)]"
-                )}
+                className="btn-frosted-white px-4 py-1.5 text-[13px] font-semibold rounded-full bg-white/16 backdrop-blur-[18px] border border-white/45 text-white shadow-[0_0_12px_rgba(0,0,0,0.35)] transition-all duration-150 hover:bg-white/22 hover:-translate-y-px hover:shadow-[0_6px_14px_rgba(0,0,0,0.45)] active:translate-y-0 active:shadow-[0_2px_8px_rgba(0,0,0,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isAddingComment ? 'Sending...' : 'Send'}
               </button>
