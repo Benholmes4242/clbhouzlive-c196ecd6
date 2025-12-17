@@ -1,8 +1,10 @@
 /**
  * Hook to fetch posts that tag a business via post_tags/taggable_entities
  */
-import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { postEventBus } from '@/events/postEventBus';
 
 export interface TaggedPost {
   id: string;
@@ -33,6 +35,20 @@ export interface TaggedPost {
 }
 
 export function useBusinessTaggedPosts(businessId: string | undefined) {
+  const queryClient = useQueryClient();
+
+  // Listen for post:created events to refresh tagged posts in real-time
+  useEffect(() => {
+    if (!businessId) return;
+
+    const off = postEventBus.on('post:created', () => {
+      // Invalidate tagged posts - new post may have tagged this business
+      queryClient.invalidateQueries({ queryKey: ['business-tagged-posts', businessId] });
+    });
+
+    return () => off();
+  }, [businessId, queryClient]);
+
   return useQuery({
     queryKey: ['business-tagged-posts', businessId],
     queryFn: async (): Promise<TaggedPost[]> => {
