@@ -31,6 +31,7 @@ import { PostInsightsModal } from './PostInsightsModal';
 import { PinDurationPicker } from './PinDurationPicker';
 import { toast } from 'sonner';
 import TaggedText from '@/components/posts/TaggedText';
+import PlayedAtLine from '@/components/posts/PlayedAtLine';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,6 +40,30 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { RegisterVideoFn } from '@/hooks/useGridAutoplay';
+
+// Helper to extract course info from content and remove the "Played at" line
+function parsePlayedAtFromContent(content: string | null): {
+  cleanContent: string;
+  courseName: string | null;
+  regionText: string | null;
+} {
+  if (!content) return { cleanContent: '', courseName: null, regionText: null };
+  
+  // Match the "📍 Played at Course Name, Region" pattern
+  const playedAtRegex = /\n*📍\s*Played at\s+([^,\n]+)(?:,\s*([^\n]+))?\n*/i;
+  const match = content.match(playedAtRegex);
+  
+  if (match) {
+    const cleanContent = content.replace(playedAtRegex, '').trim();
+    return {
+      cleanContent,
+      courseName: match[1]?.trim() || null,
+      regionText: match[2]?.trim() || null,
+    };
+  }
+  
+  return { cleanContent: content, courseName: null, regionText: null };
+}
 
 interface BusinessPostCardProps {
   post: BusinessPost;
@@ -93,10 +118,15 @@ export default function BusinessPostCard({
     .replace(' months', 'mo')
     .replace(' month', 'mo');
 
+  // Parse out the "Played at" line and get clean content
+  const { cleanContent, courseName, regionText } = useMemo(
+    () => parsePlayedAtFromContent(post.content),
+    [post.content]
+  );
+  
   // Truncate content if longer than 150 chars
-  const content = post.content || '';
-  const shouldTruncate = content.length > 150 && !isExpanded;
-  const displayContent = shouldTruncate ? content.slice(0, 150) : content;
+  const shouldTruncate = cleanContent.length > 150 && !isExpanded;
+  const displayContent = shouldTruncate ? cleanContent.slice(0, 150) : cleanContent;
 
   // Transform post_tags into TaggedText format
   const tags = useMemo(() => {
@@ -283,22 +313,33 @@ export default function BusinessPostCard({
         </div>
 
         {/* Caption block - consistent padding below header */}
-        {content && (
+        {(cleanContent || courseName) && (
           <div style={{ padding: '0 16px 10px 16px' }}>
-            <div className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
-              <TaggedText text={displayContent} tags={tags} />
-              {shouldTruncate && (
-                <>
-                  {'... '}
-                  <button
-                    onClick={() => setIsExpanded(true)}
-                    className="text-muted-foreground hover:text-foreground hover:underline"
-                  >
-                    more
-                  </button>
-                </>
-              )}
-            </div>
+            {cleanContent && (
+              <div className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
+                <TaggedText text={displayContent} tags={tags} />
+                {shouldTruncate && (
+                  <>
+                    {'... '}
+                    <button
+                      onClick={() => setIsExpanded(true)}
+                      className="text-muted-foreground hover:text-foreground hover:underline"
+                    >
+                      more
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+            {/* Played At line with clickable course name */}
+            {courseName && (
+              <PlayedAtLine
+                courseId={post.course_id}
+                courseName={courseName}
+                regionText={regionText}
+                className={cleanContent ? 'mt-2' : ''}
+              />
+            )}
           </div>
         )}
 
