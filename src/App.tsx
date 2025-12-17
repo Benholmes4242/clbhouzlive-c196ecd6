@@ -29,6 +29,7 @@ import { ModalProvider } from '@/contexts/ModalContext';
 import { BottomNavigationProvider } from '@/contexts/BottomNavigationContext';
 import { CinemaDimProvider } from '@/contexts/CinemaDimContext';
 import { PostEventsBridge } from '@/events/PostEventsBridge';
+import { UploadToastsBridge } from '@/uploads/UploadToastsBridge';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
 import { FLAGS } from '@/config/flags';
 import { FEATURE_FLAGS } from '@/config/featureFlags';
@@ -600,6 +601,7 @@ const App: React.FC = () => {
         <Top100DebugProvider>
           <QueryClientProvider client={queryClient}>
             <PostEventsBridge>
+              <UploadToastsBridge />
               <AppInner />
             </PostEventsBridge>
           </QueryClientProvider>
