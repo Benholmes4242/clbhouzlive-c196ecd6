@@ -165,10 +165,10 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   };
 
-  // Apple-style frosted glass with tier color tint
-  const frostedBackground = unlocked && !isGhost
-    ? `linear-gradient(135deg, ${hexToRgba(palette.bgLight, 0.5)}, ${hexToRgba(palette.bgDark, 0.4)})`
-    : 'rgba(255, 255, 255, 0.35)';
+  // Apple frosted glass with tier color tint - like Golfer pill but with achievement colors
+  const colorTintOverlay = unlocked && !isGhost
+    ? `linear-gradient(145deg, ${hexToRgba(palette.bgLight, 0.4)} 0%, ${hexToRgba(palette.bgDark, 0.25)} 100%)`
+    : 'none';
 
   return (
     <div
@@ -177,19 +177,37 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         'rounded-sq-md flex flex-col justify-between transition-all duration-150 relative overflow-hidden',
         // Fixed global size for ALL achievement badges site-wide
         'min-w-[180px] h-[92px] px-3 py-2.5',
-        // Frosted glass effect
-        'backdrop-blur-xl border border-slate-200/60',
+        // Frosted glass effect - white frosted base
+        'backdrop-blur-xl',
         // Micro-interactions
         'active:scale-[0.98]',
         // Ghost styling
-        isGhost && 'border-dashed border-white/60'
+        isGhost && 'border-dashed'
       )}
       style={{
-        background: frostedBackground,
+        background: unlocked && !isGhost 
+          ? `linear-gradient(135deg, rgba(255,255,255,0.65), rgba(255,255,255,0.45))`
+          : 'rgba(255, 255, 255, 0.5)',
+        borderWidth: '1px',
+        borderStyle: isGhost ? 'dashed' : 'solid',
+        borderColor: unlocked && !isGhost 
+          ? hexToRgba(palette.accent, 0.35) 
+          : 'rgba(148, 163, 184, 0.3)',
+        boxShadow: unlocked && !isGhost 
+          ? `inset 0 1px 0 rgba(255,255,255,0.5), 0 1px 3px ${hexToRgba(palette.bgDark, 0.1)}`
+          : 'inset 0 1px 0 rgba(255,255,255,0.5)',
         transform: isPrimary ? 'translateY(-2px)' : undefined,
         opacity: isGhost ? 0.7 : (!unlocked ? 0.85 : 1),
       }}
     >
+      {/* Color tint overlay - subtle tier color wash */}
+      {unlocked && !isGhost && (
+        <div 
+          className="absolute inset-0 rounded-[inherit] pointer-events-none"
+          style={{ background: colorTintOverlay }}
+        />
+      )}
+      
       {/* Background emblem - engraved crest effect */}
       {emblemSrc && (
         <img
