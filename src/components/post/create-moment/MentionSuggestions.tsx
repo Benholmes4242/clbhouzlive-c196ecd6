@@ -3,16 +3,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2, User, Building2 } from "lucide-react";
 
 interface MentionSuggestion {
-  id: string;
+  id: string;  // taggable_entities.id for consistent post_tags insertion
+  entity_id: string;  // the underlying entity (user_id or business_id)
+  entity_type: 'user' | 'business';
   name: string;
-  username: string;
+  username: string | null;
   avatar_url?: string;
-  type: 'user' | 'business';
 }
 
 interface MentionSuggestionsProps {
   query: string;
-  onSelect: (mention: { id: string; name: string; username: string }) => void;
+  onSelect: (mention: MentionSuggestion) => void;
   onClose: () => void;
 }
 
@@ -29,44 +30,26 @@ export default function MentionSuggestions({ query, onSelect, onClose }: Mention
 
       setIsLoading(true);
       try {
-        // Search users from user_profiles
-        const { data: users, error: usersError } = await supabase
-          .from('user_profiles')
-          .select('id, display_name, username, profile_photo_url')
-          .or(`username.ilike.%${query}%,display_name.ilike.%${query}%`)
-          .eq('is_public', true)
-          .limit(6);
-
-        if (usersError) throw usersError;
-
-        // Search businesses from taggable_entities
-        const { data: businesses, error: businessesError } = await supabase
+        // Search from taggable_entities to get correct IDs for post_tags
+        const { data: entities, error } = await supabase
           .from('taggable_entities')
-          .select('entity_id, name, username, profile_image_url')
-          .eq('entity_type', 'business')
+          .select('id, entity_id, entity_type, name, username, profile_image_url')
           .or(`name.ilike.%${query}%,username.ilike.%${query}%`)
-          .limit(6);
+          .in('entity_type', ['user', 'business'])
+          .limit(8);
 
-        if (businessesError) throw businessesError;
+        if (error) throw error;
 
-        const userSuggestions: MentionSuggestion[] = (users || []).map(user => ({
-          id: user.id,
-          name: user.display_name || user.username || 'Unknown',
-          username: user.username || '',
-          avatar_url: user.profile_photo_url,
-          type: 'user' as const
+        const suggestions: MentionSuggestion[] = (entities || []).map(entity => ({
+          id: entity.id,  // taggable_entities.id - this is what post_tags needs
+          entity_id: entity.entity_id,
+          entity_type: entity.entity_type as 'user' | 'business',
+          name: entity.name || 'Unknown',
+          username: entity.username,
+          avatar_url: entity.profile_image_url || undefined,
         }));
 
-        const businessSuggestions: MentionSuggestion[] = (businesses || []).map(business => ({
-          id: business.entity_id,
-          name: business.name || 'Unknown',
-          username: business.username || business.name?.toLowerCase().replace(/\s+/g, '') || '',
-          avatar_url: business.profile_image_url,
-          type: 'business' as const
-        }));
-
-        // Combine and limit to 8 total results
-        setSuggestions([...userSuggestions, ...businessSuggestions].slice(0, 8));
+        setSuggestions(suggestions);
       } catch (error) {
         console.error('Error fetching mention suggestions:', error);
         setSuggestions([]);
@@ -114,7 +97,7 @@ export default function MentionSuggestions({ query, onSelect, onClose }: Mention
                     alt={suggestion.name}
                     className="w-full h-full object-cover"
                   />
-                ) : suggestion.type === 'business' ? (
+                ) : suggestion.entity_type === 'business' ? (
                   <Building2 className="w-4 h-4 text-white/60" />
                 ) : (
                   <User className="w-4 h-4 text-white/60" />
@@ -127,7 +110,7 @@ export default function MentionSuggestions({ query, onSelect, onClose }: Mention
                   {suggestion.name}
                 </div>
                 <div className="text-xs text-white/50 truncate">
-                  @{suggestion.username}
+                  @{suggestion.username || suggestion.name}
                 </div>
               </div>
             </button>

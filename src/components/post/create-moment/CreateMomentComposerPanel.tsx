@@ -4,7 +4,7 @@ import { ComposerMediaItem } from "@/hooks/useSnapModal";
 import { IdentitySelector } from "@/components/identity/IdentitySelector";
 import CourseTagInput from "@/components/posts/CourseTagInput";
 import { StudioEdits } from "@/types/studio";
-import { GolfCourse } from "./types";
+import { GolfCourse, TaggableEntity } from "./types";
 import MentionSuggestions from "./MentionSuggestions";
 
 interface CreateMomentComposerPanelProps {
@@ -17,6 +17,8 @@ interface CreateMomentComposerPanelProps {
   availableActorsCount: number;
   currentFilter?: string;
   onTypingStateChange?: (isTyping: boolean) => void;
+  selectedTags: TaggableEntity[];
+  onTagsChange: (tags: TaggableEntity[]) => void;
 }
 
 export default function CreateMomentComposerPanel({
@@ -29,6 +31,8 @@ export default function CreateMomentComposerPanel({
   availableActorsCount,
   currentFilter,
   onTypingStateChange,
+  selectedTags,
+  onTagsChange,
 }: CreateMomentComposerPanelProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [showMentions, setShowMentions] = useState(false);
@@ -68,21 +72,27 @@ export default function CreateMomentComposerPanel({
   }, [onCaptionChange]);
 
   // Handle mention selection
-  const handleMentionSelect = useCallback((mention: { id: string; name: string; username: string }) => {
+  const handleMentionSelect = useCallback((mention: TaggableEntity) => {
     const textBeforeCursor = caption.slice(0, cursorPosition);
     const textAfterCursor = caption.slice(cursorPosition);
     
     // Find and replace the @query with the selected mention
     const beforeMention = textBeforeCursor.replace(/@\w*$/, '');
-    const newCaption = `${beforeMention}@${mention.username} ${textAfterCursor}`;
+    const displayName = mention.username || mention.name;
+    const newCaption = `${beforeMention}@${displayName} ${textAfterCursor}`;
     
     onCaptionChange(newCaption);
     setShowMentions(false);
     setMentionQuery('');
     
+    // Add to selected tags if not already present (use taggable_entities.id)
+    if (!selectedTags.some(t => t.id === mention.id)) {
+      onTagsChange([...selectedTags, mention]);
+    }
+    
     // Focus back on textarea
     textareaRef.current?.focus();
-  }, [caption, cursorPosition, onCaptionChange]);
+  }, [caption, cursorPosition, onCaptionChange, selectedTags, onTagsChange]);
 
   // Track typing state
   const handleFocus = () => {

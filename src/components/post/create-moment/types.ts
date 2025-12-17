@@ -1,6 +1,16 @@
 // Types for Create Moment modal components
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
 
+// Taggable entity for @mentions (matches taggable_entities table)
+export interface TaggableEntity {
+  id: string;  // taggable_entities.id - used for post_tags.tagged_entity_id
+  entity_id: string;  // the underlying entity ID (user_id or business_id)
+  entity_type: 'user' | 'business';
+  name: string;
+  username: string | null;
+  avatar_url?: string;
+}
+
 export interface GolfCourse {
   id: string;
   name: string;
