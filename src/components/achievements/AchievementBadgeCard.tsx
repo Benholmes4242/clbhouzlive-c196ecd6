@@ -5,8 +5,34 @@ import {
   getTierPalette, 
   MILESTONE_THEMES,
   MilestoneTier,
+  REGION_THEMES,
 } from '@/lib/globalAchievementMilestoneSystem';
+import { CLBHOUZ_ACHIEVEMENT_PALETTE, MILESTONE_PALETTE_MAP } from '@/lib/clbhouzAchievementPalette';
 import { getEmblemPath } from '@/lib/achievementEmblems';
+
+// Get the ACTUAL tier accent color (not the dark slate icon override)
+function getActualTierColor(tier: string, unlocked: boolean): string {
+  if (!unlocked) return '#94a3b8'; // slate-400 for locked
+  
+  // Milestone tiers
+  const threshold = parseInt(tier, 10);
+  if (!isNaN(threshold) && MILESTONE_PALETTE_MAP[threshold as keyof typeof MILESTONE_PALETTE_MAP]) {
+    const paletteKey = MILESTONE_PALETTE_MAP[threshold as keyof typeof MILESTONE_PALETTE_MAP];
+    return CLBHOUZ_ACHIEVEMENT_PALETTE[paletteKey];
+  }
+  
+  // Regional tiers - use their bgDark as the accent
+  const regionMap: Record<string, string> = {
+    'GBI': REGION_THEMES.GBI.bgDark,
+    'EU': REGION_THEMES.EUROPE.bgDark,
+    'USA': REGION_THEMES.USA.bgDark,
+    'WORLD': REGION_THEMES.WORLD.bgDark,
+  };
+  
+  if (regionMap[tier]) return regionMap[tier];
+  
+  return '#94a3b8'; // fallback
+}
 
 // Helper to convert hex to rgba
 function hexToRgba(hex: string, alpha: number): string {
@@ -161,6 +187,8 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   regionGlyph,
 }) => {
   const palette = getTierPalette(tier, unlocked && !isGhost);
+  // Use the ACTUAL tier accent color, not the dark slate override
+  const accentColor = getActualTierColor(tier, unlocked && !isGhost);
   const tierLabel = TIER_LABELS[tier] || tier;
   const clubName = CLUB_NAMES[tier] || title;
   const emblemSrc = getEmblemPath(tier);
@@ -227,12 +255,12 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
       style={{
         // Same pill styling but with achievement-specific colors
         background: unlocked && !isGhost 
-          ? hexToRgba(palette.accent, 0.15)
+          ? hexToRgba(accentColor, 0.15)
           : '#f1f5f9', // slate-100 for locked
         backdropFilter: unlocked && !isGhost ? 'blur(8px)' : undefined,
         WebkitBackdropFilter: unlocked && !isGhost ? 'blur(8px)' : undefined,
         border: unlocked && !isGhost 
-          ? `1px solid ${hexToRgba(palette.accent, 0.3)}`
+          ? `1px solid ${hexToRgba(accentColor, 0.3)}`
           : '1px solid rgba(148, 163, 184, 0.3)',
         transform: isPrimary ? 'translateY(-2px)' : undefined,
         opacity: isGhost ? 0.7 : (!unlocked ? 0.85 : 1),
@@ -247,7 +275,7 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         className="pointer-events-none select-none absolute inset-y-0 right-0 h-full w-auto translate-x-4 scale-125 opacity-[0.12]"
         style={{ 
           filter: unlocked && !isGhost 
-            ? getColorFilter(palette.accent)
+            ? getColorFilter(accentColor)
             : 'brightness(0)',
         }}
         />
@@ -263,24 +291,24 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         <div 
           className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
           style={{ 
-            backgroundColor: unlocked && !isGhost ? hexToRgba(palette.accent, 0.2) : 'rgba(148,163,184,0.12)' 
+            backgroundColor: unlocked && !isGhost ? hexToRgba(accentColor, 0.2) : 'rgba(148,163,184,0.12)' 
           }}
         >
           <Trophy 
             className="w-3.5 h-3.5"
-            style={{ color: unlocked && !isGhost ? palette.accent : '#94a3b8' }} 
+            style={{ color: unlocked && !isGhost ? accentColor : '#94a3b8' }} 
           />
         </div>
         <div className="flex-1 min-w-0 overflow-hidden text-left">
           <div 
             className="font-semibold leading-tight truncate text-[13px]"
-            style={{ color: unlocked && !isGhost ? palette.accent : '#0f172a' }}
+            style={{ color: unlocked && !isGhost ? accentColor : '#0f172a' }}
           >
             {isMilestone ? `${threshold} Club` : title}
           </div>
           <div 
             className="text-[11px] truncate"
-            style={{ color: unlocked && !isGhost ? hexToRgba(palette.accent, 0.8) : '#64748b' }}
+            style={{ color: unlocked && !isGhost ? hexToRgba(accentColor, 0.8) : '#64748b' }}
           >
             {isMilestone ? clubName : subtitle}
           </div>
@@ -292,8 +320,8 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         <div 
           className="inline-flex items-center px-2 py-0.5 rounded-sq-xs text-[10px] font-medium"
           style={{
-            backgroundColor: unlocked && !isGhost ? hexToRgba(palette.accent, 0.2) : 'rgba(148,163,184,0.2)',
-            color: unlocked && !isGhost ? palette.accent : '#64748b'
+            backgroundColor: unlocked && !isGhost ? hexToRgba(accentColor, 0.2) : 'rgba(148,163,184,0.2)',
+            color: unlocked && !isGhost ? accentColor : '#64748b'
           }}
         >
           {statusLabel}
