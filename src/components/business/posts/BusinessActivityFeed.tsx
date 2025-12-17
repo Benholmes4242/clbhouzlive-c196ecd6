@@ -7,7 +7,6 @@ import React, { useState, useCallback } from 'react';
 import { useBusinessPosts, BusinessPost } from '@/hooks/useBusinessPosts';
 import { useRealtimeBusinessPosts } from '@/hooks/useRealtimeBusinessPosts';
 import { BusinessMembership } from '@/hooks/useBusinessMembership';
-import { Button } from '@/components/ui/button';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import EnhancedCreateMomentModalCinematic from '@/components/post/EnhancedCreateMomentModal.cinematic';
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
@@ -117,21 +116,25 @@ export function BusinessActivityFeed({
     return true;
   });
 
+  const canManage = membership?.canManage ?? false;
+
   if (isLoading) {
     return (
       <div className="space-y-4 px-4">
         {/* Filter pills skeleton */}
-        <div className="flex gap-2 overflow-x-auto py-2 -mx-4 px-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-8 w-20 bg-muted animate-pulse rounded-full flex-shrink-0" />
-          ))}
+        <div className="flex justify-center py-2">
+          <div className="flex gap-2">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-8 w-20 bg-muted animate-pulse rounded-full flex-shrink-0" />
+            ))}
+          </div>
         </div>
         {/* Post cards skeleton */}
         {[1, 2].map((i) => (
           <div key={i} className="bg-white rounded-sq-md border border-border/50 overflow-hidden">
             <div className="p-4 space-y-3">
               <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-full bg-muted animate-pulse" />
+                <div className="h-10 w-10 rounded-sq-sm bg-muted animate-pulse" />
                 <div className="space-y-2">
                   <div className="h-4 w-32 bg-muted animate-pulse rounded" />
                   <div className="h-3 w-24 bg-muted animate-pulse rounded" />
@@ -156,37 +159,47 @@ export function BusinessActivityFeed({
 
   return (
     <div>
-      {/* Filter pills - horizontal scrollable, full bleed */}
-      <div className="flex gap-2 overflow-x-auto py-3 -mx-5 px-5 no-scrollbar">
-        {FILTER_OPTIONS.map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => setActiveFilter(key)}
-            className={cn(
-              'flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-colors',
-              activeFilter === key
-                ? 'bg-[#01754F] text-white'
-                : 'bg-white text-foreground border border-border hover:bg-muted/50'
-            )}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {/* Create post button for admins */}
-      {membership?.canManage && (
-        <div className="pb-3">
-          <Button
-            onClick={handleCreatePost}
-            variant="outline"
-            className="w-full rounded-sq-md border-border/50 bg-white hover:bg-muted/50"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Create post
-          </Button>
+      {/* Centered controls container */}
+      <div className="flex flex-col items-center gap-[10px] py-3">
+        {/* Filter pills - centered with max-width */}
+        <div className="w-full max-w-[520px] mx-auto flex justify-center gap-2 px-4">
+          {FILTER_OPTIONS.map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setActiveFilter(key)}
+              className={cn(
+                'flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-colors',
+                activeFilter === key
+                  ? 'bg-[#01754F] text-white'
+                  : 'bg-white text-foreground border border-border hover:bg-muted/50'
+              )}
+            >
+              {label}
+            </button>
+          ))}
         </div>
-      )}
+
+        {/* Create post CTA - centered premium card for admins */}
+        {canManage && (
+          <div className="w-full max-w-[520px] mx-auto px-4">
+            <button
+              onClick={handleCreatePost}
+              className={cn(
+                'w-full flex items-center justify-center gap-2',
+                'min-h-[46px] rounded-sq-md',
+                'bg-white border border-border/60',
+                'text-foreground text-sm font-medium',
+                'shadow-sm hover:shadow-md',
+                'transition-all duration-150',
+                'active:scale-[0.98] active:shadow-sm'
+              )}
+            >
+              <Plus className="h-4 w-4" />
+              Create post
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* Posts feed with gradient background and spacing */}
       {!filteredPosts || filteredPosts.length === 0 ? (
@@ -198,20 +211,23 @@ export function BusinessActivityFeed({
             <ImageIcon className="h-8 w-8 text-[#97A1AA]" />
           </div>
           <p className="text-sm text-muted-foreground mb-4">
-            {membership?.canManage
+            {canManage
               ? 'No posts yet. Share updates, photos and offers.'
               : `No posts yet from ${businessName || 'this business'}.`}
           </p>
-          {membership?.canManage && (
-            <Button className="rounded-full bg-[#01754F] hover:bg-[#016544] text-white" onClick={handleCreatePost}>
+          {canManage && (
+            <button
+              className="rounded-full bg-[#01754F] hover:bg-[#016544] text-white px-6 py-2.5 text-sm font-medium transition-colors"
+              onClick={handleCreatePost}
+            >
               Create your first post
-            </Button>
+            </button>
           )}
         </div>
       ) : (
         /* Gradient background container with spacing */
         <div
-          className="-mx-5 px-0"
+          className="-mx-5 px-0 mt-3"
           style={{
             background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)',
           }}
@@ -224,7 +240,7 @@ export function BusinessActivityFeed({
                 businessName={businessName}
                 businessLogo={businessLogo}
                 followerCount={followerCount}
-                isOwner={membership?.canManage ?? false}
+                canManage={canManage}
                 registerVideo={registerVideo}
                 isPlaying={playingIds.has(post.id)}
                 videoIndex={index}
