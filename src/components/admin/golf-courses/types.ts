@@ -37,14 +37,21 @@ export interface GolfCourseEditorProps {
   onClose: () => void;
 }
 
-// Scope filter type (merged All Courses + Regions, no Worldwide)
-export type ScopeKey = 'all' | 'usa' | 'britain-ireland' | 'europe';
+// Scope filter type (merged All Courses + Regions)
+export type ScopeKey = 'all' | 'usa' | 'britain-ireland' | 'europe' | 'asia' | 'middle-east' | 'oceania' | 'caribbean' | 'central-south-america' | 'africa' | 'rest';
 
 export const scopeMapping: Record<ScopeKey, string> = {
   all: 'All Courses',
   usa: 'USA',
   'britain-ireland': 'Britain & Ireland',
-  europe: 'Continental Europe'
+  europe: 'Continental Europe',
+  asia: 'Asia',
+  'middle-east': 'Middle East',
+  oceania: 'Oceania',
+  caribbean: 'Caribbean',
+  'central-south-america': 'Central & South America',
+  africa: 'Africa',
+  rest: 'Rest of World'
 };
 
 // Filter state interface for cascading dropdowns

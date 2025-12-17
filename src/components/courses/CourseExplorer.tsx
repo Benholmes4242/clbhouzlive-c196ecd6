@@ -322,14 +322,10 @@ const CourseExplorer = () => {
     </div>
   );
 
-  const regionOptions = [
-    { value: PRIMARY_REGIONS.ALL, label: PRIMARY_REGION_LABELS['all'] },
-    { value: PRIMARY_REGIONS.GB_I, label: PRIMARY_REGION_LABELS['gb-i'] },
-    { value: PRIMARY_REGIONS.USA, label: PRIMARY_REGION_LABELS['usa'] },
-    { value: PRIMARY_REGIONS.EUROPE, label: PRIMARY_REGION_LABELS['europe'] },
-    { value: PRIMARY_REGIONS.AFRICA, label: PRIMARY_REGION_LABELS['africa'] },
-    { value: PRIMARY_REGIONS.REST, label: PRIMARY_REGION_LABELS['rest'] },
-  ];
+  const regionOptions = Object.entries(PRIMARY_REGION_LABELS).map(([key, label]) => ({
+    value: key as PrimaryRegionKey,
+    label,
+  }));
 
   const getRegionLabel = () => {
     if (selectedRegion === PRIMARY_REGIONS.ALL) return 'worldwide';
