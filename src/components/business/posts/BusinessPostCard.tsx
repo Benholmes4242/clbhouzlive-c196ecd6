@@ -12,7 +12,6 @@ import {
   Repeat2,
   Send,
   MoreHorizontal,
-  Globe,
   Play,
   Copy,
   Share2,
@@ -206,8 +205,6 @@ export default function BusinessPostCard({
               <span>{followerCount.toLocaleString()} followers</span>
               <span className="mx-1">·</span>
               <span>{timeAgo}</span>
-              <span className="mx-1">·</span>
-              <Globe className="inline-block h-3 w-3 align-[-2px]" />
             </p>
           </div>
 
