@@ -72,10 +72,7 @@ const PostSubmissionHandler: React.FC<PostSubmissionHandlerProps> = ({
         });
       }
 
-      // Navigate to discover if not already there
-      if (location.pathname !== '/discover') {
-        navigate('/discover');
-      }
+      // Note: No forced navigation - closeComposer will return to origin
 
       // Update recent media cache
       if (mediaItems.length > 0) {
