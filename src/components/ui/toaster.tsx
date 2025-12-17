@@ -18,12 +18,12 @@ export function Toaster() {
           <Toast 
             key={id} 
             {...props}
-            className={variant === 'destructive' ? 'bg-red-600 text-white border-red-700' : ''}
+            className={variant === 'destructive' ? 'bg-red-600 text-white border-red-700' : undefined}
           >
             <div className="grid gap-1">
-              {title && <ToastTitle className={variant === 'destructive' ? 'text-white' : ''}>{title}</ToastTitle>}
+              {title && <ToastTitle className={variant === 'destructive' ? 'text-white' : undefined}>{title}</ToastTitle>}
               {description && (
-                <ToastDescription className={variant === 'destructive' ? 'text-white opacity-100' : ''}>{description}</ToastDescription>
+                <ToastDescription className={variant === 'destructive' ? 'text-white' : undefined}>{description}</ToastDescription>
               )}
             </div>
             {action}
