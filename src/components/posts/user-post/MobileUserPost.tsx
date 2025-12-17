@@ -7,7 +7,7 @@ import { useVideoPreloader } from '@/hooks/useVideoPreloader';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import LazyImage from '@/components/ui/lazy-image';
 import { Skeleton } from '@/components/ui/skeleton';
-import CoursePostBadge from '../CoursePostBadge';
+import PlayedAtLine from '../PlayedAtLine';
 import { UserPostData, GolfCourse } from './types';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
@@ -312,14 +312,10 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
           {/* Golf Course Location - Above Caption */}
           {golfCourse && (
             <div className="mb-2">
-              <CoursePostBadge 
-                course={{
-                  id: golfCourse.id,
-                  name: golfCourse.name,
-                  country: golfCourse.country,
-                  region: golfCourse.region
-                }}
-                className="text-xs"
+              <PlayedAtLine
+                courseId={golfCourse.id}
+                courseName={golfCourse.name}
+                regionText={golfCourse.country || golfCourse.region}
               />
             </div>
           )}

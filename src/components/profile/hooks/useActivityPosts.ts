@@ -25,6 +25,7 @@ export const useActivityPosts = (actorId?: string) => {
             user_id,
             actor_type,
             actor_id,
+            course_id,
             post_media (
               id,
               media_type,
@@ -95,6 +96,7 @@ export const useActivityPosts = (actorId?: string) => {
             shares: 0,
             timeAgo: new Date(post.created_at).toLocaleDateString(),
             created_at: post.created_at,
+            course_id: post.course_id || null,
             post_media: (post.post_media || []).map((media: any) => ({
               id: media.id,
               media_type: media.media_type as 'image' | 'video',

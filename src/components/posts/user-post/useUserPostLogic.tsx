@@ -47,9 +47,30 @@ export const useUserPostLogic = ({
   const isOwnPost = user?.id === post.user.id;
   const golfClubTags = post.post_tags?.filter(tag => tag.entity_type === 'golf_club') || [];
 
-  // Extract golf course from content or tags
+  // Extract golf course from post.course_id, content, or tags
   useEffect(() => {
-    // First try to extract from post content
+    // Priority 1: Use real course_id from database if available
+    if (post.course_id) {
+      const fetchCourseById = async () => {
+        try {
+          const { data: courseData, error } = await supabase
+            .from('golf_courses')
+            .select('id, name, country, region')
+            .eq('id', post.course_id)
+            .single();
+
+          if (!error && courseData) {
+            setGolfCourse(courseData);
+          }
+        } catch (error) {
+          console.error('Error fetching golf course by ID:', error);
+        }
+      };
+      fetchCourseById();
+      return;
+    }
+
+    // Priority 2: Extract from post content text
     const extractedCourse = extractGolfCourseFromContent(post.content);
     if (extractedCourse) {
       setGolfCourse({
@@ -59,7 +80,7 @@ export const useUserPostLogic = ({
       return;
     }
 
-    // Fallback to tags if available
+    // Priority 3: Fallback to tags if available
     const fetchGolfCourse = async () => {
       if (golfClubTags.length > 0 && !golfCourse) {
         try {
@@ -79,7 +100,7 @@ export const useUserPostLogic = ({
     };
 
     fetchGolfCourse();
-  }, [post.content, golfClubTags.length > 0 ? golfClubTags[0]?.entity_id : null]);
+  }, [post.course_id, post.content, golfClubTags.length > 0 ? golfClubTags[0]?.entity_id : null]);
 
   const handleDeletePost = async () => {
     if (!isOwnPost) return;

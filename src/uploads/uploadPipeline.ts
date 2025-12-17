@@ -114,6 +114,7 @@ async function processJob(jobId: string): Promise<void> {
       achievementId: job.achievementId || null,
       actorType: job.actorType,
       actorId: job.actorId,
+      courseId: job.courseInfo?.id || null,
     });
 
     const postId = postData.id;

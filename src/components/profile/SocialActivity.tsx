@@ -31,10 +31,20 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
       currentUserId: userId
     });
 
-    // Helper function to extract golf course from post tags or content
-    const extractGolfCourse = (postTags: any[], content: string | null) => {
-      // First try to extract from post tags
-      const golfCourseTag = postTags?.find(tag => 
+    // Helper function to extract golf course from post.course_id, tags, or content
+    const extractGolfCourse = (post: ActivityPost) => {
+      // Priority 1: Use course_id from database
+      if (post.course_id) {
+        return {
+          id: post.course_id,
+          name: '', // Will be fetched when component mounts
+          country: '',
+          region: ''
+        };
+      }
+      
+      // Priority 2: Try to extract from post tags
+      const golfCourseTag = post.post_tags?.find(tag => 
         tag.tagged_entity?.entity_type === 'golf_club' || tag.entity_type === 'golf_club'
       );
       
@@ -57,8 +67,8 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
         }
       }
       
-      // If not found in tags, try to extract from content
-      const courseFromContent = extractGolfCourseFromContent(content);
+      // Priority 3: Try to extract from content
+      const courseFromContent = extractGolfCourseFromContent(post.content);
       if (courseFromContent) {
         return courseFromContent;
       }
@@ -74,7 +84,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
       user: post.user,
       post_media: post.post_media || [],
       post_tags: post.post_tags || [],
-      golfCourse: extractGolfCourse(post.post_tags || [], post.content)
+      golfCourse: extractGolfCourse(post)
     };
     
     // Transform all posts
@@ -85,7 +95,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
       user: p.user,
       post_media: p.post_media || [],
       post_tags: p.post_tags || [],
-      golfCourse: extractGolfCourse(p.post_tags || [], p.content)
+      golfCourse: extractGolfCourse(p)
     }));
     
     // This function is now simplified - posts handle their own modals
