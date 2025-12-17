@@ -2,6 +2,7 @@ import React, { useCallback, useRef, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ActivityMediaItem } from './types';
 import VideoOverlay from './VideoOverlay';
+import GridAutoplayVideo from './GridAutoplayVideo';
 import { Images, Trophy } from 'lucide-react';
 import { RegisterVideoFn } from '@/hooks/useGridAutoplay';
 
@@ -82,16 +83,12 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({
         draggable={false}
       />
 
-      {/* 2) Video fades in over the top once it can play */}
+      {/* 2) HLS-aware video fades in over the top once it can play */}
       {isVideo && isAutoplayCandidate && item.playbackUrl && (
-        <video
+        <GridAutoplayVideo
           ref={videoRef}
           src={item.playbackUrl}
           poster={thumbnailSrc}
-          muted
-          loop
-          playsInline
-          preload="metadata"
           onCanPlay={handleCanPlay}
           className={cn(
             "absolute inset-0 h-full w-full object-cover transition-opacity duration-150",
