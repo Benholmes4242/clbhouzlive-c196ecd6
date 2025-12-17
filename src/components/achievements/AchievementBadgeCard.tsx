@@ -157,8 +157,18 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
     regionalProgress = Math.min(100, (playedOnList / totalOnList) * 100);
   }
 
-  // Frosted glass background - neutral white/grey
-  const frostedBackground = 'rgba(255, 255, 255, 0.15)';
+  // Convert hex to rgba for frosted tinting
+  const hexToRgba = (hex: string, alpha: number) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  };
+
+  // Apple-style frosted glass with subtle tier color tint
+  const frostedBackground = unlocked && !isGhost
+    ? `linear-gradient(135deg, rgba(255,255,255,0.45), ${hexToRgba(palette.bgDark, 0.18)})`
+    : 'rgba(255, 255, 255, 0.35)';
 
   return (
     <div
