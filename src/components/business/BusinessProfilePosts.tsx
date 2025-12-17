@@ -367,18 +367,6 @@ function LinkedInPostCard({ post, businessName, businessLogo, followerCount = 0 
         </div>
       )}
 
-      {/* Social proof line */}
-      <div className="py-2 flex items-center justify-between text-xs text-muted-foreground">
-        <div className="flex items-center gap-1">
-          <div className="flex -space-x-1">
-            <div className="w-4 h-4 rounded-full bg-[#0A66C2] flex items-center justify-center">
-              <ThumbsUp className="h-2.5 w-2.5 text-white" />
-            </div>
-          </div>
-          <span className="ml-1">—</span>
-        </div>
-        <span>—</span>
-      </div>
 
       {/* Action bar */}
       <div className="py-1 flex items-center justify-around">
