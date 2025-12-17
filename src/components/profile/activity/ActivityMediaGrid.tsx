@@ -5,7 +5,7 @@ import HeroPostTile from './HeroPostTile';
 import StandardPostTile from './StandardPostTile';
 import { ActivityMediaGridProps, ActivityMediaItem, AspectRatio, ActivityPost } from './types';
 import { buildActivityLayout } from './layoutEngine';
-import { streamPosterFrom } from '@/utils/mediaThumbs';
+import { getStreamPoster } from '@/utils/stream';
 import { useGridAutoplay } from '@/hooks/useGridAutoplay';
 
 /**
@@ -34,10 +34,10 @@ function postToMediaItem(
 
   const isVideo = primaryMedia.media_type === 'video';
   
-  // For videos: use poster_url, fallback to streamPosterFrom helper
+  // For videos: prefer DB poster_url; otherwise derive a stable Stream poster (videodelivery.net)
   // For images: use media_url directly
   const thumbnailUrl = isVideo
-    ? (primaryMedia.poster_url || streamPosterFrom(primaryMedia.media_url) || primaryMedia.media_url)
+    ? (primaryMedia.poster_url || getStreamPoster(primaryMedia.media_url, '1s') || primaryMedia.media_url)
     : primaryMedia.media_url;
 
   // Every 3rd video is an autoplay candidate
