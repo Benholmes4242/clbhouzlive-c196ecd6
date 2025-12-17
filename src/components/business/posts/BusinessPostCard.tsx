@@ -1,27 +1,21 @@
 /**
  * BusinessPostCard - Premium post tile with action bar
  * Full-width tile with subtle elevation on gradient background
- * Action bar: Appreciate / Comment / Reshare / Send
+ * Action bar: Like / Comment / Reshare / Send (via global PostActionBar)
  */
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { BusinessPost } from '@/hooks/useBusinessPosts';
 import {
-  Heart,
-  MessageSquare,
-  Repeat2,
-  Send,
   MoreHorizontal,
   Play,
   Copy,
   Share2,
-  Flag,
   Pencil,
   Eye,
   Pin,
   BarChart2,
   Trash2,
-  Loader2,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -30,6 +24,7 @@ import GridAutoplayVideo from '@/components/profile/activity/GridAutoplayVideo';
 import CommentsPage from '@/components/clubhouse/cinematic/CommentsPage';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
+import { PostActionBar } from '@/components/posts/PostActionBar';
 import { toast } from 'sonner';
 import {
   DropdownMenu,
@@ -69,8 +64,8 @@ export default function BusinessPostCard({
   const isVideo = primaryMedia?.media_type === 'video';
   const hasMultipleMedia = (post.post_media?.length || 0) > 1;
 
-  // Engagement hook for like/comment functionality
-  const { hasLiked, likesCount, toggleLike, isTogglingLike, commentsCount } = usePostEngagement(post.id);
+  // Engagement data for social proof line (like/comment actions handled by PostActionBar)
+  const { likesCount, commentsCount } = usePostEngagement(post.id);
 
   // Format timestamp like LinkedIn
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: false })
@@ -119,38 +114,28 @@ export default function BusinessPostCard({
     };
   }, [isVideo, registerVideo, post.id, videoIndex]);
 
-  const handleAppreciate = useCallback(() => {
-    toggleLike();
-  }, [toggleLike]);
-
   const handleComment = useCallback(() => {
     setCommentsOpen(true);
   }, []);
-
-  const handleReshare = useCallback(() => {
-    toast.info('Reshare coming soon');
-  }, []);
-
-  const handleSend = useCallback(async () => {
-    const url = `${window.location.origin}/post/${post.id}`;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: businessName, url });
-      } catch {}
-    } else {
-      await navigator.clipboard.writeText(url);
-      toast.success('Link copied');
-    }
-  }, [post.id, businessName]);
 
   const handleCopyLink = useCallback(async () => {
     await navigator.clipboard.writeText(`${window.location.origin}/post/${post.id}`);
     toast.success('Link copied');
   }, [post.id]);
 
-  const handleReport = useCallback(() => {
-    toast.info('Report submitted');
-  }, []);
+  const handleSend = useCallback(async () => {
+    const url = `${window.location.origin}/post/${post.id}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: businessName || 'Post', url });
+      } catch {
+        // User cancelled
+      }
+    } else {
+      await navigator.clipboard.writeText(url);
+      toast.success('Link copied');
+    }
+  }, [post.id, businessName]);
 
   const handleEditCaption = useCallback(() => {
     toast.info('Edit caption coming soon');
@@ -328,7 +313,7 @@ export default function BusinessPostCard({
         {/* Social proof line */}
         {(likesCount > 0 || commentsCount > 0) && (
           <div className="px-4 py-2 text-xs text-muted-foreground border-b border-border/30">
-            {likesCount > 0 && <span>{likesCount} golfer{likesCount !== 1 ? 's' : ''} appreciated</span>}
+            {likesCount > 0 && <span>{likesCount} golfer{likesCount !== 1 ? 's' : ''} liked</span>}
             {likesCount > 0 && commentsCount > 0 && <span> · </span>}
             {commentsCount > 0 && (
               <button onClick={handleComment} className="hover:underline">
@@ -338,19 +323,12 @@ export default function BusinessPostCard({
           </div>
         )}
 
-        {/* Action bar - equal distribution with flex:1 */}
-        <div className="py-1 flex items-center border-t border-border/30">
-          <ActionButton
-            icon={Heart}
-            label="Appreciate"
-            isActive={hasLiked}
-            isLoading={isTogglingLike}
-            onClick={handleAppreciate}
-          />
-          <ActionButton icon={MessageSquare} label="Comment" onClick={handleComment} />
-          <ActionButton icon={Repeat2} label="Reshare" onClick={handleReshare} />
-          <ActionButton icon={Send} label="Send" onClick={handleSend} />
-        </div>
+        {/* Action bar - global canonical component */}
+        <PostActionBar
+          postId={post.id}
+          onOpenComments={handleComment}
+          shareTitle={businessName}
+        />
       </div>
 
       {/* Comments - use Clubhouse slide-in panel with light theme */}
@@ -367,31 +345,3 @@ export default function BusinessPostCard({
   );
 }
 
-interface ActionButtonProps {
-  icon: React.ElementType;
-  label: string;
-  isActive?: boolean;
-  isLoading?: boolean;
-  onClick?: () => void;
-}
-
-function ActionButton({ icon: Icon, label, isActive, isLoading, onClick }: ActionButtonProps) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={isLoading}
-      aria-label={label}
-      className={cn(
-        'flex-1 flex flex-col items-center justify-center gap-0.5 py-2 px-2 transition-colors hover:bg-muted/50 disabled:opacity-50',
-        isActive ? 'text-[#F7931E]' : 'text-muted-foreground'
-      )}
-    >
-      {isLoading ? (
-        <Loader2 className="h-5 w-5 animate-spin" />
-      ) : (
-        <Icon className="h-5 w-5" fill={isActive ? 'currentColor' : 'none'} />
-      )}
-      <span className="text-xs font-medium">{label}</span>
-    </button>
-  );
-}
