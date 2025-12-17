@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { Heart, MessageCircle, Share2, Bookmark, Volume2, VolumeX } from 'lucide-react';
+import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -192,17 +192,17 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
 
       {/* Slot 3: Comment */}
       <ActionSlot
-        icon={MessageCircle}
+        icon={MessageSquare}
         count={commentsCount}
         onClick={onComment}
         ariaLabel="Comments"
       />
 
-      {/* Slot 4: Share */}
+      {/* Slot 4: Send */}
       <ActionSlot
-        icon={Share2}
+        icon={Send}
         onClick={onShare}
-        ariaLabel="Share"
+        ariaLabel="Send"
         showCount={false}
       />
 
