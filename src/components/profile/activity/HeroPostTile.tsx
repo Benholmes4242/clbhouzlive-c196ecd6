@@ -41,19 +41,29 @@ const HeroPostTile: React.FC<HeroPostTileProps> = ({
     setResolvedDurationSeconds(item.durationSeconds);
   }, [item.durationSeconds]);
 
-  // Register video with autoplay hook
+  // Register video with autoplay hook - use a callback to ensure element is ready
   useEffect(() => {
     if (!isVideo || !registerVideo) return;
 
-    registerVideo({
-      id: item.postId,
-      element: videoRef.current,
-      isCandidate: isAutoplayCandidate,
-      sortIndex: item.sortIndex ?? 0,
-    });
+    // Wait for ref to be populated by GridAutoplayVideo
+    const checkAndRegister = () => {
+      if (videoRef.current) {
+        registerVideo({
+          id: item.postId,
+          element: videoRef.current,
+          isCandidate: isAutoplayCandidate,
+          sortIndex: item.sortIndex ?? 0,
+        });
+      }
+    };
+
+    // Try immediately, then retry after a short delay if ref not ready
+    checkAndRegister();
+    const retryTimer = setTimeout(checkAndRegister, 100);
 
     // Clean up on unmount
     return () => {
+      clearTimeout(retryTimer);
       registerVideo({
         id: item.postId,
         element: null,

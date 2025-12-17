@@ -119,6 +119,9 @@ export function useGridAutoplay(
       if (preloadObserverRef.current) {
         preloadObserverRef.current.observe(element);
       }
+
+      // Trigger playback check shortly after registration to catch initially-visible videos
+      setTimeout(() => updatePlayback(), 50);
     },
     [updatePlayback]
   );
@@ -163,7 +166,7 @@ export function useGridAutoplay(
       }
     );
 
-    // Videos can register before this effect runs; ensure they’re observed.
+    // Videos can register before this effect runs; ensure they're observed.
     for (const v of videosRef.current.values()) {
       preloadObserverRef.current.observe(v.element);
     }
@@ -200,12 +203,18 @@ export function useGridAutoplay(
       }
     );
 
-    // Videos can register before this effect runs; ensure they’re observed.
+    // Videos can register before this effect runs; ensure they're observed.
     for (const v of videosRef.current.values()) {
       autoplayObserverRef.current.observe(v.element);
     }
 
+    // Trigger initial playback check after a short delay to allow observer to report initial visibility
+    const initialCheck = setTimeout(() => {
+      updatePlayback();
+    }, 150);
+
     return () => {
+      clearTimeout(initialCheck);
       autoplayObserverRef.current?.disconnect();
       autoplayObserverRef.current = null;
       videosRef.current.clear();
