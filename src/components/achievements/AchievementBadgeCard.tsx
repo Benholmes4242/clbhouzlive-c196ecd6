@@ -160,18 +160,16 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   return (
     <div
       className={cn(
-        // Frosted glass base with SDS rounded corners
+        // Clean glass card with SDS rounded corners
         'rounded-[18px] flex flex-col justify-between relative overflow-hidden',
         // Fixed global size for ALL achievement badges site-wide
         'min-w-[180px] h-[92px] px-3 py-2.5',
-        // Glassmorphism backdrop blur
-        'backdrop-blur-[16px] backdrop-saturate-[140%]',
-        // Subtle border for floating effect - darker for light mode
+        // Subtle border for floating effect
         'border',
         // Soft shadow - lifted feel
         unlocked && !isGhost
-          ? 'shadow-[0_8px_30px_rgba(0,0,0,0.12)]' 
-          : 'shadow-[0_4px_20px_rgba(0,0,0,0.08)]',
+          ? 'shadow-[0_8px_30px_rgba(0,0,0,0.08)]' 
+          : 'shadow-[0_4px_20px_rgba(0,0,0,0.05)]',
         // Smooth micro-interactions
         'transition-all duration-200 ease-out',
         'active:scale-[0.98]',
@@ -180,30 +178,17 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         isGhost && 'border-dashed'
       )}
       style={{
-        // Translucent glass background - darker tint for light backgrounds
+        // Clean solid background - no gradients
         background: unlocked && !isGhost
-          ? 'rgba(15, 23, 42, 0.06)'
-          : 'rgba(15, 23, 42, 0.03)',
+          ? 'rgba(248, 250, 252, 1)'
+          : 'rgba(248, 250, 252, 0.7)',
         borderColor: unlocked && !isGhost
-          ? 'rgba(15, 23, 42, 0.12)'
-          : 'rgba(15, 23, 42, 0.08)',
+          ? 'rgba(226, 232, 240, 1)'
+          : 'rgba(226, 232, 240, 0.6)',
         transform: isPrimary ? 'translateY(-2px)' : undefined,
         opacity: isGhost ? 0.7 : (!unlocked ? 0.6 : 1),
       }}
     >
-      {/* Background emblem - subtle engraved crest */}
-      {emblemSrc && (
-        <img
-          src={emblemSrc}
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none select-none absolute inset-y-0 right-0 h-full w-auto translate-x-4 scale-125"
-          style={{ 
-            filter: 'brightness(0)',
-            opacity: unlocked && !isGhost ? 0.06 : 0.03,
-          }}
-        />
-      )}
 
       {/* Ghost overlay */}
       {isGhost && (
