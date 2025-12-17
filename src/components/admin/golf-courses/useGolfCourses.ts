@@ -50,6 +50,27 @@ export const useGolfCourses = ({ regionalFilter, searchTerm }: UseGolfCoursesOpt
             case 'europe':
               query = query.eq('country', 'Continental Europe');
               break;
+            case 'asia':
+              query = query.eq('country', 'Asia');
+              break;
+            case 'middle-east':
+              query = query.eq('country', 'Middle East');
+              break;
+            case 'oceania':
+              query = query.eq('country', 'Oceania');
+              break;
+            case 'caribbean':
+              query = query.eq('country', 'Caribbean');
+              break;
+            case 'central-south-america':
+              query = query.eq('country', 'Central and South America');
+              break;
+            case 'africa':
+              query = query.eq('country', 'Africa');
+              break;
+            case 'rest':
+              query = query.eq('country', 'Rest of World');
+              break;
           }
         }
       }
