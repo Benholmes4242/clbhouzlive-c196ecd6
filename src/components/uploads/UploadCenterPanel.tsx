@@ -13,14 +13,19 @@ interface UploadCenterPanelProps {
 export function UploadCenterPanel({ isOpen, onClose }: UploadCenterPanelProps) {
   const { jobs, retry, dismiss } = useUploadJobs();
 
-  // Filter to show recent/relevant jobs
-  const visibleJobs = jobs.filter(j => {
-    // Always show pending and failed
-    if (j.status !== 'complete') return true;
-    // Show completed jobs from last 5 minutes
-    const age = Date.now() - new Date(j.createdAt).getTime();
-    return age < 5 * 60 * 1000;
-  });
+  // Filter to show recent/relevant jobs, sorted newest-first
+  const visibleJobs = jobs
+    .filter(j => {
+      // Always show pending and failed
+      if (j.status !== 'complete') return true;
+      // Show completed jobs from last 5 minutes
+      const age = Date.now() - new Date(j.createdAt).getTime();
+      return age < 5 * 60 * 1000;
+    })
+    .sort((a, b) => {
+      // Sort by createdAt descending (newest first)
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
 
   return (
     <AnimatePresence>

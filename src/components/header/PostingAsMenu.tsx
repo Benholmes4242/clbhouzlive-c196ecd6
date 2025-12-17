@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Building2, User, Settings, LogOut, Shield, Bell, Pencil, Plus } from 'lucide-react';
+import { Check, Building2, User, Settings, LogOut, Shield, Bell, Pencil, Plus, CloudUpload } from 'lucide-react';
+import { UploadCenterPanel } from '@/components/uploads/UploadCenterPanel';
+import { useUploadJobs } from '@/uploads/useUploadJobs';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,6 +25,9 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
   const { user } = useSupabaseSession();
   const { data: userProfile } = useUserProfile(user?.id);
   const { hasUnread } = useUnreadNotifications();
+  const [uploadCenterOpen, setUploadCenterOpen] = useState(false);
+  const { hasPending, hasFailed } = useUploadJobs();
+  const showUploadIndicator = hasPending || hasFailed;
 
   // Check admin status
   const { data: adminStatus } = useQuery({
@@ -59,230 +64,255 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
     onClose();
   };
 
-  if (!isOpen) return null;
-
   const displayName = userProfile?.display_name || user?.user_metadata?.full_name || 'User';
   const email = user?.email || '';
 
   return (
     <>
-      {/* Backdrop */}
-      <button
-        className="fixed inset-0 z-[199] bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-        aria-label="Close profile menu"
+      {/* Upload Center Panel - rendered outside menu so it persists when menu closes */}
+      <UploadCenterPanel 
+        isOpen={uploadCenterOpen} 
+        onClose={() => setUploadCenterOpen(false)} 
       />
-      
-      {/* Menu panel - Glassy dark design */}
-      <div 
-        className={cn(
-          "fixed inset-x-0 z-[200]",
-          "animate-in fade-in slide-in-from-top-2 duration-200"
-        )}
-        style={{ 
-          top: 'calc(56px + env(safe-area-inset-top) + 8px)',
-          transform: 'translateZ(0)',
-          WebkitTransform: 'translate3d(0, 0, 0)',
-          willChange: 'transform'
-        }}
-      >
-        <div 
-          className="mx-2 sm:mx-3 overflow-hidden"
-          style={{
-            borderRadius: '24px',
-            background: 'rgba(16, 16, 16, 0.92)',
-            backdropFilter: 'blur(40px) saturate(150%)',
-            WebkitBackdropFilter: 'blur(40px) saturate(150%)',
-            boxShadow: '0 24px 60px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.08)',
-          }}
-        >
-          {/* Identity summary card */}
-          <div 
-            className="px-4 py-4 border-b border-white/8"
-            style={{ background: 'rgba(255, 255, 255, 0.04)' }}
-          >
-            <div className="flex items-center gap-3">
-              <SquircleAvatar
-                size={44}
-                src={activeActor?.avatarUrl}
-                alt={displayName}
-                fallback={getInitials(displayName)}
-                hideRing
-              />
-              <div className="flex flex-col min-w-0 flex-1">
-                <span className="text-sm font-semibold text-white truncate">
-                  {displayName}
-                </span>
-                <span className="text-xs text-white/50 truncate">
-                  {email}
-                </span>
-                <span className="mt-0.5 text-[11px] text-white/40">
-                  {postingAsCopy.headerPill.label}{' '}
-                  <span className="font-medium text-white/60">
-                    {activeActor?.name}
-                  </span>
-                </span>
-              </div>
-            </div>
-          </div>
+
+      {/* Menu content - only render when open */}
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <button
+            className="fixed inset-0 z-[199] bg-black/60 backdrop-blur-sm"
+            onClick={onClose}
+            aria-label="Close profile menu"
+          />
           
-          {/* Switch profile section */}
-          <div className="px-3 py-2">
-            <div className="px-2 mb-1">
-              <span className="text-[11px] font-medium text-white/45 uppercase tracking-wider">
-                {postingAsCopy.dropdown.sectionTitle}
-              </span>
-              <p className="text-[10px] text-white/30 mt-0.5">
-                {postingAsCopy.dropdown.helper}
-              </p>
-            </div>
-            <div className="mt-2 space-y-0.5">
-              {availableActors.map((actor) => {
-                const isActive = activeActor?.type === actor.type && activeActor?.id === actor.id;
+          {/* Menu panel - Glassy dark design */}
+          <div 
+            className={cn(
+              "fixed inset-x-0 z-[200]",
+              "animate-in fade-in slide-in-from-top-2 duration-200"
+            )}
+            style={{ 
+              top: 'calc(56px + env(safe-area-inset-top) + 8px)',
+              transform: 'translateZ(0)',
+              WebkitTransform: 'translate3d(0, 0, 0)',
+              willChange: 'transform'
+            }}
+          >
+            <div 
+              className="mx-2 sm:mx-3 overflow-hidden"
+              style={{
+                borderRadius: '24px',
+                background: 'rgba(16, 16, 16, 0.92)',
+                backdropFilter: 'blur(40px) saturate(150%)',
+                WebkitBackdropFilter: 'blur(40px) saturate(150%)',
+                boxShadow: '0 24px 60px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.08)',
+              }}
+            >
+              {/* Identity summary card */}
+              <div 
+                className="px-4 py-4 border-b border-white/8"
+                style={{ background: 'rgba(255, 255, 255, 0.04)' }}
+              >
+                <div className="flex items-center gap-3">
+                  <SquircleAvatar
+                    size={44}
+                    src={activeActor?.avatarUrl}
+                    alt={displayName}
+                    fallback={getInitials(displayName)}
+                    hideRing
+                  />
+                  <div className="flex flex-col min-w-0 flex-1">
+                    <span className="text-sm font-semibold text-white truncate">
+                      {displayName}
+                    </span>
+                    <span className="text-xs text-white/50 truncate">
+                      {email}
+                    </span>
+                    <span className="mt-0.5 text-[11px] text-white/40">
+                      {postingAsCopy.headerPill.label}{' '}
+                      <span className="font-medium text-white/60">
+                        {activeActor?.name}
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Switch profile section */}
+              <div className="px-3 py-2">
+                <div className="px-2 mb-1">
+                  <span className="text-[11px] font-medium text-white/45 uppercase tracking-wider">
+                    {postingAsCopy.dropdown.sectionTitle}
+                  </span>
+                  <p className="text-[10px] text-white/30 mt-0.5">
+                    {postingAsCopy.dropdown.helper}
+                  </p>
+                </div>
+                <div className="mt-2 space-y-0.5">
+                  {availableActors.map((actor) => {
+                    const isActive = activeActor?.type === actor.type && activeActor?.id === actor.id;
+                    
+                    return (
+                      <button
+                        key={`${actor.type}-${actor.id}`}
+                        onClick={() => {
+                          if (!isActive) {
+                            setActiveActor(actor);
+                            toast.success(postingAsCopy.toasts.switchedToBusiness(actor.name));
+                          }
+                          onClose();
+                        }}
+                        className={cn(
+                          "flex w-full items-center gap-2.5 rounded-sq-md px-3 py-2.5",
+                          "transition-all duration-150 active:scale-[0.98]",
+                          isActive 
+                            ? "bg-white/10 border border-white/12" 
+                            : "hover:bg-white/5 border border-transparent"
+                        )}
+                      >
+                        <SquircleAvatar
+                          size={28}
+                          src={actor.avatarUrl}
+                          alt={actor.name}
+                          fallback={getInitials(actor.name)}
+                          hideRing
+                        />
+                        <div className="flex-1 text-left min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-medium text-white truncate">
+                              {actor.name}
+                            </span>
+                            {actor.type === 'business' ? (
+                              <Building2 className="h-3 w-3 text-white/40 flex-shrink-0" />
+                            ) : (
+                              <User className="h-3 w-3 text-white/40 flex-shrink-0" />
+                            )}
+                          </div>
+                          <span className="text-[10px] text-white/40">
+                            {actor.type === 'personal' 
+                              ? postingAsCopy.actorLabels.personal 
+                              : postingAsCopy.actorLabels.business}
+                          </span>
+                        </div>
+                        {isActive && (
+                          <Check className="h-4 w-4 text-emerald-400 flex-shrink-0" />
+                        )}
+                      </button>
+                    );
+                  })}
+                  
+                  {/* Empty state when no businesses */}
+                  {availableActors.filter(a => a.type === 'business').length === 0 && (
+                    <div className="px-3 py-3 rounded-sq-md border border-dashed border-white/10 mt-2">
+                      <p className="text-xs font-medium text-white/60">
+                        {postingAsCopy.emptyState.title}
+                      </p>
+                      <p className="text-[10px] text-white/40 mt-0.5">
+                        {postingAsCopy.emptyState.body}
+                      </p>
+                      <button
+                        onClick={() => handleNavigate('/business/intro')}
+                        className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-primary hover:text-primary/80 transition-colors"
+                      >
+                        <Plus className="h-3 w-3" />
+                        {postingAsCopy.emptyState.cta}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Divider */}
+              <div className="border-t border-white/6" />
+              
+              {/* Core action items */}
+              <nav className="px-3 py-1.5 space-y-0.5">
+                {/* Notifications */}
+                <MenuRow
+                  icon={<Bell className="h-[18px] w-[18px]" />}
+                  label="Notifications"
+                  onClick={() => handleNavigate('/notificationmessages')}
+                  trailing={hasUnread && (
+                    <span className="h-2.5 w-2.5 rounded-full bg-orange-500" />
+                  )}
+                />
                 
-                return (
+                {/* Upload Center */}
+                <MenuRow
+                  icon={<CloudUpload className="h-[18px] w-[18px]" />}
+                  label="Upload Center"
+                  onClick={() => {
+                    setUploadCenterOpen(true);
+                    onClose();
+                  }}
+                  trailing={showUploadIndicator && (
+                    <span className={cn(
+                      "h-2.5 w-2.5 rounded-full",
+                      hasFailed ? "bg-red-500" : "bg-primary"
+                    )} />
+                  )}
+                />
+                
+                {/* View profile */}
+                <MenuRow
+                  icon={<User className="h-[18px] w-[18px]" />}
+                  label="View profile"
+                  onClick={() => handleNavigate('/profile')}
+                />
+                
+                {/* Edit profile */}
+                <MenuRow
+                  icon={<Pencil className="h-[18px] w-[18px]" />}
+                  label="Edit profile"
+                  onClick={() => handleNavigate('/edit-profile')}
+                />
+                
+                {/* Business profiles */}
+                <MenuRow
+                  icon={<Building2 className="h-[18px] w-[18px]" />}
+                  label="Business profiles"
+                  onClick={() => handleNavigate('/businesses/manage')}
+                />
+                
+                {/* Settings */}
+                <MenuRow
+                  icon={<Settings className="h-[18px] w-[18px]" />}
+                  label="Settings"
+                  onClick={() => handleNavigate('/settings')}
+                />
+
+                {/* Admin Dashboard */}
+                {hasAdminAccess && (
+                  <MenuRow
+                    icon={<Shield className="h-[18px] w-[18px]" />}
+                    label="Admin Dashboard"
+                    onClick={() => handleNavigate('/admin')}
+                  />
+                )}
+              </nav>
+              
+              {/* Logout section */}
+              <div className="px-3 pt-1 pb-3">
+                <div className="border-t border-white/6 pt-2">
                   <button
-                    key={`${actor.type}-${actor.id}`}
                     onClick={() => {
-                      if (!isActive) {
-                        setActiveActor(actor);
-                        toast.success(postingAsCopy.toasts.switchedToBusiness(actor.name));
-                      }
+                      handleLogout();
                       onClose();
                     }}
                     className={cn(
                       "flex w-full items-center gap-2.5 rounded-sq-md px-3 py-2.5",
-                      "transition-all duration-150 active:scale-[0.98]",
-                      isActive 
-                        ? "bg-white/10 border border-white/12" 
-                        : "hover:bg-white/5 border border-transparent"
+                      "hover:bg-red-500/10 transition-colors active:scale-[0.98]"
                     )}
                   >
-                    <SquircleAvatar
-                      size={28}
-                      src={actor.avatarUrl}
-                      alt={actor.name}
-                      fallback={getInitials(actor.name)}
-                      hideRing
-                    />
-                    <div className="flex-1 text-left min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-medium text-white truncate">
-                          {actor.name}
-                        </span>
-                        {actor.type === 'business' ? (
-                          <Building2 className="h-3 w-3 text-white/40 flex-shrink-0" />
-                        ) : (
-                          <User className="h-3 w-3 text-white/40 flex-shrink-0" />
-                        )}
-                      </div>
-                      <span className="text-[10px] text-white/40">
-                        {actor.type === 'personal' 
-                          ? postingAsCopy.actorLabels.personal 
-                          : postingAsCopy.actorLabels.business}
-                      </span>
-                    </div>
-                    {isActive && (
-                      <Check className="h-4 w-4 text-emerald-400 flex-shrink-0" />
-                    )}
-                  </button>
-                );
-              })}
-              
-              {/* Empty state when no businesses */}
-              {availableActors.filter(a => a.type === 'business').length === 0 && (
-                <div className="px-3 py-3 rounded-sq-md border border-dashed border-white/10 mt-2">
-                  <p className="text-xs font-medium text-white/60">
-                    {postingAsCopy.emptyState.title}
-                  </p>
-                  <p className="text-[10px] text-white/40 mt-0.5">
-                    {postingAsCopy.emptyState.body}
-                  </p>
-                  <button
-                    onClick={() => handleNavigate('/business/intro')}
-                    className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-primary hover:text-primary/80 transition-colors"
-                  >
-                    <Plus className="h-3 w-3" />
-                    {postingAsCopy.emptyState.cta}
+                    <LogOut className="h-[18px] w-[18px] text-red-400" />
+                    <span className="text-sm text-red-400 font-medium">Log out</span>
                   </button>
                 </div>
-              )}
+              </div>
             </div>
           </div>
-          
-          {/* Divider */}
-          <div className="border-t border-white/6" />
-          
-          {/* Core action items */}
-          <nav className="px-3 py-1.5 space-y-0.5">
-            {/* Notifications */}
-            <MenuRow
-              icon={<Bell className="h-[18px] w-[18px]" />}
-              label="Notifications"
-              onClick={() => handleNavigate('/notificationmessages')}
-              trailing={hasUnread && (
-                <span className="h-2.5 w-2.5 rounded-full bg-orange-500" />
-              )}
-            />
-            
-            {/* View profile */}
-            <MenuRow
-              icon={<User className="h-[18px] w-[18px]" />}
-              label="View profile"
-              onClick={() => handleNavigate('/profile')}
-            />
-            
-            {/* Edit profile */}
-            <MenuRow
-              icon={<Pencil className="h-[18px] w-[18px]" />}
-              label="Edit profile"
-              onClick={() => handleNavigate('/edit-profile')}
-            />
-            
-            {/* Business profiles */}
-            <MenuRow
-              icon={<Building2 className="h-[18px] w-[18px]" />}
-              label="Business profiles"
-              onClick={() => handleNavigate('/businesses/manage')}
-            />
-            
-            {/* Settings */}
-            <MenuRow
-              icon={<Settings className="h-[18px] w-[18px]" />}
-              label="Settings"
-              onClick={() => handleNavigate('/settings')}
-            />
-
-            {/* Admin Dashboard */}
-            {hasAdminAccess && (
-              <MenuRow
-                icon={<Shield className="h-[18px] w-[18px]" />}
-                label="Admin Dashboard"
-                onClick={() => handleNavigate('/admin')}
-              />
-            )}
-          </nav>
-          
-          {/* Logout section */}
-          <div className="px-3 pt-1 pb-3">
-            <div className="border-t border-white/6 pt-2">
-              <button
-                onClick={() => {
-                  handleLogout();
-                  onClose();
-                }}
-                className={cn(
-                  "flex w-full items-center gap-2.5 rounded-sq-md px-3 py-2.5",
-                  "hover:bg-red-500/10 transition-colors active:scale-[0.98]"
-                )}
-              >
-                <LogOut className="h-[18px] w-[18px] text-red-400" />
-                <span className="text-sm text-red-400 font-medium">Log out</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+        </>
+      )}
     </>
   );
 }
