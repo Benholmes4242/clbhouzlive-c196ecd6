@@ -19,7 +19,7 @@ export interface BusinessPost {
 
 export function useBusinessPosts(businessId?: string) {
   return useQuery({
-    queryKey: ['business-posts', businessId],
+    queryKey: ['actor-posts', 'business', businessId],
     enabled: !!businessId,
     queryFn: async () => {
       const { data, error } = await supabase
@@ -56,7 +56,7 @@ export function useBusinessPosts(businessId?: string) {
 
 export function useBusinessPostsCount(businessId?: string) {
   return useQuery({
-    queryKey: ['business-posts-count', businessId],
+    queryKey: ['actor-posts-count', 'business', businessId],
     enabled: !!businessId,
     queryFn: async () => {
       const { count, error } = await supabase

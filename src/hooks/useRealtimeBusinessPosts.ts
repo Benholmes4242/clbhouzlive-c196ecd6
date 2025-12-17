@@ -16,8 +16,8 @@ export function useRealtimeBusinessPosts(businessId?: string) {
         (payload) => {
           const row = (payload.new ?? payload.old) as any;
           if (row?.actor_type === 'business' && row?.actor_id === businessId) {
-            qc.invalidateQueries({ queryKey: ['business-posts', businessId] });
-            qc.invalidateQueries({ queryKey: ['business-posts-count', businessId] });
+            qc.invalidateQueries({ queryKey: ['actor-posts', 'business', businessId] });
+            qc.invalidateQueries({ queryKey: ['actor-posts-count', 'business', businessId] });
           }
         }
       )
