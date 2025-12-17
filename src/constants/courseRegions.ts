@@ -5,6 +5,11 @@ export const PRIMARY_REGIONS = {
   EUROPE: 'europe',
   USA: 'usa',
   AFRICA: 'africa',
+  ASIA: 'asia',
+  MIDDLE_EAST: 'middle-east',
+  OCEANIA: 'oceania',
+  CARIBBEAN: 'caribbean',
+  CENTRAL_SOUTH_AMERICA: 'central-south-america',
   REST: 'rest',
 } as const;
 
@@ -15,8 +20,13 @@ export type PrimaryRegionKey =
 export const PRIMARY_REGION_LABELS: Record<PrimaryRegionKey, string> = {
   'all': 'All Regions',
   'gb-i': 'Britain & Ireland',
-  'europe': 'Continental Europe',
   'usa': 'USA',
+  'europe': 'Continental Europe',
+  'asia': 'Asia',
+  'middle-east': 'Middle East',
+  'oceania': 'Oceania',
+  'caribbean': 'Caribbean',
+  'central-south-america': 'Central & South America',
   'africa': 'Africa',
   'rest': 'Rest of World',
 };
@@ -151,6 +161,111 @@ export const SUBREGIONS: Record<Exclude<PrimaryRegionKey, 'all'>, string[]> = {
     'Zambia',
     'Zimbabwe',
   ],
+  'asia': [
+    'Afghanistan',
+    'Armenia',
+    'Azerbaijan',
+    'Bangladesh',
+    'Bhutan',
+    'Brunei',
+    'Cambodia',
+    'China',
+    'Georgia',
+    'Hong Kong',
+    'India',
+    'Indonesia',
+    'Japan',
+    'Kazakhstan',
+    'Kyrgyzstan',
+    'Laos',
+    'Malaysia',
+    'Mongolia',
+    'Myanmar',
+    'Nepal',
+    'North Korea',
+    'Pakistan',
+    'Philippines',
+    'Singapore',
+    'South Korea',
+    'Sri Lanka',
+    'Taiwan',
+    'Thailand',
+    'Uzbekistan',
+    'Vietnam',
+  ],
+  'middle-east': [
+    'Bahrain',
+    'Iran',
+    'Israel',
+    'Jordan',
+    'Kuwait',
+    'Lebanon',
+    'Oman',
+    'Qatar',
+    'Saudi Arabia',
+    'United Arab Emirates',
+  ],
+  'oceania': [
+    'Australia',
+    'Cook Islands',
+    'Fiji',
+    'French Polynesia',
+    'Guam',
+    'New Caledonia',
+    'New Zealand',
+    'Norfolk Island',
+    'Northern Mariana Islands',
+    'Papua New Guinea',
+    'Samoa',
+    'Vanuatu',
+  ],
+  'caribbean': [
+    'Anguilla',
+    'Antigua and Barbuda',
+    'Aruba',
+    'Bahamas',
+    'Barbados',
+    'Cayman Islands',
+    'Cuba',
+    'Curaçao',
+    'Dominican Republic',
+    'Grenada',
+    'Guadeloupe',
+    'Haiti',
+    'Jamaica',
+    'Martinique',
+    'Puerto Rico',
+    'St Kitts and Nevis',
+    'St Lucia',
+    'St Martin',
+    'St Vincent and the Grenadines',
+    'Trinidad and Tobago',
+    'Turks and Caicos Islands',
+    'Virgin Islands',
+  ],
+  'central-south-america': [
+    'Argentina',
+    'Belize',
+    'Bolivia',
+    'Brazil',
+    'Chile',
+    'Colombia',
+    'Costa Rica',
+    'Ecuador',
+    'El Salvador',
+    'Falkland Islands',
+    'French Guiana',
+    'Guatemala',
+    'Guyana',
+    'Honduras',
+    'Nicaragua',
+    'Panama',
+    'Paraguay',
+    'Peru',
+    'Suriname',
+    'Uruguay',
+    'Venezuela',
+  ],
   'rest': [],
 };
 
@@ -174,6 +289,16 @@ export function regionKeyToDbValue(key: PrimaryRegionKey): string | null {
       return 'USA';
     case 'africa':
       return 'Africa';
+    case 'asia':
+      return 'Asia';
+    case 'middle-east':
+      return 'Middle East';
+    case 'oceania':
+      return 'Oceania';
+    case 'caribbean':
+      return 'Caribbean';
+    case 'central-south-america':
+      return 'Central and South America';
     case 'rest':
       return 'Rest of World';
     case 'all':
@@ -212,6 +337,21 @@ export function dbValueToRegionKey(dbValue?: string | null): PrimaryRegionKey {
   if (value === 'africa') {
     return PRIMARY_REGIONS.AFRICA;
   }
+  if (value === 'asia') {
+    return PRIMARY_REGIONS.ASIA;
+  }
+  if (value.includes('middle east')) {
+    return PRIMARY_REGIONS.MIDDLE_EAST;
+  }
+  if (value === 'oceania') {
+    return PRIMARY_REGIONS.OCEANIA;
+  }
+  if (value === 'caribbean') {
+    return PRIMARY_REGIONS.CARIBBEAN;
+  }
+  if (value.includes('central') && value.includes('south') && value.includes('america')) {
+    return PRIMARY_REGIONS.CENTRAL_SOUTH_AMERICA;
+  }
   if (value.includes('rest of world')) {
     return PRIMARY_REGIONS.REST;
   }
@@ -249,6 +389,16 @@ export function primaryRegionKeyToTop100Slug(
       return 'usa';
     case PRIMARY_REGIONS.AFRICA:
       return 'africa';
+    case PRIMARY_REGIONS.ASIA:
+      return 'asia';
+    case PRIMARY_REGIONS.MIDDLE_EAST:
+      return 'middle-east';
+    case PRIMARY_REGIONS.OCEANIA:
+      return 'oceania';
+    case PRIMARY_REGIONS.CARIBBEAN:
+      return 'caribbean';
+    case PRIMARY_REGIONS.CENTRAL_SOUTH_AMERICA:
+      return 'central-south-america';
     case PRIMARY_REGIONS.REST:
       return 'rest';
     case PRIMARY_REGIONS.ALL:
