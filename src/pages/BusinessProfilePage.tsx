@@ -33,7 +33,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 // Tab content components
-import { BusinessProfilePosts } from '@/components/business/BusinessProfilePosts';
+import { BusinessActivityFeed } from '@/components/business/posts/BusinessActivityFeed';
 import { BusinessProfileOverview } from '@/components/business/BusinessProfileOverview';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
 import { GolfersHereTab } from '@/components/business/GolfersHereTab';
@@ -178,7 +178,7 @@ const BusinessProfilePage: React.FC = () => {
     .toUpperCase() || 'B';
 
   const tabs = [
-    { id: 'content', label: 'Content' },
+    { id: 'content', label: 'Activity' },
     { id: 'overview', label: 'Overview' },
     { id: 'golfers', label: 'Golfers' },
     { id: 'info', label: 'Info' },
@@ -188,7 +188,7 @@ const BusinessProfilePage: React.FC = () => {
     switch (activeTab) {
       case 'content':
         return (
-          <BusinessProfilePosts 
+          <BusinessActivityFeed 
             businessId={business?.id || ''}
             businessName={business?.name || ''}
             businessLogo={business?.logo_url}
