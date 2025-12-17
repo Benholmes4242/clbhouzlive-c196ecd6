@@ -4,7 +4,7 @@
 import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { postEventBus } from '@/events/postEventBus';
+import { uploadEventBus } from '@/uploads/uploadEventBus';
 
 export interface TaggedPost {
   id: string;
@@ -37,17 +37,18 @@ export interface TaggedPost {
 export function useBusinessTaggedPosts(businessId: string | undefined) {
   const queryClient = useQueryClient();
 
-  // Listen for post:created events to refresh tagged posts in real-time
+  // IMPORTANT: tags are written during the upload pipeline "finalizing" step.
+  // post:created can fire before post_tags exist, so we refresh on upload:complete.
   useEffect(() => {
     if (!businessId) return;
 
-    const off = postEventBus.on('post:created', () => {
-      // Invalidate tagged posts - new post may have tagged this business
+    const off = uploadEventBus.on('upload:complete', () => {
       queryClient.invalidateQueries({ queryKey: ['business-tagged-posts', businessId] });
     });
 
     return () => off();
   }, [businessId, queryClient]);
+
 
   return useQuery({
     queryKey: ['business-tagged-posts', businessId],
