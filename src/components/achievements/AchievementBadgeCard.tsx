@@ -166,28 +166,27 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         'min-w-[180px] h-[92px] px-3 py-2.5',
         // Glassmorphism backdrop blur
         'backdrop-blur-[16px] backdrop-saturate-[140%]',
-        // Subtle border for floating effect
-        'border border-white/[0.18]',
+        // Subtle border for floating effect - darker for light mode
+        'border',
         // Soft shadow - lifted feel
         unlocked && !isGhost
-          ? 'shadow-[0_8px_30px_rgba(0,0,0,0.25)]' 
-          : 'shadow-[0_4px_20px_rgba(0,0,0,0.15)]',
+          ? 'shadow-[0_8px_30px_rgba(0,0,0,0.12)]' 
+          : 'shadow-[0_4px_20px_rgba(0,0,0,0.08)]',
         // Smooth micro-interactions
         'transition-all duration-200 ease-out',
         'active:scale-[0.98]',
-        unlocked && !isGhost && 'hover:scale-[1.02] hover:backdrop-blur-[18px]',
+        unlocked && !isGhost && 'hover:scale-[1.02]',
         // Ghost styling
         isGhost && 'border-dashed'
       )}
       style={{
-        // Translucent glass background
+        // Translucent glass background - darker tint for light backgrounds
         background: unlocked && !isGhost
-          ? 'rgba(255, 255, 255, 0.12)'
-          : 'rgba(255, 255, 255, 0.06)',
-        // Inner highlight gradient for Apple feel
-        backgroundImage: unlocked && !isGhost
-          ? 'linear-gradient(to bottom, rgba(255,255,255,0.25) 0%, transparent 40%)'
-          : 'linear-gradient(to bottom, rgba(255,255,255,0.12) 0%, transparent 40%)',
+          ? 'rgba(15, 23, 42, 0.06)'
+          : 'rgba(15, 23, 42, 0.03)',
+        borderColor: unlocked && !isGhost
+          ? 'rgba(15, 23, 42, 0.12)'
+          : 'rgba(15, 23, 42, 0.08)',
         transform: isPrimary ? 'translateY(-2px)' : undefined,
         opacity: isGhost ? 0.7 : (!unlocked ? 0.6 : 1),
       }}
@@ -200,32 +199,32 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
           aria-hidden="true"
           className="pointer-events-none select-none absolute inset-y-0 right-0 h-full w-auto translate-x-4 scale-125"
           style={{ 
-            filter: 'brightness(0) invert(1)',
-            opacity: unlocked && !isGhost ? 0.08 : 0.04,
+            filter: 'brightness(0)',
+            opacity: unlocked && !isGhost ? 0.06 : 0.03,
           }}
         />
       )}
 
       {/* Ghost overlay */}
       {isGhost && (
-        <div className="absolute inset-0 rounded-[inherit] bg-white/10 pointer-events-none" />
+        <div className="absolute inset-0 rounded-[inherit] bg-slate-500/5 pointer-events-none" />
       )}
 
       {/* Top left: Trophy icon + Title/Subtitle */}
       <div className="flex items-start gap-2 relative z-10">
-        {/* Trophy icon - monochrome white, no solid background */}
+        {/* Trophy icon - slate color for light backgrounds */}
         <Trophy 
           className="w-5 h-5 flex-shrink-0 mt-0.5"
           style={{ 
-            color: unlocked && !isGhost ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.45)',
+            color: unlocked && !isGhost ? 'rgba(15,23,42,0.7)' : 'rgba(15,23,42,0.35)',
           }} 
         />
         <div className="flex-1 min-w-0 overflow-hidden text-left">
-          {/* Title - white/near-white, medium weight */}
+          {/* Title - dark slate for light backgrounds */}
           <div 
             className="font-medium leading-tight truncate text-[13px]"
             style={{ 
-              color: unlocked && !isGhost ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.5)',
+              color: unlocked && !isGhost ? 'rgba(15,23,42,0.9)' : 'rgba(15,23,42,0.45)',
             }}
           >
             {isMilestone ? `${threshold} Club` : title}
@@ -234,7 +233,7 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
           <div 
             className="text-[11px] truncate"
             style={{ 
-              color: unlocked && !isGhost ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.35)',
+              color: unlocked && !isGhost ? 'rgba(15,23,42,0.6)' : 'rgba(15,23,42,0.3)',
             }}
           >
             {isMilestone ? clubName : subtitle}
@@ -253,21 +252,21 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
           )}
           style={{
             background: unlocked && !isGhost 
-              ? 'rgba(255,255,255,0.18)' 
-              : 'rgba(255,255,255,0.08)',
+              ? 'rgba(15,23,42,0.06)' 
+              : 'rgba(15,23,42,0.03)',
             borderColor: unlocked && !isGhost 
-              ? 'rgba(255,255,255,0.25)' 
-              : 'rgba(255,255,255,0.12)',
+              ? 'rgba(15,23,42,0.12)' 
+              : 'rgba(15,23,42,0.06)',
             color: unlocked && !isGhost 
-              ? 'rgba(255,255,255,0.9)' 
-              : 'rgba(255,255,255,0.5)',
+              ? 'rgba(15,23,42,0.75)' 
+              : 'rgba(15,23,42,0.4)',
           }}
         >
-          {/* Optional green glass tick for unlocked state */}
+          {/* Green tick for unlocked state */}
           {unlocked && !isGhost && (
             <Check 
               className="w-3 h-3" 
-              style={{ color: 'rgba(134,239,172,0.9)' }} 
+              style={{ color: 'rgba(34,197,94,0.85)' }} 
             />
           )}
           <span className="uppercase tracking-wider">{statusLabel}</span>
