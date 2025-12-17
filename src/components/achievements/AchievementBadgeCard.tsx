@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
@@ -7,6 +7,61 @@ import {
   MilestoneTier,
 } from '@/lib/globalAchievementMilestoneSystem';
 import { getEmblemPath } from '@/lib/achievementEmblems';
+
+// Helper to convert hex to rgba
+function hexToRgba(hex: string, alpha: number): string {
+  // Handle hsl colors - return as-is with opacity adjustment
+  if (hex.startsWith('hsl')) {
+    return hex.replace(')', ` / ${alpha})`).replace('hsl(', 'hsla(');
+  }
+  // Handle hex colors
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  if (!result) return hex;
+  const r = parseInt(result[1], 16);
+  const g = parseInt(result[2], 16);
+  const b = parseInt(result[3], 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+// Generate CSS filter to colorize emblem to match accent color
+function getColorFilter(hex: string): string {
+  // For locked state (slate)
+  if (hex === '#94a3b8') return 'brightness(0)';
+  
+  // Parse hex to RGB
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  if (!result) return 'brightness(0)';
+  
+  const r = parseInt(result[1], 16);
+  const g = parseInt(result[2], 16);
+  const b = parseInt(result[3], 16);
+  
+  // Convert to HSL for filter calculation
+  const rNorm = r / 255;
+  const gNorm = g / 255;
+  const bNorm = b / 255;
+  const max = Math.max(rNorm, gNorm, bNorm);
+  const min = Math.min(rNorm, gNorm, bNorm);
+  const l = (max + min) / 2;
+  
+  let h = 0, s = 0;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case rNorm: h = ((gNorm - bNorm) / d + (gNorm < bNorm ? 6 : 0)) * 60; break;
+      case gNorm: h = ((bNorm - rNorm) / d + 2) * 60; break;
+      case bNorm: h = ((rNorm - gNorm) / d + 4) * 60; break;
+    }
+  }
+  
+  // Generate filter to achieve target color
+  const hueRotate = h - 180; // Base hue after invert is ~180
+  const saturate = s * 100 * 5; // Amplify saturation
+  const brightness = 0.5 + l * 0.5;
+  
+  return `brightness(0) saturate(100%) invert(${Math.round(l * 100)}%) sepia(50%) saturate(${Math.round(saturate)}%) hue-rotate(${Math.round(hueRotate)}deg) brightness(${brightness.toFixed(2)}) contrast(90%)`;
+}
 
 export type AchievementStatus = 'UNLOCKED' | 'LOCKED' | 'NEW';
 export type AchievementType = 'MILESTONE' | 'LIST' | 'SKILL' | 'SEASONAL';
@@ -170,14 +225,14 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         isGhost && 'border-dashed border-slate-300'
       )}
       style={{
-        // Exact same styling as Golfer pill in ProfilePageV2
+        // Same pill styling but with achievement-specific colors
         background: unlocked && !isGhost 
-          ? 'rgba(52, 199, 89, 0.15)' // Apple green #34C759 at 15% opacity
+          ? hexToRgba(palette.accent, 0.15)
           : '#f1f5f9', // slate-100 for locked
         backdropFilter: unlocked && !isGhost ? 'blur(8px)' : undefined,
         WebkitBackdropFilter: unlocked && !isGhost ? 'blur(8px)' : undefined,
         border: unlocked && !isGhost 
-          ? '1px solid rgba(52, 199, 89, 0.3)' 
+          ? `1px solid ${hexToRgba(palette.accent, 0.3)}`
           : '1px solid rgba(148, 163, 184, 0.3)',
         transform: isPrimary ? 'translateY(-2px)' : undefined,
         opacity: isGhost ? 0.7 : (!unlocked ? 0.85 : 1),
@@ -192,7 +247,7 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         className="pointer-events-none select-none absolute inset-y-0 right-0 h-full w-auto translate-x-4 scale-125 opacity-[0.12]"
         style={{ 
           filter: unlocked && !isGhost 
-            ? 'brightness(0) saturate(100%) invert(50%) sepia(88%) saturate(533%) hue-rotate(100deg) brightness(94%) contrast(91%)' // Apple green #34C759 filter
+            ? getColorFilter(palette.accent)
             : 'brightness(0)',
         }}
         />
@@ -208,25 +263,24 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         <div 
           className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
           style={{ 
-            backgroundColor: unlocked && !isGhost ? 'rgba(52, 199, 89, 0.2)' : 'rgba(148,163,184,0.12)' 
+            backgroundColor: unlocked && !isGhost ? hexToRgba(palette.accent, 0.2) : 'rgba(148,163,184,0.12)' 
           }}
         >
-          {/* Trophy - emerald-700 when unlocked (same as Golfer pill text) */}
           <Trophy 
             className="w-3.5 h-3.5"
-            style={{ color: unlocked && !isGhost ? '#047857' : '#94a3b8' }} 
+            style={{ color: unlocked && !isGhost ? palette.accent : '#94a3b8' }} 
           />
         </div>
         <div className="flex-1 min-w-0 overflow-hidden text-left">
           <div 
             className="font-semibold leading-tight truncate text-[13px]"
-            style={{ color: unlocked && !isGhost ? '#047857' : '#0f172a' }}
+            style={{ color: unlocked && !isGhost ? palette.accent : '#0f172a' }}
           >
             {isMilestone ? `${threshold} Club` : title}
           </div>
           <div 
             className="text-[11px] truncate"
-            style={{ color: unlocked && !isGhost ? '#15803d' : '#64748b' }}
+            style={{ color: unlocked && !isGhost ? hexToRgba(palette.accent, 0.8) : '#64748b' }}
           >
             {isMilestone ? clubName : subtitle}
           </div>
@@ -238,8 +292,8 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         <div 
           className="inline-flex items-center px-2 py-0.5 rounded-sq-xs text-[10px] font-medium"
           style={{
-            backgroundColor: unlocked && !isGhost ? 'rgba(52, 199, 89, 0.2)' : 'rgba(148,163,184,0.2)',
-            color: unlocked && !isGhost ? '#047857' : '#64748b'
+            backgroundColor: unlocked && !isGhost ? hexToRgba(palette.accent, 0.2) : 'rgba(148,163,184,0.2)',
+            color: unlocked && !isGhost ? palette.accent : '#64748b'
           }}
         >
           {statusLabel}
