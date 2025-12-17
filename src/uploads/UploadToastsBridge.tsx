@@ -1,24 +1,49 @@
 // Upload toasts bridge - shows toast notifications for upload events
+// Also handles cache invalidation when uploads complete
 
 import { useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { uploadEventBus } from './uploadEventBus';
+import { postKeys } from '@/queryKeys/posts';
+
+const TOAST_DURATION_MS = 2000;
+const TOAST_DURATION_ERROR_MS = 4000;
 
 export function UploadToastsBridge() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const offEnqueued = uploadEventBus.on('upload:enqueued', (evt) => {
       toast({
         title: "Uploading...",
         description: "Your post will appear soon.",
+        duration: TOAST_DURATION_MS,
       });
     });
 
     const offComplete = uploadEventBus.on('upload:complete', (evt) => {
+      // Show success toast
       toast({
         title: "Posted ✓",
         description: "Now live on clbhouz",
+        duration: TOAST_DURATION_MS,
+      });
+
+      // Invalidate the actor-scoped feed so media appears immediately
+      if (evt.actorType && evt.actorId) {
+        queryClient.invalidateQueries({ 
+          queryKey: postKeys.actorPosts(evt.actorType, evt.actorId) 
+        });
+        queryClient.invalidateQueries({ 
+          queryKey: postKeys.actorPostsCount(evt.actorType, evt.actorId) 
+        });
+      }
+      
+      // Also invalidate trending for good measure
+      queryClient.invalidateQueries({ 
+        queryKey: postKeys.trending() 
       });
     });
 
@@ -27,6 +52,7 @@ export function UploadToastsBridge() {
         title: "Upload failed",
         description: evt.error || "Tap to retry",
         variant: "destructive",
+        duration: TOAST_DURATION_ERROR_MS,
       });
     });
 
@@ -35,7 +61,7 @@ export function UploadToastsBridge() {
       offComplete();
       offFailed();
     };
-  }, [toast]);
+  }, [toast, queryClient]);
 
   return null;
 }
