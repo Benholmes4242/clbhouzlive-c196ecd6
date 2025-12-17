@@ -89,7 +89,6 @@ const ProfileQuestView = lazy(() => import("./pages/ProfileQuestView"));
 const QuestIndexView = lazy(() => import("./pages/QuestIndexView"));
 const QuestReplayView = lazy(() => import("./pages/QuestReplayView"));
 const AdminBackfill = lazy(() => import("./pages/AdminBackfill"));
-const UserProfilePage = lazy(() => import("./pages/UserProfilePage"));
 const UserReviewsPage = lazy(() => import("./pages/UserReviewsPage"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Courses = lazy(() => import("./pages/Courses"));
