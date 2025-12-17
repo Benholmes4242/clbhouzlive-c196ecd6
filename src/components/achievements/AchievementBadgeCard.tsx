@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trophy, Check } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   getTierPalette, 
@@ -80,13 +80,13 @@ export interface AchievementBadgeCardProps {
 }
 
 /**
- * AchievementBadgeCard - Frosted Glass Glassmorphism Design
+ * AchievementBadgeCard - Global Achievement & Milestone System
  * 
- * Premium iOS/VisionOS-inspired achievement card with:
- * - Translucent glass background with backdrop blur
- * - Subtle edge highlights and soft shadows
- * - Monochrome white iconography
- * - Smooth micro-interactions on hover/tap
+ * World-class premium badge card with:
+ * - Top row: tier band + status chip
+ * - Hero value block (threshold number)
+ * - Label row: trophy + named club
+ * - Bottom micro-progress to next tier
  * 
  * All colors sourced from globalAchievementMilestoneSystem.ts
  */
@@ -160,130 +160,78 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   return (
     <div
       className={cn(
-        // Base card with SDS rounded corners
-        'rounded-[18px] flex flex-col justify-between relative overflow-hidden',
+        // Horizontal rectangle with SDS rounded corners - GLOBAL SIZE for all badges
+        'rounded-sq-md flex flex-col justify-between transition-all duration-150 relative overflow-hidden',
         // Fixed global size for ALL achievement badges site-wide
         'min-w-[180px] h-[92px] px-3 py-2.5',
-        // Subtle border for glass edge highlight
-        'border border-white/20',
-        // Smooth micro-interactions
-        'transition-all duration-200 ease-out',
+        unlocked && !isGhost
+          ? 'shadow-[0_6px_20px_rgba(15,23,42,0.10)]' 
+          : 'shadow-sm',
+        // Micro-interactions
         'active:scale-[0.98]',
-        unlocked && !isGhost && 'hover:scale-[1.02]',
+        unlocked && !isGhost && 'hover:shadow-[0_10px_28px_rgba(16,185,129,0.15)]',
         // Ghost styling
-        isGhost && 'border-dashed border-white/30'
+        isGhost && 'border border-dashed border-white/60'
       )}
       style={{
-        // Layer 1: Achievement gradient as base (your existing color system)
         background: unlocked && !isGhost
-          ? `linear-gradient(135deg, ${palette.bgLight} 0%, ${palette.bgDark} 100%)`
-          : `linear-gradient(135deg, ${palette.bgLocked} 0%, ${palette.bgDark} 100%)`,
-        // Soft shadow for depth
-        boxShadow: unlocked && !isGhost
-          ? '0 4px 20px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.2)'
-          : 'inset 0 1px 0 rgba(255,255,255,0.1)',
+          ? `linear-gradient(135deg, ${palette.bgLight}, ${palette.bgDark})`
+          : palette.bgLocked,
         transform: isPrimary ? 'translateY(-2px)' : undefined,
-        opacity: isGhost ? 0.7 : (!unlocked ? 0.6 : 1),
+        opacity: isGhost ? 0.7 : (!unlocked ? 0.85 : 1),
       }}
     >
-      {/* Layer 2: Glass overlay - adds depth and shine */}
-      <div 
-        className="absolute inset-0 rounded-[inherit] pointer-events-none"
-        style={{
-          background: unlocked && !isGhost
-            ? 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)'
-            : 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%, rgba(0,0,0,0.05) 100%)',
-        }}
-      />
-      
-      {/* Inner highlight at top edge for Apple feel */}
-      <div 
-        className="absolute inset-x-0 top-0 h-[1px] rounded-t-[inherit] pointer-events-none"
-        style={{
-          background: 'linear-gradient(90deg, transparent 10%, rgba(255,255,255,0.3) 50%, transparent 90%)',
-        }}
-      />
-
-      {/* Background emblem - subtle engraved crest */}
+      {/* Background emblem - engraved crest effect */}
       {emblemSrc && (
         <img
           src={emblemSrc}
           alt=""
           aria-hidden="true"
-          className="pointer-events-none select-none absolute inset-y-0 right-0 h-full w-auto translate-x-4 scale-125"
+          className="pointer-events-none select-none absolute inset-y-0 right-0 h-full w-auto translate-x-4 scale-125 opacity-[0.08]"
           style={{ 
-            filter: 'brightness(0) invert(1)',
-            opacity: unlocked && !isGhost ? 0.12 : 0.06,
+            filter: 'brightness(0)',
           }}
         />
       )}
 
       {/* Ghost overlay */}
       {isGhost && (
-        <div className="absolute inset-0 rounded-[inherit] bg-white/10 pointer-events-none" />
+        <div className="absolute inset-0 rounded-[inherit] bg-white/40 pointer-events-none" />
       )}
 
       {/* Top left: Trophy icon + Title/Subtitle */}
-      <div className="flex items-start gap-2 relative z-10">
-        {/* Trophy icon - monochrome white */}
-        <Trophy 
-          className="w-5 h-5 flex-shrink-0 mt-0.5"
+      <div className="flex items-start gap-2">
+        <div 
+          className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
           style={{ 
-            color: unlocked && !isGhost ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.5)',
-          }} 
-        />
+            backgroundColor: unlocked ? 'rgba(15,23,42,0.08)' : 'rgba(148,163,184,0.12)' 
+          }}
+        >
+          {/* Trophy always uses dark slate to match title text */}
+          <Trophy 
+            className="w-3.5 h-3.5"
+            style={{ color: unlocked ? '#0F172A' : '#94a3b8' }} 
+          />
+        </div>
         <div className="flex-1 min-w-0 overflow-hidden text-left">
-          {/* Title - white, medium weight */}
-          <div 
-            className="font-medium leading-tight truncate text-[13px]"
-            style={{ 
-              color: unlocked && !isGhost ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.6)',
-              textShadow: unlocked && !isGhost ? '0 1px 2px rgba(0,0,0,0.3)' : 'none',
-            }}
-          >
+          <div className="font-semibold leading-tight text-slate-900 truncate text-[13px]">
             {isMilestone ? `${threshold} Club` : title}
           </div>
-          {/* Subtitle - smaller, slightly reduced opacity */}
-          <div 
-            className="text-[11px] truncate"
-            style={{ 
-              color: unlocked && !isGhost ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.45)',
-            }}
-          >
+          <div className="text-[11px] text-slate-800/70 truncate">
             {isMilestone ? clubName : subtitle}
           </div>
         </div>
       </div>
 
-      {/* Bottom right: Glass micro-badge */}
-      <div className="flex justify-end relative z-10">
-        <div 
-          className={cn(
-            "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium",
-            "backdrop-blur-[8px]",
-            "border",
-            "transition-all duration-200"
-          )}
-          style={{
-            background: unlocked && !isGhost 
-              ? 'rgba(255,255,255,0.2)' 
-              : 'rgba(255,255,255,0.1)',
-            borderColor: unlocked && !isGhost 
-              ? 'rgba(255,255,255,0.3)' 
-              : 'rgba(255,255,255,0.15)',
-            color: unlocked && !isGhost 
-              ? 'rgba(255,255,255,0.95)' 
-              : 'rgba(255,255,255,0.55)',
-          }}
-        >
-          {/* Green glass tick for unlocked state */}
-          {unlocked && !isGhost && (
-            <Check 
-              className="w-3 h-3" 
-              style={{ color: 'rgba(134,239,172,0.95)' }} 
-            />
-          )}
-          <span className="uppercase tracking-wider">{statusLabel}</span>
+      {/* Bottom right: Status chip */}
+      <div className="flex justify-end">
+        <div className={cn(
+          "inline-flex items-center px-2 py-0.5 rounded-sq-xs text-[10px] font-medium",
+          unlocked && !isGhost
+            ? "bg-white/75 text-slate-800"
+            : "bg-white/60 text-slate-500"
+        )}>
+          {statusLabel}
         </div>
       </div>
     </div>
