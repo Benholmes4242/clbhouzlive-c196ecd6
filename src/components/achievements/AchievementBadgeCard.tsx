@@ -157,18 +157,8 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
     regionalProgress = Math.min(100, (playedOnList / totalOnList) * 100);
   }
 
-  // Convert hex to rgba for glass tinting
-  const hexToRgba = (hex: string, alpha: number) => {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-  };
-
-  // Glass background with tier color tint
-  const glassBackground = unlocked && !isGhost
-    ? `linear-gradient(135deg, ${hexToRgba(palette.bgLight, 0.25)}, ${hexToRgba(palette.bgDark, 0.35)})`
-    : 'rgba(148, 163, 184, 0.15)';
+  // Frosted glass background - neutral white/grey
+  const frostedBackground = 'rgba(255, 255, 255, 0.15)';
 
   return (
     <div
@@ -177,15 +167,15 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         'rounded-sq-md flex flex-col justify-between transition-all duration-150 relative overflow-hidden',
         // Fixed global size for ALL achievement badges site-wide
         'min-w-[180px] h-[92px] px-3 py-2.5',
-        // Liquid glass effect
-        'backdrop-blur-xl border border-white/20',
+        // Frosted glass effect
+        'backdrop-blur-xl border border-slate-200/60',
         // Micro-interactions
         'active:scale-[0.98]',
         // Ghost styling
         isGhost && 'border-dashed border-white/60'
       )}
       style={{
-        background: glassBackground,
+        background: frostedBackground,
         transform: isPrimary ? 'translateY(-2px)' : undefined,
         opacity: isGhost ? 0.7 : (!unlocked ? 0.85 : 1),
       }}
@@ -213,20 +203,20 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         <div 
           className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
           style={{ 
-            backgroundColor: unlocked ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)' 
+            backgroundColor: unlocked ? 'rgba(15,23,42,0.08)' : 'rgba(148,163,184,0.12)' 
           }}
         >
           {/* Trophy uses tier accent color when unlocked */}
           <Trophy 
             className="w-3.5 h-3.5"
-            style={{ color: unlocked ? palette.accent : 'rgba(255,255,255,0.5)' }} 
+            style={{ color: unlocked ? palette.accent : '#94a3b8' }} 
           />
         </div>
         <div className="flex-1 min-w-0 overflow-hidden text-left">
-          <div className="font-semibold leading-tight text-white truncate text-[13px]">
+          <div className="font-semibold leading-tight text-slate-900 truncate text-[13px]">
             {isMilestone ? `${threshold} Club` : title}
           </div>
-          <div className="text-[11px] text-white/70 truncate">
+          <div className="text-[11px] text-slate-600 truncate">
             {isMilestone ? clubName : subtitle}
           </div>
         </div>
@@ -237,8 +227,8 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         <div className={cn(
           "inline-flex items-center px-2 py-0.5 rounded-sq-xs text-[10px] font-medium",
           unlocked && !isGhost
-            ? "bg-white/20 text-white"
-            : "bg-white/10 text-white/60"
+            ? "bg-slate-900/10 text-slate-700"
+            : "bg-slate-400/20 text-slate-500"
         )}>
           {statusLabel}
         </div>
