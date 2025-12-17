@@ -13,7 +13,7 @@ interface VideoOverlayProps {
  * Used on both HeroPostTile and StandardPostTile for video content
  */
 const VideoOverlay: React.FC<VideoOverlayProps> = ({ durationSeconds, isPlaying = false }) => {
-  const durationLabel = formatDuration(durationSeconds);
+  const durationLabel = durationSeconds && durationSeconds > 0 ? formatDuration(durationSeconds) : '';
 
   return (
     <>
@@ -21,13 +21,13 @@ const VideoOverlay: React.FC<VideoOverlayProps> = ({ durationSeconds, isPlaying 
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-slate-900/45 to-transparent" />
 
       {/* Duration pill - bottom left */}
-      {durationLabel && (
+      {durationLabel ? (
         <div className="pointer-events-none absolute bottom-1.5 left-1.5 flex items-center gap-1 rounded-full bg-slate-900/85 px-2 py-1 shadow-sm">
           <span className="text-[10px] leading-none font-medium text-white">
             {durationLabel}
           </span>
         </div>
-      )}
+      ) : null}
 
       {/* Play/pause icon chip - bottom right */}
       <div 
