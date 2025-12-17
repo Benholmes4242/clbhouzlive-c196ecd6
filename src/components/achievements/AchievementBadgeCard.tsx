@@ -165,9 +165,9 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   };
 
-  // Apple-style frosted glass with subtle tier color tint
+  // Apple-style frosted glass with tier color tint
   const frostedBackground = unlocked && !isGhost
-    ? `linear-gradient(135deg, rgba(255,255,255,0.45), ${hexToRgba(palette.bgDark, 0.18)})`
+    ? `linear-gradient(135deg, ${hexToRgba(palette.bgLight, 0.5)}, ${hexToRgba(palette.bgDark, 0.4)})`
     : 'rgba(255, 255, 255, 0.35)';
 
   return (
