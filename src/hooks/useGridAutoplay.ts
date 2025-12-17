@@ -163,6 +163,11 @@ export function useGridAutoplay(
       }
     );
 
+    // Videos can register before this effect runs; ensure they’re observed.
+    for (const v of videosRef.current.values()) {
+      preloadObserverRef.current.observe(v.element);
+    }
+
     return () => {
       preloadObserverRef.current?.disconnect();
       preloadObserverRef.current = null;
@@ -194,6 +199,11 @@ export function useGridAutoplay(
         threshold: [0, visibilityThreshold],
       }
     );
+
+    // Videos can register before this effect runs; ensure they’re observed.
+    for (const v of videosRef.current.values()) {
+      autoplayObserverRef.current.observe(v.element);
+    }
 
     return () => {
       autoplayObserverRef.current?.disconnect();

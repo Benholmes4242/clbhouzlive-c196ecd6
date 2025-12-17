@@ -6,6 +6,7 @@ import StandardPostTile from './StandardPostTile';
 import { ActivityMediaGridProps, ActivityMediaItem, AspectRatio, ActivityPost } from './types';
 import { buildActivityLayout } from './layoutEngine';
 import { getStreamPoster } from '@/utils/stream';
+import { uidFromNode, generateHlsUrl } from '@/utils/cloudflareStreamTransform';
 import { useGridAutoplay } from '@/hooks/useGridAutoplay';
 
 /**
@@ -33,6 +34,10 @@ function postToMediaItem(
   }
 
   const isVideo = primaryMedia.media_type === 'video';
+
+  // Normalize Stream customer domains to stable videodelivery.net manifests (prevents 404s)
+  const uid = isVideo ? uidFromNode({ src: primaryMedia.media_url, media_url: primaryMedia.media_url }) : null;
+  const playbackUrl = uid ? generateHlsUrl(uid) : primaryMedia.media_url;
   
   // For videos: prefer DB poster_url; otherwise derive a stable Stream poster (videodelivery.net)
   // For images: use media_url directly
@@ -55,7 +60,7 @@ function postToMediaItem(
     type: primaryMedia.media_type,
     url: primaryMedia.media_url,
     thumbnailUrl,
-    playbackUrl: primaryMedia.media_url,
+    playbackUrl,
     courseName: golfCourseTag?.name,
     roundDate: post.created_at,
     additionalMediaCount: media.length > 1 ? media.length - 1 : undefined,
@@ -151,26 +156,26 @@ const ActivityMediaGrid: React.FC<ActivityMediaGridProps> = ({
             );
           }
 
-          return (
-            <React.Fragment key={`pair-${index}`}>
-              <StandardPostTile 
-                item={row.left} 
-                onPress={onPostPress}
-                registerVideo={registerVideo}
-                isPlaying={playingIds.has(row.left.postId)}
-              />
-              {row.right ? (
+            return (
+              <div key={`pair-${index}`} className="contents">
                 <StandardPostTile 
-                  item={row.right} 
+                  item={row.left} 
                   onPress={onPostPress}
                   registerVideo={registerVideo}
-                  isPlaying={playingIds.has(row.right.postId)}
+                  isPlaying={playingIds.has(row.left.postId)}
                 />
-              ) : (
-                <div className="aspect-[3/4]" /> // empty spacer if odd
-              )}
-            </React.Fragment>
-          );
+                {row.right ? (
+                  <StandardPostTile 
+                    item={row.right} 
+                    onPress={onPostPress}
+                    registerVideo={registerVideo}
+                    isPlaying={playingIds.has(row.right.postId)}
+                  />
+                ) : (
+                  <div className="aspect-[3/4]" /> // empty spacer if odd
+                )}
+              </div>
+            );
         })}
       </div>
     </div>
