@@ -157,19 +157,6 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
     regionalProgress = Math.min(100, (playedOnList / totalOnList) * 100);
   }
 
-  // Convert hex to rgba for frosted tinting
-  const hexToRgba = (hex: string, alpha: number) => {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-  };
-
-  // Apple frosted glass with tier color tint - like Golfer pill but with achievement colors
-  const colorTintOverlay = unlocked && !isGhost
-    ? `linear-gradient(145deg, ${hexToRgba(palette.bgLight, 0.4)} 0%, ${hexToRgba(palette.bgDark, 0.25)} 100%)`
-    : 'none';
-
   return (
     <div
       className={cn(
@@ -177,46 +164,29 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         'rounded-sq-md flex flex-col justify-between transition-all duration-150 relative overflow-hidden',
         // Fixed global size for ALL achievement badges site-wide
         'min-w-[180px] h-[92px] px-3 py-2.5',
-        // Frosted glass effect - white frosted base
-        'backdrop-blur-xl',
         // Micro-interactions
         'active:scale-[0.98]',
         // Ghost styling
-        isGhost && 'border-dashed'
+        isGhost && 'border-dashed border-slate-300'
       )}
       style={{
+        // Solid pill style like Golfer/Verified badge - use tier colors directly
         background: unlocked && !isGhost 
-          ? `linear-gradient(135deg, rgba(255,255,255,0.65), rgba(255,255,255,0.45))`
-          : 'rgba(255, 255, 255, 0.5)',
-        borderWidth: '1px',
-        borderStyle: isGhost ? 'dashed' : 'solid',
-        borderColor: unlocked && !isGhost 
-          ? hexToRgba(palette.accent, 0.35) 
-          : 'rgba(148, 163, 184, 0.3)',
-        boxShadow: unlocked && !isGhost 
-          ? `inset 0 1px 0 rgba(255,255,255,0.5), 0 1px 3px ${hexToRgba(palette.bgDark, 0.1)}`
-          : 'inset 0 1px 0 rgba(255,255,255,0.5)',
+          ? palette.bgLight
+          : '#f1f5f9', // slate-100 for locked
         transform: isPrimary ? 'translateY(-2px)' : undefined,
         opacity: isGhost ? 0.7 : (!unlocked ? 0.85 : 1),
       }}
     >
-      {/* Color tint overlay - subtle tier color wash */}
-      {unlocked && !isGhost && (
-        <div 
-          className="absolute inset-0 rounded-[inherit] pointer-events-none"
-          style={{ background: colorTintOverlay }}
-        />
-      )}
-      
-      {/* Background emblem - engraved crest effect */}
+      {/* Background emblem - subtle watermark */}
       {emblemSrc && (
         <img
           src={emblemSrc}
           alt=""
           aria-hidden="true"
-          className="pointer-events-none select-none absolute inset-y-0 right-0 h-full w-auto translate-x-4 scale-125 opacity-[0.08]"
+          className="pointer-events-none select-none absolute inset-y-0 right-0 h-full w-auto translate-x-4 scale-125 opacity-[0.12]"
           style={{ 
-            filter: 'brightness(0)',
+            filter: unlocked && !isGhost ? 'brightness(0) invert(1)' : 'brightness(0)',
           }}
         />
       )}
@@ -227,37 +197,44 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
       )}
 
       {/* Top left: Trophy icon + Title/Subtitle */}
-      <div className="flex items-start gap-2">
+      <div className="flex items-start gap-2 relative z-10">
         <div 
           className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
           style={{ 
-            backgroundColor: unlocked ? 'rgba(15,23,42,0.08)' : 'rgba(148,163,184,0.12)' 
+            backgroundColor: unlocked && !isGhost ? 'rgba(255,255,255,0.25)' : 'rgba(148,163,184,0.12)' 
           }}
         >
-          {/* Trophy uses tier accent color when unlocked */}
+          {/* Trophy white when unlocked on colored bg */}
           <Trophy 
             className="w-3.5 h-3.5"
-            style={{ color: unlocked ? palette.accent : '#94a3b8' }} 
+            style={{ color: unlocked && !isGhost ? '#ffffff' : '#94a3b8' }} 
           />
         </div>
         <div className="flex-1 min-w-0 overflow-hidden text-left">
-          <div className="font-semibold leading-tight text-slate-900 truncate text-[13px]">
+          <div 
+            className="font-semibold leading-tight truncate text-[13px]"
+            style={{ color: unlocked && !isGhost ? '#ffffff' : '#0f172a' }}
+          >
             {isMilestone ? `${threshold} Club` : title}
           </div>
-          <div className="text-[11px] text-slate-600 truncate">
+          <div 
+            className="text-[11px] truncate"
+            style={{ color: unlocked && !isGhost ? 'rgba(255,255,255,0.8)' : '#64748b' }}
+          >
             {isMilestone ? clubName : subtitle}
           </div>
         </div>
       </div>
 
       {/* Bottom right: Status chip */}
-      <div className="flex justify-end">
-        <div className={cn(
-          "inline-flex items-center px-2 py-0.5 rounded-sq-xs text-[10px] font-medium",
-          unlocked && !isGhost
-            ? "bg-slate-900/10 text-slate-700"
-            : "bg-slate-400/20 text-slate-500"
-        )}>
+      <div className="flex justify-end relative z-10">
+        <div 
+          className="inline-flex items-center px-2 py-0.5 rounded-sq-xs text-[10px] font-medium"
+          style={{
+            backgroundColor: unlocked && !isGhost ? 'rgba(255,255,255,0.25)' : 'rgba(148,163,184,0.2)',
+            color: unlocked && !isGhost ? '#ffffff' : '#64748b'
+          }}
+        >
           {statusLabel}
         </div>
       </div>
