@@ -25,6 +25,7 @@ export interface BusinessPost {
   user_id: string;
   actor_type: string | null;
   actor_id: string | null;
+  course_id: string | null;
   is_pinned: boolean | null;
   pinned_until: string | null;
   pinned_at: string | null;
@@ -56,6 +57,7 @@ export function useBusinessPosts(businessId?: string) {
           user_id,
           actor_type,
           actor_id,
+          course_id,
           is_pinned,
           pinned_until,
           pinned_at,

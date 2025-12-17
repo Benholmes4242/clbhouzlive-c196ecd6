@@ -3435,6 +3435,7 @@ export type Database = {
           actor_id: string
           actor_type: string
           content: string | null
+          course_id: string | null
           created_at: string
           id: string
           is_pinned: boolean | null
@@ -3449,6 +3450,7 @@ export type Database = {
           actor_id: string
           actor_type?: string
           content?: string | null
+          course_id?: string | null
           created_at?: string
           id?: string
           is_pinned?: boolean | null
@@ -3463,6 +3465,7 @@ export type Database = {
           actor_id?: string
           actor_type?: string
           content?: string | null
+          course_id?: string | null
           created_at?: string
           id?: string
           is_pinned?: boolean | null
@@ -3486,6 +3489,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_achievements_view"
             referencedColumns: ["achievement_id"]
+          },
+          {
+            foreignKeyName: "posts_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
           },
         ]
       }

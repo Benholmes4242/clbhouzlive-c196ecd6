@@ -24,6 +24,7 @@ export interface UserPostData {
   created_at: string;
   actor_type?: 'personal' | 'business' | null;
   actor_id?: string | null;
+  course_id?: string | null;
   user: {
     id: string;
     display_name: string | null;
