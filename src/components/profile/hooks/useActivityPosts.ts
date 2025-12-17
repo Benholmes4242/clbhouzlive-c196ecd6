@@ -17,7 +17,7 @@ export const useActivityPosts = (userId?: string) => {
     setLoading(true);
 
     try {
-      // Get posts with media and tags using direct query
+      // Get posts with media and tags using actor identity (personal)
       const { data: postsData, error } = await supabase
         .from('posts')
         .select(`
@@ -25,6 +25,8 @@ export const useActivityPosts = (userId?: string) => {
           content,
           created_at,
           user_id,
+          actor_type,
+          actor_id,
           post_media (
             id,
             media_type,
@@ -49,7 +51,8 @@ export const useActivityPosts = (userId?: string) => {
             )
           )
         `)
-        .eq('user_id', userId)
+        .eq('actor_type', 'personal')
+        .eq('actor_id', userId)
         .order('created_at', { ascending: false });
 
       if (error) {
