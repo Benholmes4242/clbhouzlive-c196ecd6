@@ -40,11 +40,24 @@ export async function uploadToCloudflareStream(file: File): Promise<StreamUpload
       return { success: false, error: `Upload failed: ${uploadResponse.status}` };
     }
 
-    const result = await uploadResponse.json();
-    console.log('[CloudflareStream] Upload successful:', result);
+    const rawBody = await uploadResponse.text();
+    let result: any = null;
+
+    if (rawBody) {
+      try {
+        result = JSON.parse(rawBody);
+      } catch {
+        console.warn('[CloudflareStream] Upload response was not JSON; continuing with uid from upload URL.', {
+          contentType: uploadResponse.headers.get('content-type'),
+          rawBody,
+        });
+      }
+    }
+
+    console.log('[CloudflareStream] Upload successful:', result ?? '[no response body]');
 
     // Extract video URL
-    const streamId = result?.result?.uid || uploadData.uid;
+    const streamId = result?.result?.uid || result?.uid || uploadData.uid;
     if (!streamId) {
       return { success: false, error: 'No stream ID returned' };
     }
