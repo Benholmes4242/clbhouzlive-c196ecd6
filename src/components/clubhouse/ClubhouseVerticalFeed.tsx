@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef } from 'react';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
 import { MapPin, UserPlus, UserCheck, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
-import { HeartIcon, ChatBubbleOvalLeftEllipsisIcon, PaperAirplaneIcon, SpeakerXMarkIcon, SpeakerWaveIcon } from '@heroicons/react/24/solid';
+import { SpeakerXMarkIcon, SpeakerWaveIcon } from '@heroicons/react/24/solid';
 import { EmojiReactionTray } from './EmojiReactionTray';
 import { usePostReactions } from '@/hooks/usePostReactions';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
