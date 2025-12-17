@@ -16,20 +16,30 @@ interface TaggedTextProps {
   className?: string;
 }
 
+// Only these entity types render as orange @mentions
+const MENTIONABLE_TYPES = new Set(['user', 'business']);
+
 const TaggedText: React.FC<TaggedTextProps> = ({ text, tags, className = '' }) => {
   if (!tags || tags.length === 0) {
     return <span className={className}>{text}</span>;
   }
 
+  // Filter to only mentionable types (user, business) - golf_club uses "Played at" CTA instead
+  const mentionableTags = tags.filter(tag => MENTIONABLE_TYPES.has(tag.entity_type));
+
+  if (mentionableTags.length === 0) {
+    return <span className={className}>{text}</span>;
+  }
+
   // Sort tags by start_index to process them in order
-  const sortedTags = [...tags].sort((a, b) => a.start_index - b.start_index);
+  const sortedTags = [...mentionableTags].sort((a, b) => (a.start_index ?? 0) - (b.start_index ?? 0));
   
   const parts: React.ReactNode[] = [];
   let lastIndex = 0;
 
   sortedTags.forEach((tag, index) => {
     // Add text before the tag
-    if (tag.start_index > lastIndex) {
+    if ((tag.start_index ?? 0) > lastIndex) {
       parts.push(text.slice(lastIndex, tag.start_index));
     }
 
@@ -38,8 +48,6 @@ const TaggedText: React.FC<TaggedTextProps> = ({ text, tags, className = '' }) =
       switch (tag.entity_type) {
         case 'user':
           return `/profile/${tag.entity_id}`;
-        case 'golf_club':
-          return `/courses/${tag.entity_id}`;
         case 'business':
           return `/business/${tag.entity_id}`;
         default:
@@ -47,21 +55,21 @@ const TaggedText: React.FC<TaggedTextProps> = ({ text, tags, className = '' }) =
       }
     };
 
-    // Add the tagged link with accent styling
+    // Add the tagged link with orange accent styling
     parts.push(
       <Link
         key={`tag-${index}`}
         to={getEntityLink(tag)}
         className="text-primary hover:text-primary/80 hover:underline font-medium cursor-pointer"
         onClick={(e) => {
-          e.stopPropagation(); // Prevent parent click handlers
+          e.stopPropagation();
         }}
       >
         @{tag.name}
       </Link>
     );
 
-    lastIndex = tag.end_index;
+    lastIndex = tag.end_index ?? 0;
   });
 
   // Add any remaining text after the last tag

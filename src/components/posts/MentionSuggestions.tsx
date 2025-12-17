@@ -15,20 +15,34 @@ interface MentionSuggestionsProps {
   isVisible: boolean;
 }
 
+// Human-readable labels for entity types
+const getEntityTypeLabel = (type: string): string => {
+  switch (type) {
+    case 'user':
+      return 'Person';
+    case 'business':
+      return 'Business';
+    case 'golf_club':
+      return 'Course listing';
+    default:
+      return type;
+  }
+};
+
 const MentionSuggestions = ({ suggestions, onSelect, isVisible }: MentionSuggestionsProps) => {
   if (!isVisible || suggestions.length === 0) return null;
 
   return (
-    <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg max-h-40 overflow-y-auto z-50 mt-1">
+    <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-sq-sm shadow-lg max-h-48 overflow-y-auto z-50 mt-1">
       {suggestions.map((entity) => (
         <div
           key={entity.id}
-          className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
+          className="px-3 py-2.5 hover:bg-muted cursor-pointer flex items-center gap-3"
           onClick={() => onSelect(entity)}
         >
-          <div className="flex flex-col">
-            <span className="font-medium">@{entity.username || entity.name}</span>
-            <span className="text-xs text-gray-500 capitalize">{entity.entity_type}</span>
+          <div className="flex flex-col gap-0.5">
+            <span className="font-medium text-foreground">@{entity.username || entity.name}</span>
+            <span className="text-xs text-muted-foreground">{getEntityTypeLabel(entity.entity_type)}</span>
           </div>
         </div>
       ))}
