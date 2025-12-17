@@ -2,7 +2,7 @@
  * TaggedPostCard - Card for posts by others that tag this business
  * Similar to BusinessPostCard but shows author info instead of business
  */
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { TaggedPost } from '@/hooks/useBusinessTaggedPosts';
 import { MoreHorizontal, Play, EyeOff, Flag, Copy, Share2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -13,6 +13,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { PostActionBar } from '@/components/posts/PostActionBar';
 import { toast } from 'sonner';
+import TaggedText from '@/components/posts/TaggedText';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -61,6 +62,20 @@ export default function TaggedPostCard({
   const content = post.content || '';
   const shouldTruncate = content.length > 150 && !isExpanded;
   const displayContent = shouldTruncate ? content.slice(0, 150) : content;
+
+  // Transform post_tags into TaggedText format
+  const tags = useMemo(() => {
+    return (post.post_tags || [])
+      .filter(tag => tag.taggable_entities && tag.start_index !== null && tag.end_index !== null)
+      .map(tag => ({
+        id: tag.id,
+        entity_type: tag.taggable_entities!.entity_type,
+        entity_id: tag.taggable_entities!.entity_id,
+        name: tag.taggable_entities!.username || tag.taggable_entities!.name,
+        start_index: tag.start_index!,
+        end_index: tag.end_index!,
+      }));
+  }, [post.post_tags]);
 
   const streamId = isVideo ? getStreamIdFromUrl(primaryMedia?.media_url || '') : null;
   const thumbnailUrl = isVideo
@@ -165,8 +180,8 @@ export default function TaggedPostCard({
         {/* Caption */}
         {content && (
           <div style={{ padding: '0 16px 10px 16px' }}>
-            <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
-              {displayContent}
+            <div className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
+              <TaggedText text={displayContent} tags={tags} />
               {shouldTruncate && (
                 <>
                   {'... '}
@@ -178,7 +193,7 @@ export default function TaggedPostCard({
                   </button>
                 </>
               )}
-            </p>
+            </div>
           </div>
         )}
 

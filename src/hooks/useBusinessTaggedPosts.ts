@@ -6,6 +6,21 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { uploadEventBus } from '@/uploads/uploadEventBus';
 
+export interface PostTag {
+  id: string;
+  post_id: string;
+  tagged_entity_id: string;
+  start_index: number | null;
+  end_index: number | null;
+  taggable_entities: {
+    id: string;
+    entity_type: 'user' | 'business' | 'golf_club';
+    entity_id: string;
+    name: string;
+    username: string | null;
+  } | null;
+}
+
 export interface TaggedPost {
   id: string;
   content: string | null;
@@ -21,6 +36,7 @@ export interface TaggedPost {
     poster_url: string | null;
     duration_seconds: number | null;
   }>;
+  post_tags: PostTag[];
   user_profiles: {
     id: string;
     display_name: string | null;
@@ -109,6 +125,20 @@ export function useBusinessTaggedPosts(businessId: string | undefined) {
             media_type,
             poster_url,
             duration_seconds
+          ),
+          post_tags (
+            id,
+            post_id,
+            tagged_entity_id,
+            start_index,
+            end_index,
+            taggable_entities (
+              id,
+              entity_type,
+              entity_id,
+              name,
+              username
+            )
           )
         `)
         .in('id', postIds)
