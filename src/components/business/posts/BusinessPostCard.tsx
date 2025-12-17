@@ -28,7 +28,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { getStreamPoster, getStreamIdFromUrl } from '@/utils/stream';
 import GridAutoplayVideo from '@/components/profile/activity/GridAutoplayVideo';
-import CommentsModal from '@/components/posts/CommentsModal';
+import CommentsPage from '@/components/clubhouse/cinematic/CommentsPage';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { toast } from 'sonner';
 import {
@@ -358,8 +358,15 @@ export default function BusinessPostCard({
         </div>
       </div>
 
-      {/* Comments Modal - reuse exact same as Clubhouse */}
-      <CommentsModal isOpen={commentsOpen} onClose={() => setCommentsOpen(false)} postId={post.id} />
+      {/* Comments - use the exact Clubhouse slide-in panel */}
+      <CommentsPage
+        isOpen={commentsOpen}
+        onClose={() => setCommentsOpen(false)}
+        postId={post.id}
+        videoThumbnail={thumbnailUrl || undefined}
+        creatorName={businessName}
+        creatorAvatar={businessLogo || undefined}
+      />
     </>
   );
 }
