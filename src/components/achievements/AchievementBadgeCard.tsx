@@ -160,34 +160,50 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
   return (
     <div
       className={cn(
-        // Frosted glass base with SDS rounded corners
+        // Base card with SDS rounded corners
         'rounded-[18px] flex flex-col justify-between relative overflow-hidden',
         // Fixed global size for ALL achievement badges site-wide
         'min-w-[180px] h-[92px] px-3 py-2.5',
-        // Glassmorphism backdrop blur
-        'backdrop-blur-[16px] backdrop-saturate-[140%]',
-        // Subtle border for floating effect - dark for light backgrounds
-        'border border-slate-200/80',
+        // Subtle border for glass edge highlight
+        'border border-white/20',
         // Smooth micro-interactions
         'transition-all duration-200 ease-out',
         'active:scale-[0.98]',
-        unlocked && !isGhost && 'hover:scale-[1.02] hover:backdrop-blur-[18px]',
+        unlocked && !isGhost && 'hover:scale-[1.02]',
         // Ghost styling
-        isGhost && 'border-dashed'
+        isGhost && 'border-dashed border-white/30'
       )}
       style={{
-        // Frosted glass background - dark tint for light backgrounds
+        // Layer 1: Achievement gradient as base (your existing color system)
         background: unlocked && !isGhost
-          ? 'rgba(30, 41, 59, 0.85)'  // slate-800 with transparency
-          : 'rgba(30, 41, 59, 0.5)',
-        // Inner highlight gradient for Apple feel
-        backgroundImage: unlocked && !isGhost
-          ? 'linear-gradient(to bottom, rgba(255,255,255,0.12) 0%, transparent 40%)'
-          : 'linear-gradient(to bottom, rgba(255,255,255,0.06) 0%, transparent 40%)',
+          ? `linear-gradient(135deg, ${palette.bgLight} 0%, ${palette.bgDark} 100%)`
+          : `linear-gradient(135deg, ${palette.bgLocked} 0%, ${palette.bgDark} 100%)`,
+        // Soft shadow for depth
+        boxShadow: unlocked && !isGhost
+          ? '0 4px 20px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.2)'
+          : 'inset 0 1px 0 rgba(255,255,255,0.1)',
         transform: isPrimary ? 'translateY(-2px)' : undefined,
         opacity: isGhost ? 0.7 : (!unlocked ? 0.6 : 1),
       }}
     >
+      {/* Layer 2: Glass overlay - adds depth and shine */}
+      <div 
+        className="absolute inset-0 rounded-[inherit] pointer-events-none"
+        style={{
+          background: unlocked && !isGhost
+            ? 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)'
+            : 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%, rgba(0,0,0,0.05) 100%)',
+        }}
+      />
+      
+      {/* Inner highlight at top edge for Apple feel */}
+      <div 
+        className="absolute inset-x-0 top-0 h-[1px] rounded-t-[inherit] pointer-events-none"
+        style={{
+          background: 'linear-gradient(90deg, transparent 10%, rgba(255,255,255,0.3) 50%, transparent 90%)',
+        }}
+      />
+
       {/* Background emblem - subtle engraved crest */}
       {emblemSrc && (
         <img
@@ -197,7 +213,7 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
           className="pointer-events-none select-none absolute inset-y-0 right-0 h-full w-auto translate-x-4 scale-125"
           style={{ 
             filter: 'brightness(0) invert(1)',
-            opacity: unlocked && !isGhost ? 0.08 : 0.04,
+            opacity: unlocked && !isGhost ? 0.12 : 0.06,
           }}
         />
       )}
@@ -209,28 +225,29 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
 
       {/* Top left: Trophy icon + Title/Subtitle */}
       <div className="flex items-start gap-2 relative z-10">
-        {/* Trophy icon - monochrome white, no solid background */}
+        {/* Trophy icon - monochrome white */}
         <Trophy 
           className="w-5 h-5 flex-shrink-0 mt-0.5"
           style={{ 
-            color: unlocked && !isGhost ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.45)',
+            color: unlocked && !isGhost ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.5)',
           }} 
         />
         <div className="flex-1 min-w-0 overflow-hidden text-left">
-          {/* Title - white/near-white, medium weight */}
+          {/* Title - white, medium weight */}
           <div 
             className="font-medium leading-tight truncate text-[13px]"
             style={{ 
-              color: unlocked && !isGhost ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.5)',
+              color: unlocked && !isGhost ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.6)',
+              textShadow: unlocked && !isGhost ? '0 1px 2px rgba(0,0,0,0.3)' : 'none',
             }}
           >
             {isMilestone ? `${threshold} Club` : title}
           </div>
-          {/* Subtitle - smaller, reduced opacity */}
+          {/* Subtitle - smaller, slightly reduced opacity */}
           <div 
             className="text-[11px] truncate"
             style={{ 
-              color: unlocked && !isGhost ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.35)',
+              color: unlocked && !isGhost ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.45)',
             }}
           >
             {isMilestone ? clubName : subtitle}
@@ -243,27 +260,27 @@ export const AchievementBadgeCard: React.FC<AchievementBadgeCardProps> = ({
         <div 
           className={cn(
             "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium",
-            "backdrop-blur-[10px]",
+            "backdrop-blur-[8px]",
             "border",
             "transition-all duration-200"
           )}
           style={{
             background: unlocked && !isGhost 
-              ? 'rgba(255,255,255,0.18)' 
-              : 'rgba(255,255,255,0.08)',
+              ? 'rgba(255,255,255,0.2)' 
+              : 'rgba(255,255,255,0.1)',
             borderColor: unlocked && !isGhost 
-              ? 'rgba(255,255,255,0.25)' 
-              : 'rgba(255,255,255,0.12)',
+              ? 'rgba(255,255,255,0.3)' 
+              : 'rgba(255,255,255,0.15)',
             color: unlocked && !isGhost 
-              ? 'rgba(255,255,255,0.9)' 
-              : 'rgba(255,255,255,0.5)',
+              ? 'rgba(255,255,255,0.95)' 
+              : 'rgba(255,255,255,0.55)',
           }}
         >
-          {/* Optional green glass tick for unlocked state */}
+          {/* Green glass tick for unlocked state */}
           {unlocked && !isGhost && (
             <Check 
               className="w-3 h-3" 
-              style={{ color: 'rgba(134,239,172,0.9)' }} 
+              style={{ color: 'rgba(134,239,172,0.95)' }} 
             />
           )}
           <span className="uppercase tracking-wider">{statusLabel}</span>
