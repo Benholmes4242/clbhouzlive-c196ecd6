@@ -73,8 +73,7 @@ export function useBusinessTaggedPosts(businessId: string | undefined) {
 
       const postIds = postTags.map(t => t.post_id);
 
-      // Step 3: Fetch posts that are NOT from this business itself
-      // (business's own posts go in Activity, not Tagged)
+      // Step 3: Fetch posts by IDs (filter business's own posts client-side)
       const { data: posts, error: postsError } = await supabase
         .from('posts')
         .select(`
@@ -96,7 +95,6 @@ export function useBusinessTaggedPosts(businessId: string | undefined) {
           )
         `)
         .in('id', postIds)
-        .or(`actor_type.neq.business,actor_id.neq.${businessId}`)
         .order('created_at', { ascending: false });
 
       if (postsError) {
@@ -108,6 +106,11 @@ export function useBusinessTaggedPosts(businessId: string | undefined) {
         return [];
       }
 
+      // Step 3b: Filter out business's own posts (actor_type='business' AND actor_id=businessId)
+      const externalPosts = posts.filter(
+        p => !(p.actor_type === 'business' && p.actor_id === businessId)
+      );
+
       // Step 4: Check visibility - exclude hidden posts
       const { data: hiddenPosts } = await supabase
         .from('business_tag_visibility')
@@ -116,7 +119,7 @@ export function useBusinessTaggedPosts(businessId: string | undefined) {
         .eq('is_hidden', true);
 
       const hiddenPostIds = new Set(hiddenPosts?.map(h => h.post_id) || []);
-      const visiblePosts = posts.filter(p => !hiddenPostIds.has(p.id));
+      const visiblePosts = externalPosts.filter(p => !hiddenPostIds.has(p.id));
 
       // Step 5: Fetch user profiles for authors
       const userIds = [...new Set(visiblePosts.map(p => p.user_id))];

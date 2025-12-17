@@ -1,7 +1,7 @@
 /**
  * CommentsPage - Full-screen slide-in comments experience
  * Slides in from right, video thumbnail pinned at top
- * Supports dark (Clubhouse) and light (Business Profile) themes
+ * Supports dark (Clubhouse), light, and grey (Business Profile) themes
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -20,8 +20,8 @@ interface CommentsPageProps {
   videoThumbnail?: string;
   creatorName?: string;
   creatorAvatar?: string;
-  /** Theme variant: 'dark' for Clubhouse, 'light' for Business Profile */
-  theme?: 'dark' | 'light';
+  /** Theme variant: 'dark' for Clubhouse, 'light' or 'grey' for Business Profile */
+  theme?: 'dark' | 'light' | 'grey';
 }
 
 export const CommentsPage: React.FC<CommentsPageProps> = ({
@@ -36,7 +36,9 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   const [newComment, setNewComment] = useState('');
   const { comments, commentsLoading, addComment, isAddingComment } = usePostEngagement(postId);
 
-  const isLight = theme === 'light';
+  const isDark = theme === 'dark';
+  const isGrey = theme === 'grey';
+  const isLightOrGrey = theme === 'light' || theme === 'grey';
 
   const handleSubmitComment = useCallback(() => {
     if (!newComment.trim() || isAddingComment) return;
@@ -73,7 +75,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
             transition={{ duration: 0.25 }}
             className={cn(
               "fixed inset-0 z-[100] backdrop-blur-sm",
-              isLight ? "bg-black/40" : "bg-black/70"
+              isDark ? "bg-black/70" : "bg-black/40"
             )}
             onClick={onClose}
           />
@@ -93,13 +95,13 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
               'fixed inset-y-0 right-0 z-[101]',
               'w-full sm:w-[420px] max-w-full',
               'flex flex-col',
-              isLight ? 'bg-[#f8fafc]' : 'bg-black'
+              isDark ? 'bg-black' : isGrey ? 'bg-muted' : 'bg-[#f8fafc]'
             )}
           >
             {/* Header with back button and thumbnail */}
             <div className={cn(
               "flex-shrink-0 border-b",
-              isLight ? "border-border/50" : "border-white/10"
+              isDark ? "border-white/10" : "border-border/50"
             )}>
               {/* Back button row */}
               <div className="flex items-center gap-3 px-4 py-3">
@@ -109,16 +111,16 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                     'w-9 h-9 rounded-sq-sm',
                     'flex items-center justify-center',
                     'transition-colors',
-                    isLight 
-                      ? 'bg-muted hover:bg-muted/80' 
-                      : 'bg-white/10 hover:bg-white/15'
+                    isDark 
+                      ? 'bg-white/10 hover:bg-white/15' 
+                      : 'bg-muted hover:bg-muted/80'
                   )}
                 >
-                  <ChevronLeft className={cn("w-5 h-5", isLight ? "text-foreground" : "text-white")} />
+                  <ChevronLeft className={cn("w-5 h-5", isDark ? "text-white" : "text-foreground")} />
                 </button>
                 <span className={cn(
                   "text-[15px] font-semibold",
-                  isLight ? "text-foreground" : "text-white"
+                  isDark ? "text-white" : "text-foreground"
                 )}>
                   Comments
                 </span>
@@ -129,7 +131,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 <div className="px-4 pb-3">
                   <div className={cn(
                     "flex items-center gap-3 p-2 rounded-sq-md",
-                    isLight ? "bg-muted/50" : "bg-white/5"
+                    isDark ? "bg-white/5" : isGrey ? "bg-background/50" : "bg-muted/50"
                   )}>
                     <img
                       src={videoThumbnail}
@@ -147,7 +149,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                         />
                         <span className={cn(
                           "text-[13px] font-medium",
-                          isLight ? "text-foreground" : "text-white"
+                          isDark ? "text-white" : "text-foreground"
                         )}>
                           {creatorName}
                         </span>
@@ -165,16 +167,16 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
             >
               {commentsLoading ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className={cn("text-sm", isLight ? "text-muted-foreground" : "text-white/50")}>
+                  <div className={cn("text-sm", isDark ? "text-white/50" : "text-muted-foreground")}>
                     Loading comments...
                   </div>
                 </div>
               ) : comments.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <div className={cn("text-sm mb-1", isLight ? "text-muted-foreground" : "text-white/50")}>
+                  <div className={cn("text-sm mb-1", isDark ? "text-white/50" : "text-muted-foreground")}>
                     No comments yet
                   </div>
-                  <div className={cn("text-xs", isLight ? "text-muted-foreground/70" : "text-white/30")}>
+                  <div className={cn("text-xs", isDark ? "text-white/30" : "text-muted-foreground/70")}>
                     Be the first to comment!
                   </div>
                 </div>
@@ -193,20 +195,20 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                         <div className="flex items-baseline gap-2">
                           <span className={cn(
                             "text-[13px] font-semibold",
-                            isLight ? "text-foreground" : "text-white"
+                            isDark ? "text-white" : "text-foreground"
                           )}>
                             {comment.user_name}
                           </span>
                           <span className={cn(
                             "text-[11px]",
-                            isLight ? "text-muted-foreground" : "text-white/40"
+                            isDark ? "text-white/40" : "text-muted-foreground"
                           )}>
                             {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
                           </span>
                         </div>
                         <p className={cn(
                           "mt-0.5 text-[13px] leading-snug",
-                          isLight ? "text-foreground/85" : "text-white/85"
+                          isDark ? "text-white/85" : "text-foreground/85"
                         )}>
                           {comment.content}
                         </p>
@@ -221,9 +223,11 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
             <div 
               className={cn(
                 "flex-shrink-0 border-t backdrop-blur-xl px-4 py-3",
-                isLight 
-                  ? "border-border/50 bg-white/80" 
-                  : "border-white/10 bg-black/80"
+                isDark 
+                  ? "border-white/10 bg-black/80" 
+                  : isGrey 
+                    ? "border-border/50 bg-muted/80"
+                    : "border-border/50 bg-white/80"
               )}
               style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }}
             >
@@ -231,9 +235,9 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                 <div className="flex-1">
                   <div className={cn(
                     "flex items-center gap-2 rounded-full px-4 py-2.5",
-                    isLight 
-                      ? "bg-muted border border-border/50" 
-                      : "bg-white/10 border border-white/15"
+                    isDark 
+                      ? "bg-white/10 border border-white/15" 
+                      : "bg-background border border-border/50"
                   )}>
                     <input
                       type="text"
@@ -245,16 +249,16 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                         'flex-1 bg-transparent',
                         'text-[14px]',
                         'outline-none border-none',
-                        isLight 
-                          ? 'text-foreground placeholder:text-muted-foreground' 
-                          : 'text-white placeholder:text-white/40'
+                        isDark 
+                          ? 'text-white placeholder:text-white/40' 
+                          : 'text-foreground placeholder:text-muted-foreground'
                       )}
                     />
                     <button className={cn(
                       "transition-colors",
-                      isLight 
-                        ? "text-muted-foreground hover:text-foreground" 
-                        : "text-white/40 hover:text-white/60"
+                      isDark 
+                        ? "text-white/40 hover:text-white/60" 
+                        : "text-muted-foreground hover:text-foreground"
                     )}>
                       <Smile className="w-5 h-5" />
                     </button>
@@ -270,9 +274,9 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
                     'flex items-center justify-center',
                     'transition-all',
                     'disabled:opacity-40 disabled:cursor-not-allowed',
-                    isLight 
-                      ? 'bg-[#F7931E] text-white hover:bg-[#e5850f]' 
-                      : 'bg-white text-black hover:bg-white/90'
+                    isDark 
+                      ? 'bg-white text-black hover:bg-white/90' 
+                      : 'bg-[#F7931E] text-white hover:bg-[#e5850f]'
                   )}
                 >
                   <Send className="w-4 h-4" />

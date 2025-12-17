@@ -43,7 +43,16 @@ export function usePostInsights(postId: string | undefined) {
   });
 }
 
+// Session-level throttle to avoid duplicate views per post
+const viewedPostsThisSession = new Set<string>();
+
 export async function trackPostView(postId: string) {
+  // Throttle: only track once per post per session
+  if (viewedPostsThisSession.has(postId)) {
+    return;
+  }
+  viewedPostsThisSession.add(postId);
+
   const { data: { user } } = await supabase.auth.getUser();
   
   await supabase

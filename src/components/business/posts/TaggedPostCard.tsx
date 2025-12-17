@@ -249,7 +249,7 @@ export default function TaggedPostCard({
         videoThumbnail={thumbnailUrl || undefined}
         creatorName={authorName}
         creatorAvatar={authorAvatar || undefined}
-        theme="light"
+        theme="grey"
       />
     </>
   );
