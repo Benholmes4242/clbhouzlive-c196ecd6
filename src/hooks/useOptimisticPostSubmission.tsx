@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useBackgroundUpload } from './useBackgroundUpload';
 import { validateFiles } from '@/components/posts/utils/fileValidation';
 import { handlePostTags } from './usePostSubmission/uploadUtils';
+import { createPost } from '@/services/posts/createPost';
 
 interface PostSubmissionData {
   user: any;
@@ -29,7 +29,6 @@ interface PostSubmissionData {
 export const useOptimisticPostSubmission = () => {
   const { toast } = useToast();
   const { startBackgroundUpload } = useBackgroundUpload();
-  const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const submitPost = async ({
@@ -91,20 +90,14 @@ export const useOptimisticPostSubmission = () => {
       const resolvedActorType = actorType || 'personal';
       const resolvedActorId = actorId || user.id;
 
-      // Create the post first
-      const { data: postData, error: postError } = await supabase
-        .from('posts')
-        .insert({
-          user_id: user.id,
-          content: content || null,
-          achievement_id: achievementId || null,
-          actor_type: resolvedActorType,
-          actor_id: resolvedActorId,
-        })
-        .select()
-        .single();
-
-      if (postError) throw postError;
+      // Create the post using the unified service (emits post:created event automatically)
+      const postData = await createPost({
+        userId: user.id,
+        content: content || null,
+        achievementId: achievementId || null,
+        actorType: resolvedActorType,
+        actorId: resolvedActorId,
+      });
 
       console.log('Post created successfully:', postData);
 
@@ -220,22 +213,9 @@ export const useOptimisticPostSubmission = () => {
         }
       }
 
-      // Upload is already complete - media files are uploaded before post creation
+      // Post creation complete - event already emitted by createPost service
+      // Cache invalidation handled by PostEventsBridge
       console.log('Post created with uploaded media files');
-
-      // Invalidate actor-scoped caches (identity = actor_type+actor_id)
-      queryClient.invalidateQueries({ queryKey: ['actor-posts', resolvedActorType, resolvedActorId] });
-      if (resolvedActorType === 'business') {
-        queryClient.invalidateQueries({ queryKey: ['actor-posts-count', 'business', resolvedActorId] });
-      }
-
-      // Dispatch success event immediately
-      window.dispatchEvent(new CustomEvent('postCompleted', {
-        detail: { 
-          optimisticId: null,
-          realPost: postData 
-        }
-      }));
 
       // Call success immediately
       onSuccess?.();
