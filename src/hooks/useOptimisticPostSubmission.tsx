@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useBackgroundUpload } from './useBackgroundUpload';
@@ -28,6 +29,7 @@ interface PostSubmissionData {
 export const useOptimisticPostSubmission = () => {
   const { toast } = useToast();
   const { startBackgroundUpload } = useBackgroundUpload();
+  const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const submitPost = async ({
@@ -220,6 +222,12 @@ export const useOptimisticPostSubmission = () => {
 
       // Upload is already complete - media files are uploaded before post creation
       console.log('Post created with uploaded media files');
+
+      // Invalidate actor-scoped caches (identity = actor_type+actor_id)
+      queryClient.invalidateQueries({ queryKey: ['actor-posts', resolvedActorType, resolvedActorId] });
+      if (resolvedActorType === 'business') {
+        queryClient.invalidateQueries({ queryKey: ['actor-posts-count', 'business', resolvedActorId] });
+      }
 
       // Dispatch success event immediately
       window.dispatchEvent(new CustomEvent('postCompleted', {

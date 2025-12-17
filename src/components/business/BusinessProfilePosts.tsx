@@ -89,8 +89,8 @@ export function BusinessProfilePosts({
         setIsComposerOpen(false);
         setComposerMedia([]);
         setIsSubmitting(false);
-        queryClient.invalidateQueries({ queryKey: ['business-posts', businessId] });
-        queryClient.invalidateQueries({ queryKey: ['business-posts-count', businessId] });
+        queryClient.invalidateQueries({ queryKey: ['actor-posts', 'business', businessId] });
+        queryClient.invalidateQueries({ queryKey: ['actor-posts-count', 'business', businessId] });
       },
       onError: () => {
         setIsSubmitting(false);
