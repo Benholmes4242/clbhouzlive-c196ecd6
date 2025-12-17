@@ -3,21 +3,26 @@ import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
 
+// UUID v4 detection regex
+const isUuid = (v: string) =>
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v);
+
 export const useUserProfileQueries = () => {
   const { username } = useParams<{ username: string }>();
   const { user } = useSupabaseSession();
 
-  // Fetch user profile data
+  // Fetch user profile data - supports both UUID (id) and username
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ['user-profile', username],
     queryFn: async () => {
       if (!username) return null;
       
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('username', username)
-        .single();
+      // Detect if param is UUID or username and query accordingly
+      const query = supabase.from('user_profiles').select('*');
+      const { data, error } = await (isUuid(username) 
+        ? query.eq('id', username) 
+        : query.eq('username', username)
+      ).single();
       
       if (error) {
         console.error('Error fetching profile:', error);
