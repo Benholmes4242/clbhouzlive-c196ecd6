@@ -161,7 +161,7 @@ export default function CreateMomentComposerPanel({
 
           {/* Tagged entities confirmation chips */}
           {selectedTags.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1.5 mt-2">
+            <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
               <span className="text-[11px] text-white/50">Tagged:</span>
               {selectedTags.map(tag => (
                 <button
