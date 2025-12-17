@@ -174,15 +174,11 @@ export default function BusinessPostCard({
 
   return (
     <>
-      {/* Post tile with subtle elevation */}
+      {/* Post tile - full width with border gutter */}
       <div
-        className="bg-white overflow-hidden"
+        className="bg-white overflow-hidden border-x border-border/40"
         style={{
-          border: '1px solid rgba(255,255,255,0.06)',
           boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-          borderRadius: 'var(--radius-sq-md, 18px)',
-          marginLeft: '12px',
-          marginRight: '12px',
         }}
       >
         {/* Post header */}
