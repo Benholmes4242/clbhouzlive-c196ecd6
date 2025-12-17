@@ -1,0 +1,293 @@
+// Upload Manager - Framework-agnostic singleton for managing upload jobs
+
+import { nanoid } from 'nanoid';
+import type { UploadJob, UploadJobInput, SerializedUploadJob, UploadJobStatus } from './types';
+import { uploadEventBus } from './uploadEventBus';
+
+const STORAGE_KEY = 'clbhouz_upload_jobs';
+
+class UploadManager {
+  private jobs: Map<string, UploadJob> = new Map();
+  private processing: Set<string> = new Set();
+
+  constructor() {
+    this.restoreFromStorage();
+  }
+
+  /**
+   * Enqueue a new upload job. Returns the jobId immediately.
+   * The upload will be processed asynchronously.
+   */
+  enqueue(input: UploadJobInput): string {
+    const jobId = nanoid(12);
+    
+    const job: UploadJob = {
+      jobId,
+      actorType: input.actorType,
+      actorId: input.actorId,
+      userId: input.userId,
+      caption: input.caption,
+      achievementId: input.achievementId,
+      courseInfo: input.courseInfo,
+      selectedTags: input.selectedTags,
+      files: input.files,
+      mediaItems: input.mediaItems,
+      studioEditsByMediaId: input.studioEditsByMediaId,
+      createdAt: new Date().toISOString(),
+      status: 'queued',
+      progress: {
+        totalFiles: input.files.length,
+        uploadedFiles: 0,
+      },
+    };
+
+    this.jobs.set(jobId, job);
+    this.persistToStorage();
+
+    // Emit enqueued event
+    uploadEventBus.emit('upload:enqueued', {
+      type: 'upload:enqueued',
+      jobId,
+      actorType: input.actorType,
+      actorId: input.actorId,
+      fileCount: input.files.length,
+    });
+
+    console.log(`[UploadManager] Enqueued job ${jobId} with ${input.files.length} files`);
+
+    return jobId;
+  }
+
+  /**
+   * Get a job by ID
+   */
+  getJob(jobId: string): UploadJob | undefined {
+    return this.jobs.get(jobId);
+  }
+
+  /**
+   * Get all jobs
+   */
+  getAllJobs(): UploadJob[] {
+    return Array.from(this.jobs.values());
+  }
+
+  /**
+   * Get pending jobs (queued or in-progress)
+   */
+  getPendingJobs(): UploadJob[] {
+    return this.getAllJobs().filter(
+      j => j.status === 'queued' || j.status === 'creating_post' || j.status === 'uploading_media' || j.status === 'finalizing'
+    );
+  }
+
+  /**
+   * Check if a job is currently being processed
+   */
+  isProcessing(jobId: string): boolean {
+    return this.processing.has(jobId);
+  }
+
+  /**
+   * Mark a job as being processed (to prevent double-processing)
+   */
+  markProcessing(jobId: string): boolean {
+    if (this.processing.has(jobId)) return false;
+    this.processing.add(jobId);
+    return true;
+  }
+
+  /**
+   * Clear processing flag
+   */
+  clearProcessing(jobId: string): void {
+    this.processing.delete(jobId);
+  }
+
+  /**
+   * Update job status
+   */
+  updateStatus(jobId: string, status: UploadJobStatus, postId?: string): void {
+    const job = this.jobs.get(jobId);
+    if (!job) return;
+
+    job.status = status;
+    if (postId) job.postId = postId;
+    
+    this.persistToStorage();
+
+    uploadEventBus.emit('upload:status', {
+      type: 'upload:status',
+      jobId,
+      status,
+      postId,
+    });
+  }
+
+  /**
+   * Update job progress
+   */
+  updateProgress(jobId: string, uploadedFiles: number): void {
+    const job = this.jobs.get(jobId);
+    if (!job) return;
+
+    job.progress.uploadedFiles = uploadedFiles;
+    this.persistToStorage();
+
+    uploadEventBus.emit('upload:progress', {
+      type: 'upload:progress',
+      jobId,
+      progress: { ...job.progress },
+    });
+  }
+
+  /**
+   * Mark job as complete
+   */
+  markComplete(jobId: string, postId: string): void {
+    const job = this.jobs.get(jobId);
+    if (!job) return;
+
+    job.status = 'complete';
+    job.postId = postId;
+    job.progress.uploadedFiles = job.progress.totalFiles;
+    
+    this.clearProcessing(jobId);
+    this.persistToStorage();
+
+    uploadEventBus.emit('upload:complete', {
+      type: 'upload:complete',
+      jobId,
+      postId,
+      actorType: job.actorType,
+      actorId: job.actorId,
+    });
+
+    console.log(`[UploadManager] Job ${jobId} complete`);
+  }
+
+  /**
+   * Mark job as failed
+   */
+  markFailed(jobId: string, error: string): void {
+    const job = this.jobs.get(jobId);
+    if (!job) return;
+
+    job.status = 'failed';
+    job.error = error;
+    
+    this.clearProcessing(jobId);
+    this.persistToStorage();
+
+    uploadEventBus.emit('upload:failed', {
+      type: 'upload:failed',
+      jobId,
+      error,
+      postId: job.postId,
+    });
+
+    console.error(`[UploadManager] Job ${jobId} failed:`, error);
+  }
+
+  /**
+   * Dismiss (remove) a completed or failed job
+   */
+  dismiss(jobId: string): void {
+    this.jobs.delete(jobId);
+    this.processing.delete(jobId);
+    this.persistToStorage();
+  }
+
+  /**
+   * Reset a failed job for retry
+   */
+  resetForRetry(jobId: string): void {
+    const job = this.jobs.get(jobId);
+    if (!job || job.status !== 'failed') return;
+
+    job.status = 'queued';
+    job.error = undefined;
+    job.progress.uploadedFiles = 0;
+    
+    this.persistToStorage();
+
+    uploadEventBus.emit('upload:status', {
+      type: 'upload:status',
+      jobId,
+      status: 'queued',
+    });
+  }
+
+  /**
+   * Persist jobs to localStorage (metadata only, not files)
+   */
+  private persistToStorage(): void {
+    try {
+      const serialized: SerializedUploadJob[] = Array.from(this.jobs.values()).map(job => ({
+        jobId: job.jobId,
+        postId: job.postId,
+        actorType: job.actorType,
+        actorId: job.actorId,
+        userId: job.userId,
+        caption: job.caption,
+        achievementId: job.achievementId,
+        createdAt: job.createdAt,
+        status: job.status,
+        progress: job.progress,
+        error: job.error,
+        fileCount: job.files.length,
+      }));
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(serialized));
+    } catch (e) {
+      console.warn('[UploadManager] Failed to persist to storage:', e);
+    }
+  }
+
+  /**
+   * Restore jobs from localStorage
+   * Jobs that were mid-upload are marked as failed (files can't be restored)
+   */
+  private restoreFromStorage(): void {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (!stored) return;
+
+      const serialized: SerializedUploadJob[] = JSON.parse(stored);
+      
+      for (const s of serialized) {
+        // Skip completed jobs older than 1 hour
+        const age = Date.now() - new Date(s.createdAt).getTime();
+        if (s.status === 'complete' && age > 60 * 60 * 1000) continue;
+
+        // Mark in-progress jobs as failed (files can't be restored)
+        const wasMidUpload = ['queued', 'creating_post', 'uploading_media', 'finalizing'].includes(s.status);
+        
+        const job: UploadJob = {
+          jobId: s.jobId,
+          postId: s.postId,
+          actorType: s.actorType,
+          actorId: s.actorId,
+          userId: s.userId,
+          caption: s.caption,
+          achievementId: s.achievementId,
+          createdAt: s.createdAt,
+          status: wasMidUpload ? 'failed' : s.status,
+          progress: s.progress,
+          error: wasMidUpload ? 'Upload interrupted - page was refreshed' : s.error,
+          files: [], // Files cannot be restored
+        };
+
+        this.jobs.set(s.jobId, job);
+      }
+
+      // Clean up storage after restore
+      this.persistToStorage();
+    } catch (e) {
+      console.warn('[UploadManager] Failed to restore from storage:', e);
+    }
+  }
+}
+
+// Export singleton instance
+export const uploadManager = new UploadManager();

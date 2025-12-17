@@ -9,6 +9,7 @@ import HeaderNavigation from './HeaderNavigation';
 import { PostingAsPill } from './PostingAsPill';
 import { PostingAsMenu } from './PostingAsMenu';
 import { SearchOverlay } from './SearchOverlay';
+import { UploadCenterButton } from '@/components/uploads/UploadCenterButton';
 import { cn } from '@/lib/utils';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 
@@ -145,6 +146,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
 
           {/* Right: Search + Identity pill */}
           <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Upload Center Button */}
+            <UploadCenterButton />
+            
             {/* Search Button */}
             <Button
               variant="ghost"

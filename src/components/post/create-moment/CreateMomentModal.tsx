@@ -9,18 +9,18 @@ import { useImmersiveHeader } from '@/hooks/useImmersiveHeader';
 import { useChromeState } from '@/hooks/useChromeState';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useStudio } from "@/hooks/useStudio";
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { openMediaPicker } from "@/utils/openMediaPicker";
 import { normalizeFilesToMediaItems } from "@/lib/mediaUtils";
+import { enqueuePostUpload } from "@/uploads/uploadPipeline";
 import StudioShelf from "@/components/studio/StudioShelf";
-import PostSuccessOverlay from '../PostSuccessOverlay';
 import { OverlayPortalProvider } from "@/context/OverlayPortalContext";
 
 import CreateMomentHero from "./CreateMomentHero";
 import CreateMomentMediaStage from "./CreateMomentMediaStage";
 import CreateMomentComposerPanel from "./CreateMomentComposerPanel";
-import CreateMomentShareBar from "./CreateMomentShareBar";
 import { useDraftPersistence } from "./useDraftPersistence";
-import { CreateMomentProps, GolfCourse, UploadProgressState } from "./types";
+import { CreateMomentProps, GolfCourse } from "./types";
 
 // Animation constants
 const ECM_ENTRY_DURATION = 500;
@@ -60,15 +60,10 @@ export default function CreateMomentModal({
   const [activeIndex, setActiveIndex] = useState(0);
   const [coverIndex, setCoverIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
-  const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
   const [showDraftPrompt, setShowDraftPrompt] = useState(false);
   
-  // Upload progress
-  const [uploadProgress, setUploadProgress] = useState<UploadProgressState>({
-    status: 'idle',
-    uploadedFiles: 0,
-    totalFiles: 0,
-  });
+  // Get user session
+  const { user } = useSupabaseSession();
 
   // Hooks
   const {
@@ -98,7 +93,7 @@ export default function CreateMomentModal({
   // Derived state
   const media = useMemo(() => (mediaItems || []).slice(0, 10), [mediaItems]);
   const hasMedia = media.length > 0;
-  const canPost = hasMedia && !isSubmitting && uploadProgress.status !== 'uploading';
+  const canPost = hasMedia && !isSubmitting && !!user;
   const course = selectedCourse || snapCourse;
   const isBusinessActor = activeActor?.type === 'business';
   const currentFilter = hasMedia ? getEdits(media[activeIndex]?.id)?.filter : undefined;
@@ -194,7 +189,6 @@ export default function CreateMomentModal({
       setSelectedCourse(null);
       onCourseSelect?.(null);
       setSnapVisibility('public');
-      setUploadProgress({ status: 'idle', uploadedFiles: 0, totalFiles: 0 });
       
       // Check for draft
       if (hasDraft) {
@@ -384,15 +378,9 @@ export default function CreateMomentModal({
     }
   };
 
-  // Post handler with progress tracking
-  const handlePost = async () => {
-    if (!canPost) return;
-    
-    setUploadProgress({
-      status: 'uploading',
-      uploadedFiles: 0,
-      totalFiles: media.length,
-    });
+  // Post handler - enqueue and close immediately
+  const handlePost = () => {
+    if (!canPost || !user) return;
 
     const files = media.map(item => item.file);
     
@@ -404,43 +392,20 @@ export default function CreateMomentModal({
       return acc;
     }, {} as Record<string, { filter: string }>);
     
-    try {
-      await onSubmit({
-        caption,
-        files,
-        mediaItems: media,
-        selectedCourse: course,
-        visibility: snapVisibility,
-        isPrivate: snapVisibility === "private",
-        backgroundMusic: null,
-        coverIndex,
-        studioEditsByMediaId
-      });
-      
-      setUploadProgress({
-        status: 'success',
-        uploadedFiles: media.length,
-        totalFiles: media.length,
-      });
-      
-      clearDraft();
-      setShowSuccessOverlay(true);
-    } catch (error) {
-      setUploadProgress({
-        status: 'failed',
-        uploadedFiles: 0,
-        totalFiles: media.length,
-        error: 'Upload failed. Please try again.',
-      });
-    }
-  };
-
-  // Success overlay handler
-  const handleSuccessComplete = () => {
-    setShowSuccessOverlay(false);
-    setTimeout(() => {
-      onClose();
-    }, 100);
+    // Enqueue upload and close immediately
+    enqueuePostUpload({
+      userId: user.id,
+      actorType: activeActor?.type === 'business' ? 'business' : 'personal',
+      actorId: activeActor?.type === 'business' ? activeActor.id : user.id,
+      caption,
+      courseInfo: course ? { id: course.id, name: course.name, country: course.country || '' } : undefined,
+      files,
+      mediaItems: media,
+      studioEditsByMediaId,
+    });
+    
+    clearDraft();
+    onClose();
   };
 
   // Restore draft handler
@@ -559,7 +524,7 @@ export default function CreateMomentModal({
             />
           </OverlayPortalProvider>
 
-          {/* Share Bar - sticky at bottom, safe-area aware */}
+          {/* Share Bar - simple button */}
           <div
             className="flex-shrink-0 px-4 pt-2 border-t border-white/8"
             style={{
@@ -567,12 +532,19 @@ export default function CreateMomentModal({
               background: 'rgba(15, 15, 15, 0.98)',
             }}
           >
-            <CreateMomentShareBar
-              canPost={canPost}
-              uploadProgress={uploadProgress}
-              onPost={handlePost}
-              onRetry={() => setUploadProgress({ status: 'idle', uploadedFiles: 0, totalFiles: 0 })}
-            />
+            <button
+              disabled={!canPost}
+              onClick={handlePost}
+              className="w-full h-11 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[.99] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              style={{
+                background: 'rgba(255, 255, 255, 0.18)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255, 255, 255, 0.28)',
+                color: 'rgba(255, 255, 255, 0.96)'
+              }}
+            >
+              Share
+            </button>
           </div>
         </section>
 
@@ -615,12 +587,6 @@ export default function CreateMomentModal({
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Success overlay */}
-        <PostSuccessOverlay 
-          isVisible={showSuccessOverlay} 
-          onComplete={handleSuccessComplete}
-        />
       </div>
 
       {/* Studio Shelf */}
