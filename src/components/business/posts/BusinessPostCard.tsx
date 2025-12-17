@@ -46,7 +46,7 @@ interface BusinessPostCardProps {
   businessName?: string;
   businessLogo?: string | null;
   followerCount?: number;
-  isOwner?: boolean;
+  canManage?: boolean;
   registerVideo?: RegisterVideoFn;
   isPlaying?: boolean;
   videoIndex?: number;
@@ -57,7 +57,7 @@ export default function BusinessPostCard({
   businessName,
   businessLogo,
   followerCount = 0,
-  isOwner = false,
+  canManage = false,
   registerVideo,
   isPlaying,
   videoIndex = 0,
@@ -182,92 +182,88 @@ export default function BusinessPostCard({
           boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
         }}
       >
-        {/* Post header */}
-        <div className="px-4 py-3">
-          <div className="flex items-start justify-between">
-            <div className="flex gap-3">
-              {/* Business avatar - Squircle with SDS radius */}
-              <SquircleAvatar
-                size={48}
-                src={businessLogo || undefined}
-                alt={businessName || 'Business'}
-                fallback={businessName?.charAt(0) || 'B'}
-                hideRing
-              />
-
-              {/* Business info */}
-              <div className="min-w-0">
-                <p className="font-semibold text-foreground text-sm leading-tight">{businessName || 'Business'}</p>
-                <p className="text-xs text-muted-foreground leading-tight">{followerCount.toLocaleString()} followers</p>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
-                  <span>{timeAgo}</span>
-                  <span>•</span>
-                  <Globe className="h-3 w-3" />
-                </div>
-              </div>
-            </div>
-
-            {/* Three-dots menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  className="p-1.5 hover:bg-muted/50 rounded-full transition-colors"
-                  aria-label="Post options"
-                >
-                  <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
-                {/* Everyone */}
-                <DropdownMenuItem onClick={handleCopyLink}>
-                  <Copy className="h-4 w-4 mr-2" />
-                  Copy link
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleSend}>
-                  <Share2 className="h-4 w-4 mr-2" />
-                  Send
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleReport}>
-                  <Flag className="h-4 w-4 mr-2" />
-                  Report
-                </DropdownMenuItem>
-
-                {/* Owner/admin only */}
-                {isOwner && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleEditCaption}>
-                      <Pencil className="h-4 w-4 mr-2" />
-                      Edit caption
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleChangeVisibility}>
-                      <Eye className="h-4 w-4 mr-2" />
-                      Change visibility
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handlePinToTop}>
-                      <Pin className="h-4 w-4 mr-2" />
-                      Pin to top
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleViewInsights}>
-                      <BarChart2 className="h-4 w-4 mr-2" />
-                      View insights
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleDeletePost} className="text-destructive focus:text-destructive">
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Delete post
-                    </DropdownMenuItem>
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+        {/* Post header - 3 column layout: avatar / meta / actions */}
+        <div className="flex items-start gap-3" style={{ padding: '12px 16px 8px 16px' }}>
+          {/* Left: Avatar (fixed) */}
+          <div className="flex-shrink-0">
+            <SquircleAvatar
+              size={40}
+              src={businessLogo || undefined}
+              alt={businessName || 'Business'}
+              fallback={businessName?.charAt(0) || 'B'}
+              hideRing
+            />
           </div>
+
+          {/* Middle: Meta (flex-grow) */}
+          <div className="flex-1 min-w-0">
+            {/* Line 1: Name */}
+            <p className="font-semibold text-foreground text-sm leading-tight truncate">
+              {businessName || 'Business'}
+            </p>
+            {/* Line 2: Follower count + timestamp */}
+            <p className="text-xs text-muted-foreground leading-tight mt-0.5 truncate">
+              <span>{followerCount.toLocaleString()} followers</span>
+              <span className="mx-1">·</span>
+              <span>{timeAgo}</span>
+              <span className="mx-1">·</span>
+              <Globe className="inline-block h-3 w-3 align-[-2px]" />
+            </p>
+          </div>
+
+          {/* Right: Actions (fixed) - Only show if viewer can manage */}
+          {canManage && (
+            <div className="flex-shrink-0 self-start">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="p-1.5 hover:bg-muted/50 rounded-full transition-colors"
+                    aria-label="Post options"
+                  >
+                    <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52">
+                  <DropdownMenuItem onClick={handleCopyLink}>
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copy link
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSend}>
+                    <Share2 className="h-4 w-4 mr-2" />
+                    Send
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleEditCaption}>
+                    <Pencil className="h-4 w-4 mr-2" />
+                    Edit caption
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleChangeVisibility}>
+                    <Eye className="h-4 w-4 mr-2" />
+                    Change visibility
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handlePinToTop}>
+                    <Pin className="h-4 w-4 mr-2" />
+                    Pin to top
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleViewInsights}>
+                    <BarChart2 className="h-4 w-4 mr-2" />
+                    View insights
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleDeletePost} className="text-destructive focus:text-destructive">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete post
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
         </div>
 
-        {/* Post content */}
+        {/* Caption block - consistent padding below header */}
         {content && (
-          <div className="px-4 pb-3">
-            <p className="text-sm text-foreground whitespace-pre-wrap">
+          <div style={{ padding: '0 16px 10px 16px' }}>
+            <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">
               {displayContent}
               {shouldTruncate && (
                 <>
@@ -284,14 +280,17 @@ export default function BusinessPostCard({
           </div>
         )}
 
-        {/* Media - Phase 2: strict wrapper to prevent overflow */}
+        {/* Subtle divider under header/caption before media */}
+        <div className="h-px bg-border/30 mx-4" />
+
+        {/* Media - centered with safety net */}
         {primaryMedia && (
           <div
-            className="relative w-full overflow-hidden"
+            className="relative w-full overflow-hidden flex justify-center items-center"
             style={{
               aspectRatio: isVideo ? '16 / 9' : undefined,
               maxHeight: isVideo ? undefined : '500px',
-              minWidth: 0, // Flex layout gotcha fix
+              minWidth: 0,
             }}
           >
             {isVideo && hlsUrl ? (
@@ -299,7 +298,7 @@ export default function BusinessPostCard({
                 ref={videoRef}
                 src={hlsUrl}
                 poster={thumbnailUrl || undefined}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover max-w-full"
               />
             ) : isVideo ? (
               <div className="relative w-full h-full bg-muted">
@@ -342,8 +341,8 @@ export default function BusinessPostCard({
           </div>
         )}
 
-        {/* Action bar - Phase 3: Appreciate/Comment/Reshare/Send */}
-        <div className="py-1 flex items-center justify-around border-t border-border/30">
+        {/* Action bar - equal distribution with flex:1 */}
+        <div className="py-1 flex items-center border-t border-border/30">
           <ActionButton
             icon={Heart}
             label="Appreciate"
@@ -386,7 +385,7 @@ function ActionButton({ icon: Icon, label, isActive, isLoading, onClick }: Actio
       disabled={isLoading}
       aria-label={label}
       className={cn(
-        'flex flex-col items-center gap-0.5 py-2 px-3 rounded-md transition-colors hover:bg-muted/50 disabled:opacity-50',
+        'flex-1 flex flex-col items-center justify-center gap-0.5 py-2 px-2 transition-colors hover:bg-muted/50 disabled:opacity-50',
         isActive ? 'text-[#F7931E]' : 'text-muted-foreground'
       )}
     >
