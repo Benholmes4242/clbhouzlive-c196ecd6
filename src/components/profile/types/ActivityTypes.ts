@@ -29,6 +29,9 @@ export interface ActivityPost {
     media_url: string;
     filter_id?: string | null;
     studio_edits?: any | null;
+    aspect_ratio?: number | null;
+    poster_url?: string | null;
+    duration_seconds?: number | null;
   }>;
   post_tags: PostTag[];
   user: {
