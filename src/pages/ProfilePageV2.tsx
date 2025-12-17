@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { cn } from '@/lib/utils';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile.tsx';
@@ -567,7 +568,7 @@ const ProfilePageV2: React.FC = () => {
         </section>
 
         {/* Tab Content */}
-        <div className="pt-4 px-5">
+        <div className={cn("pt-4", activeSection === 'activity' ? 'px-0' : 'px-5')}>
           {getCurrentContent()}
         </div>
       </div>
