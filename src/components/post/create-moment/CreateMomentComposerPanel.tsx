@@ -150,34 +150,39 @@ export default function CreateMomentComposerPanel({
             maxLength={2200}
           />
           
-          {/* Character count - only show when typing */}
-          {caption.length > 0 && (
-            <div className="flex items-center justify-end mt-1">
-              <span className={`text-[10px] ${caption.length > 2000 ? 'text-amber-400' : 'text-white/35'}`}>
-                {caption.length}/2200
-              </span>
-            </div>
-          )}
-
-          {/* Tagged entities confirmation chips */}
-          {selectedTags.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
-              <span className="text-[11px] text-white/50">Tagged:</span>
-              {selectedTags.map(tag => (
-                <button
-                  key={tag.id}
-                  onClick={() => onTagsChange(selectedTags.filter(t => t.id !== tag.id))}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors"
-                  style={{
-                    background: 'rgba(255, 147, 30, 0.15)',
-                    color: 'hsl(var(--primary))',
-                    border: '1px solid rgba(255, 147, 30, 0.25)',
-                  }}
-                >
-                  @{tag.username || tag.name}
-                  <X className="w-3 h-3 opacity-60 hover:opacity-100" />
-                </button>
-              ))}
+          {/* Character count and tagged entities - same row */}
+          {(caption.length > 0 || selectedTags.length > 0) && (
+            <div className="flex items-start justify-between gap-2 mt-1">
+              {/* Tagged entities confirmation chips */}
+              {selectedTags.length > 0 ? (
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="text-[11px] text-white/50">Tagged:</span>
+                  {selectedTags.map(tag => (
+                    <button
+                      key={tag.id}
+                      onClick={() => onTagsChange(selectedTags.filter(t => t.id !== tag.id))}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors"
+                      style={{
+                        background: 'rgba(255, 147, 30, 0.15)',
+                        color: 'hsl(var(--primary))',
+                        border: '1px solid rgba(255, 147, 30, 0.25)',
+                      }}
+                    >
+                      @{tag.username || tag.name}
+                      <X className="w-3 h-3 opacity-60 hover:opacity-100" />
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div />
+              )}
+              
+              {/* Character count */}
+              {caption.length > 0 && (
+                <span className={`text-[10px] flex-shrink-0 ${caption.length > 2000 ? 'text-amber-400' : 'text-white/35'}`}>
+                  {caption.length}/2200
+                </span>
+              )}
             </div>
           )}
 
