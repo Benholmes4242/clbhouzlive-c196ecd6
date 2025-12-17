@@ -213,7 +213,7 @@ export function BusinessActivityFeed({
         <div
           className="-mx-5 px-0"
           style={{
-            background: 'linear-gradient(180deg, #E8EBF0 0%, #EDEFF2 100%)',
+            background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)',
           }}
         >
           <div className="flex flex-col gap-3 md:gap-4 py-3 md:py-4">
