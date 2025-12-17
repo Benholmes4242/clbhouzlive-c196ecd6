@@ -198,11 +198,11 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         ariaLabel="Comments"
       />
 
-      {/* Slot 4: Send */}
+      {/* Slot 4: Reshare */}
       <ActionSlot
         icon={Send}
         onClick={onShare}
-        ariaLabel="Send"
+        ariaLabel="Reshare"
         showCount={false}
       />
 
