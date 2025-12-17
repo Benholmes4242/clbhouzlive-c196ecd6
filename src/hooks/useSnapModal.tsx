@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useModalContext } from '@/contexts/ModalContext';
 import { normalizeFilesToMediaItems, revokeMediaItemUrls } from '@/lib/mediaUtils';
 
@@ -53,7 +54,10 @@ type SnapState = {
 
 export const useSnapModal = () => {
   const captionInputRef = useRef<HTMLDivElement>(null);
+  const originRef = useRef<string | null>(null);
   const { setCreateMomentModalOpen } = useModalContext();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isComposerOpen, setIsComposerOpen] = useState(false);
   const [mode, setMode] = useState<'create' | 'edit'>('create');
   
@@ -85,6 +89,9 @@ export const useSnapModal = () => {
   // NEW: Multi-file opener
   const openComposerWithFiles = async (files: File[], composerMode: 'create' | 'edit' = 'create'): Promise<void> => {
     console.log('[composer] received files:', files?.length, 'mode:', composerMode);
+    
+    // Capture origin route before opening
+    originRef.current = location.pathname + location.search;
     
     // Set mode first
     setMode(composerMode);
@@ -170,13 +177,22 @@ export const useSnapModal = () => {
   };
 
   const closeComposer = () => {
-    console.log('Closing composer');
+    console.log('Closing composer, returning to:', originRef.current);
     
     // Clean up media before clearing state (so we have mediaItems to cleanup)
     cleanupPreviousMedia();
     
     setIsComposerOpen(false);
     setCreateMomentModalOpen(false); // Update modal context
+    
+    // Navigate back to origin (if we have one and it's not the current route)
+    const origin = originRef.current;
+    originRef.current = null; // Clear for next open
+    
+    // Only navigate if origin exists and is different from current
+    if (origin && origin !== location.pathname + location.search) {
+      navigate(origin, { replace: true });
+    }
     
     // Reset all transient state
     resetComposerState();
