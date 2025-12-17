@@ -221,26 +221,11 @@ async function processJob(jobId: string): Promise<void> {
       }
     }
 
-    // Handle course info
+    // Handle course info - store as "Played at" line in content, NOT as a post_tag
+    // Golf clubs are not @mentions - they use the "Played at" CTA instead
     if (job.courseInfo) {
       try {
-        const { data: taggableEntity } = await supabase
-          .from('taggable_entities')
-          .select('id')
-          .eq('entity_type', 'golf_club')
-          .eq('entity_id', job.courseInfo.id)
-          .single();
-
-        if (taggableEntity) {
-          await supabase.from('post_tags').insert({
-            post_id: postId,
-            tagged_entity_id: taggableEntity.id,
-            start_index: 0,
-            end_index: 0,
-          });
-        }
-
-        // Update content with course info
+        // Update content with course info (the CoursePostBadge renders this as a clickable CTA)
         const updatedContent = `${job.caption || ''}\n\n📍 Played at ${job.courseInfo.name}, ${job.courseInfo.country}`.trim();
         await supabase.from('posts').update({ content: updatedContent }).eq('id', postId);
       } catch (courseError) {

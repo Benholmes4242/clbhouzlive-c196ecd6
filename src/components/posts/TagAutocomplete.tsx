@@ -44,9 +44,9 @@ const TagAutocomplete: React.FC<TagAutocompleteProps> = ({
   const getEntityTypeLabel = (entityType: string) => {
     switch (entityType) {
       case 'user':
-        return 'User';
+        return 'Person';
       case 'golf_club':
-        return 'Golf Club';
+        return 'Course listing';
       case 'business':
         return 'Business';
       default:
@@ -69,14 +69,14 @@ const TagAutocomplete: React.FC<TagAutocompleteProps> = ({
   const limitedEntities = entities.slice(0, 6);
 
   return (
-    <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg max-h-80 overflow-y-auto z-50 mt-1">
+    <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-sq-sm shadow-lg max-h-80 overflow-y-auto z-50 mt-1">
       {loading ? (
-        <div className="px-4 py-3 text-sm text-gray-500 flex items-center gap-2">
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+        <div className="px-4 py-3 text-sm text-muted-foreground flex items-center gap-2">
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
           Searching...
         </div>
       ) : limitedEntities.length === 0 ? (
-        <div className="px-4 py-3 text-sm text-gray-500">
+        <div className="px-4 py-3 text-sm text-muted-foreground">
           No users, clubs, or businesses found
         </div>
       ) : (
@@ -86,8 +86,8 @@ const TagAutocomplete: React.FC<TagAutocompleteProps> = ({
               key={`${entity.entity_type}-${entity.entity_id}`}
               className={`px-4 py-3 cursor-pointer flex items-center gap-3 transition-colors ${
                 index === selectedIndex
-                  ? 'bg-blue-50 border-l-2 border-blue-500'
-                  : 'hover:bg-gray-50'
+                  ? 'bg-primary/10 border-l-2 border-primary'
+                  : 'hover:bg-muted'
               }`}
               onClick={() => onSelect(entity)}
               onMouseDown={(e) => e.preventDefault()} // Prevent input blur
@@ -109,18 +109,18 @@ const TagAutocomplete: React.FC<TagAutocompleteProps> = ({
               
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-gray-900 truncate text-sm">
+                  <span className="font-semibold text-foreground truncate text-sm">
                     {getDisplayName(entity)}
                   </span>
                 </div>
-                <div className="text-xs text-gray-500 truncate">
+                <div className="text-xs text-muted-foreground truncate">
                   {getSubtitle(entity)}
                 </div>
               </div>
             </div>
           ))}
           {entities.length > 6 && (
-            <div className="px-4 py-2 text-xs text-gray-400 border-t border-gray-100 bg-gray-50">
+            <div className="px-4 py-2 text-xs text-muted-foreground border-t border-border bg-muted/50">
               {entities.length - 6} more results...
             </div>
           )}

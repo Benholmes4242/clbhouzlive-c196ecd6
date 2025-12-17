@@ -23,6 +23,9 @@ interface PostContentWithTagsProps {
   className?: string;
 }
 
+// Only these entity types render as orange @mentions
+const MENTIONABLE_TYPES = new Set(['user', 'business']);
+
 const PostContentWithTags: React.FC<PostContentWithTagsProps> = ({
   content,
   tags,
@@ -37,20 +40,28 @@ const PostContentWithTags: React.FC<PostContentWithTagsProps> = ({
       } else {
         navigate(`/profile/${entity.entity_id}`);
       }
-    } else if (entity.entity_type === 'golf_club') {
-      navigate(`/courses/${entity.entity_id}`);
     } else if (entity.entity_type === 'business') {
       navigate(`/business/${entity.entity_id}`);
     }
+    // golf_club navigation is handled via "Played at" CTA, not @mentions
   };
 
   const renderContentWithTags = () => {
-    if (!content || tags.length === 0) {
+    if (!content) {
+      return <span>{content}</span>;
+    }
+
+    // Filter to only mentionable types (user, business) - golf_club uses "Played at" CTA instead
+    const mentionableTags = tags.filter(tag => 
+      tag.taggable_entities && MENTIONABLE_TYPES.has(tag.taggable_entities.entity_type)
+    );
+
+    if (mentionableTags.length === 0) {
       return <span>{content}</span>;
     }
 
     // Sort tags by start_index to process them in order
-    const sortedTags = [...tags].sort((a, b) => a.start_index - b.start_index);
+    const sortedTags = [...mentionableTags].sort((a, b) => a.start_index - b.start_index);
     
     let lastIndex = 0;
     const elements: React.ReactNode[] = [];
@@ -67,7 +78,7 @@ const PostContentWithTags: React.FC<PostContentWithTagsProps> = ({
         );
       }
 
-      // Add the clickable tag
+      // Add the clickable tag with orange accent styling
       const tagText = content.slice(start_index, end_index);
       const displayName = taggable_entities.username 
         ? `@${taggable_entities.username}` 
@@ -77,10 +88,10 @@ const PostContentWithTags: React.FC<PostContentWithTagsProps> = ({
         <button
           key={`tag-${tag.id}`}
           onClick={(e) => {
-            e.stopPropagation(); // Prevent triggering post click
+            e.stopPropagation();
             handleTagClick(taggable_entities);
           }}
-          className="text-[#6e9277] font-medium hover:underline cursor-pointer bg-transparent border-none p-0 m-0 inline"
+          className="text-primary font-medium hover:underline cursor-pointer bg-transparent border-none p-0 m-0 inline"
           style={{ fontSize: 'inherit', lineHeight: 'inherit' }}
         >
           {tagText || displayName}
