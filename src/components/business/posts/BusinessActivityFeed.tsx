@@ -209,28 +209,21 @@ export function BusinessActivityFeed({
           )}
         </div>
       ) : (
-        /* Gradient background container with spacing */
-        <div
-          className="-mx-5 px-0"
-          style={{
-            background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)',
-          }}
-        >
-          <div className="flex flex-col gap-3 md:gap-4 py-3 md:py-4">
-            {filteredPosts.map((post, index) => (
-              <BusinessPostCard
-                key={post.id}
-                post={post}
-                businessName={businessName}
-                businessLogo={businessLogo}
-                followerCount={followerCount}
-                isOwner={membership?.canManage ?? false}
-                registerVideo={registerVideo}
-                isPlaying={playingIds.has(post.id)}
-                videoIndex={index}
-              />
-            ))}
-          </div>
+        /* Posts directly on page background */
+        <div className="flex flex-col gap-4 md:gap-5 py-2">
+          {filteredPosts.map((post, index) => (
+            <BusinessPostCard
+              key={post.id}
+              post={post}
+              businessName={businessName}
+              businessLogo={businessLogo}
+              followerCount={followerCount}
+              isOwner={membership?.canManage ?? false}
+              registerVideo={registerVideo}
+              isPlaying={playingIds.has(post.id)}
+              videoIndex={index}
+            />
+          ))}
         </div>
       )}
 
