@@ -29,6 +29,7 @@ import { cn } from '@/lib/utils';
 import { getStreamPoster, getStreamIdFromUrl } from '@/utils/stream';
 import GridAutoplayVideo from '@/components/profile/activity/GridAutoplayVideo';
 import CommentsPage from '@/components/clubhouse/cinematic/CommentsPage';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { toast } from 'sonner';
 import {
@@ -185,16 +186,14 @@ export default function BusinessPostCard({
         <div className="px-4 py-3">
           <div className="flex items-start justify-between">
             <div className="flex gap-3">
-              {/* Business avatar */}
-              <div className="w-12 h-12 rounded-full overflow-hidden bg-muted flex-shrink-0">
-                {businessLogo ? (
-                  <img src={businessLogo} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-muted-foreground text-lg font-semibold">
-                    {businessName?.charAt(0) || 'B'}
-                  </div>
-                )}
-              </div>
+              {/* Business avatar - Squircle with SDS radius */}
+              <SquircleAvatar
+                size={48}
+                src={businessLogo || undefined}
+                alt={businessName || 'Business'}
+                fallback={businessName?.charAt(0) || 'B'}
+                hideRing
+              />
 
               {/* Business info */}
               <div className="min-w-0">
@@ -358,7 +357,7 @@ export default function BusinessPostCard({
         </div>
       </div>
 
-      {/* Comments - use the exact Clubhouse slide-in panel */}
+      {/* Comments - use Clubhouse slide-in panel with light theme */}
       <CommentsPage
         isOpen={commentsOpen}
         onClose={() => setCommentsOpen(false)}
@@ -366,6 +365,7 @@ export default function BusinessPostCard({
         videoThumbnail={thumbnailUrl || undefined}
         creatorName={businessName}
         creatorAvatar={businessLogo || undefined}
+        theme="light"
       />
     </>
   );
