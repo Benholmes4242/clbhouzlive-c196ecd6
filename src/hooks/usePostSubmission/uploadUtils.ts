@@ -4,8 +4,8 @@ import { uploadMediaWithRetry, uploadMultipleMediaWithRetry } from '@/components
 import { createPostTags, rollbackPost, createTagNotifications } from '@/components/posts/utils/postOperations';
 import { TaggableEntity } from './types';
 
-export const createPost = async (userId: string, content: string) => {
-  console.log('Creating post in database...', { userId, contentLength: content?.length || 0 });
+export const createPost = async (userId: string, content: string, actorType: 'personal' | 'business' = 'personal', actorId?: string) => {
+  console.log('Creating post in database...', { userId, contentLength: content?.length || 0, actorType, actorId });
   
   if (!userId) {
     throw new Error('User ID is required to create a post');
@@ -15,7 +15,9 @@ export const createPost = async (userId: string, content: string) => {
     .from('posts')
     .insert({
       user_id: userId,
-      content: content?.trim() || null
+      content: content?.trim() || null,
+      actor_type: actorType,
+      actor_id: actorId || userId,
     })
     .select()
     .single();
