@@ -221,7 +221,7 @@ export function BusinessProfilePosts({
         </div>
       )}
 
-      {/* Composer Modal */}
+      {/* Composer Modal - with actor override to this business */}
       <EnhancedCreateMomentModalCinematic
         isOpen={isComposerOpen}
         onClose={handleComposerClose}
@@ -229,6 +229,7 @@ export function BusinessProfilePosts({
         isSubmitting={isSubmitting}
         mediaItems={composerMedia}
         onMediaChange={setComposerMedia}
+        initialActorOverride={{ type: 'business', id: businessId }}
       />
     </div>
   );

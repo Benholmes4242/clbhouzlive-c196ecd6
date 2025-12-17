@@ -37,11 +37,13 @@ export default function CreateMomentModal({
   mediaItems = [],
   selectedCourse,
   onCourseSelect,
-  onMediaChange
+  onMediaChange,
+  initialActorOverride
 }: CreateMomentProps) {
   const { setCreateMomentModalOpen } = useModalContext();
-  const { activeActor, availableActors } = useActiveActor();
+  const { activeActor, availableActors, setActiveActor } = useActiveActor();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const [hasAppliedOverride, setHasAppliedOverride] = useState(false);
   const overlayRootRef = useRef<HTMLDivElement>(null);
   const [overlayRoot, setOverlayRoot] = useState<HTMLElement | null>(null);
   // Animation state
@@ -105,6 +107,31 @@ export default function CreateMomentModal({
   useEffect(() => {
     setCreateMomentModalOpen(isOpen);
   }, [isOpen, setCreateMomentModalOpen]);
+
+  // Apply initial actor override once when modal opens (session-only, not persisted)
+  useEffect(() => {
+    if (!isOpen || hasAppliedOverride || !initialActorOverride) return;
+    if (availableActors.length === 0) return; // Wait for actors to load
+    
+    // Verify the override actor exists in available actors
+    const overrideActor = availableActors.find(
+      a => a.type === initialActorOverride.type && a.id === initialActorOverride.id
+    );
+    
+    if (overrideActor) {
+      console.log('[CreateMomentModal] Applying actor override:', overrideActor.name);
+      setActiveActor(overrideActor, { persist: false });
+    }
+    
+    setHasAppliedOverride(true);
+  }, [isOpen, initialActorOverride, availableActors, hasAppliedOverride, setActiveActor]);
+
+  // Reset override flag when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setHasAppliedOverride(false);
+    }
+  }, [isOpen]);
 
   // Set overlay root for portal-based components (dropdowns, popovers)
   useEffect(() => {
