@@ -72,7 +72,7 @@ serve(async (req) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            // Optional: requireSignedURLs: true,
+            maxDurationSeconds: 3600, // 1 hour max video length
             meta: { name: fileName },
           }),
         },
