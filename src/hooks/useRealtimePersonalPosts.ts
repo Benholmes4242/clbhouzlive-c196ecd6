@@ -6,24 +6,29 @@ import { postKeys } from '@/queryKeys/posts';
 // Debounce delay for post_media invalidations (ms)
 const MEDIA_INVALIDATION_DEBOUNCE_MS = 300;
 
-export function useRealtimeBusinessPosts(businessId?: string) {
+/**
+ * Realtime subscription for personal profile posts.
+ * Listens for posts and post_media changes to keep the feed fresh.
+ * Secondary safety net - primary invalidation is via upload:complete event.
+ */
+export function useRealtimePersonalPosts(userId?: string) {
   const qc = useQueryClient();
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (!businessId) return;
+    if (!userId) return;
 
     // Channel for posts table changes
     const postsChannel = supabase
-      .channel(`rt:business-posts:${businessId}`)
+      .channel(`rt:personal-posts:${userId}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'posts' },
         (payload) => {
           const row = (payload.new ?? payload.old) as any;
-          if (row?.actor_type === 'business' && row?.actor_id === businessId) {
-            qc.invalidateQueries({ queryKey: postKeys.actorPosts('business', businessId) });
-            qc.invalidateQueries({ queryKey: postKeys.actorPostsCount('business', businessId) });
+          if (row?.actor_type === 'personal' && row?.actor_id === userId) {
+            qc.invalidateQueries({ queryKey: postKeys.actorPosts('personal', userId) });
+            qc.invalidateQueries({ queryKey: postKeys.actorPostsCount('personal', userId) });
           }
         }
       )
@@ -31,7 +36,7 @@ export function useRealtimeBusinessPosts(businessId?: string) {
 
     // Channel for post_media table changes - secondary safety net for media attachment
     const mediaChannel = supabase
-      .channel(`rt:business-post-media:${businessId}`)
+      .channel(`rt:personal-post-media:${userId}`)
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'post_media' },
@@ -42,8 +47,8 @@ export function useRealtimeBusinessPosts(businessId?: string) {
           }
           
           debounceTimerRef.current = setTimeout(() => {
-            console.log('[useRealtimeBusinessPosts] post_media INSERT detected, invalidating feed');
-            qc.invalidateQueries({ queryKey: postKeys.actorPosts('business', businessId) });
+            console.log('[useRealtimePersonalPosts] post_media INSERT detected, invalidating feed');
+            qc.invalidateQueries({ queryKey: postKeys.actorPosts('personal', userId) });
           }, MEDIA_INVALIDATION_DEBOUNCE_MS);
         }
       )
@@ -56,5 +61,5 @@ export function useRealtimeBusinessPosts(businessId?: string) {
       supabase.removeChannel(postsChannel);
       supabase.removeChannel(mediaChannel);
     };
-  }, [businessId, qc]);
+  }, [userId, qc]);
 }
