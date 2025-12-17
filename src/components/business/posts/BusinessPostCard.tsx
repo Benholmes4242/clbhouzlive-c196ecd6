@@ -119,12 +119,12 @@ export default function BusinessPostCard({
   }, []);
 
   const handleCopyLink = useCallback(async () => {
-    await navigator.clipboard.writeText(`${window.location.origin}/post/${post.id}`);
+    await navigator.clipboard.writeText(`${window.location.origin}/clubhouse/post/${post.id}`);
     toast.success('Link copied');
   }, [post.id]);
 
   const handleSend = useCallback(async () => {
-    const url = `${window.location.origin}/post/${post.id}`;
+    const url = `${window.location.origin}/clubhouse/post/${post.id}`;
     if (navigator.share) {
       try {
         await navigator.share({ title: businessName || 'Post', url });
@@ -313,11 +313,11 @@ export default function BusinessPostCard({
         {/* Social proof line */}
         {(likesCount > 0 || commentsCount > 0) && (
           <div className="px-4 py-2 text-xs text-muted-foreground border-b border-border/30">
-            {likesCount > 0 && <span>{likesCount} golfer{likesCount !== 1 ? 's' : ''} liked</span>}
+            {likesCount > 0 && <span>{likesCount} {likesCount === 1 ? 'like' : 'likes'}</span>}
             {likesCount > 0 && commentsCount > 0 && <span> · </span>}
             {commentsCount > 0 && (
               <button onClick={handleComment} className="hover:underline">
-                {commentsCount} comment{commentsCount !== 1 ? 's' : ''}
+                {commentsCount} {commentsCount === 1 ? 'comment' : 'comments'}
               </button>
             )}
           </div>

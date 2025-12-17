@@ -2,11 +2,11 @@
  * PostActionBar - Global canonical action bar for posts
  * Single source of truth for action icons and labels across all surfaces
  * 
- * Canonical icons:
- * - Like: Heart
- * - Comment: MessageSquare (rounded)
- * - Reshare: Repeat2 (circular arrows)
- * - Send: Send (paper plane)
+ * Canonical icons (matching Business Activity):
+ * - Like: Heart (lucide)
+ * - Comment: MessageSquare (lucide, rounded-square bubble)
+ * - Reshare: Repeat2 (lucide, circular arrows)
+ * - Send: Send (lucide, paper plane)
  */
 
 import React, { useCallback } from 'react';
@@ -26,6 +26,9 @@ export interface PostActionBarProps {
   /** Optional share title for native share */
   shareTitle?: string;
 }
+
+// Minimum touch target height per accessibility guidelines
+const MIN_TOUCH_TARGET = 44;
 
 /**
  * PostActionBar - Canonical action bar for all post surfaces
@@ -53,7 +56,8 @@ export function PostActionBar({
   }, []);
 
   const handleSend = useCallback(async () => {
-    const url = `${window.location.origin}/post/${postId}`;
+    // Use canonical post deep link path
+    const url = `${window.location.origin}/clubhouse/post/${postId}`;
     if (navigator.share) {
       try {
         await navigator.share({ title: shareTitle || 'Post', url });
@@ -122,6 +126,7 @@ function ActionButton({
       onClick={onClick}
       disabled={isLoading}
       aria-label={label}
+      style={{ minHeight: MIN_TOUCH_TARGET }}
       className={cn(
         'flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors hover:bg-muted/50 disabled:opacity-50',
         compact ? 'py-1.5 px-1' : 'py-2 px-2',
