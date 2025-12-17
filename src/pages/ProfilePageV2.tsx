@@ -35,6 +35,10 @@ import HandicapSection from '@/components/profile/HandicapSection';
 // Background color - matches course details page (slate-50)
 const BG_COLOR = '#f8fafc'; // slate-50
 
+// UUID v4 detection regex
+const isUuid = (v: string) =>
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v);
+
 const ProfilePageV2: React.FC = () => {
   const navigate = useNavigate();
   const { username: routeUsername } = useParams<{ username?: string }>();
@@ -44,19 +48,20 @@ const ProfilePageV2: React.FC = () => {
   const [profileUserId, setProfileUserId] = useState<string | undefined>(undefined);
   
   useEffect(() => {
-    const fetchProfileByUsername = async () => {
+    const fetchProfileByUsernameOrId = async () => {
       if (routeUsername) {
-        const { data } = await supabase
-          .from('user_profiles')
-          .select('id')
-          .eq('username', routeUsername)
-          .single();
+        // Support both UUID and username in route param
+        const query = supabase.from('user_profiles').select('id');
+        const { data } = await (isUuid(routeUsername)
+          ? query.eq('id', routeUsername)
+          : query.eq('username', routeUsername)
+        ).single();
         setProfileUserId(data?.id || undefined);
       } else {
         setProfileUserId(user?.id);
       }
     };
-    fetchProfileByUsername();
+    fetchProfileByUsernameOrId();
   }, [routeUsername, user?.id]);
   
   const { data: profile, isLoading: profileLoading } = useUserProfile(profileUserId);
