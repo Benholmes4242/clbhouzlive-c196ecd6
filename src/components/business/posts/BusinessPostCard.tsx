@@ -358,8 +358,8 @@ export default function BusinessPostCard({
         </div>
       </div>
 
-      {/* Comments Modal - Phase 4: reuse existing with grey variant */}
-      <CommentsModal isOpen={commentsOpen} onClose={() => setCommentsOpen(false)} postId={post.id} theme="grey" />
+      {/* Comments Modal - reuse exact same as Clubhouse */}
+      <CommentsModal isOpen={commentsOpen} onClose={() => setCommentsOpen(false)} postId={post.id} />
     </>
   );
 }
