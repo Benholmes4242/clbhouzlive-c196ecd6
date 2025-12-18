@@ -292,7 +292,7 @@ export default function ManageTeamPage() {
           
           <button
             onClick={handleBack}
-            className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Done
           </button>
