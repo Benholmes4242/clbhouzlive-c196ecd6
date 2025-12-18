@@ -160,7 +160,7 @@ const BusinessCreatePage = () => {
       // Link to golf club if applicable
       if (isGolfClubCategory && selectedClub) {
         insertData.club_id = selectedClub.id;
-        insertData.club_key = selectedClub.name; // Store for reference
+        insertData.club_key = selectedClub.club_key || null; // Store canonical key
       }
 
       const { data: businessData, error: businessError } = await supabase
@@ -622,7 +622,7 @@ const BusinessCreatePage = () => {
           <Button
             variant="secondary"
             onClick={handleSubmit}
-            disabled={saving || saveSuccess || !isValid || !!existingBusinessForClub}
+            disabled={saving || saveSuccess || !isValid || !!existingBusinessForClub || checkingClub}
             className={cn(
               "flex-[1.5] h-11",
               saveSuccess && "bg-emerald-500 hover:bg-emerald-500 text-white"

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Check, Loader2 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -34,6 +34,7 @@ export const ClaimCoursesStep: React.FC<ClaimCoursesStepProps> = ({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const autoSaveTriggered = useRef(false);
 
   // Fetch courses for this club
   useEffect(() => {
@@ -62,6 +63,19 @@ export const ClaimCoursesStep: React.FC<ClaimCoursesStepProps> = ({
       fetchCourses();
     }
   }, [clubId]);
+
+  // Auto-handle single course or no courses (moved to useEffect to prevent infinite loop)
+  useEffect(() => {
+    if (loading || autoSaveTriggered.current) return;
+    
+    if (courses.length === 0) {
+      autoSaveTriggered.current = true;
+      onSkip();
+    } else if (courses.length === 1 && !saving) {
+      autoSaveTriggered.current = true;
+      handleSave();
+    }
+  }, [loading, courses.length, saving]);
 
   const toggleCourse = (courseId: string) => {
     setSelectedIds(prev => {
@@ -119,15 +133,13 @@ export const ClaimCoursesStep: React.FC<ClaimCoursesStepProps> = ({
     );
   }
 
-  // If only one course, skip this step
+  // Don't render UI if auto-handling (single/no courses)
   if (courses.length <= 1) {
-    // Auto-claim the single course
-    if (courses.length === 1) {
-      handleSave();
-    } else {
-      onSkip();
-    }
-    return null;
+    return (
+      <div className="py-12 flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+      </div>
+    );
   }
 
   return (
