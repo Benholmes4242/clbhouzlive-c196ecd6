@@ -130,6 +130,22 @@ serve(async (req) => {
     const now = new Date().toISOString();
     const statusToSet = decision === "approve" ? "approved" : "declined";
 
+    // Auto-clear access-request notifications for ALL admin recipients when resolved
+    // This marks "business_access_request" notifications as read for this specific request
+    const { error: clearNotifError } = await supabase
+      .from("notifications")
+      .update({ is_read: true })
+      .eq("type", "business_access_request")
+      .eq("entity_id", request.business_id)
+      .contains("data", { request_id: request_id });
+
+    if (clearNotifError) {
+      console.warn("Failed to clear access request notifications:", clearNotifError);
+      // Non-blocking - continue with the decision
+    } else {
+      console.log(`Marked access request notifications as read for request ${request_id}`);
+    }
+
     if (decision === "approve") {
       // Update request status
       const { error: updateError } = await supabase
