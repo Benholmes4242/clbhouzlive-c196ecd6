@@ -25,6 +25,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { AccessRequestsSection } from '@/components/business/AccessRequestsSection';
+import { AppLog } from '@/lib/logger';
 
 interface SearchResult {
   id: string;
@@ -223,46 +224,21 @@ export default function ManageTeamPage() {
   const handleRemoveMember = async () => {
     const target = removeTarget ?? editingMember;
 
-    console.groupCollapsed('[ManageTeamPage] handleRemoveMember');
-    console.log('state snapshot', {
-      businessId,
-      removing,
-      editingMemberId: editingMember?.id,
-      editingUserProfileId: editingMember?.profile?.id,
-      removeTargetId: removeTarget?.id,
-      removeTargetProfileId: removeTarget?.profile?.id,
-      targetId: target?.id,
-      targetProfileId: target?.profile?.id,
-      targetName: target?.profile?.display_name,
-    });
-
     if (!target?.profile || !businessId) {
-      console.warn('[ManageTeamPage] early return: missing target.profile or businessId', {
-        hasTarget: !!target,
-        hasProfile: !!target?.profile,
-        businessId,
-      });
+      AppLog.warn('ManageTeamPage', 'Remove cancelled: missing target or businessId');
       toast.error('No team member selected');
       setShowRemoveConfirm(false);
       setRemoveTarget(null);
-      console.groupEnd();
       return;
     }
 
     setRemoving(true);
-    console.time('[ManageTeamPage] remove_from_business_team');
 
     try {
-      const payload = {
+      const { data, error } = await supabase.rpc('remove_from_business_team', {
         p_business_id: businessId,
         p_user_profile_id: target.profile.id,
-      };
-      console.log('[ManageTeamPage] calling supabase.rpc(remove_from_business_team)', payload);
-
-      const { data, error } = await supabase.rpc('remove_from_business_team', payload);
-
-      console.timeEnd('[ManageTeamPage] remove_from_business_team');
-      console.log('[ManageTeamPage] rpc result', { data, error });
+      });
 
       if (error) throw error;
 
@@ -281,14 +257,12 @@ export default function ManageTeamPage() {
       // Wait another frame before invalidating to ensure DOM cleanup
       await new Promise((resolve) => requestAnimationFrame(resolve));
 
-      console.log('[ManageTeamPage] invalidating team query', ['business-team-members', businessId]);
       queryClient.invalidateQueries({ queryKey: ['business-team-members', businessId] });
     } catch (error: any) {
-      console.error('[ManageTeamPage] remove failed', error);
+      AppLog.error('ManageTeamPage', 'Remove failed', error);
       toast.error(error?.message || 'Failed to remove team member');
     } finally {
       setRemoving(false);
-      console.groupEnd();
     }
   };
 
@@ -542,11 +516,6 @@ export default function ManageTeamPage() {
                     type="button"
                     variant="ghost" 
                     onClick={(e) => {
-                      console.log('[ManageTeamPage] Open remove confirm', {
-                        businessId,
-                        editingMemberId: editingMember?.id,
-                        editingUserProfileId: editingMember?.profile?.id,
-                      });
                       e.preventDefault();
                       e.stopPropagation();
                       setRemoveTarget(editingMember);
@@ -605,14 +574,6 @@ export default function ManageTeamPage() {
               variant="destructive"
               disabled={removing}
               onClick={async (e) => {
-                console.log('[ManageTeamPage] Remove button clicked', {
-                  businessId,
-                  removing,
-                  editingMemberId: editingMember?.id,
-                  editingUserProfileId: editingMember?.profile?.id,
-                  removeTargetId: removeTarget?.id,
-                  removeTargetProfileId: removeTarget?.profile?.id,
-                });
                 e.preventDefault();
                 e.stopPropagation();
                 await handleRemoveMember();

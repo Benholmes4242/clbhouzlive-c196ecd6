@@ -6,6 +6,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
+import { AppLog } from '@/lib/logger';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -59,7 +60,7 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
   const { data: requests, isLoading } = useQuery({
     queryKey: ['business-access-requests', businessId],
     queryFn: async () => {
-      console.log('[AccessRequestsSection] Fetching access requests for business:', businessId);
+      AppLog.debug('AccessRequestsSection', 'Fetching access requests for business:', businessId);
       const { data, error } = await supabase
         .from('business_access_requests')
         .select(`
@@ -77,7 +78,7 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
 
       if (error) throw error;
 
-      console.log('[AccessRequestsSection] Fetched requests:', data?.length ?? 0);
+      AppLog.debug('AccessRequestsSection', 'Fetched requests:', data?.length ?? 0);
 
       // Fetch requester profiles separately
       if (!data || data.length === 0) return [];
