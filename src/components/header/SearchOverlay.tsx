@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, X, User, MapPin, Building, Clock, TrendingUp, ChevronRight, Verified } from 'lucide-react';
+import { Search, X, User, MapPin, Building, Clock, TrendingUp, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGlobalEntitySearch, saveRecentSearch, clearRecentSearches, type PersonResult, type ClubResult, type BusinessResult } from '@/hooks/useGlobalEntitySearch';
@@ -416,16 +416,11 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
       )}
     >
       {/* Avatar */}
-      <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 relative bg-white/8 overflow-hidden">
+      <div className="w-10 h-10 rounded-sq-md flex items-center justify-center flex-shrink-0 relative bg-white/8 overflow-hidden">
         {item.image ? (
           <img src={item.image} alt="" className="w-full h-full object-cover" />
         ) : (
           <span className="text-xs font-medium text-white/60">{getInitials(item.title)}</span>
-        )}
-        {item.verified && (
-          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
-            <Verified className="h-2.5 w-2.5 text-white" fill="currentColor" />
-          </div>
         )}
       </div>
 
