@@ -1,0 +1,169 @@
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Loader2, Building2, Check } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+
+interface RequestAccessModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  businessId: string;
+  businessName: string;
+  userId: string;
+}
+
+/**
+ * Modal for requesting access to an already-claimed business profile.
+ */
+export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
+  open,
+  onOpenChange,
+  businessId,
+  businessName,
+  userId,
+}) => {
+  const [requestedRole, setRequestedRole] = useState<'team' | 'manager'>('team');
+  const [message, setMessage] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from('business_access_requests')
+        .insert({
+          business_id: businessId,
+          requester_user_profile_id: userId,
+          requested_role: requestedRole,
+          message: message.trim() || null,
+        });
+
+      if (error) throw error;
+
+      setSubmitted(true);
+      toast.success('Access request sent');
+      
+      // Close after short delay
+      setTimeout(() => {
+        onOpenChange(false);
+        setSubmitted(false);
+        setMessage('');
+        setRequestedRole('team');
+      }, 1500);
+    } catch (error: any) {
+      console.error('Error submitting access request:', error);
+      if (error.code === '23505') {
+        toast.error('You already have a pending request for this business');
+      } else {
+        toast.error('Failed to submit request');
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Building2 className="w-5 h-5 text-muted-foreground" />
+            Request access
+          </DialogTitle>
+          <DialogDescription>
+            <span className="font-medium text-foreground">{businessName}</span> already has a business profile on clbhouz.
+          </DialogDescription>
+        </DialogHeader>
+
+        {submitted ? (
+          <div className="py-8 text-center">
+            <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-3">
+              <Check className="w-6 h-6 text-emerald-600" />
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Your request has been sent to the business owners.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4 pt-2">
+            {/* Role selection */}
+            <div className="space-y-2">
+              <Label className="text-sm">What role are you requesting?</Label>
+              <RadioGroup
+                value={requestedRole}
+                onValueChange={(v) => setRequestedRole(v as 'team' | 'manager')}
+                className="space-y-2"
+              >
+                <div className="flex items-start gap-3 p-3 border border-border rounded-sq-sm hover:bg-muted/30 transition-colors">
+                  <RadioGroupItem value="team" id="role-team" className="mt-0.5" />
+                  <div className="flex-1">
+                    <label htmlFor="role-team" className="text-sm font-medium cursor-pointer">
+                      Team member
+                    </label>
+                    <p className="text-xs text-muted-foreground">
+                      Appear as part of the team and post on behalf of the business.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 border border-border rounded-sq-sm hover:bg-muted/30 transition-colors">
+                  <RadioGroupItem value="manager" id="role-manager" className="mt-0.5" />
+                  <div className="flex-1">
+                    <label htmlFor="role-manager" className="text-sm font-medium cursor-pointer">
+                      Manager
+                    </label>
+                    <p className="text-xs text-muted-foreground">
+                      Full access to edit the profile and manage the team.
+                    </p>
+                  </div>
+                </div>
+              </RadioGroup>
+            </div>
+
+            {/* Optional message */}
+            <div className="space-y-1.5">
+              <Label htmlFor="message" className="text-sm">
+                Message (optional)
+              </Label>
+              <Textarea
+                id="message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Introduce yourself or explain your role at the club..."
+                className="min-h-[80px] resize-none rounded-sq-sm"
+                maxLength={500}
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-2">
+              <Button
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                className="flex-1"
+                disabled={submitting}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                disabled={submitting}
+                className="flex-1"
+              >
+                {submitting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  'Send request'
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+};
