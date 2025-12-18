@@ -330,6 +330,7 @@ export type Database = {
           address_line2: string | null
           category: string | null
           city: string | null
+          club_id: string | null
           club_key: string | null
           club_name: string | null
           country: string | null
@@ -367,6 +368,7 @@ export type Database = {
           address_line2?: string | null
           category?: string | null
           city?: string | null
+          club_id?: string | null
           club_key?: string | null
           club_name?: string | null
           country?: string | null
@@ -404,6 +406,7 @@ export type Database = {
           address_line2?: string | null
           category?: string | null
           city?: string | null
+          club_id?: string | null
           club_key?: string | null
           club_name?: string | null
           country?: string | null
@@ -435,7 +438,15 @@ export type Database = {
           verified_by?: string | null
           website?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "business_accounts_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "golf_clubs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       business_activity_log: {
         Row: {
@@ -512,6 +523,42 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_claimed_courses: {
+        Row: {
+          business_id: string
+          course_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          business_id: string
+          course_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          business_id?: string
+          course_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_claimed_courses_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_claimed_courses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
             referencedColumns: ["id"]
           },
         ]
@@ -2526,8 +2573,48 @@ export type Database = {
           },
         ]
       }
+      golf_clubs: {
+        Row: {
+          club_key: string
+          continent: string | null
+          country: string | null
+          created_at: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          region: string | null
+          sub_country: string | null
+        }
+        Insert: {
+          club_key: string
+          continent?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          region?: string | null
+          sub_country?: string | null
+        }
+        Update: {
+          club_key?: string
+          continent?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          region?: string | null
+          sub_country?: string | null
+        }
+        Relationships: []
+      }
       golf_courses: {
         Row: {
+          club_id: string | null
           continent: Database["public"]["Enums"]["continent"]
           country: string
           country_rank: number | null
@@ -2548,6 +2635,7 @@ export type Database = {
           website_url: string | null
         }
         Insert: {
+          club_id?: string | null
           continent: Database["public"]["Enums"]["continent"]
           country: string
           country_rank?: number | null
@@ -2568,6 +2656,7 @@ export type Database = {
           website_url?: string | null
         }
         Update: {
+          club_id?: string | null
           continent?: Database["public"]["Enums"]["continent"]
           country?: string
           country_rank?: number | null
@@ -2587,7 +2676,15 @@ export type Database = {
           usa_rank?: number | null
           website_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "golf_courses_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "golf_clubs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       golfer_candidate_overrides: {
         Row: {
@@ -5066,18 +5163,21 @@ export type Database = {
       user_home_clubs: {
         Row: {
           business_id: string
+          club_id: string | null
           created_at: string
           id: string
           user_profile_id: string
         }
         Insert: {
           business_id: string
+          club_id?: string | null
           created_at?: string
           id?: string
           user_profile_id: string
         }
         Update: {
           business_id?: string
+          club_id?: string | null
           created_at?: string
           id?: string
           user_profile_id?: string
@@ -5088,6 +5188,13 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_home_clubs_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "golf_clubs"
             referencedColumns: ["id"]
           },
           {
@@ -5246,6 +5353,7 @@ export type Database = {
           phone: string | null
           pinned_achievement_ids: string[] | null
           pinned_post_ids: string[] | null
+          primary_club_id: string | null
           profile_photo_url: string | null
           profile_type: string | null
           profile_video_thumbnail_url: string | null
@@ -5335,6 +5443,7 @@ export type Database = {
           phone?: string | null
           pinned_achievement_ids?: string[] | null
           pinned_post_ids?: string[] | null
+          primary_club_id?: string | null
           profile_photo_url?: string | null
           profile_type?: string | null
           profile_video_thumbnail_url?: string | null
@@ -5424,6 +5533,7 @@ export type Database = {
           phone?: string | null
           pinned_achievement_ids?: string[] | null
           pinned_post_ids?: string[] | null
+          primary_club_id?: string | null
           profile_photo_url?: string | null
           profile_type?: string | null
           profile_video_thumbnail_url?: string | null
@@ -5469,6 +5579,13 @@ export type Database = {
             columns: ["home_club_business_id"]
             isOneToOne: false
             referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_profiles_primary_club_id_fkey"
+            columns: ["primary_club_id"]
+            isOneToOne: false
+            referencedRelation: "golf_clubs"
             referencedColumns: ["id"]
           },
         ]
@@ -6535,6 +6652,7 @@ export type Database = {
           status: string
         }[]
       }
+      base_club_name: { Args: { p_course_name: string }; Returns: string }
       can_change_email: { Args: { user_id_param: string }; Returns: boolean }
       can_manage_business: { Args: { _business_id: string }; Returns: boolean }
       can_view_game_participant_profile: {
@@ -7387,6 +7505,7 @@ export type Database = {
         }[]
       }
       normalize_club_key: { Args: { p_name: string }; Returns: string }
+      normalize_key: { Args: { p_text: string }; Returns: string }
       populate_geometry_columns:
         | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
         | { Args: { use_typmod?: boolean }; Returns: string }
