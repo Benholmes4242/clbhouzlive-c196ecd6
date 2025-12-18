@@ -16,17 +16,23 @@ interface SegmentedTabsProps {
 export function SegmentedTabs({ tabs, activeTab, onTabChange }: SegmentedTabsProps) {
   return (
     <div className="flex justify-center py-3">
-      <div className="inline-flex items-center rounded-full bg-muted/50 p-1">
+      <div 
+        className="inline-flex items-center rounded-full px-1 py-1"
+        style={{ 
+          background: '#F0F0F0',
+          border: '1px solid #E0E0E0'
+        }}
+      >
         {tabs.map((tab) => (
           <button
             key={tab.id}
             type="button"
             onClick={() => onTabChange(tab.id)}
             className={cn(
-              "px-4 py-2 text-sm font-medium rounded-full transition-all",
+              "px-4 py-1.5 text-sm font-medium rounded-full transition-all duration-150",
               activeTab === tab.id
-                ? "bg-background shadow-sm text-foreground"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-white shadow-sm text-[#0F0F0F]"
+                : "text-[#0F0F0F]/70 hover:text-[#0F0F0F]"
             )}
           >
             {tab.label}
