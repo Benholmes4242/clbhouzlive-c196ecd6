@@ -146,21 +146,25 @@ serve(async (req) => {
         throw updateError;
       }
 
-      // Map requested_role to business_members role (must match DB constraint: owner/admin/editor/analyst)
-      const roleMap: Record<string, "admin" | "editor" | "analyst"> = {
-        team_member: "editor",
+      // Map requested_role to business_team_members role (must match enum: owner/admin/director/coach/staff)
+      const roleMap: Record<string, "admin" | "staff"> = {
         manager: "admin",
+        team_member: "staff",
       };
-      const memberRole = roleMap[request.requested_role] ?? "editor";
+      const memberRole = roleMap[request.requested_role] ?? "staff";
 
-      // Insert into business_members (upsert to be idempotent)
+      console.log(`Adding ${request.requester_user_profile_id} to business_team_members with role: ${memberRole}`);
+
+      // Insert into business_team_members (upsert to be idempotent)
+      // This is the table that useBusinessTeamMembers queries for "Current Team"
       const { error: memberError } = await supabase
-        .from("business_members")
+        .from("business_team_members")
         .upsert(
           {
             business_id: request.business_id,
             user_profile_id: request.requester_user_profile_id,
             role: memberRole,
+            created_by: user.id, // The admin who approved the request
           },
           {
             onConflict: "business_id,user_profile_id",
@@ -168,7 +172,7 @@ serve(async (req) => {
         );
 
       if (memberError) {
-        console.error("Failed to add member:", memberError);
+        console.error("Failed to add member to business_team_members:", memberError);
         throw memberError;
       }
 
