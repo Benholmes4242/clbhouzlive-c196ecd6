@@ -4,6 +4,7 @@ import { ArrowLeft, Plus, Users, Crown, MoreHorizontal, Trash2 } from 'lucide-re
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
+import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessTeam, useBusinessInvites, useRemoveMember, useUpdateMemberRole, useRevokeInvite, BusinessMember, BusinessInvite } from '@/hooks/useBusinessTeam';
 import { ConfirmModal } from '@/components/ui/confirm-modal';
 import { AccessRequestsSection } from '@/components/business/AccessRequestsSection';
@@ -28,6 +29,7 @@ export default function BusinessTeamPage() {
   const { businessId } = useParams<{ businessId: string }>();
   const navigate = useNavigate();
   const { data: membership } = useBusinessMembership(businessId);
+  const { data: business } = useBusinessProfile(businessId);
   const { data: team, isLoading: teamLoading } = useBusinessTeam(businessId);
   const { data: invites } = useBusinessInvites(businessId);
   const removeMember = useRemoveMember(businessId || '');
@@ -125,7 +127,12 @@ export default function BusinessTeamPage() {
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-8">
         {/* Access Requests Section */}
-        <AccessRequestsSection businessId={businessId} canManage={canManage || false} />
+        <AccessRequestsSection 
+          businessId={businessId} 
+          businessName={business?.name || 'Business'} 
+          businessAvatarUrl={business?.logo_url}
+          canManage={canManage || false} 
+        />
         {/* Owners Section */}
         <section>
           <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Owner</h2>

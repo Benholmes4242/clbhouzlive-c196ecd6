@@ -33,12 +33,24 @@ function getFriendBadgeIcon(isActive: boolean) {
 }
 
 // Check if notification is a system/Clbhouz notification type
+// NOTE: Business notifications should NOT use Clbhouz branding - they use business avatar/name
 function isClbhouzSystemNotification(type: string): boolean {
   return (
     type === 'system' ||
     type === 'app_update' ||
-    type.startsWith('golfer_verification_') ||
-    type.startsWith('business_verification_')
+    type.startsWith('golfer_verification_')
+    // Business notifications explicitly excluded - they show business identity
+  );
+}
+
+// Check if this is a business-entity notification (should show business avatar/name)
+function isBusinessEntityNotification(type: string): boolean {
+  return (
+    type.startsWith('business_verification_') ||
+    type === 'business_member_added' ||
+    type === 'business_access_request' ||
+    type === 'business_access_approved' ||
+    type === 'business_access_declined'
   );
 }
 
@@ -80,6 +92,14 @@ function getNotificationBadgeIcon(type: string) {
     case 'business_verification_removed':
     case 'business_verification_revoked':
       return <ShieldOff className={cn(iconClass, "text-red-500")} />;
+    // Business access notifications
+    case 'business_member_added':
+    case 'business_access_approved':
+      return <Building2 className={cn(iconClass, "text-emerald-500")} />;
+    case 'business_access_request':
+      return <UserPlus className={cn(iconClass, "text-amber-500")} />;
+    case 'business_access_declined':
+      return <X className={cn(iconClass, "text-red-500")} />;
     // Golfer verification notifications - use unified VerifiedBadge for approved
     case 'golfer_verification_approved':
       return <VerifiedBadge size="sm" />;
@@ -95,41 +115,48 @@ function getNotificationBadgeIcon(type: string) {
 }
 
 function getActorDisplayName(notification: ActivityNotification): string {
-  // For business notifications, use business name from data if available
-  if (notification.type?.startsWith('business_verification')) {
-    const businessName = notification.data?.business_name;
+  // For business-entity notifications, prioritize business name from data
+  if (isBusinessEntityNotification(notification.type)) {
+    const businessName = notification.data?.business_name || notification.data?.entity_name;
     if (businessName) return businessName;
-    // Fallback to title which now contains business name
-    if (notification.title && notification.title !== 'Business verification removed') {
-      return notification.title;
-    }
   }
   
-  // For system notifications, use Clbhouz Team
+  // For system notifications only, use Clbhouz Team
   if (notification.type === 'system' || notification.type === 'app_update') {
     return 'Clbhouz Team';
   }
   
-  // Use actor display name, never fallback to "Someone" or "Unknown"
+  // Use actor display name for user-triggered notifications
   const name = notification.actor_display_name;
   if (name && name !== 'Someone' && name !== 'Unknown User') {
     return name;
   }
   
-  // Default to Clbhouz Team for system-like notifications
-  return 'Clbhouz Team';
+  // For business notifications without actor, use business name
+  if (isBusinessEntityNotification(notification.type)) {
+    return notification.data?.business_name || 'Business';
+  }
+  
+  // Default fallback
+  return 'Someone';
 }
 
 function getActorAvatarUrl(notification: ActivityNotification): string | null {
-  // For Clbhouz system notifications (verification, app updates), use logo mark
+  // For business-entity notifications, use business avatar from data
+  if (isBusinessEntityNotification(notification.type)) {
+    const businessAvatar = notification.data?.business_avatar_url || 
+                           notification.data?.business_logo_url || 
+                           notification.data?.entity_avatar_url;
+    if (businessAvatar) return businessAvatar;
+    // No fallback to Clbhouz logo - return null to show initials
+    return null;
+  }
+  
+  // For Clbhouz system notifications only (golfer verification, app updates), use logo mark
   if (isClbhouzSystemNotification(notification.type)) {
     return CLBHOUZ_LOGOMARK_URL;
   }
-  // For business notifications, use business logo from data if available
-  if (notification.type?.startsWith('business_verification')) {
-    const businessLogo = notification.data?.business_logo_url;
-    if (businessLogo) return businessLogo;
-  }
+  
   return notification.actor_avatar_url;
 }
 
@@ -820,7 +847,133 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
     }
 
     /**
-     * 13) DEFAULT – All other notification types (follow, like, comment, etc.)
+     * 13) BUSINESS MEMBER ADDED - user was added to a business team
+     */
+    case 'business_member_added': {
+      const businessName = data?.business_name || 'a business';
+      const statusIcon = <Building2 className="h-3 w-3 text-emerald-500" />;
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              Added to team
+            </span>
+          }
+          subtext={`You've been added to ${businessName}.`}
+          meta={notification.time_ago}
+          actions={
+            <span className={cn(basePillClass, "border-emerald-500 bg-emerald-500/10 text-emerald-600")}>
+              <Building2 className="h-3 w-3" />
+              Team member
+            </span>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 14) BUSINESS ACCESS REQUEST - someone requested access to your business
+     */
+    case 'business_access_request': {
+      const requesterName = notification.actor_display_name || data?.requester_name || 'Someone';
+      const businessName = data?.business_name || 'your business';
+      const requestedRole = data?.role_requested || 'team member';
+      const statusIcon = <UserPlus className="h-3 w-3 text-amber-500" />;
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <>
+              <span className={cn(showOrange ? "font-semibold" : "font-medium")}>{requesterName}</span>{' '}
+              <span className="font-normal text-muted-foreground">requested {requestedRole} access</span>
+            </>
+          }
+          subtext={`To ${businessName}`}
+          meta={notification.time_ago}
+          actions={
+            <span className={cn(basePillClass, "border-amber-400 bg-amber-500/10 text-amber-600")}>
+              Pending
+            </span>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 15) BUSINESS ACCESS APPROVED - your access request was approved
+     */
+    case 'business_access_approved': {
+      const businessName = data?.business_name || 'the business';
+      const statusIcon = <Building2 className="h-3 w-3 text-emerald-500" />;
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              Access request approved
+            </span>
+          }
+          subtext={`You now have access to ${businessName}.`}
+          meta={notification.time_ago}
+          actions={
+            <span className={cn(basePillClass, "border-emerald-500 bg-emerald-500/10 text-emerald-600")}>
+              <Building2 className="h-3 w-3" />
+              Approved
+            </span>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 16) BUSINESS ACCESS DECLINED - your access request was declined
+     */
+    case 'business_access_declined': {
+      const businessName = data?.business_name || 'the business';
+      const statusIcon = <X className="h-3 w-3 text-red-500" />;
+      
+      return (
+        <FlatRow
+          notification={notification}
+          onClick={onClick}
+          onOpenActionsSheet={onOpenActionsSheet}
+          avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
+          title={
+            <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
+              Access request declined
+            </span>
+          }
+          subtext={`Your request to join ${businessName} was declined.`}
+          meta={notification.time_ago}
+          actions={
+            <span className={cn(basePillClass, "border-red-400 bg-red-500/5 text-red-500")}>
+              <X className="h-3 w-3" />
+              Declined
+            </span>
+          }
+          isSessionNew={isSessionNew}
+        />
+      );
+    }
+
+    /**
+     * 17) DEFAULT – All other notification types (follow, like, comment, etc.)
      */
     default: {
       const statusIcon = getNotificationBadgeIcon(type);
