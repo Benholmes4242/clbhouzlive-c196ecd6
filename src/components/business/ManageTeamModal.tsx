@@ -30,7 +30,6 @@ interface ManageTeamModalProps {
   businessId: string;
   currentTeam: TeamMember[];
   isOwner: boolean;
-  mockMode?: boolean;
 }
 
 interface SearchResult {
@@ -88,8 +87,7 @@ export function ManageTeamModal({
   onOpenChange, 
   businessId, 
   currentTeam,
-  isOwner,
-  mockMode = false
+  isOwner
 }: ManageTeamModalProps) {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
@@ -390,9 +388,9 @@ export function ManageTeamModal({
                     </RadioGroup>
                   </div>
 
-                  <Button onClick={handleAddMember} disabled={adding || mockMode} className="w-full">
+                  <Button onClick={handleAddMember} disabled={adding} className="w-full">
                     {adding ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                    {mockMode ? 'Disabled in test mode' : 'Add'}
+                    Add
                   </Button>
                 </div>
               )}
@@ -497,18 +495,10 @@ export function ManageTeamModal({
                 </RadioGroup>
               </div>
 
-              {/* Actions */}
-              {/* Mock mode notice */}
-              {mockMode && (
-                <div className="flex items-center gap-2 px-3 py-2 rounded-sq-sm bg-amber-50 border border-amber-200 text-amber-800 text-xs">
-                  Actions disabled in test mode
-                </div>
-              )}
-
               <div className="space-y-3 pt-2">
                 <Button 
                   onClick={handleSaveAccess} 
-                  disabled={saving || mockMode || editAccess === getAccessLevel(editingMember)} 
+                  disabled={saving || editAccess === getAccessLevel(editingMember)} 
                   className="w-full"
                 >
                   {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
@@ -520,7 +510,6 @@ export function ManageTeamModal({
                   <Button 
                     variant="ghost" 
                     onClick={() => setShowRemoveConfirm(true)}
-                    disabled={mockMode}
                     className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
                   >
                     Remove from team

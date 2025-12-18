@@ -1,19 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Briefcase, Info } from 'lucide-react';
+import { Users, Briefcase } from 'lucide-react';
 import { useBusinessTeamMembers, TeamMember } from '@/hooks/useBusinessTeamMembers';
-import { useBusinessClubMembers, ClubMember } from '@/hooks/useBusinessClubMembers';
+import { useBusinessClubMembers } from '@/hooks/useBusinessClubMembers';
 import { ManageTeamModal } from './ManageTeamModal';
 import { SegmentedTabs } from './people/SegmentedTabs';
 import { PeopleList } from './people/PeopleList';
 import { PersonRow } from './people/PersonRow';
 import { TeamRow } from './people/TeamRow';
 import { EmptyState } from './people/EmptyState';
-import { 
-  isMockBusiness, 
-  getMockTeamMembers, 
-  getMockClubMembers 
-} from '@/lib/mockPeopleData';
 
 interface PeopleTabProps {
   businessId: string;
@@ -34,41 +29,26 @@ export function PeopleTab({
   isOwner = false
 }: PeopleTabProps) {
   const navigate = useNavigate();
-  const isMockMode = isMockBusiness(businessId);
   const isGolfClub = category === 'Golf Club';
   const [manageModalOpen, setManageModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   
-  const { data: realTeamMembers = [], isLoading: teamLoading } = useBusinessTeamMembers(businessId);
-  const { data: realClubMembers = [], isLoading: membersLoading } = useBusinessClubMembers(businessId);
+  const { data: teamMembers = [], isLoading: teamLoading } = useBusinessTeamMembers(businessId);
+  const { data: clubMembers = [], isLoading: membersLoading } = useBusinessClubMembers(businessId);
 
-  // Use mock data when in mock mode
-  const teamMembers = useMemo(() => 
-    isMockMode ? getMockTeamMembers() as TeamMember[] : realTeamMembers, 
-    [isMockMode, realTeamMembers]
-  );
-  const clubMembers = useMemo(() => 
-    isMockMode ? getMockClubMembers() as ClubMember[] : realClubMembers, 
-    [isMockMode, realClubMembers]
-  );
-
-  // In mock mode, allow Members tab even if not Golf Club (for testing)
-  const showMembersTab = isGolfClub || isMockMode;
-
-  // Default to Members for golf clubs (or mock mode), Team for others
-  const [activeSubTab, setActiveSubTab] = useState<SubTab>(showMembersTab ? 'members' : 'team');
+  // Default to Members for golf clubs, Team for others
+  const [activeSubTab, setActiveSubTab] = useState<SubTab>(isGolfClub ? 'members' : 'team');
 
   useEffect(() => {
     // For golf clubs: if Members is empty and Team exists, default to Team
-    if (showMembersTab && !membersLoading && !teamLoading && !isMockMode) {
+    if (isGolfClub && !membersLoading && !teamLoading) {
       if (clubMembers.length === 0 && teamMembers.length > 0) {
         setActiveSubTab('team');
       }
     }
-  }, [showMembersTab, clubMembers.length, teamMembers.length, membersLoading, teamLoading, isMockMode]);
+  }, [isGolfClub, clubMembers.length, teamMembers.length, membersLoading, teamLoading]);
 
-  // Loading state - skip if in mock mode
-  const isLoading = isMockMode ? false : (activeSubTab === 'team' ? teamLoading : membersLoading);
+  const isLoading = activeSubTab === 'team' ? teamLoading : membersLoading;
 
   const handleProfileClick = (userId: string) => {
     navigate(`/profile/${userId}`);
@@ -111,8 +91,8 @@ export function PeopleTab({
     });
   }, [clubMembers]);
 
-  // Build tabs array
-  const tabs = showMembersTab
+  // Build tabs array - only show Members tab for Golf Clubs
+  const tabs = isGolfClub
     ? [
         { id: 'members', label: 'Members', count: clubMembers.length },
         { id: 'team', label: 'Team', count: teamMembers.length },
@@ -125,21 +105,13 @@ export function PeopleTab({
     <div className="bg-white">
       {/* Header + tabs constrained */}
       <div className="max-w-screen-sm mx-auto px-4">
-        {/* Mock mode indicator */}
-        {isMockMode && (
-          <div className="mt-4 flex items-center gap-2 px-3 py-2 rounded-sq-sm bg-amber-50 border border-amber-200 text-amber-800">
-            <Info className="h-4 w-4 shrink-0" />
-            <span className="text-xs">Sample data for layout testing</span>
-          </div>
-        )}
-
         {/* Header */}
         <div className="pt-4 pb-1">
           <h2 className="text-lg font-semibold text-foreground text-center">People</h2>
         </div>
 
         {/* Centered Segmented Tabs */}
-        {showMembersTab && (
+        {isGolfClub && (
           <SegmentedTabs
             tabs={tabs}
             activeTab={activeSubTab}
@@ -200,7 +172,7 @@ export function PeopleTab({
       )}
 
       {/* Members list - only for Golf Clubs, full width */}
-      {!isLoading && activeSubTab === 'members' && showMembersTab && (
+      {!isLoading && activeSubTab === 'members' && isGolfClub && (
         sortedClubMembers.length > 0 ? (
           <PeopleList>
             {sortedClubMembers.map((member) => (
@@ -236,7 +208,6 @@ export function PeopleTab({
         businessId={businessId}
         currentTeam={teamMembers}
         isOwner={isOwner}
-        mockMode={isMockMode}
       />
     </div>
   );

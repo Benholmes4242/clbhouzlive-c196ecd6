@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Search, ArrowLeft, ChevronRight, Loader2, X, UserPlus, Info } from 'lucide-react';
+import { Search, ArrowLeft, ChevronRight, Loader2, X, UserPlus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -24,7 +24,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { isMockBusiness, getMockTeamMembers } from '@/lib/mockPeopleData';
 import { AccessRequestsSection } from '@/components/business/AccessRequestsSection';
 
 interface SearchResult {
@@ -85,16 +84,13 @@ export default function ManageTeamPage() {
   });
   
   const { data: business } = useBusinessProfile(businessId);
-  const { data: realTeamMembers = [], isLoading: teamLoading } = useBusinessTeamMembers(businessId);
+  const { data: teamMembers = [], isLoading: teamLoading } = useBusinessTeamMembers(businessId);
   
   // Ticket 2: Subscribe to realtime updates for access requests
   useBusinessAccessRequestsRealtime(businessId);
   
-  const isMockMode = businessId ? isMockBusiness(businessId) : false;
-  const currentTeam = isMockMode ? getMockTeamMembers() as TeamMember[] : realTeamMembers;
-  
   // Determine if current user is owner
-  const isOwner = currentTeam.some(m => 
+  const isOwner = teamMembers.some(m => 
     m.profile?.id === currentUser?.id && m.role === 'owner'
   );
 
@@ -137,7 +133,7 @@ export default function ManageTeamPage() {
 
       if (error) throw error;
 
-      const teamUserIds = new Set(currentTeam.map(m => m.profile?.id));
+      const teamUserIds = new Set(teamMembers.map(m => m.profile?.id));
       const filtered = (data || []).filter((u: SearchResult) => !teamUserIds.has(u.id));
       setSearchResults(filtered);
     } catch (error) {
@@ -145,7 +141,7 @@ export default function ManageTeamPage() {
     } finally {
       setSearching(false);
     }
-  }, [currentTeam]);
+  }, [teamMembers]);
 
   const handleAddMember = async () => {
     if (!selectedUser || !selectedAccess || !businessId) return;
@@ -311,17 +307,10 @@ export default function ManageTeamPage() {
           businessId={businessId || ''}
           businessName={business?.name || 'Business'}
           businessAvatarUrl={business?.logo_url}
-          canManage={isOwner || currentTeam.some(m => m.profile?.id === currentUser?.id && ['owner', 'admin'].includes(m.role))}
+          canManage={isOwner || teamMembers.some(m => m.profile?.id === currentUser?.id && ['owner', 'admin'].includes(m.role))}
         />
 
         <div className="px-4 py-5 space-y-6">
-          {/* Mock mode indicator */}
-          {isMockMode && (
-            <div className="flex items-center gap-2 px-3 py-2 rounded-sq-sm bg-amber-50 border border-amber-200 text-amber-800">
-              <Info className="h-4 w-4 shrink-0" />
-              <span className="text-xs">Sample data for layout testing</span>
-            </div>
-          )}
 
         {/* Add people section */}
         <div className="space-y-3">
@@ -406,9 +395,9 @@ export default function ManageTeamPage() {
                 </RadioGroup>
               </div>
 
-              <Button onClick={handleAddMember} disabled={adding || isMockMode} className="w-full">
+              <Button onClick={handleAddMember} disabled={adding} className="w-full">
                 {adding ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                {isMockMode ? 'Disabled in test mode' : 'Add'}
+                Add
               </Button>
             </div>
           )}
@@ -418,13 +407,13 @@ export default function ManageTeamPage() {
         <div className="space-y-3">
           <h3 className="text-sm font-medium text-foreground">Current team</h3>
           
-          {teamLoading && !isMockMode ? (
+          {teamLoading ? (
             <div className="py-6 text-center text-sm text-muted-foreground">Loading...</div>
-          ) : currentTeam.length === 0 ? (
+          ) : teamMembers.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-6">No team members yet</p>
           ) : (
             <div className="space-y-1">
-              {currentTeam.map((member) => {
+              {teamMembers.map((member) => {
                 const profile = member.profile;
                 if (!profile) return null;
 
@@ -500,16 +489,10 @@ export default function ManageTeamPage() {
                 </RadioGroup>
               </div>
 
-              {isMockMode && (
-                <div className="flex items-center gap-2 px-3 py-2 rounded-sq-sm bg-amber-50 border border-amber-200 text-amber-800 text-xs">
-                  Actions disabled in test mode
-                </div>
-              )}
-
               <div className="space-y-3 pt-2">
                 <Button 
                   onClick={handleSaveAccess} 
-                  disabled={saving || isMockMode || editAccess === getAccessLevel(editingMember)} 
+                  disabled={saving || editAccess === getAccessLevel(editingMember)} 
                   className="w-full"
                 >
                   {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
@@ -520,7 +503,6 @@ export default function ManageTeamPage() {
                   <Button 
                     variant="ghost" 
                     onClick={() => setShowRemoveConfirm(true)}
-                    disabled={isMockMode}
                     className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
                   >
                     Remove from team
