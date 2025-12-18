@@ -124,8 +124,8 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
         toast.success(`Approved ${requesterName} — added to team`);
       }
 
-      // Invalidate relevant queries
-      await Promise.all([
+      // Invalidate relevant queries (fire-and-forget so UI always recovers)
+      void Promise.allSettled([
         queryClient.invalidateQueries({ queryKey: ['business-access-requests', businessId] }),
         queryClient.invalidateQueries({ queryKey: ['business-team-members', businessId] }),
         queryClient.invalidateQueries({ queryKey: ['business-pending-requests-count', businessId] }),
@@ -166,8 +166,8 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
         toast.success(`Declined ${requesterName}'s request`);
       }
 
-      // Invalidate relevant queries
-      await Promise.all([
+      // Invalidate relevant queries (fire-and-forget so UI always recovers)
+      void Promise.allSettled([
         queryClient.invalidateQueries({ queryKey: ['business-access-requests', businessId] }),
         queryClient.invalidateQueries({ queryKey: ['business-pending-requests-count', businessId] }),
         queryClient.invalidateQueries({ queryKey: ['activity-feed'] }),
