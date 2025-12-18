@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Search, ChevronLeft, ChevronRight, Loader2, X, UserPlus, Info } from 'lucide-react';
+import { Search, ArrowLeft, ChevronRight, Loader2, X, UserPlus, Info } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -262,21 +262,31 @@ export default function ManageTeamPage() {
 
   return (
     <div className="fixed inset-0 z-[100] bg-background flex flex-col">
-      {/* Header - 3-column centered layout */}
-      <header className="flex items-center justify-between px-4 py-3 border-b border-border/50 bg-background safe-top">
-        <Button variant="ghost" size="sm" onClick={handleBack} className="gap-1">
-          <ChevronLeft className="h-4 w-4" />
-          Back
-        </Button>
-        <div className="flex-1 text-center">
-          <h1 className="text-base font-semibold">Manage team</h1>
-          <p className="text-xs text-muted-foreground">
-            Control who can edit this profile and appear as part of the team.
-          </p>
+      {/* Header - consistent with site pattern */}
+      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border/40 safe-top">
+        <div className="flex items-center justify-between px-4 py-3">
+          {/* Back button - icon only */}
+          <button
+            onClick={handleBack}
+            className="h-9 w-9 flex items-center justify-center rounded-sq-sm hover:bg-muted/50 transition-colors"
+            aria-label="Go back"
+          >
+            <ArrowLeft className="h-5 w-5 text-foreground" />
+          </button>
+          
+          {/* Title - centered */}
+          <div className="flex-1 text-center px-2">
+            <h1 className="text-lg font-semibold text-foreground">Manage team</h1>
+          </div>
+          
+          {/* Done button - text only, top right */}
+          <button
+            onClick={handleBack}
+            className="text-sm font-medium text-primary hover:text-primary/80 transition-colors px-2 py-1"
+          >
+            Done
+          </button>
         </div>
-        <Button variant="ghost" size="sm" onClick={handleBack}>
-          Done
-        </Button>
       </header>
 
       {/* Content */}
