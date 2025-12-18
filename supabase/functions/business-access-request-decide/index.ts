@@ -146,12 +146,12 @@ serve(async (req) => {
         throw updateError;
       }
 
-      // Map requested_role to business_members role
-      const roleMap: Record<string, string> = {
-        team_member: "member",
-        manager: "manager",
+      // Map requested_role to business_members role (must match DB constraint: owner/admin/editor/analyst)
+      const roleMap: Record<string, "admin" | "editor" | "analyst"> = {
+        team_member: "editor",
+        manager: "admin",
       };
-      const memberRole = roleMap[request.requested_role] || "member";
+      const memberRole = roleMap[request.requested_role] ?? "editor";
 
       // Insert into business_members (upsert to be idempotent)
       const { error: memberError } = await supabase
