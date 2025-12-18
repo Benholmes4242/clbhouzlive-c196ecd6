@@ -65,10 +65,18 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
       </div>
 
       {/* Main clickable area */}
-      <button
+      <div
+        role={onClick ? "button" : undefined}
+        tabIndex={onClick ? 0 : undefined}
         onClick={onClick}
-        className="flex-1 flex items-start gap-3 text-left min-w-0"
-        type="button"
+        onKeyDown={(e) => {
+          if (!onClick) return;
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onClick();
+          }
+        }}
+        className="flex-1 flex items-start gap-3 text-left min-w-0 cursor-pointer"
       >
         {/* Avatar */}
         <div className="shrink-0">{avatar}</div>
@@ -92,7 +100,11 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
           
           {/* Actions row: Buttons (optional) */}
           {actions && (
-            <div className="mt-2 flex items-center flex-wrap gap-2">
+            <div 
+              className="mt-2 flex items-center flex-wrap gap-2"
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+            >
               {actions}
             </div>
           )}
@@ -100,7 +112,7 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
           {/* Meta row: Timestamp */}
           <p className="text-xs text-muted-foreground/70 mt-1">{timestamp}</p>
         </div>
-      </button>
+      </div>
 
       {/* Kebab menu */}
       {onMenuClick && (
