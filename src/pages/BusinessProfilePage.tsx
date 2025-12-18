@@ -14,7 +14,7 @@ import { useBusinessFollowersCount, useIsFollowingBusiness, useBusinessFollowMut
 import { supabase } from '@/integrations/supabase/client';
 import { 
   Phone, Globe, MapPin, MoreHorizontal, Send, Check, ExternalLink, Loader2, 
-  ChevronRight, Share2, Link2, AlertCircle, BadgeCheck
+  ChevronRight, Share2, Link2, AlertCircle
 } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -309,7 +309,7 @@ const BusinessProfilePage: React.FC = () => {
                 boxShadow: '0 2px 8px rgba(31, 36, 40, 0.08)'
               }}
             >
-              <BadgeCheck className="w-3.5 h-3.5" />
+              <VerifiedBadge size="sm" />
               Verified
             </span>
           )}
