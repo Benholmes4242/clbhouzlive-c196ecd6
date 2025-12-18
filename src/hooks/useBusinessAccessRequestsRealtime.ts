@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { AppLog } from '@/lib/logger';
 
 /**
  * Hook to subscribe to realtime updates for business_access_requests.
@@ -12,7 +13,7 @@ export function useBusinessAccessRequestsRealtime(businessId: string | undefined
   useEffect(() => {
     if (!businessId) return;
 
-    console.log('[useBusinessAccessRequestsRealtime] Subscribing for business:', businessId);
+    AppLog.debug('useBusinessAccessRequestsRealtime', 'Subscribing for business:', businessId);
 
     const channel = supabase
       .channel(`business-access-requests-${businessId}`)
@@ -25,7 +26,7 @@ export function useBusinessAccessRequestsRealtime(businessId: string | undefined
           filter: `business_id=eq.${businessId}`,
         },
         (payload) => {
-          console.log('[useBusinessAccessRequestsRealtime] Received event:', payload.eventType, payload);
+          AppLog.debug('useBusinessAccessRequestsRealtime', 'Received event:', payload.eventType);
           
           // Invalidate all related queries
           queryClient.invalidateQueries({ queryKey: ['business-pending-requests-count', businessId] });
@@ -33,11 +34,11 @@ export function useBusinessAccessRequestsRealtime(businessId: string | undefined
         }
       )
       .subscribe((status) => {
-        console.log('[useBusinessAccessRequestsRealtime] Subscription status:', status);
+        AppLog.debug('useBusinessAccessRequestsRealtime', 'Subscription status:', status);
       });
 
     return () => {
-      console.log('[useBusinessAccessRequestsRealtime] Unsubscribing for business:', businessId);
+      AppLog.debug('useBusinessAccessRequestsRealtime', 'Unsubscribing for business:', businessId);
       supabase.removeChannel(channel);
     };
   }, [businessId, queryClient]);
