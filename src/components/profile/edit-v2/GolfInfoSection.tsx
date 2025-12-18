@@ -10,13 +10,17 @@ import { cn } from '@/lib/utils';
 import { InviteClubModal } from './InviteClubModal';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { VisibilityDropdown, VisibilityValue } from './VisibilityDropdown';
 
 interface GolfInfoSectionProps {
   homeClub: string;
   homeClubId: string | null;
   handicap: string;
   userId?: string;
+  homeClubVisibility: VisibilityValue;
+  additionalClubsVisibility: VisibilityValue;
   onChange: (field: string, value: string | null) => void;
+  onVisibilityChange: (field: 'homeClubVisibility' | 'additionalClubsVisibility', value: VisibilityValue) => void;
 }
 
 interface AdditionalClub {
@@ -36,7 +40,10 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
   homeClubId,
   handicap,
   userId,
+  homeClubVisibility,
+  additionalClubsVisibility,
   onChange,
+  onVisibilityChange,
 }) => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
@@ -248,9 +255,15 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
             <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Home Club
             </Label>
-            {homeClub && (
-              <span className="text-[10px] text-muted-foreground">Primary</span>
-            )}
+            <div className="flex items-center gap-2">
+              {homeClub && (
+                <span className="text-[10px] text-muted-foreground">Primary</span>
+              )}
+              <VisibilityDropdown
+                value={homeClubVisibility}
+                onChange={(val) => onVisibilityChange('homeClubVisibility', val)}
+              />
+            </div>
           </div>
           
           <div ref={searchRef} className="relative">
@@ -384,18 +397,24 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
               <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 Additional Clubs
               </Label>
-              {!showAddClub && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowAddClub(true)}
-                  className="h-7 px-2 text-xs text-primary hover:text-primary/80"
-                >
-                  <Plus className="w-3.5 h-3.5 mr-1" />
-                  Add club
-                </Button>
-              )}
+              <div className="flex items-center gap-2">
+                {!showAddClub && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowAddClub(true)}
+                    className="h-7 px-2 text-xs text-primary hover:text-primary/80"
+                  >
+                    <Plus className="w-3.5 h-3.5 mr-1" />
+                    Add club
+                  </Button>
+                )}
+                <VisibilityDropdown
+                  value={additionalClubsVisibility}
+                  onChange={(val) => onVisibilityChange('additionalClubsVisibility', val)}
+                />
+              </div>
             </div>
             
             {/* List of additional clubs as chips */}
