@@ -552,13 +552,19 @@ export function ManageTeamModal({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleRemoveMember}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={removing}
+              onClick={async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                await handleRemoveMember();
+              }}
             >
-              {removing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              {removing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Remove
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
