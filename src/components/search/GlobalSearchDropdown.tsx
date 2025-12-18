@@ -7,7 +7,6 @@ import {
   Building, 
   Clock, 
   TrendingUp, 
-  Verified, 
   ChevronRight,
   X
 } from 'lucide-react';
@@ -294,7 +293,7 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
             )}
           >
             <div className={cn(
-              "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
+              "w-8 h-8 rounded-sq-sm flex items-center justify-center flex-shrink-0",
               isClubhousePage ? "bg-white/10" : "bg-black/10"
             )}>
               {getResultIcon(item)}
@@ -367,31 +366,23 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
               >
                 {/* Avatar/Icon */}
                 <div className={cn(
-                  "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 relative",
+                  "w-10 h-10 rounded-sq-md flex items-center justify-center flex-shrink-0 overflow-hidden",
                   isClubhousePage ? "bg-white/10" : "bg-black/10"
                 )}>
                   {item.image ? (
                     <img 
                       src={item.image} 
                       alt="" 
-                      className="w-full h-full rounded-full object-cover"
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     <div className={cn(
-                      "w-full h-full rounded-full bg-gradient-to-br flex items-center justify-center text-xs font-medium",
+                      "w-full h-full bg-gradient-to-br flex items-center justify-center text-xs font-medium",
                       isClubhousePage
                         ? "from-primary/20 to-primary/10 text-white"
                         : "from-[#F58220]/20 to-[#F58220]/10 text-black"
                     )}>
                       {item.title ? getInitials(item.title) : getResultIcon(item)}
-                    </div>
-                  )}
-                  {item.verified && (
-                    <div className={cn(
-                      "absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center",
-                      isClubhousePage ? "bg-primary" : "bg-[#F58220]"
-                    )}>
-                      <Verified className="h-2.5 w-2.5 text-white" fill="currentColor" />
                     </div>
                   )}
                 </div>
