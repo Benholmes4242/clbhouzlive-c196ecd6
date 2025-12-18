@@ -35,6 +35,17 @@ export interface PageResult {
   type: 'page';
 }
 
+export interface BusinessResult {
+  id: string;
+  name: string;
+  slug?: string;
+  logo_url: string | null;
+  category?: string | null;
+  location?: string | null;
+  verified?: boolean;
+  type: 'business';
+}
+
 export interface TrendingItem {
   label: string;
   type: 'people' | 'clubs' | 'pages';
@@ -53,6 +64,7 @@ export interface GlobalSearchResults {
   people: PersonResult[];
   clubs: ClubResult[];
   pages: PageResult[];
+  businesses: BusinessResult[];
   recent: RecentSearch[];
   trending: TrendingItem[];
   isLoading: boolean;
@@ -66,6 +78,7 @@ export interface UseGlobalEntitySearchProps {
     people?: number;
     clubs?: number;
     pages?: number;
+    businesses?: number;
   };
 }
 
@@ -142,6 +155,34 @@ const searchPages = async (query: string, limit: number = 6): Promise<PageResult
   return [];
 };
 
+const searchBusinesses = async (query: string, limit: number = 6): Promise<BusinessResult[]> => {
+  if (!query.trim()) return [];
+
+  const { data, error } = await supabase
+    .from('business_accounts')
+    .select('id, name, slug, category, location, logo_url, is_verified')
+    .ilike('name', `%${query}%`)
+    .eq('is_deleted', false)
+    .order('name')
+    .limit(Math.min(limit, 8));
+
+  if (error) {
+    console.error('Error searching businesses:', error);
+    throw new Error('Failed to search businesses');
+  }
+
+  return (data || []).map(business => ({
+    id: business.id,
+    name: business.name,
+    slug: business.slug || undefined,
+    logo_url: business.logo_url,
+    category: business.category,
+    location: business.location,
+    verified: business.is_verified || false,
+    type: 'business' as const
+  }));
+};
+
 // Get recent searches from localStorage
 const getRecentSearches = (): RecentSearch[] => {
   try {
@@ -185,7 +226,7 @@ const getTrendingItems = async (): Promise<TrendingItem[]> => {
 export const useGlobalEntitySearch = ({
   query,
   enabled = true,
-  limits = { people: 6, clubs: 6, pages: 6 }
+  limits = { people: 6, clubs: 6, pages: 6, businesses: 6 }
 }: UseGlobalEntitySearchProps): GlobalSearchResults => {
   // Track query changes for analytics
   const prevQuery = useRef<string>('');
@@ -236,24 +277,33 @@ export const useGlobalEntitySearch = ({
     enabled: enabled && hasQuery
   });
 
+  const businessesQuery = useQuery({
+    queryKey: ['global-search', 'businesses', normalizedQuery],
+    queryFn: () => searchBusinesses(normalizedQuery, limits.businesses || 6),
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
+    enabled: enabled && hasQuery
+  });
+
   // Extract results
   const people = peopleQuery.data || [];
   const clubs = clubsQuery.data || [];
   const pages = pagesQuery.data || [];
+  const businesses = businessesQuery.data || [];
 
   // Loading state
   const isLoading = hasQuery 
-    ? (peopleQuery.isLoading || clubsQuery.isLoading || pagesQuery.isLoading)
+    ? (peopleQuery.isLoading || clubsQuery.isLoading || pagesQuery.isLoading || businessesQuery.isLoading)
     : trendingQuery.isLoading;
 
   // Error handling
   const error = hasQuery
-    ? (peopleQuery.error || clubsQuery.error || pagesQuery.error)
+    ? (peopleQuery.error || clubsQuery.error || pagesQuery.error || businessesQuery.error)
     : trendingQuery.error;
 
   const trending = trendingQuery.data || [];
 
-  const allResultsEmpty = people.length === 0 && clubs.length === 0 && pages.length === 0;
+  const allResultsEmpty = people.length === 0 && clubs.length === 0 && pages.length === 0 && businesses.length === 0;
   
   // Track no results for analytics
   useEffect(() => {
@@ -266,6 +316,7 @@ export const useGlobalEntitySearch = ({
     people,
     clubs,
     pages,
+    businesses,
     recent,
     trending,
     isLoading,

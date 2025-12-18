@@ -524,6 +524,11 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
                 icon={<MapPin className="h-3 w-3" />}
               />
               <ResultSection 
+                title="Business Profiles" 
+                items={groupedResults.businesses} 
+                icon={<Building className="h-3 w-3" />}
+              />
+              <ResultSection 
                 title="Pages & Channels" 
                 items={groupedResults.pages_channels} 
                 icon={<Building className="h-3 w-3" />}
