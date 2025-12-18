@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, MapPin, Clock, Trash2 } from 'lucide-react';
+import { User, MapPin, Clock, Trash2, Building } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Squircle } from '@/components/ui/squircle';
 import { Button } from '@/components/ui/button';
@@ -9,11 +9,12 @@ import Suggestions from './Suggestions';
 
 interface SearchResult {
   id: string;
-  type: 'user' | 'course';
+  type: 'user' | 'course' | 'business';
   title: string;
   subtitle: string;
   image?: string;
   username?: string;
+  verified?: boolean;
 }
 
 interface RecentSearch {
@@ -50,6 +51,8 @@ const SearchResults: React.FC<SearchResultsProps> = ({
       navigate(`/profile/${result.username}`);
     } else if (result.type === 'course') {
       navigate(`/courses/${result.id}`);
+    } else if (result.type === 'business') {
+      navigate(`/business/${result.id}`);
     }
     onResultClick(result);
   };
@@ -172,6 +175,11 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                 <>
                   <User className="w-3 h-3 mr-1" />
                   User
+                </>
+              ) : result.type === 'business' ? (
+                <>
+                  <Building className="w-3 h-3 mr-1" />
+                  Business
                 </>
               ) : (
                 <>

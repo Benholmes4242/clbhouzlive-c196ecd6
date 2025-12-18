@@ -16,13 +16,13 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 interface SearchResult {
   id: string;
-  type: 'user' | 'course' | 'page';
+  type: 'user' | 'course' | 'business' | 'page';
   title: string;
   subtitle: string;
   image?: string;
   username?: string;
   verified?: boolean;
-  category?: 'people' | 'clubs_courses' | 'pages_channels';
+  category?: 'people' | 'clubs_courses' | 'businesses' | 'pages_channels';
 }
 
 interface RecentSearch {
@@ -84,6 +84,7 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
     const groups = {
       people: results.filter(r => r.type === 'user'),
       clubs_courses: results.filter(r => r.type === 'course'),
+      businesses: results.filter(r => r.type === 'business'),
       pages_channels: results.filter(r => r.type === 'page')
     };
     return groups;
@@ -95,6 +96,7 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
       return [
         ...groupedResults.people,
         ...groupedResults.clubs_courses,
+        ...groupedResults.businesses,
         ...groupedResults.pages_channels
       ];
     } else {
@@ -165,6 +167,8 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
         return <User className={iconClass} />;
       case 'course':
         return <MapPin className={iconClass} />;
+      case 'business':
+        return <Building className={iconClass} />;
       case 'page':
         return <Building className={iconClass} />;
       case 'recent':
@@ -454,6 +458,11 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
             title="Clubs & Courses" 
             items={groupedResults.clubs_courses} 
             icon={<MapPin className="h-3 w-3" />}
+          />
+          <ResultSection 
+            title="Business Profiles" 
+            items={groupedResults.businesses} 
+            icon={<Building className="h-3 w-3" />}
           />
           <ResultSection 
             title="Pages & Channels" 
