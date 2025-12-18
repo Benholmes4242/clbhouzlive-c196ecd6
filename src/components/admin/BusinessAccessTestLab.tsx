@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { Building2, ExternalLink, Trash2 } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { callEdge } from '@/utils/callEdge';
 
 const SEED_KEY = 'testlab_business_access_v1';
 
@@ -46,17 +47,6 @@ function useTestUsers() {
   });
 }
 
-// Fetch business admins (owners/admins for notifications)
-async function getBusinessAdmins(businessId: string) {
-  const { data, error } = await supabase
-    .from('business_members')
-    .select('user_profile_id')
-    .eq('business_id', businessId)
-    .in('role', ['owner', 'admin']);
-  if (error) throw error;
-  return data?.map(m => m.user_profile_id) || [];
-}
-
 export function BusinessAccessTestLab() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -81,76 +71,41 @@ export function BusinessAccessTestLab() {
   const selectedBusiness = businesses?.find(b => b.id === selectedBusinessId);
   const selectedRequester = testUsers?.find(u => u.id === selectedRequesterId);
   
-  // Create access request mutation
+  // Create access request mutation (via Edge Function)
   const createRequest = useMutation({
     mutationFn: async ({ role, requester }: { role: 'team_member' | 'manager'; requester: typeof selectedRequester }) => {
       if (!selectedBusiness || !requester || !user) {
         throw new Error('Missing required data');
       }
       
-      // 1. Insert access request
-      const { data: request, error: requestError } = await supabase
-        .from('business_access_requests')
-        .insert({
+      const result = await callEdge('admin-testlab-business-access', {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'create',
           business_id: selectedBusinessId,
           requester_user_profile_id: requester.id,
           requested_role: role,
           message: message || null,
-          status: 'pending',
-        })
-        .select('id')
-        .single();
-      
-      if (requestError) throw requestError;
-      
-      // 2. Get business admins to notify
-      const adminIds = await getBusinessAdmins(selectedBusinessId);
-      
-      // 3. Create notifications for each admin
-      const notifications = adminIds.map(adminId => ({
-        user_id: adminId,
-        actor_id: requester.id,
-        type: 'business_access_request',
-        title: 'Access request',
-        entity_type: 'business',
-        entity_id: selectedBusinessId,
-        data: {
           seed_key: SEED_KEY,
-          request_id: request.id,
-          business_id: selectedBusinessId,
-          business_name: selectedBusiness.name,
-          business_avatar_url: selectedBusiness.logo_url,
-          entity_name: selectedBusiness.name,
-          entity_avatar_url: selectedBusiness.logo_url,
-          requester_id: requester.id,
-          requester_name: requester.display_name || requester.username,
-          requester_avatar_url: requester.profile_photo_url,
-          role_requested: role,
-        },
-      }));
+        }),
+      });
       
-      if (notifications.length > 0) {
-        const { error: notifError } = await supabase
-          .from('notifications')
-          .insert(notifications);
-        if (notifError) throw notifError;
-      }
-      
-      return { requestId: request.id, adminCount: adminIds.length };
+      return result;
     },
     onSuccess: (data) => {
-      toast.success(`Created request, notified ${data.adminCount} admin(s)`);
+      toast.success(`Created request, notified ${data.admin_count} admin(s)`);
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
       queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
       queryClient.invalidateQueries({ queryKey: ['business-pending-requests-count'] });
+      queryClient.invalidateQueries({ queryKey: ['business-access-requests'] });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Failed to create request:', error);
-      toast.error('Failed to create request');
+      toast.error(error.message || 'Failed to create request');
     },
   });
   
-  // Create two requests mutation
+  // Create two requests mutation (via Edge Function)
   const createTwoRequests = useMutation({
     mutationFn: async () => {
       if (!selectedBusiness || !testUsers || testUsers.length === 0 || !user) {
@@ -158,132 +113,74 @@ export function BusinessAccessTestLab() {
       }
       
       const requester = testUsers[0];
-      const adminIds = await getBusinessAdmins(selectedBusinessId);
       
       // Create team member request
-      const { data: req1, error: err1 } = await supabase
-        .from('business_access_requests')
-        .insert({
+      const result1 = await callEdge('admin-testlab-business-access', {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'create',
           business_id: selectedBusinessId,
           requester_user_profile_id: requester.id,
           requested_role: 'team_member',
           message: 'Test request for team member access',
-          status: 'pending',
-        })
-        .select('id')
-        .single();
-      if (err1) throw err1;
+          seed_key: SEED_KEY,
+        }),
+      });
       
       // Create manager request
-      const { data: req2, error: err2 } = await supabase
-        .from('business_access_requests')
-        .insert({
+      const result2 = await callEdge('admin-testlab-business-access', {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'create',
           business_id: selectedBusinessId,
           requester_user_profile_id: requester.id,
           requested_role: 'manager',
           message: 'Test request for manager access',
-          status: 'pending',
-        })
-        .select('id')
-        .single();
-      if (err2) throw err2;
+          seed_key: SEED_KEY,
+        }),
+      });
       
-      // Create notifications
-      const notifications = adminIds.flatMap(adminId => [
-        {
-          user_id: adminId,
-          actor_id: requester.id,
-          type: 'business_access_request',
-          title: 'Access request',
-          entity_type: 'business',
-          entity_id: selectedBusinessId,
-          data: {
-            seed_key: SEED_KEY,
-            request_id: req1.id,
-            business_id: selectedBusinessId,
-            business_name: selectedBusiness.name,
-            business_avatar_url: selectedBusiness.logo_url,
-            entity_name: selectedBusiness.name,
-            entity_avatar_url: selectedBusiness.logo_url,
-            requester_id: requester.id,
-            requester_name: requester.display_name || requester.username,
-            requester_avatar_url: requester.profile_photo_url,
-            role_requested: 'team_member',
-          },
-        },
-        {
-          user_id: adminId,
-          actor_id: requester.id,
-          type: 'business_access_request',
-          title: 'Access request',
-          entity_type: 'business',
-          entity_id: selectedBusinessId,
-          data: {
-            seed_key: SEED_KEY,
-            request_id: req2.id,
-            business_id: selectedBusinessId,
-            business_name: selectedBusiness.name,
-            business_avatar_url: selectedBusiness.logo_url,
-            entity_name: selectedBusiness.name,
-            entity_avatar_url: selectedBusiness.logo_url,
-            requester_id: requester.id,
-            requester_name: requester.display_name || requester.username,
-            requester_avatar_url: requester.profile_photo_url,
-            role_requested: 'manager',
-          },
-        },
-      ]);
-      
-      if (notifications.length > 0) {
-        const { error: notifError } = await supabase
-          .from('notifications')
-          .insert(notifications);
-        if (notifError) throw notifError;
-      }
-      
-      return { count: 2, adminCount: adminIds.length };
+      return { 
+        count: 2, 
+        adminCount: result1.admin_count || result2.admin_count || 0,
+      };
     },
     onSuccess: (data) => {
       toast.success(`Created ${data.count} requests, notified ${data.adminCount} admin(s)`);
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
       queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
       queryClient.invalidateQueries({ queryKey: ['business-pending-requests-count'] });
+      queryClient.invalidateQueries({ queryKey: ['business-access-requests'] });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Failed to create requests:', error);
-      toast.error('Failed to create requests');
+      toast.error(error.message || 'Failed to create requests');
     },
   });
   
-  // Reset test state mutation
+  // Reset test state mutation (via Edge Function)
   const resetTestState = useMutation({
     mutationFn: async () => {
-      // Delete test notifications
-      const { error: notifError } = await supabase
-        .from('notifications')
-        .delete()
-        .contains('data', { seed_key: SEED_KEY });
-      if (notifError) console.error('Failed to delete notifications:', notifError);
+      const result = await callEdge('admin-testlab-business-access', {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'reset',
+          seed_key: SEED_KEY,
+        }),
+      });
       
-      // Delete test access requests (those with test message markers)
-      const { error: reqError } = await supabase
-        .from('business_access_requests')
-        .delete()
-        .or('message.ilike.%Test request%,message.is.null')
-        .eq('status', 'pending');
-      if (reqError) console.error('Failed to delete requests:', reqError);
-      
-      return true;
+      return result;
     },
-    onSuccess: () => {
-      toast.success('Test state reset');
+    onSuccess: (data) => {
+      toast.success(`Test state reset (${data.deleted_notifications} notifications, ${data.deleted_requests} requests)`);
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
       queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
       queryClient.invalidateQueries({ queryKey: ['business-pending-requests-count'] });
+      queryClient.invalidateQueries({ queryKey: ['business-access-requests'] });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Failed to reset state:', error);
-      toast.error('Failed to reset test state');
+      toast.error(error.message || 'Failed to reset test state');
     },
   });
   

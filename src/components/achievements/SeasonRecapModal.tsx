@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
 import { Trophy, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -54,6 +55,10 @@ export const SeasonRecapModal: React.FC<SeasonRecapModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
+        <VisuallyHidden>
+          <DialogTitle>Season Complete</DialogTitle>
+          <DialogDescription>Your season recap for {seasonName}</DialogDescription>
+        </VisuallyHidden>
         {isOpen && <Confetti width={width} height={height} recycle={false} numberOfPieces={200} />}
         
         <div className="flex flex-col items-center text-center space-y-6 py-6">
