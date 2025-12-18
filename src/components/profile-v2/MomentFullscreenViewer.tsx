@@ -3,7 +3,8 @@
  */
 
 import React, { useRef, useEffect } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { MomentPost } from './types';
 import { X, ChevronLeft, ChevronRight, Heart, MessageCircle, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
@@ -58,7 +59,11 @@ export const MomentFullscreenViewer: React.FC<MomentFullscreenViewerProps> = ({
       <DialogContent
         className="max-w-none w-screen h-screen p-0 border-0"
         style={{ background: 'var(--dgp-bg-primary)' }}
+        aria-describedby={undefined}
       >
+        <VisuallyHidden>
+          <DialogTitle>View moment</DialogTitle>
+        </VisuallyHidden>
         <div {...swipeHandlers} className="relative w-full h-full">
           {/* Close Button */}
           <button

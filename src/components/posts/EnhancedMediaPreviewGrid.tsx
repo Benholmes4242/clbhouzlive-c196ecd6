@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import PhotoEditor from './PhotoEditor';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 interface MediaFile {
   file: File;
@@ -447,7 +448,10 @@ const EnhancedMediaPreviewGrid: React.FC<EnhancedMediaPreviewGridProps> = ({
       {/* Full Screen Preview Modal */}
       {previewMedia && (
         <Dialog open={!!previewMedia} onOpenChange={() => setPreviewMedia(null)}>
-          <DialogContent className="max-w-4xl w-full max-h-[90vh] p-0">
+          <DialogContent className="max-w-4xl w-full max-h-[90vh] p-0" aria-describedby={undefined}>
+            <VisuallyHidden>
+              <DialogTitle>Media preview</DialogTitle>
+            </VisuallyHidden>
             <div className="relative w-full h-full flex items-center justify-center bg-black">
               <button
                 onClick={() => setPreviewMedia(null)}

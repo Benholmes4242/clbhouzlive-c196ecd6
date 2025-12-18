@@ -62,3 +62,6 @@ verify_jwt = true
 
 [functions.cloudflare-stream-delete]
 verify_jwt = true
+
+[functions.admin-testlab-business-access]
+verify_jwt = true
