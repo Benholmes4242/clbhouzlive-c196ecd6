@@ -107,7 +107,12 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
     
     const requesterName = request.requester.display_name || request.requester.username || 'A user';
     setLoadingId(request.id);
+    
+    // Ticket B: Close dialog FIRST, then wait for animation before proceeding
     setConfirmApprove(null);
+    
+    // Wait for dialog close animation to complete and Radix cleanup
+    await new Promise(resolve => setTimeout(resolve, 150));
     
     try {
       const { data, error } = await supabase.functions.invoke(
@@ -123,6 +128,9 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
       } else {
         toast.success(`Approved ${requesterName} — added to team`);
       }
+
+      // Wait another frame to ensure UI is stable before invalidations
+      await new Promise(resolve => requestAnimationFrame(resolve));
 
       // Invalidate relevant queries (fire-and-forget so UI always recovers)
       void Promise.allSettled([
@@ -149,7 +157,12 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
     
     const requesterName = request.requester.display_name || request.requester.username || 'A user';
     setLoadingId(request.id);
+    
+    // Ticket B: Close dialog FIRST, then wait for animation before proceeding
     setConfirmDecline(null);
+    
+    // Wait for dialog close animation to complete and Radix cleanup
+    await new Promise(resolve => setTimeout(resolve, 150));
     
     try {
       const { data, error } = await supabase.functions.invoke(
@@ -165,6 +178,9 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
       } else {
         toast.success(`Declined ${requesterName}'s request`);
       }
+
+      // Wait another frame to ensure UI is stable before invalidations
+      await new Promise(resolve => requestAnimationFrame(resolve));
 
       // Invalidate relevant queries (fire-and-forget so UI always recovers)
       void Promise.allSettled([

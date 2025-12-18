@@ -16,6 +16,7 @@ import { DeleteBusinessDialog } from './DeleteBusinessDialog';
 import { useBusinessStats7d } from '@/hooks/useBusinessStats7d';
 import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
 import { useBusinessPendingRequestsCount } from '@/hooks/useBusinessPendingRequestsCount';
+import { useBusinessAccessRequestsRealtime } from '@/hooks/useBusinessAccessRequestsRealtime';
 import { cn } from '@/lib/utils';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import BusinessVerificationModal from './verification/BusinessVerificationModal';
@@ -72,6 +73,10 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
   
   // Fetch pending access requests count for indicator
   const { data: pendingRequestsCount } = useBusinessPendingRequestsCount(business.id);
+  
+  // Subscribe to realtime updates for access requests (Ticket A)
+  useBusinessAccessRequestsRealtime(business.id);
+  
   const canDelete = role === 'owner';
   const canManage = role === 'owner' || role === 'admin';
   const isOwner = role === 'owner';
