@@ -93,7 +93,11 @@ export function BusinessAccessTestLab() {
       return result;
     },
     onSuccess: (data) => {
-      toast.success(`Created request, notified ${data.admin_count} admin(s)`);
+      if (data.already_pending) {
+        toast.info('Request already pending — open Manage Team to review.');
+      } else {
+        toast.success(`Created request, notified ${data.admin_count} admin(s)`);
+      }
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
       queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
       queryClient.invalidateQueries({ queryKey: ['business-pending-requests-count'] });

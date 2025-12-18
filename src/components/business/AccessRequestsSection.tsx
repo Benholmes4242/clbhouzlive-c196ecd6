@@ -102,6 +102,9 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
 
   // Handle approve via Edge Function
   const handleApprove = async (request: AccessRequest) => {
+    // Prevent double-click
+    if (loadingId) return;
+    
     const requesterName = request.requester.display_name || request.requester.username || 'A user';
     setLoadingId(request.id);
     setConfirmApprove(null);
@@ -127,6 +130,9 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
         queryClient.invalidateQueries({ queryKey: ['business-team-members', businessId] }),
         queryClient.invalidateQueries({ queryKey: ['business-pending-requests-count', businessId] }),
         queryClient.invalidateQueries({ queryKey: ['business-members', businessId] }),
+        queryClient.invalidateQueries({ queryKey: ['business-membership', businessId] }),
+        queryClient.invalidateQueries({ queryKey: ['activity-feed'] }),
+        queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] }),
       ]);
     } catch (e: any) {
       console.error('Approve error:', e);
@@ -138,6 +144,9 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
 
   // Handle decline via Edge Function
   const handleDecline = async (request: AccessRequest) => {
+    // Prevent double-click
+    if (loadingId) return;
+    
     const requesterName = request.requester.display_name || request.requester.username || 'A user';
     setLoadingId(request.id);
     setConfirmDecline(null);
@@ -161,6 +170,8 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['business-access-requests', businessId] }),
         queryClient.invalidateQueries({ queryKey: ['business-pending-requests-count', businessId] }),
+        queryClient.invalidateQueries({ queryKey: ['activity-feed'] }),
+        queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] }),
       ]);
     } catch (e: any) {
       console.error('Decline error:', e);
@@ -210,7 +221,6 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
               const requesterName = request.requester.display_name || request.requester.username || 'A user';
               const roleLabel = getRoleLabel(request.requested_role);
               const timeAgo = formatDistanceToNow(new Date(request.created_at), { addSuffix: false });
-              const isLoading = loadingId === request.id;
 
               return (
                 <div 
@@ -257,10 +267,10 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
                       variant="outline"
                       size="sm"
                       onClick={() => setConfirmDecline(request)}
-                      disabled={isLoading || loadingId !== null}
+                      disabled={loadingId !== null}
                       className="h-9 px-3.5 rounded-sq-xs text-[14px] font-semibold text-destructive border-destructive/30 hover:bg-destructive/10"
                     >
-                      {isLoading && confirmDecline?.id === request.id ? (
+                      {loadingId === request.id ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
                         'Decline'
@@ -269,10 +279,10 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
                     <Button
                       size="sm"
                       onClick={() => setConfirmApprove(request)}
-                      disabled={isLoading || loadingId !== null}
+                      disabled={loadingId !== null}
                       className="h-9 px-3.5 rounded-sq-xs text-[14px] font-semibold"
                     >
-                      {isLoading && confirmApprove?.id === request.id ? (
+                      {loadingId === request.id ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
                         'Approve'

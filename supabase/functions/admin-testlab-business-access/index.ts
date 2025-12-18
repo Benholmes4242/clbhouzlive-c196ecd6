@@ -130,6 +130,35 @@ async function handleCreate(supabase: any, body: any) {
     });
   }
 
+  // Check for existing pending request (handle 23505 duplicate gracefully)
+  const { data: existingRequest } = await supabase
+    .from('business_access_requests')
+    .select('id')
+    .eq('business_id', business_id)
+    .eq('requester_user_profile_id', requester_user_profile_id)
+    .eq('status', 'pending')
+    .maybeSingle();
+
+  if (existingRequest) {
+    console.log('[admin-testlab-business-access] Request already pending:', existingRequest.id);
+    
+    // Still need admin count for response
+    const { data: admins } = await supabase
+      .from('business_members')
+      .select('user_profile_id')
+      .eq('business_id', business_id)
+      .in('role', ['owner', 'admin', 'primary_manager', 'manager', 'member']);
+    
+    return new Response(JSON.stringify({
+      success: true,
+      already_pending: true,
+      request_id: existingRequest.id,
+      admin_count: admins?.length || 0,
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
   // Insert access request
   const { data: request, error: requestError } = await supabase
     .from('business_access_requests')
@@ -144,6 +173,27 @@ async function handleCreate(supabase: any, body: any) {
     .single();
 
   if (requestError) {
+    // Handle unique constraint violation (23505)
+    if (requestError.code === '23505') {
+      console.log('[admin-testlab-business-access] Duplicate request detected via constraint');
+      const { data: existing } = await supabase
+        .from('business_access_requests')
+        .select('id')
+        .eq('business_id', business_id)
+        .eq('requester_user_profile_id', requester_user_profile_id)
+        .eq('status', 'pending')
+        .single();
+      
+      return new Response(JSON.stringify({
+        success: true,
+        already_pending: true,
+        request_id: existing?.id || null,
+        admin_count: 0,
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    
     console.error('Failed to create request:', requestError);
     return new Response(JSON.stringify({ error: 'Failed to create request: ' + requestError.message }), {
       status: 500,
@@ -153,7 +203,8 @@ async function handleCreate(supabase: any, body: any) {
 
   console.log('[admin-testlab-business-access] Request created:', request.id);
 
-  // Get business admins to notify (owners, admins, managers)
+  // Get business admins to notify (owners, admins, managers, primary_manager, member with management perms)
+  // Include ALL roles that might have management permissions
   const { data: admins, error: adminsError } = await supabase
     .from('business_members')
     .select('user_profile_id')
@@ -165,7 +216,7 @@ async function handleCreate(supabase: any, body: any) {
   }
 
   const adminIds = admins?.map((a: any) => a.user_profile_id) || [];
-  console.log('[admin-testlab-business-access] Notifying admins:', adminIds);
+  console.log('[admin-testlab-business-access] Found admins to notify:', adminIds.length, adminIds);
 
   // Create notifications for each admin
   const requesterName = requester.display_name || requester.username || 'A user';
@@ -198,6 +249,8 @@ async function handleCreate(supabase: any, body: any) {
 
     if (notifError) {
       console.error('Failed to create notifications:', notifError);
+    } else {
+      console.log('[admin-testlab-business-access] Created', notifications.length, 'notifications');
     }
   }
 
@@ -222,37 +275,52 @@ async function handleReset(supabase: any, body: any) {
 
   console.log('[admin-testlab-business-access] Resetting test state for seed_key:', seed_key);
 
-  // Delete test notifications
-  const { error: notifError, count: notifCount } = await supabase
+  // Delete test notifications by seed_key in data JSONB
+  const { data: deletedNotifs, error: notifError } = await supabase
     .from('notifications')
     .delete()
-    .contains('data', { seed_key })
-    .select('id', { count: 'exact' });
+    .filter('data->>seed_key', 'eq', seed_key)
+    .select('id');
 
+  const notifCount = deletedNotifs?.length || 0;
   if (notifError) {
     console.error('Failed to delete notifications:', notifError);
   } else {
     console.log('[admin-testlab-business-access] Deleted notifications:', notifCount);
   }
 
-  // Delete test access requests (those with test message markers)
-  const { error: reqError, count: reqCount } = await supabase
-    .from('business_access_requests')
-    .delete()
-    .or('message.ilike.%Test request%,message.is.null')
-    .eq('status', 'pending')
-    .select('id', { count: 'exact' });
+  // Delete pending test access requests that have the seed_key marker in related notifications
+  // Since we can't easily track seed_key on requests, delete pending requests where message contains test markers
+  // OR safer: delete requests whose request_id appears in notifications with this seed_key
+  const { data: seededNotifs } = await supabase
+    .from('notifications')
+    .select('data')
+    .filter('data->>seed_key', 'eq', seed_key);
+  
+  const requestIds = (seededNotifs || [])
+    .map((n: any) => n.data?.request_id)
+    .filter(Boolean);
 
-  if (reqError) {
-    console.error('Failed to delete requests:', reqError);
-  } else {
-    console.log('[admin-testlab-business-access] Deleted requests:', reqCount);
+  let reqCount = 0;
+  if (requestIds.length > 0) {
+    const { data: deletedReqs, error: reqError } = await supabase
+      .from('business_access_requests')
+      .delete()
+      .in('id', requestIds)
+      .select('id');
+    
+    reqCount = deletedReqs?.length || 0;
+    if (reqError) {
+      console.error('Failed to delete requests:', reqError);
+    } else {
+      console.log('[admin-testlab-business-access] Deleted requests:', reqCount);
+    }
   }
 
   return new Response(JSON.stringify({
     success: true,
-    deleted_notifications: notifCount || 0,
-    deleted_requests: reqCount || 0,
+    deleted_notifications: notifCount,
+    deleted_requests: reqCount,
   }), {
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
