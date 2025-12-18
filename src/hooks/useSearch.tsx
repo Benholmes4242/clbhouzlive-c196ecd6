@@ -134,7 +134,7 @@ export const useSearch = () => {
   const searchBusinesses = async (searchTerm: string): Promise<SearchResult[]> => {
     const { data, error } = await supabase
       .from('business_accounts')
-      .select('id, name, slug, category, location, logo_url, is_verified')
+      .select('id, name, slug, city, country, location, logo_url, is_verified')
       .ilike('name', `%${searchTerm}%`)
       .eq('is_deleted', false)
       .limit(6);
@@ -144,11 +144,28 @@ export const useSearch = () => {
       return [];
     }
 
+    // Format subtitle as "City, Country" only - no category, no full address
+    const formatCityCountry = (business: { city?: string | null; country?: string | null; location?: string | null }) => {
+      // Prefer structured city/country fields
+      if (business.city || business.country) {
+        return [business.city, business.country].filter(Boolean).join(', ');
+      }
+      // Fallback: parse location string to get last two parts (city, country)
+      if (business.location) {
+        const parts = business.location.split(',').map(p => p.trim()).filter(Boolean);
+        if (parts.length >= 2) {
+          return `${parts[parts.length - 2]}, ${parts[parts.length - 1]}`;
+        }
+        return parts[0] ?? '';
+      }
+      return '';
+    };
+
     return (data || []).map(business => ({
       id: business.id,
       type: 'business' as const,
       title: business.name,
-      subtitle: [business.category, business.location].filter(Boolean).join(' · ') || 'Business',
+      subtitle: formatCityCountry(business) || 'Business Profile',
       image: business.logo_url || undefined,
       verified: business.is_verified || false
     }));
