@@ -522,10 +522,10 @@ const BusinessProfilePage: React.FC = () => {
             </button>
           )}
           
-          {/* Location Card - shows when location exists */}
-          {business.location && (
+          {/* Location Card - shows when location exists OR for linked golf clubs */}
+          {(business.location || business.club_id) && (
             <BusinessLocationCard
-              location={business.location}
+              location={business.location || ''}
               lat={business.lat}
               lng={business.lng}
               businessName={business.name}
@@ -533,6 +533,7 @@ const BusinessProfilePage: React.FC = () => {
               country={business.country}
               region={business.region}
               isOwner={isOwner}
+              isLinkedClub={!!business.club_id}
             />
           )}
         </section>

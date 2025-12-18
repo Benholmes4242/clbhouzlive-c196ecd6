@@ -25,10 +25,12 @@ interface AccessRequest {
 
 interface AccessRequestsSectionProps {
   businessId: string;
+  businessName: string;
+  businessAvatarUrl?: string | null;
   canManage: boolean;
 }
 
-export function AccessRequestsSection({ businessId, canManage }: AccessRequestsSectionProps) {
+export function AccessRequestsSection({ businessId, businessName, businessAvatarUrl, canManage }: AccessRequestsSectionProps) {
   const queryClient = useQueryClient();
 
   // Fetch pending access requests
@@ -108,16 +110,21 @@ export function AccessRequestsSection({ businessId, canManage }: AccessRequestsS
         throw memberError;
       }
 
-      // Send notification to requester
+      // Send notification to requester with business identity
       await supabase.from('notifications').insert({
         user_id: request.requester_user_profile_id,
         actor_id: user.id,
         type: 'business_access_approved',
         title: 'Access request approved',
-        message: `Your request to join the team has been approved`,
+        message: `Your request to join ${businessName} has been approved`,
         entity_type: 'business',
         entity_id: request.business_id,
-        data: { business_id: request.business_id, role },
+        data: { 
+          business_id: request.business_id,
+          business_name: businessName,
+          business_avatar_url: businessAvatarUrl || null,
+          role,
+        },
       });
 
       return request;
@@ -149,16 +156,20 @@ export function AccessRequestsSection({ businessId, canManage }: AccessRequestsS
 
       if (error) throw error;
 
-      // Send notification to requester
+      // Send notification to requester with business identity
       await supabase.from('notifications').insert({
         user_id: request.requester_user_profile_id,
         actor_id: user.id,
-        type: 'business_access_rejected',
+        type: 'business_access_declined',
         title: 'Access request declined',
-        message: `Your request to join the team was declined`,
+        message: `Your request to join ${businessName} was declined`,
         entity_type: 'business',
         entity_id: request.business_id,
-        data: { business_id: request.business_id },
+        data: { 
+          business_id: request.business_id,
+          business_name: businessName,
+          business_avatar_url: businessAvatarUrl || null,
+        },
       });
 
       return request;

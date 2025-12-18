@@ -13,6 +13,7 @@ interface RequestAccessModalProps {
   onOpenChange: (open: boolean) => void;
   businessId: string;
   businessName: string;
+  businessAvatarUrl?: string | null;
   userId: string;
 }
 
@@ -24,6 +25,7 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
   onOpenChange,
   businessId,
   businessName,
+  businessAvatarUrl,
   userId,
 }) => {
   const [requestedRole, setRequestedRole] = useState<'team_member' | 'manager'>('team_member');
@@ -91,10 +93,10 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
             data: { 
               business_id: businessId, 
               business_name: businessName,
+              business_avatar_url: businessAvatarUrl || null,
               requester_id: userId,
               requester_name: requesterName,
-              requested_role: requestedRole,
-              entity_name: requesterName,
+              role_requested: roleDisplayName,
               request_id: requestId, // For idempotency
             },
           }));
