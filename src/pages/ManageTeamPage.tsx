@@ -110,6 +110,7 @@ export default function ManageTeamPage() {
   const [showTransferConfirm, setShowTransferConfirm] = useState(false);
   const [pendingTransfer, setPendingTransfer] = useState<{user: SearchResult | null, memberName: string} | null>(null);
   const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
+  const [removeTarget, setRemoveTarget] = useState<TeamMember | null>(null);
 
   useEffect(() => {
     if (editingMember) {
@@ -220,20 +221,30 @@ export default function ManageTeamPage() {
   };
 
   const handleRemoveMember = async () => {
+    const target = removeTarget ?? editingMember;
+
     console.groupCollapsed('[ManageTeamPage] handleRemoveMember');
     console.log('state snapshot', {
       businessId,
       removing,
       editingMemberId: editingMember?.id,
       editingUserProfileId: editingMember?.profile?.id,
-      editingName: editingMember?.profile?.display_name,
+      removeTargetId: removeTarget?.id,
+      removeTargetProfileId: removeTarget?.profile?.id,
+      targetId: target?.id,
+      targetProfileId: target?.profile?.id,
+      targetName: target?.profile?.display_name,
     });
 
-    if (!editingMember?.profile || !businessId) {
-      console.warn('[ManageTeamPage] early return: missing editingMember.profile or businessId', {
-        hasProfile: !!editingMember?.profile,
+    if (!target?.profile || !businessId) {
+      console.warn('[ManageTeamPage] early return: missing target.profile or businessId', {
+        hasTarget: !!target,
+        hasProfile: !!target?.profile,
         businessId,
       });
+      toast.error('No team member selected');
+      setShowRemoveConfirm(false);
+      setRemoveTarget(null);
       console.groupEnd();
       return;
     }
@@ -244,7 +255,7 @@ export default function ManageTeamPage() {
     try {
       const payload = {
         p_business_id: businessId,
-        p_user_profile_id: editingMember.profile.id,
+        p_user_profile_id: target.profile.id,
       };
       console.log('[ManageTeamPage] calling supabase.rpc(remove_from_business_team)', payload);
 
@@ -255,12 +266,19 @@ export default function ManageTeamPage() {
 
       if (error) throw error;
 
-      toast.success(`${editingMember.profile.display_name || 'Member'} removed from team`);
+      toast.success(`${target.profile.display_name || 'Member'} removed from team`);
 
-      // Ticket D: Close overlays SEQUENTIALLY to prevent Radix cleanup race condition
+      // Close overlays
       setShowRemoveConfirm(false);
+      setRemoveTarget(null);
+
+      // Wait for AlertDialog animation to complete before closing Sheet
       await new Promise((resolve) => setTimeout(resolve, 150));
+
+      // Close the sheet (if open)
       setEditingMember(null);
+
+      // Wait another frame before invalidating to ensure DOM cleanup
       await new Promise((resolve) => requestAnimationFrame(resolve));
 
       console.log('[ManageTeamPage] invalidating team query', ['business-team-members', businessId]);
@@ -521,8 +539,19 @@ export default function ManageTeamPage() {
                 
                 {getAccessLevel(editingMember) !== 'primary_manager' && (
                   <Button 
+                    type="button"
                     variant="ghost" 
-                    onClick={() => setShowRemoveConfirm(true)}
+                    onClick={(e) => {
+                      console.log('[ManageTeamPage] Open remove confirm', {
+                        businessId,
+                        editingMemberId: editingMember?.id,
+                        editingUserProfileId: editingMember?.profile?.id,
+                      });
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setRemoveTarget(editingMember);
+                      setShowRemoveConfirm(true);
+                    }}
                     className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
                   >
                     Remove from team
@@ -555,12 +584,18 @@ export default function ManageTeamPage() {
       </AlertDialog>
 
       {/* Remove confirmation - Ticket C: z-[10100] to appear above Sheet z-[10050] */}
-      <AlertDialog open={showRemoveConfirm} onOpenChange={setShowRemoveConfirm}>
+      <AlertDialog
+        open={showRemoveConfirm}
+        onOpenChange={(open) => {
+          setShowRemoveConfirm(open);
+          if (!open) setRemoveTarget(null);
+        }}
+      >
         <AlertDialogContent className="z-[10100]" overlayClassName="z-[10099]">
           <AlertDialogHeader>
             <AlertDialogTitle>Remove from team?</AlertDialogTitle>
             <AlertDialogDescription>
-              {editingMember?.profile?.display_name || 'This person'} will no longer appear as part of this business team.
+              {(removeTarget?.profile?.display_name || editingMember?.profile?.display_name || 'This person')} will no longer appear as part of this business team.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -575,6 +610,8 @@ export default function ManageTeamPage() {
                   removing,
                   editingMemberId: editingMember?.id,
                   editingUserProfileId: editingMember?.profile?.id,
+                  removeTargetId: removeTarget?.id,
+                  removeTargetProfileId: removeTarget?.profile?.id,
                 });
                 e.preventDefault();
                 e.stopPropagation();

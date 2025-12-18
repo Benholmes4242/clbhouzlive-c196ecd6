@@ -111,6 +111,7 @@ export function ManageTeamModal({
   
   // Remove confirmation
   const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
+  const [removeTarget, setRemoveTarget] = useState<TeamMember | null>(null);
 
   // Reset state when modal closes
   useEffect(() => {
@@ -236,17 +237,26 @@ export function ManageTeamModal({
   };
 
   const handleRemoveMember = async () => {
+    const target = removeTarget ?? editingMember;
+
     console.groupCollapsed('[ManageTeamModal] handleRemoveMember');
     console.log('state snapshot', {
       businessId,
       removing,
       editingMemberId: editingMember?.id,
       editingUserProfileId: editingMember?.profile?.id,
-      editingName: editingMember?.profile?.display_name,
+      removeTargetId: removeTarget?.id,
+      removeTargetProfileId: removeTarget?.profile?.id,
+      targetId: target?.id,
+      targetProfileId: target?.profile?.id,
+      targetName: target?.profile?.display_name,
     });
 
-    if (!editingMember?.profile) {
-      console.warn('[ManageTeamModal] early return: missing editingMember.profile');
+    if (!target?.profile) {
+      console.warn('[ManageTeamModal] early return: missing target.profile');
+      toast.error('No team member selected');
+      setShowRemoveConfirm(false);
+      setRemoveTarget(null);
       console.groupEnd();
       return;
     }
@@ -257,7 +267,7 @@ export function ManageTeamModal({
     try {
       const payload = {
         p_business_id: businessId,
-        p_user_profile_id: editingMember.profile.id,
+        p_user_profile_id: target.profile.id,
       };
       console.log('[ManageTeamModal] calling supabase.rpc(remove_from_business_team)', payload);
 
@@ -268,9 +278,10 @@ export function ManageTeamModal({
 
       if (error) throw error;
 
-      toast.success(`${editingMember.profile.display_name || 'Member'} removed from team`);
-      setEditingMember(null);
+      toast.success(`${target.profile.display_name || 'Member'} removed from team`);
       setShowRemoveConfirm(false);
+      setRemoveTarget(null);
+      setEditingMember(null);
       console.log('[ManageTeamModal] invalidating team query', ['business-team-members', businessId]);
       queryClient.invalidateQueries({ queryKey: ['business-team-members', businessId] });
     } catch (error: any) {
@@ -532,8 +543,19 @@ export function ManageTeamModal({
                 {/* Can't remove primary manager or yourself */}
                 {getAccessLevel(editingMember) !== 'primary_manager' && (
                   <Button 
+                    type="button"
                     variant="ghost" 
-                    onClick={() => setShowRemoveConfirm(true)}
+                    onClick={(e) => {
+                      console.log('[ManageTeamModal] Open remove confirm', {
+                        businessId,
+                        editingMemberId: editingMember?.id,
+                        editingUserProfileId: editingMember?.profile?.id,
+                      });
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setRemoveTarget(editingMember);
+                      setShowRemoveConfirm(true);
+                    }}
                     className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
                   >
                     Remove from team
@@ -566,12 +588,18 @@ export function ManageTeamModal({
       </AlertDialog>
 
       {/* Remove confirmation */}
-      <AlertDialog open={showRemoveConfirm} onOpenChange={setShowRemoveConfirm}>
+      <AlertDialog
+        open={showRemoveConfirm}
+        onOpenChange={(open) => {
+          setShowRemoveConfirm(open);
+          if (!open) setRemoveTarget(null);
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Remove from team?</AlertDialogTitle>
             <AlertDialogDescription>
-              {editingMember?.profile?.display_name || 'This person'} will no longer appear as part of this business team.
+              {(removeTarget?.profile?.display_name || editingMember?.profile?.display_name || 'This person')} will no longer appear as part of this business team.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -586,6 +614,8 @@ export function ManageTeamModal({
                   removing,
                   editingMemberId: editingMember?.id,
                   editingUserProfileId: editingMember?.profile?.id,
+                  removeTargetId: removeTarget?.id,
+                  removeTargetProfileId: removeTarget?.profile?.id,
                 });
                 e.preventDefault();
                 e.stopPropagation();
