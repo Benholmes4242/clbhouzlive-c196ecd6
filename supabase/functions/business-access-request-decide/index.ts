@@ -36,7 +36,22 @@ serve(async (req) => {
       });
     }
 
-    const { request_id, decision } = await req.json();
+    let body: any = {};
+    try {
+      body = await req.json();
+    } catch (_e) {
+      body = {};
+    }
+
+    const request_id = body?.request_id;
+    const decisionRaw = body?.decision;
+    const decisionInput = typeof decisionRaw === "string" ? decisionRaw.toLowerCase() : "";
+
+    // Back-compat: older clients may send approved/declined
+    const decision =
+      decisionInput === "approved" ? "approve"
+      : decisionInput === "declined" ? "decline"
+      : decisionInput;
 
     if (!request_id || !decision) {
       return new Response(JSON.stringify({ error: "Missing request_id or decision" }), {
@@ -45,7 +60,7 @@ serve(async (req) => {
       });
     }
 
-    if (!["approved", "declined"].includes(decision)) {
+    if (!["approve", "decline"].includes(decision)) {
       return new Response(JSON.stringify({ error: "Invalid decision" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -113,13 +128,14 @@ serve(async (req) => {
     }
 
     const now = new Date().toISOString();
+    const statusToSet = decision === "approve" ? "approved" : "declined";
 
-    if (decision === "approved") {
+    if (decision === "approve") {
       // Update request status
       const { error: updateError } = await supabase
         .from("business_access_requests")
         .update({
-          status: "approved",
+          status: statusToSet,
           decided_at: now,
           decided_by: user.id,
         })
@@ -140,13 +156,16 @@ serve(async (req) => {
       // Insert into business_members (upsert to be idempotent)
       const { error: memberError } = await supabase
         .from("business_members")
-        .upsert({
-          business_id: request.business_id,
-          user_profile_id: request.requester_user_profile_id,
-          role: memberRole,
-        }, {
-          onConflict: "business_id,user_profile_id",
-        });
+        .upsert(
+          {
+            business_id: request.business_id,
+            user_profile_id: request.requester_user_profile_id,
+            role: memberRole,
+          },
+          {
+            onConflict: "business_id,user_profile_id",
+          }
+        );
 
       if (memberError) {
         console.error("Failed to add member:", memberError);
@@ -177,14 +196,15 @@ serve(async (req) => {
         // Don't throw - notification is secondary
       }
 
-      console.log(`Approved request ${request_id}, added ${request.requester_user_profile_id} as ${memberRole}`);
-
+      console.log(
+        `Approved request ${request_id}, added ${request.requester_user_profile_id} as ${memberRole}`
+      );
     } else {
       // Declined
       const { error: updateError } = await supabase
         .from("business_access_requests")
         .update({
-          status: "declined",
+          status: statusToSet,
           decided_at: now,
           decided_by: user.id,
         })
@@ -220,16 +240,20 @@ serve(async (req) => {
       console.log(`Declined request ${request_id}`);
     }
 
-    return new Response(JSON.stringify({ 
-      ok: true, 
-      status: decision,
-      business_id: request.business_id,
-      requester_id: request.requester_user_profile_id,
-      requester_name: request.requester?.display_name || request.requester?.username || "User",
-    }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({
+        ok: true,
+        status: statusToSet,
+        business_id: request.business_id,
+        requester_id: request.requester_user_profile_id,
+        requester_name:
+          request.requester?.display_name || request.requester?.username || "User",
+      }),
+      {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
+    );
 
   } catch (error) {
     console.error("Error:", error);
