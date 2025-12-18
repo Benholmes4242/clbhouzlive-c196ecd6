@@ -36,6 +36,7 @@ import {
 } from '@/hooks/useAdminTestActions';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Users, UserPlus, Heart, MessageCircle, AtSign, Trash2, AlertCircle, Check, Zap, RotateCcw, Sparkles } from 'lucide-react';
+import { BusinessAccessTestLab } from '@/components/admin/BusinessAccessTestLab';
 
 // Reusable button component
 const TestButton: React.FC<{
@@ -435,6 +436,9 @@ export function AdminTestLabPage() {
           </div>
         </div>
       )}
+
+      {/* Business Access Test Lab */}
+      {user && <BusinessAccessTestLab />}
 
       {/* Action Sections */}
       {testUser && targetUserId && (
