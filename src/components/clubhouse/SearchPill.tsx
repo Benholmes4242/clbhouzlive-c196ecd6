@@ -96,14 +96,30 @@ const SearchPill = ({
       subtitle: `${club.region ? `${club.region}, ` : ''}${club.country}${club.global_rank ? ` • #${club.global_rank}` : ''}`,
       image: club.logo_url || undefined
     })),
-    ...businesses.map(business => ({
-      id: business.id,
-      type: 'business' as const,
-      title: business.name,
-      subtitle: [business.category, business.location].filter(Boolean).join(' · ') || 'Business',
-      image: business.logo_url || undefined,
-      verified: business.verified
-    }))
+    ...businesses.map(business => {
+      // Format subtitle as "City, Country" only - no category, no full address
+      const formatCityCountry = () => {
+        if (business.city || business.country) {
+          return [business.city, business.country].filter(Boolean).join(', ');
+        }
+        if (business.location) {
+          const parts = business.location.split(',').map(p => p.trim()).filter(Boolean);
+          if (parts.length >= 2) {
+            return `${parts[parts.length - 2]}, ${parts[parts.length - 1]}`;
+          }
+          return parts[0] ?? '';
+        }
+        return '';
+      };
+      return {
+        id: business.id,
+        type: 'business' as const,
+        title: business.name,
+        subtitle: formatCityCountry() || 'Business Profile',
+        image: business.logo_url || undefined,
+        verified: business.verified
+      };
+    })
   ];
 
   // Convert trending to SearchResult format

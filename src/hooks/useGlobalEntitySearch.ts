@@ -40,7 +40,8 @@ export interface BusinessResult {
   name: string;
   slug?: string;
   logo_url: string | null;
-  category?: string | null;
+  city?: string | null;
+  country?: string | null;
   location?: string | null;
   verified?: boolean;
   type: 'business';
@@ -160,7 +161,7 @@ const searchBusinesses = async (query: string, limit: number = 6): Promise<Busin
 
   const { data, error } = await supabase
     .from('business_accounts')
-    .select('id, name, slug, category, location, logo_url, is_verified')
+    .select('id, name, slug, city, country, location, logo_url, is_verified')
     .ilike('name', `%${query}%`)
     .eq('is_deleted', false)
     .order('name')
@@ -176,7 +177,8 @@ const searchBusinesses = async (query: string, limit: number = 6): Promise<Busin
     name: business.name,
     slug: business.slug || undefined,
     logo_url: business.logo_url,
-    category: business.category,
+    city: business.city,
+    country: business.country,
     location: business.location,
     verified: business.is_verified || false,
     type: 'business' as const
