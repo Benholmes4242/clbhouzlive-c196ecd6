@@ -32,7 +32,7 @@ export function useBusinessClubMembers(businessId: string | undefined) {
           is_verified_golfer,
           created_at
         `)
-        .eq('home_club_id', businessId)
+        .eq('home_club_business_id', businessId)
         .eq('is_public', true)
         .order('display_name', { ascending: true });
 
