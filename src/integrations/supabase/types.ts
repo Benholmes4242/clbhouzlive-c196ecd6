@@ -5253,6 +5253,7 @@ export type Database = {
           profile_video_visibility: string | null
           recent_activity_badges: Json | null
           show_achievements_public: boolean | null
+          show_additional_home_clubs: boolean
           show_handicap: boolean | null
           social_links: Json | null
           top100_visible: boolean | null
@@ -5341,6 +5342,7 @@ export type Database = {
           profile_video_visibility?: string | null
           recent_activity_badges?: Json | null
           show_achievements_public?: boolean | null
+          show_additional_home_clubs?: boolean
           show_handicap?: boolean | null
           social_links?: Json | null
           top100_visible?: boolean | null
@@ -5429,6 +5431,7 @@ export type Database = {
           profile_video_visibility?: string | null
           recent_activity_badges?: Json | null
           show_achievements_public?: boolean | null
+          show_additional_home_clubs?: boolean
           show_handicap?: boolean | null
           social_links?: Json | null
           top100_visible?: boolean | null
@@ -7103,6 +7106,15 @@ export type Database = {
         Returns: Json
       }
       get_cloudflare_secrets: { Args: never; Returns: Json }
+      get_home_clubs: { Args: never; Returns: Json }
+      get_home_clubs_for_user: {
+        Args: { p_user_profile_id: string }
+        Returns: Json
+      }
+      get_home_clubs_for_users: {
+        Args: { p_user_profile_ids: string[] }
+        Returns: Json
+      }
       get_relationship_status: {
         Args: { target_user_id: string }
         Returns: Json
@@ -7539,6 +7551,14 @@ export type Database = {
       }
       set_home_club: {
         Args: { p_business_id?: string; p_pending_name?: string }
+        Returns: undefined
+      }
+      set_home_clubs: {
+        Args: {
+          p_additional_business_ids?: string[]
+          p_clear_pending?: boolean
+          p_primary_business_id: string
+        }
         Returns: undefined
       }
       show_limit: { Args: never; Returns: number }
