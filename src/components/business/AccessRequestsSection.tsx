@@ -59,6 +59,7 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
   const { data: requests, isLoading } = useQuery({
     queryKey: ['business-access-requests', businessId],
     queryFn: async () => {
+      console.log('[AccessRequestsSection] Fetching access requests for business:', businessId);
       const { data, error } = await supabase
         .from('business_access_requests')
         .select(`
@@ -75,6 +76,8 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+
+      console.log('[AccessRequestsSection] Fetched requests:', data?.length ?? 0);
 
       // Fetch requester profiles separately
       if (!data || data.length === 0) return [];
@@ -98,6 +101,9 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
       })) as AccessRequest[];
     },
     enabled: canManage,
+    // Ensure fresh data when navigating to the page
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
 
   // Handle approve via Edge Function
