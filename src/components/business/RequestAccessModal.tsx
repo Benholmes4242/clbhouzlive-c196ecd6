@@ -43,27 +43,20 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
 
       const requesterName = requesterProfile?.display_name || requesterProfile?.username || 'Someone';
 
-      const { error } = await supabase
+      const { data: insertedRequest, error } = await supabase
         .from('business_access_requests')
         .insert({
           business_id: businessId,
           requester_user_profile_id: userId,
           requested_role: requestedRole,
           message: message.trim() || null,
-        });
+        })
+        .select('id')
+        .single();
 
       if (error) throw error;
 
-      // Get the created request ID for idempotent notifications
-      const { data: createdRequest } = await supabase
-        .from('business_access_requests')
-        .select('id')
-        .eq('business_id', businessId)
-        .eq('requester_user_profile_id', userId)
-        .eq('status', 'pending')
-        .single();
-
-      const requestId = createdRequest?.id;
+      const requestId = insertedRequest?.id;
 
       // Notify business owners/managers (expanded roles)
       const { data: managers } = await supabase
