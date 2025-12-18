@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Briefcase, User } from 'lucide-react';
+import { Users, Briefcase } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
@@ -40,57 +40,64 @@ export function GolfersHereTab({ businessId, businessName }: GolfersHereTabProps
   }, [clubMembers.length, teamMembers.length, membersLoading, teamLoading]);
 
   const isLoading = activeSubTab === 'team' ? teamLoading : membersLoading;
+  const currentCount = activeSubTab === 'team' ? teamMembers.length : clubMembers.length;
 
   const handleProfileClick = (userId: string) => {
     navigate(`/profile/${userId}`);
   };
 
   return (
-    <div className="space-y-4">
-      {/* Sub-tab navigation */}
-      <div className="flex gap-2 px-1">
+    <div>
+      {/* Sub-tabs: Members / Team - matches Activity/Tagged styling exactly */}
+      <div className="flex justify-center border-b border-border/50 bg-white">
         <button
           onClick={() => setActiveSubTab('members')}
           className={cn(
-            "px-4 py-2 text-sm font-medium rounded-sq-pill transition-colors",
+            'px-6 py-3 text-sm font-medium transition-colors relative',
             activeSubTab === 'members'
-              ? "bg-[#0F0F0F] text-white"
-              : "bg-[#EDEFF2] text-[#5E666D] hover:bg-[#E0E3E7]"
+              ? 'text-foreground'
+              : 'text-muted-foreground hover:text-foreground'
           )}
         >
           Members
+          {activeSubTab === 'members' && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground" />
+          )}
         </button>
         <button
           onClick={() => setActiveSubTab('team')}
           className={cn(
-            "px-4 py-2 text-sm font-medium rounded-sq-pill transition-colors",
+            'px-6 py-3 text-sm font-medium transition-colors relative',
             activeSubTab === 'team'
-              ? "bg-[#0F0F0F] text-white"
-              : "bg-[#EDEFF2] text-[#5E666D] hover:bg-[#E0E3E7]"
+              ? 'text-foreground'
+              : 'text-muted-foreground hover:text-foreground'
           )}
         >
           Team
+          {activeSubTab === 'team' && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground" />
+          )}
         </button>
       </div>
 
-      {/* Header count */}
-      <div className="px-1">
-        <p className="text-sm text-[#5E666D]">
+      {/* Count header - consistent spacing with Activity */}
+      <div className="py-3 px-4">
+        <p className="text-sm text-muted-foreground">
           {activeSubTab === 'team' 
-            ? `${teamMembers.length} team member${teamMembers.length !== 1 ? 's' : ''}`
-            : `${clubMembers.length} member${clubMembers.length !== 1 ? 's' : ''}`
+            ? `${currentCount} team member${currentCount !== 1 ? 's' : ''}`
+            : `${currentCount} member${currentCount !== 1 ? 's' : ''}`
           }
         </p>
       </div>
 
       {/* Loading state */}
       {isLoading && (
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-3 px-4">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="flex flex-col items-center p-3 rounded-sq-md animate-pulse" style={{ background: '#EDEFF2' }}>
-              <div className="w-16 h-16 rounded-full bg-slate-200 mb-2" />
-              <div className="w-16 h-3 bg-slate-200 rounded mb-1" />
-              <div className="w-12 h-2 bg-slate-200 rounded" />
+            <div key={i} className="flex flex-col items-center p-3 rounded-sq-md animate-pulse bg-muted">
+              <div className="w-16 h-16 rounded-full bg-muted-foreground/20 mb-2" />
+              <div className="w-16 h-3 bg-muted-foreground/20 rounded mb-1" />
+              <div className="w-12 h-2 bg-muted-foreground/20 rounded" />
             </div>
           ))}
         </div>
@@ -99,7 +106,7 @@ export function GolfersHereTab({ businessId, businessName }: GolfersHereTabProps
       {/* Team content */}
       {!isLoading && activeSubTab === 'team' && (
         teamMembers.length > 0 ? (
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-3 px-4">
             {teamMembers.map((member) => (
               <TeamMemberCard
                 key={member.id}
@@ -110,7 +117,7 @@ export function GolfersHereTab({ businessId, businessName }: GolfersHereTabProps
           </div>
         ) : (
           <EmptyState
-            icon={<Briefcase className="h-8 w-8 text-[#97A1AA]" />}
+            icon={<Briefcase className="h-8 w-8 text-muted-foreground/60" />}
             title="No team members yet"
             description="This business hasn't added any team members."
           />
@@ -120,7 +127,7 @@ export function GolfersHereTab({ businessId, businessName }: GolfersHereTabProps
       {/* Members content */}
       {!isLoading && activeSubTab === 'members' && (
         clubMembers.length > 0 ? (
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-3 px-4">
             {clubMembers.map((member) => (
               <ClubMemberCard
                 key={member.id}
@@ -131,7 +138,7 @@ export function GolfersHereTab({ businessId, businessName }: GolfersHereTabProps
           </div>
         ) : (
           <EmptyState
-            icon={<Users className="h-8 w-8 text-[#97A1AA]" />}
+            icon={<Users className="h-8 w-8 text-muted-foreground/60" />}
             title="No members yet"
             description={`Be the first to set ${businessName || 'this club'} as your home club.`}
           />
@@ -149,7 +156,7 @@ function TeamMemberCard({ member, onClick }: { member: TeamMember; onClick: () =
   return (
     <button
       onClick={onClick}
-      className="flex flex-col items-center p-3 rounded-sq-md bg-white border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all text-center"
+      className="flex flex-col items-center p-3 rounded-sq-md bg-white border border-border/50 hover:border-border hover:shadow-sm transition-all text-center"
     >
       <SquircleAvatar
         src={profile.profile_photo_url}
@@ -158,12 +165,12 @@ function TeamMemberCard({ member, onClick }: { member: TeamMember; onClick: () =
         className="mb-2"
       />
       <div className="flex items-center gap-1 mb-0.5">
-        <span className="text-sm font-medium text-[#0F0F0F] truncate max-w-[80px]">
+        <span className="text-sm font-medium text-foreground truncate max-w-[80px]">
           {profile.display_name || profile.username || 'Unknown'}
         </span>
         {profile.is_verified_golfer && <VerifiedBadge size="sm" />}
       </div>
-      <span className="text-xs text-[#5E666D] bg-[#EDEFF2] px-2 py-0.5 rounded-sq-pill">
+      <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-sq-pill">
         {ROLE_LABELS[member.role] || member.role}
       </span>
     </button>
@@ -177,7 +184,7 @@ function ClubMemberCard({ member, onClick }: { member: ClubMember; onClick: () =
   return (
     <button
       onClick={onClick}
-      className="flex flex-col items-center p-3 rounded-sq-md bg-white border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all text-center"
+      className="flex flex-col items-center p-3 rounded-sq-md bg-white border border-border/50 hover:border-border hover:shadow-sm transition-all text-center"
     >
       <SquircleAvatar
         src={member.profile_photo_url}
@@ -186,13 +193,13 @@ function ClubMemberCard({ member, onClick }: { member: ClubMember; onClick: () =
         className="mb-2"
       />
       <div className="flex items-center gap-1 mb-0.5">
-        <span className="text-sm font-medium text-[#0F0F0F] truncate max-w-[80px]">
+        <span className="text-sm font-medium text-foreground truncate max-w-[80px]">
           {member.display_name || member.username || 'Unknown'}
         </span>
         {member.is_verified_golfer && <VerifiedBadge size="sm" />}
       </div>
       {showHandicap && (
-        <span className="text-xs text-[#5E666D]">
+        <span className="text-xs text-muted-foreground">
           HCP {member.eg_handicap_index!.toFixed(1)}
         </span>
       )}
@@ -203,15 +210,12 @@ function ClubMemberCard({ member, onClick }: { member: ClubMember; onClick: () =
 // Empty state component
 function EmptyState({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
   return (
-    <div className="py-16 text-center">
-      <div 
-        className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-        style={{ background: '#EDEFF2' }}
-      >
+    <div className="py-12 text-center">
+      <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-muted">
         {icon}
       </div>
-      <h3 className="text-base font-medium text-[#0F0F0F] mb-1">{title}</h3>
-      <p className="text-sm text-[#5E666D] max-w-[240px] mx-auto">
+      <h3 className="text-base font-medium text-foreground mb-1">{title}</h3>
+      <p className="text-sm text-muted-foreground max-w-[240px] mx-auto">
         {description}
       </p>
     </div>
