@@ -3,7 +3,7 @@
  * Only content substitutions, not layout changes
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -60,6 +60,8 @@ const BusinessProfilePage: React.FC = () => {
   const [activeMiniNav, setActiveMiniNav] = useState('posts');
   const [followingCount, setFollowingCount] = useState(0);
   const [bioExpanded, setBioExpanded] = useState(false);
+  const [isBioClamped, setIsBioClamped] = useState(false);
+  const bioRef = useRef<HTMLParagraphElement>(null);
 
   // Check ownership
   const isOwner = membership?.canManage;
@@ -98,6 +100,19 @@ const BusinessProfilePage: React.FC = () => {
     };
     fetchFollowingCount();
   }, [business?.id]);
+
+  // Check if bio text is clamped (overflows 5 lines)
+  useEffect(() => {
+    const checkClamped = () => {
+      if (bioRef.current) {
+        setIsBioClamped(bioRef.current.scrollHeight > bioRef.current.clientHeight);
+      }
+    };
+    checkClamped();
+    // Re-check on window resize
+    window.addEventListener('resize', checkClamped);
+    return () => window.removeEventListener('resize', checkClamped);
+  }, [business?.description]);
 
   const handleCall = () => {
     if (business?.phone) {
@@ -444,20 +459,23 @@ const BusinessProfilePage: React.FC = () => {
           {bioText ? (
             <div>
               <p 
+                ref={bioRef}
                 className={cn(
                   "text-base text-[#0F0F0F] leading-relaxed whitespace-pre-wrap",
-                  !bioExpanded && "line-clamp-3"
+                  !bioExpanded && "line-clamp-5"
                 )}
                 style={{ overflowWrap: 'anywhere' }}
               >
                 {bioText}
               </p>
-              <button
-                onClick={() => setBioExpanded(!bioExpanded)}
-                className="text-sm font-medium mt-1 hover:underline text-slate-500"
-              >
-                {bioExpanded ? 'Show less' : 'More'}
-              </button>
+              {(isBioClamped || bioExpanded) && (
+                <button
+                  onClick={() => setBioExpanded(!bioExpanded)}
+                  className="text-sm font-medium mt-1 hover:underline text-slate-500"
+                >
+                  {bioExpanded ? 'Show less' : 'More'}
+                </button>
+              )}
             </div>
           ) : (
             <p className="text-base text-slate-400 italic">No description provided</p>
