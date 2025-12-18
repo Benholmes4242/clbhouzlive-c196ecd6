@@ -81,7 +81,7 @@ export function GolfersHereTab({ businessId, businessName }: GolfersHereTabProps
       </div>
 
       {/* Count header - consistent spacing with Activity */}
-      <div className="py-3 px-4">
+      <div className="py-3 px-4 text-center">
         <p className="text-sm text-muted-foreground">
           {activeSubTab === 'team' 
             ? `${currentCount} team member${currentCount !== 1 ? 's' : ''}`
