@@ -5279,22 +5279,22 @@ export type Database = {
       }
       user_home_clubs: {
         Row: {
-          business_id: string
-          club_id: string | null
+          business_id: string | null
+          club_id: string
           created_at: string
           id: string
           user_profile_id: string
         }
         Insert: {
-          business_id: string
-          club_id?: string | null
+          business_id?: string | null
+          club_id: string
           created_at?: string
           id?: string
           user_profile_id: string
         }
         Update: {
-          business_id?: string
-          club_id?: string | null
+          business_id?: string | null
+          club_id?: string
           created_at?: string
           id?: string
           user_profile_id?: string
