@@ -36,7 +36,7 @@ import {
 // Tab content components
 import { BusinessActivityFeed } from '@/components/business/posts/BusinessActivityFeed';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
-import { GolfersHereTab } from '@/components/business/GolfersHereTab';
+import { PeopleTab } from '@/components/business/PeopleTab';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 
 // Background color - matches personal profile page (slate-50)
@@ -194,7 +194,7 @@ const BusinessProfilePage: React.FC = () => {
   
   const tabs = [
     { id: 'content', label: 'Activity' },
-    { id: 'golfers', label: isGolfClub ? 'Golfers' : 'People' },
+    { id: 'golfers', label: 'People' },
     { id: 'info', label: 'Info' },
   ];
 
@@ -212,7 +212,7 @@ const BusinessProfilePage: React.FC = () => {
         );
       case 'golfers':
         return (
-          <GolfersHereTab 
+          <PeopleTab 
             businessId={business?.id || ''}
             businessName={business?.name || ''}
             businessLocation={business?.location || undefined}

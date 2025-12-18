@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Briefcase, Settings } from 'lucide-react';
+import { Users, Briefcase } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -9,7 +9,7 @@ import { useBusinessTeamMembers, TeamMember } from '@/hooks/useBusinessTeamMembe
 import { useBusinessClubMembers, ClubMember } from '@/hooks/useBusinessClubMembers';
 import { ManageTeamModal } from './ManageTeamModal';
 
-interface GolfersHereTabProps {
+interface PeopleTabProps {
   businessId: string;
   businessName?: string;
   businessLocation?: string;
@@ -20,21 +20,13 @@ interface GolfersHereTabProps {
 
 type SubTab = 'members' | 'team';
 
-const ROLE_LABELS: Record<string, string> = {
-  owner: 'Owner',
-  director: 'Director',
-  admin: 'Admin',
-  coach: 'Coach',
-  staff: 'Staff',
-};
-
-export function GolfersHereTab({ 
+export function PeopleTab({ 
   businessId, 
   businessName, 
   category,
   canManage = false,
   isOwner = false
-}: GolfersHereTabProps) {
+}: PeopleTabProps) {
   const navigate = useNavigate();
   const isGolfClub = category === 'Golf Club';
   const [manageModalOpen, setManageModalOpen] = useState(false);
@@ -42,7 +34,7 @@ export function GolfersHereTab({
   const { data: teamMembers = [], isLoading: teamLoading } = useBusinessTeamMembers(businessId);
   const { data: clubMembers = [], isLoading: membersLoading } = useBusinessClubMembers(businessId);
 
-  // Default to Team for non-golf-clubs, or Members for golf clubs (unless empty)
+  // Default to Members for golf clubs, Team for others
   const [activeSubTab, setActiveSubTab] = useState<SubTab>(isGolfClub ? 'members' : 'team');
 
   useEffect(() => {
@@ -63,15 +55,53 @@ export function GolfersHereTab({
     navigate(`/profile/${userId}`);
   };
 
+  // Count label text
+  const getCountLabel = () => {
+    if (isLoading) return '';
+    if (isGolfClub && showMembersTab) {
+      const membersCount = clubMembers.length;
+      const teamCount = teamMembers.length;
+      if (membersCount > 0 && teamCount > 0) {
+        return `${membersCount} member${membersCount !== 1 ? 's' : ''} · ${teamCount} team`;
+      }
+    }
+    if (activeSubTab === 'team') {
+      return `${currentCount} team member${currentCount !== 1 ? 's' : ''}`;
+    }
+    return `${currentCount} member${currentCount !== 1 ? 's' : ''}`;
+  };
+
   return (
-    <div>
-      {/* Sub-tabs: Members / Team - only show Members for Golf Clubs */}
-      {showMembersTab ? (
-        <div className="flex justify-center border-b border-border/50 bg-white">
+    <div className="bg-white">
+      {/* Header row */}
+      <div className="px-4 pt-4 pb-3 flex items-start justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">People</h2>
+          {!isLoading && (currentCount > 0 || (isGolfClub && (clubMembers.length > 0 || teamMembers.length > 0))) && (
+            <p className="text-sm text-muted-foreground mt-0.5">
+              {getCountLabel()}
+            </p>
+          )}
+        </div>
+        {canManage && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setManageModalOpen(true)}
+            className="h-8"
+          >
+            Manage
+          </Button>
+        )}
+      </div>
+
+      {/* Sub-tabs: Members / Team - only show for Golf Clubs */}
+      {showMembersTab && (
+        <div className="flex border-b border-border/50 px-4">
           <button
             onClick={() => setActiveSubTab('members')}
             className={cn(
-              'px-6 py-3 text-sm font-medium transition-colors relative',
+              'px-4 py-2.5 text-sm font-medium transition-colors relative',
               activeSubTab === 'members'
                 ? 'text-foreground'
                 : 'text-muted-foreground hover:text-foreground'
@@ -85,7 +115,7 @@ export function GolfersHereTab({
           <button
             onClick={() => setActiveSubTab('team')}
             className={cn(
-              'px-6 py-3 text-sm font-medium transition-colors relative',
+              'px-4 py-2.5 text-sm font-medium transition-colors relative',
               activeSubTab === 'team'
                 ? 'text-foreground'
                 : 'text-muted-foreground hover:text-foreground'
@@ -97,50 +127,25 @@ export function GolfersHereTab({
             )}
           </button>
         </div>
-      ) : null}
-
-      {/* Count header + Manage button */}
-      <div className="py-3 px-4 flex items-center justify-between">
-        <div className="flex-1">
-          {currentCount > 0 && (
-            <p className="text-sm text-muted-foreground text-center">
-              {activeSubTab === 'team' 
-                ? `${currentCount} team member${currentCount !== 1 ? 's' : ''}`
-                : `${currentCount} member${currentCount !== 1 ? 's' : ''}`
-              }
-            </p>
-          )}
-        </div>
-        {canManage && activeSubTab === 'team' && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setManageModalOpen(true)}
-            className="gap-1.5"
-          >
-            <Settings className="h-3.5 w-3.5" />
-            Manage Team
-          </Button>
-        )}
-      </div>
+      )}
 
       {/* Loading state */}
       {isLoading && (
-        <div className="grid grid-cols-3 gap-3 px-4">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="flex flex-col items-center p-3 rounded-sq-md animate-pulse bg-muted">
-              <div className="w-16 h-16 rounded-full bg-muted-foreground/20 mb-2" />
-              <div className="w-16 h-3 bg-muted-foreground/20 rounded mb-1" />
-              <div className="w-12 h-2 bg-muted-foreground/20 rounded" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="flex flex-col items-center p-4 rounded-sq-lg animate-pulse bg-muted/30 border border-border/30">
+              <div className="w-16 h-16 rounded-full bg-muted-foreground/10 mb-3" />
+              <div className="w-20 h-4 bg-muted-foreground/10 rounded mb-1" />
+              <div className="w-14 h-3 bg-muted-foreground/10 rounded" />
             </div>
           ))}
         </div>
       )}
 
-      {/* Team content - shown for non-golf-clubs or when Team tab is active */}
+      {/* Team content */}
       {!isLoading && activeSubTab === 'team' && (
         teamMembers.length > 0 ? (
-          <div className="grid grid-cols-3 gap-3 px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4">
             {teamMembers.map((member) => (
               <TeamMemberCard
                 key={member.id}
@@ -151,11 +156,12 @@ export function GolfersHereTab({
           </div>
         ) : (
           <EmptyState
-            icon={<Briefcase className="h-8 w-8 text-muted-foreground/60" />}
-            title="No team members yet"
-            description="Team members will appear here once added."
+            icon={<Briefcase className="h-10 w-10 text-muted-foreground/40" />}
+            title="No team yet"
+            description="Add the people who represent this business on Clbhouz."
             showManageButton={canManage}
             onManageClick={() => setManageModalOpen(true)}
+            manageButtonLabel="Add team member"
           />
         )
       )}
@@ -163,7 +169,7 @@ export function GolfersHereTab({
       {/* Members content - only for Golf Clubs */}
       {!isLoading && activeSubTab === 'members' && showMembersTab && (
         clubMembers.length > 0 ? (
-          <div className="grid grid-cols-3 gap-3 px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4">
             {clubMembers.map((member) => (
               <ClubMemberCard
                 key={member.id}
@@ -174,10 +180,10 @@ export function GolfersHereTab({
           </div>
         ) : (
           <EmptyState
-            icon={<Users className="h-8 w-8 text-muted-foreground/60" />}
+            icon={<Users className="h-10 w-10 text-muted-foreground/40" />}
             title="No members yet"
             description="Golfers who set this as their home club will appear here automatically."
-            secondaryDescription="Want to grow this? Invite members to set their home club."
+            secondaryDescription="Share your club page so members can find you on Clbhouz."
           />
         )
       )}
@@ -194,7 +200,7 @@ export function GolfersHereTab({
   );
 }
 
-// Team member card component
+// Team member card - premium styling, no role labels publicly
 function TeamMemberCard({ member, onClick }: { member: TeamMember; onClick: () => void }) {
   const profile = member.profile;
   if (!profile) return null;
@@ -202,50 +208,47 @@ function TeamMemberCard({ member, onClick }: { member: TeamMember; onClick: () =
   return (
     <button
       onClick={onClick}
-      className="flex flex-col items-center p-3 rounded-sq-md bg-white border border-border/50 hover:border-border hover:shadow-sm transition-all text-center"
+      className="flex flex-col items-center p-4 rounded-sq-lg bg-white border border-border/40 hover:border-border/60 hover:shadow-sm transition-all text-center"
     >
       <SquircleAvatar
         src={profile.profile_photo_url}
         alt={profile.display_name || 'Team member'}
         size={64}
-        className="mb-2"
+        className="mb-3"
       />
-      <div className="flex items-center gap-1 mb-0.5">
-        <span className="text-sm font-medium text-foreground truncate max-w-[80px]">
+      <div className="flex items-center gap-1 justify-center">
+        <span className="text-sm font-medium text-foreground line-clamp-2">
           {profile.display_name || profile.username || 'Unknown'}
         </span>
         {profile.is_verified_golfer && <VerifiedBadge size="sm" />}
       </div>
-      <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-sq-pill">
-        {ROLE_LABELS[member.role] || member.role}
-      </span>
     </button>
   );
 }
 
-// Club member card component
+// Club member card
 function ClubMemberCard({ member, onClick }: { member: ClubMember; onClick: () => void }) {
   const showHandicap = member.show_handicap !== false && member.eg_handicap_index != null;
 
   return (
     <button
       onClick={onClick}
-      className="flex flex-col items-center p-3 rounded-sq-md bg-white border border-border/50 hover:border-border hover:shadow-sm transition-all text-center"
+      className="flex flex-col items-center p-4 rounded-sq-lg bg-white border border-border/40 hover:border-border/60 hover:shadow-sm transition-all text-center"
     >
       <SquircleAvatar
         src={member.profile_photo_url}
         alt={member.display_name || 'Member'}
         size={64}
-        className="mb-2"
+        className="mb-3"
       />
-      <div className="flex items-center gap-1 mb-0.5">
-        <span className="text-sm font-medium text-foreground truncate max-w-[80px]">
+      <div className="flex items-center gap-1 justify-center">
+        <span className="text-sm font-medium text-foreground line-clamp-2">
           {member.display_name || member.username || 'Unknown'}
         </span>
         {member.is_verified_golfer && <VerifiedBadge size="sm" />}
       </div>
       {showHandicap && (
-        <span className="text-xs text-muted-foreground">
+        <span className="text-xs text-muted-foreground mt-1">
           HCP {member.eg_handicap_index!.toFixed(1)}
         </span>
       )}
@@ -253,14 +256,15 @@ function ClubMemberCard({ member, onClick }: { member: ClubMember; onClick: () =
   );
 }
 
-// Empty state component
+// Empty state component - centered, premium
 function EmptyState({ 
   icon, 
   title, 
   description,
   secondaryDescription,
   showManageButton,
-  onManageClick
+  onManageClick,
+  manageButtonLabel = 'Add team member'
 }: { 
   icon: React.ReactNode; 
   title: string; 
@@ -268,13 +272,14 @@ function EmptyState({
   secondaryDescription?: string;
   showManageButton?: boolean;
   onManageClick?: () => void;
+  manageButtonLabel?: string;
 }) {
   return (
-    <div className="py-12 text-center">
-      <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-muted">
+    <div className="py-16 px-6 text-center">
+      <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 bg-muted/50">
         {icon}
       </div>
-      <h3 className="text-base font-medium text-foreground mb-1">{title}</h3>
+      <h3 className="text-base font-semibold text-foreground mb-2">{title}</h3>
       <p className="text-sm text-muted-foreground max-w-[280px] mx-auto">
         {description}
       </p>
@@ -285,15 +290,15 @@ function EmptyState({
       )}
       {showManageButton && onManageClick && (
         <Button
-          variant="outline"
-          size="sm"
           onClick={onManageClick}
-          className="mt-4 gap-1.5"
+          className="mt-6"
         >
-          <Settings className="h-3.5 w-3.5" />
-          Add Team Members
+          {manageButtonLabel}
         </Button>
       )}
     </div>
   );
 }
+
+// Re-export for backwards compatibility
+export { PeopleTab as GolfersHereTab };

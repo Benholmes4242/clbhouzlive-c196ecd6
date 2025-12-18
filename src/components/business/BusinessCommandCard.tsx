@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
-  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, MapPin, ShieldCheck, Clock, CheckCircle, Mail
+  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, MapPin, ShieldCheck, Clock, CheckCircle, Mail, Users
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,8 +13,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { DeleteBusinessDialog } from './DeleteBusinessDialog';
+import { ManageTeamModal } from './ManageTeamModal';
 import { useBusinessStats7d } from '@/hooks/useBusinessStats7d';
 import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
+import { useBusinessTeamMembers } from '@/hooks/useBusinessTeamMembers';
 import { cn } from '@/lib/utils';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import BusinessVerificationModal from './verification/BusinessVerificationModal';
@@ -29,9 +31,10 @@ interface BusinessCommandCardProps {
   isActive?: boolean;
 }
 
-const ROLE_LABELS: Record<string, string> = {
-  owner: 'Owner',
-  admin: 'Admin',
+// Access level labels for UI (not DB roles)
+const ACCESS_LABELS: Record<string, string> = {
+  owner: 'Primary manager',
+  admin: 'Manager',
   editor: 'Editor',
   analyst: 'Analyst',
 };
@@ -40,12 +43,14 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
   const navigate = useNavigate();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [showTeamModal, setShowTeamModal] = useState(false);
 
   // CRITICAL: Close modals on unmount to prevent stuck overlay
   useEffect(() => {
     return () => {
       setShowDeleteDialog(false);
       setShowVerificationModal(false);
+      setShowTeamModal(false);
     };
   }, []);
   
@@ -57,10 +62,14 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
   // Fetch TOTAL followers count (source of truth)
   const { data: totalFollowers, isLoading: followersLoading } = useBusinessFollowersCount(business.id);
   
+  // Fetch team members for the modal
+  const { data: teamMembers = [] } = useBusinessTeamMembers(business.id);
+  
   const { data: verificationRequest } = useBusinessVerificationRequest(business.id);
 
   const canDelete = role === 'owner';
   const canManage = role === 'owner' || role === 'admin';
+  const isOwner = role === 'owner';
   
   // Derive verification state
   const verificationState = deriveVerificationState(business.is_verified, verificationRequest);
@@ -121,9 +130,9 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
               )}
             </div>
             
-            {/* Role + Category + Active pill */}
+            {/* Access level + Category + Active pill */}
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="text-xs text-muted-foreground/80">{ROLE_LABELS[role]}</span>
+              <span className="text-xs text-muted-foreground/80">{ACCESS_LABELS[role] || role}</span>
               {business.category && (
                 <>
                   <span className="text-xs text-muted-foreground/50">•</span>
@@ -209,6 +218,17 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
               {canManage && (
                 <>
                   <DropdownMenuSeparator className="my-1" />
+                  <DropdownMenuItem 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowTeamModal(true);
+                    }}
+                    className="gap-2.5 cursor-pointer py-2"
+                  >
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    Manage team
+                  </DropdownMenuItem>
+                  
                   {/* Verification menu item - state-based */}
                   {verificationState === 'verified' ? (
                     <DropdownMenuItem disabled className="gap-2.5 py-2 text-emerald-600">
@@ -334,6 +354,21 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                 <BarChart3 className="h-3.5 w-3.5" />
                 Insights
               </Button>
+              
+              {canManage && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowTeamModal(true);
+                  }}
+                  className="gap-1.5 h-9 flex-1 border-border/40 hover:border-border/60 active:scale-[0.98] transition-all"
+                >
+                  <Users className="h-3.5 w-3.5" />
+                  Manage team
+                </Button>
+              )}
             </>
           )}
         </div>
@@ -355,6 +390,14 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
         onOpenChange={setShowVerificationModal}
         businessId={business.id}
         isReapply={verificationState === 'rejected'}
+      />
+
+      <ManageTeamModal
+        open={showTeamModal}
+        onOpenChange={setShowTeamModal}
+        businessId={business.id}
+        currentTeam={teamMembers}
+        isOwner={isOwner}
       />
     </>
   );

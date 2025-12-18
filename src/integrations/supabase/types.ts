@@ -7038,6 +7038,10 @@ export type Database = {
           username: string
         }[]
       }
+      get_business_access_level: {
+        Args: { p_business_id: string; p_user_profile_id: string }
+        Returns: string
+      }
       get_business_profile_analytics: {
         Args: { p_business_profile_id: string; p_days?: number }
         Returns: {
@@ -7395,6 +7399,10 @@ export type Database = {
         Args: { p_business_id: string; p_member_user_id: string }
         Returns: Json
       }
+      remove_from_business_team: {
+        Args: { p_business_id: string; p_user_profile_id: string }
+        Returns: Json
+      }
       remove_golfer_verification: {
         Args: { p_note?: string; p_user_id: string }
         Returns: undefined
@@ -7478,6 +7486,14 @@ export type Database = {
         Returns: undefined
       }
       send_user_ping: { Args: { p_recipient_id: string }; Returns: undefined }
+      set_business_access: {
+        Args: {
+          p_access: string
+          p_business_id: string
+          p_user_profile_id: string
+        }
+        Returns: Json
+      }
       set_home_club: {
         Args: { p_business_id?: string; p_pending_name?: string }
         Returns: undefined
