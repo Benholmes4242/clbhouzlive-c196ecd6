@@ -2,17 +2,19 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MapPin, Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useCourseSearch } from '@/hooks/useCourseSearch';
+import { useClubSearch } from '@/hooks/useClubSearch';
 import { getFlagCode } from '@/utils/countryFlags';
 
 interface GolfInfoSectionProps {
   homeClub: string;
+  homeClubId: string | null;
   handicap: string;
-  onChange: (field: string, value: string) => void;
+  onChange: (field: string, value: string | null) => void;
 }
 
 export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
   homeClub,
+  homeClubId,
   handicap,
   onChange,
 }) => {
@@ -20,9 +22,10 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   
-  const { data: searchResults, loading } = useCourseSearch(searchQuery, {
+  // Query golf_clubs (parent entities) instead of golf_courses
+  const { data: searchResults, loading } = useClubSearch(searchQuery, {
     debounceMs: 250,
-    limit: 8,
+    limit: 10,
   });
 
   // Close dropdown when clicking outside
@@ -36,14 +39,16 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleCourseSelect = (courseName: string) => {
-    onChange('homeClub', courseName);
+  const handleClubSelect = (club: { id: string; name: string }) => {
+    onChange('homeClub', club.name);
+    onChange('homeClubId', club.id);
     setSearchQuery('');
     setIsSearchOpen(false);
   };
 
   const handleClearClub = () => {
     onChange('homeClub', '');
+    onChange('homeClubId', null);
     setSearchQuery('');
   };
 
@@ -55,7 +60,7 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
       </div>
 
       <div className="space-y-4">
-        {/* Home Club with Autocomplete */}
+        {/* Home Club with Autocomplete - queries golf_clubs */}
         <div className="space-y-1.5">
           <Label htmlFor="homeClub" className="text-xs text-muted-foreground">
             Home Club
@@ -90,7 +95,7 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
                   />
                 </div>
 
-                {/* Search Results Dropdown */}
+                {/* Search Results Dropdown - shows golf_clubs (collapsed multi-course clubs) */}
                 {isSearchOpen && searchQuery.length >= 2 && (
                   <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-background border border-border rounded-sq-sm shadow-lg max-h-64 overflow-y-auto">
                     {loading ? (
@@ -103,17 +108,17 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
                       </div>
                     ) : (
                       <div className="py-1">
-                        {searchResults.map((course) => (
+                        {searchResults.map((club) => (
                           <button
-                            key={course.id}
+                            key={club.id}
                             type="button"
-                            onClick={() => handleCourseSelect(course.name)}
+                            onClick={() => handleClubSelect(club)}
                             className="w-full px-3 py-2 text-left hover:bg-muted/50 transition-colors flex items-center gap-3"
                           >
-                            {course.country && (
+                            {club.country && (
                               <img
-                                src={`https://flagcdn.com/w20/${getFlagCode(course.country)}.png`}
-                                alt={course.country}
+                                src={`https://flagcdn.com/w20/${getFlagCode(club.country)}.png`}
+                                alt={club.country}
                                 className="w-5 h-4 object-cover rounded-sm flex-shrink-0"
                                 onError={(e) => {
                                   (e.target as HTMLImageElement).style.display = 'none';
@@ -122,10 +127,10 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
                             )}
                             <div className="flex-1 min-w-0">
                               <div className="text-sm font-medium truncate">
-                                {course.name}
+                                {club.name}
                               </div>
                               <div className="text-xs text-muted-foreground truncate">
-                                {[course.sub_country, course.country].filter(Boolean).join(', ')}
+                                {[club.sub_country, club.country].filter(Boolean).join(', ')}
                               </div>
                             </div>
                           </button>
