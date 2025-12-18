@@ -42,7 +42,7 @@ export interface BusinessProfile {
 
 export function useBusinessProfile(idOrSlug: string | undefined) {
   return useQuery({
-    queryKey: ['business-profile', idOrSlug],
+    queryKey: ['business-profile', 'v3_course_fallback', idOrSlug],
     enabled: !!idOrSlug,
     queryFn: async () => {
       if (!idOrSlug) throw new Error('No business ID or slug provided');
@@ -77,20 +77,28 @@ export function useBusinessProfile(idOrSlug: string | undefined) {
       let finalLat = data.lat ?? golfClub?.latitude ?? null;
       let finalLng = data.lng ?? golfClub?.longitude ?? null;
 
-      // If still no coords and we have a club_id, try to get coords from linked golf_courses
-      if ((finalLat === null || finalLng === null) && golfClub?.id) {
-        const { data: courseData } = await supabase
+      // If still no coords, try to get coords from linked golf_courses
+      // Use club_id from either the joined object or directly from business data
+      const clubIdForCourses = golfClub?.id ?? data.club_id;
+      
+      if ((finalLat === null || finalLng === null) && clubIdForCourses) {
+        const { data: courseData, error: courseError } = await supabase
           .from('golf_courses')
           .select('latitude, longitude')
-          .eq('club_id', golfClub.id)
+          .eq('club_id', clubIdForCourses)
           .not('latitude', 'is', null)
           .not('longitude', 'is', null)
           .limit(1)
           .maybeSingle();
 
+        if (courseError) {
+          console.error('[useBusinessProfile] course coords fallback error', courseError);
+        }
+
         if (courseData) {
-          finalLat = finalLat ?? courseData.latitude;
-          finalLng = finalLng ?? courseData.longitude;
+          finalLat = courseData.latitude;
+          finalLng = courseData.longitude;
+          console.log('[useBusinessProfile] Using course coords fallback:', finalLat, finalLng);
         }
       }
 
