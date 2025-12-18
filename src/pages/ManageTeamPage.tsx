@@ -278,30 +278,29 @@ export default function ManageTeamPage() {
 
   return (
     <div className="fixed inset-0 z-[100] bg-background flex flex-col">
-      {/* Header - consistent with site pattern */}
-      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border/40 safe-top">
-        <div className="flex items-center justify-between px-4 py-3">
-          {/* Back button - icon only */}
+      {/* Header - matching World's Top 100 page pattern */}
+      <header className="sticky top-0 z-10 bg-background safe-top">
+        {/* Top row: Back link left, Done button right */}
+        <div className="flex items-center justify-between px-4 pt-4 pb-2">
           <button
             onClick={handleBack}
-            className="h-9 w-9 flex items-center justify-center rounded-sq-sm hover:bg-muted/50 transition-colors"
-            aria-label="Go back"
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            <ArrowLeft className="h-5 w-5 text-foreground" />
+            <ArrowLeft className="h-4 w-4" />
+            <span>Back</span>
           </button>
           
-          {/* Title - centered */}
-          <div className="flex-1 text-center px-2">
-            <h1 className="text-lg font-semibold text-foreground">Manage team</h1>
-          </div>
-          
-          {/* Done button - text only, top right */}
           <button
             onClick={handleBack}
-            className="text-sm font-medium text-primary hover:text-primary/80 transition-colors px-2 py-1"
+            className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
           >
             Done
           </button>
+        </div>
+        
+        {/* Title - centered below */}
+        <div className="text-center px-4 pb-4">
+          <h1 className="text-2xl font-bold text-foreground">Manage Team</h1>
         </div>
       </header>
 
