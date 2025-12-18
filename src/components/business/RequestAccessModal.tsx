@@ -39,11 +39,12 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
       // Get requester's profile info for the notification
       const { data: requesterProfile } = await supabase
         .from('user_profiles')
-        .select('display_name, username')
+        .select('display_name, username, profile_photo_url')
         .eq('id', userId)
         .single();
 
       const requesterName = requesterProfile?.display_name || requesterProfile?.username || 'Someone';
+      const requesterAvatarUrl = requesterProfile?.profile_photo_url || null;
 
       const { data: insertedRequest, error } = await supabase
         .from('business_access_requests')
@@ -96,6 +97,7 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
               business_avatar_url: businessAvatarUrl || null,
               requester_id: userId,
               requester_name: requesterName,
+              requester_avatar_url: requesterAvatarUrl,
               role_requested: roleDisplayName,
               request_id: requestId, // For idempotency
             },

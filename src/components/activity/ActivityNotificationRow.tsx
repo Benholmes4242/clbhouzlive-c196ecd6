@@ -881,9 +881,13 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
      * 14) BUSINESS ACCESS REQUEST - someone requested access to your business
      */
     case 'business_access_request': {
+      // Priority: actor_display_name > data.requester_name > fallback
       const requesterName = notification.actor_display_name || data?.requester_name || 'Someone';
       const businessName = data?.business_name || 'your business';
-      const requestedRole = data?.role_requested || 'team member';
+      const businessId = data?.business_id || notification.entity_id;
+      // Normalize role label: team_member → "team member", manager → "manager"
+      const rawRole = data?.role_requested || 'team member';
+      const roleLabel = rawRole.toLowerCase().replace('_', ' ');
       const statusIcon = <UserPlus className="h-3 w-3 text-amber-500" />;
       
       return (
@@ -895,10 +899,15 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           title={
             <>
               <span className={cn(showOrange ? "font-semibold" : "font-medium")}>{requesterName}</span>{' '}
-              <span className="font-normal text-muted-foreground">requested {requestedRole} access</span>
+              <span className="font-normal text-muted-foreground">requested {roleLabel} access</span>
             </>
           }
-          subtext={`To ${businessName}`}
+          subtext={
+            <span className="flex flex-col gap-0.5">
+              <span>to {businessName}</span>
+              <span className="text-xs text-muted-foreground/70">Review in Business Profiles → Manage team</span>
+            </span>
+          }
           meta={notification.time_ago}
           actions={
             <span className={cn(basePillClass, "border-amber-400 bg-amber-500/10 text-amber-600")}>
