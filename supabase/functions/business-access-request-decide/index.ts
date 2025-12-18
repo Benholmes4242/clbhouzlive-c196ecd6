@@ -1,0 +1,241 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Get the user from the Authorization header
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "No authorization header" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Verify the user's JWT
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+    
+    if (userError || !user) {
+      return new Response(JSON.stringify({ error: "Invalid token" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { request_id, decision } = await req.json();
+
+    if (!request_id || !decision) {
+      return new Response(JSON.stringify({ error: "Missing request_id or decision" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (!["approved", "declined"].includes(decision)) {
+      return new Response(JSON.stringify({ error: "Invalid decision" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    console.log(`Processing decision: ${decision} for request: ${request_id} by user: ${user.id}`);
+
+    // Load the request
+    const { data: request, error: requestError } = await supabase
+      .from("business_access_requests")
+      .select(`
+        *,
+        business:business_accounts(id, name, logo_url),
+        requester:user_profiles!business_access_requests_requester_user_profile_id_fkey(id, display_name, username, profile_photo_url)
+      `)
+      .eq("id", request_id)
+      .single();
+
+    if (requestError || !request) {
+      console.error("Request not found:", requestError);
+      return new Response(JSON.stringify({ error: "Request not found" }), {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Idempotent: if already resolved, return success with current status
+    if (request.status !== "pending") {
+      console.log(`Request already ${request.status}`);
+      return new Response(JSON.stringify({ 
+        ok: true, 
+        status: request.status, 
+        already_resolved: true,
+        business_id: request.business_id,
+        requester_id: request.requester_user_profile_id
+      }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Check caller is allowed to decide (must be business admin/owner/manager)
+    const { data: membership, error: membershipError } = await supabase
+      .from("business_members")
+      .select("role")
+      .eq("business_id", request.business_id)
+      .eq("user_profile_id", user.id)
+      .single();
+
+    if (membershipError || !membership) {
+      console.error("Caller not a member:", membershipError);
+      return new Response(JSON.stringify({ error: "You are not authorized to decide on this request" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const allowedRoles = ["owner", "admin", "primary_manager", "manager"];
+    if (!allowedRoles.includes(membership.role)) {
+      return new Response(JSON.stringify({ error: "Your role does not allow approving/declining requests" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const now = new Date().toISOString();
+
+    if (decision === "approved") {
+      // Update request status
+      const { error: updateError } = await supabase
+        .from("business_access_requests")
+        .update({
+          status: "approved",
+          decided_at: now,
+          decided_by: user.id,
+        })
+        .eq("id", request_id);
+
+      if (updateError) {
+        console.error("Failed to update request:", updateError);
+        throw updateError;
+      }
+
+      // Map requested_role to business_members role
+      const roleMap: Record<string, string> = {
+        team_member: "member",
+        manager: "manager",
+      };
+      const memberRole = roleMap[request.requested_role] || "member";
+
+      // Insert into business_members (upsert to be idempotent)
+      const { error: memberError } = await supabase
+        .from("business_members")
+        .upsert({
+          business_id: request.business_id,
+          user_profile_id: request.requester_user_profile_id,
+          role: memberRole,
+        }, {
+          onConflict: "business_id,user_profile_id",
+        });
+
+      if (memberError) {
+        console.error("Failed to add member:", memberError);
+        throw memberError;
+      }
+
+      // Create notification for requester
+      const { error: notifError } = await supabase
+        .from("notifications")
+        .insert({
+          user_id: request.requester_user_profile_id,
+          type: "business_access_approved",
+          actor_id: user.id,
+          entity_type: "business",
+          entity_id: request.business_id,
+          title: "Added to team",
+          data: {
+            business_id: request.business_id,
+            business_name: request.business?.name,
+            business_avatar_url: request.business?.logo_url,
+            role_granted: request.requested_role === "manager" ? "Manager" : "Team member",
+            request_id: request_id,
+          },
+        });
+
+      if (notifError) {
+        console.error("Failed to create notification:", notifError);
+        // Don't throw - notification is secondary
+      }
+
+      console.log(`Approved request ${request_id}, added ${request.requester_user_profile_id} as ${memberRole}`);
+
+    } else {
+      // Declined
+      const { error: updateError } = await supabase
+        .from("business_access_requests")
+        .update({
+          status: "declined",
+          decided_at: now,
+          decided_by: user.id,
+        })
+        .eq("id", request_id);
+
+      if (updateError) {
+        console.error("Failed to update request:", updateError);
+        throw updateError;
+      }
+
+      // Create notification for requester
+      const { error: notifError } = await supabase
+        .from("notifications")
+        .insert({
+          user_id: request.requester_user_profile_id,
+          type: "business_access_declined",
+          actor_id: user.id,
+          entity_type: "business",
+          entity_id: request.business_id,
+          title: "Request declined",
+          data: {
+            business_id: request.business_id,
+            business_name: request.business?.name,
+            business_avatar_url: request.business?.logo_url,
+            request_id: request_id,
+          },
+        });
+
+      if (notifError) {
+        console.error("Failed to create notification:", notifError);
+      }
+
+      console.log(`Declined request ${request_id}`);
+    }
+
+    return new Response(JSON.stringify({ 
+      ok: true, 
+      status: decision,
+      business_id: request.business_id,
+      requester_id: request.requester_user_profile_id,
+      requester_name: request.requester?.display_name || request.requester?.username || "User",
+    }), {
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+
+  } catch (error) {
+    console.error("Error:", error);
+    return new Response(JSON.stringify({ error: error.message || "Internal server error" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});
