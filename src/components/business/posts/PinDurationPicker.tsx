@@ -1,7 +1,9 @@
 /**
  * PinDurationPicker - Bottom sheet to select pin duration
+ * Uses portal to escape stacking context issues
  */
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { X, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -23,16 +25,23 @@ const OPTIONS: { value: PinDuration; label: string }[] = [
 export function PinDurationPicker({ isOpen, onClose, onSelect }: PinDurationPickerProps) {
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
+  const content = (
+    <div 
+      className="fixed inset-0 flex items-end justify-center sm:items-center"
+      style={{ zIndex: 9999 }}
+    >
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        style={{ zIndex: 1 }}
         onClick={onClose}
       />
       
       {/* Sheet */}
-      <div className="relative bg-white rounded-t-sq-lg sm:rounded-sq-lg w-full max-w-sm sm:mx-4 overflow-hidden">
+      <div 
+        className="relative bg-white rounded-t-sq-lg sm:rounded-sq-lg w-full max-w-sm sm:mx-4 overflow-hidden shadow-2xl"
+        style={{ zIndex: 2 }}
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-border/50">
           <div className="flex items-center gap-2">
@@ -59,7 +68,7 @@ export function PinDurationPicker({ isOpen, onClose, onSelect }: PinDurationPick
               className={cn(
                 "w-full text-left px-4 py-3 rounded-sq-sm",
                 "text-sm font-medium text-foreground",
-                "hover:bg-muted/50 transition-colors"
+                "hover:bg-slate-100 active:bg-slate-200 transition-colors"
               )}
             >
               {label}
@@ -72,6 +81,9 @@ export function PinDurationPicker({ isOpen, onClose, onSelect }: PinDurationPick
       </div>
     </div>
   );
+
+  // Portal to document.body to escape stacking contexts
+  return createPortal(content, document.body);
 }
 
 export default PinDurationPicker;
