@@ -190,9 +190,11 @@ const BusinessProfilePage: React.FC = () => {
     .join('')
     .toUpperCase() || 'B';
 
+  const isGolfClub = business?.category === 'Golf Club';
+  
   const tabs = [
     { id: 'content', label: 'Activity' },
-    { id: 'golfers', label: 'Golfers' },
+    { id: 'golfers', label: isGolfClub ? 'Golfers' : 'People' },
     { id: 'info', label: 'Info' },
   ];
 
@@ -214,6 +216,7 @@ const BusinessProfilePage: React.FC = () => {
             businessId={business?.id || ''}
             businessName={business?.name || ''}
             businessLocation={business?.location || undefined}
+            category={business?.category}
           />
         );
       case 'info':
