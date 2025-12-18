@@ -1,7 +1,11 @@
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Play, Heart, MessageCircle, Image as ImageIcon, Users } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Users, Briefcase, User } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { useBusinessTeamMembers, TeamMember } from '@/hooks/useBusinessTeamMembers';
+import { useBusinessClubMembers, ClubMember } from '@/hooks/useBusinessClubMembers';
 
 interface GolfersHereTabProps {
   businessId: string;
@@ -9,150 +13,207 @@ interface GolfersHereTabProps {
   businessLocation?: string;
 }
 
-interface TaggedPost {
-  id: string;
-  content: string | null;
-  created_at: string;
-  user_id: string;
-  post_media: Array<{
-    media_url: string;
-    media_type: string;
-    poster_url?: string;
-  }>;
-  user_profiles: {
-    display_name: string | null;
-    username: string | null;
-    profile_photo_url: string | null;
-  } | null;
-}
+type SubTab = 'members' | 'team';
 
-export function GolfersHereTab({ businessId, businessName, businessLocation }: GolfersHereTabProps) {
-  // Fetch posts tagged at this location/business
-  // Note: This is a placeholder query - actual implementation depends on your tagging schema
-  const { data: taggedPosts, isLoading } = useQuery({
-    queryKey: ['business-tagged-posts', businessId],
-    queryFn: async () => {
-      // For now, return empty array since the posts table schema may not have
-      // tagged_business_id or location columns yet
-      // TODO: Implement proper tagging when schema is updated
-      
-      // Placeholder: try to find posts that might be related
-      // In production, you'd have a proper tagged_business_id column
-      try {
-        const { data, error } = await supabase
-          .from('posts')
-          .select(`
-            id,
-            content,
-            created_at,
-            user_id,
-            post_media (
-              media_url,
-              media_type,
-              poster_url
-            )
-          `)
-          .limit(30)
-          .order('created_at', { ascending: false });
+const ROLE_LABELS: Record<string, string> = {
+  owner: 'Owner',
+  director: 'Director',
+  admin: 'Admin',
+  coach: 'Coach',
+  staff: 'Staff',
+};
 
-        if (error) {
-          console.error('Error fetching posts:', error);
-          return [];
-        }
+export function GolfersHereTab({ businessId, businessName }: GolfersHereTabProps) {
+  const navigate = useNavigate();
+  const { data: teamMembers = [], isLoading: teamLoading } = useBusinessTeamMembers(businessId);
+  const { data: clubMembers = [], isLoading: membersLoading } = useBusinessClubMembers(businessId);
 
-        // For now, return empty since we can't properly filter by business
-        // This prevents showing unrelated posts
-        return [];
-      } catch (err) {
-        console.error('Error in tagged posts query:', err);
-        return [];
+  // Default to Members, but if Members is empty and Team exists, default to Team
+  const [activeSubTab, setActiveSubTab] = useState<SubTab>('members');
+
+  useEffect(() => {
+    if (!membersLoading && !teamLoading) {
+      if (clubMembers.length === 0 && teamMembers.length > 0) {
+        setActiveSubTab('team');
       }
-    },
-    enabled: !!businessId,
-  });
+    }
+  }, [clubMembers.length, teamMembers.length, membersLoading, teamLoading]);
 
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-3 gap-1">
-        {Array.from({ length: 9 }).map((_, i) => (
-          <div key={i} className="aspect-square rounded-sq-xs animate-pulse" style={{ background: '#EDEFF2' }} />
-        ))}
-      </div>
-    );
-  }
+  const isLoading = activeSubTab === 'team' ? teamLoading : membersLoading;
 
-  if (!taggedPosts || taggedPosts.length === 0) {
-    return (
-      <div className="py-16 text-center">
-        <div 
-          className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-          style={{ background: '#EDEFF2' }}
-        >
-          <Users className="h-8 w-8 text-[#97A1AA]" />
-        </div>
-        <p className="text-sm text-[#5E666D]">
-          No followers yet.
-        </p>
-      </div>
-    );
-  }
+  const handleProfileClick = (userId: string) => {
+    navigate(`/profile/${userId}`);
+  };
 
   return (
     <div className="space-y-4">
-      {/* Header with count */}
-      <div className="flex items-center justify-between px-1">
+      {/* Sub-tab navigation */}
+      <div className="flex gap-2 px-1">
+        <button
+          onClick={() => setActiveSubTab('members')}
+          className={cn(
+            "px-4 py-2 text-sm font-medium rounded-sq-pill transition-colors",
+            activeSubTab === 'members'
+              ? "bg-[#0F0F0F] text-white"
+              : "bg-[#EDEFF2] text-[#5E666D] hover:bg-[#E0E3E7]"
+          )}
+        >
+          Members
+        </button>
+        <button
+          onClick={() => setActiveSubTab('team')}
+          className={cn(
+            "px-4 py-2 text-sm font-medium rounded-sq-pill transition-colors",
+            activeSubTab === 'team'
+              ? "bg-[#0F0F0F] text-white"
+              : "bg-[#EDEFF2] text-[#5E666D] hover:bg-[#E0E3E7]"
+          )}
+        >
+          Team
+        </button>
+      </div>
+
+      {/* Header count */}
+      <div className="px-1">
         <p className="text-sm text-[#5E666D]">
-          {taggedPosts.length} post{taggedPosts.length !== 1 ? 's' : ''} from golfers
+          {activeSubTab === 'team' 
+            ? `${teamMembers.length} team member${teamMembers.length !== 1 ? 's' : ''}`
+            : `${clubMembers.length} member${clubMembers.length !== 1 ? 's' : ''}`
+          }
         </p>
       </div>
 
-      {/* Grid of tagged posts */}
-      <div className="grid grid-cols-3 gap-1">
-        {taggedPosts.map((post) => (
-          <PostTile key={post.id} post={post} />
-        ))}
-      </div>
+      {/* Loading state */}
+      {isLoading && (
+        <div className="grid grid-cols-3 gap-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="flex flex-col items-center p-3 rounded-sq-md animate-pulse" style={{ background: '#EDEFF2' }}>
+              <div className="w-16 h-16 rounded-full bg-slate-200 mb-2" />
+              <div className="w-16 h-3 bg-slate-200 rounded mb-1" />
+              <div className="w-12 h-2 bg-slate-200 rounded" />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Team content */}
+      {!isLoading && activeSubTab === 'team' && (
+        teamMembers.length > 0 ? (
+          <div className="grid grid-cols-3 gap-3">
+            {teamMembers.map((member) => (
+              <TeamMemberCard
+                key={member.id}
+                member={member}
+                onClick={() => member.profile && handleProfileClick(member.profile.id)}
+              />
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            icon={<Briefcase className="h-8 w-8 text-[#97A1AA]" />}
+            title="No team members yet"
+            description="This business hasn't added any team members."
+          />
+        )
+      )}
+
+      {/* Members content */}
+      {!isLoading && activeSubTab === 'members' && (
+        clubMembers.length > 0 ? (
+          <div className="grid grid-cols-3 gap-3">
+            {clubMembers.map((member) => (
+              <ClubMemberCard
+                key={member.id}
+                member={member}
+                onClick={() => handleProfileClick(member.id)}
+              />
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            icon={<Users className="h-8 w-8 text-[#97A1AA]" />}
+            title="No members yet"
+            description={`Be the first to set ${businessName || 'this club'} as your home club.`}
+          />
+        )
+      )}
     </div>
   );
 }
 
-function PostTile({ post }: { post: TaggedPost }) {
-  const primaryMedia = post.post_media?.[0];
-  const isVideo = primaryMedia?.media_type === 'video';
-  const thumbnailUrl = isVideo ? primaryMedia?.poster_url : primaryMedia?.media_url;
+// Team member card component
+function TeamMemberCard({ member, onClick }: { member: TeamMember; onClick: () => void }) {
+  const profile = member.profile;
+  if (!profile) return null;
 
   return (
-    <div className="group relative aspect-square overflow-hidden cursor-pointer rounded-sq-xs" style={{ background: '#EDEFF2' }}>
-      {thumbnailUrl ? (
-        <img
-          src={thumbnailUrl}
-          alt=""
-          className="w-full h-full object-cover transition-transform group-hover:scale-105"
-        />
-      ) : (
-        <div className="w-full h-full flex items-center justify-center">
-          <ImageIcon className="h-8 w-8 text-[#97A1AA]" />
-        </div>
-      )}
-
-      {/* Video indicator */}
-      {isVideo && (
-        <div className="absolute top-2 right-2">
-          <Play className="h-5 w-5 text-white drop-shadow-lg" fill="white" />
-        </div>
-      )}
-
-      {/* Hover overlay */}
-      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 text-white">
-        <div className="flex items-center gap-1">
-          <Heart className="h-5 w-5" />
-          <span className="text-sm font-medium">–</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <MessageCircle className="h-5 w-5" />
-          <span className="text-sm font-medium">–</span>
-        </div>
+    <button
+      onClick={onClick}
+      className="flex flex-col items-center p-3 rounded-sq-md bg-white border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all text-center"
+    >
+      <SquircleAvatar
+        src={profile.profile_photo_url}
+        alt={profile.display_name || 'Team member'}
+        size={64}
+        className="mb-2"
+      />
+      <div className="flex items-center gap-1 mb-0.5">
+        <span className="text-sm font-medium text-[#0F0F0F] truncate max-w-[80px]">
+          {profile.display_name || profile.username || 'Unknown'}
+        </span>
+        {profile.is_verified_golfer && <VerifiedBadge size="sm" />}
       </div>
+      <span className="text-xs text-[#5E666D] bg-[#EDEFF2] px-2 py-0.5 rounded-sq-pill">
+        {ROLE_LABELS[member.role] || member.role}
+      </span>
+    </button>
+  );
+}
+
+// Club member card component
+function ClubMemberCard({ member, onClick }: { member: ClubMember; onClick: () => void }) {
+  const showHandicap = member.show_handicap !== false && member.eg_handicap_index != null;
+
+  return (
+    <button
+      onClick={onClick}
+      className="flex flex-col items-center p-3 rounded-sq-md bg-white border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all text-center"
+    >
+      <SquircleAvatar
+        src={member.profile_photo_url}
+        alt={member.display_name || 'Member'}
+        size={64}
+        className="mb-2"
+      />
+      <div className="flex items-center gap-1 mb-0.5">
+        <span className="text-sm font-medium text-[#0F0F0F] truncate max-w-[80px]">
+          {member.display_name || member.username || 'Unknown'}
+        </span>
+        {member.is_verified_golfer && <VerifiedBadge size="sm" />}
+      </div>
+      {showHandicap && (
+        <span className="text-xs text-[#5E666D]">
+          HCP {member.eg_handicap_index!.toFixed(1)}
+        </span>
+      )}
+    </button>
+  );
+}
+
+// Empty state component
+function EmptyState({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
+  return (
+    <div className="py-16 text-center">
+      <div 
+        className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+        style={{ background: '#EDEFF2' }}
+      >
+        {icon}
+      </div>
+      <h3 className="text-base font-medium text-[#0F0F0F] mb-1">{title}</h3>
+      <p className="text-sm text-[#5E666D] max-w-[240px] mx-auto">
+        {description}
+      </p>
     </div>
   );
 }
