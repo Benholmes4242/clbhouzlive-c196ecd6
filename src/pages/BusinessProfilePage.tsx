@@ -462,7 +462,7 @@ const BusinessProfilePage: React.FC = () => {
                 ref={bioRef}
                 className={cn(
                   "text-base text-[#0F0F0F] leading-relaxed whitespace-pre-wrap",
-                  !bioExpanded && "line-clamp-[8]"
+                  !bioExpanded && "line-clamp-4"
                 )}
                 style={{ overflowWrap: 'anywhere' }}
               >
