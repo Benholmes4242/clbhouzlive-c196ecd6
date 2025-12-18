@@ -11,6 +11,7 @@ interface GolfersHereTabProps {
   businessId: string;
   businessName?: string;
   businessLocation?: string;
+  category?: string | null;
 }
 
 type SubTab = 'members' | 'team';
@@ -23,22 +24,27 @@ const ROLE_LABELS: Record<string, string> = {
   staff: 'Staff',
 };
 
-export function GolfersHereTab({ businessId, businessName }: GolfersHereTabProps) {
+export function GolfersHereTab({ businessId, businessName, category }: GolfersHereTabProps) {
   const navigate = useNavigate();
+  const isGolfClub = category === 'Golf Club';
+  
   const { data: teamMembers = [], isLoading: teamLoading } = useBusinessTeamMembers(businessId);
   const { data: clubMembers = [], isLoading: membersLoading } = useBusinessClubMembers(businessId);
 
-  // Default to Members, but if Members is empty and Team exists, default to Team
-  const [activeSubTab, setActiveSubTab] = useState<SubTab>('members');
+  // Default to Team for non-golf-clubs, or Members for golf clubs (unless empty)
+  const [activeSubTab, setActiveSubTab] = useState<SubTab>(isGolfClub ? 'members' : 'team');
 
   useEffect(() => {
-    if (!membersLoading && !teamLoading) {
+    // For golf clubs: if Members is empty and Team exists, default to Team
+    if (isGolfClub && !membersLoading && !teamLoading) {
       if (clubMembers.length === 0 && teamMembers.length > 0) {
         setActiveSubTab('team');
       }
     }
-  }, [clubMembers.length, teamMembers.length, membersLoading, teamLoading]);
+  }, [isGolfClub, clubMembers.length, teamMembers.length, membersLoading, teamLoading]);
 
+  // For non-golf-clubs, always show team
+  const showMembersTab = isGolfClub;
   const isLoading = activeSubTab === 'team' ? teamLoading : membersLoading;
   const currentCount = activeSubTab === 'team' ? teamMembers.length : clubMembers.length;
 
@@ -48,51 +54,55 @@ export function GolfersHereTab({ businessId, businessName }: GolfersHereTabProps
 
   return (
     <div>
-      {/* Sub-tabs: Members / Team - matches Activity/Tagged styling exactly */}
-      <div className="flex justify-center border-b border-border/50 bg-white">
-        <button
-          onClick={() => setActiveSubTab('members')}
-          className={cn(
-            'px-6 py-3 text-sm font-medium transition-colors relative',
-            activeSubTab === 'members'
-              ? 'text-foreground'
-              : 'text-muted-foreground hover:text-foreground'
-          )}
-        >
-          Members
-          {activeSubTab === 'members' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground" />
-          )}
-        </button>
-        <button
-          onClick={() => setActiveSubTab('team')}
-          className={cn(
-            'px-6 py-3 text-sm font-medium transition-colors relative',
-            activeSubTab === 'team'
-              ? 'text-foreground'
-              : 'text-muted-foreground hover:text-foreground'
-          )}
-        >
-          Team
-          {activeSubTab === 'team' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground" />
-          )}
-        </button>
-      </div>
+      {/* Sub-tabs: Members / Team - only show Members for Golf Clubs */}
+      {showMembersTab ? (
+        <div className="flex justify-center border-b border-border/50 bg-white">
+          <button
+            onClick={() => setActiveSubTab('members')}
+            className={cn(
+              'px-6 py-3 text-sm font-medium transition-colors relative',
+              activeSubTab === 'members'
+                ? 'text-foreground'
+                : 'text-muted-foreground hover:text-foreground'
+            )}
+          >
+            Members
+            {activeSubTab === 'members' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground" />
+            )}
+          </button>
+          <button
+            onClick={() => setActiveSubTab('team')}
+            className={cn(
+              'px-6 py-3 text-sm font-medium transition-colors relative',
+              activeSubTab === 'team'
+                ? 'text-foreground'
+                : 'text-muted-foreground hover:text-foreground'
+            )}
+          >
+            Team
+            {activeSubTab === 'team' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground" />
+            )}
+          </button>
+        </div>
+      ) : null}
 
-      {/* Count header - consistent spacing with Activity */}
-      <div className="py-3 px-4 text-center">
-        <p className="text-sm text-muted-foreground">
-          {activeSubTab === 'team' 
-            ? `${currentCount} team member${currentCount !== 1 ? 's' : ''}`
-            : `${currentCount} member${currentCount !== 1 ? 's' : ''}`
-          }
-        </p>
-      </div>
+      {/* Count header - only show if there are people */}
+      {currentCount > 0 && (
+        <div className="py-3 px-4 text-center">
+          <p className="text-sm text-muted-foreground">
+            {activeSubTab === 'team' 
+              ? `${currentCount} team member${currentCount !== 1 ? 's' : ''}`
+              : `${currentCount} member${currentCount !== 1 ? 's' : ''}`
+            }
+          </p>
+        </div>
+      )}
 
       {/* Loading state */}
       {isLoading && (
-        <div className="grid grid-cols-3 gap-3 px-4">
+        <div className="grid grid-cols-3 gap-3 px-4 pt-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="flex flex-col items-center p-3 rounded-sq-md animate-pulse bg-muted">
               <div className="w-16 h-16 rounded-full bg-muted-foreground/20 mb-2" />
@@ -103,10 +113,10 @@ export function GolfersHereTab({ businessId, businessName }: GolfersHereTabProps
         </div>
       )}
 
-      {/* Team content */}
+      {/* Team content - shown for non-golf-clubs or when Team tab is active */}
       {!isLoading && activeSubTab === 'team' && (
         teamMembers.length > 0 ? (
-          <div className="grid grid-cols-3 gap-3 px-4">
+          <div className="grid grid-cols-3 gap-3 px-4 pt-4">
             {teamMembers.map((member) => (
               <TeamMemberCard
                 key={member.id}
@@ -119,15 +129,15 @@ export function GolfersHereTab({ businessId, businessName }: GolfersHereTabProps
           <EmptyState
             icon={<Briefcase className="h-8 w-8 text-muted-foreground/60" />}
             title="No team members yet"
-            description="This business hasn't added any team members."
+            description="Team members will appear here once added."
           />
         )
       )}
 
-      {/* Members content */}
-      {!isLoading && activeSubTab === 'members' && (
+      {/* Members content - only for Golf Clubs */}
+      {!isLoading && activeSubTab === 'members' && showMembersTab && (
         clubMembers.length > 0 ? (
-          <div className="grid grid-cols-3 gap-3 px-4">
+          <div className="grid grid-cols-3 gap-3 px-4 pt-4">
             {clubMembers.map((member) => (
               <ClubMemberCard
                 key={member.id}
@@ -140,7 +150,8 @@ export function GolfersHereTab({ businessId, businessName }: GolfersHereTabProps
           <EmptyState
             icon={<Users className="h-8 w-8 text-muted-foreground/60" />}
             title="No members yet"
-            description={`Be the first to set ${businessName || 'this club'} as your home club.`}
+            description="Golfers who set this as their home club will appear here automatically."
+            secondaryDescription="Want to grow this? Invite members to set their home club."
           />
         )
       )}
@@ -208,16 +219,31 @@ function ClubMemberCard({ member, onClick }: { member: ClubMember; onClick: () =
 }
 
 // Empty state component
-function EmptyState({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
+function EmptyState({ 
+  icon, 
+  title, 
+  description,
+  secondaryDescription 
+}: { 
+  icon: React.ReactNode; 
+  title: string; 
+  description: string;
+  secondaryDescription?: string;
+}) {
   return (
     <div className="py-12 text-center">
       <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-muted">
         {icon}
       </div>
       <h3 className="text-base font-medium text-foreground mb-1">{title}</h3>
-      <p className="text-sm text-muted-foreground max-w-[240px] mx-auto">
+      <p className="text-sm text-muted-foreground max-w-[280px] mx-auto">
         {description}
       </p>
+      {secondaryDescription && (
+        <p className="text-sm text-muted-foreground/70 max-w-[280px] mx-auto mt-2">
+          {secondaryDescription}
+        </p>
+      )}
     </div>
   );
 }
