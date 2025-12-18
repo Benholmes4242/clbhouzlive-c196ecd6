@@ -323,6 +323,81 @@ export type Database = {
         }
         Relationships: []
       }
+      business_access_requests: {
+        Row: {
+          business_id: string
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          id: string
+          message: string | null
+          requested_role: string
+          requester_user_profile_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          message?: string | null
+          requested_role?: string
+          requester_user_profile_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          message?: string | null
+          requested_role?: string
+          requester_user_profile_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_access_requests_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_access_requests_decided_by_fkey"
+            columns: ["decided_by"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_access_requests_decided_by_fkey"
+            columns: ["decided_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_access_requests_requester_user_profile_id_fkey"
+            columns: ["requester_user_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_access_requests_requester_user_profile_id_fkey"
+            columns: ["requester_user_profile_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_accounts: {
         Row: {
           address_label: string | null
@@ -1241,6 +1316,7 @@ export type Database = {
           created_at: string
           id: string
           manager_email: string | null
+          requested_club_id: string | null
           requested_club_key: string
           requested_club_name: string
           requester_user_profile_id: string
@@ -1250,6 +1326,7 @@ export type Database = {
           created_at?: string
           id?: string
           manager_email?: string | null
+          requested_club_id?: string | null
           requested_club_key: string
           requested_club_name: string
           requester_user_profile_id: string
@@ -1259,12 +1336,20 @@ export type Database = {
           created_at?: string
           id?: string
           manager_email?: string | null
+          requested_club_id?: string | null
           requested_club_key?: string
           requested_club_name?: string
           requester_user_profile_id?: string
           status?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "club_page_requests_requested_club_id_fkey"
+            columns: ["requested_club_id"]
+            isOneToOne: false
+            referencedRelation: "golf_clubs"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "club_page_requests_requester_user_profile_id_fkey"
             columns: ["requester_user_profile_id"]

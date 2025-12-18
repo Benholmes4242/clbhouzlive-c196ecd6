@@ -490,6 +490,7 @@ const EditProfilePage: React.FC = () => {
               homeClub={formData.homeClub}
               homeClubId={formData.homeClubId}
               handicap={formData.handicap}
+              userId={user?.id}
               onChange={handleFieldChange}
             />
           </motion.section>

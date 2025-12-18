@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Building2, MapPin, Globe, Mail, Phone, Check, Loader2, GraduationCap, ShoppingBag, Briefcase, Flag, BadgeCheck } from 'lucide-react';
+import { ArrowLeft, Building2, MapPin, Globe, Mail, Phone, Check, Loader2, GraduationCap, ShoppingBag, Briefcase, Flag, BadgeCheck, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,6 +15,9 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { cn } from '@/lib/utils';
 import { LocationAutocomplete, LocationValue } from '@/components/business/LocationAutocomplete';
 import { PhoneInputWithDialCode, PhoneValue } from '@/components/business/PhoneInputWithDialCode';
+import { ClubSearchDropdown, SelectedClub } from '@/components/business/ClubSearchDropdown';
+import { RequestAccessModal } from '@/components/business/RequestAccessModal';
+import { ClaimCoursesStep } from '@/components/business/ClaimCoursesStep';
 
 // Categories with icons
 const BUSINESS_CATEGORIES_WITH_ICONS = [
@@ -28,27 +31,35 @@ const BUSINESS_CATEGORIES_WITH_ICONS = [
   { value: 'Other', label: 'Other', icon: Building2 },
 ];
 
-/**
- * Screen 3: "Business details" (Step 2 of 2)
- * Reduced "gov form" feeling, clarified what's public, reduced anxiety
- */
+type FlowStep = 'details' | 'claim-courses' | 'success';
+
 const BusinessCreatePage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user, loading: authLoading } = useSupabaseSession();
   
+  const [step, setStep] = useState<FlowStep>('details');
+  const [createdBusinessId, setCreatedBusinessId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  
+  // Form state
+  const [category, setCategory] = useState('');
+  const [selectedClub, setSelectedClub] = useState<SelectedClub | null>(null);
+  const [businessName, setBusinessName] = useState('');
   const [location, setLocation] = useState<LocationValue | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [phone, setPhone] = useState<PhoneValue | null>(null);
   const [formData, setFormData] = useState({
-    businessName: '',
-    businessCategory: '',
     businessWebsite: '',
     businessContactEmail: '',
     businessBio: '',
   });
+
+  // Duplicate club handling
+  const [existingBusinessForClub, setExistingBusinessForClub] = useState<{id: string; name: string} | null>(null);
+  const [checkingClub, setCheckingClub] = useState(false);
+  const [showRequestAccessModal, setShowRequestAccessModal] = useState(false);
 
   // Redirect to auth if not logged in
   useEffect(() => {
@@ -57,19 +68,68 @@ const BusinessCreatePage = () => {
     }
   }, [authLoading, user, navigate]);
 
+  // Check if club already has a business profile
+  useEffect(() => {
+    const checkClubBusiness = async () => {
+      if (!selectedClub?.id) {
+        setExistingBusinessForClub(null);
+        return;
+      }
+
+      setCheckingClub(true);
+      try {
+        const { data, error } = await supabase
+          .from('business_accounts')
+          .select('id, name')
+          .eq('club_id', selectedClub.id)
+          .limit(1)
+          .maybeSingle();
+
+        if (error) throw error;
+        setExistingBusinessForClub(data);
+      } catch (error) {
+        console.error('Error checking club business:', error);
+      } finally {
+        setCheckingClub(false);
+      }
+    };
+
+    checkClubBusiness();
+  }, [selectedClub?.id]);
+
+  const isGolfClubCategory = category === 'Golf Club';
+
+  // Get effective business name
+  const effectiveBusinessName = isGolfClubCategory ? selectedClub?.name || '' : businessName;
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  // Validation - require selected location (not just any string)
-  const isValid =
-    formData.businessName.trim().length > 0 &&
-    location !== null &&
-    (formData.businessWebsite.trim().length > 0 ||
-      formData.businessContactEmail.trim().length > 0);
+  // Validation
+  const isValid = (() => {
+    // Category required
+    if (!category) return false;
+
+    // Business name required (from club selection or free text)
+    if (isGolfClubCategory) {
+      if (!selectedClub) return false;
+      // Can't proceed if club already claimed
+      if (existingBusinessForClub) return false;
+    } else {
+      if (!businessName.trim()) return false;
+    }
+
+    // Location required
+    if (!location) return false;
+
+    // At least one contact method
+    if (!formData.businessWebsite.trim() && !formData.businessContactEmail.trim()) return false;
+
+    return true;
+  })();
 
   const handleSubmit = async () => {
-    // Validate location selection
     if (!location) {
       setLocationError('Please select a location from the list');
       return;
@@ -81,32 +141,47 @@ const BusinessCreatePage = () => {
     setSaveSuccess(false);
 
     try {
-      // Format location as "City, Country" for cleaner display
       const formattedLocation = location.country 
         ? `${location.city}, ${location.country}`
         : location.label;
 
-      // 1. Create the business account
+      // Create the business account
+      const insertData: any = {
+        name: effectiveBusinessName,
+        category: category,
+        location: formattedLocation,
+        website: formData.businessWebsite || null,
+        email: formData.businessContactEmail || null,
+        phone: phone?.fullNumber || null,
+        description: formData.businessBio || null,
+        is_verified: false,
+      };
+
+      // Link to golf club if applicable
+      if (isGolfClubCategory && selectedClub) {
+        insertData.club_id = selectedClub.id;
+        insertData.club_key = selectedClub.name; // Store for reference
+      }
+
       const { data: businessData, error: businessError } = await supabase
         .from('business_accounts')
-        .insert({
-          name: formData.businessName,
-          category: formData.businessCategory || null,
-          location: formattedLocation,
-          website: formData.businessWebsite || null,
-          email: formData.businessContactEmail || null,
-          phone: phone?.fullNumber || null,
-          description: formData.businessBio || null,
-          is_verified: false,
-        })
+        .insert(insertData)
         .select('id')
         .single();
 
-      if (businessError) throw businessError;
+      if (businessError) {
+        // Check for unique constraint violation (duplicate club)
+        if (businessError.code === '23505' && businessError.message?.includes('club_id')) {
+          toast.error('This club already has a business profile');
+          return;
+        }
+        throw businessError;
+      }
 
       const businessId = businessData.id;
+      setCreatedBusinessId(businessId);
 
-      // 2. Add current user as owner
+      // Add current user as owner
       const { error: memberError } = await supabase
         .from('business_members')
         .insert({
@@ -117,26 +192,30 @@ const BusinessCreatePage = () => {
 
       if (memberError) throw memberError;
 
-      // Invalidate my-businesses cache
+      // Invalidate caches
       await queryClient.invalidateQueries({ queryKey: ['my-businesses'] });
 
       setSaveSuccess(true);
       
-      toast.success('Business profile created!');
-
-      // Navigate to success screen with business details
-      setTimeout(() => {
-        navigate('/business/success', {
-          state: {
-            businessId: businessId,
-            businessName: formData.businessName,
-            category: formData.businessCategory || 'Business',
-            location: formattedLocation,
-            avatarUrl: undefined, // No avatar uploaded during creation
-            username: undefined, // Business accounts don't have usernames in this flow
-          },
-        });
-      }, 600);
+      // If Golf Club with multiple courses, show claim step
+      if (isGolfClubCategory && selectedClub) {
+        setTimeout(() => {
+          setStep('claim-courses');
+        }, 600);
+      } else {
+        // Navigate to success
+        toast.success('Business profile created!');
+        setTimeout(() => {
+          navigate('/business/success', {
+            state: {
+              businessId: businessId,
+              businessName: effectiveBusinessName,
+              category: category,
+              location: formattedLocation,
+            },
+          });
+        }, 600);
+      }
     } catch (error) {
       console.error('Error creating business profile:', error);
       toast.error('Failed to create business profile');
@@ -145,8 +224,25 @@ const BusinessCreatePage = () => {
     }
   };
 
+  const handleClaimCoursesComplete = () => {
+    toast.success('Business profile created!');
+    navigate('/business/success', {
+      state: {
+        businessId: createdBusinessId,
+        businessName: effectiveBusinessName,
+        category: category,
+        location: location?.label,
+      },
+    });
+  };
+
   const handleBack = () => {
-    navigate(-1);
+    if (step === 'claim-courses') {
+      // Skip courses and go to success
+      handleClaimCoursesComplete();
+    } else {
+      navigate(-1);
+    }
   };
 
   if (authLoading) {
@@ -157,7 +253,6 @@ const BusinessCreatePage = () => {
     );
   }
 
-  // Section animation variants
   const sectionVariants = {
     hidden: { opacity: 0, y: 8 },
     visible: (i: number) => ({
@@ -171,12 +266,45 @@ const BusinessCreatePage = () => {
     }),
   };
 
+  // Claim courses step
+  if (step === 'claim-courses' && createdBusinessId && selectedClub) {
+    return (
+      <PageRoot className="min-h-screen flex flex-col bg-muted/40">
+        <header className="sticky top-0 z-20 border-b border-border/40 bg-background/95 backdrop-blur">
+          <div className="mx-auto w-full max-w-3xl px-4 pt-3 pb-3">
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-[10px] font-medium text-muted-foreground/70">
+                Final step
+              </span>
+            </div>
+            <h1 className="text-xl font-semibold text-center mt-1 text-foreground">
+              Claim your courses
+            </h1>
+            <p className="text-sm text-muted-foreground text-center mt-1">
+              Select which courses belong to your club.
+            </p>
+          </div>
+        </header>
+
+        <main className="flex-1">
+          <div className="mx-auto w-full max-w-3xl px-4 py-6">
+            <ClaimCoursesStep
+              clubId={selectedClub.id}
+              businessId={createdBusinessId}
+              onComplete={handleClaimCoursesComplete}
+              onSkip={handleClaimCoursesComplete}
+            />
+          </div>
+        </main>
+      </PageRoot>
+    );
+  }
+
   return (
     <PageRoot className="min-h-screen flex flex-col bg-muted/40">
       {/* Header */}
       <header className="sticky top-0 z-20 border-b border-border/40 bg-background/95 backdrop-blur">
         <div className="mx-auto w-full max-w-3xl px-4 pt-3 pb-3">
-          {/* Back link - slate color */}
           <button
             onClick={handleBack}
             className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors mb-2"
@@ -185,19 +313,16 @@ const BusinessCreatePage = () => {
             <span>Back</span>
           </button>
 
-          {/* Step indicator - muted */}
           <div className="flex items-center justify-center gap-2">
             <span className="text-[10px] font-medium text-muted-foreground/70">
               Step 2 of 2
             </span>
           </div>
           
-          {/* Title */}
           <h1 className="text-xl font-semibold text-center mt-1 text-foreground">
             Set up your business profile
           </h1>
           
-          {/* Subtitle */}
           <p className="text-sm text-muted-foreground text-center mt-1">
             This is how your business will appear to golfers on clbhouz.
           </p>
@@ -221,42 +346,33 @@ const BusinessCreatePage = () => {
             </div>
 
             <div className="space-y-4 mt-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="businessName" className="text-xs text-muted-foreground">
-                  Business Name <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="businessName"
-                  value={formData.businessName}
-                  onChange={(e) => handleInputChange('businessName', e.target.value)}
-                  placeholder="e.g., Royal Golf Club"
-                  className="h-10 capitalize"
-                  autoCapitalize="words"
-                />
-                <p className="text-[11px] text-muted-foreground">
-                  This is shown publicly on your profile and in search.
-                </p>
-              </div>
-
+              {/* Category - REQUIRED FIRST */}
               <div className="space-y-1.5">
                 <Label htmlFor="businessCategory" className="text-xs text-muted-foreground">
-                  Category
+                  Category <span className="text-destructive">*</span>
                 </Label>
                 <Select
-                  value={formData.businessCategory}
-                  onValueChange={(value) => handleInputChange('businessCategory', value)}
+                  value={category}
+                  onValueChange={(value) => {
+                    setCategory(value);
+                    // Clear club selection when switching away from Golf Club
+                    if (value !== 'Golf Club') {
+                      setSelectedClub(null);
+                      setExistingBusinessForClub(null);
+                    }
+                  }}
                 >
                   <SelectTrigger className="h-10">
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent>
-                    {BUSINESS_CATEGORIES_WITH_ICONS.map((category) => {
-                      const Icon = category.icon;
+                    {BUSINESS_CATEGORIES_WITH_ICONS.map((cat) => {
+                      const Icon = cat.icon;
                       return (
-                        <SelectItem key={category.value} value={category.value}>
+                        <SelectItem key={cat.value} value={cat.value}>
                           <span className="flex items-center gap-2">
                             <Icon className="h-4 w-4 text-muted-foreground" />
-                            <span>{category.label}</span>
+                            <span>{cat.label}</span>
                           </span>
                         </SelectItem>
                       );
@@ -268,6 +384,76 @@ const BusinessCreatePage = () => {
                 </p>
               </div>
 
+              {/* Business Name - depends on category */}
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">
+                  Business Name <span className="text-destructive">*</span>
+                </Label>
+                
+                {isGolfClubCategory ? (
+                  <>
+                    <ClubSearchDropdown
+                      value={selectedClub}
+                      onChange={setSelectedClub}
+                      placeholder="Search for your golf club..."
+                      disabled={!category}
+                      error={existingBusinessForClub ? undefined : undefined}
+                    />
+                    
+                    {/* Already claimed warning */}
+                    {existingBusinessForClub && (
+                      <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-sq-sm">
+                        <div className="flex items-start gap-2">
+                          <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                          <div className="flex-1">
+                            <p className="text-sm text-amber-800 font-medium">
+                              This club already has a business profile
+                            </p>
+                            <p className="text-xs text-amber-700 mt-1">
+                              If you work here, you can request access to manage the profile.
+                            </p>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setShowRequestAccessModal(true)}
+                              className="mt-2 h-8 text-xs"
+                            >
+                              Request access
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {!selectedClub && !category && (
+                      <p className="text-[11px] text-muted-foreground">
+                        Select "Golf Club" category first.
+                      </p>
+                    )}
+                    {selectedClub && !existingBusinessForClub && (
+                      <p className="text-[11px] text-muted-foreground">
+                        Your business will be linked to this club's courses.
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <Input
+                      value={businessName}
+                      onChange={(e) => setBusinessName(e.target.value)}
+                      placeholder={category ? "e.g., Elite Golf Academy" : "Select a category first"}
+                      className="h-10 capitalize"
+                      autoCapitalize="words"
+                      disabled={!category}
+                    />
+                    <p className="text-[11px] text-muted-foreground">
+                      This is shown publicly on your profile and in search.
+                    </p>
+                  </>
+                )}
+              </div>
+
+              {/* About */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="businessBio" className="text-xs text-muted-foreground">
@@ -282,7 +468,7 @@ const BusinessCreatePage = () => {
                   value={formData.businessBio}
                   onChange={(e) => handleInputChange('businessBio', e.target.value)}
                   placeholder="Tell golfers about your business..."
-                  className="min-h-[120px] resize-none rounded-[14px] leading-relaxed"
+                  className="min-h-[120px] resize-none rounded-sq-sm leading-relaxed"
                   maxLength={500}
                 />
                 <p className="text-[11px] text-muted-foreground">
@@ -305,7 +491,7 @@ const BusinessCreatePage = () => {
               <h2 className="text-sm font-semibold text-foreground">Location & contact</h2>
             </div>
             
-            {!isValid && formData.businessName.trim().length > 0 && (
+            {!isValid && effectiveBusinessName.trim().length > 0 && (
               <p className="text-xs text-muted-foreground mt-1">
                 Add a location and at least one contact method (website or email) to continue.
               </p>
@@ -378,7 +564,7 @@ const BusinessCreatePage = () => {
             </div>
           </motion.section>
 
-          {/* Verification callout - aspirational, not blocking */}
+          {/* Verification callout */}
           <motion.section
             custom={2}
             initial="hidden"
@@ -387,7 +573,6 @@ const BusinessCreatePage = () => {
             className="px-4 py-5"
           >
             <div className="space-y-3">
-              {/* Header with badge icon */}
               <div className="flex items-center gap-2">
                 <div className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-100">
                   <BadgeCheck className="h-3.5 w-3.5 text-slate-600" />
@@ -395,12 +580,10 @@ const BusinessCreatePage = () => {
                 <h3 className="text-sm font-semibold text-foreground">Get verified on clbhouz</h3>
               </div>
               
-              {/* Body */}
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Once your profile is live, you can request verification to show golfers your business is authentic and trusted.
               </p>
               
-              {/* How it works bullets */}
               <ul className="space-y-1.5 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2">
                   <span className="text-muted-foreground/60 mt-1.5">•</span>
@@ -416,7 +599,6 @@ const BusinessCreatePage = () => {
                 </li>
               </ul>
               
-              {/* Optional helper */}
               <p className="text-[11px] text-muted-foreground/70">
                 Verification is optional and not required to use clbhouz.
               </p>
@@ -428,7 +610,6 @@ const BusinessCreatePage = () => {
       {/* Sticky Footer */}
       <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-border/40 bg-background/95 backdrop-blur">
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-3">
-          {/* Secondary: text button */}
           <button
             type="button"
             onClick={handleBack}
@@ -438,11 +619,10 @@ const BusinessCreatePage = () => {
             Cancel
           </button>
 
-          {/* Primary: slate button */}
           <Button
             variant="secondary"
             onClick={handleSubmit}
-            disabled={saving || saveSuccess || !isValid}
+            disabled={saving || saveSuccess || !isValid || !!existingBusinessForClub}
             className={cn(
               "flex-[1.5] h-11",
               saveSuccess && "bg-emerald-500 hover:bg-emerald-500 text-white"
@@ -490,6 +670,17 @@ const BusinessCreatePage = () => {
           </Button>
         </div>
       </footer>
+
+      {/* Request Access Modal */}
+      {existingBusinessForClub && user && (
+        <RequestAccessModal
+          open={showRequestAccessModal}
+          onOpenChange={setShowRequestAccessModal}
+          businessId={existingBusinessForClub.id}
+          businessName={existingBusinessForClub.name}
+          userId={user.id}
+        />
+      )}
     </PageRoot>
   );
 };
