@@ -6533,7 +6533,7 @@ export type Database = {
       }
       delete_business_team_member: {
         Args: { p_business_id: string; p_user_profile_id: string }
-        Returns: undefined
+        Returns: boolean
       }
       disablelongtransactions: { Args: never; Returns: string }
       dismiss_golfer_candidate: {
@@ -7457,6 +7457,16 @@ export type Database = {
           website_url: string
         }[]
       }
+      search_users_for_team: {
+        Args: { p_limit?: number; p_query: string }
+        Returns: {
+          display_name: string
+          id: string
+          is_verified_golfer: boolean
+          profile_photo_url: string
+          username: string
+        }[]
+      }
       send_push_notification: {
         Args: {
           data?: Json
@@ -8155,14 +8165,23 @@ export type Database = {
         }
         Returns: string
       }
-      upsert_business_team_member: {
-        Args: {
-          p_business_id: string
-          p_role: Database["public"]["Enums"]["business_team_role"]
-          p_user_profile_id: string
-        }
-        Returns: undefined
-      }
+      upsert_business_team_member:
+        | {
+            Args: {
+              p_business_id: string
+              p_role: Database["public"]["Enums"]["business_team_role"]
+              p_user_profile_id: string
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              p_business_id: string
+              p_role: string
+              p_user_profile_id: string
+            }
+            Returns: string
+          }
       user_can_see_game: {
         Args: { _game_id: string; _user_id: string }
         Returns: boolean

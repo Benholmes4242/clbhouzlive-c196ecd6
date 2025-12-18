@@ -217,6 +217,8 @@ const BusinessProfilePage: React.FC = () => {
             businessName={business?.name || ''}
             businessLocation={business?.location || undefined}
             category={business?.category}
+            canManage={membership?.canManage}
+            isOwner={membership?.role === 'owner'}
           />
         );
       case 'info':

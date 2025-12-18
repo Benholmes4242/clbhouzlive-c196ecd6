@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Briefcase } from 'lucide-react';
+import { Users, Briefcase, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { useBusinessTeamMembers, TeamMember } from '@/hooks/useBusinessTeamMembers';
 import { useBusinessClubMembers, ClubMember } from '@/hooks/useBusinessClubMembers';
+import { ManageTeamModal } from './ManageTeamModal';
 
 interface GolfersHereTabProps {
   businessId: string;
   businessName?: string;
   businessLocation?: string;
   category?: string | null;
+  canManage?: boolean;
+  isOwner?: boolean;
 }
 
 type SubTab = 'members' | 'team';
@@ -24,9 +28,16 @@ const ROLE_LABELS: Record<string, string> = {
   staff: 'Staff',
 };
 
-export function GolfersHereTab({ businessId, businessName, category }: GolfersHereTabProps) {
+export function GolfersHereTab({ 
+  businessId, 
+  businessName, 
+  category,
+  canManage = false,
+  isOwner = false
+}: GolfersHereTabProps) {
   const navigate = useNavigate();
   const isGolfClub = category === 'Golf Club';
+  const [manageModalOpen, setManageModalOpen] = useState(false);
   
   const { data: teamMembers = [], isLoading: teamLoading } = useBusinessTeamMembers(businessId);
   const { data: clubMembers = [], isLoading: membersLoading } = useBusinessClubMembers(businessId);
@@ -88,21 +99,34 @@ export function GolfersHereTab({ businessId, businessName, category }: GolfersHe
         </div>
       ) : null}
 
-      {/* Count header - only show if there are people */}
-      {currentCount > 0 && (
-        <div className="py-3 px-4 text-center">
-          <p className="text-sm text-muted-foreground">
-            {activeSubTab === 'team' 
-              ? `${currentCount} team member${currentCount !== 1 ? 's' : ''}`
-              : `${currentCount} member${currentCount !== 1 ? 's' : ''}`
-            }
-          </p>
+      {/* Count header + Manage button */}
+      <div className="py-3 px-4 flex items-center justify-between">
+        <div className="flex-1">
+          {currentCount > 0 && (
+            <p className="text-sm text-muted-foreground text-center">
+              {activeSubTab === 'team' 
+                ? `${currentCount} team member${currentCount !== 1 ? 's' : ''}`
+                : `${currentCount} member${currentCount !== 1 ? 's' : ''}`
+              }
+            </p>
+          )}
         </div>
-      )}
+        {canManage && activeSubTab === 'team' && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setManageModalOpen(true)}
+            className="gap-1.5"
+          >
+            <Settings className="h-3.5 w-3.5" />
+            Manage Team
+          </Button>
+        )}
+      </div>
 
       {/* Loading state */}
       {isLoading && (
-        <div className="grid grid-cols-3 gap-3 px-4 pt-4">
+        <div className="grid grid-cols-3 gap-3 px-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="flex flex-col items-center p-3 rounded-sq-md animate-pulse bg-muted">
               <div className="w-16 h-16 rounded-full bg-muted-foreground/20 mb-2" />
@@ -116,7 +140,7 @@ export function GolfersHereTab({ businessId, businessName, category }: GolfersHe
       {/* Team content - shown for non-golf-clubs or when Team tab is active */}
       {!isLoading && activeSubTab === 'team' && (
         teamMembers.length > 0 ? (
-          <div className="grid grid-cols-3 gap-3 px-4 pt-4">
+          <div className="grid grid-cols-3 gap-3 px-4">
             {teamMembers.map((member) => (
               <TeamMemberCard
                 key={member.id}
@@ -130,6 +154,8 @@ export function GolfersHereTab({ businessId, businessName, category }: GolfersHe
             icon={<Briefcase className="h-8 w-8 text-muted-foreground/60" />}
             title="No team members yet"
             description="Team members will appear here once added."
+            showManageButton={canManage}
+            onManageClick={() => setManageModalOpen(true)}
           />
         )
       )}
@@ -137,7 +163,7 @@ export function GolfersHereTab({ businessId, businessName, category }: GolfersHe
       {/* Members content - only for Golf Clubs */}
       {!isLoading && activeSubTab === 'members' && showMembersTab && (
         clubMembers.length > 0 ? (
-          <div className="grid grid-cols-3 gap-3 px-4 pt-4">
+          <div className="grid grid-cols-3 gap-3 px-4">
             {clubMembers.map((member) => (
               <ClubMemberCard
                 key={member.id}
@@ -155,6 +181,15 @@ export function GolfersHereTab({ businessId, businessName, category }: GolfersHe
           />
         )
       )}
+
+      {/* Manage Team Modal */}
+      <ManageTeamModal
+        open={manageModalOpen}
+        onOpenChange={setManageModalOpen}
+        businessId={businessId}
+        currentTeam={teamMembers}
+        isOwner={isOwner}
+      />
     </div>
   );
 }
@@ -223,12 +258,16 @@ function EmptyState({
   icon, 
   title, 
   description,
-  secondaryDescription 
+  secondaryDescription,
+  showManageButton,
+  onManageClick
 }: { 
   icon: React.ReactNode; 
   title: string; 
   description: string;
   secondaryDescription?: string;
+  showManageButton?: boolean;
+  onManageClick?: () => void;
 }) {
   return (
     <div className="py-12 text-center">
@@ -243,6 +282,17 @@ function EmptyState({
         <p className="text-sm text-muted-foreground/70 max-w-[280px] mx-auto mt-2">
           {secondaryDescription}
         </p>
+      )}
+      {showManageButton && onManageClick && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onManageClick}
+          className="mt-4 gap-1.5"
+        >
+          <Settings className="h-3.5 w-3.5" />
+          Add Team Members
+        </Button>
       )}
     </div>
   );
