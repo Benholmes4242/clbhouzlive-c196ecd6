@@ -220,10 +220,21 @@ export function PeopleTab({
   );
 }
 
-// Team member card - premium styling, no role labels publicly
+// Role display labels
+const ROLE_LABELS: Record<string, string> = {
+  owner: 'Owner',
+  director: 'Director',
+  admin: 'Admin',
+  coach: 'Coach',
+  staff: 'Team',
+};
+
+// Team member card - premium styling with role labels
 function TeamMemberCard({ member, onClick }: { member: TeamMember; onClick: () => void }) {
   const profile = member.profile;
   if (!profile) return null;
+
+  const roleLabel = ROLE_LABELS[member.role] || 'Team';
 
   return (
     <button
@@ -242,13 +253,26 @@ function TeamMemberCard({ member, onClick }: { member: TeamMember; onClick: () =
         </span>
         {profile.is_verified_golfer && <VerifiedBadge size="sm" />}
       </div>
+      <span className="text-xs text-muted-foreground mt-1">
+        {roleLabel}
+      </span>
     </button>
   );
 }
 
-// Club member card
+// Club member card with handicap and "Also plays at"
 function ClubMemberCard({ member, onClick }: { member: ClubMember; onClick: () => void }) {
   const showHandicap = member.show_handicap !== false && member.eg_handicap_index != null;
+  const alsoPlaysAt = member.also_plays_at || [];
+
+  // Format "Also plays at" text
+  const getAlsoPlaysAtText = () => {
+    if (alsoPlaysAt.length === 0) return null;
+    if (alsoPlaysAt.length === 1) return `Also plays at ${alsoPlaysAt[0]}`;
+    return `Also plays at ${alsoPlaysAt[0]} +${alsoPlaysAt.length - 1}`;
+  };
+
+  const alsoPlaysAtText = getAlsoPlaysAtText();
 
   return (
     <button
@@ -270,6 +294,11 @@ function ClubMemberCard({ member, onClick }: { member: ClubMember; onClick: () =
       {showHandicap && (
         <span className="text-xs text-muted-foreground mt-1">
           HCP {member.eg_handicap_index!.toFixed(1)}
+        </span>
+      )}
+      {alsoPlaysAtText && (
+        <span className="text-[11px] text-muted-foreground/70 mt-1 line-clamp-1">
+          {alsoPlaysAtText}
         </span>
       )}
     </button>
