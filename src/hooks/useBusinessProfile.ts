@@ -47,10 +47,16 @@ export function useBusinessProfile(idOrSlug: string | undefined) {
     queryFn: async () => {
       if (!idOrSlug) throw new Error('No business ID or slug provided');
 
-      // Try to fetch by slug first, then by id - filter out deleted businesses
+      // Fetch business with joined golf_clubs data for coords fallback
       const { data, error } = await supabase
         .from('business_accounts')
-        .select('*')
+        .select(`
+          *,
+          golf_clubs:club_id (
+            latitude,
+            longitude
+          )
+        `)
         .or(`id.eq.${idOrSlug},slug.eq.${idOrSlug}`)
         .eq('is_deleted', false)
         .maybeSingle();
@@ -64,7 +70,20 @@ export function useBusinessProfile(idOrSlug: string | undefined) {
         throw new Error('Business not found');
       }
 
-      return data as BusinessProfile;
+      // Extract golf_clubs coords as fallback if business has no lat/lng
+      const golfClubs = data.golf_clubs as { latitude: number | null; longitude: number | null } | null;
+      
+      // Remove the nested golf_clubs object and build the result
+      const { golf_clubs: _, ...businessData } = data;
+      
+      const result: BusinessProfile = {
+        ...(businessData as BusinessProfile),
+        // Use business coords, or fall back to linked golf_clubs coords
+        lat: data.lat ?? golfClubs?.latitude ?? null,
+        lng: data.lng ?? golfClubs?.longitude ?? null,
+      };
+
+      return result;
     },
     staleTime: 30 * 1000, // 30 seconds - shorter for fresher verification status
     refetchOnWindowFocus: true, // Refetch when user returns to tab
