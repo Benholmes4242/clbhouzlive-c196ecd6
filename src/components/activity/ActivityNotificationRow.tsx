@@ -881,8 +881,8 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
      * 14) BUSINESS ACCESS REQUEST - someone requested access to your business
      */
     case 'business_access_request': {
-      // Priority: actor_display_name > data.requester_name > fallback
-      const requesterName = notification.actor_display_name || data?.requester_name || 'Someone';
+      // Priority: actor_display_name > data.requester_name > fallback "A user"
+      const requesterName = notification.actor_display_name || data?.requester_name || 'A user';
       const businessName = data?.business_name || 'your business';
       const businessId = data?.business_id || notification.entity_id;
       // Normalize role label: team_member → "team member", manager → "manager"
@@ -924,6 +924,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
      */
     case 'business_access_approved': {
       const businessName = data?.business_name || 'the business';
+      const roleGranted = data?.role_granted || data?.role || 'Team member';
       const statusIcon = <Building2 className="h-3 w-3 text-emerald-500" />;
       
       return (
@@ -934,7 +935,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
           title={
             <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
-              Access request approved
+              Added to team
             </span>
           }
           subtext={`You now have access to ${businessName}.`}
@@ -942,7 +943,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           actions={
             <span className={cn(basePillClass, "border-emerald-500 bg-emerald-500/10 text-emerald-600")}>
               <Building2 className="h-3 w-3" />
-              Approved
+              {roleGranted}
             </span>
           }
           isSessionNew={isSessionNew}
@@ -965,7 +966,7 @@ export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (
           avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
           title={
             <span className={cn(showOrange ? "font-semibold" : "font-medium")}>
-              Access request declined
+              Request declined
             </span>
           }
           subtext={`Your request to join ${businessName} was declined.`}
