@@ -49,42 +49,45 @@ export function useClubSearch(query: string, options: UseClubSearchOptions = {})
 
         if (clubsError) throw clubsError;
 
-        // Also search aliases and get their canonical clubs
+        // Search aliases only if query is long enough (reduces noise)
         const normalizedQuery = query.toLowerCase().replace(/[^a-z0-9]/g, '');
-        const { data: aliasMatches, error: aliasError } = await supabase
-          .from('golf_club_aliases')
-          .select('canonical_club_id')
-          .ilike('alias_key', `%${normalizedQuery}%`)
-          .limit(limit);
-
-        if (aliasError) throw aliasError;
-
-        // Get canonical clubs from aliases
         let aliasClubs: GolfClub[] = [];
-        if (aliasMatches && aliasMatches.length > 0) {
-          const aliasClubIds = aliasMatches.map(a => a.canonical_club_id);
-          const { data: aliasClubData, error: aliasClubError } = await supabase
-            .from('golf_clubs')
-            .select('id, name, country, region, sub_country, continent')
-            .in('id', aliasClubIds);
-
-          if (aliasClubError) throw aliasClubError;
-          aliasClubs = aliasClubData || [];
-        }
-
-        // Merge and dedupe results (direct matches take priority)
-        const clubIds = new Set(clubs?.map(c => c.id) || []);
-        const mergedClubs = [...(clubs || [])];
         
-        for (const aliasClub of aliasClubs) {
-          if (!clubIds.has(aliasClub.id)) {
-            mergedClubs.push(aliasClub);
-            clubIds.add(aliasClub.id);
+        if (normalizedQuery.length >= 4) {
+          // Use prefix match for better precision
+          const { data: aliasMatches, error: aliasError } = await supabase
+            .from('golf_club_aliases')
+            .select('canonical_club_id')
+            .ilike('alias_key', `${normalizedQuery}%`)
+            .limit(limit);
+
+          if (aliasError) throw aliasError;
+
+          // Get canonical clubs from aliases
+          if (aliasMatches && aliasMatches.length > 0) {
+            const aliasClubIds = aliasMatches.map(a => a.canonical_club_id);
+            const { data: aliasClubData, error: aliasClubError } = await supabase
+              .from('golf_clubs')
+              .select('id, name, country, region, sub_country, continent')
+              .in('id', aliasClubIds);
+
+            if (aliasClubError) throw aliasClubError;
+            aliasClubs = aliasClubData || [];
           }
         }
 
-        // Sort alphabetically and limit
-        mergedClubs.sort((a, b) => a.name.localeCompare(b.name));
+        // Merge results: direct matches first (sorted), then alias results (sorted)
+        const directMatches = (clubs || []).sort((a, b) => a.name.localeCompare(b.name));
+        const clubIds = new Set(directMatches.map(c => c.id));
+        
+        // Add alias clubs that aren't already in direct matches
+        const uniqueAliasClubs = aliasClubs
+          .filter(c => !clubIds.has(c.id))
+          .sort((a, b) => a.name.localeCompare(b.name));
+        
+        const mergedClubs = [...directMatches, ...uniqueAliasClubs];
+
+        // Limit results (already sorted: direct first, then alias)
         setData(mergedClubs.slice(0, limit));
       } catch (err) {
         console.error('Error searching clubs:', err);
