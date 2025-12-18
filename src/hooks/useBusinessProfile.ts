@@ -47,12 +47,13 @@ export function useBusinessProfile(idOrSlug: string | undefined) {
     queryFn: async () => {
       if (!idOrSlug) throw new Error('No business ID or slug provided');
 
-      // Fetch business with joined golf_clubs data for coords fallback
+      // Fetch business with joined golf_clubs and golf_courses for coords fallback chain
       const { data, error } = await supabase
         .from('business_accounts')
         .select(`
           *,
           golf_clubs:club_id (
+            id,
             latitude,
             longitude
           )
@@ -70,17 +71,37 @@ export function useBusinessProfile(idOrSlug: string | undefined) {
         throw new Error('Business not found');
       }
 
-      // Extract golf_clubs coords as fallback if business has no lat/lng
-      const golfClubs = data.golf_clubs as { latitude: number | null; longitude: number | null } | null;
+      // Extract golf_clubs coords as first fallback
+      const golfClub = data.golf_clubs as { id: string; latitude: number | null; longitude: number | null } | null;
       
+      let finalLat = data.lat ?? golfClub?.latitude ?? null;
+      let finalLng = data.lng ?? golfClub?.longitude ?? null;
+
+      // If still no coords and we have a club_id, try to get coords from linked golf_courses
+      if ((finalLat === null || finalLng === null) && golfClub?.id) {
+        const { data: courseData } = await supabase
+          .from('golf_courses')
+          .select('latitude, longitude')
+          .eq('club_id', golfClub.id)
+          .not('latitude', 'is', null)
+          .not('longitude', 'is', null)
+          .limit(1)
+          .maybeSingle();
+
+        if (courseData) {
+          finalLat = finalLat ?? courseData.latitude;
+          finalLng = finalLng ?? courseData.longitude;
+        }
+      }
+
       // Remove the nested golf_clubs object and build the result
       const { golf_clubs: _, ...businessData } = data;
       
       const result: BusinessProfile = {
         ...(businessData as BusinessProfile),
-        // Use business coords, or fall back to linked golf_clubs coords
-        lat: data.lat ?? golfClubs?.latitude ?? null,
-        lng: data.lng ?? golfClubs?.longitude ?? null,
+        // Use business coords → golf_clubs coords → golf_courses coords
+        lat: finalLat,
+        lng: finalLng,
       };
 
       return result;
