@@ -545,13 +545,17 @@ export default function ManageTeamPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleRemoveMember}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            <Button 
+              variant="destructive"
+              disabled={removing}
+              onClick={async (e) => {
+                e.preventDefault();
+                await handleRemoveMember();
+              }}
             >
               {removing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               Remove
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
