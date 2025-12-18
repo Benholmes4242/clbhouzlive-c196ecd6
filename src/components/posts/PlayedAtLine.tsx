@@ -49,12 +49,7 @@ const PlayedAtLine: React.FC<PlayedAtLineProps> = ({
       ) : (
         <span className="font-medium text-foreground">{courseName}</span>
       )}
-      {regionText && (
-        <>
-          <span>,</span>
-          <span>{regionText}</span>
-        </>
-      )}
+      {regionText && <span>, {regionText}</span>}
     </div>
   );
 };

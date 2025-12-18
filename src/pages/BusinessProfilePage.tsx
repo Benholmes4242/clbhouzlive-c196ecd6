@@ -34,7 +34,6 @@ import {
 
 // Tab content components
 import { BusinessActivityFeed } from '@/components/business/posts/BusinessActivityFeed';
-import { BusinessProfileOverview } from '@/components/business/BusinessProfileOverview';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
 import { GolfersHereTab } from '@/components/business/GolfersHereTab';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
@@ -42,7 +41,7 @@ import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton'
 // Background color - matches personal profile page (slate-50)
 const BG_COLOR = '#f8fafc';
 
-type BusinessTab = 'content' | 'overview' | 'golfers' | 'info';
+type BusinessTab = 'content' | 'golfers' | 'info';
 
 const BusinessProfilePage: React.FC = () => {
   const navigate = useNavigate();
@@ -179,7 +178,6 @@ const BusinessProfilePage: React.FC = () => {
 
   const tabs = [
     { id: 'content', label: 'Activity' },
-    { id: 'overview', label: 'Overview' },
     { id: 'golfers', label: 'Golfers' },
     { id: 'info', label: 'Info' },
   ];
@@ -194,13 +192,6 @@ const BusinessProfilePage: React.FC = () => {
             businessLogo={business?.logo_url}
             followerCount={followersCount}
             membership={membership ?? null} 
-          />
-        );
-      case 'overview':
-        return (
-          <BusinessProfileOverview 
-            business={business!} 
-            membership={membership}
           />
         );
       case 'golfers':
