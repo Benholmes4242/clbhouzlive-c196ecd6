@@ -9,6 +9,8 @@ export interface GolfClub {
   sub_country: string | null;
   continent: string | null;
   club_key: string | null;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 interface UseClubSearchOptions {
@@ -43,7 +45,7 @@ export function useClubSearch(query: string, options: UseClubSearchOptions = {})
         // Search clubs directly by name
         const { data: clubs, error: clubsError } = await supabase
           .from('golf_clubs')
-          .select('id, name, country, region, sub_country, continent, club_key')
+          .select('id, name, country, region, sub_country, continent, club_key, latitude, longitude')
           .ilike('name', `%${query}%`)
           .order('name')
           .limit(limit);
@@ -69,7 +71,7 @@ export function useClubSearch(query: string, options: UseClubSearchOptions = {})
             const aliasClubIds = aliasMatches.map(a => a.canonical_club_id);
             const { data: aliasClubData, error: aliasClubError } = await supabase
               .from('golf_clubs')
-              .select('id, name, country, region, sub_country, continent, club_key')
+              .select('id, name, country, region, sub_country, continent, club_key, latitude, longitude')
               .in('id', aliasClubIds);
 
             if (aliasClubError) throw aliasClubError;

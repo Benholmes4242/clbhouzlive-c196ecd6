@@ -12,6 +12,8 @@ export interface SelectedClub {
   region: string | null;
   sub_country: string | null;
   club_key: string | null;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 interface ClubSearchDropdownProps {
@@ -63,6 +65,8 @@ export const ClubSearchDropdown: React.FC<ClubSearchDropdownProps> = ({
       region: club.region,
       sub_country: club.sub_country,
       club_key: club.club_key,
+      latitude: club.latitude,
+      longitude: club.longitude,
     });
     setSearchQuery('');
     setIsOpen(false);

@@ -589,47 +589,68 @@ const BusinessEditPage = () => {
           >
             <SectionHeader 
               title="Business identity" 
-              subtitle="This appears across clbhouz wherever your business is shown."
+              subtitle={business?.club_id 
+                ? "This profile is linked to a verified club record." 
+                : "This appears across clbhouz wherever your business is shown."}
             />
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="businessName" className="text-xs text-muted-foreground">
                   Business name <span className="text-destructive">*</span>
                 </Label>
-                <Input
-                  id="businessName"
-                  value={formData.businessName}
-                  onChange={(e) => handleInputChange('businessName', e.target.value)}
-                  placeholder="e.g., Royal Golf Club"
-                  className="h-10"
-                />
+                {business?.club_id ? (
+                  <>
+                    <div className="flex items-center gap-2 px-3 py-2.5 border border-border rounded-sq-sm bg-muted/50">
+                      <Flag className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                      <span className="text-sm text-foreground">{formData.businessName}</span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground">
+                      Linked to a club record. Contact support to update.
+                    </p>
+                  </>
+                ) : (
+                  <Input
+                    id="businessName"
+                    value={formData.businessName}
+                    onChange={(e) => handleInputChange('businessName', e.target.value)}
+                    placeholder="e.g., Royal Golf Club"
+                    className="h-10"
+                  />
+                )}
               </div>
 
               <div className="space-y-1.5">
                 <Label htmlFor="businessCategory" className="text-xs text-muted-foreground">
                   Category
                 </Label>
-                <Select
-                  value={formData.businessCategory}
-                  onValueChange={(value) => handleInputChange('businessCategory', value)}
-                >
-                  <SelectTrigger className="h-10">
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {BUSINESS_CATEGORIES_WITH_ICONS.map((category) => {
-                      const IconComp = category.icon;
-                      return (
-                        <SelectItem key={category.value} value={category.value}>
-                          <span className="flex items-center gap-2">
-                            <IconComp className="h-4 w-4 text-muted-foreground" />
-                            <span>{category.label}</span>
-                          </span>
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
+                {business?.club_id ? (
+                  <div className="flex items-center gap-2 px-3 py-2.5 border border-border rounded-sq-sm bg-muted/50">
+                    <Flag className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                    <span className="text-sm text-foreground">{formData.businessCategory || 'Golf Club'}</span>
+                  </div>
+                ) : (
+                  <Select
+                    value={formData.businessCategory}
+                    onValueChange={(value) => handleInputChange('businessCategory', value)}
+                  >
+                    <SelectTrigger className="h-10">
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {BUSINESS_CATEGORIES_WITH_ICONS.map((category) => {
+                        const IconComp = category.icon;
+                        return (
+                          <SelectItem key={category.value} value={category.value}>
+                            <span className="flex items-center gap-2">
+                              <IconComp className="h-4 w-4 text-muted-foreground" />
+                              <span>{category.label}</span>
+                            </span>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
             </div>
           </section>
@@ -672,87 +693,110 @@ const BusinessEditPage = () => {
           >
             <SectionHeader 
               title="Location & contact" 
-              subtitle="Where you are and how golfers reach you."
+              subtitle={business?.club_id 
+                ? "Location is linked to the club record." 
+                : "Where you are and how golfers reach you."}
             />
             <div className="space-y-4">
-              {/* Country selector */}
-              <div className="space-y-1.5">
-                <Label className="text-xs text-muted-foreground">
-                  Country <span className="text-destructive">*</span>
-                </Label>
-                <CountrySelector
-                  value={countrySelection}
-                  onChange={(name) => {
-                    setCountrySelection(name);
-                    // Clear address when country changes
-                    if (address) {
-                      setAddress(null);
-                    }
-                  }}
-                />
-              </div>
-              
-              {/* Business address */}
-              <div className="space-y-1.5">
-                <Label className="text-xs text-muted-foreground">
-                  Business address <span className="text-destructive">*</span>
-                </Label>
-                <AddressAutocomplete
-                  value={address}
-                  onChange={(val) => {
-                    setAddress(val);
-                    setAddressError(null);
-                  }}
-                  onDropPinClick={() => setShowPinDropModal(true)}
-                  countryCode={getCountryCode(countrySelection)}
-                  countryDisplayName={getCountryDisplayName(countrySelection)}
-                  placeholder="Start typing street, postcode/ZIP, or area…"
-                  error={addressError || undefined}
-                />
-              </div>
-
-              {/* Map preview - shows immediately when address selected */}
-              <div className="mt-3">
-                {address?.lat != null && address?.lng != null && Number.isFinite(address.lat) && Number.isFinite(address.lng) ? (
-                  <div 
-                    key={`preview-${address.lat}-${address.lng}`} 
-                    className="rounded-sq-md border border-slate-200 overflow-hidden"
-                  >
-                    <MapPreview
-                      lat={address.lat}
-                      lng={address.lng}
-                      name={formData.businessName || 'Business location'}
-                      height={160}
-                      zoom={14}
-                      markerColor="#F7931E"
-                      showExpandButton={false}
+              {business?.club_id ? (
+                /* Locked location for linked clubs */
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground">
+                    Location
+                  </Label>
+                  <div className="flex items-center gap-2 px-3 py-2.5 border border-border rounded-sq-sm bg-muted/50">
+                    <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                    <span className="text-sm text-foreground">
+                      {address?.label || business?.location || 'Location unavailable'}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Contact support to update the location for this linked club.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {/* Country selector */}
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">
+                      Country <span className="text-destructive">*</span>
+                    </Label>
+                    <CountrySelector
+                      value={countrySelection}
+                      onChange={(name) => {
+                        setCountrySelection(name);
+                        // Clear address when country changes
+                        if (address) {
+                          setAddress(null);
+                        }
+                      }}
                     />
-                    <div className="px-3 py-2.5 flex items-center justify-between bg-white border-t border-slate-100">
-                      <div className="flex items-center gap-2 text-sm min-w-0">
-                        <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-                        <span className="truncate text-slate-700">{address.city && address.country ? `${address.city}, ${address.country}` : address.label}</span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setShowPinDropModal(true)}
-                        className="text-xs text-primary hover:underline flex-shrink-0 ml-2"
-                      >
-                        Adjust pin
-                      </button>
-                    </div>
                   </div>
-                ) : (
-                  <div className="rounded-sq-md border border-dashed border-slate-200 bg-slate-50 p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-sq-sm bg-slate-100 flex items-center justify-center flex-shrink-0">
-                        <MapPin className="h-5 w-5 text-slate-400" />
-                      </div>
-                      <p className="text-sm text-slate-500">Select an address to preview your map pin.</p>
-                    </div>
+                  
+                  {/* Business address */}
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">
+                      Business address <span className="text-destructive">*</span>
+                    </Label>
+                    <AddressAutocomplete
+                      value={address}
+                      onChange={(val) => {
+                        setAddress(val);
+                        setAddressError(null);
+                      }}
+                      onDropPinClick={() => setShowPinDropModal(true)}
+                      countryCode={getCountryCode(countrySelection)}
+                      countryDisplayName={getCountryDisplayName(countrySelection)}
+                      placeholder="Start typing street, postcode/ZIP, or area…"
+                      error={addressError || undefined}
+                    />
                   </div>
-                )}
-              </div>
 
+                  {/* Map preview - shows immediately when address selected */}
+                  <div className="mt-3">
+                    {address?.lat != null && address?.lng != null && Number.isFinite(address.lat) && Number.isFinite(address.lng) ? (
+                      <div 
+                        key={`preview-${address.lat}-${address.lng}`} 
+                        className="rounded-sq-md border border-slate-200 overflow-hidden"
+                      >
+                        <MapPreview
+                          lat={address.lat}
+                          lng={address.lng}
+                          name={formData.businessName || 'Business location'}
+                          height={160}
+                          zoom={14}
+                          markerColor="#F7931E"
+                          showExpandButton={false}
+                        />
+                        <div className="px-3 py-2.5 flex items-center justify-between bg-white border-t border-slate-100">
+                          <div className="flex items-center gap-2 text-sm min-w-0">
+                            <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                            <span className="truncate text-slate-700">{address.city && address.country ? `${address.city}, ${address.country}` : address.label}</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setShowPinDropModal(true)}
+                            className="text-xs text-primary hover:underline flex-shrink-0 ml-2"
+                          >
+                            Adjust pin
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="rounded-sq-md border border-dashed border-slate-200 bg-slate-50 p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-sq-sm bg-slate-100 flex items-center justify-center flex-shrink-0">
+                            <MapPin className="h-5 w-5 text-slate-400" />
+                          </div>
+                          <p className="text-sm text-slate-500">Select an address to preview your map pin.</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* Contact info - always editable */}
               <div className="space-y-1.5">
                 <Label htmlFor="businessWebsite" className="text-xs text-muted-foreground flex items-center gap-1.5">
                   <Globe className="w-3.5 h-3.5" />
