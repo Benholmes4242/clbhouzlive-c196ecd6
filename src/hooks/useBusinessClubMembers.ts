@@ -19,7 +19,9 @@ export interface ClubMember {
  */
 export function useBusinessClubMembers(businessId: string | undefined) {
   return useQuery({
-    queryKey: ['business-club-members', businessId],
+    // NOTE: Versioned key to avoid stale cached results from the previous (incorrect)
+    // home_club_business_id-based implementation.
+    queryKey: ['business-club-members', businessId, 'v2_primary_club_id'],
     enabled: !!businessId,
     queryFn: async () => {
       if (!businessId) return [];
@@ -65,6 +67,8 @@ export function useBusinessClubMembers(businessId: string | undefined) {
 
       return (data || []) as ClubMember[];
     },
-    staleTime: 60 * 1000,
+    // Keep this fairly fresh; Members is a social surface.
+    staleTime: 10 * 1000,
+    refetchOnWindowFocus: true,
   });
 }
