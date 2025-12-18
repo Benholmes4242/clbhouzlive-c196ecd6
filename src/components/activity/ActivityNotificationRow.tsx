@@ -235,7 +235,7 @@ const AvatarWithBadge: React.FC<AvatarWithBadgeProps> = ({ notification, badgeIc
         fallback={displayName?.charAt(0) || '?'}
         ringColor={isSystemNotification ? undefined : getRingColorForTotalPlayed(notification.data?.actor_total_top100_played || 0)}
       />
-      <span className="absolute bottom-0 right-0 translate-x-1 translate-y-1 h-5 w-5 rounded-full border-2 border-background bg-white/72 backdrop-blur-[6px] flex items-center justify-center shadow-[0_2px_10px_rgba(0,0,0,0.08)]">
+      <span className="absolute bottom-0 right-0 translate-x-1 translate-y-1 h-5 w-5 rounded-full bg-white/95 border border-black/5 shadow-sm backdrop-blur-[2px] flex items-center justify-center">
         {badgeIcon}
       </span>
     </div>
