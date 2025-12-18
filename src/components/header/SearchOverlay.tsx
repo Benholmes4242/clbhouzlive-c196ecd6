@@ -294,6 +294,28 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose })
                   </div>
                 </div>
               )}
+
+              {/* Business Profiles section */}
+              {businessResults.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 px-2 mb-2">
+                    <Building className="h-3.5 w-3.5 text-white/40" />
+                    <span className="text-xs font-medium text-white/40 uppercase tracking-wide">Business Profiles</span>
+                  </div>
+                  <div className="space-y-0.5">
+                    {businessResults.map((item, index) => (
+                      <ResultRow 
+                        key={item.id} 
+                        item={item} 
+                        isActive={activeIndex === peopleResults.length + courseResults.length + index}
+                        onClick={() => handleResultSelect(item, peopleResults.length + courseResults.length + index)}
+                        query={query}
+                        getInitials={getInitials}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
