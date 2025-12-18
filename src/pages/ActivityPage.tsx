@@ -12,6 +12,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { PageRoot } from '@/components/layout/PageRoot';
 import CompactHeader from '@/components/header/CompactHeader';
+import { seedBenjaminBusinessNotifications } from '@/utils/seedBenjaminBusinessNotifs';
 
 const ActivityPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActivityTabId>('all');
@@ -36,6 +37,11 @@ const ActivityPage: React.FC = () => {
   const [sessionNewIds, setSessionNewIds] = useState<string[] | null>(null);
   const [sessionNewCount, setSessionNewCount] = useState<number | null>(null);
   const [hasInitializedNew, setHasInitializedNew] = useState(false);
+  
+  // ⚠️ TEMPORARY: Seed Benjamin Holmes business access notifications for QA
+  useEffect(() => {
+    seedBenjaminBusinessNotifications().catch(console.error);
+  }, []);
   
   // On first load: capture "New" IDs, mark them read (clears bell), but keep showing in "New"
   useEffect(() => {
