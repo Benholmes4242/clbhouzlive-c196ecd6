@@ -236,25 +236,49 @@ export function ManageTeamModal({
   };
 
   const handleRemoveMember = async () => {
-    if (!editingMember?.profile) return;
+    console.groupCollapsed('[ManageTeamModal] handleRemoveMember');
+    console.log('state snapshot', {
+      businessId,
+      removing,
+      editingMemberId: editingMember?.id,
+      editingUserProfileId: editingMember?.profile?.id,
+      editingName: editingMember?.profile?.display_name,
+    });
+
+    if (!editingMember?.profile) {
+      console.warn('[ManageTeamModal] early return: missing editingMember.profile');
+      console.groupEnd();
+      return;
+    }
 
     setRemoving(true);
+    console.time('[ManageTeamModal] remove_from_business_team');
+
     try {
-      const { error } = await supabase.rpc('remove_from_business_team', {
+      const payload = {
         p_business_id: businessId,
-        p_user_profile_id: editingMember.profile.id
-      });
+        p_user_profile_id: editingMember.profile.id,
+      };
+      console.log('[ManageTeamModal] calling supabase.rpc(remove_from_business_team)', payload);
+
+      const { data, error } = await supabase.rpc('remove_from_business_team', payload);
+
+      console.timeEnd('[ManageTeamModal] remove_from_business_team');
+      console.log('[ManageTeamModal] rpc result', { data, error });
 
       if (error) throw error;
 
       toast.success(`${editingMember.profile.display_name || 'Member'} removed from team`);
       setEditingMember(null);
       setShowRemoveConfirm(false);
+      console.log('[ManageTeamModal] invalidating team query', ['business-team-members', businessId]);
       queryClient.invalidateQueries({ queryKey: ['business-team-members', businessId] });
     } catch (error: any) {
-      toast.error(error.message || 'Failed to remove team member');
+      console.error('[ManageTeamModal] remove failed', error);
+      toast.error(error?.message || 'Failed to remove team member');
     } finally {
       setRemoving(false);
+      console.groupEnd();
     }
   };
 
@@ -557,6 +581,12 @@ export function ManageTeamModal({
               variant="destructive"
               disabled={removing}
               onClick={async (e) => {
+                console.log('[ManageTeamModal] Remove button clicked', {
+                  businessId,
+                  removing,
+                  editingMemberId: editingMember?.id,
+                  editingUserProfileId: editingMember?.profile?.id,
+                });
                 e.preventDefault();
                 e.stopPropagation();
                 await handleRemoveMember();
