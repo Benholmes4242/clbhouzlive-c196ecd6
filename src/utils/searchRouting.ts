@@ -6,12 +6,13 @@ import { NavigateFunction } from 'react-router-dom';
 
 export interface SearchResult {
   id: string;
-  type: 'user' | 'course';
+  type: 'user' | 'course' | 'business';
   title: string;
   subtitle: string;
   image?: string;
   username?: string;
   slug?: string;
+  verified?: boolean;
 }
 
 export class SearchRouter {
@@ -33,6 +34,11 @@ export class SearchRouter {
         const coursePath = result.slug ? `/courses/${result.slug}` : `/courses/${result.id}`;
         this.navigate(coursePath);
         break;
+
+      case 'business':
+        // Navigate to business profile page
+        this.navigate(`/business/${result.id}`);
+        break;
         
       default:
         console.warn('Unknown search result type:', result.type);
@@ -49,6 +55,8 @@ export class SearchRouter {
         return result.username ? `/profile/${result.username}` : `/profile/${result.id}`;
       case 'course':
         return result.slug ? `/courses/${result.slug}` : `/courses/${result.id}`;
+      case 'business':
+        return `/business/${result.id}`;
       default:
         return '/';
     }

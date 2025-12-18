@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useGlobalEntitySearch, saveRecentSearch, clearRecentSearches, type PersonResult, type ClubResult, type PageResult } from '@/hooks/useGlobalEntitySearch';
+import { useGlobalEntitySearch, saveRecentSearch, clearRecentSearches, type PersonResult, type ClubResult, type PageResult, type BusinessResult } from '@/hooks/useGlobalEntitySearch';
 import GlobalSearchDropdown from '@/components/search/GlobalSearchDropdown';
 import type { HeaderVariant } from '@/contexts/GlobalHeaderContext';
 import { searchAnalytics } from '@/utils/searchAnalytics';
@@ -11,11 +11,12 @@ import { createSearchRouter } from '@/utils/searchRouting';
 
 interface SearchResult {
   id: string;
-  type: 'user' | 'course';
+  type: 'user' | 'course' | 'business';
   title: string;
   subtitle: string;
   image?: string;
   username?: string;
+  verified?: boolean;
 }
 
 interface RecentSearchItem {
@@ -65,6 +66,7 @@ const SearchPill = ({
     people,
     clubs,
     pages,
+    businesses,
     recent,
     trending,
     isLoading,
@@ -93,6 +95,14 @@ const SearchPill = ({
       title: club.name,
       subtitle: `${club.region ? `${club.region}, ` : ''}${club.country}${club.global_rank ? ` • #${club.global_rank}` : ''}`,
       image: club.logo_url || undefined
+    })),
+    ...businesses.map(business => ({
+      id: business.id,
+      type: 'business' as const,
+      title: business.name,
+      subtitle: [business.category, business.location].filter(Boolean).join(' · ') || 'Business',
+      image: business.logo_url || undefined,
+      verified: business.verified
     }))
   ];
 
