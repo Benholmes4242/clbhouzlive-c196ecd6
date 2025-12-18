@@ -55,7 +55,7 @@ export function useHomeClubsMap(userIds: string[], viewerId?: string | null) {
  * Fetch home clubs for a single user with visibility rules applied.
  * Uses the get_home_clubs_for_user RPC.
  */
-export function useHomeClubsForUser(userId: string | null | undefined, viewerId?: string | null) {
+export function useUserHomeClubs(userId?: string | null, viewerId?: string | null) {
   const [data, setData] = useState<HomeClubsPayload | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -87,5 +87,5 @@ export function useHomeClubsForUser(userId: string | null | undefined, viewerId?
     run();
   }, [userId, viewerId]);
 
-  return { homeClubs: data, loading };
+  return { clubs: data, loading };
 }
