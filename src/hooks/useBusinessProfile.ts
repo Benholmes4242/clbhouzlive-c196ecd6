@@ -11,7 +11,11 @@ export interface BusinessProfile {
   location: string | null;
   lat: number | null;
   lng: number | null;
-  // New address fields
+  // Club linkage
+  club_id: string | null;
+  club_key: string | null;
+  club_name: string | null;
+  // Address fields
   address_label: string | null;
   address_line1: string | null;
   address_line2: string | null;

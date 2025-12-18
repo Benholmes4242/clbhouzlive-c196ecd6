@@ -82,11 +82,29 @@ const BusinessCreatePage = () => {
           .from('business_accounts')
           .select('id, name')
           .eq('club_id', selectedClub.id)
+          .eq('is_deleted', false)
           .limit(1)
           .maybeSingle();
 
         if (error) throw error;
         setExistingBusinessForClub(data);
+
+        // Auto-fill location from club data if not already claimed
+        if (!data && selectedClub) {
+          const locationLabel = [selectedClub.sub_country, selectedClub.region, selectedClub.country]
+            .filter(Boolean)
+            .join(', ');
+          
+          setLocation({
+            label: locationLabel,
+            city: selectedClub.sub_country || selectedClub.region || '',
+            region: selectedClub.region || undefined,
+            country: selectedClub.country || '',
+            countryCode: selectedClub.country || '',
+            lat: selectedClub.latitude || undefined,
+            lng: selectedClub.longitude || undefined,
+          });
+        }
       } catch (error) {
         console.error('Error checking club business:', error);
       } finally {
@@ -502,18 +520,35 @@ const BusinessCreatePage = () => {
                 <Label className="text-xs text-muted-foreground">
                   Location <span className="text-destructive">*</span>
                 </Label>
-                <LocationAutocomplete
-                  value={location}
-                  onChange={(val) => {
-                    setLocation(val);
-                    setLocationError(null);
-                  }}
-                  placeholder="Search for a city…"
-                  error={locationError || undefined}
-                />
-                <p className="text-[11px] text-muted-foreground">
-                  Choose your main base so golfers know where to find you.
-                </p>
+                {isGolfClubCategory && selectedClub && !existingBusinessForClub ? (
+                  <>
+                    {/* Locked location for linked clubs */}
+                    <div className="flex items-center gap-2 px-3 py-2.5 border border-border rounded-sq-sm bg-muted/50">
+                      <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                      <span className="text-sm text-foreground">
+                        {[selectedClub.sub_country, selectedClub.region, selectedClub.country].filter(Boolean).join(', ') || 'Location unavailable'}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground">
+                      Location is linked to the club record. Contact support to update details.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <LocationAutocomplete
+                      value={location}
+                      onChange={(val) => {
+                        setLocation(val);
+                        setLocationError(null);
+                      }}
+                      placeholder="Search for a city…"
+                      error={locationError || undefined}
+                    />
+                    <p className="text-[11px] text-muted-foreground">
+                      Choose your main base so golfers know where to find you.
+                    </p>
+                  </>
+                )}
               </div>
 
               <div className="space-y-1.5">

@@ -26,7 +26,7 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
   businessName,
   userId,
 }) => {
-  const [requestedRole, setRequestedRole] = useState<'team' | 'manager'>('team');
+  const [requestedRole, setRequestedRole] = useState<'team_member' | 'manager'>('team_member');
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -34,6 +34,15 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
+      // Get requester's profile info for the notification
+      const { data: requesterProfile } = await supabase
+        .from('user_profiles')
+        .select('display_name, username')
+        .eq('id', userId)
+        .single();
+
+      const requesterName = requesterProfile?.display_name || requesterProfile?.username || 'Someone';
+
       const { error } = await supabase
         .from('business_access_requests')
         .insert({
@@ -53,15 +62,23 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
         .in('role', ['owner', 'admin']);
 
       if (owners && owners.length > 0) {
+        const roleDisplayName = requestedRole === 'manager' ? 'Manager' : 'Team member';
         const notifications = owners.map(owner => ({
           user_id: owner.user_profile_id,
           actor_id: userId,
           type: 'business_access_request',
-          title: 'New access request',
-          message: `Someone requested to join ${businessName}`,
+          title: 'Access request',
+          message: `${requesterName} requested ${roleDisplayName} access to ${businessName}`,
           entity_type: 'business',
           entity_id: businessId,
-          data: { business_id: businessId, business_name: businessName },
+          data: { 
+            business_id: businessId, 
+            business_name: businessName,
+            requester_id: userId,
+            requester_name: requesterName,
+            requested_role: requestedRole,
+            entity_name: requesterName,
+          },
         }));
 
         await supabase.from('notifications').insert(notifications);
@@ -75,7 +92,7 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
         onOpenChange(false);
         setSubmitted(false);
         setMessage('');
-        setRequestedRole('team');
+        setRequestedRole('team_member');
       }, 1500);
     } catch (error: any) {
       console.error('Error submitting access request:', error);
@@ -118,11 +135,11 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
               <Label className="text-sm">What role are you requesting?</Label>
               <RadioGroup
                 value={requestedRole}
-                onValueChange={(v) => setRequestedRole(v as 'team' | 'manager')}
+                onValueChange={(v) => setRequestedRole(v as 'team_member' | 'manager')}
                 className="space-y-2"
               >
                 <div className="flex items-start gap-3 p-3 border border-border rounded-sq-sm hover:bg-muted/30 transition-colors">
-                  <RadioGroupItem value="team" id="role-team" className="mt-0.5" />
+                  <RadioGroupItem value="team_member" id="role-team" className="mt-0.5" />
                   <div className="flex-1">
                     <label htmlFor="role-team" className="text-sm font-medium cursor-pointer">
                       Team member
