@@ -115,37 +115,38 @@ export interface MockClubMember {
   avatar_url: string | null;
   handicap: number | null;
   is_verified: boolean;
+  also_plays_at?: string[]; // Club names for "Also plays at" feature
 }
 
 export const mockMembers: MockClubMember[] = [
   // Single-figure handicaps (5)
-  { id: 'mock-member-1', name: 'Ben Carter', username: 'bencarter', avatar_url: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop&crop=face', handicap: 4.2, is_verified: true },
-  { id: 'mock-member-2', name: 'Tom Hughes', username: 'tomhughes', avatar_url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face', handicap: 2.8, is_verified: false },
+  { id: 'mock-member-1', name: 'Ben Carter', username: 'bencarter', avatar_url: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop&crop=face', handicap: 4.2, is_verified: true, also_plays_at: ['Royal St George\'s', 'Sunningdale'] },
+  { id: 'mock-member-2', name: 'Tom Hughes', username: 'tomhughes', avatar_url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face', handicap: 2.8, is_verified: false, also_plays_at: ['Wentworth'] },
   { id: 'mock-member-3', name: 'Robert Lee', username: 'robertlee', avatar_url: 'https://images.unsplash.com/photo-1463453091185-61582044d556?w=200&h=200&fit=crop&crop=face', handicap: 6.5, is_verified: true },
-  { id: 'mock-member-4', name: 'Michael Scott', username: 'michaelscott', avatar_url: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=200&h=200&fit=crop&crop=face', handicap: 8.1, is_verified: false },
+  { id: 'mock-member-4', name: 'Michael Scott', username: 'michaelscott', avatar_url: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=200&h=200&fit=crop&crop=face', handicap: 8.1, is_verified: false, also_plays_at: ['The Belfry', 'Celtic Manor', 'Royal Troon'] },
   { id: 'mock-member-5', name: 'Daniel Park', username: 'danielpark', avatar_url: 'https://images.unsplash.com/photo-1528892952291-009c663ce843?w=200&h=200&fit=crop&crop=face', handicap: 5.9, is_verified: true },
   
   // Mid-handicaps (12)
-  { id: 'mock-member-6', name: 'Sarah Williams', username: 'sarahw', avatar_url: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200&h=200&fit=crop&crop=face', handicap: 18.7, is_verified: false },
+  { id: 'mock-member-6', name: 'Sarah Williams', username: 'sarahw', avatar_url: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200&h=200&fit=crop&crop=face', handicap: 18.7, is_verified: false, also_plays_at: ['Queenwood'] },
   { id: 'mock-member-7', name: 'Emma Johnson', username: 'emmaj', avatar_url: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=face', handicap: 14.3, is_verified: true },
   { id: 'mock-member-8', name: 'Hannah Brown', username: 'hannahb', avatar_url: 'https://images.unsplash.com/photo-1597223557154-721c1cecc4b0?w=200&h=200&fit=crop&crop=face', handicap: 12.0, is_verified: false },
-  { id: 'mock-member-9', name: 'Lucas Martinez', username: 'lucasm', avatar_url: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&h=200&fit=crop&crop=face', handicap: 15.8, is_verified: false },
+  { id: 'mock-member-9', name: 'Lucas Martinez', username: 'lucasm', avatar_url: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&h=200&fit=crop&crop=face', handicap: 15.8, is_verified: false, also_plays_at: ['St Andrews', 'Carnoustie'] },
   { id: 'mock-member-10', name: 'Sophie Taylor', username: 'sophiet', avatar_url: 'https://images.unsplash.com/photo-1546961342-ea6f6983f9f7?w=200&h=200&fit=crop&crop=face', handicap: 11.2, is_verified: true },
   { id: 'mock-member-11', name: 'Jack Wilson', username: 'jackw', avatar_url: 'https://images.unsplash.com/photo-1499996860823-5f82763f0023?w=200&h=200&fit=crop&crop=face', handicap: 16.4, is_verified: false },
-  { id: 'mock-member-12', name: 'Amelia Davis', username: 'ameliad', avatar_url: 'https://images.unsplash.com/photo-1558898479-33c0057a5d12?w=200&h=200&fit=crop&crop=face', handicap: 13.7, is_verified: false },
+  { id: 'mock-member-12', name: 'Amelia Davis', username: 'ameliad', avatar_url: 'https://images.unsplash.com/photo-1558898479-33c0057a5d12?w=200&h=200&fit=crop&crop=face', handicap: 13.7, is_verified: false, also_plays_at: ['Royal Lytham'] },
   { id: 'mock-member-13', name: 'Oliver White', username: 'oliverw', avatar_url: 'https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=200&h=200&fit=crop&crop=face', handicap: 10.5, is_verified: true },
   { id: 'mock-member-14', name: 'Charlotte Anderson', username: 'charlottea', avatar_url: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=200&h=200&fit=crop&crop=face', handicap: 17.2, is_verified: false },
   { id: 'mock-member-15', name: 'William Jackson', username: 'williamj', avatar_url: 'https://images.unsplash.com/photo-1552058544-f2b08422138a?w=200&h=200&fit=crop&crop=face', handicap: 14.9, is_verified: false },
-  { id: 'mock-member-16', name: 'Grace Thompson', username: 'gracet', avatar_url: 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=200&h=200&fit=crop&crop=face', handicap: 12.8, is_verified: true },
+  { id: 'mock-member-16', name: 'Grace Thompson', username: 'gracet', avatar_url: 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=200&h=200&fit=crop&crop=face', handicap: 12.8, is_verified: true, also_plays_at: ['Muirfield'] },
   { id: 'mock-member-17', name: 'Henry Moore', username: 'henrym', avatar_url: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=200&h=200&fit=crop&crop=face', handicap: 11.6, is_verified: false },
   
   // Higher handicaps (8)
   { id: 'mock-member-18', name: 'Isabella Clark', username: 'isabellac', avatar_url: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=200&h=200&fit=crop&crop=face', handicap: 24.3, is_verified: false },
-  { id: 'mock-member-19', name: 'George Harris', username: 'georgeh', avatar_url: 'https://images.unsplash.com/photo-1557862921-37829c790f19?w=200&h=200&fit=crop&crop=face', handicap: 28.1, is_verified: false },
+  { id: 'mock-member-19', name: 'George Harris', username: 'georgeh', avatar_url: 'https://images.unsplash.com/photo-1557862921-37829c790f19?w=200&h=200&fit=crop&crop=face', handicap: 28.1, is_verified: false, also_plays_at: ['Royal Birkdale', 'Hoylake'] },
   { id: 'mock-member-20', name: 'Mia Robinson', username: 'miar', avatar_url: 'https://images.unsplash.com/photo-1508002366005-75a695ee2d17?w=200&h=200&fit=crop&crop=face', handicap: 22.6, is_verified: true },
   { id: 'mock-member-21', name: 'Edward Lewis', username: 'edwardl', avatar_url: 'https://images.unsplash.com/photo-1564564321837-a57b7070ac4f?w=200&h=200&fit=crop&crop=face', handicap: 19.8, is_verified: false },
   { id: 'mock-member-22', name: 'Ava Walker', username: 'avaw', avatar_url: 'https://images.unsplash.com/photo-1485893086445-ed75865251e0?w=200&h=200&fit=crop&crop=face', handicap: 26.2, is_verified: false },
-  { id: 'mock-member-23', name: 'Freddie Hall', username: 'freddieh', avatar_url: 'https://images.unsplash.com/photo-1571512599285-9ac4fdf3dba2?w=200&h=200&fit=crop&crop=face', handicap: 21.4, is_verified: false },
+  { id: 'mock-member-23', name: 'Freddie Hall', username: 'freddieh', avatar_url: 'https://images.unsplash.com/photo-1571512599285-9ac4fdf3dba2?w=200&h=200&fit=crop&crop=face', handicap: 21.4, is_verified: false, also_plays_at: ['Gleneagles'] },
   { id: 'mock-member-24', name: 'Lily Young', username: 'lilyy', avatar_url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop&crop=face', handicap: 30.5, is_verified: true },
   { id: 'mock-member-25', name: 'Arthur King', username: 'arthurk', avatar_url: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=200&h=200&fit=crop&crop=face', handicap: 25.7, is_verified: false },
 ];
@@ -176,5 +177,6 @@ export function getMockClubMembers() {
     eg_handicap_index: m.handicap,
     is_verified_golfer: m.is_verified,
     show_handicap: true,
+    also_plays_at: m.also_plays_at || [],
   }));
 }
