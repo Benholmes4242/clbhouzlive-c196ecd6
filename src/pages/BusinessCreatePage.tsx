@@ -18,6 +18,7 @@ import { PhoneInputWithDialCode, PhoneValue } from '@/components/business/PhoneI
 import { ClubSearchDropdown, SelectedClub } from '@/components/business/ClubSearchDropdown';
 import { RequestAccessModal } from '@/components/business/RequestAccessModal';
 import { ClaimCoursesStep } from '@/components/business/ClaimCoursesStep';
+import { getCountryCodeFromClub } from '@/utils/countryCodeMapping';
 
 // Categories with icons
 const BUSINESS_CATEGORIES_WITH_ICONS = [
@@ -95,12 +96,15 @@ const BusinessCreatePage = () => {
             .filter(Boolean)
             .join(', ');
           
+          // Get proper ISO country code from club data
+          const countryCode = getCountryCodeFromClub(selectedClub);
+          
           setLocation({
             label: locationLabel,
             city: selectedClub.sub_country || selectedClub.region || '',
             region: selectedClub.region || undefined,
-            country: selectedClub.country || '',
-            countryCode: selectedClub.country || '',
+            country: selectedClub.sub_country || selectedClub.country || '',
+            countryCode: countryCode || '',
             lat: selectedClub.latitude || undefined,
             lng: selectedClub.longitude || undefined,
           });
@@ -173,12 +177,25 @@ const BusinessCreatePage = () => {
         phone: phone?.fullNumber || null,
         description: formData.businessBio || null,
         is_verified: false,
+        // Persist location coordinates
+        lat: location.lat || null,
+        lng: location.lng || null,
+        city: location.city || null,
+        region: location.region || null,
+        country: location.country || null,
+        address_label: location.label || null,
       };
 
-      // Link to golf club if applicable
+      // Link to golf club if applicable - force club data over any form drift
       if (isGolfClubCategory && selectedClub) {
         insertData.club_id = selectedClub.id;
-        insertData.club_key = selectedClub.club_key || null; // Store canonical key
+        insertData.club_key = selectedClub.club_key || null;
+        // Override with club data to ensure consistency
+        insertData.lat = selectedClub.latitude || null;
+        insertData.lng = selectedClub.longitude || null;
+        insertData.city = selectedClub.sub_country || selectedClub.region || null;
+        insertData.region = selectedClub.region || null;
+        insertData.country = selectedClub.sub_country || selectedClub.country || null;
       }
 
       const { data: businessData, error: businessError } = await supabase

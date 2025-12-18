@@ -54,34 +54,61 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
 
       if (error) throw error;
 
-      // Notify business owners/managers
-      const { data: owners } = await supabase
+      // Get the created request ID for idempotent notifications
+      const { data: createdRequest } = await supabase
+        .from('business_access_requests')
+        .select('id')
+        .eq('business_id', businessId)
+        .eq('requester_user_profile_id', userId)
+        .eq('status', 'pending')
+        .single();
+
+      const requestId = createdRequest?.id;
+
+      // Notify business owners/managers (expanded roles)
+      const { data: managers } = await supabase
         .from('business_members')
         .select('user_profile_id')
         .eq('business_id', businessId)
-        .in('role', ['owner', 'admin']);
+        .in('role', ['owner', 'admin', 'primary_manager', 'manager']);
 
-      if (owners && owners.length > 0) {
+      if (managers && managers.length > 0 && requestId) {
         const roleDisplayName = requestedRole === 'manager' ? 'Manager' : 'Team member';
-        const notifications = owners.map(owner => ({
-          user_id: owner.user_profile_id,
-          actor_id: userId,
-          type: 'business_access_request',
-          title: 'Access request',
-          message: `${requesterName} requested ${roleDisplayName} access to ${businessName}`,
-          entity_type: 'business',
-          entity_id: businessId,
-          data: { 
-            business_id: businessId, 
-            business_name: businessName,
-            requester_id: userId,
-            requester_name: requesterName,
-            requested_role: requestedRole,
-            entity_name: requesterName,
-          },
-        }));
+        
+        // Check existing notifications to avoid duplicates (idempotency)
+        const { data: existingNotifications } = await supabase
+          .from('notifications')
+          .select('user_id')
+          .eq('type', 'business_access_request')
+          .eq('entity_id', businessId)
+          .contains('data', { request_id: requestId });
 
-        await supabase.from('notifications').insert(notifications);
+        const existingUserIds = new Set(existingNotifications?.map(n => n.user_id) || []);
+        
+        const notifications = managers
+          .filter(m => !existingUserIds.has(m.user_profile_id))
+          .map(manager => ({
+            user_id: manager.user_profile_id,
+            actor_id: userId,
+            type: 'business_access_request',
+            title: 'Access request',
+            message: `${requesterName} requested ${roleDisplayName} access to ${businessName}`,
+            entity_type: 'business',
+            entity_id: businessId,
+            data: { 
+              business_id: businessId, 
+              business_name: businessName,
+              requester_id: userId,
+              requester_name: requesterName,
+              requested_role: requestedRole,
+              entity_name: requesterName,
+              request_id: requestId, // For idempotency
+            },
+          }));
+
+        if (notifications.length > 0) {
+          await supabase.from('notifications').insert(notifications);
+        }
       }
 
       setSubmitted(true);
