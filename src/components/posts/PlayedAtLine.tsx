@@ -37,19 +37,21 @@ const PlayedAtLine: React.FC<PlayedAtLineProps> = ({
   return (
     <div className={`flex items-center gap-1.5 text-sm text-muted-foreground ${className}`}>
       <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
-      <span>Played at </span>
-      {isClickable ? (
-        <button
-          type="button"
-          onClick={handleCourseClick}
-          className="font-medium text-foreground hover:underline cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 rounded-sm"
-        >
-          {courseName}
-        </button>
-      ) : (
-        <span className="font-medium text-foreground">{courseName}</span>
-      )}
-      {regionText && <span>, {regionText}</span>}
+      <span>
+        Played at{' '}
+        {isClickable ? (
+          <button
+            type="button"
+            onClick={handleCourseClick}
+            className="font-medium text-foreground hover:underline cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 rounded-sm"
+          >
+            {courseName}
+          </button>
+        ) : (
+          <span className="font-medium text-foreground">{courseName}</span>
+        )}
+        {regionText && <>, {regionText}</>}
+      </span>
     </div>
   );
 };
