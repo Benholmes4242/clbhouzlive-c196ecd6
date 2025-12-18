@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, X, User, MapPin, Clock, TrendingUp, ChevronRight, Verified } from 'lucide-react';
+import { Search, X, User, MapPin, Building, Clock, TrendingUp, ChevronRight, Verified } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useGlobalEntitySearch, saveRecentSearch, clearRecentSearches, type PersonResult, type ClubResult } from '@/hooks/useGlobalEntitySearch';
+import { useGlobalEntitySearch, saveRecentSearch, clearRecentSearches, type PersonResult, type ClubResult, type BusinessResult } from '@/hooks/useGlobalEntitySearch';
 import { searchAnalytics } from '@/utils/searchAnalytics';
 import { createSearchRouter } from '@/utils/searchRouting';
 
 interface SearchResult {
   id: string;
-  type: 'user' | 'course';
+  type: 'user' | 'course' | 'business';
   title: string;
   subtitle: string;
   image?: string;
@@ -35,6 +35,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose })
   const {
     people,
     clubs,
+    businesses,
     recent,
     trending,
     isLoading,
@@ -60,6 +61,14 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose })
       title: club.name,
       subtitle: `${club.region ? `${club.region}, ` : ''}${club.country}${club.global_rank ? ` • #${club.global_rank}` : ''}`,
       image: club.logo_url || undefined
+    })),
+    ...businesses.map(business => ({
+      id: business.id,
+      type: 'business' as const,
+      title: business.name,
+      subtitle: [business.category, business.location].filter(Boolean).join(' · ') || 'Business',
+      image: business.logo_url || undefined,
+      verified: business.verified
     }))
   ];
 
@@ -169,6 +178,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose })
   // Group results
   const peopleResults = results.filter(r => r.type === 'user');
   const courseResults = results.filter(r => r.type === 'course');
+  const businessResults = results.filter(r => r.type === 'business');
 
   return (
     <div 
