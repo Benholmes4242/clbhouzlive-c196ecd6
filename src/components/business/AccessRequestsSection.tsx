@@ -133,6 +133,7 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
       await new Promise(resolve => requestAnimationFrame(resolve));
 
       // Invalidate relevant queries (fire-and-forget so UI always recovers)
+      // Include notifications + unread-count to clear orange dot for this resolved request
       void Promise.allSettled([
         queryClient.invalidateQueries({ queryKey: ['business-access-requests', businessId] }),
         queryClient.invalidateQueries({ queryKey: ['business-team-members', businessId] }),
@@ -141,6 +142,8 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
         queryClient.invalidateQueries({ queryKey: ['business-membership', businessId] }),
         queryClient.invalidateQueries({ queryKey: ['activity-feed'] }),
         queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] }),
+        queryClient.invalidateQueries({ queryKey: ['notifications'] }),
+        queryClient.invalidateQueries({ queryKey: ['unread-notifications-count'] }),
       ]);
     } catch (e: any) {
       console.error('Approve error:', e);
@@ -183,11 +186,14 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
       await new Promise(resolve => requestAnimationFrame(resolve));
 
       // Invalidate relevant queries (fire-and-forget so UI always recovers)
+      // Include notifications + unread-count to clear orange dot for this resolved request
       void Promise.allSettled([
         queryClient.invalidateQueries({ queryKey: ['business-access-requests', businessId] }),
         queryClient.invalidateQueries({ queryKey: ['business-pending-requests-count', businessId] }),
         queryClient.invalidateQueries({ queryKey: ['activity-feed'] }),
         queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] }),
+        queryClient.invalidateQueries({ queryKey: ['notifications'] }),
+        queryClient.invalidateQueries({ queryKey: ['unread-notifications-count'] }),
       ]);
     } catch (e: any) {
       console.error('Decline error:', e);
