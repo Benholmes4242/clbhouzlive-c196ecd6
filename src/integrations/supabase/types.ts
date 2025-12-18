@@ -841,26 +841,26 @@ export type Database = {
         Row: {
           business_id: string
           created_at: string
+          created_by: string
           id: string
-          role: string
-          updated_at: string
-          user_id: string
+          role: Database["public"]["Enums"]["business_team_role"]
+          user_profile_id: string
         }
         Insert: {
           business_id: string
           created_at?: string
+          created_by: string
           id?: string
-          role?: string
-          updated_at?: string
-          user_id: string
+          role?: Database["public"]["Enums"]["business_team_role"]
+          user_profile_id: string
         }
         Update: {
           business_id?: string
           created_at?: string
+          created_by?: string
           id?: string
-          role?: string
-          updated_at?: string
-          user_id?: string
+          role?: Database["public"]["Enums"]["business_team_role"]
+          user_profile_id?: string
         }
         Relationships: [
           {
@@ -871,15 +871,15 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "business_team_members_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "business_team_members_user_profile_id_fkey"
+            columns: ["user_profile_id"]
             isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "business_team_members_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "business_team_members_user_profile_id_fkey"
+            columns: ["user_profile_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
@@ -5123,6 +5123,7 @@ export type Database = {
           has_profile_video: boolean | null
           header_photo_url: string | null
           home_club: string | null
+          home_club_business_id: string | null
           home_club_id: string | null
           id: string
           is_business_verified: boolean | null
@@ -5208,6 +5209,7 @@ export type Database = {
           has_profile_video?: boolean | null
           header_photo_url?: string | null
           home_club?: string | null
+          home_club_business_id?: string | null
           home_club_id?: string | null
           id: string
           is_business_verified?: boolean | null
@@ -5293,6 +5295,7 @@ export type Database = {
           has_profile_video?: boolean | null
           header_photo_url?: string | null
           home_club?: string | null
+          home_club_business_id?: string | null
           home_club_id?: string | null
           id?: string
           is_business_verified?: boolean | null
@@ -5356,6 +5359,13 @@ export type Database = {
             columns: ["featured_post_id"]
             isOneToOne: false
             referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_profiles_home_club_business_id_fkey"
+            columns: ["home_club_business_id"]
+            isOneToOne: false
+            referencedRelation: "business_accounts"
             referencedColumns: ["id"]
           },
         ]
@@ -6453,6 +6463,10 @@ export type Database = {
       }
       decrement_slots_if_available: {
         Args: { p_game_id: string }
+        Returns: undefined
+      }
+      delete_business_team_member: {
+        Args: { p_business_id: string; p_user_profile_id: string }
         Returns: undefined
       }
       disablelongtransactions: { Args: never; Returns: string }
@@ -8066,6 +8080,14 @@ export type Database = {
         }
         Returns: string
       }
+      upsert_business_team_member: {
+        Args: {
+          p_business_id: string
+          p_role: Database["public"]["Enums"]["business_team_role"]
+          p_user_profile_id: string
+        }
+        Returns: undefined
+      }
       user_can_see_game: {
         Args: { _game_id: string; _user_id: string }
         Returns: boolean
@@ -8092,6 +8114,7 @@ export type Database = {
       app_role: "admin" | "moderator" | "user" | "limited_admin"
       badge_category: "top_100_courses" | "engagement" | "community" | "special"
       badge_tier: "bronze" | "silver" | "gold" | "platinum" | "diamond"
+      business_team_role: "owner" | "admin" | "director" | "coach" | "staff"
       business_type:
         | "golf_club"
         | "pro_shop"
@@ -8258,6 +8281,7 @@ export const Constants = {
       app_role: ["admin", "moderator", "user", "limited_admin"],
       badge_category: ["top_100_courses", "engagement", "community", "special"],
       badge_tier: ["bronze", "silver", "gold", "platinum", "diamond"],
+      business_team_role: ["owner", "admin", "director", "coach", "staff"],
       business_type: [
         "golf_club",
         "pro_shop",

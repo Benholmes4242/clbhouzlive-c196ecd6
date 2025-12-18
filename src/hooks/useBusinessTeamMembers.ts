@@ -3,7 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 
 export interface TeamMember {
   id: string;
-  user_id: string;
   role: 'owner' | 'director' | 'admin' | 'coach' | 'staff';
   created_at: string;
   profile: {
@@ -34,10 +33,9 @@ export function useBusinessTeamMembers(businessId: string | undefined) {
         .from('business_team_members')
         .select(`
           id,
-          user_id,
           role,
           created_at,
-          user_profiles!business_team_members_user_id_fkey (
+          user_profiles:user_profile_id (
             id,
             display_name,
             username,
@@ -55,7 +53,6 @@ export function useBusinessTeamMembers(businessId: string | undefined) {
       // Map and sort by role priority then alphabetically
       const members: TeamMember[] = (data || []).map((row: any) => ({
         id: row.id,
-        user_id: row.user_id,
         role: row.role,
         created_at: row.created_at,
         profile: row.user_profiles,
