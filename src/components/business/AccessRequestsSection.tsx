@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Check, X, Loader2, Clock } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
@@ -49,15 +49,11 @@ function getRoleLabel(role: string): string {
   }
 }
 
-// Lowercase role for sentence context: "team member access", "manager access"
-function getRoleLabelLower(role: string): string {
-  return getRoleLabel(role).toLowerCase();
-}
-
 export function AccessRequestsSection({ businessId, businessName, businessAvatarUrl, canManage }: AccessRequestsSectionProps) {
   const queryClient = useQueryClient();
   const [confirmApprove, setConfirmApprove] = useState<AccessRequest | null>(null);
   const [confirmDecline, setConfirmDecline] = useState<AccessRequest | null>(null);
+  const [loadingId, setLoadingId] = useState<string | null>(null);
 
   // Fetch pending access requests
   const { data: requests, isLoading } = useQuery({
@@ -104,116 +100,75 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
     enabled: canManage,
   });
 
-  // Approve request mutation
-  const approveMutation = useMutation({
-    mutationFn: async (request: AccessRequest) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      // Update request status
-      const { error: updateError } = await supabase
-        .from('business_access_requests')
-        .update({ 
-          status: 'approved',
-          decided_at: new Date().toISOString(),
-          decided_by: user.id,
-        })
-        .eq('id', request.id);
-
-      if (updateError) throw updateError;
-
-      // Add to business_members
-      const role = request.requested_role === 'manager' ? 'admin' : 'member';
-      const { error: memberError } = await supabase
-        .from('business_members')
-        .insert({
-          business_id: request.business_id,
-          user_profile_id: request.requester_user_profile_id,
-          role,
-        });
-
-      if (memberError && !memberError.message.includes('duplicate')) {
-        throw memberError;
-      }
-
-      // Send notification to requester with business identity
-      const requesterName = request.requester.display_name || request.requester.username || 'A user';
-      await supabase.from('notifications').insert({
-        user_id: request.requester_user_profile_id,
-        actor_id: user.id,
-        type: 'business_access_approved',
-        title: 'Added to team',
-        message: `You now have access to ${businessName}.`,
-        entity_type: 'business',
-        entity_id: request.business_id,
-        data: { 
-          business_id: request.business_id,
-          business_name: businessName,
-          business_avatar_url: businessAvatarUrl || null,
-          role_granted: getRoleLabel(request.requested_role),
-        },
-      });
-
-      return request;
-    },
-    onSuccess: (request) => {
-      const requesterName = request.requester.display_name || request.requester.username || 'A user';
-      toast.success(`Approved. ${requesterName} added to team.`);
-      queryClient.invalidateQueries({ queryKey: ['business-access-requests', businessId] });
-      queryClient.invalidateQueries({ queryKey: ['business-team-members', businessId] });
-      queryClient.invalidateQueries({ queryKey: ['business-pending-requests-count', businessId] });
-      setConfirmApprove(null);
-    },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to approve request');
-    },
-  });
-
-  // Decline request mutation
-  const declineMutation = useMutation({
-    mutationFn: async (request: AccessRequest) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      const { error } = await supabase
-        .from('business_access_requests')
-        .update({ 
-          status: 'rejected',
-          decided_at: new Date().toISOString(),
-          decided_by: user.id,
-        })
-        .eq('id', request.id);
+  // Handle approve via Edge Function
+  const handleApprove = async (request: AccessRequest) => {
+    const requesterName = request.requester.display_name || request.requester.username || 'A user';
+    setLoadingId(request.id);
+    setConfirmApprove(null);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        'business-access-request-decide',
+        { body: { request_id: request.id, decision: 'approved' } }
+      );
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
-      // Send notification to requester with business identity
-      await supabase.from('notifications').insert({
-        user_id: request.requester_user_profile_id,
-        actor_id: user.id,
-        type: 'business_access_declined',
-        title: 'Request declined',
-        message: `Your request to join ${businessName} was declined.`,
-        entity_type: 'business',
-        entity_id: request.business_id,
-        data: { 
-          business_id: request.business_id,
-          business_name: businessName,
-          business_avatar_url: businessAvatarUrl || null,
-        },
-      });
+      if (data?.already_resolved) {
+        toast.info(`Request already ${data.status}`);
+      } else {
+        toast.success(`Approved ${requesterName} — added to team`);
+      }
 
-      return request;
-    },
-    onSuccess: () => {
-      toast.success('Declined.');
-      queryClient.invalidateQueries({ queryKey: ['business-access-requests', businessId] });
-      queryClient.invalidateQueries({ queryKey: ['business-pending-requests-count', businessId] });
-      setConfirmDecline(null);
-    },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to decline request');
-    },
-  });
+      // Invalidate relevant queries
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['business-access-requests', businessId] }),
+        queryClient.invalidateQueries({ queryKey: ['business-team-members', businessId] }),
+        queryClient.invalidateQueries({ queryKey: ['business-pending-requests-count', businessId] }),
+        queryClient.invalidateQueries({ queryKey: ['business-members', businessId] }),
+      ]);
+    } catch (e: any) {
+      console.error('Approve error:', e);
+      toast.error(e?.message ?? 'Failed to approve request');
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
+  // Handle decline via Edge Function
+  const handleDecline = async (request: AccessRequest) => {
+    const requesterName = request.requester.display_name || request.requester.username || 'A user';
+    setLoadingId(request.id);
+    setConfirmDecline(null);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        'business-access-request-decide',
+        { body: { request_id: request.id, decision: 'declined' } }
+      );
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      if (data?.already_resolved) {
+        toast.info(`Request already ${data.status}`);
+      } else {
+        toast.success(`Declined ${requesterName}'s request`);
+      }
+
+      // Invalidate relevant queries
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['business-access-requests', businessId] }),
+        queryClient.invalidateQueries({ queryKey: ['business-pending-requests-count', businessId] }),
+      ]);
+    } catch (e: any) {
+      console.error('Decline error:', e);
+      toast.error(e?.message ?? 'Failed to decline request');
+    } finally {
+      setLoadingId(null);
+    }
+  };
 
   if (!canManage) return null;
   if (isLoading) return null;
@@ -255,6 +210,7 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
               const requesterName = request.requester.display_name || request.requester.username || 'A user';
               const roleLabel = getRoleLabel(request.requested_role);
               const timeAgo = formatDistanceToNow(new Date(request.created_at), { addSuffix: false });
+              const isLoading = loadingId === request.id;
 
               return (
                 <div 
@@ -301,18 +257,26 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
                       variant="outline"
                       size="sm"
                       onClick={() => setConfirmDecline(request)}
-                      disabled={declineMutation.isPending || approveMutation.isPending}
+                      disabled={isLoading || loadingId !== null}
                       className="h-9 px-3.5 rounded-sq-xs text-[14px] font-semibold text-destructive border-destructive/30 hover:bg-destructive/10"
                     >
-                      Decline
+                      {isLoading && confirmDecline?.id === request.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        'Decline'
+                      )}
                     </Button>
                     <Button
                       size="sm"
                       onClick={() => setConfirmApprove(request)}
-                      disabled={approveMutation.isPending || declineMutation.isPending}
+                      disabled={isLoading || loadingId !== null}
                       className="h-9 px-3.5 rounded-sq-xs text-[14px] font-semibold"
                     >
-                      Approve
+                      {isLoading && confirmApprove?.id === request.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        'Approve'
+                      )}
                     </Button>
                   </div>
                 </div>
@@ -332,12 +296,12 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={loadingId !== null}>Cancel</AlertDialogCancel>
             <AlertDialogAction 
-              onClick={() => confirmApprove && approveMutation.mutate(confirmApprove)}
-              disabled={approveMutation.isPending}
+              onClick={() => confirmApprove && handleApprove(confirmApprove)}
+              disabled={loadingId !== null}
             >
-              {approveMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              {loadingId === confirmApprove?.id ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               Approve
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -354,13 +318,13 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={loadingId !== null}>Cancel</AlertDialogCancel>
             <AlertDialogAction 
-              onClick={() => confirmDecline && declineMutation.mutate(confirmDecline)}
-              disabled={declineMutation.isPending}
+              onClick={() => confirmDecline && handleDecline(confirmDecline)}
+              disabled={loadingId !== null}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {declineMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              {loadingId === confirmDecline?.id ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               Decline
             </AlertDialogAction>
           </AlertDialogFooter>
