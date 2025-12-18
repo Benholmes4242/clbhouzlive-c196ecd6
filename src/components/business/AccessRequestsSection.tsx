@@ -112,7 +112,7 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
     try {
       const { data, error } = await supabase.functions.invoke(
         'business-access-request-decide',
-        { body: { request_id: request.id, decision: 'approved' } }
+        { body: { request_id: request.id, decision: 'approve' } }
       );
 
       if (error) throw error;
@@ -154,7 +154,7 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
     try {
       const { data, error } = await supabase.functions.invoke(
         'business-access-request-decide',
-        { body: { request_id: request.id, decision: 'declined' } }
+        { body: { request_id: request.id, decision: 'decline' } }
       );
 
       if (error) throw error;

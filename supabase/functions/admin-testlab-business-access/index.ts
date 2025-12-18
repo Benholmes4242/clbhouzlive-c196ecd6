@@ -275,23 +275,7 @@ async function handleReset(supabase: any, body: any) {
 
   console.log('[admin-testlab-business-access] Resetting test state for seed_key:', seed_key);
 
-  // Delete test notifications by seed_key in data JSONB
-  const { data: deletedNotifs, error: notifError } = await supabase
-    .from('notifications')
-    .delete()
-    .filter('data->>seed_key', 'eq', seed_key)
-    .select('id');
-
-  const notifCount = deletedNotifs?.length || 0;
-  if (notifError) {
-    console.error('Failed to delete notifications:', notifError);
-  } else {
-    console.log('[admin-testlab-business-access] Deleted notifications:', notifCount);
-  }
-
-  // Delete pending test access requests that have the seed_key marker in related notifications
-  // Since we can't easily track seed_key on requests, delete pending requests where message contains test markers
-  // OR safer: delete requests whose request_id appears in notifications with this seed_key
+  // STEP 1: First fetch seeded notifications to extract request_ids BEFORE deleting
   const { data: seededNotifs } = await supabase
     .from('notifications')
     .select('data')
@@ -301,6 +285,9 @@ async function handleReset(supabase: any, body: any) {
     .map((n: any) => n.data?.request_id)
     .filter(Boolean);
 
+  console.log('[admin-testlab-business-access] Found request_ids from notifications:', requestIds);
+
+  // STEP 2: Delete the access requests by those ids
   let reqCount = 0;
   if (requestIds.length > 0) {
     const { data: deletedReqs, error: reqError } = await supabase
@@ -315,6 +302,20 @@ async function handleReset(supabase: any, body: any) {
     } else {
       console.log('[admin-testlab-business-access] Deleted requests:', reqCount);
     }
+  }
+
+  // STEP 3: Now delete the notifications
+  const { data: deletedNotifs, error: notifError } = await supabase
+    .from('notifications')
+    .delete()
+    .filter('data->>seed_key', 'eq', seed_key)
+    .select('id');
+
+  const notifCount = deletedNotifs?.length || 0;
+  if (notifError) {
+    console.error('Failed to delete notifications:', notifError);
+  } else {
+    console.log('[admin-testlab-business-access] Deleted notifications:', notifCount);
   }
 
   return new Response(JSON.stringify({
