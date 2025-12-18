@@ -4,11 +4,12 @@ import { useDebounce } from '@/hooks/useDebounce';
 
 interface SearchResult {
   id: string;
-  type: 'user' | 'course';
+  type: 'user' | 'course' | 'business';
   title: string;
   subtitle: string;
   image?: string;
   username?: string;
+  verified?: boolean;
 }
 
 interface RecentSearch {
@@ -130,6 +131,29 @@ export const useSearch = () => {
     }));
   };
 
+  const searchBusinesses = async (searchTerm: string): Promise<SearchResult[]> => {
+    const { data, error } = await supabase
+      .from('business_accounts')
+      .select('id, name, slug, category, location, logo_url, is_verified')
+      .ilike('name', `%${searchTerm}%`)
+      .eq('is_deleted', false)
+      .limit(6);
+
+    if (error) {
+      console.error('Error searching businesses:', error);
+      return [];
+    }
+
+    return (data || []).map(business => ({
+      id: business.id,
+      type: 'business' as const,
+      title: business.name,
+      subtitle: [business.category, business.location].filter(Boolean).join(' · ') || 'Business',
+      image: business.logo_url || undefined,
+      verified: business.is_verified || false
+    }));
+  };
+
   const performSearch = useCallback(async (searchTerm: string) => {
     if (!searchTerm.trim()) {
       setResults([]);
@@ -140,13 +164,14 @@ export const useSearch = () => {
     setLoading(true);
     
     try {
-      const [userResults, courseResults] = await Promise.all([
+      const [userResults, courseResults, businessResults] = await Promise.all([
         searchUsers(searchTerm),
-        searchCourses(searchTerm)
+        searchCourses(searchTerm),
+        searchBusinesses(searchTerm)
       ]);
 
-      // Combine results with users first
-      const allResults = [...userResults, ...courseResults];
+      // Combine results: people, clubs/courses, then businesses
+      const allResults = [...userResults, ...courseResults, ...businessResults];
       setResults(allResults);
     } catch (error) {
       console.error('Search error:', error);
