@@ -7,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 export type VisibilityValue = 'public' | 'followers' | 'friends' | 'private';
 
@@ -28,6 +29,8 @@ interface VisibilityDropdownProps {
   onChange: (value: VisibilityValue) => void;
   label?: string;
   disabled?: boolean;
+  size?: 'sm' | 'md';
+  className?: string;
 }
 
 export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
@@ -35,32 +38,46 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
   onChange,
   label = 'Visible to',
   disabled = false,
+  size = 'sm',
+  className,
 }) => {
   const selectedOption = VISIBILITY_OPTIONS.find(o => o.value === value) || VISIBILITY_OPTIONS[0];
   const Icon = selectedOption.icon;
+  const isPrivate = value === 'private';
 
   return (
-    <Select value={value} onValueChange={onChange} disabled={disabled}>
-      <SelectTrigger className="h-7 w-auto gap-1.5 px-2 text-[11px] border-none bg-muted/50 hover:bg-muted transition-colors">
-        <Icon className="w-3 h-3 text-muted-foreground" />
-        <SelectValue>
-          <span className="text-muted-foreground">{label}:</span>
-          <span className="ml-1 font-medium">{selectedOption.label}</span>
-        </SelectValue>
-      </SelectTrigger>
-      <SelectContent align="end">
-        {VISIBILITY_OPTIONS.map((option) => {
-          const OptionIcon = option.icon;
-          return (
-            <SelectItem key={option.value} value={option.value} className="text-sm">
-              <div className="flex items-center gap-2">
-                <OptionIcon className="w-3.5 h-3.5 text-muted-foreground" />
-                <span>{option.label}</span>
-              </div>
-            </SelectItem>
-          );
-        })}
-      </SelectContent>
-    </Select>
+    <div className={cn("flex items-center gap-1.5", className)}>
+      {isPrivate && <Lock className="h-3.5 w-3.5 text-muted-foreground" />}
+      <Select value={value} onValueChange={onChange} disabled={disabled}>
+        <SelectTrigger 
+          className={cn(
+            "gap-1.5 border-none bg-muted/50 hover:bg-muted transition-colors rounded-full",
+            size === 'sm' ? "h-7 px-2.5 text-[11px]" : "h-9 px-4 text-sm"
+          )}
+        >
+          <Icon className="w-3 h-3 text-muted-foreground" />
+          <SelectValue>
+            <span className="text-muted-foreground">{label}:</span>
+            <span className="ml-1 font-medium">{selectedOption.label}</span>
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent align="end" className="min-w-[200px]">
+          {VISIBILITY_OPTIONS.map((option) => {
+            const OptionIcon = option.icon;
+            return (
+              <SelectItem key={option.value} value={option.value} className="text-sm">
+                <div className="flex items-center gap-2">
+                  <OptionIcon className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span>{option.label}</span>
+                </div>
+              </SelectItem>
+            );
+          })}
+        </SelectContent>
+      </Select>
+    </div>
   );
 };
+
+export const visibilityLabel = (v: VisibilityValue) => 
+  VISIBILITY_OPTIONS.find(o => o.value === v)?.label || 'Everyone';

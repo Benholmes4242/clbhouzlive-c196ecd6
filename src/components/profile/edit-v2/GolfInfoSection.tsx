@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MapPin, Search, X, Plus, Check, ExternalLink, Mail } from 'lucide-react';
+import { MapPin, Search, X, Plus, Check, ExternalLink, Mail, Lock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -252,19 +252,33 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
         {/* Primary Home Club Card */}
         <div className="rounded-sq-md border border-border bg-card p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Home Club
-            </Label>
             <div className="flex items-center gap-2">
+              <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Home Club
+              </Label>
               {homeClub && (
-                <span className="text-[10px] text-muted-foreground">Primary</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                  Primary
+                </span>
               )}
-              <VisibilityDropdown
-                value={homeClubVisibility}
-                onChange={(val) => onVisibilityChange('homeClubVisibility', val)}
-              />
             </div>
+            <VisibilityDropdown
+              value={homeClubVisibility}
+              onChange={(val) => onVisibilityChange('homeClubVisibility', val)}
+            />
           </div>
+          
+          <p className="text-xs text-muted-foreground -mt-1">
+            Controls who can see your primary club on your profile and in People.
+          </p>
+          
+          {/* Private visibility banner */}
+          {homeClubVisibility === 'private' && (
+            <div className="flex items-center gap-2 rounded-sq-sm border border-border bg-muted/30 px-3 py-2">
+              <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">Only you can see your home club.</span>
+            </div>
+          )}
           
           <div ref={searchRef} className="relative">
             {homeClub ? (
@@ -398,25 +412,34 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
                 Additional Clubs
               </Label>
               <div className="flex items-center gap-2">
-                {!showAddClub && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowAddClub(true)}
-                    className="h-7 px-2 text-xs text-primary hover:text-primary/80"
-                  >
-                    <Plus className="w-3.5 h-3.5 mr-1" />
-                    Add club
-                  </Button>
-                )}
                 <VisibilityDropdown
                   value={additionalClubsVisibility}
                   onChange={(val) => onVisibilityChange('additionalClubsVisibility', val)}
                 />
+                {!showAddClub && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAddClub(true)}
+                    className="h-7 px-3 text-xs rounded-full border border-border hover:bg-muted/40 transition"
+                  >
+                    + Add club
+                  </button>
+                )}
               </div>
             </div>
             
+            <p className="text-xs text-muted-foreground -mt-1">
+              Controls who can see "Also plays at…" and your extra clubs.
+            </p>
+            
+            {/* Private visibility banner */}
+            {additionalClubsVisibility === 'private' && (
+              <div className="flex items-center gap-2 rounded-sq-sm border border-border bg-muted/30 px-3 py-2">
+                <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground">Only you can see your additional clubs.</span>
+              </div>
+            )}
+
             {/* List of additional clubs as chips */}
             {additionalClubs.length > 0 && (
               <div className="flex flex-wrap gap-2">
