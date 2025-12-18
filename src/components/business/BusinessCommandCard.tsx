@@ -344,7 +344,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   e.stopPropagation();
                   navigate(`/business/${business.id}/edit`);
                 }}
-                className="h-9 flex-1 border-border/40 hover:border-border/60 active:scale-[0.98] transition-all"
+                className="h-9 flex-1 text-xs whitespace-nowrap border-border/40 hover:border-border/60 active:scale-[0.98] transition-all"
               >
                 Edit profile
               </Button>
@@ -356,7 +356,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   e.stopPropagation();
                   navigate(`/business/${business.id}/insights`);
                 }}
-                className="h-9 flex-1 border-border/40 hover:border-border/60 active:scale-[0.98] transition-all"
+                className="h-9 flex-1 text-xs whitespace-nowrap border-border/40 hover:border-border/60 active:scale-[0.98] transition-all"
               >
                 Insights
               </Button>
@@ -366,7 +366,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   variant="outline"
                   size="sm"
                   onClick={handleManageTeam}
-                  className="h-9 flex-1 border-border/40 hover:border-border/60 active:scale-[0.98] transition-all"
+                  className="h-9 flex-1 text-xs whitespace-nowrap border-border/40 hover:border-border/60 active:scale-[0.98] transition-all"
                 >
                   Manage team
                 </Button>
