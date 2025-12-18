@@ -13,6 +13,7 @@ import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useBusinessTeamMembers, TeamMember } from '@/hooks/useBusinessTeamMembers';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
+import { useBusinessAccessRequestsRealtime } from '@/hooks/useBusinessAccessRequestsRealtime';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -85,6 +86,9 @@ export default function ManageTeamPage() {
   
   const { data: business } = useBusinessProfile(businessId);
   const { data: realTeamMembers = [], isLoading: teamLoading } = useBusinessTeamMembers(businessId);
+  
+  // Ticket 2: Subscribe to realtime updates for access requests
+  useBusinessAccessRequestsRealtime(businessId);
   
   const isMockMode = businessId ? isMockBusiness(businessId) : false;
   const currentTeam = isMockMode ? getMockTeamMembers() as TeamMember[] : realTeamMembers;
