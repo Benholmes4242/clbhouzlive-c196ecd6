@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
@@ -13,10 +13,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { DeleteBusinessDialog } from './DeleteBusinessDialog';
-import { ManageTeamModal } from './ManageTeamModal';
 import { useBusinessStats7d } from '@/hooks/useBusinessStats7d';
 import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
-import { useBusinessTeamMembers } from '@/hooks/useBusinessTeamMembers';
 import { cn } from '@/lib/utils';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import BusinessVerificationModal from './verification/BusinessVerificationModal';
@@ -39,18 +37,25 @@ const ACCESS_LABELS: Record<string, string> = {
   analyst: 'Analyst',
 };
 
+// Map category to cleaner display text
+function getCategoryDisplay(category: string | null | undefined): string {
+  if (!category) return '';
+  // "Brand / Manufacturer" → "Brand"
+  if (category.toLowerCase().includes('brand')) return 'Brand';
+  return category;
+}
+
 export function BusinessCommandCard({ membership, userId, index = 0, isActive = false }: BusinessCommandCardProps) {
   const navigate = useNavigate();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
-  const [showTeamModal, setShowTeamModal] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   // CRITICAL: Close modals on unmount to prevent stuck overlay
   useEffect(() => {
     return () => {
       setShowDeleteDialog(false);
       setShowVerificationModal(false);
-      setShowTeamModal(false);
     };
   }, []);
   
@@ -61,9 +66,6 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
   
   // Fetch TOTAL followers count (source of truth)
   const { data: totalFollowers, isLoading: followersLoading } = useBusinessFollowersCount(business.id);
-  
-  // Fetch team members for the modal
-  const { data: teamMembers = [] } = useBusinessTeamMembers(business.id);
   
   const { data: verificationRequest } = useBusinessVerificationRequest(business.id);
 
@@ -87,6 +89,15 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
   const formatDelta = (value: number | undefined) => {
     if (value === undefined || value === 0) return '+0';
     return value >= 0 ? `+${value.toLocaleString()}` : value.toLocaleString();
+  };
+
+  // Navigate to manage team page - close dropdown first
+  const handleManageTeam = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDropdownOpen(false);
+    requestAnimationFrame(() => {
+      navigate(`/business/${business.id}/manage-team`);
+    });
   };
 
   const handleRowClick = (e: React.MouseEvent) => {
@@ -136,7 +147,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
               {business.category && (
                 <>
                   <span className="text-xs text-muted-foreground/50">•</span>
-                  <span className="text-xs text-muted-foreground/80">{business.category}</span>
+                  <span className="text-xs text-muted-foreground/80">{getCategoryDisplay(business.category)}</span>
                 </>
               )}
               {isActive && (
@@ -171,7 +182,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
           </div>
 
           {/* Three-dot menu */}
-          <DropdownMenu>
+          <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
             <DropdownMenuTrigger asChild>
               <button 
                 className="p-1.5 -mr-1.5 hover:bg-muted/60 rounded-sq-xs transition-colors"
@@ -219,10 +230,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                 <>
                   <DropdownMenuSeparator className="my-1" />
                   <DropdownMenuItem 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowTeamModal(true);
-                    }}
+                    onClick={handleManageTeam}
                     className="gap-2.5 cursor-pointer py-2"
                   >
                     <Users className="h-4 w-4 text-muted-foreground" />
@@ -336,9 +344,8 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   e.stopPropagation();
                   navigate(`/business/${business.id}/edit`);
                 }}
-                className="gap-1.5 h-9 flex-1 border-border/40 hover:border-border/60 active:scale-[0.98] transition-all"
+                className="h-9 flex-1 border-border/40 hover:border-border/60 active:scale-[0.98] transition-all"
               >
-                <Pencil className="h-3.5 w-3.5" />
                 Edit profile
               </Button>
               
@@ -349,9 +356,8 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   e.stopPropagation();
                   navigate(`/business/${business.id}/insights`);
                 }}
-                className="gap-1.5 h-9 flex-1 border-border/40 hover:border-border/60 active:scale-[0.98] transition-all"
+                className="h-9 flex-1 border-border/40 hover:border-border/60 active:scale-[0.98] transition-all"
               >
-                <BarChart3 className="h-3.5 w-3.5" />
                 Insights
               </Button>
               
@@ -359,13 +365,9 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowTeamModal(true);
-                  }}
-                  className="gap-1.5 h-9 flex-1 border-border/40 hover:border-border/60 active:scale-[0.98] transition-all"
+                  onClick={handleManageTeam}
+                  className="h-9 flex-1 border-border/40 hover:border-border/60 active:scale-[0.98] transition-all"
                 >
-                  <Users className="h-3.5 w-3.5" />
                   Manage team
                 </Button>
               )}
@@ -390,14 +392,6 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
         onOpenChange={setShowVerificationModal}
         businessId={business.id}
         isReapply={verificationState === 'rejected'}
-      />
-
-      <ManageTeamModal
-        open={showTeamModal}
-        onOpenChange={setShowTeamModal}
-        businessId={business.id}
-        currentTeam={teamMembers}
-        isOwner={isOwner}
       />
     </>
   );

@@ -99,60 +99,53 @@ export function PeopleTab({
         </div>
       )}
 
-      {/* Header row */}
-      <div className="px-4 pt-4 pb-3 flex items-start justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-foreground">People</h2>
-          {!isLoading && (currentCount > 0 || (showMembersTab && (clubMembers.length > 0 || teamMembers.length > 0))) && (
-            <p className="text-sm text-muted-foreground mt-0.5">
-              {getCountLabel()}
-            </p>
-          )}
-        </div>
-        {canManage && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setManageModalOpen(true)}
-            className="h-8"
-          >
-            Manage
-          </Button>
+      {/* Header row - NO Manage button here (access via Business Profiles page or 3-dot) */}
+      <div className="px-4 pt-4 pb-3">
+        <h2 className="text-lg font-semibold text-foreground text-center">People</h2>
+        {!isLoading && (currentCount > 0 || (showMembersTab && (clubMembers.length > 0 || teamMembers.length > 0))) && (
+          <p className="text-sm text-muted-foreground mt-0.5 text-center">
+            {getCountLabel()}
+          </p>
         )}
       </div>
 
-      {/* Sub-tabs: Members / Team - show for Golf Clubs or mock mode */}
-      {showMembersTab && (
-        <div className="flex border-b border-border/50 px-4">
-          <button
-            onClick={() => setActiveSubTab('members')}
-            className={cn(
-              'px-4 py-2.5 text-sm font-medium transition-colors relative',
-              activeSubTab === 'members'
-                ? 'text-foreground'
-                : 'text-muted-foreground hover:text-foreground'
-            )}
-          >
-            Members
-            {activeSubTab === 'members' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground" />
-            )}
-          </button>
-          <button
-            onClick={() => setActiveSubTab('team')}
-            className={cn(
-              'px-4 py-2.5 text-sm font-medium transition-colors relative',
-              activeSubTab === 'team'
-                ? 'text-foreground'
-                : 'text-muted-foreground hover:text-foreground'
-            )}
-          >
-            Team
-            {activeSubTab === 'team' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground" />
-            )}
-          </button>
+      {/* Sub-tabs: Members / Team - Activity-style underline tabs */}
+      {showMembersTab ? (
+        <div className="border-b border-border/50">
+          <div className="flex px-4">
+            <button
+              onClick={() => setActiveSubTab('members')}
+              className={cn(
+                'px-4 py-3 text-sm font-medium transition-colors relative',
+                activeSubTab === 'members'
+                  ? 'text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              Members
+              {activeSubTab === 'members' && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-full" />
+              )}
+            </button>
+            <button
+              onClick={() => setActiveSubTab('team')}
+              className={cn(
+                'px-4 py-3 text-sm font-medium transition-colors relative',
+                activeSubTab === 'team'
+                  ? 'text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              Team
+              {activeSubTab === 'team' && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-full" />
+              )}
+            </button>
+          </div>
         </div>
+      ) : (
+        // For non-Golf Clubs, show a subtle divider
+        <div className="border-b border-border/50" />
       )}
 
       {/* Loading state */}
