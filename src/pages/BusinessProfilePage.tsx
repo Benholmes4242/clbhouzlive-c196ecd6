@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { cn } from '@/lib/utils';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
@@ -163,10 +164,8 @@ const BusinessProfilePage: React.FC = () => {
     return url.startsWith('http') ? url : `https://${url}`;
   };
 
-  // Bio truncation
+  // Bio text
   const bioText = business?.description || '';
-  const shouldTruncateBio = bioText.length > 200;
-  const displayBio = shouldTruncateBio && !bioExpanded ? bioText.slice(0, 200) + '…' : bioText;
 
   // Generate initials
   const initials = business?.name
@@ -444,17 +443,21 @@ const BusinessProfilePage: React.FC = () => {
           <h3 className="text-xl font-semibold text-[#0F0F0F] mb-2">About</h3>
           {bioText ? (
             <div>
-              <p className="text-base text-[#0F0F0F] leading-relaxed whitespace-pre-wrap" style={{ overflowWrap: 'anywhere' }}>
-                {displayBio}
+              <p 
+                className={cn(
+                  "text-base text-[#0F0F0F] leading-relaxed whitespace-pre-wrap",
+                  !bioExpanded && "line-clamp-3"
+                )}
+                style={{ overflowWrap: 'anywhere' }}
+              >
+                {bioText}
               </p>
-              {shouldTruncateBio && (
-                <button
-                  onClick={() => setBioExpanded(!bioExpanded)}
-                  className="text-sm font-medium mt-1 hover:underline text-slate-500"
-                >
-                  {bioExpanded ? 'Show less' : 'More'}
-                </button>
-              )}
+              <button
+                onClick={() => setBioExpanded(!bioExpanded)}
+                className="text-sm font-medium mt-1 hover:underline text-slate-500"
+              >
+                {bioExpanded ? 'Show less' : 'More'}
+              </button>
             </div>
           ) : (
             <p className="text-base text-slate-400 italic">No description provided</p>
