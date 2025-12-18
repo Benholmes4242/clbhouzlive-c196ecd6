@@ -35,7 +35,7 @@ interface FormData {
   displayName: string;
   username: string;
   homeClub: string;
-  homeClubId: string | null;
+  homeClubId: string | null;  // Links to golf_clubs.id (primary_club_id)
   handicap: string;
   bio: string;
   websites: string[];
@@ -111,7 +111,7 @@ const EditProfilePage: React.FC = () => {
         displayName: profile.display_name || '',
         username: profile.username || '',
         homeClub: profile.home_club || '',
-        homeClubId: null,
+        homeClubId: profile.primary_club_id || null,  // Load from primary_club_id
         handicap: profile.eg_handicap_index?.toString() || '',
         bio: profile.bio || '',
         websites: profile.websites || [],
@@ -267,6 +267,7 @@ const EditProfilePage: React.FC = () => {
       const updateData: any = {
         display_name: formData.displayName || null,
         home_club: formData.homeClub || null,
+        primary_club_id: formData.homeClubId || null,  // Store club ID from golf_clubs
         eg_handicap_index: formData.handicap ? parseFloat(formData.handicap) : null,
         bio: formData.bio || null,
         websites: normalizeWebsites(formData.websites),
@@ -487,6 +488,7 @@ const EditProfilePage: React.FC = () => {
           >
             <GolfInfoSection
               homeClub={formData.homeClub}
+              homeClubId={formData.homeClubId}
               handicap={formData.handicap}
               onChange={handleFieldChange}
             />
