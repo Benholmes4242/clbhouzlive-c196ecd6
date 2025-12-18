@@ -5407,6 +5407,7 @@ export type Database = {
       }
       user_profiles: {
         Row: {
+          additional_clubs_visibility: string
           background_image_url: string | null
           bag_visible: boolean | null
           bio: string | null
@@ -5445,6 +5446,7 @@ export type Database = {
           home_club_id: string | null
           home_club_pending_key: string | null
           home_club_pending_name: string | null
+          home_club_visibility: string
           id: string
           is_business_verified: boolean | null
           is_creator: boolean
@@ -5497,6 +5499,7 @@ export type Database = {
           websites: string[] | null
         }
         Insert: {
+          additional_clubs_visibility?: string
           background_image_url?: string | null
           bag_visible?: boolean | null
           bio?: string | null
@@ -5535,6 +5538,7 @@ export type Database = {
           home_club_id?: string | null
           home_club_pending_key?: string | null
           home_club_pending_name?: string | null
+          home_club_visibility?: string
           id: string
           is_business_verified?: boolean | null
           is_creator?: boolean
@@ -5587,6 +5591,7 @@ export type Database = {
           websites?: string[] | null
         }
         Update: {
+          additional_clubs_visibility?: string
           background_image_url?: string | null
           bag_visible?: boolean | null
           bio?: string | null
@@ -5625,6 +5630,7 @@ export type Database = {
           home_club_id?: string | null
           home_club_pending_key?: string | null
           home_club_pending_name?: string | null
+          home_club_visibility?: string
           id?: string
           is_business_verified?: boolean | null
           is_creator?: boolean
