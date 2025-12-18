@@ -66,6 +66,7 @@ export async function seedBenjaminBusinessNotifications(): Promise<void> {
     // A) Access request received (admin-facing)
     {
       user_id: BENJAMIN_USER_ID,
+      actor_id: MOCK_REQUESTER.id,
       type: 'business_access_request',
       title: 'Access request',
       entity_type: 'business',
@@ -81,12 +82,13 @@ export async function seedBenjaminBusinessNotifications(): Promise<void> {
         requester_id: MOCK_REQUESTER.id,
         requester_name: MOCK_REQUESTER.name,
         requester_avatar_url: MOCK_REQUESTER.avatar_url,
-        role_requested: 'Manager',
+        role_requested: 'manager', // lowercase
       },
     },
-    // B) Request received (pending) - requester-facing
+    // B) Request received (pending) - requester-facing - team member role
     {
       user_id: BENJAMIN_USER_ID,
+      actor_id: BENJAMIN_USER_ID,
       type: 'business_access_request',
       title: 'Request pending',
       entity_type: 'business',
@@ -99,6 +101,10 @@ export async function seedBenjaminBusinessNotifications(): Promise<void> {
         business_avatar_url: AUGUSTA_BUSINESS.logo_url,
         entity_name: AUGUSTA_BUSINESS.name,
         entity_avatar_url: AUGUSTA_BUSINESS.logo_url,
+        requester_id: BENJAMIN_USER_ID,
+        requester_name: 'Benjamin Holmes',
+        requester_avatar_url: null,
+        role_requested: 'team_member', // lowercase with underscore (normalized)
         status: 'pending',
       },
     },

@@ -15,6 +15,7 @@ import {
 import { DeleteBusinessDialog } from './DeleteBusinessDialog';
 import { useBusinessStats7d } from '@/hooks/useBusinessStats7d';
 import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
+import { useBusinessPendingRequestsCount } from '@/hooks/useBusinessPendingRequestsCount';
 import { cn } from '@/lib/utils';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import BusinessVerificationModal from './verification/BusinessVerificationModal';
@@ -68,7 +69,9 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
   const { data: totalFollowers, isLoading: followersLoading } = useBusinessFollowersCount(business.id);
   
   const { data: verificationRequest } = useBusinessVerificationRequest(business.id);
-
+  
+  // Fetch pending access requests count for indicator
+  const { data: pendingRequestsCount } = useBusinessPendingRequestsCount(business.id);
   const canDelete = role === 'owner';
   const canManage = role === 'owner' || role === 'admin';
   const isOwner = role === 'owner';
@@ -235,6 +238,9 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   >
                     <Users className="h-4 w-4 text-muted-foreground" />
                     Manage team
+                    {(pendingRequestsCount ?? 0) > 0 && (
+                      <span className="ml-auto h-2 w-2 rounded-full bg-primary" />
+                    )}
                   </DropdownMenuItem>
                   
                   {/* Verification menu item - state-based */}
@@ -366,9 +372,12 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   variant="outline"
                   size="sm"
                   onClick={handleManageTeam}
-                  className="h-9 flex-1 text-xs whitespace-nowrap border-border/40 hover:border-border/60 active:scale-[0.98] transition-all"
+                  className="h-9 flex-1 text-xs whitespace-nowrap border-border/40 hover:border-border/60 active:scale-[0.98] transition-all relative"
                 >
                   Manage team
+                  {(pendingRequestsCount ?? 0) > 0 && (
+                    <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-background" />
+                  )}
                 </Button>
               )}
             </>
