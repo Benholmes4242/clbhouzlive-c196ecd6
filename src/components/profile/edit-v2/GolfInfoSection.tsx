@@ -216,6 +216,7 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
         region: null,
         sub_country: null,
         continent: null,
+        club_key: null,
       });
     }
     

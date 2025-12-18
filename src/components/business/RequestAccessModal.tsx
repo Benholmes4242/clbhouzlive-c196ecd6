@@ -45,6 +45,28 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
 
       if (error) throw error;
 
+      // Notify business owners/managers
+      const { data: owners } = await supabase
+        .from('business_members')
+        .select('user_profile_id')
+        .eq('business_id', businessId)
+        .in('role', ['owner', 'admin']);
+
+      if (owners && owners.length > 0) {
+        const notifications = owners.map(owner => ({
+          user_id: owner.user_profile_id,
+          actor_id: userId,
+          type: 'business_access_request',
+          title: 'New access request',
+          message: `Someone requested to join ${businessName}`,
+          entity_type: 'business',
+          entity_id: businessId,
+          data: { business_id: businessId, business_name: businessName },
+        }));
+
+        await supabase.from('notifications').insert(notifications);
+      }
+
       setSubmitted(true);
       toast.success('Access request sent');
       
