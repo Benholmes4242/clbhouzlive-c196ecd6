@@ -13,6 +13,10 @@ export interface ClubMember {
   also_plays_at?: string[]; // Additional club names
 }
 
+/**
+ * Fetches members of a golf club linked to a business profile.
+ * Uses the correct relationship: business_accounts.club_id → user_profiles.primary_club_id
+ */
 export function useBusinessClubMembers(businessId: string | undefined) {
   return useQuery({
     queryKey: ['business-club-members', businessId],
@@ -20,7 +24,24 @@ export function useBusinessClubMembers(businessId: string | undefined) {
     queryFn: async () => {
       if (!businessId) return [];
 
-      // Query users who have this business set as their home club
+      // Step 1: Get the club_id from the business account
+      const { data: business, error: bizError } = await supabase
+        .from('business_accounts')
+        .select('club_id')
+        .eq('id', businessId)
+        .maybeSingle();
+
+      if (bizError) {
+        console.error('[useBusinessClubMembers] error fetching business:', bizError);
+        throw bizError;
+      }
+
+      // If no club_id, this business isn't linked to a golf club
+      if (!business?.club_id) {
+        return [];
+      }
+
+      // Step 2: Query users whose primary_club_id matches the business's club_id
       const { data, error } = await supabase
         .from('user_profiles')
         .select(`
@@ -33,7 +54,7 @@ export function useBusinessClubMembers(businessId: string | undefined) {
           is_verified_golfer,
           created_at
         `)
-        .eq('home_club_business_id', businessId)
+        .eq('primary_club_id', business.club_id)
         .eq('is_public', true)
         .order('display_name', { ascending: true });
 
