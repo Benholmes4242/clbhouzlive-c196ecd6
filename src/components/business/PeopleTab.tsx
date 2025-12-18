@@ -123,27 +123,30 @@ export function PeopleTab({
 
   return (
     <div className="bg-white">
-      {/* Mock mode indicator */}
-      {isMockMode && (
-        <div className="mx-4 mt-4 flex items-center gap-2 px-3 py-2 rounded-sq-sm bg-amber-50 border border-amber-200 text-amber-800">
-          <Info className="h-4 w-4 shrink-0" />
-          <span className="text-xs">Sample data for layout testing</span>
+      {/* Header + tabs constrained */}
+      <div className="max-w-screen-sm mx-auto px-4">
+        {/* Mock mode indicator */}
+        {isMockMode && (
+          <div className="mt-4 flex items-center gap-2 px-3 py-2 rounded-sq-sm bg-amber-50 border border-amber-200 text-amber-800">
+            <Info className="h-4 w-4 shrink-0" />
+            <span className="text-xs">Sample data for layout testing</span>
+          </div>
+        )}
+
+        {/* Header */}
+        <div className="pt-4 pb-1">
+          <h2 className="text-lg font-semibold text-foreground text-center">People</h2>
         </div>
-      )}
 
-      {/* Header */}
-      <div className="px-4 pt-4 pb-1">
-        <h2 className="text-lg font-semibold text-foreground text-center">People</h2>
+        {/* Centered Segmented Tabs */}
+        {showMembersTab && (
+          <SegmentedTabs
+            tabs={tabs}
+            activeTab={activeSubTab}
+            onTabChange={(tabId) => setActiveSubTab(tabId as SubTab)}
+          />
+        )}
       </div>
-
-      {/* Centered Segmented Tabs */}
-      {showMembersTab && (
-        <SegmentedTabs
-          tabs={tabs}
-          activeTab={activeSubTab}
-          onTabChange={(tabId) => setActiveSubTab(tabId as SubTab)}
-        />
-      )}
 
       {/* Loading skeleton */}
       {isLoading && (
@@ -160,10 +163,10 @@ export function PeopleTab({
         </div>
       )}
 
-      {/* Team list */}
+      {/* Team list - full width */}
       {!isLoading && activeSubTab === 'team' && (
         sortedTeamMembers.length > 0 ? (
-          <PeopleList label="Team" count={sortedTeamMembers.length}>
+          <PeopleList>
             {sortedTeamMembers.map((member) => {
               const profile = member.profile;
               if (!profile) return null;
@@ -196,10 +199,10 @@ export function PeopleTab({
         )
       )}
 
-      {/* Members list - only for Golf Clubs */}
+      {/* Members list - only for Golf Clubs, full width */}
       {!isLoading && activeSubTab === 'members' && showMembersTab && (
         sortedClubMembers.length > 0 ? (
-          <PeopleList label="Members" count={sortedClubMembers.length}>
+          <PeopleList>
             {sortedClubMembers.map((member) => (
               <PersonRow
                 key={member.id}
