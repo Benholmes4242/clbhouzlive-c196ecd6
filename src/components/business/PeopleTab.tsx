@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, Briefcase, Info } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { useBusinessTeamMembers, TeamMember } from '@/hooks/useBusinessTeamMembers';
 import { useBusinessClubMembers, ClubMember } from '@/hooks/useBusinessClubMembers';
 import { ManageTeamModal } from './ManageTeamModal';
+import { SegmentedTabs } from './people/SegmentedTabs';
+import { PeopleList } from './people/PeopleList';
+import { PersonRow } from './people/PersonRow';
+import { TeamRow } from './people/TeamRow';
+import { EmptyState } from './people/EmptyState';
 import { 
   isMockBusiness, 
   getMockTeamMembers, 
@@ -36,6 +37,7 @@ export function PeopleTab({
   const isMockMode = isMockBusiness(businessId);
   const isGolfClub = category === 'Golf Club';
   const [manageModalOpen, setManageModalOpen] = useState(false);
+  const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   
   const { data: realTeamMembers = [], isLoading: teamLoading } = useBusinessTeamMembers(businessId);
   const { data: realClubMembers = [], isLoading: membersLoading } = useBusinessClubMembers(businessId);
@@ -67,27 +69,57 @@ export function PeopleTab({
 
   // Loading state - skip if in mock mode
   const isLoading = isMockMode ? false : (activeSubTab === 'team' ? teamLoading : membersLoading);
-  const currentCount = activeSubTab === 'team' ? teamMembers.length : clubMembers.length;
 
   const handleProfileClick = (userId: string) => {
     navigate(`/profile/${userId}`);
   };
 
-  // Count label text
-  const getCountLabel = () => {
-    if (isLoading) return '';
-    if (showMembersTab) {
-      const membersCount = clubMembers.length;
-      const teamCount = teamMembers.length;
-      if (membersCount > 0 && teamCount > 0) {
-        return `${membersCount} member${membersCount !== 1 ? 's' : ''} · ${teamCount} team`;
+  // Sort team members: Owner → Admin/Manager → Team
+  const sortedTeamMembers = useMemo(() => {
+    const roleOrder: Record<string, number> = {
+      owner: 0,
+      primary_manager: 1,
+      admin: 2,
+      manager: 3,
+      director: 4,
+      coach: 5,
+      staff: 6,
+      team: 7,
+    };
+    return [...teamMembers].sort((a, b) => {
+      const orderA = roleOrder[a.role] ?? 10;
+      const orderB = roleOrder[b.role] ?? 10;
+      if (orderA !== orderB) return orderA - orderB;
+      // Then by name
+      const nameA = a.profile?.display_name || a.profile?.username || '';
+      const nameB = b.profile?.display_name || b.profile?.username || '';
+      return nameA.localeCompare(nameB);
+    });
+  }, [teamMembers]);
+
+  // Sort club members: verified first, then by name
+  const sortedClubMembers = useMemo(() => {
+    return [...clubMembers].sort((a, b) => {
+      // Verified first
+      if (a.is_verified_golfer !== b.is_verified_golfer) {
+        return a.is_verified_golfer ? -1 : 1;
       }
-    }
-    if (activeSubTab === 'team') {
-      return `${currentCount} team member${currentCount !== 1 ? 's' : ''}`;
-    }
-    return `${currentCount} member${currentCount !== 1 ? 's' : ''}`;
-  };
+      // Then by name
+      const nameA = a.display_name || a.username || '';
+      const nameB = b.display_name || b.username || '';
+      return nameA.localeCompare(nameB);
+    });
+  }, [clubMembers]);
+
+  // Build tabs array
+  const tabs = showMembersTab
+    ? [
+        { id: 'members', label: 'Members', count: clubMembers.length },
+        { id: 'team', label: 'Team', count: teamMembers.length },
+      ]
+    : [
+        { id: 'team', label: 'Team', count: teamMembers.length },
+      ];
 
   return (
     <div className="bg-white">
@@ -99,110 +131,97 @@ export function PeopleTab({
         </div>
       )}
 
-      {/* Header row - NO Manage button here (access via Business Profiles page or 3-dot) */}
-      <div className="px-4 pt-4 pb-3">
+      {/* Header */}
+      <div className="px-4 pt-4 pb-1">
         <h2 className="text-lg font-semibold text-foreground text-center">People</h2>
-        {!isLoading && (currentCount > 0 || (showMembersTab && (clubMembers.length > 0 || teamMembers.length > 0))) && (
-          <p className="text-sm text-muted-foreground mt-0.5 text-center">
-            {getCountLabel()}
-          </p>
-        )}
       </div>
 
-      {/* Sub-tabs: Members / Team - Activity-style underline tabs */}
-      {showMembersTab ? (
-        <div className="border-b border-border/50">
-          <div className="flex px-4">
-            <button
-              onClick={() => setActiveSubTab('members')}
-              className={cn(
-                'px-4 py-3 text-sm font-medium transition-colors relative',
-                activeSubTab === 'members'
-                  ? 'text-foreground'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              Members
-              {activeSubTab === 'members' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-full" />
-              )}
-            </button>
-            <button
-              onClick={() => setActiveSubTab('team')}
-              className={cn(
-                'px-4 py-3 text-sm font-medium transition-colors relative',
-                activeSubTab === 'team'
-                  ? 'text-foreground'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              Team
-              {activeSubTab === 'team' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground rounded-full" />
-              )}
-            </button>
-          </div>
-        </div>
-      ) : (
-        // For non-Golf Clubs, show a subtle divider
-        <div className="border-b border-border/50" />
+      {/* Centered Segmented Tabs */}
+      {showMembersTab && (
+        <SegmentedTabs
+          tabs={tabs}
+          activeTab={activeSubTab}
+          onTabChange={(tabId) => setActiveSubTab(tabId as SubTab)}
+        />
       )}
 
-      {/* Loading state */}
+      {/* Loading skeleton */}
       {isLoading && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4">
+        <div className="px-4 py-4 space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="flex flex-col items-center p-4 rounded-sq-lg animate-pulse bg-muted/30 border border-border/30">
-              <div className="w-16 h-16 rounded-full bg-muted-foreground/10 mb-3" />
-              <div className="w-20 h-4 bg-muted-foreground/10 rounded mb-1" />
-              <div className="w-14 h-3 bg-muted-foreground/10 rounded" />
+            <div key={i} className="flex items-center gap-3 animate-pulse">
+              <div className="w-12 h-12 rounded-sq-md bg-muted" />
+              <div className="flex-1 space-y-2">
+                <div className="w-32 h-4 bg-muted rounded" />
+                <div className="w-24 h-3 bg-muted rounded" />
+              </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Team content */}
+      {/* Team list */}
       {!isLoading && activeSubTab === 'team' && (
-        teamMembers.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4">
-            {teamMembers.map((member) => (
-              <TeamMemberCard
-                key={member.id}
-                member={member}
-                onClick={() => member.profile && handleProfileClick(member.profile.id)}
-              />
-            ))}
-          </div>
+        sortedTeamMembers.length > 0 ? (
+          <PeopleList label="Team" count={sortedTeamMembers.length}>
+            {sortedTeamMembers.map((member) => {
+              const profile = member.profile;
+              if (!profile) return null;
+              
+              return (
+                <TeamRow
+                  key={member.id}
+                  id={member.id}
+                  displayName={profile.display_name}
+                  username={profile.username}
+                  profilePhotoUrl={profile.profile_photo_url}
+                  isVerified={profile.is_verified_golfer}
+                  role={member.role}
+                  canManage={canManage}
+                  onProfileClick={() => handleProfileClick(profile.id)}
+                  onEditAccess={canManage ? () => setEditingMember(member) : undefined}
+                />
+              );
+            })}
+          </PeopleList>
         ) : (
           <EmptyState
-            icon={<Briefcase className="h-10 w-10 text-muted-foreground/40" />}
+            icon={<Briefcase className="h-8 w-8 text-muted-foreground/40" />}
             title="No team yet"
             description="Add the people who represent this business on Clbhouz."
-            showManageButton={canManage}
-            onManageClick={() => setManageModalOpen(true)}
-            manageButtonLabel="Add team member"
+            showActionButton={canManage}
+            onActionClick={() => setManageModalOpen(true)}
+            actionButtonLabel="Add team member"
           />
         )
       )}
 
-      {/* Members content - only for Golf Clubs */}
+      {/* Members list - only for Golf Clubs */}
       {!isLoading && activeSubTab === 'members' && showMembersTab && (
-        clubMembers.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4">
-            {clubMembers.map((member) => (
-              <ClubMemberCard
+        sortedClubMembers.length > 0 ? (
+          <PeopleList label="Members" count={sortedClubMembers.length}>
+            {sortedClubMembers.map((member) => (
+              <PersonRow
                 key={member.id}
-                member={member}
+                id={member.id}
+                displayName={member.display_name}
+                username={member.username}
+                profilePhotoUrl={member.profile_photo_url}
+                isVerified={member.is_verified_golfer}
+                handicap={member.eg_handicap_index}
+                showHandicap={member.show_handicap !== false}
+                homeClub={null} // They're already at their home club
+                alsoPlaysAt={member.also_plays_at || []}
                 onClick={() => handleProfileClick(member.id)}
               />
             ))}
-          </div>
+          </PeopleList>
         ) : (
           <EmptyState
-            icon={<Users className="h-10 w-10 text-muted-foreground/40" />}
+            icon={<Users className="h-8 w-8 text-muted-foreground/40" />}
             title="No members yet"
             description="Golfers who set this as their home club will appear here automatically."
-            secondaryDescription="Share your club page so members can find you on Clbhouz."
+            secondaryDescription="Share your club page so members can find you."
           />
         )
       )}
@@ -216,135 +235,6 @@ export function PeopleTab({
         isOwner={isOwner}
         mockMode={isMockMode}
       />
-    </div>
-  );
-}
-
-// Role display labels
-const ROLE_LABELS: Record<string, string> = {
-  owner: 'Owner',
-  director: 'Director',
-  admin: 'Admin',
-  coach: 'Coach',
-  staff: 'Team',
-};
-
-// Team member card - premium styling with role labels
-function TeamMemberCard({ member, onClick }: { member: TeamMember; onClick: () => void }) {
-  const profile = member.profile;
-  if (!profile) return null;
-
-  const roleLabel = ROLE_LABELS[member.role] || 'Team';
-
-  return (
-    <button
-      onClick={onClick}
-      className="flex flex-col items-center p-4 rounded-sq-lg bg-white border border-border/40 hover:border-border/60 hover:shadow-sm transition-all text-center"
-    >
-      <SquircleAvatar
-        src={profile.profile_photo_url}
-        alt={profile.display_name || 'Team member'}
-        size={64}
-        className="mb-3"
-      />
-      <div className="flex items-center gap-1 justify-center">
-        <span className="text-sm font-medium text-foreground line-clamp-2">
-          {profile.display_name || profile.username || 'Unknown'}
-        </span>
-        {profile.is_verified_golfer && <VerifiedBadge size="sm" />}
-      </div>
-      <span className="text-xs text-muted-foreground mt-1">
-        {roleLabel}
-      </span>
-    </button>
-  );
-}
-
-// Club member card with handicap and "Also plays at"
-function ClubMemberCard({ member, onClick }: { member: ClubMember; onClick: () => void }) {
-  const showHandicap = member.show_handicap !== false && member.eg_handicap_index != null;
-  const alsoPlaysAt = member.also_plays_at || [];
-
-  // Format "Also plays at" text
-  const getAlsoPlaysAtText = () => {
-    if (alsoPlaysAt.length === 0) return null;
-    if (alsoPlaysAt.length === 1) return `Also plays at ${alsoPlaysAt[0]}`;
-    return `Also plays at ${alsoPlaysAt[0]} +${alsoPlaysAt.length - 1}`;
-  };
-
-  const alsoPlaysAtText = getAlsoPlaysAtText();
-
-  return (
-    <button
-      onClick={onClick}
-      className="flex flex-col items-center p-4 rounded-sq-lg bg-white border border-border/40 hover:border-border/60 hover:shadow-sm transition-all text-center"
-    >
-      <SquircleAvatar
-        src={member.profile_photo_url}
-        alt={member.display_name || 'Member'}
-        size={64}
-        className="mb-3"
-      />
-      <div className="flex items-center gap-1 justify-center">
-        <span className="text-sm font-medium text-foreground line-clamp-2">
-          {member.display_name || member.username || 'Unknown'}
-        </span>
-        {member.is_verified_golfer && <VerifiedBadge size="sm" />}
-      </div>
-      {showHandicap && (
-        <span className="text-xs text-muted-foreground mt-1">
-          HCP {member.eg_handicap_index!.toFixed(1)}
-        </span>
-      )}
-      {alsoPlaysAtText && (
-        <span className="text-[11px] text-muted-foreground/70 mt-1 line-clamp-1">
-          {alsoPlaysAtText}
-        </span>
-      )}
-    </button>
-  );
-}
-
-// Empty state component - centered, premium
-function EmptyState({ 
-  icon, 
-  title, 
-  description,
-  secondaryDescription,
-  showManageButton,
-  onManageClick,
-  manageButtonLabel = 'Add team member'
-}: { 
-  icon: React.ReactNode; 
-  title: string; 
-  description: string;
-  secondaryDescription?: string;
-  showManageButton?: boolean;
-  onManageClick?: () => void;
-  manageButtonLabel?: string;
-}) {
-  return (
-    <div className="py-16 px-6 text-center">
-      <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 bg-muted/50">
-        {icon}
-      </div>
-      <h3 className="text-base font-semibold text-foreground mb-2">{title}</h3>
-      <p className="text-sm text-muted-foreground max-w-[280px] mx-auto">
-        {description}
-      </p>
-      {secondaryDescription && (
-        <p className="text-sm text-muted-foreground/70 max-w-[280px] mx-auto mt-2">
-          {secondaryDescription}
-        </p>
-      )}
-      {showManageButton && onManageClick && (
-        <Button
-          onClick={onManageClick}
-          className="mt-6"
-        >
-          {manageButtonLabel}
-        </Button>
-      )}
     </div>
   );
 }
