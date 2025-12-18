@@ -2573,9 +2573,39 @@ export type Database = {
           },
         ]
       }
+      golf_club_aliases: {
+        Row: {
+          alias_key: string
+          canonical_club_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          alias_key: string
+          canonical_club_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          alias_key?: string
+          canonical_club_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "golf_club_aliases_canonical_club_id_fkey"
+            columns: ["canonical_club_id"]
+            isOneToOne: false
+            referencedRelation: "golf_clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       golf_clubs: {
         Row: {
           club_key: string
+          club_key_v2: string | null
           continent: string | null
           country: string | null
           created_at: string
@@ -2588,6 +2618,7 @@ export type Database = {
         }
         Insert: {
           club_key: string
+          club_key_v2?: string | null
           continent?: string | null
           country?: string | null
           created_at?: string
@@ -2600,6 +2631,7 @@ export type Database = {
         }
         Update: {
           club_key?: string
+          club_key_v2?: string | null
           continent?: string | null
           country?: string | null
           created_at?: string
@@ -6663,6 +6695,7 @@ export type Database = {
         Args: { p_game_id: string; p_user_id: string }
         Returns: boolean
       }
+      canonical_club_name_v2: { Args: { p_name: string }; Returns: string }
       check_and_award_badges: {
         Args: { user_id_param: string }
         Returns: {
@@ -6676,6 +6709,7 @@ export type Database = {
         Args: { limit_count?: number }
         Returns: number
       }
+      club_key_v2: { Args: { p_name: string }; Returns: string }
       count_orphan_posts: { Args: never; Returns: number }
       create_business_account: {
         Args: {
