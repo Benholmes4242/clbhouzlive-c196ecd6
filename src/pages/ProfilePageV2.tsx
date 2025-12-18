@@ -31,6 +31,7 @@ import { ProfileCoursesTab } from '@/components/profile/ProfileCoursesTab';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import AchievementsPane from '@/components/profile/AchievementsPane';
 import HandicapSection from '@/components/profile/HandicapSection';
+import { ProfileClubsSection } from '@/components/profile/ProfileClubsSection';
 
 // Background color - matches course details page (slate-50)
 const BG_COLOR = '#f8fafc'; // slate-50
@@ -507,6 +508,15 @@ const ProfilePageV2: React.FC = () => {
           )}
         </section>
 
+        {/* Clubs section - uses RPC for viewer-aware visibility */}
+        {isPersonal && profile?.id && user?.id && (
+          <section className="px-5 mb-6">
+            <ProfileClubsSection
+              profileUserId={profile.id}
+              viewerId={user.id}
+            />
+          </section>
+        )}
 
         {/* Achievements */}
         {isPersonal && unlockedAchievements.length > 0 && (
