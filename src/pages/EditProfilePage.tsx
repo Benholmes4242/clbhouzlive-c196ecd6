@@ -31,6 +31,8 @@ const SECTIONS = [
   { id: 'privacy', label: 'Privacy' },
 ];
 
+import { VisibilityValue } from '@/components/profile/edit-v2/VisibilityDropdown';
+
 interface FormData {
   displayName: string;
   username: string;
@@ -40,6 +42,8 @@ interface FormData {
   bio: string;
   websites: string[];
   isPublic: boolean;
+  homeClubVisibility: VisibilityValue;
+  additionalClubsVisibility: VisibilityValue;
   profilePhoto: File | null;
   headerPhoto: File | null;
   profilePhotoPreview: string | null;
@@ -95,6 +99,8 @@ const EditProfilePage: React.FC = () => {
     bio: '',
     websites: [],
     isPublic: true,
+    homeClubVisibility: 'public',
+    additionalClubsVisibility: 'followers',
     profilePhoto: null,
     headerPhoto: null,
     profilePhotoPreview: null,
@@ -116,6 +122,8 @@ const EditProfilePage: React.FC = () => {
         bio: profile.bio || '',
         websites: profile.websites || [],
         isPublic: profile.is_public ?? true,
+        homeClubVisibility: (profile as any).home_club_visibility || 'public',
+        additionalClubsVisibility: (profile as any).additional_clubs_visibility || 'followers',
         profilePhoto: null,
         headerPhoto: null,
         profilePhotoPreview: null,
@@ -223,6 +231,11 @@ const EditProfilePage: React.FC = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   }, []);
 
+  // Handle visibility changes
+  const handleVisibilityChange = useCallback((field: 'homeClubVisibility' | 'additionalClubsVisibility', value: VisibilityValue) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  }, []);
+
   // Handle photo changes
   const handlePhotoChange = useCallback((type: 'profilePhoto' | 'headerPhoto', file: File | null) => {
     if (file) {
@@ -272,6 +285,8 @@ const EditProfilePage: React.FC = () => {
         bio: formData.bio || null,
         websites: normalizeWebsites(formData.websites),
         is_public: formData.isPublic,
+        home_club_visibility: formData.homeClubVisibility,
+        additional_clubs_visibility: formData.additionalClubsVisibility,
         updated_at: new Date().toISOString(),
       };
 
@@ -491,7 +506,10 @@ const EditProfilePage: React.FC = () => {
               homeClubId={formData.homeClubId}
               handicap={formData.handicap}
               userId={user?.id}
+              homeClubVisibility={formData.homeClubVisibility}
+              additionalClubsVisibility={formData.additionalClubsVisibility}
               onChange={handleFieldChange}
+              onVisibilityChange={handleVisibilityChange}
             />
           </motion.section>
 

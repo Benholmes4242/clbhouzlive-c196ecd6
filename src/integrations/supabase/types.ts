@@ -7350,14 +7350,18 @@ export type Database = {
       }
       get_cloudflare_secrets: { Args: never; Returns: Json }
       get_home_clubs: { Args: never; Returns: Json }
-      get_home_clubs_for_user: {
-        Args: { p_user_profile_id: string }
-        Returns: Json
-      }
-      get_home_clubs_for_users: {
-        Args: { p_user_profile_ids: string[] }
-        Returns: Json
-      }
+      get_home_clubs_for_user:
+        | { Args: { p_user_profile_id: string }; Returns: Json }
+        | {
+            Args: { p_user_profile_id: string; p_viewer_id: string }
+            Returns: Json
+          }
+      get_home_clubs_for_users:
+        | { Args: { p_user_profile_ids: string[] }; Returns: Json }
+        | {
+            Args: { p_user_profile_ids: string[]; p_viewer_id: string }
+            Returns: Json
+          }
       get_relationship_status: {
         Args: { target_user_id: string }
         Returns: Json
