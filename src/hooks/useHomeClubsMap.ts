@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export type ClubMini = { id: string; name: string };
@@ -18,6 +18,9 @@ export type HomeClubsMap = Record<string, HomeClubsPayload>;
 export function useHomeClubsMap(userIds: string[], viewerId?: string | null) {
   const [map, setMap] = useState<HomeClubsMap>({});
   const [loading, setLoading] = useState(false);
+
+  // Stable signature (prevents unnecessary refetch)
+  const idsKey = useMemo(() => userIds.slice().sort().join(','), [userIds]);
 
   useEffect(() => {
     const run = async () => {
@@ -46,7 +49,7 @@ export function useHomeClubsMap(userIds: string[], viewerId?: string | null) {
     };
 
     run();
-  }, [viewerId, JSON.stringify(userIds)]);
+  }, [viewerId, idsKey]); // Use idsKey, not JSON.stringify
 
   return { homeClubsMap: map, loading };
 }
