@@ -232,8 +232,20 @@ export default function ManageTeamPage() {
       if (error) throw error;
 
       toast.success(`${editingMember.profile.display_name || 'Member'} removed from team`);
-      setEditingMember(null);
+      
+      // Ticket D: Close overlays SEQUENTIALLY to prevent Radix cleanup race condition
+      // First close the AlertDialog
       setShowRemoveConfirm(false);
+      
+      // Wait for AlertDialog animation to complete before closing Sheet
+      await new Promise(resolve => setTimeout(resolve, 150));
+      
+      // Then close the Sheet
+      setEditingMember(null);
+      
+      // Wait another frame before invalidating to ensure DOM cleanup
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      
       queryClient.invalidateQueries({ queryKey: ['business-team-members', businessId] });
     } catch (error: any) {
       toast.error(error.message || 'Failed to remove team member');
@@ -517,9 +529,9 @@ export default function ManageTeamPage() {
         </SheetContent>
       </Sheet>
 
-      {/* Transfer ownership confirmation - portal to ensure z-index */}
+      {/* Transfer ownership confirmation - z-[10100] to appear above Sheet */}
       <AlertDialog open={showTransferConfirm} onOpenChange={setShowTransferConfirm}>
-        <AlertDialogContent className="z-[200]">
+        <AlertDialogContent className="z-[10100]" overlayClassName="z-[10099]">
           <AlertDialogHeader>
             <AlertDialogTitle>Make primary manager?</AlertDialogTitle>
             <AlertDialogDescription className="space-y-2">
@@ -537,9 +549,9 @@ export default function ManageTeamPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Remove confirmation */}
+      {/* Remove confirmation - Ticket C: z-[10100] to appear above Sheet z-[10050] */}
       <AlertDialog open={showRemoveConfirm} onOpenChange={setShowRemoveConfirm}>
-        <AlertDialogContent className="z-[200]">
+        <AlertDialogContent className="z-[10100]" overlayClassName="z-[10099]">
           <AlertDialogHeader>
             <AlertDialogTitle>Remove from team?</AlertDialogTitle>
             <AlertDialogDescription>
