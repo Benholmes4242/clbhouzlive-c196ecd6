@@ -330,6 +330,8 @@ export type Database = {
           address_line2: string | null
           category: string | null
           city: string | null
+          club_key: string | null
+          club_name: string | null
           country: string | null
           cover_image_url: string | null
           created_at: string | null
@@ -365,6 +367,8 @@ export type Database = {
           address_line2?: string | null
           category?: string | null
           city?: string | null
+          club_key?: string | null
+          club_name?: string | null
           country?: string | null
           cover_image_url?: string | null
           created_at?: string | null
@@ -400,6 +404,8 @@ export type Database = {
           address_line2?: string | null
           category?: string | null
           city?: string | null
+          club_key?: string | null
+          club_name?: string | null
           country?: string | null
           cover_image_url?: string | null
           created_at?: string | null
@@ -1177,6 +1183,51 @@ export type Database = {
           {
             foreignKeyName: "challenges_created_by_fkey"
             columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_page_requests: {
+        Row: {
+          created_at: string
+          id: string
+          manager_email: string | null
+          requested_club_key: string
+          requested_club_name: string
+          requester_user_profile_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          manager_email?: string | null
+          requested_club_key: string
+          requested_club_name: string
+          requester_user_profile_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          manager_email?: string | null
+          requested_club_key?: string
+          requested_club_name?: string
+          requester_user_profile_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_page_requests_requester_user_profile_id_fkey"
+            columns: ["requester_user_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_page_requests_requester_user_profile_id_fkey"
+            columns: ["requester_user_profile_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
@@ -5125,6 +5176,8 @@ export type Database = {
           home_club: string | null
           home_club_business_id: string | null
           home_club_id: string | null
+          home_club_pending_key: string | null
+          home_club_pending_name: string | null
           id: string
           is_business_verified: boolean | null
           is_creator: boolean
@@ -5211,6 +5264,8 @@ export type Database = {
           home_club?: string | null
           home_club_business_id?: string | null
           home_club_id?: string | null
+          home_club_pending_key?: string | null
+          home_club_pending_name?: string | null
           id: string
           is_business_verified?: boolean | null
           is_creator?: boolean
@@ -5297,6 +5352,8 @@ export type Database = {
           home_club?: string | null
           home_club_business_id?: string | null
           home_club_id?: string | null
+          home_club_pending_key?: string | null
+          home_club_pending_name?: string | null
           id?: string
           is_business_verified?: boolean | null
           is_creator?: boolean
@@ -6456,6 +6513,15 @@ export type Database = {
         Returns: number
       }
       count_orphan_posts: { Args: never; Returns: number }
+      create_business_account: {
+        Args: {
+          p_category?: string
+          p_club_name?: string
+          p_description?: string
+          p_name: string
+        }
+        Returns: string
+      }
       current_auth_uid: { Args: never; Returns: string }
       decline_golfer_verification_invite: {
         Args: { p_note?: string; p_request_id: string }
@@ -7261,6 +7327,7 @@ export type Database = {
           username: string
         }[]
       }
+      normalize_club_key: { Args: { p_name: string }; Returns: string }
       populate_geometry_columns:
         | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
         | { Args: { use_typmod?: boolean }; Returns: string }
@@ -7336,6 +7403,10 @@ export type Database = {
         Args: { p_profile_id: string }
         Returns: undefined
       }
+      request_club_page: {
+        Args: { p_club_name: string; p_manager_email?: string }
+        Returns: string
+      }
       request_domain_verification: {
         Args: { p_domain: string; p_request_id: string }
         Returns: Json
@@ -7397,6 +7468,10 @@ export type Database = {
         Returns: undefined
       }
       send_user_ping: { Args: { p_recipient_id: string }; Returns: undefined }
+      set_home_club: {
+        Args: { p_business_id?: string; p_pending_name?: string }
+        Returns: undefined
+      }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
       st_3dclosestpoint: {
