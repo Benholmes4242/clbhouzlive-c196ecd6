@@ -112,7 +112,7 @@ export async function seedBenjaminBusinessNotifications(): Promise<void> {
     {
       user_id: BENJAMIN_USER_ID,
       type: 'business_access_approved',
-      title: 'Access approved',
+      title: 'Added to team',
       entity_type: 'business',
       entity_id: AUGUSTA_BUSINESS.id,
       data: {
@@ -123,14 +123,14 @@ export async function seedBenjaminBusinessNotifications(): Promise<void> {
         business_avatar_url: AUGUSTA_BUSINESS.logo_url,
         entity_name: AUGUSTA_BUSINESS.name,
         entity_avatar_url: AUGUSTA_BUSINESS.logo_url,
-        role_granted: 'Manager',
+        role_granted: 'Team member',
       },
     },
     // D) Declined
     {
       user_id: BENJAMIN_USER_ID,
       type: 'business_access_declined',
-      title: 'Access declined',
+      title: 'Request declined',
       entity_type: 'business',
       entity_id: AUGUSTA_BUSINESS.id,
       data: {

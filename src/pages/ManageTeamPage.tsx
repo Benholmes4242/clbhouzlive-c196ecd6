@@ -24,6 +24,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { isMockBusiness, getMockTeamMembers } from '@/lib/mockPeopleData';
+import { AccessRequestsSection } from '@/components/business/AccessRequestsSection';
 
 interface SearchResult {
   id: string;
@@ -279,14 +280,23 @@ export default function ManageTeamPage() {
       </header>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
-        {/* Mock mode indicator */}
-        {isMockMode && (
-          <div className="flex items-center gap-2 px-3 py-2 rounded-sq-sm bg-amber-50 border border-amber-200 text-amber-800">
-            <Info className="h-4 w-4 shrink-0" />
-            <span className="text-xs">Sample data for layout testing</span>
-          </div>
-        )}
+      <div className="flex-1 overflow-y-auto">
+        {/* Access Requests Section */}
+        <AccessRequestsSection
+          businessId={businessId || ''}
+          businessName={business?.name || 'Business'}
+          businessAvatarUrl={business?.logo_url}
+          canManage={isOwner || currentTeam.some(m => m.profile?.id === currentUser?.id && ['owner', 'admin'].includes(m.role))}
+        />
+
+        <div className="px-4 py-5 space-y-6">
+          {/* Mock mode indicator */}
+          {isMockMode && (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-sq-sm bg-amber-50 border border-amber-200 text-amber-800">
+              <Info className="h-4 w-4 shrink-0" />
+              <span className="text-xs">Sample data for layout testing</span>
+            </div>
+          )}
 
         {/* Add people section */}
         <div className="space-y-3">
@@ -422,6 +432,7 @@ export default function ManageTeamPage() {
               })}
             </div>
           )}
+        </div>
         </div>
       </div>
 

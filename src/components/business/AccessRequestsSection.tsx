@@ -1,11 +1,21 @@
-import React from 'react';
-import { Check, X, Loader2, Users, Clock } from 'lucide-react';
+import React, { useState } from 'react';
+import { Check, X, Loader2, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface AccessRequest {
   id: string;
@@ -30,8 +40,24 @@ interface AccessRequestsSectionProps {
   canManage: boolean;
 }
 
+// Normalize role for display: team_member → "Team member", manager → "Manager"
+function getRoleLabel(role: string): string {
+  switch (role?.toLowerCase()) {
+    case 'manager': return 'Manager';
+    case 'team_member': 
+    default: return 'Team member';
+  }
+}
+
+// Lowercase role for sentence context: "team member access", "manager access"
+function getRoleLabelLower(role: string): string {
+  return getRoleLabel(role).toLowerCase();
+}
+
 export function AccessRequestsSection({ businessId, businessName, businessAvatarUrl, canManage }: AccessRequestsSectionProps) {
   const queryClient = useQueryClient();
+  const [confirmApprove, setConfirmApprove] = useState<AccessRequest | null>(null);
+  const [confirmDecline, setConfirmDecline] = useState<AccessRequest | null>(null);
 
   // Fetch pending access requests
   const { data: requests, isLoading } = useQuery({
@@ -111,36 +137,40 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
       }
 
       // Send notification to requester with business identity
+      const requesterName = request.requester.display_name || request.requester.username || 'A user';
       await supabase.from('notifications').insert({
         user_id: request.requester_user_profile_id,
         actor_id: user.id,
         type: 'business_access_approved',
-        title: 'Access request approved',
-        message: `Your request to join ${businessName} has been approved`,
+        title: 'Added to team',
+        message: `You now have access to ${businessName}.`,
         entity_type: 'business',
         entity_id: request.business_id,
         data: { 
           business_id: request.business_id,
           business_name: businessName,
           business_avatar_url: businessAvatarUrl || null,
-          role,
+          role_granted: getRoleLabel(request.requested_role),
         },
       });
 
       return request;
     },
     onSuccess: (request) => {
-      toast.success(`${request.requester.display_name || 'Request'} approved`);
+      const requesterName = request.requester.display_name || request.requester.username || 'A user';
+      toast.success(`Approved. ${requesterName} added to team.`);
       queryClient.invalidateQueries({ queryKey: ['business-access-requests', businessId] });
-      queryClient.invalidateQueries({ queryKey: ['business-team', businessId] });
+      queryClient.invalidateQueries({ queryKey: ['business-team-members', businessId] });
+      queryClient.invalidateQueries({ queryKey: ['business-pending-requests-count', businessId] });
+      setConfirmApprove(null);
     },
     onError: (error: any) => {
       toast.error(error.message || 'Failed to approve request');
     },
   });
 
-  // Reject request mutation
-  const rejectMutation = useMutation({
+  // Decline request mutation
+  const declineMutation = useMutation({
     mutationFn: async (request: AccessRequest) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
@@ -161,8 +191,8 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
         user_id: request.requester_user_profile_id,
         actor_id: user.id,
         type: 'business_access_declined',
-        title: 'Access request declined',
-        message: `Your request to join ${businessName} was declined`,
+        title: 'Request declined',
+        message: `Your request to join ${businessName} was declined.`,
         entity_type: 'business',
         entity_id: request.business_id,
         data: { 
@@ -174,9 +204,11 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
 
       return request;
     },
-    onSuccess: (request) => {
-      toast.success('Request declined');
+    onSuccess: () => {
+      toast.success('Declined.');
       queryClient.invalidateQueries({ queryKey: ['business-access-requests', businessId] });
+      queryClient.invalidateQueries({ queryKey: ['business-pending-requests-count', businessId] });
+      setConfirmDecline(null);
     },
     onError: (error: any) => {
       toast.error(error.message || 'Failed to decline request');
@@ -185,90 +217,155 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
 
   if (!canManage) return null;
   if (isLoading) return null;
-  if (!requests || requests.length === 0) return null;
 
-  const roleLabel = (role: string) => {
-    switch (role) {
-      case 'manager': return 'Manager access';
-      default: return 'Team access';
-    }
-  };
+  // Show empty state if no requests (always show section for context)
+  const hasRequests = requests && requests.length > 0;
 
   return (
-    <section>
-      <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 flex items-center gap-2">
-        <Clock className="h-3.5 w-3.5" />
-        Access requests
-        <span className="inline-flex items-center justify-center h-5 min-w-5 px-1.5 text-xs font-semibold rounded-full bg-primary text-primary-foreground">
-          {requests.length}
-        </span>
-      </h2>
-      <div className="divide-y divide-border rounded-sq-md border border-border overflow-hidden bg-background">
-        {requests.map((request) => (
-          <div key={request.id} className="p-4 space-y-3">
-            <div className="flex items-start gap-3">
-              <SquircleAvatar
-                src={request.requester.profile_photo_url || undefined}
-                alt={request.requester.display_name || 'User'}
-                size={44}
-              />
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-[15px] truncate">
-                  {request.requester.display_name || request.requester.username || 'Unknown'}
-                </p>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <span>{roleLabel(request.requested_role)}</span>
-                  <span>·</span>
-                  <span>{formatDistanceToNow(new Date(request.created_at), { addSuffix: true })}</span>
-                </div>
-              </div>
-            </div>
+    <>
+      <section className="p-4 space-y-3">
+        {/* Section header */}
+        <div>
+          <h2 className="text-[15px] font-semibold leading-5 text-foreground">
+            Access requests
+          </h2>
+          {hasRequests && (
+            <p className="text-[13px] font-normal leading-[18px] text-muted-foreground mt-1">
+              Review and manage requests to join this business.
+            </p>
+          )}
+        </div>
 
-            {request.message && (
-              <p className="text-sm text-muted-foreground bg-muted/50 rounded-sq-sm p-3">
-                "{request.message}"
-              </p>
-            )}
-
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => rejectMutation.mutate(request)}
-                disabled={rejectMutation.isPending || approveMutation.isPending}
-                className="flex-1"
-              >
-                {rejectMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <>
-                    <X className="h-4 w-4 mr-1.5" />
-                    Decline
-                  </>
-                )}
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => approveMutation.mutate(request)}
-                disabled={approveMutation.isPending || rejectMutation.isPending}
-                className="flex-1"
-              >
-                {approveMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <>
-                    <Check className="h-4 w-4 mr-1.5" />
-                    Approve
-                  </>
-                )}
-              </Button>
-            </div>
+        {/* Empty state */}
+        {!hasRequests && (
+          <div className="py-8 text-center">
+            <p className="text-[15px] font-semibold text-foreground">
+              No access requests
+            </p>
+            <p className="text-[13px] text-muted-foreground mt-1">
+              Requests to join this business will appear here.
+            </p>
           </div>
-        ))}
-      </div>
-      <p className="text-xs text-muted-foreground mt-2">
-        These people have requested to join your team.
-      </p>
-    </section>
+        )}
+
+        {/* Request cards */}
+        {hasRequests && (
+          <div className="space-y-3">
+            {requests.map((request) => {
+              const requesterName = request.requester.display_name || request.requester.username || 'A user';
+              const roleLabel = getRoleLabel(request.requested_role);
+              const timeAgo = formatDistanceToNow(new Date(request.created_at), { addSuffix: false });
+
+              return (
+                <div 
+                  key={request.id} 
+                  className="p-3 rounded-sq-sm bg-card border border-border/50 space-y-2"
+                >
+                  {/* Top row: Avatar + Name + Role */}
+                  <div className="flex items-start gap-3">
+                    <SquircleAvatar
+                      src={request.requester.profile_photo_url || undefined}
+                      alt={requesterName}
+                      size={40}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[15px] font-semibold leading-5 text-foreground truncate">
+                        {requesterName}
+                      </p>
+                      <p className="text-[13px] font-normal leading-[18px] text-muted-foreground mt-0.5">
+                        Requested {roleLabel} access
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Optional message */}
+                  {request.message && (
+                    <div className="mt-2">
+                      <p className="text-[12px] font-medium text-muted-foreground/70 mb-0.5">
+                        Message
+                      </p>
+                      <p className="text-[13px] font-normal leading-[18px] text-foreground">
+                        {request.message}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Timestamp */}
+                  <p className="text-[12px] font-normal text-muted-foreground/70 mt-1.5">
+                    Requested {timeAgo} ago
+                  </p>
+
+                  {/* Action buttons */}
+                  <div className="flex gap-2 mt-2.5 justify-end">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setConfirmDecline(request)}
+                      disabled={declineMutation.isPending || approveMutation.isPending}
+                      className="h-9 px-3.5 rounded-sq-xs text-[14px] font-semibold text-destructive border-destructive/30 hover:bg-destructive/10"
+                    >
+                      Decline
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => setConfirmApprove(request)}
+                      disabled={approveMutation.isPending || declineMutation.isPending}
+                      className="h-9 px-3.5 rounded-sq-xs text-[14px] font-semibold"
+                    >
+                      Approve
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      {/* Approve Confirmation Modal */}
+      <AlertDialog open={!!confirmApprove} onOpenChange={(open) => !open && setConfirmApprove(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Approve request?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Add {confirmApprove?.requester.display_name || confirmApprove?.requester.username || 'this user'} to {businessName} as {getRoleLabel(confirmApprove?.requested_role || '')}.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => confirmApprove && approveMutation.mutate(confirmApprove)}
+              disabled={approveMutation.isPending}
+            >
+              {approveMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Approve
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Decline Confirmation Modal */}
+      <AlertDialog open={!!confirmDecline} onOpenChange={(open) => !open && setConfirmDecline(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Decline request?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Decline {confirmDecline?.requester.display_name || confirmDecline?.requester.username || 'this user'}'s request to join {businessName}.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => confirmDecline && declineMutation.mutate(confirmDecline)}
+              disabled={declineMutation.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {declineMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Decline
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
