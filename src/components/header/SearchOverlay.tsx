@@ -200,17 +200,29 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose })
     <div 
       className="fixed inset-0 z-[80] flex flex-col"
       style={{
-        background: 'rgba(10, 10, 10, 0.98)',
+        background: 'var(--chrome-light-bg-blur)',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
         paddingTop: 'env(safe-area-inset-top)',
       }}
     >
       {/* Search bar at top */}
-      <div className="flex-shrink-0 px-3 pt-3 pb-2 border-b border-white/6">
+      <div 
+        className="flex-shrink-0 px-3 pt-3 pb-2 border-b"
+        style={{ borderColor: 'var(--chrome-light-border)' }}
+      >
         <div className="max-w-2xl mx-auto">
-          <div className="relative flex items-center gap-3 h-12 px-4 rounded-full bg-white/8 border border-white/10">
-            <Search className="h-5 w-5 text-white/50 flex-shrink-0" />
+          <div 
+            className="relative flex items-center gap-3 h-12 px-4 rounded-full border"
+            style={{ 
+              background: '#FFFFFF',
+              borderColor: 'var(--chrome-light-border)'
+            }}
+          >
+            <Search 
+              className="h-5 w-5 flex-shrink-0" 
+              style={{ color: 'var(--chrome-light-icon-dim)' }}
+            />
             <input
               ref={inputRef}
               type="text"
@@ -221,16 +233,17 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose })
               }}
               onKeyDown={handleKeyDown}
               placeholder="Search players, courses..."
-              className="flex-1 bg-transparent border-none outline-none text-white text-base placeholder:text-white/40"
+              className="flex-1 bg-transparent border-none outline-none text-base placeholder:text-[var(--chrome-light-text-dim)]"
+              style={{ color: 'var(--chrome-light-text)' }}
               autoComplete="off"
               spellCheck="false"
             />
             <button
               onClick={handleClear}
-              className="flex-shrink-0 p-1.5 rounded-full hover:bg-white/10 transition-colors"
+              className="flex-shrink-0 p-1.5 rounded-full transition-colors hover:bg-[var(--chrome-light-hover)]"
               aria-label={query ? "Clear" : "Close"}
             >
-              <X className="h-5 w-5 text-white/60" />
+              <X className="h-5 w-5" style={{ color: 'var(--chrome-light-icon-dim)' }} />
             </button>
           </div>
         </div>
@@ -245,10 +258,10 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose })
             <div className="space-y-2">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="flex items-center gap-4 p-3 rounded-sq-md animate-pulse">
-                  <div className="w-10 h-10 rounded-full bg-white/10" />
+                  <div className="w-10 h-10 rounded-full" style={{ background: 'var(--chrome-light-hover)' }} />
                   <div className="flex-1 space-y-2">
-                    <div className="w-32 h-4 bg-white/10 rounded" />
-                    <div className="w-24 h-3 bg-white/5 rounded" />
+                    <div className="w-32 h-4 rounded" style={{ background: 'var(--chrome-light-hover)' }} />
+                    <div className="w-24 h-3 rounded" style={{ background: 'var(--chrome-light-hover)' }} />
                   </div>
                 </div>
               ))}
@@ -258,9 +271,9 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose })
           {/* Empty state */}
           {showEmpty && (
             <div className="py-12 text-center">
-              <Search className="h-12 w-12 mx-auto mb-4 text-white/20" />
-              <p className="text-white/50 text-sm">No results found for "{query}"</p>
-              <p className="text-white/30 text-xs mt-1">Try searching by name or course</p>
+              <Search className="h-12 w-12 mx-auto mb-4" style={{ color: 'var(--chrome-light-icon-dim)', opacity: 0.5 }} />
+              <p className="text-sm" style={{ color: 'var(--chrome-light-text-dim)' }}>No results found for "{query}"</p>
+              <p className="text-xs mt-1" style={{ color: 'var(--chrome-light-text-dim)', opacity: 0.7 }}>Try searching by name or course</p>
             </div>
           )}
 
@@ -271,8 +284,8 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose })
               {peopleResults.length > 0 && (
                 <div>
                   <div className="flex items-center gap-2 px-2 mb-2">
-                    <User className="h-3.5 w-3.5 text-white/40" />
-                    <span className="text-xs font-medium text-white/40 uppercase tracking-wide">People</span>
+                    <User className="h-3.5 w-3.5" style={{ color: 'var(--chrome-light-icon-dim)' }} />
+                    <span className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--chrome-light-text-dim)' }}>People</span>
                   </div>
                   <div className="space-y-0.5">
                     {peopleResults.map((item, index) => (
@@ -293,8 +306,8 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose })
               {courseResults.length > 0 && (
                 <div>
                   <div className="flex items-center gap-2 px-2 mb-2">
-                    <MapPin className="h-3.5 w-3.5 text-white/40" />
-                    <span className="text-xs font-medium text-white/40 uppercase tracking-wide">Clubs & Courses</span>
+                    <MapPin className="h-3.5 w-3.5" style={{ color: 'var(--chrome-light-icon-dim)' }} />
+                    <span className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--chrome-light-text-dim)' }}>Clubs & Courses</span>
                   </div>
                   <div className="space-y-0.5">
                     {courseResults.map((item, index) => (
@@ -315,8 +328,8 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose })
               {businessResults.length > 0 && (
                 <div>
                   <div className="flex items-center gap-2 px-2 mb-2">
-                    <Building className="h-3.5 w-3.5 text-white/40" />
-                    <span className="text-xs font-medium text-white/40 uppercase tracking-wide">Business Profiles</span>
+                    <Building className="h-3.5 w-3.5" style={{ color: 'var(--chrome-light-icon-dim)' }} />
+                    <span className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--chrome-light-text-dim)' }}>Business Profiles</span>
                   </div>
                   <div className="space-y-0.5">
                     {businessResults.map((item, index) => (
@@ -343,12 +356,13 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose })
                 <div>
                   <div className="flex items-center justify-between mb-3 px-2">
                     <div className="flex items-center gap-2">
-                      <Clock className="h-3.5 w-3.5 text-white/40" />
-                      <span className="text-xs font-medium text-white/40 uppercase tracking-wide">Recent</span>
+                      <Clock className="h-3.5 w-3.5" style={{ color: 'var(--chrome-light-icon-dim)' }} />
+                      <span className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--chrome-light-text-dim)' }}>Recent</span>
                     </div>
                     <button
                       onClick={clearRecentSearches}
-                      className="text-xs text-white/30 hover:text-white/50 transition-colors"
+                      className="text-xs transition-colors hover:opacity-80"
+                      style={{ color: 'var(--chrome-light-text-dim)' }}
                     >
                       Clear
                     </button>
@@ -358,7 +372,12 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose })
                       <button
                         key={search.id}
                         onClick={() => handleRecentSearchClick(search.query)}
-                        className="px-3 py-1.5 text-xs rounded-full bg-white/8 hover:bg-white/12 text-white/70 transition-colors"
+                        className="px-3 py-1.5 text-xs rounded-full transition-colors border"
+                        style={{ 
+                          background: '#FFFFFF',
+                          borderColor: 'var(--chrome-light-border)',
+                          color: 'var(--chrome-light-text)'
+                        }}
                       >
                         {search.query}
                       </button>
@@ -371,8 +390,8 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose })
               {popularItems.length > 0 && (
                 <div>
                   <div className="flex items-center gap-2 px-2 mb-3">
-                    <TrendingUp className="h-3.5 w-3.5 text-white/40" />
-                    <span className="text-xs font-medium text-white/40 uppercase tracking-wide">Popular</span>
+                    <TrendingUp className="h-3.5 w-3.5" style={{ color: 'var(--chrome-light-icon-dim)' }} />
+                    <span className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--chrome-light-text-dim)' }}>Popular</span>
                   </div>
                   <div className="space-y-0.5">
                     {popularItems.slice(0, 5).map((item, index) => (
@@ -427,29 +446,43 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
     <button
       onClick={onClick}
       className={cn(
-        "w-full flex items-center gap-3 p-3 rounded-sq-md transition-colors text-left group",
-        isActive ? "bg-white/10" : "hover:bg-white/5"
+        "w-full flex items-center gap-3 p-3 rounded-sq-md transition-colors text-left group"
       )}
+      style={{
+        background: isActive ? 'var(--chrome-light-active)' : 'transparent'
+      }}
+      onMouseEnter={(e) => {
+        if (!isActive) e.currentTarget.style.background = 'var(--chrome-light-hover)';
+      }}
+      onMouseLeave={(e) => {
+        if (!isActive) e.currentTarget.style.background = 'transparent';
+      }}
     >
       {/* Avatar */}
-      <div className="w-10 h-10 rounded-sq-md flex items-center justify-center flex-shrink-0 relative bg-white/8 overflow-hidden">
+      <div 
+        className="w-10 h-10 rounded-sq-md flex items-center justify-center flex-shrink-0 relative overflow-hidden"
+        style={{ background: 'var(--chrome-light-hover)' }}
+      >
         {item.image ? (
           <img src={item.image} alt="" className="w-full h-full object-cover" />
         ) : (
-          <span className="text-xs font-medium text-white/60">{getInitials(item.title)}</span>
+          <span className="text-xs font-medium" style={{ color: 'var(--chrome-light-text-dim)' }}>{getInitials(item.title)}</span>
         )}
       </div>
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-medium text-white truncate">
+        <div className="text-sm font-medium truncate" style={{ color: 'var(--chrome-light-text)' }}>
           {highlightText(item.title)}
         </div>
-        <div className="text-xs text-white/50 truncate">{item.subtitle}</div>
+        <div className="text-xs truncate" style={{ color: 'var(--chrome-light-text-dim)' }}>{item.subtitle}</div>
       </div>
 
       {/* Chevron */}
-      <ChevronRight className="h-4 w-4 text-white/20 group-hover:text-white/40 flex-shrink-0 transition-colors" />
+      <ChevronRight 
+        className="h-4 w-4 flex-shrink-0 transition-colors group-hover:opacity-80" 
+        style={{ color: 'var(--chrome-light-icon-dim)', opacity: 0.5 }}
+      />
     </button>
   );
 };

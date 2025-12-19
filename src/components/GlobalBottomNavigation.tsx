@@ -47,6 +47,10 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   // Determine dim state
   const isDimmed = isClubhousePage && cinemaDim;
   
+  // Check if we're on a non-clubhouse route (use light chrome)
+  const isClubhouseRoute = CLUBHOUSE_ROUTES.includes(location.pathname);
+  const useLightChrome = !isClubhouseRoute;
+  
   // Check if drawer is active (for clubhouse mini profile or comments)
   const [isDrawerActive, setIsDrawerActive] = useState(false);
   
@@ -65,7 +69,6 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   
   // Determine if current route should hide navigation
   const shouldHideForRoute = HIDDEN_ROUTES.includes(location.pathname);
-  const isClubhouseRoute = CLUBHOUSE_ROUTES.includes(location.pathname);
   
   // Final visibility state - chrome auto-hide system now handles ECM footer behavior
   const showNavigation = isVisible && !shouldHideForRoute;
@@ -209,17 +212,22 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 setNavRef(el);
               }}
             className={cn(
-              "chrome-bottom-nav clubhouse-footer border-t",
-              "border-[rgba(255,255,255,0.06)] backdrop-blur-xl",
+              "chrome-bottom-nav border-t",
+              useLightChrome 
+                ? "border-[var(--chrome-light-border)]"
+                : "clubhouse-footer border-[rgba(255,255,255,0.06)]",
+              !useLightChrome && "backdrop-blur-xl",
               isDimmed && "backdrop-blur-0"
             )}
               data-chrome="bottom-nav"
               style={{
-                background: isDimmed 
-                  ? 'rgba(15, 15, 15, 0.02)'
-                  : 'rgba(15, 15, 15, 0.95)',
-                backdropFilter: isDimmed ? 'none' : undefined,
-                WebkitBackdropFilter: isDimmed ? 'none' : undefined,
+                background: useLightChrome
+                  ? 'var(--chrome-light-bg-blur)'
+                  : isDimmed 
+                    ? 'rgba(15, 15, 15, 0.02)'
+                    : 'rgba(15, 15, 15, 0.95)',
+                backdropFilter: useLightChrome ? 'blur(20px)' : (isDimmed ? 'none' : undefined),
+                WebkitBackdropFilter: useLightChrome ? 'blur(20px)' : (isDimmed ? 'none' : undefined),
                 paddingBottom: 'env(safe-area-inset-bottom, 0px)',
                 transition: 'background-color 800ms cubic-bezier(0.22, 1, 0.36, 1), color 800ms cubic-bezier(0.22, 1, 0.36, 1), border-color 800ms cubic-bezier(0.22, 1, 0.36, 1)',
               }}
@@ -229,6 +237,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 onTabClick={handleTabClickWithCamera}
                 variant={isClubhouseRoute ? 'clubhouse' : 'default'}
                 isDimmed={isDimmed}
+                useLightTheme={useLightChrome}
               />
             </div>
           </motion.div>

@@ -18,8 +18,8 @@ interface CompactHeaderProps {
 
 /**
  * Compact Header (56px) - used on Discover, Tour, Notifications, Clubhouse
- * On Clubhouse: Uses chrome-header class for auto-hide system (body.chrome-hidden)
- * On other pages: Uses useScrollDirection for scroll-based hide/show
+ * On Clubhouse: Uses dark chrome with cinema dim
+ * On other pages: Uses light chrome (slate on light grey)
  */
 const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const navigate = useNavigate();
@@ -33,8 +33,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const { cinemaDim, bumpChrome, isClubhousePage } = useCinemaDimContext();
   const isDimmed = isClubhousePage && cinemaDim;
   
-  // Keep for reference
+  // Clubhouse routes use dark chrome, everything else uses light chrome
   const isClubhouseRoute = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
+  const useLightChrome = !isClubhouseRoute;
 
   const handleLogoClick = () => {
     bumpChrome();
@@ -51,30 +52,39 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
     setMenuOpen(v => !v);
   };
 
-  // Hardcoded RGBA values for reliable iOS rendering (no CSS variable resolution issues)
+  // Dark chrome values (for Clubhouse)
   const DIM_BG = 'rgba(15, 15, 15, 0.02)';
   const DIM_BORDER = 'rgba(255, 255, 255, 0.06)';
   const STANDARD_BG = 'rgba(10, 10, 10, 0.95)';
   const STANDARD_BORDER = 'rgba(255, 255, 255, 0.06)';
+  
+  // Light chrome values (for non-Clubhouse pages)
+  const LIGHT_BG = 'var(--chrome-light-bg-blur)';
+  const LIGHT_BORDER = 'var(--chrome-light-border)';
+  
   const CINEMA_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+
+  // Determine styles based on route
+  const headerBg = useLightChrome ? LIGHT_BG : (isDimmed ? DIM_BG : STANDARD_BG);
+  const headerBorder = useLightChrome ? LIGHT_BORDER : (isDimmed ? DIM_BORDER : STANDARD_BORDER);
 
   return (
     <>
       <header
         data-chrome="header"
         className={cn(
-          "compact-header clubhouse-header",
-          isClubhouseRoute && "chrome-header",
+          "compact-header",
+          isClubhouseRoute && "clubhouse-header chrome-header",
           "fixed top-0 left-0 right-0 z-header",
           "h-14",
           className
         )}
         style={{
-          background: isDimmed ? DIM_BG : STANDARD_BG,
-          backdropFilter: isDimmed ? 'none' : 'blur(20px)',
-          WebkitBackdropFilter: isDimmed ? 'none' : 'blur(20px)',
+          background: headerBg,
+          backdropFilter: useLightChrome ? 'blur(20px)' : (isDimmed ? 'none' : 'blur(20px)'),
+          WebkitBackdropFilter: useLightChrome ? 'blur(20px)' : (isDimmed ? 'none' : 'blur(20px)'),
           paddingTop: 'env(safe-area-inset-top)',
-          borderBottom: `1px solid ${isDimmed ? DIM_BORDER : STANDARD_BORDER}`,
+          borderBottom: `1px solid ${headerBorder}`,
           boxShadow: isDimmed ? 'none' : undefined,
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}`,
         }}
@@ -92,13 +102,26 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               alt="clbhouz"
               className={cn(
                 "h-9 w-9 object-contain transition-opacity",
-                isDimmed ? "opacity-55" : "hover:opacity-80"
+                useLightChrome 
+                  ? "opacity-100 hover:opacity-80" 
+                  : isDimmed 
+                    ? "opacity-55" 
+                    : "hover:opacity-80"
               )}
             />
             {/* Wordmark - desktop only */}
             <span 
-              className="hidden md:inline font-semibold text-lg tracking-tight transition-colors duration-300"
-              style={{ color: isDimmed ? 'rgba(255, 255, 255, 0.55)' : 'white' }}
+              className={cn(
+                "hidden md:inline font-semibold text-lg tracking-tight transition-colors duration-300",
+                useLightChrome && "text-text-primary"
+              )}
+              style={{ 
+                color: useLightChrome 
+                  ? 'var(--chrome-light-text)' 
+                  : isDimmed 
+                    ? 'rgba(255, 255, 255, 0.55)' 
+                    : 'white' 
+              }}
             >
               clbhouz
             </span>
@@ -123,19 +146,23 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                   }}
                   className={cn(
                     "px-3 py-1.5 text-sm font-medium rounded-sq-sm transition-colors duration-300",
-                    isActive 
-                      ? isDimmed 
-                        ? "bg-white/5" 
-                        : "text-white bg-white/10"
-                      : isDimmed
-                        ? "hover:bg-white/5"
-                        : "text-white/60 hover:text-white hover:bg-white/5"
+                    useLightChrome
+                      ? isActive
+                        ? "bg-[var(--chrome-light-active)] text-[var(--chrome-light-text)]"
+                        : "text-[var(--chrome-light-text-dim)] hover:text-[var(--chrome-light-text)] hover:bg-[var(--chrome-light-hover)]"
+                      : isActive 
+                        ? isDimmed 
+                          ? "bg-white/5" 
+                          : "text-white bg-white/10"
+                        : isDimmed
+                          ? "hover:bg-white/5"
+                          : "text-white/60 hover:text-white hover:bg-white/5"
                   )}
-                  style={{
+                  style={!useLightChrome ? {
                     color: isDimmed 
                       ? (isActive ? 'rgba(255, 255, 255, 0.78)' : 'rgba(255, 255, 255, 0.55)')
                       : undefined
-                  }}
+                  } : undefined}
                 >
                   {item.label}
                 </button>
@@ -151,11 +178,13 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               size="icon"
               className={cn(
                 "h-10 w-10 p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all duration-300",
-                isDimmed 
-                  ? "hover:bg-white/5" 
-                  : "text-white/70 hover:text-white hover:bg-white/10"
+                useLightChrome
+                  ? "text-[var(--chrome-light-icon)] hover:bg-[var(--chrome-light-hover)]"
+                  : isDimmed 
+                    ? "hover:bg-white/5" 
+                    : "text-white/70 hover:text-white hover:bg-white/10"
               )}
-              style={{ color: isDimmed ? 'rgba(255, 255, 255, 0.55)' : undefined }}
+              style={!useLightChrome ? { color: isDimmed ? 'rgba(255, 255, 255, 0.55)' : undefined } : undefined}
               onClick={handleSearchClick}
               aria-label="Search"
             >
@@ -175,7 +204,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
             
             {/* Desktop: Full navigation (notifications, profile, settings) */}
             <div className="hidden sm:flex items-center">
-              <HeaderNavigation onInteraction={bumpChrome} />
+              <HeaderNavigation onInteraction={bumpChrome} useLightTheme={useLightChrome} />
             </div>
           </div>
         </div>
