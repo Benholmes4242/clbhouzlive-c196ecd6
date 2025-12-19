@@ -7,14 +7,49 @@ interface NavigationBarProps {
   onTabClick: (tab: { id: string; path: string | null; isAction?: boolean }) => void;
   variant?: 'default' | 'clubhouse';
   isDimmed?: boolean;
+  useLightTheme?: boolean;
 }
 
-const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, variant = 'default', isDimmed = false }) => {
+// Light theme colors
+const LIGHT_ICON = '#5A6270';
+const LIGHT_ICON_ACTIVE = '#1F2428';
+const LIGHT_TEXT = '#8A919C';
+const LIGHT_TEXT_ACTIVE = '#1F2428';
+
+const NavigationBar: React.FC<NavigationBarProps> = ({ 
+  activeTab, 
+  onTabClick, 
+  variant = 'default', 
+  isDimmed = false,
+  useLightTheme = false 
+}) => {
   return (
     <nav className="w-full h-14 flex items-center justify-around">
       {navigationTabs.map((tab) => {
         const Icon = tab.icon;
         const isActive = activeTab === tab.id;
+        
+        // Determine icon color based on theme
+        const getIconColor = () => {
+          if (useLightTheme) {
+            return isActive ? LIGHT_ICON_ACTIVE : LIGHT_ICON;
+          }
+          if (isDimmed) {
+            return isActive ? 'rgba(255, 255, 255, 0.78)' : 'rgba(255, 255, 255, 0.55)';
+          }
+          return isActive ? undefined : 'rgba(255, 255, 255, 0.7)';
+        };
+        
+        // Determine label color based on theme
+        const getLabelColor = () => {
+          if (useLightTheme) {
+            return isActive ? LIGHT_TEXT_ACTIVE : LIGHT_TEXT;
+          }
+          if (isDimmed) {
+            return isActive ? 'rgba(255, 255, 255, 0.78)' : 'rgba(255, 255, 255, 0.42)';
+          }
+          return isActive ? 'white' : 'rgba(255, 255, 255, 0.6)';
+        };
         
         return (
           <button
@@ -25,7 +60,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
               onTabClick(tab);
             }}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 flex-1 py-1",
+              "nav-tab flex flex-col items-center justify-center gap-1 flex-1 py-1",
               "transition-transform duration-[120ms] ease-out",
               "active:scale-95",
               "focus:outline-none"
@@ -34,27 +69,22 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
           >
             <Icon 
               className={cn(
-                "h-7 w-7 transition-colors duration-300",
-                isActive 
-                  ? "text-primary" 
-                  : isDimmed 
-                    ? "text-[rgba(255,255,255,0.55)]" 
-                    : "text-white/70"
+                "nav-icon h-7 w-7 transition-colors duration-300",
+                isActive && !useLightTheme && !isDimmed && "text-primary",
+                isActive && "active"
               )}
+              style={{ 
+                color: (useLightTheme || isDimmed || !isActive) ? getIconColor() : undefined 
+              }}
             />
             
             {/* Label */}
             <span 
               className={cn(
-                "text-[11px] leading-none transition-colors duration-300",
-                isActive 
-                  ? isDimmed 
-                    ? "text-[rgba(255,255,255,0.78)]" 
-                    : "text-white"
-                  : isDimmed 
-                    ? "text-[rgba(255,255,255,0.42)]" 
-                    : "text-white/60"
+                "nav-label text-[11px] leading-none transition-colors duration-300",
+                isActive && "active"
               )}
+              style={{ color: getLabelColor() }}
             >
               {tab.label}
             </span>
