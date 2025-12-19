@@ -59,7 +59,7 @@ export function IdentitySelector({ compact = false, variant = 'light' }: Identit
 
   const textClasses = variant === 'dark'
     ? `${compact ? 'text-xs' : 'text-sm'} font-medium truncate max-w-[120px] text-white leading-none`
-    : `${compact ? 'text-xs' : 'text-sm'} font-medium truncate max-w-[120px]`;
+    : `${compact ? 'text-xs' : 'text-sm'} font-medium truncate max-w-[120px] text-foreground`;
 
   const chevronClasses = variant === 'dark'
     ? 'h-3 w-3 text-white/50'
