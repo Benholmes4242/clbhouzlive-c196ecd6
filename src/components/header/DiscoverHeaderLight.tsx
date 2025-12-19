@@ -117,13 +117,14 @@ const DiscoverHeaderLight: React.FC<DiscoverHeaderLightProps> = ({ className }) 
                   onClick={handleMenuClick} 
                   isOpen={menuOpen}
                   hasUnread={hasUnread}
+                  useLightTheme
                 />
               </div>
             )}
             
             {/* Desktop: Full navigation */}
             <div className="hidden sm:flex items-center">
-              <HeaderNavigation />
+              <HeaderNavigation useLightTheme />
             </div>
           </div>
         </div>
@@ -134,13 +135,15 @@ const DiscoverHeaderLight: React.FC<DiscoverHeaderLightProps> = ({ className }) 
         <PostingAsMenu
           isOpen={menuOpen}
           onClose={() => setMenuOpen(false)}
+          useLightTheme
         />
       )}
 
       {/* Search Overlay */}
       <SearchOverlay 
         isOpen={searchOpen} 
-        onClose={() => setSearchOpen(false)} 
+        onClose={() => setSearchOpen(false)}
+        useLightTheme
       />
     </>
   );
