@@ -367,24 +367,24 @@
 }
 
 .hub-btn--primary {
-  background: var(--hub-primary-bg);
-  border: 1px solid var(--hub-primary-border);
-  color: var(--hub-primary-text);
+  background: var(--hub-glass-bg);
+  border: 1px solid var(--hub-stroke);
+  color: var(--hub-text);
 }
 
 .hub-btn--primary:hover:not(:disabled) {
-  background: var(--hub-primary-bg-hover);
+  background: var(--hub-glass-bg-hover);
 }
 
 .hub-btn--secondary {
-  background: var(--hub-glass-bg-button);
-  border: 1px solid var(--hub-stroke);
-  color: var(--hub-text-bright);
+  background: var(--hub-glass-bg-subtle);
+  border: 1px solid var(--hub-stroke-subtle);
+  color: var(--hub-text);
 }
 
 .hub-btn--secondary:hover:not(:disabled) {
   background: var(--hub-glass-bg-hover);
-  border-color: var(--hub-stroke-strong);
+  border-color: var(--hub-stroke);
 }
 
 .hub-btn--destructive {

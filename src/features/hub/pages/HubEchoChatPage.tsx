@@ -153,43 +153,47 @@ export function HubEchoChatPage() {
   return (
     <div className="fixed inset-0 z-[9999]">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
+      <div 
+        className="absolute inset-0" 
+        style={{ 
+          background: 'var(--hub-backdrop)',
+          backdropFilter: `blur(var(--hub-backdrop-blur))`,
+          WebkitBackdropFilter: `blur(var(--hub-backdrop-blur))`,
+        }} 
+      />
       
       {/* Glass Sheet */}
       <div
         className="hub-glass-page fixed inset-0 flex flex-col"
         style={{
           zIndex: Z.page,
-          background: 'rgba(0, 0, 0, 0.28)',
-          backdropFilter: 'blur(22px)',
-          WebkitBackdropFilter: 'blur(22px)',
-          border: '1px solid rgba(255, 255, 255, 0.06)',
-          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.45), 0 0 1px rgba(255, 255, 255, 0.16)',
+          background: 'var(--hub-bg-start)',
+          border: '1px solid var(--hub-stroke-subtle)',
+          boxShadow: 'var(--hub-shadow-main)',
         }}
       >
       {/* Header */}
       <header 
         className={cn(
           "relative z-10 fixed top-0 left-0 right-0 flex items-center justify-between px-4 h-14 border-b transition-shadow duration-200",
-          hasScrolled ? "shadow-[0_6px_12px_rgba(0,0,0,0.45)]" : "shadow-none"
+          hasScrolled ? "shadow-[0_4px_24px_rgba(31,36,40,0.08)]" : "shadow-none"
         )}
         style={{
           zIndex: Z.pageHeader,
           borderColor: 'var(--hub-stroke)',
-          background: 'rgba(22, 24, 27, 0.98)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
+          background: 'var(--hub-header-bg)',
           paddingTop: 'env(safe-area-inset-top, 0px)',
         }}
       >
         <button
           onClick={handleBack}
-          className="text-white/90 hover:text-white text-[15px] font-medium transition-colors"
+          className="text-[15px] font-medium transition-colors"
+          style={{ color: 'var(--hub-text-body)' }}
           aria-label="Back to Hub"
         >
           ‹ Back
         </button>
-        <h1 className="text-white/90 text-[17px] font-semibold">Echo</h1>
+        <h1 className="text-[17px] font-semibold" style={{ color: 'var(--hub-text)' }}>Echo</h1>
         <div className="w-16" />
         
         {/* Thinking shimmer bar */}
@@ -210,8 +214,8 @@ export function HubEchoChatPage() {
           <div className="flex items-center justify-center h-full">
             <div className="text-center space-y-2 pb-20">
               <div className="text-4xl mb-4">💬</div>
-              <h3 className="text-lg font-semibold text-white/90">Ask Echo anything</h3>
-              <p className="text-sm text-white/60 max-w-xs">
+              <h3 className="text-lg font-semibold" style={{ color: 'var(--hub-text)' }}>Ask Echo anything</h3>
+              <p className="text-sm max-w-xs" style={{ color: 'var(--hub-text-sub)' }}>
                 Get golf tips, course info, or just chat about the game
               </p>
             </div>
@@ -219,7 +223,7 @@ export function HubEchoChatPage() {
         ) : (
           <>
             {hiddenCount > 0 && (
-              <div className="text-center text-xs text-white/40 mb-3">
+              <div className="text-center text-xs mb-3" style={{ color: 'var(--hub-text-dim)' }}>
                 Showing latest {MAX_VISIBLE_MESSAGES} messages ({hiddenCount} older messages hidden)
               </div>
             )}
@@ -240,7 +244,7 @@ export function HubEchoChatPage() {
         )}
         
         {/* Bottom fade mask */}
-        <div className="pointer-events-none fixed inset-x-0 bottom-[64px] h-10 bg-gradient-to-t from-black/35 via-black/10 to-transparent" />
+        <div className="pointer-events-none fixed inset-x-0 bottom-[64px] h-10 bg-gradient-to-t from-[var(--hub-bg-start)]/50 via-transparent to-transparent" />
       </div>
 
       {/* Jump to bottom button */}
@@ -249,12 +253,19 @@ export function HubEchoChatPage() {
           type="button"
           onClick={scrollToBottom}
           className="fixed right-4 bottom-[76px] z-20 rounded-full px-3 py-1.5 
-                     bg-black/60 border border-white/12 backdrop-blur-xl 
-                     shadow-[0_10px_30px_rgba(0,0,0,0.6)]
-                     text-[12px] font-medium text-white/90 flex items-center gap-1
+                     shadow-[var(--hub-shadow-tile)]
+                     text-[12px] font-medium flex items-center gap-1
                      active:scale-[0.96] transition-transform"
+          style={{
+            background: 'var(--hub-glass-bg)',
+            border: '1px solid var(--hub-stroke)',
+            color: 'var(--hub-text)',
+          }}
         >
-          <span className="inline-block h-[18px] w-[18px] rounded-full border border-white/30 flex items-center justify-center text-[10px]">
+          <span 
+            className="inline-block h-[18px] w-[18px] rounded-full flex items-center justify-center text-[10px]"
+            style={{ border: '1px solid var(--hub-stroke)' }}
+          >
             ⌄
           </span>
           New reply
@@ -264,11 +275,12 @@ export function HubEchoChatPage() {
       {/* Input Bar */}
       <footer className="relative z-10 px-4 pt-2 pb-[10px]" style={{ paddingBottom: 'calc(10px + env(safe-area-inset-bottom, 0px))' }}>
         <div
-          className={cn(
-            "flex items-center gap-2 rounded-2xl px-3 py-2",
-            "bg-black/45 border border-white/14 shadow-[0_12px_30px_rgba(0,0,0,0.8)]",
-            "backdrop-blur-xl"
-          )}
+          className="flex items-center gap-2 rounded-2xl px-3 py-2"
+          style={{
+            background: 'var(--hub-glass-bg)',
+            border: '1px solid var(--hub-stroke)',
+            boxShadow: 'var(--hub-shadow-tile)',
+          }}
         >
           <input
             ref={inputRef}
@@ -277,9 +289,11 @@ export function HubEchoChatPage() {
             onKeyDown={handleKeyDown}
             placeholder="Ask Echo..."
             disabled={isStreaming}
-            className="flex-1 bg-transparent border-none outline-none text-[15px] text-white/92
-                       placeholder:text-white/40"
-            style={{ caretColor: 'var(--echo-accent)' }}
+            className="flex-1 bg-transparent border-none outline-none text-[15px]"
+            style={{ 
+              color: 'var(--hub-text)', 
+              caretColor: 'var(--echo-accent)',
+            }}
           />
 
           <button
@@ -288,15 +302,17 @@ export function HubEchoChatPage() {
             disabled={!input.trim() || isStreaming}
             className={cn(
               "h-9 w-9 rounded-full flex items-center justify-center flex-shrink-0",
-              "border border-white/18 bg-white/10 backdrop-blur-xl",
-              "shadow-[0_8px_20px_rgba(0,0,0,0.65)]",
               "active:scale-[0.94] transition-transform",
               !input.trim() || isStreaming
                 ? "opacity-40 cursor-default"
-                : "opacity-100 hover:bg-white/16"
+                : "opacity-100"
             )}
+            style={{
+              background: 'var(--hub-glass-bg-subtle)',
+              border: '1px solid var(--hub-stroke)',
+            }}
           >
-            <Send className="h-4 w-4 text-white" />
+            <Send className="h-4 w-4" style={{ color: 'var(--hub-text-sub)' }} />
           </button>
         </div>
       </footer>

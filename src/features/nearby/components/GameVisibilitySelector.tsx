@@ -38,7 +38,7 @@ const VISIBILITY_OPTIONS: Array<{
 export function GameVisibilitySelector({ value, onChange, className }: GameVisibilitySelectorProps) {
   return (
     <div className={cn('space-y-2', className)}>
-      <div className="flex items-center gap-2 text-xs text-white/60 mb-3">
+      <div className="flex items-center gap-2 text-xs mb-3" style={{ color: 'var(--hub-text-sub)' }}>
         <Info className="h-3.5 w-3.5" />
         <span>Who can see this game?</span>
       </div>
@@ -55,28 +55,28 @@ export function GameVisibilitySelector({ value, onChange, className }: GameVisib
               onClick={() => onChange(option.value)}
               className={cn(
                 "w-full px-4 py-3 rounded-lg text-left transition-all",
-                "border border-white/[0.08]",
                 isSelected
                   ? "bg-gradient-to-br from-[#6E9277] to-[#89A78C] border-transparent"
-                  : "bg-white/[0.04] hover:bg-white/[0.08]"
+                  : "hover:bg-[var(--hub-glass-bg-hover)]"
               )}
+              style={{
+                border: isSelected ? 'none' : '1px solid var(--hub-stroke-subtle)',
+                background: isSelected ? undefined : 'var(--hub-glass-bg-subtle)',
+              }}
             >
               <div className="flex items-start gap-3">
-                <Icon className={cn(
-                  "h-5 w-5 mt-0.5 flex-shrink-0",
-                  isSelected ? "text-white" : "text-white/60"
-                )} />
+                <Icon className="h-5 w-5 mt-0.5 flex-shrink-0" style={{ color: isSelected ? 'white' : 'var(--hub-text-sub)' }} />
                 <div className="flex-1 min-w-0">
-                  <div className={cn(
-                    "font-medium text-sm mb-0.5",
-                    isSelected ? "text-white" : "text-white/90"
-                  )}>
+                  <div 
+                    className="font-medium text-sm mb-0.5"
+                    style={{ color: isSelected ? 'white' : 'var(--hub-text)' }}
+                  >
                     {option.label}
                   </div>
-                  <div className={cn(
-                    "text-xs",
-                    isSelected ? "text-white/80" : "text-white/50"
-                  )}>
+                  <div 
+                    className="text-xs"
+                    style={{ color: isSelected ? 'rgba(255,255,255,0.8)' : 'var(--hub-text-sub)' }}
+                  >
                     {option.description}
                   </div>
                 </div>

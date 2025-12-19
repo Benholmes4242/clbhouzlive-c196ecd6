@@ -235,11 +235,11 @@ export function CreateGameForm({ prefilledClub, onSubmit }: CreateGameFormProps)
                 }}
                 className={cn(
                   "px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150",
-                  "border backdrop-blur-sm",
+                  "border",
                   "active:scale-[0.97]",
                   gameType === type.value
-                    ? "bg-white/[0.12] border-white/20 text-white shadow-sm"
-                    : "bg-white/[0.04] border-white/[0.08] text-white/70 hover:bg-white/[0.08]"
+                    ? "bg-[var(--hub-glass-bg)] border-[var(--hub-stroke-strong)] text-[var(--hub-text)] shadow-sm"
+                    : "bg-[var(--hub-glass-bg-subtle)] border-[var(--hub-stroke-subtle)] text-[var(--hub-text-sub)] hover:bg-[var(--hub-glass-bg-hover)]"
                 )}
                 style={{ letterSpacing: '0.2px' }}
               >
@@ -358,11 +358,11 @@ export function CreateGameForm({ prefilledClub, onSubmit }: CreateGameFormProps)
                 onClick={() => handleTimingChange(option.value)}
                 className={cn(
                   "px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150",
-                  "border backdrop-blur-sm",
+                  "border",
                   "active:scale-[0.97]",
                   timing === option.value
-                    ? "bg-transparent border-white/30 text-white"
-                    : "bg-white/[0.04] border-white/[0.08] text-white/70 hover:bg-white/[0.08]"
+                    ? "bg-[var(--hub-glass-bg)] border-[var(--hub-stroke-strong)] text-[var(--hub-text)]"
+                    : "bg-[var(--hub-glass-bg-subtle)] border-[var(--hub-stroke-subtle)] text-[var(--hub-text-sub)] hover:bg-[var(--hub-glass-bg-hover)]"
                 )}
                 style={{ letterSpacing: '0.2px' }}
               >
@@ -393,11 +393,11 @@ export function CreateGameForm({ prefilledClub, onSubmit }: CreateGameFormProps)
                 disabled={slots > maxAvailableSlots}
                 className={cn(
                   "flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150",
-                  "border backdrop-blur-sm",
+                  "border",
                   "active:scale-[0.97]",
                   availableSlots === slots
-                    ? "bg-transparent border-white/30 text-white"
-                    : "bg-white/[0.04] border-white/[0.08] text-white/70 hover:bg-white/[0.08]",
+                    ? "bg-[var(--hub-glass-bg)] border-[var(--hub-stroke-strong)] text-[var(--hub-text)]"
+                    : "bg-[var(--hub-glass-bg-subtle)] border-[var(--hub-stroke-subtle)] text-[var(--hub-text-sub)] hover:bg-[var(--hub-glass-bg-hover)]",
                   slots > maxAvailableSlots && "opacity-40 cursor-not-allowed"
                 )}
                 style={{ letterSpacing: '0.2px' }}
@@ -430,10 +430,8 @@ export function CreateGameForm({ prefilledClub, onSubmit }: CreateGameFormProps)
             className="w-full px-4 py-3 rounded-xl text-sm resize-none"
             style={{
               minHeight: '100px',
-              background: 'rgba(255, 255, 255, 0.06)',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              background: 'var(--hub-glass-bg-input)',
+              border: '1px solid var(--hub-stroke-subtle)',
               color: 'var(--hub-text)',
               letterSpacing: '0.2px',
             }}
