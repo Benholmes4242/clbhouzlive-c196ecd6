@@ -10,6 +10,8 @@ interface NavigationBarProps {
 }
 
 const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, variant = 'default', isDimmed = false }) => {
+  const isLightTheme = variant === 'default';
+  
   return (
     <nav className="w-full h-14 flex items-center justify-around">
       {navigationTabs.map((tab) => {
@@ -35,11 +37,15 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
             <Icon 
               className={cn(
                 "h-7 w-7 transition-colors duration-300",
-                isActive 
-                  ? "text-primary" 
-                  : isDimmed 
-                    ? "text-[rgba(255,255,255,0.55)]" 
-                    : "text-white/70"
+                isLightTheme
+                  ? isActive 
+                    ? "text-slate-800" 
+                    : "text-slate-500"
+                  : isActive 
+                    ? "text-primary" 
+                    : isDimmed 
+                      ? "text-[rgba(255,255,255,0.55)]" 
+                      : "text-white/70"
               )}
             />
             
@@ -47,13 +53,17 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
             <span 
               className={cn(
                 "text-[11px] leading-none transition-colors duration-300",
-                isActive 
-                  ? isDimmed 
-                    ? "text-[rgba(255,255,255,0.78)]" 
-                    : "text-white"
-                  : isDimmed 
-                    ? "text-[rgba(255,255,255,0.42)]" 
-                    : "text-white/60"
+                isLightTheme
+                  ? isActive 
+                    ? "text-slate-800" 
+                    : "text-slate-500"
+                  : isActive 
+                    ? isDimmed 
+                      ? "text-[rgba(255,255,255,0.78)]" 
+                      : "text-white"
+                    : isDimmed 
+                      ? "text-[rgba(255,255,255,0.42)]" 
+                      : "text-white/60"
               )}
             >
               {tab.label}
