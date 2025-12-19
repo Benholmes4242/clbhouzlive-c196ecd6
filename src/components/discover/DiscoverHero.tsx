@@ -1,0 +1,168 @@
+import React, { useRef, useEffect, useState } from 'react';
+import { Play } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
+
+interface HeroItem {
+  id: string;
+  contextLabel: string; // e.g. "Trending in golf"
+  title: string;
+  subContext: string; // creator OR course name
+  mediaUrl: string;
+  mediaType: 'image' | 'video';
+  posterUrl?: string;
+  ctaLabel?: string;
+  onClick?: () => void;
+}
+
+interface DiscoverHeroProps {
+  item: HeroItem | null;
+  isLoading?: boolean;
+  onWatch?: (item: HeroItem) => void;
+}
+
+export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+
+  // Autoplay muted video when in view
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !item || item.mediaType !== 'video') return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    observer.observe(video);
+    return () => observer.disconnect();
+  }, [item]);
+
+  if (isLoading) {
+    return (
+      <div className="relative w-full aspect-[16/9] md:aspect-[21/9] overflow-hidden bg-slate-100">
+        <Skeleton className="absolute inset-0" />
+        <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 space-y-2">
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-6 w-3/4" />
+          <Skeleton className="h-4 w-1/3" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!item) return null;
+
+  const handleClick = () => {
+    onWatch?.(item);
+    item.onClick?.();
+  };
+
+  return (
+    <div 
+      className="relative w-full aspect-[16/9] md:aspect-[21/9] overflow-hidden bg-slate-900 cursor-pointer group"
+      onClick={handleClick}
+    >
+      {/* Media - Image or Video */}
+      {item.mediaType === 'video' ? (
+        <>
+          {/* Poster while video loads */}
+          {!videoLoaded && item.posterUrl && (
+            <img
+              src={item.posterUrl}
+              alt={item.title}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          )}
+          <video
+            ref={videoRef}
+            src={item.mediaUrl}
+            poster={item.posterUrl}
+            muted
+            loop
+            playsInline
+            onLoadedData={() => setVideoLoaded(true)}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+              videoLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+        </>
+      ) : (
+        <img
+          src={item.mediaUrl}
+          alt={item.title}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      )}
+
+      {/* Gradient overlay for text readability */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+
+      {/* Content overlay */}
+      <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 lg:p-8">
+        {/* Context label */}
+        <span className="inline-block text-[11px] md:text-xs font-medium text-white/80 uppercase tracking-wider mb-2">
+          {item.contextLabel}
+        </span>
+
+        {/* Title */}
+        <h2 className="text-lg md:text-2xl lg:text-3xl font-semibold text-white leading-tight mb-1 md:mb-2 line-clamp-2">
+          {item.title}
+        </h2>
+
+        {/* Sub-context (creator or course) */}
+        <p className="text-sm md:text-base text-white/70 mb-3 md:mb-4">
+          {item.subContext}
+        </p>
+
+        {/* CTA Button */}
+        <Button
+          size="sm"
+          className="bg-white text-slate-900 hover:bg-white/90 gap-1.5 font-medium"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleClick();
+          }}
+        >
+          <Play className="w-3.5 h-3.5 fill-current" />
+          {item.ctaLabel || 'Watch'}
+        </Button>
+      </div>
+
+      {/* Subtle hover effect */}
+      <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
+    </div>
+  );
+}
+
+// Helper to create hero item from post data
+export function createHeroItem(post: any): HeroItem | null {
+  if (!post) return null;
+
+  const mediaUrl = post.media?.[0]?.media_url || post.src;
+  const mediaType = (post.media?.[0]?.media_type || post.type) === 'video' ? 'video' : 'image';
+  
+  let posterUrl: string | undefined;
+  if (mediaType === 'video' && mediaUrl) {
+    posterUrl = getStreamPoster(mediaUrl, '1s') ?? undefined;
+  }
+
+  return {
+    id: post.id,
+    contextLabel: 'Trending in golf',
+    title: post.title || post.caption || 'Featured moment',
+    subContext: post.user?.name || post.course_name || '',
+    mediaUrl,
+    mediaType,
+    posterUrl,
+    ctaLabel: 'Watch',
+  };
+}

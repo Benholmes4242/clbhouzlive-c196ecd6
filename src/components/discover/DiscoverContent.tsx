@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import ExploreGrid from '@/components/explore/ExploreGrid';
@@ -19,6 +19,7 @@ import { useChannelSuggestions } from '@/hooks/useChannelSuggestions';
 import { useShortsSuggestions } from '@/hooks/useShortsSuggestions';
 import { buildInterleavedFeed, InterleavedItem } from '@/utils/interleaveFeed';
 import { toast } from 'sonner';
+import DiscoverHero, { createHeroItem } from '@/components/discover/DiscoverHero';
 
 interface DiscoverContentProps {
   onLike: (contentId: string) => void;
@@ -222,13 +223,37 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   // Chip order for slide animation
   const CHIP_ORDER = ['all', 'shorts', 'under4', '4to20', 'over20'] as const;
 
+  // Create hero item from the first video content item
+  const heroItem = useMemo(() => {
+    if (!currentContent || currentContent.length === 0) return null;
+    // Find the first video item for the hero
+    const firstVideo = currentContent.find(item => item.type === 'video');
+    return firstVideo ? createHeroItem(firstVideo) : null;
+  }, [currentContent]);
+
+  // Filter out the hero item from the grid
+  const gridContent = useMemo(() => {
+    if (!currentContent || !heroItem) return currentContent;
+    return currentContent.filter(item => item.id !== heroItem.id);
+  }, [currentContent, heroItem]);
+
   // Handle Shorts tab directly (no sliding panels needed)
   if (main === 'shorts') {
     return (
       <>
+        {/* Watch Hero - single featured item */}
+        <DiscoverHero 
+          item={heroItem}
+          isLoading={loading && !currentContent}
+          onWatch={(item) => {
+            const originalItem = currentContent?.find(c => c.id === item.id);
+            if (originalItem) onMediaClick(originalItem);
+          }}
+        />
+        
         <LiveClubhouseStrip />
         <ShortsGrid 
-          items={currentContent || []} 
+          items={gridContent || []} 
           onOpen={onMediaClick}
           isLoading={loading}
           hasMore={hasMore}
