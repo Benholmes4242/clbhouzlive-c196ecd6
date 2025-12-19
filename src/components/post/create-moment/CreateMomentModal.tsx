@@ -434,33 +434,28 @@ export default function CreateMomentModal({
   if (!isOpen) return null;
 
   const modalContent = (
-    <div className="fixed inset-0 z-[9999]">
+    <div 
+      className="fixed inset-0 z-[9999]"
+      style={{ touchAction: 'none' }}
+    >
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-[rgba(31,36,40,0.35)]"
+      <div 
+        className="absolute inset-0 bg-black/60"
         onClick={animateAndClose}
       />
-
+      
       {/* Main sheet */}
-      <div
+      <div 
         ref={wrapperRef}
         role="dialog"
         aria-modal="true"
         aria-label="Create a Moment"
-        className="
-          absolute inset-x-0 bottom-0 mx-auto
-          z-[10000]
-          flex w-full max-w-[520px] flex-col
-          max-h-[92vh]
-          rounded-t-3xl
-          bg-[var(--surface-card)]
-          text-[var(--text-primary)]
-          border border-[var(--border)]
-          shadow-2xl
-          overflow-hidden
-        "
+        className="ecm-glass-sheet fixed inset-0 flex flex-col"
         style={{
-          paddingBottom: "env(safe-area-inset-bottom)",
+          background: 'rgba(15, 15, 15, 0.95)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
           transform: `translateY(${translateY}px)`,
           transition:
             isDragging || !hasEntered || prefersReduced()
@@ -475,18 +470,13 @@ export default function CreateMomentModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Grabber bar */}
-        <div className="pt-2 pb-1">
-          <div className="mx-auto h-[5px] w-11 rounded-full bg-[var(--border)]" />
-        </div>
-
-        {/* Optional: top micro-divider */}
-        <div className="h-px w-full bg-[var(--border-subtle)]" />
+        {!hasMedia && <div className="hub-grabber" />}
 
         {/* Media Stage */}
-        <div
-          id="media"
-          className="relative flex-1 min-h-0 overflow-hidden"
-          style={{ paddingTop: "env(safe-area-inset-top)" }}
+        <section
+          id="media" 
+          className="relative flex-1 min-h-0 overflow-hidden z-[1002]"
+          style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
         >
           {hasMedia ? (
             <CreateMomentMediaStage
@@ -500,23 +490,26 @@ export default function CreateMomentModal({
               getEdits={getEdits}
             />
           ) : (
-            <div className="m-4 rounded-2xl bg-[var(--surface-alt)] border border-dashed border-[var(--border)] p-6">
-              <CreateMomentHero
-                hasMedia={false}
-                isBusinessActor={isBusinessActor}
-                isTyping={isTyping}
-                onPickFromCamera={handlePickFromCamera}
-                onPickFromLibrary={handlePickFromLibrary}
-              />
-            </div>
+            <CreateMomentHero
+              hasMedia={false}
+              isBusinessActor={isBusinessActor}
+              isTyping={isTyping}
+              onPickFromCamera={handlePickFromCamera}
+              onPickFromLibrary={handlePickFromLibrary}
+            />
           )}
-        </div>
+        </section>
 
-        {/* Divider */}
-        <div className="h-px w-full bg-[var(--border-subtle)]" />
-
-        {/* Composer Panel */}
-        <div className="px-4 pt-3 pb-4">
+        {/* Composer Panel (no internal scroll; hero shrinks/grows) */}
+        <section
+          className="composer relative z-[1003] flex flex-col"
+          style={{
+            background: 'rgba(15, 15, 15, 0.95)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+          }}
+        >
           <OverlayPortalProvider container={overlayRoot}>
             <CreateMomentComposerPanel
               hasMedia={hasMedia}
@@ -535,55 +528,63 @@ export default function CreateMomentModal({
               onTagsChange={setSelectedTags}
             />
           </OverlayPortalProvider>
-        </div>
 
-        {/* Divider */}
-        <div className="h-px w-full bg-[var(--border-subtle)]" />
-
-        {/* Share Bar */}
-        <div className="p-4">
-          <button
-            type="button"
-            disabled={!canPost}
-            onClick={handlePost}
-            className={[
-              "w-full rounded-2xl py-3 font-semibold transition",
-              canPost
-                ? "bg-[var(--surface-slate)] text-white hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-accent)]/30"
-                : "bg-[var(--surface-alt)] text-[var(--text-tertiary)] border border-[var(--border-subtle)]",
-            ].join(" ")}
+          {/* Share Bar - simple button */}
+          <div
+            className="flex-shrink-0 px-4 pt-2 border-t border-white/8"
+            style={{
+              paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)',
+              background: 'rgba(15, 15, 15, 0.98)',
+            }}
           >
-            Share
-          </button>
-        </div>
+            <button
+              disabled={!canPost}
+              onClick={handlePost}
+              className="w-full h-11 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[.99] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              style={{
+                background: 'rgba(255, 255, 255, 0.18)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255, 255, 255, 0.28)',
+                color: 'rgba(255, 255, 255, 0.96)'
+              }}
+            >
+              Share
+            </button>
+          </div>
+        </section>
 
-        {/* Overlay root for dropdowns */}
+        {/* Overlay root for dropdowns/popovers inside the modal */}
         <div
           ref={overlayRootRef}
           id="create-moment-overlay-root"
-          className="relative z-[11000]"
+          className="pointer-events-none absolute inset-0 z-[1010]"
         />
 
-        {/* Draft prompt (AnimatePresence) */}
+        {/* Draft prompt */}
         <AnimatePresence>
           {showDraftPrompt && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
-              className="absolute top-20 left-4 right-4 z-[11000] p-4 rounded-2xl bg-[var(--surface-card)] border border-[var(--border)]"
+              className="absolute top-20 left-4 right-4 z-[1010] p-4 rounded-2xl"
+              style={{
+                background: 'rgba(30, 30, 35, 0.95)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+              }}
             >
-              <p className="text-[var(--text-primary)] text-sm font-medium mb-3">Resume your draft?</p>
+              <p className="text-white text-sm font-medium mb-3">Resume your draft?</p>
               <div className="flex gap-2">
                 <button
                   onClick={handleRestoreDraft}
-                  className="flex-1 py-2 rounded-xl bg-[var(--surface-slate)] text-white text-sm font-medium"
+                  className="flex-1 py-2 rounded-xl bg-white/20 text-white text-sm font-medium"
                 >
                   Resume
                 </button>
                 <button
                   onClick={handleDiscardDraft}
-                  className="flex-1 py-2 rounded-xl bg-[var(--surface-alt)] text-[var(--text-secondary)] text-sm"
+                  className="flex-1 py-2 rounded-xl bg-white/10 text-white/70 text-sm"
                 >
                   Discard
                 </button>
@@ -594,19 +595,17 @@ export default function CreateMomentModal({
       </div>
 
       {/* Studio Shelf */}
-      <div className="absolute inset-x-0 bottom-0 z-[10001]">
-        <StudioShelf
-          open={studioOpen}
-          onClose={closeStudio}
-          activeTool={activeTool}
-          setActiveTool={setActiveTool}
-          activeMediaId={media[activeIndex]?.id || ''}
-          activeMediaType={media[activeIndex]?.type || 'image'}
-          edits={getEdits(media[activeIndex]?.id || '')}
-          updateEdits={(patch) => updateEdits(media[activeIndex]?.id || '', patch)}
-          clearEdits={() => clearEdits(media[activeIndex]?.id || '')}
-        />
-      </div>
+      <StudioShelf
+        open={studioOpen}
+        onClose={closeStudio}
+        activeTool={activeTool}
+        setActiveTool={setActiveTool}
+        activeMediaId={media[activeIndex]?.id || ''}
+        activeMediaType={media[activeIndex]?.type || 'image'}
+        edits={getEdits(media[activeIndex]?.id || '')}
+        updateEdits={(patch) => updateEdits(media[activeIndex]?.id || '', patch)}
+        clearEdits={() => clearEdits(media[activeIndex]?.id || '')}
+      />
     </div>
   );
 
