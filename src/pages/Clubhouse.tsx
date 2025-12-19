@@ -18,10 +18,14 @@ import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { cn } from '@/lib/utils';
+import { useThemeColor } from '@/hooks/useThemeColor';
 
 const Clubhouse = () => {
   // Set header variant for clubhouse (glass-dark)
   useHeaderVariant('glass-dark');
+  
+  // Set dark theme-color for iOS PWA safe areas
+  useThemeColor('#0F0F0F');
   
   // Cinema Dim: register this page as Clubhouse
   const { setIsClubhousePage, cinemaDim } = useCinemaDimContext();
