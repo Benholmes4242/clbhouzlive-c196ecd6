@@ -130,7 +130,9 @@
 .cm-grabber {
   width: 36px;
   height: 5px;
-  background: var(--cm-border);
+  background: white;
   border-radius: 3px;
   margin: 8px auto;
+  position: relative;
+  z-index: 10;
 }
