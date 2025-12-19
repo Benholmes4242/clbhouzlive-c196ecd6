@@ -69,23 +69,25 @@
 }
 
 /* ================================================
-   DISCOVER TABS - Light Theme
+   DISCOVER TABS - Light Theme (Integrated with canvas)
+   Option B: Tabs sit directly on page canvas, no white container
    ================================================ */
 
 .discover-tabs-light {
   display: flex;
   gap: 0;
-  background: var(--discover-card);
-  border-bottom: 1px solid var(--discover-border);
+  background: transparent; /* Sits on canvas, not a separate card */
+  border-bottom: 1px solid var(--discover-border-subtle);
   padding: 0 var(--discover-spacing-lg);
+  padding-top: var(--discover-spacing-sm);
 }
 
 .discover-tab-light {
   position: relative;
-  padding: 14px 0;
-  margin-right: 24px;
-  color: var(--discover-text-secondary);
-  font-size: 15px;
+  padding: 12px 0;
+  margin-right: 20px;
+  color: var(--discover-text-tertiary);
+  font-size: 14px;
   font-weight: 500;
   background: transparent;
   border: none;
@@ -94,7 +96,7 @@
 }
 
 .discover-tab-light:hover {
-  color: var(--discover-text-primary);
+  color: var(--discover-text-secondary);
 }
 
 .discover-tab-light.active {
@@ -114,13 +116,14 @@
 }
 
 /* ================================================
-   DISCOVER HERO
+   DISCOVER HERO - Editorial, calm, not billboard
+   Height reduced 10-15%, softer overlay
    ================================================ */
 
 .discover-hero {
   position: relative;
-  margin: var(--discover-spacing-lg);
-  border-radius: var(--discover-radius-xl);
+  margin: var(--discover-spacing-md) var(--discover-spacing-lg);
+  border-radius: var(--discover-radius-lg);
   overflow: hidden;
   background: var(--discover-card);
   border: 1px solid var(--discover-border);
@@ -128,7 +131,7 @@
 
 .discover-hero__media {
   position: relative;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 2 / 1; /* Reduced from 16/9 for less visual dominance */
   overflow: hidden;
 }
 
@@ -144,9 +147,9 @@
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(0, 0, 0, 0.7) 0%,
-    rgba(0, 0, 0, 0.3) 40%,
-    transparent 70%
+    rgba(0, 0, 0, 0.55) 0%,  /* Softer overlay */
+    rgba(0, 0, 0, 0.2) 40%,
+    transparent 65%
   );
 }
 
@@ -155,50 +158,53 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding: var(--discover-spacing-xl);
+  padding: var(--discover-spacing-lg);
   color: white;
 }
 
 .discover-hero__context {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  opacity: 0.85;
-  margin-bottom: var(--discover-spacing-sm);
+  letter-spacing: 0.4px;
+  opacity: 0.75;
+  margin-bottom: var(--discover-spacing-xs);
 }
 
 .discover-hero__title {
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 1.2;
-  margin-bottom: var(--discover-spacing-sm);
+  font-size: 20px;  /* Reduced from 24px */
+  font-weight: 600; /* Reduced from 700 */
+  line-height: 1.25;
+  margin-bottom: var(--discover-spacing-xs);
 }
 
 .discover-hero__sub-context {
-  font-size: 14px;
-  opacity: 0.85;
-  margin-bottom: var(--discover-spacing-lg);
+  font-size: 13px;
+  opacity: 0.75;
+  margin-bottom: var(--discover-spacing-md);
 }
 
+/* CTA: Secondary button style - less dominant */
 .discover-hero__cta {
   display: inline-flex;
   align-items: center;
-  gap: var(--discover-spacing-sm);
-  padding: 10px 20px;
-  background: rgba(255, 255, 255, 0.95);
-  color: var(--discover-accent-slate);
-  font-size: 14px;
-  font-weight: 600;
-  border-radius: var(--discover-radius-md);
-  border: none;
+  gap: 6px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--discover-radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   transition: all var(--discover-motion-fast) var(--discover-ease);
 }
 
 .discover-hero__cta:hover {
-  background: white;
-  transform: scale(1.02);
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .discover-hero__cta:active {
