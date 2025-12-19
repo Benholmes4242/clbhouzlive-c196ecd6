@@ -185,6 +185,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                   onClick={handleMenuClick} 
                   isOpen={menuOpen}
                   hasUnread={hasUnread}
+                  useLightTheme={useLightTheme}
                 />
               </div>
             )}
@@ -202,6 +203,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         <PostingAsMenu
           isOpen={menuOpen}
           onClose={() => setMenuOpen(false)}
+          useLightTheme={useLightTheme}
         />
       )}
 
