@@ -43,8 +43,8 @@ export default function CreateMomentHero({
         <div 
           className="p-8 rounded-2xl flex flex-col items-center"
           style={{
-            width: '320px',
-            minWidth: '320px',
+            width: '360px',
+            minWidth: '360px',
             background: 'var(--cm-surface-card)',
             border: '1px dashed var(--cm-border)',
           }}
