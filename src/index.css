@@ -449,7 +449,6 @@ header[data-chrome="header"],
 header.global-header,
 [data-hides-on-scroll] {
   margin-top: 0 !important;
-  padding-top: 0 !important;
   top: 0 !important;
 }
 
