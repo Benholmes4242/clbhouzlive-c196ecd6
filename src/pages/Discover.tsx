@@ -199,18 +199,18 @@ const Discover = () => {
     // In real app: API call to follow user
   };
 
-    return (
-      <PageRoot className="min-h-screen bg-background text-foreground">
-        <CompactHeader />
-        <FadeInContent>
-          <main className="pb-20 compact-header-offset-no-safe bg-background">
-              {/* Tabs - sit directly on page canvas, no intermediate blocks */}
-              <div className="px-1 bg-background">
-                <SegmentedControl 
-                  activeTab={activeFilter}
-                  onTabChange={() => {}} // No-op: tabs control via URL now
-                />
-              </div>
+  return (
+    <PageRoot className="min-h-screen bg-background text-foreground">
+      <CompactHeader />
+      <FadeInContent>
+        <main className="pb-20 bg-background">
+            {/* Tabs - sit directly on page canvas, no intermediate blocks */}
+            <div className="px-1 bg-background">
+              <SegmentedControl 
+                activeTab={activeFilter}
+                onTabChange={() => {}} // No-op: tabs control via URL now
+              />
+            </div>
             
             
             {/* Filter Pills Row - show for non-videos/shorts tabs */}
