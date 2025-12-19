@@ -491,8 +491,8 @@ html, body, #root {
      CLBHOUZ DARK THEME - CORE TOKENS
      ======================================== */
   
-  /* Core surfaces - Global Background: #F4F5F7 */
-  --bg-page: #F4F5F7;
+  /* Core surfaces - Global Background: Cool blue-grey slate */
+  --bg-page: #F8FAFC;
   --bg-surface: #0F0F0F;
   --bg-card: rgba(255,255,255,0.06);
   --bg-card-hover: rgba(255,255,255,0.08);
@@ -553,8 +553,8 @@ html, body, #root {
   /* Overlays */
   --hover-overlay: rgba(255,255,255,0.05);
 
-  /* Dark Mode Discover Navigation Tokens - Global Background: #F4F5F7 */
-  --bg-app: #F4F5F7;
+  /* Dark Mode Discover Navigation Tokens - Global Background: Cool blue-grey slate */
+  --bg-app: #F8FAFC;
   --bg-header: #B1C3CB;
   
   /* Tab text colors - Phase 2: Slate on light background */
