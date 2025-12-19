@@ -1,6 +1,4 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Play } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 
@@ -119,23 +117,9 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
         </h2>
 
         {/* Sub-context (creator or course) */}
-        <p className="text-xs md:text-sm text-white/60 mb-2.5 md:mb-3">
+        <p className="text-xs md:text-sm text-white/60">
           {item.subContext}
         </p>
-
-        {/* CTA Button - secondary/outline style */}
-        <Button
-          variant="outline"
-          size="sm"
-          className="bg-white/10 text-white border-white/30 hover:bg-white/20 hover:border-white/40 gap-1.5 text-xs font-medium backdrop-blur-sm"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleClick();
-          }}
-        >
-          <Play className="w-3 h-3 fill-current" />
-          {item.ctaLabel || 'Watch'}
-        </Button>
       </div>
 
       {/* Subtle hover effect */}
