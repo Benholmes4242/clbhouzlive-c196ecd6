@@ -16,6 +16,7 @@
 @import './styles/profile-light.css';
 @import './styles/profile-linkedin.css';
 @import './styles/create-moment-light.css';
+@import './styles/chrome-light.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
