@@ -36,15 +36,15 @@ export default function CreateMomentShareBar({
             className="overflow-hidden"
           >
             <div className="flex items-center gap-2">
-              <div className="flex-1 h-1 bg-muted rounded-full overflow-hidden">
+              <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full bg-primary rounded-full"
+                  className="h-full bg-white/80 rounded-full"
                   initial={{ width: 0 }}
                   animate={{ width: `${progressPercent}%` }}
                   transition={{ duration: 0.3, ease: "easeOut" }}
                 />
               </div>
-              <span className="text-[10px] text-muted-foreground tabular-nums">
+              <span className="text-[10px] text-white/60 tabular-nums">
                 {uploadedFiles}/{totalFiles}
               </span>
             </div>
@@ -59,14 +59,14 @@ export default function CreateMomentShareBar({
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
-            className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-destructive/10 border border-destructive/20"
+            className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-red-500/20 border border-red-500/30"
           >
-            <AlertCircle className="w-3.5 h-3.5 text-destructive flex-shrink-0" />
-            <span className="text-[11px] text-destructive flex-1">{error}</span>
+            <AlertCircle className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />
+            <span className="text-[11px] text-red-300 flex-1">{error}</span>
             {onRetry && (
               <button
                 onClick={onRetry}
-                className="flex items-center gap-1 text-[11px] text-foreground hover:text-foreground/80 transition-colors"
+                className="flex items-center gap-1 text-[11px] text-white/80 hover:text-white transition-colors"
               >
                 <RotateCcw className="w-3 h-3" />
                 Retry
@@ -80,11 +80,18 @@ export default function CreateMomentShareBar({
       <button
         disabled={!canPost || isUploading}
         onClick={onPost}
-        className={`w-full h-11 rounded-xl shadow-sm font-semibold text-sm transition-all duration-200 active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
-          isSuccess 
-            ? 'bg-green-500/10 border border-green-500/30 text-green-600' 
-            : 'bg-primary text-primary-foreground hover:bg-primary/90'
-        }`}
+        className="w-full h-11 rounded-xl shadow-sm font-semibold text-sm transition-all duration-200 active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-white/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        style={{
+          background: isSuccess 
+            ? 'rgba(34, 197, 94, 0.25)' 
+            : 'rgba(255, 255, 255, 0.18)',
+          backdropFilter: 'blur(12px) saturate(150%)',
+          WebkitBackdropFilter: 'blur(12px) saturate(150%)',
+          border: isSuccess 
+            ? '1px solid rgba(34, 197, 94, 0.4)' 
+            : '1px solid rgba(255, 255, 255, 0.28)',
+          color: 'rgba(255, 255, 255, 0.96)'
+        }}
         aria-label="Post your moment"
       >
         {isUploading ? (

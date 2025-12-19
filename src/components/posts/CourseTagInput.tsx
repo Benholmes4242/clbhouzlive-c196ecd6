@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { X, MapPin, Loader2 } from 'lucide-react';
-// Using Tailwind semantic tokens instead of dark-mode CSS classes
+import '@/features/nearby/GamesTab.css';
 
 interface GolfCourse {
   id: string;
@@ -114,16 +114,22 @@ const CourseTagInput = ({
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-semibold text-foreground mb-1.5">Where was this played?</label>
+      <label className="findLabel">Where was this played?</label>
       
       {selectedCourse ? (
-        // Show selected course pill
-        <div className="flex items-center gap-2.5">
-          <div className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/10 border border-primary/20">
-            <span className="font-semibold text-sm text-foreground">{selectedCourse.name}</span>
+        // Show selected course pill matching Create Game styling
+        <div className="selectedClubRow">
+          <div 
+            className="clubPill"
+            style={{
+              padding: '6px 10px 6px 14px',
+              borderColor: 'rgba(255, 255, 255, 0.18)',
+            }}
+          >
+            <span className="clubName">{selectedCourse.name}</span>
             <button
               onClick={handleRemoveCourse}
-              className="w-5 h-5 grid place-items-center rounded-md bg-muted hover:bg-muted/80 text-muted-foreground text-xs"
+              className="x"
               title="Remove course"
             >
               ✕
@@ -133,12 +139,12 @@ const CourseTagInput = ({
       ) : (
         // Show search input when no course is selected
         <div className="relative">
-          <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 bg-muted border border-border">
-            <MapPin className="w-[18px] h-[18px] text-muted-foreground flex-shrink-0" />
+          <div className="clubSearchBar">
+            <MapPin className="searchBox__icon" style={{ width: '18px', height: '18px' }} />
             <input
               ref={inputRef}
               type="text"
-              className="flex-1 bg-transparent border-0 text-foreground text-[15px] outline-none placeholder:text-muted-foreground"
+              className="clubSearchInput"
               value={searchQuery}
               onChange={handleInputChange}
               onFocus={handleInputFocus}
@@ -147,24 +153,24 @@ const CourseTagInput = ({
             />
             {isLoading && searchQuery.length >= 2 && (
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                <Loader2 className="h-4 w-4 animate-spin text-white/60" />
               </div>
             )}
           </div>
 
           {showSuggestions && suggestions.length > 0 && (
-            <div className="absolute z-60 mt-2 w-full rounded-xl bg-background border border-border shadow-lg max-h-[42vh] overflow-auto p-2">
+            <div className="resultsSheet">
               {suggestions.map((course) => (
                 <button
                   key={course.id}
                   type="button"
-                  className="flex items-center gap-2.5 w-full p-2.5 rounded-lg text-left hover:bg-muted transition-colors"
+                  className="resultRow"
                   onClick={() => handleCourseSelect(course)}
                 >
-                  <MapPin className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[15px] font-semibold text-foreground">{course.name}</div>
-                    <div className="text-[13px] text-muted-foreground">
+                  <MapPin className="w-5 h-5 text-white/60" />
+                  <div className="rMid">
+                    <div className="rTitle">{course.name}</div>
+                    <div className="rSub">
                       {course.region ? `${course.region}, ${course.country}` : course.country}
                     </div>
                   </div>

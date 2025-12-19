@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { ChevronRight, Sparkles, X } from "lucide-react";
+import { ChevronRight, Sparkles, AtSign, X } from "lucide-react";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
 import { IdentitySelector } from "@/components/identity/IdentitySelector";
 import CourseTagInput from "@/components/posts/CourseTagInput";
 import { StudioEdits } from "@/types/studio";
 import { GolfCourse, TaggableEntity } from "./types";
 import MentionSuggestions from "./MentionSuggestions";
+import { useNavigate } from "react-router-dom";
 
 interface CreateMomentComposerPanelProps {
   hasMedia: boolean;
@@ -117,21 +118,27 @@ export default function CreateMomentComposerPanel({
         {/* Posting As Selector - compressed single row */}
         {availableActorsCount > 1 && (
           <div className="flex items-center justify-between py-1">
-            <span className="text-[11px] text-muted-foreground">Posting as</span>
-            <IdentitySelector compact variant="light" />
+            <span className="text-[11px] text-white/50">Posting as</span>
+            <IdentitySelector compact variant="dark" />
           </div>
         )}
 
         {/* Caption Section - compact */}
         <div className="flex flex-col relative">
-          <label className="block text-sm font-semibold text-foreground mb-1.5">Add a caption</label>
+          <label className="block text-sm font-semibold text-white mb-1.5">Add a caption</label>
           
           <textarea
             ref={textareaRef}
-            className="caption-input w-full rounded-xl px-3 py-2.5 text-[14px] leading-snug resize-none bg-muted text-foreground placeholder:text-muted-foreground border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30"
+            className="caption-input w-full rounded-xl px-3 py-2.5 text-[14px] leading-snug resize-none text-white placeholder:text-white/50 focus:outline-none focus:ring-0 focus:border-transparent"
             style={{
+              background: 'rgba(255, 255, 255, 0.06)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
               minHeight: '48px',
               maxHeight: '100px',
+              boxShadow: 'none',
+              outline: 'none',
               WebkitTapHighlightColor: 'transparent',
               WebkitAppearance: 'none'
             }}
@@ -149,12 +156,17 @@ export default function CreateMomentComposerPanel({
               {/* Tagged entities confirmation chips */}
               {selectedTags.length > 0 ? (
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="text-[11px] text-muted-foreground">Tagged:</span>
+                  <span className="text-[11px] text-white/50">Tagged:</span>
                   {selectedTags.map(tag => (
                     <button
                       key={tag.id}
                       onClick={() => onTagsChange(selectedTags.filter(t => t.id !== tag.id))}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors"
+                      style={{
+                        background: 'rgba(255, 147, 30, 0.15)',
+                        color: 'hsl(var(--primary))',
+                        border: '1px solid rgba(255, 147, 30, 0.25)',
+                      }}
                     >
                       @{tag.username || tag.name}
                       <X className="w-3 h-3 opacity-60 hover:opacity-100" />
@@ -167,7 +179,7 @@ export default function CreateMomentComposerPanel({
               
               {/* Character count */}
               {caption.length > 0 && (
-                <span className={`text-[10px] flex-shrink-0 ${caption.length > 2000 ? 'text-amber-500' : 'text-muted-foreground/60'}`}>
+                <span className={`text-[10px] flex-shrink-0 ${caption.length > 2000 ? 'text-amber-400' : 'text-white/35'}`}>
                   {caption.length}/2200
                 </span>
               )}
@@ -191,7 +203,7 @@ export default function CreateMomentComposerPanel({
             selectedCourse={selectedCourse}
             placeholder="Where was this played?"
           />
-          <p className="mt-1 text-[10px] text-muted-foreground">
+          <p className="mt-1 text-[10px] text-white/45">
             Tag a course to help others discover your round
           </p>
         </div>
@@ -200,22 +212,34 @@ export default function CreateMomentComposerPanel({
         <button
           onClick={onOpenStudio}
           disabled={!hasMedia}
-          className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 bg-primary/5 border border-primary/15 hover:bg-primary/10 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200"
+          style={{
+            background: 'linear-gradient(135deg, rgba(255, 147, 30, 0.10) 0%, rgba(255, 200, 100, 0.06) 100%)',
+            backdropFilter: 'blur(12px) saturate(150%)',
+            WebkitBackdropFilter: 'blur(12px) saturate(150%)',
+            border: '1px solid rgba(255, 147, 30, 0.20)',
+            opacity: hasMedia ? 1 : 0.5,
+            cursor: hasMedia ? 'pointer' : 'not-allowed'
+          }}
           title={!hasMedia ? 'Add media to open Studio' : 'Enhance your moment'}
         >
           <div className="flex items-center gap-2.5">
             <div 
-              className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary shadow-sm"
+              className="w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{ 
+                background: 'linear-gradient(135deg, #FFB366 0%, #FF9933 100%)',
+                boxShadow: '0 2px 8px rgba(255, 147, 30, 0.25)'
+              }}
             >
-              <Sparkles className="w-4 h-4 text-primary-foreground" />
+              <Sparkles className="w-4 h-4 text-white" />
             </div>
-            <span className="text-sm font-medium text-foreground">
+            <span className="text-sm font-medium text-white">
               {currentFilter && currentFilter !== 'normal' 
                 ? `Filter: ${currentFilter}` 
                 : 'Enhance your moment'}
             </span>
           </div>
-          <ChevronRight className="w-4 h-4 text-muted-foreground" />
+          <ChevronRight className="w-4 h-4 text-white/40" />
         </button>
       </div>
     </div>

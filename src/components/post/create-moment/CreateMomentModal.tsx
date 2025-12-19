@@ -440,7 +440,7 @@ export default function CreateMomentModal({
     >
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/40"
+        className="absolute inset-0 bg-black/60"
         onClick={animateAndClose}
       />
       
@@ -452,7 +452,10 @@ export default function CreateMomentModal({
         aria-label="Create a Moment"
         className="ecm-glass-sheet fixed inset-0 flex flex-col"
         style={{
-          background: 'hsl(var(--background))',
+          background: 'rgba(15, 15, 15, 0.95)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
           transform: `translateY(${translateY}px)`,
           transition:
             isDragging || !hasEntered || prefersReduced()
@@ -467,7 +470,7 @@ export default function CreateMomentModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Grabber bar */}
-        {!hasMedia && <div className="w-10 h-1 bg-muted-foreground/30 rounded-full mx-auto mt-3" />}
+        {!hasMedia && <div className="hub-grabber" />}
 
         {/* Media Stage */}
         <section
@@ -499,7 +502,13 @@ export default function CreateMomentModal({
 
         {/* Composer Panel (no internal scroll; hero shrinks/grows) */}
         <section
-          className="composer relative z-[1003] flex flex-col bg-background border-t border-border"
+          className="composer relative z-[1003] flex flex-col"
+          style={{
+            background: 'rgba(15, 15, 15, 0.95)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+          }}
         >
           <OverlayPortalProvider container={overlayRoot}>
             <CreateMomentComposerPanel
@@ -522,15 +531,22 @@ export default function CreateMomentModal({
 
           {/* Share Bar - simple button */}
           <div
-            className="flex-shrink-0 px-4 pt-2 border-t border-border bg-background"
+            className="flex-shrink-0 px-4 pt-2 border-t border-white/8"
             style={{
               paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)',
+              background: 'rgba(15, 15, 15, 0.98)',
             }}
           >
             <button
               disabled={!canPost}
               onClick={handlePost}
-              className="w-full h-11 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[.99] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center bg-primary text-primary-foreground hover:bg-primary/90"
+              className="w-full h-11 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[.99] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              style={{
+                background: 'rgba(255, 255, 255, 0.18)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255, 255, 255, 0.28)',
+                color: 'rgba(255, 255, 255, 0.96)'
+              }}
             >
               Share
             </button>
@@ -551,19 +567,24 @@ export default function CreateMomentModal({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
-              className="absolute top-20 left-4 right-4 z-[1010] p-4 rounded-2xl bg-card border border-border shadow-lg"
+              className="absolute top-20 left-4 right-4 z-[1010] p-4 rounded-2xl"
+              style={{
+                background: 'rgba(30, 30, 35, 0.95)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+              }}
             >
-              <p className="text-foreground text-sm font-medium mb-3">Resume your draft?</p>
+              <p className="text-white text-sm font-medium mb-3">Resume your draft?</p>
               <div className="flex gap-2">
                 <button
                   onClick={handleRestoreDraft}
-                  className="flex-1 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium"
+                  className="flex-1 py-2 rounded-xl bg-white/20 text-white text-sm font-medium"
                 >
                   Resume
                 </button>
                 <button
                   onClick={handleDiscardDraft}
-                  className="flex-1 py-2 rounded-xl bg-muted text-muted-foreground text-sm"
+                  className="flex-1 py-2 rounded-xl bg-white/10 text-white/70 text-sm"
                 >
                   Discard
                 </button>
