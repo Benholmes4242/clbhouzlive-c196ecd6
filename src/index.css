@@ -1871,8 +1871,8 @@ html[data-immersive="true"] .app-shell--topSpacer {
      Light Grey + Slate + Orange Accent
      ======================================== */
     
-    /* Base canvas */
-    --background: 240 5% 96%;            /* #F4F5F7 */
+    /* Base canvas - Cool blue-grey slate */
+    --background: 210 40% 98%;           /* #F8FAFC */
     --foreground: 210 13% 18%;           /* #1F2428 (text-primary) */
     
     /* Surfaces */
