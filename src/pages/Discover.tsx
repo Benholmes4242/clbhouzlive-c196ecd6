@@ -212,16 +212,6 @@ const Discover = () => {
               />
             </div>
             
-            {/* Filter chips row - only show for shorts/Watch tab */}
-            {main === 'shorts' && (
-              <DiscoverVideosHeader
-                activeDuration={durationFilter}
-                onChangeDuration={setDurationFilter}
-                onOpenShorts={() => setDurationFilter('shorts')}
-                onSearchSubmit={(query) => setSearchQuery(query)}
-                initialQuery={searchQuery}
-              />
-            )}
             
             {/* Filter Pills Row - show for non-videos/shorts tabs */}
             {main !== 'videos' && main !== 'shorts' && (
