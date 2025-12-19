@@ -34,7 +34,7 @@ import Top100Pills from '@/components/courses/Top100Pills';
 
 // Lazy load heavy/inactive components for better initial bundle size
 const FollowingFeed = lazy(() => import('@/components/discover/FollowingFeed'));
-const VideosPage = lazy(() => import('@/features/videos2/pages/VideosPage'));
+const LearnTab = lazy(() => import('@/components/learn/LearnTab'));
 
 type MainKey = 'shorts' | 'videos' | 'channels' | 'following';
 
@@ -253,7 +253,7 @@ const Discover = () => {
                 if (key === 'videos') {
                   return (
                     <Suspense fallback={null}>
-                      <VideosPage />
+                      <LearnTab onVideoClick={handleMediaClick} />
                     </Suspense>
                   );
                 }
