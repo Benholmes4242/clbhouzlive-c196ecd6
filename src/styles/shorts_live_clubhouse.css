@@ -1,16 +1,29 @@
-/* Live Clubhouse Strip Styles */
+/* Live Clubhouse Strip Styles - Suggested Golfers */
 
-/* Row container - transparent background */
+/* Row container - transparent background with proper vertical spacing */
 .live-row {
   position: relative;
-  padding: 5px 0 5px 4px;
+  /* 24-32px spacing from hero above */
+  padding-top: 24px;
+  /* 24-32px spacing to feed below */
+  padding-bottom: 24px;
+  padding-left: 4px;
   background: transparent;
+}
+
+/* Section title - subtle, slate text */
+.live-row-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: hsl(var(--muted-foreground));
+  padding-left: 12px;
+  margin-bottom: 12px;
 }
 
 /* Horizontal scroll track */
 .live-scroll {
   display: flex;
-  gap: 6px;
+  gap: 10px; /* Slightly increased spacing between squircles */
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scroll-behavior: smooth;
@@ -39,7 +52,7 @@
   align-items: center;
   justify-content: center;
   width: 84px;
-  height: 96px;  /* Match nearby button height for alignment */
+  height: 96px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -60,12 +73,10 @@
   object-fit: cover;
   display: block;
   position: relative;
-  border-radius: 0 !important; /* Let Squircle component handle the shape */
+  border-radius: 0 !important;
 }
 
-/* Recent posts indicator removed */
-
-/* Online dot - high contrast for dark mode visibility */
+/* Online dot - high contrast for visibility */
 .lc-dot {
   position: absolute;
   right: -2px;
@@ -73,20 +84,20 @@
   width: 10px;
   height: 10px;
   border-radius: 9999px;
-  background-color: #4ade80; /* presence green */
+  background-color: #4ade80;
   box-shadow:
-    0 0 0 2px rgba(0, 0, 0, 0.8),   /* ring so it sits on any avatar */
-    0 0 4px rgba(0, 0, 0, 0.9);     /* subtle glow for dark mode */
+    0 0 0 2px rgba(0, 0, 0, 0.8),
+    0 0 4px rgba(0, 0, 0, 0.9);
   z-index: 2;
 }
 
-/* Labels */
+/* Labels - using semantic tokens, NO white text */
 .lc-name {
   margin-top: 6px;
   font-size: 13px;
   line-height: 1.2;
   font-weight: 600;
-  color: #000;
+  color: hsl(var(--foreground));
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
@@ -97,7 +108,7 @@
 .lc-sub {
   font-size: 12px;
   line-height: 1.2;
-  color: rgba(0, 0, 0, 0.6);
+  color: hsl(var(--muted-foreground));
   margin-top: 2px;
   text-align: center;
   display: -webkit-box;
@@ -111,13 +122,7 @@
   margin-top: 6px;
 }
 
-/* White labels for both nearby golfers and creators */
-.live-row .lc-name, 
-.live-row .lc-sub { 
-  color: #fff !important; 
-}
-
-/* Peek card styles removed - feature disabled */
+/* REMOVED: White text override - now using semantic tokens above */
 
 /* Nearby bubble styling */
 .lc-nearby {
@@ -136,16 +141,16 @@
 }
 
 /* ============================= */
-/* Nearby pin — Frosted white glass (dark mode) */
+/* Nearby pin — Frosted white glass */
 /* ============================= */
 
 /* Sizing tokens */
 :root {
-  --lc-avatar-size: 84px;      /* creator avatar size (matches .lc-avatar) */
-  --lc-nearby-scale: 1.0;      /* 100% of avatar size - matches creator avatars */
+  --lc-avatar-size: 84px;
+  --lc-nearby-scale: 1.0;
   --lc-nearby-size: calc(var(--lc-avatar-size) * var(--lc-nearby-scale));
-  --lc-nearby-border: 2px;     /* inset ring thickness - DO NOT CHANGE */
-  --lc-nearby-inset: 3px;      /* inner padding for checker/pin */
+  --lc-nearby-border: 2px;
+  --lc-nearby-inset: 3px;
 }
 
 /* Avatar container styling for nearby - frosted white glass */
@@ -185,29 +190,10 @@
   height: 76%;
   object-fit: contain;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
-  pointer-events: none; /* ensure clicks go to parent */
+  pointer-events: none;
 }
 
-/* Pulse animation removed - keeping static design only */
-
-/* Dark mode disabled during development */
-/* @media (prefers-color-scheme: dark) {
-  .lc-nearby-avatar {
-    background: radial-gradient(60% 60% at 50% 40%, rgba(110,146,119,.12) 0%, rgba(110,146,119,.05) 100%), #111214;
-    border-color: rgba(110,146,119,.35);
-    box-shadow: 0 8px 18px rgba(0,0,0,.45);
-  }
-  
-  .lc-name {
-    color: rgba(255,255,255,.92);
-  }
-  
-  .lc-sub {
-    color: rgba(255,255,255,.72);
-  }
-} */
-
-/* Reduced motion - no animations to disable */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   /* All animations removed - static design only */
 }

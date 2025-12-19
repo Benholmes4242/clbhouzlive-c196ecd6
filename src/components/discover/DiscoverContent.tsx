@@ -240,7 +240,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   // Handle Shorts tab directly (no sliding panels needed)
   if (main === 'shorts') {
     return (
-      <>
+      <div className="watch-tab-content">
         {/* Watch Hero - single featured item */}
         <DiscoverHero 
           item={heroItem}
@@ -251,7 +251,10 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
           }}
         />
         
+        {/* Suggested Golfers - with 24-32px spacing handled in CSS */}
         <LiveClubhouseStrip />
+        
+        {/* Feed Grid */}
         <ShortsGrid 
           items={gridContent || []} 
           onOpen={onMediaClick}
@@ -261,7 +264,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
           onLike={handleLikeToggle}
           onAuthorClick={handleAuthorClick}
         />
-      </>
+      </div>
     );
   }
 

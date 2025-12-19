@@ -1,14 +1,14 @@
 /* Discover Tabs - Light/Clean Design */
 
-/* Tokens */
+/* Tokens - using slate for subtle emphasis */
 :root {
-  --tab-active-color: #1e293b; /* slate-800 */
-  --tab-inactive-color: #64748b; /* slate-500 */
-  --tab-hover-color: #334155; /* slate-700 */
-  --tab-underline-color: #1e293b; /* slate-800 */
+  --tab-active-color: hsl(var(--foreground));
+  --tab-inactive-color: hsl(var(--muted-foreground));
+  --tab-hover-color: hsl(var(--foreground) / 0.8);
+  --tab-underline-color: hsl(var(--foreground));
 }
 
-/* Tab container - sits directly on page, no background card */
+/* Tab container - sits directly on page canvas, fully transparent */
 .discover-tabs {
   display: flex;
   gap: 0;
@@ -19,7 +19,7 @@
 /* Base tab */
 .discover-tab {
   position: relative;
-  padding: 10px 0;
+  padding: 12px 0;
   color: var(--tab-inactive-color);
   font-weight: 500;
   font-size: 14px;
@@ -36,21 +36,29 @@
   font-weight: 600;
 }
 
+/* Underline: text-width only, 2px height, slate color, no glow */
 .discover-tab.active::after {
   content: '';
   position: absolute;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 24px;
+  width: 100%;
+  max-width: 40px; /* Roughly text width */
   height: 2px;
   background: var(--tab-underline-color);
   border-radius: 1px;
+  /* No shadow or glow */
+  box-shadow: none;
 }
 
-/* Header - transparent, no visual block */
+/* Header - fully transparent, on page canvas */
 .discover-header {
   background: transparent;
   border: none;
   padding: 0 4px;
+  /* Spacing: 16-20px from header chrome to tabs */
+  padding-top: 16px;
+  /* Spacing: 12-16px from tabs to hero */
+  padding-bottom: 14px;
 }
