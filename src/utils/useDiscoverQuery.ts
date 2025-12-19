@@ -7,12 +7,12 @@ export function useDiscoverQuery() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
 
-  const rawMain = params.get("main") || "watch";
+  const rawMain = params.get("main") || "videos";
   
-  // Map legacy routes to new structure
+  // Map legacy routes: 'friends' -> 'following', 'photos' -> 'videos'
   let mappedMain = rawMain;
   if (rawMain === "friends") mappedMain = "following";
-  if (rawMain === "photos" || rawMain === "videos" || rawMain === "shorts" || rawMain === "channels") mappedMain = "watch";
+  if (rawMain === "photos") mappedMain = "videos";
   
   const main = mappedMain as MainPill;
   const sub = params.get("sub") || "";

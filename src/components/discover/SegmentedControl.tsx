@@ -39,7 +39,14 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
   }, [main]);
 
   const handleTabClick = (tabId: string) => {
-    setMain(tabId as MainPill);
+    // Map new tabs to main pill values
+    // For now, 'watch' maps to 'shorts' (the shorts grid)
+    // Other tabs will be stubs
+    if (tabId === 'watch') {
+      setMain('shorts' as MainPill);
+    } else {
+      setMain(tabId as MainPill);
+    }
   };
 
   return (
