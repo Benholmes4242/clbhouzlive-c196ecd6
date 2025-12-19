@@ -1,12 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { ChevronRight, Sparkles, AtSign, X } from "lucide-react";
+import { ChevronRight, Sparkles, X } from "lucide-react";
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
 import { IdentitySelector } from "@/components/identity/IdentitySelector";
 import CourseTagInput from "@/components/posts/CourseTagInput";
 import { StudioEdits } from "@/types/studio";
 import { GolfCourse, TaggableEntity } from "./types";
 import MentionSuggestions from "./MentionSuggestions";
-import { useNavigate } from "react-router-dom";
 
 interface CreateMomentComposerPanelProps {
   hasMedia: boolean;
@@ -110,34 +109,41 @@ export default function CreateMomentComposerPanel({
       className="flex flex-col px-4 pt-2 gap-2.5"
       style={{
         paddingBottom: '8px',
-        touchAction: 'pan-y'
+        touchAction: 'pan-y',
+        background: 'var(--cm-surface-card)',
       }}
       data-ecm-scroll-container="true"
     >
       <div className="flex flex-col gap-2.5">
-        {/* Posting As Selector - compressed single row */}
+        {/* Posting As Selector - light row */}
         {availableActorsCount > 1 && (
-          <div className="flex items-center justify-between py-1">
-            <span className="text-[11px] text-white/50">Posting as</span>
-            <IdentitySelector compact variant="dark" />
+          <div 
+            className="flex items-center justify-between py-1"
+            style={{ borderBottom: '1px solid var(--cm-border-subtle)' }}
+          >
+            <span className="text-[11px]" style={{ color: 'var(--cm-text-tertiary)' }}>Posting as</span>
+            <IdentitySelector compact variant="light" />
           </div>
         )}
 
-        {/* Caption Section - compact */}
+        {/* Caption Section - slate input */}
         <div className="flex flex-col relative">
-          <label className="block text-sm font-semibold text-white mb-1.5">Add a caption</label>
+          <label 
+            className="block text-sm font-semibold mb-1.5"
+            style={{ color: 'var(--cm-text-primary)' }}
+          >
+            Add a caption
+          </label>
           
           <textarea
             ref={textareaRef}
-            className="caption-input w-full rounded-xl px-3 py-2.5 text-[14px] leading-snug resize-none text-white placeholder:text-white/50 focus:outline-none focus:ring-0 focus:border-transparent"
+            className="w-full rounded-xl px-3 py-2.5 text-[14px] leading-snug resize-none transition-colors"
             style={{
-              background: 'rgba(255, 255, 255, 0.06)',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              background: 'var(--cm-surface-input)',
+              border: '1px solid var(--cm-border-subtle)',
+              color: 'var(--cm-text-primary)',
               minHeight: '48px',
               maxHeight: '100px',
-              boxShadow: 'none',
               outline: 'none',
               WebkitTapHighlightColor: 'transparent',
               WebkitAppearance: 'none'
@@ -156,16 +162,16 @@ export default function CreateMomentComposerPanel({
               {/* Tagged entities confirmation chips */}
               {selectedTags.length > 0 ? (
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="text-[11px] text-white/50">Tagged:</span>
+                  <span className="text-[11px]" style={{ color: 'var(--cm-text-tertiary)' }}>Tagged:</span>
                   {selectedTags.map(tag => (
                     <button
                       key={tag.id}
                       onClick={() => onTagsChange(selectedTags.filter(t => t.id !== tag.id))}
                       className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium transition-colors"
                       style={{
-                        background: 'rgba(255, 147, 30, 0.15)',
-                        color: 'hsl(var(--primary))',
-                        border: '1px solid rgba(255, 147, 30, 0.25)',
+                        background: 'var(--cm-accent-subtle)',
+                        color: 'var(--cm-accent)',
+                        border: '1px solid rgba(247, 147, 30, 0.25)',
                       }}
                     >
                       @{tag.username || tag.name}
@@ -179,7 +185,10 @@ export default function CreateMomentComposerPanel({
               
               {/* Character count */}
               {caption.length > 0 && (
-                <span className={`text-[10px] flex-shrink-0 ${caption.length > 2000 ? 'text-amber-400' : 'text-white/35'}`}>
+                <span 
+                  className="text-[10px] flex-shrink-0"
+                  style={{ color: caption.length > 2000 ? '#D97706' : 'var(--cm-text-tertiary)' }}
+                >
                   {caption.length}/2200
                 </span>
               )}
@@ -196,28 +205,29 @@ export default function CreateMomentComposerPanel({
           )}
         </div>
 
-        {/* Course Tagging Section - tighter */}
+        {/* Course Tagging Section */}
         <div className="flex flex-col">
           <CourseTagInput
             onCourseSelect={onCourseSelect}
             selectedCourse={selectedCourse}
             placeholder="Where was this played?"
           />
-          <p className="mt-1 text-[10px] text-white/45">
+          <p 
+            className="mt-1 text-[10px]"
+            style={{ color: 'var(--cm-text-tertiary)' }}
+          >
             Tag a course to help others discover your round
           </p>
         </div>
 
-        {/* Studio Entry Card - compact single line */}
+        {/* Studio Entry Card - Apple Settings row style */}
         <button
           onClick={onOpenStudio}
           disabled={!hasMedia}
           className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200"
           style={{
-            background: 'linear-gradient(135deg, rgba(255, 147, 30, 0.10) 0%, rgba(255, 200, 100, 0.06) 100%)',
-            backdropFilter: 'blur(12px) saturate(150%)',
-            WebkitBackdropFilter: 'blur(12px) saturate(150%)',
-            border: '1px solid rgba(255, 147, 30, 0.20)',
+            background: 'var(--cm-surface-card)',
+            border: '1px solid var(--cm-border-subtle)',
             opacity: hasMedia ? 1 : 0.5,
             cursor: hasMedia ? 'pointer' : 'not-allowed'
           }}
@@ -227,19 +237,21 @@ export default function CreateMomentComposerPanel({
             <div 
               className="w-8 h-8 rounded-lg flex items-center justify-center"
               style={{ 
-                background: 'linear-gradient(135deg, #FFB366 0%, #FF9933 100%)',
-                boxShadow: '0 2px 8px rgba(255, 147, 30, 0.25)'
+                background: 'var(--cm-surface-alt)',
               }}
             >
-              <Sparkles className="w-4 h-4 text-white" />
+              <Sparkles className="w-4 h-4" style={{ color: 'var(--cm-accent)' }} />
             </div>
-            <span className="text-sm font-medium text-white">
+            <span 
+              className="text-sm font-medium"
+              style={{ color: 'var(--cm-text-primary)' }}
+            >
               {currentFilter && currentFilter !== 'normal' 
                 ? `Filter: ${currentFilter}` 
                 : 'Enhance your moment'}
             </span>
           </div>
-          <ChevronRight className="w-4 h-4 text-white/40" />
+          <ChevronRight className="w-4 h-4" style={{ color: 'var(--cm-icon-secondary)' }} />
         </button>
       </div>
     </div>
