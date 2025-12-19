@@ -1,4 +1,4 @@
-import React, { useState } from 'react'; // v3 - Phase 1 polish pass
+import React, { useState } from 'react'; // v4 - Phase 5: Reviews, Memory & Planning
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +21,7 @@ import { CourseTop100Summary } from './CourseTop100Summary';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import CommunityScoreCard from './CommunityScoreCard';
 import { CourseTop100Spotlight } from './CourseTop100Spotlight';
+import { PersonalSection } from '@/components/courses/phase5';
 
 interface Course {
   id: string;
@@ -138,7 +139,10 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {/* 1. Location Breadcrumb & Quick Filters (Explore more + See Top 100 in) */}
       <CourseLocationBreadcrumb course={course} />
 
-      
+      {/* Phase 5: Personal Section - Your Journey */}
+      {user && (
+        <PersonalSection courseId={course.id} courseName={course.name} />
+      )}
       {/* 2. Community Score Section - Card-based design */}
       <section className="px-4 pt-5 pb-5 bg-slate-100 md:px-6 md:pt-7 space-y-4">
         <CommunityScoreCard
