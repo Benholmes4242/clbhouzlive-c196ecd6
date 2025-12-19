@@ -16,7 +16,7 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
       <div
         ref={ref}
         className={cn(
-          "page-root min-h-[100vh] w-full flex flex-col",
+          "page-root min-h-[100vh] w-full flex flex-col bg-[var(--bg-page)]",
           className
         )}
         {...rest}
