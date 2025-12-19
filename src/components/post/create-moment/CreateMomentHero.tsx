@@ -39,10 +39,12 @@ export default function CreateMomentHero({
         animate={{ opacity: 1 }}
         transition={{ duration: 0.25, ease: "easeOut" }}
       >
-        {/* Drop zone container */}
+        {/* Drop zone container - fixed width */}
         <div 
-          className="w-full p-8 rounded-2xl flex flex-col items-center"
+          className="p-8 rounded-2xl flex flex-col items-center"
           style={{
+            width: '320px',
+            minWidth: '320px',
             background: 'var(--cm-surface-card)',
             border: '1px dashed var(--cm-border)',
           }}

@@ -467,15 +467,22 @@ export default function CreateMomentModal({
         onTouchEnd={handleSheetTouchEnd}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Grabber bar - slate */}
-        {!hasMedia && <div className="cm-grabber" />}
-
-        {/* Media Stage */}
+        {/* Media Stage - grey background flows to top */}
         <section
           id="media" 
           className="relative flex-1 min-h-0 overflow-hidden z-[1002]"
-          style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+          style={{ 
+            paddingTop: 'env(safe-area-inset-top, 0px)',
+            background: 'var(--cm-surface-alt)',
+          }}
         >
+          {/* Grabber bar - white, positioned at top */}
+          {!hasMedia && (
+            <div 
+              className="cm-grabber"
+              style={{ position: 'absolute', top: 'calc(env(safe-area-inset-top, 0px) + 8px)', left: '50%', transform: 'translateX(-50%)' }}
+            />
+          )}
           {hasMedia ? (
             <CreateMomentMediaStage
               media={media}
