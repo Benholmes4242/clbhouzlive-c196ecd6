@@ -393,8 +393,12 @@ html.lightbox-open {
   padding-top: calc(56px + env(safe-area-inset-top));
 }
 
-/* ========================================
-   PAGE ROOT - iOS Safari Text Rendering Fix
+/* Discover needs the compact header offset WITHOUT adding safe-area again
+   (CompactHeader already handles safe-area padding internally). */
+.compact-header-offset-no-safe {
+  padding-top: 56px;
+}
+
    Forces a separate compositing layer to escape the
    position:fixed html/body + nested scroll bug on iOS.
    Use .page-root for new pages, .activity-page-root kept for backward compat.
