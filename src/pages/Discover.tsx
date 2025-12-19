@@ -1,5 +1,5 @@
 import React, { useState, useMemo, lazy, Suspense } from 'react';
-import CompactHeader from '@/components/header/CompactHeader';
+import DiscoverHeaderLight from '@/components/header/DiscoverHeaderLight';
 import { FadeInContent } from '@/components/ui/FadeInContent';
 import { PageRoot } from '@/components/layout/PageRoot';
 
@@ -176,7 +176,7 @@ const Discover = () => {
 
   return (
     <PageRoot className="min-h-screen" style={{ background: '#F4F5F7' }}>
-      <CompactHeader />
+      <DiscoverHeaderLight />
       <FadeInContent>
         <main className="pb-20 compact-header-offset">
           {/* Tabs - integrated with canvas, no separate container */}
