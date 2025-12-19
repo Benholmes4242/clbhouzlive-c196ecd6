@@ -50,7 +50,7 @@
   height: 44px;
   border-radius: 14px;
   padding: 10px 14px;
-  background: var(--hub-glass-bg-button);
+  background: var(--hub-glass-bg);
   border: 1px solid var(--hub-stroke);
   color: var(--hub-text-sub);
   font-weight: 600;
@@ -63,9 +63,10 @@
 }
 
 .modeChip--active {
-  background: var(--hub-glass-bg-button-hover);
+  background: var(--hub-glass-bg-hover);
   border-color: var(--hub-stroke-strong);
   color: var(--hub-text);
+  box-shadow: var(--hub-shadow-tile);
 }
 
 .modeChip:active {
@@ -357,9 +358,9 @@
   height: 44px;
   border-radius: 14px;
   padding: 10px 14px;
-  background: var(--hub-glass-bg-button);
+  background: var(--hub-glass-bg);
   border: 1px solid var(--hub-stroke);
-  color: var(--hub-text);
+  color: var(--hub-text-sub);
   font-weight: 600;
   font-size: 15px;
   line-height: 1;
@@ -381,13 +382,14 @@
 }
 
 .chip--active {
-  background: var(--hub-glass-bg-button-hover);
+  background: var(--hub-glass-bg-hover);
   border-color: var(--hub-stroke-strong);
-  color: var(--hub-text-bright);
+  color: var(--hub-text);
+  box-shadow: var(--hub-shadow-tile);
 }
 
 .chip:hover:not(:disabled) {
-  background: var(--hub-glass-bg-button-hover);
+  background: var(--hub-glass-bg-hover);
 }
 
 .chip:active {
