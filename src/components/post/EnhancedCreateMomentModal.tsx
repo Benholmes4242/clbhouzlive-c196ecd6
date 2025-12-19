@@ -376,15 +376,15 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
       {/* Bottom Sheet Overlay */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Frosted backdrop */}
+          {/* Solid backdrop */}
           <div 
-            className="absolute inset-0 bg-white/20 backdrop-blur-md"
+            className="absolute inset-0 bg-black"
             onClick={onClose}
           />
           
-          {/* Modal with white frosted glassmorphism */}
+          {/* Modal - solid black */}
           <div 
-            className="relative w-full max-w-[420px] md:max-w-[480px] bg-white/40 backdrop-blur-md border border-white/30 rounded-3xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] py-6 px-5 max-h-[85vh] overflow-y-auto animate-fade-in animate-scale-in"
+            className="relative w-full max-w-[420px] md:max-w-[480px] bg-black border border-white/10 rounded-3xl py-6 px-5 max-h-[85vh] overflow-y-auto animate-fade-in animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -392,7 +392,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
               {modalMode === 'upload' && (
                 <button
                   onClick={handleBackToSelection}
-                  className="flex items-center justify-center w-6 h-6 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="flex items-center justify-center w-6 h-6 text-white/60 hover:text-white transition-colors"
                   aria-label="Back to selection"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -401,12 +401,12 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 </button>
               )}
               {modalMode === 'selection' && <div className="w-6 h-6" />}
-              <h2 className="text-lg font-bold text-center flex-1">
+              <h2 className="text-lg font-bold text-center flex-1 text-white">
                 {editMode ? 'Edit Moment' : 'Create a Moment'}
               </h2>
               <button
                 onClick={onClose}
-                className="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+                className="w-6 h-6 flex items-center justify-center text-white/60 hover:text-white transition-colors"
                 aria-label="Close modal"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -423,12 +423,12 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 {isMobile && (
                   <button
                     onClick={handleCaptureClick}
-                    className="w-full flex items-center gap-4 p-5 bg-[#f9f9f9] hover:bg-[#f0f0f0] active:bg-[#e8e8e8] text-[#222222] rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md transform active:scale-[0.98]"
+                    className="w-full flex items-center gap-4 p-5 bg-white/10 hover:bg-white/15 active:bg-white/20 text-white rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 focus:ring-offset-2 focus:ring-offset-black cursor-pointer transform active:scale-[0.98]"
                     disabled={isSubmitting}
                     aria-label="Open camera to record in real-time"
                     tabIndex={0}
                   >
-                    <Camera className="h-6 w-6 text-[#222222] flex-shrink-0" />
+                    <Camera className="h-6 w-6 text-white flex-shrink-0" />
                     <div className="text-left flex-1">
                       <div className="text-base font-medium">Capture Photo or Video</div>
                     </div>
@@ -438,12 +438,12 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 {/* Select Photos */}
                 <button
                   onClick={handleSelectPhotos}
-                  className="w-full flex items-center gap-4 p-5 bg-[#f9f9f9] hover:bg-[#f0f0f0] active:bg-[#e8e8e8] text-[#222222] rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md transform active:scale-[0.98]"
+                  className="w-full flex items-center gap-4 p-5 bg-white/10 hover:bg-white/15 active:bg-white/20 text-white rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 focus:ring-offset-2 focus:ring-offset-black cursor-pointer transform active:scale-[0.98]"
                   disabled={isSubmitting}
                   aria-label="Choose saved images from your gallery"
                   tabIndex={0}
                 >
-                  <Image className="h-6 w-6 text-[#222222] flex-shrink-0" />
+                  <Image className="h-6 w-6 text-white flex-shrink-0" />
                   <div className="text-left flex-1">
                     <div className="text-base font-medium">Select Photos from Gallery</div>
                   </div>
@@ -452,27 +452,27 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 {/* Select Videos */}
                 <button
                   onClick={handleSelectVideos}
-                  className="w-full flex items-center gap-4 p-5 bg-[#f9f9f9] hover:bg-[#f0f0f0] active:bg-[#e8e8e8] text-[#222222] rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md transform active:scale-[0.98]"
+                  className="w-full flex items-center gap-4 p-5 bg-white/10 hover:bg-white/15 active:bg-white/20 text-white rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 focus:ring-offset-2 focus:ring-offset-black cursor-pointer transform active:scale-[0.98]"
                   disabled={isSubmitting}
                   aria-label="Upload pre-recorded golf clips"
                   tabIndex={0}
                 >
-                  <Video className="h-6 w-6 text-[#222222] flex-shrink-0" />
+                  <Video className="h-6 w-6 text-white flex-shrink-0" />
                   <div className="text-left flex-1">
                     <div className="text-base font-medium">Select Videos from Gallery</div>
                   </div>
                 </button>
 
                 {/* Helper Text */}
-                <p className="text-xs text-gray-500 mt-4 px-1 text-center">
+                <p className="text-xs text-white/50 mt-4 px-1 text-center">
                   Select multiple files to create a carousel post with swipeable media.
                 </p>
 
                 {/* Cancel Button */}
-                <div className="mt-6 pt-4 border-t border-gray-100">
+                <div className="mt-6 pt-4 border-t border-white/10">
                   <button
                     onClick={onClose}
-                    className="w-full text-center py-3 text-black text-base font-medium hover:text-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 rounded-lg"
+                    className="w-full text-center py-3 text-white text-base font-medium hover:text-white/80 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/40 focus:ring-offset-2 focus:ring-offset-black rounded-lg"
                     tabIndex={0}
                     aria-label="Cancel and close modal"
                   >

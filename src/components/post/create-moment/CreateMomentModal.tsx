@@ -440,7 +440,7 @@ export default function CreateMomentModal({
     >
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/60"
+        className="absolute inset-0 bg-black"
         onClick={animateAndClose}
       />
       
@@ -450,12 +450,8 @@ export default function CreateMomentModal({
         role="dialog"
         aria-modal="true"
         aria-label="Create a Moment"
-        className="ecm-glass-sheet fixed inset-0 flex flex-col"
+        className="fixed inset-0 flex flex-col bg-black"
         style={{
-          background: 'rgba(15, 15, 15, 0.95)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
           transform: `translateY(${translateY}px)`,
           transition:
             isDragging || !hasEntered || prefersReduced()
