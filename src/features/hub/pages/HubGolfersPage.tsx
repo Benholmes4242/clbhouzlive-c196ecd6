@@ -11,6 +11,7 @@ import { OpenToPlayButton } from '@/features/nearby/components/OpenToPlayButton'
 import { NearbyFilterBar } from '@/features/nearby/components/NearbyFilterBar';
 import { useVisibility } from '@/features/nearby/hooks/useVisibility';
 import { GolferFilters } from '@/hooks/useActiveGolfers';
+import { HubHeader } from '../components/HubHeader';
 import '../home/hubThemeLight.css';
 
 export function HubGolfersPage() {
@@ -34,40 +35,27 @@ export function HubGolfersPage() {
   return (
     <div className="fixed inset-0 z-[9999]">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
+      <div 
+        className="absolute inset-0" 
+        style={{ 
+          background: 'var(--hub-backdrop)',
+          backdropFilter: `blur(var(--hub-backdrop-blur))`,
+          WebkitBackdropFilter: `blur(var(--hub-backdrop-blur))`,
+        }} 
+      />
       
       {/* Glass Sheet */}
       <div
         className="hub-glass-page fixed inset-0"
         style={{
-          background: 'rgba(0, 0, 0, 0.28)',
-          backdropFilter: 'blur(22px)',
-          WebkitBackdropFilter: 'blur(22px)',
-          border: '1px solid rgba(255, 255, 255, 0.06)',
-          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.45), 0 0 1px rgba(255, 255, 255, 0.16)',
+          background: 'var(--hub-bg-start)',
+          border: '1px solid var(--hub-stroke-subtle)',
+          boxShadow: 'var(--hub-shadow-main)',
         }}
       >
-      <header 
-        className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-14 border-b"
-        style={{
-          borderColor: 'var(--hub-stroke)',
-          background: 'rgba(22, 24, 27, 0.98)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          paddingTop: 'env(safe-area-inset-top, 0px)',
-        }}
-      >
-        <button
-          onClick={() => nav(-1)}
-          className="text-white/90 hover:text-white text-[15px] font-medium transition-colors"
-          aria-label="Back to Hub"
-        >
-          ‹ Back
-        </button>
-        <h1 className="text-white/90 text-[17px] font-semibold">Golfers</h1>
-        <div className="w-16" />
-      </header>
-      <div ref={listRef} className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
+        <HubHeader title="Golfers" onBack={() => nav(-1)} />
+        
+        <div ref={listRef} className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
           <div className="px-4 pt-[calc(env(safe-area-inset-top,0px)+16px)] pb-6 space-y-4">
             <div className="space-y-3">
               <GolferStatusBar value={visibilityMode} onChange={setVisibilityMode} />
@@ -85,8 +73,8 @@ export function HubGolfersPage() {
                 {golfers.map((golfer, index) => <NearbyGolferCard key={golfer.id ?? index} golfer={golfer} index={index} />)}
               </div>
             )}
-           </div>
-       </div>
+          </div>
+        </div>
       </div>
     </div>
   );
