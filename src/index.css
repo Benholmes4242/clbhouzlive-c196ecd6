@@ -15,6 +15,7 @@
 @import './styles/dark-golf-passport.css';
 @import './styles/profile-light.css';
 @import './styles/profile-linkedin.css';
+@import './styles/create-moment-light.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

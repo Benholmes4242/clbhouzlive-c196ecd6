@@ -438,20 +438,22 @@ export default function CreateMomentModal({
       className="fixed inset-0 z-[9999]"
       style={{ touchAction: 'none' }}
     >
-      {/* Backdrop */}
+      {/* Backdrop - subtle dim, no blur */}
       <div 
-        className="absolute inset-0 bg-black"
+        className="absolute inset-0"
+        style={{ background: 'var(--cm-backdrop)' }}
         onClick={animateAndClose}
       />
       
-      {/* Main sheet */}
+      {/* Main sheet - light slate surface */}
       <div 
         ref={wrapperRef}
         role="dialog"
         aria-modal="true"
         aria-label="Create a Moment"
-        className="fixed inset-0 flex flex-col bg-black"
+        className="fixed inset-0 flex flex-col"
         style={{
+          background: 'var(--cm-surface-card)',
           transform: `translateY(${translateY}px)`,
           transition:
             isDragging || !hasEntered || prefersReduced()
@@ -465,8 +467,8 @@ export default function CreateMomentModal({
         onTouchEnd={handleSheetTouchEnd}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Grabber bar */}
-        {!hasMedia && <div className="hub-grabber" />}
+        {/* Grabber bar - slate */}
+        {!hasMedia && <div className="cm-grabber" />}
 
         {/* Media Stage */}
         <section
@@ -496,14 +498,12 @@ export default function CreateMomentModal({
           )}
         </section>
 
-        {/* Composer Panel (no internal scroll; hero shrinks/grows) */}
+        {/* Composer Panel - light slate surface */}
         <section
           className="composer relative z-[1003] flex flex-col"
           style={{
-            background: 'rgba(15, 15, 15, 0.95)',
-            backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)',
-            borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+            background: 'var(--cm-surface-card)',
+            borderTop: '1px solid var(--cm-border-subtle)',
           }}
         >
           <OverlayPortalProvider container={overlayRoot}>
@@ -525,23 +525,25 @@ export default function CreateMomentModal({
             />
           </OverlayPortalProvider>
 
-          {/* Share Bar - simple button */}
+          {/* Share Bar - slate theme */}
           <div
-            className="flex-shrink-0 px-4 pt-2 border-t border-white/8"
+            className="flex-shrink-0 px-4 pt-2"
             style={{
               paddingBottom: 'max(env(safe-area-inset-bottom, 12px), 12px)',
-              background: 'rgba(15, 15, 15, 0.98)',
+              background: 'var(--cm-surface-card)',
+              borderTop: '1px solid var(--cm-border-subtle)',
             }}
           >
             <button
               disabled={!canPost}
               onClick={handlePost}
-              className="w-full h-11 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[.99] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="w-full h-11 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-[.99] disabled:cursor-not-allowed flex items-center justify-center"
               style={{
-                background: 'rgba(255, 255, 255, 0.18)',
-                backdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255, 255, 255, 0.28)',
-                color: 'rgba(255, 255, 255, 0.96)'
+                background: canPost ? 'var(--cm-surface-slate)' : 'var(--cm-surface-alt)',
+                border: canPost ? 'none' : '1px solid var(--cm-border-subtle)',
+                color: canPost ? 'white' : 'var(--cm-text-tertiary)',
+                boxShadow: canPost ? 'var(--cm-shadow-button)' : 'none',
+                opacity: canPost ? 1 : 1,
               }}
             >
               Share
@@ -556,7 +558,7 @@ export default function CreateMomentModal({
           className="pointer-events-none absolute inset-0 z-[1010]"
         />
 
-        {/* Draft prompt */}
+        {/* Draft prompt - light slate */}
         <AnimatePresence>
           {showDraftPrompt && (
             <motion.div
@@ -565,22 +567,24 @@ export default function CreateMomentModal({
               exit={{ opacity: 0, y: 20 }}
               className="absolute top-20 left-4 right-4 z-[1010] p-4 rounded-2xl"
               style={{
-                background: 'rgba(30, 30, 35, 0.95)',
-                backdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                background: 'var(--cm-surface-card)',
+                border: '1px solid var(--cm-border)',
+                boxShadow: 'var(--cm-shadow-soft)',
               }}
             >
-              <p className="text-white text-sm font-medium mb-3">Resume your draft?</p>
+              <p className="text-sm font-medium mb-3" style={{ color: 'var(--cm-text-primary)' }}>Resume your draft?</p>
               <div className="flex gap-2">
                 <button
                   onClick={handleRestoreDraft}
-                  className="flex-1 py-2 rounded-xl bg-white/20 text-white text-sm font-medium"
+                  className="flex-1 py-2 rounded-xl text-sm font-medium"
+                  style={{ background: 'var(--cm-surface-slate)', color: 'white' }}
                 >
                   Resume
                 </button>
                 <button
                   onClick={handleDiscardDraft}
-                  className="flex-1 py-2 rounded-xl bg-white/10 text-white/70 text-sm"
+                  className="flex-1 py-2 rounded-xl text-sm"
+                  style={{ background: 'var(--cm-surface-alt)', color: 'var(--cm-text-secondary)', border: '1px solid var(--cm-border-subtle)' }}
                 >
                   Discard
                 </button>

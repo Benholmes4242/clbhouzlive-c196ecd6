@@ -1,0 +1,136 @@
+/**
+ * Create Moment Modal - Light Slate Theme
+ * Clean, Apple-inspired design tokens for the light mode composer
+ */
+
+:root {
+  /* ========================================
+     CREATE MOMENT LIGHT PALETTE
+     ======================================== */
+  
+  /* Surfaces */
+  --cm-surface-card: #FAFAFB;
+  --cm-surface-alt: #EDEFF2;
+  --cm-surface-slate: #3A3F46;
+  
+  /* Inputs */
+  --cm-surface-input: #EDEFF2;
+  --cm-surface-input-hover: #E8EAEC;
+  --cm-surface-input-focus: #E0E2E4;
+  
+  /* Borders */
+  --cm-border: #D4D7DB;
+  --cm-border-subtle: #E5E7EA;
+  
+  /* Text hierarchy */
+  --cm-text-primary: #1F2428;
+  --cm-text-secondary: #5E666D;
+  --cm-text-tertiary: #97A1AA;
+  
+  /* Icons */
+  --cm-icon-primary: #3A3F46;
+  --cm-icon-secondary: #7A8490;
+  
+  /* Backdrop */
+  --cm-backdrop: rgba(31, 36, 40, 0.35);
+  
+  /* Accent */
+  --cm-accent: #F7931E;
+  --cm-accent-subtle: rgba(247, 147, 30, 0.15);
+  
+  /* Shadows */
+  --cm-shadow-soft: 0 4px 24px rgba(31, 36, 40, 0.08);
+  --cm-shadow-button: 0 2px 8px rgba(31, 36, 40, 0.06);
+}
+
+/* ========================================
+   CREATE MOMENT MODAL UTILITIES
+   ======================================== */
+
+.cm-modal-backdrop {
+  background: var(--cm-backdrop);
+}
+
+.cm-modal-surface {
+  background: var(--cm-surface-card);
+  border: 1px solid var(--cm-border);
+  border-radius: 24px;
+  box-shadow: var(--cm-shadow-soft);
+}
+
+.cm-composer-panel {
+  background: var(--cm-surface-card);
+  border-top: 1px solid var(--cm-border-subtle);
+}
+
+.cm-input {
+  background: var(--cm-surface-input);
+  border: 1px solid var(--cm-border-subtle);
+  color: var(--cm-text-primary);
+}
+
+.cm-input::placeholder {
+  color: var(--cm-text-tertiary);
+}
+
+.cm-input:hover {
+  background: var(--cm-surface-input-hover);
+}
+
+.cm-input:focus {
+  background: var(--cm-surface-input-focus);
+  border-color: var(--cm-border);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(247, 147, 30, 0.15);
+}
+
+.cm-button-primary {
+  background: var(--cm-surface-slate);
+  color: white;
+  border: none;
+  box-shadow: var(--cm-shadow-button);
+}
+
+.cm-button-primary:hover {
+  background: #4A5058;
+}
+
+.cm-button-secondary {
+  background: var(--cm-surface-alt);
+  border: 1px solid var(--cm-border);
+  color: var(--cm-text-primary);
+}
+
+.cm-button-secondary:hover {
+  background: var(--cm-surface-input-hover);
+}
+
+.cm-button-disabled {
+  background: var(--cm-surface-alt);
+  border: 1px solid var(--cm-border-subtle);
+  color: var(--cm-text-tertiary);
+}
+
+.cm-drop-zone {
+  background: var(--cm-surface-alt);
+  border: 1px dashed var(--cm-border);
+  border-radius: 16px;
+}
+
+.cm-row-tile {
+  background: var(--cm-surface-card);
+  border: 1px solid var(--cm-border-subtle);
+  border-radius: 12px;
+}
+
+.cm-row-tile:hover {
+  background: var(--cm-surface-alt);
+}
+
+.cm-grabber {
+  width: 36px;
+  height: 5px;
+  background: var(--cm-border);
+  border-radius: 3px;
+  margin: 8px auto;
+}
