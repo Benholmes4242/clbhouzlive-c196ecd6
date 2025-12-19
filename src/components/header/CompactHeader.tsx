@@ -73,7 +73,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // Get border based on theme
   const getBorder = () => {
     if (useLightTheme) return LIGHT_BORDER;
-    if (isDimmed) return DIM_BORDER;
+    // In cinema "faded" mode, borders must be fully invisible
+    if (isDimmed) return 'transparent';
     return STANDARD_BORDER;
   };
 
