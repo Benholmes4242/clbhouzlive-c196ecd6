@@ -120,7 +120,7 @@ function FindAGame({
                 ) : (
                   courses.map(c => (
                     <TapButton key={c.id} className="resultRow" onClick={() => handleSelect(c)}>
-                      <MapPin size={18} style={{ color: 'white', flexShrink: 0 }} />
+                      <MapPin size={18} style={{ color: 'var(--hub-text-sub)', flexShrink: 0 }} />
                       <div className="rMid">
                         <div className="rTitle">{c.name}</div>
                         <div className="rSub">{c.region || c.country}</div>
@@ -253,7 +253,7 @@ function GamesList({ games, isLoading }: { games: Game[]; isLoading: boolean }) 
     return (
       <div className="gamesEmpty" role="status">
         <div className="gamesEmpty__icon">
-          <MapPin size={32} className="text-white" strokeWidth={2} />
+          <MapPin size={32} style={{ color: 'var(--hub-text-sub)' }} strokeWidth={2} />
         </div>
         <h2 className="gamesEmpty__title">No games found</h2>
         <p className="gamesEmpty__body">Be the first to start one — tap <strong>Create a Game</strong>.</p>

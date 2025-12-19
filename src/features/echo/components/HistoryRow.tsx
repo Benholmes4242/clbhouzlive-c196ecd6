@@ -38,8 +38,8 @@ export function HistoryRow({ item, onToggle, trailing, children }: Props) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: 'rgba(255,255,255,0.45)',
-                border: '1px solid rgba(255,255,255,0.55)',
+                background: 'var(--hub-glass-bg)',
+                border: '1px solid var(--hub-stroke)',
                 position: 'relative',
                 overflow: 'hidden'
               }}
@@ -48,12 +48,12 @@ export function HistoryRow({ item, onToggle, trailing, children }: Props) {
                 style={{
                   position: 'absolute',
                   inset: 0,
-                  background: 'linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
-                  opacity: 0.8,
+                  background: 'linear-gradient(180deg, var(--hub-glass-bg-elevated) 0%, var(--hub-glass-bg) 100%)',
+                  opacity: 0.5,
                   pointerEvents: 'none'
                 }}
               />
-              <PiWaveform size={29} className="text-black/80" style={{ position: 'relative', zIndex: 1 }} />
+              <PiWaveform size={29} style={{ color: 'var(--hub-text-sub)', position: 'relative', zIndex: 1 }} />
             </div>
           </Squircle>
         </div>

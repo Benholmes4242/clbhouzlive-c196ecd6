@@ -26,11 +26,11 @@ export function GolferStatusBar({ value, onChange }: GolferStatusBarProps) {
   const getHelperText = () => {
     switch (value) {
       case 'all':
-        return { text: 'Visible to all golfers nearby', color: '#72ff8d' };
+        return { text: 'Visible to all golfers nearby', color: 'var(--hub-accent)' };
       case 'friends':
-        return { text: 'Visible to your friends only', color: '#72ff8d' };
+        return { text: 'Visible to your friends only', color: 'var(--hub-accent)' };
       case 'hidden':
-        return { text: 'Hidden from nearby golfers', color: 'rgba(255,255,255,0.78)' };
+        return { text: 'Hidden from nearby golfers', color: 'var(--hub-text-sub)' };
     }
   };
 
@@ -40,10 +40,10 @@ export function GolferStatusBar({ value, onChange }: GolferStatusBarProps) {
     <div className="mx-3">
       {/* Segmented control - PRIMARY hierarchy */}
       <div
-        className="relative rounded-xl backdrop-blur-[20px] border p-1.5 flex"
+        className="relative rounded-xl border p-1.5 flex"
         style={{
-          background: 'rgba(255,255,255,0.08)',
-          borderColor: 'rgba(255,255,255,0.12)',
+          background: 'var(--hub-glass-bg)',
+          borderColor: 'var(--hub-stroke)',
           height: '48px',
         }}
       >
@@ -53,9 +53,9 @@ export function GolferStatusBar({ value, onChange }: GolferStatusBarProps) {
           style={{
             width: 'calc(33.33% - 6px)',
             transform: `translateX(calc(${getSliderPosition()} / 0.3333))`,
-            background: 'rgba(255,255,255,0.20)',
+            background: 'var(--hub-glass-bg-hover)',
             transition: 'transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1)',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+            boxShadow: 'var(--hub-shadow-tile)'
           }}
         />
 
@@ -65,7 +65,7 @@ export function GolferStatusBar({ value, onChange }: GolferStatusBarProps) {
             key={mode}
             className="relative flex-1 font-semibold transition-colors duration-200 flex items-center justify-center"
             style={{
-              color: value === mode ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.65)',
+              color: value === mode ? 'var(--hub-text)' : 'var(--hub-text-sub)',
               fontSize: '17px',
               padding: '12px 16px',
               lineHeight: 1,

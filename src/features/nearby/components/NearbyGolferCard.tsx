@@ -121,7 +121,7 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
                     {golfer.home_club}
                   </span>
                   {golfer.handicap !== undefined && (
-                    <span className="text-white/40">•</span>
+                    <span style={{ color: 'var(--hub-text-dim)' }}>•</span>
                   )}
                 </>
               )}
@@ -145,8 +145,8 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
         {/* Action buttons */}
         <div className="flex gap-2 mt-3">
           <button
-            className="flex-1 h-[40px] rounded-[14px] border bg-white/[0.02] text-[14px] font-medium shadow-[0_1px_0_rgba(255,255,255,0.04)] transition-all duration-[120ms] hover:bg-white/[0.06] active:scale-[0.97] active:bg-white/[0.09]"
-            style={{ color: 'var(--hub-text-body)', borderColor: 'var(--hub-stroke)' }}
+            className="flex-1 h-[40px] rounded-[14px] border text-[14px] font-medium transition-all duration-[120ms] active:scale-[0.97]"
+            style={{ color: 'var(--hub-text-body)', borderColor: 'var(--hub-stroke)', background: 'var(--hub-glass-bg)' }}
             onClick={() => {
               haptic('light');
               sendFriendRequest();
@@ -157,12 +157,19 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
           </button>
 
           <button
-            className={`flex-1 h-[40px] rounded-[14px] border text-[14px] font-medium shadow-[0_1px_0_rgba(255,255,255,0.04)] transition-all duration-[120ms] active:scale-[0.97] ${
-              isFollowing
-                ? 'bg-emerald-500/18 border-emerald-400/40 text-emerald-200 hover:bg-emerald-500/24 active:bg-emerald-500/26'
-                : 'bg-transparent hover:bg-white/[0.06] active:bg-white/[0.09]'
-            }`}
-            style={isFollowing ? undefined : { color: 'var(--hub-text-body)', borderColor: 'var(--hub-stroke)' }}
+            className="flex-1 h-[40px] rounded-[14px] border text-[14px] font-medium transition-all duration-[120ms] active:scale-[0.97]"
+            style={isFollowing 
+              ? { 
+                  background: 'rgba(110, 146, 119, 0.12)', 
+                  borderColor: 'rgba(110, 146, 119, 0.35)', 
+                  color: 'var(--hub-accent)' 
+                } 
+              : { 
+                  color: 'var(--hub-text-body)', 
+                  borderColor: 'var(--hub-stroke)', 
+                  background: 'var(--hub-glass-bg)' 
+                }
+            }
             onClick={() => {
               haptic('light');
               toggleFollow();
@@ -174,8 +181,8 @@ export function NearbyGolferCard({ golfer, index }: NearbyGolferCardProps) {
           </button>
 
           <button
-            className="flex-1 h-[40px] rounded-[14px] border bg-transparent text-[14px] font-medium shadow-[0_1px_0_rgba(255,255,255,0.04)] transition-all duration-[120ms] hover:bg-white/[0.06] active:scale-[0.97] active:bg-white/[0.09]"
-            style={{ color: 'var(--hub-text-body)', borderColor: 'var(--hub-stroke)' }}
+            className="flex-1 h-[40px] rounded-[14px] border text-[14px] font-medium transition-all duration-[120ms] active:scale-[0.97]"
+            style={{ color: 'var(--hub-text-body)', borderColor: 'var(--hub-stroke)', background: 'var(--hub-glass-bg)' }}
             onClick={() => {
               haptic('light');
               openMessage();

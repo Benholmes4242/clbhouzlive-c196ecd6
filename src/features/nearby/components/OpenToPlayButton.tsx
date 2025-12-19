@@ -55,25 +55,25 @@ export function OpenToPlayButton() {
         aria-label={isActive ? `Open to Play active, ${remainingMinutes} minutes remaining` : 'Activate Open to Play'}
         disabled={isSaving}
         onPointerDown={handleToggle}
-        className="relative inline-flex items-center justify-center gap-2.5 transition-all duration-100 active:scale-[0.97] rounded-[14px] bg-white/[0.04] border border-white/10"
+        className="relative inline-flex items-center justify-center gap-2.5 transition-all duration-100 active:scale-[0.97] rounded-[14px] border"
         style={{
           minWidth: '240px',
           height: '42px',
           fontWeight: 600,
           fontSize: '16px',
-          color: '#fff',
+          color: 'var(--hub-text)',
           padding: '12px 16px',
-          ...(isActive && {
-            background: 'linear-gradient(to bottom, rgba(78, 199, 120, 0.16), rgba(78, 199, 120, 0.10))',
-            borderColor: 'rgba(78, 199, 120, 0.28)',
-          }),
+          background: isActive 
+            ? 'linear-gradient(to bottom, rgba(110, 146, 119, 0.16), rgba(110, 146, 119, 0.10))' 
+            : 'var(--hub-glass-bg)',
+          borderColor: isActive ? 'rgba(110, 146, 119, 0.35)' : 'var(--hub-stroke)',
         }}
       >
         <span className="text-[16px]" aria-hidden="true">🏌️‍♂️</span>
         {isSaving ? (
           'Updating…'
         ) : isActive ? (
-          <>Open to Play <span className="text-white/70 text-[13px]">• {remainingMinutes}m</span></>
+          <>Open to Play <span style={{ color: 'var(--hub-text-sub)' }} className="text-[13px]">• {remainingMinutes}m</span></>
         ) : (
           'Open to Play'
         )}
