@@ -213,7 +213,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
               isClubhouseRoute 
                 ? "border-[rgba(255,255,255,0.06)] backdrop-blur-xl"
                 : "border-slate-200/60 backdrop-blur-xl",
-              isDimmed && "backdrop-blur-0"
+              // In cinema "faded" mode, borders must be fully invisible
+              isDimmed && "backdrop-blur-0 border-transparent"
             )}
               data-chrome="bottom-nav"
               style={{
