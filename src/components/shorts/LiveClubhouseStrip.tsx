@@ -83,11 +83,13 @@ export function LiveClubhouseStrip() {
 
   return (
     <div className="live-row">
+      {/* Section title - subtle, understated */}
+      <div className="live-row-title">Suggested golfers</div>
       <div 
         className="live-scroll" 
         ref={rowRef} 
         role="listbox" 
-        aria-label="Suggested creators"
+        aria-label="Suggested golfers"
       >
           {nearbyOnlineGolfers.map((golfer, idx) => (
             <LiveTile 

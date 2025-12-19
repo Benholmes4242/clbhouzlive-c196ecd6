@@ -203,9 +203,9 @@ const Discover = () => {
     <PageRoot className="min-h-screen bg-background text-foreground">
       <CompactHeader />
       <FadeInContent>
-        <main className="pb-20 compact-header-offset">
+        <main className="pb-20 compact-header-offset bg-background">
             {/* Tabs - sit directly on page canvas, no intermediate blocks */}
-            <div className="px-1">
+            <div className="px-1 bg-background">
               <SegmentedControl 
                 activeTab={activeFilter}
                 onTabChange={() => {}} // No-op: tabs control via URL now
