@@ -1,11 +1,12 @@
 /**
  * Hub Games Page
- * Full-screen glass page overlaying the origin page.
+ * Full-screen page with standard Hub light theme styling
  */
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { GamesTab } from '@/features/nearby/GamesTab';
 import { useHub } from '@/features/hub/useHub';
+import { HubHeader } from '../components/HubHeader';
 import '../home/hubThemeLight.css';
 
 export function HubGamesPage() {
@@ -16,10 +17,8 @@ export function HubGamesPage() {
   const goBack = () => {
     const state = loc.state as any;
     if (state?.backgroundLocation) {
-      // Navigate back to close this overlay
       nav(-1);
     } else {
-      // Deep link fallback - return to Hub
       nav('/hub', { replace: true });
     }
   };
@@ -31,45 +30,30 @@ export function HubGamesPage() {
   return (
     <div className="fixed inset-0 z-[9999]">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
+      <div 
+        className="absolute inset-0" 
+        style={{ 
+          background: 'var(--hub-backdrop)',
+          backdropFilter: `blur(var(--hub-backdrop-blur))`,
+          WebkitBackdropFilter: `blur(var(--hub-backdrop-blur))`,
+        }} 
+      />
       
       {/* Glass Sheet */}
       <div
         className="hub-glass-page fixed inset-0"
         style={{
-          background: 'rgba(0, 0, 0, 0.28)',
-          backdropFilter: 'blur(22px)',
-          WebkitBackdropFilter: 'blur(22px)',
-          border: '1px solid rgba(255, 255, 255, 0.06)',
-          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.45), 0 0 1px rgba(255, 255, 255, 0.16)',
+          background: 'var(--hub-bg-start)',
+          border: '1px solid var(--hub-stroke-subtle)',
+          boxShadow: 'var(--hub-shadow-main)',
         }}
       >
-      {/* Header */}
-      <header 
-        className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-14 border-b"
-        style={{
-          borderColor: 'var(--hub-stroke)',
-          background: 'rgba(22, 24, 27, 0.98)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          paddingTop: 'env(safe-area-inset-top, 0px)',
-        }}
-      >
-        <button
-          onClick={goBack}
-          className="text-white/90 hover:text-white text-[15px] font-medium transition-colors"
-          aria-label="Back to Hub"
-        >
-          ‹ Back
-        </button>
-        <h1 className="text-white/90 text-[17px] font-semibold">Games</h1>
-        <div className="w-16" />
-      </header>
+        <HubHeader title="Games" onBack={goBack} />
 
-      {/* Content area - GamesTab content */}
-      <div className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
-        <GamesTab onOpenCreate={handleOpenCreate} />
-      </div>
+        {/* Content area - GamesTab content */}
+        <div className="overflow-y-auto h-screen pt-[calc(3.5rem+env(safe-area-inset-top,0px))]">
+          <GamesTab onOpenCreate={handleOpenCreate} />
+        </div>
       </div>
     </div>
   );

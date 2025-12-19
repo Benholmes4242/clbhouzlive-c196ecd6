@@ -809,17 +809,22 @@ export function HubEchoHistoryPage() {
   return (
     <div className="fixed inset-0 z-[9999]">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
+      <div 
+        className="absolute inset-0" 
+        style={{ 
+          background: 'var(--hub-backdrop)',
+          backdropFilter: `blur(var(--hub-backdrop-blur))`,
+          WebkitBackdropFilter: `blur(var(--hub-backdrop-blur))`,
+        }} 
+      />
       
       {/* Glass Sheet */}
       <div
         className="hub-glass-page fixed inset-0 flex flex-col overflow-x-hidden overflow-y-auto"
         style={{
-          background: 'rgba(0, 0, 0, 0.28)',
-          backdropFilter: 'blur(22px)',
-          WebkitBackdropFilter: 'blur(22px)',
-          border: '1px solid rgba(255, 255, 255, 0.06)',
-          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.45), 0 0 1px rgba(255, 255, 255, 0.16)',
+          background: 'var(--hub-bg-start)',
+          border: '1px solid var(--hub-stroke-subtle)',
+          boxShadow: 'var(--hub-shadow-main)',
           touchAction: 'pan-y',
           overscrollBehaviorX: 'none',
         }}
@@ -829,9 +834,8 @@ export function HubEchoHistoryPage() {
         className="fixed top-0 left-0 right-0 z-[10000] flex items-center justify-between px-4 h-14 border-b"
         style={{
           borderColor: 'var(--hub-stroke)',
-          background: 'var(--hub-header-bg-solid)',
-          backdropFilter: 'none',
-          WebkitBackdropFilter: 'none',
+          background: 'var(--hub-header-bg)',
+          boxShadow: 'var(--hub-header-shadow)',
           transition: 'all 160ms ease-out',
           paddingTop: 'env(safe-area-inset-top, 0px)',
           contain: 'paint',
@@ -839,12 +843,15 @@ export function HubEchoHistoryPage() {
       >
         <button
           onClick={handleBack}
-          className="text-white/90 hover:text-white text-[15px] font-medium transition-colors"
+          className="text-[15px] font-medium transition-colors"
+          style={{ color: 'var(--hub-text-body)' }}
+          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--hub-text)'}
+          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--hub-text-body)'}
           aria-label="Back to Hub"
         >
           ‹ Back
         </button>
-        <h1 className="text-white/90 text-[17px] font-semibold">Echo History</h1>
+        <h1 className="text-[17px] font-semibold" style={{ color: 'var(--hub-text)' }}>Echo History</h1>
         <div /> {/* Spacer for flex layout */}
       </header>
 
@@ -860,7 +867,7 @@ export function HubEchoHistoryPage() {
         <section className="px-4 md:px-6 max-w-3xl mx-auto eh-fixedLayer min-w-0" style={{ touchAction: 'pan-y' }}>
           <h2
             className="text-[17px] font-semibold mb-3"
-            style={{ color: 'rgba(255,255,255,0.9)' }}
+            style={{ color: 'var(--hub-text)' }}
           >
             Recent chats
           </h2>
@@ -884,10 +891,10 @@ export function HubEchoHistoryPage() {
                     setFilters(prev => ({ ...prev, tag: undefined }));
                     announce(`Cleared tag filter: ${filters.tag}`);
                   }}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors hover:bg-white/12"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors"
                   style={{
-                    background: 'rgba(255,255,255,0.10)',
-                    border: '1px solid rgba(255,255,255,0.18)',
+                    background: 'var(--hub-glass)',
+                    border: '1px solid var(--hub-stroke)',
                     color: 'var(--hub-text)',
                   }}
                   aria-label={`Clear tag filter ${filters.tag}`}
@@ -967,8 +974,8 @@ export function HubEchoHistoryPage() {
                 {filters.tag && (
                   <button
                     onClick={() => setFilters((p) => ({ ...p, tag: undefined }))}
-                    className="px-3 py-1.5 rounded-full text-[13px] border border-white/12 hover:bg-white/10 transition-colors"
-                    style={{ color: 'var(--hub-text)' }}
+                    className="px-3 py-1.5 rounded-full text-[13px] transition-colors"
+                    style={{ color: 'var(--hub-text)', border: '1px solid var(--hub-stroke)', background: 'var(--hub-glass)' }}
                   >
                     Clear tag filter
                   </button>
@@ -976,8 +983,8 @@ export function HubEchoHistoryPage() {
                 {filters.query && (
                   <button
                     onClick={() => setFilters((p) => ({ ...p, query: '' }))}
-                    className="px-3 py-1.5 rounded-full text-[13px] border border-white/12 hover:bg-white/10 transition-colors"
-                    style={{ color: 'var(--hub-text)' }}
+                    className="px-3 py-1.5 rounded-full text-[13px] transition-colors"
+                    style={{ color: 'var(--hub-text)', border: '1px solid var(--hub-stroke)', background: 'var(--hub-glass)' }}
                   >
                     Clear search
                   </button>
@@ -985,8 +992,8 @@ export function HubEchoHistoryPage() {
                 {(filters.hasResponse !== undefined || filters.starred || filters.dateFrom) && (
                   <button
                     onClick={() => setFilters((p) => ({ ...p, hasResponse: undefined, starred: undefined, dateFrom: undefined }))}
-                    className="px-3 py-1.5 rounded-full text-[13px] border border-white/12 hover:bg-white/10 transition-colors"
-                    style={{ color: 'var(--hub-text)' }}
+                    className="px-3 py-1.5 rounded-full text-[13px] transition-colors"
+                    style={{ color: 'var(--hub-text)', border: '1px solid var(--hub-stroke)', background: 'var(--hub-glass)' }}
                   >
                     Clear filters
                   </button>
