@@ -12,9 +12,9 @@ interface SegmentedControlProps {
 }
 
 const tabs = [
-  { id: 'shorts', label: 'Shorts' },
-  { id: 'videos', label: 'Videos' },
-  { id: 'channels', label: 'Channels' },
+  { id: 'shorts', label: 'Watch' },
+  { id: 'videos', label: 'Learn' },
+  { id: 'channels', label: 'Explore' },
   { id: 'following', label: 'Following' }
 ];
 
