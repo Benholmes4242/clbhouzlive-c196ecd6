@@ -73,9 +73,13 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // Get border based on theme
   const getBorder = () => {
     if (useLightTheme) return LIGHT_BORDER;
+    if (isDimmed && isClubhouseRoute) return "transparent";
     if (isDimmed) return DIM_BORDER;
     return STANDARD_BORDER;
   };
+  
+  // Hide brand (logo + wordmark) when dimmed on Clubhouse
+  const hideBrand = isDimmed && isClubhouseRoute;
 
   return (
     <>
@@ -110,8 +114,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
               alt="clbhouz"
               className={cn(
-                "h-9 w-9 object-contain transition-opacity",
-                isDimmed ? "opacity-55" : "hover:opacity-80"
+                "h-9 w-9 object-contain transition-opacity duration-300",
+                hideBrand ? "opacity-0" : isDimmed ? "opacity-55" : "hover:opacity-80"
               )}
             />
             {/* Wordmark - desktop only */}
@@ -120,7 +124,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 "hidden md:inline font-semibold text-lg tracking-tight transition-colors duration-300",
                 useLightTheme ? "text-slate-800" : ""
               )}
-              style={{ color: useLightTheme ? '#3A3F46' : isDimmed ? 'rgba(255, 255, 255, 0.55)' : 'white' }}
+              style={{ color: useLightTheme ? '#3A3F46' : hideBrand ? 'rgba(255, 255, 255, 0)' : isDimmed ? 'rgba(255, 255, 255, 0.55)' : 'white' }}
             >
               clbhouz
             </span>
