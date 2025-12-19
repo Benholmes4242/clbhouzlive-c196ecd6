@@ -16,10 +16,10 @@
   align-items: center;
 }
 
-/* Base tab */
+/* Base tab - tight vertical padding, underline sits close to text */
 .discover-tab {
   position: relative;
-  padding: 12px 0;
+  padding: 10px 0 8px 0; /* Less bottom padding so underline is close */
   color: var(--tab-inactive-color);
   font-weight: 500;
   font-size: 14px;
@@ -52,13 +52,13 @@
   box-shadow: none;
 }
 
-/* Header - fully transparent, on page canvas */
+/* Header - fully transparent, tucked tight under header chrome */
 .discover-header {
   background: transparent;
   border: none;
   padding: 0 4px;
-  /* Spacing: 16-20px from header chrome to tabs */
-  padding-top: 16px;
-  /* Spacing: 12-16px from tabs to hero */
-  padding-bottom: 14px;
+  /* NO top padding - tabs anchor directly to header */
+  padding-top: 0;
+  /* Space below tabs to hero: 12-14px */
+  padding-bottom: 12px;
 }
