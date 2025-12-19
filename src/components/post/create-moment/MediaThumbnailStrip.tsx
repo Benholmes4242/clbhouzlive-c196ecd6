@@ -66,7 +66,7 @@ function SortableThumb({ item, index, isActive, isCover, getEdits, onSelect }: S
       className={`
         relative flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden cursor-pointer
         transition-all duration-150
-        ${isActive ? 'ring-2 ring-white ring-offset-1 ring-offset-black/50' : 'opacity-70 hover:opacity-100'}
+        ${isActive ? 'ring-2 ring-primary ring-offset-1 ring-offset-background' : 'opacity-70 hover:opacity-100'}
         ${isDragging ? 'scale-105 shadow-xl' : ''}
       `}
       whileTap={{ scale: 0.95 }}
@@ -98,8 +98,8 @@ function SortableThumb({ item, index, isActive, isCover, getEdits, onSelect }: S
 
       {/* Cover indicator */}
       {isCover && (
-        <div className="absolute top-1 right-1 rounded bg-amber-500 px-1 py-0.5">
-          <Star className="w-2.5 h-2.5 text-white fill-white" />
+        <div className="absolute top-1 right-1 rounded bg-primary px-1 py-0.5">
+          <Star className="w-2.5 h-2.5 text-primary-foreground fill-primary-foreground" />
         </div>
       )}
 
@@ -149,7 +149,7 @@ export default function MediaThumbnailStrip({
   }, [media, onReorder]);
 
   return (
-    <div className="px-4 py-3 bg-black/30 backdrop-blur-sm">
+    <div className="px-4 py-3 bg-muted/50 border-t border-border">
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -176,7 +176,7 @@ export default function MediaThumbnailStrip({
       </DndContext>
       
       {/* Helper text */}
-      <p className="text-xs text-white/50 mt-2 text-center">
+      <p className="text-xs text-muted-foreground mt-2 text-center">
         Hold and drag to reorder • Tap ★ to set cover
       </p>
     </div>
