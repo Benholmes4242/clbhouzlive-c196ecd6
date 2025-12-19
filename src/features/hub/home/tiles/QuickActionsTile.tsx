@@ -57,11 +57,12 @@ const QuickActionButton: React.FC<QuickActionButtonProps> = ({
   <button
     type="button"
     onClick={(e) => { e.stopPropagation(); onClick(); }}
-    className="flex flex-col items-center justify-center gap-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+    className="flex flex-col items-center justify-center gap-0.5 focus:outline-none focus-visible:ring-2"
+    style={{ color: 'var(--hub-text)' }}
     aria-label={label}
   >
-    <Icon className={`${iconSize} text-white`} aria-hidden="true" />
-    <span className="text-[12px] leading-tight font-medium text-white/90 whitespace-nowrap">{label}</span>
+    <Icon className={iconSize} aria-hidden="true" />
+    <span className="text-[12px] leading-tight font-medium whitespace-nowrap" style={{ color: 'var(--hub-text-body)' }}>{label}</span>
   </button>
 );
 
