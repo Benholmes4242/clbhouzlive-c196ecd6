@@ -14,43 +14,12 @@ import { cn } from '@/lib/utils';
 import { postingAsCopy } from '@/lib/postingAsCopy';
 import { toast } from 'sonner';
 
-// Light theme colors
-const LIGHT = {
-  bg: '#FFFFFF',
-  bgCard: '#FAFBFC',
-  bgHover: '#F5F6F7',
-  bgActive: '#EDEFF2',
-  border: '#E4E7EB',
-  borderSubtle: '#EDEFF2',
-  text: '#1F2428',
-  textSecondary: '#5A6270',
-  textTertiary: '#8A919C',
-  textMuted: '#A8AEB8',
-  shadow: '0 24px 60px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05)',
-};
-
-// Dark theme colors (existing)
-const DARK = {
-  bg: 'rgba(16, 16, 16, 0.92)',
-  bgCard: 'rgba(255, 255, 255, 0.04)',
-  bgHover: 'rgba(255, 255, 255, 0.05)',
-  bgActive: 'rgba(255, 255, 255, 0.1)',
-  border: 'rgba(255, 255, 255, 0.08)',
-  borderSubtle: 'rgba(255, 255, 255, 0.06)',
-  text: 'white',
-  textSecondary: 'rgba(255, 255, 255, 0.8)',
-  textTertiary: 'rgba(255, 255, 255, 0.5)',
-  textMuted: 'rgba(255, 255, 255, 0.4)',
-  shadow: '0 24px 60px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.08)',
-};
-
 interface PostingAsMenuProps {
   isOpen: boolean;
   onClose: () => void;
-  useLightTheme?: boolean;
 }
 
-export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: PostingAsMenuProps) {
+export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
   const navigate = useNavigate();
   const { activeActor, setActiveActor, availableActors } = useActiveActor();
   const { user } = useSupabaseSession();
@@ -59,9 +28,6 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: Postin
   const [uploadCenterOpen, setUploadCenterOpen] = useState(false);
   const { hasPending, hasFailed } = useUploadJobs();
   const showUploadIndicator = hasPending || hasFailed;
-
-  // Select theme colors
-  const theme = useLightTheme ? LIGHT : DARK;
 
   // Check admin status
   const { data: adminStatus } = useQuery({
@@ -114,17 +80,12 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: Postin
         <>
           {/* Backdrop */}
           <button
-            className="fixed inset-0 z-[199]"
-            style={{
-              background: useLightTheme ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.6)',
-              backdropFilter: useLightTheme ? 'blur(4px)' : 'blur(8px)',
-              WebkitBackdropFilter: useLightTheme ? 'blur(4px)' : 'blur(8px)',
-            }}
+            className="fixed inset-0 z-[199] bg-black/60 backdrop-blur-sm"
             onClick={onClose}
             aria-label="Close profile menu"
           />
           
-          {/* Menu panel */}
+          {/* Menu panel - Glassy dark design */}
           <div 
             className={cn(
               "fixed inset-x-0 z-[200]",
@@ -141,20 +102,16 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: Postin
               className="mx-2 sm:mx-3 overflow-hidden"
               style={{
                 borderRadius: '24px',
-                background: useLightTheme ? LIGHT.bg : DARK.bg,
-                backdropFilter: useLightTheme ? 'none' : 'blur(40px) saturate(150%)',
-                WebkitBackdropFilter: useLightTheme ? 'none' : 'blur(40px) saturate(150%)',
-                boxShadow: theme.shadow,
-                border: useLightTheme ? `1px solid ${LIGHT.border}` : 'none',
+                background: 'rgba(16, 16, 16, 0.92)',
+                backdropFilter: 'blur(40px) saturate(150%)',
+                WebkitBackdropFilter: 'blur(40px) saturate(150%)',
+                boxShadow: '0 24px 60px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.08)',
               }}
             >
               {/* Identity summary card */}
               <div 
-                className="px-4 py-4"
-                style={{ 
-                  background: theme.bgCard,
-                  borderBottom: `1px solid ${theme.border}`,
-                }}
+                className="px-4 py-4 border-b border-white/8"
+                style={{ background: 'rgba(255, 255, 255, 0.04)' }}
               >
                 <div className="flex items-center gap-3">
                   <SquircleAvatar
@@ -165,27 +122,15 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: Postin
                     hideRing
                   />
                   <div className="flex flex-col min-w-0 flex-1">
-                    <span 
-                      className="text-sm font-semibold truncate"
-                      style={{ color: theme.text }}
-                    >
+                    <span className="text-sm font-semibold text-white truncate">
                       {displayName}
                     </span>
-                    <span 
-                      className="text-xs truncate"
-                      style={{ color: theme.textTertiary }}
-                    >
+                    <span className="text-xs text-white/50 truncate">
                       {email}
                     </span>
-                    <span 
-                      className="mt-0.5 text-[11px]"
-                      style={{ color: theme.textMuted }}
-                    >
+                    <span className="mt-0.5 text-[11px] text-white/40">
                       {postingAsCopy.headerPill.label}{' '}
-                      <span 
-                        className="font-medium"
-                        style={{ color: theme.textSecondary }}
-                      >
+                      <span className="font-medium text-white/60">
                         {activeActor?.name}
                       </span>
                     </span>
@@ -196,16 +141,10 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: Postin
               {/* Switch profile section */}
               <div className="px-3 py-2">
                 <div className="px-2 mb-1">
-                  <span 
-                    className="text-[11px] font-medium uppercase tracking-wider"
-                    style={{ color: theme.textMuted }}
-                  >
+                  <span className="text-[11px] font-medium text-white/45 uppercase tracking-wider">
                     {postingAsCopy.dropdown.sectionTitle}
                   </span>
-                  <p 
-                    className="text-[10px] mt-0.5"
-                    style={{ color: useLightTheme ? theme.textTertiary : 'rgba(255, 255, 255, 0.3)' }}
-                  >
+                  <p className="text-[10px] text-white/30 mt-0.5">
                     {postingAsCopy.dropdown.helper}
                   </p>
                 </div>
@@ -225,20 +164,11 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: Postin
                         }}
                         className={cn(
                           "flex w-full items-center gap-2.5 rounded-sq-md px-3 py-2.5",
-                          "transition-all duration-150 active:scale-[0.98]"
+                          "transition-all duration-150 active:scale-[0.98]",
+                          isActive 
+                            ? "bg-white/10 border border-white/12" 
+                            : "hover:bg-white/5 border border-transparent"
                         )}
-                        style={{
-                          background: isActive ? theme.bgActive : 'transparent',
-                          border: isActive 
-                            ? `1px solid ${useLightTheme ? theme.border : 'rgba(255, 255, 255, 0.12)'}` 
-                            : '1px solid transparent',
-                        }}
-                        onMouseEnter={(e) => {
-                          if (!isActive) e.currentTarget.style.background = theme.bgHover;
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!isActive) e.currentTarget.style.background = 'transparent';
-                        }}
                       >
                         <SquircleAvatar
                           size={28}
@@ -249,35 +179,23 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: Postin
                         />
                         <div className="flex-1 text-left min-w-0">
                           <div className="flex items-center gap-1.5">
-                            <span 
-                              className="text-xs font-medium truncate"
-                              style={{ color: theme.text }}
-                            >
+                            <span className="text-xs font-medium text-white truncate">
                               {actor.name}
                             </span>
                             {actor.type === 'business' ? (
-                              <Building2 
-                                className="h-3 w-3 flex-shrink-0" 
-                                style={{ color: theme.textMuted }}
-                              />
+                              <Building2 className="h-3 w-3 text-white/40 flex-shrink-0" />
                             ) : (
-                              <User 
-                                className="h-3 w-3 flex-shrink-0"
-                                style={{ color: theme.textMuted }}
-                              />
+                              <User className="h-3 w-3 text-white/40 flex-shrink-0" />
                             )}
                           </div>
-                          <span 
-                            className="text-[10px]"
-                            style={{ color: theme.textMuted }}
-                          >
+                          <span className="text-[10px] text-white/40">
                             {actor.type === 'personal' 
                               ? postingAsCopy.actorLabels.personal 
                               : postingAsCopy.actorLabels.business}
                           </span>
                         </div>
                         {isActive && (
-                          <Check className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+                          <Check className="h-4 w-4 text-emerald-400 flex-shrink-0" />
                         )}
                       </button>
                     );
@@ -285,20 +203,11 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: Postin
                   
                   {/* Empty state when no businesses */}
                   {availableActors.filter(a => a.type === 'business').length === 0 && (
-                    <div 
-                      className="px-3 py-3 rounded-sq-md border border-dashed mt-2"
-                      style={{ borderColor: theme.border }}
-                    >
-                      <p 
-                        className="text-xs font-medium"
-                        style={{ color: theme.textSecondary }}
-                      >
+                    <div className="px-3 py-3 rounded-sq-md border border-dashed border-white/10 mt-2">
+                      <p className="text-xs font-medium text-white/60">
                         {postingAsCopy.emptyState.title}
                       </p>
-                      <p 
-                        className="text-[10px] mt-0.5"
-                        style={{ color: theme.textMuted }}
-                      >
+                      <p className="text-[10px] text-white/40 mt-0.5">
                         {postingAsCopy.emptyState.body}
                       </p>
                       <button
@@ -314,7 +223,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: Postin
               </div>
               
               {/* Divider */}
-              <div style={{ borderTop: `1px solid ${theme.borderSubtle}` }} />
+              <div className="border-t border-white/6" />
               
               {/* Core action items */}
               <nav className="px-3 py-1.5 space-y-0.5">
@@ -323,7 +232,6 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: Postin
                   icon={<Bell className="h-[18px] w-[18px]" />}
                   label="Notifications"
                   onClick={() => handleNavigate('/notificationmessages')}
-                  theme={theme}
                   trailing={hasUnread && (
                     <span className="h-2.5 w-2.5 rounded-full bg-orange-500" />
                   )}
@@ -337,7 +245,6 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: Postin
                     setUploadCenterOpen(true);
                     onClose();
                   }}
-                  theme={theme}
                   trailing={showUploadIndicator && (
                     <span className={cn(
                       "h-2.5 w-2.5 rounded-full",
@@ -351,7 +258,6 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: Postin
                   icon={<User className="h-[18px] w-[18px]" />}
                   label="View profile"
                   onClick={() => handleNavigate('/profile')}
-                  theme={theme}
                 />
                 
                 {/* Edit profile */}
@@ -359,7 +265,6 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: Postin
                   icon={<Pencil className="h-[18px] w-[18px]" />}
                   label="Edit profile"
                   onClick={() => handleNavigate('/edit-profile')}
-                  theme={theme}
                 />
                 
                 {/* Business profiles */}
@@ -367,7 +272,6 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: Postin
                   icon={<Building2 className="h-[18px] w-[18px]" />}
                   label="Business profiles"
                   onClick={() => handleNavigate('/businesses/manage')}
-                  theme={theme}
                 />
                 
                 {/* Settings */}
@@ -375,7 +279,6 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: Postin
                   icon={<Settings className="h-[18px] w-[18px]" />}
                   label="Settings"
                   onClick={() => handleNavigate('/settings')}
-                  theme={theme}
                 />
 
                 {/* Admin Dashboard */}
@@ -384,14 +287,13 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: Postin
                     icon={<Shield className="h-[18px] w-[18px]" />}
                     label="Admin Dashboard"
                     onClick={() => handleNavigate('/admin')}
-                    theme={theme}
                   />
                 )}
               </nav>
               
               {/* Logout section */}
               <div className="px-3 pt-1 pb-3">
-                <div style={{ borderTop: `1px solid ${theme.borderSubtle}` }} className="pt-2">
+                <div className="border-t border-white/6 pt-2">
                   <button
                     onClick={() => {
                       handleLogout();
@@ -402,8 +304,8 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: Postin
                       "hover:bg-red-500/10 transition-colors active:scale-[0.98]"
                     )}
                   >
-                    <LogOut className="h-[18px] w-[18px] text-red-500" />
-                    <span className="text-sm text-red-500 font-medium">Log out</span>
+                    <LogOut className="h-[18px] w-[18px] text-red-400" />
+                    <span className="text-sm text-red-400 font-medium">Log out</span>
                   </button>
                 </div>
               </div>
@@ -421,27 +323,19 @@ interface MenuRowProps {
   label: string;
   onClick: () => void;
   trailing?: React.ReactNode;
-  theme: typeof LIGHT | typeof DARK;
 }
 
-const MenuRow: React.FC<MenuRowProps> = ({ icon, label, onClick, trailing, theme }) => (
+const MenuRow: React.FC<MenuRowProps> = ({ icon, label, onClick, trailing }) => (
   <button
     onClick={onClick}
     className={cn(
       "flex w-full items-center justify-between rounded-sq-md px-3 h-11",
-      "transition-colors active:scale-[0.98]"
+      "hover:bg-white/5 transition-colors active:scale-[0.98]"
     )}
-    style={{ color: theme.textSecondary }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.background = theme.bgHover;
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.background = 'transparent';
-    }}
   >
     <span className="flex items-center gap-2.5">
-      <span style={{ color: theme.textTertiary }}>{icon}</span>
-      <span className="text-sm" style={{ color: theme.textSecondary }}>{label}</span>
+      <span className="text-white/50">{icon}</span>
+      <span className="text-sm text-white/80">{label}</span>
     </span>
     {trailing}
   </button>

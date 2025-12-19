@@ -1,14 +1,22 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
-import { DISCOVER_TABS, DiscoverTab, DEFAULT_DISCOVER_TAB, LEGACY_TO_NEW_TAB } from '@/constants/discoverTabs';
-import '@/styles/discover-light.css';
+import { MainPill } from '@/constants/discoverPills';
+import { Search } from 'lucide-react';
+import '@/styles/discover-tabs.css';
 
 interface SegmentedControlProps {
-  activeTab?: string;
-  onTabChange?: (tab: string) => void;
+  activeTab: string;
+  onTabChange: (tab: string) => void;
   onOpenVideoSearch?: () => void;
 }
+
+const tabs = [
+  { id: 'shorts', label: 'Shorts' },
+  { id: 'videos', label: 'Videos' },
+  { id: 'channels', label: 'Channels' },
+  { id: 'following', label: 'Following' }
+];
 
 const SegmentedControl: React.FC<SegmentedControlProps> = ({ 
   activeTab, 
@@ -16,37 +24,57 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
   onOpenVideoSearch
 }) => {
   const { main, setMain } = useDiscoverQuery();
-  
-  // Map legacy main values to new tab system
-  const currentTab: DiscoverTab = LEGACY_TO_NEW_TAB[main] || DEFAULT_DISCOVER_TAB;
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const handleTabClick = (tabId: DiscoverTab) => {
-    // Map new tabs back to main param values
-    // For Phase 1, Watch maps to 'shorts' (existing shorts feed)
-    const tabToMain: Record<DiscoverTab, string> = {
-      'watch': 'shorts',
-      'learn': 'learn',
-      'explore': 'explore',
-      'following': 'following',
-    };
-    setMain(tabToMain[tabId] as any);
+  const handleTabClick = (tabId: string) => {
+    setMain(tabId as MainPill);
   };
 
   return (
-    <nav className="discover-tabs-light">
-      {DISCOVER_TABS.map((tab) => (
-        <button
-          key={tab.id}
-          onClick={() => handleTabClick(tab.id)}
-          className={cn(
-            "discover-tab-light",
-            currentTab === tab.id && "active"
-          )}
-        >
-          {tab.label}
-        </button>
-      ))}
-    </nav>
+    <div 
+      ref={containerRef}
+      className="discover-header relative w-full"
+    >
+      {/* Tab buttons */}
+      <div className="discover-tabs flex w-full items-center">
+        <div className="flex flex-1">
+          {tabs.map((tab, index) => (
+            <button
+              key={tab.id}
+              ref={el => tabRefs.current[index] = el}
+              onClick={() => handleTabClick(tab.id)}
+              className={cn(
+                "discover-tab flex-1 py-[10px] px-4 text-center relative z-10 text-heading-md font-medium leading-tight",
+                "transition-all duration-motion-fast ease-standard",
+                "active:scale-[0.97] motion-reduce:active:scale-100",
+                main === tab.id 
+                  ? "active text-primary" 
+                  : "text-secondary hover:text-primary/80 motion-reduce:transition-none"
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        
+        {/* Search icon */}
+        {onOpenVideoSearch && (
+          <button
+            aria-label="Search videos"
+            onClick={onOpenVideoSearch}
+            className="p-2 mr-2 rounded-full transition-all duration-motion-fast ease-standard hover:scale-[1.1] active:scale-95"
+            style={{ 
+              color: 'rgba(255,255,255,0.7)',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'rgba(255,255,255,1)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255,255,255,0.7)'}
+          >
+            <Search size={20} />
+          </button>
+        )}
+      </div>
+    </div>
   );
 };
 

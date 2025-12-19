@@ -19,7 +19,7 @@ interface CompactHeaderProps {
 /**
  * Compact Header (56px) - used on Discover, Tour, Notifications, Clubhouse
  * On Clubhouse: Uses chrome-header class for auto-hide system (body.chrome-hidden)
- * On other pages: Uses light theme with slate colors
+ * On other pages: Uses useScrollDirection for scroll-based hide/show
  */
 const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const navigate = useNavigate();
@@ -35,9 +35,6 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   
   // Keep for reference
   const isClubhouseRoute = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
-  
-  // Use light theme for non-Clubhouse pages
-  const useLightTheme = !isClubhouseRoute;
 
   const handleLogoClick = () => {
     bumpChrome();
@@ -54,14 +51,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
     setMenuOpen(v => !v);
   };
 
-  // Light theme colors
-  const LIGHT_BG = '#FAFBFC';
-  const LIGHT_BORDER = '#E4E7EB';
-  const LIGHT_TEXT = '#1F2428';
-  const LIGHT_TEXT_SECONDARY = '#5A6270';
-  const LIGHT_HOVER = '#EDEFF2';
-
-  // Dark theme colors (Clubhouse)
+  // Hardcoded RGBA values for reliable iOS rendering (no CSS variable resolution issues)
   const DIM_BG = 'rgba(15, 15, 15, 0.02)';
   const DIM_BORDER = 'rgba(255, 255, 255, 0.06)';
   const STANDARD_BG = 'rgba(10, 10, 10, 0.95)';
@@ -75,19 +65,16 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         className={cn(
           "compact-header clubhouse-header",
           isClubhouseRoute && "chrome-header",
-          useLightTheme && "chrome-header-light",
           "fixed top-0 left-0 right-0 z-header",
           "h-14",
           className
         )}
         style={{
-          background: useLightTheme 
-            ? LIGHT_BG 
-            : (isDimmed ? DIM_BG : STANDARD_BG),
-          backdropFilter: useLightTheme ? 'none' : (isDimmed ? 'none' : 'blur(20px)'),
-          WebkitBackdropFilter: useLightTheme ? 'none' : (isDimmed ? 'none' : 'blur(20px)'),
+          background: isDimmed ? DIM_BG : STANDARD_BG,
+          backdropFilter: isDimmed ? 'none' : 'blur(20px)',
+          WebkitBackdropFilter: isDimmed ? 'none' : 'blur(20px)',
           paddingTop: 'env(safe-area-inset-top)',
-          borderBottom: `1px solid ${useLightTheme ? LIGHT_BORDER : (isDimmed ? DIM_BORDER : STANDARD_BORDER)}`,
+          borderBottom: `1px solid ${isDimmed ? DIM_BORDER : STANDARD_BORDER}`,
           boxShadow: isDimmed ? 'none' : undefined,
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}`,
         }}
@@ -105,15 +92,13 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               alt="clbhouz"
               className={cn(
                 "h-9 w-9 object-contain transition-opacity",
-                useLightTheme 
-                  ? "opacity-100 hover:opacity-80"
-                  : (isDimmed ? "opacity-55" : "hover:opacity-80")
+                isDimmed ? "opacity-55" : "hover:opacity-80"
               )}
             />
             {/* Wordmark - desktop only */}
             <span 
               className="hidden md:inline font-semibold text-lg tracking-tight transition-colors duration-300"
-              style={{ color: useLightTheme ? LIGHT_TEXT : (isDimmed ? 'rgba(255, 255, 255, 0.55)' : 'white') }}
+              style={{ color: isDimmed ? 'rgba(255, 255, 255, 0.55)' : 'white' }}
             >
               clbhouz
             </span>
@@ -137,19 +122,19 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                     navigate(item.path);
                   }}
                   className={cn(
-                    "header-nav-link px-3 py-1.5 text-sm font-medium rounded-sq-sm transition-colors duration-300",
-                    isActive && "active"
+                    "px-3 py-1.5 text-sm font-medium rounded-sq-sm transition-colors duration-300",
+                    isActive 
+                      ? isDimmed 
+                        ? "bg-white/5" 
+                        : "text-white bg-white/10"
+                      : isDimmed
+                        ? "hover:bg-white/5"
+                        : "text-white/60 hover:text-white hover:bg-white/5"
                   )}
-                  style={useLightTheme ? {
-                    color: isActive ? LIGHT_TEXT : LIGHT_TEXT_SECONDARY,
-                    background: isActive ? LIGHT_HOVER : 'transparent',
-                  } : {
+                  style={{
                     color: isDimmed 
                       ? (isActive ? 'rgba(255, 255, 255, 0.78)' : 'rgba(255, 255, 255, 0.55)')
-                      : (isActive ? 'white' : 'rgba(255, 255, 255, 0.6)'),
-                    background: isActive 
-                      ? (isDimmed ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.1)') 
-                      : 'transparent',
+                      : undefined
                   }}
                 >
                   {item.label}
@@ -165,13 +150,12 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
               variant="ghost"
               size="icon"
               className={cn(
-                "header-icon-btn h-10 w-10 p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all duration-300",
+                "h-10 w-10 p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all duration-300",
+                isDimmed 
+                  ? "hover:bg-white/5" 
+                  : "text-white/70 hover:text-white hover:bg-white/10"
               )}
-              style={useLightTheme ? {
-                color: LIGHT_TEXT_SECONDARY,
-              } : {
-                color: isDimmed ? 'rgba(255, 255, 255, 0.55)' : 'rgba(255, 255, 255, 0.7)',
-              }}
+              style={{ color: isDimmed ? 'rgba(255, 255, 255, 0.55)' : undefined }}
               onClick={handleSearchClick}
               aria-label="Search"
             >
@@ -185,14 +169,13 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                   onClick={handleMenuClick} 
                   isOpen={menuOpen}
                   hasUnread={hasUnread}
-                  useLightTheme={useLightTheme}
                 />
               </div>
             )}
             
             {/* Desktop: Full navigation (notifications, profile, settings) */}
             <div className="hidden sm:flex items-center">
-              <HeaderNavigation onInteraction={bumpChrome} useLightTheme={useLightTheme} />
+              <HeaderNavigation onInteraction={bumpChrome} />
             </div>
           </div>
         </div>
@@ -203,15 +186,13 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         <PostingAsMenu
           isOpen={menuOpen}
           onClose={() => setMenuOpen(false)}
-          useLightTheme={useLightTheme}
         />
       )}
 
       {/* Search Overlay - full-screen, covers header */}
       <SearchOverlay 
         isOpen={searchOpen} 
-        onClose={() => setSearchOpen(false)}
-        useLightTheme={useLightTheme}
+        onClose={() => setSearchOpen(false)} 
       />
     </>
   );

@@ -20,10 +20,9 @@ interface SearchResult {
 interface SearchOverlayProps {
   isOpen: boolean;
   onClose: () => void;
-  useLightTheme?: boolean;
 }
 
-export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, useLightTheme = false }) => {
+export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const searchRouter = createSearchRouter(navigate);
@@ -64,6 +63,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
       image: club.logo_url || undefined
     })),
     ...businesses.map(business => {
+      // Format subtitle as "City, Country" only - no category, no full address
       const formatCityCountry = () => {
         if (business.city || business.country) {
           return [business.city, business.country].filter(Boolean).join(', ');
@@ -196,42 +196,21 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
   const courseResults = results.filter(r => r.type === 'course');
   const businessResults = results.filter(r => r.type === 'business');
 
-  // Light theme colors
-  const lightBg = '#FAFBFC';
-  const lightBorder = '#E4E7EB';
-  const lightText = '#1F2428';
-  const lightTextSecondary = '#5A6270';
-  const lightTextTertiary = '#8A919C';
-  const lightHover = '#EDEFF2';
-  const lightActive = '#E4E7EB';
-
   return (
     <div 
-      className={cn("fixed inset-0 z-[80] flex flex-col", useLightTheme && "search-overlay-light")}
+      className="fixed inset-0 z-[80] flex flex-col"
       style={{
-        background: useLightTheme ? lightBg : 'rgba(10, 10, 10, 0.98)',
-        backdropFilter: useLightTheme ? 'none' : 'blur(24px)',
-        WebkitBackdropFilter: useLightTheme ? 'none' : 'blur(24px)',
+        background: 'rgba(10, 10, 10, 0.98)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
         paddingTop: 'env(safe-area-inset-top)',
       }}
     >
       {/* Search bar at top */}
-      <div 
-        className="flex-shrink-0 px-3 pt-3 pb-2"
-        style={{ borderBottom: `1px solid ${useLightTheme ? lightBorder : 'rgba(255, 255, 255, 0.06)'}` }}
-      >
+      <div className="flex-shrink-0 px-3 pt-3 pb-2 border-b border-white/6">
         <div className="max-w-2xl mx-auto">
-          <div 
-            className="search-input-wrapper relative flex items-center gap-3 h-12 px-4 rounded-full"
-            style={{
-              background: useLightTheme ? '#FFFFFF' : 'rgba(255, 255, 255, 0.08)',
-              border: `1px solid ${useLightTheme ? lightBorder : 'rgba(255, 255, 255, 0.1)'}`,
-            }}
-          >
-            <Search 
-              className={cn("search-icon h-5 w-5 flex-shrink-0")}
-              style={{ color: useLightTheme ? lightTextTertiary : 'rgba(255, 255, 255, 0.5)' }}
-            />
+          <div className="relative flex items-center gap-3 h-12 px-4 rounded-full bg-white/8 border border-white/10">
+            <Search className="h-5 w-5 text-white/50 flex-shrink-0" />
             <input
               ref={inputRef}
               type="text"
@@ -242,20 +221,16 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
               }}
               onKeyDown={handleKeyDown}
               placeholder="Search players, courses..."
-              className="search-input flex-1 bg-transparent border-none outline-none text-base"
-              style={{ color: useLightTheme ? lightText : 'white' }}
+              className="flex-1 bg-transparent border-none outline-none text-white text-base placeholder:text-white/40"
               autoComplete="off"
               spellCheck="false"
             />
             <button
               onClick={handleClear}
-              className="flex-shrink-0 p-1.5 rounded-full transition-colors"
-              style={{ 
-                color: useLightTheme ? lightTextSecondary : 'rgba(255, 255, 255, 0.6)',
-              }}
+              className="flex-shrink-0 p-1.5 rounded-full hover:bg-white/10 transition-colors"
               aria-label={query ? "Clear" : "Close"}
             >
-              <X className="h-5 w-5" />
+              <X className="h-5 w-5 text-white/60" />
             </button>
           </div>
         </div>
@@ -270,19 +245,10 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
             <div className="space-y-2">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="flex items-center gap-4 p-3 rounded-sq-md animate-pulse">
-                  <div 
-                    className="search-skeleton w-10 h-10 rounded-full"
-                    style={{ background: useLightTheme ? lightHover : 'rgba(255, 255, 255, 0.1)' }}
-                  />
+                  <div className="w-10 h-10 rounded-full bg-white/10" />
                   <div className="flex-1 space-y-2">
-                    <div 
-                      className="search-skeleton w-32 h-4 rounded"
-                      style={{ background: useLightTheme ? lightHover : 'rgba(255, 255, 255, 0.1)' }}
-                    />
-                    <div 
-                      className="search-skeleton w-24 h-3 rounded"
-                      style={{ background: useLightTheme ? lightActive : 'rgba(255, 255, 255, 0.05)' }}
-                    />
+                    <div className="w-32 h-4 bg-white/10 rounded" />
+                    <div className="w-24 h-3 bg-white/5 rounded" />
                   </div>
                 </div>
               ))}
@@ -292,22 +258,9 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
           {/* Empty state */}
           {showEmpty && (
             <div className="py-12 text-center">
-              <Search 
-                className="search-empty-icon h-12 w-12 mx-auto mb-4"
-                style={{ color: useLightTheme ? lightBorder : 'rgba(255, 255, 255, 0.2)' }}
-              />
-              <p 
-                className="search-empty-text text-sm"
-                style={{ color: useLightTheme ? lightTextSecondary : 'rgba(255, 255, 255, 0.5)' }}
-              >
-                No results found for "{query}"
-              </p>
-              <p 
-                className="text-xs mt-1"
-                style={{ color: useLightTheme ? lightTextTertiary : 'rgba(255, 255, 255, 0.3)' }}
-              >
-                Try searching by name or course
-              </p>
+              <Search className="h-12 w-12 mx-auto mb-4 text-white/20" />
+              <p className="text-white/50 text-sm">No results found for "{query}"</p>
+              <p className="text-white/30 text-xs mt-1">Try searching by name or course</p>
             </div>
           )}
 
@@ -318,16 +271,8 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
               {peopleResults.length > 0 && (
                 <div>
                   <div className="flex items-center gap-2 px-2 mb-2">
-                    <User 
-                      className="h-3.5 w-3.5"
-                      style={{ color: useLightTheme ? lightTextTertiary : 'rgba(255, 255, 255, 0.4)' }}
-                    />
-                    <span 
-                      className="search-section-title text-xs font-medium uppercase tracking-wide"
-                      style={{ color: useLightTheme ? lightTextTertiary : 'rgba(255, 255, 255, 0.4)' }}
-                    >
-                      People
-                    </span>
+                    <User className="h-3.5 w-3.5 text-white/40" />
+                    <span className="text-xs font-medium text-white/40 uppercase tracking-wide">People</span>
                   </div>
                   <div className="space-y-0.5">
                     {peopleResults.map((item, index) => (
@@ -338,7 +283,6 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                         onClick={() => handleResultSelect(item, index)}
                         query={query}
                         getInitials={getInitials}
-                        useLightTheme={useLightTheme}
                       />
                     ))}
                   </div>
@@ -349,16 +293,8 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
               {courseResults.length > 0 && (
                 <div>
                   <div className="flex items-center gap-2 px-2 mb-2">
-                    <MapPin 
-                      className="h-3.5 w-3.5"
-                      style={{ color: useLightTheme ? lightTextTertiary : 'rgba(255, 255, 255, 0.4)' }}
-                    />
-                    <span 
-                      className="search-section-title text-xs font-medium uppercase tracking-wide"
-                      style={{ color: useLightTheme ? lightTextTertiary : 'rgba(255, 255, 255, 0.4)' }}
-                    >
-                      Clubs & Courses
-                    </span>
+                    <MapPin className="h-3.5 w-3.5 text-white/40" />
+                    <span className="text-xs font-medium text-white/40 uppercase tracking-wide">Clubs & Courses</span>
                   </div>
                   <div className="space-y-0.5">
                     {courseResults.map((item, index) => (
@@ -369,7 +305,6 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                         onClick={() => handleResultSelect(item, peopleResults.length + index)}
                         query={query}
                         getInitials={getInitials}
-                        useLightTheme={useLightTheme}
                       />
                     ))}
                   </div>
@@ -380,16 +315,8 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
               {businessResults.length > 0 && (
                 <div>
                   <div className="flex items-center gap-2 px-2 mb-2">
-                    <Building 
-                      className="h-3.5 w-3.5"
-                      style={{ color: useLightTheme ? lightTextTertiary : 'rgba(255, 255, 255, 0.4)' }}
-                    />
-                    <span 
-                      className="search-section-title text-xs font-medium uppercase tracking-wide"
-                      style={{ color: useLightTheme ? lightTextTertiary : 'rgba(255, 255, 255, 0.4)' }}
-                    >
-                      Business Profiles
-                    </span>
+                    <Building className="h-3.5 w-3.5 text-white/40" />
+                    <span className="text-xs font-medium text-white/40 uppercase tracking-wide">Business Profiles</span>
                   </div>
                   <div className="space-y-0.5">
                     {businessResults.map((item, index) => (
@@ -400,7 +327,6 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                         onClick={() => handleResultSelect(item, peopleResults.length + courseResults.length + index)}
                         query={query}
                         getInitials={getInitials}
-                        useLightTheme={useLightTheme}
                       />
                     ))}
                   </div>
@@ -417,21 +343,12 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                 <div>
                   <div className="flex items-center justify-between mb-3 px-2">
                     <div className="flex items-center gap-2">
-                      <Clock 
-                        className="h-3.5 w-3.5"
-                        style={{ color: useLightTheme ? lightTextTertiary : 'rgba(255, 255, 255, 0.4)' }}
-                      />
-                      <span 
-                        className="search-section-title text-xs font-medium uppercase tracking-wide"
-                        style={{ color: useLightTheme ? lightTextTertiary : 'rgba(255, 255, 255, 0.4)' }}
-                      >
-                        Recent
-                      </span>
+                      <Clock className="h-3.5 w-3.5 text-white/40" />
+                      <span className="text-xs font-medium text-white/40 uppercase tracking-wide">Recent</span>
                     </div>
                     <button
                       onClick={clearRecentSearches}
-                      className="text-xs transition-colors"
-                      style={{ color: useLightTheme ? lightTextTertiary : 'rgba(255, 255, 255, 0.3)' }}
+                      className="text-xs text-white/30 hover:text-white/50 transition-colors"
                     >
                       Clear
                     </button>
@@ -441,11 +358,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                       <button
                         key={search.id}
                         onClick={() => handleRecentSearchClick(search.query)}
-                        className="search-pill px-3 py-1.5 text-xs rounded-full transition-colors"
-                        style={{
-                          background: useLightTheme ? lightHover : 'rgba(255, 255, 255, 0.08)',
-                          color: useLightTheme ? lightTextSecondary : 'rgba(255, 255, 255, 0.7)',
-                        }}
+                        className="px-3 py-1.5 text-xs rounded-full bg-white/8 hover:bg-white/12 text-white/70 transition-colors"
                       >
                         {search.query}
                       </button>
@@ -458,16 +371,8 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
               {popularItems.length > 0 && (
                 <div>
                   <div className="flex items-center gap-2 px-2 mb-3">
-                    <TrendingUp 
-                      className="h-3.5 w-3.5"
-                      style={{ color: useLightTheme ? lightTextTertiary : 'rgba(255, 255, 255, 0.4)' }}
-                    />
-                    <span 
-                      className="search-section-title text-xs font-medium uppercase tracking-wide"
-                      style={{ color: useLightTheme ? lightTextTertiary : 'rgba(255, 255, 255, 0.4)' }}
-                    >
-                      Popular
-                    </span>
+                    <TrendingUp className="h-3.5 w-3.5 text-white/40" />
+                    <span className="text-xs font-medium text-white/40 uppercase tracking-wide">Popular</span>
                   </div>
                   <div className="space-y-0.5">
                     {popularItems.slice(0, 5).map((item, index) => (
@@ -478,7 +383,6 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, u
                         onClick={() => handleResultSelect(item, recent.length + index)}
                         query=""
                         getInitials={getInitials}
-                        useLightTheme={useLightTheme}
                       />
                     ))}
                   </div>
@@ -506,16 +410,9 @@ interface ResultRowProps {
   onClick: () => void;
   query: string;
   getInitials: (name: string) => string;
-  useLightTheme?: boolean;
 }
 
-const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, getInitials, useLightTheme = false }) => {
-  // Light theme colors
-  const lightText = '#1F2428';
-  const lightTextSecondary = '#5A6270';
-  const lightHover = '#EDEFF2';
-  const lightBorder = '#E4E7EB';
-
+const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, getInitials }) => {
   // Highlight matching text
   const highlightText = (text: string) => {
     if (!query.trim()) return text;
@@ -530,54 +427,29 @@ const ResultRow: React.FC<ResultRowProps> = ({ item, isActive, onClick, query, g
     <button
       onClick={onClick}
       className={cn(
-        "search-result-row w-full flex items-center gap-3 p-3 rounded-sq-md transition-colors text-left group"
+        "w-full flex items-center gap-3 p-3 rounded-sq-md transition-colors text-left group",
+        isActive ? "bg-white/10" : "hover:bg-white/5"
       )}
-      style={{
-        background: isActive 
-          ? (useLightTheme ? lightHover : 'rgba(255, 255, 255, 0.1)') 
-          : 'transparent',
-      }}
     >
       {/* Avatar */}
-      <div 
-        className="w-10 h-10 rounded-sq-md flex items-center justify-center flex-shrink-0 relative overflow-hidden"
-        style={{
-          background: useLightTheme ? lightHover : 'rgba(255, 255, 255, 0.08)',
-        }}
-      >
+      <div className="w-10 h-10 rounded-sq-md flex items-center justify-center flex-shrink-0 relative bg-white/8 overflow-hidden">
         {item.image ? (
           <img src={item.image} alt="" className="w-full h-full object-cover" />
         ) : (
-          <span 
-            className="text-xs font-medium"
-            style={{ color: useLightTheme ? lightTextSecondary : 'rgba(255, 255, 255, 0.6)' }}
-          >
-            {getInitials(item.title)}
-          </span>
+          <span className="text-xs font-medium text-white/60">{getInitials(item.title)}</span>
         )}
       </div>
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <div 
-          className="text-sm font-medium truncate"
-          style={{ color: useLightTheme ? lightText : 'white' }}
-        >
+        <div className="text-sm font-medium text-white truncate">
           {highlightText(item.title)}
         </div>
-        <div 
-          className="search-result-subtitle text-xs truncate"
-          style={{ color: useLightTheme ? lightTextSecondary : 'rgba(255, 255, 255, 0.5)' }}
-        >
-          {item.subtitle}
-        </div>
+        <div className="text-xs text-white/50 truncate">{item.subtitle}</div>
       </div>
 
       {/* Chevron */}
-      <ChevronRight 
-        className="h-4 w-4 flex-shrink-0 transition-colors"
-        style={{ color: useLightTheme ? lightBorder : 'rgba(255, 255, 255, 0.2)' }}
-      />
+      <ChevronRight className="h-4 w-4 text-white/20 group-hover:text-white/40 flex-shrink-0 transition-colors" />
     </button>
   );
 };
