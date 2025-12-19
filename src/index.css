@@ -399,6 +399,8 @@ html.lightbox-open {
   padding-top: 56px;
 }
 
+/* ========================================
+   PAGE ROOT - iOS Safari Text Rendering Fix
    Forces a separate compositing layer to escape the
    position:fixed html/body + nested scroll bug on iOS.
    Use .page-root for new pages, .activity-page-root kept for backward compat.
