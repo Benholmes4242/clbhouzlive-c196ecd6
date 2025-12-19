@@ -123,7 +123,7 @@
 }
 
 .searchBox__icon {
-  color: white;
+  color: var(--hub-text-sub);
   flex-shrink: 0;
 }
 
@@ -165,7 +165,7 @@
 }
 
 .resultRow:active {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--hub-glass-bg-hover);
 }
 
 .resultRow .rMid {
@@ -201,10 +201,8 @@
   gap: 10px;
   border-radius: 14px;
   padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--hub-glass-bg-input);
+  border: 1px solid var(--hub-stroke-subtle);
   outline: none;
   box-shadow: none;
   cursor: text;
@@ -243,10 +241,8 @@
   margin-top: 10px;
   border-radius: 16px;
   padding: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--hub-glass-bg-elevated);
+  border: 1px solid var(--hub-stroke-subtle);
   max-height: 320px;
   overflow-y: auto;
 }
@@ -266,11 +262,11 @@
 }
 
 .clubResultRow:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--hub-glass-bg-hover);
 }
 
 .clubResultRow:active {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--hub-glass-bg-hover);
 }
 
 .clubResultInfo {
@@ -331,7 +327,7 @@
   height: 24px;
   display: grid;
   place-items: center;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--hub-glass);
   border-radius: 8px;
   color: var(--hub-text-muted);
   font-size: 16px;
@@ -400,13 +396,13 @@
 }
 
 .chip__icon {
-  color: white;
+  color: var(--hub-text-sub);
   flex-shrink: 0;
 }
 
 .chip:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.18);
+  box-shadow: 0 0 0 2px var(--hub-stroke-strong);
 }
 
 /* Ensure inner text truncates cleanly */
@@ -455,7 +451,7 @@
 }
 
 .gameRow:hover {
-  background: rgba(0, 0, 0, 0.14);
+  background: var(--hub-glass-bg-hover);
 }
 
 .gameRow:active {
@@ -551,7 +547,7 @@
 
 .skeletonLine {
   height: 14px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--hub-skeleton-base);
   border-radius: 6px;
   animation: pulse 1.5s ease-in-out infinite;
   margin-bottom: 8px;

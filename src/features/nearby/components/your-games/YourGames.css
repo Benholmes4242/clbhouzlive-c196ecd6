@@ -15,8 +15,8 @@
 }
 
 .yourGameRow--expanded {
-  background: rgba(255, 255, 255, 0.03);
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--hub-glass-bg-hover);
+  border-top: 1px solid var(--hub-stroke-subtle);
 }
 
 @keyframes yourGameRowIn {
@@ -27,7 +27,7 @@
 }
 
 .yourGameRow:hover {
-  background: rgba(0, 0, 0, 0.14);
+  background: var(--hub-glass-bg-hover);
 }
 
 .yourGameRow:active {
@@ -177,8 +177,8 @@
   margin-bottom: 8px;
   padding: 10px 16px;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--hub-glass-bg);
+  border: 1px solid var(--hub-stroke-subtle);
 }
 
 .yourGames__pendingHeader {
@@ -383,7 +383,7 @@
 }
 
 .hub-btn--secondary:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--hub-glass-bg-hover);
   border-color: var(--hub-stroke-strong);
 }
 

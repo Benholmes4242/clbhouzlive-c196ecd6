@@ -283,16 +283,16 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
           placeholder="Search conversations…"
           className="w-full h-10 pl-10 pr-10 rounded-[14px] text-body-md transition-colors"
           style={{
-            background: 'rgba(255,255,255,0.06)',
-            border: '1px solid rgba(255,255,255,0.08)',
+            background: 'var(--hub-glass-bg-input)',
+            border: '1px solid var(--hub-stroke-subtle)',
             color: 'var(--hub-text)',
             outline: 'none',
           }}
           onFocus={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)';
+            e.currentTarget.style.borderColor = 'var(--hub-stroke)';
           }}
           onBlur={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+            e.currentTarget.style.borderColor = 'var(--hub-stroke-subtle)';
           }}
           aria-label="Search conversations"
         />
@@ -340,7 +340,10 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
               onClick={() => {
                 onFilterChange({ tag: undefined });
               }}
-              className="p-0.5 rounded-full hover:bg-white/15 transition-colors"
+              className="p-0.5 rounded-full transition-colors"
+              style={{ background: 'transparent' }}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hub-glass-bg-hover)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
               aria-label="Clear tag filter"
             >
               <X className="w-3 h-3" />
@@ -357,14 +360,12 @@ export const EchoHistorySearch: React.FC<EchoHistorySearchProps> = ({
               className="flex-shrink-0 h-[34px] px-3 rounded-[10px] text-body-md font-medium transition-all"
               style={{
                 background: isActive
-                  ? 'rgba(255,255,255,0.12)'
-                  : 'rgba(255,255,255,0.04)',
+                  ? 'var(--hub-glass-bg-hover)'
+                  : 'var(--hub-glass-bg)',
                 border: `1px solid ${
-                  isActive ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.08)'
+                  isActive ? 'var(--hub-stroke)' : 'var(--hub-stroke-subtle)'
                 }`,
                 color: isActive ? 'var(--hub-text)' : 'var(--hub-text-dim)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
               }}
               aria-pressed={isActive}
               aria-label={`Filter by ${filter.label}`}
