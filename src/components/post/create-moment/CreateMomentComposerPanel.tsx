@@ -211,6 +211,7 @@ export default function CreateMomentComposerPanel({
             onCourseSelect={onCourseSelect}
             selectedCourse={selectedCourse}
             placeholder="Where was this played?"
+            variant="light"
           />
           <p 
             className="mt-1 text-[10px]"
