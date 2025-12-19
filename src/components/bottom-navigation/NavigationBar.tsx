@@ -7,16 +7,9 @@ interface NavigationBarProps {
   onTabClick: (tab: { id: string; path: string | null; isAction?: boolean }) => void;
   variant?: 'default' | 'clubhouse';
   isDimmed?: boolean;
-  useLightTheme?: boolean;
 }
 
-const NavigationBar: React.FC<NavigationBarProps> = ({ 
-  activeTab, 
-  onTabClick, 
-  variant = 'default', 
-  isDimmed = false, 
-  useLightTheme = false 
-}) => {
+const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, variant = 'default', isDimmed = false }) => {
   return (
     <nav className="w-full h-14 flex items-center justify-around">
       {navigationTabs.map((tab) => {
@@ -42,15 +35,11 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
             <Icon 
               className={cn(
                 "h-7 w-7 transition-colors duration-300",
-                useLightTheme
-                  ? isActive
-                    ? "text-[var(--chrome-light-icon-active)]"
-                    : "text-[var(--chrome-light-icon-dim)]"
-                  : isActive 
-                    ? "text-primary" 
-                    : isDimmed 
-                      ? "text-[rgba(255,255,255,0.55)]" 
-                      : "text-white/70"
+                isActive 
+                  ? "text-primary" 
+                  : isDimmed 
+                    ? "text-[rgba(255,255,255,0.55)]" 
+                    : "text-white/70"
               )}
             />
             
@@ -58,17 +47,13 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
             <span 
               className={cn(
                 "text-[11px] leading-none transition-colors duration-300",
-                useLightTheme
-                  ? isActive
-                    ? "text-[var(--chrome-light-text)]"
-                    : "text-[var(--chrome-light-text-dim)]"
-                  : isActive 
-                    ? isDimmed 
-                      ? "text-[rgba(255,255,255,0.78)]" 
-                      : "text-white"
-                    : isDimmed 
-                      ? "text-[rgba(255,255,255,0.42)]" 
-                      : "text-white/60"
+                isActive 
+                  ? isDimmed 
+                    ? "text-[rgba(255,255,255,0.78)]" 
+                    : "text-white"
+                  : isDimmed 
+                    ? "text-[rgba(255,255,255,0.42)]" 
+                    : "text-white/60"
               )}
             >
               {tab.label}

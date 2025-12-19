@@ -21,10 +21,9 @@ import { IdentitySelector } from '@/components/identity/IdentitySelector';
 
 interface HeaderNavigationProps {
   onInteraction?: () => void;
-  useLightTheme?: boolean;
 }
 
-const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useLightTheme = false }) => {
+const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useSupabaseSession();
@@ -44,11 +43,8 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
   // Use adaptive text color for profile page, fallback to existing logic for other pages
   const shouldUseDarkText = useAdaptiveTextColor(navigationRef);
   
-  // Icon color based on theme
+  // Always use white icons for global header
   const getIconColorClass = () => {
-    if (useLightTheme) {
-      return 'text-[var(--chrome-light-icon)] hover:text-[var(--chrome-light-text)] hover:bg-[var(--chrome-light-hover)] transition-colors';
-    }
     return 'text-white/70 hover:text-white transition-colors';
   };
 

@@ -44,21 +44,6 @@
   --radius-xl: 18px;
   --radius-pill: 999px;
   
-  /* ============================
-     LIGHT CHROME TOKENS
-     For non-Clubhouse pages (Discover, Tour, etc.)
-     ============================ */
-  --chrome-light-bg: #FAFAFB;
-  --chrome-light-bg-blur: rgba(250, 250, 251, 0.92);
-  --chrome-light-border: rgba(31, 36, 40, 0.08);
-  --chrome-light-text: #3A3F46;
-  --chrome-light-text-dim: #5E666D;
-  --chrome-light-icon: #3A3F46;
-  --chrome-light-icon-dim: #5E666D;
-  --chrome-light-icon-active: #3A3F46;
-  --chrome-light-hover: rgba(31, 36, 40, 0.06);
-  --chrome-light-active: rgba(31, 36, 40, 0.10);
-  
   /* Hub header solid background */
   --hub-header-bg-solid: rgba(22, 24, 27, 0.98);
   
