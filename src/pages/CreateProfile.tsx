@@ -202,7 +202,7 @@ const CreateProfile = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="relative z-50 bg-white border-b border-border">
+      <header className="relative z-50 bg-[var(--bg-page)] border-b border-border">
         <div className="px-4 md:container md:mx-auto md:px-0">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center space-x-2">

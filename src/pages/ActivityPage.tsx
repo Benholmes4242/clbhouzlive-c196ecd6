@@ -213,7 +213,7 @@ const ActivityPage: React.FC = () => {
   const isAllCaughtUp = hasNotifications && effectiveNewItems.length === 0;
 
   return (
-    <PageRoot className="bg-[#f5f5f7] pb-24">
+    <PageRoot className="pb-24">
       <CompactHeader />
 
       {/* Header section with padding */}

@@ -491,8 +491,8 @@ html, body, #root {
      CLBHOUZ DARK THEME - CORE TOKENS
      ======================================== */
   
-  /* Core surfaces - Global Background: Cool blue-grey slate */
-  --bg-page: #F8FAFC;
+  /* Core surfaces - Global Background: Neutral grey #F5F5F7 */
+  --bg-page: #F5F5F7;
   --bg-surface: #0F0F0F;
   --bg-card: rgba(255,255,255,0.06);
   --bg-card-hover: rgba(255,255,255,0.08);
@@ -1871,8 +1871,8 @@ html[data-immersive="true"] .app-shell--topSpacer {
      Light Grey + Slate + Orange Accent
      ======================================== */
     
-    /* Base canvas - Cool blue-grey slate */
-    --background: 210 40% 98%;           /* #F8FAFC */
+    /* Base canvas - Neutral grey #F5F5F7 */
+    --background: 240 6% 96%;            /* #F5F5F7 */
     --foreground: 210 13% 18%;           /* #1F2428 (text-primary) */
     
     /* Surfaces */
