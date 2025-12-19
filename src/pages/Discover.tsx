@@ -116,12 +116,6 @@ const Discover = () => {
       {/* Hero - Single, no carousel */}
       <DiscoverHero item={hero} isLoading={heroLoading} />
       
-      {/* Creator Spotlight Rail - Suggested golfers after hero */}
-      <CreatorSpotlightRail 
-        creators={creators} 
-        isLoading={creatorsLoading} 
-      />
-      
       {/* Shorts Grid - Primary Feed */}
       <DiscoverContent
         onLike={handleLike}
@@ -129,6 +123,12 @@ const Discover = () => {
         onMediaClick={handleMediaClick}
         searchQuery={searchQuery}
         selectedTags={selectedTags}
+      />
+      
+      {/* Creator Spotlight Rail - Interruption after ~2-3 screens */}
+      <CreatorSpotlightRail 
+        creators={creators} 
+        isLoading={creatorsLoading} 
       />
       
       {/* Long-Form Highlight - Another interruption */}
