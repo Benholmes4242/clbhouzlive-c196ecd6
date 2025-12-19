@@ -68,7 +68,7 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
 
   return (
     <div 
-      className="relative w-full aspect-[16/9] md:aspect-[21/9] overflow-hidden bg-slate-900 cursor-pointer group"
+      className="relative w-full aspect-[2/1] md:aspect-[2.5/1] overflow-hidden bg-slate-800 cursor-pointer group"
       onClick={handleClick}
     >
       {/* Media - Image or Video */}
@@ -103,42 +103,43 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
         />
       )}
 
-      {/* Gradient overlay for text readability */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+      {/* Softer gradient overlay - less contrast */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
 
       {/* Content overlay */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 lg:p-8">
+      <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5 lg:p-6">
         {/* Context label */}
-        <span className="inline-block text-[11px] md:text-xs font-medium text-white/80 uppercase tracking-wider mb-2">
+        <span className="inline-block text-[10px] md:text-[11px] font-medium text-white/70 uppercase tracking-wider mb-1.5">
           {item.contextLabel}
         </span>
 
-        {/* Title */}
-        <h2 className="text-lg md:text-2xl lg:text-3xl font-semibold text-white leading-tight mb-1 md:mb-2 line-clamp-2">
+        {/* Title - reduced weight */}
+        <h2 className="text-base md:text-xl lg:text-2xl font-medium text-white leading-snug mb-1 line-clamp-2">
           {item.title}
         </h2>
 
         {/* Sub-context (creator or course) */}
-        <p className="text-sm md:text-base text-white/70 mb-3 md:mb-4">
+        <p className="text-xs md:text-sm text-white/60 mb-2.5 md:mb-3">
           {item.subContext}
         </p>
 
-        {/* CTA Button */}
+        {/* CTA Button - secondary/outline style */}
         <Button
+          variant="outline"
           size="sm"
-          className="bg-white text-slate-900 hover:bg-white/90 gap-1.5 font-medium"
+          className="bg-white/10 text-white border-white/30 hover:bg-white/20 hover:border-white/40 gap-1.5 text-xs font-medium backdrop-blur-sm"
           onClick={(e) => {
             e.stopPropagation();
             handleClick();
           }}
         >
-          <Play className="w-3.5 h-3.5 fill-current" />
+          <Play className="w-3 h-3 fill-current" />
           {item.ctaLabel || 'Watch'}
         </Button>
       </div>
 
       {/* Subtle hover effect */}
-      <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
+      <div className="absolute inset-0 bg-white/3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
     </div>
   );
 }

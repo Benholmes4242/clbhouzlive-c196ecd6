@@ -204,37 +204,36 @@ const Discover = () => {
       <CompactHeader />
       <FadeInContent>
         <main className="pb-20 compact-header-offset">
-            {/* Static Tabs */}
-            <div className="relative z-30">
-              {/* Segmented Control Tabs */}
+            {/* Tabs - sit directly on page canvas, no intermediate blocks */}
+            <div className="px-1">
               <SegmentedControl 
                 activeTab={activeFilter}
                 onTabChange={() => {}} // No-op: tabs control via URL now
               />
-              
-              {/* Videos Header - only show for shorts tab */}
-              {main === 'shorts' && (
-                <DiscoverVideosHeader
-                  activeDuration={durationFilter}
-                  onChangeDuration={setDurationFilter}
-                  onOpenShorts={() => setDurationFilter('shorts')}
-                  onSearchSubmit={(query) => setSearchQuery(query)}
-                  initialQuery={searchQuery}
-                />
-              )}
-              
-              {/* Filter Pills Row - show for non-videos/shorts tabs */}
-              {main !== 'videos' && main !== 'shorts' && (
-                <div className="pt-1 pb-3 border-b border-gray-50 pl-1.5">
-                  <ExploreFilters 
-                    activeFilter={activeFilter}
-                    onFilterChange={() => {}} // No-op: pills will be subfilters
-                    main={main}
-                    sub={sub}
-                  />
-                </div>
-              )}
             </div>
+            
+            {/* Filter chips row - only show for shorts/Watch tab */}
+            {main === 'shorts' && (
+              <DiscoverVideosHeader
+                activeDuration={durationFilter}
+                onChangeDuration={setDurationFilter}
+                onOpenShorts={() => setDurationFilter('shorts')}
+                onSearchSubmit={(query) => setSearchQuery(query)}
+                initialQuery={searchQuery}
+              />
+            )}
+            
+            {/* Filter Pills Row - show for non-videos/shorts tabs */}
+            {main !== 'videos' && main !== 'shorts' && (
+              <div className="pt-1 pb-3 pl-3">
+                <ExploreFilters 
+                  activeFilter={activeFilter}
+                  onFilterChange={() => {}} // No-op: pills will be subfilters
+                  main={main}
+                  sub={sub}
+                />
+              </div>
+            )}
 
             {/* Suggested Users - Below Tabs/Search */}
             {/* <div className="pt-1">

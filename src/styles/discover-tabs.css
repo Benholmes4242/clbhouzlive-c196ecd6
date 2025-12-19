@@ -1,15 +1,14 @@
-/* Discover Tabs - Dark Mode */
+/* Discover Tabs - Light/Clean Design */
 
 /* Tokens */
 :root {
-  --tab-active-color: var(--text-tab-active);
-  --tab-inactive-color: var(--text-tab-inactive);
-  --tab-hover-color: var(--text-tab-hover);
-  --tab-underline-color: var(--accent-clbhouz);
-  --divider-color: rgba(255, 255, 255, 0.08);
+  --tab-active-color: #1e293b; /* slate-800 */
+  --tab-inactive-color: #64748b; /* slate-500 */
+  --tab-hover-color: #334155; /* slate-700 */
+  --tab-underline-color: #1e293b; /* slate-800 */
 }
 
-/* Tab container */
+/* Tab container - sits directly on page, no background card */
 .discover-tabs {
   display: flex;
   gap: 0;
@@ -20,9 +19,10 @@
 /* Base tab */
 .discover-tab {
   position: relative;
-  padding: 12px 0;
+  padding: 10px 0;
   color: var(--tab-inactive-color);
   font-weight: 500;
+  font-size: 14px;
   transition: color 120ms ease;
 }
 
@@ -30,15 +30,27 @@
   color: var(--tab-hover-color);
 }
 
-/* Active state */
+/* Active state with underline */
 .discover-tab.active {
   color: var(--tab-active-color);
   font-weight: 600;
 }
 
-/* Header with thin divider lines */
+.discover-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 2px;
+  background: var(--tab-underline-color);
+  border-radius: 1px;
+}
+
+/* Header - transparent, no visual block */
 .discover-header {
-  background: var(--bg-header);
-  border-top: 1px solid var(--divider-color);
-  border-bottom: 1px solid var(--divider-color);
+  background: transparent;
+  border: none;
+  padding: 0 4px;
 }
