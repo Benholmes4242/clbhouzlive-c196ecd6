@@ -201,12 +201,12 @@ const Discover = () => {
   };
 
   return (
-    <PageRoot className="min-h-screen bg-background text-foreground">
+    <PageRoot className="min-h-screen text-foreground" style={{ backgroundColor: 'rgb(248, 250, 252)' }}>
       <CompactHeader />
       <FadeInContent>
-        <main className="pb-20 bg-background">
+        <main className="pb-20" style={{ backgroundColor: 'rgb(248, 250, 252)' }}>
             {/* Tabs - sit directly on page canvas, no intermediate blocks */}
-            <div className="px-1 bg-background">
+            <div className="px-1" style={{ backgroundColor: 'rgb(248, 250, 252)' }}>
               <SegmentedControl 
                 activeTab={activeFilter}
                 onTabChange={() => {}} // No-op: tabs control via URL now
