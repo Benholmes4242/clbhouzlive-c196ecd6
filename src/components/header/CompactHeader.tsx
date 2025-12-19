@@ -39,6 +39,9 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   
   // Use light theme for non-clubhouse pages
   const useLightTheme = !isClubhouseRoute;
+  
+  // Seamless header (no border/shadow) for Discover
+  const isSeamless = isDiscoverRoute;
 
   const handleLogoClick = () => {
     bumpChrome();
@@ -98,8 +101,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           backdropFilter: isDimmed ? 'none' : 'blur(20px)',
           WebkitBackdropFilter: isDimmed ? 'none' : 'blur(20px)',
           paddingTop: isDiscoverRoute ? '0px' : 'env(safe-area-inset-top)',
-          borderBottom: `1px solid ${getBorder()}`,
-          boxShadow: isDimmed ? 'none' : useLightTheme ? '0 1px 3px rgba(0,0,0,0.04)' : undefined,
+          borderBottom: isSeamless ? 'none' : `1px solid ${getBorder()}`,
+          boxShadow: isSeamless || isDimmed ? 'none' : useLightTheme ? '0 1px 3px rgba(0,0,0,0.04)' : undefined,
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}`,
         }}
       >
