@@ -4,7 +4,7 @@
  */
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import '../home/hubTheme.css';
+import '../home/hubThemeLight.css';
 import { useSwingHistory } from '@/features/echo/hooks/useSwingHistory';
 import { formatRelativeTime } from '@/utils/dateFormat';
 

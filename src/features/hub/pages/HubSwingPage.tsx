@@ -5,7 +5,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import SwingCoach from '@/components/ai-chat/SwingCoach';
-import '../home/hubTheme.css';
+import '../home/hubThemeLight.css';
 
 export function HubSwingPage() {
   const nav = useNavigate();

@@ -13,7 +13,7 @@ import { EchoTile } from '../home/tiles/EchoTile';
 import { QuickActionsTile } from '../home/tiles/QuickActionsTile';
 import { NearbyGolfersTile } from '../home/tiles/NearbyGolfersTile';
 import { YourGamesTile } from '../home/tiles/YourGamesTile';
-import '../home/hubTheme.css';
+import '../home/hubThemeLight.css';
 
 // Animation constants - matches expanded map sheet
 const HUB_ENTRY_DURATION = 500; // ms – buttery smooth slide-up
@@ -195,10 +195,8 @@ export function HubHomePage() {
         ref={sheetRef}
         className="hub-glass-page fixed inset-0"
         style={{
-          background: 'rgba(15, 15, 15, 0.95)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+          background: 'var(--hub-bg-start)',
+          borderTop: '1px solid var(--hub-stroke)',
           transform: `translateY(${translateY}px)`,
           transition:
             // no transition while dragging or before first frame

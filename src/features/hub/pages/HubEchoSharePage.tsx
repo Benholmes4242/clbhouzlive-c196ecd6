@@ -13,7 +13,7 @@ import { echoHistoryAnalytics } from '@/features/echo/analytics/echoHistoryAnaly
 import { HighlightedText } from '@/features/echo/components/HighlightedText';
 import { ArrowLeft, X } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import '@/features/hub/home/hubTheme.css';
+import '@/features/hub/home/hubThemeLight.css';
 
 export function HubEchoSharePage() {
   const { token } = useParams<{ token: string }>();

@@ -9,7 +9,7 @@ import { JoinRequestsInboxSheet } from '@/features/nearby/components/JoinRequest
 import { useMyJoinRequests } from '@/features/nearby/hooks/useMyJoinRequests';
 import { useHub } from '@/features/hub/useHub';
 import { HubHeader } from '@/features/hub/components/HubHeader';
-import '../home/hubTheme.css';
+import '../home/hubThemeLight.css';
 
 export function HubYourGamesPage() {
   const nav = useNavigate();

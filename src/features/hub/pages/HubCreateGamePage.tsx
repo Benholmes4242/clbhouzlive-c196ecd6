@@ -8,7 +8,7 @@ import { CreateGameForm } from '@/features/nearby/components/CreateGameForm';
 import { useGameBeacon } from '@/features/nearby/hooks/useGameBeacon';
 import { useKeyboardAwareScroll } from '@/hooks/useKeyboardAwareScroll';
 import { HubHeader } from '../components/HubHeader';
-import '../home/hubTheme.css';
+import '../home/hubThemeLight.css';
 
 export function HubCreateGamePage() {
   const nav = useNavigate();

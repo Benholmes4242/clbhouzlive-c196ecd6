@@ -4,7 +4,7 @@
  */
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
-import '../home/hubTheme.css';
+import '../home/hubThemeLight.css';
 import { useSwingDetail } from '@/features/echo/hooks/useSwingDetail';
 import { useSwingConversation } from '@/features/echo/hooks/useSwingConversation';
 import { GlassVideo } from '@/components/media/GlassVideo';

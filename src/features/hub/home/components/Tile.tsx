@@ -22,10 +22,8 @@ export function Tile({ title, subtitle, children, onViewAll, footer, align = 'st
       style={{
         background: 'var(--hub-glass-bg)',
         border: '1px solid var(--hub-stroke)',
-        boxShadow: 'none',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        willChange: 'transform, backdrop-filter',
+        boxShadow: 'var(--hub-shadow-tile)',
+        willChange: 'transform',
         transform: 'translateZ(0)',
         transition: 'box-shadow 0.2s ease-out',
       }}

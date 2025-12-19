@@ -15,7 +15,7 @@ import { EchoContextMenu } from '@/features/echo/components/EchoContextMenu';
 import type { EchoMessage } from '@/features/echo/state/echoTypes';
 import { haptic } from '@/utils/haptics';
 import { useToast } from '@/hooks/use-toast';
-import '../home/hubTheme.css';
+import '../home/hubThemeLight.css';
 
 const MAX_VISIBLE_MESSAGES = 100;
 

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { echoHistoryAnalytics } from '@/features/echo/analytics/echoHistoryAnalytics';
 import { toast } from '@/hooks/use-toast';
 import { ArrowLeft, Pencil, Merge, Trash2 } from 'lucide-react';
-import '../home/hubTheme.css';
+import '../home/hubThemeLight.css';
 
 export default function HubEchoTagsPage() {
   const nav = useNavigate();
