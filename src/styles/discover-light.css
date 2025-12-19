@@ -1,0 +1,369 @@
+/* ================================================
+   DISCOVER LIGHT THEME
+   ================================================
+   Premium, editorial, Apple-style design system
+   Background canvas: #F4F5F7
+   Cards: #FAFAFB
+   Primary actions: slate
+   ================================================ */
+
+:root {
+  /* Canvas & Surface */
+  --discover-canvas: #F4F5F7;
+  --discover-card: #FAFAFB;
+  --discover-card-elevated: #FFFFFF;
+  
+  /* Text hierarchy */
+  --discover-text-primary: #1F2428;
+  --discover-text-secondary: #5A6270;
+  --discover-text-tertiary: #8A919C;
+  --discover-text-muted: #A8AEB8;
+  
+  /* Borders - favor over shadows */
+  --discover-border: #E4E7EB;
+  --discover-border-strong: #D4D7DB;
+  --discover-border-subtle: #EDEFF2;
+  
+  /* Accent - slate first, minimal orange */
+  --discover-accent-slate: #3A3F46;
+  --discover-accent-slate-light: #5A6270;
+  --discover-accent-orange: #E67E22; /* Use sparingly */
+  
+  /* Interactive states */
+  --discover-hover: #EDEFF2;
+  --discover-active: #E4E7EB;
+  --discover-focus-ring: rgba(58, 63, 70, 0.2);
+  
+  /* Shadows - subtle, use sparingly */
+  --discover-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --discover-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --discover-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+  
+  /* Spacing */
+  --discover-spacing-xs: 4px;
+  --discover-spacing-sm: 8px;
+  --discover-spacing-md: 12px;
+  --discover-spacing-lg: 16px;
+  --discover-spacing-xl: 24px;
+  --discover-spacing-2xl: 32px;
+  
+  /* Radius */
+  --discover-radius-sm: 8px;
+  --discover-radius-md: 12px;
+  --discover-radius-lg: 16px;
+  --discover-radius-xl: 20px;
+  
+  /* Motion */
+  --discover-motion-fast: 150ms;
+  --discover-motion-medium: 250ms;
+  --discover-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* ================================================
+   DISCOVER PAGE CONTAINER
+   ================================================ */
+
+.discover-page {
+  background: var(--discover-canvas);
+  min-height: 100vh;
+}
+
+/* ================================================
+   DISCOVER TABS - Light Theme
+   ================================================ */
+
+.discover-tabs-light {
+  display: flex;
+  gap: 0;
+  background: var(--discover-card);
+  border-bottom: 1px solid var(--discover-border);
+  padding: 0 var(--discover-spacing-lg);
+}
+
+.discover-tab-light {
+  position: relative;
+  padding: 14px 0;
+  margin-right: 24px;
+  color: var(--discover-text-secondary);
+  font-size: 15px;
+  font-weight: 500;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color var(--discover-motion-fast) var(--discover-ease);
+}
+
+.discover-tab-light:hover {
+  color: var(--discover-text-primary);
+}
+
+.discover-tab-light.active {
+  color: var(--discover-text-primary);
+  font-weight: 600;
+}
+
+.discover-tab-light.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--discover-accent-slate);
+  border-radius: 1px 1px 0 0;
+}
+
+/* ================================================
+   DISCOVER HERO
+   ================================================ */
+
+.discover-hero {
+  position: relative;
+  margin: var(--discover-spacing-lg);
+  border-radius: var(--discover-radius-xl);
+  overflow: hidden;
+  background: var(--discover-card);
+  border: 1px solid var(--discover-border);
+}
+
+.discover-hero__media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.discover-hero__media img,
+.discover-hero__media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.discover-hero__gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 0.3) 40%,
+    transparent 70%
+  );
+}
+
+.discover-hero__content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--discover-spacing-xl);
+  color: white;
+}
+
+.discover-hero__context {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.85;
+  margin-bottom: var(--discover-spacing-sm);
+}
+
+.discover-hero__title {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: var(--discover-spacing-sm);
+}
+
+.discover-hero__sub-context {
+  font-size: 14px;
+  opacity: 0.85;
+  margin-bottom: var(--discover-spacing-lg);
+}
+
+.discover-hero__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--discover-spacing-sm);
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--discover-accent-slate);
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--discover-radius-md);
+  border: none;
+  cursor: pointer;
+  transition: all var(--discover-motion-fast) var(--discover-ease);
+}
+
+.discover-hero__cta:hover {
+  background: white;
+  transform: scale(1.02);
+}
+
+.discover-hero__cta:active {
+  transform: scale(0.98);
+}
+
+/* ================================================
+   CREATOR SPOTLIGHT RAIL
+   ================================================ */
+
+.creator-spotlight-rail {
+  padding: var(--discover-spacing-xl) 0;
+}
+
+.creator-spotlight-rail__header {
+  padding: 0 var(--discover-spacing-lg);
+  margin-bottom: var(--discover-spacing-md);
+}
+
+.creator-spotlight-rail__title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--discover-text-primary);
+}
+
+.creator-spotlight-rail__scroll {
+  display: flex;
+  gap: var(--discover-spacing-md);
+  overflow-x: auto;
+  padding: 0 var(--discover-spacing-lg);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.creator-spotlight-rail__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.creator-spotlight-card {
+  flex-shrink: 0;
+  width: 140px;
+  padding: var(--discover-spacing-lg);
+  background: var(--discover-card);
+  border: 1px solid var(--discover-border);
+  border-radius: var(--discover-radius-lg);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--discover-motion-fast) var(--discover-ease);
+}
+
+.creator-spotlight-card:hover {
+  border-color: var(--discover-border-strong);
+  transform: translateY(-2px);
+}
+
+.creator-spotlight-card__avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 0 auto var(--discover-spacing-md);
+  border: 2px solid var(--discover-border);
+}
+
+.creator-spotlight-card__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--discover-text-primary);
+  margin-bottom: var(--discover-spacing-xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.creator-spotlight-card__handle {
+  font-size: 12px;
+  color: var(--discover-text-tertiary);
+}
+
+/* ================================================
+   LONG-FORM HIGHLIGHT
+   ================================================ */
+
+.longform-highlight {
+  padding: var(--discover-spacing-xl) var(--discover-spacing-lg);
+}
+
+.longform-highlight__header {
+  margin-bottom: var(--discover-spacing-md);
+}
+
+.longform-highlight__label {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--discover-text-tertiary);
+}
+
+.longform-highlight__grid {
+  display: grid;
+  gap: var(--discover-spacing-md);
+}
+
+.longform-card {
+  position: relative;
+  border-radius: var(--discover-radius-lg);
+  overflow: hidden;
+  background: var(--discover-card);
+  border: 1px solid var(--discover-border);
+  cursor: pointer;
+  transition: all var(--discover-motion-fast) var(--discover-ease);
+}
+
+.longform-card:hover {
+  border-color: var(--discover-border-strong);
+}
+
+.longform-card__media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+}
+
+.longform-card__media img,
+.longform-card__media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.longform-card__duration {
+  position: absolute;
+  bottom: var(--discover-spacing-sm);
+  right: var(--discover-spacing-sm);
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: var(--discover-radius-sm);
+}
+
+.longform-card__content {
+  padding: var(--discover-spacing-md);
+}
+
+.longform-card__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--discover-text-primary);
+  line-height: 1.3;
+  margin-bottom: var(--discover-spacing-xs);
+}
+
+.longform-card__creator {
+  font-size: 13px;
+  color: var(--discover-text-secondary);
+}
+
+/* ================================================
+   UTILITY CLASSES
+   ================================================ */
+
+.discover-section-divider {
+  height: 1px;
+  background: var(--discover-border-subtle);
+  margin: var(--discover-spacing-xl) var(--discover-spacing-lg);
+}
