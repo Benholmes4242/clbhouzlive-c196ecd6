@@ -94,18 +94,10 @@ export default React.memo(function ShortCard({
           />
         )}
 
-        {/* Gradient overlay for badges */}
+        {/* Gradient overlay */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
-        {/* Trending Badge - Top Right */}
-        {isTrending && (
-          <TrendingBadge className="absolute top-1.5 right-1.5" />
-        )}
-
-        {/* Suggested Badge - Top Right */}
-        {isSuggested && (
-          <SuggestedBadge className="absolute top-1.5 right-1.5" />
-        )}
+        {/* Trending and Suggested badges removed for cleaner editorial look */}
 
         {/* Hover Overlay */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200" />
@@ -128,10 +120,10 @@ export default React.memo(function ShortCard({
               {/* Divider line */}
               <div className="mt-1 mb-1.5 h-px w-[calc(100%-4px)] bg-white/20" />
 
-              {/* Likes row */}
-              <div className="flex items-center gap-2 text-white/90 text-body-sm font-medium leading-snug">
-                <Heart className="w-3.5 h-3.5" />
-                <span>{item.likes || 0} likes</span>
+              {/* Likes row - de-emphasised */}
+              <div className="flex items-center gap-1.5 text-white/50 text-[10px] font-normal leading-snug">
+                <Heart className="w-3 h-3" />
+                <span>{item.likes || 0}</span>
               </div>
             </div>
 
@@ -174,9 +166,9 @@ export default React.memo(function ShortCard({
                 </span>
               </div>
 
-              {/* Likes row */}
-              <div className="flex items-center gap-1.5 text-white text-body-md leading-none font-medium" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
-                <Heart className="w-4 h-4" />
+              {/* Likes row - de-emphasised, tertiary style */}
+              <div className="flex items-center gap-1 text-white/50 text-[10px] leading-none font-normal" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
+                <Heart className="w-3 h-3" />
                 <span>{item.likes || 0}</span>
               </div>
             </div>
