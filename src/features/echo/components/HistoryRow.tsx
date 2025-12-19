@@ -60,16 +60,16 @@ export function HistoryRow({ item, onToggle, trailing, children }: Props) {
 
         <div className="eh-row__content">
           <div className="eh-row-head">
-            <h3 className="eh-row__title line-clamp-2">{item.title}</h3>
+            <h3 className="eh-row__title line-clamp-2" style={{ color: 'var(--hub-text)' }}>{item.title}</h3>
             <div className="eh-row__meta">
-              {when && <time className="eh-row-when">{when}</time>}
+              {when && <time className="eh-row-when" style={{ color: 'var(--hub-text-sub)' }}>{when}</time>}
               <div className="eh-actions flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
                 {trailing}
               </div>
             </div>
           </div>
           {item.preview_snippet && (
-            <div className="eh-row__preview line-clamp-2">{item.preview_snippet}</div>
+            <div className="eh-row__preview line-clamp-2" style={{ color: 'var(--hub-text-sub)' }}>{item.preview_snippet}</div>
           )}
         </div>
       </div>

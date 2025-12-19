@@ -12,24 +12,23 @@
   -webkit-overflow-scrolling: touch;
 }
 
-/* Create Game CTA */
+/* Create Game CTA - Light theme: white bg, slate border, slate text */
 .ctaHero {
   width: 74%;
   height: 44px;
   margin: 16px auto 20px;
   border-radius: 16px;
-  background: var(--hub-glass-bg-button);
-  backdrop-filter: blur(10px);
+  background: var(--hub-glass-bg);
   border: 1px solid var(--hub-stroke);
   color: var(--hub-text);
   font-weight: 700;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--hub-shadow-tile);
   transition: transform var(--hub-anim-fast) ease, background-color var(--hub-anim-default) ease;
 }
 
 .ctaHero:active {
   transform: scale(0.97);
-  background: var(--hub-glass-bg-button-hover);
+  background: var(--hub-glass-bg-hover);
 }
 
 /* Find a Game */

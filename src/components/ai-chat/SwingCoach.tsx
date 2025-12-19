@@ -1352,17 +1352,17 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       >
         <div className="px-2 py-0">
         {messages.length === 0 && !uploadedVideo ? (
-          <div className="text-center text-muted-foreground">
-            <h3 className="text-lg font-medium mb-2">
+          <div className="text-center">
+            <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--hub-text)' }}>
               Upload your swing for swing analysis
             </h3>
-            <p className="mb-6 text-sm">
+            <p className="mb-6 text-sm" style={{ color: 'var(--hub-text-sub)' }}>
               Get instant feedback and drills from Swing Coach.
             </p>
             
             <div className="text-center max-w-sm mx-auto">
-              <p className="text-sm font-medium mb-3">Best results:</p>
-              <ul className="text-sm space-y-1 text-muted-foreground">
+              <p className="text-sm font-medium mb-3" style={{ color: 'var(--hub-text)' }}>Best results:</p>
+              <ul className="text-sm space-y-1" style={{ color: 'var(--hub-text-sub)' }}>
                 <li>• Face-on or down-the-line, full body, good lighting</li>
                 <li>• State the club and typical miss (e.g., Driver + Hook)</li>
                 <li>• Include swing speed or ball flight if known</li>
@@ -1375,15 +1375,19 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => fileInputRef.current?.click()}
-                className="h-[56px] rounded-2xl bg-white/[0.08] border border-white/10 py-[10px] px-6 text-[15px] font-medium text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] hover:bg-white/[0.12] active:scale-[0.98] transition-all"
+                className="h-[56px] rounded-2xl py-[10px] px-6 text-[15px] font-medium active:scale-[0.98] transition-all"
                 style={{ 
+                  background: 'var(--hub-glass-bg)',
+                  border: '1px solid var(--hub-stroke)',
+                  color: 'var(--hub-text)',
+                  boxShadow: 'var(--hub-shadow-tile)',
                   userSelect: 'none', 
                   WebkitTapHighlightColor: 'transparent', 
                   WebkitTouchCallout: 'none', 
                   WebkitUserSelect: 'none',
                 }}
               >
-                <Upload className="h-4 w-4 mr-1" />
+                <Upload className="h-4 w-4 mr-1" style={{ color: 'var(--hub-text-sub)' }} />
                 Upload Swing Video
               </Button>
             </div>
