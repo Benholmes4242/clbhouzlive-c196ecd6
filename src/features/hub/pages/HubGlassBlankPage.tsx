@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import '../home/hubTheme.css';
+import '../home/hubThemeLight.css';
 
 export default function HubGlassBlankPage() {
   return (

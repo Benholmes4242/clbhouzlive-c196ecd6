@@ -34,7 +34,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { announce } from '@/utils/a11y';
 import { clamp, isTypingTarget, readHashIndex, writeHashIndex } from '@/features/echo/utils/focus';
-import '../home/hubTheme.css';
+import '../home/hubThemeLight.css';
 
 export function HubEchoHistoryPage() {
   const nav = useNavigate();

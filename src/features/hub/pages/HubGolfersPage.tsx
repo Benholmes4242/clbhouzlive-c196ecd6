@@ -11,7 +11,7 @@ import { OpenToPlayButton } from '@/features/nearby/components/OpenToPlayButton'
 import { NearbyFilterBar } from '@/features/nearby/components/NearbyFilterBar';
 import { useVisibility } from '@/features/nearby/hooks/useVisibility';
 import { GolferFilters } from '@/hooks/useActiveGolfers';
-import '../home/hubTheme.css';
+import '../home/hubThemeLight.css';
 
 export function HubGolfersPage() {
   const nav = useNavigate();

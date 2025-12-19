@@ -6,7 +6,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { GamesTab } from '@/features/nearby/GamesTab';
 import { useHub } from '@/features/hub/useHub';
-import '../home/hubTheme.css';
+import '../home/hubThemeLight.css';
 
 export function HubGamesPage() {
   const nav = useNavigate();

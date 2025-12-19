@@ -3,7 +3,7 @@
  */
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import '../home/hubTheme.css';
+import '../home/hubThemeLight.css';
 import { useEchoChatThread } from '@/features/echo/hooks/useEchoChatThread';
 import { EchoMessageRow } from '@/features/echo/components/EchoMessageRow';
 import type { EchoMessage } from '@/features/echo/state/echoTypes';
