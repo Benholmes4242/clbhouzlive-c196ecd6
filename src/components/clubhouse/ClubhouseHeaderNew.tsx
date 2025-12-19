@@ -110,6 +110,8 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = '
           "chrome-header", // Chrome auto-hide class
           "relative z-header m-0", // Remove transition, handled by chrome-autohide.css, ensure no top margin
           "h-16 md:h-18", // 64px mobile, 72px desktop
+          "border-b transition-[border-color] duration-[220ms]",
+          chromeState === 'hidden' ? 'border-transparent' : (isDarkContext ? 'border-white/5' : 'border-border'),
           className
         )}
         data-hides-on-scroll
@@ -119,7 +121,6 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = '
           background: isDarkContext ? 'rgba(10, 10, 10, 0.6)' : 'var(--surface-slate)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
-          borderBottom: isDarkContext ? 'none' : '1px solid var(--border-subtle)',
         } as any}
       >
         <div className="mx-auto flex h-full items-center justify-between px-4 md:px-6">

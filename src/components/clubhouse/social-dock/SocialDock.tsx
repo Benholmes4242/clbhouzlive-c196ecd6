@@ -118,7 +118,8 @@ export const SocialDock: React.FC<SocialDockProps> = ({
             'rounded-t-sq-lg rounded-b-none',
             'bg-[rgba(10,10,10,0.78)] backdrop-blur-[22px]',
             'shadow-[0_-10px_30px_rgba(0,0,0,0.55)]',
-            'border-t border-white/5',
+            'border-t transition-[border-color] duration-[220ms]',
+            isVisible ? 'border-white/5' : 'border-transparent',
             'px-4 pt-3',
             'pb-[max(env(safe-area-inset-bottom,16px),16px)]',
             'transition-all duration-[220ms] ease-[cubic-bezier(0.19,1,0.22,1)]'
