@@ -166,12 +166,8 @@ export default function ShortsGrid({
             index: landscapeCandidate.index,
             type: 'landscape',
             variant: 'landscape',
-            isTrending: !firstLandscapeMarked // First landscape is always trending
+            isTrending: false // Phase 1: Removed badge clutter
           });
-          
-          if (!firstLandscapeMarked) {
-            firstLandscapeMarked = true;
-          }
           
           usedIndexes.add(landscapeCandidate.index);
           
@@ -185,35 +181,19 @@ export default function ShortsGrid({
       }
       
       // Add portrait card if not already used - all use base height (no variant)
+      // Phase 1: Removed trending/suggested badge logic for cleaner Watch tab
       if (!usedIndexes.has(itemIndex)) {
-        const isTrending = !firstPortraitMarked || (
-          firstPortraitMarked && 
-          firstLandscapeMarked && 
-          result.length > 5 && // After the two anchors are placed
-          (item.likes ?? 0) > 50 && // Mock "high engagement"
-          !result[result.length - 1]?.isTrending && // Not adjacent
-          result.length % 5 === 0 // Roughly every 5th card after anchors
-        );
-        
-        // Suggested logic: every 8th card (after initial cards), not adjacent to trending
-        const isSuggested = !isTrending && 
-          result.length >= 8 && 
-          result.length % 8 === 0 &&
-          !result[result.length - 1]?.isTrending;
-        
         result.push({
           item,
           index: itemIndex,
           type: 'portrait',
           height: baseHeightPx, // All portraits same size
           variant: 'portrait',
-          isTrending,
-          isSuggested
+          isTrending: false,
+          isSuggested: false
         });
         
-        if (!firstPortraitMarked && isTrending) {
-          firstPortraitMarked = true;
-        }
+        // Phase 1: Removed badge marking logic
         
         usedIndexes.add(itemIndex);
         portraitCount++;
