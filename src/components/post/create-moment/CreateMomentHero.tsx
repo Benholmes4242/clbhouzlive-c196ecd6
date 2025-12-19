@@ -29,7 +29,7 @@ export default function CreateMomentHero({
   }
 
   return (
-    <div className="h-full w-full flex items-center justify-center bg-transparent pointer-events-none">
+    <div className="h-full w-full flex items-center justify-center bg-muted/30 pointer-events-none">
       <motion.div 
         className="text-center px-6 max-w-[520px] flex flex-col items-center"
         initial={{ opacity: 0 }}
@@ -38,17 +38,16 @@ export default function CreateMomentHero({
       >
         {/* Camera Icon - reduced size */}
         <Camera 
-          className="w-12 h-12 mb-3 opacity-80" 
+          className="w-12 h-12 mb-3 text-muted-foreground/60" 
           strokeWidth={1.5}
           aria-hidden="true"
-          style={{ color: 'white' }}
         />
         
         {/* Smart rotating prompt */}
         <AnimatePresence mode="wait">
           <motion.h2 
             key={prompt}
-            className="text-white/90 text-[16px] font-medium leading-snug max-w-[480px]"
+            className="text-foreground/80 text-[16px] font-medium leading-snug max-w-[480px]"
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
@@ -68,11 +67,7 @@ export default function CreateMomentHero({
             type="button"
             onClick={onPickFromCamera}
             aria-label="Open Camera"
-            className="inline-flex items-center gap-2 rounded-xl px-4 py-2 shadow-sm active:scale-[.98] focus:outline-none focus:ring-2 focus:ring-white/30 font-semibold text-sm transition-transform"
-            style={{
-              background: 'rgba(255, 255, 255, 0.95)',
-              color: 'rgba(15, 15, 15, 0.9)',
-            }}
+            className="inline-flex items-center gap-2 rounded-xl px-4 py-2 shadow-sm active:scale-[.98] focus:outline-none focus:ring-2 focus:ring-primary/30 font-semibold text-sm transition-transform bg-primary text-primary-foreground"
           >
             <Camera className="w-4 h-4" />
             <span>Camera</span>
@@ -83,14 +78,7 @@ export default function CreateMomentHero({
             type="button"
             onClick={onPickFromLibrary}
             aria-label="Choose from Gallery"
-            className="inline-flex items-center gap-2 rounded-xl px-4 py-2 shadow-sm active:scale-[.98] focus:outline-none focus:ring-2 focus:ring-white/30 font-medium text-sm transition-transform"
-            style={{
-              background: 'rgba(255, 255, 255, 0.15)',
-              backdropFilter: 'blur(12px) saturate(150%)',
-              WebkitBackdropFilter: 'blur(12px) saturate(150%)',
-              border: '1px solid rgba(255, 255, 255, 0.25)',
-              color: 'rgba(255, 255, 255, 0.96)'
-            }}
+            className="inline-flex items-center gap-2 rounded-xl px-4 py-2 shadow-sm active:scale-[.98] focus:outline-none focus:ring-2 focus:ring-primary/30 font-medium text-sm transition-transform bg-muted text-foreground border border-border hover:bg-muted/80"
           >
             <Images className="w-4 h-4" />
             <span>Gallery</span>
