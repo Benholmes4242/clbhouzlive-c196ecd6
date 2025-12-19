@@ -25,7 +25,7 @@ const Clubhouse = () => {
   useHeaderVariant('glass-dark');
   
   // Force dark status bar for Median iOS wrapper
-  useMedianStatusBar("light", "#0F0F0F");
+  useMedianStatusBar("dark", "#0F0F0F", false, false);
   
   // Cinema Dim: register this page as Clubhouse
   const { setIsClubhousePage, cinemaDim } = useCinemaDimContext();

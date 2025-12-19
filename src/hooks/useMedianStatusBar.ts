@@ -2,54 +2,58 @@ import { useEffect } from "react";
 
 declare global {
   interface Window {
-    Median?: any;
-    webkit?: any;
+    median?: any;
+    median_library_ready?: () => void;
   }
 }
 
-type StatusBarStyle = "light" | "dark";
+function toAARRGGBB(hex: string) {
+  // Input: "#F8FAFC" or "F8FAFC"
+  const clean = hex.replace("#", "").trim();
+  if (clean.length !== 6) return "FFFFFFFF"; // fallback white
+  // Median expects AARRGGBB, e.g. "FFF8FAFC"
+  return `FF${clean.toUpperCase()}`;
+}
 
-/**
- * Controls iOS status bar via Median JS Bridge.
- * - "light" = white status bar icons (for dark backgrounds)
- * - "dark" = dark status bar icons (for light backgrounds)
- */
-export function useMedianStatusBar(
-  style: StatusBarStyle,
-  backgroundColor: string
-) {
+export function useMedianStatusBar(style: "light" | "dark" | "auto", hexColor: string, overlay = false, blur = false) {
   useEffect(() => {
-    // TEMPORARY DEBUG - Remove after testing in TestFlight
-    console.log("[MedianDebug] Checking bridge availability...");
-    console.log("[MedianDebug] window.Median:", window.Median);
-    console.log("[MedianDebug] webkit messageHandlers:", window.webkit?.messageHandlers);
-    
-    if (window.webkit?.messageHandlers) {
-      console.log("[MedianDebug] Handler keys:", Object.keys(window.webkit.messageHandlers));
-    }
-    // END TEMPORARY DEBUG
+    // Only attempt in Median app runtime
+    if (!navigator.userAgent.toLowerCase().includes("median")) return;
 
-    try {
-      // Primary Median bridge
-      if (window.Median?.statusBar) {
-        console.log("[MedianDebug] Using window.Median.statusBar");
-        window.Median.statusBar.setStyle(style);
-        window.Median.statusBar.setBackgroundColor(backgroundColor);
-        return;
+    const apply = () => {
+      try {
+        if (window.median?.statusbar?.set) {
+          window.median.statusbar.set({
+            style,                 // 'light' = black icons, 'dark' = white icons, 'auto' = follows device
+            color: toAARRGGBB(hexColor),
+            overlay,
+            blur,
+          });
+        }
+      } catch {
+        // fail silently
       }
+    };
 
-      // WKWebView fallback
-      if (window.webkit?.messageHandlers?.median) {
-        console.log("[MedianDebug] Using webkit messageHandler fallback");
-        window.webkit.messageHandlers.median.postMessage({
-          type: "statusBar",
-          style,
-          backgroundColor,
-        });
-      }
-    } catch (e) {
-      console.log("[MedianDebug] Error:", e);
-      // Fail silently (web preview will ignore this)
-    }
-  }, [style, backgroundColor]);
+    // 1) Try immediately (sometimes bridge is already ready)
+    apply();
+
+    // 2) Also register Median's ready callback (bridge loads async)
+    const prev = window.median_library_ready;
+    window.median_library_ready = () => {
+      if (typeof prev === "function") prev();
+      apply();
+    };
+
+    // 3) Failsafe: retry a few times in case ready callback doesn't fire for SPA navigation
+    const t1 = window.setTimeout(apply, 250);
+    const t2 = window.setTimeout(apply, 750);
+    const t3 = window.setTimeout(apply, 1500);
+
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.clearTimeout(t3);
+    };
+  }, [style, hexColor, overlay, blur]);
 }

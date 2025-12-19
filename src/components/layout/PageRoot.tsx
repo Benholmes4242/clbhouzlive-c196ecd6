@@ -15,7 +15,7 @@ interface PageRootProps extends React.HTMLAttributes<HTMLDivElement> {
 export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
   ({ children, className, ...rest }, ref) => {
     // Default light chrome for all pages (Clubhouse overrides this)
-    useMedianStatusBar("dark", "#F8FAFC");
+    useMedianStatusBar("light", "#F8FAFC", false, false);
     return (
       <div
         ref={ref}
