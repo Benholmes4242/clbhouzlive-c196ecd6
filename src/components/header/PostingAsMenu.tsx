@@ -17,9 +17,10 @@ import { toast } from 'sonner';
 interface PostingAsMenuProps {
   isOpen: boolean;
   onClose: () => void;
+  useLightTheme?: boolean;
 }
 
-export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
+export function PostingAsMenu({ isOpen, onClose, useLightTheme = false }: PostingAsMenuProps) {
   const navigate = useNavigate();
   const { activeActor, setActiveActor, availableActors } = useActiveActor();
   const { user } = useSupabaseSession();
@@ -80,12 +81,15 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
         <>
           {/* Backdrop */}
           <button
-            className="fixed inset-0 z-[199] bg-black/60 backdrop-blur-sm"
+            className={cn(
+              "fixed inset-0 z-[199]",
+              useLightTheme ? "bg-black/20 backdrop-blur-sm" : "bg-black/60 backdrop-blur-sm"
+            )}
             onClick={onClose}
             aria-label="Close profile menu"
           />
           
-          {/* Menu panel - Glassy dark design */}
+          {/* Menu panel */}
           <div 
             className={cn(
               "fixed inset-x-0 z-[200]",
@@ -102,16 +106,21 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
               className="mx-2 sm:mx-3 overflow-hidden"
               style={{
                 borderRadius: '24px',
-                background: 'rgba(16, 16, 16, 0.92)',
+                background: useLightTheme ? 'rgba(255, 255, 255, 0.98)' : 'rgba(16, 16, 16, 0.92)',
                 backdropFilter: 'blur(40px) saturate(150%)',
                 WebkitBackdropFilter: 'blur(40px) saturate(150%)',
-                boxShadow: '0 24px 60px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.08)',
+                boxShadow: useLightTheme 
+                  ? '0 24px 60px rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(0, 0, 0, 0.06)'
+                  : '0 24px 60px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.08)',
               }}
             >
               {/* Identity summary card */}
               <div 
-                className="px-4 py-4 border-b border-white/8"
-                style={{ background: 'rgba(255, 255, 255, 0.04)' }}
+                className={cn(
+                  "px-4 py-4 border-b",
+                  useLightTheme ? "border-slate-200/80" : "border-white/8"
+                )}
+                style={{ background: useLightTheme ? 'rgba(0, 0, 0, 0.02)' : 'rgba(255, 255, 255, 0.04)' }}
               >
                 <div className="flex items-center gap-3">
                   <SquircleAvatar
@@ -122,15 +131,27 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
                     hideRing
                   />
                   <div className="flex flex-col min-w-0 flex-1">
-                    <span className="text-sm font-semibold text-white truncate">
+                    <span className={cn(
+                      "text-sm font-semibold truncate",
+                      useLightTheme ? "text-slate-800" : "text-white"
+                    )}>
                       {displayName}
                     </span>
-                    <span className="text-xs text-white/50 truncate">
+                    <span className={cn(
+                      "text-xs truncate",
+                      useLightTheme ? "text-slate-500" : "text-white/50"
+                    )}>
                       {email}
                     </span>
-                    <span className="mt-0.5 text-[11px] text-white/40">
+                    <span className={cn(
+                      "mt-0.5 text-[11px]",
+                      useLightTheme ? "text-slate-400" : "text-white/40"
+                    )}>
                       {postingAsCopy.headerPill.label}{' '}
-                      <span className="font-medium text-white/60">
+                      <span className={cn(
+                        "font-medium",
+                        useLightTheme ? "text-slate-600" : "text-white/60"
+                      )}>
                         {activeActor?.name}
                       </span>
                     </span>
@@ -141,10 +162,16 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
               {/* Switch profile section */}
               <div className="px-3 py-2">
                 <div className="px-2 mb-1">
-                  <span className="text-[11px] font-medium text-white/45 uppercase tracking-wider">
+                  <span className={cn(
+                    "text-[11px] font-medium uppercase tracking-wider",
+                    useLightTheme ? "text-slate-400" : "text-white/45"
+                  )}>
                     {postingAsCopy.dropdown.sectionTitle}
                   </span>
-                  <p className="text-[10px] text-white/30 mt-0.5">
+                  <p className={cn(
+                    "text-[10px] mt-0.5",
+                    useLightTheme ? "text-slate-400" : "text-white/30"
+                  )}>
                     {postingAsCopy.dropdown.helper}
                   </p>
                 </div>
@@ -165,9 +192,13 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
                         className={cn(
                           "flex w-full items-center gap-2.5 rounded-sq-md px-3 py-2.5",
                           "transition-all duration-150 active:scale-[0.98]",
-                          isActive 
-                            ? "bg-white/10 border border-white/12" 
-                            : "hover:bg-white/5 border border-transparent"
+                          useLightTheme 
+                            ? isActive 
+                              ? "bg-slate-100 border border-slate-200" 
+                              : "hover:bg-slate-50 border border-transparent"
+                            : isActive 
+                              ? "bg-white/10 border border-white/12" 
+                              : "hover:bg-white/5 border border-transparent"
                         )}
                       >
                         <SquircleAvatar
@@ -179,23 +210,35 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
                         />
                         <div className="flex-1 text-left min-w-0">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs font-medium text-white truncate">
+                            <span className={cn(
+                              "text-xs font-medium truncate",
+                              useLightTheme ? "text-slate-700" : "text-white"
+                            )}>
                               {actor.name}
                             </span>
                             {actor.type === 'business' ? (
-                              <Building2 className="h-3 w-3 text-white/40 flex-shrink-0" />
+                              <Building2 className={cn(
+                                "h-3 w-3 flex-shrink-0",
+                                useLightTheme ? "text-slate-400" : "text-white/40"
+                              )} />
                             ) : (
-                              <User className="h-3 w-3 text-white/40 flex-shrink-0" />
+                              <User className={cn(
+                                "h-3 w-3 flex-shrink-0",
+                                useLightTheme ? "text-slate-400" : "text-white/40"
+                              )} />
                             )}
                           </div>
-                          <span className="text-[10px] text-white/40">
+                          <span className={cn(
+                            "text-[10px]",
+                            useLightTheme ? "text-slate-400" : "text-white/40"
+                          )}>
                             {actor.type === 'personal' 
                               ? postingAsCopy.actorLabels.personal 
                               : postingAsCopy.actorLabels.business}
                           </span>
                         </div>
                         {isActive && (
-                          <Check className="h-4 w-4 text-emerald-400 flex-shrink-0" />
+                          <Check className="h-4 w-4 text-emerald-500 flex-shrink-0" />
                         )}
                       </button>
                     );
@@ -203,11 +246,20 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
                   
                   {/* Empty state when no businesses */}
                   {availableActors.filter(a => a.type === 'business').length === 0 && (
-                    <div className="px-3 py-3 rounded-sq-md border border-dashed border-white/10 mt-2">
-                      <p className="text-xs font-medium text-white/60">
+                    <div className={cn(
+                      "px-3 py-3 rounded-sq-md border border-dashed mt-2",
+                      useLightTheme ? "border-slate-200" : "border-white/10"
+                    )}>
+                      <p className={cn(
+                        "text-xs font-medium",
+                        useLightTheme ? "text-slate-600" : "text-white/60"
+                      )}>
                         {postingAsCopy.emptyState.title}
                       </p>
-                      <p className="text-[10px] text-white/40 mt-0.5">
+                      <p className={cn(
+                        "text-[10px] mt-0.5",
+                        useLightTheme ? "text-slate-400" : "text-white/40"
+                      )}>
                         {postingAsCopy.emptyState.body}
                       </p>
                       <button
@@ -223,7 +275,10 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
               </div>
               
               {/* Divider */}
-              <div className="border-t border-white/6" />
+              <div className={cn(
+                "border-t",
+                useLightTheme ? "border-slate-100" : "border-white/6"
+              )} />
               
               {/* Core action items */}
               <nav className="px-3 py-1.5 space-y-0.5">
@@ -232,6 +287,7 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
                   icon={<Bell className="h-[18px] w-[18px]" />}
                   label="Notifications"
                   onClick={() => handleNavigate('/notificationmessages')}
+                  useLightTheme={useLightTheme}
                   trailing={hasUnread && (
                     <span className="h-2.5 w-2.5 rounded-full bg-orange-500" />
                   )}
@@ -245,6 +301,7 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
                     setUploadCenterOpen(true);
                     onClose();
                   }}
+                  useLightTheme={useLightTheme}
                   trailing={showUploadIndicator && (
                     <span className={cn(
                       "h-2.5 w-2.5 rounded-full",
@@ -258,6 +315,7 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
                   icon={<User className="h-[18px] w-[18px]" />}
                   label="View profile"
                   onClick={() => handleNavigate('/profile')}
+                  useLightTheme={useLightTheme}
                 />
                 
                 {/* Edit profile */}
@@ -265,6 +323,7 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
                   icon={<Pencil className="h-[18px] w-[18px]" />}
                   label="Edit profile"
                   onClick={() => handleNavigate('/edit-profile')}
+                  useLightTheme={useLightTheme}
                 />
                 
                 {/* Business profiles */}
@@ -272,6 +331,7 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
                   icon={<Building2 className="h-[18px] w-[18px]" />}
                   label="Business profiles"
                   onClick={() => handleNavigate('/businesses/manage')}
+                  useLightTheme={useLightTheme}
                 />
                 
                 {/* Settings */}
@@ -279,6 +339,7 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
                   icon={<Settings className="h-[18px] w-[18px]" />}
                   label="Settings"
                   onClick={() => handleNavigate('/settings')}
+                  useLightTheme={useLightTheme}
                 />
 
                 {/* Admin Dashboard */}
@@ -287,13 +348,17 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
                     icon={<Shield className="h-[18px] w-[18px]" />}
                     label="Admin Dashboard"
                     onClick={() => handleNavigate('/admin')}
+                    useLightTheme={useLightTheme}
                   />
                 )}
               </nav>
               
               {/* Logout section */}
               <div className="px-3 pt-1 pb-3">
-                <div className="border-t border-white/6 pt-2">
+                <div className={cn(
+                  "border-t pt-2",
+                  useLightTheme ? "border-slate-100" : "border-white/6"
+                )}>
                   <button
                     onClick={() => {
                       handleLogout();
@@ -304,8 +369,8 @@ export function PostingAsMenu({ isOpen, onClose }: PostingAsMenuProps) {
                       "hover:bg-red-500/10 transition-colors active:scale-[0.98]"
                     )}
                   >
-                    <LogOut className="h-[18px] w-[18px] text-red-400" />
-                    <span className="text-sm text-red-400 font-medium">Log out</span>
+                    <LogOut className="h-[18px] w-[18px] text-red-500" />
+                    <span className="text-sm text-red-500 font-medium">Log out</span>
                   </button>
                 </div>
               </div>
@@ -323,19 +388,24 @@ interface MenuRowProps {
   label: string;
   onClick: () => void;
   trailing?: React.ReactNode;
+  useLightTheme?: boolean;
 }
 
-const MenuRow: React.FC<MenuRowProps> = ({ icon, label, onClick, trailing }) => (
+const MenuRow: React.FC<MenuRowProps> = ({ icon, label, onClick, trailing, useLightTheme = false }) => (
   <button
     onClick={onClick}
     className={cn(
       "flex w-full items-center justify-between rounded-sq-md px-3 h-11",
-      "hover:bg-white/5 transition-colors active:scale-[0.98]"
+      "transition-colors active:scale-[0.98]",
+      useLightTheme ? "hover:bg-slate-50" : "hover:bg-white/5"
     )}
   >
     <span className="flex items-center gap-2.5">
-      <span className="text-white/50">{icon}</span>
-      <span className="text-sm text-white/80">{label}</span>
+      <span className={useLightTheme ? "text-slate-500" : "text-white/50"}>{icon}</span>
+      <span className={cn(
+        "text-sm",
+        useLightTheme ? "text-slate-700" : "text-white/80"
+      )}>{label}</span>
     </span>
     {trailing}
   </button>

@@ -8,16 +8,31 @@ interface PostingAsPillProps {
   onClick: () => void;
   isOpen: boolean;
   hasUnread?: boolean;
+  useLightTheme?: boolean;
 }
 
-export function PostingAsPill({ onClick, isOpen, hasUnread = false }: PostingAsPillProps) {
+export function PostingAsPill({ onClick, isOpen, hasUnread = false, useLightTheme = false }: PostingAsPillProps) {
   const { activeActor, isLoading } = useActiveActor();
 
   if (isLoading || !activeActor) {
     return (
-      <div className="flex items-center gap-2 px-2 py-1.5 rounded-sq-pill bg-white/5 border border-white/10">
-        <div className="h-7 w-7 bg-white/10 animate-pulse" style={{ borderRadius: '34%' }} />
-        <div className="h-3 w-16 rounded bg-white/10 animate-pulse" />
+      <div className={cn(
+        "flex items-center gap-2 px-2 py-1.5 rounded-sq-pill border",
+        useLightTheme 
+          ? "bg-slate-100 border-slate-200" 
+          : "bg-white/5 border-white/10"
+      )}>
+        <div 
+          className={cn(
+            "h-7 w-7 animate-pulse",
+            useLightTheme ? "bg-slate-200" : "bg-white/10"
+          )} 
+          style={{ borderRadius: '34%' }} 
+        />
+        <div className={cn(
+          "h-3 w-16 rounded animate-pulse",
+          useLightTheme ? "bg-slate-200" : "bg-white/10"
+        )} />
       </div>
     );
   }
@@ -29,9 +44,11 @@ export function PostingAsPill({ onClick, isOpen, hasUnread = false }: PostingAsP
       onClick={onClick}
       className={cn(
         "flex items-center gap-2 pl-1.5 pr-2.5 py-1",
-        "rounded-sq-pill bg-white/5 border border-white/10",
-        "hover:bg-white/10 active:bg-white/15 transition-colors",
-        "max-w-[200px]"
+        "rounded-sq-pill border transition-colors",
+        "max-w-[200px]",
+        useLightTheme 
+          ? "bg-slate-100 border-slate-200/80 hover:bg-slate-200/80 active:bg-slate-200" 
+          : "bg-white/5 border-white/10 hover:bg-white/10 active:bg-white/15"
       )}
     >
       {/* Squircle Avatar with notification dot */}
@@ -45,21 +62,28 @@ export function PostingAsPill({ onClick, isOpen, hasUnread = false }: PostingAsP
         />
         {hasUnread && (
           <span 
-            className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-orange-500 ring-[1.5px] ring-[rgb(10,10,10)]"
+            className={cn(
+              "absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-orange-500",
+              useLightTheme ? "ring-[1.5px] ring-slate-50" : "ring-[1.5px] ring-[rgb(10,10,10)]"
+            )}
             aria-label="Unread notifications"
           />
         )}
       </div>
       
       {/* Name */}
-      <span className="text-xs font-medium text-white truncate max-w-[120px] leading-none">
+      <span className={cn(
+        "text-xs font-medium truncate max-w-[120px] leading-none",
+        useLightTheme ? "text-slate-700" : "text-white"
+      )}>
         {activeActor.name}
       </span>
       
       {/* Chevron */}
       <ChevronDown 
         className={cn(
-          "h-3 w-3 text-white/50 flex-shrink-0 transition-transform duration-200",
+          "h-3 w-3 flex-shrink-0 transition-transform duration-200",
+          useLightTheme ? "text-slate-400" : "text-white/50",
           isOpen && "rotate-180"
         )} 
       />
