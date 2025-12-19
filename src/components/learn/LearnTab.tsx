@@ -42,7 +42,7 @@ export const LearnTab: React.FC<LearnTabProps> = ({
   };
 
   return (
-    <div className={cn("min-h-screen bg-background", className)}>
+    <div className={cn("min-h-screen", className)}>
       {/* Orientation / Intro */}
       <LearnIntro />
 

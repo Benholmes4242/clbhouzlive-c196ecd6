@@ -67,7 +67,7 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
   };
 
   return (
-    <div className={cn("min-h-screen bg-background", className)}>
+    <div className={cn("min-h-screen", className)}>
       {/* Hero Section - Sets aspirational tone */}
       <ExploreHero onExploreClick={handleExploreClick} />
       

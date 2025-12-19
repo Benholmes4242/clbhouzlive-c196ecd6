@@ -72,7 +72,7 @@ export default function FollowingFeed({ onMediaClick }: FollowingFeedProps) {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       {/* Unified chronological feed */}
       <div className="flex flex-col">
         {items.map((item) => (
