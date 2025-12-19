@@ -32,6 +32,7 @@ import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import AchievementsPane from '@/components/profile/AchievementsPane';
 import HandicapSection from '@/components/profile/HandicapSection';
 import { ProfileClubsSection } from '@/components/profile/ProfileClubsSection';
+import { GolfJourneyProgress, MilestoneBadges } from '@/components/profile/phase6';
 
 // Background color - matches course details page (slate-50)
 const BG_COLOR = '#f8fafc'; // slate-50
@@ -514,6 +515,26 @@ const ProfilePageV2: React.FC = () => {
             <ProfileClubsSection
               profileUserId={profile.id}
               viewerId={user.id}
+            />
+          </section>
+        )}
+
+        {/* Phase 6: Golf Journey Progress */}
+        {isPersonal && profile?.id && (
+          <section className="px-5 mb-6">
+            <GolfJourneyProgress 
+              userId={profile.id}
+              isOwnProfile={isSelf}
+            />
+          </section>
+        )}
+
+        {/* Phase 6: Milestones */}
+        {isPersonal && profile?.id && (
+          <section className="px-5 mb-6">
+            <MilestoneBadges
+              userId={profile.id}
+              isOwnProfile={isSelf}
             />
           </section>
         )}
