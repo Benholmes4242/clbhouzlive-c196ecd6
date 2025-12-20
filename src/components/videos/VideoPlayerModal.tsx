@@ -600,7 +600,10 @@ export const VideoPlayerModal: React.FC = () => {
                   {/* Autoplay toggle + Up next header */}
                   <div className="flex items-center justify-between">
                     <h3 className="text-white/80 font-medium text-sm">Up next</h3>
-                    <label className="flex items-center gap-2 cursor-pointer">
+                    <label 
+                      className="flex items-center gap-2 cursor-pointer"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <span className="text-white/60 text-xs">Autoplay</span>
                       <Switch
                         checked={autoplayEnabled}
@@ -657,7 +660,10 @@ export const VideoPlayerModal: React.FC = () => {
                     {/* Autoplay toggle + Up next header */}
                     <div className="flex items-center justify-between">
                       <h3 className="text-white/80 font-medium text-sm">Up next</h3>
-                      <label className="flex items-center gap-2 cursor-pointer">
+                      <label 
+                        className="flex items-center gap-2 cursor-pointer"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <span className="text-white/60 text-xs">Autoplay</span>
                         <Switch
                           checked={autoplayEnabled}
