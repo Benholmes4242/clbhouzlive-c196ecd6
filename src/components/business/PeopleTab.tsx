@@ -102,9 +102,9 @@ export function PeopleTab({
       ];
 
   return (
-    <div className="bg-white">
-      {/* Header + tabs constrained */}
-      <div className="max-w-screen-sm mx-auto px-4">
+    <div>
+      {/* Header + tabs constrained - white background */}
+      <div className="bg-white max-w-screen-sm mx-auto px-4">
         {/* Header */}
         <div className="pt-4 pb-1">
           <h2 className="text-lg font-semibold text-foreground text-center">People</h2>
@@ -122,7 +122,7 @@ export function PeopleTab({
 
       {/* Loading skeleton */}
       {isLoading && (
-        <div className="px-4 py-4 space-y-3">
+        <div className="px-4 py-4 space-y-3 bg-white">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="flex items-center gap-3 animate-pulse">
               <div className="w-12 h-12 rounded-sq-md bg-muted" />
@@ -135,30 +135,37 @@ export function PeopleTab({
         </div>
       )}
 
-      {/* Team list - full width */}
+      {/* Team list - full width with cool blue background */}
       {!isLoading && activeSubTab === 'team' && (
         sortedTeamMembers.length > 0 ? (
-          <PeopleList>
-            {sortedTeamMembers.map((member) => {
-              const profile = member.profile;
-              if (!profile) return null;
-              
-              return (
-                <TeamRow
-                  key={member.id}
-                  id={member.id}
-                  displayName={profile.display_name}
-                  username={profile.username}
-                  profilePhotoUrl={profile.profile_photo_url}
-                  isVerified={profile.is_verified_golfer}
-                  role={member.role}
-                  canManage={canManage}
-                  onProfileClick={() => handleProfileClick(profile.id)}
-                  onEditAccess={canManage ? () => setEditingMember(member) : undefined}
-                />
-              );
-            })}
-          </PeopleList>
+          <div 
+            className="-mx-5 px-0 mt-2"
+            style={{
+              background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)',
+            }}
+          >
+            <div className="flex flex-col gap-[2px]">
+              {sortedTeamMembers.map((member) => {
+                const profile = member.profile;
+                if (!profile) return null;
+                
+                return (
+                  <TeamRow
+                    key={member.id}
+                    id={member.id}
+                    displayName={profile.display_name}
+                    username={profile.username}
+                    profilePhotoUrl={profile.profile_photo_url}
+                    isVerified={profile.is_verified_golfer}
+                    role={member.role}
+                    canManage={canManage}
+                    onProfileClick={() => handleProfileClick(profile.id)}
+                    onEditAccess={canManage ? () => setEditingMember(member) : undefined}
+                  />
+                );
+              })}
+            </div>
+          </div>
         ) : (
           <EmptyState
             icon={<Briefcase className="h-8 w-8 text-muted-foreground/40" />}
@@ -171,26 +178,33 @@ export function PeopleTab({
         )
       )}
 
-      {/* Members list - only for Golf Clubs, full width */}
+      {/* Members list - only for Golf Clubs, full width with cool blue background */}
       {!isLoading && activeSubTab === 'members' && isGolfClub && (
         sortedClubMembers.length > 0 ? (
-          <PeopleList>
-            {sortedClubMembers.map((member) => (
-              <PersonRow
-                key={member.id}
-                id={member.id}
-                displayName={member.display_name}
-                username={member.username}
-                profilePhotoUrl={member.profile_photo_url}
-                isVerified={member.is_verified_golfer}
-                handicap={member.eg_handicap_index}
-                showHandicap={member.show_handicap !== false}
-                homeClub={null} // They're already at their home club
-                alsoPlaysAt={member.also_plays_at || []}
-                onClick={() => handleProfileClick(member.id)}
-              />
-            ))}
-          </PeopleList>
+          <div 
+            className="-mx-5 px-0 mt-2"
+            style={{
+              background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)',
+            }}
+          >
+            <div className="flex flex-col gap-[2px]">
+              {sortedClubMembers.map((member) => (
+                <PersonRow
+                  key={member.id}
+                  id={member.id}
+                  displayName={member.display_name}
+                  username={member.username}
+                  profilePhotoUrl={member.profile_photo_url}
+                  isVerified={member.is_verified_golfer}
+                  handicap={member.eg_handicap_index}
+                  showHandicap={member.show_handicap !== false}
+                  homeClub={null}
+                  alsoPlaysAt={member.also_plays_at || []}
+                  onClick={() => handleProfileClick(member.id)}
+                />
+              ))}
+            </div>
+          </div>
         ) : (
           <EmptyState
             icon={<Users className="h-8 w-8 text-muted-foreground/40" />}
