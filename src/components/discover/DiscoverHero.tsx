@@ -166,8 +166,8 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
 
       {/* Meta Area - White card section */}
       <div className="px-4 py-3 flex items-end justify-between gap-3">
-        {/* Text content - constrained to ~60% to leave room for avatar */}
-        <div className="flex-1 min-w-0 max-w-[60%]">
+        {/* Text content - constrained to ~75% to leave room for avatar */}
+        <div className="flex-1 min-w-0 max-w-[75%]">
           {/* Caption - 2 lines max */}
           <p className="text-sm text-foreground line-clamp-2 leading-snug">
             {item.title}
@@ -221,8 +221,8 @@ export function createHeroItem(post: any): HeroItem | null {
     golfCourse: post.golfCourse,
     creator: post.user ? {
       id: post.user.id,
-      name: post.user.name || post.user.username,
-      avatarUrl: post.user.avatar_url || post.user.profile_photo_url,
+      name: post.user.display_name || post.user.name || post.user.username,
+      avatarUrl: post.user.profile_photo_url || post.user.avatar_url,
     } : undefined,
   };
 }
