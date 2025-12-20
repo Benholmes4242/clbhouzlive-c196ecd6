@@ -14,15 +14,23 @@ interface LearnTabProps {
 }
 
 /**
- * LearnTab - Main container for Learn experience
+ * VideosTab - Main container for Videos experience (formerly Learn)
  * 
- * Learn is intentionally:
+ * DATA RULE: Videos tab = long-form ONLY (≥3 min)
+ * Shorts (<3 min) = Watch tab ONLY — NO crossover
+ * 
+ * ROUTING RULES (Phase 1):
+ * - Watch tab: avatar/username taps → Profile Page
+ * - Videos tab: avatar/username taps → Creator Page (future, route to Profile for now)
+ * - Profile page: "View videos" CTA → Creator Page (future)
+ * 
+ * Videos is intentionally:
  * - Quieter than Watch
- * - Slower and more deliberate  
+ * - Slower and more deliberate
  * - More structured
  * 
  * If Watch answers "What's exciting?"
- * Learn answers "What should I work on next?"
+ * Videos answers "What should I work on next?"
  */
 export const LearnTab: React.FC<LearnTabProps> = ({
   onVideoClick,

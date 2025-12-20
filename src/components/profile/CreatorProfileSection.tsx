@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FeaturedVideoSlot } from './FeaturedVideoSlot';
 import { PinnedPostsSection } from './PinnedPostsSection';
 import { CreatorBadge } from './CreatorBadge';
 import { CreatorAnalyticsCard } from './CreatorAnalyticsCard';
 import { useCreatorFeatures } from '@/hooks/useCreatorFeatures';
 import { PostPickerSheet } from './PostPickerSheet';
+import { Film } from 'lucide-react';
 
 interface CreatorProfileSectionProps {
   userId: string;
@@ -26,6 +28,7 @@ export function CreatorProfileSection({
   isOwnProfile,
   className 
 }: CreatorProfileSectionProps) {
+  const navigate = useNavigate();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerMode, setPickerMode] = useState<'featured' | 'pin'>('featured');
   
@@ -109,6 +112,20 @@ export function CreatorProfileSection({
       {isOwnProfile && (
         <CreatorAnalyticsCard userId={userId} className="mb-4" />
       )}
+
+      {/* Phase 1: Placeholder Videos CTA - creator-only, routes to Videos tab for now */}
+      <button
+        onClick={() => navigate('/discover?main=videos')}
+        className="mb-4 w-full py-3 flex items-center justify-center gap-2 text-sm font-medium rounded-xl transition-colors"
+        style={{
+          background: 'rgba(15, 15, 15, 0.05)',
+          border: '1px solid rgba(15, 15, 15, 0.1)',
+          color: 'rgba(15, 15, 15, 0.6)'
+        }}
+      >
+        <Film className="w-4 h-4" />
+        Videos (coming soon)
+      </button>
 
       {/* Post Picker Sheet */}
       <PostPickerSheet
