@@ -51,7 +51,8 @@ export const VideosSectionPage: React.FC = () => {
   };
 
   const handleCreatorClick = (creatorUserId: string) => {
-    navigate(`/profile/${creatorUserId}`);
+    // Videos context: navigate to Creator Page
+    navigate(`/creator/${creatorUserId}`);
   };
 
   const handleBack = () => {

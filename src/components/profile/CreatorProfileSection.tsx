@@ -113,18 +113,13 @@ export function CreatorProfileSection({
         <CreatorAnalyticsCard userId={userId} className="mb-4" />
       )}
 
-      {/* Phase 1: Placeholder Videos CTA - creator-only, routes to Videos tab for now */}
+      {/* Phase 3: View videos CTA - creator-only, routes to Creator Page */}
       <button
-        onClick={() => navigate('/discover?main=videos')}
-        className="mb-4 w-full py-3 flex items-center justify-center gap-2 text-sm font-medium rounded-xl transition-colors"
-        style={{
-          background: 'rgba(15, 15, 15, 0.05)',
-          border: '1px solid rgba(15, 15, 15, 0.1)',
-          color: 'rgba(15, 15, 15, 0.6)'
-        }}
+        onClick={() => navigate(`/creator/${userId}`)}
+        className="mb-4 w-full py-3 flex items-center justify-center gap-2 text-sm font-medium rounded-xl transition-colors bg-primary/10 hover:bg-primary/15 text-primary border border-primary/20"
       >
         <Film className="w-4 h-4" />
-        Videos (coming soon)
+        View videos
       </button>
 
       {/* Post Picker Sheet */}
