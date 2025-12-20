@@ -1,283 +1,322 @@
-import React, { useEffect, useRef, useCallback, useState } from 'react';
-import { X, Play, Pause } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useVideoPlaybackSafe } from '@/context/VideoPlaybackContext';
-import { useVideoProgress } from '@/hooks/useVideoProgress';
-import { usePostData } from '@/hooks/usePostData';
-import { uidFromNode, generateHlsUrl, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
-import Hls from 'hls.js';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { X, Play, Pause } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useVideoPlaybackSafe } from "@/context/VideoPlaybackContext";
+import { usePostData } from "@/hooks/usePostData";
+import { useVideoProgress } from "@/hooks/useVideoProgress";
+import { uidFromNode, generateHlsUrl, generateThumbnailUrl } from "@/utils/cloudflareStreamTransform";
+import FlickerFreeHLSPlayer from "@/components/ui/FlickerFreeHLSPlayer";
+
+type MiniVideo = {
+  id: string;
+  title: string;
+  creatorName: string;
+  creatorAvatarUrl?: string;
+  hlsUrl: string;
+  posterUrl?: string;
+};
+
+const PROGRESS_THROTTLE_MS = 5000;
 
 /**
  * MiniPlayer - YouTube-style mini video player
  * 
- * - Persists at bottom-right when user closes full player
- * - Shows thumbnail, title, play/pause, close
- * - Tap to reopen full player
+ * - Mobile: full-width bottom bar
+ * - Desktop: bottom-right floating card
+ * - Persists via VideoPlaybackContext
  * - Auto-resumes from progress
  */
 export const MiniPlayer: React.FC = () => {
   const context = useVideoPlaybackSafe();
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const hlsRef = useRef<Hls | null>(null);
+  
+  const videoElRef = useRef<HTMLVideoElement | null>(null);
   const pendingSeekRef = useRef<number | null>(null);
-  
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [videoMeta, setVideoMeta] = useState<{
-    title: string;
-    creatorName: string;
-    thumbnailUrl: string;
-    hlsUrl: string;
-  } | null>(null);
-  
+  const lastProgressSentAtRef = useRef<number>(0);
+
   const { fetchPostWithDetails } = usePostData();
-  
-  // Only render if context exists and mini player is open
-  if (!context || !context.isMiniOpen || !context.activeVideoId) {
-    return null;
-  }
 
-  const { activeVideoId, isMiniOpen, miniMeta, closeMini, openFull } = context;
-  
-  // Use progress hook for resume
-  const { shouldResume, resumePosition, updateProgress } = useVideoProgress(activeVideoId);
+  const [videoData, setVideoData] = useState<MiniVideo | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  // Fetch video data if not provided via meta
+  // Don't render if context doesn't exist or mini isn't open
+  const activeVideoId = context?.activeVideoId;
+  const isMiniOpen = context?.isMiniOpen ?? false;
+
+  const { shouldResume, resumePosition, updateProgress, isLoading: progressLoading } =
+    useVideoProgress(activeVideoId || "");
+
+  // Load video details when activeVideoId changes
   useEffect(() => {
-    if (!activeVideoId) return;
-    
-    // If we have meta from context, use it
-    if (miniMeta) {
-      setVideoMeta({
-        title: miniMeta.title,
-        creatorName: miniMeta.creatorName,
-        thumbnailUrl: miniMeta.thumbnailUrl,
-        hlsUrl: miniMeta.hlsUrl,
-      });
+    if (!activeVideoId || !isMiniOpen) {
+      setVideoData(null);
+      setIsPlaying(false);
       return;
     }
 
-    // Otherwise fetch
-    const loadVideo = async () => {
+    // If we have meta from context, use it
+    if (context?.miniMeta) {
+      setVideoData({
+        id: activeVideoId,
+        title: context.miniMeta.title,
+        creatorName: context.miniMeta.creatorName,
+        hlsUrl: context.miniMeta.hlsUrl,
+        posterUrl: context.miniMeta.posterUrl,
+      });
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    (async () => {
+      setLoading(true);
       try {
         const post = await fetchPostWithDetails(activeVideoId);
-        if (!post) return;
-        
-        const media = post.post_media?.[0];
-        if (!media) return;
-        
+        if (cancelled) return;
+
+        const media = post?.post_media?.[0];
+        if (!post || !media) {
+          setVideoData(null);
+          setLoading(false);
+          return;
+        }
+
         const uid = uidFromNode(media) || uidFromNode({ media_url: media.media_url });
         const hlsUrl = uid ? generateHlsUrl(uid) : media.media_url;
-        const thumbnailUrl = media.poster_url || (uid ? generateThumbnailUrl(uid) : '');
-        
+        const posterUrl = media.poster_url || (uid ? generateThumbnailUrl(uid) : undefined);
+
         const user = Array.isArray(post.user) ? post.user[0] : post.user;
-        
-        setVideoMeta({
-          title: post.content?.split('\n')[0]?.substring(0, 100) || 'Untitled Video',
-          creatorName: user?.display_name || user?.username || 'Unknown',
-          thumbnailUrl,
+
+        const title = post.content?.split("\n")[0]?.substring(0, 100) || "Untitled Video";
+
+        setVideoData({
+          id: post.id,
+          title,
+          creatorName: user?.display_name || user?.username || "Unknown",
+          creatorAvatarUrl: user?.profile_photo_url,
           hlsUrl,
+          posterUrl,
         });
-      } catch (err) {
-        console.error('MiniPlayer: Failed to load video', err);
+      } catch {
+        if (!cancelled) setVideoData(null);
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-    };
-    
-    loadVideo();
-  }, [activeVideoId, miniMeta, fetchPostWithDetails]);
-
-  // Setup HLS when we have the URL
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !videoMeta?.hlsUrl) return;
-
-    const setupHls = () => {
-      // Cleanup previous
-      if (hlsRef.current) {
-        hlsRef.current.destroy();
-        hlsRef.current = null;
-      }
-
-      if (Hls.isSupported()) {
-        const hls = new Hls({
-          enableWorker: true,
-          lowLatencyMode: false,
-          startLevel: -1,
-        });
-        hls.loadSource(videoMeta.hlsUrl);
-        hls.attachMedia(video);
-        hlsRef.current = hls;
-
-        hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          // Apply pending seek if we have resume position
-          if (shouldResume && resumePosition > 0) {
-            pendingSeekRef.current = resumePosition;
-          }
-          video.play().catch(() => {});
-        });
-      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = videoMeta.hlsUrl;
-        video.addEventListener('loadedmetadata', () => {
-          if (shouldResume && resumePosition > 0) {
-            video.currentTime = resumePosition;
-          }
-          video.play().catch(() => {});
-        }, { once: true });
-      }
-    };
-
-    setupHls();
+    })();
 
     return () => {
-      if (hlsRef.current) {
-        hlsRef.current.destroy();
-        hlsRef.current = null;
-      }
+      cancelled = true;
     };
-  }, [videoMeta?.hlsUrl, shouldResume, resumePosition]);
+  }, [activeVideoId, isMiniOpen, context?.miniMeta, fetchPostWithDetails]);
 
-  // Apply pending seek on canplay
+  // When progress info arrives, queue a seek (mini-player should "just continue")
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
+    if (!activeVideoId || !isMiniOpen) return;
+    if (progressLoading) return;
 
-    const handleCanPlay = () => {
-      if (pendingSeekRef.current !== null) {
-        video.currentTime = pendingSeekRef.current;
+    if (shouldResume && resumePosition > 0) {
+      pendingSeekRef.current = resumePosition;
+      // If the video is already ready, attempt immediate seek
+      const el = videoElRef.current;
+      if (el && el.readyState >= 1) {
+        try {
+          el.currentTime = resumePosition;
+          pendingSeekRef.current = null;
+        } catch {
+          // ignore
+        }
+      }
+    } else {
+      pendingSeekRef.current = null;
+    }
+  }, [activeVideoId, isMiniOpen, progressLoading, shouldResume, resumePosition]);
+
+  const handleLoadedMetadata = useCallback(() => {
+    const el = videoElRef.current;
+    if (!el) return;
+
+    if (pendingSeekRef.current !== null) {
+      try {
+        el.currentTime = pendingSeekRef.current;
+      } catch {
+        // ignore
+      } finally {
         pendingSeekRef.current = null;
       }
-    };
-
-    video.addEventListener('canplay', handleCanPlay);
-    return () => video.removeEventListener('canplay', handleCanPlay);
+    }
   }, []);
 
-  // Track play/pause state
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
+  // Progress updates: throttle every 5s
+  const handleTimeUpdate = useCallback(
+    (currentTime: number, duration: number) => {
+      if (!activeVideoId || !isMiniOpen) return;
+      if (!duration || duration <= 0) return;
 
-    const handlePlay = () => setIsPlaying(true);
-    const handlePause = () => setIsPlaying(false);
-
-    video.addEventListener('play', handlePlay);
-    video.addEventListener('pause', handlePause);
-
-    return () => {
-      video.removeEventListener('play', handlePlay);
-      video.removeEventListener('pause', handlePause);
-    };
-  }, []);
-
-  // Progress tracking (throttled)
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    let lastUpdate = 0;
-    const handleTimeUpdate = () => {
       const now = Date.now();
-      if (now - lastUpdate >= 5000 && video.duration > 0) {
-        updateProgress(video.currentTime, video.duration);
-        lastUpdate = now;
+      if (now - lastProgressSentAtRef.current < PROGRESS_THROTTLE_MS) return;
+
+      lastProgressSentAtRef.current = now;
+      updateProgress(currentTime, duration);
+    },
+    [activeVideoId, isMiniOpen, updateProgress]
+  );
+
+  const handleTogglePlay = useCallback(
+    async (e: React.MouseEvent) => {
+      e.stopPropagation();
+      const el = videoElRef.current;
+      if (!el) return;
+
+      try {
+        if (el.paused) {
+          await el.play();
+          setIsPlaying(true);
+        } else {
+          el.pause();
+          setIsPlaying(false);
+        }
+      } catch {
+        // ignore
       }
-    };
+    },
+    []
+  );
 
-    video.addEventListener('timeupdate', handleTimeUpdate);
-    return () => video.removeEventListener('timeupdate', handleTimeUpdate);
-  }, [updateProgress]);
+  const handleClose = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
 
-  const handlePlayPause = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const video = videoRef.current;
-    if (!video) return;
-    
-    if (isPlaying) {
-      video.pause();
-    } else {
-      video.play().catch(() => {});
+      // Flush progress once on close
+      const el = videoElRef.current;
+      if (el && el.duration > 0) {
+        updateProgress(el.currentTime, el.duration);
+      }
+
+      // Pause and close
+      try {
+        el?.pause();
+      } catch {
+        // ignore
+      }
+      setIsPlaying(false);
+      context?.closeMini();
+    },
+    [context, updateProgress]
+  );
+
+  const handleOpenFull = useCallback(() => {
+    if (!activeVideoId || !context) return;
+
+    // Flush progress before opening full player
+    const el = videoElRef.current;
+    if (el && el.duration > 0) {
+      updateProgress(el.currentTime, el.duration);
     }
-  };
 
-  const handleClose = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    // Flush progress before closing
-    const video = videoRef.current;
-    if (video && video.duration > 0) {
-      updateProgress(video.currentTime, video.duration);
-    }
-    closeMini();
-  };
+    context.openFull(activeVideoId);
+  }, [activeVideoId, context, updateProgress]);
 
-  const handleOpenFull = () => {
-    // Flush progress
-    const video = videoRef.current;
-    if (video && video.duration > 0) {
-      updateProgress(video.currentTime, video.duration);
-    }
-    openFull(activeVideoId);
-  };
+  // Track play state from player
+  const handlePlay = useCallback(() => setIsPlaying(true), []);
+  const handlePause = useCallback(() => setIsPlaying(false), []);
 
-  if (!videoMeta) {
-    // Loading state
-    return (
-      <div className="fixed bottom-20 right-4 z-[90] w-80 bg-zinc-900/95 backdrop-blur-xl rounded-xl shadow-2xl border border-white/10 overflow-hidden animate-in slide-in-from-right-5 fade-in duration-300">
-        <div className="flex items-center gap-3 p-3">
-          <div className="w-24 aspect-video bg-white/10 rounded animate-pulse" />
-          <div className="flex-1 space-y-2">
-            <div className="h-4 bg-white/10 rounded animate-pulse" />
-            <div className="h-3 w-2/3 bg-white/10 rounded animate-pulse" />
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const isVisible = !!activeVideoId && isMiniOpen;
+
+  // Responsive container:
+  // - mobile: full-width bottom bar (above bottom nav)
+  // - desktop: bottom-right floating card
+  const containerClass = useMemo(
+    () =>
+      cn(
+        "fixed z-[90]",
+        "left-0 right-0 bottom-16", // mobile: full width, above bottom nav
+        "md:left-auto md:right-4 md:bottom-4 md:w-[360px]", // desktop: floating
+        "pointer-events-none"
+      ),
+    []
+  );
+
+  if (!isVisible) return null;
 
   return (
-    <div 
-      className="fixed bottom-20 right-4 z-[90] w-80 bg-zinc-900/95 backdrop-blur-xl rounded-xl shadow-2xl border border-white/10 overflow-hidden cursor-pointer hover:border-white/20 transition-colors animate-in slide-in-from-right-5 fade-in duration-300"
-      onClick={handleOpenFull}
-    >
-      <div className="flex items-center gap-3 p-2">
-        {/* Video thumbnail / actual video */}
-        <div className="relative w-28 aspect-video rounded overflow-hidden bg-black shrink-0">
-          <video
-            ref={videoRef}
-            className="w-full h-full object-cover"
-            playsInline
-            muted={false}
-            poster={videoMeta.thumbnailUrl}
-          />
-          
-          {/* Play/Pause overlay */}
+    <div className={containerClass} aria-label="Mini player">
+      <div
+        className={cn(
+          "pointer-events-auto",
+          "bg-zinc-900/95 backdrop-blur-xl border border-white/10",
+          "rounded-none md:rounded-2xl",
+          "shadow-2xl",
+          "p-2 md:p-3",
+          "flex gap-3 items-center",
+          "cursor-pointer hover:bg-zinc-800/95 transition-colors",
+          "animate-in slide-in-from-bottom-4 fade-in duration-300"
+        )}
+        onClick={handleOpenFull}
+        role="button"
+        tabIndex={0}
+      >
+        {/* Thumbnail / mini video */}
+        <div className="relative w-24 h-14 md:w-28 md:h-16 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
+          {!loading && videoData?.hlsUrl ? (
+            <FlickerFreeHLSPlayer
+              ref={videoElRef as any}
+              hlsUrl={videoData.hlsUrl}
+              poster={videoData.posterUrl}
+              autoplay
+              playsInline
+              muted={false}
+              loop={false}
+              className="w-full h-full"
+              objectFit="cover"
+              onLoadedMetadata={handleLoadedMetadata}
+              onTimeUpdate={handleTimeUpdate}
+              onPlay={handlePlay}
+              onPause={handlePause}
+            />
+          ) : (
+            <div className="w-full h-full animate-pulse bg-white/10" />
+          )}
+        </div>
+
+        {/* Title + creator */}
+        <div className="min-w-0 flex-1">
+          <div className="text-white text-sm font-medium truncate">
+            {videoData?.title || "Loading..."}
+          </div>
+          <div className="text-white/60 text-xs truncate">
+            {videoData?.creatorName || ""}
+          </div>
+        </div>
+
+        {/* Controls */}
+        <div className="flex items-center gap-1.5">
           <button
-            onClick={handlePlayPause}
-            className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/40 transition-colors"
-          >
-            {isPlaying ? (
-              <Pause className="h-6 w-6 text-white/90" fill="currentColor" />
-            ) : (
-              <Play className="h-6 w-6 text-white/90 ml-0.5" fill="currentColor" />
+            onClick={handleTogglePlay}
+            className={cn(
+              "w-9 h-9 rounded-full",
+              "bg-white/10 hover:bg-white/20",
+              "text-white flex items-center justify-center transition"
             )}
+            aria-label={isPlaying ? "Pause" : "Play"}
+            type="button"
+          >
+            {isPlaying ? <Pause className="w-4 h-4" fill="currentColor" /> : <Play className="w-4 h-4 ml-0.5" fill="currentColor" />}
+          </button>
+
+          <button
+            onClick={handleClose}
+            className={cn(
+              "w-9 h-9 rounded-full",
+              "bg-white/10 hover:bg-white/20",
+              "text-white/80 hover:text-white flex items-center justify-center transition"
+            )}
+            aria-label="Close mini player"
+            type="button"
+          >
+            <X className="w-4 h-4" />
           </button>
         </div>
-        
-        {/* Info */}
-        <div className="flex-1 min-w-0 py-1">
-          <h4 className="text-white text-sm font-medium line-clamp-2 leading-tight">
-            {videoMeta.title}
-          </h4>
-          <p className="text-white/50 text-xs mt-1 truncate">
-            {videoMeta.creatorName}
-          </p>
-        </div>
-        
-        {/* Close button */}
-        <button
-          onClick={handleClose}
-          className="p-2 hover:bg-white/10 rounded-full transition-colors shrink-0"
-        >
-          <X className="h-5 w-5 text-white/70 hover:text-white" />
-        </button>
       </div>
     </div>
   );
