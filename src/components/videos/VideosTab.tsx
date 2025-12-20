@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { VideosIntro } from './VideosIntro';
@@ -32,37 +32,55 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   className,
 }) => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const [selectedCategory, setSelectedCategory] = useState<VideoCategory>('all');
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Check URL params for mode
   const sectionParam = searchParams.get('section');
   const modeParam = searchParams.get('mode');
   const searchQuery = searchParams.get('q') || '';
+  const categoryParam = (searchParams.get('category') || 'all') as VideoCategory;
 
   // Get followed user IDs for "From creators you follow" section
   const { followedIds } = useFollowedUsers();
 
+  // Handle category selection - update URL
+  const handleCategorySelect = (category: VideoCategory) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (category === 'all') {
+      newParams.delete('category');
+    } else {
+      newParams.set('category', category);
+    }
+    setSearchParams(newParams);
+  };
+
   // Fetch videos for each section using the real data hook
+  // Pass category filter if selected (not 'all')
+  const categoryFilter = categoryParam !== 'all' ? categoryParam : undefined;
+
   const { videos: recommendedVideos, isLoading: recLoading } = useLongFormVideos({
     section: 'recommended',
     limit: 4,
+    category: categoryFilter,
   });
 
   const { videos: trendingVideos, isLoading: trendLoading } = useLongFormVideos({
     section: 'trending',
     limit: 3,
+    category: categoryFilter,
   });
 
   const { videos: followedVideos, isLoading: followLoading } = useLongFormVideos({
     section: 'following',
     limit: 4,
     followedCreatorIds: followedIds,
+    category: categoryFilter,
   });
 
   const { videos: coursesVideos, isLoading: coursesLoading } = useLongFormVideos({
     section: 'courses',
     limit: 3,
+    category: categoryFilter,
   });
 
   const handleVideoClick = (id: string) => {
@@ -94,7 +112,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     return (
       <VideosSearchResults
         query={searchQuery}
-        category={selectedCategory !== 'all' ? selectedCategory : undefined}
+        category={categoryFilter}
         onBack={handleBackFromSearch}
         className={className}
       />
@@ -116,8 +134,8 @@ export const VideosTab: React.FC<VideosTabProps> = ({
 
       {/* Filter chips */}
       <VideoFilterChips
-        selected={selectedCategory}
-        onSelect={setSelectedCategory}
+        selected={categoryParam}
+        onSelect={handleCategorySelect}
         className="mb-6"
       />
 
