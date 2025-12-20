@@ -54,16 +54,23 @@ const MyBusinessesPage = () => {
         </div>
       </header>
 
-      <main className="mx-auto max-w-xl">
+      <main 
+        className="mx-auto max-w-xl -mx-0 px-0"
+        style={{
+          background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)',
+          minHeight: 'calc(100vh - 120px)',
+        }}
+      >
         {/* Loading state - flat skeleton */}
         {isLoading && (
-          <div>
+          <div className="flex flex-col gap-3 pt-3">
             {[1, 2].map(i => (
               <motion.div 
                 key={i} 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: i * 0.1 }}
+                className="bg-white"
               >
                 {/* Business row skeleton */}
                 <div className="flex items-start gap-3.5 px-4 py-3.5">
@@ -91,7 +98,6 @@ const MyBusinessesPage = () => {
                   <div className="h-9 flex-1 rounded-sq-sm bg-muted animate-pulse" />
                   <div className="h-9 flex-1 rounded-sq-sm bg-muted animate-pulse" />
                 </div>
-                <div className="h-px bg-border/30" />
               </motion.div>
             ))}
           </div>
@@ -99,12 +105,14 @@ const MyBusinessesPage = () => {
 
         {/* Empty state */}
         {!isLoading && !hasBusinesses && (
-          <AddBusinessCard onClick={handleCreateBusiness} isFirst />
+          <div className="pt-3">
+            <AddBusinessCard onClick={handleCreateBusiness} isFirst />
+          </div>
         )}
 
-        {/* Business list - flat layout */}
+        {/* Business list - white cards with gap */}
         {!isLoading && hasBusinesses && (
-          <div>
+          <div className="flex flex-col gap-3 pt-3">
             {businesses.map((membership, index) => {
               // Resilient Active pill logic:
               // - If only 1 business → always show Active
