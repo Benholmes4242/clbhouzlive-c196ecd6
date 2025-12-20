@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { VideosIntro } from './VideosIntro';
@@ -9,9 +9,12 @@ import { VideosEmptyState } from './VideosEmptyState';
 import { VideosSectionPage } from './VideosSectionPage';
 import { VideosSearchResults } from './VideosSearchResults';
 import { ContinueWatchingSection } from './ContinueWatchingSection';
+import { VideoNudgeBanner } from './VideoNudgeBanner';
 import { useLongFormVideos } from '@/hooks/useLongFormVideos';
 import { useFollowedUsers } from '@/hooks/useFollowedUsers';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
+import { useVideoNudges } from '@/hooks/useVideoNudges';
+import { useVideoQueue } from '@/hooks/useVideoQueue';
 
 interface VideosTabProps {
   onVideoClick?: (id: string) => void;
@@ -39,6 +42,27 @@ export const VideosTab: React.FC<VideosTabProps> = ({
 
   // Preserve scroll position when navigating to/from videos
   const { savePosition } = useScrollRestoration('discover:videos');
+
+  // Nudges for growth hooks
+  const { shouldShowNudge, markNudgeSeen, getNudgeMessage, shouldShowQueueReminder, markQueueReminderShown } = useVideoNudges();
+  const { queue } = useVideoQueue();
+  const [showQueueNudge, setShowQueueNudge] = useState(false);
+  const [showQueueReminder, setShowQueueReminder] = useState(false);
+
+  // Show queue nudge after user has been on page (one-time)
+  useEffect(() => {
+    if (shouldShowNudge('use-queue')) {
+      const timer = setTimeout(() => setShowQueueNudge(true), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [shouldShowNudge]);
+
+  // Show queue reminder if user has items in queue (session-based)
+  useEffect(() => {
+    if (shouldShowQueueReminder(queue.length)) {
+      setShowQueueReminder(true);
+    }
+  }, [queue.length, shouldShowQueueReminder]);
 
   // Check URL params for mode
   const sectionParam = searchParams.get('section');
@@ -142,6 +166,40 @@ export const VideosTab: React.FC<VideosTabProps> = ({
 
   return (
     <div className={cn("min-h-screen pb-20", className)}>
+      {/* Queue reminder nudge */}
+      {showQueueReminder && (
+        <div className="px-5 mb-4">
+          <VideoNudgeBanner
+            type="queue-reminder"
+            message={getNudgeMessage('queue-reminder')}
+            onDismiss={() => {
+              setShowQueueReminder(false);
+              markQueueReminderShown();
+            }}
+            onAction={() => {
+              setShowQueueReminder(false);
+              markQueueReminderShown();
+              // Could open queue drawer here if needed
+            }}
+            actionLabel={`${queue.length} video${queue.length !== 1 ? 's' : ''}`}
+          />
+        </div>
+      )}
+
+      {/* Queue usage nudge (one-time) */}
+      {showQueueNudge && !showQueueReminder && (
+        <div className="px-5 mb-4">
+          <VideoNudgeBanner
+            type="use-queue"
+            message={getNudgeMessage('use-queue')}
+            onDismiss={() => {
+              setShowQueueNudge(false);
+              markNudgeSeen('use-queue');
+            }}
+          />
+        </div>
+      )}
+
       {/* Intro text */}
       <VideosIntro />
 
