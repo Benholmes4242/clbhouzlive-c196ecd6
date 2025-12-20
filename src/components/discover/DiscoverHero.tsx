@@ -8,7 +8,7 @@ interface HeroItem {
   id: string;
   contextLabel: string; // e.g. "Trending in golf"
   title: string;
-  subContext: string; // creator OR course name
+  caption?: string; // Post caption
   mediaUrl: string;
   mediaType: 'image' | 'video';
   posterUrl?: string;
@@ -21,6 +21,11 @@ interface HeroItem {
     id: string;
     name: string;
     country: string;
+  };
+  creator?: {
+    id: string;
+    name: string;
+    avatarUrl?: string;
   };
 }
 
@@ -99,80 +104,113 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
     }
   };
 
+  const handleCreatorClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (item.creator?.id) {
+      navigate(`/profile/${item.creator.id}`);
+    }
+  };
+
   const isVideo = item.mediaType === 'video';
 
   return (
-    <div 
-      className="relative w-full aspect-[16/9] overflow-hidden bg-slate-800 cursor-pointer group"
-      onClick={handleClick}
-    >
-      {/* Media - Image or Video */}
-      {item.mediaType === 'video' ? (
-        <>
-          {/* Poster while video loads */}
-          {!videoLoaded && item.posterUrl && (
-            <img
-              src={item.posterUrl}
-              alt={item.title}
-              className="absolute inset-0 w-full h-full object-cover"
+    <div className="w-full">
+      {/* Hero Video Container */}
+      <div 
+        className="relative w-full aspect-[16/9] overflow-hidden bg-slate-800 cursor-pointer group rounded-lg"
+        onClick={handleClick}
+      >
+        {/* Media - Image or Video */}
+        {item.mediaType === 'video' ? (
+          <>
+            {/* Poster while video loads */}
+            {!videoLoaded && item.posterUrl && (
+              <img
+                src={item.posterUrl}
+                alt={item.title}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            )}
+            <video
+              ref={videoRef}
+              src={item.mediaUrl}
+              poster={item.posterUrl}
+              muted
+              loop
+              playsInline
+              onLoadedMetadata={handleLoadedMetadata}
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+                videoLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
             />
-          )}
-          <video
-            ref={videoRef}
+          </>
+        ) : (
+          <img
             src={item.mediaUrl}
-            poster={item.posterUrl}
-            muted
-            loop
-            playsInline
-            onLoadedMetadata={handleLoadedMetadata}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
-              videoLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
+            alt={item.title}
+            className="absolute inset-0 w-full h-full object-cover"
           />
-        </>
-      ) : (
-        <img
-          src={item.mediaUrl}
-          alt={item.title}
-          className="absolute inset-0 w-full h-full object-cover"
+        )}
+
+        {/* Softer gradient overlay - less contrast */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+
+        {/* Unified overlay system: club (top-left), fire icon (top-right) */}
+        <OverlayCorners
+          surface="hero"
+          club={item.golfCourse ? { id: item.golfCourse.id, name: item.golfCourse.name } : null}
+          onClubClick={handleClubClick}
+          showDuration={false}
+          hotState={true}
+          showCreator={false}
+          showLikes={false}
+          showAvatar={false}
         />
-      )}
 
-      {/* Softer gradient overlay - less contrast */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+        {/* On-video label: TRENDING TODAY (lower-left, where username was) */}
+        <div className="absolute bottom-3 left-3 z-10">
+          <span className="text-[10px] md:text-[11px] font-semibold text-white/90 uppercase tracking-wider">
+            {item.contextLabel}
+          </span>
+        </div>
 
-      {/* Unified overlay system (uses hero surface for appropriate max-widths) */}
-      <OverlayCorners
-        surface="hero"
-        club={item.golfCourse ? { id: item.golfCourse.id, name: item.golfCourse.name } : null}
-        onClubClick={handleClubClick}
-        showDuration={false}
-        hotState={true}
-        showCreator={false}
-        showLikes={false}
-        showAvatar={false}
-      />
-
-      {/* Content overlay (bottom text) */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5 lg:p-6 z-10">
-        {/* Context label */}
-        <span className="inline-block text-[10px] md:text-[11px] font-medium text-white/70 uppercase tracking-wider mb-1.5">
-          {item.contextLabel}
-        </span>
-
-        {/* Title - reduced weight */}
-        <h2 className="text-base md:text-xl lg:text-2xl font-medium text-white leading-snug mb-1 line-clamp-2">
-          {item.title}
-        </h2>
-
-        {/* Sub-context (creator or course) */}
-        <p className="text-xs md:text-sm text-white/60">
-          {item.subContext}
-        </p>
+        {/* Subtle hover effect */}
+        <div className="absolute inset-0 bg-white/3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
       </div>
 
-      {/* Subtle hover effect */}
-      <div className="absolute inset-0 bg-white/3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
+      {/* Meta Area Below Video */}
+      <div className="flex items-start justify-between gap-3 pt-3 pb-1">
+        {/* Left: Username + Caption */}
+        <div className="flex-1 min-w-0">
+          {item.creator?.name && (
+            <button
+              onClick={handleCreatorClick}
+              className="text-sm font-semibold text-slate-700 dark:text-slate-300 hover:underline truncate block"
+            >
+              {item.creator.name}
+            </button>
+          )}
+          {item.caption && (
+            <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 mt-0.5">
+              {item.caption}
+            </p>
+          )}
+        </div>
+
+        {/* Right: Avatar */}
+        {item.creator?.avatarUrl && (
+          <button
+            onClick={handleCreatorClick}
+            className="flex-shrink-0"
+          >
+            <img
+              src={item.creator.avatarUrl}
+              alt={item.creator.name || 'Creator'}
+              className="w-10 h-10 rounded-xl object-cover"
+            />
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -193,7 +231,7 @@ export function createHeroItem(post: any): HeroItem | null {
     id: post.id,
     contextLabel: 'TRENDING TODAY',
     title: post.title || post.caption || 'Featured moment',
-    subContext: post.user?.name || post.course_name || '',
+    caption: post.caption,
     mediaUrl,
     mediaType,
     posterUrl,
@@ -202,5 +240,10 @@ export function createHeroItem(post: any): HeroItem | null {
     isPopular: post.isPopular,
     isTrending: post.isTrending,
     golfCourse: post.golfCourse,
+    creator: post.user ? {
+      id: post.user.id,
+      name: post.user.name,
+      avatarUrl: post.user.avatar_url,
+    } : undefined,
   };
 }
