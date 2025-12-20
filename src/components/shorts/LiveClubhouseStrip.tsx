@@ -4,6 +4,7 @@ import { useActiveGolfers } from '@/hooks/useActiveGolfers';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { ChevronRight } from 'lucide-react';
 import '@/styles/shorts_live_clubhouse.css';
 
 const SEEN_KEY = 'seenCreatorImmersiveIds';
@@ -26,6 +27,7 @@ export function LiveClubhouseStrip() {
   const { golfers } = useActiveGolfers();
   const rowRef = useRef<HTMLDivElement>(null);
   const [scrolling, setScrolling] = useState(false);
+  const navigate = useNavigate();
   
   const nearbyOnlineGolfers = golfers;
 
@@ -83,9 +85,18 @@ export function LiveClubhouseStrip() {
 
   return (
     <div className="live-row">
-      {/* Section title - subtle, understated */}
-      <div className="live-row-title">Suggested golfers</div>
-      <div 
+      {/* Section header with "See all" link */}
+      <div className="live-row-header">
+        <span className="live-row-title">Suggested golfers</span>
+        <button 
+          className="live-row-see-all"
+          onClick={() => navigate('/golfers-to-follow?source=watch')}
+        >
+          See all
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+      <div
         className="live-scroll" 
         ref={rowRef} 
         role="listbox" 

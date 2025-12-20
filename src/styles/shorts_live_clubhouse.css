@@ -11,13 +11,40 @@
   background: transparent;
 }
 
+/* Section header - flex row with title and "See all" */
+.live-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 12px;
+  padding-right: 12px;
+  margin-bottom: 12px;
+}
+
 /* Section title - subtle, slate text */
 .live-row-title {
   font-size: 13px;
   font-weight: 500;
   color: hsl(var(--muted-foreground));
-  padding-left: 12px;
-  margin-bottom: 12px;
+}
+
+/* See all button - chevron action */
+.live-row-see-all {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 13px;
+  font-weight: 500;
+  color: hsl(var(--muted-foreground));
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.live-row-see-all:hover {
+  color: hsl(var(--foreground));
 }
 
 /* Horizontal scroll track */
