@@ -1,5 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
+import { MapPin } from 'lucide-react';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 
 interface HeroItem {
@@ -12,6 +14,11 @@ interface HeroItem {
   posterUrl?: string;
   ctaLabel?: string;
   onClick?: () => void;
+  golfCourse?: {
+    id: string;
+    name: string;
+    country: string;
+  };
 }
 
 interface DiscoverHeroProps {
@@ -21,6 +28,7 @@ interface DiscoverHeroProps {
 }
 
 export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroProps) {
+  const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
 
@@ -46,7 +54,7 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
 
   if (isLoading) {
     return (
-      <div className="relative w-full aspect-[16/9] md:aspect-[21/9] overflow-hidden bg-slate-100">
+      <div className="relative w-full aspect-[16/10] md:aspect-[21/10] overflow-hidden bg-slate-100">
         <Skeleton className="absolute inset-0" />
         <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 space-y-2">
           <Skeleton className="h-3 w-24" />
@@ -64,9 +72,16 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
     item.onClick?.();
   };
 
+  const handleClubClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (item.golfCourse?.id) {
+      navigate(`/clubs/${item.golfCourse.id}`);
+    }
+  };
+
   return (
     <div 
-      className="relative w-full aspect-[2/1] md:aspect-[2.5/1] overflow-hidden bg-slate-800 cursor-pointer group"
+      className="relative w-full aspect-[1.75/1] md:aspect-[2.2/1] overflow-hidden bg-slate-800 cursor-pointer group"
       onClick={handleClick}
     >
       {/* Media - Image or Video */}
@@ -103,6 +118,17 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
 
       {/* Softer gradient overlay - less contrast */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+
+      {/* Golf Club Tag Pill - Top Right */}
+      {item.golfCourse && (
+        <button
+          onClick={handleClubClick}
+          className="absolute top-3 right-3 md:top-4 md:right-4 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white text-xs font-medium hover:bg-black/50 transition-colors max-w-[180px] md:max-w-[220px]"
+        >
+          <MapPin className="w-3 h-3 flex-shrink-0" />
+          <span className="truncate">{item.golfCourse.name}</span>
+        </button>
+      )}
 
       {/* Content overlay */}
       <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5 lg:p-6">
@@ -149,5 +175,6 @@ export function createHeroItem(post: any): HeroItem | null {
     mediaType,
     posterUrl,
     ctaLabel: 'Watch',
+    golfCourse: post.golfCourse,
   };
 }
