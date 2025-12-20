@@ -1,4 +1,6 @@
-// Learn Tab Components
+// Videos Tab Components (formerly Learn)
+// Videos tab = long-form only (≥3 min)
+// Shorts (<3 min) remain Watch-only — NO crossover
 export { LearnTab, default } from './LearnTab';
 export { LearnIntro } from './LearnIntro';
 export { SkillPathSelector } from './SkillPathSelector';
