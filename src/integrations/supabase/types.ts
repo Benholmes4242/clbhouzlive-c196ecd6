@@ -6076,6 +6076,44 @@ export type Database = {
         }
         Relationships: []
       }
+      video_progress: {
+        Row: {
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          last_position_seconds: number
+          post_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          last_position_seconds?: number
+          post_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          last_position_seconds?: number
+          post_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_progress_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       weekly_challenge_ladder: {
         Row: {
           created_at: string | null
