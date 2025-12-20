@@ -1,6 +1,6 @@
 import React from 'react';
 import { Heart } from 'lucide-react';
-import DurationBadge from '@/components/shared/DurationBadge';
+import GlassPill, { formatPillDuration, getRankingInfo } from '@/components/shared/GlassPill';
 
 interface TileOverlayProps {
   // Creator info
@@ -13,11 +13,16 @@ interface TileOverlayProps {
   // Duration (in seconds)
   durationSeconds?: number | null;
   
+  // Ranking
+  isPopular?: boolean;
+  isTrending?: boolean;
+  
   // Config
   showCreator: boolean;
   showLikes: boolean;
   showDuration?: boolean;
   showAvatar?: boolean;
+  showRanking?: boolean;
   
   // Variant
   variant?: 'portrait' | 'landscape';
@@ -30,26 +35,31 @@ interface TileOverlayProps {
  * Shared overlay component for media tiles
  * 
  * Layout zones:
- * - Top-right: Duration badge (using shared DurationBadge component)
+ * - Top-left: Ranking pill (Popular today / Trending)
+ * - Top-right: Duration badge
  * - Bottom-left (stacked): Creator name, Like count
  * - Bottom-right: Creator avatar squircle
  * 
- * Consistent styling across Watch and Profile grids
- * No play icon - video is implied in Watch/Shorts context
+ * Uses unified GlassPill component for consistent styling
  */
 const TileOverlay: React.FC<TileOverlayProps> = ({
   creatorName,
   creatorAvatar,
   likes,
   durationSeconds,
+  isPopular,
+  isTrending,
   showCreator,
   showLikes,
   showDuration = true,
   showAvatar = true,
+  showRanking = true,
   variant = 'portrait',
   onAuthorClick,
 }) => {
   const hasValidDuration = typeof durationSeconds === 'number' && Number.isFinite(durationSeconds) && durationSeconds > 0;
+  const durationLabel = hasValidDuration ? formatPillDuration(durationSeconds) : null;
+  const rankingInfo = showRanking ? getRankingInfo({ isPopular, isTrending }) : null;
   
   const handleAuthorClick = (e: React.MouseEvent) => {
     if (onAuthorClick) {
@@ -59,7 +69,7 @@ const TileOverlay: React.FC<TileOverlayProps> = ({
   };
 
   const hasBottomContent = (showCreator && creatorName) || showLikes;
-  const hasTopContent = showDuration && hasValidDuration;
+  const hasTopContent = (showDuration && hasValidDuration) || rankingInfo;
   
   if (!hasBottomContent && !hasTopContent) {
     return null;
@@ -67,10 +77,26 @@ const TileOverlay: React.FC<TileOverlayProps> = ({
 
   return (
     <>
-      {/* Duration badge - top right (using shared component) */}
-      {showDuration && hasValidDuration && (
+      {/* Top-left: Ranking pill */}
+      {rankingInfo && (
+        <div className="absolute top-2 left-2 z-20">
+          <GlassPill
+            label={rankingInfo.label}
+            icon={rankingInfo.icon}
+            variant="ranking"
+            size="sm"
+          />
+        </div>
+      )}
+
+      {/* Top-right: Duration badge */}
+      {showDuration && durationLabel && (
         <div className="absolute top-2 right-2 z-20">
-          <DurationBadge durationSeconds={durationSeconds} size="sm" />
+          <GlassPill
+            label={durationLabel}
+            variant="duration"
+            size="sm"
+          />
         </div>
       )}
 

@@ -1,8 +1,9 @@
 import React, { useCallback, useRef, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { UnifiedMediaItem, UnifiedGridConfig, GridSurface } from './types';
+import { UnifiedMediaItem, UnifiedGridConfig } from './types';
 import TileOverlay from './TileOverlay';
 import GridAutoplayVideo from '@/components/profile/activity/GridAutoplayVideo';
+import GlassPill from '@/components/shared/GlassPill';
 import { Images, Trophy } from 'lucide-react';
 import { RegisterVideoFn } from '@/hooks/useGridAutoplay';
 import { motion } from 'framer-motion';
@@ -24,12 +25,11 @@ interface UnifiedMediaTileProps {
  * Features:
  * - Portrait: 3:4 aspect ratio
  * - Landscape: 16:9, spans full width
- * - Configurable overlays (creator label, likes, duration)
+ * - Configurable overlays using unified GlassPill system
  * - Press feedback animation (scale 0.98 on tap)
- * - Consistent styling and autoplay behavior
- * - No play icon - video is implied in Watch/Shorts context
  * 
  * Overlay layout:
+ * - Top-left: Ranking pill (Popular today / Trending) OR course tag on landscape
  * - Top-right: Duration badge
  * - Bottom-left (stacked): Creator name, Like count
  * - Bottom-right: Creator avatar squircle
@@ -113,6 +113,11 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
 
   const thumbnailSrc = item.thumbnailUrl || item.url;
   const aspectClass = isLandscape ? 'aspect-[16/9]' : 'aspect-[3/4]';
+  
+  // Determine what shows in top-left (priority: milestone > multi-media > ranking > course tag)
+  const hasMultiMedia = item.additionalMediaCount && item.additionalMediaCount > 0;
+  const hasRanking = item.isPopular || item.isTrending;
+  const showCourseTag = isLandscape && item.courseName && !item.isMilestone && !hasMultiMedia && !hasRanking;
 
   return (
     <motion.button
@@ -152,40 +157,45 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
       {/* Bottom gradient overlay for text legibility */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
-      {/* Multi-media indicator - top left (if no milestone) */}
-      {item.additionalMediaCount && item.additionalMediaCount > 0 && !item.isMilestone && (
+      {/* Top-left indicators (mutually exclusive, priority order) */}
+      {item.isMilestone && (
+        <div className="absolute top-2 left-2 z-20 flex items-center justify-center h-5 w-5 rounded-full bg-black/50">
+          <Trophy className="h-2.5 w-2.5 text-amber-400" />
+        </div>
+      )}
+      
+      {!item.isMilestone && hasMultiMedia && (
         <div className="absolute top-2 left-2 z-20 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-black/55 text-white text-[10px] font-medium">
           <Images className="h-2.5 w-2.5" />
           <span>+{item.additionalMediaCount}</span>
         </div>
       )}
 
-      {/* Milestone indicator - top left */}
-      {item.isMilestone && (
-        <div className="absolute top-2 left-2 z-20 flex items-center justify-center h-5 w-5 rounded-full bg-black/50">
-          <Trophy className="h-2.5 w-2.5 text-amber-400" />
-        </div>
-      )}
-
-      {/* Course tag - only on landscape tiles, top left (if no milestone or multi-media) */}
-      {isLandscape && item.courseName && !item.isMilestone && !(item.additionalMediaCount && item.additionalMediaCount > 0) && (
+      {/* Course tag on landscape - only if no ranking/milestone/multi-media */}
+      {showCourseTag && (
         <div className="absolute left-3 top-3 z-20 max-w-[70%]">
-          <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-black/65 text-xs font-medium text-white shadow-sm truncate">
-            {item.courseName}
-          </span>
+          <GlassPill
+            label={item.courseName!}
+            icon="📍"
+            variant="club"
+            size="sm"
+          />
         </div>
       )}
 
-      {/* Unified overlay: Duration (top-right), Creator + Likes (bottom-left), Avatar (bottom-right) */}
+      {/* Unified overlay: Ranking (top-left), Duration (top-right), Creator + Likes (bottom) */}
       <TileOverlay
         creatorName={item.creator?.name}
         creatorAvatar={item.creator?.avatar}
         likes={item.likes}
         durationSeconds={isVideo ? resolvedDurationSeconds : undefined}
+        isPopular={item.isPopular}
+        isTrending={item.isTrending}
         showCreator={config.showCreator}
         showLikes={config.showLikes}
         showDuration={isVideo}
         showAvatar={config.showCreator}
+        showRanking={!item.isMilestone && !hasMultiMedia && !showCourseTag}
         variant={variant}
         onAuthorClick={handleAuthorClick}
       />

@@ -3,7 +3,7 @@ import { X, Volume2, VolumeX, ChevronUp, ChevronDown } from 'lucide-react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { useSwipeable } from 'react-swipeable';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
-import DurationBadge from '@/components/shared/DurationBadge';
+import GlassPill, { formatPillDuration, getRankingInfo } from '@/components/shared/GlassPill';
 
 interface ShortsViewerProps {
   items: ExploreContentItem[];
@@ -159,6 +159,12 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
 
   if (!isOpen || !currentItem) return null;
 
+  const durationLabel = resolvedDuration && resolvedDuration > 0 ? formatPillDuration(resolvedDuration) : null;
+  const rankingInfo = getRankingInfo({ 
+    isPopular: (currentItem as any).isPopular, 
+    isTrending: (currentItem as any).isTrending 
+  });
+
   return (
     <div
       className="fixed inset-0 z-[100] bg-black"
@@ -185,10 +191,26 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
         <X className="w-5 h-5" />
       </button>
 
-      {/* Duration Badge - Top Right (consistent with grid tiles and hero) */}
-      {resolvedDuration && resolvedDuration > 0 && (
+      {/* Ranking Pill - Top Left (offset from close button) */}
+      {rankingInfo && (
+        <div className="absolute top-4 left-16 z-40">
+          <GlassPill
+            label={rankingInfo.label}
+            icon={rankingInfo.icon}
+            variant="ranking"
+            size="md"
+          />
+        </div>
+      )}
+
+      {/* Duration Badge - Top Right (left of mute button) */}
+      {durationLabel && (
         <div className="absolute top-4 right-16 z-40">
-          <DurationBadge durationSeconds={resolvedDuration} size="md" />
+          <GlassPill
+            label={durationLabel}
+            variant="duration"
+            size="md"
+          />
         </div>
       )}
 

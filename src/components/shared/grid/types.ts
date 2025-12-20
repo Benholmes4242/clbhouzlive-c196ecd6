@@ -66,6 +66,10 @@ export interface UnifiedMediaItem {
   contentCategory?: ContentCategory;
   golfCourseId?: string; // If tagged to a course
   
+  // Ranking metadata
+  isPopular?: boolean; // Top X% by likes in last 24 hours
+  isTrending?: boolean; // High engagement velocity in last 3-6 hours
+  
   // Display data
   durationSeconds?: number | null;
   likes?: number;

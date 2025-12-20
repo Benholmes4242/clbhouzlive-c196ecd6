@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MapPin } from 'lucide-react';
 import { getStreamPoster } from '@/utils/stream';
-import DurationBadge from '@/components/shared/DurationBadge';
+import GlassPill, { formatPillDuration, getRankingInfo } from '@/components/shared/GlassPill';
 
 interface HeroItem {
   id: string;
@@ -16,6 +16,8 @@ interface HeroItem {
   ctaLabel?: string;
   onClick?: () => void;
   durationSeconds?: number; // Video duration in seconds
+  isPopular?: boolean; // Ranking: Popular today
+  isTrending?: boolean; // Ranking: Trending
   golfCourse?: {
     id: string;
     name: string;
@@ -101,6 +103,8 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
   const isVideo = item.mediaType === 'video';
   const hasClubPill = !!item.golfCourse;
   const showDuration = isVideo && resolvedDuration && resolvedDuration > 0;
+  const durationLabel = showDuration ? formatPillDuration(resolvedDuration) : null;
+  const rankingInfo = getRankingInfo({ isPopular: item.isPopular, isTrending: item.isTrending });
 
   return (
     <div 
@@ -142,23 +146,39 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
       {/* Softer gradient overlay - less contrast */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
 
-      {/* Top-right zone: Duration badge and/or Club pill */}
-      {/* If both exist, duration moves left of club pill to avoid overlap */}
+      {/* Top-left: Ranking pill */}
+      {rankingInfo && (
+        <div className="absolute top-3 left-3 md:top-4 md:left-4 z-20">
+          <GlassPill
+            label={rankingInfo.label}
+            icon={rankingInfo.icon}
+            variant="ranking"
+            size="md"
+          />
+        </div>
+      )}
+
+      {/* Top-right zone: Duration badge and/or Club pill (stacked to avoid overlap) */}
       <div className="absolute top-3 right-3 md:top-4 md:right-4 flex items-center gap-2 z-20">
         {/* Duration badge - shown for video content */}
-        {showDuration && (
-          <DurationBadge durationSeconds={resolvedDuration} size="md" />
+        {durationLabel && (
+          <GlassPill
+            label={durationLabel}
+            variant="duration"
+            size="md"
+          />
         )}
         
         {/* Golf Club Tag Pill */}
         {hasClubPill && (
-          <button
+          <GlassPill
+            label={item.golfCourse!.name}
+            icon={<MapPin className="w-3 h-3" />}
+            variant="club"
+            size="md"
+            interactive
             onClick={handleClubClick}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white text-xs font-medium hover:bg-black/50 transition-colors max-w-[180px] md:max-w-[220px]"
-          >
-            <MapPin className="w-3 h-3 flex-shrink-0" />
-            <span className="truncate">{item.golfCourse!.name}</span>
-          </button>
+          />
         )}
       </div>
 
@@ -208,6 +228,8 @@ export function createHeroItem(post: any): HeroItem | null {
     posterUrl,
     ctaLabel: 'Watch',
     durationSeconds: post.durationSeconds,
+    isPopular: post.isPopular,
+    isTrending: post.isTrending,
     golfCourse: post.golfCourse,
   };
 }
