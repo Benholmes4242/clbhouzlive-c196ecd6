@@ -175,10 +175,9 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
       <OverlayCorners
         surface="tile"
         variant={variant}
-        isPopular={item.isPopular}
-        isTrending={item.isTrending}
         club={clubData}
         durationSeconds={isVideo ? resolvedDurationSeconds : undefined}
+        durationPlacement="top-left"
         creatorName={item.creator?.name}
         creatorAvatar={item.creator?.avatar}
         likes={item.likes}

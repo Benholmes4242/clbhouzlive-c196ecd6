@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
-import { Heart, MapPin } from 'lucide-react';
+import { Heart, MapPin, Flame } from 'lucide-react';
 import GlassPill, { formatPillDuration, getRankingInfo, RankingType } from '@/components/shared/GlassPill';
 import {
   OVERLAY_TOP_LEFT,
@@ -21,17 +21,24 @@ export interface OverlayCornersProps {
   surface: OverlaySurface;
   variant?: TileVariant; // Only for tile surface
   
-  // Top-left: Ranking
+  // Top-left content options
   isPopular?: boolean;
   isTrending?: boolean;
   
-  // Top-right: Club + Duration (stacked)
+  // Club pill
   club?: {
     id: string;
     name: string;
   } | null;
-  durationSeconds?: number | null;
   onClubClick?: (e: React.MouseEvent) => void;
+  
+  // Duration badge
+  durationSeconds?: number | null;
+  showDuration?: boolean; // Default true, set false for hero
+  durationPlacement?: 'top-left' | 'top-right'; // Default 'top-left' for tiles
+  
+  // Hero: hot state (fire icon)
+  hotState?: boolean;
   
   // Bottom-left: Creator + Likes (stacked)
   creatorName?: string;
@@ -73,6 +80,9 @@ const OverlayCorners: React.FC<OverlayCornersProps> = ({
   isTrending,
   club,
   durationSeconds,
+  showDuration = true,
+  durationPlacement = 'top-left',
+  hotState = false,
   onClubClick,
   creatorName,
   likes,
@@ -85,7 +95,7 @@ const OverlayCorners: React.FC<OverlayCornersProps> = ({
   hideRankingIfOverride = true,
 }) => {
   const rankingInfo = getRankingInfo({ isPopular, isTrending });
-  const hasValidDuration = typeof durationSeconds === 'number' && Number.isFinite(durationSeconds) && durationSeconds > 0;
+  const hasValidDuration = showDuration && typeof durationSeconds === 'number' && Number.isFinite(durationSeconds) && durationSeconds > 0;
   const durationLabel = hasValidDuration ? formatPillDuration(durationSeconds) : null;
   
   const pillMaxWidth = getPillMaxWidth(surface);
@@ -93,51 +103,97 @@ const OverlayCorners: React.FC<OverlayCornersProps> = ({
   const textMaxWidth = getTextMaxWidth(surface, variant);
   
   const showRanking = rankingInfo && !(topLeftOverride && hideRankingIfOverride);
-  const hasTopRight = club || durationLabel;
+  
+  // Determine what goes in each corner based on surface and placement
+  const durationInTopLeft = durationPlacement === 'top-left' && durationLabel;
+  const durationInTopRight = durationPlacement === 'top-right' && durationLabel;
+  
+  // Top-left: Duration (tiles) or Club (hero) or Ranking/Override
+  const hasTopLeftContent = topLeftOverride || durationInTopLeft || (surface === 'hero' && club) || showRanking;
+  
+  // Top-right: Club (tiles) or Hot icon (hero) or Duration (if top-right placement)
+  const hasTopRightContent = (surface === 'tile' && club) || durationInTopRight || hotState;
+  
   const hasBottomLeft = (showCreator && creatorName) || showLikes;
   const hasBottomRight = showCreator && showAvatar && creatorAvatar;
 
   return (
     <>
-      {/* ===== TOP-LEFT: Ranking or Override ===== */}
-      {(showRanking || topLeftOverride) && (
-        <div className={cn(OVERLAY_TOP_LEFT, 'z-20')}>
+      {/* ===== TOP-LEFT ===== */}
+      {hasTopLeftContent && (
+        <div className={cn(OVERLAY_TOP_LEFT, 'z-20 flex flex-col items-start', OVERLAY_GAP_CLASS)}>
+          {/* Override takes priority */}
           {topLeftOverride ? (
             topLeftOverride
-          ) : rankingInfo ? (
-            <div style={{ maxWidth: rankingMaxWidth }}>
-              <GlassPill
-                label={rankingInfo.label}
-                icon={rankingInfo.icon}
-                variant="ranking"
-                size={surface === 'tile' ? 'sm' : 'md'}
-              />
-            </div>
-          ) : null}
+          ) : (
+            <>
+              {/* Duration badge (tiles: top-left) */}
+              {durationInTopLeft && (
+                <GlassPill
+                  label={durationLabel!}
+                  variant="duration"
+                  size="sm"
+                />
+              )}
+              
+              {/* Club pill (hero: top-left) */}
+              {surface === 'hero' && club && (
+                <div style={{ maxWidth: pillMaxWidth }}>
+                  <GlassPill
+                    label={club.name}
+                    icon={<MapPin className="w-3 h-3" />}
+                    variant="club"
+                    size="md"
+                    interactive={!!onClubClick}
+                    onClick={onClubClick}
+                  />
+                </div>
+              )}
+              
+              {/* Ranking pill (if no override and no duration in top-left) */}
+              {!durationInTopLeft && showRanking && rankingInfo && (
+                <div style={{ maxWidth: rankingMaxWidth }}>
+                  <GlassPill
+                    label={rankingInfo.label}
+                    icon={rankingInfo.icon}
+                    variant="ranking"
+                    size={surface === 'tile' ? 'sm' : 'md'}
+                  />
+                </div>
+              )}
+            </>
+          )}
         </div>
       )}
 
-      {/* ===== TOP-RIGHT: Pill Stack (Club + Duration) ===== */}
-      {hasTopRight && (
+      {/* ===== TOP-RIGHT ===== */}
+      {hasTopRightContent && (
         <div className={cn(OVERLAY_TOP_RIGHT, 'z-20 flex flex-col items-end', OVERLAY_GAP_CLASS)}>
-          {/* Club pill (first in stack) */}
-          {club && (
+          {/* Hot state fire icon (hero only) */}
+          {hotState && (
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm border border-white/10">
+              <Flame className="w-4 h-4 text-orange-400" />
+            </div>
+          )}
+          
+          {/* Club pill (tiles: top-right) */}
+          {surface === 'tile' && club && (
             <div style={{ maxWidth: pillMaxWidth }}>
               <GlassPill
                 label={club.name}
                 icon={<MapPin className="w-3 h-3" />}
                 variant="club"
-                size={surface === 'tile' ? 'sm' : 'md'}
+                size="sm"
                 interactive={!!onClubClick}
                 onClick={onClubClick}
               />
             </div>
           )}
           
-          {/* Duration badge (second in stack) */}
-          {durationLabel && (
+          {/* Duration badge (if top-right placement) */}
+          {durationInTopRight && (
             <GlassPill
-              label={durationLabel}
+              label={durationLabel!}
               variant="duration"
               size={surface === 'tile' ? 'sm' : 'md'}
             />

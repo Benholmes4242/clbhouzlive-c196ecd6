@@ -74,7 +74,7 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
 
   if (isLoading) {
     return (
-      <div className="relative w-full aspect-[16/10] md:aspect-[21/10] overflow-hidden bg-slate-100">
+      <div className="relative w-full aspect-[16/9] overflow-hidden bg-slate-100">
         <Skeleton className="absolute inset-0" />
         <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 space-y-2">
           <Skeleton className="h-3 w-24" />
@@ -103,7 +103,7 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
 
   return (
     <div 
-      className="relative w-full aspect-[1.75/1] md:aspect-[2.2/1] overflow-hidden bg-slate-800 cursor-pointer group"
+      className="relative w-full aspect-[16/9] overflow-hidden bg-slate-800 cursor-pointer group"
       onClick={handleClick}
     >
       {/* Media - Image or Video */}
@@ -144,11 +144,10 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
       {/* Unified overlay system (uses hero surface for appropriate max-widths) */}
       <OverlayCorners
         surface="hero"
-        isPopular={item.isPopular}
-        isTrending={item.isTrending}
         club={item.golfCourse ? { id: item.golfCourse.id, name: item.golfCourse.name } : null}
-        durationSeconds={isVideo ? resolvedDuration : undefined}
         onClubClick={handleClubClick}
+        showDuration={false}
+        hotState={true}
         showCreator={false}
         showLikes={false}
         showAvatar={false}
