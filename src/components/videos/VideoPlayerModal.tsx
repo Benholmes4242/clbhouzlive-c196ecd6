@@ -84,7 +84,7 @@ export const VideoPlayerModal: React.FC = () => {
   const { autoplayEnabled, setAutoplayEnabled } = useAutoplayPreference();
   
   // Video queue for continuous playback
-  const { queue, queueMeta, playNext, enqueue, popNext, peekNext, getMeta, setQueueFromRelated, queueLength, removeFromQueue, clearQueue } = useVideoQueue();
+  const { queue, queueMeta, playNext, enqueue, popNext, peekNext, getMeta, setQueueFromRelated, queueLength, removeFromQueue, clearQueue, moveQueueItem } = useVideoQueue();
   
   // Mini-player context (optional - may not exist in all app shells)
   const videoPlayback = useVideoPlaybackSafe();
@@ -269,6 +269,24 @@ export const VideoPlayerModal: React.FC = () => {
       updateProgress(video.currentTime, video.duration);
     }
   }, [updateProgress]);
+  
+  // 6B-4: Flush progress on tab hide / page unload
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        flushProgress();
+      }
+    };
+    const handlePageHide = () => flushProgress();
+    
+    window.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pagehide', handlePageHide);
+    
+    return () => {
+      window.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('pagehide', handlePageHide);
+    };
+  }, [flushProgress]);
   
   const handleClose = useCallback(() => {
     // Flush progress before closing
@@ -951,13 +969,22 @@ export const VideoPlayerModal: React.FC = () => {
         onClose={() => setIsQueueDrawerOpen(false)}
         queue={queue}
         queueMeta={queueMeta}
+        nowPlayingId={videoId}
+        nowPlayingMeta={videoData ? { title: videoData.title, thumbnailUrl: videoData.posterUrl, creatorName: videoData.creatorName } : null}
+        nextId={peekNext()}
+        nextMeta={peekNext() ? getMeta(peekNext()!) : null}
         onPlayNow={(id) => {
           setIsQueueDrawerOpen(false);
           removeFromQueue(id);
           handleVideoSelect(id);
         }}
+        onPlayNext={(id) => {
+          const meta = getMeta(id);
+          playNext(id, meta || undefined);
+        }}
         onRemove={removeFromQueue}
         onClear={clearQueue}
+        onReorder={moveQueueItem}
       />
     </div>
   );
