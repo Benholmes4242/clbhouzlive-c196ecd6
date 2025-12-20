@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { X, ArrowLeft, Play, Heart, MapPin } from 'lucide-react';
+import { X, ArrowLeft, Play, Heart, MapPin, Bookmark, Share2, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -12,19 +12,24 @@ import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { usePostData } from '@/hooks/usePostData';
 import { useRelatedLongFormVideos } from '@/hooks/useRelatedLongFormVideos';
 import { useAutoplayPreference } from '@/hooks/useAutoplayPreference';
+import { useFollow } from '@/hooks/useFollow';
 import { uidFromNode, generateHlsUrl, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { toast } from 'sonner';
+import { formatDistanceToNow } from 'date-fns';
 
 interface VideoData {
   id: string;
   title: string;
+  description: string;
   creatorUserId: string;
   creatorName: string;
   creatorAvatarUrl?: string;
   hlsUrl: string;
   posterUrl: string;
   views: number;
+  createdAt: string;
   golfCourseName?: string;
   golfCourseId?: string;
   durationSeconds?: number;
@@ -55,6 +60,7 @@ export const VideoPlayerModal: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showResumeOverlay, setShowResumeOverlay] = useState(false);
   const [hasAutoStarted, setHasAutoStarted] = useState(false);
+  const [showFullDescription, setShowFullDescription] = useState(false);
   
   // Up Next autoplay state
   const [showUpNextOverlay, setShowUpNextOverlay] = useState(false);
@@ -75,6 +81,9 @@ export const VideoPlayerModal: React.FC = () => {
   const { fetchPostWithDetails } = usePostData();
   const { progress, shouldResume, resumePosition, updateProgress, clearProgress, isLoading: progressLoading } = useVideoProgress(videoId || '');
   const { likesCount, hasLiked, toggleLike, isTogglingLike } = usePostEngagement(videoId || null);
+  
+  // Follow hook for creator
+  const { isFollowing, toggle: toggleFollow, busy: isTogglingFollow, ensureInitial: ensureFollowInitial } = useFollow(videoData?.creatorUserId);
   
   // Fetch related videos for recommendations - only fetch once videoData exists
   const { videos: relatedVideos, upNextVideo, isLoading: relatedLoading } = useRelatedLongFormVideos(
@@ -107,6 +116,7 @@ export const VideoPlayerModal: React.FC = () => {
     setHasAutoStarted(false);
     setShowUpNextOverlay(false);
     setUpNextCountdown(5);
+    setShowFullDescription(false);
     upNextCancelledRef.current = false;
     clearUpNextTimers();
   }, [videoId, clearUpNextTimers]);
@@ -154,12 +164,14 @@ export const VideoPlayerModal: React.FC = () => {
         setVideoData({
           id: post.id,
           title: post.content?.split('\n')[0]?.substring(0, 100) || 'Untitled Video',
+          description: post.content || '',
           creatorUserId: post.user_id,
           creatorName: user?.display_name || user?.username || 'Unknown',
           creatorAvatarUrl: user?.profile_photo_url,
           hlsUrl,
           posterUrl,
           views: 0,
+          createdAt: post.created_at,
           golfCourseName: golfTag?.tagged_entity?.name,
           golfCourseId: golfTag?.tagged_entity?.entity_id,
           durationSeconds: media.duration_seconds,
@@ -175,6 +187,13 @@ export const VideoPlayerModal: React.FC = () => {
     
     loadVideo();
   }, [videoId, fetchPostWithDetails]);
+  
+  // Ensure follow status is loaded when video data is ready
+  useEffect(() => {
+    if (videoData?.creatorUserId) {
+      ensureFollowInitial();
+    }
+  }, [videoData?.creatorUserId, ensureFollowInitial]);
   
   // Handle resume logic once progress is loaded
   useEffect(() => {
@@ -207,14 +226,24 @@ export const VideoPlayerModal: React.FC = () => {
     };
   }, []);
   
+  // Flush progress helper
+  const flushProgress = useCallback(() => {
+    const video = videoRef.current;
+    if (video && video.duration > 0) {
+      updateProgress(video.currentTime, video.duration);
+    }
+  }, [updateProgress]);
+  
   const handleClose = useCallback(() => {
+    // Flush progress before closing
+    flushProgress();
     // Use history.back() if there's history, otherwise navigate to discover
     if (window.history.length > 2) {
       navigate(-1);
     } else {
       navigate('/discover?main=videos');
     }
-  }, [navigate]);
+  }, [navigate, flushProgress]);
   
   const handleCreatorClick = () => {
     if (videoData?.creatorUserId) {
@@ -261,12 +290,14 @@ export const VideoPlayerModal: React.FC = () => {
   
   // Base navigation function for video selection
   const navigateToVideo = useCallback((newVideoId: string) => {
+    // Flush progress before navigating to new video
+    flushProgress();
     const backgroundLocation = location.state?.backgroundLocation;
     navigate(`/video/${newVideoId}`, { 
       state: { backgroundLocation, fromVideo: true },
       replace: false 
     });
-  }, [navigate, location.state?.backgroundLocation]);
+  }, [navigate, location.state?.backgroundLocation, flushProgress]);
   
   // Start up next countdown
   const startUpNextCountdown = useCallback(() => {
@@ -551,19 +582,52 @@ export const VideoPlayerModal: React.FC = () => {
                   <Skeleton className="h-4 w-1/4 bg-white/10" />
                 </div>
               ) : videoData ? (
-                <div className="max-w-4xl mx-auto space-y-3">
+                <div className="max-w-4xl mx-auto space-y-4">
                   {/* Title */}
                   <h1 className="text-white text-lg md:text-xl font-semibold line-clamp-2">
                     {videoData.title}
                   </h1>
                   
-                  {/* Meta row */}
-                  <div className="flex items-center gap-4 flex-wrap">
-                    {/* Views */}
-                    <span className="text-white/60 text-sm">
-                      {formatViews(videoData.views)}
-                    </span>
+                  {/* Views + Date row */}
+                  <div className="flex items-center gap-2 text-white/60 text-sm">
+                    <span>{formatViews(videoData.views)}</span>
+                    <span>•</span>
+                    <span>{formatDistanceToNow(new Date(videoData.createdAt), { addSuffix: true })}</span>
+                  </div>
+                  
+                  {/* Creator row with Follow button */}
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={handleCreatorClick}
+                      className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                    >
+                      <Avatar className="h-10 w-10 border border-white/20">
+                        <AvatarImage src={videoData.creatorAvatarUrl} alt={videoData.creatorName} />
+                        <AvatarFallback className="bg-primary/20 text-primary-foreground text-sm">
+                          {videoData.creatorName.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-white font-medium">{videoData.creatorName}</span>
+                    </button>
                     
+                    <Button
+                      variant={isFollowing === 'following' ? 'outline' : 'default'}
+                      size="sm"
+                      onClick={() => toggleFollow()}
+                      disabled={isTogglingFollow || isFollowing === 'unknown'}
+                      className={cn(
+                        "min-w-[90px]",
+                        isFollowing === 'following' 
+                          ? "border-white/20 text-white/80 hover:bg-white/10" 
+                          : "bg-primary hover:bg-primary/90"
+                      )}
+                    >
+                      {isFollowing === 'following' ? 'Following' : 'Follow'}
+                    </Button>
+                  </div>
+                  
+                  {/* Action buttons row */}
+                  <div className="flex items-center gap-3 flex-wrap">
                     {/* Like button */}
                     <button
                       onClick={() => toggleLike()}
@@ -581,6 +645,28 @@ export const VideoPlayerModal: React.FC = () => {
                       <span className="text-sm font-medium">{likesCount}</span>
                     </button>
                     
+                    {/* Save button (stub) */}
+                    <button
+                      onClick={() => toast.info('Save feature coming soon!')}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-all"
+                    >
+                      <Bookmark className="h-4 w-4" />
+                      <span className="text-sm font-medium">Save</span>
+                    </button>
+                    
+                    {/* Share button */}
+                    <button
+                      onClick={() => {
+                        const url = `${window.location.origin}/video/${videoData.id}`;
+                        navigator.clipboard.writeText(url);
+                        toast.success('Link copied to clipboard!');
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-all"
+                    >
+                      <Share2 className="h-4 w-4" />
+                      <span className="text-sm font-medium">Share</span>
+                    </button>
+                    
                     {/* Course badge */}
                     {videoData.golfCourseName && (
                       <Badge variant="secondary" className="bg-white/10 text-white/80 hover:bg-white/20 gap-1">
@@ -589,6 +675,38 @@ export const VideoPlayerModal: React.FC = () => {
                       </Badge>
                     )}
                   </div>
+                  
+                  {/* Description - expandable */}
+                  {videoData.description && videoData.description.length > 0 && (
+                    <div className="bg-white/5 rounded-xl p-3">
+                      <div 
+                        className={cn(
+                          "text-white/80 text-sm whitespace-pre-wrap",
+                          !showFullDescription && "line-clamp-2"
+                        )}
+                      >
+                        {videoData.description}
+                      </div>
+                      {videoData.description.length > 100 && (
+                        <button
+                          onClick={() => setShowFullDescription(!showFullDescription)}
+                          className="flex items-center gap-1 text-white/60 hover:text-white text-sm mt-2 transition-colors"
+                        >
+                          {showFullDescription ? (
+                            <>
+                              <ChevronUp className="h-4 w-4" />
+                              Less
+                            </>
+                          ) : (
+                            <>
+                              <ChevronDown className="h-4 w-4" />
+                              More
+                            </>
+                          )}
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               ) : null}
             </div>
