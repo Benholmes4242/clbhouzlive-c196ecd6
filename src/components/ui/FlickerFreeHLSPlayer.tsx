@@ -18,6 +18,7 @@ interface FlickerFreeHLSPlayerProps {
   onPause?: () => void;
   onClick?: () => void;
   onEnded?: () => void;
+  onTimeUpdate?: (currentTime: number, duration: number) => void;
   externallyManaged?: boolean;
 }
 
@@ -41,6 +42,7 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
   onPause,
   onClick,
   onEnded,
+  onTimeUpdate,
   externallyManaged = false
 }, ref) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -292,12 +294,16 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
 
   const handleVideoWaiting = () => {
     console.log('[HLSPlayer] Video waiting/stalled');
-    // Minimal handling: just log for now as requested
   };
 
   const handleVideoStalled = () => {
     console.log('[HLSPlayer] Video stalled');
-    // Minimal handling: just log for now as requested
+  };
+
+  const handleVideoTimeUpdate = () => {
+    const video = videoRef.current;
+    if (!video || !onTimeUpdate) return;
+    onTimeUpdate(video.currentTime, video.duration || 0);
   };
 
   const handleVideoClick = () => {
@@ -369,6 +375,7 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
         onPause={handleVideoPause}
         onWaiting={handleVideoWaiting}
         onStalled={handleVideoStalled}
+        onTimeUpdate={handleVideoTimeUpdate}
         onEnded={onEnded}
         onClick={handleVideoClick}
       />
