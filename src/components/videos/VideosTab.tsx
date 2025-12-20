@@ -11,6 +11,7 @@ import { VideosSearchResults } from './VideosSearchResults';
 import { ContinueWatchingSection } from './ContinueWatchingSection';
 import { useLongFormVideos } from '@/hooks/useLongFormVideos';
 import { useFollowedUsers } from '@/hooks/useFollowedUsers';
+import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 
 interface VideosTabProps {
   onVideoClick?: (id: string) => void;
@@ -34,6 +35,9 @@ export const VideosTab: React.FC<VideosTabProps> = ({
 }) => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Preserve scroll position when navigating to/from videos
+  const { savePosition } = useScrollRestoration('discover:videos');
 
   // Check URL params for mode
   const sectionParam = searchParams.get('section');
@@ -85,11 +89,15 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   });
 
   const handleVideoClick = (id: string) => {
+    // Save scroll position before navigating
+    savePosition();
     console.log('Video clicked:', id);
     onVideoClick?.(id);
   };
 
   const handleCreatorClick = (creatorUserId: string) => {
+    // Save scroll position before navigating
+    savePosition();
     // Videos tab: navigate to Creator Page (Phase 3 routing rule)
     navigate(`/creator/${creatorUserId}`);
   };
