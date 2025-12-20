@@ -142,7 +142,7 @@ export function createHeroItem(post: any): HeroItem | null {
 
   return {
     id: post.id,
-    contextLabel: 'Trending in golf',
+    contextLabel: 'TRENDING TODAY',
     title: post.title || post.caption || 'Featured moment',
     subContext: post.user?.name || post.course_name || '',
     mediaUrl,
