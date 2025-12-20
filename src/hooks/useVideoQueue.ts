@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
+import { markQueueUsed } from './useDiscoverySignals';
 
 const QUEUE_KEY = 'video_queue';
 const META_KEY = 'video_queue_meta';
@@ -77,6 +78,7 @@ export function useVideoQueue() {
     if (meta) {
       setQueueMeta((prev) => ({ ...prev, [videoId]: meta }));
     }
+    markQueueUsed(); // Track for discovery signals
     toast.success('Playing next');
   }, []);
 
@@ -92,6 +94,7 @@ export function useVideoQueue() {
     if (meta) {
       setQueueMeta((prev) => ({ ...prev, [videoId]: meta }));
     }
+    markQueueUsed(); // Track for discovery signals
     toast.success('Added to queue');
   }, []);
 
