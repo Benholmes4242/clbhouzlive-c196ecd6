@@ -165,8 +165,9 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
       </div>
 
       {/* Meta Area - White card section */}
-      <div className="px-4 py-3 flex items-start justify-between gap-3">
-        <div className="flex-1 min-w-0">
+      <div className="px-4 py-3 flex items-end justify-between gap-3">
+        {/* Text content - constrained to ~60% to leave room for avatar */}
+        <div className="flex-1 min-w-0 max-w-[60%]">
           {/* Caption - 2 lines max */}
           <p className="text-sm text-foreground line-clamp-2 leading-snug">
             {item.title}
@@ -177,19 +178,17 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
           </p>
         </div>
 
-        {/* Avatar squircle */}
-        {creatorAvatar && (
-          <Squircle width={36} height={36} className="shrink-0">
-            <img 
-              src={creatorAvatar} 
-              alt={creatorName}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              onError={(e) => {
-                e.currentTarget.src = '/placeholder.svg';
-              }}
-            />
-          </Squircle>
-        )}
+        {/* Avatar squircle - bottom right */}
+        <Squircle width={40} height={40} className="shrink-0">
+          <img 
+            src={creatorAvatar || '/placeholder.svg'} 
+            alt={creatorName}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            onError={(e) => {
+              e.currentTarget.src = '/placeholder.svg';
+            }}
+          />
+        </Squircle>
       </div>
     </div>
   );
