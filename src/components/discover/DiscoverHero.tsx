@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getStreamPoster } from '@/utils/stream';
 import { OverlayCorners } from '@/components/shared/overlay';
+import { Squircle } from '@/components/ui/squircle';
 
 interface HeroItem {
   id: string;
@@ -21,6 +22,11 @@ interface HeroItem {
     id: string;
     name: string;
     country: string;
+  };
+  creator?: {
+    id: string;
+    name: string;
+    avatarUrl?: string;
   };
 }
 
@@ -74,12 +80,13 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
 
   if (isLoading) {
     return (
-      <div className="relative w-full aspect-[16/9] overflow-hidden bg-slate-100">
-        <Skeleton className="absolute inset-0" />
-        <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 space-y-2">
-          <Skeleton className="h-3 w-24" />
-          <Skeleton className="h-6 w-3/4" />
-          <Skeleton className="h-4 w-1/3" />
+      <div className="bg-card border border-border/60 overflow-hidden">
+        <div className="relative w-full aspect-[16/9] overflow-hidden bg-muted">
+          <Skeleton className="absolute inset-0" />
+        </div>
+        <div className="px-4 py-3 space-y-2">
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-3 w-1/3" />
         </div>
       </div>
     );
@@ -99,80 +106,91 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
     }
   };
 
-  const isVideo = item.mediaType === 'video';
+  const creatorName = item.creator?.name || item.subContext;
+  const creatorAvatar = item.creator?.avatarUrl;
 
   return (
     <div 
-      className="relative w-full aspect-[16/9] overflow-hidden bg-slate-800 cursor-pointer group"
+      className="bg-card border border-border/60 overflow-hidden cursor-pointer group"
       onClick={handleClick}
     >
-      {/* Media - Image or Video */}
-      {item.mediaType === 'video' ? (
-        <>
-          {/* Poster while video loads */}
-          {!videoLoaded && item.posterUrl && (
-            <img
-              src={item.posterUrl}
-              alt={item.title}
-              className="absolute inset-0 w-full h-full object-cover"
+      {/* Media Section - 16:9 */}
+      <div className="relative w-full aspect-[16/9] overflow-hidden bg-muted">
+        {/* Media - Image or Video */}
+        {item.mediaType === 'video' ? (
+          <>
+            {/* Poster while video loads */}
+            {!videoLoaded && item.posterUrl && (
+              <img
+                src={item.posterUrl}
+                alt={item.title}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            )}
+            <video
+              ref={videoRef}
+              src={item.mediaUrl}
+              poster={item.posterUrl}
+              muted
+              loop
+              playsInline
+              onLoadedMetadata={handleLoadedMetadata}
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+                videoLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
             />
-          )}
-          <video
-            ref={videoRef}
+          </>
+        ) : (
+          <img
             src={item.mediaUrl}
-            poster={item.posterUrl}
-            muted
-            loop
-            playsInline
-            onLoadedMetadata={handleLoadedMetadata}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
-              videoLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
+            alt={item.title}
+            className="absolute inset-0 w-full h-full object-cover"
           />
-        </>
-      ) : (
-        <img
-          src={item.mediaUrl}
-          alt={item.title}
-          className="absolute inset-0 w-full h-full object-cover"
+        )}
+
+        {/* Unified overlay system */}
+        <OverlayCorners
+          surface="hero"
+          club={item.golfCourse ? { id: item.golfCourse.id, name: item.golfCourse.name } : null}
+          onClubClick={handleClubClick}
+          showDuration={false}
+          hotState={true}
+          showCreator={false}
+          showLikes={false}
+          showAvatar={false}
         />
-      )}
 
-      {/* Softer gradient overlay - less contrast */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
-
-      {/* Unified overlay system (uses hero surface for appropriate max-widths) */}
-      <OverlayCorners
-        surface="hero"
-        club={item.golfCourse ? { id: item.golfCourse.id, name: item.golfCourse.name } : null}
-        onClubClick={handleClubClick}
-        showDuration={false}
-        hotState={true}
-        showCreator={false}
-        showLikes={false}
-        showAvatar={false}
-      />
-
-      {/* Content overlay (bottom text) */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5 lg:p-6 z-10">
-        {/* Context label */}
-        <span className="inline-block text-[10px] md:text-[11px] font-medium text-white/70 uppercase tracking-wider mb-1.5">
-          {item.contextLabel}
-        </span>
-
-        {/* Title - reduced weight */}
-        <h2 className="text-base md:text-xl lg:text-2xl font-medium text-white leading-snug mb-1 line-clamp-2">
-          {item.title}
-        </h2>
-
-        {/* Sub-context (creator or course) */}
-        <p className="text-xs md:text-sm text-white/60">
-          {item.subContext}
-        </p>
+        {/* Subtle hover effect */}
+        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
       </div>
 
-      {/* Subtle hover effect */}
-      <div className="absolute inset-0 bg-white/3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
+      {/* Meta Area - White card section */}
+      <div className="px-4 py-3 flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          {/* Caption - 2 lines max */}
+          <p className="text-sm text-foreground line-clamp-2 leading-snug">
+            {item.title}
+          </p>
+          {/* Creator name */}
+          <p className="text-xs text-muted-foreground mt-1 truncate">
+            {creatorName}
+          </p>
+        </div>
+
+        {/* Avatar squircle */}
+        {creatorAvatar && (
+          <Squircle width={36} height={36} className="shrink-0">
+            <img 
+              src={creatorAvatar} 
+              alt={creatorName}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              onError={(e) => {
+                e.currentTarget.src = '/placeholder.svg';
+              }}
+            />
+          </Squircle>
+        )}
+      </div>
     </div>
   );
 }
@@ -202,5 +220,10 @@ export function createHeroItem(post: any): HeroItem | null {
     isPopular: post.isPopular,
     isTrending: post.isTrending,
     golfCourse: post.golfCourse,
+    creator: post.user ? {
+      id: post.user.id,
+      name: post.user.name || post.user.username,
+      avatarUrl: post.user.avatar_url || post.user.profile_photo_url,
+    } : undefined,
   };
 }
