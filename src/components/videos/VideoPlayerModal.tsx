@@ -277,9 +277,9 @@ export const VideoPlayerModal: React.FC = () => {
       videoPlayback.openMini(videoId, {
         title: videoData.title,
         creatorName: videoData.creatorName,
-        thumbnailUrl: videoData.posterUrl,
+        thumbnailUrl: videoData.posterUrl || '',
         hlsUrl: videoData.hlsUrl,
-        posterUrl: videoData.posterUrl,
+        posterUrl: videoData.posterUrl || '',
       });
     }
     
