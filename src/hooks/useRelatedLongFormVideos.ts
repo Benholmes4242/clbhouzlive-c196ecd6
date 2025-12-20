@@ -22,10 +22,10 @@ interface UseRelatedLongFormVideosResult {
  * Hook to fetch related long-form videos for the video player modal
  * 
  * Priority order (YouTube-style):
- * 1. Same creator
- * 2. Same video_category
- * 3. Same golf_club tag
- * 4. Fallback to trending in same category (or global)
+ * 1. Same creator (limit 5)
+ * 2. Same video_category (limit 6)
+ * 3. Trending last 7 days (limit 15)
+ * 4. Popular fallback (all-time, score-sorted)
  */
 export const useRelatedLongFormVideos = (
   videoId: string,
@@ -157,40 +157,7 @@ export const useRelatedLongFormVideos = (
         }
       }
 
-      // 2. Same course videos (if courseId provided)
-      if (courseId && allVideos.length < limit) {
-        // Get post IDs with this course tag
-        const { data: courseTaggedPosts } = await supabase
-          .from('post_tags')
-          .select('post_id, taggable_entities!inner(entity_type, entity_id)')
-          .eq('taggable_entities.entity_type', 'golf_club')
-          .eq('taggable_entities.entity_id', courseId);
-
-        if (courseTaggedPosts && courseTaggedPosts.length > 0) {
-          const coursePostIds = courseTaggedPosts.map(t => t.post_id).filter(id => !seenIds.has(id));
-          
-          if (coursePostIds.length > 0) {
-            const { data: courseVideos } = await supabase
-              .from('posts')
-              .select(selectString)
-              .in('id', coursePostIds)
-              .eq('post_media.media_type', 'video')
-              .gte('post_media.duration_seconds', VIDEO_DURATION_THRESHOLD_SECONDS)
-              .not('post_media.duration_seconds', 'is', null)
-              .order('created_at', { ascending: false })
-              .limit(5);
-
-            if (courseVideos) {
-              for (const post of courseVideos) {
-                const video = transformPost(post);
-                if (video) allVideos.push(video);
-              }
-            }
-          }
-        }
-      }
-
-      // 3. Same category videos (if category provided)
+      // 2. Same category videos (if category provided) - moved up in priority
       if (category && allVideos.length < limit) {
         const { data: categoryTaggedPosts } = await supabase
           .from('post_tags')
@@ -222,7 +189,7 @@ export const useRelatedLongFormVideos = (
         }
       }
 
-      // 4. Fallback to trending (last 7 days, score-sorted)
+      // 3. Trending last 7 days (score-sorted)
       if (allVideos.length < limit) {
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -239,6 +206,25 @@ export const useRelatedLongFormVideos = (
 
         if (trendingVideos) {
           for (const post of trendingVideos) {
+            const video = transformPost(post);
+            if (video) allVideos.push(video);
+          }
+        }
+      }
+
+      // 4. Popular fallback (all-time, if still need more)
+      if (allVideos.length < limit) {
+        const { data: popularVideos } = await supabase
+          .from('posts')
+          .select(selectString)
+          .eq('post_media.media_type', 'video')
+          .gte('post_media.duration_seconds', VIDEO_DURATION_THRESHOLD_SECONDS)
+          .not('post_media.duration_seconds', 'is', null)
+          .order('created_at', { ascending: false })
+          .limit(20);
+
+        if (popularVideos) {
+          for (const post of popularVideos) {
             const video = transformPost(post);
             if (video) allVideos.push(video);
           }

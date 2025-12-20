@@ -291,6 +291,11 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
 
   const handleVideoPause = () => {
     setIsPlaying(false);
+    // Flush progress on pause (YouTube-style)
+    const video = videoRef.current;
+    if (video && onTimeUpdate && video.duration > 0) {
+      onTimeUpdate(video.currentTime, video.duration);
+    }
     onPause?.();
   };
 
