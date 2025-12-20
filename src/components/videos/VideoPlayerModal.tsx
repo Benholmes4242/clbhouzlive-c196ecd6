@@ -47,6 +47,7 @@ export const VideoPlayerModal: React.FC = () => {
   const videoAreaRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef<number | null>(null);
   const startTargetRef = useRef<EventTarget | null>(null);
+  const pendingSeekRef = useRef<number | null>(null);
   
   const [videoData, setVideoData] = useState<VideoData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -57,9 +58,9 @@ export const VideoPlayerModal: React.FC = () => {
   const { progress, shouldResume, resumePosition, updateProgress, clearProgress, isLoading: progressLoading } = useVideoProgress(videoId || '');
   const { likesCount, hasLiked, toggleLike, isTogglingLike } = usePostEngagement(videoId || null);
   
-  // Fetch related videos for recommendations
+  // Fetch related videos for recommendations - only fetch once videoData exists
   const { videos: relatedVideos, upNextVideo, isLoading: relatedLoading } = useRelatedLongFormVideos(
-    videoId || '',
+    videoData ? (videoId || '') : '', // Empty string skips fetch until videoData is ready
     {
       limit: 10,
       creatorUserId: videoData?.creatorUserId,
@@ -191,14 +192,26 @@ export const VideoPlayerModal: React.FC = () => {
     setShowResumeOverlay(false);
     setHasAutoStarted(true);
     
-    // Seek to resume position after video starts
-    setTimeout(() => {
+    // Store pending seek - will be applied on loadedmetadata/canplay
+    if (resumePosition > 0) {
+      pendingSeekRef.current = resumePosition;
+      // Also try immediate seek in case video is already ready
       const video = videoRef.current;
-      if (video && resumePosition > 0) {
+      if (video && video.readyState >= 1) {
         video.currentTime = resumePosition;
+        pendingSeekRef.current = null;
       }
-    }, 100);
+    }
   };
+  
+  // Apply pending seek when video metadata is ready
+  const handleLoadedMetadata = useCallback(() => {
+    const video = videoRef.current;
+    if (video && pendingSeekRef.current !== null) {
+      video.currentTime = pendingSeekRef.current;
+      pendingSeekRef.current = null;
+    }
+  }, []);
   
   const handleStartFromBeginning = () => {
     setShowResumeOverlay(false);
@@ -340,6 +353,7 @@ export const VideoPlayerModal: React.FC = () => {
                     showMuteButton={false}
                     onEnded={handleVideoEnded}
                     onTimeUpdate={handleTimeUpdate}
+                    onLoadedMetadata={handleLoadedMetadata}
                   />
                   
                   {/* Resume overlay */}
