@@ -178,8 +178,15 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
           </p>
         </div>
 
-        {/* Avatar - matching grid tile style */}
-        <div className="shrink-0 w-10 h-10 rounded-[8px] overflow-hidden border border-border/40 shadow-sm">
+        {/* Avatar - global squircle shape with tile-style border */}
+        <div 
+          className="shrink-0 overflow-hidden border border-border/40 shadow-sm"
+          style={{
+            width: '40px',
+            aspectRatio: '1 / 1.05',
+            borderRadius: '34%',
+          }}
+        >
           <img
             src={creatorAvatar || '/placeholder.svg'}
             alt={creatorName}
