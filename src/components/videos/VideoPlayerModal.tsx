@@ -1,11 +1,17 @@
 import React, { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { X, ArrowLeft, Play, Heart, MapPin, Bookmark, Share2, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, ArrowLeft, Play, Heart, MapPin, Bookmark, Share2, ChevronDown, ChevronUp, MoreVertical, PlayCircle, ListPlus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import FlickerFreeHLSPlayer from '@/components/ui/FlickerFreeHLSPlayer';
 import { useVideoProgress } from '@/hooks/useVideoProgress';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
@@ -13,6 +19,7 @@ import { usePostData } from '@/hooks/usePostData';
 import { useRelatedLongFormVideos } from '@/hooks/useRelatedLongFormVideos';
 import { useAutoplayPreference } from '@/hooks/useAutoplayPreference';
 import { useFollow } from '@/hooks/useFollow';
+import { useVideoQueue } from '@/hooks/useVideoQueue';
 import { uidFromNode, generateHlsUrl, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -73,6 +80,9 @@ export const VideoPlayerModal: React.FC = () => {
   // Autoplay preference (persisted)
   const { autoplayEnabled, setAutoplayEnabled } = useAutoplayPreference();
   
+  // Video queue for continuous playback
+  const { queue, playNext, enqueue, popNext, peekNext, setQueueFromRelated } = useVideoQueue();
+  
   // Mark user interaction (resets autoplay eligibility timer)
   const markInteraction = useCallback(() => {
     lastInteractionTsRef.current = Date.now();
@@ -95,6 +105,13 @@ export const VideoPlayerModal: React.FC = () => {
       category: videoData?.category,
     }
   );
+  
+  // Initialize queue from related videos when they load
+  useEffect(() => {
+    if (relatedVideos.length > 0 && videoId) {
+      setQueueFromRelated(relatedVideos.map(v => v.id), videoId);
+    }
+  }, [relatedVideos, videoId, setQueueFromRelated]);
   
   // Helper to clear up next timers
   const clearUpNextTimers = useCallback(() => {
@@ -299,12 +316,20 @@ export const VideoPlayerModal: React.FC = () => {
     });
   }, [navigate, location.state?.backgroundLocation, flushProgress]);
   
-  // Start up next countdown
+  // Get next video from queue (or fall back to upNextVideo)
+  const nextQueuedVideo = useMemo(() => {
+    const nextId = peekNext();
+    if (nextId) {
+      return relatedVideos.find(v => v.id === nextId) || upNextVideo;
+    }
+    return upNextVideo;
+  }, [peekNext, relatedVideos, upNextVideo]);
+  
+  // Start up next countdown - uses queue
   const startUpNextCountdown = useCallback(() => {
-    // Gate: autoplay must be enabled
-    if (!autoplayEnabled) return;
-    // Gate: need an up next video
-    if (!upNextVideo) return;
+    // Gate: need a next video (from queue or upNext)
+    const nextVideo = nextQueuedVideo;
+    if (!nextVideo) return;
     // Gate: don't autoplay if resume overlay is showing or video hasn't started
     if (showResumeOverlay || !hasAutoStarted) return;
     // Gate: don't autoplay if user was recently interacting (4s threshold)
@@ -322,15 +347,16 @@ export const VideoPlayerModal: React.FC = () => {
       });
     }, 1000);
     
-    // Autoplay timer
+    // Autoplay timer - only auto-navigate if autoplay is ON
     upNextTimerRef.current = window.setTimeout(() => {
-      if (!upNextCancelledRef.current && upNextVideo) {
+      if (!upNextCancelledRef.current && nextVideo && autoplayEnabled) {
         setShowUpNextOverlay(false);
         clearUpNextTimers();
-        navigateToVideo(upNextVideo.id);
+        popNext(); // Remove from queue
+        navigateToVideo(nextVideo.id);
       }
     }, 5000);
-  }, [autoplayEnabled, upNextVideo, showResumeOverlay, hasAutoStarted, clearUpNextTimers, navigateToVideo]);
+  }, [nextQueuedVideo, showResumeOverlay, hasAutoStarted, autoplayEnabled, clearUpNextTimers, navigateToVideo, popNext]);
   
   const handleVideoEnded = useCallback(() => {
     clearProgress();
@@ -345,12 +371,14 @@ export const VideoPlayerModal: React.FC = () => {
   }, [clearUpNextTimers, markInteraction]);
   
   const handlePlayNow = useCallback(() => {
-    if (!upNextVideo) return;
+    const nextVideo = nextQueuedVideo;
+    if (!nextVideo) return;
     markInteraction();
     clearUpNextTimers();
     setShowUpNextOverlay(false);
-    navigateToVideo(upNextVideo.id);
-  }, [upNextVideo, clearUpNextTimers, navigateToVideo, markInteraction]);
+    popNext(); // Remove from queue
+    navigateToVideo(nextVideo.id);
+  }, [nextQueuedVideo, clearUpNextTimers, navigateToVideo, markInteraction, popNext]);
   
   // Navigate to another video within the modal - also cancels any up next countdown
   const handleVideoSelect = useCallback((newVideoId: string) => {
@@ -524,15 +552,15 @@ export const VideoPlayerModal: React.FC = () => {
                   )}
                   
                   {/* Up Next autoplay overlay */}
-                  {showUpNextOverlay && upNextVideo && (
+                  {showUpNextOverlay && nextQueuedVideo && (
                     <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 via-black/70 to-transparent">
                       <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10">
                         {/* Thumbnail */}
                         <div className="relative w-24 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-black/50">
-                          {upNextVideo.thumbnailUrl && (
+                          {nextQueuedVideo.thumbnailUrl && (
                             <img 
-                              src={upNextVideo.thumbnailUrl} 
-                              alt={upNextVideo.title}
+                              src={nextQueuedVideo.thumbnailUrl} 
+                              alt={nextQueuedVideo.title}
                               className="w-full h-full object-cover"
                             />
                           )}
@@ -543,9 +571,11 @@ export const VideoPlayerModal: React.FC = () => {
                         
                         {/* Info */}
                         <div className="flex-1 min-w-0">
-                          <p className="text-white/60 text-xs mb-0.5">Up next in {upNextCountdown}</p>
-                          <p className="text-white font-medium text-sm line-clamp-1">{upNextVideo.title}</p>
-                          <p className="text-white/50 text-xs line-clamp-1">{upNextVideo.creatorName}</p>
+                          <p className="text-white/60 text-xs mb-0.5">
+                            {autoplayEnabled ? `Up next in ${upNextCountdown}` : 'Up next'}
+                          </p>
+                          <p className="text-white font-medium text-sm line-clamp-1">{nextQueuedVideo.title}</p>
+                          <p className="text-white/50 text-xs line-clamp-1">{nextQueuedVideo.creatorName}</p>
                         </div>
                         
                         {/* Buttons */}
@@ -730,7 +760,7 @@ export const VideoPlayerModal: React.FC = () => {
                       />
                     </label>
                   </div>
-                  <UpNextTile video={upNextVideo} onClick={() => handleVideoSelect(upNextVideo.id)} />
+                  <UpNextTile video={upNextVideo} onClick={() => handleVideoSelect(upNextVideo.id)} onPlayNext={playNext} onEnqueue={enqueue} />
                   
                   {/* Recommended list */}
                   {recommendedVideos.length > 0 && (
@@ -741,7 +771,9 @@ export const VideoPlayerModal: React.FC = () => {
                           <RecommendedTile 
                             key={video.id} 
                             video={video} 
-                            onClick={() => handleVideoSelect(video.id)} 
+                            onClick={() => handleVideoSelect(video.id)}
+                            onPlayNext={playNext}
+                            onEnqueue={enqueue}
                           />
                         ))}
                       </div>
@@ -790,7 +822,7 @@ export const VideoPlayerModal: React.FC = () => {
                         />
                       </label>
                     </div>
-                    <UpNextTile video={upNextVideo} onClick={() => handleVideoSelect(upNextVideo.id)} />
+                    <UpNextTile video={upNextVideo} onClick={() => handleVideoSelect(upNextVideo.id)} onPlayNext={playNext} onEnqueue={enqueue} />
                   </>
                 )}
                 
@@ -803,7 +835,9 @@ export const VideoPlayerModal: React.FC = () => {
                         <RecommendedTile 
                           key={video.id} 
                           video={video} 
-                          onClick={() => handleVideoSelect(video.id)} 
+                          onClick={() => handleVideoSelect(video.id)}
+                          onPlayNext={playNext}
+                          onEnqueue={enqueue}
                         />
                       ))}
                     </div>
@@ -830,9 +864,11 @@ interface UpNextTileProps {
     views?: number;
   };
   onClick: () => void;
+  onPlayNext?: (id: string) => void;
+  onEnqueue?: (id: string) => void;
 }
 
-const UpNextTile: React.FC<UpNextTileProps> = ({ video, onClick }) => {
+const UpNextTile: React.FC<UpNextTileProps> = ({ video, onClick, onPlayNext, onEnqueue }) => {
   return (
     <div 
       className="group cursor-pointer rounded-lg overflow-hidden bg-white/5 hover:bg-white/10 transition-colors"
@@ -858,6 +894,41 @@ const UpNextTile: React.FC<UpNextTileProps> = ({ video, onClick }) => {
             <Play className="h-5 w-5 text-foreground ml-0.5" fill="currentColor" />
           </div>
         </div>
+        
+        {/* Queue menu - top right */}
+        {(onPlayNext || onEnqueue) && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                onClick={(e) => e.stopPropagation()}
+                className="absolute top-2 right-2 p-1.5 rounded-full bg-black/50 hover:bg-black/70 text-white/80 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                aria-label="Video options"
+              >
+                <MoreVertical className="h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              align="end" 
+              className="w-48 bg-zinc-900 border-white/10 text-white"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <DropdownMenuItem
+                onClick={(e) => { e.stopPropagation(); onPlayNext?.(video.id); toast.success('Added to play next'); }}
+                className="flex items-center gap-2 cursor-pointer hover:bg-white/10 focus:bg-white/10"
+              >
+                <PlayCircle className="h-4 w-4" />
+                <span>Play next</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => { e.stopPropagation(); onEnqueue?.(video.id); toast.success('Added to queue'); }}
+                className="flex items-center gap-2 cursor-pointer hover:bg-white/10 focus:bg-white/10"
+              >
+                <ListPlus className="h-4 w-4" />
+                <span>Add to queue</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
         
         {/* Duration badge */}
         <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-black/70 backdrop-blur-sm text-white text-xs font-medium rounded">
@@ -895,9 +966,11 @@ interface RecommendedTileProps {
     views?: number;
   };
   onClick: () => void;
+  onPlayNext?: (id: string) => void;
+  onEnqueue?: (id: string) => void;
 }
 
-const RecommendedTile: React.FC<RecommendedTileProps> = ({ video, onClick }) => {
+const RecommendedTile: React.FC<RecommendedTileProps> = ({ video, onClick, onPlayNext, onEnqueue }) => {
   const formatViews = (views: number): string => {
     if (views >= 1000000) return `${(views / 1000000).toFixed(1)}M`;
     if (views >= 1000) return `${(views / 1000).toFixed(1)}K`;
@@ -922,6 +995,41 @@ const RecommendedTile: React.FC<RecommendedTileProps> = ({ video, onClick }) => 
           <div className="w-full h-full bg-muted/20 flex items-center justify-center">
             <Play className="h-5 w-5 text-white/30" />
           </div>
+        )}
+        
+        {/* Queue menu - top right */}
+        {(onPlayNext || onEnqueue) && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                onClick={(e) => e.stopPropagation()}
+                className="absolute top-1 right-1 p-1 rounded-full bg-black/50 hover:bg-black/70 text-white/80 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                aria-label="Video options"
+              >
+                <MoreVertical className="h-3.5 w-3.5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              align="end" 
+              className="w-48 bg-zinc-900 border-white/10 text-white"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <DropdownMenuItem
+                onClick={(e) => { e.stopPropagation(); onPlayNext?.(video.id); toast.success('Added to play next'); }}
+                className="flex items-center gap-2 cursor-pointer hover:bg-white/10 focus:bg-white/10"
+              >
+                <PlayCircle className="h-4 w-4" />
+                <span>Play next</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => { e.stopPropagation(); onEnqueue?.(video.id); toast.success('Added to queue'); }}
+                className="flex items-center gap-2 cursor-pointer hover:bg-white/10 focus:bg-white/10"
+              >
+                <ListPlus className="h-4 w-4" />
+                <span>Add to queue</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
         
         {/* Duration badge */}

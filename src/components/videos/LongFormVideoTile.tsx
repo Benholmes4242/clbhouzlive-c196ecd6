@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Play, Flame } from 'lucide-react';
+import { VideoQueueMenu } from './VideoQueueMenu';
 
 export interface LongFormVideo {
   id: string;
@@ -22,6 +23,8 @@ interface LongFormVideoTileProps {
   video: LongFormVideo;
   onVideoClick?: (id: string) => void;
   onCreatorClick?: (creatorUserId: string) => void;
+  onPlayNext?: (id: string) => void;
+  onEnqueue?: (id: string) => void;
   className?: string;
 }
 
@@ -33,6 +36,8 @@ export const LongFormVideoTile: React.FC<LongFormVideoTileProps> = ({
   video,
   onVideoClick,
   onCreatorClick,
+  onPlayNext,
+  onEnqueue,
   className,
 }) => {
   const formatViews = (views: number): string => {
@@ -97,6 +102,17 @@ export const LongFormVideoTile: React.FC<LongFormVideoTileProps> = ({
             <Flame className="h-3 w-3" />
             <span>Trending</span>
           </div>
+        )}
+
+        {/* Queue menu - top right */}
+        {(onPlayNext || onEnqueue) && (
+          <VideoQueueMenu
+            videoId={video.id}
+            videoTitle={video.title}
+            onPlayNext={onPlayNext || (() => {})}
+            onEnqueue={onEnqueue || (() => {})}
+            className="absolute top-2 right-2"
+          />
         )}
 
         {/* Duration badge - bottom right (glass pill) */}
