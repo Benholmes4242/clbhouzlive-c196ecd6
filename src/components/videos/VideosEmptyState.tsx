@@ -4,7 +4,7 @@ import { Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface VideosEmptyStateProps {
-  type: 'creators-you-follow' | 'search' | 'general';
+  type: 'creators-you-follow' | 'search' | 'general' | 'global-explore';
   onAction?: () => void;
 }
 
@@ -32,6 +32,24 @@ export const VideosEmptyState: React.FC<VideosEmptyStateProps> = ({
           onClick={() => navigate('/golfers')}
         >
           Discover creators
+        </Button>
+      </div>
+    );
+  }
+
+  if (type === 'global-explore') {
+    return (
+      <div className="flex flex-col items-center justify-center py-6 px-4 bg-muted/20 rounded-lg border border-border/40">
+        <p className="text-sm text-muted-foreground text-center">
+          We're loading more long-form videos — check back soon.
+        </p>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="mt-3 text-primary"
+          onClick={() => navigate('/discover?main=watch')}
+        >
+          Browse Shorts
         </Button>
       </div>
     );

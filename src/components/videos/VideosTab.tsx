@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { VideosIntro } from './VideosIntro';
@@ -10,12 +10,13 @@ import { VideosSectionPage } from './VideosSectionPage';
 import { VideosSearchResults } from './VideosSearchResults';
 import { ContinueWatchingSection } from './ContinueWatchingSection';
 import { VideoNudgeBanner } from './VideoNudgeBanner';
-import { useLongFormVideos } from '@/hooks/useLongFormVideos';
+import { useLongFormVideosQuery } from '@/hooks/useLongFormVideosQuery';
 import { useFollowedUsers } from '@/hooks/useFollowedUsers';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import { useVideoNudges } from '@/hooks/useVideoNudges';
 import { useVideoQueue } from '@/hooks/useVideoQueue';
 import { useDiscoverySignals } from '@/hooks/useDiscoverySignals';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
 interface VideosTabProps {
   onVideoClick?: (id: string) => void;
@@ -28,10 +29,10 @@ interface VideosTabProps {
  * DATA RULE: Videos tab = long-form ONLY (≥3 min / 180 seconds)
  * Shorts (<3 min) = Watch tab ONLY — NO crossover
  * 
- * Modes:
- * - Default: Modular sections (Recommended, Trending, etc.)
- * - Section: View all for a specific section (?section=trending)
- * - Search: Search results (?mode=search&q=...)
+ * Performance optimizations:
+ * - React Query caching (5min stale, 30min gc)
+ * - Lazy loading for Trending/Courses (fetch on scroll into view)
+ * - Memoized boost score function
  */
 export const VideosTab: React.FC<VideosTabProps> = ({
   onVideoClick,
@@ -50,6 +51,28 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   const { getBoostScore } = useDiscoverySignals();
   const [showQueueNudge, setShowQueueNudge] = useState(false);
   const [showQueueReminder, setShowQueueReminder] = useState(false);
+
+  // Lazy loading triggers for below-fold sections
+  const { ref: trendingRef, isInView: trendingInView } = useIntersectionObserver({ rootMargin: '200px' });
+  const { ref: coursesRef, isInView: coursesInView } = useIntersectionObserver({ rootMargin: '200px' });
+  
+  // Track if sections have been triggered (once visible, stay enabled)
+  const [trendingTriggered, setTrendingTriggered] = useState(false);
+  const [coursesTriggered, setCoursesTriggered] = useState(false);
+
+  useEffect(() => {
+    if (trendingInView && !trendingTriggered) setTrendingTriggered(true);
+  }, [trendingInView, trendingTriggered]);
+
+  useEffect(() => {
+    if (coursesInView && !coursesTriggered) setCoursesTriggered(true);
+  }, [coursesInView, coursesTriggered]);
+
+  // Memoize boost score to prevent unnecessary re-renders
+  const memoizedBoostScore = useCallback(
+    (creatorId: string, category?: string) => getBoostScore(creatorId, category),
+    [getBoostScore]
+  );
 
   // Show queue nudge after user has been on page (one-time)
   useEffect(() => {
@@ -86,42 +109,43 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     setSearchParams(newParams);
   };
 
-  // Fetch videos for each section using the real data hook
-  // Pass category filter if selected (not 'all')
+  // Category filter - undefined when 'all' (not the string 'all')
   const categoryFilter = categoryParam !== 'all' ? categoryParam : undefined;
 
-  const { videos: recommendedVideos, isLoading: recLoading } = useLongFormVideos({
+  // Fetch videos using React Query with caching
+  // Recommended + Following load immediately, Trending + Courses lazy-load
+  const { videos: recommendedVideos, isLoading: recLoading } = useLongFormVideosQuery({
     section: 'recommended',
     limit: 4,
     category: categoryFilter,
-    getBoostScore, // Wire discovery signals for personalized ranking
+    getBoostScore: memoizedBoostScore,
   });
 
-  const { videos: trendingVideos, isLoading: trendLoading } = useLongFormVideos({
+  const { videos: trendingVideos, isLoading: trendLoading } = useLongFormVideosQuery({
     section: 'trending',
     limit: 3,
     category: categoryFilter,
+    enabled: trendingTriggered, // Lazy load
   });
 
-  const { videos: followedVideos, isLoading: followLoading } = useLongFormVideos({
+  const { videos: followedVideos, isLoading: followLoading } = useLongFormVideosQuery({
     section: 'following',
     limit: 4,
     followedCreatorIds: followedIds,
     category: categoryFilter,
   });
 
-  const { videos: coursesVideos, isLoading: coursesLoading } = useLongFormVideos({
+  const { videos: coursesVideos, isLoading: coursesLoading } = useLongFormVideosQuery({
     section: 'courses',
     limit: 3,
     category: categoryFilter,
+    enabled: coursesTriggered, // Lazy load
   });
 
   const handleVideoClick = (id: string) => {
-    // Save scroll position before navigating
     savePosition();
     console.log('Video clicked:', id);
     
-    // Navigate to video modal with background location for modal pattern
     navigate(`/video/${id}`, {
       state: { backgroundLocation: location, fromVideo: true }
     });
@@ -130,19 +154,15 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   };
 
   const handleCreatorClick = (creatorUserId: string) => {
-    // Save scroll position before navigating
     savePosition();
-    // Videos tab: navigate to Creator Page (Phase 3 routing rule)
     navigate(`/creator/${creatorUserId}`);
   };
 
   const handleSearch = (query: string) => {
-    // Navigate to search mode within Videos tab
     navigate(`/discover?main=videos&mode=search&q=${encodeURIComponent(query)}`);
   };
 
   const handleViewAll = (section: string) => {
-    // Use discover-scoped route to avoid /videos conflict
     navigate(`/discover?main=videos&section=${section}`);
   };
 
@@ -182,7 +202,6 @@ export const VideosTab: React.FC<VideosTabProps> = ({
             onAction={() => {
               setShowQueueReminder(false);
               markQueueReminderShown();
-              // Could open queue drawer here if needed
             }}
             actionLabel={`${queue.length} video${queue.length !== 1 ? 's' : ''}`}
           />
@@ -228,28 +247,32 @@ export const VideosTab: React.FC<VideosTabProps> = ({
         className="mb-8"
       />
 
-      {/* Module 1: Recommended for you */}
+      {/* Module 1: Recommended for you (loads immediately) */}
       <VideoSection
         title="Recommended for you"
         videos={recommendedVideos.slice(0, 3)}
         onViewAll={() => handleViewAll('recommended')}
         onVideoClick={handleVideoClick}
         onCreatorClick={handleCreatorClick}
+        emptyState={<VideosEmptyState type="global-explore" />}
         className="mb-8"
       />
 
-      {/* Module 2: Trending this week */}
-      <VideoSection
-        title="Trending this week"
-        subtitle="Popular with golfers right now"
-        videos={trendingVideos.slice(0, 2)}
-        onViewAll={() => handleViewAll('trending')}
-        onVideoClick={handleVideoClick}
-        onCreatorClick={handleCreatorClick}
-        className="mb-8"
-      />
+      {/* Module 2: Trending this week (lazy loaded) */}
+      <div ref={trendingRef}>
+        <VideoSection
+          title="Trending this week"
+          subtitle="Popular with golfers right now"
+          videos={trendingVideos.slice(0, 2)}
+          onViewAll={() => handleViewAll('trending')}
+          onVideoClick={handleVideoClick}
+          onCreatorClick={handleCreatorClick}
+          emptyState={<VideosEmptyState type="global-explore" />}
+          className="mb-8"
+        />
+      </div>
 
-      {/* Module 3: From creators you follow */}
+      {/* Module 3: From creators you follow (loads immediately) */}
       <VideoSection
         title="From creators you follow"
         videos={followedVideos.slice(0, 3)}
@@ -261,16 +284,19 @@ export const VideosTab: React.FC<VideosTabProps> = ({
         className="mb-8"
       />
 
-      {/* Module 4: Courses & destinations */}
-      <VideoSection
-        title="Courses & destinations"
-        subtitle="Course vlogs and bucket-list rounds"
-        videos={coursesVideos.slice(0, 2)}
-        onViewAll={() => handleViewAll('courses')}
-        onVideoClick={handleVideoClick}
-        onCreatorClick={handleCreatorClick}
-        className="mb-8"
-      />
+      {/* Module 4: Courses & destinations (lazy loaded) */}
+      <div ref={coursesRef}>
+        <VideoSection
+          title="Courses & destinations"
+          subtitle="Course vlogs and bucket-list rounds"
+          videos={coursesVideos.slice(0, 2)}
+          onViewAll={() => handleViewAll('courses')}
+          onVideoClick={handleVideoClick}
+          onCreatorClick={handleCreatorClick}
+          emptyState={<VideosEmptyState type="global-explore" />}
+          className="mb-8"
+        />
+      </div>
     </div>
   );
 };
