@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getStreamPoster } from '@/utils/stream';
 import { OverlayCorners } from '@/components/shared/overlay';
-import { Squircle } from '@/components/ui/squircle';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface HeroItem {
   id: string;
@@ -179,16 +179,13 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
         </div>
 
         {/* Avatar squircle - bottom right */}
-        <Squircle width={40} height={40} className="shrink-0">
-          <img 
-            src={creatorAvatar || '/placeholder.svg'} 
-            alt={creatorName}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            onError={(e) => {
-              e.currentTarget.src = '/placeholder.svg';
-            }}
-          />
-        </Squircle>
+        <SquircleAvatar
+          size={40}
+          src={creatorAvatar}
+          alt={creatorName}
+          fallback={creatorName?.charAt(0) || '?'}
+          className="shrink-0"
+        />
       </div>
     </div>
   );
