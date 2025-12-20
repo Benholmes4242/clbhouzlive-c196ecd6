@@ -67,7 +67,7 @@ export const LongFormVideoTile: React.FC<LongFormVideoTileProps> = ({
       onClick={() => onVideoClick?.(video.id)}
     >
       {/* Thumbnail */}
-      <div className="relative aspect-video overflow-hidden rounded-xl bg-muted">
+      <div className="relative aspect-video overflow-hidden rounded-xl bg-muted transition-all duration-200 group-hover:ring-2 group-hover:ring-primary/30 group-active:scale-[0.98]">
         {video.thumbnailUrl ? (
           <img
             src={video.thumbnailUrl}
@@ -80,6 +80,9 @@ export const LongFormVideoTile: React.FC<LongFormVideoTileProps> = ({
             <Play className="h-12 w-12 text-muted-foreground/40" />
           </div>
         )}
+
+        {/* Glass highlight overlay on hover */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
         {/* Play overlay on hover */}
         <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/10 transition-colors">

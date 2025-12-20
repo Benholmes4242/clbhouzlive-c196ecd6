@@ -28,6 +28,11 @@ interface UseLongFormVideosResult {
  * - duration_seconds >= 180
  * - duration_seconds IS NOT NULL
  * 
+ * SCORING:
+ * - engagement_score = views_count + (likes_count * 25)
+ * - Trending: last 7 days, order by score desc
+ * - Popular: order by score desc (all-time or last 30 days)
+ * 
  * SERVER-SIDE FILTERING:
  * - Category filtering via post_tags -> taggable_entities (entity_type='video_category', slug=category)
  * - Search filtering via posts.content ilike
@@ -57,6 +62,11 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
       return `${hrs}:${remainingMins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Calculate engagement score for ranking
+  const calculateScore = (views: number, likes: number): number => {
+    return (views || 0) + ((likes || 0) * 25);
   };
 
   const fetchVideos = useCallback(async () => {
@@ -166,7 +176,7 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
       if (!creatorUserId && !searchQuery) {
         switch (section) {
           case 'trending':
-            // Last 7 days, sorted by engagement
+            // Last 7 days
             const sevenDaysAgo = new Date();
             sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
             query = query.gte('created_at', sevenDaysAgo.toISOString());
@@ -186,15 +196,15 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
         }
       }
 
-      // Apply sorting and limit
-      query = query.order('created_at', { ascending: false }).limit(limit);
+      // Apply base ordering (we'll re-sort by score client-side for trending/popular)
+      query = query.order('created_at', { ascending: false }).limit(limit * 3); // Over-fetch for score sorting
 
       const { data, error: queryError } = await query;
 
       if (queryError) throw queryError;
 
-      // Transform to LongFormVideo format (no client-side filtering needed)
-      const transformedVideos: LongFormVideo[] = (data || []).map((post: any) => {
+      // Transform to LongFormVideo format with score calculation
+      let transformedVideos: LongFormVideo[] = (data || []).map((post: any) => {
         const media = post.post_media?.[0];
         const user = post.user_profiles;
         const stats = post.post_stats?.[0];
@@ -204,8 +214,9 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
           (tag: any) => tag.taggable_entities?.entity_type === 'golf_club'
         );
 
-        // Calculate if trending (for trending section)
-        const isTrending = section === 'trending';
+        const views = stats?.views_count || 0;
+        const likes = stats?.likes_count || 0;
+        const score = calculateScore(views, likes);
 
         return {
           id: post.id,
@@ -216,18 +227,36 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
           thumbnailUrl: media?.poster_url || '',
           duration: formatDuration(media?.duration_seconds || 0),
           durationSeconds: media?.duration_seconds || 0,
-          views: stats?.views_count || 0,
+          views,
           createdAt: post.created_at,
           golfCourseId: golfTag?.taggable_entities?.entity_id,
           golfCourseName: golfTag?.taggable_entities?.name,
-          isTrending,
-        };
+          isTrending: section === 'trending',
+          // Internal score for sorting (not exposed in type but used here)
+          _score: score,
+        } as LongFormVideo & { _score: number };
       });
 
-      // Client-side sort by popularity (views) if requested
-      if (sort === 'popular') {
-        transformedVideos.sort((a, b) => (b.views || 0) - (a.views || 0));
+      // Apply score-based sorting for trending and popular sections
+      if (section === 'trending' || sort === 'popular') {
+        // Sort by engagement score descending, tie-break by created_at descending
+        transformedVideos.sort((a, b) => {
+          const aScore = (a as any)._score || 0;
+          const bScore = (b as any)._score || 0;
+          if (bScore !== aScore) return bScore - aScore;
+          // Tie-break by created_at
+          return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+        });
       }
+
+      // Trim to requested limit after sorting
+      transformedVideos = transformedVideos.slice(0, limit);
+
+      // Remove internal _score field
+      transformedVideos = transformedVideos.map((video: any) => {
+        const { _score, ...rest } = video;
+        return rest as LongFormVideo;
+      });
 
       setVideos(transformedVideos);
     } catch (err) {
