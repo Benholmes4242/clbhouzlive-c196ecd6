@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { VideosIntro } from './VideosIntro';
@@ -6,6 +6,8 @@ import { VideoSearchBar } from './VideoSearchBar';
 import { VideoFilterChips, VideoCategory } from './VideoFilterChips';
 import { VideoSection } from './VideoSection';
 import { VideosEmptyState } from './VideosEmptyState';
+import { VideosSectionPage } from './VideosSectionPage';
+import { VideosSearchResults } from './VideosSearchResults';
 import { useLongFormVideos } from '@/hooks/useLongFormVideos';
 import { useFollowedUsers } from '@/hooks/useFollowedUsers';
 
@@ -20,10 +22,10 @@ interface VideosTabProps {
  * DATA RULE: Videos tab = long-form ONLY (≥3 min / 180 seconds)
  * Shorts (<3 min) = Watch tab ONLY — NO crossover
  * 
- * Layout:
- * 1. Search bar
- * 2. Filter chips (horizontal scroll)
- * 3. Modular sections with "View all"
+ * Modes:
+ * - Default: Modular sections (Recommended, Trending, etc.)
+ * - Section: View all for a specific section (?section=trending)
+ * - Search: Search results (?mode=search&q=...)
  */
 export const VideosTab: React.FC<VideosTabProps> = ({
   onVideoClick,
@@ -33,8 +35,10 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   const [searchParams] = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState<VideoCategory>('all');
 
-  // Check if we're in a section view (View All clicked)
+  // Check URL params for mode
   const sectionParam = searchParams.get('section');
+  const modeParam = searchParams.get('mode');
+  const searchQuery = searchParams.get('q') || '';
 
   // Get followed user IDs for "From creators you follow" section
   const { followedIds } = useFollowedUsers();
@@ -72,7 +76,8 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   };
 
   const handleSearch = (query: string) => {
-    navigate(`/search?type=videos&q=${encodeURIComponent(query)}`);
+    // Navigate to search mode within Videos tab
+    navigate(`/discover?main=videos&mode=search&q=${encodeURIComponent(query)}`);
   };
 
   const handleViewAll = (section: string) => {
@@ -80,9 +85,26 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     navigate(`/discover?main=videos&section=${section}`);
   };
 
-  // If section param exists, we could render VideosSectionPage inline
-  // For now, sections are handled by query param and we just filter differently
-  // This keeps everything in Discover without needing a new route
+  const handleBackFromSearch = () => {
+    navigate('/discover?main=videos');
+  };
+
+  // If in search mode, render search results
+  if (modeParam === 'search' && searchQuery) {
+    return (
+      <VideosSearchResults
+        query={searchQuery}
+        category={selectedCategory !== 'all' ? selectedCategory : undefined}
+        onBack={handleBackFromSearch}
+        className={className}
+      />
+    );
+  }
+
+  // If section param exists, render section page
+  if (sectionParam) {
+    return <VideosSectionPage />;
+  }
 
   return (
     <div className={cn("min-h-screen pb-20", className)}>

@@ -5,8 +5,11 @@
 export { VideosTab, default } from './VideosTab';
 export { VideosIntro } from './VideosIntro';
 export { VideoSearchBar } from './VideoSearchBar';
-export { VideoFilterChips, type VideoCategory } from './VideoFilterChips';
+export { VideoFilterChips } from './VideoFilterChips';
+export type { VideoCategory } from './VideoFilterChips';
+export { LongFormVideoTile } from './LongFormVideoTile';
+export type { LongFormVideo } from './LongFormVideoTile';
 export { VideoSection } from './VideoSection';
-export { LongFormVideoTile, type LongFormVideo } from './LongFormVideoTile';
 export { VideosEmptyState } from './VideosEmptyState';
 export { VideosSectionPage } from './VideosSectionPage';
+export { VideosSearchResults } from './VideosSearchResults';
