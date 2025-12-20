@@ -221,6 +221,26 @@ export const MiniPlayer: React.FC = () => {
   const handlePlay = useCallback(() => setIsPlaying(true), []);
   const handlePause = useCallback(() => setIsPlaying(false), []);
 
+  // 6B-3: Handle video ended - advance to next in queue
+  const handleEnded = useCallback(() => {
+    // Flush progress at end
+    const el = videoElRef.current;
+    if (el && el.duration > 0) {
+      updateProgress(el.currentTime, el.duration);
+    }
+
+    // Try to advance to next
+    const next = context?.consumeNext?.();
+    if (next?.videoId) {
+      // Switch mini to next item
+      context?.openMini(next.videoId, next.meta || undefined);
+      return;
+    }
+
+    // Nothing queued → close mini
+    context?.closeMini();
+  }, [context, updateProgress]);
+
   const isVisible = !!activeVideoId && isMiniOpen;
 
   // Responsive container:
@@ -274,6 +294,7 @@ export const MiniPlayer: React.FC = () => {
                 onTimeUpdate={handleTimeUpdate}
                 onPlay={handlePlay}
                 onPause={handlePause}
+                onEnded={handleEnded}
               />
               {/* Muted indicator */}
               <div className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/60 rounded text-[10px] text-white/60">
@@ -285,7 +306,7 @@ export const MiniPlayer: React.FC = () => {
           )}
         </div>
 
-        {/* Title + creator */}
+        {/* Title + creator + next up indicator */}
         <div className="min-w-0 flex-1">
           <div className="text-white text-sm font-medium truncate">
             {videoData?.title || "Loading..."}
@@ -293,6 +314,21 @@ export const MiniPlayer: React.FC = () => {
           <div className="text-white/60 text-xs truncate">
             {videoData?.creatorName || ""}
           </div>
+          {/* 6B-3: Next up indicator */}
+          {context?.nextVideoId && context?.nextMeta && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                const next = context.consumeNext();
+                if (next.videoId) {
+                  context.openMini(next.videoId, next.meta || undefined);
+                }
+              }}
+              className="mt-1 text-[10px] text-primary/80 hover:text-primary truncate max-w-full text-left"
+            >
+              Next: {context.nextMeta.title}
+            </button>
+          )}
         </div>
 
         {/* Controls */}

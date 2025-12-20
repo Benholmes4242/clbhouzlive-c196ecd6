@@ -369,6 +369,34 @@ export const VideoPlayerModal: React.FC = () => {
     return upNextVideo;
   }, [peekNext, relatedVideos, upNextVideo, getMeta]);
   
+  // 6B-3: Sync queue "next" to playback context for mini-player
+  useEffect(() => {
+    if (!videoPlayback) return;
+    
+    const nextId = peekNext();
+    if (!nextId) {
+      // Fallback to upNextVideo
+      if (upNextVideo) {
+        videoPlayback.setNext(upNextVideo.id, {
+          title: upNextVideo.title,
+          creatorName: upNextVideo.creatorName,
+          thumbnailUrl: upNextVideo.thumbnailUrl,
+        });
+      } else {
+        videoPlayback.setNext(null, null);
+      }
+      return;
+    }
+    
+    // Use queueMeta for best info
+    const meta = getMeta(nextId);
+    videoPlayback.setNext(nextId, meta ? {
+      title: meta.title,
+      creatorName: meta.creatorName,
+      thumbnailUrl: meta.thumbnailUrl,
+    } : null);
+  }, [peekNext, getMeta, upNextVideo, videoPlayback]);
+  
   // Start up next countdown - uses queue
   const startUpNextCountdown = useCallback(() => {
     // Gate: need a next video (from queue or upNext)
