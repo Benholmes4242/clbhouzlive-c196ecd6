@@ -18,6 +18,7 @@ interface HeroItem {
   durationSeconds?: number; // Video duration in seconds
   isPopular?: boolean; // Ranking: Popular today
   isTrending?: boolean; // Ranking: Trending
+  likes?: number; // Like count
   golfCourse?: {
     id: string;
     name: string;
@@ -156,7 +157,8 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
           showDuration={false}
           hotState={true}
           showCreator={false}
-          showLikes={false}
+          showLikes={true}
+          likes={item.likes}
           showAvatar={false}
         />
 
@@ -226,6 +228,7 @@ export function createHeroItem(post: any): HeroItem | null {
     isPopular: post.isPopular,
     isTrending: post.isTrending,
     golfCourse: post.golfCourse,
+    likes: post.likes,
     creator: post.user ? {
       id: post.user.id,
       name: post.user.display_name || post.user.name || post.user.username,
