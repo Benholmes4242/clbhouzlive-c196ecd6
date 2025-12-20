@@ -8,6 +8,7 @@ import { VideoSection } from './VideoSection';
 import { VideosEmptyState } from './VideosEmptyState';
 import { VideosSectionPage } from './VideosSectionPage';
 import { VideosSearchResults } from './VideosSearchResults';
+import { ContinueWatchingSection } from './ContinueWatchingSection';
 import { useLongFormVideos } from '@/hooks/useLongFormVideos';
 import { useFollowedUsers } from '@/hooks/useFollowedUsers';
 
@@ -141,6 +142,15 @@ export const VideosTab: React.FC<VideosTabProps> = ({
 
       {/* Divider */}
       <div className="h-px bg-border/40 mx-5 mb-6" />
+
+      {/* Continue Watching (only shows if user has in-progress videos) */}
+      <ContinueWatchingSection
+        onVideoClick={(id, resumeAt) => {
+          console.log('Resume video:', id, 'at', resumeAt);
+          onVideoClick?.(id);
+        }}
+        className="mb-8"
+      />
 
       {/* Module 1: Recommended for you */}
       <VideoSection

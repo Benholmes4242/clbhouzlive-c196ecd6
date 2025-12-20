@@ -13,3 +13,5 @@ export { VideoSection } from './VideoSection';
 export { VideosEmptyState } from './VideosEmptyState';
 export { VideosSectionPage } from './VideosSectionPage';
 export { VideosSearchResults } from './VideosSearchResults';
+export { ContinueWatchingSection } from './ContinueWatchingSection';
+export { ContinueWatchingTile } from './ContinueWatchingTile';
