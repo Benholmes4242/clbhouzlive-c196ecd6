@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { X, ArrowLeft, Play, Heart, MapPin, Bookmark, Share2, ChevronDown, ChevronUp, MoreVertical, PlayCircle, ListPlus } from 'lucide-react';
+import { X, ArrowLeft, Play, Heart, MapPin, Bookmark, Share2, ChevronDown, ChevronUp, MoreVertical, PlayCircle, ListPlus, ListMusic } from 'lucide-react';
+import QueueDrawer from '@/components/videos/QueueDrawer';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -73,6 +74,7 @@ export const VideoPlayerModal: React.FC = () => {
   // Up Next autoplay state
   const [showUpNextOverlay, setShowUpNextOverlay] = useState(false);
   const [upNextCountdown, setUpNextCountdown] = useState(5);
+  const [isQueueDrawerOpen, setIsQueueDrawerOpen] = useState(false);
   const upNextCancelledRef = useRef(false);
   const upNextTimerRef = useRef<number | null>(null);
   const upNextIntervalRef = useRef<number | null>(null);
@@ -82,7 +84,7 @@ export const VideoPlayerModal: React.FC = () => {
   const { autoplayEnabled, setAutoplayEnabled } = useAutoplayPreference();
   
   // Video queue for continuous playback
-  const { queue, queueMeta, playNext, enqueue, popNext, peekNext, getMeta, setQueueFromRelated, queueLength } = useVideoQueue();
+  const { queue, queueMeta, playNext, enqueue, popNext, peekNext, getMeta, setQueueFromRelated, queueLength, removeFromQueue, clearQueue } = useVideoQueue();
   
   // Mini-player context (optional - may not exist in all app shells)
   const videoPlayback = useVideoPlaybackSafe();
@@ -822,7 +824,13 @@ export const VideoPlayerModal: React.FC = () => {
                     <div className="flex items-center gap-2">
                       <h3 className="text-white/80 font-medium text-sm">Up next</h3>
                       {queueLength > 0 && (
-                        <span className="text-white/40 text-xs">· Queue: {queueLength}</span>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); setIsQueueDrawerOpen(true); }}
+                          className="flex items-center gap-1 text-white/50 hover:text-white/80 text-xs transition-colors"
+                        >
+                          <ListMusic className="h-3 w-3" />
+                          Queue: {queueLength}
+                        </button>
                       )}
                     </div>
                     <label 
@@ -889,7 +897,13 @@ export const VideoPlayerModal: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <h3 className="text-white/80 font-medium text-sm">Up next</h3>
                         {queueLength > 0 && (
-                          <span className="text-white/40 text-xs">· Queue: {queueLength}</span>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); setIsQueueDrawerOpen(true); }}
+                            className="flex items-center gap-1 text-white/50 hover:text-white/80 text-xs transition-colors"
+                          >
+                            <ListMusic className="h-3 w-3" />
+                            Queue: {queueLength}
+                          </button>
                         )}
                       </div>
                       <label 
@@ -930,6 +944,21 @@ export const VideoPlayerModal: React.FC = () => {
           </div>
         </div>
       </ScrollArea>
+      
+      {/* Queue Drawer */}
+      <QueueDrawer
+        isOpen={isQueueDrawerOpen}
+        onClose={() => setIsQueueDrawerOpen(false)}
+        queue={queue}
+        queueMeta={queueMeta}
+        onPlayNow={(id) => {
+          setIsQueueDrawerOpen(false);
+          removeFromQueue(id);
+          handleVideoSelect(id);
+        }}
+        onRemove={removeFromQueue}
+        onClear={clearQueue}
+      />
     </div>
   );
 };
