@@ -1,6 +1,49 @@
 // Unified Media Grid Types
 
-export type MediaOrientation = 'portrait' | 'landscape';
+// ============= Orientation Classification =============
+
+export type MediaOrientation = 'portrait' | 'landscape' | 'square';
+
+// Aspect ratio thresholds for deterministic classification
+export const AR_LANDSCAPE_THRESHOLD = 1.25; // >= 1.25 = landscape
+export const AR_PORTRAIT_THRESHOLD = 0.85;  // <= 0.85 = portrait
+// Between 0.85 and 1.25 = square/neutral
+
+// ============= Content Categories =============
+
+export type ContentCategory = 
+  | 'swing'
+  | 'scenic'
+  | 'course'
+  | 'tips'
+  | 'funny'
+  | 'news'
+  | 'highlight'
+  | 'cinematic'
+  | 'flyover'
+  | 'other';
+
+// Categories that trigger landscape tile display
+export const LANDSCAPE_CATEGORY_SET = new Set<ContentCategory>([
+  'scenic', 'course', 'cinematic', 'flyover'
+]);
+
+// ============= Tile Display Output =============
+
+export type TileVariant = 'portrait' | 'landscape';
+export type TileAspect = '3:4' | '16:9';
+
+export interface TileDisplayInfo {
+  tileVariant: TileVariant;
+  tileSpan: 1 | 2; // 2 = full-width across both columns
+  tileAspect: TileAspect;
+}
+
+// ============= Grid Surface Context =============
+
+export type GridSurface = 'watch' | 'profile-activity';
+
+// ============= Unified Media Item =============
 
 export interface UnifiedMediaItem {
   id: string;
@@ -10,14 +53,18 @@ export interface UnifiedMediaItem {
   thumbnailUrl?: string;
   playbackUrl?: string;
   
-  // Orientation & sizing
-  aspectRatio?: number; // width/height ratio from media metadata
-  orientation?: MediaOrientation; // Computed or explicit
+  // Media dimensions (required for orientation)
+  mediaWidth?: number;
+  mediaHeight?: number;
+  aspectRatio?: number; // width/height - computed or stored
+  
+  // Computed orientation (set by layout utils)
+  orientation?: MediaOrientation;
   
   // Content metadata for landscape eligibility
-  isFeatured?: boolean; // Explicitly featured content
-  isScenic?: boolean; // Scenic/course/cinematic content
-  isCinematic?: boolean; // Cinematic style content
+  isFeatured?: boolean; // Editorial or algorithmic boosting
+  contentCategory?: ContentCategory;
+  golfCourseId?: string; // If tagged to a course
   
   // Display data
   durationSeconds?: number | null;
@@ -38,7 +85,12 @@ export interface UnifiedMediaItem {
   // Autoplay
   isAutoplayCandidate?: boolean;
   sortIndex?: number;
+  
+  // Computed tile display (set by layout utils)
+  tileDisplay?: TileDisplayInfo;
 }
+
+// ============= Grid Configuration =============
 
 export interface UnifiedGridConfig {
   // Overlay visibility
@@ -53,6 +105,9 @@ export interface UnifiedGridConfig {
   autoplayEnabled?: boolean;
   maxAutoplay?: number;
   visibilityThreshold?: number;
+  
+  // Surface context (affects tap behavior)
+  surface?: GridSurface;
 }
 
 export interface UnifiedMediaGridProps {
@@ -61,22 +116,26 @@ export interface UnifiedMediaGridProps {
   isLoading?: boolean;
   hasMore?: boolean;
   onLoadMore?: () => void;
-  onItemClick?: (item: UnifiedMediaItem) => void;
+  onItemClick?: (item: UnifiedMediaItem, index: number) => void;
   onLike?: (itemId: string) => void;
   onAuthorClick?: (authorId: string) => void;
   currentUserId?: string;
 }
 
-// Layout types
+// ============= Layout Types =============
+
 export interface LayoutRow {
   type: 'portrait-pair' | 'landscape';
   items: UnifiedMediaItem[];
 }
 
-// Constants
+// ============= Layout Constants =============
+
 export const PORTRAIT_ASPECT_RATIO = 3 / 4; // 0.75
 export const LANDSCAPE_ASPECT_RATIO = 16 / 9; // 1.777...
-export const LANDSCAPE_AR_MIN = 1.5; // Minimum AR to be considered landscape
-export const MIN_ITEMS_BETWEEN_LANDSCAPE = 6;
-export const MAX_ITEMS_BETWEEN_LANDSCAPE = 10;
+
+// Landscape placement constraints
+export const LANDSCAPE_FREQUENCY_CAP = 8; // Max 1 landscape per 8 items
+export const LANDSCAPE_MIN_START_POSITION = 2; // No landscape in first 2 tiles
+
 export const GRID_GAP_PX = 2;

@@ -1,13 +1,24 @@
 // Adapters to convert data from existing types to UnifiedMediaItem
 
 import { ExploreContentItem } from '@/components/explore/types';
-import { ActivityPost, ActivityMediaItem } from '@/components/profile/activity/types';
-import { UnifiedMediaItem } from './types';
+import { ActivityPost } from '@/components/profile/activity/types';
+import { UnifiedMediaItem, ContentCategory, AR_LANDSCAPE_THRESHOLD } from './types';
 import { getStreamPoster } from '@/utils/stream';
 import { uidFromNode, generateHlsUrl } from '@/utils/cloudflareStreamTransform';
+import { classifyOrientation } from './layoutUtils';
 
-// Minimum aspect ratio to consider content as landscape
-const LANDSCAPE_AR_THRESHOLD = 1.5;
+/**
+ * Map content tags to ContentCategory
+ */
+function inferContentCategory(item: ExploreContentItem): ContentCategory | undefined {
+  // Check landscapeSuitable flag (scenic content)
+  if (item.landscapeSuitable) {
+    return 'scenic';
+  }
+  
+  // Could be extended to check tags, title keywords, etc.
+  return undefined;
+}
 
 /**
  * Convert ExploreContentItem (Watch/Discover) to UnifiedMediaItem
@@ -18,9 +29,12 @@ export function exploreItemToUnified(item: ExploreContentItem): UnifiedMediaItem
   const playbackUrl = uid ? generateHlsUrl(uid) : item.src;
   const thumbnailUrl = item.thumbnailSrc ?? (uid ? getStreamPoster(item.src, '0s', 720) : undefined);
   
-  // Determine landscape eligibility
+  // Compute aspect ratio
   const aspectRatio = item.aspectRatio ?? (item.width && item.height ? item.width / item.height : undefined);
-  const isNativeLandscape = aspectRatio ? aspectRatio >= LANDSCAPE_AR_THRESHOLD : false;
+  const orientation = classifyOrientation(aspectRatio);
+  
+  // Infer content category
+  const contentCategory = inferContentCategory(item);
   
   return {
     id: item.id,
@@ -30,14 +44,16 @@ export function exploreItemToUnified(item: ExploreContentItem): UnifiedMediaItem
     thumbnailUrl,
     playbackUrl: isVideo ? playbackUrl : undefined,
     
-    // Orientation
+    // Dimensions & orientation
+    mediaWidth: item.width,
+    mediaHeight: item.height,
     aspectRatio,
-    orientation: isNativeLandscape ? 'landscape' : 'portrait',
+    orientation,
     
     // Landscape eligibility flags
     isFeatured: item.isFeatured,
-    isScenic: item.landscapeSuitable,
-    isCinematic: false,
+    contentCategory,
+    golfCourseId: item.golfCourse?.id,
     
     // Display data
     durationSeconds: item.durationSeconds,
@@ -77,9 +93,9 @@ export function activityPostToUnified(post: ActivityPost, overallIndex: number):
     ? (primaryMedia.poster_url || getStreamPoster(primaryMedia.media_url, '1s') || primaryMedia.media_url)
     : primaryMedia.media_url;
 
-  // Determine orientation from aspect ratio
+  // Compute orientation from aspect ratio
   const aspectRatio = primaryMedia.aspect_ratio ?? undefined;
-  const isNativeLandscape = aspectRatio ? aspectRatio >= LANDSCAPE_AR_THRESHOLD : false;
+  const orientation = classifyOrientation(aspectRatio);
 
   return {
     id: primaryMedia.id,
@@ -89,14 +105,14 @@ export function activityPostToUnified(post: ActivityPost, overallIndex: number):
     thumbnailUrl,
     playbackUrl: isVideo ? playbackUrl : undefined,
     
-    // Orientation
+    // Dimensions & orientation
     aspectRatio,
-    orientation: isNativeLandscape ? 'landscape' : 'portrait',
+    orientation,
     
     // Landscape eligibility - can be enhanced with more metadata
     isFeatured: false,
-    isScenic: false,
-    isCinematic: false,
+    contentCategory: undefined,
+    golfCourseId: golfCourseTag?.entity_id,
     
     // Display data
     durationSeconds: primaryMedia.duration_seconds,

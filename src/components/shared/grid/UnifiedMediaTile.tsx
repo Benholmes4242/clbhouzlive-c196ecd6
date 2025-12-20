@@ -1,17 +1,19 @@
 import React, { useCallback, useRef, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { UnifiedMediaItem, UnifiedGridConfig, PORTRAIT_ASPECT_RATIO, LANDSCAPE_ASPECT_RATIO } from './types';
+import { UnifiedMediaItem, UnifiedGridConfig, GridSurface } from './types';
 import TileOverlay from './TileOverlay';
 import GridAutoplayVideo from '@/components/profile/activity/GridAutoplayVideo';
 import VideoOverlay from '@/components/profile/activity/VideoOverlay';
 import { Images, Trophy } from 'lucide-react';
 import { RegisterVideoFn } from '@/hooks/useGridAutoplay';
+import { motion } from 'framer-motion';
 
 interface UnifiedMediaTileProps {
   item: UnifiedMediaItem;
   config: UnifiedGridConfig;
   variant: 'portrait' | 'landscape';
-  onPress?: (item: UnifiedMediaItem) => void;
+  index: number;
+  onPress?: (item: UnifiedMediaItem, index: number) => void;
   onAuthorClick?: (authorId: string) => void;
   registerVideo?: RegisterVideoFn;
   isPlaying?: boolean;
@@ -19,15 +21,23 @@ interface UnifiedMediaTileProps {
 
 /**
  * Unified media tile component used by both Watch and Profile grids
+ * 
+ * Features:
  * - Portrait: 3:4 aspect ratio
  * - Landscape: 16:9, spans full width
  * - Configurable overlays (creator label, likes)
+ * - Press feedback animation (scale 0.98 on tap)
  * - Consistent styling and autoplay behavior
+ * 
+ * Tap behavior by surface:
+ * - Watch grid: Opens Shorts Fullscreen Player
+ * - Profile Activity: Opens standard Post Viewer
  */
 const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   item,
   config,
   variant,
+  index,
   onPress,
   onAuthorClick,
   registerVideo,
@@ -40,8 +50,8 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   );
   
   const handleClick = useCallback(() => {
-    onPress?.(item);
-  }, [item, onPress]);
+    onPress?.(item, index);
+  }, [item, index, onPress]);
 
   const handleAuthorClick = useCallback(() => {
     if (item.creator?.id) {
@@ -104,7 +114,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   const aspectClass = isLandscape ? 'aspect-[16/9]' : 'aspect-[3/4]';
 
   return (
-    <button
+    <motion.button
       type="button"
       className={cn(
         aspectClass,
@@ -112,6 +122,8 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
         isLandscape && "col-span-2"
       )}
       onClick={handleClick}
+      whileTap={{ scale: 0.98 }}
+      transition={{ duration: 0.1, ease: 'easeOut' }}
     >
       {/* Thumbnail - always visible as fallback */}
       <img
@@ -181,7 +193,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
         variant={variant}
         onAuthorClick={handleAuthorClick}
       />
-    </button>
+    </motion.button>
   );
 };
 
