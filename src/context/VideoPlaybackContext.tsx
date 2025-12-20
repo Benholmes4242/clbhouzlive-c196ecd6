@@ -34,12 +34,18 @@ export const VideoPlaybackProvider: React.FC<{ children: React.ReactNode }> = ({
   const location = useLocation();
   
   // Initialize from sessionStorage
+  // IMPORTANT: If we're on /video/ route on mount, force isMiniOpen=false to avoid mini under modal
   const [state, setState] = useState<PersistedState>(() => {
     if (typeof window === 'undefined') return { activeVideoId: null, isMiniOpen: false, miniMeta: null };
     try {
       const stored = sessionStorage.getItem(STORAGE_KEY);
       if (stored) {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored) as PersistedState;
+        // Don't restore mini-open state if we're already on video route (hard refresh scenario)
+        if (window.location.pathname.startsWith('/video/')) {
+          return { ...parsed, isMiniOpen: false };
+        }
+        return parsed;
       }
     } catch {
       // Ignore parse errors

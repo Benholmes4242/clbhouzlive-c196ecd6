@@ -259,21 +259,27 @@ export const MiniPlayer: React.FC = () => {
         {/* Thumbnail / mini video */}
         <div className="relative w-24 h-14 md:w-28 md:h-16 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
           {!loading && videoData?.hlsUrl ? (
-            <FlickerFreeHLSPlayer
-              ref={videoElRef as any}
-              hlsUrl={videoData.hlsUrl}
-              poster={videoData.posterUrl}
-              autoplay
-              playsInline
-              muted={false}
-              loop={false}
-              className="w-full h-full"
-              objectFit="cover"
-              onLoadedMetadata={handleLoadedMetadata}
-              onTimeUpdate={handleTimeUpdate}
-              onPlay={handlePlay}
-              onPause={handlePause}
-            />
+            <>
+              <FlickerFreeHLSPlayer
+                ref={videoElRef as any}
+                hlsUrl={videoData.hlsUrl}
+                poster={videoData.posterUrl}
+                autoplay
+                playsInline
+                muted={true}  // Muted in mini to avoid audio issues / iOS restrictions
+                loop={false}
+                className="w-full h-full"
+                objectFit="cover"
+                onLoadedMetadata={handleLoadedMetadata}
+                onTimeUpdate={handleTimeUpdate}
+                onPlay={handlePlay}
+                onPause={handlePause}
+              />
+              {/* Muted indicator */}
+              <div className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/60 rounded text-[10px] text-white/60">
+                🔇
+              </div>
+            </>
           ) : (
             <div className="w-full h-full animate-pulse bg-white/10" />
           )}
