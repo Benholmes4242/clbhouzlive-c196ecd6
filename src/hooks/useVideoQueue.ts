@@ -1,24 +1,44 @@
 import { useState, useCallback, useEffect } from 'react';
+import { toast } from 'sonner';
 
-const STORAGE_KEY = 'video_queue';
+const QUEUE_KEY = 'video_queue';
+const META_KEY = 'video_queue_meta';
+
+export interface QueueItemMeta {
+  title: string;
+  thumbnailUrl: string;
+  creatorName: string;
+  durationSeconds?: number;
+}
 
 /**
  * useVideoQueue - Manages a queue of videos for continuous playback
  * - Persists in sessionStorage (survives modal navigation, clears on tab close)
  * - queue: array of video IDs
+ * - queueMeta: metadata for each video (title, thumbnail, etc.)
  * - playNext: inserts video at front of queue
  * - enqueue: appends video to end of queue
- * - popNext: removes and returns next video from queue
+ * - popNext: removes next video from queue (use peekNext first)
  * - setQueueFromRelated: initializes queue from related videos (excludes current)
  */
 export function useVideoQueue() {
   const [queue, setQueue] = useState<string[]>(() => {
     if (typeof window === 'undefined') return [];
     try {
-      const stored = sessionStorage.getItem(STORAGE_KEY);
+      const stored = sessionStorage.getItem(QUEUE_KEY);
       return stored ? JSON.parse(stored) : [];
     } catch {
       return [];
+    }
+  });
+
+  const [queueMeta, setQueueMeta] = useState<Record<string, QueueItemMeta>>(() => {
+    if (typeof window === 'undefined') return {};
+    try {
+      const stored = sessionStorage.getItem(META_KEY);
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
     }
   });
 
@@ -26,39 +46,52 @@ export function useVideoQueue() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(queue));
+      sessionStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
     } catch {
       // Ignore storage errors
     }
   }, [queue]);
 
+  // Persist queue meta to sessionStorage whenever it changes
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      sessionStorage.setItem(META_KEY, JSON.stringify(queueMeta));
+    } catch {
+      // Ignore storage errors
+    }
+  }, [queueMeta]);
+
   // Insert video at front of queue (plays after current video)
-  const playNext = useCallback((videoId: string) => {
+  const playNext = useCallback((videoId: string, meta?: QueueItemMeta) => {
     setQueue((prev) => {
-      // Remove if already in queue to avoid duplicates
       const filtered = prev.filter((id) => id !== videoId);
       return [videoId, ...filtered];
     });
+    if (meta) {
+      setQueueMeta((prev) => ({ ...prev, [videoId]: meta }));
+    }
+    toast.success('Playing next');
   }, []);
 
   // Append video to end of queue
-  const enqueue = useCallback((videoId: string) => {
+  const enqueue = useCallback((videoId: string, meta?: QueueItemMeta) => {
     setQueue((prev) => {
-      // Don't add if already in queue
-      if (prev.includes(videoId)) return prev;
+      if (prev.includes(videoId)) {
+        toast.info('Already in queue');
+        return prev;
+      }
       return [...prev, videoId];
     });
+    if (meta) {
+      setQueueMeta((prev) => ({ ...prev, [videoId]: meta }));
+    }
+    toast.success('Added to queue');
   }, []);
 
-  // Remove and return the next video ID from queue
-  const popNext = useCallback((): string | null => {
-    let nextId: string | null = null;
-    setQueue((prev) => {
-      if (prev.length === 0) return prev;
-      nextId = prev[0];
-      return prev.slice(1);
-    });
-    return nextId;
+  // Remove the next video from queue (use peekNext first to get the ID)
+  const popNext = useCallback(() => {
+    setQueue((prev) => prev.slice(1));
   }, []);
 
   // Peek at next video without removing
@@ -66,9 +99,22 @@ export function useVideoQueue() {
     return queue.length > 0 ? queue[0] : null;
   }, [queue]);
 
+  // Get metadata for a video ID
+  const getMeta = useCallback((videoId: string): QueueItemMeta | null => {
+    return queueMeta[videoId] || null;
+  }, [queueMeta]);
+
   // Initialize queue from related videos (excludes current video)
-  const setQueueFromRelated = useCallback((relatedIds: string[], currentVideoId?: string) => {
+  // Only call this when queue is empty to avoid overwriting user additions
+  const setQueueFromRelated = useCallback((
+    relatedIds: string[], 
+    currentVideoId?: string,
+    metaMap?: Record<string, QueueItemMeta>
+  ) => {
     setQueue(relatedIds.filter((id) => id !== currentVideoId));
+    if (metaMap) {
+      setQueueMeta((prev) => ({ ...prev, ...metaMap }));
+    }
   }, []);
 
   // Remove a specific video from queue
@@ -79,14 +125,17 @@ export function useVideoQueue() {
   // Clear the entire queue
   const clearQueue = useCallback(() => {
     setQueue([]);
+    setQueueMeta({});
   }, []);
 
   return {
     queue,
+    queueMeta,
     playNext,
     enqueue,
     popNext,
     peekNext,
+    getMeta,
     setQueueFromRelated,
     removeFromQueue,
     clearQueue,

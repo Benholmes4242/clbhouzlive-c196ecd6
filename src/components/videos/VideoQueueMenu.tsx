@@ -6,13 +6,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { toast } from 'sonner';
+import type { QueueItemMeta } from '@/hooks/useVideoQueue';
 
 interface VideoQueueMenuProps {
   videoId: string;
   videoTitle: string;
-  onPlayNext: (videoId: string) => void;
-  onEnqueue: (videoId: string) => void;
+  thumbnailUrl?: string;
+  creatorName?: string;
+  durationSeconds?: number;
+  onPlayNext: (videoId: string, meta?: QueueItemMeta) => void;
+  onEnqueue: (videoId: string, meta?: QueueItemMeta) => void;
   className?: string;
 }
 
@@ -24,20 +27,28 @@ interface VideoQueueMenuProps {
 export const VideoQueueMenu: React.FC<VideoQueueMenuProps> = ({
   videoId,
   videoTitle,
+  thumbnailUrl,
+  creatorName,
+  durationSeconds,
   onPlayNext,
   onEnqueue,
   className,
 }) => {
+  const meta: QueueItemMeta | undefined = thumbnailUrl && creatorName ? {
+    title: videoTitle,
+    thumbnailUrl,
+    creatorName,
+    durationSeconds,
+  } : undefined;
+
   const handlePlayNext = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onPlayNext(videoId);
-    toast.success('Added to play next');
+    onPlayNext(videoId, meta);
   };
 
   const handleEnqueue = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onEnqueue(videoId);
-    toast.success('Added to queue');
+    onEnqueue(videoId, meta);
   };
 
   return (

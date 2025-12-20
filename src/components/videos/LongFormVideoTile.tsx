@@ -2,6 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { Play, Flame } from 'lucide-react';
 import { VideoQueueMenu } from './VideoQueueMenu';
+import type { QueueItemMeta } from '@/hooks/useVideoQueue';
 
 export interface LongFormVideo {
   id: string;
@@ -23,8 +24,8 @@ interface LongFormVideoTileProps {
   video: LongFormVideo;
   onVideoClick?: (id: string) => void;
   onCreatorClick?: (creatorUserId: string) => void;
-  onPlayNext?: (id: string) => void;
-  onEnqueue?: (id: string) => void;
+  onPlayNext?: (id: string, meta?: QueueItemMeta) => void;
+  onEnqueue?: (id: string, meta?: QueueItemMeta) => void;
   className?: string;
 }
 
@@ -109,6 +110,9 @@ export const LongFormVideoTile: React.FC<LongFormVideoTileProps> = ({
           <VideoQueueMenu
             videoId={video.id}
             videoTitle={video.title}
+            thumbnailUrl={video.thumbnailUrl}
+            creatorName={video.creatorName}
+            durationSeconds={video.durationSeconds}
             onPlayNext={onPlayNext || (() => {})}
             onEnqueue={onEnqueue || (() => {})}
             className="absolute top-2 right-2"

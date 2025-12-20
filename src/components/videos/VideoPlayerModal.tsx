@@ -81,7 +81,7 @@ export const VideoPlayerModal: React.FC = () => {
   const { autoplayEnabled, setAutoplayEnabled } = useAutoplayPreference();
   
   // Video queue for continuous playback
-  const { queue, playNext, enqueue, popNext, peekNext, setQueueFromRelated } = useVideoQueue();
+  const { queue, queueMeta, playNext, enqueue, popNext, peekNext, getMeta, setQueueFromRelated, queueLength } = useVideoQueue();
   
   // Mark user interaction (resets autoplay eligibility timer)
   const markInteraction = useCallback(() => {
@@ -106,12 +106,25 @@ export const VideoPlayerModal: React.FC = () => {
     }
   );
   
-  // Initialize queue from related videos when they load
+  // Initialize queue from related videos ONLY when queue is empty (Fix 2: don't overwrite user queue)
   useEffect(() => {
-    if (relatedVideos.length > 0 && videoId) {
-      setQueueFromRelated(relatedVideos.map(v => v.id), videoId);
-    }
-  }, [relatedVideos, videoId, setQueueFromRelated]);
+    if (!videoId) return;
+    if (queue.length > 0) return; // Don't overwrite existing queue
+    if (relatedVideos.length === 0) return;
+    
+    // Build meta map for related videos
+    const metaMap: Record<string, { title: string; thumbnailUrl: string; creatorName: string; durationSeconds?: number }> = {};
+    relatedVideos.forEach(v => {
+      metaMap[v.id] = {
+        title: v.title,
+        thumbnailUrl: v.thumbnailUrl,
+        creatorName: v.creatorName,
+        durationSeconds: v.durationSeconds,
+      };
+    });
+    
+    setQueueFromRelated(relatedVideos.map(v => v.id), videoId, metaMap);
+  }, [videoId, relatedVideos, queue.length, setQueueFromRelated]);
   
   // Helper to clear up next timers
   const clearUpNextTimers = useCallback(() => {
@@ -317,13 +330,28 @@ export const VideoPlayerModal: React.FC = () => {
   }, [navigate, location.state?.backgroundLocation, flushProgress]);
   
   // Get next video from queue (or fall back to upNextVideo)
+  // Uses queueMeta to show correct info even if video isn't in relatedVideos
   const nextQueuedVideo = useMemo(() => {
     const nextId = peekNext();
     if (nextId) {
-      return relatedVideos.find(v => v.id === nextId) || upNextVideo;
+      // First check if it's in related videos
+      const fromRelated = relatedVideos.find(v => v.id === nextId);
+      if (fromRelated) return fromRelated;
+      
+      // Fall back to queueMeta (for videos added from feed/elsewhere)
+      const meta = getMeta(nextId);
+      if (meta) {
+        return {
+          id: nextId,
+          title: meta.title,
+          thumbnailUrl: meta.thumbnailUrl,
+          creatorName: meta.creatorName,
+          durationSeconds: meta.durationSeconds,
+        };
+      }
     }
     return upNextVideo;
-  }, [peekNext, relatedVideos, upNextVideo]);
+  }, [peekNext, relatedVideos, upNextVideo, getMeta]);
   
   // Start up next countdown - uses queue
   const startUpNextCountdown = useCallback(() => {
@@ -745,9 +773,14 @@ export const VideoPlayerModal: React.FC = () => {
             <div className="lg:hidden px-4 pb-6">
               {!relatedLoading && upNextVideo && (
                 <div className="space-y-3">
-                  {/* Autoplay toggle + Up next header */}
+                  {/* Autoplay toggle + Up next header + Queue count */}
                   <div className="flex items-center justify-between">
-                    <h3 className="text-white/80 font-medium text-sm">Up next</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-white/80 font-medium text-sm">Up next</h3>
+                      {queueLength > 0 && (
+                        <span className="text-white/40 text-xs">· Queue: {queueLength}</span>
+                      )}
+                    </div>
                     <label 
                       className="flex items-center gap-2 cursor-pointer"
                       onClick={(e) => e.stopPropagation()}
@@ -807,9 +840,14 @@ export const VideoPlayerModal: React.FC = () => {
                 {/* Up Next - primary tile */}
                 {upNextVideo && (
                   <>
-                    {/* Autoplay toggle + Up next header */}
+                    {/* Autoplay toggle + Up next header + Queue count */}
                     <div className="flex items-center justify-between">
-                      <h3 className="text-white/80 font-medium text-sm">Up next</h3>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-white/80 font-medium text-sm">Up next</h3>
+                        {queueLength > 0 && (
+                          <span className="text-white/40 text-xs">· Queue: {queueLength}</span>
+                        )}
+                      </div>
                       <label 
                         className="flex items-center gap-2 cursor-pointer"
                         onClick={(e) => e.stopPropagation()}
@@ -861,14 +899,16 @@ interface UpNextTileProps {
     creatorAvatarUrl?: string;
     thumbnailUrl: string;
     duration: string;
+    durationSeconds?: number;
     views?: number;
   };
   onClick: () => void;
-  onPlayNext?: (id: string) => void;
-  onEnqueue?: (id: string) => void;
+  onPlayNext?: (id: string, meta?: { title: string; thumbnailUrl: string; creatorName: string; durationSeconds?: number }) => void;
+  onEnqueue?: (id: string, meta?: { title: string; thumbnailUrl: string; creatorName: string; durationSeconds?: number }) => void;
 }
 
 const UpNextTile: React.FC<UpNextTileProps> = ({ video, onClick, onPlayNext, onEnqueue }) => {
+  const meta = { title: video.title, thumbnailUrl: video.thumbnailUrl, creatorName: video.creatorName, durationSeconds: video.durationSeconds };
   return (
     <div 
       className="group cursor-pointer rounded-lg overflow-hidden bg-white/5 hover:bg-white/10 transition-colors"
@@ -913,14 +953,14 @@ const UpNextTile: React.FC<UpNextTileProps> = ({ video, onClick, onPlayNext, onE
               onClick={(e) => e.stopPropagation()}
             >
               <DropdownMenuItem
-                onClick={(e) => { e.stopPropagation(); onPlayNext?.(video.id); toast.success('Added to play next'); }}
+                onClick={(e) => { e.stopPropagation(); onPlayNext?.(video.id, meta); }}
                 className="flex items-center gap-2 cursor-pointer hover:bg-white/10 focus:bg-white/10"
               >
                 <PlayCircle className="h-4 w-4" />
                 <span>Play next</span>
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={(e) => { e.stopPropagation(); onEnqueue?.(video.id); toast.success('Added to queue'); }}
+                onClick={(e) => { e.stopPropagation(); onEnqueue?.(video.id, meta); }}
                 className="flex items-center gap-2 cursor-pointer hover:bg-white/10 focus:bg-white/10"
               >
                 <ListPlus className="h-4 w-4" />
@@ -963,14 +1003,17 @@ interface RecommendedTileProps {
     creatorName: string;
     thumbnailUrl: string;
     duration: string;
+    durationSeconds?: number;
     views?: number;
   };
   onClick: () => void;
-  onPlayNext?: (id: string) => void;
-  onEnqueue?: (id: string) => void;
+  onPlayNext?: (id: string, meta?: { title: string; thumbnailUrl: string; creatorName: string; durationSeconds?: number }) => void;
+  onEnqueue?: (id: string, meta?: { title: string; thumbnailUrl: string; creatorName: string; durationSeconds?: number }) => void;
 }
 
 const RecommendedTile: React.FC<RecommendedTileProps> = ({ video, onClick, onPlayNext, onEnqueue }) => {
+  const meta = { title: video.title, thumbnailUrl: video.thumbnailUrl, creatorName: video.creatorName, durationSeconds: video.durationSeconds };
+  
   const formatViews = (views: number): string => {
     if (views >= 1000000) return `${(views / 1000000).toFixed(1)}M`;
     if (views >= 1000) return `${(views / 1000).toFixed(1)}K`;
@@ -1015,14 +1058,14 @@ const RecommendedTile: React.FC<RecommendedTileProps> = ({ video, onClick, onPla
               onClick={(e) => e.stopPropagation()}
             >
               <DropdownMenuItem
-                onClick={(e) => { e.stopPropagation(); onPlayNext?.(video.id); toast.success('Added to play next'); }}
+                onClick={(e) => { e.stopPropagation(); onPlayNext?.(video.id, meta); }}
                 className="flex items-center gap-2 cursor-pointer hover:bg-white/10 focus:bg-white/10"
               >
                 <PlayCircle className="h-4 w-4" />
                 <span>Play next</span>
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={(e) => { e.stopPropagation(); onEnqueue?.(video.id); toast.success('Added to queue'); }}
+                onClick={(e) => { e.stopPropagation(); onEnqueue?.(video.id, meta); }}
                 className="flex items-center gap-2 cursor-pointer hover:bg-white/10 focus:bg-white/10"
               >
                 <ListPlus className="h-4 w-4" />
