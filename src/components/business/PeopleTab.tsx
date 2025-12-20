@@ -168,7 +168,7 @@ export function PeopleTab({
       {/* Team list */}
       {!isLoading && activeSubTab === 'team' && (
         sortedTeamMembers.length > 0 ? (
-          <div className="flex flex-col gap-3 mt-3">
+          <div className="flex flex-col gap-3">
             {sortedTeamMembers.map((member) => {
               const profile = member.profile;
               if (!profile) return null;
@@ -204,7 +204,7 @@ export function PeopleTab({
       {/* Members list - only for Golf Clubs */}
       {!isLoading && activeSubTab === 'members' && isGolfClub && (
         sortedClubMembers.length > 0 ? (
-          <div className="flex flex-col gap-3 mt-3">
+          <div className="flex flex-col gap-3">
             {sortedClubMembers.map((member) => (
               <PersonRow
                 key={member.id}
