@@ -55,7 +55,7 @@ const MyBusinessesPage = () => {
       </header>
 
       <main 
-        className="mx-auto max-w-xl -mx-0 px-0"
+        className="w-full"
         style={{
           background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)',
           minHeight: 'calc(100vh - 120px)',
