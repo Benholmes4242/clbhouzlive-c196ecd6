@@ -11,6 +11,7 @@ import VideoSearchOverlay from '@/components/videos/VideoSearchOverlay';
 import SlidingPanels from '@/components/ui/SlidingPanels';
 import { useVideoLengthFilter } from '@/hooks/useVideoLengthFilter';
 import { DURATION_FILTERS } from '@/constants/videoFilters';
+import { ContinueWatchingSection } from '@/components/videos/ContinueWatchingSection';
 
 // import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned'; // Stored for future use
 import DiscoverContent from '@/components/discover/DiscoverContent';
@@ -265,6 +266,11 @@ const Discover = () => {
                 // 'shorts' uses DiscoverContent
                 return (
                   <div className="md:container md:mx-auto md:px-0">
+                    {/* Continue Watching section at top of Shorts/Discover */}
+                    <ContinueWatchingSection
+                      onVideoClick={(id) => navigate(`/video/${id}`)}
+                      className="mb-6 mt-2"
+                    />
                     <DiscoverContent
                       onLike={handleLike}
                       onFollow={handleFollow}
