@@ -21,23 +21,6 @@ interface PeopleTabProps {
 
 type SubTab = 'members' | 'team';
 
-// ========== MOCK DATA FLAG - Set to false to disable mock team members ==========
-const SHOW_MOCK_TEAM_MEMBERS = true;
-
-const MOCK_TEAM_MEMBERS: TeamMember[] = [
-  { id: 'mock-1', role: 'admin', created_at: '2024-01-01', profile: { id: 'mock-1', display_name: 'Sarah Mitchell', username: 'sarahmitchell', profile_photo_url: null, is_verified_golfer: true } },
-  { id: 'mock-2', role: 'coach', created_at: '2024-01-02', profile: { id: 'mock-2', display_name: 'James Chen', username: 'jameschen', profile_photo_url: null, is_verified_golfer: true } },
-  { id: 'mock-3', role: 'staff', created_at: '2024-01-03', profile: { id: 'mock-3', display_name: 'Emma Thompson', username: 'emmathompson', profile_photo_url: null, is_verified_golfer: false } },
-  { id: 'mock-4', role: 'coach', created_at: '2024-01-04', profile: { id: 'mock-4', display_name: 'Michael Brooks', username: 'michaelbrooks', profile_photo_url: null, is_verified_golfer: true } },
-  { id: 'mock-5', role: 'staff', created_at: '2024-01-05', profile: { id: 'mock-5', display_name: 'Olivia Parker', username: 'oliviaparker', profile_photo_url: null, is_verified_golfer: false } },
-  { id: 'mock-6', role: 'director', created_at: '2024-01-06', profile: { id: 'mock-6', display_name: 'William Foster', username: 'williamfoster', profile_photo_url: null, is_verified_golfer: true } },
-  { id: 'mock-7', role: 'staff', created_at: '2024-01-07', profile: { id: 'mock-7', display_name: 'Sophie Adams', username: 'sophieadams', profile_photo_url: null, is_verified_golfer: false } },
-  { id: 'mock-8', role: 'coach', created_at: '2024-01-08', profile: { id: 'mock-8', display_name: 'Daniel Wright', username: 'danielwright', profile_photo_url: null, is_verified_golfer: true } },
-  { id: 'mock-9', role: 'staff', created_at: '2024-01-09', profile: { id: 'mock-9', display_name: 'Isabella Scott', username: 'isabellascott', profile_photo_url: null, is_verified_golfer: false } },
-  { id: 'mock-10', role: 'staff', created_at: '2024-01-10', profile: { id: 'mock-10', display_name: 'Alexander Hughes', username: 'alexanderhughes', profile_photo_url: null, is_verified_golfer: true } },
-];
-// ================================================================================
-
 export function PeopleTab({ 
   businessId, 
   businessName, 
@@ -52,14 +35,6 @@ export function PeopleTab({
   
   const { data: teamMembers = [], isLoading: teamLoading } = useBusinessTeamMembers(businessId);
   const { data: clubMembers = [], isLoading: membersLoading } = useBusinessClubMembers(businessId);
-
-  // Combine real team members with mock data if flag is enabled
-  const allTeamMembers = useMemo(() => {
-    if (SHOW_MOCK_TEAM_MEMBERS) {
-      return [...teamMembers, ...MOCK_TEAM_MEMBERS];
-    }
-    return teamMembers;
-  }, [teamMembers]);
 
   // Default to Members for golf clubs, Team for others
   const [activeSubTab, setActiveSubTab] = useState<SubTab>(isGolfClub ? 'members' : 'team');
@@ -91,7 +66,7 @@ export function PeopleTab({
       staff: 6,
       team: 7,
     };
-    return [...allTeamMembers].sort((a, b) => {
+    return [...teamMembers].sort((a, b) => {
       const orderA = roleOrder[a.role] ?? 10;
       const orderB = roleOrder[b.role] ?? 10;
       if (orderA !== orderB) return orderA - orderB;
@@ -100,7 +75,7 @@ export function PeopleTab({
       const nameB = b.profile?.display_name || b.profile?.username || '';
       return nameA.localeCompare(nameB);
     });
-  }, [allTeamMembers]);
+  }, [teamMembers]);
 
   // Sort club members: verified first, then by name
   const sortedClubMembers = useMemo(() => {
@@ -120,10 +95,10 @@ export function PeopleTab({
   const tabs = isGolfClub
     ? [
         { id: 'members', label: 'Members', count: clubMembers.length },
-        { id: 'team', label: 'Team', count: allTeamMembers.length },
+        { id: 'team', label: 'Team', count: teamMembers.length },
       ]
     : [
-        { id: 'team', label: 'Team', count: allTeamMembers.length },
+        { id: 'team', label: 'Team', count: teamMembers.length },
       ];
 
   return (
