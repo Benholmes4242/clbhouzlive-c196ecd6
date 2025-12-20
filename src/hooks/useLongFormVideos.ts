@@ -10,7 +10,7 @@ interface UseLongFormVideosOptions {
   creatorUserId?: string; // Filter to specific creator's videos
   sort?: 'latest' | 'popular'; // Sort order for creator page
   searchQuery?: string; // Search term for videos search
-  category?: string; // Category filter (maps to video_category tag)
+  category?: string; // Category filter slug (maps to video_category tag slug)
 }
 
 interface UseLongFormVideosResult {
@@ -27,6 +27,11 @@ interface UseLongFormVideosResult {
  * - media_type = 'video'
  * - duration_seconds >= 180
  * - duration_seconds IS NOT NULL
+ * 
+ * SERVER-SIDE FILTERING:
+ * - Category filtering via post_tags -> taggable_entities (entity_type='video_category', slug=category)
+ * - Search filtering via posts.content ilike
+ * - Courses section filtering via post_tags -> taggable_entities (entity_type='golf_club')
  */
 export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLongFormVideosResult => {
   const { 
@@ -59,7 +64,55 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
     setError(null);
 
     try {
+      // Determine if we need category or courses filtering (requires subquery approach)
+      const needsCategoryFilter = category && category !== 'all';
+      const needsCoursesFilter = section === 'courses' && !creatorUserId && !searchQuery;
+
+      // If category or courses filter is needed, get matching post IDs first
+      let filteredPostIds: string[] | null = null;
+
+      if (needsCategoryFilter) {
+        // Get post IDs that have the matching video_category tag
+        const { data: taggedPosts, error: tagError } = await supabase
+          .from('post_tags')
+          .select(`
+            post_id,
+            taggable_entities!inner(entity_type, slug)
+          `)
+          .eq('taggable_entities.entity_type', 'video_category')
+          .eq('taggable_entities.slug', category);
+
+        if (tagError) throw tagError;
+        filteredPostIds = taggedPosts?.map(t => t.post_id) || [];
+        
+        // If no posts match the category, return empty
+        if (filteredPostIds.length === 0) {
+          setVideos([]);
+          setIsLoading(false);
+          return;
+        }
+      } else if (needsCoursesFilter) {
+        // Get post IDs that have a golf_club tag
+        const { data: courseTaggedPosts, error: courseTagError } = await supabase
+          .from('post_tags')
+          .select(`
+            post_id,
+            taggable_entities!inner(entity_type)
+          `)
+          .eq('taggable_entities.entity_type', 'golf_club');
+
+        if (courseTagError) throw courseTagError;
+        filteredPostIds = courseTaggedPosts?.map(t => t.post_id) || [];
+        
+        if (filteredPostIds.length === 0) {
+          setVideos([]);
+          setIsLoading(false);
+          return;
+        }
+      }
+
       // Base query: get posts with video media that are long-form
+      // Select only fields needed by tiles
       let query = supabase
         .from('posts')
         .select(`
@@ -68,17 +121,12 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
           created_at,
           user_id,
           post_media!inner(
-            id,
-            media_type,
             media_url,
             duration_seconds,
             poster_url
           ),
           post_tags(
-            id,
-            tagged_entity_id,
             taggable_entities(
-              id,
               entity_type,
               entity_id,
               name
@@ -99,23 +147,19 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
         .gte('post_media.duration_seconds', VIDEO_DURATION_THRESHOLD_SECONDS)
         .not('post_media.duration_seconds', 'is', null);
 
+      // Apply category/courses filter if we have filtered post IDs
+      if (filteredPostIds !== null) {
+        query = query.in('id', filteredPostIds);
+      }
+
       // If fetching for a specific creator (Creator Page)
       if (creatorUserId) {
         query = query.eq('user_id', creatorUserId);
       }
 
-      // Apply search filter if provided
+      // Apply search filter server-side
       if (searchQuery && searchQuery.trim()) {
-        // Search in post content (title is first line, plus caption)
         query = query.ilike('content', `%${searchQuery.trim()}%`);
-      }
-
-      // Apply sorting
-      if (sort === 'popular') {
-        // Order by views/likes - we'll sort client-side since Supabase can't sort by joined table
-        query = query.order('created_at', { ascending: false });
-      } else {
-        query = query.order('created_at', { ascending: false });
       }
 
       // Apply section-specific filters for Videos tab (only if not creator-specific)
@@ -139,74 +183,46 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
               return;
             }
             break;
-            
-          case 'courses':
-            // Videos that have a golf course/club tag - filtered post-query
-            break;
         }
       }
 
-      query = query.limit(limit);
+      // Apply sorting and limit
+      query = query.order('created_at', { ascending: false }).limit(limit);
 
       const { data, error: queryError } = await query;
 
       if (queryError) throw queryError;
 
-      // Transform to LongFormVideo format
-      const transformedVideos: LongFormVideo[] = (data || [])
-        .filter(post => {
-          // For courses section, filter to posts that have golf_club entity tags
-          if (section === 'courses') {
-            const hasGolfTag = post.post_tags?.some(
-              (tag: any) => tag.taggable_entities?.entity_type === 'golf_club'
-            );
-            if (!hasGolfTag) return false;
-          }
+      // Transform to LongFormVideo format (no client-side filtering needed)
+      const transformedVideos: LongFormVideo[] = (data || []).map((post: any) => {
+        const media = post.post_media?.[0];
+        const user = post.user_profiles;
+        const stats = post.post_stats?.[0];
+        
+        // Find golf course tag if present (for display purposes)
+        const golfTag = post.post_tags?.find(
+          (tag: any) => tag.taggable_entities?.entity_type === 'golf_club'
+        );
 
-          // If category filter is provided, filter to posts with matching video_category tag
-          if (category) {
-            const categorySlug = category.toLowerCase().replace(/[^a-z0-9]/g, '');
-            const hasCategoryTag = post.post_tags?.some((tag: any) => {
-              const tagEntity = tag.taggable_entities;
-              if (tagEntity?.entity_type !== 'video_category') return false;
-              // Match by name (case-insensitive, normalized)
-              const tagSlug = (tagEntity.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-              return tagSlug === categorySlug || tagSlug.includes(categorySlug) || categorySlug.includes(tagSlug);
-            });
-            if (!hasCategoryTag) return false;
-          }
+        // Calculate if trending (for trending section)
+        const isTrending = section === 'trending';
 
-          return true;
-        })
-        .map((post: any) => {
-          const media = post.post_media?.[0];
-          const user = post.user_profiles;
-          const stats = post.post_stats?.[0];
-          
-          // Find golf course tag if present
-          const golfTag = post.post_tags?.find(
-            (tag: any) => tag.taggable_entities?.entity_type === 'golf_club'
-          );
-
-          // Calculate if trending (for trending section)
-          const isTrending = section === 'trending';
-
-          return {
-            id: post.id,
-            title: post.content?.split('\n')[0]?.substring(0, 100) || 'Untitled Video',
-            creatorUserId: post.user_id,
-            creatorName: user?.display_name || user?.username || 'Unknown',
-            creatorAvatarUrl: user?.profile_photo_url,
-            thumbnailUrl: media?.poster_url || '',
-            duration: formatDuration(media?.duration_seconds || 0),
-            durationSeconds: media?.duration_seconds || 0,
-            views: stats?.views_count || 0,
-            createdAt: post.created_at,
-            golfCourseId: golfTag?.taggable_entities?.entity_id,
-            golfCourseName: golfTag?.taggable_entities?.name,
-            isTrending,
-          };
-        });
+        return {
+          id: post.id,
+          title: post.content?.split('\n')[0]?.substring(0, 100) || 'Untitled Video',
+          creatorUserId: post.user_id,
+          creatorName: user?.display_name || user?.username || 'Unknown',
+          creatorAvatarUrl: user?.profile_photo_url,
+          thumbnailUrl: media?.poster_url || '',
+          duration: formatDuration(media?.duration_seconds || 0),
+          durationSeconds: media?.duration_seconds || 0,
+          views: stats?.views_count || 0,
+          createdAt: post.created_at,
+          golfCourseId: golfTag?.taggable_entities?.entity_id,
+          golfCourseName: golfTag?.taggable_entities?.name,
+          isTrending,
+        };
+      });
 
       // Client-side sort by popularity (views) if requested
       if (sort === 'popular') {

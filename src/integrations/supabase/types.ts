@@ -4793,6 +4793,7 @@ export type Database = {
           id: string
           name: string
           profile_image_url: string | null
+          slug: string | null
           updated_at: string
           username: string | null
         }
@@ -4803,6 +4804,7 @@ export type Database = {
           id?: string
           name: string
           profile_image_url?: string | null
+          slug?: string | null
           updated_at?: string
           username?: string | null
         }
@@ -4813,6 +4815,7 @@ export type Database = {
           id?: string
           name?: string
           profile_image_url?: string | null
+          slug?: string | null
           updated_at?: string
           username?: string | null
         }
