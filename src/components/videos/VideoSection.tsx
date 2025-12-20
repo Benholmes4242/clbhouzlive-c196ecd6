@@ -9,7 +9,7 @@ interface VideoSectionProps {
   videos: LongFormVideo[];
   onViewAll?: () => void;
   onVideoClick?: (id: string) => void;
-  onCreatorClick?: (creatorId: string) => void;
+  onCreatorClick?: (creatorUserId: string) => void;
   showViewAll?: boolean;
   emptyState?: React.ReactNode;
   className?: string;
