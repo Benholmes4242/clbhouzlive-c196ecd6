@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
 import { useContinueWatching } from '@/hooks/useContinueWatching';
@@ -19,6 +19,7 @@ export const ContinueWatchingSection: React.FC<ContinueWatchingSectionProps> = (
   className,
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { videos, isLoading } = useContinueWatching(6);
 
   const handleCreatorClick = (creatorUserId: string) => {
