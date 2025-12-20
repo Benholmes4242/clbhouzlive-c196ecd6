@@ -22,6 +22,7 @@ import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { usePresenceTracker } from '@/hooks/usePresenceTracker';
 import { useLocationBroadcast } from '@/features/nearby/hooks/useLocationBroadcast';
 import { TopTenProvider } from '@/context/TopTenContext';
+import { VideoPlaybackProvider } from '@/context/VideoPlaybackContext';
 import { ActiveActorProvider } from '@/context/ActiveActorContext';
 import { Top100DebugProvider } from '@/context/Top100DebugContext';
 import { UIProvider } from '@/contexts/UIContext';
@@ -169,6 +170,7 @@ const VideosPage = lazy(() => import("./features/videos2/pages/VideosPage"));
 const CreatorPage = lazy(() => import("./pages/CreatorPage"));
 // Video Player Modal (Phase 6A-1)
 const VideoPlayerModal = lazy(() => import("./components/videos/VideoPlayerModal"));
+const MiniPlayer = lazy(() => import("./components/videos/MiniPlayer"));
 const SeasonShop = lazy(() => import("./pages/SeasonShop"));
 const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 const BusinessDirectoryPage = lazy(() => import("./pages/BusinessDirectoryPage"));
@@ -577,18 +579,24 @@ const AppInner: React.FC = () => {
                           <VideoManagerProvider>
                             <VideoPlaybackManagerProvider>
                               <TopTenProvider>
-                                <ErrorBoundary>
-                                  <AuthWrapper>
-                                    <SeasonWrapModal />
-                                    <AchievementToastWrapper />
-                                    <Suspense fallback={null}>
-                                      <div className="app-depth">
-                                        {/* No global header - each page renders its own ClubhouseHeaderNew */}
-                                        <AppRoutes />
-                                      </div>
-                                    </Suspense>
-                                  </AuthWrapper>
-                                </ErrorBoundary>
+                                <VideoPlaybackProvider>
+                                  <ErrorBoundary>
+                                    <AuthWrapper>
+                                      <SeasonWrapModal />
+                                      <AchievementToastWrapper />
+                                      <Suspense fallback={null}>
+                                        <div className="app-depth">
+                                          {/* No global header - each page renders its own ClubhouseHeaderNew */}
+                                          <AppRoutes />
+                                        </div>
+                                      </Suspense>
+                                      {/* Mini Player - persists across navigation */}
+                                      <Suspense fallback={null}>
+                                        <MiniPlayer />
+                                      </Suspense>
+                                    </AuthWrapper>
+                                  </ErrorBoundary>
+                                </VideoPlaybackProvider>
                               </TopTenProvider>
                             </VideoPlaybackManagerProvider>
                           </VideoManagerProvider>
