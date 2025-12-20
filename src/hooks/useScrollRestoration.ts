@@ -15,10 +15,12 @@ export function useScrollRestoration(routeKey: string) {
     const savedPosition = sessionStorage.getItem(storageKey);
     if (savedPosition) {
       const position = parseInt(savedPosition, 10);
-      // Delay to let content render
+      // Double RAF to wait for layout to settle (prevents jump on image-heavy pages)
       requestAnimationFrame(() => {
-        window.scrollTo(0, position);
-        restoredRef.current = true;
+        requestAnimationFrame(() => {
+          window.scrollTo(0, position);
+          restoredRef.current = true;
+        });
       });
     }
   }, [storageKey]);

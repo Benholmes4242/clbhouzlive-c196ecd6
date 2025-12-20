@@ -197,14 +197,20 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
       }
 
       // Apply base ordering (we'll re-sort by score client-side for trending/popular)
-      query = query.order('created_at', { ascending: false }).limit(limit * 3); // Over-fetch for score sorting
+      // Only over-fetch when score sorting is needed
+      const needsScoreSort = section === 'trending' || sort === 'popular';
+      const fetchLimit = needsScoreSort ? limit * 3 : limit;
+      query = query.order('created_at', { ascending: false }).limit(fetchLimit);
 
       const { data, error: queryError } = await query;
 
       if (queryError) throw queryError;
 
       // Transform to LongFormVideo format with score calculation
-      let transformedVideos: LongFormVideo[] = (data || []).map((post: any) => {
+      // Use typed intermediate structure for cleaner score sorting
+      type VideoWithScore = { video: LongFormVideo; score: number };
+      
+      const videosWithScores: VideoWithScore[] = (data || []).map((post: any) => {
         const media = post.post_media?.[0];
         const user = post.user_profiles;
         const stats = post.post_stats?.[0];
@@ -218,7 +224,7 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
         const likes = stats?.likes_count || 0;
         const score = calculateScore(views, likes);
 
-        return {
+        const video: LongFormVideo = {
           id: post.id,
           title: post.content?.split('\n')[0]?.substring(0, 100) || 'Untitled Video',
           creatorUserId: post.user_id,
@@ -232,33 +238,26 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
           golfCourseId: golfTag?.taggable_entities?.entity_id,
           golfCourseName: golfTag?.taggable_entities?.name,
           isTrending: section === 'trending',
-          // Internal score for sorting (not exposed in type but used here)
-          _score: score,
-        } as LongFormVideo & { _score: number };
+        };
+
+        return { video, score };
       });
 
       // Apply score-based sorting for trending and popular sections
+      let sortedVideos = videosWithScores;
       if (section === 'trending' || sort === 'popular') {
         // Sort by engagement score descending, tie-break by created_at descending
-        transformedVideos.sort((a, b) => {
-          const aScore = (a as any)._score || 0;
-          const bScore = (b as any)._score || 0;
-          if (bScore !== aScore) return bScore - aScore;
+        sortedVideos = [...videosWithScores].sort((a, b) => {
+          if (b.score !== a.score) return b.score - a.score;
           // Tie-break by created_at
-          return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+          return new Date(b.video.createdAt || 0).getTime() - new Date(a.video.createdAt || 0).getTime();
         });
       }
 
-      // Trim to requested limit after sorting
-      transformedVideos = transformedVideos.slice(0, limit);
+      // Trim to requested limit and extract videos
+      const finalVideos = sortedVideos.slice(0, limit).map(v => v.video);
 
-      // Remove internal _score field
-      transformedVideos = transformedVideos.map((video: any) => {
-        const { _score, ...rest } = video;
-        return rest as LongFormVideo;
-      });
-
-      setVideos(transformedVideos);
+      setVideos(finalVideos);
     } catch (err) {
       console.error('Error fetching long-form videos:', err);
       setError(err instanceof Error ? err : new Error('Failed to fetch videos'));
