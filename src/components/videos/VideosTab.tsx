@@ -15,6 +15,7 @@ import { useFollowedUsers } from '@/hooks/useFollowedUsers';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import { useVideoNudges } from '@/hooks/useVideoNudges';
 import { useVideoQueue } from '@/hooks/useVideoQueue';
+import { useDiscoverySignals } from '@/hooks/useDiscoverySignals';
 
 interface VideosTabProps {
   onVideoClick?: (id: string) => void;
@@ -46,6 +47,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   // Nudges for growth hooks
   const { shouldShowNudge, markNudgeSeen, getNudgeMessage, shouldShowQueueReminder, markQueueReminderShown } = useVideoNudges();
   const { queue } = useVideoQueue();
+  const { getBoostScore } = useDiscoverySignals();
   const [showQueueNudge, setShowQueueNudge] = useState(false);
   const [showQueueReminder, setShowQueueReminder] = useState(false);
 
@@ -92,6 +94,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     section: 'recommended',
     limit: 4,
     category: categoryFilter,
+    getBoostScore, // Wire discovery signals for personalized ranking
   });
 
   const { videos: trendingVideos, isLoading: trendLoading } = useLongFormVideos({

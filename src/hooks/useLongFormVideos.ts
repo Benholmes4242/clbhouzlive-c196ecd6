@@ -11,6 +11,8 @@ interface UseLongFormVideosOptions {
   sort?: 'latest' | 'popular'; // Sort order for creator page
   searchQuery?: string; // Search term for videos search
   category?: string; // Category filter slug (maps to video_category tag slug)
+  // Optional boost function for personalized ranking (Phase 7D discovery signals)
+  getBoostScore?: (creatorId: string, category?: string) => number;
 }
 
 interface UseLongFormVideosResult {
@@ -47,6 +49,7 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
     sort = 'latest',
     searchQuery,
     category,
+    getBoostScore,
   } = options;
   
   const [videos, setVideos] = useState<LongFormVideo[]>([]);
@@ -222,7 +225,10 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
 
         const views = stats?.views_count || 0;
         const likes = stats?.likes_count || 0;
-        const score = calculateScore(views, likes);
+        // Base engagement score + optional discovery boost for personalization
+        const baseScore = calculateScore(views, likes);
+        const boostScore = getBoostScore ? getBoostScore(post.user_id, category) : 0;
+        const score = baseScore + boostScore;
 
         const video: LongFormVideo = {
           id: post.id,
@@ -243,10 +249,11 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
         return { video, score };
       });
 
-      // Apply score-based sorting for trending and popular sections
+      // Apply score-based sorting for trending, popular, and recommended (with boost) sections
       let sortedVideos = videosWithScores;
-      if (section === 'trending' || sort === 'popular') {
-        // Sort by engagement score descending, tie-break by created_at descending
+      const needsScoreSorting = section === 'trending' || section === 'recommended' || sort === 'popular';
+      if (needsScoreSorting) {
+        // Sort by score descending, tie-break by created_at descending
         sortedVideos = [...videosWithScores].sort((a, b) => {
           if (b.score !== a.score) return b.score - a.score;
           // Tie-break by created_at
