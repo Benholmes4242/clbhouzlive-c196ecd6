@@ -102,6 +102,13 @@ export const VideoPlaybackProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [location.pathname, state.isMiniOpen]);
 
+  // 6B-4 G: Close mini if activeVideoId is missing (bad restore state)
+  useEffect(() => {
+    if (state.isMiniOpen && !state.activeVideoId) {
+      setState(prev => ({ ...prev, isMiniOpen: false }));
+    }
+  }, [state.isMiniOpen, state.activeVideoId]);
+
   const openMini = useCallback((videoId: string, meta?: MiniPlayerMeta) => {
     setState(prev => ({
       ...prev,

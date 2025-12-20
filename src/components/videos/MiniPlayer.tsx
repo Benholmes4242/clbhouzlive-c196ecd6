@@ -166,6 +166,34 @@ export const MiniPlayer: React.FC = () => {
     [activeVideoId, isMiniOpen, updateProgress]
   );
 
+  // Flush progress helper for mini-player
+  const flushMiniProgress = useCallback(() => {
+    const el = videoElRef.current;
+    if (el && el.duration > 0) {
+      updateProgress(el.currentTime, el.duration);
+    }
+  }, [updateProgress]);
+
+  // 6B-4: Flush progress on tab hide / page unload
+  useEffect(() => {
+    if (!activeVideoId || !isMiniOpen) return;
+    
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        flushMiniProgress();
+      }
+    };
+    const handlePageHide = () => flushMiniProgress();
+    
+    window.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pagehide', handlePageHide);
+    
+    return () => {
+      window.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('pagehide', handlePageHide);
+    };
+  }, [activeVideoId, isMiniOpen, flushMiniProgress]);
+
   const handleTogglePlay = useCallback(
     async (e: React.MouseEvent) => {
       e.stopPropagation();

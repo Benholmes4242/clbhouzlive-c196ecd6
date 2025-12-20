@@ -128,6 +128,25 @@ export function useVideoQueue() {
     setQueueMeta({});
   }, []);
 
+  // Move queue item from one index to another (for drag reorder)
+  const moveQueueItem = useCallback((fromIndex: number, toIndex: number) => {
+    setQueue((prev) => {
+      if (fromIndex === toIndex) return prev;
+      if (fromIndex < 0 || fromIndex >= prev.length) return prev;
+      if (toIndex < 0 || toIndex >= prev.length) return prev;
+      
+      const newQueue = [...prev];
+      const [removed] = newQueue.splice(fromIndex, 1);
+      newQueue.splice(toIndex, 0, removed);
+      return newQueue;
+    });
+  }, []);
+
+  // Update meta for a video (useful when fetching details)
+  const updateMeta = useCallback((videoId: string, meta: QueueItemMeta) => {
+    setQueueMeta((prev) => ({ ...prev, [videoId]: meta }));
+  }, []);
+
   return {
     queue,
     queueMeta,
@@ -139,6 +158,8 @@ export function useVideoQueue() {
     setQueueFromRelated,
     removeFromQueue,
     clearQueue,
+    moveQueueItem,
+    updateMeta,
     queueLength: queue.length,
   };
 }

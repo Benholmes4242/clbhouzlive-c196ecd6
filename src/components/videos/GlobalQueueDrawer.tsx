@@ -15,11 +15,18 @@ export const GlobalQueueDrawer: React.FC = () => {
   const {
     queue,
     queueMeta,
+    playNext,
     removeFromQueue,
     clearQueue,
+    moveQueueItem,
+    peekNext,
+    getMeta,
   } = useVideoQueue();
 
   if (!playback) return null;
+
+  const nextId = peekNext();
+  const nextMeta = nextId ? getMeta(nextId) : null;
 
   return (
     <QueueDrawer
@@ -27,6 +34,14 @@ export const GlobalQueueDrawer: React.FC = () => {
       onClose={playback.closeQueue}
       queue={queue}
       queueMeta={queueMeta}
+      nowPlayingId={playback.activeVideoId}
+      nowPlayingMeta={playback.miniMeta ? {
+        title: playback.miniMeta.title,
+        thumbnailUrl: playback.miniMeta.thumbnailUrl,
+        creatorName: playback.miniMeta.creatorName,
+      } : null}
+      nextId={nextId}
+      nextMeta={nextMeta}
       onPlayNow={(id) => {
         // Play immediately in the mini-player
         const meta = queueMeta[id];
@@ -41,8 +56,13 @@ export const GlobalQueueDrawer: React.FC = () => {
 
         playback.closeQueue();
       }}
+      onPlayNext={(id) => {
+        const meta = queueMeta[id];
+        playNext(id, meta);
+      }}
       onRemove={(id) => removeFromQueue(id)}
       onClear={() => clearQueue()}
+      onReorder={moveQueueItem}
     />
   );
 };
