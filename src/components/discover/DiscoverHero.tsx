@@ -2,7 +2,8 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MapPin } from 'lucide-react';
-import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
+import { getStreamPoster } from '@/utils/stream';
+import DurationBadge from '@/components/shared/DurationBadge';
 
 interface HeroItem {
   id: string;
@@ -14,6 +15,7 @@ interface HeroItem {
   posterUrl?: string;
   ctaLabel?: string;
   onClick?: () => void;
+  durationSeconds?: number; // Video duration in seconds
   golfCourse?: {
     id: string;
     name: string;
@@ -31,6 +33,7 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [resolvedDuration, setResolvedDuration] = useState<number | undefined>(item?.durationSeconds);
 
   // Autoplay muted video when in view
   useEffect(() => {
@@ -51,6 +54,22 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
     observer.observe(video);
     return () => observer.disconnect();
   }, [item]);
+
+  // Update resolved duration when item changes
+  useEffect(() => {
+    setResolvedDuration(item?.durationSeconds);
+  }, [item?.durationSeconds]);
+
+  // Get duration from video element if not provided
+  const handleLoadedMetadata = () => {
+    setVideoLoaded(true);
+    if (videoRef.current && !item?.durationSeconds) {
+      const d = videoRef.current.duration;
+      if (Number.isFinite(d) && d > 0 && d !== Infinity) {
+        setResolvedDuration(d);
+      }
+    }
+  };
 
   if (isLoading) {
     return (
@@ -79,6 +98,10 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
     }
   };
 
+  const isVideo = item.mediaType === 'video';
+  const hasClubPill = !!item.golfCourse;
+  const showDuration = isVideo && resolvedDuration && resolvedDuration > 0;
+
   return (
     <div 
       className="relative w-full aspect-[1.75/1] md:aspect-[2.2/1] overflow-hidden bg-slate-800 cursor-pointer group"
@@ -102,7 +125,7 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
             muted
             loop
             playsInline
-            onLoadedData={() => setVideoLoaded(true)}
+            onLoadedMetadata={handleLoadedMetadata}
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
               videoLoaded ? 'opacity-100' : 'opacity-0'
             }`}
@@ -119,16 +142,25 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
       {/* Softer gradient overlay - less contrast */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
 
-      {/* Golf Club Tag Pill - Top Right */}
-      {item.golfCourse && (
-        <button
-          onClick={handleClubClick}
-          className="absolute top-3 right-3 md:top-4 md:right-4 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white text-xs font-medium hover:bg-black/50 transition-colors max-w-[180px] md:max-w-[220px]"
-        >
-          <MapPin className="w-3 h-3 flex-shrink-0" />
-          <span className="truncate">{item.golfCourse.name}</span>
-        </button>
-      )}
+      {/* Top-right zone: Duration badge and/or Club pill */}
+      {/* If both exist, duration moves left of club pill to avoid overlap */}
+      <div className="absolute top-3 right-3 md:top-4 md:right-4 flex items-center gap-2 z-20">
+        {/* Duration badge - shown for video content */}
+        {showDuration && (
+          <DurationBadge durationSeconds={resolvedDuration} size="md" />
+        )}
+        
+        {/* Golf Club Tag Pill */}
+        {hasClubPill && (
+          <button
+            onClick={handleClubClick}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white text-xs font-medium hover:bg-black/50 transition-colors max-w-[180px] md:max-w-[220px]"
+          >
+            <MapPin className="w-3 h-3 flex-shrink-0" />
+            <span className="truncate">{item.golfCourse!.name}</span>
+          </button>
+        )}
+      </div>
 
       {/* Content overlay */}
       <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5 lg:p-6">
@@ -175,6 +207,7 @@ export function createHeroItem(post: any): HeroItem | null {
     mediaType,
     posterUrl,
     ctaLabel: 'Watch',
+    durationSeconds: post.durationSeconds,
     golfCourse: post.golfCourse,
   };
 }
