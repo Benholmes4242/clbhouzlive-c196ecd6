@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback, useState } from 'react';
+import React, { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { X, ArrowLeft, Play, Heart, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -9,8 +9,10 @@ import FlickerFreeHLSPlayer from '@/components/ui/FlickerFreeHLSPlayer';
 import { useVideoProgress } from '@/hooks/useVideoProgress';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { usePostData } from '@/hooks/usePostData';
+import { useRelatedLongFormVideos } from '@/hooks/useRelatedLongFormVideos';
 import { uidFromNode, generateHlsUrl, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface VideoData {
   id: string;
@@ -24,6 +26,7 @@ interface VideoData {
   golfCourseName?: string;
   golfCourseId?: string;
   durationSeconds?: number;
+  category?: string;
 }
 
 /**
@@ -32,6 +35,7 @@ interface VideoData {
  * - Route-backed: /video/:videoId
  * - Fullscreen modal with backdrop blur
  * - Resume playback support
+ * - Up Next + Recommended videos
  * - Feed stays mounted underneath
  */
 export const VideoPlayerModal: React.FC = () => {
@@ -40,7 +44,9 @@ export const VideoPlayerModal: React.FC = () => {
   const { videoId } = useParams<{ videoId: string }>();
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const videoAreaRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef<number | null>(null);
+  const startTargetRef = useRef<EventTarget | null>(null);
   
   const [videoData, setVideoData] = useState<VideoData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -51,7 +57,26 @@ export const VideoPlayerModal: React.FC = () => {
   const { progress, shouldResume, resumePosition, updateProgress, clearProgress, isLoading: progressLoading } = useVideoProgress(videoId || '');
   const { likesCount, hasLiked, toggleLike, isTogglingLike } = usePostEngagement(videoId || null);
   
-  // Fetch video data on mount
+  // Fetch related videos for recommendations
+  const { videos: relatedVideos, upNextVideo, isLoading: relatedLoading } = useRelatedLongFormVideos(
+    videoId || '',
+    {
+      limit: 10,
+      creatorUserId: videoData?.creatorUserId,
+      courseId: videoData?.golfCourseId,
+      category: videoData?.category,
+    }
+  );
+  
+  // Reset state when videoId changes (for in-modal navigation)
+  useEffect(() => {
+    setVideoData(null);
+    setIsLoading(true);
+    setShowResumeOverlay(false);
+    setHasAutoStarted(false);
+  }, [videoId]);
+  
+  // Fetch video data on mount or when videoId changes
   useEffect(() => {
     if (!videoId) return;
     
@@ -61,7 +86,7 @@ export const VideoPlayerModal: React.FC = () => {
         const post = await fetchPostWithDetails(videoId);
         if (!post) {
           console.error('Post not found');
-          navigate(-1);
+          handleClose();
           return;
         }
         
@@ -69,7 +94,7 @@ export const VideoPlayerModal: React.FC = () => {
         const media = post.post_media?.[0];
         if (!media) {
           console.error('No media found for post');
-          navigate(-1);
+          handleClose();
           return;
         }
         
@@ -81,11 +106,14 @@ export const VideoPlayerModal: React.FC = () => {
         // Get creator info - user is an array from the join
         const user = Array.isArray(post.user) ? post.user[0] : post.user;
         
-        // Get golf course tag if present
+        // Get golf course and category tags if present
         const postTags = post.post_tags as any[] | undefined;
         const golfTag = postTags?.find((tag: any) => 
           tag.tagged_entity?.entity_type === 'golf_club' || 
           tag.tagged_entity?.entity_type === 'golf_course'
+        );
+        const categoryTag = postTags?.find((tag: any) => 
+          tag.tagged_entity?.entity_type === 'video_category'
         );
         
         setVideoData({
@@ -96,21 +124,22 @@ export const VideoPlayerModal: React.FC = () => {
           creatorAvatarUrl: user?.profile_photo_url,
           hlsUrl,
           posterUrl,
-          views: 0, // We'll add views tracking later
+          views: 0,
           golfCourseName: golfTag?.tagged_entity?.name,
           golfCourseId: golfTag?.tagged_entity?.entity_id,
           durationSeconds: media.duration_seconds,
+          category: categoryTag?.tagged_entity?.slug,
         });
       } catch (err) {
         console.error('Error loading video:', err);
-        navigate(-1);
+        handleClose();
       } finally {
         setIsLoading(false);
       }
     };
     
     loadVideo();
-  }, [videoId, fetchPostWithDetails, navigate]);
+  }, [videoId, fetchPostWithDetails]);
   
   // Handle resume logic once progress is loaded
   useEffect(() => {
@@ -176,24 +205,41 @@ export const VideoPlayerModal: React.FC = () => {
     setHasAutoStarted(true);
   };
   
-  const handleTimeUpdate = useCallback(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    
-    updateProgress(video.currentTime, video.duration);
+  // Progress tracking - wired directly to HLS player's onTimeUpdate
+  const handleTimeUpdate = useCallback((currentTime: number, duration: number) => {
+    if (duration > 0) {
+      updateProgress(currentTime, duration);
+    }
   }, [updateProgress]);
   
   const handleVideoEnded = useCallback(() => {
     clearProgress();
   }, [clearProgress]);
   
-  // Swipe down to dismiss (mobile)
+  // Navigate to another video within the modal
+  const handleVideoSelect = useCallback((newVideoId: string) => {
+    // Preserve backgroundLocation to keep feed mounted
+    const backgroundLocation = location.state?.backgroundLocation;
+    navigate(`/video/${newVideoId}`, { 
+      state: { backgroundLocation, fromVideo: true },
+      replace: false 
+    });
+  }, [navigate, location.state?.backgroundLocation]);
+  
+  // Swipe down to dismiss (mobile) - protected from player interaction
   const handleTouchStart = (e: React.TouchEvent) => {
     startYRef.current = e.touches[0].clientY;
+    startTargetRef.current = e.target;
   };
   
   const handleTouchMove = (e: React.TouchEvent) => {
     if (startYRef.current === null) return;
+    
+    // Don't dismiss if started on video player area (prevents conflict with scrubbing)
+    const videoArea = videoAreaRef.current;
+    if (videoArea && startTargetRef.current && videoArea.contains(startTargetRef.current as Node)) {
+      return;
+    }
     
     const deltaY = e.touches[0].clientY - startYRef.current;
     // If swiped down more than 100px, dismiss
@@ -205,6 +251,7 @@ export const VideoPlayerModal: React.FC = () => {
   
   const handleTouchEnd = () => {
     startYRef.current = null;
+    startTargetRef.current = null;
   };
   
   const formatTime = (seconds: number): string => {
@@ -218,158 +265,358 @@ export const VideoPlayerModal: React.FC = () => {
     if (views >= 1000) return `${(views / 1000).toFixed(1)}K views`;
     return `${views} views`;
   };
+  
+  // Split related videos: first is "up next", rest are recommendations
+  const recommendedVideos = useMemo(() => {
+    return relatedVideos.slice(1);
+  }, [relatedVideos]);
 
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-[100] flex flex-col bg-black/95 backdrop-blur-xl"
+      className="fixed inset-0 z-[100] flex bg-black/95 backdrop-blur-xl overflow-hidden"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Top bar */}
-      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/60 to-transparent">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={handleClose}
-            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-            aria-label="Close"
-          >
-            <ArrowLeft className="h-5 w-5 text-white" />
-          </button>
-          
-          {!isLoading && videoData && (
-            <button
-              onClick={handleCreatorClick}
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-            >
-              <Avatar className="h-8 w-8 border border-white/20">
-                <AvatarImage src={videoData.creatorAvatarUrl} alt={videoData.creatorName} />
-                <AvatarFallback className="bg-primary/20 text-primary-foreground text-xs">
-                  {videoData.creatorName.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <span className="text-white font-medium text-sm">{videoData.creatorName}</span>
-            </button>
-          )}
-        </div>
-        
-        <button
-          onClick={handleClose}
-          className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors md:hidden"
-          aria-label="Close"
-        >
-          <X className="h-5 w-5 text-white" />
-        </button>
-      </div>
-      
-      {/* Video area - centered 16:9 */}
-      <div className="flex-1 flex items-center justify-center px-4 py-16">
-        {isLoading ? (
-          <div className="w-full max-w-4xl aspect-video bg-muted/20 rounded-xl animate-pulse flex items-center justify-center">
-            <Play className="h-12 w-12 text-white/30" />
-          </div>
-        ) : videoData ? (
-          <div className="relative w-full max-w-4xl aspect-video rounded-xl overflow-hidden bg-black">
-            <FlickerFreeHLSPlayer
-              ref={videoRef}
-              hlsUrl={videoData.hlsUrl}
-              poster={videoData.posterUrl}
-              autoplay={hasAutoStarted && !showResumeOverlay}
-              loop={false}
-              muted={false}
-              className="w-full h-full"
-              objectFit="contain"
-              showMuteButton={false}
-              onEnded={handleVideoEnded}
-            />
-            
-            {/* Resume overlay */}
-            {showResumeOverlay && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm">
-                <div className="flex flex-col items-center gap-4">
-                  <p className="text-white/70 text-sm">Resume watching?</p>
-                  <Button
-                    onClick={handleResumeClick}
-                    className="gap-2 bg-primary hover:bg-primary/90"
-                  >
-                    <Play className="h-4 w-4" />
-                    Resume at {formatTime(resumePosition)}
-                  </Button>
+      {/* Main content - scrollable on mobile */}
+      <ScrollArea className="flex-1 h-full">
+        <div className="flex flex-col lg:flex-row min-h-full">
+          {/* Left column: Video player + info */}
+          <div className="flex-1 flex flex-col">
+            {/* Top bar */}
+            <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/80 to-transparent">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleClose}
+                  className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                  aria-label="Close"
+                >
+                  <ArrowLeft className="h-5 w-5 text-white" />
+                </button>
+                
+                {!isLoading && videoData && (
                   <button
-                    onClick={handleStartFromBeginning}
-                    className="text-white/60 hover:text-white text-sm underline"
+                    onClick={handleCreatorClick}
+                    className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                   >
-                    Start from beginning
+                    <Avatar className="h-8 w-8 border border-white/20">
+                      <AvatarImage src={videoData.creatorAvatarUrl} alt={videoData.creatorName} />
+                      <AvatarFallback className="bg-primary/20 text-primary-foreground text-xs">
+                        {videoData.creatorName.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-white font-medium text-sm">{videoData.creatorName}</span>
                   </button>
-                </div>
-              </div>
-            )}
-            
-            {/* Time update listener */}
-            {hasAutoStarted && (
-              <video
-                ref={(el) => {
-                  if (el && videoRef.current !== el) {
-                    // This is just to add the timeupdate listener to the actual video element
-                  }
-                }}
-                onTimeUpdate={handleTimeUpdate}
-                className="hidden"
-              />
-            )}
-          </div>
-        ) : null}
-      </div>
-      
-      {/* Bottom info area */}
-      <div className="absolute bottom-0 left-0 right-0 px-4 py-6 bg-gradient-to-t from-black/80 to-transparent">
-        {isLoading ? (
-          <div className="max-w-4xl mx-auto space-y-3">
-            <Skeleton className="h-6 w-3/4 bg-white/10" />
-            <Skeleton className="h-4 w-1/4 bg-white/10" />
-          </div>
-        ) : videoData ? (
-          <div className="max-w-4xl mx-auto space-y-3">
-            {/* Title */}
-            <h1 className="text-white text-lg md:text-xl font-semibold line-clamp-2">
-              {videoData.title}
-            </h1>
-            
-            {/* Meta row */}
-            <div className="flex items-center gap-4 flex-wrap">
-              {/* Views */}
-              <span className="text-white/60 text-sm">
-                {formatViews(videoData.views)}
-              </span>
-              
-              {/* Like button */}
-              <button
-                onClick={() => toggleLike()}
-                disabled={isTogglingLike}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all",
-                  hasLiked 
-                    ? "bg-red-500/20 text-red-400" 
-                    : "bg-white/10 text-white/70 hover:bg-white/20 hover:text-white"
                 )}
-              >
-                <Heart 
-                  className={cn("h-4 w-4", hasLiked && "fill-current")} 
-                />
-                <span className="text-sm font-medium">{likesCount}</span>
-              </button>
+              </div>
               
-              {/* Course badge */}
-              {videoData.golfCourseName && (
-                <Badge variant="secondary" className="bg-white/10 text-white/80 hover:bg-white/20 gap-1">
-                  <MapPin className="h-3 w-3" />
-                  {videoData.golfCourseName}
-                </Badge>
+              <button
+                onClick={handleClose}
+                className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors lg:hidden"
+                aria-label="Close"
+              >
+                <X className="h-5 w-5 text-white" />
+              </button>
+            </div>
+            
+            {/* Video area - centered 16:9 */}
+            <div ref={videoAreaRef} className="flex-1 flex items-center justify-center px-4 py-4">
+              {isLoading ? (
+                <div className="w-full max-w-4xl aspect-video bg-muted/20 rounded-xl animate-pulse flex items-center justify-center">
+                  <Play className="h-12 w-12 text-white/30" />
+                </div>
+              ) : videoData ? (
+                <div className="relative w-full max-w-4xl aspect-video rounded-xl overflow-hidden bg-black">
+                  <FlickerFreeHLSPlayer
+                    ref={videoRef}
+                    hlsUrl={videoData.hlsUrl}
+                    poster={videoData.posterUrl}
+                    autoplay={hasAutoStarted && !showResumeOverlay}
+                    loop={false}
+                    muted={false}
+                    className="w-full h-full"
+                    objectFit="contain"
+                    showMuteButton={false}
+                    onEnded={handleVideoEnded}
+                    onTimeUpdate={handleTimeUpdate}
+                  />
+                  
+                  {/* Resume overlay */}
+                  {showResumeOverlay && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm">
+                      <div className="flex flex-col items-center gap-4">
+                        <p className="text-white/70 text-sm">Resume watching?</p>
+                        <Button
+                          onClick={handleResumeClick}
+                          className="gap-2 bg-primary hover:bg-primary/90"
+                        >
+                          <Play className="h-4 w-4" />
+                          Resume at {formatTime(resumePosition)}
+                        </Button>
+                        <button
+                          onClick={handleStartFromBeginning}
+                          className="text-white/60 hover:text-white text-sm underline"
+                        >
+                          Start from beginning
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : null}
+            </div>
+            
+            {/* Bottom info area */}
+            <div className="px-4 py-4">
+              {isLoading ? (
+                <div className="max-w-4xl mx-auto space-y-3">
+                  <Skeleton className="h-6 w-3/4 bg-white/10" />
+                  <Skeleton className="h-4 w-1/4 bg-white/10" />
+                </div>
+              ) : videoData ? (
+                <div className="max-w-4xl mx-auto space-y-3">
+                  {/* Title */}
+                  <h1 className="text-white text-lg md:text-xl font-semibold line-clamp-2">
+                    {videoData.title}
+                  </h1>
+                  
+                  {/* Meta row */}
+                  <div className="flex items-center gap-4 flex-wrap">
+                    {/* Views */}
+                    <span className="text-white/60 text-sm">
+                      {formatViews(videoData.views)}
+                    </span>
+                    
+                    {/* Like button */}
+                    <button
+                      onClick={() => toggleLike()}
+                      disabled={isTogglingLike}
+                      className={cn(
+                        "flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all",
+                        hasLiked 
+                          ? "bg-red-500/20 text-red-400" 
+                          : "bg-white/10 text-white/70 hover:bg-white/20 hover:text-white"
+                      )}
+                    >
+                      <Heart 
+                        className={cn("h-4 w-4", hasLiked && "fill-current")} 
+                      />
+                      <span className="text-sm font-medium">{likesCount}</span>
+                    </button>
+                    
+                    {/* Course badge */}
+                    {videoData.golfCourseName && (
+                      <Badge variant="secondary" className="bg-white/10 text-white/80 hover:bg-white/20 gap-1">
+                        <MapPin className="h-3 w-3" />
+                        {videoData.golfCourseName}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+            
+            {/* Up Next section - shows on mobile, hidden on desktop (right sidebar) */}
+            <div className="lg:hidden px-4 pb-6">
+              {!relatedLoading && upNextVideo && (
+                <div className="space-y-3">
+                  <h3 className="text-white/80 font-medium text-sm">Up next</h3>
+                  <UpNextTile video={upNextVideo} onClick={() => handleVideoSelect(upNextVideo.id)} />
+                  
+                  {/* Recommended list */}
+                  {recommendedVideos.length > 0 && (
+                    <div className="mt-6 space-y-3">
+                      <h3 className="text-white/80 font-medium text-sm">Recommended</h3>
+                      <div className="space-y-3">
+                        {recommendedVideos.slice(0, 5).map((video) => (
+                          <RecommendedTile 
+                            key={video.id} 
+                            video={video} 
+                            onClick={() => handleVideoSelect(video.id)} 
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </div>
-        ) : null}
+          
+          {/* Right sidebar: Up Next + Recommended (desktop only) */}
+          <div className="hidden lg:block w-96 border-l border-white/10 p-4">
+            {relatedLoading ? (
+              <div className="space-y-4">
+                <Skeleton className="h-5 w-24 bg-white/10" />
+                <Skeleton className="aspect-video w-full bg-white/10 rounded-lg" />
+                <div className="space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex gap-3">
+                      <Skeleton className="w-40 aspect-video bg-white/10 rounded" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-full bg-white/10" />
+                        <Skeleton className="h-3 w-2/3 bg-white/10" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {/* Up Next - primary tile */}
+                {upNextVideo && (
+                  <>
+                    <h3 className="text-white/80 font-medium text-sm">Up next</h3>
+                    <UpNextTile video={upNextVideo} onClick={() => handleVideoSelect(upNextVideo.id)} />
+                  </>
+                )}
+                
+                {/* Recommended list */}
+                {recommendedVideos.length > 0 && (
+                  <div className="mt-6 space-y-3">
+                    <h3 className="text-white/80 font-medium text-sm">Recommended</h3>
+                    <div className="space-y-3">
+                      {recommendedVideos.map((video) => (
+                        <RecommendedTile 
+                          key={video.id} 
+                          video={video} 
+                          onClick={() => handleVideoSelect(video.id)} 
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </ScrollArea>
+    </div>
+  );
+};
+
+// Up Next primary tile - larger format
+interface UpNextTileProps {
+  video: {
+    id: string;
+    title: string;
+    creatorName: string;
+    creatorAvatarUrl?: string;
+    thumbnailUrl: string;
+    duration: string;
+    views?: number;
+  };
+  onClick: () => void;
+}
+
+const UpNextTile: React.FC<UpNextTileProps> = ({ video, onClick }) => {
+  return (
+    <div 
+      className="group cursor-pointer rounded-lg overflow-hidden bg-white/5 hover:bg-white/10 transition-colors"
+      onClick={onClick}
+    >
+      <div className="relative aspect-video">
+        {video.thumbnailUrl ? (
+          <img
+            src={video.thumbnailUrl}
+            alt={video.title}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full bg-muted/20 flex items-center justify-center">
+            <Play className="h-8 w-8 text-white/30" />
+          </div>
+        )}
+        
+        {/* Play overlay */}
+        <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors">
+          <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+            <Play className="h-5 w-5 text-foreground ml-0.5" fill="currentColor" />
+          </div>
+        </div>
+        
+        {/* Duration badge */}
+        <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-black/70 backdrop-blur-sm text-white text-xs font-medium rounded">
+          {video.duration}
+        </div>
+      </div>
+      
+      <div className="p-3">
+        <h4 className="text-white font-medium text-sm line-clamp-2 leading-snug">
+          {video.title}
+        </h4>
+        <div className="flex items-center gap-2 mt-2">
+          {video.creatorAvatarUrl ? (
+            <img src={video.creatorAvatarUrl} alt="" className="w-5 h-5 rounded-full" />
+          ) : (
+            <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-[10px] text-primary">
+              {video.creatorName.charAt(0)}
+            </div>
+          )}
+          <span className="text-white/60 text-xs truncate">{video.creatorName}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Recommended tile - compact horizontal format
+interface RecommendedTileProps {
+  video: {
+    id: string;
+    title: string;
+    creatorName: string;
+    thumbnailUrl: string;
+    duration: string;
+    views?: number;
+  };
+  onClick: () => void;
+}
+
+const RecommendedTile: React.FC<RecommendedTileProps> = ({ video, onClick }) => {
+  const formatViews = (views: number): string => {
+    if (views >= 1000000) return `${(views / 1000000).toFixed(1)}M`;
+    if (views >= 1000) return `${(views / 1000).toFixed(1)}K`;
+    return `${views}`;
+  };
+
+  return (
+    <div 
+      className="group flex gap-3 cursor-pointer hover:bg-white/5 rounded-lg p-1 -mx-1 transition-colors"
+      onClick={onClick}
+    >
+      {/* Thumbnail */}
+      <div className="relative w-40 aspect-video rounded overflow-hidden shrink-0">
+        {video.thumbnailUrl ? (
+          <img
+            src={video.thumbnailUrl}
+            alt={video.title}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full bg-muted/20 flex items-center justify-center">
+            <Play className="h-5 w-5 text-white/30" />
+          </div>
+        )}
+        
+        {/* Duration badge */}
+        <div className="absolute bottom-1 right-1 px-1 py-0.5 bg-black/70 text-white text-[10px] font-medium rounded">
+          {video.duration}
+        </div>
+      </div>
+      
+      {/* Info */}
+      <div className="flex-1 min-w-0 py-0.5">
+        <h4 className="text-white text-sm font-medium line-clamp-2 leading-snug">
+          {video.title}
+        </h4>
+        <p className="text-white/50 text-xs mt-1 truncate">{video.creatorName}</p>
+        {video.views !== undefined && video.views > 0 && (
+          <p className="text-white/40 text-xs">{formatViews(video.views)} views</p>
+        )}
       </div>
     </div>
   );
