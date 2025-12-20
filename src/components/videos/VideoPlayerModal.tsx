@@ -54,6 +54,13 @@ export const VideoPlayerModal: React.FC = () => {
   const [showResumeOverlay, setShowResumeOverlay] = useState(false);
   const [hasAutoStarted, setHasAutoStarted] = useState(false);
   
+  // Up Next autoplay state
+  const [showUpNextOverlay, setShowUpNextOverlay] = useState(false);
+  const [upNextCountdown, setUpNextCountdown] = useState(5);
+  const upNextCancelledRef = useRef(false);
+  const upNextTimerRef = useRef<number | null>(null);
+  const upNextIntervalRef = useRef<number | null>(null);
+  
   const { fetchPostWithDetails } = usePostData();
   const { progress, shouldResume, resumePosition, updateProgress, clearProgress, isLoading: progressLoading } = useVideoProgress(videoId || '');
   const { likesCount, hasLiked, toggleLike, isTogglingLike } = usePostEngagement(videoId || null);
@@ -69,13 +76,29 @@ export const VideoPlayerModal: React.FC = () => {
     }
   );
   
+  // Helper to clear up next timers
+  const clearUpNextTimers = useCallback(() => {
+    if (upNextTimerRef.current) {
+      clearTimeout(upNextTimerRef.current);
+      upNextTimerRef.current = null;
+    }
+    if (upNextIntervalRef.current) {
+      clearInterval(upNextIntervalRef.current);
+      upNextIntervalRef.current = null;
+    }
+  }, []);
+  
   // Reset state when videoId changes (for in-modal navigation)
   useEffect(() => {
     setVideoData(null);
     setIsLoading(true);
     setShowResumeOverlay(false);
     setHasAutoStarted(false);
-  }, [videoId]);
+    setShowUpNextOverlay(false);
+    setUpNextCountdown(5);
+    upNextCancelledRef.current = false;
+    clearUpNextTimers();
+  }, [videoId, clearUpNextTimers]);
   
   // Fetch video data on mount or when videoId changes
   useEffect(() => {
@@ -225,19 +248,74 @@ export const VideoPlayerModal: React.FC = () => {
     }
   }, [updateProgress]);
   
-  const handleVideoEnded = useCallback(() => {
-    clearProgress();
-  }, [clearProgress]);
-  
-  // Navigate to another video within the modal
-  const handleVideoSelect = useCallback((newVideoId: string) => {
-    // Preserve backgroundLocation to keep feed mounted
+  // Base navigation function for video selection
+  const navigateToVideo = useCallback((newVideoId: string) => {
     const backgroundLocation = location.state?.backgroundLocation;
     navigate(`/video/${newVideoId}`, { 
       state: { backgroundLocation, fromVideo: true },
       replace: false 
     });
   }, [navigate, location.state?.backgroundLocation]);
+  
+  // Start up next countdown
+  const startUpNextCountdown = useCallback(() => {
+    if (!upNextVideo || showResumeOverlay || !hasAutoStarted) return;
+    
+    upNextCancelledRef.current = false;
+    setShowUpNextOverlay(true);
+    setUpNextCountdown(5);
+    
+    // Countdown interval
+    upNextIntervalRef.current = window.setInterval(() => {
+      setUpNextCountdown(prev => {
+        if (prev <= 1) return 0;
+        return prev - 1;
+      });
+    }, 1000);
+    
+    // Autoplay timer
+    upNextTimerRef.current = window.setTimeout(() => {
+      if (!upNextCancelledRef.current && upNextVideo) {
+        setShowUpNextOverlay(false);
+        clearUpNextTimers();
+        navigateToVideo(upNextVideo.id);
+      }
+    }, 5000);
+  }, [upNextVideo, showResumeOverlay, hasAutoStarted, clearUpNextTimers, navigateToVideo]);
+  
+  const handleVideoEnded = useCallback(() => {
+    clearProgress();
+    startUpNextCountdown();
+  }, [clearProgress, startUpNextCountdown]);
+  
+  const handleCancelUpNext = useCallback(() => {
+    upNextCancelledRef.current = true;
+    setShowUpNextOverlay(false);
+    clearUpNextTimers();
+  }, [clearUpNextTimers]);
+  
+  const handlePlayNow = useCallback(() => {
+    if (!upNextVideo) return;
+    clearUpNextTimers();
+    setShowUpNextOverlay(false);
+    navigateToVideo(upNextVideo.id);
+  }, [upNextVideo, clearUpNextTimers, navigateToVideo]);
+  
+  // Navigate to another video within the modal - also cancels any up next countdown
+  const handleVideoSelect = useCallback((newVideoId: string) => {
+    // Cancel any pending up next autoplay
+    upNextCancelledRef.current = true;
+    setShowUpNextOverlay(false);
+    clearUpNextTimers();
+    navigateToVideo(newVideoId);
+  }, [clearUpNextTimers, navigateToVideo]);
+  
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      clearUpNextTimers();
+    };
+  }, [clearUpNextTimers]);
   
   // Swipe down to dismiss (mobile) - protected from player interaction
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -374,6 +452,54 @@ export const VideoPlayerModal: React.FC = () => {
                         >
                           Start from beginning
                         </button>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Up Next autoplay overlay */}
+                  {showUpNextOverlay && upNextVideo && (
+                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 via-black/70 to-transparent">
+                      <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10">
+                        {/* Thumbnail */}
+                        <div className="relative w-24 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-black/50">
+                          {upNextVideo.thumbnailUrl && (
+                            <img 
+                              src={upNextVideo.thumbnailUrl} 
+                              alt={upNextVideo.title}
+                              className="w-full h-full object-cover"
+                            />
+                          )}
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                            <Play className="h-6 w-6 text-white" />
+                          </div>
+                        </div>
+                        
+                        {/* Info */}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white/60 text-xs mb-0.5">Up next in {upNextCountdown}</p>
+                          <p className="text-white font-medium text-sm line-clamp-1">{upNextVideo.title}</p>
+                          <p className="text-white/50 text-xs line-clamp-1">{upNextVideo.creatorName}</p>
+                        </div>
+                        
+                        {/* Buttons */}
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleCancelUpNext}
+                            className="text-white/70 hover:text-white hover:bg-white/10"
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={handlePlayNow}
+                            className="bg-primary hover:bg-primary/90 gap-1.5"
+                          >
+                            <Play className="h-3.5 w-3.5" />
+                            Play now
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   )}
