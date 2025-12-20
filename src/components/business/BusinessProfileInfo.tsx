@@ -62,7 +62,7 @@ export function BusinessProfileInfo({ business }: BusinessProfileInfoProps) {
         background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)',
       }}
     >
-      <div className="flex flex-col gap-[2px]">
+      <div className="flex flex-col gap-3">
         {/* About - Full text without truncation */}
         {business.description && (
           <section className="bg-white p-4 space-y-3">
