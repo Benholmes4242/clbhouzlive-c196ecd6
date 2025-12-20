@@ -20,6 +20,7 @@ import { useRelatedLongFormVideos } from '@/hooks/useRelatedLongFormVideos';
 import { useAutoplayPreference } from '@/hooks/useAutoplayPreference';
 import { useFollow } from '@/hooks/useFollow';
 import { useVideoQueue } from '@/hooks/useVideoQueue';
+import { useVideoPlaybackSafe } from '@/context/VideoPlaybackContext';
 import { uidFromNode, generateHlsUrl, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -82,6 +83,9 @@ export const VideoPlayerModal: React.FC = () => {
   
   // Video queue for continuous playback
   const { queue, queueMeta, playNext, enqueue, popNext, peekNext, getMeta, setQueueFromRelated, queueLength } = useVideoQueue();
+  
+  // Mini-player context (optional - may not exist in all app shells)
+  const videoPlayback = useVideoPlaybackSafe();
   
   // Mark user interaction (resets autoplay eligibility timer)
   const markInteraction = useCallback(() => {
@@ -267,13 +271,25 @@ export const VideoPlayerModal: React.FC = () => {
   const handleClose = useCallback(() => {
     // Flush progress before closing
     flushProgress();
-    // Use history.back() if there's history, otherwise navigate to discover
+    
+    // Open mini-player if context is available and we have video data
+    if (videoPlayback && videoId && videoData) {
+      videoPlayback.openMini(videoId, {
+        title: videoData.title,
+        creatorName: videoData.creatorName,
+        thumbnailUrl: videoData.posterUrl,
+        hlsUrl: videoData.hlsUrl,
+        posterUrl: videoData.posterUrl,
+      });
+    }
+    
+    // Navigate back
     if (window.history.length > 2) {
       navigate(-1);
     } else {
       navigate('/discover?main=videos');
     }
-  }, [navigate, flushProgress]);
+  }, [navigate, flushProgress, videoPlayback, videoId, videoData]);
   
   const handleCreatorClick = () => {
     if (videoData?.creatorUserId) {
