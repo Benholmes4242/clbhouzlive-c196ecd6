@@ -7,6 +7,8 @@ interface UseLongFormVideosOptions {
   section?: 'recommended' | 'trending' | 'following' | 'courses' | 'all';
   limit?: number;
   followedCreatorIds?: string[];
+  creatorUserId?: string; // Filter to specific creator's videos
+  sort?: 'latest' | 'popular'; // Sort order for creator page
 }
 
 interface UseLongFormVideosResult {
@@ -25,7 +27,7 @@ interface UseLongFormVideosResult {
  * - duration_seconds IS NOT NULL
  */
 export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLongFormVideosResult => {
-  const { section = 'all', limit = 10, followedCreatorIds = [] } = options;
+  const { section = 'all', limit = 10, followedCreatorIds = [], creatorUserId, sort = 'latest' } = options;
   
   const [videos, setVideos] = useState<LongFormVideo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -87,39 +89,50 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
         .gte('post_media.duration_seconds', VIDEO_DURATION_THRESHOLD_SECONDS)
         .not('post_media.duration_seconds', 'is', null);
 
-      // Apply section-specific filters
-      switch (section) {
-        case 'trending':
-          // Last 7 days, sorted by engagement
-          const sevenDaysAgo = new Date();
-          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-          query = query
-            .gte('created_at', sevenDaysAgo.toISOString())
-            .order('created_at', { ascending: false });
-          break;
-          
-        case 'following':
-          // Only show videos from followed creators
-          if (followedCreatorIds.length > 0) {
-            query = query.in('user_id', followedCreatorIds);
-          } else {
-            // No followed creators = empty result
-            setVideos([]);
-            setIsLoading(false);
-            return;
-          }
+      // If fetching for a specific creator (Creator Page)
+      if (creatorUserId) {
+        query = query.eq('user_id', creatorUserId);
+        // Apply sort for creator page
+        if (sort === 'popular') {
+          query = query.order('created_at', { ascending: false }); // Fallback until we have proper popularity sorting
+        } else {
           query = query.order('created_at', { ascending: false });
-          break;
-          
-        case 'courses':
-          // Videos that have a golf course/club tag
-          query = query.order('created_at', { ascending: false });
-          break;
-          
-        case 'recommended':
-        default:
-          query = query.order('created_at', { ascending: false });
-          break;
+        }
+      } else {
+        // Apply section-specific filters for Videos tab
+        switch (section) {
+          case 'trending':
+            // Last 7 days, sorted by engagement
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+            query = query
+              .gte('created_at', sevenDaysAgo.toISOString())
+              .order('created_at', { ascending: false });
+            break;
+            
+          case 'following':
+            // Only show videos from followed creators
+            if (followedCreatorIds.length > 0) {
+              query = query.in('user_id', followedCreatorIds);
+            } else {
+              // No followed creators = empty result
+              setVideos([]);
+              setIsLoading(false);
+              return;
+            }
+            query = query.order('created_at', { ascending: false });
+            break;
+            
+          case 'courses':
+            // Videos that have a golf course/club tag
+            query = query.order('created_at', { ascending: false });
+            break;
+            
+          case 'recommended':
+          default:
+            query = query.order('created_at', { ascending: false });
+            break;
+        }
       }
 
       query = query.limit(limit);
@@ -177,7 +190,7 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
     } finally {
       setIsLoading(false);
     }
-  }, [section, limit, followedCreatorIds]);
+  }, [section, limit, followedCreatorIds, creatorUserId, sort]);
 
   useEffect(() => {
     fetchVideos();

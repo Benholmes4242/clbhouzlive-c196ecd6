@@ -165,6 +165,8 @@ const EchoSharePage = lazy(() => import("./pages/EchoSharePage").then(m => ({ de
 
 // Videos2 page
 const VideosPage = lazy(() => import("./features/videos2/pages/VideosPage"));
+// Creator Page (Phase 3)
+const CreatorPage = lazy(() => import("./pages/CreatorPage"));
 const SeasonShop = lazy(() => import("./pages/SeasonShop"));
 const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 const BusinessDirectoryPage = lazy(() => import("./pages/BusinessDirectoryPage"));
@@ -248,8 +250,9 @@ function AppRoutes() {
         <Route path="/news" element={<Suspense fallback={<GenericPageSkeleton />}><News /></Suspense>} />
         
         <Route path="/videos" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><VideosPage /></Suspense>} />
-          <Route path="/season-shop" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><SeasonShop /></Suspense>} />
-          <Route path="/challenges" element={<Suspense fallback={<GenericPageSkeleton />}><ChallengesPage /></Suspense>} />
+        <Route path="/creator/:userId" element={<Suspense fallback={<ProfileSkeleton />}><CreatorPage /></Suspense>} />
+        <Route path="/season-shop" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><SeasonShop /></Suspense>} />
+        <Route path="/challenges" element={<Suspense fallback={<GenericPageSkeleton />}><ChallengesPage /></Suspense>} />
         
         <Route path="/messages" element={<Suspense fallback={<GenericPageSkeleton />}><MessagesPage /></Suspense>} />
         <Route path="/notificationmessages" element={<Suspense fallback={<ActivityPageSkeleton />}><ActivityPageWrapped /></Suspense>} />

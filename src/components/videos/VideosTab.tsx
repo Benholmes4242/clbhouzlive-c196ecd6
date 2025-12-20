@@ -67,8 +67,8 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   };
 
   const handleCreatorClick = (creatorUserId: string) => {
-    // Navigate using UUID - will work with profile route
-    navigate(`/profile/${creatorUserId}`);
+    // Videos tab: navigate to Creator Page (Phase 3 routing rule)
+    navigate(`/creator/${creatorUserId}`);
   };
 
   const handleSearch = (query: string) => {
