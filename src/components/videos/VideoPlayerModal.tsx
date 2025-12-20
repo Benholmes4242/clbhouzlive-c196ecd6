@@ -5,11 +5,13 @@ import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import FlickerFreeHLSPlayer from '@/components/ui/FlickerFreeHLSPlayer';
 import { useVideoProgress } from '@/hooks/useVideoProgress';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { usePostData } from '@/hooks/usePostData';
 import { useRelatedLongFormVideos } from '@/hooks/useRelatedLongFormVideos';
+import { useAutoplayPreference } from '@/hooks/useAutoplayPreference';
 import { uidFromNode, generateHlsUrl, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -60,6 +62,15 @@ export const VideoPlayerModal: React.FC = () => {
   const upNextCancelledRef = useRef(false);
   const upNextTimerRef = useRef<number | null>(null);
   const upNextIntervalRef = useRef<number | null>(null);
+  const lastInteractionTsRef = useRef<number>(Date.now());
+  
+  // Autoplay preference (persisted)
+  const { autoplayEnabled, setAutoplayEnabled } = useAutoplayPreference();
+  
+  // Mark user interaction (resets autoplay eligibility timer)
+  const markInteraction = useCallback(() => {
+    lastInteractionTsRef.current = Date.now();
+  }, []);
   
   const { fetchPostWithDetails } = usePostData();
   const { progress, shouldResume, resumePosition, updateProgress, clearProgress, isLoading: progressLoading } = useVideoProgress(videoId || '');
@@ -259,7 +270,14 @@ export const VideoPlayerModal: React.FC = () => {
   
   // Start up next countdown
   const startUpNextCountdown = useCallback(() => {
-    if (!upNextVideo || showResumeOverlay || !hasAutoStarted) return;
+    // Gate: autoplay must be enabled
+    if (!autoplayEnabled) return;
+    // Gate: need an up next video
+    if (!upNextVideo) return;
+    // Gate: don't autoplay if resume overlay is showing or video hasn't started
+    if (showResumeOverlay || !hasAutoStarted) return;
+    // Gate: don't autoplay if user was recently interacting (4s threshold)
+    if (Date.now() - lastInteractionTsRef.current < 4000) return;
     
     upNextCancelledRef.current = false;
     setShowUpNextOverlay(true);
@@ -281,7 +299,7 @@ export const VideoPlayerModal: React.FC = () => {
         navigateToVideo(upNextVideo.id);
       }
     }, 5000);
-  }, [upNextVideo, showResumeOverlay, hasAutoStarted, clearUpNextTimers, navigateToVideo]);
+  }, [autoplayEnabled, upNextVideo, showResumeOverlay, hasAutoStarted, clearUpNextTimers, navigateToVideo]);
   
   const handleVideoEnded = useCallback(() => {
     clearProgress();
@@ -289,26 +307,41 @@ export const VideoPlayerModal: React.FC = () => {
   }, [clearProgress, startUpNextCountdown]);
   
   const handleCancelUpNext = useCallback(() => {
+    markInteraction();
     upNextCancelledRef.current = true;
     setShowUpNextOverlay(false);
     clearUpNextTimers();
-  }, [clearUpNextTimers]);
+  }, [clearUpNextTimers, markInteraction]);
   
   const handlePlayNow = useCallback(() => {
     if (!upNextVideo) return;
+    markInteraction();
     clearUpNextTimers();
     setShowUpNextOverlay(false);
     navigateToVideo(upNextVideo.id);
-  }, [upNextVideo, clearUpNextTimers, navigateToVideo]);
+  }, [upNextVideo, clearUpNextTimers, navigateToVideo, markInteraction]);
   
   // Navigate to another video within the modal - also cancels any up next countdown
   const handleVideoSelect = useCallback((newVideoId: string) => {
+    markInteraction();
     // Cancel any pending up next autoplay
     upNextCancelledRef.current = true;
     setShowUpNextOverlay(false);
     clearUpNextTimers();
     navigateToVideo(newVideoId);
-  }, [clearUpNextTimers, navigateToVideo]);
+  }, [clearUpNextTimers, navigateToVideo, markInteraction]);
+  
+  // Toggle autoplay preference - cancel countdown if turning off
+  const handleAutoplayToggle = useCallback((enabled: boolean) => {
+    markInteraction();
+    setAutoplayEnabled(enabled);
+    if (!enabled) {
+      // Immediately cancel any running countdown
+      upNextCancelledRef.current = true;
+      setShowUpNextOverlay(false);
+      clearUpNextTimers();
+    }
+  }, [setAutoplayEnabled, clearUpNextTimers, markInteraction]);
   
   // Cleanup timers on unmount
   useEffect(() => {
@@ -367,8 +400,11 @@ export const VideoPlayerModal: React.FC = () => {
       ref={containerRef}
       className="fixed inset-0 z-[100] flex bg-black/95 backdrop-blur-xl overflow-hidden"
       onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
+      onTouchMove={(e) => { markInteraction(); handleTouchMove(e); }}
       onTouchEnd={handleTouchEnd}
+      onMouseMove={markInteraction}
+      onScroll={markInteraction}
+      onKeyDown={markInteraction}
     >
       {/* Main content - scrollable on mobile */}
       <ScrollArea className="flex-1 h-full">
@@ -561,7 +597,18 @@ export const VideoPlayerModal: React.FC = () => {
             <div className="lg:hidden px-4 pb-6">
               {!relatedLoading && upNextVideo && (
                 <div className="space-y-3">
-                  <h3 className="text-white/80 font-medium text-sm">Up next</h3>
+                  {/* Autoplay toggle + Up next header */}
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-white/80 font-medium text-sm">Up next</h3>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <span className="text-white/60 text-xs">Autoplay</span>
+                      <Switch
+                        checked={autoplayEnabled}
+                        onCheckedChange={handleAutoplayToggle}
+                        className="data-[state=checked]:bg-primary scale-75"
+                      />
+                    </label>
+                  </div>
                   <UpNextTile video={upNextVideo} onClick={() => handleVideoSelect(upNextVideo.id)} />
                   
                   {/* Recommended list */}
@@ -607,7 +654,18 @@ export const VideoPlayerModal: React.FC = () => {
                 {/* Up Next - primary tile */}
                 {upNextVideo && (
                   <>
-                    <h3 className="text-white/80 font-medium text-sm">Up next</h3>
+                    {/* Autoplay toggle + Up next header */}
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-white/80 font-medium text-sm">Up next</h3>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <span className="text-white/60 text-xs">Autoplay</span>
+                        <Switch
+                          checked={autoplayEnabled}
+                          onCheckedChange={handleAutoplayToggle}
+                          className="data-[state=checked]:bg-primary scale-75"
+                        />
+                      </label>
+                    </div>
                     <UpNextTile video={upNextVideo} onClick={() => handleVideoSelect(upNextVideo.id)} />
                   </>
                 )}
