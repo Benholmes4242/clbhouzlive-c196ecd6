@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { VideosIntro } from './VideosIntro';
 import { VideoSearchBar } from './VideoSearchBar';
@@ -34,6 +34,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   className,
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Preserve scroll position when navigating to/from videos
@@ -92,6 +93,12 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     // Save scroll position before navigating
     savePosition();
     console.log('Video clicked:', id);
+    
+    // Navigate to video modal with background location for modal pattern
+    navigate(`/video/${id}`, {
+      state: { backgroundLocation: location, fromVideo: true }
+    });
+    
     onVideoClick?.(id);
   };
 

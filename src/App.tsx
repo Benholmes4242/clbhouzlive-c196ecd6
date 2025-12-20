@@ -167,6 +167,8 @@ const EchoSharePage = lazy(() => import("./pages/EchoSharePage").then(m => ({ de
 const VideosPage = lazy(() => import("./features/videos2/pages/VideosPage"));
 // Creator Page (Phase 3)
 const CreatorPage = lazy(() => import("./pages/CreatorPage"));
+// Video Player Modal (Phase 6A-1)
+const VideoPlayerModal = lazy(() => import("./components/videos/VideoPlayerModal"));
 const SeasonShop = lazy(() => import("./pages/SeasonShop"));
 const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 const BusinessDirectoryPage = lazy(() => import("./pages/BusinessDirectoryPage"));
@@ -195,10 +197,10 @@ const CreateMomentPage = lazy(() => import("./pages/CreateMomentPage"));
 // Import season wrap modal
 import { SeasonWrapModal } from '@/components/season/SeasonWrapModal';
 
-// Routes component that handles background location pattern for Hub overlays
+// Routes component that handles background location pattern for Hub overlays and Video modal
 function AppRoutes() {
   const location = useLocation();
-  const state = location.state as { backgroundLocation?: Location; fromHub?: boolean } | null;
+  const state = location.state as { backgroundLocation?: Location; fromHub?: boolean; fromVideo?: boolean } | null;
   const { shouldHideHeader } = useModalContext();
   
   // Render origin page when we have a background location
@@ -208,8 +210,12 @@ function AppRoutes() {
   const isHubRoute = location.pathname === '/hub' || location.pathname.startsWith('/hub/');
   const showHubOverlay = isHubRoute && !!state?.backgroundLocation;
   
+  // Video modal = /video/:id with backgroundLocation
+  const isVideoRoute = location.pathname.startsWith('/video/');
+  const showVideoModal = isVideoRoute && !!state?.backgroundLocation;
+  
   // Global overlay detection - sync with <html> class
-  const overlayActive = showHubOverlay || shouldHideHeader;
+  const overlayActive = showHubOverlay || showVideoModal || shouldHideHeader;
   
   useEffect(() => {
     const el = document.documentElement;
@@ -250,6 +256,7 @@ function AppRoutes() {
         <Route path="/news" element={<Suspense fallback={<GenericPageSkeleton />}><News /></Suspense>} />
         
         <Route path="/videos" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><VideosPage /></Suspense>} />
+        <Route path="/video/:videoId" element={<Suspense fallback={null}><VideoPlayerModal /></Suspense>} />
         <Route path="/creator/:userId" element={<Suspense fallback={<ProfileSkeleton />}><CreatorPage /></Suspense>} />
         <Route path="/season-shop" element={<Suspense fallback={<GenericPageSkeleton layout="grid" count={6} />}><SeasonShop /></Suspense>} />
         <Route path="/challenges" element={<Suspense fallback={<GenericPageSkeleton />}><ChallengesPage /></Suspense>} />
@@ -410,6 +417,13 @@ function AppRoutes() {
           <Route path="/echo/share/:token" element={<HubEchoSharePage />} />
           <Route path="/hub/new" element={<Navigate to="/hub/echo/history" replace />} />
         </Routes>
+      )}
+      
+      {/* Video Player Modal - rendered over origin page when navigating from video feed */}
+      {showVideoModal && (
+        <Suspense fallback={null}>
+          <VideoPlayerModal />
+        </Suspense>
       )}
     </>
   );
