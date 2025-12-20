@@ -160,8 +160,22 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
             const hasGolfTag = post.post_tags?.some(
               (tag: any) => tag.taggable_entities?.entity_type === 'golf_club'
             );
-            return hasGolfTag;
+            if (!hasGolfTag) return false;
           }
+
+          // If category filter is provided, filter to posts with matching video_category tag
+          if (category) {
+            const categorySlug = category.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const hasCategoryTag = post.post_tags?.some((tag: any) => {
+              const tagEntity = tag.taggable_entities;
+              if (tagEntity?.entity_type !== 'video_category') return false;
+              // Match by name (case-insensitive, normalized)
+              const tagSlug = (tagEntity.name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+              return tagSlug === categorySlug || tagSlug.includes(categorySlug) || categorySlug.includes(tagSlug);
+            });
+            if (!hasCategoryTag) return false;
+          }
+
           return true;
         })
         .map((post: any) => {
