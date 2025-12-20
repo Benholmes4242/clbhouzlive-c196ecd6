@@ -19,6 +19,7 @@ interface FlickerFreeHLSPlayerProps {
   onClick?: () => void;
   onEnded?: () => void;
   onTimeUpdate?: (currentTime: number, duration: number) => void;
+  onLoadedMetadata?: () => void;
   externallyManaged?: boolean;
 }
 
@@ -43,6 +44,7 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
   onClick,
   onEnded,
   onTimeUpdate,
+  onLoadedMetadata,
   externallyManaged = false
 }, ref) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -370,6 +372,7 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
         controlsList="nodownload noplaybackrate noremoteplayback"
         poster={poster}
         onLoadedData={handleVideoReady}
+        onLoadedMetadata={onLoadedMetadata}
         onCanPlay={handleVideoReady}
         onPlay={handleVideoPlay}
         onPause={handleVideoPause}
