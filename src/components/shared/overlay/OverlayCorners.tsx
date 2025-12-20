@@ -108,15 +108,15 @@ const OverlayCorners: React.FC<OverlayCornersProps> = ({
   
   const showRanking = rankingInfo && !(topLeftOverride && hideRankingIfOverride);
   
-  // Determine what goes in each corner based on surface and placement
-  // For tiles: club top-left, duration top-right (matching hero layout)
-  // For hero: club top-left, hot icon top-right
+  // Determine what goes in each corner based on surface
+  // For tiles: club top-right (no duration)
+  // For hero: club top-left (no duration)
   
-  // Top-left: Club (tiles & hero) or Ranking/Override
-  const hasTopLeftContent = topLeftOverride || club || showRanking;
+  // Top-left: Ranking/Override only (no club for tiles)
+  const hasTopLeftContent = topLeftOverride || (surface === 'hero' && club) || showRanking;
   
-  // Top-right: Duration (tiles only, no fire icon)
-  const hasTopRightContent = surface === 'tile' && durationLabel;
+  // Top-right: Club pill for tiles only
+  const hasTopRightContent = surface === 'tile' && club;
   
   const hasBottomLeft = (showCreator && creatorName) || showLikes || trendingLabel;
   const hasBottomRight = showCreator && showAvatar && creatorAvatar;
@@ -131,22 +131,22 @@ const OverlayCorners: React.FC<OverlayCornersProps> = ({
             topLeftOverride
           ) : (
             <>
-              {/* Club pill (tiles & hero: top-left) */}
-              {club && (
+              {/* Club pill (hero only: top-left) */}
+              {surface === 'hero' && club && (
                 <div style={{ maxWidth: pillMaxWidth }}>
                   <GlassPill
                     label={club.name}
                     icon={<MapPin className="w-3 h-3 text-white" />}
                     variant="club"
-                    size={surface === 'tile' ? 'sm' : 'md'}
+                    size="md"
                     interactive={!!onClubClick}
                     onClick={onClubClick}
                   />
                 </div>
               )}
               
-              {/* Ranking pill (if no club) */}
-              {!club && showRanking && rankingInfo && (
+              {/* Ranking pill (if no club on hero) */}
+              {!(surface === 'hero' && club) && showRanking && rankingInfo && (
                 <div style={{ maxWidth: rankingMaxWidth }}>
                   <GlassPill
                     label={rankingInfo.label}
@@ -161,23 +161,21 @@ const OverlayCorners: React.FC<OverlayCornersProps> = ({
         </div>
       )}
 
-      {/* ===== TOP-RIGHT ===== */}
+      {/* ===== TOP-RIGHT: Club pill for tiles ===== */}
       {hasTopRightContent && (
         <div className={cn(OVERLAY_TOP_RIGHT, 'z-20 flex flex-col items-end', OVERLAY_GAP_CLASS)}>
-          {/* Hot state fire icon (hero only) */}
-          {hotState && (
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm border border-white/10">
-              <Flame className="w-4 h-4 text-orange-400" />
+          {/* Club pill (tiles: top-right) */}
+          {surface === 'tile' && club && (
+            <div style={{ maxWidth: pillMaxWidth }}>
+              <GlassPill
+                label={club.name}
+                icon={<MapPin className="w-3 h-3 text-white" />}
+                variant="club"
+                size="sm"
+                interactive={!!onClubClick}
+                onClick={onClubClick}
+              />
             </div>
-          )}
-          
-          {/* Duration badge (tiles: top-right) */}
-          {surface === 'tile' && durationLabel && (
-            <GlassPill
-              label={durationLabel}
-              variant="duration"
-              size="sm"
-            />
           )}
         </div>
       )}
