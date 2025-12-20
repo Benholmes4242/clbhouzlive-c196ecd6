@@ -120,8 +120,9 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.05, duration: 0.2, ease: 'easeOut' }}
+        className="bg-white"
       >
-        {/* Business Row - flat on background */}
+        {/* Business Row */}
         <div 
           onClick={handleRowClick}
           className="flex items-start gap-3.5 px-4 py-3.5 cursor-pointer hover:bg-muted/30 transition-colors"
@@ -388,9 +389,6 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
             </>
           )}
         </div>
-
-        {/* Bottom divider for section separation */}
-        <div className="h-px bg-border/30" />
       </motion.div>
 
       <DeleteBusinessDialog
