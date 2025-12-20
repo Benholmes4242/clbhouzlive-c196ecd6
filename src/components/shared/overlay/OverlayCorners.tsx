@@ -37,8 +37,11 @@ export interface OverlayCornersProps {
   showDuration?: boolean; // Default true, set false for hero
   durationPlacement?: 'top-left' | 'top-right'; // Default 'top-left' for tiles
   
-  // Hero: hot state (fire icon)
+  // Hero: hot state (fire icon) - deprecated, use trendingLabel instead
   hotState?: boolean;
+  
+  // Hero: trending label text (e.g. "Trending Today", "Trending This Week")
+  trendingLabel?: string;
   
   // Bottom-left: Creator + Likes (stacked)
   creatorName?: string;
@@ -83,6 +86,7 @@ const OverlayCorners: React.FC<OverlayCornersProps> = ({
   showDuration = true,
   durationPlacement = 'top-left',
   hotState = false,
+  trendingLabel,
   onClubClick,
   creatorName,
   likes,
@@ -111,10 +115,10 @@ const OverlayCorners: React.FC<OverlayCornersProps> = ({
   // Top-left: Club (tiles & hero) or Ranking/Override
   const hasTopLeftContent = topLeftOverride || club || showRanking;
   
-  // Top-right: Duration (tiles) or Hot icon (hero)
-  const hasTopRightContent = (surface === 'tile' && durationLabel) || hotState;
+  // Top-right: Duration (tiles only, no fire icon)
+  const hasTopRightContent = surface === 'tile' && durationLabel;
   
-  const hasBottomLeft = (showCreator && creatorName) || showLikes;
+  const hasBottomLeft = (showCreator && creatorName) || showLikes || trendingLabel;
   const hasBottomRight = showCreator && showAvatar && creatorAvatar;
 
   return (
@@ -178,23 +182,13 @@ const OverlayCorners: React.FC<OverlayCornersProps> = ({
         </div>
       )}
 
-      {/* ===== BOTTOM-LEFT: Creator + Likes ===== */}
+      {/* ===== BOTTOM-LEFT: Likes + Trending Label (for hero) or Creator + Likes ===== */}
       {hasBottomLeft && (
         <div 
           className={cn(OVERLAY_BOTTOM_LEFT, 'z-10 flex flex-col gap-1 pointer-events-none')}
           style={{ maxWidth: textMaxWidth }}
         >
-          {showCreator && creatorName && (
-            <button
-              type="button"
-              className="text-white font-semibold text-sm leading-tight truncate block pointer-events-auto hover:underline text-left"
-              style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}
-              onClick={onCreatorClick}
-            >
-              {creatorName}
-            </button>
-          )}
-          
+          {/* Likes - shown above trending label for hero */}
           {showLikes && (
             <div 
               className="flex items-center gap-1 text-white/70 text-[10px] leading-none font-medium"
@@ -203,6 +197,28 @@ const OverlayCorners: React.FC<OverlayCornersProps> = ({
               <Heart className="w-3 h-3" />
               <span>{formatLikeCount(likes ?? 0)}</span>
             </div>
+          )}
+          
+          {/* Trending label for hero */}
+          {trendingLabel && (
+            <span 
+              className="text-white font-semibold text-sm leading-tight"
+              style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}
+            >
+              {trendingLabel}
+            </span>
+          )}
+          
+          {/* Creator name (for non-hero surfaces) */}
+          {showCreator && creatorName && !trendingLabel && (
+            <button
+              type="button"
+              className="text-white font-semibold text-sm leading-tight truncate block pointer-events-auto hover:underline text-left"
+              style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}
+              onClick={onCreatorClick}
+            >
+              {creatorName}
+            </button>
           )}
         </div>
       )}

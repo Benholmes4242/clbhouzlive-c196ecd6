@@ -155,7 +155,7 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
           club={item.golfCourse ? { id: item.golfCourse.id, name: item.golfCourse.name } : null}
           onClubClick={handleClubClick}
           showDuration={false}
-          hotState={true}
+          trendingLabel="Trending Today"
           showCreator={false}
           showLikes={true}
           likes={item.likes}
