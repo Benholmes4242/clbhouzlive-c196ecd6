@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { X, Play, Pause } from "lucide-react";
+import { X, Play, Pause, ListMusic } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useVideoPlaybackSafe } from "@/context/VideoPlaybackContext";
 import { usePostData } from "@/hooks/usePostData";
 import { useVideoProgress } from "@/hooks/useVideoProgress";
+import { useVideoQueue } from "@/hooks/useVideoQueue";
 import { uidFromNode, generateHlsUrl, generateThumbnailUrl } from "@/utils/cloudflareStreamTransform";
 import FlickerFreeHLSPlayer from "@/components/ui/FlickerFreeHLSPlayer";
 
@@ -45,6 +46,9 @@ export const MiniPlayer: React.FC = () => {
 
   const { shouldResume, resumePosition, updateProgress, isLoading: progressLoading } =
     useVideoProgress(activeVideoId || "");
+  
+  // Queue for showing queue count
+  const { queueLength } = useVideoQueue();
 
   // Load video details when activeVideoId changes
   useEffect(() => {
@@ -314,21 +318,32 @@ export const MiniPlayer: React.FC = () => {
           <div className="text-white/60 text-xs truncate">
             {videoData?.creatorName || ""}
           </div>
-          {/* 6B-3: Next up indicator */}
-          {context?.nextVideoId && context?.nextMeta && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                const next = context.consumeNext();
-                if (next.videoId) {
-                  context.openMini(next.videoId, next.meta || undefined);
-                }
-              }}
-              className="mt-1 text-[10px] text-primary/80 hover:text-primary truncate max-w-full text-left"
-            >
-              Next: {context.nextMeta.title}
-            </button>
-          )}
+          {/* 6B-3.3: Queue trigger + Next up indicator */}
+          <div className="flex items-center gap-2 mt-1">
+            {queueLength > 0 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  context?.openQueue?.();
+                }}
+                className="flex items-center gap-1 text-[10px] text-white/60 hover:text-white transition-colors"
+              >
+                <ListMusic className="w-3 h-3" />
+                Queue: {queueLength}
+              </button>
+            )}
+            {context?.nextVideoId && context?.nextMeta && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  context?.openQueue?.();
+                }}
+                className="text-[10px] text-primary/80 hover:text-primary truncate max-w-[120px] text-left"
+              >
+                Next: {context.nextMeta.title}
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Controls */}

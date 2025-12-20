@@ -171,6 +171,7 @@ const CreatorPage = lazy(() => import("./pages/CreatorPage"));
 // Video Player Modal (Phase 6A-1)
 const VideoPlayerModal = lazy(() => import("./components/videos/VideoPlayerModal"));
 const MiniPlayer = lazy(() => import("./components/videos/MiniPlayer"));
+const GlobalQueueDrawer = lazy(() => import("./components/videos/GlobalQueueDrawer"));
 const SeasonShop = lazy(() => import("./pages/SeasonShop"));
 const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 const BusinessDirectoryPage = lazy(() => import("./pages/BusinessDirectoryPage"));
@@ -593,6 +594,7 @@ const AppInner: React.FC = () => {
                                       {/* Mini Player - persists across navigation */}
                                       <Suspense fallback={null}>
                                         <MiniPlayer />
+                                        <GlobalQueueDrawer />
                                       </Suspense>
                                     </AuthWrapper>
                                   </ErrorBoundary>

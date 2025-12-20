@@ -20,6 +20,9 @@ interface VideoPlaybackContextValue {
   nextVideoId: string | null;
   nextMeta: MiniPlayerMeta | null;
   
+  // 6B-3.3: Queue drawer state
+  isQueueOpen: boolean;
+  
   openMini: (videoId: string, meta?: MiniPlayerMeta) => void;
   closeMini: () => void;
   openFull: (videoId: string, backgroundLocation?: Location) => void;
@@ -28,6 +31,10 @@ interface VideoPlaybackContextValue {
   // 6B-3: Queue integration
   setNext: (videoId: string | null, meta?: MiniPlayerMeta | null) => void;
   consumeNext: () => { videoId: string | null; meta: MiniPlayerMeta | null };
+  
+  // 6B-3.3: Queue drawer controls
+  openQueue: () => void;
+  closeQueue: () => void;
 }
 
 const VideoPlaybackContext = createContext<VideoPlaybackContextValue | null>(null);
@@ -38,6 +45,7 @@ interface PersistedState {
   miniMeta: MiniPlayerMeta | null;
   nextVideoId: string | null;
   nextMeta: MiniPlayerMeta | null;
+  isQueueOpen: boolean;
 }
 
 const DEFAULT_STATE: PersistedState = {
@@ -46,6 +54,7 @@ const DEFAULT_STATE: PersistedState = {
   miniMeta: null,
   nextVideoId: null,
   nextMeta: null,
+  isQueueOpen: false,
 };
 
 export const VideoPlaybackProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -139,6 +148,15 @@ export const VideoPlaybackProvider: React.FC<{ children: React.ReactNode }> = ({
     return result;
   }, []);
 
+  // 6B-3.3: Queue drawer controls
+  const openQueue = useCallback(() => {
+    setState(prev => ({ ...prev, isQueueOpen: true }));
+  }, []);
+
+  const closeQueue = useCallback(() => {
+    setState(prev => ({ ...prev, isQueueOpen: false }));
+  }, []);
+
   return (
     <VideoPlaybackContext.Provider value={{
       activeVideoId: state.activeVideoId,
@@ -146,12 +164,15 @@ export const VideoPlaybackProvider: React.FC<{ children: React.ReactNode }> = ({
       miniMeta: state.miniMeta,
       nextVideoId: state.nextVideoId,
       nextMeta: state.nextMeta,
+      isQueueOpen: state.isQueueOpen,
       openMini,
       closeMini,
       openFull,
       setMiniMeta,
       setNext,
       consumeNext,
+      openQueue,
+      closeQueue,
     }}>
       {children}
     </VideoPlaybackContext.Provider>
