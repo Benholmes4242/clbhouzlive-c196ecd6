@@ -110,6 +110,8 @@ export const VideoPlaybackProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [state.isMiniOpen, state.activeVideoId]);
 
   const openMini = useCallback((videoId: string, meta?: MiniPlayerMeta) => {
+    // 6B-4: Guard against null/empty video IDs
+    if (!videoId) return;
     setState(prev => ({
       ...prev,
       activeVideoId: videoId,

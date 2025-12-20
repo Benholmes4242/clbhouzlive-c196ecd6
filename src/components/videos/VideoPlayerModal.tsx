@@ -440,15 +440,16 @@ export const VideoPlayerModal: React.FC = () => {
     }, 1000);
     
     // Autoplay timer - only auto-navigate if autoplay is ON
+    const expectedNextId = peekNext() || nextVideo.id;
     upNextTimerRef.current = window.setTimeout(() => {
       if (!upNextCancelledRef.current && nextVideo && autoplayEnabled) {
         setShowUpNextOverlay(false);
         clearUpNextTimers();
-        popNext(); // Remove from queue
+        popNext(expectedNextId); // 6B-4: Pop with expected ID for safety
         navigateToVideo(nextVideo.id);
       }
     }, 5000);
-  }, [nextQueuedVideo, showResumeOverlay, hasAutoStarted, autoplayEnabled, clearUpNextTimers, navigateToVideo, popNext]);
+  }, [nextQueuedVideo, showResumeOverlay, hasAutoStarted, autoplayEnabled, clearUpNextTimers, navigateToVideo, popNext, peekNext]);
   
   const handleVideoEnded = useCallback(() => {
     clearProgress();
@@ -468,9 +469,10 @@ export const VideoPlayerModal: React.FC = () => {
     markInteraction();
     clearUpNextTimers();
     setShowUpNextOverlay(false);
-    popNext(); // Remove from queue
+    const expectedId = peekNext() || nextVideo.id;
+    popNext(expectedId); // 6B-4: Pop with expected ID for safety
     navigateToVideo(nextVideo.id);
-  }, [nextQueuedVideo, clearUpNextTimers, navigateToVideo, markInteraction, popNext]);
+  }, [nextQueuedVideo, clearUpNextTimers, navigateToVideo, markInteraction, popNext, peekNext]);
   
   // Navigate to another video within the modal - also cancels any up next countdown
   const handleVideoSelect = useCallback((newVideoId: string) => {

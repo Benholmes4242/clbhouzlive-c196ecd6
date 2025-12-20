@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { X, Play, Pause, ListMusic } from "lucide-react";
+import { X, Play, Pause, ListMusic, Maximize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useVideoPlaybackSafe } from "@/context/VideoPlaybackContext";
 import { usePostData } from "@/hooks/usePostData";
@@ -7,6 +7,7 @@ import { useVideoProgress } from "@/hooks/useVideoProgress";
 import { useVideoQueue } from "@/hooks/useVideoQueue";
 import { uidFromNode, generateHlsUrl, generateThumbnailUrl } from "@/utils/cloudflareStreamTransform";
 import FlickerFreeHLSPlayer from "@/components/ui/FlickerFreeHLSPlayer";
+import { trackVideoCloseMini } from "@/lib/analytics/videoAnalytics";
 
 type MiniVideo = {
   id: string;
@@ -39,6 +40,7 @@ export const MiniPlayer: React.FC = () => {
   const [videoData, setVideoData] = useState<MiniVideo | null>(null);
   const [loading, setLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [miniProgress, setMiniProgress] = useState(0); // For visual progress bar
 
   // Don't render if context doesn't exist or mini isn't open
   const activeVideoId = context?.activeVideoId;
@@ -151,11 +153,14 @@ export const MiniPlayer: React.FC = () => {
     }
   }, []);
 
-  // Progress updates: throttle every 5s
+  // Progress updates: throttle every 5s + update visual progress bar
   const handleTimeUpdate = useCallback(
     (currentTime: number, duration: number) => {
       if (!activeVideoId || !isMiniOpen) return;
       if (!duration || duration <= 0) return;
+
+      // Update visual progress bar (always)
+      setMiniProgress((currentTime / duration) * 100);
 
       const now = Date.now();
       if (now - lastProgressSentAtRef.current < PROGRESS_THROTTLE_MS) return;
@@ -223,6 +228,10 @@ export const MiniPlayer: React.FC = () => {
       const el = videoElRef.current;
       if (el && el.duration > 0) {
         updateProgress(el.currentTime, el.duration);
+        // Track analytics
+        if (activeVideoId) {
+          trackVideoCloseMini(activeVideoId, el.currentTime);
+        }
       }
 
       // Pause and close
@@ -232,9 +241,10 @@ export const MiniPlayer: React.FC = () => {
         // ignore
       }
       setIsPlaying(false);
+      setMiniProgress(0);
       context?.closeMini();
     },
-    [context, updateProgress]
+    [context, updateProgress, activeVideoId]
   );
 
   const handleOpenFull = useCallback(() => {
@@ -292,51 +302,67 @@ export const MiniPlayer: React.FC = () => {
   if (!isVisible) return null;
 
   return (
-    <div className={containerClass} aria-label="Mini player">
+    <div className={containerClass} aria-label="Mini player" role="dialog">
       <div
         className={cn(
-          "pointer-events-auto",
+          "pointer-events-auto relative",
           "bg-zinc-900/95 backdrop-blur-xl border border-white/10",
           "rounded-none md:rounded-2xl",
           "shadow-2xl",
-          "p-2 md:p-3",
-          "flex gap-3 items-center",
-          "cursor-pointer hover:bg-zinc-800/95 transition-colors",
+          "overflow-hidden",
           "animate-in slide-in-from-bottom-4 fade-in duration-300"
         )}
-        onClick={handleOpenFull}
-        role="button"
-        tabIndex={0}
       >
-        {/* Thumbnail / mini video */}
-        <div className="relative w-24 h-14 md:w-28 md:h-16 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
-          {!loading && videoData?.hlsUrl ? (
-            <>
-              <FlickerFreeHLSPlayer
-                ref={videoElRef as any}
-                hlsUrl={videoData.hlsUrl}
-                poster={videoData.posterUrl}
-                autoplay
-                playsInline
-                muted={true}  // Muted in mini to avoid audio issues / iOS restrictions
-                loop={false}
-                className="w-full h-full"
-                objectFit="cover"
-                onLoadedMetadata={handleLoadedMetadata}
-                onTimeUpdate={handleTimeUpdate}
-                onPlay={handlePlay}
-                onPause={handlePause}
-                onEnded={handleEnded}
-              />
-              {/* Muted indicator */}
-              <div className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/60 rounded text-[10px] text-white/60">
-                🔇
-              </div>
-            </>
-          ) : (
-            <div className="w-full h-full animate-pulse bg-white/10" />
-          )}
+        {/* Progress bar at top edge */}
+        <div className="absolute top-0 left-0 right-0 h-0.5 bg-white/10">
+          <div 
+            className="h-full bg-primary transition-all duration-200 ease-linear"
+            style={{ width: `${miniProgress}%` }}
+          />
         </div>
+        
+        <div
+          className={cn(
+            "p-2 md:p-3",
+            "flex gap-3 items-center"
+          )}
+        >
+          {/* Thumbnail / mini video - click opens full */}
+          <div 
+            className="relative w-24 h-14 md:w-28 md:h-16 rounded-lg overflow-hidden bg-white/5 flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
+            onClick={handleOpenFull}
+            role="button"
+            tabIndex={0}
+            aria-label="Open full player"
+          >
+            {!loading && videoData?.hlsUrl ? (
+              <>
+                <FlickerFreeHLSPlayer
+                  key={activeVideoId} // 6B-4: Key by activeVideoId to prevent stale audio
+                  ref={videoElRef as any}
+                  hlsUrl={videoData.hlsUrl}
+                  poster={videoData.posterUrl}
+                  autoplay
+                  playsInline
+                  muted={true}  // Muted in mini to avoid audio issues / iOS restrictions
+                  loop={false}
+                  className="w-full h-full"
+                  objectFit="cover"
+                  onLoadedMetadata={handleLoadedMetadata}
+                  onTimeUpdate={handleTimeUpdate}
+                  onPlay={handlePlay}
+                  onPause={handlePause}
+                  onEnded={handleEnded}
+                />
+                {/* Muted indicator */}
+                <div className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/60 rounded text-[10px] text-white/60">
+                  🔇
+                </div>
+              </>
+            ) : (
+              <div className="w-full h-full animate-pulse bg-white/10" />
+            )}
+          </div>
 
         {/* Title + creator + next up indicator */}
         <div className="min-w-0 flex-1">
@@ -374,33 +400,48 @@ export const MiniPlayer: React.FC = () => {
           </div>
         </div>
 
-        {/* Controls */}
-        <div className="flex items-center gap-1.5">
-          <button
-            onClick={handleTogglePlay}
-            className={cn(
-              "w-9 h-9 rounded-full",
-              "bg-white/10 hover:bg-white/20",
-              "text-white flex items-center justify-center transition"
-            )}
-            aria-label={isPlaying ? "Pause" : "Play"}
-            type="button"
-          >
-            {isPlaying ? <Pause className="w-4 h-4" fill="currentColor" /> : <Play className="w-4 h-4 ml-0.5" fill="currentColor" />}
-          </button>
+          {/* Controls */}
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={handleTogglePlay}
+              className={cn(
+                "w-9 h-9 rounded-full",
+                "bg-white/10 hover:bg-white/20",
+                "text-white flex items-center justify-center transition"
+              )}
+              aria-label={isPlaying ? "Pause" : "Play"}
+              type="button"
+            >
+              {isPlaying ? <Pause className="w-4 h-4" fill="currentColor" /> : <Play className="w-4 h-4 ml-0.5" fill="currentColor" />}
+            </button>
 
-          <button
-            onClick={handleClose}
-            className={cn(
-              "w-9 h-9 rounded-full",
-              "bg-white/10 hover:bg-white/20",
-              "text-white/80 hover:text-white flex items-center justify-center transition"
-            )}
-            aria-label="Close mini player"
-            type="button"
-          >
-            <X className="w-4 h-4" />
-          </button>
+            {/* Expand button (opens full player) */}
+            <button
+              onClick={(e) => { e.stopPropagation(); handleOpenFull(); }}
+              className={cn(
+                "w-9 h-9 rounded-full hidden md:flex",
+                "bg-white/10 hover:bg-white/20",
+                "text-white/80 hover:text-white items-center justify-center transition"
+              )}
+              aria-label="Open full player"
+              type="button"
+            >
+              <Maximize2 className="w-4 h-4" />
+            </button>
+
+            <button
+              onClick={handleClose}
+              className={cn(
+                "w-9 h-9 rounded-full",
+                "bg-white/10 hover:bg-white/20",
+                "text-white/80 hover:text-white flex items-center justify-center transition"
+              )}
+              aria-label="Close mini player"
+              type="button"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

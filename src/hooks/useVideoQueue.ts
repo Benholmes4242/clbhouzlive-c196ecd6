@@ -26,7 +26,10 @@ export function useVideoQueue() {
     if (typeof window === 'undefined') return [];
     try {
       const stored = sessionStorage.getItem(QUEUE_KEY);
-      return stored ? JSON.parse(stored) : [];
+      if (!stored) return [];
+      const parsed = JSON.parse(stored);
+      // 6B-4: Stricter validation - ensure array of strings
+      return Array.isArray(parsed) ? parsed.filter(x => typeof x === 'string') : [];
     } catch {
       return [];
     }
@@ -36,7 +39,10 @@ export function useVideoQueue() {
     if (typeof window === 'undefined') return {};
     try {
       const stored = sessionStorage.getItem(META_KEY);
-      return stored ? JSON.parse(stored) : {};
+      if (!stored) return {};
+      const parsed = JSON.parse(stored);
+      // 6B-4: Stricter validation - ensure plain object
+      return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
     } catch {
       return {};
     }
@@ -89,9 +95,26 @@ export function useVideoQueue() {
     toast.success('Added to queue');
   }, []);
 
-  // Remove the next video from queue (use peekNext first to get the ID)
-  const popNext = useCallback(() => {
-    setQueue((prev) => prev.slice(1));
+  // Remove the next video from queue (optionally with expected id for safety)
+  const popNext = useCallback((expectedId?: string) => {
+    setQueue((prev) => {
+      if (prev.length === 0) return prev;
+      if (expectedId && prev[0] !== expectedId) return prev; // Safety: don't pop wrong item
+      return prev.slice(1);
+    });
+    // Also clean up meta for popped item
+    if (expectedId) {
+      setQueueMeta((prev) => {
+        const copy = { ...prev };
+        delete copy[expectedId];
+        return copy;
+      });
+    }
+  }, []);
+
+  // Play now: removes item from queue and returns it (caller handles navigation)
+  const playNow = useCallback((videoId: string) => {
+    setQueue((prev) => prev.filter((id) => id !== videoId));
   }, []);
 
   // Peek at next video without removing
@@ -160,6 +183,7 @@ export function useVideoQueue() {
     clearQueue,
     moveQueueItem,
     updateMeta,
+    playNow,
     queueLength: queue.length,
   };
 }
