@@ -85,7 +85,7 @@ export const useContinueWatching = (limit: number = 10): UseContinueWatchingResu
           )
         `)
         .eq('user_id', userId)
-        .gt('last_position_seconds', 0) // Only partially watched
+        .gt('last_position_seconds', 10) // Only show videos with meaningful progress (>10s per spec)
         .order('updated_at', { ascending: false })
         .limit(limit);
 
