@@ -9,6 +9,8 @@ interface UseLongFormVideosOptions {
   followedCreatorIds?: string[];
   creatorUserId?: string; // Filter to specific creator's videos
   sort?: 'latest' | 'popular'; // Sort order for creator page
+  searchQuery?: string; // Search term for videos search
+  category?: string; // Category filter (maps to video_category tag)
 }
 
 interface UseLongFormVideosResult {
@@ -27,7 +29,15 @@ interface UseLongFormVideosResult {
  * - duration_seconds IS NOT NULL
  */
 export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLongFormVideosResult => {
-  const { section = 'all', limit = 10, followedCreatorIds = [], creatorUserId, sort = 'latest' } = options;
+  const { 
+    section = 'all', 
+    limit = 10, 
+    followedCreatorIds = [], 
+    creatorUserId, 
+    sort = 'latest',
+    searchQuery,
+    category,
+  } = options;
   
   const [videos, setVideos] = useState<LongFormVideo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -92,22 +102,30 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
       // If fetching for a specific creator (Creator Page)
       if (creatorUserId) {
         query = query.eq('user_id', creatorUserId);
-        // Apply sort for creator page
-        if (sort === 'popular') {
-          query = query.order('created_at', { ascending: false }); // Fallback until we have proper popularity sorting
-        } else {
-          query = query.order('created_at', { ascending: false });
-        }
+      }
+
+      // Apply search filter if provided
+      if (searchQuery && searchQuery.trim()) {
+        // Search in post content (title is first line, plus caption)
+        query = query.ilike('content', `%${searchQuery.trim()}%`);
+      }
+
+      // Apply sorting
+      if (sort === 'popular') {
+        // Order by views/likes - we'll sort client-side since Supabase can't sort by joined table
+        query = query.order('created_at', { ascending: false });
       } else {
-        // Apply section-specific filters for Videos tab
+        query = query.order('created_at', { ascending: false });
+      }
+
+      // Apply section-specific filters for Videos tab (only if not creator-specific)
+      if (!creatorUserId && !searchQuery) {
         switch (section) {
           case 'trending':
             // Last 7 days, sorted by engagement
             const sevenDaysAgo = new Date();
             sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-            query = query
-              .gte('created_at', sevenDaysAgo.toISOString())
-              .order('created_at', { ascending: false });
+            query = query.gte('created_at', sevenDaysAgo.toISOString());
             break;
             
           case 'following':
@@ -120,17 +138,10 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
               setIsLoading(false);
               return;
             }
-            query = query.order('created_at', { ascending: false });
             break;
             
           case 'courses':
-            // Videos that have a golf course/club tag
-            query = query.order('created_at', { ascending: false });
-            break;
-            
-          case 'recommended':
-          default:
-            query = query.order('created_at', { ascending: false });
+            // Videos that have a golf course/club tag - filtered post-query
             break;
         }
       }
@@ -183,6 +194,11 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
           };
         });
 
+      // Client-side sort by popularity (views) if requested
+      if (sort === 'popular') {
+        transformedVideos.sort((a, b) => (b.views || 0) - (a.views || 0));
+      }
+
       setVideos(transformedVideos);
     } catch (err) {
       console.error('Error fetching long-form videos:', err);
@@ -190,7 +206,7 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
     } finally {
       setIsLoading(false);
     }
-  }, [section, limit, followedCreatorIds, creatorUserId, sort]);
+  }, [section, limit, followedCreatorIds, creatorUserId, sort, searchQuery, category]);
 
   useEffect(() => {
     fetchVideos();
