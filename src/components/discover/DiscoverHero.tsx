@@ -1,9 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
-import { MapPin } from 'lucide-react';
 import { getStreamPoster } from '@/utils/stream';
-import GlassPill, { formatPillDuration, getRankingInfo } from '@/components/shared/GlassPill';
+import { OverlayCorners } from '@/components/shared/overlay';
 
 interface HeroItem {
   id: string;
@@ -101,10 +100,6 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
   };
 
   const isVideo = item.mediaType === 'video';
-  const hasClubPill = !!item.golfCourse;
-  const showDuration = isVideo && resolvedDuration && resolvedDuration > 0;
-  const durationLabel = showDuration ? formatPillDuration(resolvedDuration) : null;
-  const rankingInfo = getRankingInfo({ isPopular: item.isPopular, isTrending: item.isTrending });
 
   return (
     <div 
@@ -146,44 +141,21 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
       {/* Softer gradient overlay - less contrast */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
 
-      {/* Top-left: Ranking pill */}
-      {rankingInfo && (
-        <div className="absolute top-3 left-3 md:top-4 md:left-4 z-20">
-          <GlassPill
-            label={rankingInfo.label}
-            icon={rankingInfo.icon}
-            variant="ranking"
-            size="md"
-          />
-        </div>
-      )}
+      {/* Unified overlay system (uses hero surface for appropriate max-widths) */}
+      <OverlayCorners
+        surface="hero"
+        isPopular={item.isPopular}
+        isTrending={item.isTrending}
+        club={item.golfCourse ? { id: item.golfCourse.id, name: item.golfCourse.name } : null}
+        durationSeconds={isVideo ? resolvedDuration : undefined}
+        onClubClick={handleClubClick}
+        showCreator={false}
+        showLikes={false}
+        showAvatar={false}
+      />
 
-      {/* Top-right zone: Duration badge and/or Club pill (stacked to avoid overlap) */}
-      <div className="absolute top-3 right-3 md:top-4 md:right-4 flex items-center gap-2 z-20">
-        {/* Duration badge - shown for video content */}
-        {durationLabel && (
-          <GlassPill
-            label={durationLabel}
-            variant="duration"
-            size="md"
-          />
-        )}
-        
-        {/* Golf Club Tag Pill */}
-        {hasClubPill && (
-          <GlassPill
-            label={item.golfCourse!.name}
-            icon={<MapPin className="w-3 h-3" />}
-            variant="club"
-            size="md"
-            interactive
-            onClick={handleClubClick}
-          />
-        )}
-      </div>
-
-      {/* Content overlay */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5 lg:p-6">
+      {/* Content overlay (bottom text) */}
+      <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5 lg:p-6 z-10">
         {/* Context label */}
         <span className="inline-block text-[10px] md:text-[11px] font-medium text-white/70 uppercase tracking-wider mb-1.5">
           {item.contextLabel}

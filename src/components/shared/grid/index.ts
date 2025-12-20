@@ -2,7 +2,6 @@
 
 export { default as UnifiedMediaGrid } from './UnifiedMediaGrid';
 export { default as UnifiedMediaTile } from './UnifiedMediaTile';
-export { default as TileOverlay } from './TileOverlay';
 export * from './types';
 export * from './layoutUtils';
 export * from './adapters';

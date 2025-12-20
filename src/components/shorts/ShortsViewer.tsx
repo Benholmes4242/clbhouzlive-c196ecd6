@@ -3,7 +3,8 @@ import { X, Volume2, VolumeX, ChevronUp, ChevronDown } from 'lucide-react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { useSwipeable } from 'react-swipeable';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
-import GlassPill, { formatPillDuration, getRankingInfo } from '@/components/shared/GlassPill';
+import { OverlayCorners, OVERLAY_TOP_LEFT, OVERLAY_TOP_RIGHT } from '@/components/shared/overlay';
+import { cn } from '@/lib/utils';
 
 interface ShortsViewerProps {
   items: ExploreContentItem[];
@@ -122,7 +123,6 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
 
   // Get duration from video element or item data
   useEffect(() => {
-    // First try to use durationSeconds from item
     if (currentItem?.durationSeconds && currentItem.durationSeconds > 0) {
       setResolvedDuration(currentItem.durationSeconds);
     }
@@ -159,11 +159,11 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
 
   if (!isOpen || !currentItem) return null;
 
-  const durationLabel = resolvedDuration && resolvedDuration > 0 ? formatPillDuration(resolvedDuration) : null;
-  const rankingInfo = getRankingInfo({ 
-    isPopular: (currentItem as any).isPopular, 
-    isTrending: (currentItem as any).isTrending 
-  });
+  // Build club data if golf course exists
+  const clubData = currentItem.golfCourse ? {
+    id: currentItem.golfCourse.id,
+    name: currentItem.golfCourse.name,
+  } : null;
 
   return (
     <div
@@ -182,7 +182,7 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
         onLoadedMetadata={handleLoadedMetadata}
       />
 
-      {/* Close Button - Top Left */}
+      {/* Close Button - Top Left (before ranking pill) */}
       <button
         onClick={onClose}
         className="absolute top-4 left-4 z-50 w-10 h-10 rounded-full bg-black/65 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white hover:bg-black/80 transition-colors"
@@ -191,28 +191,21 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
         <X className="w-5 h-5" />
       </button>
 
-      {/* Ranking Pill - Top Left (offset from close button) */}
-      {rankingInfo && (
-        <div className="absolute top-4 left-16 z-40">
-          <GlassPill
-            label={rankingInfo.label}
-            icon={rankingInfo.icon}
-            variant="ranking"
-            size="md"
-          />
-        </div>
-      )}
-
-      {/* Duration Badge - Top Right (left of mute button) */}
-      {durationLabel && (
-        <div className="absolute top-4 right-16 z-40">
-          <GlassPill
-            label={durationLabel}
-            variant="duration"
-            size="md"
-          />
-        </div>
-      )}
+      {/* Unified overlay system (uses player surface) */}
+      {/* Offset left/right to account for close and mute buttons */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Custom positioning for player to avoid button overlap */}
+        <OverlayCorners
+          surface="player"
+          isPopular={(currentItem as any).isPopular}
+          isTrending={(currentItem as any).isTrending}
+          club={clubData}
+          durationSeconds={resolvedDuration}
+          showCreator={false}
+          showLikes={false}
+          showAvatar={false}
+        />
+      </div>
 
       {/* Mute Toggle - Top Right */}
       <button
