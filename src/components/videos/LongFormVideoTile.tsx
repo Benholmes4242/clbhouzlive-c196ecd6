@@ -5,7 +5,7 @@ import { Play, Flame } from 'lucide-react';
 export interface LongFormVideo {
   id: string;
   title: string;
-  creatorId: string;
+  creatorUserId: string; // UUID - used for navigation
   creatorName: string;
   creatorAvatarUrl?: string;
   thumbnailUrl: string;
@@ -21,7 +21,7 @@ export interface LongFormVideo {
 interface LongFormVideoTileProps {
   video: LongFormVideo;
   onVideoClick?: (id: string) => void;
-  onCreatorClick?: (creatorId: string) => void;
+  onCreatorClick?: (creatorUserId: string) => void;
   className?: string;
 }
 
@@ -58,7 +58,7 @@ export const LongFormVideoTile: React.FC<LongFormVideoTileProps> = ({
 
   const handleCreatorClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onCreatorClick?.(video.creatorId);
+    onCreatorClick?.(video.creatorUserId);
   };
 
   return (
@@ -76,7 +76,9 @@ export const LongFormVideoTile: React.FC<LongFormVideoTileProps> = ({
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20" />
+          <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">
+            <Play className="h-12 w-12 text-muted-foreground/40" />
+          </div>
         )}
 
         {/* Play overlay on hover */}
@@ -132,7 +134,7 @@ export const LongFormVideoTile: React.FC<LongFormVideoTileProps> = ({
             >
               {video.creatorName}
             </button>
-            {video.views !== undefined && (
+            {video.views !== undefined && video.views > 0 && (
               <>
                 <span>·</span>
                 <span>{formatViews(video.views)}</span>

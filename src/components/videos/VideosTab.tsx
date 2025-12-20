@@ -1,119 +1,18 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { VIDEO_DURATION_THRESHOLD_SECONDS } from '@/constants/videoRules';
 import { VideosIntro } from './VideosIntro';
 import { VideoSearchBar } from './VideoSearchBar';
 import { VideoFilterChips, VideoCategory } from './VideoFilterChips';
 import { VideoSection } from './VideoSection';
 import { VideosEmptyState } from './VideosEmptyState';
-import { LongFormVideo } from './LongFormVideoTile';
+import { useLongFormVideos } from '@/hooks/useLongFormVideos';
+import { useFollowedUsers } from '@/hooks/useFollowedUsers';
 
 interface VideosTabProps {
   onVideoClick?: (id: string) => void;
   className?: string;
 }
-
-// Mock data - replace with real API integration
-// All videos here are long-form (≥3 min / 180 seconds)
-const MOCK_RECOMMENDED: LongFormVideo[] = [
-  {
-    id: 'rec1',
-    title: 'Stop Slicing Forever – The Fix That Actually Works',
-    creatorId: 'rick-shiels',
-    creatorName: 'Rick Shiels',
-    creatorAvatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=640&q=80',
-    duration: '11:20',
-    durationSeconds: 680,
-    views: 1250000,
-    createdAt: '2024-12-18',
-  },
-  {
-    id: 'rec2',
-    title: 'Iron Contact Drills You Can Do at Home',
-    creatorId: 'athletic-motion',
-    creatorName: 'Athletic Motion Golf',
-    creatorAvatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=640&q=80',
-    duration: '9:15',
-    durationSeconds: 555,
-    views: 890000,
-    createdAt: '2024-12-15',
-  },
-  {
-    id: 'rec3',
-    title: 'Course Management to Break 100',
-    creatorId: 'golf-sidekick',
-    creatorName: 'Golf Sidekick',
-    creatorAvatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&q=80',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=640&q=80',
-    duration: '18:30',
-    durationSeconds: 1110,
-    views: 2100000,
-    createdAt: '2024-12-10',
-  },
-];
-
-const MOCK_TRENDING: LongFormVideo[] = [
-  {
-    id: 'trend1',
-    title: 'Bryson DeChambeau Shows His INSANE Practice Routine',
-    creatorId: 'bryson',
-    creatorName: 'Bryson DeChambeau',
-    creatorAvatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1592919505780-303950717480?w=640&q=80',
-    duration: '22:45',
-    durationSeconds: 1365,
-    views: 5400000,
-    createdAt: '2024-12-19',
-    isTrending: true,
-  },
-  {
-    id: 'trend2',
-    title: 'The SECRET Tiger Woods Drill Nobody Talks About',
-    creatorId: 'peter-finch',
-    creatorName: 'Peter Finch',
-    creatorAvatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=640&q=80',
-    duration: '15:30',
-    durationSeconds: 930,
-    views: 3200000,
-    createdAt: '2024-12-17',
-    isTrending: true,
-  },
-];
-
-const MOCK_COURSES: LongFormVideo[] = [
-  {
-    id: 'course1',
-    title: 'Playing Pebble Beach for the First Time',
-    creatorId: 'golf-sidekick',
-    creatorName: 'Golf Sidekick',
-    creatorAvatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&q=80',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=640&q=80',
-    duration: '45:20',
-    durationSeconds: 2720,
-    views: 1800000,
-    createdAt: '2024-12-12',
-    golfCourseId: 'pebble-beach',
-    golfCourseName: 'Pebble Beach Golf Links',
-  },
-  {
-    id: 'course2',
-    title: 'St Andrews Old Course – A Dream Come True',
-    creatorId: 'rick-shiels',
-    creatorName: 'Rick Shiels',
-    creatorAvatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=640&q=80',
-    duration: '38:15',
-    durationSeconds: 2295,
-    views: 2500000,
-    createdAt: '2024-12-08',
-    golfCourseId: 'st-andrews',
-    golfCourseName: 'St Andrews Old Course',
-  },
-];
 
 /**
  * VideosTab - YouTube-style long-form video home
@@ -131,35 +30,59 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   className,
 }) => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState<VideoCategory>('all');
 
-  // TODO: Replace with real data fetching hooks
-  // All queries must include: duration_seconds >= VIDEO_DURATION_THRESHOLD_SECONDS
-  const recommendedVideos = MOCK_RECOMMENDED;
-  const trendingVideos = MOCK_TRENDING;
-  const coursesVideos = MOCK_COURSES;
-  
-  // Mock: no followed creators yet
-  const followedCreatorsVideos: LongFormVideo[] = [];
+  // Check if we're in a section view (View All clicked)
+  const sectionParam = searchParams.get('section');
+
+  // Get followed user IDs for "From creators you follow" section
+  const { followedIds } = useFollowedUsers();
+
+  // Fetch videos for each section using the real data hook
+  const { videos: recommendedVideos, isLoading: recLoading } = useLongFormVideos({
+    section: 'recommended',
+    limit: 4,
+  });
+
+  const { videos: trendingVideos, isLoading: trendLoading } = useLongFormVideos({
+    section: 'trending',
+    limit: 3,
+  });
+
+  const { videos: followedVideos, isLoading: followLoading } = useLongFormVideos({
+    section: 'following',
+    limit: 4,
+    followedCreatorIds: followedIds,
+  });
+
+  const { videos: coursesVideos, isLoading: coursesLoading } = useLongFormVideos({
+    section: 'courses',
+    limit: 3,
+  });
 
   const handleVideoClick = (id: string) => {
     console.log('Video clicked:', id);
     onVideoClick?.(id);
   };
 
-  const handleCreatorClick = (creatorId: string) => {
-    // Phase 1 rule: route to Profile for now (Creator Page later)
-    navigate(`/profile/${creatorId}`);
+  const handleCreatorClick = (creatorUserId: string) => {
+    // Navigate using UUID - will work with profile route
+    navigate(`/profile/${creatorUserId}`);
   };
 
   const handleSearch = (query: string) => {
-    // Navigate to search with videos filter
     navigate(`/search?type=videos&q=${encodeURIComponent(query)}`);
   };
 
   const handleViewAll = (section: string) => {
-    navigate(`/videos?section=${section}`);
+    // Use discover-scoped route to avoid /videos conflict
+    navigate(`/discover?main=videos&section=${section}`);
   };
+
+  // If section param exists, we could render VideosSectionPage inline
+  // For now, sections are handled by query param and we just filter differently
+  // This keeps everything in Discover without needing a new route
 
   return (
     <div className={cn("min-h-screen pb-20", className)}>
@@ -203,11 +126,11 @@ export const VideosTab: React.FC<VideosTabProps> = ({
       {/* Module 3: From creators you follow */}
       <VideoSection
         title="From creators you follow"
-        videos={followedCreatorsVideos.slice(0, 3)}
+        videos={followedVideos.slice(0, 3)}
         onViewAll={() => handleViewAll('following')}
         onVideoClick={handleVideoClick}
         onCreatorClick={handleCreatorClick}
-        showViewAll={followedCreatorsVideos.length > 0}
+        showViewAll={followedVideos.length > 0}
         emptyState={<VideosEmptyState type="creators-you-follow" />}
         className="mb-8"
       />
