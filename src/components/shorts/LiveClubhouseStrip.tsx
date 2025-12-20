@@ -90,7 +90,7 @@ export function LiveClubhouseStrip() {
         <span className="live-row-title">Suggested golfers</span>
         <button 
           className="live-row-see-all"
-          onClick={() => navigate('/golfers-to-follow?source=watch')}
+          onClick={() => navigate('/golferstofollow')}
         >
           See all
           <ChevronRight className="w-4 h-4" />
