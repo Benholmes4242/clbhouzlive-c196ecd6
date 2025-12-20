@@ -1,9 +1,8 @@
 import React, { useCallback, useRef, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { UnifiedMediaItem, UnifiedGridConfig } from './types';
-import TileOverlay from './TileOverlay';
+import { OverlayCorners } from '@/components/shared/overlay';
 import GridAutoplayVideo from '@/components/profile/activity/GridAutoplayVideo';
-import GlassPill from '@/components/shared/GlassPill';
 import { Images, Trophy } from 'lucide-react';
 import { RegisterVideoFn } from '@/hooks/useGridAutoplay';
 import { motion } from 'framer-motion';
@@ -22,16 +21,10 @@ interface UnifiedMediaTileProps {
 /**
  * Unified media tile component used by both Watch and Profile grids
  * 
- * Features:
- * - Portrait: 3:4 aspect ratio
- * - Landscape: 16:9, spans full width
- * - Configurable overlays using unified GlassPill system
- * - Press feedback animation (scale 0.98 on tap)
- * 
- * Overlay layout:
- * - Top-left: Ranking pill (Popular today / Trending) OR course tag on landscape
- * - Top-right: Duration badge
- * - Bottom-left (stacked): Creator name, Like count
+ * Uses OverlayCorners for consistent overlay positioning:
+ * - Top-left: Ranking pill (or milestone/multi-media indicator)
+ * - Top-right: Club pill + Duration badge (stacked)
+ * - Bottom-left: Creator name + Like count
  * - Bottom-right: Creator avatar squircle
  */
 const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
@@ -54,7 +47,8 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
     onPress?.(item, index);
   }, [item, index, onPress]);
 
-  const handleAuthorClick = useCallback(() => {
+  const handleAuthorClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
     if (item.creator?.id) {
       onAuthorClick?.(item.creator.id);
     }
@@ -114,10 +108,30 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   const thumbnailSrc = item.thumbnailUrl || item.url;
   const aspectClass = isLandscape ? 'aspect-[16/9]' : 'aspect-[3/4]';
   
-  // Determine what shows in top-left (priority: milestone > multi-media > ranking > course tag)
+  // Determine top-left override content (priority: milestone > multi-media)
   const hasMultiMedia = item.additionalMediaCount && item.additionalMediaCount > 0;
-  const hasRanking = item.isPopular || item.isTrending;
-  const showCourseTag = isLandscape && item.courseName && !item.isMilestone && !hasMultiMedia && !hasRanking;
+  
+  let topLeftOverride: React.ReactNode = null;
+  if (item.isMilestone) {
+    topLeftOverride = (
+      <div className="flex items-center justify-center h-5 w-5 rounded-full bg-black/50">
+        <Trophy className="h-2.5 w-2.5 text-amber-400" />
+      </div>
+    );
+  } else if (hasMultiMedia) {
+    topLeftOverride = (
+      <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-black/55 text-white text-[10px] font-medium">
+        <Images className="h-2.5 w-2.5" />
+        <span>+{item.additionalMediaCount}</span>
+      </div>
+    );
+  }
+
+  // Build club object if course name exists (for landscape tiles)
+  const clubData = isLandscape && item.courseName && item.golfCourseId ? {
+    id: item.golfCourseId,
+    name: item.courseName,
+  } : null;
 
   return (
     <motion.button
@@ -157,47 +171,23 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
       {/* Bottom gradient overlay for text legibility */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
-      {/* Top-left indicators (mutually exclusive, priority order) */}
-      {item.isMilestone && (
-        <div className="absolute top-2 left-2 z-20 flex items-center justify-center h-5 w-5 rounded-full bg-black/50">
-          <Trophy className="h-2.5 w-2.5 text-amber-400" />
-        </div>
-      )}
-      
-      {!item.isMilestone && hasMultiMedia && (
-        <div className="absolute top-2 left-2 z-20 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-black/55 text-white text-[10px] font-medium">
-          <Images className="h-2.5 w-2.5" />
-          <span>+{item.additionalMediaCount}</span>
-        </div>
-      )}
-
-      {/* Course tag on landscape - only if no ranking/milestone/multi-media */}
-      {showCourseTag && (
-        <div className="absolute left-3 top-3 z-20 max-w-[70%]">
-          <GlassPill
-            label={item.courseName!}
-            icon="📍"
-            variant="club"
-            size="sm"
-          />
-        </div>
-      )}
-
-      {/* Unified overlay: Ranking (top-left), Duration (top-right), Creator + Likes (bottom) */}
-      <TileOverlay
+      {/* Unified overlay system */}
+      <OverlayCorners
+        surface="tile"
+        variant={variant}
+        isPopular={item.isPopular}
+        isTrending={item.isTrending}
+        club={clubData}
+        durationSeconds={isVideo ? resolvedDurationSeconds : undefined}
         creatorName={item.creator?.name}
         creatorAvatar={item.creator?.avatar}
         likes={item.likes}
-        durationSeconds={isVideo ? resolvedDurationSeconds : undefined}
-        isPopular={item.isPopular}
-        isTrending={item.isTrending}
         showCreator={config.showCreator}
         showLikes={config.showLikes}
-        showDuration={isVideo}
         showAvatar={config.showCreator}
-        showRanking={!item.isMilestone && !hasMultiMedia && !showCourseTag}
-        variant={variant}
-        onAuthorClick={handleAuthorClick}
+        onCreatorClick={handleAuthorClick}
+        topLeftOverride={topLeftOverride}
+        hideRankingIfOverride={true}
       />
     </motion.button>
   );
