@@ -5,7 +5,7 @@ import { UnifiedMediaGrid, UnifiedGridConfig, exploreItemsToUnified, UnifiedMedi
 
 interface ShortsGridProps {
   items: ExploreContentItem[];
-  onOpen: (item: ExploreContentItem) => void;
+  onOpen: (item: ExploreContentItem, index: number) => void;
   isLoading?: boolean;
   hasMore?: boolean;
   onLoadMore?: () => void;
@@ -23,11 +23,14 @@ const WATCH_GRID_CONFIG: UnifiedGridConfig = {
   autoplayEnabled: true,
   maxAutoplay: 2,
   visibilityThreshold: 0.6,
+  surface: 'watch', // Watch surface - tap opens Shorts Player
 };
 
 /**
  * ShortsGrid - Watch page grid wrapper
  * Uses UnifiedMediaGrid with Watch-specific config
+ * 
+ * Tap behavior: Opens Shorts Fullscreen Player at tapped index
  */
 export default function ShortsGrid({ 
   items, 
@@ -46,11 +49,12 @@ export default function ShortsGrid({
     return exploreItemsToUnified(items);
   }, [items]);
 
-  // Handle item click - convert back to ExploreContentItem
-  const handleItemClick = useCallback((unifiedItem: UnifiedMediaItem) => {
+  // Handle item click - passes index for Shorts Player entry
+  const handleItemClick = useCallback((unifiedItem: UnifiedMediaItem, index: number) => {
     const originalItem = items.find(item => item.id === unifiedItem.id);
     if (originalItem) {
-      onOpen(originalItem);
+      // Pass the index for proper Shorts Player entry
+      onOpen(originalItem, index);
     }
   }, [items, onOpen]);
 

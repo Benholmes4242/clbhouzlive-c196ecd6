@@ -21,11 +21,15 @@ const PROFILE_GRID_CONFIG: UnifiedGridConfig = {
   autoplayEnabled: true,
   maxAutoplay: 2,
   visibilityThreshold: 0.6,
+  surface: 'profile-activity', // Profile surface - tap opens Post Viewer
 };
 
 /**
  * ActivityMediaGrid - Profile Activity grid wrapper
  * Uses UnifiedMediaGrid with Profile-specific config
+ * 
+ * Tap behavior: Opens standard Post Viewer (not Shorts Player)
+ * This is because Activity is "your content library", not a Shorts feed
  */
 const ActivityMediaGrid: React.FC<ActivityMediaGridProps> = ({
   posts,
@@ -42,8 +46,8 @@ const ActivityMediaGrid: React.FC<ActivityMediaGridProps> = ({
     return activityPostsToUnified(posts);
   }, [posts]);
 
-  // Handle item click
-  const handleItemClick = useCallback((item: UnifiedMediaItem) => {
+  // Handle item click - opens Post Viewer
+  const handleItemClick = useCallback((item: UnifiedMediaItem, index: number) => {
     onPostPress?.(item.postId);
   }, [onPostPress]);
 

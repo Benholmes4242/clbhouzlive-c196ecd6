@@ -1,5 +1,4 @@
 import React, { useMemo, useRef, useEffect, useCallback } from 'react';
-import { cn } from '@/lib/utils';
 import { UnifiedMediaGridProps, UnifiedMediaItem, GRID_GAP_PX } from './types';
 import { buildUnifiedLayout, markAutoplayCandidates } from './layoutUtils';
 import UnifiedMediaTile from './UnifiedMediaTile';
@@ -14,6 +13,11 @@ import { useGridAutoplay } from '@/hooks/useGridAutoplay';
  * - Shared autoplay logic via useGridAutoplay
  * - Configurable overlays (creator, likes)
  * - Infinite scroll support
+ * - Surface-aware tap behavior routing
+ * 
+ * Surfaces:
+ * - 'watch': Tap opens Shorts Fullscreen Player
+ * - 'profile-activity': Tap opens Post Viewer
  */
 const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
   items,
@@ -44,6 +48,19 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
     return buildUnifiedLayout(processedItems);
   }, [processedItems]);
 
+  // Build flat index map for proper item indexing
+  const itemIndexMap = useMemo(() => {
+    const map = new Map<string, number>();
+    let flatIndex = 0;
+    layoutRows.forEach(row => {
+      row.items.forEach(item => {
+        map.set(item.id, flatIndex);
+        flatIndex++;
+      });
+    });
+    return map;
+  }, [layoutRows]);
+
   // Infinite scroll handler
   useEffect(() => {
     if (!config.infiniteScroll || !onLoadMore) return;
@@ -67,8 +84,8 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, [config.infiniteScroll, hasMore, isLoading, onLoadMore]);
 
-  const handleItemClick = useCallback((item: UnifiedMediaItem) => {
-    onItemClick?.(item);
+  const handleItemClick = useCallback((item: UnifiedMediaItem, index: number) => {
+    onItemClick?.(item, index);
   }, [onItemClick]);
 
   const handleAuthorClick = useCallback((authorId: string) => {
@@ -112,12 +129,14 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
           {layoutRows.map((row, rowIndex) => {
             if (row.type === 'landscape') {
               const item = row.items[0];
+              const flatIndex = itemIndexMap.get(item.id) ?? 0;
               return (
                 <UnifiedMediaTile
                   key={`landscape-${item.id}-${rowIndex}`}
                   item={item}
                   config={{ ...config, autoplayEnabled: config.autoplayEnabled ?? true }}
                   variant="landscape"
+                  index={flatIndex}
                   onPress={handleItemClick}
                   onAuthorClick={handleAuthorClick}
                   registerVideo={registerVideo}
@@ -127,18 +146,22 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
             }
 
             // Portrait pair
-            return row.items.map((item, itemIndex) => (
-              <UnifiedMediaTile
-                key={`portrait-${item.id}-${rowIndex}-${itemIndex}`}
-                item={item}
-                config={{ ...config, autoplayEnabled: config.autoplayEnabled ?? true }}
-                variant="portrait"
-                onPress={handleItemClick}
-                onAuthorClick={handleAuthorClick}
-                registerVideo={registerVideo}
-                isPlaying={playingIds.has(item.postId)}
-              />
-            ));
+            return row.items.map((item, itemIndex) => {
+              const flatIndex = itemIndexMap.get(item.id) ?? 0;
+              return (
+                <UnifiedMediaTile
+                  key={`portrait-${item.id}-${rowIndex}-${itemIndex}`}
+                  item={item}
+                  config={{ ...config, autoplayEnabled: config.autoplayEnabled ?? true }}
+                  variant="portrait"
+                  index={flatIndex}
+                  onPress={handleItemClick}
+                  onAuthorClick={handleAuthorClick}
+                  registerVideo={registerVideo}
+                  isPlaying={playingIds.has(item.postId)}
+                />
+              );
+            });
           })}
         </div>
       </div>
