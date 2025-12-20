@@ -223,12 +223,35 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   // Chip order for slide animation
   const CHIP_ORDER = ['all', 'shorts', 'under4', '4to20', 'over20'] as const;
 
-  // Create hero item from the first video content item
+  // Create hero item from the first LANDSCAPE video content item
+  // Hero must only select landscape videos (aspectRatio >= 1.25) to avoid cropping
   const heroItem = useMemo(() => {
     if (!currentContent || currentContent.length === 0) return null;
-    // Find the first video item for the hero
-    const firstVideo = currentContent.find(item => item.type === 'video');
-    return firstVideo ? createHeroItem(firstVideo) : null;
+    
+    const LANDSCAPE_THRESHOLD = 1.25;
+    
+    // Find the first landscape video item for the hero
+    const landscapeVideo = currentContent.find(item => {
+      if (item.type !== 'video') return false;
+      
+      // Check if we have explicit aspect ratio
+      if (item.aspectRatio && item.aspectRatio >= LANDSCAPE_THRESHOLD) {
+        return true;
+      }
+      
+      // Fallback: compute from width/height if available
+      if (item.width && item.height && item.height > 0) {
+        const computedAspectRatio = item.width / item.height;
+        return computedAspectRatio >= LANDSCAPE_THRESHOLD;
+      }
+      
+      // Fallback: check landscapeSuitable flag
+      return item.landscapeSuitable === true;
+    });
+    
+    // If no landscape video found, return null (hero won't render)
+    // This prevents portrait videos from being cropped in the hero
+    return landscapeVideo ? createHeroItem(landscapeVideo) : null;
   }, [currentContent]);
 
   // Filter out the hero item from the grid

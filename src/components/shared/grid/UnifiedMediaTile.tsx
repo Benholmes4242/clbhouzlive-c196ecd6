@@ -3,7 +3,6 @@ import { cn } from '@/lib/utils';
 import { UnifiedMediaItem, UnifiedGridConfig, GridSurface } from './types';
 import TileOverlay from './TileOverlay';
 import GridAutoplayVideo from '@/components/profile/activity/GridAutoplayVideo';
-import VideoOverlay from '@/components/profile/activity/VideoOverlay';
 import { Images, Trophy } from 'lucide-react';
 import { RegisterVideoFn } from '@/hooks/useGridAutoplay';
 import { motion } from 'framer-motion';
@@ -25,13 +24,15 @@ interface UnifiedMediaTileProps {
  * Features:
  * - Portrait: 3:4 aspect ratio
  * - Landscape: 16:9, spans full width
- * - Configurable overlays (creator label, likes)
+ * - Configurable overlays (creator label, likes, duration)
  * - Press feedback animation (scale 0.98 on tap)
  * - Consistent styling and autoplay behavior
+ * - No play icon - video is implied in Watch/Shorts context
  * 
- * Tap behavior by surface:
- * - Watch grid: Opens Shorts Fullscreen Player
- * - Profile Activity: Opens standard Post Viewer
+ * Overlay layout:
+ * - Top-right: Duration badge
+ * - Bottom-left (stacked): Creator name, Like count
+ * - Bottom-right: Creator avatar squircle
  */
 const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   item,
@@ -148,20 +149,12 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
         />
       )}
 
-      {/* Bottom gradient overlay */}
+      {/* Bottom gradient overlay for text legibility */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
-      {/* Video duration/play indicator */}
-      {isVideo && (
-        <VideoOverlay
-          durationSeconds={resolvedDurationSeconds}
-          isPlaying={isAutoplayCandidate && isPlaying}
-        />
-      )}
-
-      {/* Multi-media indicator - top right */}
-      {item.additionalMediaCount && item.additionalMediaCount > 0 && (
-        <div className="absolute top-2 right-2 z-20 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-black/55 text-white text-[10px] font-medium">
+      {/* Multi-media indicator - top left (if no milestone) */}
+      {item.additionalMediaCount && item.additionalMediaCount > 0 && !item.isMilestone && (
+        <div className="absolute top-2 left-2 z-20 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-black/55 text-white text-[10px] font-medium">
           <Images className="h-2.5 w-2.5" />
           <span>+{item.additionalMediaCount}</span>
         </div>
@@ -174,8 +167,8 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
         </div>
       )}
 
-      {/* Course tag - only on landscape tiles, top left */}
-      {isLandscape && item.courseName && !item.isMilestone && (
+      {/* Course tag - only on landscape tiles, top left (if no milestone or multi-media) */}
+      {isLandscape && item.courseName && !item.isMilestone && !(item.additionalMediaCount && item.additionalMediaCount > 0) && (
         <div className="absolute left-3 top-3 z-20 max-w-[70%]">
           <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-black/65 text-xs font-medium text-white shadow-sm truncate">
             {item.courseName}
@@ -183,13 +176,16 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
         </div>
       )}
 
-      {/* Creator/Likes overlay */}
+      {/* Unified overlay: Duration (top-right), Creator + Likes (bottom-left), Avatar (bottom-right) */}
       <TileOverlay
         creatorName={item.creator?.name}
         creatorAvatar={item.creator?.avatar}
         likes={item.likes}
+        durationSeconds={isVideo ? resolvedDurationSeconds : undefined}
         showCreator={config.showCreator}
         showLikes={config.showLikes}
+        showDuration={isVideo}
+        showAvatar={config.showCreator}
         variant={variant}
         onAuthorClick={handleAuthorClick}
       />
