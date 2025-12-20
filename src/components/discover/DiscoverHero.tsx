@@ -178,14 +178,17 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
           </p>
         </div>
 
-        {/* Avatar squircle - bottom right */}
-        <SquircleAvatar
-          size={40}
-          src={creatorAvatar}
-          alt={creatorName}
-          fallback={creatorName?.charAt(0) || '?'}
-          className="shrink-0"
-        />
+        {/* Avatar - matching grid tile style */}
+        <div className="shrink-0 w-10 h-10 rounded-[8px] overflow-hidden border border-border/40 shadow-sm">
+          <img
+            src={creatorAvatar || '/placeholder.svg'}
+            alt={creatorName}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              e.currentTarget.src = '/placeholder.svg';
+            }}
+          />
+        </div>
       </div>
     </div>
   );
