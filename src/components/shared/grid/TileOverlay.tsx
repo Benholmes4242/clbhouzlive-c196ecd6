@@ -1,7 +1,6 @@
 import React from 'react';
 import { Heart } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { formatDuration } from '@/utils/formatDuration';
+import DurationBadge from '@/components/shared/DurationBadge';
 
 interface TileOverlayProps {
   // Creator info
@@ -31,7 +30,7 @@ interface TileOverlayProps {
  * Shared overlay component for media tiles
  * 
  * Layout zones:
- * - Top-right: Duration badge
+ * - Top-right: Duration badge (using shared DurationBadge component)
  * - Bottom-left (stacked): Creator name, Like count
  * - Bottom-right: Creator avatar squircle
  * 
@@ -51,7 +50,6 @@ const TileOverlay: React.FC<TileOverlayProps> = ({
   onAuthorClick,
 }) => {
   const hasValidDuration = typeof durationSeconds === 'number' && Number.isFinite(durationSeconds) && durationSeconds > 0;
-  const durationLabel = hasValidDuration ? formatDuration(durationSeconds) : null;
   
   const handleAuthorClick = (e: React.MouseEvent) => {
     if (onAuthorClick) {
@@ -61,7 +59,7 @@ const TileOverlay: React.FC<TileOverlayProps> = ({
   };
 
   const hasBottomContent = (showCreator && creatorName) || showLikes;
-  const hasTopContent = showDuration && durationLabel;
+  const hasTopContent = showDuration && hasValidDuration;
   
   if (!hasBottomContent && !hasTopContent) {
     return null;
@@ -69,14 +67,10 @@ const TileOverlay: React.FC<TileOverlayProps> = ({
 
   return (
     <>
-      {/* Duration badge - top right */}
-      {showDuration && durationLabel && (
-        <div className="pointer-events-none absolute top-2 right-2 z-20">
-          <div className="flex items-center rounded-full bg-black/70 px-2 py-1 shadow-sm">
-            <span className="text-[10px] leading-none font-medium text-white">
-              {durationLabel}
-            </span>
-          </div>
+      {/* Duration badge - top right (using shared component) */}
+      {showDuration && hasValidDuration && (
+        <div className="absolute top-2 right-2 z-20">
+          <DurationBadge durationSeconds={durationSeconds} size="sm" />
         </div>
       )}
 

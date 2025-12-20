@@ -3,6 +3,7 @@ import { X, Volume2, VolumeX, ChevronUp, ChevronDown } from 'lucide-react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { useSwipeable } from 'react-swipeable';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
+import DurationBadge from '@/components/shared/DurationBadge';
 
 interface ShortsViewerProps {
   items: ExploreContentItem[];
@@ -15,6 +16,7 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [captionExpanded, setCaptionExpanded] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [resolvedDuration, setResolvedDuration] = useState<number | undefined>();
   const videoRef = useRef<HTMLVideoElement>(null);
   const rafRef = useRef<number>();
   
@@ -28,6 +30,7 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
       setCurrentIndex(prev => prev + 1);
       setCaptionExpanded(false);
       setProgress(0);
+      setResolvedDuration(undefined);
     }
   }, [currentIndex, items.length]);
 
@@ -36,6 +39,7 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
       setCurrentIndex(prev => prev - 1);
       setCaptionExpanded(false);
       setProgress(0);
+      setResolvedDuration(undefined);
     }
   }, [currentIndex]);
 
@@ -116,6 +120,24 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
     }
   }, [currentIndex]);
 
+  // Get duration from video element or item data
+  useEffect(() => {
+    // First try to use durationSeconds from item
+    if (currentItem?.durationSeconds && currentItem.durationSeconds > 0) {
+      setResolvedDuration(currentItem.durationSeconds);
+    }
+  }, [currentItem?.durationSeconds]);
+
+  const handleLoadedMetadata = () => {
+    const video = videoRef.current;
+    if (video && !resolvedDuration) {
+      const d = video.duration;
+      if (Number.isFinite(d) && d > 0 && d !== Infinity) {
+        setResolvedDuration(d);
+      }
+    }
+  };
+
   // Preload adjacent videos
   useEffect(() => {
     if (!isOpen) return;
@@ -151,6 +173,7 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
         playsInline
         autoPlay
         loop
+        onLoadedMetadata={handleLoadedMetadata}
       />
 
       {/* Close Button - Top Left */}
@@ -162,10 +185,10 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
         <X className="w-5 h-5" />
       </button>
 
-      {/* Duration Badge - Top Center */}
-      {currentItem.duration && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-40 px-3 py-1.5 rounded-full bg-black/65 backdrop-blur-sm border border-white/10">
-          <span className="text-sm font-medium text-white">{currentItem.duration}</span>
+      {/* Duration Badge - Top Right (consistent with grid tiles and hero) */}
+      {resolvedDuration && resolvedDuration > 0 && (
+        <div className="absolute top-4 right-16 z-40">
+          <DurationBadge durationSeconds={resolvedDuration} size="md" />
         </div>
       )}
 
