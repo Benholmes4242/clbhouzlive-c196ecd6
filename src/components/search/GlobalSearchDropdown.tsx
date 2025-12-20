@@ -8,20 +8,21 @@ import {
   Clock, 
   TrendingUp, 
   ChevronRight,
-  X
+  X,
+  Play
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface SearchResult {
   id: string;
-  type: 'user' | 'course' | 'business' | 'page';
+  type: 'user' | 'course' | 'business' | 'page' | 'video';
   title: string;
   subtitle: string;
   image?: string;
   username?: string;
   verified?: boolean;
-  category?: 'people' | 'clubs_courses' | 'businesses' | 'pages_channels';
+  category?: 'people' | 'clubs_courses' | 'businesses' | 'pages_channels' | 'videos';
 }
 
 interface RecentSearch {
@@ -82,6 +83,7 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
   const groupedResults = React.useMemo(() => {
     const groups = {
       people: results.filter(r => r.type === 'user'),
+      videos: results.filter(r => r.type === 'video'),
       clubs_courses: results.filter(r => r.type === 'course'),
       businesses: results.filter(r => r.type === 'business'),
       pages_channels: results.filter(r => r.type === 'page')
@@ -94,6 +96,7 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
     if (query.trim()) {
       return [
         ...groupedResults.people,
+        ...groupedResults.videos,
         ...groupedResults.clubs_courses,
         ...groupedResults.businesses,
         ...groupedResults.pages_channels
@@ -164,6 +167,8 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
     switch (result.type) {
       case 'user':
         return <User className={iconClass} />;
+      case 'video':
+        return <Play className={iconClass} />;
       case 'course':
         return <MapPin className={iconClass} />;
       case 'business':
@@ -444,6 +449,11 @@ const GlobalSearchDropdown: React.FC<GlobalSearchDropdownProps> = ({
             title="People" 
             items={groupedResults.people} 
             icon={<User className="h-3 w-3" />}
+          />
+          <ResultSection 
+            title="Videos" 
+            items={groupedResults.videos} 
+            icon={<Play className="h-3 w-3" />}
           />
           <ResultSection 
             title="Clubs & Courses" 

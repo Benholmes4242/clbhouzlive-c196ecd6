@@ -2,6 +2,7 @@ import { useQuery, useQueries } from '@tanstack/react-query';
 import { useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { searchAnalytics } from '@/utils/searchAnalytics';
+import { VIDEO_DURATION_THRESHOLD_SECONDS } from '@/constants/videoRules';
 
 // Types for search results
 export interface PersonResult {
@@ -24,6 +25,17 @@ export interface ClubResult {
   region?: string | null;
   global_rank?: number | null;
   type: 'course';
+}
+
+export interface VideoResult {
+  id: string;
+  title: string;
+  thumbnail_url: string | null;
+  creator_name: string;
+  creator_id: string;
+  duration: string;
+  views: number;
+  type: 'video';
 }
 
 export interface PageResult {
@@ -49,7 +61,7 @@ export interface BusinessResult {
 
 export interface TrendingItem {
   label: string;
-  type: 'people' | 'clubs' | 'pages';
+  type: 'people' | 'clubs' | 'pages' | 'videos';
   id?: string;
   image?: string | null;
   subtitle?: string;
@@ -64,6 +76,7 @@ export interface RecentSearch {
 export interface GlobalSearchResults {
   people: PersonResult[];
   clubs: ClubResult[];
+  videos: VideoResult[];
   pages: PageResult[];
   businesses: BusinessResult[];
   recent: RecentSearch[];
@@ -78,6 +91,7 @@ export interface UseGlobalEntitySearchProps {
   limits?: {
     people?: number;
     clubs?: number;
+    videos?: number;
     pages?: number;
     businesses?: number;
   };
@@ -148,6 +162,70 @@ const searchClubs = async (query: string, limit: number = 6): Promise<ClubResult
     global_rank: course.global_rank,
     type: 'course' as const
   }));
+};
+
+// Format duration helper
+const formatDuration = (seconds: number): string => {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  if (mins >= 60) {
+    const hrs = Math.floor(mins / 60);
+    const remainingMins = mins % 60;
+    return `${hrs}:${remainingMins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+};
+
+const searchVideos = async (query: string, limit: number = 6): Promise<VideoResult[]> => {
+  if (!query.trim()) return [];
+
+  const { data, error } = await supabase
+    .from('posts')
+    .select(`
+      id,
+      content,
+      user_id,
+      post_media!inner(
+        media_url,
+        duration_seconds,
+        poster_url
+      ),
+      user_profiles!posts_user_id_fkey(
+        id,
+        display_name,
+        username
+      ),
+      post_stats(
+        views_count
+      )
+    `)
+    .eq('post_media.media_type', 'video')
+    .gte('post_media.duration_seconds', VIDEO_DURATION_THRESHOLD_SECONDS)
+    .ilike('content', `%${query}%`)
+    .order('created_at', { ascending: false })
+    .limit(Math.min(limit, 8));
+
+  if (error) {
+    console.error('Error searching videos:', error);
+    throw new Error('Failed to search videos');
+  }
+
+  return (data || []).map((post: any) => {
+    const media = post.post_media?.[0];
+    const user = post.user_profiles;
+    const stats = post.post_stats?.[0];
+
+    return {
+      id: post.id,
+      title: post.content?.split('\n')[0]?.substring(0, 80) || 'Untitled Video',
+      thumbnail_url: media?.poster_url || null,
+      creator_name: user?.display_name || user?.username || 'Unknown',
+      creator_id: post.user_id,
+      duration: formatDuration(media?.duration_seconds || 0),
+      views: stats?.views_count || 0,
+      type: 'video' as const
+    };
+  });
 };
 
 const searchPages = async (query: string, limit: number = 6): Promise<PageResult[]> => {
@@ -228,7 +306,7 @@ const getTrendingItems = async (): Promise<TrendingItem[]> => {
 export const useGlobalEntitySearch = ({
   query,
   enabled = true,
-  limits = { people: 6, clubs: 6, pages: 6, businesses: 6 }
+  limits = { people: 6, clubs: 6, videos: 6, pages: 6, businesses: 6 }
 }: UseGlobalEntitySearchProps): GlobalSearchResults => {
   // Track query changes for analytics
   const prevQuery = useRef<string>('');
@@ -271,6 +349,14 @@ export const useGlobalEntitySearch = ({
     enabled: enabled && hasQuery
   });
 
+  const videosQuery = useQuery({
+    queryKey: ['global-search', 'videos', normalizedQuery],
+    queryFn: () => searchVideos(normalizedQuery, limits.videos || 6),
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
+    enabled: enabled && hasQuery
+  });
+
   const pagesQuery = useQuery({
     queryKey: ['global-search', 'pages', normalizedQuery],
     queryFn: () => searchPages(normalizedQuery, limits.pages || 6),
@@ -290,22 +376,23 @@ export const useGlobalEntitySearch = ({
   // Extract results
   const people = peopleQuery.data || [];
   const clubs = clubsQuery.data || [];
+  const videos = videosQuery.data || [];
   const pages = pagesQuery.data || [];
   const businesses = businessesQuery.data || [];
 
   // Loading state
   const isLoading = hasQuery 
-    ? (peopleQuery.isLoading || clubsQuery.isLoading || pagesQuery.isLoading || businessesQuery.isLoading)
+    ? (peopleQuery.isLoading || clubsQuery.isLoading || videosQuery.isLoading || pagesQuery.isLoading || businessesQuery.isLoading)
     : trendingQuery.isLoading;
 
   // Error handling
   const error = hasQuery
-    ? (peopleQuery.error || clubsQuery.error || pagesQuery.error || businessesQuery.error)
+    ? (peopleQuery.error || clubsQuery.error || videosQuery.error || pagesQuery.error || businessesQuery.error)
     : trendingQuery.error;
 
   const trending = trendingQuery.data || [];
 
-  const allResultsEmpty = people.length === 0 && clubs.length === 0 && pages.length === 0 && businesses.length === 0;
+  const allResultsEmpty = people.length === 0 && clubs.length === 0 && videos.length === 0 && pages.length === 0 && businesses.length === 0;
   
   // Track no results for analytics
   useEffect(() => {
@@ -317,6 +404,7 @@ export const useGlobalEntitySearch = ({
   return {
     people,
     clubs,
+    videos,
     pages,
     businesses,
     recent,

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useGlobalEntitySearch, saveRecentSearch, clearRecentSearches, type PersonResult, type ClubResult, type PageResult, type BusinessResult } from '@/hooks/useGlobalEntitySearch';
+import { useGlobalEntitySearch, saveRecentSearch, clearRecentSearches, type PersonResult, type ClubResult, type PageResult, type BusinessResult, type VideoResult } from '@/hooks/useGlobalEntitySearch';
 import GlobalSearchDropdown from '@/components/search/GlobalSearchDropdown';
 import type { HeaderVariant } from '@/contexts/GlobalHeaderContext';
 import { searchAnalytics } from '@/utils/searchAnalytics';
@@ -11,7 +11,7 @@ import { createSearchRouter } from '@/utils/searchRouting';
 
 interface SearchResult {
   id: string;
-  type: 'user' | 'course' | 'business';
+  type: 'user' | 'course' | 'business' | 'video';
   title: string;
   subtitle: string;
   image?: string;
@@ -65,6 +65,7 @@ const SearchPill = ({
   const {
     people,
     clubs,
+    videos,
     pages,
     businesses,
     recent,
@@ -88,6 +89,13 @@ const SearchPill = ({
       subtitle: person.home_club_name || 'No home club',
       image: person.avatar_url || undefined,
       username: person.username || undefined
+    })),
+    ...videos.map(video => ({
+      id: video.id,
+      type: 'video' as const,
+      title: video.title,
+      subtitle: `${video.creator_name} • ${video.duration}${video.views > 0 ? ` • ${video.views.toLocaleString()} views` : ''}`,
+      image: video.thumbnail_url || undefined
     })),
     ...clubs.map(club => ({
       id: club.id,
