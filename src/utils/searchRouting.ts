@@ -6,7 +6,7 @@ import { NavigateFunction } from 'react-router-dom';
 
 export interface SearchResult {
   id: string;
-  type: 'user' | 'course' | 'business';
+  type: 'user' | 'course' | 'business' | 'video';
   title: string;
   subtitle: string;
   image?: string;
@@ -39,6 +39,11 @@ export class SearchRouter {
         // Navigate to business profile page
         this.navigate(`/business/${result.id}`);
         break;
+
+      case 'video':
+        // Navigate to video player
+        this.navigate(`/video/${result.id}`);
+        break;
         
       default:
         console.warn('Unknown search result type:', result.type);
@@ -57,6 +62,8 @@ export class SearchRouter {
         return result.slug ? `/courses/${result.slug}` : `/courses/${result.id}`;
       case 'business':
         return `/business/${result.id}`;
+      case 'video':
+        return `/video/${result.id}`;
       default:
         return '/';
     }
