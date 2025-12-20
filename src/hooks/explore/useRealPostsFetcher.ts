@@ -130,12 +130,13 @@ export const useRealPostsFetcher = () => {
           const contentText = post.content;
           
           // Look for patterns like "📍 Played at [Course Name]" or "@[Course Name]"
-          const courseMatch = contentText.match(/📍\s*(?:Played at\s+)?([^,\n]+(?:Golf Club|Golf Course|GC)[^,\n]*)/i) ||
-                            contentText.match(/at\s+([^,\n]+(?:Golf Club|Golf Course|GC)[^,\n]*)/i);
+          // IMPORTANT: Stop capturing immediately after "Golf Club", "Golf Course", or "GC"
+          const courseMatch = contentText.match(/📍\s*(?:Played at\s+)?([^,\n.!?]+(?:Golf Club|Golf Course|GC))/i) ||
+                            contentText.match(/at\s+([^,\n.!?]+(?:Golf Club|Golf Course|GC))/i);
           
           if (courseMatch) {
             const courseName = courseMatch[1].trim()
-              .replace(/\([^)]*(?<!Course|course)\)/g, '') // Remove parentheses content EXCEPT if it contains "Course"
+              .replace(/\([^)]*\)/g, '') // Remove any parentheses content
               .replace(/\s+/g, ' ') // Normalize spaces
               .trim();
             
@@ -396,12 +397,13 @@ export const useRealPostsFetcher = () => {
           const contentText = post.content;
           
           // Look for patterns like "📍 Played at [Course Name]" or "@[Course Name]"
-          const courseMatch = contentText.match(/📍\s*(?:Played at\s+)?([^,\n]+(?:Golf Club|Golf Course|GC)[^,\n]*)/i) ||
-                            contentText.match(/at\s+([^,\n]+(?:Golf Club|Golf Course|GC)[^,\n]*)/i);
+          // IMPORTANT: Stop capturing immediately after "Golf Club", "Golf Course", or "GC"
+          const courseMatch = contentText.match(/📍\s*(?:Played at\s+)?([^,\n.!?]+(?:Golf Club|Golf Course|GC))/i) ||
+                            contentText.match(/at\s+([^,\n.!?]+(?:Golf Club|Golf Course|GC))/i);
           
           if (courseMatch) {
             const courseName = courseMatch[1].trim()
-              .replace(/\([^)]*(?<!Course|course)\)/g, '') // Remove parentheses content EXCEPT if it contains "Course"
+              .replace(/\([^)]*\)/g, '') // Remove any parentheses content
               .replace(/\s+/g, ' ') // Normalize spaces
               .trim();
             
