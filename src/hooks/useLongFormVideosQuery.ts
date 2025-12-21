@@ -174,6 +174,7 @@ async function fetchLongFormVideos(options: Omit<UseLongFormVideosOptions, 'enab
       creatorName: user?.display_name || user?.username || 'Unknown',
       creatorAvatarUrl: user?.profile_photo_url,
       thumbnailUrl: media?.poster_url || '',
+      mediaUrl: media?.media_url || '', // Video URL for autoplay
       duration: formatDuration(media?.duration_seconds || 0),
       durationSeconds: media?.duration_seconds || 0,
       views,
