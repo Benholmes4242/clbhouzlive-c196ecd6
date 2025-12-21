@@ -20,10 +20,10 @@ export const Pressable = React.forwardRef<HTMLDivElement, PressableProps>(
         className: cn(
           // Base transition using motion tokens
           'transition-transform duration-motion-fast ease-standard',
-          // Hover + active states
-          'hover:scale-[1.02] active:scale-[0.97]',
+          // Hover state only - no active scale (Instagram-style)
+          'hover:scale-[1.02]',
           // Respect prefers-reduced-motion
-          'motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100',
+          'motion-reduce:transition-none motion-reduce:hover:scale-100',
           (children as React.ReactElement<any>).props.className
         ),
       });
@@ -34,8 +34,8 @@ export const Pressable = React.forwardRef<HTMLDivElement, PressableProps>(
         ref={ref}
         className={cn(
           'transition-transform duration-motion-fast ease-standard',
-          'hover:scale-[1.02] active:scale-[0.97]',
-          'motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100',
+          'hover:scale-[1.02]',
+          'motion-reduce:transition-none motion-reduce:hover:scale-100',
           className
         )}
         {...props}

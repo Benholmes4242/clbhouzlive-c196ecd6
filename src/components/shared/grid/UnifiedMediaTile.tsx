@@ -147,8 +147,6 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
         isLandscape && "col-span-2"
       )}
       onClick={handleClick}
-      whileTap={{ scale: 0.98 }}
-      transition={{ duration: 0.1, ease: 'easeOut' }}
     >
       {/* Thumbnail - always visible as fallback */}
       <img
