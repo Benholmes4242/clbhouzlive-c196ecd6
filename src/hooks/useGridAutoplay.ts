@@ -12,27 +12,60 @@ type UseGridAutoplayOptions = {
   maxPlaying?: number;
   visibilityThreshold?: number; // 0–1
   preloadMargin?: number; // pixels above/below viewport to start preloading
+  scrollSettleDelay?: number; // ms to wait after scroll stops before resuming playback
 };
 
 /**
  * Hook to manage grid video autoplay with IntersectionObserver
- * - Max 2 videos playing at once (configurable)
+ * - Max 1 video playing at once (configurable)
  * - Only candidate videos (1 in every 3) will autoplay
  * - Videos pause when scrolled out of view or displaced
  * - Preloads videos near viewport for smooth playback start
+ * - Scroll velocity protection: pauses during fast scroll, resumes after settle
+ * - Tab/window blur: pauses all when tab hidden, resumes when visible
  * - Returns playingIds set for UI state and registerVideo function
  */
 export function useGridAutoplay(
-  { maxPlaying = 2, visibilityThreshold = 0.6, preloadMargin = 300 }: UseGridAutoplayOptions = {}
+  { 
+    maxPlaying = 1, 
+    visibilityThreshold = 0.6, 
+    preloadMargin = 300,
+    scrollSettleDelay = 200 
+  }: UseGridAutoplayOptions = {}
 ) {
   const videosRef = useRef<Map<string, VideoRegistration>>(new Map());
   const visibleRef = useRef<Set<string>>(new Set());
   const autoplayObserverRef = useRef<IntersectionObserver | null>(null);
   const preloadObserverRef = useRef<IntersectionObserver | null>(null);
   const [playingIds, setPlayingIds] = useState<Set<string>>(new Set());
+  
+  // Scroll velocity protection state
+  const isScrollingRef = useRef(false);
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const playbackPausedByScrollRef = useRef(false);
+  
+  // Tab visibility state
+  const isTabVisibleRef = useRef(!document.hidden);
+
+  // Pause all videos helper
+  const pauseAllVideos = useCallback(() => {
+    const videos = Array.from(videosRef.current.values());
+    videos.forEach(v => {
+      if (v.element) {
+        v.element.pause();
+      }
+    });
+    setPlayingIds(new Set());
+  }, []);
 
   // Core playback logic
   const updatePlayback = useCallback(() => {
+    // Don't play if scrolling fast or tab is hidden
+    if (isScrollingRef.current || !isTabVisibleRef.current) {
+      pauseAllVideos();
+      return;
+    }
+
     const videos = Array.from(videosRef.current.values());
 
     // Only visible candidates
@@ -61,7 +94,10 @@ export function useGridAutoplay(
         } else {
           // Wait for canplay event before playing
           const onCanPlay = () => {
-            v.element.play().catch(() => {});
+            // Re-check conditions before playing
+            if (!isScrollingRef.current && isTabVisibleRef.current && visibleRef.current.has(v.id)) {
+              v.element.play().catch(() => {});
+            }
             v.element.removeEventListener('canplay', onCanPlay);
           };
           v.element.addEventListener('canplay', onCanPlay, { once: true });
@@ -72,7 +108,7 @@ export function useGridAutoplay(
     });
 
     setPlayingIds(newPlayingIds);
-  }, [maxPlaying]);
+  }, [maxPlaying, pauseAllVideos]);
 
   // Called by each tile with its video ref
   const registerVideo = useCallback(
@@ -125,6 +161,72 @@ export function useGridAutoplay(
     },
     [updatePlayback]
   );
+
+  // Scroll velocity protection
+  useEffect(() => {
+    const handleScroll = () => {
+      // Mark as scrolling
+      if (!isScrollingRef.current) {
+        isScrollingRef.current = true;
+        playbackPausedByScrollRef.current = true;
+        pauseAllVideos();
+      }
+
+      // Clear existing timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+
+      // Set timeout to resume after scroll settles
+      scrollTimeoutRef.current = setTimeout(() => {
+        isScrollingRef.current = false;
+        playbackPausedByScrollRef.current = false;
+        updatePlayback();
+      }, scrollSettleDelay);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [scrollSettleDelay, pauseAllVideos, updatePlayback]);
+
+  // Tab/window visibility handling
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      isTabVisibleRef.current = !document.hidden;
+      if (document.hidden) {
+        pauseAllVideos();
+      } else {
+        // Resume playback when tab becomes visible (after a brief delay)
+        setTimeout(() => updatePlayback(), 100);
+      }
+    };
+
+    const handleWindowBlur = () => {
+      isTabVisibleRef.current = false;
+      pauseAllVideos();
+    };
+
+    const handleWindowFocus = () => {
+      isTabVisibleRef.current = true;
+      setTimeout(() => updatePlayback(), 100);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleWindowBlur);
+    window.addEventListener('focus', handleWindowFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', handleWindowBlur);
+      window.removeEventListener('focus', handleWindowFocus);
+    };
+  }, [pauseAllVideos, updatePlayback]);
 
   // Init preload observer (wide margin to buffer ahead)
   useEffect(() => {
