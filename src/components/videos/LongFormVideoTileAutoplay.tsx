@@ -99,23 +99,13 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
       <div className="relative w-full aspect-[16/9] overflow-hidden bg-muted">
         {hasVideo ? (
           <>
-            {/* Video element for autoplay */}
+            {/* Video element for autoplay (uses poster attribute as fallback) */}
             <GridAutoplayVideo
               ref={videoRef}
               src={video.mediaUrl!}
               poster={video.thumbnailUrl}
               className="absolute inset-0 w-full h-full object-cover"
             />
-            
-            {/* Fallback poster when not playing */}
-            {!isPlaying && (
-              <img
-                src={video.thumbnailUrl}
-                alt={video.title}
-                className="absolute inset-0 w-full h-full object-cover"
-                loading="lazy"
-              />
-            )}
           </>
         ) : video.thumbnailUrl ? (
           <img
