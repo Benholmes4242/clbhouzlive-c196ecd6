@@ -13,7 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import FlickerFreeHLSPlayer from '@/components/ui/FlickerFreeHLSPlayer';
+import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { useVideoProgress } from '@/hooks/useVideoProgress';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { usePostData } from '@/hooks/usePostData';
@@ -58,7 +58,7 @@ export const VideoPlayerModal: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { videoId } = useParams<{ videoId: string }>();
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HLSPlayerRef>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const videoAreaRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef<number | null>(null);
@@ -264,9 +264,12 @@ export const VideoPlayerModal: React.FC = () => {
   
   // Flush progress helper
   const flushProgress = useCallback(() => {
-    const video = videoRef.current;
-    if (video && video.duration > 0) {
-      updateProgress(video.currentTime, video.duration);
+    const player = videoRef.current;
+    if (player) {
+      const duration = player.getDuration();
+      if (duration > 0) {
+        updateProgress(player.getCurrentTime(), duration);
+      }
     }
   }, [updateProgress]);
   
@@ -325,9 +328,9 @@ export const VideoPlayerModal: React.FC = () => {
     if (resumePosition > 0) {
       pendingSeekRef.current = resumePosition;
       // Also try immediate seek in case video is already ready
-      const video = videoRef.current;
-      if (video && video.readyState >= 1) {
-        video.currentTime = resumePosition;
+      const player = videoRef.current;
+      if (player) {
+        player.seek(resumePosition);
         pendingSeekRef.current = null;
       }
     }
@@ -335,9 +338,9 @@ export const VideoPlayerModal: React.FC = () => {
   
   // Apply pending seek when video metadata is ready
   const handleLoadedMetadata = useCallback(() => {
-    const video = videoRef.current;
-    if (video && pendingSeekRef.current !== null) {
-      video.currentTime = pendingSeekRef.current;
+    const player = videoRef.current;
+    if (player && pendingSeekRef.current !== null) {
+      player.seek(pendingSeekRef.current);
       pendingSeekRef.current = null;
     }
   }, []);
@@ -608,9 +611,9 @@ export const VideoPlayerModal: React.FC = () => {
                 </div>
               ) : videoData ? (
                 <div className="relative w-full max-w-4xl aspect-video rounded-xl overflow-hidden bg-black">
-                  <FlickerFreeHLSPlayer
+                  <HLSPlayer
                     ref={videoRef}
-                    hlsUrl={videoData.hlsUrl}
+                    src={videoData.hlsUrl}
                     poster={videoData.posterUrl}
                     autoplay={hasAutoStarted && !showResumeOverlay}
                     loop={false}
@@ -619,8 +622,8 @@ export const VideoPlayerModal: React.FC = () => {
                     objectFit="contain"
                     showMuteButton={false}
                     onEnded={handleVideoEnded}
-                    onTimeUpdate={handleTimeUpdate}
-                    onLoadedMetadata={handleLoadedMetadata}
+                    onTimeUpdate={(currentTime, duration) => handleTimeUpdate(currentTime, duration)}
+                    onLoadedData={handleLoadedMetadata}
                   />
                   
                   {/* Resume overlay */}

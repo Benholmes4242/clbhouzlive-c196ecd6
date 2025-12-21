@@ -1,6 +1,5 @@
-import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import FlickerFreeHLSPlayer from '@/components/ui/FlickerFreeHLSPlayer';
-import FlickerFreeVideoPlayer from '@/components/ui/FlickerFreeVideoPlayer';
+import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { uidFromNode, isCloudflareStreamUrl } from '@/utils/cloudflareStreamTransform';
 
 interface EnhancedVideoPlayerProps {
@@ -15,12 +14,12 @@ interface EnhancedVideoPlayerProps {
   onPause?: () => void;
   onClick?: () => void;
   onEnded?: () => void;
-  enableHLS?: boolean; // Enable HLS streaming
-  adaptiveBitrate?: boolean; // Enable adaptive bitrate
+  enableHLS?: boolean;
+  adaptiveBitrate?: boolean;
   preloadLevel?: 'none' | 'metadata' | 'auto';
   quality?: 'auto' | '240p' | '360p' | '480p' | '720p' | '1080p';
-  hideControls?: boolean; // Hide play/pause controls
-  objectFit?: 'cover' | 'contain' | 'smart'; // Add smart object fit option for TikTok-style behavior
+  hideControls?: boolean;
+  objectFit?: 'cover' | 'contain' | 'smart';
   controls?: boolean;
   onLoadStart?: () => void;
   onLoad?: () => void;
@@ -32,78 +31,56 @@ interface EnhancedVideoPlayerProps {
   onSeeked?: (e: React.SyntheticEvent<HTMLVideoElement>) => void;
 }
 
+/**
+ * EnhancedVideoPlayer - Wrapper around HLSPlayer for simpler usage
+ * 
+ * Provides backward-compatible API while delegating to HLSPlayer.
+ * Automatically detects Cloudflare Stream URLs and generates HLS URLs.
+ */
 const EnhancedVideoPlayer = forwardRef<HTMLVideoElement, EnhancedVideoPlayerProps>(({
   src,
   autoplay = false,
-  playsInline = true,
   muted = true,
   loop = false,
-  controls = false,
   className = "",
   poster = "",
-  preloadLevel = "metadata",
   objectFit = "contain",
-  enableHLS = true, // Default to true for HLS support
-  hideControls = false,
-  onLoadStart,
-  onLoad,
-  onError,
-  onTimeUpdate,
-  onProgress,
-  onVolumeChange,
-  onSeeking,
-  onSeeked,
   onClick,
-  onEnded
+  onPlay,
+  onPause,
+  onEnded,
+  onLoad,
 }, ref) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const playerRef = useRef<HLSPlayerRef>(null);
 
-  // Expose video element to parent via ref
-  useImperativeHandle(ref, () => videoRef.current!, []);
+  // Expose video element to parent via ref (for backward compatibility)
+  useImperativeHandle(ref, () => {
+    return playerRef.current?.getElement() as HTMLVideoElement;
+  }, []);
 
   // Extract UID and generate HLS URL if it's a Cloudflare Stream video
   const uid = uidFromNode({ src });
   const hlsUrl = uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : src;
   const videoPoster = poster || (uid ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` : undefined);
 
-  // For Cloudflare Stream URLs, always use HLS
-  if (isCloudflareStreamUrl(src) || enableHLS) {
-    return (
-      <FlickerFreeHLSPlayer
-        hlsUrl={hlsUrl}
-        poster={videoPoster}
-        className={className}
-        objectFit={objectFit === 'smart' ? 'cover' : objectFit}
-        showMuteButton={false}
-        autoplay={autoplay}
-        playsInline={playsInline}
-        muted={muted}
-        loop={loop}
-        onClick={onClick}
-        onPlay={() => onLoad?.()}
-        onPause={() => {}}
-        onEnded={onEnded}
-        ref={ref}
-      />
-    );
-  }
-
-  // Fallback to flicker-free video player for non-Cloudflare URLs
   return (
-    <FlickerFreeVideoPlayer
-      ref={ref}
-      src={src}
-      autoplay={autoplay}
-      playsInline={playsInline}
-      muted={muted}
-      loop={loop}
+    <HLSPlayer
+      ref={playerRef}
+      src={hlsUrl}
+      poster={videoPoster}
       className={className}
-      poster={poster}
       objectFit={objectFit === 'smart' ? 'cover' : objectFit}
       showMuteButton={false}
+      showPlayButton={false}
+      autoplay={autoplay}
+      muted={muted}
+      loop={loop}
       onClick={onClick}
-      onPlay={() => onLoad?.()}
-      onPause={() => {}}
+      onPlay={() => {
+        onPlay?.();
+        onLoad?.();
+      }}
+      onPause={onPause}
       onEnded={onEnded}
     />
   );

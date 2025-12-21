@@ -1,8 +1,6 @@
 /**
  * HLSPlayer - Unified video player component
- * Single player for all HLS video across grids, cards, and fullscreen
- * 
- * Replaces: GridAutoplayVideo, HLSVideoCard, FlickerFreeHLSPlayer, EnhancedVideoPlayer
+ * Single player for all HLS video across grids, cards, modals, and mini-player
  * 
  * Features:
  * - WebView-safe (inline attributes baked in)
