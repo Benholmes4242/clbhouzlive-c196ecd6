@@ -13,6 +13,19 @@ export function useShortsSuggestions(shortsData: ExploreContentItem[] = [], opts
   const poolRef = useRef<ExploreContentItem[]>([]);
   const recentIdsRef = useRef<Set<string>>(new Set());
   const [initialized, setInitialized] = useState(false);
+  const prefetchScheduledRef = useRef(false);
+
+  const schedulePrefetch = useCallback(() => {
+    if (!opts?.hasMore || !opts.prefetch) return;
+    if (prefetchScheduledRef.current) return;
+
+    prefetchScheduledRef.current = true;
+    // Defer to after render/commit to avoid "setState during render" warnings
+    setTimeout(() => {
+      prefetchScheduledRef.current = false;
+      opts.prefetch?.();
+    }, 0);
+  }, [opts?.hasMore, opts?.prefetch]);
 
   const refillPool = useCallback(() => {
     // Get available suggestions that aren't in recent history
@@ -40,8 +53,8 @@ export function useShortsSuggestions(shortsData: ExploreContentItem[] = [], opts
       refillPool();
       // Proactively prefetch next page if available
       if (opts?.hasMore) {
-        opts.prefetch?.();
-        if (import.meta.env.DEV) console.debug('[ShortsPool] Prefetch requested');
+        schedulePrefetch();
+        if (import.meta.env.DEV) console.debug('[ShortsPool] Prefetch scheduled');
       }
     }
     
@@ -49,8 +62,8 @@ export function useShortsSuggestions(shortsData: ExploreContentItem[] = [], opts
     const index = poolRef.current.findIndex(item => !avoidIds.has(item.id));
     if (index === -1) {
       if (opts?.hasMore) {
-        opts.prefetch?.();
-        if (import.meta.env.DEV) console.debug('[ShortsPool] No match, prefetch requested');
+        schedulePrefetch();
+        if (import.meta.env.DEV) console.debug('[ShortsPool] No match, prefetch scheduled');
       }
       if (import.meta.env.DEV) {
         console.warn('[ShortsPool] No available shorts! Pool size:', poolRef.current.length, 
@@ -76,7 +89,7 @@ export function useShortsSuggestions(shortsData: ExploreContentItem[] = [], opts
     }
     
     return item;
-  }, [refillPool, shortsData.length, opts?.hasMore, opts?.prefetch]);
+  }, [refillPool, shortsData.length, opts?.hasMore, schedulePrefetch]);
 
   // Initialize/reinitialize pool when data changes
   useEffect(() => {

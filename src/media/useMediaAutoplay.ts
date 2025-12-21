@@ -144,6 +144,9 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
           newPlayingIds.add(item.id);
           return;
         }
+
+        // Ensure HLS source is attached before attempting to play (fixes re-entry after detach)
+        (item.element as any).__hlsPlayerRef?.attach?.();
         
         // Request play through media system
         mediaSystem.requestPlay(item.id).then((success) => {
@@ -319,23 +322,22 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
             }
             
             // Near viewport - REAL prewarm: call attach() on the player
-            // ALWAYS check if attached, not just if prewarmed (fixes re-entry bug)
+            // Ensure we can re-attach on re-entry after detach
             const playerRef = (target as any).__hlsPlayerRef;
-            const isCurrentlyAttached = playerRef?.isAttached?.() ?? true;
-            
-            if (!isCurrentlyAttached || !prewarmedIds.current.has(id)) {
-              if (prewarmedIds.current.size < maxPreloading || prewarmedIds.current.has(id)) {
-                if (playerRef?.attach) {
-                  playerRef.attach();
-                }
-                
-                // Also set preload for non-HLS
-                target.preload = 'auto';
-                
-                prewarmedIds.current.add(id);
-                reg.hasBeenPreloaded = true;
-                registry.current.set(id, reg);
-              }
+            const isCurrentlyAttached = playerRef?.isAttached?.() ?? false;
+            const isVisible = visibleIds.current.has(id);
+            const canPrewarm = prewarmedIds.current.size < maxPreloading || prewarmedIds.current.has(id);
+
+            if (!isCurrentlyAttached && (isVisible || canPrewarm)) {
+              playerRef?.attach?.();
+            }
+
+            // Track as prewarmed so we can detach later
+            if ((isVisible || canPrewarm) && !prewarmedIds.current.has(id)) {
+              target.preload = 'auto';
+              prewarmedIds.current.add(id);
+              reg.hasBeenPreloaded = true;
+              registry.current.set(id, reg);
             }
           } else {
             // Far from viewport - debounced detach to prevent thrash

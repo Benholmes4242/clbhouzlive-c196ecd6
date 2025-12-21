@@ -361,6 +361,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       
       // Expose player ref on element for prewarm observer to call attach/detach
       (video as any).__hlsPlayerRef = {
+        isAttached: () => isAttachedRef.current,
         attach: () => {
           // Skip if already attached - prevents white flash from unnecessary resets
           if (!isAttachedRef.current) {
