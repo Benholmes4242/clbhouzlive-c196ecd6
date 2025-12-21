@@ -14,7 +14,7 @@ import CoursePostBadge from '@/components/posts/CoursePostBadge';
 import ClubTagPill from './ClubTagPill';
 import { Top100OverlayPills } from './Top100OverlayPills';
 
-import HLSVideoCard from '@/components/ui/HLSVideoCard';
+import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
@@ -106,27 +106,46 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   const hlsUrl = uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null;
   const poster = uid ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` : undefined;
 
-  const isDesktop = typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches;
+  const playerRef = React.useRef<HLSPlayerRef>(null);
+
+  // Expose video element to parent via ref
+  React.useImperativeHandle(ref, () => playerRef.current?.getElement() as HTMLVideoElement);
+
+  // Handle attach/detach based on shouldAttach
+  React.useEffect(() => {
+    if (!playerRef.current) return;
+    if (shouldAttach) {
+      playerRef.current.attach();
+    } else if (!isNearby) {
+      playerRef.current.detach();
+    }
+  }, [shouldAttach, isNearby]);
+
+  // Handle play/pause based on autoplay and isActive
+  React.useEffect(() => {
+    if (!playerRef.current) return;
+    if (autoplay && isActive) {
+      playerRef.current.play();
+    } else {
+      playerRef.current.pause();
+    }
+  }, [autoplay, isActive]);
 
   return (
     <div className="relative w-full h-full bg-black overflow-hidden">
       {hlsUrl ? (
         <div className="absolute inset-0" style={{ objectPosition: 'center center' }}>
-          <HLSVideoCard
-            ref={ref}
-            hlsUrl={hlsUrl}
+          <HLSPlayer
+            ref={playerRef}
+            src={hlsUrl}
             poster={poster}
-            className="absolute inset-0 w-full h-full"
-            aspectRatio="auto"
             muted={muted}
-            loop={true}
-            autoplay={autoplay}
-            shouldAttach={shouldAttach}
+            loop
+            autoplay={false}
             showMuteButton={false}
-            externallyManaged={true}
-            fit="cover"
-            isNearby={isNearby}
-            isActive={isActive}
+            showPlayButton={false}
+            objectFit="cover"
+            className="absolute inset-0 w-full h-full"
           />
         </div>
       ) : (

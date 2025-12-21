@@ -2,7 +2,7 @@ import React, { memo, useRef, useEffect, useState } from 'react';
 import { Play } from 'lucide-react';
 import { useVideoVisibility } from '@/hooks/useVideoVisibility';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
-import HLSVideoCard from '@/components/ui/HLSVideoCard';
+import { HLSPlayer, HLSPlayerRef } from '@/media';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import SoundToggle from '@/components/ui/sound-toggle';
 import { CardMediaProps } from './CardMediaTypes';
@@ -26,7 +26,7 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
   className = '',
   showFeaturedBadge = true
 }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const playerRef = useRef<HLSPlayerRef>(null);
   const { isMuted: videoIsMuted, toggleMute: toggleVideoMute } = useExclusiveVideoAudio(`hero-${media.media_url}`);
   
   // State for API-fetched URLs
@@ -67,10 +67,10 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
   
   // Use video visibility hook for autoplay management with near/play pattern
   const { containerRef, isVisible, isNear } = useVideoVisibility({
-    threshold: 0.5, // Play when ≥50% visible
-    rootMargin: '300px 0px 300px 0px', // Prebuffer when near
-    videoRef,
-    shouldAutoplay: false, // We'll handle autoplay logic ourselves
+    threshold: 0.5,
+    rootMargin: '300px 0px 300px 0px',
+    videoRef: { current: playerRef.current?.getElement() ?? null } as React.RefObject<HTMLVideoElement>,
+    shouldAutoplay: false,
     globallyMuted: true
   });
 
@@ -109,19 +109,17 @@ const HeroCardMedia: React.FC<CardMediaProps> = memo(({
     >
       {/* Only render video if we have a valid HLS URL */}
       {hlsUrl ? (
-        <HLSVideoCard
-          ref={videoRef}
-          hlsUrl={hlsUrl}
+        <HLSPlayer
+          ref={playerRef}
+          src={hlsUrl}
           poster={poster}
-          className="w-full h-full"
-          aspectRatio="auto"
-          muted={true}
-          loop={true}
-          shouldAttach={shouldAttach}
+          muted
+          loop
           autoplay={shouldAutoPlay}
           showMuteButton={false}
-          externallyManaged={true}
-          fit="cover"
+          showPlayButton={false}
+          objectFit="cover"
+          className="w-full h-full"
         />
       ) : (
         <div className="w-full h-full bg-muted flex items-center justify-center">

@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { getStreamIdFromUrl, getStreamPoster } from '@/utils/stream';
 import ShortsCardMeta from './ShortsCardMeta';
-import HLSVideoCard from '@/components/ui/HLSVideoCard';
+import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { Squircle } from '@/components/ui/squircle';
 import { Heart } from 'lucide-react';
@@ -70,20 +70,18 @@ export default React.memo(function ShortCard({
           borderRadius: '0'
         }}
       >
-        {/* Video with HLSVideoCard for optimal performance */}
+        {/* Video with HLSPlayer for optimal performance */}
         {isVideo && hlsUrl ? (
-          <HLSVideoCard
-            hlsUrl={hlsUrl}
+          <HLSPlayer
+            src={hlsUrl}
             poster={posterUrl}
-            className="absolute inset-0 w-full h-full"
-            aspectRatio={isLandscape ? '16/11.592' : '9/16'}
-            muted={true}
-            loop={true}
-            shouldAttach={shouldAttach}
             autoplay={autoplay}
+            muted
+            loop
             showMuteButton={false}
-            externallyManaged={true}
-            fit="cover"
+            showPlayButton={false}
+            objectFit="cover"
+            className="absolute inset-0 w-full h-full"
           />
         ) : (
           <img
