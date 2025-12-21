@@ -4,7 +4,7 @@ import { MapPin, Play, Volume2, VolumeX } from 'lucide-react';
 import { format } from 'date-fns';
 import { uidFromNode, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
 import { useVideoVisibility } from '@/hooks/useVideoVisibility';
-import HLSVideoCard from '@/components/ui/HLSVideoCard';
+import { HLSPlayer, HLSPlayerRef } from '@/media';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
 
 
@@ -25,7 +25,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
 }) => {
   const primaryMedia = highlight.post_media[0];
   const createdDate = new Date(highlight.created_at);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const playerRef = useRef<HLSPlayerRef>(null);
   
   // State for audio preference (muted by default for grid autoplay)
   const [isMuted, setIsMuted] = useState(true);
@@ -50,9 +50,9 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
 
   // Use grid-style video visibility for autoplay
   const { containerRef, isVisible, isNear } = useVideoVisibility({
-    threshold: 0.6, // Slightly stricter for carousel
-    rootMargin: '0px 50px', // Prebuffer when 50px away horizontally
-    videoRef,
+    threshold: 0.6,
+    rootMargin: '0px 50px',
+    videoRef: { current: playerRef.current?.getElement() ?? null } as React.RefObject<HTMLVideoElement>,
     shouldAutoplay: true,
     globallyMuted: isMuted
   });
@@ -60,12 +60,12 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
   // Handle play/pause click
   const handleVideoClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    if (primaryMedia?.media_type === 'video' && videoRef.current) {
-      const video = videoRef.current;
-      if (video.paused) {
-        video.play();
+    if (primaryMedia?.media_type === 'video' && playerRef.current) {
+      const el = playerRef.current.getElement();
+      if (el?.paused) {
+        playerRef.current.play();
       } else {
-        video.pause();
+        playerRef.current.pause();
       }
     }
   }, [primaryMedia]);
@@ -118,17 +118,16 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
         ) : (
           <>
             {/* Grid-style video with visibility-based autoplay */}
-            <HLSVideoCard
-              ref={videoRef}
-              hlsUrl={hlsUrl}
+            <HLSPlayer
+              ref={playerRef}
+              src={hlsUrl || ''}
               poster={posterUrl || undefined}
-              shouldAttach={isNear}
               autoplay={isVisible}
               muted={isMuted}
-              loop={true}
-              externallyManaged={true}
+              loop
               showMuteButton={false}
-              fit="cover"
+              showPlayButton={false}
+              objectFit="cover"
               className="w-full h-full"
             />
           </>

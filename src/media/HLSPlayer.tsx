@@ -62,6 +62,8 @@ export interface HLSPlayerRef {
   getElement: () => HTMLVideoElement | null;
   getCurrentTime: () => number;
   getDuration: () => number;
+  attach: () => void;
+  detach: () => void;
 }
 
 // ============ Component ============
@@ -103,6 +105,9 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   
   // ============ Imperative Handle ============
   
+  // Track if source is attached
+  const isAttachedRef = useRef(true);
+  
   useImperativeHandle(ref, () => ({
     play: async () => {
       const video = videoRef.current;
@@ -121,7 +126,38 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     getElement: () => videoRef.current,
     getCurrentTime: () => videoRef.current?.currentTime ?? 0,
     getDuration: () => videoRef.current?.duration ?? 0,
-  }), []);
+    attach: () => {
+      // Re-attach HLS source if detached
+      if (!isAttachedRef.current && videoRef.current && src) {
+        isAttachedRef.current = true;
+        // Trigger re-setup by updating state
+        setIsReady(false);
+        setIsPosterVisible(true);
+      }
+    },
+    detach: () => {
+      // Detach and cleanup to save memory
+      const video = videoRef.current;
+      if (!video) return;
+      
+      isAttachedRef.current = false;
+      video.pause();
+      
+      if (hlsRef.current) {
+        try {
+          hlsRef.current.stopLoad();
+          hlsRef.current.detachMedia();
+          hlsRef.current.destroy();
+        } catch {}
+        hlsRef.current = null;
+      }
+      
+      video.removeAttribute('src');
+      try {
+        video.load();
+      } catch {}
+    },
+  }), [src]);
   
   // ============ Sync External Muted State ============
   

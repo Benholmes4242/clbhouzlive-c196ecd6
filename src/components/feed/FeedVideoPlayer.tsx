@@ -1,5 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useRef, useEffect, useState } from 'react';
-import HLSVideoCard from '@/components/ui/HLSVideoCard';
+import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { isCloudflareStreamUrl, uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { getCloudflareStreamHLS, getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
 
@@ -39,7 +39,7 @@ const FeedVideoPlayer = forwardRef<FeedVideoPlayerRef, FeedVideoPlayerProps>(({
   preload = 'metadata',
   onClick
 }, ref) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const playerRef = useRef<HLSPlayerRef>(null);
   const [apiHlsUrl, setApiHlsUrl] = useState<string | null>(null);
   const [apiPoster, setApiPoster] = useState<string | null>(null);
 
@@ -61,7 +61,7 @@ const FeedVideoPlayer = forwardRef<FeedVideoPlayerRef, FeedVideoPlayerProps>(({
 
   // Expose unified ref interface to parent
   useImperativeHandle(ref, () => {
-    const video = videoRef.current;
+    const video = playerRef.current?.getElement();
     if (video) {
       return {
         play: () => video.play(),
@@ -87,16 +87,17 @@ const FeedVideoPlayer = forwardRef<FeedVideoPlayerRef, FeedVideoPlayerProps>(({
     );
   }
 
-  // Use HLS Video Card for all videos
+  // Use HLSPlayer for all videos
   return (
-    <HLSVideoCard
-      hlsUrl={hlsUrl}
+    <HLSPlayer
+      ref={playerRef}
+      src={hlsUrl}
       poster={poster}
-      className={className}
       muted={muted}
       loop={loop}
-      autoplay={false} // Control autoplay externally
-      showMuteButton={false} // Let parent handle mute controls
+      autoplay={false}
+      showMuteButton={false}
+      className={className}
       onClick={onClick}
     />
   );
