@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { VIDEO_DURATION_THRESHOLD_SECONDS } from '@/constants/videoRules';
 import { LongFormVideo } from '@/components/videos/LongFormVideoTile';
@@ -55,6 +55,14 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
   const [videos, setVideos] = useState<LongFormVideo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const fetchInProgress = useRef(false);
+  
+  // Stabilize followedCreatorIds to prevent infinite re-renders
+  const followedIdsKey = useMemo(() => followedCreatorIds.sort().join(','), [followedCreatorIds]);
+  const stableFollowedIds = useRef(followedCreatorIds);
+  if (followedIdsKey !== stableFollowedIds.current.sort().join(',')) {
+    stableFollowedIds.current = followedCreatorIds;
+  }
 
   const formatDuration = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
@@ -73,6 +81,9 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
   };
 
   const fetchVideos = useCallback(async () => {
+    // Prevent duplicate concurrent fetches
+    if (fetchInProgress.current) return;
+    fetchInProgress.current = true;
     setIsLoading(true);
     setError(null);
 
@@ -102,6 +113,7 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
         if (filteredPostIds.length === 0) {
           setVideos([]);
           setIsLoading(false);
+          fetchInProgress.current = false;
           return;
         }
       } else if (needsCoursesFilter) {
@@ -120,6 +132,7 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
         if (filteredPostIds.length === 0) {
           setVideos([]);
           setIsLoading(false);
+          fetchInProgress.current = false;
           return;
         }
       }
@@ -179,12 +192,13 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
             
           case 'following':
             // Only show videos from followed creators
-            if (followedCreatorIds.length > 0) {
-              query = query.in('user_id', followedCreatorIds);
+            if (stableFollowedIds.current.length > 0) {
+              query = query.in('user_id', stableFollowedIds.current);
             } else {
               // No followed creators = empty result
               setVideos([]);
               setIsLoading(false);
+              fetchInProgress.current = false;
               return;
             }
             break;
@@ -203,6 +217,7 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
       if (!data || data.length === 0) {
         setVideos([]);
         setIsLoading(false);
+        fetchInProgress.current = false;
         return;
       }
 
@@ -278,9 +293,10 @@ export const useLongFormVideos = (options: UseLongFormVideosOptions = {}): UseLo
       console.error('Error fetching long-form videos:', err);
       setError(err instanceof Error ? err : new Error('Failed to fetch videos'));
     } finally {
+      fetchInProgress.current = false;
       setIsLoading(false);
     }
-  }, [section, limit, followedCreatorIds, creatorUserId, sort, searchQuery, category]);
+  }, [section, limit, followedIdsKey, creatorUserId, sort, searchQuery, category]);
 
   useEffect(() => {
     fetchVideos();
