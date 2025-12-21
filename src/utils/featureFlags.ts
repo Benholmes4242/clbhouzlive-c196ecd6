@@ -20,7 +20,7 @@ export const DEBUG_ACHIEVEMENTS_USER_EMAIL = 'benjamin@clbhouz.co.uk';
  * Use this flag to test autoplay, scroll performance, and prewarm under load.
  * Set to false and remove mock data file after testing is complete.
  */
-export const DISCOVER_VIDEOS_MOCK_DATA = true;
+export const DISCOVER_VIDEOS_MOCK_DATA = false;
 
 export const FEATURE_FLAGS = {
   SAFE_AUTOPLAY_V2: USE_SAFE_AUTOPLAY_V2,
