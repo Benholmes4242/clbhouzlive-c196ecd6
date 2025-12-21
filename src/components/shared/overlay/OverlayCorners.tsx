@@ -190,10 +190,11 @@ const OverlayCorners: React.FC<OverlayCornersProps> = ({
           {/* Trending label for hero */}
           {trendingLabel && (
             <span 
-              className="text-white font-semibold text-sm leading-tight"
+              className="flex items-center gap-1 text-white font-semibold text-sm leading-tight"
               style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}
             >
               {trendingLabel}
+              <Flame className="w-3.5 h-3.5 text-orange-500" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.5))' }} />
             </span>
           )}
           
