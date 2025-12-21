@@ -8,7 +8,7 @@ import SegmentedControl from '@/components/discover/SegmentedControl';
 import ExploreFilters from '@/components/explore/ExploreFilters';
 import DiscoverVideosHeader from '@/components/discover/DiscoverVideosHeader';
 import VideoSearchOverlay from '@/components/videos/VideoSearchOverlay';
-
+import SlidingPanels from '@/components/ui/SlidingPanels';
 import { useVideoLengthFilter } from '@/hooks/useVideoLengthFilter';
 import { DURATION_FILTERS } from '@/constants/videoFilters';
 import { ContinueWatchingSection } from '@/components/videos/ContinueWatchingSection';
@@ -235,38 +235,53 @@ const Discover = () => {
 
 
             {/* Main Content - Conditional based on active tab with slide animation */}
-            {main === 'channels' && (
-              <Suspense fallback={null}>
-                <ExploreTab onMediaClick={handleMediaClick} />
-              </Suspense>
-            )}
-            {main === 'following' && (
-              <div className="md:container md:mx-auto md:px-0 mt-4">
-                <Suspense fallback={null}>
-                  <FollowingFeed onMediaClick={handleMediaClick} />
-                </Suspense>
-              </div>
-            )}
-            {main === 'videos' && (
-              <Suspense fallback={null}>
-                <VideosTab onVideoClick={handleMediaClick} />
-              </Suspense>
-            )}
-            {main === 'shorts' && (
-              <div className="md:container md:mx-auto md:px-0">
-                <ContinueWatchingSection
-                  onVideoClick={(id) => navigate(`/video/${id}`)}
-                  className="mb-6 mt-2"
-                />
-                <DiscoverContent
-                  onLike={handleLike}
-                  onFollow={handleFollow}
-                  onMediaClick={handleMediaClick}
-                  searchQuery={searchQuery}
-                  selectedTags={selectedTags}
-                />
-              </div>
-            )}
+            <SlidingPanels
+              activeKey={main as MainKey}
+              order={['shorts', 'videos', 'channels', 'following'] as const}
+            >
+              {(key: MainKey) => {
+                if (key === 'channels') {
+                  return (
+                    <Suspense fallback={null}>
+                      <ExploreTab onMediaClick={handleMediaClick} />
+                    </Suspense>
+                  );
+                }
+                if (key === 'following') {
+                  return (
+                    <div className="md:container md:mx-auto md:px-0 mt-4">
+                      <Suspense fallback={null}>
+                        <FollowingFeed onMediaClick={handleMediaClick} />
+                      </Suspense>
+                    </div>
+                  );
+                }
+                if (key === 'videos') {
+                  return (
+                    <Suspense fallback={null}>
+                      <VideosTab onVideoClick={handleMediaClick} />
+                    </Suspense>
+                  );
+                }
+                // 'shorts' uses DiscoverContent
+                return (
+                  <div className="md:container md:mx-auto md:px-0">
+                    {/* Continue Watching section at top of Shorts/Discover */}
+                    <ContinueWatchingSection
+                      onVideoClick={(id) => navigate(`/video/${id}`)}
+                      className="mb-6 mt-2"
+                    />
+                    <DiscoverContent
+                      onLike={handleLike}
+                      onFollow={handleFollow}
+                      onMediaClick={handleMediaClick}
+                      searchQuery={searchQuery}
+                      selectedTags={selectedTags}
+                    />
+                  </div>
+                );
+              }}
+            </SlidingPanels>
         </main>
       </FadeInContent>
 
