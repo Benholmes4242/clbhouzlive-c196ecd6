@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef } 
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
 import { MapPin, UserPlus, UserCheck, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { SpeakerXMarkIcon, SpeakerWaveIcon } from '@heroicons/react/24/solid';
-import { EmojiReactionTray } from './EmojiReactionTray';
-import { usePostReactions } from '@/hooks/usePostReactions';
+
+
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ExploreContentItem } from '@/components/explore/types';
@@ -22,7 +22,7 @@ import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useVideoManager } from '@/contexts/VideoManagerContext';
 import { AudioStrip } from './AudioStrip';
 import { TopBar } from './social-dock/TopBar';
-import { VideoReactionTray } from './social-dock/VideoReactionTray';
+
 import { useTopBarVisibility } from '@/hooks/useTopBarVisibility';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
@@ -171,8 +171,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   onMeaningfulInteraction
 }) => {
   const { isVisible: topBarVisible, resetTimer: resetTopBar } = useTopBarVisibility();
-  const [showVideoReactions, setShowVideoReactions] = useState(false);
-  const [reactionPosition, setReactionPosition] = useState({ x: 0, y: 0 });
   const { user } = useSupabaseSession();
   
   // Portrait-only aspect ratio constant (height/width >= 1.2)
@@ -301,12 +299,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   }, []);
   const [videoProgress, setVideoProgress] = useState(0); // 0-100
   
-  // Post reactions
-  const { getUserReaction, handleReaction } = usePostReactions();
-  const [showReactionTray, setShowReactionTray] = useState(false);
-  const [reactionTrayPosition, setReactionTrayPosition] = useState({ x: 0, y: 0 });
-  const [reactionPostId, setReactionPostId] = useState<string>('');
-  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   
   // Double-tap like state
   const [showTapHeart, setShowTapHeart] = useState<Record<string, boolean>>({});
@@ -667,55 +659,22 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     }, 320); // Wait just past double-tap window
   }, [handleDoubleTap, onDismissNavOverlay]);
   
-  // Video long press handler for reactions
-  const videoLongPressTimers = useRef<Record<string, number>>({});
-  
-  const handleVideoLongPressStart = useCallback((e: React.TouchEvent, postId: string) => {
-    const touch = e.touches[0];
-    const position = {
-      x: touch.clientX,
-      y: touch.clientY
-    };
-    
-    // Start long-press timer
-    videoLongPressTimers.current[postId] = window.setTimeout(() => {
-      setReactionPosition(position);
-      setShowVideoReactions(true);
-      resetTopBar(); // Reset top bar timer on interaction
-    }, 400); // 400ms for long-press
-  }, [resetTopBar]);
-  
-  const handleVideoLongPressEnd = useCallback((postId: string) => {
-    if (videoLongPressTimers.current[postId]) {
-      clearTimeout(videoLongPressTimers.current[postId]);
-      delete videoLongPressTimers.current[postId];
-    }
-  }, []);
 
   // Media swipe gesture handlers (memoized to prevent re-renders)
   const handleMediaTouchStart = useCallback((e: React.TouchEvent, postId: string, hasMultipleMedia: boolean) => {
-    if (e.currentTarget.closest('[data-media-container]')) {
-      handleVideoLongPressStart(e, postId);
-    }
-    
     if (hasMultipleMedia) {
       (e.currentTarget as any).touchStartX = e.touches[0].clientX;
       (e.currentTarget as any).touchStartY = e.touches[0].clientY;
     }
-  }, [handleVideoLongPressStart]);
+  }, []);
 
   const handleMediaTouchEnd = useCallback((
     e: React.TouchEvent,
     postId: string,
     hasMultipleMedia: boolean,
     currentMediaIndex: number,
-    mediaItemsLength: number,
-    isVideo: boolean
+    mediaItemsLength: number
   ) => {
-    if (isVideo) {
-      handleVideoLongPressEnd(postId);
-    }
-    
     if (!hasMultipleMedia) return;
     
     const touchEndX = e.changedTouches[0].clientX;
@@ -741,7 +700,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         }));
       }
     }
-  }, [handleVideoLongPressEnd]);
+  }, []);
 
   // Helper function to truncate text to 9 words
   const truncateToWords = (text: string, wordLimit: number = 9) => {
@@ -917,59 +876,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     setCommentsModalOpen(true);
   };
 
-  // Long press handlers for reaction tray
-  const handleLongPressStart = useCallback((e: React.TouchEvent | React.MouseEvent, postId: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    const target = e.currentTarget as HTMLElement;
-    const rect = target.getBoundingClientRect();
-    const newPosition = {
-      x: rect.left - 80, // Position to the left of the button
-      y: rect.top + rect.height / 2
-    };
-    
-    setReactionTrayPosition(newPosition);
-    setReactionPostId(postId);
-
-    longPressTimer.current = setTimeout(() => {
-      setShowReactionTray(true);
-    }, 500); // 500ms long press threshold
-  }, []);
-
-  const handleLongPressEnd = useCallback((postId: string) => {
-    // Restore scroll behavior
-    document.documentElement.style.touchAction = '';
-    
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-
-    if (!showReactionTray) {
-      // Quick tap - toggle heart reaction
-      const currentReaction = getUserReaction(postId);
-      if (currentReaction === '❤️') {
-        handleReaction(postId, ''); // Remove reaction
-      } else {
-        handleReaction(postId, '❤️'); // Add heart reaction
-      }
-    }
-  }, [showReactionTray, getUserReaction, handleReaction]);
-
-  const handleEmojiSelect = useCallback((emoji: string) => {
-    const currentReaction = getUserReaction(reactionPostId);
-    if (currentReaction === emoji) {
-      handleReaction(reactionPostId, ''); // Remove reaction if same emoji selected
-    } else {
-      handleReaction(reactionPostId, emoji); // Set new reaction
-    }
-    setShowReactionTray(false);
-  }, [reactionPostId, getUserReaction, handleReaction]);
-
-  const handleReactionCancel = useCallback(() => {
-    setShowReactionTray(false);
-  }, []);
 
   // Preload next video HLS manifest
   useEffect(() => {
@@ -1144,8 +1050,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     item.id,
                     hasMultipleMedia,
                     currentMediaIndex,
-                    mediaItems.length,
-                    currentMedia.media_type === 'video'
+                    mediaItems.length
                   );
                 }}
                 className="relative w-full h-full z-10"
@@ -1271,14 +1176,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         )}
       </div>
 
-      {/* Emoji Reaction Tray */}
-      <EmojiReactionTray
-        isVisible={showReactionTray}
-        onEmojiSelect={handleEmojiSelect}
-        onCancel={handleReactionCancel}
-        position={reactionTrayPosition}
-        selectedEmoji={getUserReaction(reactionPostId)}
-      />
 
       <style>{`
         * {
@@ -1384,16 +1281,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         />
       )}
 
-      {/* Video Reaction Tray */}
-      <VideoReactionTray
-        isVisible={showVideoReactions}
-        position={reactionPosition}
-        onEmojiSelect={(emoji) => {
-          console.log('Emoji selected:', emoji);
-          setShowVideoReactions(false);
-        }}
-        onCancel={() => setShowVideoReactions(false)}
-      />
     </div>
   );
 };
