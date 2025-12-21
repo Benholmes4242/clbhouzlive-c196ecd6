@@ -358,8 +358,11 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     if (video) {
       video.setAttribute('webkit-playsinline', 'true');
       video.setAttribute('x5-playsinline', 'true');
-      
+
       // Expose player ref on element for prewarm observer to call attach/detach
+      // IMPORTANT: keep this logic in sync with the imperative handle attach/detach.
+      // If we detach/attach without resetting first-frame detection, the video can
+      // "play" (time updates) while still showing the poster (appears frozen).
       (video as any).__hlsPlayerRef = {
         isAttached: () => isAttachedRef.current,
         attach: () => {
@@ -379,8 +382,15 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           // Skip if already attached - prevents white flash from unnecessary resets
           if (!isAttachedRef.current) {
             isAttachedRef.current = true;
+
+            // Critical: reset first-frame detection so video layer can fade in again
+            firstFrameRequestedRef.current = false;
+            cleanupTimeUpdateListener();
+
             setHasFirstFrame(false);
             setIsPosterVisible(true);
+            setIsReady(false);
+
             setupSourceRef.current?.();
           }
         },
@@ -400,6 +410,11 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
 
           if (isAttachedRef.current) {
             isAttachedRef.current = false;
+
+            // Critical: reset first-frame detection (otherwise poster can get stuck)
+            firstFrameRequestedRef.current = false;
+            cleanupTimeUpdateListener();
+
             video.pause();
             if (hlsRef.current) {
               try {
@@ -413,16 +428,17 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
             video.load();
             setIsPosterVisible(true);
             setHasFirstFrame(false);
+            setIsReady(false);
           }
         }
       };
-      
+
       // Cleanup __hlsPlayerRef on unmount to prevent stale refs
       return () => {
         delete (video as any).__hlsPlayerRef;
       };
     }
-  }, []);
+  }, [cleanupTimeUpdateListener, src]);
   
   // ============ First Frame Detection (requestVideoFrameCallback) ============
   
