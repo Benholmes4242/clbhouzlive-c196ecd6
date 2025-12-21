@@ -28,12 +28,23 @@ export default function FollowingFeed({ onMediaClick }: FollowingFeedProps) {
 
   const sentinelRef = useRef<HTMLDivElement>(null);
 
-  // Unified media autoplay
+  // Unified media autoplay - same config as VideosTab
   const { registerMedia, playingIds } = useMediaAutoplay({
     mode: 'grid',
     preloadMargin: 300,
     scrollSettleDelay: 200,
   });
+
+  // Force playback check when items change (handles initial mount timing)
+  useEffect(() => {
+    if (items.length > 0) {
+      // Small delay to ensure registrations complete
+      const timer = setTimeout(() => {
+        window.dispatchEvent(new Event('scroll'));
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [items.length]);
 
   // Infinite scroll observer
   useEffect(() => {
