@@ -341,22 +341,27 @@ export function useGridAutoplay(
           const match = videosRef.current.get(id);
           if (!match) return;
 
-          if (import.meta.env.DEV) {
-            const wasVisible = visibleRef.current.has(id);
-            // eslint-disable-next-line no-console
-            console.log('[GridAutoplay][IO]', id.slice(0, 8), `ratio=${ratio.toFixed(2)}`, `wasVisible=${wasVisible}`);
-          }
+          const wasVisible = visibleRef.current.has(id);
           
           // Hysteresis logic (ratio-based only, ignore isIntersecting):
           // - Start playing when ratio >= visibilityThreshold (0.6)
           // - Stop playing when ratio <= visibilityStopThreshold (0.4)
           // - In between: maintain current state (no flicker)
+          let nextVisible = wasVisible;
           if (ratio >= visibilityThreshold) {
             visibleRef.current.add(id);
+            nextVisible = true;
           } else if (ratio <= visibilityStopThreshold) {
             visibleRef.current.delete(id);
+            nextVisible = false;
           }
           // If between stop and start thresholds, keep current state (hysteresis)
+          
+          if (import.meta.env.DEV && wasVisible !== nextVisible) {
+            // Only log when state actually changes
+            // eslint-disable-next-line no-console
+            console.log('[GridAutoplay][IO]', id.slice(0, 8), `ratio=${ratio.toFixed(2)}`, `visible: ${wasVisible} → ${nextVisible}`);
+          }
         });
 
         updatePlayback();
