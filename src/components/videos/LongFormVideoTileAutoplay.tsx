@@ -145,6 +145,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
               aspectRatio="16:9"
               objectFit="cover"
               externallyManaged
+              mediaId={video.id}
               onLoadedData={() => {
                 const el = playerRef.current?.getElement();
                 if (el) setVideoEl(el);
@@ -153,7 +154,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
             />
             {/* Video scrubber - positioned at bottom of media */}
             {videoEl && (
-              <VideoScrubber videoEl={videoEl} height={3} />
+              <VideoScrubber videoEl={videoEl} mediaId={video.id} height={3} />
             )}
           </>
         ) : video.thumbnailUrl ? (

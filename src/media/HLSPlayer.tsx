@@ -16,6 +16,8 @@ import { safePlay, isIOS } from '@/utils/safePlay';
 import { loadHlsJs } from '@/utils/hlsLoader';
 import type HlsType from 'hls.js';
 import { cn } from '@/lib/utils';
+import { MEDIA_SCRUBBER_V1 } from '@/config/featureFlags';
+import { VideoScrubber } from '@/components/video/VideoScrubber';
 
 // ============ Types ============
 
@@ -51,6 +53,10 @@ export interface HLSPlayerProps {
   externallyManaged?: boolean; // Disable internal play/pause on click
   startTime?: number; // Resume from position
   preload?: 'none' | 'metadata' | 'auto';
+  
+  // Scrubber
+  showScrubber?: boolean; // Show progress scrubber (default: true if MEDIA_SCRUBBER_V1)
+  mediaId?: string; // Required for scrubber intent tracking
 }
 
 export interface HLSPlayerRef {
@@ -88,6 +94,8 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   externallyManaged = false,
   startTime,
   preload = 'metadata',
+  showScrubber,
+  mediaId,
 }, ref) => {
   // Refs
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -771,6 +779,15 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
             <Volume2 className="w-4 h-4 text-white" />
           )}
         </button>
+      )}
+      
+      {/* Scrubber Overlay - Instagram-style progress bar */}
+      {(showScrubber ?? MEDIA_SCRUBBER_V1) && mediaId && !hasError && (
+        <VideoScrubber
+          videoEl={videoRef.current}
+          mediaId={mediaId}
+          height={3}
+        />
       )}
     </div>
   );

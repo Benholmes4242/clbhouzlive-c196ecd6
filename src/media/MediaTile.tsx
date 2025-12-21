@@ -170,6 +170,7 @@ const MediaTile: React.FC<MediaTileProps> = ({
           externallyManaged
           onPlay={onPlay}
           onPause={onPause}
+          mediaId={id}
         />
       )}
       
