@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Play, Flame, Eye } from 'lucide-react';
+import { Play, Flame, Heart } from 'lucide-react';
 import { VideoQueueMenu } from './VideoQueueMenu';
 import { GolferAvatar } from '@/components/golfers/GolferAvatar';
 import type { QueueItemMeta } from '@/hooks/useVideoQueue';
@@ -112,9 +112,12 @@ export const LongFormVideoTile: React.FC<LongFormVideoTileProps> = ({
           />
         )}
 
-        {/* Likes badge - bottom left (matching hero) */}
-        <div className="absolute bottom-3 left-3 flex items-center gap-1 px-2 py-0.5 bg-black/70 backdrop-blur-sm text-white text-xs font-medium rounded">
-          <Eye className="h-3 w-3" />
+        {/* Likes - bottom left (matching hero: white text with shadow, no pill) */}
+        <div 
+          className="absolute bottom-3 left-3 flex items-center gap-1 text-white/70 text-[10px] leading-none font-medium"
+          style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}
+        >
+          <Heart className="w-3 h-3" />
           <span>{formatLikes(video.likes || video.views)}</span>
         </div>
 
