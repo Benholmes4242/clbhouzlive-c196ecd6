@@ -6,24 +6,10 @@ import { GolferAvatar } from '@/components/golfers/GolferAvatar';
 import GridAutoplayVideo from '@/components/profile/activity/GridAutoplayVideo';
 import type { QueueItemMeta } from '@/hooks/useVideoQueue';
 import type { RegisterVideoFn } from '@/hooks/useGridAutoplay';
+import type { LongFormVideo } from './LongFormVideoTile';
 
-export interface LongFormVideo {
-  id: string;
-  title: string;
-  creatorUserId: string;
-  creatorName: string;
-  creatorAvatarUrl?: string;
-  thumbnailUrl: string;
-  mediaUrl?: string; // Video URL for autoplay
-  duration: string;
-  durationSeconds: number;
-  views?: number;
-  createdAt?: string;
-  golfCourseId?: string;
-  golfCourseName?: string;
-  isTrending?: boolean;
-  likes?: number;
-}
+// Re-export for convenience
+export type { LongFormVideo };
 
 interface LongFormVideoTileAutoplayProps {
   video: LongFormVideo;

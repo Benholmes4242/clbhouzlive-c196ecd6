@@ -12,6 +12,7 @@ export interface LongFormVideo {
   creatorName: string;
   creatorAvatarUrl?: string;
   thumbnailUrl: string;
+  mediaUrl?: string; // Video URL for autoplay
   duration: string; // Formatted duration e.g. "12:34"
   durationSeconds: number;
   views?: number;
