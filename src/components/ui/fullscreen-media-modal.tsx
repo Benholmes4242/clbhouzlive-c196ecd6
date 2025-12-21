@@ -267,13 +267,21 @@ const FullscreenMediaModal = ({
     }
   }, [isOpen, currentIndex]);
 
+  // Track if modal was ever actually opened (to prevent running on initial mount)
+  const wasEverOpenRef = useRef(false);
+  
   // Cleanup when modal closes - restore feed video behavior
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen) {
+      wasEverOpenRef.current = true;
+    }
+    
+    if (!isOpen && wasEverOpenRef.current) {
       // Unregister the fullscreen video
       unregisterVideo(fullscreenVideoId.current);
       
       // When modal closes, allow feed videos to resume
+      // Only run if the modal was actually open before
       const timer = setTimeout(() => {
         pauseAllAndSetActive('');
         console.log('🔊 Fullscreen modal closed, feed videos will resume');
