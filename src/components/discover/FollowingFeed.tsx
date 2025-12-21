@@ -1,33 +1,23 @@
-import React, { useEffect, useRef } from 'react';
-import { cn } from '@/lib/utils';
+import React, { useEffect, useRef, useCallback } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useUnifiedFollowingFeed } from '@/hooks/explore/useUnifiedFollowingFeed';
-import FollowingFeedCard from './FollowingFeedCard';
+import { LongFormVideoTileAutoplay } from '@/components/videos/LongFormVideoTileAutoplay';
 import FollowingEmptyState from './FollowingEmptyState';
+import { useMediaAutoplay } from '@/media';
+import type { LongFormVideo } from '@/components/videos/LongFormVideoTile';
 
 interface FollowingFeedProps {
   onMediaClick: (item: any) => void;
 }
 
 /**
- * FollowingFeed - Phase 4 Implementation
- * 
- * Following is:
- * - Chronological
- * - Predictable
- * - Calm
- * - Trust-based
- * 
- * This is where Clbhouz feels personal.
- * 
- * Core rules:
- * - One feed, one scroll, chronological-first
- * - No discovery injection
- * - No suggested content
- * - No algorithms competing for attention
- * 
- * If it feels boring in a good way — it's right.
+ * FollowingFeed - Uses same card layout as Videos page
+ * Simple chronological list, no sections
  */
 export default function FollowingFeed({ onMediaClick }: FollowingFeedProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  
   const {
     items,
     loading,
@@ -37,6 +27,13 @@ export default function FollowingFeed({ onMediaClick }: FollowingFeedProps) {
   } = useUnifiedFollowingFeed(20);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
+
+  // Unified media autoplay
+  const { registerMedia, playingIds } = useMediaAutoplay({
+    mode: 'grid',
+    preloadMargin: 300,
+    scrollSettleDelay: 200,
+  });
 
   // Infinite scroll observer
   useEffect(() => {
@@ -61,6 +58,38 @@ export default function FollowingFeed({ onMediaClick }: FollowingFeedProps) {
     };
   }, [hasMore, loading, loadMore]);
 
+  // Convert ExploreContentItem to LongFormVideo format
+  const convertToVideoFormat = useCallback((item: any): LongFormVideo => ({
+    id: item.id,
+    title: item.title || '',
+    mediaUrl: item.type === 'video' ? item.src : undefined,
+    thumbnailUrl: item.type === 'image' ? item.src : undefined,
+    duration: item.duration || '',
+    durationSeconds: item.durationSeconds || 0,
+    creatorName: item.user?.name || 'User',
+    creatorUserId: item.user?.id || '',
+    creatorAvatarUrl: item.user?.avatar,
+    views: item.likes || 0,
+    likes: item.likes || 0,
+  }), []);
+
+  const handleVideoClick = useCallback((id: string) => {
+    const item = items.find(i => i.id === id);
+    if (item) {
+      if (item.type === 'video') {
+        navigate(`/video/${id}`, {
+          state: { backgroundLocation: location, fromVideo: true }
+        });
+      } else {
+        onMediaClick(item);
+      }
+    }
+  }, [items, navigate, location, onMediaClick]);
+
+  const handleCreatorClick = useCallback((creatorUserId: string) => {
+    navigate(`/golfer/${creatorUserId}`);
+  }, [navigate]);
+
   // Empty state: User follows no one
   if (!loading && followingCount === 0) {
     return <FollowingEmptyState variant="no-following" />;
@@ -72,14 +101,18 @@ export default function FollowingFeed({ onMediaClick }: FollowingFeedProps) {
   }
 
   return (
-    <div className="min-h-screen">
-      {/* Unified chronological feed */}
-      <div className="flex flex-col">
-        {items.map((item) => (
-          <FollowingFeedCard
+    <div className="min-h-screen pb-20" style={{ background: '#f8fafc' }}>
+      {/* Simple list layout - same as Videos page */}
+      <div className="space-y-3 pt-4">
+        {items.map((item, index) => (
+          <LongFormVideoTileAutoplay
             key={item.id}
-            item={item}
-            onClick={() => onMediaClick(item)}
+            video={convertToVideoFormat(item)}
+            onVideoClick={handleVideoClick}
+            onCreatorClick={handleCreatorClick}
+            registerVideo={registerMedia}
+            isPlaying={playingIds.has(item.id)}
+            videoIndex={index}
           />
         ))}
       </div>
@@ -89,15 +122,12 @@ export default function FollowingFeed({ onMediaClick }: FollowingFeedProps) {
         <div className="py-12 px-5">
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="animate-pulse">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-muted" />
-                  <div className="flex-1">
-                    <div className="h-4 w-32 bg-muted rounded" />
-                    <div className="h-3 w-20 bg-muted rounded mt-1" />
-                  </div>
+              <div key={i} className="animate-pulse bg-card border border-border/30 overflow-hidden">
+                <div className="aspect-[16/9] bg-muted" />
+                <div className="px-4 py-3">
+                  <div className="h-4 w-3/4 bg-muted rounded" />
+                  <div className="h-3 w-1/3 bg-muted rounded mt-2" />
                 </div>
-                <div className="aspect-[4/3] bg-muted rounded-lg" />
               </div>
             ))}
           </div>
