@@ -18,6 +18,7 @@ import type HlsType from 'hls.js';
 import { cn } from '@/lib/utils';
 import { MEDIA_SCRUBBER_V1, MEDIA_RUNTIME_V2 } from '@/config/featureFlags';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
 // ============ Types ============
 
@@ -646,21 +647,23 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     
     const handleWaiting = () => {
       setIsBuffering(true);
-      // Report to runtime so it doesn't switch away while buffering
+      // Report to runtime so it doesn't switch away while buffering (static import, no dynamic promise)
       if (MEDIA_RUNTIME_V2 && mediaId) {
-        import('@/media/runtime/MediaRuntime').then(m => m.MediaRuntime.reportBuffering(mediaId));
+        MediaRuntime.reportBuffering(mediaId);
       }
     };
     const handleStalled = () => {
       setIsBuffering(true);
       if (MEDIA_RUNTIME_V2 && mediaId) {
-        import('@/media/runtime/MediaRuntime').then(m => m.MediaRuntime.reportBuffering(mediaId));
+        MediaRuntime.reportBuffering(mediaId);
       }
     };
     const handlePlaying = () => setIsBuffering(false);
     const handleCanPlay = () => setIsBuffering(false);
     const handleCanPlayThrough = () => setIsBuffering(false);
     const handleProgress = () => setBufferedPct(computeBufferedPct());
+    // Also update bufferedPct on timeupdate (some browsers fire progress infrequently)
+    const handleTimeUpdate = () => setBufferedPct(computeBufferedPct());
     
     video.addEventListener('waiting', handleWaiting);
     video.addEventListener('stalled', handleStalled);
@@ -668,6 +671,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     video.addEventListener('canplay', handleCanPlay);
     video.addEventListener('canplaythrough', handleCanPlayThrough);
     video.addEventListener('progress', handleProgress);
+    video.addEventListener('timeupdate', handleTimeUpdate);
     
     // Initial buffered pct
     setBufferedPct(computeBufferedPct());
@@ -679,8 +683,9 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       video.removeEventListener('canplay', handleCanPlay);
       video.removeEventListener('canplaythrough', handleCanPlayThrough);
       video.removeEventListener('progress', handleProgress);
+      video.removeEventListener('timeupdate', handleTimeUpdate);
     };
-  }, [computeBufferedPct]);
+  }, [computeBufferedPct, mediaId]);
   
   const handleClick = useCallback(() => {
     if (externallyManaged) {
