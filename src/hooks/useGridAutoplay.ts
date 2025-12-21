@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 type VideoRegistration = {
   id: string;
-  element: HTMLVideoElement;
+  element: HTMLVideoElement; // media element to play/pause
+  autoplayTarget: HTMLElement; // element observed for visibility (e.g. wrapper)
   isCandidate: boolean;
   sortIndex: number;
   hasBeenPreloaded: boolean;
@@ -106,15 +107,16 @@ export function useGridAutoplay(
       element: HTMLVideoElement | null;
       isCandidate: boolean;
       sortIndex: number;
+      viewportEl?: HTMLElement | null; // element used for IntersectionObserver visibility
     }) => {
-      const { id, element, isCandidate, sortIndex } = args;
+      const { id, element, isCandidate, sortIndex, viewportEl } = args;
 
       // Deregister
       if (!element) {
         const existing = videosRef.current.get(id);
         if (existing?.element) {
-          autoplayObserverRef.current?.unobserve(existing.element);
           preloadObserverRef.current?.unobserve(existing.element);
+          autoplayObserverRef.current?.unobserve(existing.autoplayTarget);
         }
         videosRef.current.delete(id);
         visibleRef.current.delete(id);
@@ -122,11 +124,14 @@ export function useGridAutoplay(
         return;
       }
 
+      const autoplayTarget = viewportEl ?? element;
+
       // Get existing or create new registration
       const existing = videosRef.current.get(id);
       const registration: VideoRegistration = {
         id,
         element,
+        autoplayTarget,
         isCandidate,
         sortIndex,
         hasBeenPreloaded: existing?.hasBeenPreloaded ?? false,
@@ -134,15 +139,16 @@ export function useGridAutoplay(
 
       videosRef.current.set(id, registration);
 
-      // Tag element for observer callbacks
+      // Tag elements for observer callbacks
       element.dataset.gridVideoId = id;
+      autoplayTarget.dataset.gridVideoId = id;
 
       // Observe with both observers
-      if (autoplayObserverRef.current) {
-        autoplayObserverRef.current.observe(element);
-      }
       if (preloadObserverRef.current) {
         preloadObserverRef.current.observe(element);
+      }
+      if (autoplayObserverRef.current) {
+        autoplayObserverRef.current.observe(autoplayTarget);
       }
 
       // Trigger playback check shortly after registration to catch initially-visible videos
@@ -273,9 +279,14 @@ export function useGridAutoplay(
     autoplayObserverRef.current = new IntersectionObserver(
       entries => {
         entries.forEach(entry => {
-          const el = entry.target as HTMLVideoElement;
+          const el = entry.target as HTMLElement;
           const id = el.dataset.gridVideoId;
           if (!id) return;
+
+          if (import.meta.env.DEV) {
+            // eslint-disable-next-line no-console
+            console.log('[GridAutoplay][IO]', id, entry.intersectionRatio, entry.isIntersecting);
+          }
 
           const match = videosRef.current.get(id);
           if (!match) return;
@@ -296,7 +307,7 @@ export function useGridAutoplay(
 
     // Videos can register before this effect runs; ensure they're observed.
     for (const v of videosRef.current.values()) {
-      autoplayObserverRef.current.observe(v.element);
+      autoplayObserverRef.current.observe(v.autoplayTarget);
     }
 
     // Trigger initial playback check after a short delay to allow observer to report initial visibility
