@@ -94,6 +94,8 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<HlsType | null>(null);
   const mountedRef = useRef(true);
+  const firstFrameRequestedRef = useRef(false); // Guard against duplicate first-frame callbacks
+  const timeUpdateListenerRef = useRef<((e: Event) => void) | null>(null); // Track timeupdate fallback listener
   
   // State
   const [isPlaying, setIsPlaying] = useState(false);
@@ -131,6 +133,8 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       // Re-attach HLS source if detached - must re-run setupSource
       if (!isAttachedRef.current && videoRef.current && src) {
         isAttachedRef.current = true;
+        firstFrameRequestedRef.current = false; // Reset first frame guard
+        cleanupTimeUpdateListener(); // Cleanup any lingering listener
         setHasFirstFrame(false);
         setIsPosterVisible(true);
         setIsReady(false);
@@ -146,6 +150,8 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       if (!video) return;
       
       isAttachedRef.current = false;
+      firstFrameRequestedRef.current = false; // Reset first frame guard
+      cleanupTimeUpdateListener(); // Cleanup any lingering listener
       video.pause();
       
       // Fully release hls.js instance
@@ -181,6 +187,15 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   // Ref to hold setupSource function for attach() to call
   const setupSourceRef = useRef<(() => void) | null>(null);
   
+  // Helper to cleanup timeupdate listener
+  const cleanupTimeUpdateListener = useCallback(() => {
+    const video = videoRef.current;
+    if (video && timeUpdateListenerRef.current) {
+      video.removeEventListener('timeupdate', timeUpdateListenerRef.current);
+      timeUpdateListenerRef.current = null;
+    }
+  }, []);
+  
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !src) return;
@@ -188,7 +203,10 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     // Skip if detached
     if (!isAttachedRef.current) return;
     
+    // Reset all state for new src
     mountedRef.current = true;
+    firstFrameRequestedRef.current = false;
+    cleanupTimeUpdateListener();
     setHasError(false);
     setIsReady(false);
     setHasFirstFrame(false);
@@ -348,8 +366,17 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   // ============ First Frame Detection (requestVideoFrameCallback) ============
   
   const waitForFirstFrame = useCallback((video: HTMLVideoElement) => {
+    // Guard: only request once per src cycle
+    if (firstFrameRequestedRef.current) return;
+    firstFrameRequestedRef.current = true;
+    
     const markReady = () => {
       if (!mountedRef.current) return;
+      // Cleanup any fallback listener
+      if (timeUpdateListenerRef.current) {
+        video.removeEventListener('timeupdate', timeUpdateListenerRef.current);
+        timeUpdateListenerRef.current = null;
+      }
       setHasFirstFrame(true);
       setIsPosterVisible(false);
     };
@@ -366,9 +393,12 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     const onTime = () => {
       if (video.currentTime > 0 && video.readyState >= 2) {
         video.removeEventListener('timeupdate', onTime);
+        timeUpdateListenerRef.current = null;
         markReady();
       }
     };
+    // Store ref for cleanup
+    timeUpdateListenerRef.current = onTime;
     video.addEventListener('timeupdate', onTime, { passive: true });
   }, []);
   
@@ -509,25 +539,40 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   return (
     <div className={cn('relative overflow-hidden bg-black', aspectClass, className)}>
       {/* Poster Layer - ALWAYS mounted, only opacity transitions */}
-      <img
-        src={poster || ''}
-        alt=""
-        draggable={false}
-        className={cn(
-          'absolute inset-0 w-full h-full transition-opacity duration-150 ease-linear',
-          objectFitClass,
-          // GPU compositing hints for WebView
-          'will-change-opacity backface-hidden transform-gpu',
-          // Show poster until first real frame is painted
-          isPosterVisible ? 'opacity-100 z-10' : 'opacity-0 z-0'
-        )}
-        style={{ 
-          backfaceVisibility: 'hidden',
-          transform: 'translateZ(0)'
-        }}
-        onLoad={() => setIsPosterLoaded(true)}
-        onError={() => setIsPosterLoaded(false)}
-      />
+      {/* If poster is null/undefined, render a black placeholder to avoid broken img */}
+      {poster ? (
+        <img
+          src={poster}
+          alt=""
+          draggable={false}
+          className={cn(
+            'absolute inset-0 w-full h-full transition-opacity duration-150 ease-linear',
+            objectFitClass,
+            // GPU compositing hints for WebView
+            'will-change-opacity backface-hidden transform-gpu',
+            // Show poster until first real frame is painted
+            isPosterVisible ? 'opacity-100 z-10' : 'opacity-0 z-0'
+          )}
+          style={{ 
+            backfaceVisibility: 'hidden',
+            transform: 'translateZ(0)'
+          }}
+          onLoad={() => setIsPosterLoaded(true)}
+          onError={() => setIsPosterLoaded(false)}
+        />
+      ) : (
+        <div 
+          className={cn(
+            'absolute inset-0 w-full h-full bg-black transition-opacity duration-150 ease-linear',
+            'will-change-opacity backface-hidden transform-gpu',
+            isPosterVisible ? 'opacity-100 z-10' : 'opacity-0 z-0'
+          )}
+          style={{ 
+            backfaceVisibility: 'hidden',
+            transform: 'translateZ(0)'
+          }}
+        />
+      )}
       
       {/* Video Element - ALWAYS mounted, only opacity transitions */}
       <video
