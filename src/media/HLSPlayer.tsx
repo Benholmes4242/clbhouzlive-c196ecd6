@@ -310,8 +310,11 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       // Expose player ref on element for prewarm observer to call attach/detach
       (video as any).__hlsPlayerRef = {
         attach: () => {
+          // Skip if already attached - prevents white flash from unnecessary resets
           if (!isAttachedRef.current) {
             isAttachedRef.current = true;
+            setHasFirstFrame(false);
+            setIsPosterVisible(true);
             setupSourceRef.current?.();
           }
         },
@@ -485,7 +488,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   const objectFitClass = objectFit === 'contain' ? 'object-contain' : 'object-cover';
   
   return (
-    <div className={cn('relative overflow-hidden bg-muted', aspectClass, className)}>
+    <div className={cn('relative overflow-hidden bg-black', aspectClass, className)}>
       {/* Poster Layer - crossfades out when video plays */}
       {poster && (
         <img
@@ -507,8 +510,8 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         className={cn(
           'w-full h-full transition-opacity duration-150',
           objectFitClass,
-          // FIX: Show video when first frame is ready OR playing, not just playing
-          (hasFirstFrame || isPlaying) ? 'opacity-100' : 'opacity-0'
+          // FIX: Only show video when first frame is ready - prevents white flash
+          hasFirstFrame ? 'opacity-100' : 'opacity-0'
         )}
         // Core playback
         muted
