@@ -319,18 +319,23 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
             }
             
             // Near viewport - REAL prewarm: call attach() on the player
-            if (!prewarmedIds.current.has(id) && prewarmedIds.current.size < maxPreloading) {
-              const playerRef = (target as any).__hlsPlayerRef;
-              if (playerRef?.attach) {
-                playerRef.attach();
+            // ALWAYS check if attached, not just if prewarmed (fixes re-entry bug)
+            const playerRef = (target as any).__hlsPlayerRef;
+            const isCurrentlyAttached = playerRef?.isAttached?.() ?? true;
+            
+            if (!isCurrentlyAttached || !prewarmedIds.current.has(id)) {
+              if (prewarmedIds.current.size < maxPreloading || prewarmedIds.current.has(id)) {
+                if (playerRef?.attach) {
+                  playerRef.attach();
+                }
+                
+                // Also set preload for non-HLS
+                target.preload = 'auto';
+                
+                prewarmedIds.current.add(id);
+                reg.hasBeenPreloaded = true;
+                registry.current.set(id, reg);
               }
-              
-              // Also set preload for non-HLS
-              target.preload = 'auto';
-              
-              prewarmedIds.current.add(id);
-              reg.hasBeenPreloaded = true;
-              registry.current.set(id, reg);
             }
           } else {
             // Far from viewport - debounced detach to prevent thrash
@@ -376,6 +381,10 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   
   // ============ Play Observer (Hysteresis) ============
   
+  // Store updatePlayback in a ref to avoid re-creating observer on every render
+  const updatePlaybackRef = useRef(updatePlayback);
+  updatePlaybackRef.current = updatePlayback;
+  
   useEffect(() => {
     const thresholds = [stopThreshold, startThreshold];
     
@@ -406,7 +415,7 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
           }
         });
         
-        updatePlayback();
+        updatePlaybackRef.current();
       },
       {
         threshold: thresholds,
@@ -420,16 +429,16 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
     });
     
     // Initial check
-    const initialCheck = setTimeout(() => updatePlayback(), 150);
+    const initialCheck = setTimeout(() => updatePlaybackRef.current(), 150);
     
     return () => {
       clearTimeout(initialCheck);
       playObserver.current?.disconnect();
       playObserver.current = null;
-      registry.current.clear();
+      // Don't clear registry on cleanup - registrations are managed by registerMedia
       visibleIds.current.clear();
     };
-  }, [startThreshold, stopThreshold, updatePlayback]);
+  }, [startThreshold, stopThreshold]);
   
   return {
     registerMedia,

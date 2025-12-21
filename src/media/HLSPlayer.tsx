@@ -64,6 +64,7 @@ export interface HLSPlayerRef {
   getDuration: () => number;
   attach: () => void;
   detach: () => void;
+  isAttached: () => boolean;
 }
 
 // ============ Component ============
@@ -131,6 +132,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     getElement: () => videoRef.current,
     getCurrentTime: () => videoRef.current?.currentTime ?? 0,
     getDuration: () => videoRef.current?.duration ?? 0,
+    isAttached: () => isAttachedRef.current,
     attach: () => {
       // Re-attach HLS source if detached - must re-run setupSource
       if (!isAttachedRef.current && videoRef.current && src) {
