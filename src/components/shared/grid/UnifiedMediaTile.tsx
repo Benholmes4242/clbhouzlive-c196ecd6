@@ -39,7 +39,6 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
 }) => {
   const playerRef = useRef<HLSPlayerRef>(null);
   const tileRef = useRef<HTMLButtonElement>(null); // Sentinel for IntersectionObserver
-  const [isVideoReady, setIsVideoReady] = useState(false);
   const [videoEl, setVideoEl] = useState<HTMLVideoElement | null>(null);
   const [resolvedDurationSeconds, setResolvedDurationSeconds] = useState<number | null | undefined>(
     item.durationSeconds
@@ -98,8 +97,6 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   }, [item.postId, isVideo, isAutoplayCandidate, item.sortIndex, registerVideo, config.autoplayEnabled]);
 
   const handleCanPlay = useCallback(() => {
-    setIsVideoReady(true);
-    
     // Capture video element reference for scrubber
     const el = playerRef.current?.getElement();
     if (el) setVideoEl(el);
@@ -163,7 +160,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
         draggable={false}
       />
 
-      {/* Video layer - uses HLSPlayer */}
+      {/* Video layer - uses HLSPlayer (handles its own poster→video crossfade) */}
       {isVideo && isAutoplayCandidate && item.playbackUrl && config.autoplayEnabled && (
         <HLSPlayer
           ref={playerRef}
@@ -175,15 +172,12 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
           objectFit="cover"
           externallyManaged
           onLoadedData={handleCanPlay}
-          className={cn(
-            "absolute inset-0 h-full w-full transition-opacity duration-150",
-            isVideoReady ? "opacity-100" : "opacity-0"
-          )}
+          className="absolute inset-0 h-full w-full"
         />
       )}
 
       {/* Video scrubber - positioned at bottom of media, above gradient/meta */}
-      {isVideo && isVideoReady && videoEl && (
+      {isVideo && videoEl && (
         <VideoScrubber videoEl={videoEl} height={3} />
       )}
 
