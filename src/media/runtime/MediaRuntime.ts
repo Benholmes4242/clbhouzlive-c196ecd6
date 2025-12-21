@@ -104,6 +104,16 @@ class MediaRuntimeCore {
   // Telemetry hooks (optional)
   private telemetry: Partial<RuntimeTelemetry> = {};
   
+  // Telemetry stats for HUD
+  private telemetryStats = {
+    lastTtff: null as number | null,
+    lastBufferingMs: null as number | null,
+    isBuffering: false,
+    bufferingStartAt: 0,
+    playRequestedAt: new Map<string, number>(),
+    bufferingStartedAt: new Map<string, number>(),
+  };
+  
   // Listeners for state changes
   private listeners = new Set<() => void>();
   
@@ -617,6 +627,81 @@ class MediaRuntimeCore {
       activeSurface: this.state.activeSurface,
       uiState: { ...this.uiState },
     };
+  }
+  
+  getActiveReason(): PlaybackReason | null {
+    return this.state.activeReason;
+  }
+  
+  // ============ Telemetry Stats ============
+  
+  getTelemetryStats(): {
+    lastTtff: number | null;
+    lastBufferingMs: number | null;
+    isBuffering: boolean;
+  } {
+    return {
+      lastTtff: this.telemetryStats.lastTtff,
+      lastBufferingMs: this.telemetryStats.lastBufferingMs,
+      isBuffering: this.telemetryStats.isBuffering,
+    };
+  }
+  
+  recordTtff(id: string, ms: number): void {
+    this.telemetryStats.lastTtff = Math.round(ms);
+    this.telemetry.timeToFirstFrame?.(id, ms);
+    
+    if (import.meta.env.DEV) {
+      console.log(`[MediaTelemetry] ttff ${id.slice(0, 8)} ${Math.round(ms)}ms`);
+    }
+  }
+  
+  recordBufferingStart(id: string): void {
+    // Only track for active autoplay
+    if (id !== this.state.activeMediaId) return;
+    
+    if (!this.telemetryStats.bufferingStartedAt.has(id)) {
+      this.telemetryStats.bufferingStartedAt.set(id, performance.now());
+      this.telemetryStats.isBuffering = true;
+      
+      if (import.meta.env.DEV) {
+        console.log(`[MediaTelemetry] bufferingStart ${id.slice(0, 8)}`);
+      }
+    }
+  }
+  
+  recordBufferingEnd(id: string): void {
+    const startTime = this.telemetryStats.bufferingStartedAt.get(id);
+    if (startTime) {
+      const ms = Math.round(performance.now() - startTime);
+      this.telemetryStats.lastBufferingMs = ms;
+      this.telemetryStats.bufferingStartedAt.delete(id);
+      this.telemetryStats.isBuffering = false;
+      
+      if (import.meta.env.DEV) {
+        console.log(`[MediaTelemetry] bufferingEnd ${id.slice(0, 8)} ${ms}ms`);
+      }
+    }
+  }
+  
+  recordPlayFailure(id: string, reason: string): void {
+    this.telemetry.playFailure?.(id, reason);
+    
+    if (import.meta.env.DEV) {
+      console.log(`[MediaTelemetry] playFailure ${id.slice(0, 8)} ${reason}`);
+    }
+  }
+  
+  setPlayRequestedAt(id: string): void {
+    this.telemetryStats.playRequestedAt.set(id, performance.now());
+  }
+  
+  getPlayRequestedAt(id: string): number | undefined {
+    return this.telemetryStats.playRequestedAt.get(id);
+  }
+  
+  clearPlayRequestedAt(id: string): void {
+    this.telemetryStats.playRequestedAt.delete(id);
   }
 }
 
