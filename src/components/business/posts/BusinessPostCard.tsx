@@ -39,7 +39,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { RegisterVideoFn } from '@/hooks/useGridAutoplay';
+import { RegisterMediaFn } from '@/media';
 
 // Helper to extract course info from content and remove the "Played at" line
 function parsePlayedAtFromContent(content: string | null): {
@@ -72,7 +72,7 @@ interface BusinessPostCardProps {
   businessLogo?: string | null;
   followerCount?: number;
   canManage?: boolean;
-  registerVideo?: RegisterVideoFn;
+  registerVideo?: RegisterMediaFn;
   isPlaying?: boolean;
   videoIndex?: number;
 }

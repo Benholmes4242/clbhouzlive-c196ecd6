@@ -16,7 +16,7 @@ import { useVideoNudges } from '@/hooks/useVideoNudges';
 import { useVideoQueue } from '@/hooks/useVideoQueue';
 import { useDiscoverySignals } from '@/hooks/useDiscoverySignals';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
-import { useGridAutoplay } from '@/hooks/useGridAutoplay';
+import { useMediaAutoplay } from '@/media';
 import { useContinueWatching } from '@/hooks/useContinueWatching';
 
 interface VideosTabProps {
@@ -56,10 +56,11 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   // Fetch Continue Watching for de-dupe (priority #1)
   const { videos: continueWatchingVideos } = useContinueWatching(6);
 
-  // Unified grid autoplay - same settings as Business Activity
-  const { registerVideo, playingIds } = useGridAutoplay({
-    maxPlaying: 1,
-    visibilityThreshold: 0.6,
+  // Unified media autoplay - new global system with 60/40 thresholds
+  const { registerMedia, playingIds } = useMediaAutoplay({
+    mode: 'grid',
+    startThreshold: 0.6,
+    stopThreshold: 0.4,
     preloadMargin: 300,
     scrollSettleDelay: 200,
   });
@@ -293,7 +294,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
         onCreatorClick={handleCreatorClick}
         emptyState={<VideosEmptyState type="global-explore" />}
         className="mb-6"
-        registerVideo={registerVideo}
+        registerVideo={registerMedia}
         playingIds={playingIds}
         startIndex={0}
       />
@@ -309,7 +310,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
           onCreatorClick={handleCreatorClick}
           emptyState={<VideosEmptyState type="global-explore" />}
           className="mb-6"
-          registerVideo={registerVideo}
+          registerVideo={registerMedia}
           playingIds={playingIds}
           startIndex={3}
         />
@@ -325,7 +326,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
         showViewAll={followedVideos.length > 0}
         emptyState={<VideosEmptyState type="creators-you-follow" />}
         className="mb-6"
-        registerVideo={registerVideo}
+        registerVideo={registerMedia}
         playingIds={playingIds}
         startIndex={5}
       />
@@ -341,7 +342,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
           onCreatorClick={handleCreatorClick}
           emptyState={<VideosEmptyState type="global-explore" />}
           className="mb-4"
-          registerVideo={registerVideo}
+          registerVideo={registerMedia}
           playingIds={playingIds}
           startIndex={8}
         />

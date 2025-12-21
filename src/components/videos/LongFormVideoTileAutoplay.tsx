@@ -3,9 +3,9 @@ import { cn } from '@/lib/utils';
 import { Play, Flame, Heart } from 'lucide-react';
 import { VideoQueueMenu } from './VideoQueueMenu';
 import { GolferAvatar } from '@/components/golfers/GolferAvatar';
-import GridAutoplayVideo from '@/components/profile/activity/GridAutoplayVideo';
+import { HLSPlayer, HLSPlayerRef } from '@/media';
 import type { QueueItemMeta } from '@/hooks/useVideoQueue';
-import type { RegisterVideoFn } from '@/hooks/useGridAutoplay';
+import type { RegisterMediaFn } from '@/media';
 import type { LongFormVideo } from './LongFormVideoTile';
 
 // Re-export for convenience
@@ -18,8 +18,8 @@ interface LongFormVideoTileAutoplayProps {
   onPlayNext?: (id: string, meta?: QueueItemMeta) => void;
   onEnqueue?: (id: string, meta?: QueueItemMeta) => void;
   className?: string;
-  // Autoplay integration
-  registerVideo?: RegisterVideoFn;
+  // Autoplay integration - new unified system
+  registerVideo?: RegisterMediaFn;
   isPlaying?: boolean;
   videoIndex?: number;
 }
@@ -39,7 +39,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
   isPlaying = false,
   videoIndex = 0,
 }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const playerRef = useRef<HLSPlayerRef>(null);
   const mediaWrapRef = useRef<HTMLDivElement>(null);
   const hasVideo = !!video.mediaUrl;
 
@@ -56,7 +56,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
     const isCandidate = true;
 
     const registerWithRef = () => {
-      const videoEl = videoRef.current;
+      const videoEl = playerRef.current?.getElement();
       const wrapperEl = mediaWrapRef.current;
       
       if (videoEl && wrapperEl) {
@@ -70,8 +70,6 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
         registerVideo({
           id: video.id,
           element: videoEl,
-          // NOTE: Do NOT pass viewportEl - observe the video element directly
-          // This matches BusinessPostCard pattern and fixes WebView autoplay issues
           isCandidate,
           sortIndex: videoIndexRef.current,
         });
@@ -125,12 +123,18 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
       >
         {hasVideo ? (
           <>
-            {/* Video element for autoplay (uses poster attribute as fallback) */}
-            <GridAutoplayVideo
-              ref={videoRef}
+            {/* HLSPlayer - unified video component with poster crossfade */}
+            <HLSPlayer
+              ref={playerRef}
               src={video.mediaUrl!}
               poster={video.thumbnailUrl}
-              className="absolute inset-0 w-full h-full object-cover"
+              autoplay={isPlaying}
+              muted
+              loop
+              aspectRatio="16:9"
+              objectFit="cover"
+              externallyManaged
+              className="absolute inset-0 w-full h-full"
             />
           </>
         ) : video.thumbnailUrl ? (

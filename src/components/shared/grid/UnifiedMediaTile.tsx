@@ -2,9 +2,8 @@ import React, { useCallback, useRef, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { UnifiedMediaItem, UnifiedGridConfig } from './types';
 import { OverlayCorners } from '@/components/shared/overlay';
-import GridAutoplayVideo from '@/components/profile/activity/GridAutoplayVideo';
+import { HLSPlayer, HLSPlayerRef, RegisterMediaFn } from '@/media';
 import { Images, Trophy } from 'lucide-react';
-import { RegisterVideoFn } from '@/hooks/useGridAutoplay';
 import { motion } from 'framer-motion';
 
 interface UnifiedMediaTileProps {
@@ -14,7 +13,7 @@ interface UnifiedMediaTileProps {
   index: number;
   onPress?: (item: UnifiedMediaItem, index: number) => void;
   onAuthorClick?: (authorId: string) => void;
-  registerVideo?: RegisterVideoFn;
+  registerVideo?: RegisterMediaFn;
   isPlaying?: boolean;
 }
 
@@ -37,7 +36,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   registerVideo,
   isPlaying = false,
 }) => {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const playerRef = useRef<HLSPlayerRef>(null);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [resolvedDurationSeconds, setResolvedDurationSeconds] = useState<number | null | undefined>(
     item.durationSeconds
@@ -67,10 +66,11 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
     if (!isVideo || !registerVideo || !config.autoplayEnabled) return;
 
     const checkAndRegister = () => {
-      if (videoRef.current) {
+      const videoEl = playerRef.current?.getElement();
+      if (videoEl) {
         registerVideo({
           id: item.postId,
-          element: videoRef.current,
+          element: videoEl,
           isCandidate: isAutoplayCandidate,
           sortIndex: item.sortIndex ?? 0,
         });
@@ -97,8 +97,8 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
     const dbDuration = item.durationSeconds;
     const hasValidDbDuration = typeof dbDuration === 'number' && Number.isFinite(dbDuration) && dbDuration > 0;
     
-    if (!hasValidDbDuration && videoRef.current) {
-      const d = videoRef.current.duration;
+    if (!hasValidDbDuration && playerRef.current) {
+      const d = playerRef.current.getDuration();
       if (Number.isFinite(d) && d > 0 && d !== Infinity) {
         setResolvedDurationSeconds(d);
       }
@@ -154,15 +154,20 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
         draggable={false}
       />
 
-      {/* Video layer - fades in when ready */}
+      {/* Video layer - uses HLSPlayer */}
       {isVideo && isAutoplayCandidate && item.playbackUrl && config.autoplayEnabled && (
-        <GridAutoplayVideo
-          ref={videoRef}
+        <HLSPlayer
+          ref={playerRef}
           src={item.playbackUrl}
           poster={thumbnailSrc}
-          onCanPlay={handleCanPlay}
+          autoplay={isPlaying}
+          muted
+          loop
+          objectFit="cover"
+          externallyManaged
+          onLoadedData={handleCanPlay}
           className={cn(
-            "absolute inset-0 h-full w-full object-cover transition-opacity duration-150",
+            "absolute inset-0 h-full w-full transition-opacity duration-150",
             isVideoReady ? "opacity-100" : "opacity-0"
           )}
         />
