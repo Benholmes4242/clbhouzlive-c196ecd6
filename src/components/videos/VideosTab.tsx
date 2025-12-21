@@ -232,39 +232,6 @@ export const VideosTab: React.FC<VideosTabProps> = ({
 
   return (
     <div className={cn("min-h-screen pb-20", className)} style={{ background: BG_COLOR }}>
-      {/* Queue reminder nudge */}
-      {showQueueReminder && (
-        <div className="px-5 mb-4">
-          <VideoNudgeBanner
-            type="queue-reminder"
-            message={getNudgeMessage('queue-reminder')}
-            onDismiss={() => {
-              setShowQueueReminder(false);
-              markQueueReminderShown();
-            }}
-            onAction={() => {
-              setShowQueueReminder(false);
-              markQueueReminderShown();
-            }}
-            actionLabel={`${queue.length} video${queue.length !== 1 ? 's' : ''}`}
-          />
-        </div>
-      )}
-
-      {/* Queue usage nudge (one-time) */}
-      {showQueueNudge && !showQueueReminder && (
-        <div className="px-5 mb-4">
-          <VideoNudgeBanner
-            type="use-queue"
-            message={getNudgeMessage('use-queue')}
-            onDismiss={() => {
-              setShowQueueNudge(false);
-              markNudgeSeen('use-queue');
-            }}
-          />
-        </div>
-      )}
-
       {/* Search bar - tight spacing from tabs */}
       <VideoSearchBar onSearch={handleSearch} className="pt-4 mb-3" />
 
