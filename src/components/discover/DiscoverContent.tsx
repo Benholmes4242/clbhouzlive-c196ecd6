@@ -216,49 +216,6 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     }
   }, [content, main, searchQuery, selectedTags, likedItems]);
 
-  // Autoplay debugging: automatically target the "better than most" post
-  useEffect(() => {
-    if (main !== 'videos') return;
-
-    // Allow manual override from console/tests
-    if ((window as any).__DEBUG_MEDIA_AUTOPLAY_ID) return;
-
-    const phrase = 'better than most';
-
-    const match = currentContent?.find((i) => {
-      const hay = `${i.title ?? ''} ${i.ctaDescription ?? ''}`.toLowerCase();
-      return hay.includes(phrase);
-    });
-
-    // Fallback: if we previously latched onto a debug ID, restore it.
-    const storedId = (() => {
-      try {
-        return sessionStorage.getItem('debug_media_autoplay_id') || undefined;
-      } catch {
-        return undefined;
-      }
-    })();
-
-    const finalId = match?.id ?? storedId;
-    if (!finalId) return;
-
-    // Only set if that id exists in the current feed (prevents debugging a stale ID)
-    const existsInFeed = !!currentContent?.some((i) => i.id === finalId);
-    if (!existsInFeed) return;
-
-    (window as any).__DEBUG_MEDIA_AUTOPLAY_ID = finalId;
-    (window as any).__DEBUG_MEDIA_AUTOPLAY_LABEL = match?.title ?? phrase;
-
-    try {
-      sessionStorage.setItem('debug_media_autoplay_id', finalId);
-    } catch {}
-
-    console.log('[AutoplayDebug] Target set', {
-      id: finalId,
-      label: (window as any).__DEBUG_MEDIA_AUTOPLAY_LABEL,
-    });
-  }, [main, currentContent]);
-
   // Handle like toggle with optimistic updates
   const handleLikeToggle = useCallback((itemId: string) => {
     if (!currentContent) return;
