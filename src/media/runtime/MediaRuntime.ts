@@ -69,6 +69,7 @@ const MAX_WARM_PLAYERS = 2; // prev + next
 const SCROLL_SETTLE_DELAY = 150;
 const INTENT_SUPPRESS_DURATION = 2000; // 2s after user pause, suppress autoplay
 const SCRUB_SUPPRESS_DURATION = 600; // 600ms after scrub, suppress autoplay switching
+const BUFFERING_SUPPRESS_DURATION = 500; // 500ms grace for buffering videos
 const MAX_RETRIES = 1;
 
 // ============ Singleton Runtime ============
@@ -98,6 +99,7 @@ class MediaRuntimeCore {
   private warmPool = new Set<string>();
   private uiSettleTimeout: ReturnType<typeof setTimeout> | null = null;
   private pendingPlaybackUpdate = false;
+  private bufferingSuppressUntil = 0; // Timestamp - don't switch away while buffering
   
   // Telemetry hooks (optional)
   private telemetry: Partial<RuntimeTelemetry> = {};
@@ -351,6 +353,14 @@ class MediaRuntimeCore {
   private evaluateBestCandidate(): void {
     if (this.isUIActive()) return;
     
+    // Don't switch away from active video while it's buffering (grace period)
+    if (Date.now() < this.bufferingSuppressUntil && this.state.activeMediaId) {
+      const activeNode = this.registry.get(this.state.activeMediaId);
+      if (activeNode?.isVisible) {
+        return; // Keep current active, it's buffering
+      }
+    }
+    
     // Get all visible candidates
     const candidates: MediaNode[] = [];
     
@@ -504,7 +514,7 @@ class MediaRuntimeCore {
   
   // ============ Intent Tracking ============
   
-  trackIntent(action: 'tap' | 'scrub' | 'pause' | 'mute'): void {
+  trackIntent(action: 'tap' | 'scrub' | 'pause' | 'mute' | 'buffer'): void {
     const now = Date.now();
     
     switch (action) {
@@ -521,6 +531,19 @@ class MediaRuntimeCore {
       case 'mute':
         this.userIntent.lastMuteToggle = now;
         break;
+      case 'buffer':
+        // Give buffering videos grace period before switching away
+        this.bufferingSuppressUntil = now + BUFFERING_SUPPRESS_DURATION;
+        break;
+    }
+  }
+  
+  /**
+   * Report that active media is buffering - suppress autoplay switching briefly
+   */
+  reportBuffering(id: string): void {
+    if (id === this.state.activeMediaId) {
+      this.bufferingSuppressUntil = Date.now() + BUFFERING_SUPPRESS_DURATION;
     }
   }
   
@@ -629,5 +652,6 @@ export function useMediaRuntime() {
     prewarmCandidate: MediaRuntime.prewarmCandidate.bind(MediaRuntime),
     isPlaying: MediaRuntime.isPlaying.bind(MediaRuntime),
     getNode: MediaRuntime.getNode.bind(MediaRuntime),
+    reportBuffering: MediaRuntime.reportBuffering.bind(MediaRuntime),
   };
 }

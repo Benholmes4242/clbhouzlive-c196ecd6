@@ -16,7 +16,7 @@ import { safePlay, isIOS } from '@/utils/safePlay';
 import { loadHlsJs } from '@/utils/hlsLoader';
 import type HlsType from 'hls.js';
 import { cn } from '@/lib/utils';
-import { MEDIA_SCRUBBER_V1 } from '@/config/featureFlags';
+import { MEDIA_SCRUBBER_V1, MEDIA_RUNTIME_V2 } from '@/config/featureFlags';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 
 // ============ Types ============
@@ -114,6 +114,10 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   const [hasError, setHasError] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [hasFirstFrame, setHasFirstFrame] = useState(false); // Track first frame readiness
+  
+  // Buffering state for scrubber
+  const [isBuffering, setIsBuffering] = useState(false);
+  const [bufferedPct, setBufferedPct] = useState(0);
   
   // ============ Imperative Handle ============
   
@@ -602,6 +606,82 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     onTimeUpdate(video.currentTime, video.duration || 0);
   }, [onTimeUpdate]);
   
+  // ============ Buffering State Tracking ============
+  
+  // Compute buffered percentage from video.buffered ranges
+  const computeBufferedPct = useCallback(() => {
+    const video = videoRef.current;
+    if (!video) return 0;
+    
+    const duration = video.duration;
+    if (!duration || !Number.isFinite(duration) || duration <= 0) return 0;
+    
+    const buffered = video.buffered;
+    if (buffered.length === 0) return 0;
+    
+    // Find the buffered range containing currentTime, or use last range end
+    const currentTime = video.currentTime;
+    let bufferedEnd = 0;
+    
+    for (let i = 0; i < buffered.length; i++) {
+      const start = buffered.start(i);
+      const end = buffered.end(i);
+      
+      if (currentTime >= start && currentTime <= end) {
+        bufferedEnd = end;
+        break;
+      }
+      // Track furthest buffer point as fallback
+      if (end > bufferedEnd) {
+        bufferedEnd = end;
+      }
+    }
+    
+    return Math.min(1, Math.max(0, bufferedEnd / duration));
+  }, []);
+  
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    
+    const handleWaiting = () => {
+      setIsBuffering(true);
+      // Report to runtime so it doesn't switch away while buffering
+      if (MEDIA_RUNTIME_V2 && mediaId) {
+        import('@/media/runtime/MediaRuntime').then(m => m.MediaRuntime.reportBuffering(mediaId));
+      }
+    };
+    const handleStalled = () => {
+      setIsBuffering(true);
+      if (MEDIA_RUNTIME_V2 && mediaId) {
+        import('@/media/runtime/MediaRuntime').then(m => m.MediaRuntime.reportBuffering(mediaId));
+      }
+    };
+    const handlePlaying = () => setIsBuffering(false);
+    const handleCanPlay = () => setIsBuffering(false);
+    const handleCanPlayThrough = () => setIsBuffering(false);
+    const handleProgress = () => setBufferedPct(computeBufferedPct());
+    
+    video.addEventListener('waiting', handleWaiting);
+    video.addEventListener('stalled', handleStalled);
+    video.addEventListener('playing', handlePlaying);
+    video.addEventListener('canplay', handleCanPlay);
+    video.addEventListener('canplaythrough', handleCanPlayThrough);
+    video.addEventListener('progress', handleProgress);
+    
+    // Initial buffered pct
+    setBufferedPct(computeBufferedPct());
+    
+    return () => {
+      video.removeEventListener('waiting', handleWaiting);
+      video.removeEventListener('stalled', handleStalled);
+      video.removeEventListener('playing', handlePlaying);
+      video.removeEventListener('canplay', handleCanPlay);
+      video.removeEventListener('canplaythrough', handleCanPlayThrough);
+      video.removeEventListener('progress', handleProgress);
+    };
+  }, [computeBufferedPct]);
+  
   const handleClick = useCallback(() => {
     if (externallyManaged) {
       onClick?.();
@@ -781,12 +861,16 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         </button>
       )}
       
-      {/* Scrubber Overlay - Instagram-style progress bar */}
+      {/* Scrubber Overlay - Instagram-style progress bar with buffering shimmer */}
       {(showScrubber ?? MEDIA_SCRUBBER_V1) && mediaId && !hasError && (
         <VideoScrubber
           videoEl={videoRef.current}
           mediaId={mediaId}
           height={3}
+          bufferedPct={bufferedPct}
+          isBuffering={isBuffering}
+          hasFirstFrame={hasFirstFrame}
+          isAttached={isAttachedRef.current}
         />
       )}
     </div>

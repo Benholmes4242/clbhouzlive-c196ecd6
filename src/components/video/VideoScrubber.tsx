@@ -4,13 +4,15 @@
  * Shows playback progress and allows seeking via drag/swipe.
  * Positioned at the bottom edge of the video/media area.
  * 
- * Important:
- * - stopPropagation on all pointer events to prevent triggering tile click (fullscreen open)
- * - Works with autoplay: progress updates while playing, stops when paused
+ * Features:
+ * - Three-layer bar: track → buffered → played
+ * - Micro-buffering shimmer when stalling
+ * - Ghost shimmer before first frame (prewarm indicator)
+ * - stopPropagation on all pointer events to prevent triggering tile click
  * - Integrates with MediaRuntime for intent tracking
  */
 
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, memo } from 'react';
 import { cn } from '@/lib/utils';
 import { MEDIA_RUNTIME_V2 } from '@/config/featureFlags';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
@@ -20,16 +22,26 @@ interface VideoScrubberProps {
   mediaId?: string; // For runtime intent tracking
   height?: number;
   className?: string;
+  // Buffering state (from HLSPlayer)
+  bufferedPct?: number;      // 0..1
+  isBuffering?: boolean;     // true when waiting/stalled
+  hasFirstFrame?: boolean;   // true when first frame painted
+  isAttached?: boolean;      // true when HLS is attached
 }
 
-export function VideoScrubber({ 
+export const VideoScrubber = memo(function VideoScrubber({ 
   videoEl, 
   mediaId,
   height = 3,
-  className 
+  className,
+  bufferedPct = 0,
+  isBuffering = false,
+  hasFirstFrame = true,
+  isAttached = true,
 }: VideoScrubberProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const fillRef = useRef<HTMLDivElement>(null);
+  const bufferedRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isValidDuration, setIsValidDuration] = useState(false);
   const wasPausedRef = useRef(false);
@@ -69,6 +81,13 @@ export function VideoScrubber({
     const ratio = Math.min(1, Math.max(0, videoEl.currentTime / duration));
     fillRef.current.style.transform = `scaleX(${ratio})`;
   }, [videoEl, isValidDuration]);
+
+  // Update buffered bar
+  useEffect(() => {
+    if (bufferedRef.current) {
+      bufferedRef.current.style.transform = `scaleX(${Math.min(1, Math.max(0, bufferedPct))})`;
+    }
+  }, [bufferedPct]);
 
   // Sync loop for progress updates
   useEffect(() => {
@@ -179,8 +198,13 @@ export function VideoScrubber({
     (e.target as HTMLElement).releasePointerCapture(e.pointerId);
   }, [isDragging]);
 
-  // Don't render if no valid video
-  if (!videoEl || !isValidDuration) {
+  // Determine shimmer state
+  const showBufferingShimmer = hasFirstFrame && isBuffering;
+  const showGhostShimmer = isAttached && !hasFirstFrame;
+  const showAnyShimmer = showBufferingShimmer || showGhostShimmer;
+
+  // Don't render if no valid video (but allow ghost shimmer before first frame)
+  if (!videoEl || (!isValidDuration && !showGhostShimmer)) {
     return null;
   }
 
@@ -203,13 +227,42 @@ export function VideoScrubber({
       onClick={(e) => e.stopPropagation()}
     >
       {/* Track background */}
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm overflow-hidden rounded-full">
+        {/* Ghost shimmer (before first frame) */}
+        {showGhostShimmer && (
+          <div 
+            className="absolute inset-0 animate-shimmer-slide"
+            style={{
+              background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
+              backgroundSize: '200% 100%',
+            }}
+          />
+        )}
+      </div>
       
-      {/* Progress fill */}
+      {/* Buffered layer (behind played) */}
+      <div
+        ref={bufferedRef}
+        className="absolute inset-0 origin-left will-change-transform bg-white/25 overflow-hidden rounded-full"
+        style={{ transform: `scaleX(${bufferedPct})` }}
+      >
+        {/* Buffering shimmer (when stalled) */}
+        {showBufferingShimmer && (
+          <div 
+            className="absolute inset-0 animate-shimmer-slide"
+            style={{
+              background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)',
+              backgroundSize: '200% 100%',
+            }}
+          />
+        )}
+      </div>
+      
+      {/* Progress fill (top layer) */}
       <div
         ref={fillRef}
         className={cn(
-          "absolute inset-0 origin-left will-change-transform",
+          "absolute inset-0 origin-left will-change-transform rounded-full",
           isDragging ? "bg-white/90" : "bg-white/60"
         )}
         style={{ transform: 'scaleX(0)' }}
@@ -222,6 +275,6 @@ export function VideoScrubber({
       />
     </div>
   );
-}
+});
 
 export default VideoScrubber;
