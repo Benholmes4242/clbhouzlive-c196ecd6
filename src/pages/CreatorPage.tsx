@@ -9,7 +9,7 @@ import { useFollow } from '@/hooks/useFollow';
 import { useLongFormVideosQuery } from '@/hooks/useLongFormVideosQuery';
 import { VideoSection } from '@/components/videos/VideoSection';
 import { VideosEmptyState } from '@/components/videos/VideosEmptyState';
-import { useGridAutoplay } from '@/hooks/useGridAutoplay';
+import { useMediaAutoplay } from '@/media';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import {
   DropdownMenu,
@@ -49,11 +49,10 @@ export const CreatorPage: React.FC = () => {
   const { savePosition } = useScrollRestoration('creator-page');
 
   // Unified grid autoplay - same settings as VideosTab
-  const { registerVideo, playingIds } = useGridAutoplay({
-    maxPlaying: 1,
-    visibilityThreshold: 0.6,
-    preloadMargin: 300,
-    scrollSettleDelay: 200,
+  const { registerMedia, playingIds } = useMediaAutoplay({
+    mode: 'grid',
+    startThreshold: 0.6,
+    stopThreshold: 0.4,
   });
 
   // Fetch creator profile data
@@ -403,7 +402,7 @@ export const CreatorPage: React.FC = () => {
         showViewAll={false}
         emptyState={creatorEmptyState}
         className="px-0"
-        registerVideo={registerVideo}
+        registerVideo={registerMedia}
         playingIds={playingIds}
         startIndex={0}
       />
