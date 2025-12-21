@@ -4,8 +4,9 @@ import { ComposerMediaItem } from "@/hooks/useSnapModal";
 import { IdentitySelector } from "@/components/identity/IdentitySelector";
 import CourseTagInput from "@/components/posts/CourseTagInput";
 import { StudioEdits } from "@/types/studio";
-import { GolfCourse, TaggableEntity } from "./types";
+import { GolfCourse, TaggableEntity, MomentType } from "./types";
 import MentionSuggestions from "./MentionSuggestions";
+import MomentTypeSelector from "./MomentTypeSelector";
 
 interface CreateMomentComposerPanelProps {
   hasMedia: boolean;
@@ -19,6 +20,8 @@ interface CreateMomentComposerPanelProps {
   onTypingStateChange?: (isTyping: boolean) => void;
   selectedTags: TaggableEntity[];
   onTagsChange: (tags: TaggableEntity[]) => void;
+  momentType: MomentType | null;
+  onMomentTypeChange: (type: MomentType) => void;
 }
 
 export default function CreateMomentComposerPanel({
@@ -33,6 +36,8 @@ export default function CreateMomentComposerPanel({
   onTypingStateChange,
   selectedTags,
   onTagsChange,
+  momentType,
+  onMomentTypeChange,
 }: CreateMomentComposerPanelProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [showMentions, setShowMentions] = useState(false);
@@ -115,13 +120,24 @@ export default function CreateMomentComposerPanel({
       data-ecm-scroll-container="true"
     >
       <div className="flex flex-col gap-2.5">
+        {/* Moment Type Selector - Required */}
+        <MomentTypeSelector
+          selected={momentType}
+          onSelect={onMomentTypeChange}
+        />
+
         {/* Posting As Selector - light row */}
         {availableActorsCount > 1 && (
           <div 
             className="flex items-center justify-between py-1"
             style={{ borderBottom: '1px solid var(--cm-border-subtle)' }}
           >
-            <span className="text-[11px]" style={{ color: 'var(--cm-text-tertiary)' }}>Posting as</span>
+            <div>
+              <span className="text-[11px]" style={{ color: 'var(--cm-text-tertiary)' }}>Posting as</span>
+              <p className="text-[9px] mt-0.5" style={{ color: 'var(--cm-text-tertiary)', opacity: 0.7 }}>
+                This moment will appear on this profile
+              </p>
+            </div>
             <IdentitySelector compact variant="light" />
           </div>
         )}

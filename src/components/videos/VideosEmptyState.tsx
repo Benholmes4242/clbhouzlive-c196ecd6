@@ -41,15 +41,15 @@ export const VideosEmptyState: React.FC<VideosEmptyStateProps> = ({
     return (
       <div className="flex flex-col items-center justify-center py-6 px-4 bg-muted/20 rounded-lg border border-border/40">
         <p className="text-sm text-muted-foreground text-center">
-          We're loading more long-form videos — check back soon.
+          We're new around here — and waiting for the community to upload more long-form videos. Check back soon.
         </p>
         <Button
-          variant="ghost"
+          variant="secondary"
           size="sm"
-          className="mt-3 text-primary"
+          className="mt-3 bg-muted hover:bg-muted/80 text-foreground"
           onClick={() => navigate('/discover?main=watch')}
         >
-          Browse Shorts
+          Watch Shorts
         </Button>
       </div>
     );

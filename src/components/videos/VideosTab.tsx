@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { VideosIntro } from './VideosIntro';
 import { VideoSearchBar } from './VideoSearchBar';
 import { VideoFilterChips, VideoCategory } from './VideoFilterChips';
 import { VideoSection } from './VideoSection';
@@ -265,21 +264,15 @@ export const VideosTab: React.FC<VideosTabProps> = ({
         </div>
       )}
 
-      {/* Intro text */}
-      <VideosIntro />
+      {/* Search bar - tight spacing from tabs */}
+      <VideoSearchBar onSearch={handleSearch} className="pt-4 mb-3" />
 
-      {/* Search bar */}
-      <VideoSearchBar onSearch={handleSearch} className="mb-4" />
-
-      {/* Filter chips */}
+      {/* Filter chips - same spacing to content */}
       <VideoFilterChips
         selected={categoryParam}
         onSelect={handleCategorySelect}
-        className="mb-6"
+        className="mb-4"
       />
-
-      {/* Divider */}
-      <div className="h-px bg-border/40 mx-5 mb-6" />
 
       {/* Continue Watching (only shows if user has in-progress videos) */}
       <ContinueWatchingSection
@@ -293,12 +286,13 @@ export const VideosTab: React.FC<VideosTabProps> = ({
       {/* Module 1: Recommended for you (loads immediately) */}
       <VideoSection
         title="Recommended for you"
+        subtitle="Based on what you watch"
         videos={recommendedVideos.slice(0, 3)}
         onViewAll={() => handleViewAll('recommended')}
         onVideoClick={handleVideoClick}
         onCreatorClick={handleCreatorClick}
         emptyState={<VideosEmptyState type="global-explore" />}
-        className="mb-8"
+        className="mb-6"
         registerVideo={registerVideo}
         playingIds={playingIds}
         startIndex={0}
@@ -314,7 +308,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
           onVideoClick={handleVideoClick}
           onCreatorClick={handleCreatorClick}
           emptyState={<VideosEmptyState type="global-explore" />}
-          className="mb-8"
+          className="mb-6"
           registerVideo={registerVideo}
           playingIds={playingIds}
           startIndex={3}
@@ -330,7 +324,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
         onCreatorClick={handleCreatorClick}
         showViewAll={followedVideos.length > 0}
         emptyState={<VideosEmptyState type="creators-you-follow" />}
-        className="mb-8"
+        className="mb-6"
         registerVideo={registerVideo}
         playingIds={playingIds}
         startIndex={5}
@@ -346,7 +340,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
           onVideoClick={handleVideoClick}
           onCreatorClick={handleCreatorClick}
           emptyState={<VideosEmptyState type="global-explore" />}
-          className="mb-8"
+          className="mb-4"
           registerVideo={registerVideo}
           playingIds={playingIds}
           startIndex={8}
