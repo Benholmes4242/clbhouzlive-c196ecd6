@@ -1,9 +1,7 @@
-import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { VIDEO_DURATION_THRESHOLD_SECONDS } from '@/constants/videoRules';
 import { LongFormVideo } from '@/components/videos/LongFormVideoTile';
-import { ENABLE_MOCK_LONGFORM_VIDEOS, getMockVideosBySection } from '@/data/mockLongFormVideos';
 
 interface UseLongFormVideosOptions {
   section?: 'recommended' | 'trending' | 'following' | 'courses' | 'all';
@@ -250,35 +248,8 @@ export const useLongFormVideosQuery = (options: UseLongFormVideosOptions = {}) =
     refetchOnWindowFocus: false,
   });
 
-  // Merge mock videos when flag is enabled
-  const mergedVideos = useMemo(() => {
-    const realVideos = query.data || [];
-    
-    if (!ENABLE_MOCK_LONGFORM_VIDEOS) {
-      return realVideos;
-    }
-    
-    // Get mock videos for this section
-    const mockVideos = getMockVideosBySection(section as 'recommended' | 'trending' | 'following' | 'courses' | 'all');
-    
-    // Merge: real videos first, then mock videos (up to limit)
-    const combined = [...realVideos, ...mockVideos];
-    
-    // Dedupe by id and respect limit
-    const seen = new Set<string>();
-    const deduped: LongFormVideo[] = [];
-    for (const video of combined) {
-      if (!seen.has(video.id) && deduped.length < limit) {
-        seen.add(video.id);
-        deduped.push(video);
-      }
-    }
-    
-    return deduped;
-  }, [query.data, section, limit]);
-
   return {
-    videos: mergedVideos,
+    videos: query.data || [],
     isLoading: query.isLoading,
     error: query.error,
     refetch: query.refetch,
