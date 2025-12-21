@@ -70,7 +70,8 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
         registerVideo({
           id: video.id,
           element: videoEl,
-          viewportEl: wrapperEl,
+          // NOTE: Do NOT pass viewportEl - observe the video element directly
+          // This matches BusinessPostCard pattern and fixes WebView autoplay issues
           isCandidate,
           sortIndex: videoIndexRef.current,
         });
