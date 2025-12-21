@@ -34,6 +34,20 @@ export const MEDIA_RUNTIME_V2 = true;
 export const MEDIA_SCRUBBER_V1 = import.meta.env.DEV;
 
 /**
+ * Media Telemetry V1 Feature Flag
+ * 
+ * When true: logs telemetry events to console (TTFF, buffering, play failures)
+ */
+export const MEDIA_TELEMETRY_V1 = import.meta.env.DEV;
+
+/**
+ * Media DEV HUD V1 Feature Flag
+ * 
+ * When true: shows a small overlay HUD with runtime debug info
+ */
+export const MEDIA_DEV_HUD_V1 = import.meta.env.DEV;
+
+/**
  * Hub Feature Flag
  * 
  * Phase 5: Hub is now always enabled for all users (production launch)
@@ -58,6 +72,8 @@ export const FEATURE_FLAGS = {
   VIDEO_PROGRESS_SYNC_V1: USE_VIDEO_PROGRESS_SYNC_V1,
   MEDIA_RUNTIME_V2,
   MEDIA_SCRUBBER_V1,
+  MEDIA_TELEMETRY_V1,
+  MEDIA_DEV_HUD_V1,
   HUB: HUB_ENABLED, // Always enabled - no longer feature flagged
   ENABLE_TOP100_MOCK_PLAYERS,
 } as const;

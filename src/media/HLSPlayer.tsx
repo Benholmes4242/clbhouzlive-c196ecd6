@@ -107,6 +107,10 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   const autoplayRef = useRef(autoplay); // Track autoplay prop without causing re-runs
   autoplayRef.current = autoplay;
   
+  // TTFF timing ref
+  const ttffStartRef = useRef<number>(0);
+  const ttffFiredRef = useRef(false);
+  
   // State
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPosterVisible, setIsPosterVisible] = useState(true);
@@ -149,6 +153,8 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       if (!isAttachedRef.current && videoRef.current && src) {
         isAttachedRef.current = true;
         firstFrameRequestedRef.current = false; // Reset first frame guard
+        ttffStartRef.current = 0; // Reset TTFF timer
+        ttffFiredRef.current = false; // Allow new TTFF measurement
         cleanupTimeUpdateListener(); // Cleanup any lingering listener
         setHasFirstFrame(false);
         setIsPosterVisible(true);
@@ -465,6 +471,14 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         video.removeEventListener('timeupdate', timeUpdateListenerRef.current);
         timeUpdateListenerRef.current = null;
       }
+      
+      // Record TTFF (only once per play cycle)
+      if (MEDIA_RUNTIME_V2 && mediaId && ttffStartRef.current > 0 && !ttffFiredRef.current) {
+        ttffFiredRef.current = true;
+        const ttffMs = performance.now() - ttffStartRef.current;
+        MediaRuntime.recordTtff(mediaId, ttffMs);
+      }
+      
       setHasFirstFrame(true);
       setIsPosterVisible(false);
     };
@@ -488,7 +502,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     // Store ref for cleanup
     timeUpdateListenerRef.current = onTime;
     video.addEventListener('timeupdate', onTime, { passive: true });
-  }, []);
+  }, [mediaId]);
   
   const handleLoadedData = useCallback(() => {
     if (!mountedRef.current) return;
@@ -524,6 +538,11 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     
     setIsPlaying(true);
     setHasError(false);
+    
+    // Start TTFF timer on play
+    if (!ttffFiredRef.current && ttffStartRef.current === 0) {
+      ttffStartRef.current = performance.now();
+    }
     
     // If first frame not yet detected, trigger detection now
     const video = videoRef.current;
@@ -647,19 +666,34 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     
     const handleWaiting = () => {
       setIsBuffering(true);
-      // Report to runtime so it doesn't switch away while buffering (static import, no dynamic promise)
+      // Report to runtime so it doesn't switch away while buffering
       if (MEDIA_RUNTIME_V2 && mediaId) {
         MediaRuntime.reportBuffering(mediaId);
+        MediaRuntime.recordBufferingStart(mediaId);
       }
     };
     const handleStalled = () => {
       setIsBuffering(true);
       if (MEDIA_RUNTIME_V2 && mediaId) {
         MediaRuntime.reportBuffering(mediaId);
+        MediaRuntime.recordBufferingStart(mediaId);
       }
     };
-    const handlePlaying = () => setIsBuffering(false);
-    const handleCanPlay = () => setIsBuffering(false);
+    const handlePlaying = () => {
+      const wasBuffering = isBuffering;
+      setIsBuffering(false);
+      // Record buffering end
+      if (MEDIA_RUNTIME_V2 && mediaId && wasBuffering) {
+        MediaRuntime.recordBufferingEnd(mediaId);
+      }
+    };
+    const handleCanPlay = () => {
+      const wasBuffering = isBuffering;
+      setIsBuffering(false);
+      if (MEDIA_RUNTIME_V2 && mediaId && wasBuffering) {
+        MediaRuntime.recordBufferingEnd(mediaId);
+      }
+    };
     const handleCanPlayThrough = () => setIsBuffering(false);
     const handleProgress = () => setBufferedPct(computeBufferedPct());
     // Also update bufferedPct on timeupdate (some browsers fire progress infrequently)
@@ -685,7 +719,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       video.removeEventListener('progress', handleProgress);
       video.removeEventListener('timeupdate', handleTimeUpdate);
     };
-  }, [computeBufferedPct, mediaId]);
+  }, [computeBufferedPct, mediaId, isBuffering]);
   
   const handleClick = useCallback(() => {
     if (externallyManaged) {

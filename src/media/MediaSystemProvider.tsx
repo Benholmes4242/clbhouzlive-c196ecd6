@@ -8,6 +8,8 @@
 import React, { createContext, useContext, useRef, useCallback, useEffect, useState, useMemo } from 'react';
 import { safePlay } from '@/utils/safePlay';
 import { runtimeUserMute } from './runtime';
+import { MediaDevHud } from './runtime/MediaDevHud';
+import { MEDIA_DEV_HUD_V1 } from '@/config/featureFlags';
 
 // ============ Types ============
 
@@ -355,6 +357,7 @@ export const MediaSystemProvider: React.FC<{ children: React.ReactNode }> = ({ c
   return (
     <MediaSystemContext.Provider value={value}>
       {children}
+      {MEDIA_DEV_HUD_V1 && <MediaDevHud />}
     </MediaSystemContext.Provider>
   );
 };
