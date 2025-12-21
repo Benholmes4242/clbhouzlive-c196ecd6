@@ -128,6 +128,7 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
               showMuteButton={false}
               showPlayButton={false}
               objectFit="cover"
+              mediaId={highlight.id}
               className="w-full h-full"
             />
           </>

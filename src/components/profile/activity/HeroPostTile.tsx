@@ -119,6 +119,7 @@ const HeroPostTile: React.FC<HeroPostTileProps> = ({
           poster={thumbnailSrc}
           onLoadedData={handleCanPlay}
           loop
+          mediaId={item.postId}
           className={cn(
             "absolute inset-0 h-full w-full object-cover transition-opacity duration-150",
             isVideoReady ? "opacity-100" : "opacity-0"

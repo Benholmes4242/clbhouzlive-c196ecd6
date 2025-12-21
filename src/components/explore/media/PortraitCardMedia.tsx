@@ -119,6 +119,7 @@ const PortraitCardMedia: React.FC<CardMediaProps> = memo(({
           showMuteButton={false}
           showPlayButton={false}
           objectFit="cover"
+          mediaId={media.id}
           className="w-full h-full"
         />
       ) : (
