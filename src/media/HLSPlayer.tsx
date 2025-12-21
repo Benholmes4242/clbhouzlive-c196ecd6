@@ -345,26 +345,47 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     }
   }, []);
   
+  // ============ First Frame Detection (requestVideoFrameCallback) ============
+  
+  const waitForFirstFrame = useCallback((video: HTMLVideoElement) => {
+    const markReady = () => {
+      if (!mountedRef.current) return;
+      setHasFirstFrame(true);
+      setIsPosterVisible(false);
+    };
+
+    const anyVideo = video as any;
+
+    // Best option: requestVideoFrameCallback (WKWebView supports this)
+    if (typeof anyVideo.requestVideoFrameCallback === 'function') {
+      anyVideo.requestVideoFrameCallback(() => markReady());
+      return;
+    }
+
+    // Fallback for older browsers: wait for actual frame via timeupdate
+    const onTime = () => {
+      if (video.currentTime > 0 && video.readyState >= 2) {
+        video.removeEventListener('timeupdate', onTime);
+        markReady();
+      }
+    };
+    video.addEventListener('timeupdate', onTime, { passive: true });
+  }, []);
+  
   const handleLoadedData = useCallback(() => {
     if (!mountedRef.current) return;
     
     setIsReady(true);
     
-    // FIX: Mark first frame ready regardless of play state
-    // This is the key fix for "no poster jump" - hide poster when frame is ready, not when playing
+    // Don't hide poster here - wait for requestVideoFrameCallback
+    // Only trigger first frame detection
     const video = videoRef.current;
-    if (video && video.readyState >= 2) {
-      setHasFirstFrame(true);
-      // Crossfade poster out on first frame readiness (not dependent on !paused)
-      setTimeout(() => {
-        if (mountedRef.current) {
-          setIsPosterVisible(false);
-        }
-      }, 50);
+    if (video) {
+      waitForFirstFrame(video);
     }
     
     onLoadedData?.();
-  }, [onLoadedData]);
+  }, [onLoadedData, waitForFirstFrame]);
   
   const handlePlay = useCallback(() => {
     if (!mountedRef.current) return;
@@ -372,23 +393,21 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     setIsPlaying(true);
     setHasError(false);
     
-    // Poster already handled by hasFirstFrame in handleLoadedData
-    // This is a backup in case loadeddata wasn't triggered yet
-    if (!hasFirstFrame) {
-      setTimeout(() => {
-        if (mountedRef.current) {
-          setIsPosterVisible(false);
-        }
-      }, 120);
+    // If first frame not yet detected, trigger detection now
+    const video = videoRef.current;
+    if (video && !hasFirstFrame) {
+      waitForFirstFrame(video);
     }
     
     onPlay?.();
-  }, [onPlay, hasFirstFrame]);
+  }, [onPlay, hasFirstFrame, waitForFirstFrame]);
   
   const handlePause = useCallback(() => {
     if (!mountedRef.current) return;
     
     setIsPlaying(false);
+    // Do NOT re-show poster on pause - keep last video frame visible
+    // Poster only comes back on detach/ended/error
     onPause?.();
   }, [onPause]);
   
@@ -489,35 +508,48 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   
   return (
     <div className={cn('relative overflow-hidden bg-black', aspectClass, className)}>
-      {/* Poster Layer - crossfades out when video plays */}
-      {poster && (
-        <img
-          src={poster}
-          alt=""
-          className={cn(
-            'absolute inset-0 w-full h-full transition-opacity duration-150',
-            objectFitClass,
-            isPosterVisible && isPosterLoaded ? 'opacity-100 z-10' : 'opacity-0 z-0'
-          )}
-          onLoad={() => setIsPosterLoaded(true)}
-          onError={() => setIsPosterLoaded(false)}
-        />
-      )}
+      {/* Poster Layer - ALWAYS mounted, only opacity transitions */}
+      <img
+        src={poster || ''}
+        alt=""
+        draggable={false}
+        className={cn(
+          'absolute inset-0 w-full h-full transition-opacity duration-150 ease-linear',
+          objectFitClass,
+          // GPU compositing hints for WebView
+          'will-change-opacity backface-hidden transform-gpu',
+          // Show poster until first real frame is painted
+          isPosterVisible ? 'opacity-100 z-10' : 'opacity-0 z-0'
+        )}
+        style={{ 
+          backfaceVisibility: 'hidden',
+          transform: 'translateZ(0)'
+        }}
+        onLoad={() => setIsPosterLoaded(true)}
+        onError={() => setIsPosterLoaded(false)}
+      />
       
-      {/* Video Element - WebView-safe attributes baked in */}
+      {/* Video Element - ALWAYS mounted, only opacity transitions */}
       <video
         ref={videoRef}
         className={cn(
-          'w-full h-full transition-opacity duration-150',
+          'absolute inset-0 w-full h-full transition-opacity duration-150 ease-linear',
           objectFitClass,
-          // FIX: Only show video when first frame is ready - prevents white flash
+          // GPU compositing hints for WebView - prevents flicker
+          'will-change-opacity backface-hidden transform-gpu',
+          // Only show when first painted frame is ready
           hasFirstFrame ? 'opacity-100' : 'opacity-0'
         )}
+        style={{ 
+          backfaceVisibility: 'hidden',
+          transform: 'translateZ(0)'
+        }}
         // Core playback
         muted
         playsInline
         loop={loop}
         preload={preload}
+        crossOrigin="anonymous"
         
         // Disable default controls
         controls={false}
