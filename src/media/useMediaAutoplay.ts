@@ -1,0 +1,404 @@
+/**
+ * useMediaAutoplay - Unified autoplay engine
+ * Single intersection observer system for all grid/feed autoplay
+ * 
+ * Replaces: useGridAutoplay, custom Clubhouse observers
+ */
+
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useMediaSystem } from './MediaSystemProvider';
+
+// ============ Types ============
+
+export interface MediaAutoplayRegistration {
+  id: string;
+  element: HTMLVideoElement;
+  observeTarget?: HTMLElement; // Optional wrapper to observe (defaults to element)
+  isCandidate: boolean; // Whether this item should autoplay
+  sortIndex: number; // For tie-breaking (lower = higher priority)
+  hasBeenPreloaded: boolean;
+}
+
+export interface UseMediaAutoplayOptions {
+  // Mode
+  mode?: 'grid' | 'feed';
+  
+  // Thresholds (60/40 standard)
+  startThreshold?: number;  // Start playing at this visibility (default: 0.6)
+  stopThreshold?: number;   // Stop playing at this visibility (default: 0.4)
+  
+  // Preload
+  preloadMargin?: number;   // Pixels to start preloading (default: 300)
+  maxPreloading?: number;   // Max concurrent preloads (default: 3)
+  
+  // Scroll protection
+  scrollSettleDelay?: number; // ms to wait after scroll stops (default: 200)
+  
+  // Feed mode specific
+  warmWindowSize?: number;  // Keep ±N items warm in feed mode (default: 1)
+}
+
+export type RegisterMediaFn = (args: {
+  id: string;
+  element: HTMLVideoElement | null;
+  isCandidate?: boolean;
+  sortIndex?: number;
+  observeTarget?: HTMLElement | null;
+}) => void;
+
+// ============ Hook ============
+
+export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
+  const {
+    mode = 'grid',
+    startThreshold = 0.6,
+    stopThreshold = 0.4,
+    preloadMargin = 300,
+    maxPreloading = 3,
+    scrollSettleDelay = 200,
+    warmWindowSize = 1,
+  } = options;
+  
+  const mediaSystem = useMediaSystem();
+  
+  // Registry
+  const registry = useRef<Map<string, MediaAutoplayRegistration>>(new Map());
+  const visibleIds = useRef<Set<string>>(new Set());
+  
+  // Observers
+  const playObserver = useRef<IntersectionObserver | null>(null);
+  const preloadObserver = useRef<IntersectionObserver | null>(null);
+  
+  // State
+  const [playingIds, setPlayingIds] = useState<Set<string>>(new Set());
+  
+  // Scroll protection
+  const isScrolling = useRef(false);
+  const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
+  // Tab visibility
+  const isTabVisible = useRef(!document.hidden);
+  
+  // ============ Pause All ============
+  
+  const pauseAllLocal = useCallback(() => {
+    registry.current.forEach((reg) => {
+      if (reg.element && !reg.element.paused) {
+        reg.element.pause();
+      }
+    });
+    setPlayingIds(new Set());
+  }, []);
+  
+  // ============ Core Playback Logic ============
+  
+  const updatePlayback = useCallback(() => {
+    // Don't play if scrolling fast or tab hidden
+    if (isScrolling.current || !isTabVisible.current) {
+      pauseAllLocal();
+      return;
+    }
+    
+    const items = Array.from(registry.current.values());
+    
+    // Get visible candidates
+    const visibleCandidates = items.filter(
+      (item) => item.isCandidate && visibleIds.current.has(item.id)
+    );
+    
+    // Sort by sortIndex (stable grid order)
+    visibleCandidates.sort((a, b) => a.sortIndex - b.sortIndex);
+    
+    // In grid mode: play first candidate only
+    // In feed mode: play first candidate, keep warm ±N
+    const toPlay = new Set<string>();
+    const toWarm = new Set<string>();
+    
+    if (visibleCandidates.length > 0) {
+      toPlay.add(visibleCandidates[0].id);
+      
+      if (mode === 'feed') {
+        // Warm window around current
+        const currentIdx = 0;
+        for (let i = Math.max(0, currentIdx - warmWindowSize); i <= Math.min(visibleCandidates.length - 1, currentIdx + warmWindowSize); i++) {
+          if (i !== currentIdx) {
+            toWarm.add(visibleCandidates[i].id);
+          }
+        }
+      }
+    }
+    
+    const newPlayingIds = new Set<string>();
+    
+    items.forEach((item) => {
+      if (!item.element) return;
+      
+      const shouldPlay = toPlay.has(item.id);
+      const shouldWarm = toWarm.has(item.id);
+      
+      if (shouldPlay) {
+        // Check if already playing to avoid play() churn
+        if (!item.element.paused && !item.element.ended) {
+          newPlayingIds.add(item.id);
+          return;
+        }
+        
+        // Request play through media system
+        mediaSystem.requestPlay(item.id).then((success) => {
+          if (success) {
+            setPlayingIds((prev) => new Set([...prev, item.id]));
+          }
+        });
+        
+        newPlayingIds.add(item.id);
+      } else if (shouldWarm) {
+        // Keep warm but paused
+        item.element.pause();
+      } else {
+        // Pause and reset
+        item.element.pause();
+      }
+    });
+    
+    setPlayingIds(newPlayingIds);
+  }, [pauseAllLocal, mode, warmWindowSize, mediaSystem]);
+  
+  // ============ Registration ============
+  
+  const registerMedia: RegisterMediaFn = useCallback((args) => {
+    const { id, element, isCandidate = true, sortIndex = 0, observeTarget } = args;
+    
+    // Unregister
+    if (!element) {
+      const existing = registry.current.get(id);
+      if (existing) {
+        if (existing.observeTarget) {
+          playObserver.current?.unobserve(existing.observeTarget);
+        } else {
+          playObserver.current?.unobserve(existing.element);
+        }
+        preloadObserver.current?.unobserve(existing.element);
+        
+        // Unregister from media system
+        mediaSystem.unregister(id);
+      }
+      
+      registry.current.delete(id);
+      visibleIds.current.delete(id);
+      updatePlayback();
+      return;
+    }
+    
+    // Register with media system
+    mediaSystem.register({
+      id,
+      element,
+      kind: 'video',
+    });
+    
+    // Create/update registration
+    const existing = registry.current.get(id);
+    const registration: MediaAutoplayRegistration = {
+      id,
+      element,
+      observeTarget: observeTarget ?? undefined,
+      isCandidate,
+      sortIndex,
+      hasBeenPreloaded: existing?.hasBeenPreloaded ?? false,
+    };
+    
+    registry.current.set(id, registration);
+    
+    // Tag for observer callbacks
+    element.dataset.mediaAutoplayId = id;
+    const target = observeTarget ?? element;
+    target.dataset.mediaAutoplayId = id;
+    
+    // Observe
+    if (playObserver.current) {
+      playObserver.current.observe(target);
+    }
+    if (preloadObserver.current) {
+      preloadObserver.current.observe(element);
+    }
+    
+    // Trigger playback check after short delay
+    setTimeout(() => updatePlayback(), 50);
+  }, [mediaSystem, updatePlayback]);
+  
+  // ============ Scroll Protection ============
+  
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!isScrolling.current) {
+        isScrolling.current = true;
+        pauseAllLocal();
+      }
+      
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current);
+      }
+      
+      scrollTimeout.current = setTimeout(() => {
+        isScrolling.current = false;
+        updatePlayback();
+      }, scrollSettleDelay);
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current);
+      }
+    };
+  }, [scrollSettleDelay, pauseAllLocal, updatePlayback]);
+  
+  // ============ Tab Visibility ============
+  
+  useEffect(() => {
+    const handleVisibility = () => {
+      isTabVisible.current = !document.hidden;
+      
+      if (document.hidden) {
+        pauseAllLocal();
+      } else {
+        setTimeout(() => updatePlayback(), 100);
+      }
+    };
+    
+    const handleBlur = () => {
+      isTabVisible.current = false;
+      pauseAllLocal();
+    };
+    
+    const handleFocus = () => {
+      isTabVisible.current = true;
+      setTimeout(() => updatePlayback(), 100);
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [pauseAllLocal, updatePlayback]);
+  
+  // ============ Preload Observer ============
+  
+  useEffect(() => {
+    let preloadingCount = 0;
+    
+    preloadObserver.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const target = entry.target as HTMLVideoElement;
+          const id = target.dataset.mediaAutoplayId;
+          if (!id) return;
+          
+          const reg = registry.current.get(id);
+          if (!reg || reg.hasBeenPreloaded) return;
+          
+          if (entry.isIntersecting && preloadingCount < maxPreloading) {
+            // Near viewport - start preloading
+            target.preload = 'auto';
+            
+            // Don't call load() for HLS videos
+            const isHls = target.currentSrc?.includes('.m3u8') || target.src?.includes('.m3u8');
+            if (!isHls) {
+              try {
+                target.load();
+              } catch { }
+            }
+            
+            reg.hasBeenPreloaded = true;
+            preloadingCount++;
+            registry.current.set(id, reg);
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: `${preloadMargin}px 0px ${preloadMargin}px 0px`,
+        threshold: 0.01,
+      }
+    );
+    
+    // Observe existing
+    registry.current.forEach((reg) => {
+      preloadObserver.current?.observe(reg.element);
+    });
+    
+    return () => {
+      preloadObserver.current?.disconnect();
+      preloadObserver.current = null;
+    };
+  }, [preloadMargin, maxPreloading]);
+  
+  // ============ Play Observer (Hysteresis) ============
+  
+  useEffect(() => {
+    const thresholds = [stopThreshold, startThreshold];
+    
+    playObserver.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const target = entry.target as HTMLElement;
+          const id = target.dataset.mediaAutoplayId;
+          if (!id) return;
+          
+          const ratio = entry.intersectionRatio;
+          const wasVisible = visibleIds.current.has(id);
+          
+          // Hysteresis: start at startThreshold, stop at stopThreshold
+          let nextVisible = wasVisible;
+          
+          if (ratio >= startThreshold) {
+            visibleIds.current.add(id);
+            nextVisible = true;
+          } else if (ratio <= stopThreshold) {
+            visibleIds.current.delete(id);
+            nextVisible = false;
+          }
+          // Between thresholds: keep current state
+          
+          if (import.meta.env.DEV && wasVisible !== nextVisible) {
+            console.log('[MediaAutoplay]', id.slice(0, 8), `ratio=${ratio.toFixed(2)}`, `visible: ${wasVisible} → ${nextVisible}`);
+          }
+        });
+        
+        updatePlayback();
+      },
+      {
+        threshold: thresholds,
+      }
+    );
+    
+    // Observe existing
+    registry.current.forEach((reg) => {
+      const target = reg.observeTarget ?? reg.element;
+      playObserver.current?.observe(target);
+    });
+    
+    // Initial check
+    const initialCheck = setTimeout(() => updatePlayback(), 150);
+    
+    return () => {
+      clearTimeout(initialCheck);
+      playObserver.current?.disconnect();
+      playObserver.current = null;
+      registry.current.clear();
+      visibleIds.current.clear();
+    };
+  }, [startThreshold, stopThreshold, updatePlayback]);
+  
+  return {
+    registerMedia,
+    playingIds,
+  };
+}
