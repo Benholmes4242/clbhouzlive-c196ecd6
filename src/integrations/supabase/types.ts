@@ -7456,16 +7456,15 @@ export type Database = {
       get_top100_discover_recommendations: {
         Args: { limit_param?: number; target_user_id: string }
         Returns: {
-          caption: string
+          content: string
           course_id: string
           course_name: string
           created_at: string
           engagement_score: number
           list_rank: number
-          list_short_label: string
           list_slug: string
           post_id: string
-          thumbnail_url: string
+          short_label: string
         }[]
       }
       get_top100_friend_recent_activity: {
@@ -7543,18 +7542,17 @@ export type Database = {
         Returns: Json
       }
       get_trending_top100_moments: {
-        Args: { days_param?: number; limit_param?: number }
+        Args: { days_param: number; limit_param: number }
         Returns: {
-          caption: string
+          content: string
           course_id: string
           course_name: string
           created_at: string
           engagement_score: number
           list_rank: number
-          list_short_label: string
           list_slug: string
           post_id: string
-          thumbnail_url: string
+          short_label: string
         }[]
       }
       get_user_business_ids: {

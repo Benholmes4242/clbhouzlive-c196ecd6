@@ -7,11 +7,10 @@ export type TrendingTop100Moment = {
   course_name: string;
   list_slug: string;
   list_rank: number | null;
-  list_short_label: string | null;
+  short_label: string | null;
   engagement_score: number;
   created_at: string;
-  thumbnail_url: string | null;
-  caption: string | null;
+  content: string | null;
 };
 
 export function useTrendingTop100Moments(limit = 12, daysWindow = 7) {
