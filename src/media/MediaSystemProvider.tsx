@@ -53,6 +53,8 @@ const MediaSystemContext = createContext<MediaSystemContextType | null>(null);
 
 const MUTE_STATE_KEY = 'media_muted';
 const POSITIONS_KEY = 'media_positions';
+const MAX_POSITIONS = 200; // Cap stored positions
+const POSITION_SAVE_THROTTLE = 3000; // ms between saves
 
 // ============ Provider ============
 
@@ -64,7 +66,22 @@ export const MediaSystemProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const activeIdRef = useRef<string | null>(null);
   
   // Stored positions (survives unmount for continue watching)
-  const positionsRef = useRef<Map<string, number>>(new Map());
+  // Hydrate from sessionStorage on init
+  const positionsRef = useRef<Map<string, number>>(
+    (() => {
+      try {
+        const saved = sessionStorage.getItem(POSITIONS_KEY);
+        if (saved) {
+          const entries = JSON.parse(saved) as [string, number][];
+          return new Map(entries.slice(-MAX_POSITIONS)); // Cap on load
+        }
+      } catch {}
+      return new Map();
+    })()
+  );
+  
+  // Throttle position saves
+  const lastPositionSaveRef = useRef<number>(0);
   
   // Mute state with session persistence
   const [isMuted, setIsMutedState] = useState(() => {
@@ -212,18 +229,31 @@ export const MediaSystemProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const savePosition = useCallback((id: string, time?: number) => {
     const reg = registry.current.get(id);
     const position = time ?? reg?.element?.currentTime ?? 0;
+    const duration = reg?.element?.duration ?? 0;
     
-    if (position > 0) {
-      positionsRef.current.set(id, position);
-      
-      // Persist to session storage
-      try {
-        sessionStorage.setItem(
-          POSITIONS_KEY, 
-          JSON.stringify(Array.from(positionsRef.current.entries()))
-        );
-      } catch {}
+    // Skip if position is 0 or video is too short (< 10s)
+    if (position <= 0 || duration < 10) return;
+    
+    // Skip if video ended (within 2s of end)
+    if (duration > 0 && position >= duration - 2) {
+      positionsRef.current.delete(id);
+      return;
     }
+    
+    positionsRef.current.set(id, position);
+    
+    // Throttle persistence to sessionStorage (every 3s max)
+    const now = Date.now();
+    if (now - lastPositionSaveRef.current < POSITION_SAVE_THROTTLE) return;
+    lastPositionSaveRef.current = now;
+    
+    // Persist to session storage with cap
+    try {
+      const entries = Array.from(positionsRef.current.entries());
+      // Keep only last MAX_POSITIONS entries
+      const capped = entries.slice(-MAX_POSITIONS);
+      sessionStorage.setItem(POSITIONS_KEY, JSON.stringify(capped));
+    } catch {}
   }, []);
   
   const getPosition = useCallback((id: string): number | undefined => {

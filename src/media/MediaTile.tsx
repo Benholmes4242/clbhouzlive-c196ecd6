@@ -101,13 +101,14 @@ const MediaTile: React.FC<MediaTileProps> = ({
     
     const videoEl = playerRef.current?.getElement();
     
-    // Register on mount
+    // FIX: Observe video element directly, not tile wrapper
+    // This fixes WebView grey-box issues where wrapper behaves differently
     registerMedia({
       id,
       element: videoEl,
       isCandidate: isAutoplayCandidate,
       sortIndex,
-      observeTarget: tileRef.current,
+      // observeTarget removed - default to video element
     });
     
     // Unregister on unmount

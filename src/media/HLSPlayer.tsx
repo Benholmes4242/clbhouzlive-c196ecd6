@@ -102,6 +102,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   const [isMutedLocal, setIsMutedLocal] = useState(muted);
   const [hasError, setHasError] = useState(false);
   const [isReady, setIsReady] = useState(false);
+  const [hasFirstFrame, setHasFirstFrame] = useState(false); // Track first frame readiness
   
   // ============ Imperative Handle ============
   
@@ -127,12 +128,16 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     getCurrentTime: () => videoRef.current?.currentTime ?? 0,
     getDuration: () => videoRef.current?.duration ?? 0,
     attach: () => {
-      // Re-attach HLS source if detached
+      // Re-attach HLS source if detached - must re-run setupSource
       if (!isAttachedRef.current && videoRef.current && src) {
         isAttachedRef.current = true;
-        // Trigger re-setup by updating state
-        setIsReady(false);
+        setHasFirstFrame(false);
         setIsPosterVisible(true);
+        setIsReady(false);
+        // Force re-run setup by toggling a dependency
+        // The useEffect watching src will handle setup
+        // Trigger immediate setup
+        setupSourceRef.current?.();
       }
     },
     detach: () => {
@@ -143,6 +148,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       isAttachedRef.current = false;
       video.pause();
       
+      // Fully release hls.js instance
       if (hlsRef.current) {
         try {
           hlsRef.current.stopLoad();
@@ -152,10 +158,12 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         hlsRef.current = null;
       }
       
+      // Clear src without flash - keep poster visible
       video.removeAttribute('src');
-      try {
-        video.load();
-      } catch {}
+      video.load(); // Reset video element state
+      setIsPosterVisible(true);
+      setHasFirstFrame(false);
+      setIsReady(false);
     },
   }), [src]);
   
@@ -170,13 +178,20 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   
   // ============ HLS Setup ============
   
+  // Ref to hold setupSource function for attach() to call
+  const setupSourceRef = useRef<(() => void) | null>(null);
+  
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !src) return;
     
+    // Skip if detached
+    if (!isAttachedRef.current) return;
+    
     mountedRef.current = true;
     setHasError(false);
     setIsReady(false);
+    setHasFirstFrame(false);
     setIsPosterVisible(true);
     
     const setupSource = async () => {
@@ -264,10 +279,14 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       }
     };
     
+    // Store setupSource for attach() to call
+    setupSourceRef.current = setupSource;
+    
     setupSource();
     
     return () => {
       mountedRef.current = false;
+      setupSourceRef.current = null;
       if (hlsRef.current) {
         try {
           hlsRef.current.stopLoad();
@@ -281,12 +300,40 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   
   // ============ Event Handlers ============
   
-  // Apply WebView attributes after video mounts
+  // Apply WebView attributes and expose ref for prewarm
   useEffect(() => {
     const video = videoRef.current;
     if (video) {
       video.setAttribute('webkit-playsinline', 'true');
       video.setAttribute('x5-playsinline', 'true');
+      
+      // Expose player ref on element for prewarm observer to call attach/detach
+      (video as any).__hlsPlayerRef = {
+        attach: () => {
+          if (!isAttachedRef.current) {
+            isAttachedRef.current = true;
+            setupSourceRef.current?.();
+          }
+        },
+        detach: () => {
+          if (isAttachedRef.current) {
+            isAttachedRef.current = false;
+            video.pause();
+            if (hlsRef.current) {
+              try {
+                hlsRef.current.stopLoad();
+                hlsRef.current.detachMedia();
+                hlsRef.current.destroy();
+              } catch {}
+              hlsRef.current = null;
+            }
+            video.removeAttribute('src');
+            video.load();
+            setIsPosterVisible(true);
+            setHasFirstFrame(false);
+          }
+        }
+      };
     }
   }, []);
   
@@ -294,18 +341,21 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     if (!mountedRef.current) return;
     
     setIsReady(true);
-    onLoadedData?.();
     
-    // Crossfade: hide poster after video has first frame
+    // FIX: Mark first frame ready regardless of play state
+    // This is the key fix for "no poster jump" - hide poster when frame is ready, not when playing
     const video = videoRef.current;
     if (video && video.readyState >= 2) {
-      // Delay crossfade slightly for smooth transition
+      setHasFirstFrame(true);
+      // Crossfade poster out on first frame readiness (not dependent on !paused)
       setTimeout(() => {
-        if (mountedRef.current && !video.paused) {
+        if (mountedRef.current) {
           setIsPosterVisible(false);
         }
       }, 50);
     }
+    
+    onLoadedData?.();
   }, [onLoadedData]);
   
   const handlePlay = useCallback(() => {
@@ -314,15 +364,18 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     setIsPlaying(true);
     setHasError(false);
     
-    // Hide poster on play
-    setTimeout(() => {
-      if (mountedRef.current) {
-        setIsPosterVisible(false);
-      }
-    }, 120); // Crossfade duration
+    // Poster already handled by hasFirstFrame in handleLoadedData
+    // This is a backup in case loadeddata wasn't triggered yet
+    if (!hasFirstFrame) {
+      setTimeout(() => {
+        if (mountedRef.current) {
+          setIsPosterVisible(false);
+        }
+      }, 120);
+    }
     
     onPlay?.();
-  }, [onPlay]);
+  }, [onPlay, hasFirstFrame]);
   
   const handlePause = useCallback(() => {
     if (!mountedRef.current) return;
@@ -335,9 +388,13 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     if (!mountedRef.current) return;
     
     setIsPlaying(false);
-    setIsPosterVisible(true);
+    // Only show poster on ended if looping is off
+    if (!loop) {
+      setIsPosterVisible(true);
+      setHasFirstFrame(false);
+    }
     onEnded?.();
-  }, [onEnded]);
+  }, [onEnded, loop]);
   
   const handleError = useCallback((e: React.SyntheticEvent<HTMLVideoElement>) => {
     if (!mountedRef.current) return;
@@ -445,7 +502,8 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         className={cn(
           'w-full h-full transition-opacity duration-150',
           objectFitClass,
-          isPlaying ? 'opacity-100' : 'opacity-0'
+          // FIX: Show video when first frame is ready OR playing, not just playing
+          (hasFirstFrame || isPlaying) ? 'opacity-100' : 'opacity-0'
         )}
         // Core playback
         muted
