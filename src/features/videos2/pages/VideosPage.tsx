@@ -6,14 +6,13 @@ import { VideoCardWide } from '../components/VideoCardWide';
 import { VideoCardPair } from '../components/VideoCardPair';
 import { SuggestedChannels } from '../components/SuggestedChannels';
 import { ShortsCarousel } from '../components/ShortsCarousel';
-import { generateMockFeed } from '../data/mockData';
 
 export default function VideosPage() {
   const [filter, setFilter] = useState<VideoFilter>('All');
   const { register } = useAutoplay();
   
-  // Mock feed data - replace with real API call
-  const feedItems = generateMockFeed(20);
+  // Real data should be fetched here - mock data has been removed
+  const feedItems: FeedItemType[] = [];
 
   const handleVideoClick = (id: string) => {
     console.log('Open video player for:', id);
