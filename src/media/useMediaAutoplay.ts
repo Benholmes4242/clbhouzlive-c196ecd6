@@ -289,11 +289,12 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
     };
   }, [pauseAllLocal, updatePlayback]);
   
-  // ============ Preload Observer ============
+  // ============ Preload Observer (Real Prewarm) ============
+  
+  // Track which items are prewarmed (attached)
+  const prewarmedIds = useRef<Set<string>>(new Set());
   
   useEffect(() => {
-    let preloadingCount = 0;
-    
     preloadObserver.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -302,23 +303,34 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
           if (!id) return;
           
           const reg = registry.current.get(id);
-          if (!reg || reg.hasBeenPreloaded) return;
+          if (!reg) return;
           
-          if (entry.isIntersecting && preloadingCount < maxPreloading) {
-            // Near viewport - start preloading
-            target.preload = 'auto';
-            
-            // Don't call load() for HLS videos
-            const isHls = target.currentSrc?.includes('.m3u8') || target.src?.includes('.m3u8');
-            if (!isHls) {
-              try {
-                target.load();
-              } catch { }
+          if (entry.isIntersecting) {
+            // Near viewport - REAL prewarm: call attach() on the player
+            if (!prewarmedIds.current.has(id) && prewarmedIds.current.size < maxPreloading) {
+              // For HLS: calling attach() is the real prewarm
+              // Access the HLSPlayerRef if available through the element
+              const playerRef = (target as any).__hlsPlayerRef;
+              if (playerRef?.attach) {
+                playerRef.attach();
+              }
+              
+              // Also set preload for non-HLS
+              target.preload = 'auto';
+              
+              prewarmedIds.current.add(id);
+              reg.hasBeenPreloaded = true;
+              registry.current.set(id, reg);
             }
-            
-            reg.hasBeenPreloaded = true;
-            preloadingCount++;
-            registry.current.set(id, reg);
+          } else {
+            // Far from viewport - detach to save memory
+            if (prewarmedIds.current.has(id)) {
+              const playerRef = (target as any).__hlsPlayerRef;
+              if (playerRef?.detach) {
+                playerRef.detach();
+              }
+              prewarmedIds.current.delete(id);
+            }
           }
         });
       },
@@ -337,6 +349,7 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
     return () => {
       preloadObserver.current?.disconnect();
       preloadObserver.current = null;
+      prewarmedIds.current.clear();
     };
   }, [preloadMargin, maxPreloading]);
   

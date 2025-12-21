@@ -19,6 +19,9 @@ import { cn } from '@/lib/utils';
 import HLSPlayer, { HLSPlayerRef } from './HLSPlayer';
 import { useMediaSystem } from './MediaSystemProvider';
 
+// Warm pool size: preload ±1 adjacent videos
+const WARM_POOL_SIZE = 1;
+
 // ============ Types ============
 
 export interface MediaFullscreenItem {
@@ -72,9 +75,13 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [progress, setProgress] = useState(0);
   const playerRef = useRef<HLSPlayerRef>(null);
+  const prevPlayerRef = useRef<HLSPlayerRef>(null);
+  const nextPlayerRef = useRef<HLSPlayerRef>(null);
   const { isMuted, setMuted, pauseAll } = useMediaSystem();
   
   const currentItem = items[currentIndex];
+  const prevItem = items[currentIndex - 1];
+  const nextItem = items[currentIndex + 1];
   const isVideo = currentItem?.type === 'video';
   const hasNext = currentIndex < items.length - 1;
   const hasPrevious = currentIndex > 0;
@@ -181,26 +188,26 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
     onTimeUpdate?.(currentTime);
   }, [onTimeUpdate]);
   
-  // ============ Preload Adjacent ============
+  // ============ Warm Pool: Keep adjacent videos attached + paused ============
   
+  // When index changes, attach adjacent players
   useEffect(() => {
     if (!isOpen) return;
     
-    // Preload adjacent items
-    const preloadUrls = [
-      items[currentIndex - 1]?.src,
-      items[currentIndex + 1]?.src,
-    ].filter(Boolean);
+    // Attach adjacent warm players
+    if (prevItem?.type === 'video') {
+      prevPlayerRef.current?.attach();
+    }
+    if (nextItem?.type === 'video') {
+      nextPlayerRef.current?.attach();
+    }
     
-    preloadUrls.forEach(url => {
-      if (url) {
-        const link = document.createElement('link');
-        link.rel = 'prefetch';
-        link.href = url;
-        document.head.appendChild(link);
-      }
-    });
-  }, [currentIndex, isOpen, items]);
+    return () => {
+      // Detach when leaving
+      prevPlayerRef.current?.detach();
+      nextPlayerRef.current?.detach();
+    };
+  }, [currentIndex, isOpen, prevItem, nextItem]);
   
   // ============ Render ============
   
@@ -236,6 +243,34 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
             alt={currentItem.title || ''}
             className="w-full h-full object-contain"
             draggable={false}
+          />
+        )}
+        
+        {/* Hidden Warm Pool: Previous Item (for instant navigation) */}
+        {prevItem?.type === 'video' && (
+          <HLSPlayer
+            ref={prevPlayerRef}
+            key={`warm-prev-${prevItem.id}`}
+            src={prevItem.src}
+            poster={prevItem.poster}
+            autoplay={false}
+            muted={true}
+            loop
+            className="absolute inset-0 opacity-0 pointer-events-none -z-10"
+          />
+        )}
+        
+        {/* Hidden Warm Pool: Next Item (for instant navigation) */}
+        {nextItem?.type === 'video' && (
+          <HLSPlayer
+            ref={nextPlayerRef}
+            key={`warm-next-${nextItem.id}`}
+            src={nextItem.src}
+            poster={nextItem.poster}
+            autoplay={false}
+            muted={true}
+            loop
+            className="absolute inset-0 opacity-0 pointer-events-none -z-10"
           />
         )}
       </div>
