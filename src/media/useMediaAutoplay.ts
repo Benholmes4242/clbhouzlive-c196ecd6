@@ -2,12 +2,20 @@
  * useMediaAutoplay - Unified autoplay engine
  * Single intersection observer system for all grid/feed autoplay
  * 
- * Replaces: useGridAutoplay, custom Clubhouse observers
+ * When MEDIA_RUNTIME_V2 is enabled:
+ * - Observes visibility and reports to MediaRuntime.setCandidateState()
+ * - Does NOT call play/pause directly - all decisions made by MediaRuntime
+ * 
+ * When MEDIA_RUNTIME_V2 is disabled:
+ * - Legacy behavior: directly controls playback
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useMediaSystem } from './MediaSystemProvider';
 import { useSlidingPanels } from '@/components/ui/SlidingPanelsContext';
+import { MEDIA_RUNTIME_V2 } from '@/config/featureFlags';
+import { MediaRuntime } from './runtime';
+import type { MediaSurface } from './runtime';
 
 // ============ Types ============
 
@@ -23,6 +31,9 @@ export interface MediaAutoplayRegistration {
 export interface UseMediaAutoplayOptions {
   // Mode
   mode?: 'grid' | 'feed';
+  
+  // Surface for runtime (maps mode to surface)
+  surface?: MediaSurface;
   
   // Thresholds (40/25 standard for sentinel-based observation)
   startThreshold?: number;  // Start playing at this visibility (default: 0.4)
@@ -52,6 +63,7 @@ export type RegisterMediaFn = (args: {
 export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   const {
     mode = 'grid',
+    surface = 'grid',
     // Updated thresholds for grid mode with observeTarget sentinel pattern
     // Lower thresholds work better when observing full tile wrappers
     startThreshold = 0.4,
@@ -87,9 +99,24 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   // Tab visibility
   const isTabVisible = useRef(!document.hidden);
   
+  // ============ Runtime V2 Integration ============
+  
+  // Sync panel animation state to runtime
+  useEffect(() => {
+    if (!MEDIA_RUNTIME_V2) return;
+    
+    MediaRuntime.setUIState({ isPanelOpen: isPanelAnimating });
+  }, [isPanelAnimating]);
+  
   // ============ Pause All ============
   
   const pauseAllLocal = useCallback(() => {
+    if (MEDIA_RUNTIME_V2) {
+      MediaRuntime.pauseAll();
+      setPlayingIds(new Set());
+      return;
+    }
+    
     registry.current.forEach((reg) => {
       if (reg.element && !reg.element.paused) {
         reg.element.pause();
@@ -98,9 +125,22 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
     setPlayingIds(new Set());
   }, []);
   
-  // ============ Core Playback Logic ============
+  // ============ Core Playback Logic (Legacy) ============
   
   const updatePlayback = useCallback(() => {
+    // V2: Let runtime handle playback decisions
+    if (MEDIA_RUNTIME_V2) {
+      // Just update playing IDs from runtime state
+      const activeId = MediaRuntime.getActiveId();
+      if (activeId) {
+        setPlayingIds(new Set([activeId]));
+      } else {
+        setPlayingIds(new Set());
+      }
+      return;
+    }
+    
+    // Legacy behavior below
     // Don't play if scrolling fast, tab hidden, or panel is animating
     if (isScrolling.current || !isTabVisible.current || isPanelAnimating) {
       pauseAllLocal();
@@ -203,6 +243,11 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
 
         // Unregister from media system
         mediaSystem.unregister(id);
+        
+        // V2: Also unregister from runtime
+        if (MEDIA_RUNTIME_V2) {
+          MediaRuntime.unregisterMedia(id);
+        }
       }
 
       registry.current.delete(id);
@@ -217,6 +262,17 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
       element,
       kind: 'video',
     });
+    
+    // V2: Also register with runtime
+    if (MEDIA_RUNTIME_V2) {
+      MediaRuntime.registerMedia({
+        id,
+        element,
+        surface,
+        sortIndex,
+        observeTarget: observeTarget ?? element,
+      });
+    }
 
     // Create/update registration
     const existing = registry.current.get(id);
@@ -246,15 +302,22 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
 
     // Trigger playback check after short delay
     setTimeout(() => updatePlayback(), 50);
-  }, [mediaSystem, updatePlayback]);
+  }, [mediaSystem, updatePlayback, surface]);
   
   // ============ Scroll Protection ============
   
   useEffect(() => {
     const handleScroll = () => {
+      // V2: Report scroll state to runtime
+      if (MEDIA_RUNTIME_V2) {
+        MediaRuntime.setUIState({ isScrolling: true });
+      }
+      
       if (!isScrolling.current) {
         isScrolling.current = true;
-        pauseAllLocal();
+        if (!MEDIA_RUNTIME_V2) {
+          pauseAllLocal();
+        }
       }
       
       if (scrollTimeout.current) {
@@ -263,6 +326,12 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
       
       scrollTimeout.current = setTimeout(() => {
         isScrolling.current = false;
+        
+        // V2: Report scroll settled to runtime
+        if (MEDIA_RUNTIME_V2) {
+          MediaRuntime.setUIState({ isScrolling: false });
+        }
+        
         updatePlayback();
       }, scrollSettleDelay);
     };
@@ -341,6 +410,15 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
               detachTimeouts.current.delete(id);
             }
             
+            // V2: Use runtime prewarm
+            if (MEDIA_RUNTIME_V2) {
+              MediaRuntime.prewarmCandidate(id);
+              prewarmedIds.current.add(id);
+              reg.hasBeenPreloaded = true;
+              return;
+            }
+            
+            // Legacy prewarm
             const playerRef = (target as any).__hlsPlayerRef;
             const isCurrentlyAttached = playerRef?.isAttached?.() ?? false;
             const isVisible = visibleIds.current.has(id);
@@ -432,6 +510,14 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
             nextVisible = false;
           }
           // Between thresholds: keep current state
+          
+          // V2: Report visibility to runtime
+          if (MEDIA_RUNTIME_V2) {
+            MediaRuntime.setCandidateState(id, {
+              visible: nextVisible,
+              ratio,
+            });
+          }
           
           if (import.meta.env.DEV && wasVisible !== nextVisible) {
             console.log('[MediaAutoplay]', id.slice(0, 8), `ratio=${ratio.toFixed(2)}`, `visible: ${wasVisible} → ${nextVisible}`);
