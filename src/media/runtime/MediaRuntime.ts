@@ -364,6 +364,14 @@ class MediaRuntimeCore {
     
     const bestCandidate = candidates[0];
     
+    if (import.meta.env.DEV) {
+      console.log('[MediaRuntime] evaluateBestCandidate', bestCandidate?.id?.slice(0, 8) ?? 'none', {
+        candidateCount: candidates.length,
+        currentActive: this.state.activeMediaId?.slice(0, 8) ?? 'none',
+        currentReason: this.state.activeReason,
+      });
+    }
+    
     if (bestCandidate) {
       // Don't switch if already playing this one
       if (this.state.activeMediaId === bestCandidate.id) return;
