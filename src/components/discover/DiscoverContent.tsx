@@ -216,6 +216,22 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     }
   }, [content, main, searchQuery, selectedTags, likedItems]);
 
+  // Autoplay debugging: automatically target the "better than most" post
+  useEffect(() => {
+    if (main !== 'videos') return;
+    const match = currentContent?.find((i) =>
+      (i.title ?? '').toLowerCase().includes('better than most')
+    );
+
+    if (match) {
+      (window as any).__DEBUG_MEDIA_AUTOPLAY_ID = match.id;
+      (window as any).__DEBUG_MEDIA_AUTOPLAY_LABEL = match.title;
+      if (import.meta.env.DEV) {
+        console.debug('[AutoplayDebug] Target set', { id: match.id, title: match.title });
+      }
+    }
+  }, [main, currentContent]);
+
   // Handle like toggle with optimistic updates
   const handleLikeToggle = useCallback((itemId: string) => {
     if (!currentContent) return;
