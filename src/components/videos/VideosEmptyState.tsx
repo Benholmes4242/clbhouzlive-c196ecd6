@@ -47,7 +47,7 @@ export const VideosEmptyState: React.FC<VideosEmptyStateProps> = ({
           variant="secondary"
           size="sm"
           className="mt-3 bg-muted hover:bg-muted/80 text-foreground"
-          onClick={() => navigate('/discover?main=watch')}
+          onClick={() => navigate('/discover?main=shorts')}
         >
           Watch Shorts
         </Button>
