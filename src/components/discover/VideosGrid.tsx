@@ -194,7 +194,7 @@ const VideoCardWithAutoplay: React.FC<VideoCardWithAutoplayProps> = ({
   const streamId = item.src ? getStreamIdFromUrl(item.src) : null;
   const posterUrl = item.thumbnailSrc ?? (streamId ? getStreamPoster(streamId, '0s', 720) : undefined);
 
-  const hasVideo = !!hlsUrl;
+  const isVideo = !!hlsUrl;
 
   // Reset state when video changes
   useEffect(() => {
@@ -202,9 +202,9 @@ const VideoCardWithAutoplay: React.FC<VideoCardWithAutoplayProps> = ({
     setHasVideoError(false);
   }, [item.id, hlsUrl]);
 
-  // BUSINESS ACTIVITY PATTERN: immediate only, videoIndex in deps (matches BusinessPostCard exactly)
+  // Register video - immediate only, videoIndex in deps
   useEffect(() => {
-    if (!hasVideo || !videoRef.current || !registerVideo) return;
+    if (!isVideo || !videoRef.current || !registerVideo) return;
 
     registerVideo({
       id: item.id,
@@ -221,7 +221,7 @@ const VideoCardWithAutoplay: React.FC<VideoCardWithAutoplayProps> = ({
         sortIndex: videoIndex,
       });
     };
-  }, [hasVideo, registerVideo, item.id, videoIndex]);
+  }, [isVideo, registerVideo, item.id, videoIndex]);
 
   const handleCanPlay = useCallback(() => {
     setIsVideoReady(true);
@@ -265,7 +265,7 @@ const VideoCardWithAutoplay: React.FC<VideoCardWithAutoplayProps> = ({
         )}
 
         {/* Video layer - fades in when ready (BUSINESS ACTIVITY PATTERN) */}
-        {hasVideo && (
+        {isVideo && (
           <GridAutoplayVideo
             ref={videoRef}
             src={hlsUrl}
