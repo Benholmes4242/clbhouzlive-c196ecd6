@@ -11,6 +11,21 @@ export const USE_SAFE_AUTOPLAY_V2 = true;
 export const USE_VIDEO_PROGRESS_SYNC_V1 = true;
 
 /**
+ * Media Runtime V2 Feature Flag
+ * 
+ * When true: surfaces route through MediaRuntime (new global playback authority)
+ * When false: current system runs unchanged
+ * 
+ * Migration order:
+ * 1. Discover → Videos tab
+ * 2. Discover → Explore / Following
+ * 3. Profile & Activity grids
+ * 4. Business profiles
+ * 5. Clubhouse (last)
+ */
+export const MEDIA_RUNTIME_V2 = true;
+
+/**
  * Hub Feature Flag
  * 
  * Phase 5: Hub is now always enabled for all users (production launch)
@@ -33,6 +48,7 @@ export const FEATURE_FLAGS = {
   CLUBHOUSE_VERTICAL_ONLY,
   SAFE_AUTOPLAY_V2: USE_SAFE_AUTOPLAY_V2,
   VIDEO_PROGRESS_SYNC_V1: USE_VIDEO_PROGRESS_SYNC_V1,
+  MEDIA_RUNTIME_V2,
   HUB: HUB_ENABLED, // Always enabled - no longer feature flagged
   ENABLE_TOP100_MOCK_PLAYERS,
 } as const;

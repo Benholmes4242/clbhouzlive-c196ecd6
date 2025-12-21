@@ -3,7 +3,7 @@
  * 
  * Import all media components and hooks from this single entry point:
  * 
- * import { MediaSystemProvider, HLSPlayer, MediaTile, MediaFullscreenViewer, useMediaSystem, useMediaAutoplay } from '@/media';
+ * import { MediaSystemProvider, HLSPlayer, MediaTile, MediaFullscreenViewer, useMediaSystem, useMediaAutoplay, MediaRuntime, useMediaRuntime } from '@/media';
  */
 
 // Provider
@@ -13,6 +13,17 @@ export type { MediaSystemContextType, MediaRegistration, MediaKind } from './Med
 // Autoplay Hook
 export { useMediaAutoplay } from './useMediaAutoplay';
 export type { UseMediaAutoplayOptions, RegisterMediaFn, MediaAutoplayRegistration } from './useMediaAutoplay';
+
+// Runtime (new global playback authority)
+export { MediaRuntime, useMediaRuntime } from './runtime';
+export type {
+  MediaSurface,
+  PlaybackReason,
+  ErrorType,
+  MediaNode,
+  UIState,
+  RuntimeTelemetry,
+} from './runtime';
 
 // Components
 export { default as HLSPlayer } from './HLSPlayer';
