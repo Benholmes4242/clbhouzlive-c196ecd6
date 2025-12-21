@@ -363,6 +363,19 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       (video as any).__hlsPlayerRef = {
         isAttached: () => isAttachedRef.current,
         attach: () => {
+          const debugId = (window as any).__DEBUG_MEDIA_AUTOPLAY_ID as string | undefined;
+          const id = video.dataset.mediaAutoplayId;
+          if (debugId && id === debugId) {
+            console.log('[AutoplayDebug][HLSPlayerRef] attach called', {
+              id: id.slice(0, 8),
+              isAttached: isAttachedRef.current,
+              src,
+              hasSrcAttr: video.hasAttribute('src'),
+              currentSrc: video.currentSrc,
+              readyState: video.readyState,
+            });
+          }
+
           // Skip if already attached - prevents white flash from unnecessary resets
           if (!isAttachedRef.current) {
             isAttachedRef.current = true;
@@ -372,6 +385,19 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           }
         },
         detach: () => {
+          const debugId = (window as any).__DEBUG_MEDIA_AUTOPLAY_ID as string | undefined;
+          const id = video.dataset.mediaAutoplayId;
+          if (debugId && id === debugId) {
+            console.log('[AutoplayDebug][HLSPlayerRef] detach called', {
+              id: id.slice(0, 8),
+              isAttached: isAttachedRef.current,
+              src,
+              currentSrc: video.currentSrc,
+              readyState: video.readyState,
+              currentTime: video.currentTime,
+            });
+          }
+
           if (isAttachedRef.current) {
             isAttachedRef.current = false;
             video.pause();
@@ -447,6 +473,20 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     const video = videoRef.current;
     if (video) {
       waitForFirstFrame(video);
+
+      const debugId = (window as any).__DEBUG_MEDIA_AUTOPLAY_ID as string | undefined;
+      const id = video.dataset.mediaAutoplayId;
+      if (debugId && id === debugId) {
+        console.log('[AutoplayDebug][HLSPlayer] event:loadeddata', {
+          id: id.slice(0, 8),
+          currentSrc: video.currentSrc,
+          hasSrcAttr: video.hasAttribute('src'),
+          readyState: video.readyState,
+          currentTime: video.currentTime,
+          duration: Number.isFinite(video.duration) ? video.duration : null,
+          isAttached: isAttachedRef.current,
+        });
+      }
     }
     
     onLoadedData?.();
@@ -460,8 +500,23 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     
     // If first frame not yet detected, trigger detection now
     const video = videoRef.current;
-    if (video && !hasFirstFrame) {
-      waitForFirstFrame(video);
+    if (video) {
+      const debugId = (window as any).__DEBUG_MEDIA_AUTOPLAY_ID as string | undefined;
+      const id = video.dataset.mediaAutoplayId;
+      if (debugId && id === debugId) {
+        console.log('[AutoplayDebug][HLSPlayer] event:play', {
+          id: id.slice(0, 8),
+          currentSrc: video.currentSrc,
+          readyState: video.readyState,
+          currentTime: video.currentTime,
+          duration: Number.isFinite(video.duration) ? video.duration : null,
+          isAttached: isAttachedRef.current,
+        });
+      }
+
+      if (!hasFirstFrame) {
+        waitForFirstFrame(video);
+      }
     }
     
     onPlay?.();
@@ -471,6 +526,22 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     if (!mountedRef.current) return;
     
     setIsPlaying(false);
+
+    const video = videoRef.current;
+    if (video) {
+      const debugId = (window as any).__DEBUG_MEDIA_AUTOPLAY_ID as string | undefined;
+      const id = video.dataset.mediaAutoplayId;
+      if (debugId && id === debugId) {
+        console.log('[AutoplayDebug][HLSPlayer] event:pause', {
+          id: id.slice(0, 8),
+          currentSrc: video.currentSrc,
+          readyState: video.readyState,
+          currentTime: video.currentTime,
+          isAttached: isAttachedRef.current,
+        });
+      }
+    }
+
     // Do NOT re-show poster on pause - keep last video frame visible
     // Poster only comes back on detach/ended/error
     onPause?.();

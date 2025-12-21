@@ -73,6 +73,20 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   
   // State
   const [playingIds, setPlayingIds] = useState<Set<string>>(new Set());
+
+  // Autoplay debug plumbing (targets window.__DEBUG_MEDIA_AUTOPLAY_ID)
+  const debugVideoCleanupRef = useRef<Map<string, () => void>>(new Map());
+  const debugSnapshotRef = useRef<string>('');
+  const debugLog = useCallback((id: string, event: string, data?: Record<string, unknown>) => {
+    const debugId = (window as any).__DEBUG_MEDIA_AUTOPLAY_ID as string | undefined;
+    if (!debugId || id !== debugId) return;
+    const label = (window as any).__DEBUG_MEDIA_AUTOPLAY_LABEL as string | undefined;
+    console.log('[AutoplayDebug]', event, {
+      id: id.slice(0, 8),
+      label,
+      ...data,
+    });
+  }, []);
   
   // Scroll protection
   const isScrolling = useRef(false);
@@ -95,30 +109,40 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   // ============ Core Playback Logic ============
   
   const updatePlayback = useCallback(() => {
+    const debugId = (window as any).__DEBUG_MEDIA_AUTOPLAY_ID as string | undefined;
+
     // Don't play if scrolling fast or tab hidden
     if (isScrolling.current || !isTabVisible.current) {
+      if (debugId && (visibleIds.current.has(debugId) || registry.current.has(debugId))) {
+        debugLog(debugId, 'updatePlayback:blocked', {
+          isScrolling: isScrolling.current,
+          isTabVisible: isTabVisible.current,
+          visible: visibleIds.current.has(debugId),
+          inRegistry: registry.current.has(debugId),
+        });
+      }
       pauseAllLocal();
       return;
     }
-    
+
     const items = Array.from(registry.current.values());
-    
+
     // Get visible candidates
     const visibleCandidates = items.filter(
       (item) => item.isCandidate && visibleIds.current.has(item.id)
     );
-    
+
     // Sort by sortIndex (stable grid order)
     visibleCandidates.sort((a, b) => a.sortIndex - b.sortIndex);
-    
+
     // In grid mode: play first candidate only
     // In feed mode: play first candidate, keep warm ±N
     const toPlay = new Set<string>();
     const toWarm = new Set<string>();
-    
+
     if (visibleCandidates.length > 0) {
       toPlay.add(visibleCandidates[0].id);
-      
+
       if (mode === 'feed') {
         // Warm window around current
         const currentIdx = 0;
@@ -129,15 +153,39 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
         }
       }
     }
-    
+
+    if (debugId && (visibleIds.current.has(debugId) || registry.current.has(debugId))) {
+      const reg = registry.current.get(debugId);
+      const el = reg?.element;
+      const snapshot = JSON.stringify({
+        tabVisible: isTabVisible.current,
+        isScrolling: isScrolling.current,
+        isVisible: visibleIds.current.has(debugId),
+        shouldPlay: toPlay.has(debugId),
+        shouldWarm: toWarm.has(debugId),
+        inRegistry: !!reg,
+        paused: el?.paused,
+        ended: el?.ended,
+        readyState: el?.readyState,
+        currentTime: el?.currentTime,
+        currentSrc: el?.currentSrc,
+        prewarmed: (el as any)?.__hlsPlayerRef ? true : false,
+        attached: (el as any)?.__hlsPlayerRef?.isAttached?.(),
+      });
+      if (snapshot !== debugSnapshotRef.current) {
+        debugSnapshotRef.current = snapshot;
+        debugLog(debugId, 'updatePlayback:snapshot', JSON.parse(snapshot));
+      }
+    }
+
     const newPlayingIds = new Set<string>();
-    
+
     items.forEach((item) => {
       if (!item.element) return;
-      
+
       const shouldPlay = toPlay.has(item.id);
       const shouldWarm = toWarm.has(item.id);
-      
+
       if (shouldPlay) {
         // Check if already playing to avoid play() churn
         if (!item.element.paused && !item.element.ended) {
@@ -147,14 +195,32 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
 
         // Ensure HLS source is attached before attempting to play (fixes re-entry after detach)
         (item.element as any).__hlsPlayerRef?.attach?.();
-        
+        if (debugId && item.id === debugId) {
+          debugLog(item.id, 'play:attempt', {
+            paused: item.element.paused,
+            readyState: item.element.readyState,
+            currentTime: item.element.currentTime,
+            currentSrc: item.element.currentSrc,
+            attached: (item.element as any).__hlsPlayerRef?.isAttached?.(),
+          });
+        }
+
         // Request play through media system
         mediaSystem.requestPlay(item.id).then((success) => {
+          if (debugId && item.id === debugId) {
+            debugLog(item.id, 'play:requestPlay:resolved', {
+              success,
+              paused: item.element.paused,
+              readyState: item.element.readyState,
+              currentSrc: item.element.currentSrc,
+              currentTime: item.element.currentTime,
+            });
+          }
           if (success) {
             setPlayingIds((prev) => new Set([...prev, item.id]));
           }
         });
-        
+
         newPlayingIds.add(item.id);
       } else if (shouldWarm) {
         // Keep warm but paused
@@ -164,17 +230,21 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
         item.element.pause();
       }
     });
-    
+
     setPlayingIds(newPlayingIds);
-  }, [pauseAllLocal, mode, warmWindowSize, mediaSystem]);
+  }, [pauseAllLocal, mode, warmWindowSize, mediaSystem, debugLog]);
   
   // ============ Registration ============
   
   const registerMedia: RegisterMediaFn = useCallback((args) => {
     const { id, element, isCandidate = true, sortIndex = 0, observeTarget } = args;
-    
+
     // Unregister
     if (!element) {
+      debugVideoCleanupRef.current.get(id)?.();
+      debugVideoCleanupRef.current.delete(id);
+      debugLog(id, 'unregister');
+
       const existing = registry.current.get(id);
       if (existing) {
         if (existing.observeTarget) {
@@ -183,24 +253,78 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
           playObserver.current?.unobserve(existing.element);
         }
         preloadObserver.current?.unobserve(existing.element);
-        
+
         // Unregister from media system
         mediaSystem.unregister(id);
       }
-      
+
       registry.current.delete(id);
       visibleIds.current.delete(id);
       updatePlayback();
       return;
     }
-    
+
+    // Debug listeners for target video
+    const debugId = (window as any).__DEBUG_MEDIA_AUTOPLAY_ID as string | undefined;
+    if (debugId && id === debugId && !debugVideoCleanupRef.current.has(id)) {
+      const el = element;
+      const events: Array<keyof HTMLMediaElementEventMap> = [
+        'loadstart',
+        'loadedmetadata',
+        'loadeddata',
+        'canplay',
+        'play',
+        'pause',
+        'waiting',
+        'stalled',
+        'seeking',
+        'seeked',
+        'emptied',
+        'error',
+      ];
+
+      const cleanups: Array<() => void> = [];
+      events.forEach((evt) => {
+        const handler = () => {
+          debugLog(id, `video:${evt}`, {
+            readyState: el.readyState,
+            paused: el.paused,
+            ended: el.ended,
+            currentTime: el.currentTime,
+            duration: Number.isFinite(el.duration) ? el.duration : null,
+            currentSrc: el.currentSrc,
+            attached: (el as any).__hlsPlayerRef?.isAttached?.(),
+            autoplayAttr: el.autoplay,
+          });
+        };
+        el.addEventListener(evt, handler);
+        cleanups.push(() => el.removeEventListener(evt, handler));
+      });
+
+      debugVideoCleanupRef.current.set(id, () => cleanups.forEach((c) => c()));
+
+      debugLog(id, 'register:debugListenersAttached', {
+        observeTarget: !!observeTarget,
+        isCandidate,
+        sortIndex,
+      });
+    }
+
     // Register with media system
     mediaSystem.register({
       id,
       element,
       kind: 'video',
     });
-    
+
+    debugLog(id, 'register', {
+      isCandidate,
+      sortIndex,
+      currentSrc: element.currentSrc,
+      readyState: element.readyState,
+      observeTarget: !!observeTarget,
+    });
+
     // Create/update registration
     const existing = registry.current.get(id);
     const registration: MediaAutoplayRegistration = {
@@ -211,14 +335,14 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
       sortIndex,
       hasBeenPreloaded: existing?.hasBeenPreloaded ?? false,
     };
-    
+
     registry.current.set(id, registration);
-    
+
     // Tag for observer callbacks
     element.dataset.mediaAutoplayId = id;
     const target = observeTarget ?? element;
     target.dataset.mediaAutoplayId = id;
-    
+
     // Observe
     if (playObserver.current) {
       playObserver.current.observe(target);
@@ -226,10 +350,10 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
     if (preloadObserver.current) {
       preloadObserver.current.observe(element);
     }
-    
+
     // Trigger playback check after short delay
     setTimeout(() => updatePlayback(), 50);
-  }, [mediaSystem, updatePlayback]);
+  }, [mediaSystem, updatePlayback, debugLog]);
   
   // ============ Scroll Protection ============
   
@@ -319,16 +443,23 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
             if (pendingDetach) {
               clearTimeout(pendingDetach);
               detachTimeouts.current.delete(id);
+              debugLog(id, 'prewarm:detachCancelled');
             }
             
-            // Near viewport - REAL prewarm: call attach() on the player
-            // Ensure we can re-attach on re-entry after detach
             const playerRef = (target as any).__hlsPlayerRef;
             const isCurrentlyAttached = playerRef?.isAttached?.() ?? false;
             const isVisible = visibleIds.current.has(id);
             const canPrewarm = prewarmedIds.current.size < maxPreloading || prewarmedIds.current.has(id);
 
+            debugLog(id, 'prewarm:intersecting', {
+              isVisible,
+              canPrewarm,
+              isAttached: isCurrentlyAttached,
+              prewarmedCount: prewarmedIds.current.size,
+            });
+
             if (!isCurrentlyAttached && (isVisible || canPrewarm)) {
+              debugLog(id, 'prewarm:attach:calling');
               playerRef?.attach?.();
             }
 
@@ -338,6 +469,7 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
               prewarmedIds.current.add(id);
               reg.hasBeenPreloaded = true;
               registry.current.set(id, reg);
+              debugLog(id, 'prewarm:marked');
             }
           } else {
             // Far from viewport - debounced detach to prevent thrash
@@ -345,8 +477,10 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
               // Only detach if not currently visible (playing)
               const isVisible = visibleIds.current.has(id);
               if (!isVisible) {
+                debugLog(id, 'prewarm:detachScheduled', { delayMs: DETACH_DELAY });
                 const timeout = setTimeout(() => {
                   const playerRef = (target as any).__hlsPlayerRef;
+                  debugLog(id, 'prewarm:detach:executing');
                   if (playerRef?.detach) {
                     playerRef.detach();
                   }
@@ -379,7 +513,7 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
       detachTimeouts.current.forEach((timeout) => clearTimeout(timeout));
       detachTimeouts.current.clear();
     };
-  }, [preloadMargin, maxPreloading]);
+  }, [preloadMargin, maxPreloading, debugLog]);
   
   // ============ Play Observer (Hysteresis) ============
   
@@ -411,6 +545,16 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
             nextVisible = false;
           }
           // Between thresholds: keep current state
+
+          if (wasVisible !== nextVisible) {
+            debugLog(id, 'visibility:changed', {
+              ratio: Number(ratio.toFixed(3)),
+              wasVisible,
+              nextVisible,
+              startThreshold,
+              stopThreshold,
+            });
+          }
           
           if (import.meta.env.DEV && wasVisible !== nextVisible) {
             console.log('[MediaAutoplay]', id.slice(0, 8), `ratio=${ratio.toFixed(2)}`, `visible: ${wasVisible} → ${nextVisible}`);
@@ -440,7 +584,7 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
       // Don't clear registry on cleanup - registrations are managed by registerMedia
       visibleIds.current.clear();
     };
-  }, [startThreshold, stopThreshold]);
+  }, [startThreshold, stopThreshold, debugLog]);
   
   return {
     registerMedia,
