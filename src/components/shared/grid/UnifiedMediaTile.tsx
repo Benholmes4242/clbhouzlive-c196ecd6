@@ -62,18 +62,26 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
     setResolvedDurationSeconds(item.durationSeconds);
   }, [item.durationSeconds]);
 
-  // Register video with autoplay hook - immediate only, sortIndex in deps
+  // Register video with autoplay hook
   useEffect(() => {
-    if (!isVideo || !videoRef.current || !registerVideo || !config.autoplayEnabled) return;
+    if (!isVideo || !registerVideo || !config.autoplayEnabled) return;
 
-    registerVideo({
-      id: item.postId,
-      element: videoRef.current,
-      isCandidate: isAutoplayCandidate,
-      sortIndex: item.sortIndex ?? 0,
-    });
+    const checkAndRegister = () => {
+      if (videoRef.current) {
+        registerVideo({
+          id: item.postId,
+          element: videoRef.current,
+          isCandidate: isAutoplayCandidate,
+          sortIndex: item.sortIndex ?? 0,
+        });
+      }
+    };
+
+    checkAndRegister();
+    const retryTimer = setTimeout(checkAndRegister, 100);
 
     return () => {
+      clearTimeout(retryTimer);
       registerVideo({
         id: item.postId,
         element: null,
@@ -81,7 +89,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
         sortIndex: item.sortIndex ?? 0,
       });
     };
-  }, [isVideo, registerVideo, item.postId, isAutoplayCandidate, item.sortIndex, config.autoplayEnabled]);
+  }, [item.postId, isVideo, isAutoplayCandidate, item.sortIndex, registerVideo, config.autoplayEnabled]);
 
   const handleCanPlay = useCallback(() => {
     setIsVideoReady(true);

@@ -33,10 +33,6 @@ export async function safePlay(
   
   console.log(`[safePlay] Starting for video ${videoId}, readyState: ${video.readyState}, currentTime: ${video.currentTime}`);
   
-  // Detect HLS source - HLS.js only buffers AFTER play() is called, so skip readyState gate
-  const src = video.currentSrc || video.src || '';
-  const isHLS = src.includes('.m3u8') || video.dataset.gridUsesHlsJs === '1';
-  
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       // If document is hidden, wait for visibility
@@ -46,8 +42,7 @@ export async function safePlay(
       }
       
       // Wait for video to have enough data to play (with timeout)
-      // SKIP for HLS: HLS.js only starts buffering after play() is called
-      if (!isHLS && video.readyState < 2) { // HAVE_CURRENT_DATA
+      if (video.readyState < 2) { // HAVE_CURRENT_DATA
         console.log(`[safePlay] Waiting for readyState >= 2 for video ${videoId}, attempt ${attempt}`);
         const readyStateReached = await Promise.race([
           waitForReadyState(video, 2),

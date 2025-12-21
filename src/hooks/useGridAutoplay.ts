@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { safePlay } from '@/utils/safePlay';
 
 type VideoRegistration = {
   id: string;
@@ -105,45 +104,36 @@ export function useGridAutoplay(
         // IMPORTANT: for HLS/HLS.js sources, readyState can remain low until a play()
         // attempt kicks off buffering. So we always attempt play() for the chosen video.
         const attemptPlay = () => {
-          safePlay(v.element)
-            .then((ok) => {
+          v.element.play()
+            .then(() => {
               pendingPlayRef.current.delete(v.id);
-              if (ok) {
-                if (import.meta.env.DEV) {
-                  console.log('[GridAutoplay][play] success', v.id);
-                }
-                return;
+              if (import.meta.env.DEV) {
+                console.log('[GridAutoplay][play] success', v.id);
               }
-
+            })
+            .catch((err: Error) => {
               if (import.meta.env.DEV) {
                 console.error('[GridAutoplay][playError]', v.id, {
+                  name: err.name,
+                  message: err.message,
                   readyState: v.element.readyState,
                   networkState: v.element.networkState,
                   muted: v.element.muted,
                 });
               }
-
               // Retry once after a short delay if still visible and candidate
               if (!pendingPlayRef.current.has(v.id) && visibleRef.current.has(v.id)) {
                 pendingPlayRef.current.add(v.id);
                 requestAnimationFrame(() => {
                   setTimeout(() => {
                     if (visibleRef.current.has(v.id) && v.isCandidate && v.element.paused) {
-                      safePlay(v.element).finally(() => {
+                      v.element.play().catch(() => {
                         pendingPlayRef.current.delete(v.id);
                       });
-                    } else {
-                      pendingPlayRef.current.delete(v.id);
                     }
+                    pendingPlayRef.current.delete(v.id);
                   }, 200);
                 });
-              }
-            })
-            .catch((err: unknown) => {
-              // safePlay should not throw in normal cases, but guard anyway
-              pendingPlayRef.current.delete(v.id);
-              if (import.meta.env.DEV) {
-                console.error('[GridAutoplay][playError]', v.id, err);
               }
             });
         };

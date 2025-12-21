@@ -41,38 +41,61 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaWrapRef = useRef<HTMLDivElement>(null);
-  const isVideo = !!video.mediaUrl;
-
-  const [isVideoReady, setIsVideoReady] = useState(false);
-  const [hasVideoError, setHasVideoError] = useState(false);
+  const hasVideo = !!video.mediaUrl;
 
 
-  // Reset state when switching videos
+  // Store videoIndex in a ref so registration doesn't retrigger when it changes
+  const videoIndexRef = useRef(videoIndex);
+  videoIndexRef.current = videoIndex;
+
+  // Register video with grid autoplay system using useLayoutEffect for ref timing
   useEffect(() => {
-    setIsVideoReady(false);
-    setHasVideoError(false);
-  }, [video.id, video.mediaUrl]);
+    if (!registerVideo || !hasVideo) return;
 
-  // Register video with grid autoplay system - immediate only, videoIndex in deps
-  useEffect(() => {
-    if (!isVideo || !videoRef.current || !registerVideo) return;
+    // Every video is a candidate for autoplay in long-form context
+    const isCandidate = true;
 
-    registerVideo({
-      id: video.id,
-      element: videoRef.current,
-      isCandidate: true,
-      sortIndex: videoIndex,
-    });
+    const registerWithRef = () => {
+      const videoEl = videoRef.current;
+      const wrapperEl = mediaWrapRef.current;
+      
+      if (videoEl && wrapperEl) {
+        if (import.meta.env.DEV) {
+          console.log('[LongFormTile][register]', video.id.slice(0, 8), {
+            hasVideoEl: !!videoEl,
+            hasWrapperEl: !!wrapperEl,
+            sortIndex: videoIndexRef.current,
+          });
+        }
+        registerVideo({
+          id: video.id,
+          element: videoEl,
+          viewportEl: wrapperEl,
+          isCandidate,
+          sortIndex: videoIndexRef.current,
+        });
+      } else {
+        // Refs not ready, retry
+        requestAnimationFrame(registerWithRef);
+      }
+    };
+
+    // Use requestAnimationFrame for better ref timing than setTimeout
+    const rafId = requestAnimationFrame(registerWithRef);
 
     return () => {
+      cancelAnimationFrame(rafId);
+      // Deregister on unmount
       registerVideo({
         id: video.id,
         element: null,
-        isCandidate: true,
-        sortIndex: videoIndex,
+        isCandidate,
+        sortIndex: videoIndexRef.current,
       });
     };
-  }, [isVideo, registerVideo, video.id, videoIndex]);
+    // IMPORTANT: Do NOT include videoIndex in deps - use ref instead to prevent re-registration
+    // when section order changes due to lazy loading
+  }, [registerVideo, video.id, hasVideo]);
 
   const formatLikes = (count?: number): string => {
     if (!count) return '0';
@@ -99,30 +122,14 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
         ref={mediaWrapRef}
         className="relative w-full aspect-[16/9] overflow-hidden bg-muted"
       >
-        {isVideo ? (
+        {hasVideo ? (
           <>
-            {/* Thumbnail ALWAYS visible as fallback (prevents grey box on WebView failures) */}
-            {video.thumbnailUrl && (
-              <img
-                src={video.thumbnailUrl}
-                alt={video.title}
-                className="absolute inset-0 w-full h-full object-cover"
-                loading="lazy"
-                draggable={false}
-              />
-            )}
-
-            {/* Video layer - fades in when ready */}
+            {/* Video element for autoplay (uses poster attribute as fallback) */}
             <GridAutoplayVideo
               ref={videoRef}
               src={video.mediaUrl!}
               poster={video.thumbnailUrl}
-              onCanPlay={() => setIsVideoReady(true)}
-              onError={() => setHasVideoError(true)}
-              className={cn(
-                "absolute inset-0 w-full h-full object-cover transition-opacity duration-150",
-                isVideoReady && !hasVideoError ? "opacity-100" : "opacity-0"
-              )}
+              className="absolute inset-0 w-full h-full object-cover"
             />
           </>
         ) : video.thumbnailUrl ? (

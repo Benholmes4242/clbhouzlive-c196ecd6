@@ -3,13 +3,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 type Key = string;
 
-/**
- * SlidingPanels - Tab panel switcher with fade animation
- * 
- * IMPORTANT: Uses fade-only animation (no x/y transforms) to ensure
- * IntersectionObserver works reliably in iOS WKWebView/Capacitor.
- * Transform-based animations can break IO visibility calculations.
- */
 export default function SlidingPanels<T extends Key = string>({
   activeKey,
   children,
@@ -23,10 +16,10 @@ export default function SlidingPanels<T extends Key = string>({
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={String(activeKey)}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.15, ease: 'easeOut' }}
+          initial={{ opacity: 0, x: 24 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -24 }}
+          transition={{ duration: 0.22, ease: [0.2, 0, 0, 1] }}
           style={{ position: 'relative' }}
         >
           {children(activeKey)}

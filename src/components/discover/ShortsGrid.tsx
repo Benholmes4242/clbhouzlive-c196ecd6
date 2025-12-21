@@ -14,15 +14,15 @@ interface ShortsGridProps {
   currentUserId?: string;
 }
 
-// Grid config for Watch page - ALIGNED WITH BUSINESS ACTIVITY
+// Grid config for Watch page
 const WATCH_GRID_CONFIG: UnifiedGridConfig = {
   showCreator: true,
   showLikes: true,
   infiniteScroll: true,
   pageSize: 24,
   autoplayEnabled: true,
-  maxAutoplay: 1, // Match Business Activity
-  visibilityThreshold: 0.6, // Match Business Activity
+  maxAutoplay: 2,
+  visibilityThreshold: 0.6,
   surface: 'watch', // Watch surface - tap opens Shorts Player
 };
 
