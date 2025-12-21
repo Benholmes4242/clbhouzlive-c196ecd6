@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { VIDEO_DURATION_THRESHOLD_SECONDS } from '@/constants/videoRules';
 import { LongFormVideo } from '@/components/videos/LongFormVideoTile';
 import { ENABLE_MOCK_LONGFORM_VIDEOS, getMockVideosBySection } from '@/data/mockLongFormVideos';
+import { getStreamIdFromUrl } from '@/utils/stream';
 
 interface UseLongFormVideosOptions {
   section?: 'recommended' | 'trending' | 'following' | 'courses' | 'all';
@@ -155,7 +156,7 @@ async function fetchLongFormVideos(options: Omit<UseLongFormVideosOptions, 'enab
   const videosWithScores: VideoWithScore[] = data.map((post: any) => {
     const media = post.post_media?.[0];
     const user = profileMap.get(post.user_id);
-    
+
     const golfTag = post.post_tags?.find(
       (tag: any) => tag.taggable_entities?.entity_type === 'golf_club'
     );
@@ -167,6 +168,13 @@ async function fetchLongFormVideos(options: Omit<UseLongFormVideosOptions, 'enab
     const boostScore = getBoostScore ? getBoostScore(post.user_id, category) : 0;
     const score = baseScore + boostScore;
 
+    // IMPORTANT: normalize Cloudflare Stream URLs to videodelivery.net HLS manifests
+    // The raw customer-*.cloudflarestream.com URLs can fail playback/CORS in HLS.js.
+    const streamId = getStreamIdFromUrl(media?.media_url || '');
+    const autoplayUrl = streamId
+      ? `https://videodelivery.net/${streamId}/manifest/video.m3u8`
+      : (media?.media_url || '');
+
     const video: LongFormVideo = {
       id: post.id,
       title: post.content?.split('\n')[0]?.substring(0, 100) || 'Untitled Video',
@@ -174,7 +182,7 @@ async function fetchLongFormVideos(options: Omit<UseLongFormVideosOptions, 'enab
       creatorName: user?.display_name || user?.username || 'Unknown',
       creatorAvatarUrl: user?.profile_photo_url,
       thumbnailUrl: media?.poster_url || '',
-      mediaUrl: media?.media_url || '', // Video URL for autoplay
+      mediaUrl: autoplayUrl,
       duration: formatDuration(media?.duration_seconds || 0),
       durationSeconds: media?.duration_seconds || 0,
       views,
