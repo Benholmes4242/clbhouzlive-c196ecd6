@@ -126,11 +126,11 @@ export const CreatorPage: React.FC = () => {
       <div className="px-5 py-6">
         <div className="flex items-start gap-4">
           {/* Creator avatar */}
-          <div className="shrink-0 w-20 h-20 rounded-full overflow-hidden bg-muted">
+          <div className="shrink-0 w-20 h-20 rounded-full overflow-hidden bg-muted border border-border">
             {profile.profile_photo_url ? (
               <img
                 src={profile.profile_photo_url}
-                alt={profile.display_name || profile.username}
+                alt={profile.display_name || profile.username || 'Creator'}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -143,16 +143,16 @@ export const CreatorPage: React.FC = () => {
           {/* Creator info */}
           <div className="flex-1 min-w-0">
             <h1 className="text-xl font-semibold text-foreground truncate">
-              {profile.display_name || profile.username}
+              {profile.display_name || profile.username || 'Creator'}
             </h1>
-            {profile.username && profile.display_name && (
+            {profile.username && (
               <p className="text-sm text-muted-foreground mt-0.5">
                 @{profile.username}
               </p>
             )}
-            {/* Follower count */}
+            {/* Video count */}
             <p className="text-sm text-muted-foreground mt-1">
-              {videos.length} video{videos.length !== 1 ? 's' : ''}
+              {videosLoading ? 'Loading...' : `${videos.length} video${videos.length !== 1 ? 's' : ''}`}
             </p>
           </div>
         </div>
