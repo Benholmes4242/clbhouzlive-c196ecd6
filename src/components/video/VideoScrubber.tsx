@@ -7,19 +7,24 @@
  * Important:
  * - stopPropagation on all pointer events to prevent triggering tile click (fullscreen open)
  * - Works with autoplay: progress updates while playing, stops when paused
+ * - Integrates with MediaRuntime for intent tracking
  */
 
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
+import { MEDIA_RUNTIME_V2 } from '@/config/featureFlags';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
 interface VideoScrubberProps {
   videoEl: HTMLVideoElement | null;
+  mediaId?: string; // For runtime intent tracking
   height?: number;
   className?: string;
 }
 
 export function VideoScrubber({ 
   videoEl, 
+  mediaId,
   height = 3,
   className 
 }: VideoScrubberProps) {
@@ -138,6 +143,11 @@ export function VideoScrubber({
     
     wasPausedRef.current = videoEl.paused;
     setIsDragging(true);
+    
+    // Track user intent in MediaRuntime
+    if (MEDIA_RUNTIME_V2) {
+      MediaRuntime.trackIntent('scrub');
+    }
     
     // Seek to initial position
     const newTime = getTimeFromEvent(e.clientX);

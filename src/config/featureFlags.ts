@@ -26,6 +26,14 @@ export const USE_VIDEO_PROGRESS_SYNC_V1 = true;
 export const MEDIA_RUNTIME_V2 = true;
 
 /**
+ * Media Scrubber V1 Feature Flag
+ * 
+ * When true: shows scrubber overlay on all HLSPlayer video tiles
+ * When false: no scrubber overlay
+ */
+export const MEDIA_SCRUBBER_V1 = import.meta.env.DEV;
+
+/**
  * Hub Feature Flag
  * 
  * Phase 5: Hub is now always enabled for all users (production launch)
@@ -49,6 +57,7 @@ export const FEATURE_FLAGS = {
   SAFE_AUTOPLAY_V2: USE_SAFE_AUTOPLAY_V2,
   VIDEO_PROGRESS_SYNC_V1: USE_VIDEO_PROGRESS_SYNC_V1,
   MEDIA_RUNTIME_V2,
+  MEDIA_SCRUBBER_V1,
   HUB: HUB_ENABLED, // Always enabled - no longer feature flagged
   ENABLE_TOP100_MOCK_PLAYERS,
 } as const;

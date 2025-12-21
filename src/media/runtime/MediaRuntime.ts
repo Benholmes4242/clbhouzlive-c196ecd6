@@ -68,6 +68,7 @@ export interface RuntimeTelemetry {
 const MAX_WARM_PLAYERS = 2; // prev + next
 const SCROLL_SETTLE_DELAY = 150;
 const INTENT_SUPPRESS_DURATION = 2000; // 2s after user pause, suppress autoplay
+const SCRUB_SUPPRESS_DURATION = 600; // 600ms after scrub, suppress autoplay switching
 const MAX_RETRIES = 1;
 
 // ============ Singleton Runtime ============
@@ -525,7 +526,11 @@ class MediaRuntimeCore {
   
   private shouldSuppressAutoplay(): boolean {
     const now = Date.now();
-    return now - this.userIntent.lastManualPause < INTENT_SUPPRESS_DURATION;
+    // Suppress autoplay after manual pause or recent scrub
+    return (
+      now - this.userIntent.lastManualPause < INTENT_SUPPRESS_DURATION ||
+      now - this.userIntent.lastScrub < SCRUB_SUPPRESS_DURATION
+    );
   }
   
   // ============ State Queries ============
