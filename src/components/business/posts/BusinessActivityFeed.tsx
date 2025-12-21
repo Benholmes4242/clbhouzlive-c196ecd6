@@ -60,10 +60,9 @@ export function BusinessActivityFeed({
   const [composerMedia, setComposerMedia] = useState<ComposerMediaItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Uses default 0.4/0.25 thresholds for sentinel-based observation
   const { registerMedia, playingIds } = useMediaAutoplay({
     mode: 'grid',
-    startThreshold: 0.6,
-    stopThreshold: 0.4,
     preloadMargin: 300,
   });
 

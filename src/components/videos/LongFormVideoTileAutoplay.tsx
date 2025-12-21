@@ -91,6 +91,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
       registerVideo({
         id: video.id,
         element: null,
+        observeTarget: null, // Explicit cleanup
         isCandidate,
         sortIndex: videoIndexRef.current,
       });

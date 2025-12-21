@@ -177,6 +177,7 @@ export default function BusinessPostCard({
       registerVideo({
         id: post.id,
         element: null,
+        observeTarget: null, // Explicit cleanup
         isCandidate: true,
         sortIndex: videoIndex,
       });
