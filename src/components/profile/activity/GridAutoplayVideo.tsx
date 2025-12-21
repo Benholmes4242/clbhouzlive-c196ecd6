@@ -1,5 +1,7 @@
-import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import React, { useEffect, useRef, forwardRef, useImperativeHandle, useState } from 'react';
 import Hls from 'hls.js';
+import { Play } from 'lucide-react';
+import { safePlay } from '@/utils/safePlay';
 
 interface GridAutoplayVideoProps {
   src: string;
@@ -18,6 +20,7 @@ const GridAutoplayVideo = forwardRef<HTMLVideoElement, GridAutoplayVideoProps>(
     const videoRef = useRef<HTMLVideoElement>(null);
     const hlsRef = useRef<Hls | null>(null);
     const hlsReadyRef = useRef(false);
+    const [hasError, setHasError] = useState(false);
 
     // Expose video element to parent
     useImperativeHandle(ref, () => videoRef.current as HTMLVideoElement);
@@ -79,18 +82,59 @@ const GridAutoplayVideo = forwardRef<HTMLVideoElement, GridAutoplayVideoProps>(
       hlsReadyRef.current = true;
     }, [src, onCanPlay]);
 
-    return (
-      <video
-        ref={videoRef}
-        poster={poster}
-        muted
-        loop
-        playsInline
-        preload="metadata"
-        onCanPlay={onCanPlay}
-        className={className}
-      />
-    );
+    const handleError = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+      const video = e.currentTarget;
+      console.error('[GridAutoplayVideo] Error', {
+        code: video.error?.code,
+        message: video.error?.message,
+        src: video.currentSrc || src,
+      });
+      setHasError(true);
+    };
+
+    const handleTapToPlay = () => {
+      const video = videoRef.current;
+      if (video) {
+        setHasError(false);
+        safePlay(video);
+      }
+    };
+
+    // Error fallback UI
+    if (hasError && poster) {
+      return (
+        <div 
+          className={`relative ${className}`}
+          onClick={handleTapToPlay}
+        >
+          <img 
+            src={poster} 
+            alt="" 
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+            <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
+              <Play className="h-5 w-5 text-foreground ml-0.5" fill="currentColor" />
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return React.createElement('video', {
+      ref: videoRef,
+      poster,
+      muted: true,
+      loop: true,
+      playsInline: true,
+      'webkit-playsinline': 'true',
+      'x5-playsinline': 'true',
+      crossOrigin: 'anonymous',
+      preload: 'metadata',
+      onCanPlay,
+      onError: handleError,
+      className,
+    });
   }
 );
 
