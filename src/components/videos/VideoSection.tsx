@@ -69,8 +69,8 @@ export const VideoSection: React.FC<VideoSectionProps> = ({
         )}
       </div>
 
-      {/* Video cards with bluey-grey divider background */}
-      <div className="space-y-3 px-4">
+      {/* Video cards - full width with divider background visible between */}
+      <div className="space-y-3">
         {videos.map((video) => (
           <LongFormVideoTile
             key={video.id}
