@@ -69,8 +69,8 @@ export const VideoSection: React.FC<VideoSectionProps> = ({
         )}
       </div>
 
-      {/* Video grid */}
-      <div className="px-5 grid grid-cols-1 gap-5">
+      {/* Video cards with bluey-grey divider background */}
+      <div className="space-y-3 px-4">
         {videos.map((video) => (
           <LongFormVideoTile
             key={video.id}

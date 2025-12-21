@@ -187,8 +187,11 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     return <VideosSectionPage />;
   }
 
+  // Bluey-grey background color matching profile page divider
+  const BG_COLOR = '#f8fafc'; // slate-50
+
   return (
-    <div className={cn("min-h-screen pb-20", className)}>
+    <div className={cn("min-h-screen pb-20", className)} style={{ background: BG_COLOR }}>
       {/* Queue reminder nudge */}
       {showQueueReminder && (
         <div className="px-5 mb-4">
