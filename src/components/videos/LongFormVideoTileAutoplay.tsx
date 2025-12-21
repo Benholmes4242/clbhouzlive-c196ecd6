@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Play, Flame, Heart } from 'lucide-react';
 import { VideoQueueMenu } from './VideoQueueMenu';
@@ -7,7 +7,6 @@ import { HLSPlayer, HLSPlayerRef, runtimeUserTap } from '@/media';
 import type { QueueItemMeta } from '@/hooks/useVideoQueue';
 import type { RegisterMediaFn } from '@/media';
 import type { LongFormVideo } from './LongFormVideoTile';
-import { VideoScrubber } from '@/components/video/VideoScrubber';
 
 // Re-export for convenience
 export type { LongFormVideo };
@@ -43,7 +42,6 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
   const playerRef = useRef<HLSPlayerRef>(null);
   const mediaWrapRef = useRef<HTMLDivElement>(null);
   const tileRef = useRef<HTMLDivElement>(null); // Sentinel for IntersectionObserver
-  const [videoEl, setVideoEl] = useState<HTMLVideoElement | null>(null);
   const hasVideo = !!video.mediaUrl;
 
 
@@ -134,7 +132,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
       >
         {hasVideo ? (
           <>
-            {/* HLSPlayer - unified video component with poster crossfade */}
+            {/* HLSPlayer - unified video component with poster crossfade + built-in scrubber */}
             <HLSPlayer
               ref={playerRef}
               src={video.mediaUrl!}
@@ -146,16 +144,8 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
               objectFit="cover"
               externallyManaged
               mediaId={video.id}
-              onLoadedData={() => {
-                const el = playerRef.current?.getElement();
-                if (el) setVideoEl(el);
-              }}
               className="absolute inset-0 w-full h-full"
             />
-            {/* Video scrubber - positioned at bottom of media */}
-            {videoEl && (
-              <VideoScrubber videoEl={videoEl} mediaId={video.id} height={3} />
-            )}
           </>
         ) : video.thumbnailUrl ? (
           <img
