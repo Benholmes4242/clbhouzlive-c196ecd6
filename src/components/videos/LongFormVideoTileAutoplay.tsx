@@ -7,6 +7,7 @@ import { HLSPlayer, HLSPlayerRef } from '@/media';
 import type { QueueItemMeta } from '@/hooks/useVideoQueue';
 import type { RegisterMediaFn } from '@/media';
 import type { LongFormVideo } from './LongFormVideoTile';
+import { VideoScrubber } from '@/components/video/VideoScrubber';
 
 // Re-export for convenience
 export type { LongFormVideo };
@@ -42,6 +43,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
   const playerRef = useRef<HLSPlayerRef>(null);
   const mediaWrapRef = useRef<HTMLDivElement>(null);
   const tileRef = useRef<HTMLDivElement>(null); // Sentinel for IntersectionObserver
+  const [videoEl, setVideoEl] = useState<HTMLVideoElement | null>(null);
   const hasVideo = !!video.mediaUrl;
 
 
@@ -139,8 +141,16 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
               aspectRatio="16:9"
               objectFit="cover"
               externallyManaged
+              onLoadedData={() => {
+                const el = playerRef.current?.getElement();
+                if (el) setVideoEl(el);
+              }}
               className="absolute inset-0 w-full h-full"
             />
+            {/* Video scrubber - positioned at bottom of media */}
+            {videoEl && (
+              <VideoScrubber videoEl={videoEl} height={3} />
+            )}
           </>
         ) : video.thumbnailUrl ? (
           <img

@@ -5,6 +5,7 @@ import { OverlayCorners } from '@/components/shared/overlay';
 import { HLSPlayer, HLSPlayerRef, RegisterMediaFn } from '@/media';
 import { Images, Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { VideoScrubber } from '@/components/video/VideoScrubber';
 
 interface UnifiedMediaTileProps {
   item: UnifiedMediaItem;
@@ -39,6 +40,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   const playerRef = useRef<HLSPlayerRef>(null);
   const tileRef = useRef<HTMLButtonElement>(null); // Sentinel for IntersectionObserver
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [videoEl, setVideoEl] = useState<HTMLVideoElement | null>(null);
   const [resolvedDurationSeconds, setResolvedDurationSeconds] = useState<number | null | undefined>(
     item.durationSeconds
   );
@@ -97,6 +99,10 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
 
   const handleCanPlay = useCallback(() => {
     setIsVideoReady(true);
+    
+    // Capture video element reference for scrubber
+    const el = playerRef.current?.getElement();
+    if (el) setVideoEl(el);
 
     const dbDuration = item.durationSeconds;
     const hasValidDbDuration = typeof dbDuration === 'number' && Number.isFinite(dbDuration) && dbDuration > 0;
@@ -174,6 +180,11 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
             isVideoReady ? "opacity-100" : "opacity-0"
           )}
         />
+      )}
+
+      {/* Video scrubber - positioned at bottom of media, above gradient/meta */}
+      {isVideo && isVideoReady && videoEl && (
+        <VideoScrubber videoEl={videoEl} height={3} />
       )}
 
       {/* Bottom gradient overlay for text legibility */}
