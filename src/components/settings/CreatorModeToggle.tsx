@@ -1,6 +1,8 @@
 import React from 'react';
-import { Video, TrendingUp, Pin, Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Video, TrendingUp, Pin, Sparkles, ExternalLink } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -23,6 +25,7 @@ export function CreatorModeToggle({ userId, isCreator }: CreatorModeToggleProps)
   const [enabled, setEnabled] = React.useState(isCreator);
   const [isUpdating, setIsUpdating] = React.useState(false);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const handleToggle = async (checked: boolean) => {
     setIsUpdating(true);
@@ -112,6 +115,17 @@ export function CreatorModeToggle({ userId, isCreator }: CreatorModeToggleProps)
           ))}
         </div>
       </div>
+
+      {/* View Creator Page button */}
+      <Button
+        variant="outline"
+        size="sm"
+        className="w-full gap-2"
+        onClick={() => navigate(`/creator/${userId}`)}
+      >
+        <ExternalLink className="h-4 w-4" />
+        View my creator page
+      </Button>
 
       {/* Explainer */}
       <p className="text-xs text-[#97A1AA] leading-relaxed">
