@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Play, Flame, Heart } from 'lucide-react';
 import { VideoQueueMenu } from './VideoQueueMenu';
@@ -40,7 +40,13 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
   videoIndex = 0,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const mediaWrapRef = useRef<HTMLDivElement>(null);
   const hasVideo = !!video.mediaUrl;
+
+  // Dev-only diagnostics overlay (Discover → Videos)
+  const isDev = import.meta.env.DEV;
+  const [isRegistered, setIsRegistered] = useState(false);
+  const [intersectionRatio, setIntersectionRatio] = useState(0);
 
   // Register video with grid autoplay system
   useEffect(() => {
@@ -57,6 +63,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
           isCandidate,
           sortIndex: videoIndex,
         });
+        setIsRegistered(true);
       }
     };
 
@@ -65,6 +72,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
 
     return () => {
       clearTimeout(timeout);
+      setIsRegistered(false);
       // Deregister on unmount
       registerVideo({
         id: video.id,
@@ -74,6 +82,25 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
       });
     };
   }, [registerVideo, video.id, videoIndex, hasVideo]);
+
+  // Track tile visibility ratio (debug)
+  useEffect(() => {
+    if (!isDev) return;
+
+    const el = mediaWrapRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry) setIntersectionRatio(entry.intersectionRatio);
+      },
+      { threshold: [0, 0.1, 0.6, 1] }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [isDev]);
 
   const formatLikes = (count?: number): string => {
     if (!count) return '0';
@@ -96,7 +123,10 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
       onClick={() => onVideoClick?.(video.id)}
     >
       {/* Media Section - 16:9 aspect ratio */}
-      <div className="relative w-full aspect-[16/9] overflow-hidden bg-muted">
+      <div
+        ref={mediaWrapRef}
+        className="relative w-full aspect-[16/9] overflow-hidden bg-muted"
+      >
         {hasVideo ? (
           <>
             {/* Video element for autoplay (uses poster attribute as fallback) */}
@@ -117,6 +147,17 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">
             <Play className="h-12 w-12 text-muted-foreground/40" />
+          </div>
+        )}
+
+        {/* Debug overlay (dev-only) */}
+        {isDev && (
+          <div className="absolute top-2 left-2 z-10 rounded-md border border-border/70 bg-background/80 px-2 py-1 text-[10px] leading-tight text-foreground backdrop-blur pointer-events-none">
+            <div>registered: {isRegistered ? 'yes' : 'no'}</div>
+            <div>hasMediaUrl: {hasVideo ? 'yes' : 'no'}</div>
+            <div>isPlaying: {isPlaying ? 'yes' : 'no'}</div>
+            <div>ratio: {intersectionRatio.toFixed(2)}</div>
+            <div>visible≥0.60: {intersectionRatio >= 0.6 ? 'yes' : 'no'}</div>
           </div>
         )}
 

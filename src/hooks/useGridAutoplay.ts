@@ -87,21 +87,10 @@ export function useGridAutoplay(
       if (!v.element) return;
 
       if (shouldPlay) {
-        // Only play if video is ready enough to avoid stuttering
-        if (v.element.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
-          v.element.play().catch(() => {});
-          newPlayingIds.add(v.id);
-        } else {
-          // Wait for canplay event before playing
-          const onCanPlay = () => {
-            // Re-check conditions before playing
-            if (!isScrollingRef.current && isTabVisibleRef.current && visibleRef.current.has(v.id)) {
-              v.element.play().catch(() => {});
-            }
-            v.element.removeEventListener('canplay', onCanPlay);
-          };
-          v.element.addEventListener('canplay', onCanPlay, { once: true });
-        }
+        // IMPORTANT: for HLS/HLS.js sources, readyState can remain low until a play()
+        // attempt kicks off buffering. So we always attempt play() for the chosen video.
+        v.element.play().catch(() => {});
+        newPlayingIds.add(v.id);
       } else {
         v.element.pause();
       }

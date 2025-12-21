@@ -230,7 +230,7 @@ export const useLongFormVideosQuery = (options: UseLongFormVideosOptions = {}) =
 
   // Stable query key - don't include getBoostScore (function)
   const queryKey = [
-    'long-form-videos',
+    'long-form-videos-v2',
     section,
     limit,
     followedCreatorIds.join(','),
