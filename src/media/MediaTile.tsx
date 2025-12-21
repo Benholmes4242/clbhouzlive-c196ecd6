@@ -136,7 +136,7 @@ const MediaTile: React.FC<MediaTileProps> = ({
     <div
       ref={tileRef}
       className={cn(
-        'relative overflow-hidden rounded-lg bg-muted cursor-pointer group',
+        'relative overflow-hidden rounded-lg bg-black cursor-pointer group',
         aspectClass,
         className
       )}
