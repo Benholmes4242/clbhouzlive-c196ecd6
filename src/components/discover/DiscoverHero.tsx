@@ -41,35 +41,15 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
   const navigate = useNavigate();
   const playerRef = useRef<HLSPlayerRef>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isInView, setIsInView] = useState(false);
   const [resolvedDuration, setResolvedDuration] = useState<number | undefined>(item?.durationSeconds);
 
-  // Intersection observer for autoplay when in view
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container || !item || item.mediaType !== 'video') return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsInView(entry.isIntersecting);
-      },
-      { threshold: 0.5 }
-    );
-
-    observer.observe(container);
-    return () => observer.disconnect();
-  }, [item]);
-
-  // Control playback based on visibility
-  useEffect(() => {
-    if (!playerRef.current || item?.mediaType !== 'video') return;
-    
-    if (isInView) {
-      playerRef.current.play();
-    } else {
-      playerRef.current.pause();
-    }
-  }, [isInView, item?.mediaType]);
+  // NOTE: DiscoverHero is now PASSIVE - no autoplay.
+  // The hero video only plays when user taps it (opens fullscreen).
+  // This prevents the hero's IntersectionObserver from competing with
+  // the grid autoplay system managed by MediaRuntime.
+  // 
+  // Previously this had its own observer that called play()/pause() directly,
+  // which caused "fighting" with grid autoplay and unpredictable behavior.
 
   // Update resolved duration when item changes
   useEffect(() => {
