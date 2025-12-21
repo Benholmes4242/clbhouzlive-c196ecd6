@@ -2,7 +2,7 @@ import React, { useMemo, useRef, useEffect, useCallback } from 'react';
 import { UnifiedMediaGridProps, UnifiedMediaItem, GRID_GAP_PX } from './types';
 import { buildUnifiedLayout, markAutoplayCandidates } from './layoutUtils';
 import UnifiedMediaTile from './UnifiedMediaTile';
-import { useGridAutoplay } from '@/hooks/useGridAutoplay';
+import { useMediaAutoplay } from '@/media';
 
 /**
  * Unified Media Grid - Single source of truth for Watch and Profile Activity grids
@@ -33,10 +33,11 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
   const gridRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
 
-  // Set up autoplay hook
-  const { registerVideo, playingIds } = useGridAutoplay({
-    maxPlaying: config.maxAutoplay ?? 2,
-    visibilityThreshold: config.visibilityThreshold ?? 0.6,
+  // Set up autoplay hook - new unified system
+  const { registerMedia, playingIds } = useMediaAutoplay({
+    mode: 'grid',
+    startThreshold: config.visibilityThreshold ?? 0.6,
+    stopThreshold: 0.4,
   });
 
   // Mark autoplay candidates and build layout
@@ -139,7 +140,7 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
                   index={flatIndex}
                   onPress={handleItemClick}
                   onAuthorClick={handleAuthorClick}
-                  registerVideo={registerVideo}
+                  registerVideo={registerMedia}
                   isPlaying={playingIds.has(item.postId)}
                 />
               );
@@ -157,7 +158,7 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
                   index={flatIndex}
                   onPress={handleItemClick}
                   onAuthorClick={handleAuthorClick}
-                  registerVideo={registerVideo}
+                  registerVideo={registerMedia}
                   isPlaying={playingIds.has(item.postId)}
                 />
               );

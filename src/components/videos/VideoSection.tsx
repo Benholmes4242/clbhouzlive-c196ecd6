@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
 import { LongFormVideoTileAutoplay, LongFormVideo } from './LongFormVideoTileAutoplay';
-import type { RegisterVideoFn } from '@/hooks/useGridAutoplay';
+import type { RegisterMediaFn } from '@/media';
 
 interface VideoSectionProps {
   title: string;
@@ -14,8 +14,8 @@ interface VideoSectionProps {
   showViewAll?: boolean;
   emptyState?: React.ReactNode;
   className?: string;
-  // Autoplay integration
-  registerVideo?: RegisterVideoFn;
+  // Autoplay integration - supports both old and new systems
+  registerVideo?: RegisterMediaFn;
   playingIds?: Set<string>;
   startIndex?: number; // Starting index for sortIndex calculation
 }

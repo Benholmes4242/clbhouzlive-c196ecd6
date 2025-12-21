@@ -17,6 +17,7 @@ import AuthWrapper from "@/components/auth/AuthWrapper";
 import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
 import { VideoManagerProvider } from './contexts/VideoManagerContext';
 import { VideoPlaybackManagerProvider } from './contexts/VideoPlaybackManager';
+import { MediaSystemProvider } from './media';
 import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
 import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { usePresenceTracker } from '@/hooks/usePresenceTracker';
@@ -576,12 +577,13 @@ const AppInner: React.FC = () => {
                       <ActiveActorProvider>
                         <ScrollToTop />
                         <ScrollRestoration />
-                        <GlobalAudioProvider>
-                          <VideoManagerProvider>
-                            <VideoPlaybackManagerProvider>
-                              <TopTenProvider>
-                                <VideoPlaybackProvider>
-                                  <ErrorBoundary>
+                        <MediaSystemProvider>
+                          <GlobalAudioProvider>
+                            <VideoManagerProvider>
+                              <VideoPlaybackManagerProvider>
+                                <TopTenProvider>
+                                  <VideoPlaybackProvider>
+                                    <ErrorBoundary>
                                     <AuthWrapper>
                                       <SeasonWrapModal />
                                       <AchievementToastWrapper />
@@ -597,12 +599,13 @@ const AppInner: React.FC = () => {
                                         <GlobalQueueDrawer />
                                       </Suspense>
                                     </AuthWrapper>
-                                  </ErrorBoundary>
-                                </VideoPlaybackProvider>
-                              </TopTenProvider>
-                            </VideoPlaybackManagerProvider>
-                          </VideoManagerProvider>
-                        </GlobalAudioProvider>
+                                    </ErrorBoundary>
+                                  </VideoPlaybackProvider>
+                                </TopTenProvider>
+                              </VideoPlaybackManagerProvider>
+                            </VideoManagerProvider>
+                          </GlobalAudioProvider>
+                        </MediaSystemProvider>
                         <Toaster />
                         <Sonner />
                         <GlobalBottomNavigation />

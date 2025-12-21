@@ -14,7 +14,7 @@ import { ComposerMediaItem } from '@/hooks/useSnapModal';
 import { useOptimisticPostSubmission } from '@/hooks/useOptimisticPostSubmission';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
-import { useGridAutoplay } from '@/hooks/useGridAutoplay';
+import { useMediaAutoplay } from '@/media';
 import { cn } from '@/lib/utils';
 import { Image as ImageIcon, Plus, Users, RefreshCw } from 'lucide-react';
 import BusinessPostCard from './BusinessPostCard';
@@ -60,9 +60,10 @@ export function BusinessActivityFeed({
   const [composerMedia, setComposerMedia] = useState<ComposerMediaItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { registerVideo, playingIds } = useGridAutoplay({
-    maxPlaying: 1,
-    visibilityThreshold: 0.6,
+  const { registerMedia, playingIds } = useMediaAutoplay({
+    mode: 'grid',
+    startThreshold: 0.6,
+    stopThreshold: 0.4,
     preloadMargin: 300,
   });
 
@@ -308,7 +309,7 @@ export function BusinessActivityFeed({
                   businessLogo={businessLogo}
                   followerCount={followerCount}
                   canManage={canManage}
-                  registerVideo={registerVideo}
+                  registerVideo={registerMedia}
                   isPlaying={playingIds.has(post.id)}
                   videoIndex={index}
                 />
