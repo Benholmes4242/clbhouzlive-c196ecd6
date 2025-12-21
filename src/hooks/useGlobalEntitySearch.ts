@@ -190,14 +190,12 @@ const searchVideos = async (query: string, limit: number = 6): Promise<VideoResu
         duration_seconds,
         poster_url
       ),
-      user_profiles!posts_user_id_fkey(
+      user_profiles(
         id,
         display_name,
         username
       ),
-      post_stats(
-        views_count
-      )
+      post_views(count)
     `)
     .eq('post_media.media_type', 'video')
     .gte('post_media.duration_seconds', VIDEO_DURATION_THRESHOLD_SECONDS)
@@ -213,7 +211,6 @@ const searchVideos = async (query: string, limit: number = 6): Promise<VideoResu
   return (data || []).map((post: any) => {
     const media = post.post_media?.[0];
     const user = post.user_profiles;
-    const stats = post.post_stats?.[0];
 
     return {
       id: post.id,
@@ -222,7 +219,7 @@ const searchVideos = async (query: string, limit: number = 6): Promise<VideoResu
       creator_name: user?.display_name || user?.username || 'Unknown',
       creator_id: post.user_id,
       duration: formatDuration(media?.duration_seconds || 0),
-      views: stats?.views_count || 0,
+      views: post.post_views?.[0]?.count || 0,
       type: 'video' as const
     };
   });

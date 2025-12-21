@@ -90,16 +90,14 @@ async function fetchLongFormVideos(options: Omit<UseLongFormVideosOptions, 'enab
           name
         )
       ),
-      user_profiles!posts_user_id_fkey(
+      user_profiles(
         id,
         display_name,
         username,
         profile_photo_url
       ),
-      post_stats(
-        likes_count,
-        views_count
-      )
+      post_likes(count),
+      post_views(count)
     `)
     .eq('post_media.media_type', 'video')
     .gte('post_media.duration_seconds', VIDEO_DURATION_THRESHOLD_SECONDS)
@@ -148,14 +146,14 @@ async function fetchLongFormVideos(options: Omit<UseLongFormVideosOptions, 'enab
   const videosWithScores: VideoWithScore[] = (data || []).map((post: any) => {
     const media = post.post_media?.[0];
     const user = post.user_profiles;
-    const stats = post.post_stats?.[0];
     
     const golfTag = post.post_tags?.find(
       (tag: any) => tag.taggable_entities?.entity_type === 'golf_club'
     );
 
-    const views = stats?.views_count || 0;
-    const likes = stats?.likes_count || 0;
+    // Get counts from aggregated relations
+    const views = post.post_views?.[0]?.count || 0;
+    const likes = post.post_likes?.[0]?.count || 0;
     const baseScore = calculateScore(views, likes);
     const boostScore = getBoostScore ? getBoostScore(post.user_id, category) : 0;
     const score = baseScore + boostScore;

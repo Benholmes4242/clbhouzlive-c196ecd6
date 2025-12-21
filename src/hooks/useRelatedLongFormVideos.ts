@@ -78,14 +78,14 @@ export const useRelatedLongFormVideos = (
 
         const media = post.post_media?.[0];
         const user = post.user_profiles;
-        const stats = post.post_stats?.[0];
         
         const golfTag = post.post_tags?.find(
           (tag: any) => tag.taggable_entities?.entity_type === 'golf_club'
         );
 
-        const views = stats?.views_count || 0;
-        const likes = stats?.likes_count || 0;
+        // Get counts from aggregated relations
+        const views = post.post_views?.[0]?.count || 0;
+        const likes = post.post_likes?.[0]?.count || 0;
 
         return {
           id: post.id,
@@ -124,16 +124,14 @@ export const useRelatedLongFormVideos = (
             slug
           )
         ),
-        user_profiles!posts_user_id_fkey(
+        user_profiles(
           id,
           display_name,
           username,
           profile_photo_url
         ),
-        post_stats(
-          likes_count,
-          views_count
-        )
+        post_likes(count),
+        post_views(count)
       `;
 
       // 1. Same creator videos (highest priority)

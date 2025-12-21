@@ -72,16 +72,14 @@ export const useContinueWatching = (limit: number = 10): UseContinueWatchingResu
               duration_seconds,
               poster_url
             ),
-            user_profiles!posts_user_id_fkey(
+            user_profiles(
               id,
               display_name,
               username,
               profile_photo_url
             ),
-            post_stats(
-              likes_count,
-              views_count
-            )
+            post_likes(count),
+            post_views(count)
           )
         `)
         .eq('user_id', userId)
@@ -111,12 +109,14 @@ export const useContinueWatching = (limit: number = 10): UseContinueWatchingResu
           const post = item.posts;
           const media = post?.post_media?.[0];
           const user = post?.user_profiles;
-          const stats = post?.post_stats?.[0];
           const mediaDuration = media?.duration_seconds || 0;
 
           const progressPercent = mediaDuration > 0 
             ? Math.min(100, Math.round((item.last_position_seconds / mediaDuration) * 100))
             : 0;
+
+          // Get counts from aggregated relations
+          const views = post?.post_views?.[0]?.count || 0;
 
           return {
             id: post.id,
@@ -127,7 +127,7 @@ export const useContinueWatching = (limit: number = 10): UseContinueWatchingResu
             thumbnailUrl: media?.poster_url || '',
             duration: formatDuration(mediaDuration),
             durationSeconds: mediaDuration,
-            views: stats?.views_count || 0,
+            views,
             createdAt: post.created_at,
             progressPercent,
             lastPositionSeconds: item.last_position_seconds,
