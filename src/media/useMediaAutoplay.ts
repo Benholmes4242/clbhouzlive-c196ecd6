@@ -74,19 +74,33 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   // State
   const [playingIds, setPlayingIds] = useState<Set<string>>(new Set());
 
-  // Autoplay debug plumbing (targets window.__DEBUG_MEDIA_AUTOPLAY_ID)
+  // Autoplay debug plumbing (targets window.__DEBUG_MEDIA_AUTOPLAY_ID or sessionStorage debug_media_autoplay_id)
   const debugVideoCleanupRef = useRef<Map<string, () => void>>(new Map());
   const debugSnapshotRef = useRef<string>('');
-  const debugLog = useCallback((id: string, event: string, data?: Record<string, unknown>) => {
-    const debugId = (window as any).__DEBUG_MEDIA_AUTOPLAY_ID as string | undefined;
-    if (!debugId || id !== debugId) return;
-    const label = (window as any).__DEBUG_MEDIA_AUTOPLAY_LABEL as string | undefined;
-    console.log('[AutoplayDebug]', event, {
-      id: id.slice(0, 8),
-      label,
-      ...data,
-    });
+
+  const getDebugTargetId = useCallback((): string | undefined => {
+    const winId = (window as any).__DEBUG_MEDIA_AUTOPLAY_ID as string | undefined;
+    if (winId) return winId;
+    try {
+      return sessionStorage.getItem('debug_media_autoplay_id') || undefined;
+    } catch {
+      return undefined;
+    }
   }, []);
+
+  const debugLog = useCallback(
+    (id: string, event: string, data?: Record<string, unknown>) => {
+      const debugId = getDebugTargetId();
+      if (!debugId || id !== debugId) return;
+      const label = (window as any).__DEBUG_MEDIA_AUTOPLAY_LABEL as string | undefined;
+      console.log('[AutoplayDebug]', event, {
+        id: id.slice(0, 8),
+        label,
+        ...data,
+      });
+    },
+    [getDebugTargetId]
+  );
   
   // Scroll protection
   const isScrolling = useRef(false);
@@ -215,7 +229,32 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
               currentSrc: item.element.currentSrc,
               currentTime: item.element.currentTime,
             });
+
+            // Post-check: did currentTime actually advance? (detect "frozen" playback)
+            const t0 = item.element.currentTime;
+            setTimeout(() => {
+              const t1 = item.element.currentTime;
+              debugLog(item.id, 'play:postcheck', {
+                advanced: t1 > t0 + 0.01,
+                t0,
+                t1,
+                paused: item.element.paused,
+                ended: item.element.ended,
+                readyState: item.element.readyState,
+                networkState: item.element.networkState,
+                bufferedEnd: (() => {
+                  try {
+                    const b = item.element.buffered;
+                    return b.length ? b.end(b.length - 1) : null;
+                  } catch {
+                    return null;
+                  }
+                })(),
+                attached: (item.element as any).__hlsPlayerRef?.isAttached?.(),
+              });
+            }, 800);
           }
+
           if (success) {
             setPlayingIds((prev) => new Set([...prev, item.id]));
           }
@@ -268,6 +307,8 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
     const debugId = (window as any).__DEBUG_MEDIA_AUTOPLAY_ID as string | undefined;
     if (debugId && id === debugId && !debugVideoCleanupRef.current.has(id)) {
       const el = element;
+      let lastTimeUpdateLog = 0;
+
       const events: Array<keyof HTMLMediaElementEventMap> = [
         'loadstart',
         'loadedmetadata',
@@ -280,12 +321,19 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
         'seeking',
         'seeked',
         'emptied',
+        'timeupdate',
         'error',
       ];
 
       const cleanups: Array<() => void> = [];
       events.forEach((evt) => {
         const handler = () => {
+          if (evt === 'timeupdate') {
+            const now = Date.now();
+            if (now - lastTimeUpdateLog < 1000) return;
+            lastTimeUpdateLog = now;
+          }
+
           debugLog(id, `video:${evt}`, {
             readyState: el.readyState,
             paused: el.paused,
@@ -389,34 +437,46 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   useEffect(() => {
     const handleVisibility = () => {
       isTabVisible.current = !document.hidden;
-      
+      const debugId = (window as any).__DEBUG_MEDIA_AUTOPLAY_ID as string | undefined;
+      if (debugId) {
+        debugLog(debugId, 'tab:visibilitychange', { hidden: document.hidden });
+      }
+
       if (document.hidden) {
         pauseAllLocal();
       } else {
         setTimeout(() => updatePlayback(), 100);
       }
     };
-    
+
     const handleBlur = () => {
       isTabVisible.current = false;
+      const debugId = (window as any).__DEBUG_MEDIA_AUTOPLAY_ID as string | undefined;
+      if (debugId) {
+        debugLog(debugId, 'tab:blur');
+      }
       pauseAllLocal();
     };
-    
+
     const handleFocus = () => {
       isTabVisible.current = true;
+      const debugId = (window as any).__DEBUG_MEDIA_AUTOPLAY_ID as string | undefined;
+      if (debugId) {
+        debugLog(debugId, 'tab:focus');
+      }
       setTimeout(() => updatePlayback(), 100);
     };
-    
+
     document.addEventListener('visibilitychange', handleVisibility);
     window.addEventListener('blur', handleBlur);
     window.addEventListener('focus', handleFocus);
-    
+
     return () => {
       document.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('blur', handleBlur);
       window.removeEventListener('focus', handleFocus);
     };
-  }, [pauseAllLocal, updatePlayback]);
+  }, [pauseAllLocal, updatePlayback, debugLog]);
   
   // ============ Preload Observer (Real Prewarm) ============
   

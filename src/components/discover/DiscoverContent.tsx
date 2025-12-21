@@ -219,17 +219,44 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   // Autoplay debugging: automatically target the "better than most" post
   useEffect(() => {
     if (main !== 'videos') return;
-    const match = currentContent?.find((i) =>
-      (i.title ?? '').toLowerCase().includes('better than most')
-    );
 
-    if (match) {
-      (window as any).__DEBUG_MEDIA_AUTOPLAY_ID = match.id;
-      (window as any).__DEBUG_MEDIA_AUTOPLAY_LABEL = match.title;
-      if (import.meta.env.DEV) {
-        console.debug('[AutoplayDebug] Target set', { id: match.id, title: match.title });
+    // Allow manual override from console/tests
+    if ((window as any).__DEBUG_MEDIA_AUTOPLAY_ID) return;
+
+    const phrase = 'better than most';
+
+    const match = currentContent?.find((i) => {
+      const hay = `${i.title ?? ''} ${i.ctaDescription ?? ''}`.toLowerCase();
+      return hay.includes(phrase);
+    });
+
+    // Fallback: if we previously latched onto a debug ID, restore it.
+    const storedId = (() => {
+      try {
+        return sessionStorage.getItem('debug_media_autoplay_id') || undefined;
+      } catch {
+        return undefined;
       }
-    }
+    })();
+
+    const finalId = match?.id ?? storedId;
+    if (!finalId) return;
+
+    // Only set if that id exists in the current feed (prevents debugging a stale ID)
+    const existsInFeed = !!currentContent?.some((i) => i.id === finalId);
+    if (!existsInFeed) return;
+
+    (window as any).__DEBUG_MEDIA_AUTOPLAY_ID = finalId;
+    (window as any).__DEBUG_MEDIA_AUTOPLAY_LABEL = match?.title ?? phrase;
+
+    try {
+      sessionStorage.setItem('debug_media_autoplay_id', finalId);
+    } catch {}
+
+    console.log('[AutoplayDebug] Target set', {
+      id: finalId,
+      label: (window as any).__DEBUG_MEDIA_AUTOPLAY_LABEL,
+    });
   }, [main, currentContent]);
 
   // Handle like toggle with optimistic updates
