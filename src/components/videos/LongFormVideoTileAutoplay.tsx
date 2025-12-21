@@ -43,12 +43,20 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
   const mediaWrapRef = useRef<HTMLDivElement>(null);
   const hasVideo = !!video.mediaUrl;
 
+  const [isVideoReady, setIsVideoReady] = useState(false);
+  const [hasVideoError, setHasVideoError] = useState(false);
 
   // Store videoIndex in a ref so registration doesn't retrigger when it changes
   const videoIndexRef = useRef(videoIndex);
   videoIndexRef.current = videoIndex;
 
-  // Register video with grid autoplay system using useLayoutEffect for ref timing
+  // Reset state when switching videos
+  useEffect(() => {
+    setIsVideoReady(false);
+    setHasVideoError(false);
+  }, [video.id, video.mediaUrl]);
+
+  // Register video with grid autoplay system (match Business Activity pattern: observe the video element)
   useEffect(() => {
     if (!registerVideo || !hasVideo) return;
 
@@ -57,20 +65,18 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
 
     const registerWithRef = () => {
       const videoEl = videoRef.current;
-      const wrapperEl = mediaWrapRef.current;
-      
-      if (videoEl && wrapperEl) {
+
+      if (videoEl) {
         if (import.meta.env.DEV) {
           console.log('[LongFormTile][register]', video.id.slice(0, 8), {
             hasVideoEl: !!videoEl,
-            hasWrapperEl: !!wrapperEl,
             sortIndex: videoIndexRef.current,
           });
         }
         registerVideo({
           id: video.id,
           element: videoEl,
-          viewportEl: wrapperEl,
+          // NOTE: intentionally NOT passing viewportEl; useGridAutoplay will observe the video element
           isCandidate,
           sortIndex: videoIndexRef.current,
         });
@@ -124,12 +130,28 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
       >
         {hasVideo ? (
           <>
-            {/* Video element for autoplay (uses poster attribute as fallback) */}
+            {/* Thumbnail ALWAYS visible as fallback (prevents grey box on WebView failures) */}
+            {video.thumbnailUrl && (
+              <img
+                src={video.thumbnailUrl}
+                alt={video.title}
+                className="absolute inset-0 w-full h-full object-cover"
+                loading="lazy"
+                draggable={false}
+              />
+            )}
+
+            {/* Video layer - fades in when ready */}
             <GridAutoplayVideo
               ref={videoRef}
               src={video.mediaUrl!}
               poster={video.thumbnailUrl}
-              className="absolute inset-0 w-full h-full object-cover"
+              onCanPlay={() => setIsVideoReady(true)}
+              onError={() => setHasVideoError(true)}
+              className={cn(
+                "absolute inset-0 w-full h-full object-cover transition-opacity duration-150",
+                isVideoReady && !hasVideoError ? "opacity-100" : "opacity-0"
+              )}
             />
           </>
         ) : video.thumbnailUrl ? (
