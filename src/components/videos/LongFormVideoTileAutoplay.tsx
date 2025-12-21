@@ -41,7 +41,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaWrapRef = useRef<HTMLDivElement>(null);
-  const hasVideo = !!video.mediaUrl;
+  const isVideo = !!video.mediaUrl;
 
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [hasVideoError, setHasVideoError] = useState(false);
@@ -53,10 +53,9 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
     setHasVideoError(false);
   }, [video.id, video.mediaUrl]);
 
-  // Register video with grid autoplay system
-  // MATCHES BusinessPostCard exactly: immediate only, videoIndex in deps
+  // Register video with grid autoplay system - immediate only, videoIndex in deps
   useEffect(() => {
-    if (!hasVideo || !videoRef.current || !registerVideo) return;
+    if (!isVideo || !videoRef.current || !registerVideo) return;
 
     registerVideo({
       id: video.id,
@@ -73,7 +72,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
         sortIndex: videoIndex,
       });
     };
-  }, [hasVideo, registerVideo, video.id, videoIndex]);
+  }, [isVideo, registerVideo, video.id, videoIndex]);
 
   const formatLikes = (count?: number): string => {
     if (!count) return '0';
@@ -100,7 +99,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
         ref={mediaWrapRef}
         className="relative w-full aspect-[16/9] overflow-hidden bg-muted"
       >
-        {hasVideo ? (
+        {isVideo ? (
           <>
             {/* Thumbnail ALWAYS visible as fallback (prevents grey box on WebView failures) */}
             {video.thumbnailUrl && (
