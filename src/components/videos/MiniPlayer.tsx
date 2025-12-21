@@ -6,7 +6,7 @@ import { usePostData } from "@/hooks/usePostData";
 import { useVideoProgress } from "@/hooks/useVideoProgress";
 import { useVideoQueue } from "@/hooks/useVideoQueue";
 import { uidFromNode, generateHlsUrl, generateThumbnailUrl } from "@/utils/cloudflareStreamTransform";
-import FlickerFreeHLSPlayer from "@/components/ui/FlickerFreeHLSPlayer";
+import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { trackVideoCloseMini } from "@/lib/analytics/videoAnalytics";
 
 type MiniVideo = {
@@ -31,7 +31,7 @@ const PROGRESS_THROTTLE_MS = 5000;
 export const MiniPlayer: React.FC = () => {
   const context = useVideoPlaybackSafe();
   
-  const videoElRef = useRef<HTMLVideoElement | null>(null);
+  const videoElRef = useRef<HLSPlayerRef>(null);
   const pendingSeekRef = useRef<number | null>(null);
   const lastProgressSentAtRef = useRef<number>(0);
 
@@ -124,10 +124,10 @@ export const MiniPlayer: React.FC = () => {
     if (shouldResume && resumePosition > 0) {
       pendingSeekRef.current = resumePosition;
       // If the video is already ready, attempt immediate seek
-      const el = videoElRef.current;
-      if (el && el.readyState >= 1) {
+      const player = videoElRef.current;
+      if (player) {
         try {
-          el.currentTime = resumePosition;
+          player.seek(resumePosition);
           pendingSeekRef.current = null;
         } catch {
           // ignore
@@ -139,12 +139,12 @@ export const MiniPlayer: React.FC = () => {
   }, [activeVideoId, isMiniOpen, progressLoading, shouldResume, resumePosition]);
 
   const handleLoadedMetadata = useCallback(() => {
-    const el = videoElRef.current;
-    if (!el) return;
+    const player = videoElRef.current;
+    if (!player) return;
 
     if (pendingSeekRef.current !== null) {
       try {
-        el.currentTime = pendingSeekRef.current;
+        player.seek(pendingSeekRef.current);
       } catch {
         // ignore
       } finally {
@@ -173,9 +173,12 @@ export const MiniPlayer: React.FC = () => {
 
   // Flush progress helper for mini-player
   const flushMiniProgress = useCallback(() => {
-    const el = videoElRef.current;
-    if (el && el.duration > 0) {
-      updateProgress(el.currentTime, el.duration);
+    const player = videoElRef.current;
+    if (player) {
+      const duration = player.getDuration();
+      if (duration > 0) {
+        updateProgress(player.getCurrentTime(), duration);
+      }
     }
   }, [updateProgress]);
 
@@ -202,15 +205,17 @@ export const MiniPlayer: React.FC = () => {
   const handleTogglePlay = useCallback(
     async (e: React.MouseEvent) => {
       e.stopPropagation();
-      const el = videoElRef.current;
-      if (!el) return;
+      const player = videoElRef.current;
+      if (!player) return;
 
       try {
-        if (el.paused) {
-          await el.play();
+        // Check if playing by attempting to get element state
+        const el = player.getElement();
+        if (el?.paused) {
+          await player.play();
           setIsPlaying(true);
         } else {
-          el.pause();
+          player.pause();
           setIsPlaying(false);
         }
       } catch {
@@ -225,18 +230,22 @@ export const MiniPlayer: React.FC = () => {
       e.stopPropagation();
 
       // Flush progress once on close
-      const el = videoElRef.current;
-      if (el && el.duration > 0) {
-        updateProgress(el.currentTime, el.duration);
-        // Track analytics
-        if (activeVideoId) {
-          trackVideoCloseMini(activeVideoId, el.currentTime);
+      const player = videoElRef.current;
+      if (player) {
+        const duration = player.getDuration();
+        if (duration > 0) {
+          const currentTime = player.getCurrentTime();
+          updateProgress(currentTime, duration);
+          // Track analytics
+          if (activeVideoId) {
+            trackVideoCloseMini(activeVideoId, currentTime);
+          }
         }
       }
 
       // Pause and close
       try {
-        el?.pause();
+        player?.pause();
       } catch {
         // ignore
       }
@@ -251,9 +260,12 @@ export const MiniPlayer: React.FC = () => {
     if (!activeVideoId || !context) return;
 
     // Flush progress before opening full player
-    const el = videoElRef.current;
-    if (el && el.duration > 0) {
-      updateProgress(el.currentTime, el.duration);
+    const player = videoElRef.current;
+    if (player) {
+      const duration = player.getDuration();
+      if (duration > 0) {
+        updateProgress(player.getCurrentTime(), duration);
+      }
     }
 
     context.openFull(activeVideoId);
@@ -266,9 +278,12 @@ export const MiniPlayer: React.FC = () => {
   // 6B-3: Handle video ended - advance to next in queue
   const handleEnded = useCallback(() => {
     // Flush progress at end
-    const el = videoElRef.current;
-    if (el && el.duration > 0) {
-      updateProgress(el.currentTime, el.duration);
+    const player = videoElRef.current;
+    if (player) {
+      const duration = player.getDuration();
+      if (duration > 0) {
+        updateProgress(player.getCurrentTime(), duration);
+      }
     }
 
     // Try to advance to next
@@ -337,19 +352,18 @@ export const MiniPlayer: React.FC = () => {
           >
             {!loading && videoData?.hlsUrl ? (
               <>
-                <FlickerFreeHLSPlayer
+                <HLSPlayer
                   key={activeVideoId} // 6B-4: Key by activeVideoId to prevent stale audio
-                  ref={videoElRef as any}
-                  hlsUrl={videoData.hlsUrl}
+                  ref={videoElRef}
+                  src={videoData.hlsUrl}
                   poster={videoData.posterUrl}
                   autoplay
-                  playsInline
                   muted={true}  // Muted in mini to avoid audio issues / iOS restrictions
                   loop={false}
                   className="w-full h-full"
                   objectFit="cover"
-                  onLoadedMetadata={handleLoadedMetadata}
-                  onTimeUpdate={handleTimeUpdate}
+                  onLoadedData={handleLoadedMetadata}
+                  onTimeUpdate={(currentTime, duration) => handleTimeUpdate(currentTime, duration)}
                   onPlay={handlePlay}
                   onPause={handlePause}
                   onEnded={handleEnded}
