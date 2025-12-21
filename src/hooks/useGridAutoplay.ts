@@ -11,7 +11,8 @@ type VideoRegistration = {
 
 type UseGridAutoplayOptions = {
   maxPlaying?: number;
-  visibilityThreshold?: number; // 0–1
+  visibilityThreshold?: number; // 0–1, threshold to START playing
+  visibilityStopThreshold?: number; // 0–1, threshold to STOP playing (hysteresis)
   preloadMargin?: number; // pixels above/below viewport to start preloading
   scrollSettleDelay?: number; // ms to wait after scroll stops before resuming playback
 };
@@ -29,7 +30,8 @@ type UseGridAutoplayOptions = {
 export function useGridAutoplay(
   { 
     maxPlaying = 1, 
-    visibilityThreshold = 0.6, 
+    visibilityThreshold = 0.6,
+    visibilityStopThreshold = 0.4, // Hysteresis: stop at lower threshold
     preloadMargin = 300,
     scrollSettleDelay = 200 
   }: UseGridAutoplayOptions = {}
@@ -47,6 +49,9 @@ export function useGridAutoplay(
   
   // Tab visibility state
   const isTabVisibleRef = useRef(!document.hidden);
+  
+  // Track pending play attempts for retry logic
+  const pendingPlayRef = useRef<Set<string>>(new Set());
 
   // Pause all videos helper
   const pauseAllVideos = useCallback(() => {
@@ -90,7 +95,41 @@ export function useGridAutoplay(
       if (shouldPlay) {
         // IMPORTANT: for HLS/HLS.js sources, readyState can remain low until a play()
         // attempt kicks off buffering. So we always attempt play() for the chosen video.
-        v.element.play().catch(() => {});
+        const attemptPlay = () => {
+          v.element.play()
+            .then(() => {
+              pendingPlayRef.current.delete(v.id);
+              if (import.meta.env.DEV) {
+                console.log('[GridAutoplay][play] success', v.id);
+              }
+            })
+            .catch((err: Error) => {
+              if (import.meta.env.DEV) {
+                console.error('[GridAutoplay][playError]', v.id, {
+                  name: err.name,
+                  message: err.message,
+                  readyState: v.element.readyState,
+                  networkState: v.element.networkState,
+                  muted: v.element.muted,
+                });
+              }
+              // Retry once after a short delay if still visible and candidate
+              if (!pendingPlayRef.current.has(v.id) && visibleRef.current.has(v.id)) {
+                pendingPlayRef.current.add(v.id);
+                requestAnimationFrame(() => {
+                  setTimeout(() => {
+                    if (visibleRef.current.has(v.id) && v.isCandidate) {
+                      v.element.play().catch(() => {
+                        pendingPlayRef.current.delete(v.id);
+                      });
+                    }
+                    pendingPlayRef.current.delete(v.id);
+                  }, 200);
+                });
+              }
+            });
+        };
+        attemptPlay();
         newPlayingIds.add(v.id);
       } else {
         v.element.pause();
@@ -274,8 +313,11 @@ export function useGridAutoplay(
     };
   }, [preloadMargin]);
 
-  // Init autoplay observer
+  // Init autoplay observer with hysteresis
   useEffect(() => {
+    // Use multiple thresholds for hysteresis detection
+    const thresholds = [0, visibilityStopThreshold, visibilityThreshold, 1];
+    
     autoplayObserverRef.current = new IntersectionObserver(
       entries => {
         entries.forEach(entry => {
@@ -285,23 +327,30 @@ export function useGridAutoplay(
 
           if (import.meta.env.DEV) {
             // eslint-disable-next-line no-console
-            console.log('[GridAutoplay][IO]', id, entry.intersectionRatio, entry.isIntersecting);
+            console.log('[GridAutoplay][IO]', id, entry.intersectionRatio.toFixed(2), entry.isIntersecting);
           }
 
           const match = videosRef.current.get(id);
           if (!match) return;
 
+          const wasVisible = visibleRef.current.has(id);
+          
+          // Hysteresis logic:
+          // - Start playing when ratio >= visibilityThreshold (0.6)
+          // - Stop playing when ratio < visibilityStopThreshold (0.4)
+          // - In between: maintain current state (no flicker)
           if (entry.intersectionRatio >= visibilityThreshold) {
             visibleRef.current.add(id);
-          } else {
+          } else if (entry.intersectionRatio < visibilityStopThreshold) {
             visibleRef.current.delete(id);
           }
+          // If between stop and start thresholds, keep current state (hysteresis)
         });
 
         updatePlayback();
       },
       {
-        threshold: [0, visibilityThreshold],
+        threshold: thresholds,
       }
     );
 
@@ -322,7 +371,7 @@ export function useGridAutoplay(
       videosRef.current.clear();
       visibleRef.current.clear();
     };
-  }, [updatePlayback, visibilityThreshold]);
+  }, [updatePlayback, visibilityThreshold, visibilityStopThreshold]);
 
   return { registerVideo, playingIds };
 }

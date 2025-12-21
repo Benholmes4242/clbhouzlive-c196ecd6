@@ -21,6 +21,75 @@ import { buildInterleavedFeed, InterleavedItem } from '@/utils/interleaveFeed';
 import { toast } from 'sonner';
 import DiscoverHero, { createHeroItem } from '@/components/discover/DiscoverHero';
 
+// Wrapper to avoid useMemo inside render callback (fixes setState during render warning)
+function VideosGridWrapper({
+  durationKey,
+  currentContent,
+  getNextShort,
+  getNextChannel,
+  recentHistory,
+  shortsContentLength,
+  onMediaClick,
+  isLoading,
+  hasMore,
+  onLoadMore,
+  duration,
+}: {
+  durationKey: LengthKey;
+  currentContent: ExploreContentItem[] | null;
+  getNextShort: () => ExploreContentItem | null;
+  getNextChannel: () => any | null;
+  recentHistory: Set<string>;
+  shortsContentLength: number;
+  onMediaClick: (item: any) => void;
+  isLoading: boolean;
+  hasMore: boolean;
+  onLoadMore: () => void;
+  duration: string;
+}) {
+  const itemsForKey = currentContent || [];
+  
+  // Build interleaved feed for "All" tab only - now in a proper component
+  const interleavedFeed = React.useMemo(() => {
+    if (durationKey !== 'all') return null;
+    
+    const feed = buildInterleavedFeed(
+      itemsForKey,
+      getNextShort,
+      getNextChannel,
+      0,
+      recentHistory
+    );
+    
+    if (import.meta.env.DEV) {
+      const shortsBlocks = feed.filter(i => i.kind === 'shorts_block').length;
+      const channelSuggs = feed.filter(i => i.kind === 'channel_suggestion').length;
+      console.debug('[Interleave]', {
+        totalVideos: itemsForKey.length,
+        shortsBlocks,
+        channelSuggs,
+        totalItems: feed.length,
+        sampleKinds: feed.slice(0, 20).map(i => i.kind)
+      });
+    }
+    
+    return feed;
+  }, [durationKey, itemsForKey.length, shortsContentLength]);
+
+  return (
+    <VideosGrid
+      content={itemsForKey}
+      onMediaClick={onMediaClick}
+      isLoading={isLoading}
+      hasMore={hasMore}
+      onLoadMore={onLoadMore}
+      isShorts={false}
+      activeTab={duration}
+      interleavedFeed={durationKey === 'all' ? interleavedFeed : undefined}
+    />
+  );
+}
+
 interface DiscoverContentProps {
   onLike: (contentId: string) => void;
   onFollow: (contentId: string) => void;
@@ -298,50 +367,21 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
         activeKey={duration as LengthKey}
         order={CHIP_ORDER}
       >
-        {(key: LengthKey) => {
-          const itemsForKey = currentContent || [];
-          
-          // Build interleaved feed for "All" tab only
-          const interleavedFeed = React.useMemo(() => {
-            if (key !== 'all') return null;
-            
-            const feed = buildInterleavedFeed(
-              itemsForKey,
-              getNextShort,
-              getNextChannel,
-              0, // Always start from 0, the function handles global counting internally
-              recentHistory
-            );
-            
-            // Debug log
-            if (import.meta.env.DEV) {
-              const shortsBlocks = feed.filter(i => i.kind === 'shorts_block').length;
-              const channelSuggs = feed.filter(i => i.kind === 'channel_suggestion').length;
-              console.debug('[Interleave]', {
-                totalVideos: itemsForKey.length,
-                shortsBlocks,
-                channelSuggs,
-                totalItems: feed.length,
-                sampleKinds: feed.slice(0, 20).map(i => i.kind)
-              });
-            }
-            
-            return feed;
-          }, [key, itemsForKey.length, shortsContent?.length]);
-          
-          return (
-            <VideosGrid
-              content={itemsForKey}
-              onMediaClick={onMediaClick}
-              isLoading={currentContent === null || loading}
-              hasMore={hasMore}
-              onLoadMore={loadMore}
-              isShorts={false}
-              activeTab={duration}
-              interleavedFeed={key === 'all' ? interleavedFeed : undefined}
-            />
-          );
-        }}
+      {(key: LengthKey) => (
+          <VideosGridWrapper
+            durationKey={key}
+            currentContent={currentContent}
+            getNextShort={getNextShort}
+            getNextChannel={getNextChannel}
+            recentHistory={recentHistory}
+            shortsContentLength={shortsContent?.length ?? 0}
+            onMediaClick={onMediaClick}
+            isLoading={currentContent === null || loading}
+            hasMore={hasMore}
+            onLoadMore={loadMore}
+            duration={duration}
+          />
+        )}
       </SlidingPanels>
     );
   }

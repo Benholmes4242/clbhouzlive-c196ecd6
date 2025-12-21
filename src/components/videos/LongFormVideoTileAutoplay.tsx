@@ -48,7 +48,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
   const [isRegistered, setIsRegistered] = useState(false);
   const [intersectionRatio, setIntersectionRatio] = useState(0);
 
-  // Register video with grid autoplay system
+  // Register video with grid autoplay system using useLayoutEffect for ref timing
   useEffect(() => {
     if (!registerVideo || !hasVideo) return;
 
@@ -57,23 +57,35 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
 
     const registerWithRef = () => {
       const videoEl = videoRef.current;
-      if (videoEl) {
+      const wrapperEl = mediaWrapRef.current;
+      
+      if (videoEl && wrapperEl) {
+        if (import.meta.env.DEV) {
+          console.log('[LongFormTile][register]', video.id, {
+            hasVideoEl: !!videoEl,
+            hasWrapperEl: !!wrapperEl,
+            sortIndex: videoIndex,
+          });
+        }
         registerVideo({
           id: video.id,
           element: videoEl,
-          viewportEl: mediaWrapRef.current,
+          viewportEl: wrapperEl,
           isCandidate,
           sortIndex: videoIndex,
         });
         setIsRegistered(true);
+      } else {
+        // Refs not ready, retry
+        requestAnimationFrame(registerWithRef);
       }
     };
 
-    // Small delay to ensure video element is mounted
-    const timeout = setTimeout(registerWithRef, 50);
+    // Use requestAnimationFrame for better ref timing than setTimeout
+    const rafId = requestAnimationFrame(registerWithRef);
 
     return () => {
-      clearTimeout(timeout);
+      cancelAnimationFrame(rafId);
       setIsRegistered(false);
       // Deregister on unmount
       registerVideo({
