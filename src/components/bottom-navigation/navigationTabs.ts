@@ -12,7 +12,7 @@ import { FEATURE_FLAGS } from '@/config/featureFlags';
 // Base tabs (always visible)
 const baseTabs = [
   { id: 'clubhouse', label: 'Home', icon: HomeIcon, path: '/clubhouse' },
-  { id: 'discover', label: 'Discover', icon: IoCompassOutline, path: '/discover' },
+  { id: 'discover', label: 'Discover', icon: IoCompassOutline, path: '/discover?main=shorts' },
   { id: 'post', label: 'Post', icon: CameraIcon, path: null, isAction: true },
   { id: 'courses', label: 'Courses', icon: MapPinIcon, path: '/courses' },
 ];
