@@ -7,6 +7,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useMediaSystem } from './MediaSystemProvider';
+import { useSlidingPanels } from '@/components/ui/SlidingPanelsContext';
 
 // ============ Types ============
 
@@ -63,6 +64,11 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   
   const mediaSystem = useMediaSystem();
   
+  // Panel animation state - freeze during transitions
+  const { isAnimating: isPanelAnimating } = useSlidingPanels();
+  const isPanelAnimatingRef = useRef(isPanelAnimating);
+  isPanelAnimatingRef.current = isPanelAnimating;
+  
   // Registry
   const registry = useRef<Map<string, MediaAutoplayRegistration>>(new Map());
   const visibleIds = useRef<Set<string>>(new Set());
@@ -95,8 +101,8 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   // ============ Core Playback Logic ============
   
   const updatePlayback = useCallback(() => {
-    // Don't play if scrolling fast or tab hidden
-    if (isScrolling.current || !isTabVisible.current) {
+    // Don't play if scrolling fast, tab hidden, or panel is animating
+    if (isScrolling.current || !isTabVisible.current || isPanelAnimating) {
       pauseAllLocal();
       return;
     }
@@ -166,7 +172,18 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
     });
 
     setPlayingIds(newPlayingIds);
-  }, [pauseAllLocal, mode, warmWindowSize, mediaSystem]);
+  }, [pauseAllLocal, mode, warmWindowSize, mediaSystem, isPanelAnimating]);
+  
+  // ============ Panel Animation Handler ============
+  // Resume playback when panel animation completes
+  
+  useEffect(() => {
+    if (!isPanelAnimating) {
+      // Animation just completed, trigger playback check
+      const timer = setTimeout(() => updatePlayback(), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isPanelAnimating, updatePlayback]);
   
   // ============ Registration ============
   
@@ -305,6 +322,9 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   useEffect(() => {
     preloadObserver.current = new IntersectionObserver(
       (entries) => {
+        // Skip during panel animations - intersection ratios unreliable during transforms
+        if (isPanelAnimatingRef.current) return;
+        
         entries.forEach((entry) => {
           const target = entry.target as HTMLVideoElement;
           const id = target.dataset.mediaAutoplayId;
@@ -390,6 +410,9 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
     
     playObserver.current = new IntersectionObserver(
       (entries) => {
+        // Skip during panel animations - intersection ratios unreliable during transforms
+        if (isPanelAnimatingRef.current) return;
+        
         entries.forEach((entry) => {
           const target = entry.target as HTMLElement;
           const id = target.dataset.mediaAutoplayId;

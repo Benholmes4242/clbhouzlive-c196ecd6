@@ -35,16 +35,6 @@ export default function FollowingFeed({ onMediaClick }: FollowingFeedProps) {
     scrollSettleDelay: 200,
   });
 
-  // Force playback check when items change (handles initial mount timing)
-  useEffect(() => {
-    if (items.length > 0) {
-      // Small delay to ensure registrations complete
-      const timer = setTimeout(() => {
-        window.dispatchEvent(new Event('scroll'));
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [items.length]);
 
   // Infinite scroll observer
   useEffect(() => {
