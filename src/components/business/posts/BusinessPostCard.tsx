@@ -40,6 +40,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { RegisterMediaFn } from '@/media';
+import { VideoScrubber } from '@/components/video/VideoScrubber';
 
 // Helper to extract course info from content and remove the "Played at" line
 function parsePlayedAtFromContent(content: string | null): {
@@ -92,6 +93,7 @@ export default function BusinessPostCard({
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [insightsOpen, setInsightsOpen] = useState(false);
   const [pinPickerOpen, setPinPickerOpen] = useState(false);
+  const [videoEl, setVideoEl] = useState<HTMLVideoElement | null>(null);
   const playerRef = useRef<HLSPlayerRef>(null);
   const cardRef = useRef<HTMLDivElement>(null); // Sentinel for IntersectionObserver
   
@@ -372,13 +374,23 @@ export default function BusinessPostCard({
             }}
           >
             {isVideo && hlsUrl ? (
-              <HLSPlayer
-                ref={playerRef}
-                src={hlsUrl}
-                poster={thumbnailUrl || undefined}
-                loop
-                className="w-full h-full object-cover max-w-full"
-              />
+              <>
+                <HLSPlayer
+                  ref={playerRef}
+                  src={hlsUrl}
+                  poster={thumbnailUrl || undefined}
+                  loop
+                  onLoadedData={() => {
+                    const el = playerRef.current?.getElement();
+                    if (el) setVideoEl(el);
+                  }}
+                  className="w-full h-full object-cover max-w-full"
+                />
+                {/* Video scrubber - positioned at bottom of media */}
+                {videoEl && (
+                  <VideoScrubber videoEl={videoEl} height={3} />
+                )}
+              </>
             ) : isVideo ? (
               <div className="relative w-full h-full bg-muted">
                 <img src={thumbnailUrl || ''} alt="" className="w-full h-full object-cover" />
