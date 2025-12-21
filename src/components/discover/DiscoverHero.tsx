@@ -1,9 +1,9 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getStreamPoster } from '@/utils/stream';
 import { OverlayCorners } from '@/components/shared/overlay';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { HLSPlayer, HLSPlayerRef } from '@/media';
 
 interface HeroItem {
   id: string;
@@ -39,29 +39,37 @@ interface DiscoverHeroProps {
 
 export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroProps) {
   const navigate = useNavigate();
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoLoaded, setVideoLoaded] = useState(false);
+  const playerRef = useRef<HLSPlayerRef>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isInView, setIsInView] = useState(false);
   const [resolvedDuration, setResolvedDuration] = useState<number | undefined>(item?.durationSeconds);
 
-  // Autoplay muted video when in view
+  // Intersection observer for autoplay when in view
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !item || item.mediaType !== 'video') return;
+    const container = containerRef.current;
+    if (!container || !item || item.mediaType !== 'video') return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          video.play().catch(() => {});
-        } else {
-          video.pause();
-        }
+        setIsInView(entry.isIntersecting);
       },
       { threshold: 0.5 }
     );
 
-    observer.observe(video);
+    observer.observe(container);
     return () => observer.disconnect();
   }, [item]);
+
+  // Control playback based on visibility
+  useEffect(() => {
+    if (!playerRef.current || item?.mediaType !== 'video') return;
+    
+    if (isInView) {
+      playerRef.current.play();
+    } else {
+      playerRef.current.pause();
+    }
+  }, [isInView, item?.mediaType]);
 
   // Update resolved duration when item changes
   useEffect(() => {
@@ -69,15 +77,14 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
   }, [item?.durationSeconds]);
 
   // Get duration from video element if not provided
-  const handleLoadedMetadata = () => {
-    setVideoLoaded(true);
-    if (videoRef.current && !item?.durationSeconds) {
-      const d = videoRef.current.duration;
+  const handleLoadedData = useCallback(() => {
+    if (playerRef.current && !item?.durationSeconds) {
+      const d = playerRef.current.getDuration();
       if (Number.isFinite(d) && d > 0 && d !== Infinity) {
         setResolvedDuration(d);
       }
     }
-  };
+  }, [item?.durationSeconds]);
 
   if (isLoading) {
     return (
@@ -112,35 +119,26 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
 
   return (
     <div 
+      ref={containerRef}
       className="bg-card border border-border/30 overflow-hidden cursor-pointer group"
       onClick={handleClick}
     >
       {/* Media Section - 16:9 */}
       <div className="relative w-full aspect-[16/9] overflow-hidden bg-muted">
         {/* Media - Image or Video */}
-        {item.mediaType === 'video' ? (
-          <>
-            {/* Poster while video loads */}
-            {!videoLoaded && item.posterUrl && (
-              <img
-                src={item.posterUrl}
-                alt={item.title}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            )}
-            <video
-              ref={videoRef}
-              src={item.mediaUrl}
-              poster={item.posterUrl}
-              muted
-              loop
-              playsInline
-              onLoadedMetadata={handleLoadedMetadata}
-              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
-                videoLoaded ? 'opacity-100' : 'opacity-0'
-              }`}
-            />
-          </>
+        {item.mediaType === 'video' && item.mediaUrl ? (
+          <HLSPlayer
+            ref={playerRef}
+            src={item.mediaUrl}
+            poster={item.posterUrl}
+            autoplay={false}
+            muted
+            loop
+            objectFit="cover"
+            externallyManaged
+            onLoadedData={handleLoadedData}
+            className="absolute inset-0 w-full h-full"
+          />
         ) : (
           <img
             src={item.mediaUrl}
