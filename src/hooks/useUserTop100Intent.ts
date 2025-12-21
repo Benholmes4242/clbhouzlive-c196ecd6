@@ -24,11 +24,20 @@ export function useUserTop100Intent(userId?: string | null) {
 
       if (!effectiveUserId) return null;
 
-      const { data, error } = await supabase.rpc('get_user_top100_intent', {
-        target_user_id: effectiveUserId,
-      });
+      const args = { target_user_id: effectiveUserId };
+      const { data, error } = await supabase.rpc('get_user_top100_intent', args);
 
-      if (error) throw error;
+      if (error) {
+        console.error('[RPC] get_user_top100_intent failed:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          args,
+        });
+        // Return null instead of throwing to prevent UI breaks
+        return null;
+      }
 
       // Type assertion for RPC response
       const result = data as any;
@@ -43,5 +52,6 @@ export function useUserTop100Intent(userId?: string | null) {
       };
     },
     staleTime: 60_000,
+    retry: false, // Don't retry broken RPCs
   });
 }
