@@ -21,7 +21,7 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { getStreamPoster, getStreamIdFromUrl } from '@/utils/stream';
-import GridAutoplayVideo from '@/components/profile/activity/GridAutoplayVideo';
+import { HLSPlayer, HLSPlayerRef } from '@/media';
 import CommentsPage from '@/components/clubhouse/cinematic/CommentsPage';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
@@ -92,7 +92,7 @@ export default function BusinessPostCard({
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [insightsOpen, setInsightsOpen] = useState(false);
   const [pinPickerOpen, setPinPickerOpen] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const playerRef = useRef<HLSPlayerRef>(null);
   
   const { pin, unpin, isPinning } = usePinPost(businessId);
   const isPinned = post.is_pinned && (!post.pinned_until || new Date(post.pinned_until) > new Date());
@@ -151,12 +151,15 @@ export default function BusinessPostCard({
 
   // Register video for autoplay (ALL videos for business, not every 3rd)
   useEffect(() => {
-    if (!isVideo || !videoRef.current || !registerVideo) return;
+    if (!isVideo || !registerVideo) return;
+    
+    const el = playerRef.current?.getElement();
+    if (!el) return;
     
     registerVideo({
       id: post.id,
-      element: videoRef.current,
-      isCandidate: true, // ALL videos are candidates for business feed
+      element: el,
+      isCandidate: true,
       sortIndex: videoIndex,
     });
 
@@ -357,10 +360,11 @@ export default function BusinessPostCard({
             }}
           >
             {isVideo && hlsUrl ? (
-              <GridAutoplayVideo
-                ref={videoRef}
+              <HLSPlayer
+                ref={playerRef}
                 src={hlsUrl}
                 poster={thumbnailUrl || undefined}
+                loop
                 className="w-full h-full object-cover max-w-full"
               />
             ) : isVideo ? (

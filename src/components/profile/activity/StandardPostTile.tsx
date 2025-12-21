@@ -2,14 +2,13 @@ import React, { useCallback, useRef, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ActivityMediaItem } from './types';
 import VideoOverlay from './VideoOverlay';
-import GridAutoplayVideo from './GridAutoplayVideo';
+import { HLSPlayer, HLSPlayerRef, RegisterMediaFn } from '@/media';
 import { Images, Trophy } from 'lucide-react';
-import { RegisterVideoFn } from '@/hooks/useGridAutoplay';
 
 interface StandardPostTileProps {
   item: ActivityMediaItem;
   onPress?: (postId: string) => void;
-  registerVideo?: RegisterVideoFn;
+  registerVideo?: RegisterMediaFn;
   isPlaying?: boolean;
 }
 
@@ -24,7 +23,7 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({
   registerVideo,
   isPlaying = false 
 }) => {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const playerRef = useRef<HLSPlayerRef>(null);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [resolvedDurationSeconds, setResolvedDurationSeconds] = useState<number | null | undefined>(
     item.durationSeconds
@@ -44,27 +43,25 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({
   // Force consistent aspect ratio for all grid tiles to prevent gaps
   const aspectClass = 'aspect-[3/4]';
 
-  // Register video with autoplay hook - use a callback to ensure element is ready
+  // Register video with autoplay hook
   useEffect(() => {
     if (!isVideo || !registerVideo) return;
 
-    // Wait for ref to be populated by GridAutoplayVideo
     const checkAndRegister = () => {
-      if (videoRef.current) {
+      const el = playerRef.current?.getElement();
+      if (el) {
         registerVideo({
           id: item.postId,
-          element: videoRef.current,
+          element: el,
           isCandidate: isAutoplayCandidate,
           sortIndex: item.sortIndex ?? 0,
         });
       }
     };
 
-    // Try immediately, then retry after a short delay if ref not ready
     checkAndRegister();
     const retryTimer = setTimeout(checkAndRegister, 100);
 
-    // Clean up on unmount
     return () => {
       clearTimeout(retryTimer);
       registerVideo({
@@ -83,10 +80,13 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({
     const dbDuration = item.durationSeconds;
     const hasValidDbDuration = typeof dbDuration === 'number' && Number.isFinite(dbDuration) && dbDuration > 0;
     
-    if (!hasValidDbDuration && videoRef.current) {
-      const d = videoRef.current.duration;
-      if (Number.isFinite(d) && d > 0 && d !== Infinity) {
-        setResolvedDurationSeconds(d);
+    if (!hasValidDbDuration) {
+      const el = playerRef.current?.getElement();
+      if (el) {
+        const d = el.duration;
+        if (Number.isFinite(d) && d > 0 && d !== Infinity) {
+          setResolvedDurationSeconds(d);
+        }
       }
     }
   }, [item.durationSeconds]);
@@ -113,11 +113,12 @@ const StandardPostTile: React.FC<StandardPostTileProps> = ({
 
       {/* 2) HLS-aware video fades in over the top once it can play */}
       {isVideo && isAutoplayCandidate && item.playbackUrl && (
-        <GridAutoplayVideo
-          ref={videoRef}
+        <HLSPlayer
+          ref={playerRef}
           src={item.playbackUrl}
           poster={thumbnailSrc}
-          onCanPlay={handleCanPlay}
+          onLoadedData={handleCanPlay}
+          loop
           className={cn(
             "absolute inset-0 h-full w-full object-cover transition-opacity duration-150",
             isVideoReady ? "opacity-100" : "opacity-0"

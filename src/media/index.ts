@@ -3,7 +3,7 @@
  * 
  * Import all media components and hooks from this single entry point:
  * 
- * import { MediaSystemProvider, HLSPlayer, MediaTile, useMediaSystem, useMediaAutoplay } from '@/media';
+ * import { MediaSystemProvider, HLSPlayer, MediaTile, MediaFullscreenViewer, useMediaSystem, useMediaAutoplay } from '@/media';
  */
 
 // Provider
@@ -20,3 +20,6 @@ export type { HLSPlayerProps, HLSPlayerRef } from './HLSPlayer';
 
 export { default as MediaTile } from './MediaTile';
 export type { MediaTileProps } from './MediaTile';
+
+export { default as MediaFullscreenViewer } from './MediaFullscreenViewer';
+export type { MediaFullscreenViewerProps, MediaFullscreenItem } from './MediaFullscreenViewer';
