@@ -17,6 +17,7 @@ import { useVideoNudges } from '@/hooks/useVideoNudges';
 import { useVideoQueue } from '@/hooks/useVideoQueue';
 import { useDiscoverySignals } from '@/hooks/useDiscoverySignals';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import { useGridAutoplay } from '@/hooks/useGridAutoplay';
 
 interface VideosTabProps {
   onVideoClick?: (id: string) => void;
@@ -51,6 +52,14 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   const { getBoostScore } = useDiscoverySignals();
   const [showQueueNudge, setShowQueueNudge] = useState(false);
   const [showQueueReminder, setShowQueueReminder] = useState(false);
+
+  // Unified grid autoplay - same settings as Business Activity
+  const { registerVideo, playingIds } = useGridAutoplay({
+    maxPlaying: 1,
+    visibilityThreshold: 0.6,
+    preloadMargin: 300,
+    scrollSettleDelay: 200,
+  });
 
   // Lazy loading triggers for below-fold sections
   const { ref: trendingRef, isInView: trendingInView } = useIntersectionObserver({ rootMargin: '200px' });
@@ -259,6 +268,9 @@ export const VideosTab: React.FC<VideosTabProps> = ({
         onCreatorClick={handleCreatorClick}
         emptyState={<VideosEmptyState type="global-explore" />}
         className="mb-8"
+        registerVideo={registerVideo}
+        playingIds={playingIds}
+        startIndex={0}
       />
 
       {/* Module 2: Trending this week (lazy loaded) */}
@@ -272,6 +284,9 @@ export const VideosTab: React.FC<VideosTabProps> = ({
           onCreatorClick={handleCreatorClick}
           emptyState={<VideosEmptyState type="global-explore" />}
           className="mb-8"
+          registerVideo={registerVideo}
+          playingIds={playingIds}
+          startIndex={3}
         />
       </div>
 
@@ -285,6 +300,9 @@ export const VideosTab: React.FC<VideosTabProps> = ({
         showViewAll={followedVideos.length > 0}
         emptyState={<VideosEmptyState type="creators-you-follow" />}
         className="mb-8"
+        registerVideo={registerVideo}
+        playingIds={playingIds}
+        startIndex={5}
       />
 
       {/* Module 4: Courses & destinations (lazy loaded) */}
@@ -298,6 +316,9 @@ export const VideosTab: React.FC<VideosTabProps> = ({
           onCreatorClick={handleCreatorClick}
           emptyState={<VideosEmptyState type="global-explore" />}
           className="mb-8"
+          registerVideo={registerVideo}
+          playingIds={playingIds}
+          startIndex={8}
         />
       </div>
     </div>

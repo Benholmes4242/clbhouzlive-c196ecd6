@@ -1,7 +1,8 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
-import { LongFormVideoTile, LongFormVideo } from './LongFormVideoTile';
+import { LongFormVideoTileAutoplay, LongFormVideo } from './LongFormVideoTileAutoplay';
+import type { RegisterVideoFn } from '@/hooks/useGridAutoplay';
 
 interface VideoSectionProps {
   title: string;
@@ -13,11 +14,16 @@ interface VideoSectionProps {
   showViewAll?: boolean;
   emptyState?: React.ReactNode;
   className?: string;
+  // Autoplay integration
+  registerVideo?: RegisterVideoFn;
+  playingIds?: Set<string>;
+  startIndex?: number; // Starting index for sortIndex calculation
 }
 
 /**
  * VideoSection - A modular section for the Videos tab
  * Contains title, optional subtitle, video grid, and View All button
+ * Supports grid autoplay with registerVideo and playingIds
  */
 export const VideoSection: React.FC<VideoSectionProps> = ({
   title,
@@ -29,6 +35,9 @@ export const VideoSection: React.FC<VideoSectionProps> = ({
   showViewAll = true,
   emptyState,
   className,
+  registerVideo,
+  playingIds,
+  startIndex = 0,
 }) => {
   if (videos.length === 0 && emptyState) {
     return (
@@ -71,12 +80,15 @@ export const VideoSection: React.FC<VideoSectionProps> = ({
 
       {/* Video cards - full width with divider background visible between */}
       <div className="space-y-3">
-        {videos.map((video) => (
-          <LongFormVideoTile
+        {videos.map((video, index) => (
+          <LongFormVideoTileAutoplay
             key={video.id}
             video={video}
             onVideoClick={onVideoClick}
             onCreatorClick={onCreatorClick}
+            registerVideo={registerVideo}
+            isPlaying={playingIds?.has(video.id) ?? false}
+            videoIndex={startIndex + index}
           />
         ))}
       </div>

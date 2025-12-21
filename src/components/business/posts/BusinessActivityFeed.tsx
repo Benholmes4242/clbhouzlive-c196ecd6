@@ -61,7 +61,7 @@ export function BusinessActivityFeed({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { registerVideo, playingIds } = useGridAutoplay({
-    maxPlaying: 2,
+    maxPlaying: 1,
     visibilityThreshold: 0.6,
     preloadMargin: 300,
   });
