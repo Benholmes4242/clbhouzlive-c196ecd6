@@ -5,7 +5,7 @@ import ExploreGrid from '@/components/explore/ExploreGrid';
 import VideosGrid from '@/components/discover/VideosGrid';
 import PhotosGrid from '@/components/discover/PhotosGrid';
 import ShortsGrid from '@/components/discover/ShortsGrid';
-import SlidingPanels from '@/components/ui/SlidingPanels';
+
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { FILTER_TYPES } from '@/components/explore/types';
 import type { ExploreContentItem } from '@/components/explore/types';
@@ -360,29 +360,22 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     );
   }
 
-  // Use VideosGrid with SlidingPanels for Videos tab
+  // Use VideosGrid directly for Videos tab
   if (main === 'videos') {
     return (
-      <SlidingPanels
-        activeKey={duration as LengthKey}
-        order={CHIP_ORDER}
-      >
-      {(key: LengthKey) => (
-          <VideosGridWrapper
-            durationKey={key}
-            currentContent={currentContent}
-            getNextShort={getNextShort}
-            getNextChannel={getNextChannel}
-            recentHistory={recentHistory}
-            shortsContentLength={shortsContent?.length ?? 0}
-            onMediaClick={onMediaClick}
-            isLoading={currentContent === null || loading}
-            hasMore={hasMore}
-            onLoadMore={loadMore}
-            duration={duration}
-          />
-        )}
-      </SlidingPanels>
+      <VideosGridWrapper
+        durationKey={duration as LengthKey}
+        currentContent={currentContent}
+        getNextShort={getNextShort}
+        getNextChannel={getNextChannel}
+        recentHistory={recentHistory}
+        shortsContentLength={shortsContent?.length ?? 0}
+        onMediaClick={onMediaClick}
+        isLoading={currentContent === null || loading}
+        hasMore={hasMore}
+        onLoadMore={loadMore}
+        duration={duration}
+      />
     );
   }
 
