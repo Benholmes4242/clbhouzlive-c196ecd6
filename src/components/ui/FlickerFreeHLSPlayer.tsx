@@ -56,6 +56,7 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
   const [isPlaying, setIsPlaying] = useState(false);
   const [isHLSLoaded, setIsHLSLoaded] = useState(false);
   const [autoplayAttempted, setAutoplayAttempted] = useState(false);
+  const [hasFirstFrame, setHasFirstFrame] = useState(false); // First-frame detection for flicker-free crossfade
 
   // Expose video element to parent
   useImperativeHandle(ref, () => videoRef.current!, []);
@@ -116,6 +117,7 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
         setIsVideoReady(false);
         setAutoplayAttempted(false);
         setIsPlaying(false);
+        setHasFirstFrame(false);
 
         const startTime = Date.now();
 
@@ -284,6 +286,22 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
     }
   };
 
+  // First-frame detection for flicker-free crossfade
+  const handleTimeUpdate = () => {
+    const video = videoRef.current;
+    if (!video || hasFirstFrame) return;
+    
+    // Detect first frame when video has actually started playing
+    if (video.currentTime > 0 && !video.paused && video.readyState >= 2) {
+      setHasFirstFrame(true);
+    }
+    
+    // Also call the external handler
+    if (onTimeUpdate && video.duration > 0) {
+      onTimeUpdate(video.currentTime, video.duration);
+    }
+  };
+
   const handleVideoPlay = () => {
     setIsPlaying(true);
     onPlay?.();
@@ -307,11 +325,7 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
     console.log('[HLSPlayer] Video stalled');
   };
 
-  const handleVideoTimeUpdate = () => {
-    const video = videoRef.current;
-    if (!video || !onTimeUpdate) return;
-    onTimeUpdate(video.currentTime, video.duration || 0);
-  };
+  // Removed handleVideoTimeUpdate - merged into handleTimeUpdate above
 
   const handleVideoClick = () => {
     if (externallyManaged) {
@@ -341,12 +355,12 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
     setIsMuted(newMutedState);
   };
 
-  // Determine poster visibility: show until video is playing
-  const showPoster = !isPlaying && poster && isPosterLoaded;
+  // Determine poster visibility: show until first frame is rendered (not just isPlaying)
+  const showPoster = !hasFirstFrame && poster && isPosterLoaded;
 
   return (
     <div className={`relative overflow-hidden bg-black ${className}`}>
-      {/* Poster Image - stays visible until video starts playing */}
+      {/* Poster Image - stays visible until first video frame renders */}
       {poster && (
         <img
           ref={posterRef}
@@ -360,12 +374,12 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
         />
       )}
 
-      {/* Video Element */}
+      {/* Video Element - visible only after first frame renders */}
       <video
         ref={videoRef}
         className={`feed-card-video w-full h-full ${
           objectFit === 'contain' ? 'object-contain' : 'object-cover'
-        } ${isPlaying ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
+        } ${hasFirstFrame ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
         muted
         autoPlay={autoplay}
         playsInline
@@ -383,7 +397,7 @@ const FlickerFreeHLSPlayer = forwardRef<HTMLVideoElement, FlickerFreeHLSPlayerPr
         onPause={handleVideoPause}
         onWaiting={handleVideoWaiting}
         onStalled={handleVideoStalled}
-        onTimeUpdate={handleVideoTimeUpdate}
+        onTimeUpdate={handleTimeUpdate}
         onEnded={onEnded}
         onClick={handleVideoClick}
       />
