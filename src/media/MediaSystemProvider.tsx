@@ -299,13 +299,20 @@ export const MediaSystemProvider: React.FC<{ children: React.ReactNode }> = ({ c
       console.log('[MediaSystem] Window blur - pausing all');
       pauseAll();
     };
-    
+
+    const handleFocus = () => {
+      console.log('[MediaSystem] Window focus');
+      // Note: We don't auto-resume here - autoplay hook decides what to play.
+    };
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('blur', handleBlur);
-    
+    window.addEventListener('focus', handleFocus);
+
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('focus', handleFocus);
     };
   }, [pauseAll]);
   
