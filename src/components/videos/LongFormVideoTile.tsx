@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Play, Flame } from 'lucide-react';
+import { Play, Flame, Eye } from 'lucide-react';
 import { VideoQueueMenu } from './VideoQueueMenu';
 import { GolferAvatar } from '@/components/golfers/GolferAvatar';
 import type { QueueItemMeta } from '@/hooks/useVideoQueue';
@@ -19,6 +19,7 @@ export interface LongFormVideo {
   golfCourseId?: string;
   golfCourseName?: string;
   isTrending?: boolean;
+  likes?: number;
 }
 
 interface LongFormVideoTileProps {
@@ -31,10 +32,10 @@ interface LongFormVideoTileProps {
 }
 
 /**
- * LongFormVideoTile - Card-style video tile matching WatchPage hero layout
- * - Full-width white card
- * - 16:9 thumbnail with avatar bottom-right
- * - White meta card below with title, creator, views, time
+ * LongFormVideoTile - Card-style video tile matching WatchPage hero layout exactly
+ * - Full-width white card with straight edges (no rounded corners)
+ * - 16:9 thumbnail with likes bottom-left, duration bottom-right
+ * - White meta card below with caption, creator name, and avatar bottom-right
  */
 export const LongFormVideoTile: React.FC<LongFormVideoTileProps> = ({
   video,
@@ -44,25 +45,11 @@ export const LongFormVideoTile: React.FC<LongFormVideoTileProps> = ({
   onEnqueue,
   className,
 }) => {
-  const formatViews = (views: number): string => {
-    if (views >= 1000000) return `${(views / 1000000).toFixed(1)}M views`;
-    if (views >= 1000) return `${(views / 1000).toFixed(1)}K views`;
-    return `${views} views`;
-  };
-
-  const formatTimeAgo = (dateString?: string): string => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return '1 day ago';
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
-    return `${Math.floor(diffDays / 365)} years ago`;
+  const formatLikes = (count?: number): string => {
+    if (!count) return '0';
+    if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
+    if (count >= 1000) return `${(count / 1000).toFixed(1)}K`;
+    return count.toString();
   };
 
   const handleCreatorClick = (e: React.MouseEvent) => {
@@ -73,28 +60,28 @@ export const LongFormVideoTile: React.FC<LongFormVideoTileProps> = ({
   return (
     <div
       className={cn(
-        "group cursor-pointer bg-white rounded-2xl overflow-hidden shadow-sm",
+        "group cursor-pointer bg-card border border-border/60 overflow-hidden",
         className
       )}
       onClick={() => onVideoClick?.(video.id)}
     >
-      {/* Thumbnail with avatar overlay */}
-      <div className="relative aspect-video overflow-hidden bg-muted">
+      {/* Media Section - 16:9 aspect ratio matching hero */}
+      <div className="relative w-full aspect-[16/9] overflow-hidden bg-muted">
         {video.thumbnailUrl ? (
           <img
             src={video.thumbnailUrl}
             alt={video.title}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+            className="absolute inset-0 w-full h-full object-cover"
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">
+          <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">
             <Play className="h-12 w-12 text-muted-foreground/40" />
           </div>
         )}
 
-        {/* Glass highlight overlay on hover */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+        {/* Subtle hover effect matching hero */}
+        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
 
         {/* Play overlay on hover */}
         <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/10 transition-colors">
@@ -125,15 +112,44 @@ export const LongFormVideoTile: React.FC<LongFormVideoTileProps> = ({
           />
         )}
 
-        {/* Duration badge - bottom left */}
-        <div className="absolute bottom-3 left-3 px-2 py-0.5 bg-black/70 backdrop-blur-sm text-white text-xs font-medium rounded">
-          {video.duration}
+        {/* Likes badge - bottom left (matching hero) */}
+        <div className="absolute bottom-3 left-3 flex items-center gap-1 px-2 py-0.5 bg-black/70 backdrop-blur-sm text-white text-xs font-medium rounded">
+          <Eye className="h-3 w-3" />
+          <span>{formatLikes(video.likes || video.views)}</span>
         </div>
 
-        {/* Creator squircle avatar - bottom right, overlapping into meta area */}
+        {/* Duration badge - bottom right (matching hero position) */}
+        <div className="absolute bottom-3 right-3 px-2 py-0.5 bg-black/70 backdrop-blur-sm text-white text-xs font-medium rounded">
+          {video.duration}
+        </div>
+      </div>
+
+      {/* Meta Area - White card section matching hero exactly */}
+      <div className="px-4 py-3 flex items-end justify-between gap-3">
+        {/* Text content - constrained to ~80% to leave room for avatar */}
+        <div className="flex-1 min-w-0 max-w-[80%]">
+          {/* Caption - 2 lines max with ellipsis */}
+          <p className="text-sm text-foreground line-clamp-2 leading-snug">
+            {video.title}
+          </p>
+          {/* Creator name */}
+          <button
+            onClick={handleCreatorClick}
+            className="text-xs text-muted-foreground mt-1 truncate block hover:text-foreground transition-colors"
+          >
+            {video.creatorName}
+          </button>
+        </div>
+
+        {/* Avatar - bottom right of meta area matching hero */}
         <button
           onClick={handleCreatorClick}
-          className="absolute bottom-3 right-3 hover:ring-2 hover:ring-ring transition-all rounded-[34%] z-10"
+          className="shrink-0 overflow-hidden border border-border/40 shadow-sm hover:ring-2 hover:ring-ring transition-all"
+          style={{
+            width: '40px',
+            aspectRatio: '1 / 1.05',
+            borderRadius: '34%',
+          }}
         >
           <GolferAvatar
             name={video.creatorName}
@@ -141,33 +157,6 @@ export const LongFormVideoTile: React.FC<LongFormVideoTileProps> = ({
             size={40}
           />
         </button>
-      </div>
-
-      {/* White meta card below thumbnail */}
-      <div className="p-4">
-        <h3 className="font-semibold text-sm text-foreground leading-snug line-clamp-2 mb-2">
-          {video.title}
-        </h3>
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <button
-            onClick={handleCreatorClick}
-            className="hover:text-foreground transition-colors font-medium truncate"
-          >
-            {video.creatorName}
-          </button>
-          {video.views !== undefined && video.views > 0 && (
-            <>
-              <span className="text-muted-foreground/50">·</span>
-              <span>{formatViews(video.views)}</span>
-            </>
-          )}
-          {video.createdAt && (
-            <>
-              <span className="text-muted-foreground/50">·</span>
-              <span>{formatTimeAgo(video.createdAt)}</span>
-            </>
-          )}
-        </div>
       </div>
     </div>
   );
