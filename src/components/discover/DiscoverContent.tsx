@@ -263,7 +263,7 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   // Handle Shorts tab directly (no sliding panels needed)
   if (main === 'shorts') {
     return (
-      <div className="watch-tab-content">
+      <div className="watch-tab-content px-3">
         {/* Watch Hero - single featured item */}
         <DiscoverHero 
           item={heroItem}
