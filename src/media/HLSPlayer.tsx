@@ -96,6 +96,8 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   const mountedRef = useRef(true);
   const firstFrameRequestedRef = useRef(false); // Guard against duplicate first-frame callbacks
   const timeUpdateListenerRef = useRef<((e: Event) => void) | null>(null); // Track timeupdate fallback listener
+  const autoplayRef = useRef(autoplay); // Track autoplay prop without causing re-runs
+  autoplayRef.current = autoplay;
   
   // State
   const [isPlaying, setIsPlaying] = useState(false);
@@ -181,6 +183,36 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       videoRef.current.muted = muted;
     }
   }, [muted]);
+  
+  // ============ Sync External Autoplay State ============
+  // React to autoplay prop changes to play/pause video without re-initializing HLS
+  
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !isAttachedRef.current) return;
+    
+    if (autoplay) {
+      // Only attempt to play if ready
+      if (video.readyState >= 2) {
+        safePlay(video);
+      } else {
+        // Wait for ready, then play
+        const handleCanPlay = () => {
+          video.removeEventListener('canplay', handleCanPlay);
+          if (autoplay && isAttachedRef.current) {
+            safePlay(video);
+          }
+        };
+        video.addEventListener('canplay', handleCanPlay);
+        return () => video.removeEventListener('canplay', handleCanPlay);
+      }
+    } else {
+      // Pause when autoplay becomes false
+      if (!video.paused) {
+        video.pause();
+      }
+    }
+  }, [autoplay]);
   
   // ============ HLS Setup ============
   
@@ -286,7 +318,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
             } catch {}
           }
           
-          if (autoplay) {
+          if (autoplayRef.current) {
             safePlay(video);
           }
         });
@@ -314,7 +346,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         hlsRef.current = null;
       }
     };
-  }, [src, autoplay, startTime, onError]);
+  }, [src, startTime, onError, cleanupTimeUpdateListener]);
   
   // ============ Event Handlers ============
   
