@@ -125,13 +125,18 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
     <>
       <div ref={gridRef} className="pb-4">
         <div className="grid grid-cols-2" style={{ gap: `${GRID_GAP_PX}px` }}>
-          {layoutRows.map((row, rowIndex) => {
+        {/* 
+          STABLE KEYS: Use only item.id (immutable identity).
+          Previously keys included rowIndex/itemIndex which caused remounts
+          when layout shifted, leading to flicker + re-registration churn.
+        */}
+        {layoutRows.map((row) => {
             if (row.type === 'landscape') {
               const item = row.items[0];
               const flatIndex = itemIndexMap.get(item.id) ?? 0;
               return (
                 <UnifiedMediaTile
-                  key={`landscape-${item.id}-${rowIndex}`}
+                  key={item.id}
                   item={item}
                   config={{ ...config, autoplayEnabled: config.autoplayEnabled ?? true }}
                   variant="landscape"
@@ -145,11 +150,11 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
             }
 
             // Portrait pair
-            return row.items.map((item, itemIndex) => {
+            return row.items.map((item) => {
               const flatIndex = itemIndexMap.get(item.id) ?? 0;
               return (
                 <UnifiedMediaTile
-                  key={`portrait-${item.id}-${rowIndex}-${itemIndex}`}
+                  key={item.id}
                   item={item}
                   config={{ ...config, autoplayEnabled: config.autoplayEnabled ?? true }}
                   variant="portrait"

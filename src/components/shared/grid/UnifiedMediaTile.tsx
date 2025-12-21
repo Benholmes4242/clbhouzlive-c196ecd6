@@ -151,17 +151,12 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
       )}
       onClick={handleClick}
     >
-      {/* Thumbnail - always visible as fallback */}
-      <img
-        src={thumbnailSrc}
-        alt=""
-        className="absolute inset-0 h-full w-full object-cover"
-        loading="lazy"
-        draggable={false}
-      />
-
-      {/* Video layer - uses HLSPlayer (handles its own poster→video crossfade) */}
-      {isVideo && isAutoplayCandidate && item.playbackUrl && config.autoplayEnabled && (
+      {/* 
+        Single media layer - EITHER thumbnail OR HLSPlayer (not both!)
+        When HLSPlayer renders, it handles its own poster→video crossfade.
+        This prevents the double-poster flicker bug.
+      */}
+      {isVideo && isAutoplayCandidate && item.playbackUrl && config.autoplayEnabled ? (
         <HLSPlayer
           ref={playerRef}
           src={item.playbackUrl}
@@ -173,6 +168,15 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
           externallyManaged
           onLoadedData={handleCanPlay}
           className="absolute inset-0 h-full w-full"
+        />
+      ) : (
+        /* Thumbnail fallback for non-video / non-autoplay / missing playbackUrl */
+        <img
+          src={thumbnailSrc}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="lazy"
+          draggable={false}
         />
       )}
 
