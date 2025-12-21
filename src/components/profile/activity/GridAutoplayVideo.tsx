@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import React, { useEffect, useRef, forwardRef, useImperativeHandle, useCallback } from 'react';
 import Hls from 'hls.js';
 
 interface GridAutoplayVideoProps {
@@ -6,6 +6,7 @@ interface GridAutoplayVideoProps {
   poster?: string;
   className?: string;
   onCanPlay?: () => void;
+  onError?: (info: { code?: number; message?: string; src?: string }) => void;
 }
 
 /**
@@ -14,7 +15,7 @@ interface GridAutoplayVideoProps {
  * Stays muted + looped for grid preview.
  */
 const GridAutoplayVideo = forwardRef<HTMLVideoElement, GridAutoplayVideoProps>(
-  ({ src, poster, className, onCanPlay }, ref) => {
+  ({ src, poster, className, onCanPlay, onError }, ref) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const hlsRef = useRef<Hls | null>(null);
     const hlsReadyRef = useRef(false);
@@ -57,8 +58,13 @@ const GridAutoplayVideo = forwardRef<HTMLVideoElement, GridAutoplayVideoProps>(
         });
 
         hlsRef.current.on(Hls.Events.ERROR, (_, data) => {
-          if (import.meta.env.DEV && data.fatal) {
-            console.error('[GridAutoplayVideo][HLS Error]', data.type, data.details);
+          if (data.fatal) {
+            // Always log fatal HLS errors (these are actionable and often differ in WebViews)
+            console.error('[GridAutoplayVideo][HLS Fatal]', {
+              type: data.type,
+              details: data.details,
+              src,
+            });
           }
         });
 
@@ -79,6 +85,21 @@ const GridAutoplayVideo = forwardRef<HTMLVideoElement, GridAutoplayVideoProps>(
       hlsReadyRef.current = true;
     }, [src, onCanPlay]);
 
+    const handleError = useCallback(
+      (e: React.SyntheticEvent<HTMLVideoElement>) => {
+        const el = e.currentTarget;
+        const info = {
+          code: el.error?.code,
+          message: (el.error as any)?.message,
+          src: el.currentSrc || el.src || src,
+        };
+
+        console.error('[GridAutoplayVideo] Error', info);
+        onError?.(info);
+      },
+      [onError, src]
+    );
+
     return (
       <video
         ref={videoRef}
@@ -88,6 +109,7 @@ const GridAutoplayVideo = forwardRef<HTMLVideoElement, GridAutoplayVideoProps>(
         playsInline
         preload="metadata"
         onCanPlay={onCanPlay}
+        onError={handleError}
         className={className}
       />
     );
