@@ -93,6 +93,7 @@ export default function BusinessPostCard({
   const [insightsOpen, setInsightsOpen] = useState(false);
   const [pinPickerOpen, setPinPickerOpen] = useState(false);
   const playerRef = useRef<HLSPlayerRef>(null);
+  const cardRef = useRef<HTMLDivElement>(null); // Sentinel for IntersectionObserver
   
   const { pin, unpin, isPinning } = usePinPost(businessId);
   const isPinned = post.is_pinned && (!post.pinned_until || new Date(post.pinned_until) > new Date());
@@ -150,20 +151,29 @@ export default function BusinessPostCard({
     : primaryMedia?.media_url;
 
   // Register video for autoplay (ALL videos for business, not every 3rd)
+  // Uses cardRef as observeTarget so IntersectionObserver observes the full card, not the video element
   useEffect(() => {
     if (!isVideo || !registerVideo) return;
     
-    const el = playerRef.current?.getElement();
-    if (!el) return;
-    
-    registerVideo({
-      id: post.id,
-      element: el,
-      isCandidate: true,
-      sortIndex: videoIndex,
-    });
+    const checkAndRegister = () => {
+      const el = playerRef.current?.getElement();
+      const cardEl = cardRef.current;
+      if (!el || !cardEl) return;
+      
+      registerVideo({
+        id: post.id,
+        element: el,
+        observeTarget: cardEl, // Observe the card wrapper, not the video element
+        isCandidate: true,
+        sortIndex: videoIndex,
+      });
+    };
+
+    checkAndRegister();
+    const retryTimer = setTimeout(checkAndRegister, 100);
 
     return () => {
+      clearTimeout(retryTimer);
       registerVideo({
         id: post.id,
         element: null,
@@ -224,6 +234,7 @@ export default function BusinessPostCard({
     <>
       {/* Post tile - full width with border gutter */}
       <div
+        ref={cardRef}
         className={cn(
           "bg-white overflow-hidden border-x border-border/40",
           isPinned && "ring-1 ring-border/60"

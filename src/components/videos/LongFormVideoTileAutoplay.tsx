@@ -41,6 +41,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
 }) => {
   const playerRef = useRef<HLSPlayerRef>(null);
   const mediaWrapRef = useRef<HTMLDivElement>(null);
+  const tileRef = useRef<HTMLDivElement>(null); // Sentinel for IntersectionObserver
   const hasVideo = !!video.mediaUrl;
 
 
@@ -49,6 +50,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
   videoIndexRef.current = videoIndex;
 
   // Register video with grid autoplay system using useLayoutEffect for ref timing
+  // Uses tileRef as observeTarget so IntersectionObserver observes the full tile, not the video element
   useEffect(() => {
     if (!registerVideo || !hasVideo) return;
 
@@ -57,19 +59,20 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
 
     const registerWithRef = () => {
       const videoEl = playerRef.current?.getElement();
-      const wrapperEl = mediaWrapRef.current;
+      const tileEl = tileRef.current;
       
-      if (videoEl && wrapperEl) {
+      if (videoEl && tileEl) {
         if (import.meta.env.DEV) {
           console.log('[LongFormTile][register]', video.id.slice(0, 8), {
             hasVideoEl: !!videoEl,
-            hasWrapperEl: !!wrapperEl,
+            hasTileEl: !!tileEl,
             sortIndex: videoIndexRef.current,
           });
         }
         registerVideo({
           id: video.id,
           element: videoEl,
+          observeTarget: tileEl, // Observe the tile wrapper, not the video element
           isCandidate,
           sortIndex: videoIndexRef.current,
         });
@@ -110,6 +113,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
 
   return (
     <div
+      ref={tileRef}
       className={cn(
         "group cursor-pointer bg-card border border-border/30 overflow-hidden",
         className

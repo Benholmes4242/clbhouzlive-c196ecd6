@@ -23,9 +23,9 @@ export interface UseMediaAutoplayOptions {
   // Mode
   mode?: 'grid' | 'feed';
   
-  // Thresholds (60/40 standard)
-  startThreshold?: number;  // Start playing at this visibility (default: 0.6)
-  stopThreshold?: number;   // Stop playing at this visibility (default: 0.4)
+  // Thresholds (40/25 standard for sentinel-based observation)
+  startThreshold?: number;  // Start playing at this visibility (default: 0.4)
+  stopThreshold?: number;   // Stop playing at this visibility (default: 0.25)
   
   // Preload
   preloadMargin?: number;   // Pixels to start preloading (default: 300)
@@ -51,8 +51,10 @@ export type RegisterMediaFn = (args: {
 export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   const {
     mode = 'grid',
-    startThreshold = 0.6,
-    stopThreshold = 0.4,
+    // Updated thresholds for grid mode with observeTarget sentinel pattern
+    // Lower thresholds work better when observing full tile wrappers
+    startThreshold = 0.4,
+    stopThreshold = 0.25,
     preloadMargin = 300,
     maxPreloading = 3,
     scrollSettleDelay = 200,
