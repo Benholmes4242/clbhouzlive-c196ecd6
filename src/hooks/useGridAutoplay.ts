@@ -93,6 +93,14 @@ export function useGridAutoplay(
       if (!v.element) return;
 
       if (shouldPlay) {
+        // IMPORTANT: Check if already playing to prevent repeated play() calls
+        // This prevents AbortError from play() being interrupted by another play()
+        if (!v.element.paused && !v.element.ended) {
+          // Already playing, just track it
+          newPlayingIds.add(v.id);
+          return;
+        }
+        
         // IMPORTANT: for HLS/HLS.js sources, readyState can remain low until a play()
         // attempt kicks off buffering. So we always attempt play() for the chosen video.
         const attemptPlay = () => {
@@ -118,7 +126,7 @@ export function useGridAutoplay(
                 pendingPlayRef.current.add(v.id);
                 requestAnimationFrame(() => {
                   setTimeout(() => {
-                    if (visibleRef.current.has(v.id) && v.isCandidate) {
+                    if (visibleRef.current.has(v.id) && v.isCandidate && v.element.paused) {
                       v.element.play().catch(() => {
                         pendingPlayRef.current.delete(v.id);
                       });
@@ -315,8 +323,8 @@ export function useGridAutoplay(
 
   // Init autoplay observer with hysteresis
   useEffect(() => {
-    // Use multiple thresholds for hysteresis detection
-    const thresholds = [0, visibilityStopThreshold, visibilityThreshold, 1];
+    // Use ONLY start/stop thresholds - no 0 threshold to avoid spurious triggers
+    const thresholds = [visibilityStopThreshold, visibilityThreshold];
     
     autoplayObserverRef.current = new IntersectionObserver(
       entries => {
@@ -325,23 +333,27 @@ export function useGridAutoplay(
           const id = el.dataset.gridVideoId;
           if (!id) return;
 
-          if (import.meta.env.DEV) {
-            // eslint-disable-next-line no-console
-            console.log('[GridAutoplay][IO]', id, entry.intersectionRatio.toFixed(2), entry.isIntersecting);
-          }
+          const ratio = entry.intersectionRatio;
+          
+          // IMPORTANT: Ignore isIntersecting, use ratio-based gating only
+          // This prevents spurious 0.00 triggers from causing play/pause churn
 
           const match = videosRef.current.get(id);
           if (!match) return;
 
-          const wasVisible = visibleRef.current.has(id);
+          if (import.meta.env.DEV) {
+            const wasVisible = visibleRef.current.has(id);
+            // eslint-disable-next-line no-console
+            console.log('[GridAutoplay][IO]', id.slice(0, 8), `ratio=${ratio.toFixed(2)}`, `wasVisible=${wasVisible}`);
+          }
           
-          // Hysteresis logic:
+          // Hysteresis logic (ratio-based only, ignore isIntersecting):
           // - Start playing when ratio >= visibilityThreshold (0.6)
-          // - Stop playing when ratio < visibilityStopThreshold (0.4)
+          // - Stop playing when ratio <= visibilityStopThreshold (0.4)
           // - In between: maintain current state (no flicker)
-          if (entry.intersectionRatio >= visibilityThreshold) {
+          if (ratio >= visibilityThreshold) {
             visibleRef.current.add(id);
-          } else if (entry.intersectionRatio < visibilityStopThreshold) {
+          } else if (ratio <= visibilityStopThreshold) {
             visibleRef.current.delete(id);
           }
           // If between stop and start thresholds, keep current state (hysteresis)

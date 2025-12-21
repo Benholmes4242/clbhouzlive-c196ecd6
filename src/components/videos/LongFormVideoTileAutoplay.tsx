@@ -48,6 +48,10 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
   const [isRegistered, setIsRegistered] = useState(false);
   const [intersectionRatio, setIntersectionRatio] = useState(0);
 
+  // Store videoIndex in a ref so registration doesn't retrigger when it changes
+  const videoIndexRef = useRef(videoIndex);
+  videoIndexRef.current = videoIndex;
+
   // Register video with grid autoplay system using useLayoutEffect for ref timing
   useEffect(() => {
     if (!registerVideo || !hasVideo) return;
@@ -61,10 +65,10 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
       
       if (videoEl && wrapperEl) {
         if (import.meta.env.DEV) {
-          console.log('[LongFormTile][register]', video.id, {
+          console.log('[LongFormTile][register]', video.id.slice(0, 8), {
             hasVideoEl: !!videoEl,
             hasWrapperEl: !!wrapperEl,
-            sortIndex: videoIndex,
+            sortIndex: videoIndexRef.current,
           });
         }
         registerVideo({
@@ -72,7 +76,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
           element: videoEl,
           viewportEl: wrapperEl,
           isCandidate,
-          sortIndex: videoIndex,
+          sortIndex: videoIndexRef.current,
         });
         setIsRegistered(true);
       } else {
@@ -92,10 +96,12 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
         id: video.id,
         element: null,
         isCandidate,
-        sortIndex: videoIndex,
+        sortIndex: videoIndexRef.current,
       });
     };
-  }, [registerVideo, video.id, videoIndex, hasVideo]);
+    // IMPORTANT: Do NOT include videoIndex in deps - use ref instead to prevent re-registration
+    // when section order changes due to lazy loading
+  }, [registerVideo, video.id, hasVideo]);
 
   // Track tile visibility ratio (debug)
   useEffect(() => {
