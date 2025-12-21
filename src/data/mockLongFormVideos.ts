@@ -12,7 +12,7 @@ import type { LongFormVideo } from '@/components/videos/LongFormVideoTile';
 
 // ============ FEATURE FLAG ============
 // Set to true to enable mock videos in the Videos tab
-export const ENABLE_MOCK_LONGFORM_VIDEOS = false;
+export const ENABLE_MOCK_LONGFORM_VIDEOS = true;
 // ======================================
 
 // Placeholder thumbnail URLs (using Unsplash golf images)
