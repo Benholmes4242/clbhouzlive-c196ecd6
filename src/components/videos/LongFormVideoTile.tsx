@@ -2,6 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { Play, Flame } from 'lucide-react';
 import { VideoQueueMenu } from './VideoQueueMenu';
+import { GolferAvatar } from '@/components/golfers/GolferAvatar';
 import type { QueueItemMeta } from '@/hooks/useVideoQueue';
 
 export interface LongFormVideo {
@@ -127,22 +128,16 @@ export const LongFormVideoTile: React.FC<LongFormVideoTileProps> = ({
 
       {/* Meta row below thumbnail */}
       <div className="flex gap-3 mt-3">
-        {/* Creator avatar */}
+        {/* Creator squircle avatar */}
         <button
           onClick={handleCreatorClick}
-          className="shrink-0 w-9 h-9 rounded-full overflow-hidden bg-muted hover:ring-2 hover:ring-ring transition-all"
+          className="shrink-0 hover:ring-2 hover:ring-ring transition-all rounded-[34%]"
         >
-          {video.creatorAvatarUrl ? (
-            <img
-              src={video.creatorAvatarUrl}
-              alt={video.creatorName}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center text-sm font-medium text-primary">
-              {video.creatorName.charAt(0).toUpperCase()}
-            </div>
-          )}
+          <GolferAvatar
+            name={video.creatorName}
+            photoUrl={video.creatorAvatarUrl}
+            size={36}
+          />
         </button>
 
         {/* Title + creator + meta */}

@@ -52,7 +52,7 @@ export const useContinueWatching = (limit: number = 10): UseContinueWatchingResu
     setIsLoading(true);
 
     try {
-      // Fetch progress records with video data
+      // Fetch progress records with video data (excluding user_profiles due to no FK)
       const { data, error } = await supabase
         .from('video_progress')
         .select(`
@@ -72,12 +72,6 @@ export const useContinueWatching = (limit: number = 10): UseContinueWatchingResu
               duration_seconds,
               poster_url
             ),
-            user_profiles(
-              id,
-              display_name,
-              username,
-              profile_photo_url
-            ),
             post_likes(count),
             post_views(count)
           )
@@ -92,6 +86,21 @@ export const useContinueWatching = (limit: number = 10): UseContinueWatchingResu
         setVideos([]);
         return;
       }
+
+      if (!data || data.length === 0) {
+        setVideos([]);
+        setIsLoading(false);
+        return;
+      }
+
+      // Fetch profiles separately since posts has no FK to user_profiles
+      const userIds = [...new Set(data.map((item: any) => item.posts?.user_id).filter(Boolean))];
+      const { data: profiles } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url')
+        .in('id', userIds);
+
+      const profileMap = new Map((profiles || []).map((p: any) => [p.id, p]));
 
       // Transform to ContinueWatchingVideo format
       const transformedVideos: ContinueWatchingVideo[] = (data || [])
@@ -108,7 +117,7 @@ export const useContinueWatching = (limit: number = 10): UseContinueWatchingResu
         .map((item: any) => {
           const post = item.posts;
           const media = post?.post_media?.[0];
-          const user = post?.user_profiles;
+          const user = profileMap.get(post?.user_id);
           const mediaDuration = media?.duration_seconds || 0;
 
           const progressPercent = mediaDuration > 0 

@@ -105,7 +105,7 @@ export const useRelatedLongFormVideos = (
         } as LongFormVideo & { _score: number };
       };
 
-      // Base select string for all queries
+      // Base select string for all queries (no user_profiles - fetched separately)
       const selectString = `
         id,
         content,
@@ -123,12 +123,6 @@ export const useRelatedLongFormVideos = (
             name,
             slug
           )
-        ),
-        user_profiles(
-          id,
-          display_name,
-          username,
-          profile_photo_url
         ),
         post_likes(count),
         post_views(count)
@@ -225,6 +219,26 @@ export const useRelatedLongFormVideos = (
           for (const post of popularVideos) {
             const video = transformPost(post);
             if (video) allVideos.push(video);
+          }
+        }
+      }
+
+      // Fetch profiles for all collected videos
+      const userIds = [...new Set(allVideos.map(v => v.creatorUserId))];
+      if (userIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('user_profiles')
+          .select('id, display_name, username, profile_photo_url')
+          .in('id', userIds);
+
+        const profileMap = new Map((profiles || []).map((p: any) => [p.id, p]));
+        
+        // Update videos with profile data
+        for (const video of allVideos) {
+          const profile = profileMap.get(video.creatorUserId);
+          if (profile) {
+            video.creatorName = profile.display_name || profile.username || 'Unknown';
+            video.creatorAvatarUrl = profile.profile_photo_url;
           }
         }
       }
