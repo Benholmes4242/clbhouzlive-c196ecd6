@@ -10,8 +10,6 @@ import { VideosSearchResults } from './VideosSearchResults';
 import { ContinueWatchingSection } from './ContinueWatchingSection';
 import { VideoNudgeBanner } from './VideoNudgeBanner';
 import { useLongFormVideosQuery } from '@/hooks/useLongFormVideosQuery';
-import { useMockVideosQuery } from '@/hooks/useMockVideosQuery';
-import { DISCOVER_VIDEOS_MOCK_DATA } from '@/utils/featureFlags';
 import { useFollowedUsers } from '@/hooks/useFollowedUsers';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import { useVideoNudges } from '@/hooks/useVideoNudges';
@@ -56,9 +54,8 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   const [showQueueReminder, setShowQueueReminder] = useState(false);
 
   // Fetch Continue Watching for de-dupe (priority #1)
-  // Skip continue watching in mock mode since mock videos have no progress
-  const continueWatchingResult = useContinueWatching(DISCOVER_VIDEOS_MOCK_DATA ? 0 : 6);
-  const continueWatchingVideos = DISCOVER_VIDEOS_MOCK_DATA ? [] : continueWatchingResult.videos;
+  const continueWatchingResult = useContinueWatching(6);
+  const continueWatchingVideos = continueWatchingResult.videos;
 
   // Unified media autoplay - uses default 0.4/0.25 thresholds for sentinel-based observation
   const { registerMedia, playingIds } = useMediaAutoplay({
@@ -127,36 +124,32 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   // Category filter - undefined when 'all' (not the string 'all')
   const categoryFilter = categoryParam !== 'all' ? categoryParam : undefined;
 
-  // Select hook based on mock data flag
-  // When DISCOVER_VIDEOS_MOCK_DATA is true, use mock hook which returns test videos
-  const useVideoQuery = DISCOVER_VIDEOS_MOCK_DATA ? useMockVideosQuery : useLongFormVideosQuery;
-
   // Fetch videos using React Query with caching
   // Recommended + Following load immediately, Trending + Courses lazy-load
-  const { videos: recommendedVideosRaw } = useVideoQuery({
+  const { videos: recommendedVideosRaw } = useLongFormVideosQuery({
     section: 'recommended',
-    limit: 10, // More videos in mock mode for stress testing
+    limit: 10,
     category: categoryFilter,
     getBoostScore: memoizedBoostScore,
   });
 
-  const { videos: trendingVideosRaw } = useVideoQuery({
+  const { videos: trendingVideosRaw } = useLongFormVideosQuery({
     section: 'trending',
-    limit: 5, // More videos in mock mode
+    limit: 5,
     category: categoryFilter,
     enabled: trendingTriggered, // Lazy load
   });
 
-  const { videos: followedVideosRaw } = useVideoQuery({
+  const { videos: followedVideosRaw } = useLongFormVideosQuery({
     section: 'following',
-    limit: 5, // More videos in mock mode
+    limit: 5,
     followedCreatorIds: followedIds,
     category: categoryFilter,
   });
 
-  const { videos: coursesVideosRaw } = useVideoQuery({
+  const { videos: coursesVideosRaw } = useLongFormVideosQuery({
     section: 'courses',
-    limit: 5, // More videos in mock mode
+    limit: 5,
     category: categoryFilter,
     enabled: coursesTriggered, // Lazy load
   });
@@ -260,8 +253,8 @@ export const VideosTab: React.FC<VideosTabProps> = ({
       {/* Module 1: Recommended for you (loads immediately) */}
       <VideoSection
         title="Recommended for you"
-        subtitle={DISCOVER_VIDEOS_MOCK_DATA ? "Mock data for stress testing" : "Based on what you watch"}
-        videos={recommendedVideos.slice(0, DISCOVER_VIDEOS_MOCK_DATA ? 8 : 3)}
+        subtitle="Based on what you watch"
+        videos={recommendedVideos.slice(0, 3)}
         onViewAll={() => handleViewAll('recommended')}
         onVideoClick={handleVideoClick}
         onCreatorClick={handleCreatorClick}
@@ -277,7 +270,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
         <VideoSection
           title="Trending this week"
           subtitle="Popular with golfers right now"
-          videos={trendingVideos.slice(0, DISCOVER_VIDEOS_MOCK_DATA ? 5 : 2)}
+          videos={trendingVideos.slice(0, 2)}
           onViewAll={() => handleViewAll('trending')}
           onVideoClick={handleVideoClick}
           onCreatorClick={handleCreatorClick}
@@ -292,7 +285,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
       {/* Module 3: From creators you follow (loads immediately) */}
       <VideoSection
         title="From creators you follow"
-        videos={followedVideos.slice(0, DISCOVER_VIDEOS_MOCK_DATA ? 6 : 3)}
+        videos={followedVideos.slice(0, 3)}
         onViewAll={() => handleViewAll('following')}
         onVideoClick={handleVideoClick}
         onCreatorClick={handleCreatorClick}
@@ -309,7 +302,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
         <VideoSection
           title="Courses & destinations"
           subtitle="Course vlogs and bucket-list rounds"
-          videos={coursesVideos.slice(0, DISCOVER_VIDEOS_MOCK_DATA ? 5 : 2)}
+          videos={coursesVideos.slice(0, 2)}
           onViewAll={() => handleViewAll('courses')}
           onVideoClick={handleVideoClick}
           onCreatorClick={handleCreatorClick}
