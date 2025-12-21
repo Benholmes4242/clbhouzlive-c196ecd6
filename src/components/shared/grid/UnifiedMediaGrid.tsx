@@ -33,10 +33,12 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
   const gridRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
 
-  // Set up autoplay hook
+  // BUSINESS ACTIVITY PATTERN: same autoplay settings
   const { registerVideo, playingIds } = useGridAutoplay({
-    maxPlaying: config.maxAutoplay ?? 2,
+    maxPlaying: config.maxAutoplay ?? 1,
     visibilityThreshold: config.visibilityThreshold ?? 0.6,
+    preloadMargin: 300,
+    scrollSettleDelay: 200,
   });
 
   // Mark autoplay candidates and build layout
