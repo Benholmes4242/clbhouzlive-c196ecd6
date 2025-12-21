@@ -48,11 +48,9 @@ export const CreatorPage: React.FC = () => {
   // Scroll restoration for navigation
   const { savePosition } = useScrollRestoration('creator-page');
 
-  // Unified grid autoplay - same settings as VideosTab
+  // Unified grid autoplay - uses default 0.4/0.25 thresholds for sentinel-based observation
   const { registerMedia, playingIds } = useMediaAutoplay({
     mode: 'grid',
-    startThreshold: 0.6,
-    stopThreshold: 0.4,
   });
 
   // Fetch creator profile data

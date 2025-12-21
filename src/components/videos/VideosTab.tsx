@@ -60,11 +60,9 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   const continueWatchingResult = useContinueWatching(DISCOVER_VIDEOS_MOCK_DATA ? 0 : 6);
   const continueWatchingVideos = DISCOVER_VIDEOS_MOCK_DATA ? [] : continueWatchingResult.videos;
 
-  // Unified media autoplay - new global system with 60/40 thresholds
+  // Unified media autoplay - uses default 0.4/0.25 thresholds for sentinel-based observation
   const { registerMedia, playingIds } = useMediaAutoplay({
     mode: 'grid',
-    startThreshold: 0.6,
-    stopThreshold: 0.4,
     preloadMargin: 300,
     scrollSettleDelay: 200,
   });

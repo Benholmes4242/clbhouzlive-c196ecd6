@@ -88,6 +88,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
       registerVideo({
         id: item.postId,
         element: null,
+        observeTarget: null, // Explicit cleanup
         isCandidate: isAutoplayCandidate,
         sortIndex: item.sortIndex ?? 0,
       });
