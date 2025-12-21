@@ -31,7 +31,7 @@ export const MEDIA_RUNTIME_V2 = true;
  * When true: shows scrubber overlay on all HLSPlayer video tiles
  * When false: no scrubber overlay
  */
-export const MEDIA_SCRUBBER_V1 = import.meta.env.DEV;
+export const MEDIA_SCRUBBER_V1 = true;
 
 /**
  * Media Telemetry V1 Feature Flag
