@@ -18,6 +18,7 @@ import { useSwipeable } from 'react-swipeable';
 import { cn } from '@/lib/utils';
 import HLSPlayer, { HLSPlayerRef } from './HLSPlayer';
 import { useMediaSystem } from './MediaSystemProvider';
+import { runtimeSetModalOpen, runtimeUserMute, runtimeClearOnFullscreenClose } from './runtime';
 
 // Warm pool size: preload ±1 adjacent videos
 const WARM_POOL_SIZE = 1;
@@ -127,6 +128,7 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
           break;
         case 'm':
         case 'M':
+          runtimeUserMute();
           setMuted(!isMuted);
           break;
         case ' ':
@@ -157,6 +159,17 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
     delta: 50,
     preventScrollOnSwipe: true,
   });
+  
+  // ============ Runtime UI State ============
+  
+  useEffect(() => {
+    runtimeSetModalOpen(isOpen);
+    return () => {
+      if (isOpen) {
+        runtimeClearOnFullscreenClose();
+      }
+    };
+  }, [isOpen]);
   
   // ============ Body Scroll Lock ============
   
@@ -287,7 +300,10 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
       {/* Mute Toggle */}
       {isVideo && (
         <button
-          onClick={() => setMuted(!isMuted)}
+          onClick={() => {
+            runtimeUserMute();
+            setMuted(!isMuted);
+          }}
           className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-black/65 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white hover:bg-black/80 transition-colors"
           aria-label={isMuted ? 'Unmute' : 'Mute'}
         >

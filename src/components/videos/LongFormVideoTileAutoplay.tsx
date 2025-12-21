@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { Play, Flame, Heart } from 'lucide-react';
 import { VideoQueueMenu } from './VideoQueueMenu';
 import { GolferAvatar } from '@/components/golfers/GolferAvatar';
-import { HLSPlayer, HLSPlayerRef } from '@/media';
+import { HLSPlayer, HLSPlayerRef, runtimeUserTap } from '@/media';
 import type { QueueItemMeta } from '@/hooks/useVideoQueue';
 import type { RegisterMediaFn } from '@/media';
 import type { LongFormVideo } from './LongFormVideoTile';
@@ -121,7 +121,11 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
         "group cursor-pointer bg-card border border-border/30 overflow-hidden",
         className
       )}
-      onClick={() => onVideoClick?.(video.id)}
+      onClick={() => {
+        // Establish user intent before navigation to prevent autoplay churn
+        runtimeUserTap(video.id);
+        onVideoClick?.(video.id);
+      }}
     >
       {/* Media Section - 16:9 aspect ratio */}
       <div

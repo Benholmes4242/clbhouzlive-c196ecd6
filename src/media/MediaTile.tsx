@@ -16,6 +16,7 @@ import { Play, Eye } from 'lucide-react';
 import HLSPlayer, { HLSPlayerRef } from './HLSPlayer';
 import { cn } from '@/lib/utils';
 import type { RegisterMediaFn } from './useMediaAutoplay';
+import { runtimeUserTap } from './runtime';
 
 // ============ Types ============
 
@@ -120,8 +121,12 @@ const MediaTile: React.FC<MediaTileProps> = ({
   // ============ Click Handler ============
   
   const handleClick = useCallback(() => {
+    // Establish user intent for video before navigation
+    if (type === 'video') {
+      runtimeUserTap(id);
+    }
     onClick?.();
-  }, [onClick]);
+  }, [onClick, id, type]);
   
   // ============ Aspect Ratio ============
   

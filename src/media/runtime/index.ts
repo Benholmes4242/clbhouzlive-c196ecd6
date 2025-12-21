@@ -13,3 +13,13 @@ export type {
   RuntimeState,
   RuntimeTelemetry,
 } from './MediaRuntime';
+
+// Intent helpers
+export {
+  runtimeUserTap,
+  runtimeUserMute,
+  runtimeUserPause,
+  runtimeUserScrub,
+  runtimeSetModalOpen,
+  runtimeClearOnFullscreenClose,
+} from './runtimeIntent';

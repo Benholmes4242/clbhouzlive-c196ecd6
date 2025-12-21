@@ -7,6 +7,7 @@
 
 import React, { createContext, useContext, useRef, useCallback, useEffect, useState, useMemo } from 'react';
 import { safePlay } from '@/utils/safePlay';
+import { runtimeUserMute } from './runtime';
 
 // ============ Types ============
 
@@ -113,6 +114,7 @@ export const MediaSystemProvider: React.FC<{ children: React.ReactNode }> = ({ c
   }, []);
   
   const toggleMute = useCallback(() => {
+    runtimeUserMute();
     setMuted(!isMuted);
   }, [isMuted, setMuted]);
   

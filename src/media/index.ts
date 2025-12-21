@@ -16,6 +16,14 @@ export type { UseMediaAutoplayOptions, RegisterMediaFn, MediaAutoplayRegistratio
 
 // Runtime (new global playback authority)
 export { MediaRuntime, useMediaRuntime } from './runtime';
+export {
+  runtimeUserTap,
+  runtimeUserMute,
+  runtimeUserPause,
+  runtimeUserScrub,
+  runtimeSetModalOpen,
+  runtimeClearOnFullscreenClose,
+} from './runtime';
 export type {
   MediaSurface,
   PlaybackReason,
