@@ -540,9 +540,11 @@ class MediaRuntimeCore {
   
   /**
    * Report that active media is buffering - suppress autoplay switching briefly
+   * Only applies to active autoplay (not user-initiated playback)
    */
   reportBuffering(id: string): void {
-    if (id === this.state.activeMediaId) {
+    // Only suppress switching if this is the active autoplay video
+    if (id === this.state.activeMediaId && this.state.activeReason === 'autoplay') {
       this.bufferingSuppressUntil = Date.now() + BUFFERING_SUPPRESS_DURATION;
     }
   }
