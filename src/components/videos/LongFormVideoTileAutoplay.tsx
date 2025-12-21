@@ -56,10 +56,12 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
     const isCandidate = true;
 
     const registerWithRef = () => {
-      if (videoRef.current) {
+      const videoEl = videoRef.current;
+      if (videoEl) {
         registerVideo({
           id: video.id,
-          element: videoRef.current,
+          element: videoEl,
+          viewportEl: mediaWrapRef.current,
           isCandidate,
           sortIndex: videoIndex,
         });

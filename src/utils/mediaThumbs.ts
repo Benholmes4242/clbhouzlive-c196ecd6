@@ -26,8 +26,16 @@ export function buildImageThumbnailUrl(
   // For blob URLs (local files), return as-is since we can't transform them
   if (url.startsWith('blob:')) return url;
 
+  // Cloudflare Stream thumbnail endpoints do NOT support generic image transform params.
+  // If we append width/height/fit, they can 400 and spam logs.
+  const isStreamThumb =
+    /\/thumbnails\/thumbnail\.jpg/i.test(url) &&
+    (url.includes('videodelivery.net') || url.includes('cloudflarestream.com'));
+
+  if (isStreamThumb) return url;
+
   const sep = url.includes('?') ? '&' : '?';
-  
+
   // Add transformation params (works with Cloudflare R2/Images)
   return `${url}${sep}width=${width}&height=${height}&fit=${fit}`;
 }
@@ -47,6 +55,9 @@ export function buildVideoPosterUrl(
 
   // For blob URLs (local files), return as-is
   if (url.startsWith('blob:')) return url;
+
+  // If this is already a Stream thumbnail URL, don't append generic params.
+  if (/\/thumbnails\/thumbnail\.jpg/i.test(url)) return url;
 
   // Check if this is a Cloudflare Stream URL
   if (url.includes('cloudflarestream.com') || url.includes('customer-')) {

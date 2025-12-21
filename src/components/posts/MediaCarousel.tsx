@@ -58,9 +58,19 @@ const MediaCarousel = ({
       if (item.type === 'image') {
         const img = new Image();
         const baseUrl = item.previewUrl || item.url || (item.file ? URL.createObjectURL(item.file) : '');
+        if (!baseUrl) return;
+
+        const isStreamThumb =
+          /\/thumbnails\/thumbnail\.jpg/i.test(baseUrl) &&
+          (baseUrl.includes('videodelivery.net') || baseUrl.includes('cloudflarestream.com'));
+
         // Preload thumbnail, not full-res
-        const sep = baseUrl.includes('?') ? '&' : '?';
-        img.src = baseUrl.startsWith('blob:') ? baseUrl : `${baseUrl}${sep}width=600&height=600&fit=cover`;
+        if (baseUrl.startsWith('blob:') || isStreamThumb) {
+          img.src = baseUrl;
+        } else {
+          const sep = baseUrl.includes('?') ? '&' : '?';
+          img.src = `${baseUrl}${sep}width=600&height=600&fit=cover`;
+        }
       }
     });
   }, [activeIndex, items]);
