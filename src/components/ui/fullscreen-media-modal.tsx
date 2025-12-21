@@ -137,21 +137,15 @@ const FullscreenMediaModal = ({
   const userIdFromProp = user?.id || (user as any)?.user_id;
   const isOwnPost = postId && currentUser && userIdFromProp && currentUser.id === userIdFromProp;
   
-  // Debug logging to help identify issues
-  console.log('🔍 FullscreenMediaModal - User ownership check:', {
-    postId,
-    currentUserId: currentUser?.id,
-    userIdFromProp,
-    isOwnPost,
-    userObject: user,
-    hasPostManagementProps: !!onPostDeleted && !!onPostEdit
-  });
-
-  // Additional debugging for the three dots button
-  console.log('🔍 Three dots button should render:', {
-    isOwnPost,
-    hasRequiredCallbacks: !!onPostDeleted && !!onPostEdit
-  });
+  // Debug logging only in dev and only when postId is provided but undefined
+  if (import.meta.env.DEV && postId === undefined && (onPostDeleted || onPostEdit)) {
+    console.warn('[FullscreenMediaModal] postId is undefined but post management callbacks were provided', {
+      userIdFromProp,
+      hasUser: !!user,
+      hasPostDeleted: !!onPostDeleted,
+      hasPostEdit: !!onPostEdit,
+    });
+  }
   
   // Register modal state for Echo detection
   useModalState(isOpen);
