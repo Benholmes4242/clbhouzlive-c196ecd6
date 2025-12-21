@@ -187,8 +187,6 @@ const VideoCardWithAutoplay: React.FC<VideoCardWithAutoplayProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [hasVideoError, setHasVideoError] = useState(false);
-  const videoIndexRef = useRef(videoIndex);
-  videoIndexRef.current = videoIndex;
 
   // Generate HLS URL from stream ID
   const uid = item.src ? uidFromNode({ src: item.src }) : null;
@@ -204,38 +202,26 @@ const VideoCardWithAutoplay: React.FC<VideoCardWithAutoplayProps> = ({
     setHasVideoError(false);
   }, [item.id, hlsUrl]);
 
-  // BUSINESS ACTIVITY PATTERN: immediate + 100ms retry registration
+  // BUSINESS ACTIVITY PATTERN: immediate only, videoIndex in deps (matches BusinessPostCard exactly)
   useEffect(() => {
-    if (!registerVideo || !hasVideo) return;
+    if (!hasVideo || !videoRef.current || !registerVideo) return;
 
-    const isCandidate = true;
-
-    const checkAndRegister = () => {
-      const videoEl = videoRef.current;
-      if (videoEl) {
-        registerVideo({
-          id: item.id,
-          element: videoEl,
-          isCandidate,
-          sortIndex: videoIndexRef.current,
-        });
-      }
-    };
-
-    // Immediate + 100ms retry (matches StandardPostTile/UnifiedMediaTile/LongFormVideoTileAutoplay)
-    checkAndRegister();
-    const retryTimer = setTimeout(checkAndRegister, 100);
+    registerVideo({
+      id: item.id,
+      element: videoRef.current,
+      isCandidate: true,
+      sortIndex: videoIndex,
+    });
 
     return () => {
-      clearTimeout(retryTimer);
       registerVideo({
         id: item.id,
         element: null,
-        isCandidate,
-        sortIndex: videoIndexRef.current,
+        isCandidate: true,
+        sortIndex: videoIndex,
       });
     };
-  }, [registerVideo, item.id, hasVideo]);
+  }, [hasVideo, registerVideo, item.id, videoIndex]);
 
   const handleCanPlay = useCallback(() => {
     setIsVideoReady(true);

@@ -46,9 +46,6 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [hasVideoError, setHasVideoError] = useState(false);
 
-  // Store videoIndex in a ref so registration doesn't retrigger when it changes
-  const videoIndexRef = useRef(videoIndex);
-  videoIndexRef.current = videoIndex;
 
   // Reset state when switching videos
   useEffect(() => {
@@ -57,48 +54,26 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
   }, [video.id, video.mediaUrl]);
 
   // Register video with grid autoplay system
-  // MATCHES Business Activity pattern exactly: immediate + 100ms retry (no RAF)
+  // MATCHES BusinessPostCard exactly: immediate only, videoIndex in deps
   useEffect(() => {
-    if (!registerVideo || !hasVideo) return;
+    if (!hasVideo || !videoRef.current || !registerVideo) return;
 
-    // Every video is a candidate for autoplay in long-form context
-    const isCandidate = true;
-
-    const checkAndRegister = () => {
-      const videoEl = videoRef.current;
-      if (videoEl) {
-        if (import.meta.env.DEV) {
-          console.log('[LongFormTile][register]', video.id.slice(0, 8), {
-            hasVideoEl: !!videoEl,
-            sortIndex: videoIndexRef.current,
-          });
-        }
-        registerVideo({
-          id: video.id,
-          element: videoEl,
-          isCandidate,
-          sortIndex: videoIndexRef.current,
-        });
-      }
-    };
-
-    // Immediate registration attempt + 100ms retry (matches StandardPostTile/UnifiedMediaTile)
-    checkAndRegister();
-    const retryTimer = setTimeout(checkAndRegister, 100);
+    registerVideo({
+      id: video.id,
+      element: videoRef.current,
+      isCandidate: true,
+      sortIndex: videoIndex,
+    });
 
     return () => {
-      clearTimeout(retryTimer);
-      // Deregister on unmount
       registerVideo({
         id: video.id,
         element: null,
-        isCandidate,
-        sortIndex: videoIndexRef.current,
+        isCandidate: true,
+        sortIndex: videoIndex,
       });
     };
-    // IMPORTANT: Do NOT include videoIndex in deps - use ref instead to prevent re-registration
-    // when section order changes due to lazy loading
-  }, [registerVideo, video.id, hasVideo]);
+  }, [hasVideo, registerVideo, video.id, videoIndex]);
 
   const formatLikes = (count?: number): string => {
     if (!count) return '0';
