@@ -37,6 +37,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   isPlaying = false,
 }) => {
   const playerRef = useRef<HLSPlayerRef>(null);
+  const tileRef = useRef<HTMLButtonElement>(null); // Sentinel for IntersectionObserver
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [resolvedDurationSeconds, setResolvedDurationSeconds] = useState<number | null | undefined>(
     item.durationSeconds
@@ -61,16 +62,18 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
     setResolvedDurationSeconds(item.durationSeconds);
   }, [item.durationSeconds]);
 
-  // Register video with autoplay hook
+  // Register video with autoplay hook - using tile wrapper as observeTarget
   useEffect(() => {
     if (!isVideo || !registerVideo || !config.autoplayEnabled) return;
 
     const checkAndRegister = () => {
       const videoEl = playerRef.current?.getElement();
-      if (videoEl) {
+      const tileEl = tileRef.current;
+      if (videoEl && tileEl) {
         registerVideo({
           id: item.postId,
           element: videoEl,
+          observeTarget: tileEl, // Observe the tile wrapper, not the video element
           isCandidate: isAutoplayCandidate,
           sortIndex: item.sortIndex ?? 0,
         });
@@ -135,6 +138,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
 
   return (
     <motion.button
+      ref={tileRef}
       type="button"
       className={cn(
         aspectClass,
