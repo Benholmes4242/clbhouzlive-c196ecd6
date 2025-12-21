@@ -123,33 +123,56 @@ export const VideosTab: React.FC<VideosTabProps> = ({
 
   // Fetch videos using React Query with caching
   // Recommended + Following load immediately, Trending + Courses lazy-load
-  const { videos: recommendedVideos, isLoading: recLoading } = useLongFormVideosQuery({
+  const { videos: recommendedVideosRaw } = useLongFormVideosQuery({
     section: 'recommended',
     limit: 4,
     category: categoryFilter,
     getBoostScore: memoizedBoostScore,
   });
 
-  const { videos: trendingVideos, isLoading: trendLoading } = useLongFormVideosQuery({
+  const { videos: trendingVideosRaw } = useLongFormVideosQuery({
     section: 'trending',
     limit: 3,
     category: categoryFilter,
     enabled: trendingTriggered, // Lazy load
   });
 
-  const { videos: followedVideos, isLoading: followLoading } = useLongFormVideosQuery({
+  const { videos: followedVideosRaw } = useLongFormVideosQuery({
     section: 'following',
     limit: 4,
     followedCreatorIds: followedIds,
     category: categoryFilter,
   });
 
-  const { videos: coursesVideos, isLoading: coursesLoading } = useLongFormVideosQuery({
+  const { videos: coursesVideosRaw } = useLongFormVideosQuery({
     section: 'courses',
     limit: 3,
     category: categoryFilter,
     enabled: coursesTriggered, // Lazy load
   });
+
+  // Hard de-dupe: each video can appear in only ONE section across the entire page
+  // Priority order: Continue Watching → Following → Recommended → Trending → Courses
+  const { recommendedVideos, followedVideos, trendingVideos, coursesVideos } = useMemo(() => {
+    const seen = new Set<string>();
+    
+    const dedupe = <T extends { id: string }>(videos: T[]): T[] => 
+      videos.filter(v => v?.id && !seen.has(v.id) && (seen.add(v.id), true));
+    
+    // Process in priority order
+    // Note: Continue Watching handles its own data, so we skip it here
+    const followed = dedupe(followedVideosRaw);
+    const recommended = dedupe(recommendedVideosRaw);
+    const trending = dedupe(trendingVideosRaw);
+    const courses = dedupe(coursesVideosRaw);
+    
+    return {
+      followedVideos: followed,
+      recommendedVideos: recommended,
+      trendingVideos: trending,
+      coursesVideos: courses,
+    };
+  }, [followedVideosRaw, recommendedVideosRaw, trendingVideosRaw, coursesVideosRaw]);
 
   const handleVideoClick = (id: string) => {
     savePosition();

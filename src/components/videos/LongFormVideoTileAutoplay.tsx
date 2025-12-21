@@ -167,9 +167,10 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
         {/* Debug overlay (dev-only) */}
         {isDev && (
           <div className="absolute top-2 left-2 z-10 rounded-md border border-border/70 bg-background/80 px-2 py-1 text-[10px] leading-tight text-foreground backdrop-blur pointer-events-none">
+            <div>id: {video.id.slice(0, 8)}</div>
             <div>registered: {isRegistered ? 'yes' : 'no'}</div>
-            <div>hasMediaUrl: {hasVideo ? 'yes' : 'no'}</div>
-            <div>isPlaying: {isPlaying ? 'yes' : 'no'}</div>
+            <div>hookIsPlaying: {isPlaying ? 'yes' : 'no'}</div>
+            <div>domIsPlaying: {videoRef.current && !videoRef.current.paused ? 'yes' : 'no'}</div>
             <div>ratio: {intersectionRatio.toFixed(2)}</div>
             <div>visible≥0.60: {intersectionRatio >= 0.6 ? 'yes' : 'no'}</div>
           </div>
