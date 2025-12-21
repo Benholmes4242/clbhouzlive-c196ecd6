@@ -31,8 +31,10 @@ interface LongFormVideoTileProps {
 }
 
 /**
- * LongFormVideoTile - YouTube-style video tile for Videos tab
- * 16:9 thumbnail, duration badge bottom-right, title + creator row below
+ * LongFormVideoTile - Card-style video tile matching WatchPage hero layout
+ * - Full-width white card
+ * - 16:9 thumbnail with avatar bottom-right
+ * - White meta card below with title, creator, views, time
  */
 export const LongFormVideoTile: React.FC<LongFormVideoTileProps> = ({
   video,
@@ -70,11 +72,14 @@ export const LongFormVideoTile: React.FC<LongFormVideoTileProps> = ({
 
   return (
     <div
-      className={cn("group cursor-pointer", className)}
+      className={cn(
+        "group cursor-pointer bg-white rounded-2xl overflow-hidden shadow-sm",
+        className
+      )}
       onClick={() => onVideoClick?.(video.id)}
     >
-      {/* Thumbnail */}
-      <div className="relative aspect-video overflow-hidden rounded-xl bg-muted transition-all duration-200 group-hover:ring-2 group-hover:ring-primary/30 group-active:scale-[0.98]">
+      {/* Thumbnail with avatar overlay */}
+      <div className="relative aspect-video overflow-hidden bg-muted">
         {video.thumbnailUrl ? (
           <img
             src={video.thumbnailUrl}
@@ -100,7 +105,7 @@ export const LongFormVideoTile: React.FC<LongFormVideoTileProps> = ({
 
         {/* Trending label - top left */}
         {video.isTrending && (
-          <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-1 bg-orange-500/90 text-white text-xs font-medium rounded-md">
+          <div className="absolute top-3 left-3 flex items-center gap-1 px-2 py-1 bg-orange-500/90 text-white text-xs font-medium rounded-md">
             <Flame className="h-3 w-3" />
             <span>Trending</span>
           </div>
@@ -116,55 +121,52 @@ export const LongFormVideoTile: React.FC<LongFormVideoTileProps> = ({
             durationSeconds={video.durationSeconds}
             onPlayNext={onPlayNext || (() => {})}
             onEnqueue={onEnqueue || (() => {})}
-            className="absolute top-2 right-2"
+            className="absolute top-3 right-3"
           />
         )}
 
-        {/* Duration badge - bottom right (glass pill) */}
-        <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/70 backdrop-blur-sm text-white text-xs font-medium rounded">
+        {/* Duration badge - bottom left */}
+        <div className="absolute bottom-3 left-3 px-2 py-0.5 bg-black/70 backdrop-blur-sm text-white text-xs font-medium rounded">
           {video.duration}
         </div>
-      </div>
 
-      {/* Meta row below thumbnail */}
-      <div className="flex gap-3 mt-3">
-        {/* Creator squircle avatar */}
+        {/* Creator squircle avatar - bottom right, overlapping into meta area */}
         <button
           onClick={handleCreatorClick}
-          className="shrink-0 hover:ring-2 hover:ring-ring transition-all rounded-[34%]"
+          className="absolute bottom-3 right-3 hover:ring-2 hover:ring-ring transition-all rounded-[34%] z-10"
         >
           <GolferAvatar
             name={video.creatorName}
             photoUrl={video.creatorAvatarUrl}
-            size={36}
+            size={40}
           />
         </button>
+      </div>
 
-        {/* Title + creator + meta */}
-        <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-sm text-foreground leading-snug line-clamp-2">
-            {video.title}
-          </h3>
-          <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-            <button
-              onClick={handleCreatorClick}
-              className="hover:text-foreground transition-colors truncate"
-            >
-              {video.creatorName}
-            </button>
-            {video.views !== undefined && video.views > 0 && (
-              <>
-                <span>·</span>
-                <span>{formatViews(video.views)}</span>
-              </>
-            )}
-            {video.createdAt && (
-              <>
-                <span>·</span>
-                <span>{formatTimeAgo(video.createdAt)}</span>
-              </>
-            )}
-          </div>
+      {/* White meta card below thumbnail */}
+      <div className="p-4">
+        <h3 className="font-semibold text-sm text-foreground leading-snug line-clamp-2 mb-2">
+          {video.title}
+        </h3>
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <button
+            onClick={handleCreatorClick}
+            className="hover:text-foreground transition-colors font-medium truncate"
+          >
+            {video.creatorName}
+          </button>
+          {video.views !== undefined && video.views > 0 && (
+            <>
+              <span className="text-muted-foreground/50">·</span>
+              <span>{formatViews(video.views)}</span>
+            </>
+          )}
+          {video.createdAt && (
+            <>
+              <span className="text-muted-foreground/50">·</span>
+              <span>{formatTimeAgo(video.createdAt)}</span>
+            </>
+          )}
         </div>
       </div>
     </div>
