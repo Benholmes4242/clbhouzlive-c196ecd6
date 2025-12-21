@@ -64,6 +64,7 @@ export function BusinessActivityFeed({
     maxPlaying: 1,
     visibilityThreshold: 0.6,
     preloadMargin: 300,
+    scrollSettleDelay: 200,
   });
 
   const canManage = membership?.canManage ?? false;

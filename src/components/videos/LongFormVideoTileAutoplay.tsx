@@ -56,16 +56,16 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
     setHasVideoError(false);
   }, [video.id, video.mediaUrl]);
 
-  // Register video with grid autoplay system (match Business Activity pattern: observe the video element)
+  // Register video with grid autoplay system
+  // MATCHES Business Activity pattern exactly: immediate + 100ms retry (no RAF)
   useEffect(() => {
     if (!registerVideo || !hasVideo) return;
 
     // Every video is a candidate for autoplay in long-form context
     const isCandidate = true;
 
-    const registerWithRef = () => {
+    const checkAndRegister = () => {
       const videoEl = videoRef.current;
-
       if (videoEl) {
         if (import.meta.env.DEV) {
           console.log('[LongFormTile][register]', video.id.slice(0, 8), {
@@ -76,21 +76,18 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
         registerVideo({
           id: video.id,
           element: videoEl,
-          // NOTE: intentionally NOT passing viewportEl; useGridAutoplay will observe the video element
           isCandidate,
           sortIndex: videoIndexRef.current,
         });
-      } else {
-        // Refs not ready, retry
-        requestAnimationFrame(registerWithRef);
       }
     };
 
-    // Use requestAnimationFrame for better ref timing than setTimeout
-    const rafId = requestAnimationFrame(registerWithRef);
+    // Immediate registration attempt + 100ms retry (matches StandardPostTile/UnifiedMediaTile)
+    checkAndRegister();
+    const retryTimer = setTimeout(checkAndRegister, 100);
 
     return () => {
-      cancelAnimationFrame(rafId);
+      clearTimeout(retryTimer);
       // Deregister on unmount
       registerVideo({
         id: video.id,
