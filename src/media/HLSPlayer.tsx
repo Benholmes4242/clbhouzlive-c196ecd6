@@ -334,6 +334,11 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           }
         }
       };
+      
+      // Cleanup __hlsPlayerRef on unmount to prevent stale refs
+      return () => {
+        delete (video as any).__hlsPlayerRef;
+      };
     }
   }, []);
   

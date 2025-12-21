@@ -293,6 +293,9 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   
   // Track which items are prewarmed (attached)
   const prewarmedIds = useRef<Set<string>>(new Set());
+  // Debounce detach to prevent thrash on fast scroll
+  const detachTimeouts = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  const DETACH_DELAY = 400; // ms delay before detaching
   
   useEffect(() => {
     preloadObserver.current = new IntersectionObserver(
@@ -306,10 +309,15 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
           if (!reg) return;
           
           if (entry.isIntersecting) {
+            // Cancel any pending detach for this item
+            const pendingDetach = detachTimeouts.current.get(id);
+            if (pendingDetach) {
+              clearTimeout(pendingDetach);
+              detachTimeouts.current.delete(id);
+            }
+            
             // Near viewport - REAL prewarm: call attach() on the player
             if (!prewarmedIds.current.has(id) && prewarmedIds.current.size < maxPreloading) {
-              // For HLS: calling attach() is the real prewarm
-              // Access the HLSPlayerRef if available through the element
               const playerRef = (target as any).__hlsPlayerRef;
               if (playerRef?.attach) {
                 playerRef.attach();
@@ -323,13 +331,21 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
               registry.current.set(id, reg);
             }
           } else {
-            // Far from viewport - detach to save memory
-            if (prewarmedIds.current.has(id)) {
-              const playerRef = (target as any).__hlsPlayerRef;
-              if (playerRef?.detach) {
-                playerRef.detach();
+            // Far from viewport - debounced detach to prevent thrash
+            if (prewarmedIds.current.has(id) && !detachTimeouts.current.has(id)) {
+              // Only detach if not currently visible (playing)
+              const isVisible = visibleIds.current.has(id);
+              if (!isVisible) {
+                const timeout = setTimeout(() => {
+                  const playerRef = (target as any).__hlsPlayerRef;
+                  if (playerRef?.detach) {
+                    playerRef.detach();
+                  }
+                  prewarmedIds.current.delete(id);
+                  detachTimeouts.current.delete(id);
+                }, DETACH_DELAY);
+                detachTimeouts.current.set(id, timeout);
               }
-              prewarmedIds.current.delete(id);
             }
           }
         });
@@ -350,6 +366,9 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
       preloadObserver.current?.disconnect();
       preloadObserver.current = null;
       prewarmedIds.current.clear();
+      // Clear all pending detach timeouts
+      detachTimeouts.current.forEach((timeout) => clearTimeout(timeout));
+      detachTimeouts.current.clear();
     };
   }, [preloadMargin, maxPreloading]);
   
