@@ -20,7 +20,7 @@ import CreateMomentHero from "./CreateMomentHero";
 import CreateMomentMediaStage from "./CreateMomentMediaStage";
 import CreateMomentComposerPanel from "./CreateMomentComposerPanel";
 import { useDraftPersistence } from "./useDraftPersistence";
-import { CreateMomentProps, GolfCourse, TaggableEntity } from "./types";
+import { CreateMomentProps, GolfCourse, TaggableEntity, MomentType } from "./types";
 
 // Animation constants
 const ECM_ENTRY_DURATION = 500;
@@ -62,6 +62,7 @@ export default function CreateMomentModal({
   const [isTyping, setIsTyping] = useState(false);
   const [showDraftPrompt, setShowDraftPrompt] = useState(false);
   const [selectedTags, setSelectedTags] = useState<TaggableEntity[]>([]);
+  const [momentType, setMomentType] = useState<MomentType | null>(null);
   
   // Get user session
   const { user } = useSupabaseSession();
@@ -94,7 +95,7 @@ export default function CreateMomentModal({
   // Derived state
   const media = useMemo(() => (mediaItems || []).slice(0, 10), [mediaItems]);
   const hasMedia = media.length > 0;
-  const canPost = hasMedia && !isSubmitting && !!user;
+  const canPost = hasMedia && !isSubmitting && !!user && !!momentType;
   const course = selectedCourse || snapCourse;
   const isBusinessActor = activeActor?.type === 'business';
   const currentFilter = hasMedia ? getEdits(media[activeIndex]?.id)?.filter : undefined;
@@ -191,6 +192,7 @@ export default function CreateMomentModal({
       onCourseSelect?.(null);
       setSnapVisibility('public');
       setSelectedTags([]);
+      setMomentType(null);
       
       // Check for draft
       if (hasDraft) {
@@ -529,6 +531,8 @@ export default function CreateMomentModal({
               onTypingStateChange={setIsTyping}
               selectedTags={selectedTags}
               onTagsChange={setSelectedTags}
+              momentType={momentType}
+              onMomentTypeChange={setMomentType}
             />
           </OverlayPortalProvider>
 

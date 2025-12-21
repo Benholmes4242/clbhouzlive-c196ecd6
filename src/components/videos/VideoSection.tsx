@@ -60,11 +60,11 @@ export const VideoSection: React.FC<VideoSectionProps> = ({
   return (
     <section className={cn("", className)}>
       {/* Header with View All */}
-      <div className="flex items-center justify-between px-5 mb-3">
+      <div className="flex items-start justify-between px-5 mb-3">
         <div>
           <h2 className="text-base font-semibold text-foreground">{title}</h2>
           {subtitle && (
-            <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
+            <p className="text-xs text-muted-foreground/70 mt-0.5">{subtitle}</p>
           )}
         </div>
         {showViewAll && onViewAll && (

@@ -1,6 +1,9 @@
 // Types for Create Moment modal components
 import { ComposerMediaItem } from "@/hooks/useSnapModal";
 
+// Moment types for category tagging
+export type MomentType = 'funny' | 'challenge' | 'course-vlog' | 'tips-coaching' | 'review' | 'other';
+
 // Taggable entity for @mentions (matches taggable_entities table)
 export interface TaggableEntity {
   id: string;  // taggable_entities.id - used for post_tags.tagged_entity_id
@@ -47,6 +50,7 @@ export interface CreateMomentSubmitData {
   backgroundMusic: null;
   coverIndex: number;
   studioEditsByMediaId: Record<string, { filter: string }>;
+  momentType?: MomentType;
 }
 
 // Extended media item with order for reordering
@@ -64,6 +68,7 @@ export interface CreateMomentDraft {
   courseCountry?: string;
   visibility: "public" | "private";
   savedAt: number;
+  momentType?: MomentType;
 }
 
 // Upload progress state
