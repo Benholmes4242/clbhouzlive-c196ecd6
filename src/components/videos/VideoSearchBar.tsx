@@ -124,34 +124,45 @@ export const VideoSearchBar: React.FC<VideoSearchBarProps> = ({
   return (
     <div ref={containerRef} className={cn("px-5 relative", className)}>
       <form onSubmit={handleSubmit}>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <input
-            ref={inputRef}
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => setIsFocused(true)}
-            placeholder="Search videos, creators, courses..."
+        <div className="relative h-10">
+          {/* Background layer with blur - separate from content */}
+          <div 
             className={cn(
-              "w-full h-10 pl-10 pr-10 text-sm text-foreground placeholder:text-muted-foreground rounded-full transition-all duration-200",
-              "bg-background/60 backdrop-blur-sm border border-border/60",
+              "absolute inset-0 rounded-full border transition-all duration-200",
+              "bg-background/60 border-border/60",
               isFocused && "bg-background/80 border-border"
             )}
-            style={{
-              outline: 'none',
-              WebkitTapHighlightColor: 'transparent',
-            }}
+            style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
           />
-          {query && (
-            <button
-              type="button"
-              onClick={handleClear}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-muted transition-colors"
-            >
-              <X className="h-3.5 w-3.5 text-muted-foreground" />
-            </button>
-          )}
+          {/* Content layer - icon sits here unblurred */}
+          <div className="relative h-full flex items-center">
+            {/* Search icon - flex centered, no transforms, integer pixel sizing */}
+            <div className="absolute left-3 inset-y-0 flex items-center pointer-events-none">
+              <Search className="h-4 w-4 text-muted-foreground" strokeWidth={2} />
+            </div>
+            <input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onFocus={() => setIsFocused(true)}
+              placeholder="Search videos, creators, courses..."
+              className="w-full h-full pl-10 pr-10 text-sm text-foreground placeholder:text-muted-foreground rounded-full bg-transparent"
+              style={{
+                outline: 'none',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={handleClear}
+                className="absolute right-3 inset-y-0 flex items-center p-1 hover:opacity-70 transition-opacity"
+              >
+                <X className="h-4 w-4 text-muted-foreground" strokeWidth={2} />
+              </button>
+            )}
+          </div>
         </div>
       </form>
 
