@@ -112,7 +112,7 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
 
   return (
     <div 
-      className="bg-card border border-border/60 overflow-hidden cursor-pointer group"
+      className="bg-card border border-border/30 overflow-hidden cursor-pointer group"
       onClick={handleClick}
     >
       {/* Media Section - 16:9 */}

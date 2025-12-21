@@ -60,7 +60,7 @@ export const LongFormVideoTile: React.FC<LongFormVideoTileProps> = ({
   return (
     <div
       className={cn(
-        "group cursor-pointer bg-card border border-border/60 overflow-hidden",
+        "group cursor-pointer bg-card border border-border/30 overflow-hidden",
         className
       )}
       onClick={() => onVideoClick?.(video.id)}
