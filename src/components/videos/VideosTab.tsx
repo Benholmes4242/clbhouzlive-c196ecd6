@@ -18,6 +18,7 @@ import { useVideoQueue } from '@/hooks/useVideoQueue';
 import { useDiscoverySignals } from '@/hooks/useDiscoverySignals';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useGridAutoplay } from '@/hooks/useGridAutoplay';
+import { useContinueWatching } from '@/hooks/useContinueWatching';
 
 interface VideosTabProps {
   onVideoClick?: (id: string) => void;
@@ -52,6 +53,9 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   const { getBoostScore } = useDiscoverySignals();
   const [showQueueNudge, setShowQueueNudge] = useState(false);
   const [showQueueReminder, setShowQueueReminder] = useState(false);
+
+  // Fetch Continue Watching for de-dupe (priority #1)
+  const { videos: continueWatchingVideos } = useContinueWatching(6);
 
   // Unified grid autoplay - same settings as Business Activity
   const { registerVideo, playingIds } = useGridAutoplay({
@@ -156,11 +160,15 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   const { recommendedVideos, followedVideos, trendingVideos, coursesVideos } = useMemo(() => {
     const seen = new Set<string>();
     
+    // First, add Continue Watching IDs (highest priority - they won't appear elsewhere)
+    continueWatchingVideos.forEach(v => {
+      if (v?.id) seen.add(v.id);
+    });
+    
     const dedupe = <T extends { id: string }>(videos: T[]): T[] => 
       videos.filter(v => v?.id && !seen.has(v.id) && (seen.add(v.id), true));
     
-    // Process in priority order
-    // Note: Continue Watching handles its own data, so we skip it here
+    // Process in priority order (after Continue Watching)
     const followed = dedupe(followedVideosRaw);
     const recommended = dedupe(recommendedVideosRaw);
     const trending = dedupe(trendingVideosRaw);
@@ -172,7 +180,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
       trendingVideos: trending,
       coursesVideos: courses,
     };
-  }, [followedVideosRaw, recommendedVideosRaw, trendingVideosRaw, coursesVideosRaw]);
+  }, [continueWatchingVideos, followedVideosRaw, recommendedVideosRaw, trendingVideosRaw, coursesVideosRaw]);
 
   const handleVideoClick = (id: string) => {
     savePosition();
