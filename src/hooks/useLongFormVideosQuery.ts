@@ -90,12 +90,6 @@ async function fetchLongFormVideos(options: Omit<UseLongFormVideosOptions, 'enab
           name
         )
       ),
-      user_profiles(
-        id,
-        display_name,
-        username,
-        profile_photo_url
-      ),
       post_likes(count),
       post_views(count)
     `)
@@ -140,12 +134,25 @@ async function fetchLongFormVideos(options: Omit<UseLongFormVideosOptions, 'enab
   const { data, error: queryError } = await query;
 
   if (queryError) throw queryError;
+  if (!data || data.length === 0) return [];
+
+  // Fetch profiles separately since posts has no FK to user_profiles
+  const userIds = [...new Set(data.map((post: any) => post.user_id))];
+  const { data: profiles } = await supabase
+    .from('user_profiles')
+    .select('id, display_name, username, profile_photo_url')
+    .in('id', userIds);
+
+  // Create profile map for quick lookup
+  const profileMap = new Map(
+    (profiles || []).map((p: any) => [p.id, p])
+  );
 
   type VideoWithScore = { video: LongFormVideo; score: number };
   
-  const videosWithScores: VideoWithScore[] = (data || []).map((post: any) => {
+  const videosWithScores: VideoWithScore[] = data.map((post: any) => {
     const media = post.post_media?.[0];
-    const user = post.user_profiles;
+    const user = profileMap.get(post.user_id);
     
     const golfTag = post.post_tags?.find(
       (tag: any) => tag.taggable_entities?.entity_type === 'golf_club'
