@@ -59,7 +59,7 @@ const FeedVideoPlayer = forwardRef<FeedVideoPlayerRef, FeedVideoPlayerProps>(({
   const hlsUrl = propHlsUrl || apiHlsUrl || (uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null);
   const poster = propPoster || apiPoster || (uid ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` : undefined);
 
-  // Expose unified ref interface to parent
+  // PLAYBACK_AUTHORITY_ALLOWED: Exposes underlying HLSPlayer element for parent control via MediaRuntime
   useImperativeHandle(ref, () => {
     const video = playerRef.current?.getElement();
     if (video) {

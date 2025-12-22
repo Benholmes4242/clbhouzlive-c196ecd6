@@ -17,6 +17,7 @@ export function useAutoplayGuard(
       return;
     }
 
+    // PLAYBACK_AUTHORITY_ALLOWED: Autoplay policy detection must test raw play()
     const tryPlay = async () => {
       try {
         await video.play();

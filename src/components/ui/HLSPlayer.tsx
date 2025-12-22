@@ -92,6 +92,7 @@ export default function HLSPlayer({ src, playing, muted, poster, onReady }: Prop
     v.muted = muted;
   }, [muted]);
 
+  // PLAYBACK_AUTHORITY_ALLOWED: Controlled component - parent sets playing prop via MediaRuntime
   useEffect(() => {
     const v = videoRef.current;
     if (!v || !isVideoReady) return;

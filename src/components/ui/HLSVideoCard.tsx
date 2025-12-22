@@ -197,6 +197,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     if (!v) return;
 
     if (autoplay && attached) {
+      // PLAYBACK_AUTHORITY_ALLOWED: Controlled component - parent sets autoplay prop via MediaRuntime bridge
       const start = async () => {
         if (!ready) return;
         console.log('[OpenFlow]', 'attemptPlay', performance.now());

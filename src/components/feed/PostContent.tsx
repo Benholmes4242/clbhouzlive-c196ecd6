@@ -7,6 +7,7 @@ import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import LazyImage from '@/components/ui/lazy-image';
+import { safePlay } from '@/utils/safePlay';
 
 interface PostContentProps {
   content: {
@@ -45,7 +46,8 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
     e.stopPropagation();
     if (content.videoUrl && videoRef.current) {
       if (videoRef.current.paused) {
-        videoRef.current.play().catch(console.error);
+        // PLAYBACK_AUTHORITY_ALLOWED: User-tap on non-autoplay video uses safePlay
+        safePlay(videoRef.current);
         setIsPlaying(true);
       } else {
         videoRef.current.pause();

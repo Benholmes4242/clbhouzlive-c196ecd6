@@ -561,6 +561,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
       // Seek handshake that can't stall
       scLog({ evt: 'seek_begin', windowStart: +windowStart.toFixed(2) });
       
+      // PLAYBACK_AUTHORITY_ALLOWED: Programmatic seek on temporary video element for frame extraction
       // Start playback first
       try { 
         await video.play();
@@ -679,6 +680,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
     if (useRVFC) (video as any).requestVideoFrameCallback(onRvfc);
     else video.addEventListener("timeupdate", onTimeUpdate);
 
+    // PLAYBACK_AUTHORITY_ALLOWED: Programmatic playback on temporary video element for frame capture
     // Start playback for short clips
     if (duration <= LONG_CLIP_THRESHOLD) {
       try { await video.play(); } catch { /* ignore autoplay issues */ }
@@ -1428,6 +1430,7 @@ const SwingCoach: React.FC<SwingCoachProps> = ({
                         muted
                         loop
                         preload="metadata"
+                        // PLAYBACK_AUTHORITY_ALLOWED: Inline preview autoplay on tiny muted preview thumbnail
                         onLoadedMetadata={(e) => {
                           const v = e.currentTarget;
                           v.currentTime = 0;
