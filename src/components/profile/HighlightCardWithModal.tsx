@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useEffect, useState } from 'react';
+import React, { useCallback, useRef, useEffect, useState, useId } from 'react';
 import { Top100Highlight } from '@/hooks/useTop100Highlights';
 import { MapPin, Play, Volume2, VolumeX } from 'lucide-react';
 import { format } from 'date-fns';
@@ -6,6 +6,7 @@ import { uidFromNode, generateThumbnailUrl } from '@/utils/cloudflareStreamTrans
 import { useVideoVisibility } from '@/hooks/useVideoVisibility';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
 
 interface HighlightCardWithModalProps {
@@ -57,18 +58,21 @@ const HighlightCardWithModal: React.FC<HighlightCardWithModalProps> = ({
     globallyMuted: isMuted
   });
 
-  // Handle play/pause click
+  // Generate stable media ID
+  const mediaId = useId();
+
+  // Handle play/pause click via MediaRuntime
   const handleVideoClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    if (primaryMedia?.media_type === 'video' && playerRef.current) {
-      const el = playerRef.current.getElement();
+    if (primaryMedia?.media_type === 'video') {
+      const el = playerRef.current?.getElement();
       if (el?.paused) {
-        playerRef.current.play();
+        MediaRuntime.requestPlay({ id: mediaId, surface: 'fullscreen', reason: 'user' });
       } else {
-        playerRef.current.pause();
+        MediaRuntime.requestPause({ id: mediaId, reason: 'user' });
       }
     }
-  }, [primaryMedia]);
+  }, [primaryMedia, mediaId]);
 
   // Handle mute/unmute toggle
   const handleMuteToggle = useCallback((e: React.MouseEvent) => {

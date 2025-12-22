@@ -286,7 +286,7 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
   // This component should NOT decide when to play based on visibility.
   // That is MediaRuntime's job via useMediaAutoplay.
 
-  // Handle mute toggle
+  // Handle mute toggle - mute is local UI state, not playback control
   const toggleMute = (e: React.MouseEvent) => {
     e.stopPropagation();
     const video = videoRef.current;
@@ -295,30 +295,11 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     const newMutedState = !isMuted;
     video.muted = newMutedState;
     setIsMuted(newMutedState);
-
-    if (!video.paused) {
-      video.play().catch(() => {});
-    }
   };
 
-  // Handle video click - if externally managed, just call onClick
+  // Handle video click - always delegate to parent via onClick
+  // No internal play/pause control - parent decides via autoplay prop
   const handleVideoClick = () => {
-    if (externallyManaged) {
-      onClick?.();
-      return;
-    }
-
-    const video = videoRef.current;
-    if (!video) return;
-
-    if (video.paused) {
-      video.play().catch(() => {
-        // Autoplay failed, but don't show error overlay if video loads successfully  
-      });
-    } else {
-      video.pause();
-    }
-    
     onClick?.();
   };
 

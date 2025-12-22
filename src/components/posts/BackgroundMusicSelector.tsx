@@ -142,9 +142,9 @@ const BackgroundMusicSelector: React.FC<BackgroundMusicSelectorProps> = ({
           currentAudio.currentTime = 0;
         }
 
-        // Play new track
+        // PLAYBACK_AUTHORITY_ALLOWED (audio UI control - not video autoplay)
+        // Play new track - audio preview is exempt from video runtime
         await audio.play();
-        setIsPlaying(track.id);
         setCurrentAudio(audio);
 
         // Auto-stop after 5 seconds for preview

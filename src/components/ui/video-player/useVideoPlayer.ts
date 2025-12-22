@@ -1,7 +1,8 @@
 import { useRef, useState, useEffect } from 'react';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
-import { safePlay } from '@/utils/safePlay';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
+// REMOVED: safePlay import - playback routed through MediaRuntime
 
 interface UseVideoPlayerProps {
   src: string;
@@ -76,10 +77,8 @@ export const useVideoPlayer = ({
     };
 
     const handleLoadedMetadata = () => {
-      // Enable autoplay when ready (regardless of current time position)
-      if (autoplay && video.paused) {
-        safePlay(video);
-      }
+      // Autoplay handled by parent via autoplay prop change triggering MediaRuntime
+      // No direct safePlay call here - let the autoplay effect handle it
     };
 
     video.addEventListener('play', handlePlay);
@@ -87,13 +86,8 @@ export const useVideoPlayer = ({
     video.addEventListener('volumechange', handleVolumeChange);
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
 
-    // Attempt autoplay on initial load if video is ready
-    if (autoplay && video.paused && video.readyState >= 1) {
-      // Use requestAnimationFrame for smoother autoplay timing
-      requestAnimationFrame(() => {
-        safePlay(video);
-      });
-    }
+    // Autoplay is now controlled by the autoplay prop effect below
+    // No direct safePlay call here
 
     return () => {
       video.removeEventListener('play', handlePlay);
@@ -106,22 +100,18 @@ export const useVideoPlayer = ({
     };
   }, [autoplay, muted, loop, onPlay, onPause, isGloballyMuted, isInFeed, registerVideo, unregisterVideo, muteAllOtherVideos, setActiveAudioVideo]);
 
-  // Add effect to handle autoplay changes for already-loaded videos
+  // Handle autoplay changes - route through MediaRuntime
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !isInFeed) return;
 
-    // If autoplay is enabled and video is paused but has been viewed before
-    // This handles the case where videos were paused by pauseAllAndSetActive but should resume
     if (autoplay && video.paused && video.readyState >= 2) {
-      console.log('🔄 Resuming autoplay for previously viewed video:', videoId.current, 'from position:', video.currentTime);
-      
-      // If the video has some currentTime (was playing before), resume from that position
-      // Otherwise start from beginning
-      safePlay(video);
+      console.log('🔄 Resuming autoplay for video:', videoId.current);
+      // Route through MediaRuntime
+      MediaRuntime.requestPlay({ id: videoId.current, surface: 'grid', reason: 'autoplay' });
     } else if (!autoplay && !video.paused) {
       // If autoplay is disabled but video is playing, pause it
-      video.pause();
+      MediaRuntime.requestPause({ id: videoId.current, reason: 'autoplay' });
     }
   }, [autoplay, isInFeed]);
 
@@ -156,10 +146,11 @@ export const useVideoPlayer = ({
 
     if (video.paused) {
       console.log('▶️ Playing video');
-      safePlay(video);
+      // Route through MediaRuntime for user-tap playback
+      MediaRuntime.requestPlay({ id: videoId.current, surface: 'grid', reason: 'user' });
     } else {
       console.log('⏸️ Pausing video');
-      video.pause();
+      MediaRuntime.requestPause({ id: videoId.current, reason: 'user' });
     }
   };
 
@@ -197,7 +188,8 @@ export const useVideoPlayer = ({
     
     // Maintain playing state - only resume if it was playing before
     if (wasPlaying && video.paused) {
-      safePlay(video);
+      // Resume via runtime
+      MediaRuntime.requestPlay({ id: videoId.current, surface: 'grid', reason: 'user' });
     }
   };
 

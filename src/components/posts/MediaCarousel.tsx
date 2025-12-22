@@ -75,10 +75,11 @@ const MediaCarousel = ({
     });
   }, [activeIndex, items]);
 
-  // Pause videos when slide changes
+  // Cleanup: pause videos when slide changes (cleanup only, not playback control)
   useEffect(() => {
     videoRefs.current.forEach((video, index) => {
       if (index !== activeIndex && !video.paused) {
+        // Allow pause for cleanup of non-visible slides
         video.pause();
       }
     });
