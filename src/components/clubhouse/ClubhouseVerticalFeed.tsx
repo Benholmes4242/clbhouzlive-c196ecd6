@@ -140,6 +140,7 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
             showPlayButton={false}
             objectFit="cover"
             className="absolute inset-0 w-full h-full"
+            managedByMediaRuntime
           />
         </div>
       ) : (
