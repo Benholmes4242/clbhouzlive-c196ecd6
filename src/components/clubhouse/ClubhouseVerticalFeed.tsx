@@ -25,8 +25,9 @@ import { TopBar } from './social-dock/TopBar';
 
 import { useTopBarVisibility } from '@/hooks/useTopBarVisibility';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
+import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR, CLUBHOUSE_RUNTIME_BRIDGE_V1 } from '@/config/featureFlags';
 import { logClubhouseFiltering } from '@/utils/clubhouseTelemetry';
+import { useClubhouseRuntimeBridge } from '@/hooks/useClubhouseRuntimeBridge';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { useUserTop100CourseIds } from '@/hooks/useUserTop100CourseIds';
@@ -302,6 +303,15 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   // Removed isTextExpanded state as mouse handlers were removed to prevent re-renders
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
   const queryClient = useQueryClient();
+  
+  // Runtime bridge for MediaRuntime integration (feature flagged)
+  const runtimeBridge = useClubhouseRuntimeBridge({
+    posts: filteredPosts,
+    currentIndex,
+    videoRefs,
+    itemRefs,
+    enabled: CLUBHOUSE_RUNTIME_BRIDGE_V1,
+  });
   
   // Two-observer system for prebuffer and autoplay
   const nearRef = useRef<IntersectionObserver | null>(null);
@@ -647,17 +657,31 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       const wasDouble = Date.now() - (lastTapRef.current[postId] || 0) < 300;
       if (wasDouble) return; // Don't execute single tap if double-tap just occurred
       
-      // Toggle play/pause
-      const videoEl = videoRefs.current[postId];
-      if (!videoEl) return;
-      
-      const isCurrentlyPlaying = !videoEl.paused;
-      if (isCurrentlyPlaying) {
-        videoEl.pause();
-        setVideosPlaying(prev => ({ ...prev, [postId]: false }));
+      // Toggle play/pause - use runtime bridge if enabled
+      if (runtimeBridge.enabled) {
+        const videoEl = videoRefs.current[postId];
+        const isCurrentlyPlaying = videoEl && !videoEl.paused;
+        
+        if (isCurrentlyPlaying) {
+          runtimeBridge.requestPause(postId, 'user');
+          setVideosPlaying(prev => ({ ...prev, [postId]: false }));
+        } else {
+          runtimeBridge.requestPlay(postId, 'user');
+          setVideosPlaying(prev => ({ ...prev, [postId]: true }));
+        }
       } else {
-        videoEl.play();
-        setVideosPlaying(prev => ({ ...prev, [postId]: true }));
+        // Legacy direct control
+        const videoEl = videoRefs.current[postId];
+        if (!videoEl) return;
+        
+        const isCurrentlyPlaying = !videoEl.paused;
+        if (isCurrentlyPlaying) {
+          videoEl.pause();
+          setVideosPlaying(prev => ({ ...prev, [postId]: false }));
+        } else {
+          videoEl.play();
+          setVideosPlaying(prev => ({ ...prev, [postId]: true }));
+        }
       }
       
       // Pause/play = meaningful interaction, trigger progressive immersion
@@ -676,7 +700,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         setVideoControlsVisible(prev => ({ ...prev, [postId]: false }));
       }, 2000);
     }, 320); // Wait just past double-tap window
-  }, [handleDoubleTap, onDismissNavOverlay]);
+  }, [handleDoubleTap, onDismissNavOverlay, runtimeBridge, onMeaningfulInteraction]);
   
 
   // Media swipe gesture handlers (memoized to prevent re-renders)
@@ -731,6 +755,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   // Track previous scroll position for direction detection
   const prevScrollTopRef = useRef(0);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const scrollSettleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isScrollingRef = useRef(false);
   const lastIndexChangeTimeRef = useRef(0);
   const hasIndexChangedOnceRef = useRef(false);
@@ -747,6 +772,21 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     
     // Track scroll metrics for audit
     trackScrollMetrics(scrollTop);
+    
+    // Notify runtime bridge of scroll start
+    if (!isScrollingRef.current) {
+      isScrollingRef.current = true;
+      runtimeBridge.setScrolling(true);
+    }
+    
+    // Clear previous settle timeout and set new one
+    if (scrollSettleTimeoutRef.current) {
+      clearTimeout(scrollSettleTimeoutRef.current);
+    }
+    scrollSettleTimeoutRef.current = setTimeout(() => {
+      isScrollingRef.current = false;
+      runtimeBridge.setScrolling(false);
+    }, 150);
     
     // Call chrome state handler if provided
     if (onScroll) {
@@ -809,7 +849,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     }, 150);
 
     prevScrollTopRef.current = scrollTop;
-  }, [currentIndex, filteredPosts, hasMore, isLoadingMore, onLoadMore, onScroll, onTopZoneChange, setActiveVideo]);
+  }, [currentIndex, filteredPosts, hasMore, isLoadingMore, onLoadMore, onScroll, onTopZoneChange, setActiveVideo, runtimeBridge]);
 
   // Notify parent of active video ref changes
   useEffect(() => {

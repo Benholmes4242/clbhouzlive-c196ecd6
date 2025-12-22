@@ -23,3 +23,6 @@ export {
   runtimeSetModalOpen,
   runtimeClearOnFullscreenClose,
 } from './runtimeIntent';
+
+// Clubhouse bridge hook
+export { useClubhouseRuntimeBridge } from '@/hooks/useClubhouseRuntimeBridge';

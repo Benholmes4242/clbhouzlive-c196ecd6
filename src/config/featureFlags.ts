@@ -48,6 +48,14 @@ export const MEDIA_TELEMETRY_V1 = import.meta.env.DEV;
 export const MEDIA_DEV_HUD_V1 = import.meta.env.DEV;
 
 /**
+ * Clubhouse Runtime Bridge V1 Feature Flag
+ * 
+ * When true: Clubhouse routes playback through MediaRuntime instead of direct video control
+ * This is the migration path for making MediaRuntime the global playback authority for Clubhouse
+ */
+export const CLUBHOUSE_RUNTIME_BRIDGE_V1 = false;
+
+/**
  * Hub Feature Flag
  * 
  * Phase 5: Hub is now always enabled for all users (production launch)
@@ -74,6 +82,7 @@ export const FEATURE_FLAGS = {
   MEDIA_SCRUBBER_V1,
   MEDIA_TELEMETRY_V1,
   MEDIA_DEV_HUD_V1,
+  CLUBHOUSE_RUNTIME_BRIDGE_V1,
   HUB: HUB_ENABLED, // Always enabled - no longer feature flagged
   ENABLE_TOP100_MOCK_PLAYERS,
 } as const;
