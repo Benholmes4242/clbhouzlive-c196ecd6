@@ -42,13 +42,13 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   onPreviewImmersive,
   onReopenImmersive
 }) => {
-  const photoRef = useRef<HTMLImageElement>(null);
-  const photoInputRef = useRef<HTMLInputElement>(null);
+  const photoRef = useRef<HTMLImageElement | null>(null);
+  const photoInputRef = useRef<HTMLInputElement | null>(null);
   const [isHovering, setIsHovering] = useState(false);
   const { toast } = useToast();
 
-  // Fallback image if no profile photo
-  const fallbackImage = '/lovable-uploads/c61119e7-5f19-471e-85a9-5de43d1a45a0.png';
+  // Fallback image if no profile photo - using standard shipped asset
+  const fallbackImage = '/placeholder.svg';
   const actualPhotoUrl = profilePhotoUrl || fallbackImage;
 
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
