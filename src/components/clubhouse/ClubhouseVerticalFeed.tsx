@@ -101,7 +101,8 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   autoplay?: boolean;
   isNearby?: boolean;
   isActive?: boolean;
-}>(({ src, muted, className, isMobile: isMobileProp = false, shouldAttach = false, autoplay = false, isNearby = true, isActive = true }, ref) => {
+  postId: string; // Required for MediaRuntime integration
+}>(({ src, muted, className, isMobile: isMobileProp = false, shouldAttach = false, autoplay = false, isNearby = true, isActive = true, postId }, ref) => {
   // Generate HLS URL from source
   const uid = uidFromNode({ src });
   const hlsUrl = uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null;
@@ -141,6 +142,7 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
             objectFit="cover"
             className="absolute inset-0 w-full h-full"
             managedByMediaRuntime
+            mediaId={postId}
           />
         </div>
       ) : (
@@ -1138,6 +1140,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                       autoplay={!!autoplayMap[item.id]}
                       isNearby={isNearby}
                       isActive={index === currentIndex}
+                      postId={item.id}
                     />
                     
                     {/* Simple video controls overlay */}
