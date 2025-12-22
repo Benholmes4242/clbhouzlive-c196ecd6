@@ -1,0 +1,205 @@
+import React, { useEffect, useRef, useCallback, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useCommunityFeed, CommunityMediaFilter, CommunitySortOption } from '@/hooks/community/useCommunityFeed';
+import CommunityFilters from './CommunityFilters';
+import CommunityFeedCard from './CommunityFeedCard';
+import CommunityEmptyState from './CommunityEmptyState';
+import { DateSeparator } from './DateSeparator';
+import { useMediaAutoplay } from '@/media';
+import { calculateDateSeparators } from '@/utils/dateSeparators';
+
+interface CommunityFeedProps {
+  onMediaClick: (item: any) => void;
+}
+
+// Local storage keys
+const FILTER_KEY = 'community-media-filter';
+const SORT_KEY = 'community-sort-option';
+
+/**
+ * CommunityFeed - Posts from friends and followed users only
+ * With filter pills (All/Shorts/Videos/Photos) and sorting options
+ */
+export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Persist filter/sort in localStorage
+  const [mediaFilter, setMediaFilter] = useState<CommunityMediaFilter>(() => {
+    const saved = localStorage.getItem(FILTER_KEY);
+    return (saved as CommunityMediaFilter) || 'all';
+  });
+  
+  const [sortOption, setSortOption] = useState<CommunitySortOption>(() => {
+    const saved = localStorage.getItem(SORT_KEY);
+    return (saved as CommunitySortOption) || 'newest';
+  });
+
+  const handleFilterChange = useCallback((filter: CommunityMediaFilter) => {
+    setMediaFilter(filter);
+    localStorage.setItem(FILTER_KEY, filter);
+  }, []);
+
+  const handleSortChange = useCallback((sort: CommunitySortOption) => {
+    setSortOption(sort);
+    localStorage.setItem(SORT_KEY, sort);
+  }, []);
+
+  const {
+    items,
+    loading,
+    hasMore,
+    communityCount,
+    loadMore,
+  } = useCommunityFeed({ mediaFilter, sortOption });
+
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  // Unified media autoplay
+  const { registerMedia, playingIds } = useMediaAutoplay({
+    mode: 'grid',
+    preloadMargin: 300,
+    scrollSettleDelay: 200,
+  });
+
+  // Calculate date separators
+  const dateSeparators = React.useMemo(() => {
+    return calculateDateSeparators(items);
+  }, [items]);
+
+  // Infinite scroll observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loading) {
+          loadMore();
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    const sentinel = sentinelRef.current;
+    if (sentinel) observer.observe(sentinel);
+    return () => { if (sentinel) observer.unobserve(sentinel); };
+  }, [hasMore, loading, loadMore]);
+
+  const handleVideoClick = useCallback((id: string) => {
+    const item = items.find(i => i.id === id);
+    if (item) {
+      if (item.type === 'video') {
+        navigate(`/video/${id}`, {
+          state: { backgroundLocation: location, fromVideo: true }
+        });
+      } else {
+        onMediaClick(item);
+      }
+    }
+  }, [items, navigate, location, onMediaClick]);
+
+  const handleCreatorClick = useCallback((creatorUserId: string) => {
+    navigate(`/golfer/${creatorUserId}`);
+  }, [navigate]);
+
+  // Empty state: User has no community (no friends/follows)
+  if (!loading && communityCount.friends === 0 && communityCount.following === 0) {
+    return (
+      <>
+        <CommunityFilters
+          activeFilter={mediaFilter}
+          onFilterChange={handleFilterChange}
+          sortOption={sortOption}
+          onSortChange={handleSortChange}
+        />
+        <CommunityEmptyState variant="no-community" />
+      </>
+    );
+  }
+
+  // Has community but no posts
+  if (!loading && items.length === 0 && (communityCount.friends > 0 || communityCount.following > 0)) {
+    return (
+      <>
+        <CommunityFilters
+          activeFilter={mediaFilter}
+          onFilterChange={handleFilterChange}
+          sortOption={sortOption}
+          onSortChange={handleSortChange}
+        />
+        <CommunityEmptyState variant="quiet" />
+      </>
+    );
+  }
+
+  return (
+    <div className="min-h-screen pb-20 bg-[var(--bg-page)]">
+      {/* Subtitle */}
+      <div className="px-4 pt-3 pb-1">
+        <p className="text-xs text-muted-foreground">
+          Posts from people you follow and play with
+        </p>
+      </div>
+
+      {/* Filter Pills */}
+      <CommunityFilters
+        activeFilter={mediaFilter}
+        onFilterChange={handleFilterChange}
+        sortOption={sortOption}
+        onSortChange={handleSortChange}
+      />
+
+      {/* Feed */}
+      <div className="space-y-0 pt-2">
+        {items.map((item, index) => (
+          <React.Fragment key={item.id}>
+            {/* Date Separator */}
+            {dateSeparators.has(index) && (
+              <DateSeparator bucket={dateSeparators.get(index)!} />
+            )}
+            
+            <CommunityFeedCard
+              item={item}
+              onVideoClick={handleVideoClick}
+              onCreatorClick={handleCreatorClick}
+              registerVideo={registerMedia}
+              isPlaying={playingIds.has(item.id)}
+              videoIndex={index}
+            />
+          </React.Fragment>
+        ))}
+      </div>
+
+      {/* Loading state */}
+      {loading && items.length === 0 && (
+        <div className="py-12 px-5">
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="animate-pulse bg-card border border-border/30 overflow-hidden">
+                <div className="aspect-[16/9] bg-muted" />
+                <div className="px-4 py-3">
+                  <div className="h-4 w-3/4 bg-muted rounded" />
+                  <div className="h-3 w-1/3 bg-muted rounded mt-2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Infinite scroll sentinel */}
+      <div ref={sentinelRef} className="h-4">
+        {loading && hasMore && items.length > 0 && (
+          <div className="flex justify-center py-6">
+            <div className="w-5 h-5 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
+          </div>
+        )}
+      </div>
+
+      {/* End of feed */}
+      {!hasMore && items.length > 0 && (
+        <div className="py-8 text-center">
+          <p className="text-sm text-muted-foreground">You're all caught up</p>
+        </div>
+      )}
+    </div>
+  );
+}

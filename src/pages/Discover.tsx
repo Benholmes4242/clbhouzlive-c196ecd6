@@ -34,7 +34,7 @@ import { useNavigate } from 'react-router-dom';
 import Top100Pills from '@/components/courses/Top100Pills';
 
 // Lazy load heavy/inactive components for better initial bundle size
-const FollowingFeed = lazy(() => import('@/components/discover/FollowingFeed'));
+const CommunityFeed = lazy(() => import('@/components/community/CommunityFeed'));
 const VideosTab = lazy(() => import('@/components/videos/VideosTab'));
 const ExploreTab = lazy(() => import('@/components/explore-tab/ExploreTab'));
 
@@ -249,9 +249,9 @@ const Discover = () => {
                 }
                 if (key === 'following') {
                   return (
-                    <div className="md:container md:mx-auto md:px-0 mt-4">
+                    <div className="md:container md:mx-auto md:px-0">
                       <Suspense fallback={null}>
-                        <FollowingFeed onMediaClick={handleMediaClick} />
+                        <CommunityFeed onMediaClick={handleMediaClick} />
                       </Suspense>
                     </div>
                   );
