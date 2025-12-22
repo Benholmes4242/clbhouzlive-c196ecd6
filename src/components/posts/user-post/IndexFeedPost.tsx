@@ -3,7 +3,7 @@ import { Maximize2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
+import { useMediaAutoplay } from '@/media';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { UserPostData, GolfCourse } from './types';
@@ -40,9 +40,18 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
   const [showFullCourseTag, setShowFullCourseTag] = useState(false);
   const [shouldResumeOnReturn, setShouldResumeOnReturn] = useState(false);
   const { user } = useSupabaseSession();
-  const { pauseVideo, pauseAllAndSetActive, storeVideoPosition, resumeVideoFromPosition, storeVideoState, resumeVideoWithState } = useVideoPlaybackManager();
   const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
   const isMobile = useIsMobile();
+  
+  // Unified media autoplay system
+  const mediaId = `index-${post.id}`;
+  const { registerMedia, playingIds } = useMediaAutoplay({
+    mode: 'feed',
+    startThreshold: 0.4,
+    stopThreshold: 0.35,
+  });
+  
+  const isPlaying = playingIds.has(mediaId);
   
   // Use the new fullscreen post navigation hook
   const {
@@ -59,10 +68,18 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
     canGoPrevious
   } = useFullscreenPostNavigation();
   
-  const { ref: containerRef, isInView } = useIntersectionObserver({
-    threshold: 0.3, // Optimized threshold for better performance
-    rootMargin: '10px 0px -10% 0px' // Reduced margin for better performance
-  });
+  // Container ref callback for media registration
+  const containerRefCallback = useCallback((el: HTMLDivElement | null) => {
+    if (el) {
+      const hasVideo = post.post_media?.some(m => m.media_type === 'video');
+      if (hasVideo) {
+        registerMedia(el, mediaId, {
+          rect: el.getBoundingClientRect(),
+          visibilityRatio: 0,
+        });
+      }
+    }
+  }, [mediaId, post.post_media, registerMedia]);
 
   // Memoize expensive calculations
   const isOwnPost = useMemo(() => user?.id === post.user.id, [user?.id, post.user.id]);
@@ -71,35 +88,17 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
   useEffect(() => {
     if (!currentMediaMemo) return;
     
-    if (isInView) {
-      // When ANY post comes into view, pause all videos first
-      pauseAllAndSetActive(''); // Pass empty string to just pause all videos
-      
-      if (currentMediaMemo.media_type === 'video') {
-        const videoId = `index-${currentMediaMemo.id}`;
-        setIsHovered(true);
-        // Allow this video to play by calling pauseAllAndSetActive with the actual videoId
-        pauseAllAndSetActive(videoId);
-      } else {
-        setIsHovered(true);
-      }
-    } else {
-      setIsHovered(false);
-      
-      // When leaving view, pause this video if it's a video
-      if (currentMediaMemo.media_type === 'video') {
-        const videoId = `index-${currentMediaMemo.id}`;
-        pauseVideo(videoId);
-      }
+    if (isPlaying) {
+      setIsHovered(true);
     }
-  }, [isInView, currentMediaMemo, pauseVideo, pauseAllAndSetActive]);
+  }, [isPlaying, currentMediaMemo]);
 
   // Hide full course tag when scrolling off the post
   useEffect(() => {
-    if (!isInView && showFullCourseTag) {
+    if (!isPlaying && showFullCourseTag) {
       setShowFullCourseTag(false);
     }
-  }, [isInView, showFullCourseTag]);
+  }, [isPlaying, showFullCourseTag]);
 
   // Memoized handlers for better performance
   const handleCourseTagClick = useCallback((e: React.MouseEvent) => {
@@ -139,7 +138,6 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
         videoMuted = video.muted;
       }
       
-      storeVideoState(videoId); // Store both position and mute state
       setShouldResumeOnReturn(true);
     }
     
@@ -162,7 +160,7 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
       videoPosition, // Pass current video position
       videoMuted // Pass current mute state
     );
-  }, [currentMediaIndex, currentMediaMemo, post, golfCourse, displayName, openFullscreenMedia, storeVideoState]);
+  }, [currentMediaIndex, currentMediaMemo, post, golfCourse, displayName, openFullscreenMedia]);
 
   // Memoized values
   const cleanContent = useMemo(() => removeGolfCourseFromContent(post.content), [post.content]);
@@ -181,14 +179,14 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
   
   return (
     <div 
-      ref={containerRef}
+      ref={containerRefCallback}
       className="relative w-full bg-media-loading rounded-xl overflow-hidden"
       style={{ aspectRatio: '4/5' }}
     >
       <MediaContainer
         media={post.post_media}
         currentIndex={currentMediaIndex}
-        isHovered={isHovered}
+        isHovered={isPlaying || isHovered}
         onMediaClick={() => {}} // Disable media click actions
         onSwipeLeft={handleSwipeLeft}
         onSwipeRight={handleSwipeRight}
@@ -275,12 +273,7 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
                   // Update global audio state to match the video's new mute state
                   setGlobalMute(videoMuted);
                 }
-                // Resume handled by VideoPlaybackManager - no direct play needed
-                resumeVideoWithState(videoId);
                 console.log('▶️ Resumed video from modal position:', videoPosition, 'muted:', videoMuted);
-              } else {
-                // Fallback to using the video manager's resume function
-                resumeVideoWithState(videoId);
               }
             }
             setShouldResumeOnReturn(false);

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { TrendingUp, ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
@@ -7,15 +7,21 @@ import { HiOutlineArrowSmLeft, HiOutlineArrowSmRight } from 'react-icons/hi';
 import { useSwipeable } from 'react-swipeable';
 import { useNavigate } from 'react-router-dom';
 import { useTrendingCard } from '@/hooks/useTrendingCard';
-import { useVideoPlaybackManager, useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
+import { useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
+import { useMediaAutoplay } from '@/media';
 import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
 
 const TrendingCard = () => {
   const { trendingPosts, loading, nextSlide, prevSlide, currentIndex, totalPosts } = useTrendingCard();
   const navigate = useNavigate();
   const modalManager = useFullscreenVideoModal();
-
   
+  // Unified media autoplay system
+  const { registerMedia, playingIds } = useMediaAutoplay({
+    mode: 'grid',
+    startThreshold: 0.4,
+    stopThreshold: 0.35,
+  });
 
   // Swipe handlers for mobile
   const swipeHandlers = useSwipeable({
@@ -51,18 +57,14 @@ const TrendingCard = () => {
     const isFirstCard = index === 0;
     const isMobile = window.innerWidth < 768;
     
-    // Video playback management
-    const { videoRef, containerRef, isPlaying, shouldShowPlayIcon, togglePlayPause } = useVideoPlaybackManager({
-      section: 'trending',
-      videoId: post.id,
-      autoplayAllowed: isFirstCard || isMobile, // First card or mobile autoplays
-      priority: index // Use stable index for priority
-    });
+    // Use unified media system - check if this video is playing
+    const mediaId = `trending-${post.id}`;
+    const isPlaying = playingIds.has(mediaId);
+    const shouldShowPlayIcon = !isPlaying;
 
     const handleVideoClick = () => {
       if (isMobile) {
-        // Mobile: toggle play/pause
-        togglePlayPause();
+        // Mobile: videos auto-manage via intersection observer
       } else {
         // Desktop: open fullscreen modal
         modalManager.openModal({
@@ -78,16 +80,22 @@ const TrendingCard = () => {
       }
     };
 
-    const handlePlayButtonClick = (e: React.MouseEvent) => {
-      e.stopPropagation();
-      if (!isMobile) {
-        // Desktop: clicking play button toggles play/pause
-        togglePlayPause();
+    // Container ref callback for media registration
+    const containerRefCallback = useCallback((el: HTMLDivElement | null) => {
+      if (el) {
+        registerMedia(el, mediaId, {
+          rect: el.getBoundingClientRect(),
+          visibilityRatio: 0,
+        });
       }
-    };
+    }, [mediaId]);
     
     return (
-      <div ref={containerRef} className="relative w-full aspect-[3/4] overflow-hidden bg-card group" onClick={handleVideoClick}>
+      <div 
+        ref={containerRefCallback} 
+        className="relative w-full aspect-[3/4] overflow-hidden bg-card group" 
+        onClick={handleVideoClick}
+      >
 
         {/* Trending Icon - top right */}
         <div className="absolute top-2 right-2 z-10">
@@ -100,7 +108,7 @@ const TrendingCard = () => {
         {shouldShowPlayIcon && (
           <div className="absolute top-2 left-2 z-10">
             <button 
-              onClick={handlePlayButtonClick}
+              onClick={(e) => e.stopPropagation()}
               className="p-1.5 text-white bg-black/50 hover:bg-black/70 transition-colors"
             >
               <Play className="w-4 h-4" />
@@ -113,10 +121,12 @@ const TrendingCard = () => {
           <EnhancedVideoPlayer
             src={firstVideo.media_url}
             className="w-full h-full object-cover"
-            autoplay={isFirstCard || isMobile}
+            autoplay={isPlaying}
             muted={true}
             loop={true}
             enableHLS={true}
+            externallyManaged={true}
+            mediaId={mediaId}
             onClick={handleVideoClick}
             onPlay={() => {}}
             onPause={() => {}}

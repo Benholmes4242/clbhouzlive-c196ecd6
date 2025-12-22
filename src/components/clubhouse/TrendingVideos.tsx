@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import { HiTrendingUp } from 'react-icons/hi';
 import { useSwipeable } from 'react-swipeable';
 import { ExploreContentItem } from '@/components/explore/types';
-import { useVideoPlaybackManager } from '@/hooks/useVideoPlaybackManager';
+import { useMediaAutoplay } from '@/media';
 import MediaDisplay from '@/components/explore/MediaDisplay';
 
 interface TrendingVideosProps {
@@ -18,6 +18,13 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
   
   // Get first 8 videos for trending
   const trendingVideos = videos.filter(item => item.type === 'video').slice(0, 8);
+  
+  // Unified media autoplay system
+  const { registerMedia, playingIds } = useMediaAutoplay({
+    mode: 'grid',
+    startThreshold: 0.4,
+    stopThreshold: 0.35,
+  });
   
   // Function to clean title text and remove golf course information
   const cleanTitleText = (title: string) => {
@@ -47,13 +54,6 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
     
     return words.slice(0, 5).join(' ') + '...';
   };
-  
-  const { togglePlayPause, shouldShowPlayIcon } = useVideoPlaybackManager({
-    section: 'trending',
-    videoId: `trending-${currentIndex}`,
-    autoplayAllowed: true,
-    priority: 1
-  });
 
   useEffect(() => {
     const checkMobile = () => {
@@ -149,49 +149,43 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
           {currentVideos.map((video, index) => {
             const isFirstCard = index === 0;
             const actualIndex = (currentIndex + index) % trendingVideos.length;
+            const mediaId = `clubhouse-trending-${video.id}`;
+            const isPlaying = playingIds.has(mediaId);
+            
+            // Container ref callback for media registration
+            const containerRefCallback = useCallback((el: HTMLDivElement | null) => {
+              if (el) {
+                registerMedia(el, mediaId, {
+                  rect: el.getBoundingClientRect(),
+                  visibilityRatio: 0,
+                });
+              }
+            }, [mediaId]);
             
             return (
               <div
                 key={`${video.id}-${actualIndex}`}
+                ref={containerRefCallback}
                 className={`relative bg-muted rounded-sq-sm overflow-hidden cursor-pointer group ${
                   isMobile ? 'h-[60vh]' : 'aspect-[9/8]'
                 }`}
                 onClick={() => handleVideoClick(actualIndex)}
               >
-                {isFirstCard ? (
-                  // First card - autoplay video
-                  <MediaDisplay
-                    media={{
-                      id: video.id,
-                      media_type: 'video',
-                      media_url: video.src
-                    }}
-                    itemTitle={video.title}
-                    shouldAutoplay={true}
-                    isLoading={false}
-                    onImageError={() => {}}
-                    onImageLoad={() => {}}
-                    itemId={video.id}
-                    currentIndex={actualIndex}
-                    loop={true}
-                  />
-                ) : (
-                  // Other cards - video without autoplay (shows first frame)
-                  <MediaDisplay
-                    media={{
-                      id: video.id,
-                      media_type: 'video',
-                      media_url: video.src
-                    }}
-                    itemTitle={video.title}
-                    shouldAutoplay={false}
-                    isLoading={false}
-                    onImageError={() => {}}
-                    onImageLoad={() => {}}
-                    itemId={video.id}
-                    currentIndex={actualIndex}
-                  />
-                )}
+                <MediaDisplay
+                  media={{
+                    id: video.id,
+                    media_type: 'video',
+                    media_url: video.src
+                  }}
+                  itemTitle={video.title}
+                  shouldAutoplay={isPlaying}
+                  isLoading={false}
+                  onImageError={() => {}}
+                  onImageLoad={() => {}}
+                  itemId={video.id}
+                  currentIndex={actualIndex}
+                  loop={true}
+                />
                 
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />

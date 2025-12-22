@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import { HiTrendingUp } from 'react-icons/hi';
 import { useSwipeable } from 'react-swipeable';
 import { ExploreContentItem } from '@/components/explore/types';
-import { useVideoPlaybackManager } from '@/hooks/useVideoPlaybackManager';
+import { useMediaAutoplay } from '@/media';
 import MediaDisplay from '@/components/explore/MediaDisplay';
 
 interface DiscoverTrendingVideosProps {
@@ -18,6 +18,13 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
   
   // Get first 8 videos for trending
   const trendingVideos = videos.filter(item => item.type === 'video').slice(0, 8);
+  
+  // Unified media autoplay system
+  const { registerMedia, playingIds } = useMediaAutoplay({
+    mode: 'grid',
+    startThreshold: 0.4,
+    stopThreshold: 0.35,
+  });
   
   // Function to clean title text and remove golf course information
   const cleanTitleText = (title: string) => {
@@ -47,13 +54,6 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
     
     return words.slice(0, 5).join(' ') + '...';
   };
-  
-  const { togglePlayPause, shouldShowPlayIcon } = useVideoPlaybackManager({
-    section: 'trending',
-    videoId: `trending-${currentIndex}`,
-    autoplayAllowed: true,
-    priority: 1
-  });
 
   useEffect(() => {
     const checkMobile = () => {
@@ -126,12 +126,24 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
         {/* Grid with 1080x1350 aspect ratio */}
         <div className={`grid gap-1 ${isMobile ? 'grid-cols-2' : 'grid-cols-3'}`} {...(isMobile ? swipeHandlers : {})}>
           {currentVideos.map((video, index) => {
-            const isFirstCard = index === 0;
             const actualIndex = (currentIndex + index) % trendingVideos.length;
+            const mediaId = `discover-trending-${video.id}`;
+            const isPlaying = playingIds.has(mediaId);
+            
+            // Container ref callback for media registration
+            const containerRefCallback = useCallback((el: HTMLDivElement | null) => {
+              if (el) {
+                registerMedia(el, mediaId, {
+                  rect: el.getBoundingClientRect(),
+                  visibilityRatio: 0,
+                });
+              }
+            }, [mediaId]);
             
             return (
               <div
                 key={`${video.id}-${actualIndex}`}
+                ref={containerRefCallback}
                 className="relative bg-muted overflow-hidden cursor-pointer group aspect-[1080/1350]"
                 style={{ borderRadius: '8px' }}
                 onClick={() => handleVideoClick(actualIndex)}
@@ -144,7 +156,7 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                     media_url: video.src
                   }}
                   itemTitle={video.title}
-                  shouldAutoplay={false}
+                  shouldAutoplay={isPlaying}
                   isLoading={false}
                   onImageError={() => {}}
                   onImageLoad={() => {}}
