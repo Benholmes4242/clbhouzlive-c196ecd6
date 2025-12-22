@@ -19,6 +19,7 @@ set -e
 ALLOWLIST=(
   # Core runtime - the single authority for playback control
   "src/media/runtime/MediaRuntime.ts"
+  "src/media/MediaSystemProvider.tsx"
   
   # Core HLS players - controlled components that respond to runtime
   "src/media/HLSPlayer.tsx"
@@ -31,8 +32,14 @@ ALLOWLIST=(
   # Highlights video controller - manages highlights carousel playback
   "src/components/profile/HighlightsVideoController.tsx"
   
-  # Vertical media feed - fullscreen viewer with internal video management
+  # Vertical media feeds - fullscreen viewers with internal video management
   "src/components/explore/VerticalMediaFeed.tsx"
+  "src/components/discover/DiscoverVerticalFeed.tsx"
+  "src/components/clubhouse/ClubhouseVerticalFeed.tsx"
+  
+  # Carousel/carousel components - cleanup pauses for non-visible slides
+  "src/components/posts/MediaCarousel.tsx"
+  "src/components/clubhouse/VideoThumbPlayer.tsx"
   
   # Utility function used by runtime
   "src/utils/safePlay.ts"
