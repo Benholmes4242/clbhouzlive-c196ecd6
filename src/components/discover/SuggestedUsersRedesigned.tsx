@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 import { useMedia } from '@/hooks/useMedia';
 import { useDiscoverOnboarding } from '@/hooks/useDiscoverOnboarding';
 import { t } from '@/lib/i18n';
-import { safePlay } from '@/utils/safePlay';
+// REMOVED: safePlay import - playback now controlled by parent visibility prop only
 
 // Utility: ensures paint before heavy updates
 const flushAnimationFrame = () =>
@@ -97,42 +97,22 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
   }, []);
   
   // Handle video autoplay based on visibility - Optimized for performance
+  // Playback is controlled by the parent via isVisible prop
+  // No direct play/pause calls - EnhancedVideoPlayer handles this through autoplay prop
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !user.latestVideo) return;
 
-    if (isVisible) {
-      // Performance optimization: Only set essential attributes
-      video.muted = true;
-      video.setAttribute('playsinline', 'true');
-      video.setAttribute('webkit-playsinline', 'true');
-      // Use poster frame only - don't auto-decode full video for performance
-      video.setAttribute('preload', 'metadata');
-      
-      // Only attempt play if user interacts or card is in primary viewport
-      const attemptPlay = async () => {
-        try {
-          const ok = await safePlay(video);
-          if (!ok) {
-            video.setAttribute('data-autoplay-blocked', '1');
-          } else {
-            video.removeAttribute('data-autoplay-blocked');
-          }
-        } catch (e) {
-          console.warn('autoplay failed', e);
-          video.setAttribute('data-autoplay-blocked', '1');
-        }
-      };
-
-      // Defer play attempt to reduce initial load
-      const timer = setTimeout(attemptPlay, 100);
-      return () => clearTimeout(timer);
-    } else {
+    // Only set essential attributes - let parent control playback via autoplay prop
+    video.muted = true;
+    video.setAttribute('playsinline', 'true');
+    video.setAttribute('webkit-playsinline', 'true');
+    video.setAttribute('preload', 'metadata');
+    
+    // Pause when not visible (cleanup only)
+    if (!isVisible) {
       video.pause();
-      // Clear video src when not visible to free memory
-      if (!video.paused) {
-        video.currentTime = 0;
-      }
+      video.currentTime = 0;
     }
   }, [isVisible, user.latestVideo]);
 
@@ -410,11 +390,10 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
             hideControls={true}
             enableHLS={isHls}
             onEnded={() => {
-              // Ensure loop continues - restart video if it ends
+              // Loop handled by EnhancedVideoPlayer loop prop - no direct play needed
               const video = videoRef.current;
-              if (video && isVisible) {
+              if (video) {
                 video.currentTime = 0;
-                video.play().catch(console.warn);
               }
             }}
           />
@@ -1209,18 +1188,8 @@ const SuggestedUsersRedesigned: React.FC<SuggestedUsersRedesignedProps> = ({
                   x: { duration: 0.4 }
                 }}
                 onClick={(e) => {
-                  const target = e.target as HTMLElement;
-                  const card = e.currentTarget;
-                  const video = card.querySelector('video') as HTMLVideoElement;
-                  if (!video) return;
-                  if (video.getAttribute('data-autoplay-blocked') === '1') {
-                    video.muted = true;
-                    video.setAttribute('playsinline', 'true');
-                    video.setAttribute('webkit-playsinline', 'true');
-                    safePlay(video).then((ok) => {
-                      if (ok) video.removeAttribute('data-autoplay-blocked');
-                    });
-                  }
+                  // Click-to-play handled by EnhancedVideoPlayer/autoplay prop
+                  // No direct play calls - playback managed via visibility state
                 }}
               >
                 <SuggestedUserCard

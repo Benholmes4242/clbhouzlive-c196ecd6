@@ -1,8 +1,9 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useId } from 'react';
 import { Play, Upload, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useSwipeable } from 'react-swipeable';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
 interface CinematicProfileHeaderProps {
   videoUrl?: string;
@@ -58,82 +59,81 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
     }
   };
 
-  // Auto-play video once when component mounts and video is available
+  // Generate stable media ID
+  const mediaId = useId();
+
+  // User-tap-only playback - no autoplay. Listen for play/pause events.
   useEffect(() => {
     const video = videoRef.current;
     const bgVideo = backgroundVideoRef.current;
-    if (!video || !videoUrl || hasPlayed) return;
+    if (!video || !videoUrl) return;
 
-    const handleCanPlayThrough = async () => {
-      try {
-        video.muted = true;
-        video.currentTime = 0;
-        await video.play();
-        setIsPlaying(true);
-        setHasPlayed(true);
-        setShowVideo(true);
-        
-        // Start background video sync
-        if (bgVideo) {
-          bgVideo.muted = true;
-          bgVideo.currentTime = 0;
-          try {
-            await bgVideo.play();
-          } catch (error) {
-            console.log('Background video autoplay failed, will sync when loaded');
-          }
-        }
-        
-        const syncInterval = setInterval(syncVideos, 100); // Sync every 100ms
-        
-        const handleTimeUpdate = () => {
-          syncVideos(); // Sync on every time update
-          const currentTime = video.currentTime;
-          const duration = video.duration;
-          
-          if (profilePhotoUrl && duration && currentTime >= duration - 1 && showVideo) {
-            setShowVideo(false);
-          }
-        };
-        
-        const handleEnded = () => {
-          setIsPlaying(false);
-          video.currentTime = 0;
-          video.pause();
-          
-          if (bgVideo) {
-            bgVideo.currentTime = 0;
-            bgVideo.pause();
-          }
-          
-          if (profilePhotoUrl) {
-            setShowVideo(false);
-          }
-          
-          clearInterval(syncInterval);
-        };
-        
-        video.addEventListener('timeupdate', handleTimeUpdate);
-        video.addEventListener('ended', handleEnded);
-        
-        return () => {
-          video.removeEventListener('timeupdate', handleTimeUpdate);
-          video.removeEventListener('ended', handleEnded);
-          clearInterval(syncInterval);
-        };
-      } catch (error) {
-        console.error('Auto-play failed:', error);
-        setHasPlayed(true);
+    let syncInterval: ReturnType<typeof setInterval> | null = null;
+    
+    const handleTimeUpdate = () => {
+      syncVideos();
+      const currentTime = video.currentTime;
+      const duration = video.duration;
+      
+      if (profilePhotoUrl && duration && currentTime >= duration - 1 && showVideo) {
+        setShowVideo(false);
+      }
+    };
+    
+    const handleEnded = () => {
+      setIsPlaying(false);
+      video.currentTime = 0;
+      
+      if (bgVideo) {
+        bgVideo.currentTime = 0;
+      }
+      
+      if (profilePhotoUrl) {
+        setShowVideo(false);
+      }
+      
+      if (syncInterval) {
+        clearInterval(syncInterval);
+        syncInterval = null;
       }
     };
 
-    video.addEventListener('canplaythrough', handleCanPlayThrough);
-    video.load();
-
-    return () => {
-      video.removeEventListener('canplaythrough', handleCanPlayThrough);
+    const handlePlay = () => {
+      setIsPlaying(true);
+      setHasPlayed(true);
+      setShowVideo(true);
+      
+      // Sync background video
+      if (bgVideo) {
+        bgVideo.muted = true;
+        bgVideo.currentTime = video.currentTime;
+        bgVideo.play().catch(() => {});
+      }
+      
+      syncInterval = setInterval(syncVideos, 100);
     };
-  }, [videoUrl, hasPlayed, profilePhotoUrl]);
+
+    const handlePause = () => {
+      setIsPlaying(false);
+      if (syncInterval) {
+        clearInterval(syncInterval);
+        syncInterval = null;
+      }
+    };
+    
+    video.addEventListener('timeupdate', handleTimeUpdate);
+    video.addEventListener('ended', handleEnded);
+    video.addEventListener('play', handlePlay);
+    video.addEventListener('pause', handlePause);
+    
+    return () => {
+      video.removeEventListener('timeupdate', handleTimeUpdate);
+      video.removeEventListener('ended', handleEnded);
+      video.removeEventListener('play', handlePlay);
+      video.removeEventListener('pause', handlePause);
+      if (syncInterval) clearInterval(syncInterval);
+    };
+  }, [videoUrl, profilePhotoUrl, showVideo]);
 
   // Remove video upload functionality - profile photos are photo-only now
 
@@ -175,30 +175,13 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
     }
   };
 
-  const replayVideo = async () => {
+  const replayVideo = () => {
     const video = videoRef.current;
-    const bgVideo = backgroundVideoRef.current;
     if (video && videoUrl) {
-      try {
-        video.currentTime = 0;
-        video.muted = isMuted;
-        
-        if (bgVideo) {
-          bgVideo.currentTime = 0;
-          bgVideo.muted = true;
-          try {
-            await bgVideo.play();
-          } catch (error) {
-            console.log('Background video replay failed');
-          }
-        }
-        
-        await video.play();
-        setIsPlaying(true);
-        setShowVideo(true);
-      } catch (error) {
-        console.error('Replay failed:', error);
-      }
+      video.currentTime = 0;
+      video.muted = isMuted;
+      // Route through MediaRuntime for user-tap playback
+      MediaRuntime.requestPlay({ id: mediaId, surface: 'grid', reason: 'user' });
     }
   };
 
