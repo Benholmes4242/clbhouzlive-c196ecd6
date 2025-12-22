@@ -1,11 +1,17 @@
 /**
  * HeroMedia - Full-bleed hero section with image or video support
+ * 
+ * User-only playback - videos do NOT autoplay.
+ * Taps route through MediaRuntime.
  */
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
+import { Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { MediaRuntime, runtimeUserTap } from '@/media/runtime';
 
 interface HeroMediaProps {
+  mediaId: string;
   mediaType: 'image' | 'video';
   url: string;
   posterUrl?: string;
@@ -14,6 +20,7 @@ interface HeroMediaProps {
 }
 
 export const HeroMedia: React.FC<HeroMediaProps> = ({
+  mediaId,
   mediaType,
   url,
   posterUrl,
@@ -21,18 +28,48 @@ export const HeroMedia: React.FC<HeroMediaProps> = ({
   className,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  useEffect(() => {
-    if (mediaType === 'video' && videoRef.current) {
-      videoRef.current.play().catch(() => {
-        // Autoplay blocked - that's fine, user will see poster
-      });
+  // Register with MediaRuntime on mount (for user-only playback)
+  React.useEffect(() => {
+    const video = videoRef.current;
+    if (mediaType !== 'video' || !video) return;
+
+    MediaRuntime.registerMedia({
+      id: mediaId,
+      element: video,
+      surface: 'grid',
+      sortIndex: 0,
+      observeTarget: containerRef.current ?? video,
+    });
+
+    // Track play/pause state
+    const handlePlay = () => setIsPlaying(true);
+    const handlePause = () => setIsPlaying(false);
+    video.addEventListener('play', handlePlay);
+    video.addEventListener('pause', handlePause);
+
+    return () => {
+      MediaRuntime.unregisterMedia(mediaId);
+      video.removeEventListener('play', handlePlay);
+      video.removeEventListener('pause', handlePause);
+    };
+  }, [mediaId, mediaType]);
+
+  // Handle tap to play/pause via runtime
+  const handleVideoTap = useCallback(() => {
+    if (isPlaying) {
+      MediaRuntime.requestPause({ id: mediaId, reason: 'user' });
+    } else {
+      runtimeUserTap(mediaId);
     }
-  }, [mediaType, url]);
+  }, [mediaId, isPlaying]);
 
   return (
     <div
+      ref={containerRef}
       className={cn(
         'relative w-full overflow-hidden',
         className
@@ -40,20 +77,34 @@ export const HeroMedia: React.FC<HeroMediaProps> = ({
       style={{ height }}
     >
       {mediaType === 'video' ? (
-        <video
-          ref={videoRef}
-          src={url}
-          poster={posterUrl}
-          autoPlay
-          loop
-          muted
-          playsInline
-          className={cn(
-            'absolute inset-0 w-full h-full object-cover transition-opacity duration-500',
-            isLoaded ? 'opacity-100' : 'opacity-0'
+        <>
+          <video
+            ref={videoRef}
+            src={url}
+            poster={posterUrl}
+            loop
+            muted
+            playsInline
+            className={cn(
+              'absolute inset-0 w-full h-full object-cover transition-opacity duration-500 cursor-pointer',
+              isLoaded ? 'opacity-100' : 'opacity-0'
+            )}
+            onLoadedData={() => setIsLoaded(true)}
+            onClick={handleVideoTap}
+          />
+          {/* Play button overlay when paused */}
+          {!isPlaying && isLoaded && (
+            <button
+              onClick={handleVideoTap}
+              className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors"
+              aria-label="Play video"
+            >
+              <div className="w-16 h-16 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
+                <Play className="w-8 h-8 text-white ml-1" fill="white" />
+              </div>
+            </button>
           )}
-          onLoadedData={() => setIsLoaded(true)}
-        />
+        </>
       ) : (
         <img
           src={url}

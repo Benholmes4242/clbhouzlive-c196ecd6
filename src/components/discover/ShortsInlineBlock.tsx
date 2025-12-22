@@ -1,3 +1,10 @@
+/**
+ * ShortsInlineBlock - Inline shorts block for discover feed
+ * 
+ * Uses MediaRuntime for playback control.
+ * No direct play/pause calls.
+ */
+
 import React, { useEffect, useRef } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { Squircle } from '@/components/ui/squircle';
@@ -6,6 +13,9 @@ import { formatLikes } from '@/utils/dateFormat';
 import { buildImageThumbnailUrl, buildVideoPosterUrl } from '@/utils/mediaThumbs';
 import { useInView } from 'react-intersection-observer';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { MediaRuntime } from '@/media/runtime';
+import { useMediaAutoplay } from '@/media/useMediaAutoplay';
+import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
 
 interface ShortsInlineBlockProps {
   shorts: ExploreContentItem[];
@@ -46,6 +56,7 @@ const ShortsInlineBlock: React.FC<ShortsInlineBlockProps> = ({ shorts, onShortCl
               key={short.id}
               short={short}
               height={height}
+              sortIndex={index}
               onClick={() => {
                 analyticsEvents.track('shorts_tile_opened', { 
                   shortId: short.id, 
@@ -65,12 +76,16 @@ const ShortsInlineBlock: React.FC<ShortsInlineBlockProps> = ({ shorts, onShortCl
 interface ShortTileProps {
   short: ExploreContentItem;
   height: number;
+  sortIndex: number;
   onClick: () => void;
 }
 
-const ShortTile: React.FC<ShortTileProps> = ({ short, height, onClick }) => {
+const ShortTile: React.FC<ShortTileProps> = ({ short, height, sortIndex, onClick }) => {
   const { ref: tileRef, inView } = useInView({ threshold: 0.3, triggerOnce: false });
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const playerRef = useRef<HLSPlayerRef>(null);
+  const { registerMedia, playingIds } = useMediaAutoplay({ surface: 'grid' });
+  const isPlaying = playingIds.has(short.id);
 
   // Optimize thumbnail and poster URLs
   const basePosterUrl = short.thumbnailSrc || '';
@@ -85,42 +100,58 @@ const ShortTile: React.FC<ShortTileProps> = ({ short, height, onClick }) => {
     }
   }, [inView, short.id]);
 
-  // Handle autoplay based on visibility using safePlay
+  // Register with MediaRuntime via useMediaAutoplay
   useEffect(() => {
-    const video = videoRef.current;
+    const video = playerRef.current?.getElement();
     if (!video) return;
 
-    if (inView) {
-      import('@/utils/safePlay').then(({ safePlay }) => {
-        safePlay(video);
-      });
-    } else {
-      video.pause();
-    }
-  }, [inView]);
+    registerMedia({
+      id: short.id,
+      element: video,
+      isCandidate: true,
+      sortIndex,
+      observeTarget: containerRef.current,
+    });
+
+    return () => {
+      registerMedia({ id: short.id, element: null });
+    };
+  }, [short.id, sortIndex, registerMedia]);
+
+  // Build HLS URL from source
+  const hlsUrl = short.src?.includes('videodelivery.net') 
+    ? short.src.replace(/\/watch$/, '/manifest/video.m3u8')
+    : short.src;
 
   return (
     <div ref={tileRef} className="flex flex-col">
       {/* Tile Container */}
-      <button
+      <div
+        ref={containerRef}
         onClick={onClick}
-        className="relative overflow-hidden rounded-xl group w-full flex-shrink-0"
+        className="relative overflow-hidden rounded-xl group w-full flex-shrink-0 cursor-pointer"
         style={{ 
           height: `${height}px`,
           aspectRatio: '9/16',
           boxShadow: '0 1px 2px rgba(0,0,0,.08), 0 6px 16px rgba(0,0,0,.06)'
         }}
         aria-label={`Watch short: ${short.title}`}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter') onClick(); }}
       >
-        {/* Video */}
-        <video
-          ref={videoRef}
-          src={short.src}
-          className="absolute inset-0 w-full h-full object-cover"
-          loop
-          muted
-          playsInline
+        {/* HLSPlayer - controlled by MediaRuntime */}
+        <HLSPlayer
+          ref={playerRef}
+          src={hlsUrl}
           poster={posterUrl || '/placeholder.svg'}
+          autoplay={isPlaying}
+          muted
+          loop
+          showMuteButton={false}
+          showPlayButton={false}
+          objectFit="cover"
+          className="absolute inset-0 w-full h-full"
         />
 
         {/* Gradient Overlay */}
@@ -137,7 +168,7 @@ const ShortTile: React.FC<ShortTileProps> = ({ short, height, onClick }) => {
           <Flame className="w-3 h-3 text-slate-400" />
           <span className="text-[12px] font-semibold text-white">Trending</span>
         </div>
-      </button>
+      </div>
 
       {/* Caption - Below Tile */}
       <div className="mt-1.5 px-1">

@@ -2,20 +2,31 @@ import React, { useRef, useEffect, memo } from 'react';
 import { Top100Highlight } from '@/hooks/useTop100Highlights';
 import { uidFromNode, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
 import { getHlsUrl, attachHlsIfNeeded } from '@/utils/videoPreload';
+import { MediaRuntime } from '@/media/runtime';
+import type { RegisterMediaFn } from '@/media/useMediaAutoplay';
 
 interface HighlightVideoProps {
   highlight: Top100Highlight;
   index: number;
   onEnded: () => void;
+  mediaId: string;
+  isPlaying: boolean;
+  registerMedia: RegisterMediaFn;
+  muted: boolean;
 }
 
-/** Video element that never re-renders due to mute changes */
+/** Video element that uses MediaRuntime for playback control */
 const HighlightVideo = memo(function HighlightVideo({
   highlight,
   index,
   onEnded,
+  mediaId,
+  isPlaying,
+  registerMedia,
+  muted,
 }: HighlightVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   
   const primaryMedia = highlight.post_media[0];
   
@@ -34,6 +45,25 @@ const HighlightVideo = memo(function HighlightVideo({
     ? generateThumbnailUrl(streamId, { width: 640, height: 360, time: 5 })
     : null;
 
+  // Register with MediaRuntime
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || primaryMedia?.media_type !== 'video') return;
+
+    registerMedia({
+      id: mediaId,
+      element: video,
+      isCandidate: true,
+      sortIndex: index,
+      observeTarget: containerRef.current,
+    });
+
+    return () => {
+      registerMedia({ id: mediaId, element: null });
+    };
+  }, [mediaId, index, registerMedia, primaryMedia?.media_type]);
+
+  // Setup video source
   useEffect(() => {
     let cancelled = false;
     
@@ -75,10 +105,18 @@ const HighlightVideo = memo(function HighlightVideo({
     };
   }, [videoId, onEnded]);
 
+  // Sync muted state
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.muted = muted;
+    }
+  }, [muted]);
+
   // Safety check for media
   if (!primaryMedia) {
     return (
-      <div className="highlights__card">
+      <div ref={containerRef} className="highlights__card">
         <div className="w-full h-full bg-muted flex items-center justify-center">
           <span className="text-muted-foreground">No media</span>
         </div>
@@ -87,7 +125,7 @@ const HighlightVideo = memo(function HighlightVideo({
   }
 
   return (
-    <div className="highlights__card">
+    <div ref={containerRef} className="highlights__card">
       {primaryMedia.media_type === 'image' ? (
         <img
           src={primaryMedia.media_url}
@@ -101,7 +139,7 @@ const HighlightVideo = memo(function HighlightVideo({
           ref={videoRef}
           className="highlights__video"
           poster={posterUrl || undefined}
-          muted
+          muted={muted}
           playsInline
           preload="auto"
         />

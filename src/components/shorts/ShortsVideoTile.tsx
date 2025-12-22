@@ -1,12 +1,20 @@
-import React from 'react';
-import { safePlay } from '@/utils/safePlay';
+/**
+ * ShortsVideoTile - Grid tile for shorts
+ * 
+ * Uses MediaRuntime for playback control.
+ * No direct play/pause calls.
+ */
+
+import React, { useRef, useEffect, useCallback, useState } from 'react';
+import { MediaRuntime } from '@/media/runtime';
+import { useMediaAutoplay } from '@/media/useMediaAutoplay';
+import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
 
 type Props = {
   id: string;
   hlsUrl: string;
   posterUrl?: string;
-  shouldAutoplay: boolean;
-  inView: boolean;
+  sortIndex: number;
   onClick?: () => void;
 };
 
@@ -14,72 +22,49 @@ export default function ShortsVideoTile({
   id,
   hlsUrl,
   posterUrl,
-  shouldAutoplay,
-  inView,
+  sortIndex,
   onClick
 }: Props) {
-  const ref = React.useRef<HTMLVideoElement | null>(null);
-  const [ready, setReady] = React.useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const playerRef = useRef<HLSPlayerRef>(null);
+  const { registerMedia, playingIds } = useMediaAutoplay({ surface: 'grid' });
+  const isPlaying = playingIds.has(id);
 
-  // Preload aggressively to avoid black frames
-  React.useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+  // Register with MediaRuntime via useMediaAutoplay
+  useEffect(() => {
+    const video = playerRef.current?.getElement();
+    if (!video) return;
 
-    // Ensure attributes (critical for mobile autoplay)
-    el.muted = true;
-    el.loop = true;
-    el.playsInline = true;
-    el.preload = 'auto';
+    registerMedia({
+      id,
+      element: video,
+      isCandidate: true,
+      sortIndex,
+      observeTarget: containerRef.current,
+    });
 
-    const onCanPlay = () => setReady(true);
-    el.addEventListener('canplay', onCanPlay);
-
-    if (el.readyState >= 2) setReady(true);
-
-    return () => el.removeEventListener('canplay', onCanPlay);
-  }, []);
-
-  // Visibility + alternating policy → play/pause
-  React.useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const canPlay = ready && inView && shouldAutoplay;
-    if (canPlay) {
-      safePlay(el);
-    } else {
-      el.pause();
-    }
-  }, [ready, inView, shouldAutoplay]);
+    return () => {
+      registerMedia({ id, element: null });
+    };
+  }, [id, sortIndex, registerMedia]);
 
   return (
     <div
+      ref={containerRef}
       className="group relative aspect-[9/16] overflow-hidden rounded bg-muted cursor-pointer"
       onClick={onClick}
     >
-      {/* Poster underneath as a safety net */}
-      {posterUrl && (
-        <img
-          src={posterUrl}
-          alt=""
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-150
-                      ${ready ? 'opacity-0' : 'opacity-100'}`}
-          draggable={false}
-          loading="eager"
-        />
-      )}
-
-      <video
-        ref={ref}
+      <HLSPlayer
+        ref={playerRef}
         src={hlsUrl}
         poster={posterUrl}
-        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-150
-                    ${ready ? 'opacity-100' : 'opacity-0'}`}
-        playsInline
+        autoplay={isPlaying}
         muted
         loop
-        controls={false}
+        showMuteButton={false}
+        showPlayButton={false}
+        objectFit="cover"
+        className="absolute inset-0 h-full w-full"
       />
 
       {/* Hover overlay */}
