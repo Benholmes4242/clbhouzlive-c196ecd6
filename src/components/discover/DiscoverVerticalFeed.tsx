@@ -355,7 +355,8 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
       if (allowedIds.has(key)) {
         pruned[key] = value;
       } else {
-        // Pause and clear video that's being pruned
+        // CLEANUP_PAUSE: Pause and clear video that's being pruned from memory
+        // This is acceptable as it's resource cleanup, not playback control
         if (value) {
           value.pause();
           value.removeAttribute('src');

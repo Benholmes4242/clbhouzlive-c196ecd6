@@ -2,13 +2,14 @@
  * MomentFullscreenViewer - Fullscreen post viewer with swipe navigation
  */
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useId } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { MomentPost } from './types';
 import { X, ChevronLeft, ChevronRight, Heart, MessageCircle, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
 import { useSwipeable } from 'react-swipeable';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
 interface MomentFullscreenViewerProps {
   moments: MomentPost[];
@@ -26,6 +27,7 @@ export const MomentFullscreenViewer: React.FC<MomentFullscreenViewerProps> = ({
   onIndexChange,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const mediaId = useId();
   const currentMoment = moments[currentIndex];
 
   const goToPrev = () => {
@@ -47,10 +49,10 @@ export const MomentFullscreenViewer: React.FC<MomentFullscreenViewerProps> = ({
   });
 
   useEffect(() => {
-    if (open && videoRef.current && currentMoment?.mediaType === 'video') {
-      videoRef.current.play().catch(() => {});
+    if (open && currentMoment?.mediaType === 'video') {
+      MediaRuntime.requestPlay({ id: mediaId, surface: 'fullscreen', reason: 'user' });
     }
-  }, [open, currentIndex, currentMoment?.mediaType]);
+  }, [open, currentIndex, currentMoment?.mediaType, mediaId]);
 
   if (!currentMoment) return null;
 
