@@ -6,10 +6,11 @@
  * - Registry/warm pool sizes
  * - UI state (scrolling, modal, panel)
  * - TTFF + buffering metrics
+ * 
+ * Only renders when import.meta.env.DEV is true (build-time check).
  */
 
 import React, { useState, useEffect, useCallback, memo } from 'react';
-import { MEDIA_DEV_HUD_V1 } from '@/config/featureFlags';
 import { MediaRuntime } from './MediaRuntime';
 import { cn } from '@/lib/utils';
 
@@ -45,7 +46,8 @@ export const MediaDevHud = memo(function MediaDevHud() {
 
   // Poll debug info periodically
   useEffect(() => {
-    if (!MEDIA_DEV_HUD_V1) return;
+    // Only run in DEV mode
+    if (!import.meta.env.DEV) return;
 
     const update = () => {
       const debug = MediaRuntime.getDebugInfo();
@@ -72,8 +74,8 @@ export const MediaDevHud = memo(function MediaDevHud() {
     return () => clearInterval(interval);
   }, []);
 
-  // Don't render in production
-  if (!MEDIA_DEV_HUD_V1) return null;
+  // Don't render in production (build-time gate)
+  if (!import.meta.env.DEV) return null;
 
   const toggle = useCallback(() => setIsExpanded(e => !e), []);
 

@@ -14,7 +14,6 @@
 
 import React, { useRef, useEffect, useState, useCallback, memo } from 'react';
 import { cn } from '@/lib/utils';
-import { MEDIA_RUNTIME_V2 } from '@/config/featureFlags';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
 interface VideoScrubberProps {
@@ -164,9 +163,7 @@ export const VideoScrubber = memo(function VideoScrubber({
     setIsDragging(true);
     
     // Track user intent in MediaRuntime
-    if (MEDIA_RUNTIME_V2) {
-      MediaRuntime.trackIntent('scrub');
-    }
+    MediaRuntime.trackIntent('scrub');
     
     // Seek to initial position
     const newTime = getTimeFromEvent(e.clientX);

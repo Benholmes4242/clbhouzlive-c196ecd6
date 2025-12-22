@@ -2,18 +2,18 @@
  * useMediaAutoplay - Unified autoplay engine
  * Single intersection observer system for all grid/feed autoplay
  * 
- * When MEDIA_RUNTIME_V2 is enabled:
- * - Observes visibility and reports to MediaRuntime.setCandidateState()
- * - Does NOT call play/pause directly - all decisions made by MediaRuntime
+ * IMPORTANT: This hook does NOT call play/pause directly.
+ * All playback decisions are made exclusively by MediaRuntime.
  * 
- * When MEDIA_RUNTIME_V2 is disabled:
- * - Legacy behavior: directly controls playback
+ * Responsibilities:
+ * - Observes visibility and reports to MediaRuntime.setCandidateState()
+ * - Registers/unregisters media with MediaRuntime
+ * - Reports UI state (scrolling, panel animations) to MediaRuntime
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useMediaSystem } from './MediaSystemProvider';
 import { useSlidingPanels } from '@/components/ui/SlidingPanelsContext';
-import { MEDIA_RUNTIME_V2 } from '@/config/featureFlags';
 import { MediaRuntime } from './runtime';
 import type { MediaSurface } from './runtime';
 
@@ -64,14 +64,10 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   const {
     mode = 'grid',
     surface = 'grid',
-    // Updated thresholds for grid mode with observeTarget sentinel pattern
-    // Lower thresholds work better when observing full tile wrappers
     startThreshold = 0.4,
     stopThreshold = 0.25,
     preloadMargin = 300,
-    maxPreloading = 3,
     scrollSettleDelay = 200,
-    warmWindowSize = 1,
   } = options;
   
   const mediaSystem = useMediaSystem();
@@ -89,7 +85,7 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   const playObserver = useRef<IntersectionObserver | null>(null);
   const preloadObserver = useRef<IntersectionObserver | null>(null);
   
-  // State
+  // State - reflects what MediaRuntime says is playing
   const [playingIds, setPlayingIds] = useState<Set<string>>(new Set());
   
   // Scroll protection
@@ -99,134 +95,46 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   // Tab visibility
   const isTabVisible = useRef(!document.hidden);
   
-  // ============ Runtime V2 Integration ============
+  // ============ Sync panel animation state to runtime ============
   
-  // Sync panel animation state to runtime
   useEffect(() => {
-    if (!MEDIA_RUNTIME_V2) return;
-    
     MediaRuntime.setUIState({ isPanelOpen: isPanelAnimating });
   }, [isPanelAnimating]);
   
-  // ============ Pause All ============
+  // ============ Sync playingIds from runtime ============
   
-  const pauseAllLocal = useCallback(() => {
-    if (MEDIA_RUNTIME_V2) {
-      MediaRuntime.pauseAll();
+  const syncPlayingFromRuntime = useCallback(() => {
+    const activeId = MediaRuntime.getActiveId();
+    if (activeId) {
+      setPlayingIds(new Set([activeId]));
+    } else {
       setPlayingIds(new Set());
-      return;
     }
-    
-    registry.current.forEach((reg) => {
-      if (reg.element && !reg.element.paused) {
-        reg.element.pause();
-      }
-    });
-    setPlayingIds(new Set());
   }, []);
   
-  // ============ Core Playback Logic (Legacy) ============
-  
-  const updatePlayback = useCallback(() => {
-    // V2: Let runtime handle playback decisions
-    if (MEDIA_RUNTIME_V2) {
-      // Just update playing IDs from runtime state
-      const activeId = MediaRuntime.getActiveId();
-      if (activeId) {
-        setPlayingIds(new Set([activeId]));
-      } else {
-        setPlayingIds(new Set());
-      }
-      return;
-    }
-    
-    // Legacy behavior below
-    // Don't play if scrolling fast, tab hidden, or panel is animating
-    if (isScrolling.current || !isTabVisible.current || isPanelAnimating) {
-      pauseAllLocal();
-      return;
-    }
-
-    const items = Array.from(registry.current.values());
-
-    // Get visible candidates
-    const visibleCandidates = items.filter(
-      (item) => item.isCandidate && visibleIds.current.has(item.id)
-    );
-
-    // Sort by sortIndex (stable grid order)
-    visibleCandidates.sort((a, b) => a.sortIndex - b.sortIndex);
-
-    // In grid mode: play first candidate only
-    // In feed mode: play first candidate, keep warm ±N
-    const toPlay = new Set<string>();
-    const toWarm = new Set<string>();
-
-    if (visibleCandidates.length > 0) {
-      toPlay.add(visibleCandidates[0].id);
-
-      if (mode === 'feed') {
-        // Warm window around current
-        const currentIdx = 0;
-        for (let i = Math.max(0, currentIdx - warmWindowSize); i <= Math.min(visibleCandidates.length - 1, currentIdx + warmWindowSize); i++) {
-          if (i !== currentIdx) {
-            toWarm.add(visibleCandidates[i].id);
-          }
-        }
-      }
-    }
-
-    const newPlayingIds = new Set<string>();
-
-    items.forEach((item) => {
-      if (!item.element) return;
-
-      const shouldPlay = toPlay.has(item.id);
-      const shouldWarm = toWarm.has(item.id);
-
-      if (shouldPlay) {
-        // Check if already playing to avoid play() churn
-        if (!item.element.paused && !item.element.ended) {
-          newPlayingIds.add(item.id);
-          return;
-        }
-
-        // Ensure HLS source is attached before attempting to play (fixes re-entry after detach)
-        (item.element as any).__hlsPlayerRef?.attach?.();
-
-        // Request play through media system
-        mediaSystem.requestPlay(item.id).then((success) => {
-          if (success) {
-            setPlayingIds((prev) => new Set([...prev, item.id]));
-          }
-        });
-
-        newPlayingIds.add(item.id);
-      } else if (shouldWarm) {
-        // Keep warm but paused
-        item.element.pause();
-      } else {
-        // Pause and reset
-        item.element.pause();
-      }
-    });
-
-    setPlayingIds(newPlayingIds);
-  }, [pauseAllLocal, mode, warmWindowSize, mediaSystem, isPanelAnimating]);
-  
-  // ============ Panel Animation Handler ============
-  // Resume playback when panel animation completes
+  // ============ Resume playback when panel animation completes ============
   
   useEffect(() => {
     if (!isPanelAnimating) {
-      // Animation just completed, trigger playback check
-      const timer = setTimeout(() => updatePlayback(), 100);
+      const timer = setTimeout(() => syncPlayingFromRuntime(), 100);
       return () => clearTimeout(timer);
     }
-  }, [isPanelAnimating, updatePlayback]);
+  }, [isPanelAnimating, syncPlayingFromRuntime]);
   
   // ============ Registration ============
   
+  /**
+   * Register a video element for autoplay management.
+   * 
+   * IMPORTANT: Never call video.play() or video.pause() directly.
+   * MediaRuntime is the ONLY entity allowed to control playback.
+   * 
+   * @param args.id - Unique identifier (typically post ID)
+   * @param args.element - The video element (pass null to unregister)
+   * @param args.isCandidate - Whether this video can autoplay
+   * @param args.sortIndex - Lower = higher priority for autoplay
+   * @param args.observeTarget - Optional wrapper element to observe instead of video
+   */
   const registerMedia: RegisterMediaFn = useCallback((args) => {
     const { id, element, isCandidate = true, sortIndex = 0, observeTarget } = args;
 
@@ -241,18 +149,13 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
         }
         preloadObserver.current?.unobserve(existing.element);
 
-        // Unregister from media system
         mediaSystem.unregister(id);
-        
-        // V2: Also unregister from runtime
-        if (MEDIA_RUNTIME_V2) {
-          MediaRuntime.unregisterMedia(id);
-        }
+        MediaRuntime.unregisterMedia(id);
       }
 
       registry.current.delete(id);
       visibleIds.current.delete(id);
-      updatePlayback();
+      syncPlayingFromRuntime();
       return;
     }
 
@@ -263,16 +166,14 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
       kind: 'video',
     });
     
-    // V2: Also register with runtime
-    if (MEDIA_RUNTIME_V2) {
-      MediaRuntime.registerMedia({
-        id,
-        element,
-        surface,
-        sortIndex,
-        observeTarget: observeTarget ?? element,
-      });
-    }
+    // Register with MediaRuntime (the playback authority)
+    MediaRuntime.registerMedia({
+      id,
+      element,
+      surface,
+      sortIndex,
+      observeTarget: observeTarget ?? element,
+    });
 
     // Create/update registration
     const existing = registry.current.get(id);
@@ -300,24 +201,18 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
       preloadObserver.current.observe(element);
     }
 
-    // Trigger playback check after short delay
-    setTimeout(() => updatePlayback(), 50);
-  }, [mediaSystem, updatePlayback, surface]);
+    // Sync after short delay
+    setTimeout(() => syncPlayingFromRuntime(), 50);
+  }, [mediaSystem, syncPlayingFromRuntime, surface]);
   
   // ============ Scroll Protection ============
   
   useEffect(() => {
     const handleScroll = () => {
-      // V2: Report scroll state to runtime
-      if (MEDIA_RUNTIME_V2) {
-        MediaRuntime.setUIState({ isScrolling: true });
-      }
+      MediaRuntime.setUIState({ isScrolling: true });
       
       if (!isScrolling.current) {
         isScrolling.current = true;
-        if (!MEDIA_RUNTIME_V2) {
-          pauseAllLocal();
-        }
       }
       
       if (scrollTimeout.current) {
@@ -326,13 +221,8 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
       
       scrollTimeout.current = setTimeout(() => {
         isScrolling.current = false;
-        
-        // V2: Report scroll settled to runtime
-        if (MEDIA_RUNTIME_V2) {
-          MediaRuntime.setUIState({ isScrolling: false });
-        }
-        
-        updatePlayback();
+        MediaRuntime.setUIState({ isScrolling: false });
+        syncPlayingFromRuntime();
       }, scrollSettleDelay);
     };
     
@@ -344,7 +234,7 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
         clearTimeout(scrollTimeout.current);
       }
     };
-  }, [scrollSettleDelay, pauseAllLocal, updatePlayback]);
+  }, [scrollSettleDelay, syncPlayingFromRuntime]);
   
   // ============ Tab Visibility ============
   
@@ -353,20 +243,22 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
       isTabVisible.current = !document.hidden;
 
       if (document.hidden) {
-        pauseAllLocal();
+        MediaRuntime.pauseAll();
+        setPlayingIds(new Set());
       } else {
-        setTimeout(() => updatePlayback(), 100);
+        setTimeout(() => syncPlayingFromRuntime(), 100);
       }
     };
 
     const handleBlur = () => {
       isTabVisible.current = false;
-      pauseAllLocal();
+      MediaRuntime.pauseAll();
+      setPlayingIds(new Set());
     };
 
     const handleFocus = () => {
       isTabVisible.current = true;
-      setTimeout(() => updatePlayback(), 100);
+      setTimeout(() => syncPlayingFromRuntime(), 100);
     };
 
     document.addEventListener('visibilitychange', handleVisibility);
@@ -378,20 +270,17 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
       window.removeEventListener('blur', handleBlur);
       window.removeEventListener('focus', handleFocus);
     };
-  }, [pauseAllLocal, updatePlayback]);
+  }, [syncPlayingFromRuntime]);
   
   // ============ Preload Observer (Real Prewarm) ============
   
-  // Track which items are prewarmed (attached)
   const prewarmedIds = useRef<Set<string>>(new Set());
-  // Debounce detach to prevent thrash on fast scroll
   const detachTimeouts = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
-  const DETACH_DELAY = 400; // ms delay before detaching
+  const DETACH_DELAY = 400;
   
   useEffect(() => {
     preloadObserver.current = new IntersectionObserver(
       (entries) => {
-        // Skip during panel animations - intersection ratios unreliable during transforms
         if (isPanelAnimatingRef.current) return;
         
         entries.forEach((entry) => {
@@ -403,42 +292,20 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
           if (!reg) return;
           
           if (entry.isIntersecting) {
-            // Cancel any pending detach for this item
+            // Cancel any pending detach
             const pendingDetach = detachTimeouts.current.get(id);
             if (pendingDetach) {
               clearTimeout(pendingDetach);
               detachTimeouts.current.delete(id);
             }
             
-            // V2: Use runtime prewarm
-            if (MEDIA_RUNTIME_V2) {
-              MediaRuntime.prewarmCandidate(id);
-              prewarmedIds.current.add(id);
-              reg.hasBeenPreloaded = true;
-              return;
-            }
-            
-            // Legacy prewarm
-            const playerRef = (target as any).__hlsPlayerRef;
-            const isCurrentlyAttached = playerRef?.isAttached?.() ?? false;
-            const isVisible = visibleIds.current.has(id);
-            const canPrewarm = prewarmedIds.current.size < maxPreloading || prewarmedIds.current.has(id);
-
-            if (!isCurrentlyAttached && (isVisible || canPrewarm)) {
-              playerRef?.attach?.();
-            }
-
-            // Track as prewarmed so we can detach later
-            if ((isVisible || canPrewarm) && !prewarmedIds.current.has(id)) {
-              target.preload = 'auto';
-              prewarmedIds.current.add(id);
-              reg.hasBeenPreloaded = true;
-              registry.current.set(id, reg);
-            }
+            // Use runtime prewarm
+            MediaRuntime.prewarmCandidate(id);
+            prewarmedIds.current.add(id);
+            reg.hasBeenPreloaded = true;
           } else {
-            // Far from viewport - debounced detach to prevent thrash
+            // Debounced detach
             if (prewarmedIds.current.has(id) && !detachTimeouts.current.has(id)) {
-              // Only detach if not currently visible (playing)
               const isVisible = visibleIds.current.has(id);
               if (!isVisible) {
                 const timeout = setTimeout(() => {
@@ -462,7 +329,6 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
       }
     );
     
-    // Observe existing
     registry.current.forEach((reg) => {
       preloadObserver.current?.observe(reg.element);
     });
@@ -471,24 +337,21 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
       preloadObserver.current?.disconnect();
       preloadObserver.current = null;
       prewarmedIds.current.clear();
-      // Clear all pending detach timeouts
       detachTimeouts.current.forEach((timeout) => clearTimeout(timeout));
       detachTimeouts.current.clear();
     };
-  }, [preloadMargin, maxPreloading]);
+  }, [preloadMargin]);
   
-  // ============ Play Observer (Hysteresis) ============
+  // ============ Play Observer (Visibility) ============
   
-  // Store updatePlayback in a ref to avoid re-creating observer on every render
-  const updatePlaybackRef = useRef(updatePlayback);
-  updatePlaybackRef.current = updatePlayback;
+  const syncPlayingRef = useRef(syncPlayingFromRuntime);
+  syncPlayingRef.current = syncPlayingFromRuntime;
   
   useEffect(() => {
     const thresholds = [stopThreshold, startThreshold];
     
     playObserver.current = new IntersectionObserver(
       (entries) => {
-        // Skip during panel animations - intersection ratios unreliable during transforms
         if (isPanelAnimatingRef.current) return;
         
         entries.forEach((entry) => {
@@ -509,42 +372,36 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
             visibleIds.current.delete(id);
             nextVisible = false;
           }
-          // Between thresholds: keep current state
           
-          // V2: Report visibility to runtime
-          if (MEDIA_RUNTIME_V2) {
-            MediaRuntime.setCandidateState(id, {
-              visible: nextVisible,
-              ratio,
-            });
-          }
+          // Report visibility to runtime - it decides what to play
+          MediaRuntime.setCandidateState(id, {
+            visible: nextVisible,
+            ratio,
+          });
           
           if (import.meta.env.DEV && wasVisible !== nextVisible) {
             console.log('[MediaAutoplay]', id.slice(0, 8), `ratio=${ratio.toFixed(2)}`, `visible: ${wasVisible} → ${nextVisible}`);
           }
         });
         
-        updatePlaybackRef.current();
+        syncPlayingRef.current();
       },
       {
         threshold: thresholds,
       }
     );
     
-    // Observe existing
     registry.current.forEach((reg) => {
       const target = reg.observeTarget ?? reg.element;
       playObserver.current?.observe(target);
     });
     
-    // Initial check
-    const initialCheck = setTimeout(() => updatePlaybackRef.current(), 150);
+    const initialCheck = setTimeout(() => syncPlayingRef.current(), 150);
     
     return () => {
       clearTimeout(initialCheck);
       playObserver.current?.disconnect();
       playObserver.current = null;
-      // Don't clear registry on cleanup - registrations are managed by registerMedia
       visibleIds.current.clear();
     };
   }, [startThreshold, stopThreshold]);

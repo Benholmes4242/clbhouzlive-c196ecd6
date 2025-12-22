@@ -16,7 +16,6 @@ import { safePlay, isIOS } from '@/utils/safePlay';
 import { loadHlsJs } from '@/utils/hlsLoader';
 import type HlsType from 'hls.js';
 import { cn } from '@/lib/utils';
-import { MEDIA_SCRUBBER_V1, MEDIA_RUNTIME_V2 } from '@/config/featureFlags';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
@@ -473,7 +472,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       }
       
       // Record TTFF (only once per play cycle)
-      if (MEDIA_RUNTIME_V2 && mediaId && ttffStartRef.current > 0 && !ttffFiredRef.current) {
+      if (mediaId && ttffStartRef.current > 0 && !ttffFiredRef.current) {
         ttffFiredRef.current = true;
         const ttffMs = performance.now() - ttffStartRef.current;
         MediaRuntime.recordTtff(mediaId, ttffMs);
@@ -666,15 +665,14 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     
     const handleWaiting = () => {
       setIsBuffering(true);
-      // Report to runtime so it doesn't switch away while buffering
-      if (MEDIA_RUNTIME_V2 && mediaId) {
+      if (mediaId) {
         MediaRuntime.reportBuffering(mediaId);
         MediaRuntime.recordBufferingStart(mediaId);
       }
     };
     const handleStalled = () => {
       setIsBuffering(true);
-      if (MEDIA_RUNTIME_V2 && mediaId) {
+      if (mediaId) {
         MediaRuntime.reportBuffering(mediaId);
         MediaRuntime.recordBufferingStart(mediaId);
       }
@@ -682,15 +680,14 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     const handlePlaying = () => {
       const wasBuffering = isBuffering;
       setIsBuffering(false);
-      // Record buffering end
-      if (MEDIA_RUNTIME_V2 && mediaId && wasBuffering) {
+      if (mediaId && wasBuffering) {
         MediaRuntime.recordBufferingEnd(mediaId);
       }
     };
     const handleCanPlay = () => {
       const wasBuffering = isBuffering;
       setIsBuffering(false);
-      if (MEDIA_RUNTIME_V2 && mediaId && wasBuffering) {
+      if (mediaId && wasBuffering) {
         MediaRuntime.recordBufferingEnd(mediaId);
       }
     };
@@ -900,8 +897,8 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         </button>
       )}
       
-      {/* Scrubber Overlay - Instagram-style progress bar with buffering shimmer */}
-      {(showScrubber ?? MEDIA_SCRUBBER_V1) && mediaId && !hasError && (
+      {/* Scrubber Overlay - Always visible when mediaId exists */}
+      {(showScrubber !== false) && mediaId && !hasError && (
         <VideoScrubber
           videoEl={videoRef.current}
           mediaId={mediaId}

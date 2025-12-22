@@ -25,7 +25,7 @@ import { TopBar } from './social-dock/TopBar';
 
 import { useTopBarVisibility } from '@/hooks/useTopBarVisibility';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR, CLUBHOUSE_RUNTIME_BRIDGE_V1 } from '@/config/featureFlags';
+import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featureFlags';
 import { logClubhouseFiltering } from '@/utils/clubhouseTelemetry';
 import { useClubhouseRuntimeBridge } from '@/hooks/useClubhouseRuntimeBridge';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
@@ -304,13 +304,12 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
   const queryClient = useQueryClient();
   
-  // Runtime bridge for MediaRuntime integration (feature flagged)
+  // Runtime bridge for MediaRuntime integration (always enabled)
   const runtimeBridge = useClubhouseRuntimeBridge({
     posts: filteredPosts,
     currentIndex,
     videoRefs,
     itemRefs,
-    enabled: CLUBHOUSE_RUNTIME_BRIDGE_V1,
   });
   
   // Two-observer system for prebuffer and autoplay
@@ -657,31 +656,16 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       const wasDouble = Date.now() - (lastTapRef.current[postId] || 0) < 300;
       if (wasDouble) return; // Don't execute single tap if double-tap just occurred
       
-      // Toggle play/pause - use runtime bridge if enabled
-      if (runtimeBridge.enabled) {
-        const videoEl = videoRefs.current[postId];
-        const isCurrentlyPlaying = videoEl && !videoEl.paused;
-        
-        if (isCurrentlyPlaying) {
-          runtimeBridge.requestPause(postId, 'user');
-          setVideosPlaying(prev => ({ ...prev, [postId]: false }));
-        } else {
-          runtimeBridge.requestPlay(postId, 'user');
-          setVideosPlaying(prev => ({ ...prev, [postId]: true }));
-        }
+      // Toggle play/pause via runtime bridge
+      const videoEl = videoRefs.current[postId];
+      const isCurrentlyPlaying = videoEl && !videoEl.paused;
+      
+      if (isCurrentlyPlaying) {
+        runtimeBridge.requestPause(postId, 'user');
+        setVideosPlaying(prev => ({ ...prev, [postId]: false }));
       } else {
-        // Legacy direct control
-        const videoEl = videoRefs.current[postId];
-        if (!videoEl) return;
-        
-        const isCurrentlyPlaying = !videoEl.paused;
-        if (isCurrentlyPlaying) {
-          videoEl.pause();
-          setVideosPlaying(prev => ({ ...prev, [postId]: false }));
-        } else {
-          videoEl.play();
-          setVideosPlaying(prev => ({ ...prev, [postId]: true }));
-        }
+        runtimeBridge.requestPlay(postId, 'user');
+        setVideosPlaying(prev => ({ ...prev, [postId]: true }));
       }
       
       // Pause/play = meaningful interaction, trigger progressive immersion
