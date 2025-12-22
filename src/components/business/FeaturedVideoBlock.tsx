@@ -1,7 +1,8 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useId } from 'react';
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useInView } from 'react-intersection-observer';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
 interface FeaturedVideoBlockProps {
   videoUrl?: string | null;
@@ -28,30 +29,34 @@ export function FeaturedVideoBlock({
     triggerOnce: false,
   });
 
-  // Auto-play when in view
-  useEffect(() => {
-    if (!videoRef.current || !videoUrl) return;
-    
-    if (inView) {
-      videoRef.current.play().catch(() => {
-        // Autoplay was prevented
-      });
-      setIsPlaying(true);
-    } else {
-      videoRef.current.pause();
-      setIsPlaying(false);
-    }
-  }, [inView, videoUrl]);
+  // Generate stable media ID
+  const mediaId = useId();
 
+  // Sync isPlaying state with video events
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handlePlay = () => setIsPlaying(true);
+    const handlePause = () => setIsPlaying(false);
+
+    video.addEventListener('play', handlePlay);
+    video.addEventListener('pause', handlePause);
+
+    return () => {
+      video.removeEventListener('play', handlePlay);
+      video.removeEventListener('pause', handlePause);
+    };
+  }, []);
+
+  // User-tap toggle - route through MediaRuntime
   const togglePlay = () => {
     if (!videoRef.current) return;
     
     if (isPlaying) {
-      videoRef.current.pause();
-      setIsPlaying(false);
+      MediaRuntime.requestPause({ id: mediaId, reason: 'user' });
     } else {
-      videoRef.current.play();
-      setIsPlaying(true);
+      MediaRuntime.requestPlay({ id: mediaId, surface: 'grid', reason: 'user' });
     }
   };
 

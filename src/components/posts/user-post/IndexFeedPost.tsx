@@ -275,8 +275,8 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
                   // Update global audio state to match the video's new mute state
                   setGlobalMute(videoMuted);
                 }
-                // Force the video to play immediately, bypassing scroll detection
-                video.play().catch(console.error);
+                // Resume handled by VideoPlaybackManager - no direct play needed
+                resumeVideoWithState(videoId);
                 console.log('▶️ Resumed video from modal position:', videoPosition, 'muted:', videoMuted);
               } else {
                 // Fallback to using the video manager's resume function

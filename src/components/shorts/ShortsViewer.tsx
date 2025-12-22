@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useId } from 'react';
 import { X, Volume2, VolumeX, ChevronUp, ChevronDown } from 'lucide-react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { useSwipeable } from 'react-swipeable';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
 import { OverlayCorners, OVERLAY_TOP_LEFT, OVERLAY_TOP_RIGHT } from '@/components/shared/overlay';
 import { cn } from '@/lib/utils';
-import { safePlay } from '@/utils/safePlay';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
 interface ShortsViewerProps {
   items: ExploreContentItem[];
@@ -92,7 +92,7 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
     video.loop = true;
     video.playsInline = true;
 
-    safePlay(video);
+    MediaRuntime.requestPlay({ id: videoId, surface: 'fullscreen', reason: 'user' });
 
     const updateProgress = () => {
       if (video.duration > 0) {

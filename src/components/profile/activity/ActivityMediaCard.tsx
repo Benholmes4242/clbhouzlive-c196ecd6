@@ -1,11 +1,12 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useId } from 'react';
 import { cn } from '@/lib/utils';
 import { useMediaStatus, getAspectClass } from './useMediaStatus';
 import MediaSkeleton from './MediaSkeleton';
 import MediaErrorFallback from './MediaErrorFallback';
 import OverlayLabels from './OverlayLabels';
 import { ActivityMediaCardProps, AspectRatio } from './types';
-import { safePlay } from '@/utils/safePlay';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
+// REMOVED: safePlay import - playback now user-tap only via MediaRuntime
 
 /**
  * Premium media card component for Activity grid
@@ -25,6 +26,7 @@ const ActivityMediaCard: React.FC<ActivityMediaCardProps> = ({
   const [supportsHover, setSupportsHover] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
+  const mediaId = useId();
   
   const { status, src, onLoad, onError, retry, canRetry } = useMediaStatus(item.url);
   const isVideo = item.type === 'video';
@@ -37,26 +39,27 @@ const ActivityMediaCard: React.FC<ActivityMediaCardProps> = ({
     }
   }, []);
 
-  // Handle video preview on hover
+  // Handle video preview on hover - route through MediaRuntime
   const handleMouseEnter = useCallback(() => {
     if (!supportsHover) return;
     setIsHovered(true);
     
     if (isVideo && videoRef.current) {
       videoRef.current.muted = true;
-      safePlay(videoRef.current);
+      // Request play via runtime for hover intent
+      MediaRuntime.requestPlay({ id: mediaId, surface: 'grid', reason: 'user' });
     }
-  }, [supportsHover, isVideo]);
+  }, [supportsHover, isVideo, mediaId]);
 
   const handleMouseLeave = useCallback(() => {
     if (!supportsHover) return;
     setIsHovered(false);
     
-    if (isVideo && videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
+    if (isVideo) {
+      // Request pause via runtime
+      MediaRuntime.requestPause({ id: mediaId, reason: 'user' });
     }
-  }, [supportsHover, isVideo]);
+  }, [supportsHover, isVideo, mediaId]);
 
   const handleClick = useCallback(() => {
     onPress?.(item.postId);

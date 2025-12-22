@@ -1,6 +1,6 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useId } from 'react';
 import './GlassVideo.css';
-import { safePlay } from '@/utils/safePlay';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
 type Props = {
   src: string;           // direct MP4/HLS URL (H.264 if MP4)
@@ -11,18 +11,18 @@ type Props = {
 
 /**
  * Glass-styled video player with overlay play button.
- * Uses safePlay for playback control.
+ * Uses MediaRuntime for playback control.
  */
 export function GlassVideo({ src, poster, ratio = 16/9, onPlayTap }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const mediaId = useId();
   
   const handlePlayClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
-    if (videoRef.current) {
-      safePlay(videoRef.current);
-    }
+    // Route through MediaRuntime for user-tap playback
+    MediaRuntime.requestPlay({ id: mediaId, surface: 'fullscreen', reason: 'user' });
     onPlayTap?.();
-  }, [onPlayTap]);
+  }, [onPlayTap, mediaId]);
 
   return (
     <div className="video-frame">

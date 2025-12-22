@@ -2,7 +2,8 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSheetPlayback } from './SheetPlaybackContext';
-import { safePlay } from '@/utils/safePlay';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
+// REMOVED: safePlay import - playback now user-tap only via MediaRuntime
 
 // Debug flag declaration
 declare global {
@@ -234,21 +235,17 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
     };
   }, [id, muted]);
 
-  const togglePlayPause = useCallback(async () => {
+  const togglePlayPause = useCallback(() => {
     const video = videoRef.current;
     if (!video || error) return;
 
-    try {
-      if (video.paused) {
-        setHasUserInteracted(true);
-        requestPlay(id); // Pause other videos
-        await safePlay(video);
-      } else {
-        video.pause();
-      }
-    } catch (err) {
-      console.error('Error toggling playback:', err);
-      setError(true);
+    setHasUserInteracted(true);
+    if (video.paused) {
+      requestPlay(id); // Pause other videos via SheetPlayback
+      // Route through MediaRuntime for user-tap playback
+      MediaRuntime.requestPlay({ id, surface: 'grid', reason: 'user' });
+    } else {
+      MediaRuntime.requestPause({ id, reason: 'user' });
     }
   }, [id, requestPlay, error]);
 
