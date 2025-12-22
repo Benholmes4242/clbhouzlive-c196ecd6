@@ -1,7 +1,7 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useId } from 'react';
 import { Play, Pause, Maximize2 } from 'lucide-react';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
-import { safePlay } from '@/utils/safePlay';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
 interface KeyframePlayerProps {
   videoUrl: string;
@@ -16,6 +16,7 @@ export const KeyframePlayer: React.FC<KeyframePlayerProps> = ({
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const mediaId = useId();
 
   useEffect(() => {
     if (videoRef.current && Math.abs(videoRef.current.currentTime - currentTime) > 0.5) {
@@ -32,10 +33,9 @@ export const KeyframePlayer: React.FC<KeyframePlayerProps> = ({
   const togglePlay = () => {
     if (videoRef.current) {
       if (isPlaying) {
-        videoRef.current.pause();
+        MediaRuntime.requestPause({ id: mediaId, reason: 'user' });
       } else {
-        // PLAYBACK_AUTHORITY_ALLOWED: User-tap on swing review player uses safePlay
-        safePlay(videoRef.current);
+        MediaRuntime.requestPlay({ id: mediaId, surface: 'grid', reason: 'user' });
       }
       setIsPlaying(!isPlaying);
     }

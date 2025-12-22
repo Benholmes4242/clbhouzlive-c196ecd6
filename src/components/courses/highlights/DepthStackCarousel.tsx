@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useId } from 'react';
 import { ChevronLeft, ChevronRight, Volume2, VolumeX, MapPin } from 'lucide-react';
 import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
 import { useThumbnailGenerator } from '@/components/posts/video/ThumbnailGenerator';
@@ -9,6 +9,7 @@ import MedalIcon from '@/components/ui/medal-icon';
 import Top100AchievementsList from '@/components/badges/Top100AchievementsList';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import Hls from 'hls.js';
 // Links legend trophy now uses uploaded UK flag trophy
 // Continental swinger trophy now uses uploaded EU flag trophy
@@ -67,6 +68,7 @@ const VideoCard: React.FC<{
   const hlsRef = useRef<Hls | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true); // Always muted since no audio controls
+  const mediaId = useId();
   const { thumbnailSrc, thumbnailReady } = useThumbnailGenerator(
     video.videoUrl || '', 
     video.id, 
@@ -123,24 +125,26 @@ const VideoCard: React.FC<{
     return () => videoElement.removeEventListener('loadeddata', handleLoadedData);
   }, [video.videoUrl]);
 
-  // Handle autoplay logic - always autoplay but muted
+  // Handle autoplay logic via MediaRuntime
   useEffect(() => {
     const videoElement = videoRef.current;
     if (!videoElement) return;
 
     videoElement.muted = true; // Always muted
     
-    // Always autoplay when in view
+    // Route playback through MediaRuntime
     if (isInView) {
-      videoElement.play().catch(() => {});
+      MediaRuntime.requestPlay({ id: mediaId, surface: 'grid', reason: 'autoplay' });
       setIsPlaying(true);
     } else {
-      // Pause but ensure video shows first frame (not black)
-      videoElement.pause();
-      videoElement.currentTime = 0; // Reset to first frame
+      // CLEANUP_PAUSE: Stop playback when out of view
+      MediaRuntime.requestPause({ id: mediaId, reason: 'visibility' });
+      if (videoElement) {
+        videoElement.currentTime = 0; // Reset to first frame
+      }
       setIsPlaying(false);
     }
-  }, [isInView]);
+  }, [isInView, mediaId]);
 
   // Update video mute state - always muted
   useEffect(() => {
@@ -153,10 +157,10 @@ const VideoCard: React.FC<{
   const handleVideoClick = () => {
     if (videoRef.current) {
       if (isPlaying) {
-        videoRef.current.pause();
+        MediaRuntime.requestPause({ id: mediaId, reason: 'user' });
         setIsPlaying(false);
       } else {
-        videoRef.current.play().catch(() => {});
+        MediaRuntime.requestPlay({ id: mediaId, surface: 'grid', reason: 'user' });
         setIsPlaying(true);
       }
     }

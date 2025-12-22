@@ -107,7 +107,8 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
       if (rafRef.current) {
         cancelAnimationFrame(rafRef.current);
       }
-      video.pause();
+      // CLEANUP_PAUSE: Stop playback when component unmounts
+      MediaRuntime.requestPause({ id: videoId, reason: 'visibility' });
     };
   }, [currentIndex, isOpen, isMuted]);
 
