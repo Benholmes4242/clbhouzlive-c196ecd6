@@ -216,11 +216,43 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     video.muted = muted;
     
     if (managedByMediaRuntime) {
-      // MediaRuntime-managed: Only handle pause, MediaRuntime calls play()
-      if (!autoplay && !video.paused) {
+      // MediaRuntime-managed: Route playback through MediaRuntime
+      if (autoplay && video.paused && mediaId) {
+        // Check if node is registered with MediaRuntime
+        const isRegistered = MediaRuntime.getNode(mediaId) !== undefined;
+        
+        if (isRegistered) {
+          // Node is registered - use MediaRuntime
+          MediaRuntime.requestPlay({
+            id: mediaId,
+            surface: 'clubhouse',
+            reason: 'autoplay',
+          });
+        } else {
+          // Node not yet registered - retry after a short delay
+          // This handles the race condition on initial page load
+          const retryTimeout = setTimeout(() => {
+            const stillRegistered = MediaRuntime.getNode(mediaId) !== undefined;
+            if (stillRegistered && video.paused && autoplayRef.current) {
+              MediaRuntime.requestPlay({
+                id: mediaId,
+                surface: 'clubhouse',
+                reason: 'autoplay',
+              });
+            } else if (video.paused && autoplayRef.current) {
+              // Fallback: if still not registered after delay, play directly
+              // This ensures the first video always starts
+              safePlay(video).catch(err => {
+                console.warn('[HLSPlayer] Fallback autoplay failed:', err);
+              });
+            }
+          }, 100);
+          
+          return () => clearTimeout(retryTimeout);
+        }
+      } else if (!autoplay && !video.paused) {
         video.pause();
       }
-      // DO NOT call play() - MediaRuntime handles it via requestPlay()
     } else {
       // Standalone mode: Handle autoplay directly (hero videos, modals, etc.)
       if (autoplay && video.paused) {
@@ -233,7 +265,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         video.pause();
       }
     }
-  }, [autoplay, muted, managedByMediaRuntime]);
+  }, [autoplay, muted, managedByMediaRuntime, mediaId]);
   
   // ============ HLS Setup ============
   
