@@ -62,8 +62,8 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     mode: 'grid',
     preloadMargin: 300,
     scrollSettleDelay: 200,
-    startThreshold: 0.4,      // Consistent 40% visible to play
-    stopThreshold: 0.4,       // Consistent 40% visible to stop (60% invisible)
+    startThreshold: 0.4,   // Play at 40% visible
+    stopThreshold: 0.35,   // Pause at 35% visible (provides hysteresis)
   });
 
   // Lazy loading triggers for below-fold sections
