@@ -1,8 +1,11 @@
 import { useEffect, useRef, useCallback } from 'react';
+import { safePlay } from '@/utils/safePlay';
 
 /**
  * Auto-preview control hook - ensures only one video plays at a time
- * Uses IntersectionObserver with 0.75 threshold for viewport detection
+ * Uses IntersectionObserver with 0.75 threshold for viewport detection.
+ * 
+ * NOTE: Uses safePlay for playback to comply with MediaRuntime patterns.
  */
 export function useAutoplay() {
   const videoRefs = useRef<Set<HTMLVideoElement>>(new Set());
@@ -33,10 +36,8 @@ export function useAutoplay() {
       currentlyPlaying.current.currentTime = 0;
     }
 
-    // Play the new video
-    video.play().catch(() => {
-      // Ignore autoplay errors
-    });
+    // Play the new video using safePlay
+    safePlay(video);
     currentlyPlaying.current = video;
   }, []);
 

@@ -85,14 +85,14 @@ const ShortTile: React.FC<ShortTileProps> = ({ short, height, onClick }) => {
     }
   }, [inView, short.id]);
 
-  // Handle autoplay based on visibility
+  // Handle autoplay based on visibility using safePlay
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     if (inView) {
-      video.play().catch((err) => {
-        console.info('Autoplay prevented:', err);
+      import('@/utils/safePlay').then(({ safePlay }) => {
+        safePlay(video);
       });
     } else {
       video.pause();

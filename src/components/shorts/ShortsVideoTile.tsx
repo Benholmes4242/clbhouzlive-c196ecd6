@@ -1,4 +1,5 @@
 import React from 'react';
+import { safePlay } from '@/utils/safePlay';
 
 type Props = {
   id: string;
@@ -46,8 +47,7 @@ export default function ShortsVideoTile({
 
     const canPlay = ready && inView && shouldAutoplay;
     if (canPlay) {
-      const p = el.play();
-      if (p && p.catch) p.catch(() => {});
+      safePlay(el);
     } else {
       el.pause();
     }

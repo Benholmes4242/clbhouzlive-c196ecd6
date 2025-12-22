@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { MapPin, X, Maximize2, VolumeX, Volume2 } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
+import { safePlay } from '@/utils/safePlay';
 
 interface VideoHighlight {
   id: string;
@@ -143,7 +144,7 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId, b
         const [entry] = entries;
         if (entry.isIntersecting) {
           // Video is in view, play it
-          currentVideo.play().catch(console.error);
+          safePlay(currentVideo);
         } else {
           // Video is out of view, pause it
           currentVideo.pause();

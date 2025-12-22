@@ -1,8 +1,11 @@
 import { useEffect, useRef, useCallback, RefObject } from 'react';
+import { safePlay } from '@/utils/safePlay';
 
 /**
  * Auto-preview control for horizontal rails (shorts carousel)
- * Uses scoped IntersectionObserver with rail container as root
+ * Uses scoped IntersectionObserver with rail container as root.
+ * 
+ * NOTE: Uses safePlay for playback to comply with MediaRuntime patterns.
  */
 export function useAutoplayInRail(railRef: RefObject<HTMLElement>) {
   const videoRefs = useRef<Set<HTMLVideoElement>>(new Set());
@@ -32,7 +35,7 @@ export function useAutoplayInRail(railRef: RefObject<HTMLElement>) {
       currentlyPlaying.current.currentTime = 0;
     }
 
-    video.play().catch(() => {});
+    safePlay(video);
     currentlyPlaying.current = video;
   }, []);
 

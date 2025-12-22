@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSheetPlayback } from './SheetPlaybackContext';
+import { safePlay } from '@/utils/safePlay';
 
 // Debug flag declaration
 declare global {
@@ -241,7 +242,7 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
       if (video.paused) {
         setHasUserInteracted(true);
         requestPlay(id); // Pause other videos
-        await video.play();
+        await safePlay(video);
       } else {
         video.pause();
       }

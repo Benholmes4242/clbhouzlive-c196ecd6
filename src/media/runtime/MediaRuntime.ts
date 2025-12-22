@@ -184,6 +184,12 @@ class MediaRuntimeCore {
   
   // ============ Playback Requests ============
   
+  /**
+   * Request playback for a media node.
+   * 
+   * IMPORTANT: This is the ONLY sanctioned way to play media in the app.
+   * Never call video.play() directly outside of MediaRuntime/safePlay.
+   */
   async requestPlay(args: {
     id: string;
     surface: MediaSurface;
@@ -195,6 +201,20 @@ class MediaRuntimeCore {
     if (!node) {
       console.warn('[MediaRuntime] requestPlay: No node for', id);
       return false;
+    }
+    
+    // DEV-only invariant: detect double-play attempts
+    if (import.meta.env.DEV) {
+      if (this.state.activeMediaId && this.state.activeMediaId !== id) {
+        const activeNode = this.registry.get(this.state.activeMediaId);
+        if (activeNode && !activeNode.videoElement.paused) {
+          console.warn(
+            '[MediaRuntime] ⚠️ INVARIANT: Attempting to play', id.slice(0, 8),
+            'while', this.state.activeMediaId.slice(0, 8), 'is still playing.',
+            'This should not happen - check for stray .play() calls.'
+          );
+        }
+      }
     }
     
     // Check intent suppression for autoplay
