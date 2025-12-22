@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useId } from 'react';
 import { X, Volume2, VolumeX, Play, Pause } from 'lucide-react';
 import { Button } from './button';
 import EnhancedVideoPlayer from './enhanced-video-player';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
 interface FullscreenVideoModalProps {
   isOpen: boolean;
@@ -28,6 +29,7 @@ const FullscreenVideoModal: React.FC<FullscreenVideoModalProps> = ({
   const [isPlaying, setIsPlaying] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+  const mediaId = useId();
 
   // Handle ESC key to close modal
   useEffect(() => {
@@ -63,14 +65,14 @@ const FullscreenVideoModal: React.FC<FullscreenVideoModalProps> = ({
     }
   };
 
-  // Toggle play/pause
+  // Toggle play/pause via MediaRuntime
   const togglePlayPause = () => {
     if (videoRef.current) {
       if (videoRef.current.paused) {
-        videoRef.current.play();
+        MediaRuntime.requestPlay({ id: mediaId, surface: 'fullscreen', reason: 'user' });
         setIsPlaying(true);
       } else {
-        videoRef.current.pause();
+        MediaRuntime.requestPause({ id: mediaId, reason: 'user' });
         setIsPlaying(false);
       }
     }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useId } from 'react';
 import { VolumeX, Volume2, ChevronDown, Check, Upload, Edit, Trash2 } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useVideoProgressSync } from '@/hooks/useVideoProgressSync';
 import { useVideoPreloader } from '@/hooks/useVideoPreloader';
 import { USE_VIDEO_PROGRESS_SYNC_V1 } from '@/utils/featureFlags';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
 import { MediaItem } from '@/types/media';
 
@@ -68,6 +69,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number>(0);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const mediaId = useId();
   const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
   
   // Video progress sync hook
@@ -132,18 +134,18 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
     boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
   };
 
-  // Handle video tap to pause/unpause
+  // Handle video tap to pause/unpause - route through MediaRuntime
   const handleVideoTap = useCallback(() => {
-    if (currentItem?.media_type === 'video' && videoRef.current) {
+    if (currentItem?.media_type === 'video') {
       if (isVideoPaused) {
-        videoRef.current.play();
+        MediaRuntime.requestPlay({ id: mediaId, surface: 'fullscreen', reason: 'user' });
         setIsVideoPaused(false);
       } else {
-        videoRef.current.pause();
+        MediaRuntime.requestPause({ id: mediaId, reason: 'user' });
         setIsVideoPaused(true);
       }
     }
-  }, [currentItem, isVideoPaused]);
+  }, [currentItem, isVideoPaused, mediaId]);
 
   // Handle media deletion
   const handleDeleteMedia = useCallback(async () => {

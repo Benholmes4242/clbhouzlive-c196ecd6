@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState, useId } from "react";
 import { X, Play, Pause, ListMusic, Maximize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useVideoPlaybackSafe } from "@/context/VideoPlaybackContext";
@@ -8,6 +8,7 @@ import { useVideoQueue } from "@/hooks/useVideoQueue";
 import { uidFromNode, generateHlsUrl, generateThumbnailUrl } from "@/utils/cloudflareStreamTransform";
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { trackVideoCloseMini } from "@/lib/analytics/videoAnalytics";
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
 type MiniVideo = {
   id: string;
@@ -34,6 +35,7 @@ export const MiniPlayer: React.FC = () => {
   const videoElRef = useRef<HLSPlayerRef>(null);
   const pendingSeekRef = useRef<number | null>(null);
   const lastProgressSentAtRef = useRef<number>(0);
+  const mediaId = useId();
 
   const { fetchPostWithDetails } = usePostData();
 
@@ -203,26 +205,22 @@ export const MiniPlayer: React.FC = () => {
   }, [activeVideoId, isMiniOpen, flushMiniProgress]);
 
   const handleTogglePlay = useCallback(
-    async (e: React.MouseEvent) => {
+    (e: React.MouseEvent) => {
       e.stopPropagation();
       const player = videoElRef.current;
       if (!player) return;
 
-      try {
-        // Check if playing by attempting to get element state
-        const el = player.getElement();
-        if (el?.paused) {
-          await player.play();
-          setIsPlaying(true);
-        } else {
-          player.pause();
-          setIsPlaying(false);
-        }
-      } catch {
-        // ignore
+      // Check if playing by attempting to get element state
+      const el = player.getElement();
+      if (el?.paused) {
+        MediaRuntime.requestPlay({ id: mediaId, surface: 'fullscreen', reason: 'user' });
+        setIsPlaying(true);
+      } else {
+        MediaRuntime.requestPause({ id: mediaId, reason: 'user' });
+        setIsPlaying(false);
       }
     },
-    []
+    [mediaId]
   );
 
   const handleClose = useCallback(

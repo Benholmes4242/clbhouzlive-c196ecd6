@@ -12,13 +12,14 @@
  * - Time sync with tiles (opens at current time)
  */
 
-import React, { useEffect, useRef, useState, useCallback, memo } from 'react';
+import React, { useEffect, useRef, useState, useCallback, memo, useId } from 'react';
 import { X, Volume2, VolumeX, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { cn } from '@/lib/utils';
 import HLSPlayer, { HLSPlayerRef } from './HLSPlayer';
 import { useMediaSystem } from './MediaSystemProvider';
 import { runtimeSetModalOpen, runtimeUserMute, runtimeClearOnFullscreenClose } from './runtime';
+import { MediaRuntime } from './runtime/MediaRuntime';
 
 // Warm pool size: preload ±1 adjacent videos
 const WARM_POOL_SIZE = 1;
@@ -133,12 +134,12 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
           break;
         case ' ':
           e.preventDefault();
-          if (playerRef.current) {
+          if (playerRef.current && currentItem) {
             const el = playerRef.current.getElement();
             if (el?.paused) {
-              playerRef.current.play();
+              MediaRuntime.requestPlay({ id: currentItem.id, surface: 'fullscreen', reason: 'user' });
             } else {
-              playerRef.current.pause();
+              MediaRuntime.requestPause({ id: currentItem.id, reason: 'user' });
             }
           }
           break;

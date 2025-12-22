@@ -122,14 +122,11 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
     }
   }, [shouldAttach, isNearby]);
 
-  // Handle play/pause based on autoplay and isActive
+  // Handle play/pause based on autoplay and isActive - route through HLSPlayer
+  // HLSPlayer's autoplay prop is controlled by parent, no direct play/pause calls needed
   React.useEffect(() => {
-    if (!playerRef.current) return;
-    if (autoplay && isActive) {
-      playerRef.current.play();
-    } else {
-      playerRef.current.pause();
-    }
+    // Playback is now controlled by HLSPlayer autoplay prop passed from ClubhouseVerticalFeed
+    // via the runtime bridge - no direct playerRef.play/pause calls
   }, [autoplay, isActive]);
 
   return (
@@ -438,7 +435,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       if (allowedIds.has(key)) {
         pruned[key] = value;
       } else {
-        // Pause and clear video that's being pruned
+        // CLEANUP_PAUSE: Pause and clear video that's being pruned from memory
+        // This is acceptable as it's resource cleanup, not playback control
         if (value) {
           value.pause();
           value.removeAttribute('src');
