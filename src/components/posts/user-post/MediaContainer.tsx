@@ -21,6 +21,7 @@ interface MediaContainerProps {
   onSwipeLeft: () => void;
   onSwipeRight: () => void;
   children?: React.ReactNode;
+  videoRefCallback?: (el: HTMLVideoElement | null) => void;
 }
 
 export const MediaContainer: React.FC<MediaContainerProps> = ({
@@ -30,7 +31,8 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
   onMediaClick,
   onSwipeLeft,
   onSwipeRight,
-  children
+  children,
+  videoRefCallback
 }) => {
   const isMobile = useIsMobile();
   const touchStartPos = useRef<{ x: number; y: number } | null>(null);
@@ -66,6 +68,7 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
     >
       {currentMedia.media_type === 'video' ? (
         <EnhancedVideoPlayer
+          ref={videoRefCallback}
           src={currentMedia.media_url}
           autoplay={isHovered}
           muted={true}

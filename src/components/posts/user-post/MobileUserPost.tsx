@@ -45,14 +45,16 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
   
   const isPlaying = playingIds.has(mediaId);
 
-  // Container ref callback for media registration
-  const containerRefCallback = useCallback((el: HTMLDivElement | null) => {
+  // Video ref callback for media registration
+  const videoRefCallback = useCallback((el: HTMLVideoElement | null) => {
     if (el) {
       const hasVideo = post.post_media?.some(m => m.media_type === 'video');
       if (hasVideo) {
-        registerMedia(el, mediaId, {
-          rect: el.getBoundingClientRect(),
-          visibilityRatio: 0,
+        registerMedia({
+          id: mediaId,
+          element: el,
+          isCandidate: true,
+          sortIndex: 0,
         });
       }
     }
@@ -147,7 +149,6 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
   
   return (
     <div 
-      ref={containerRefCallback}
       className="relative w-full bg-media-loading"
     >
       {/* Media Container */}
@@ -164,14 +165,13 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
             )}
             
             <EnhancedVideoPlayer
+              ref={videoRefCallback}
               src={currentMedia.media_url}
               autoplay={isPlaying}
               muted={true}
               loop={true}
               className="w-full h-full"
               enableHLS={true}
-              externallyManaged={true}
-              mediaId={mediaId}
               onPlay={() => setIsVideoLoading(false)}
               onPause={() => {}}
             />

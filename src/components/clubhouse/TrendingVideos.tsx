@@ -152,20 +152,21 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
             const mediaId = `clubhouse-trending-${video.id}`;
             const isPlaying = playingIds.has(mediaId);
             
-            // Container ref callback for media registration
-            const containerRefCallback = useCallback((el: HTMLDivElement | null) => {
+            // Video ref callback for media registration - will be passed to MediaDisplay
+            const videoRefCallback = useCallback((el: HTMLVideoElement | null) => {
               if (el) {
-                registerMedia(el, mediaId, {
-                  rect: el.getBoundingClientRect(),
-                  visibilityRatio: 0,
+                registerMedia({
+                  id: mediaId,
+                  element: el,
+                  isCandidate: true,
+                  sortIndex: actualIndex,
                 });
               }
-            }, [mediaId]);
+            }, [mediaId, actualIndex]);
             
             return (
               <div
                 key={`${video.id}-${actualIndex}`}
-                ref={containerRefCallback}
                 className={`relative bg-muted rounded-sq-sm overflow-hidden cursor-pointer group ${
                   isMobile ? 'h-[60vh]' : 'aspect-[9/8]'
                 }`}
@@ -185,6 +186,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                   itemId={video.id}
                   currentIndex={actualIndex}
                   loop={true}
+                  videoRefCallback={videoRefCallback}
                 />
                 
                 {/* Overlay */}
