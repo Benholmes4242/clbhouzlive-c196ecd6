@@ -241,11 +241,9 @@ export const MiniPlayer: React.FC = () => {
         }
       }
 
-      // Pause and close
-      try {
-        player?.pause();
-      } catch {
-        // ignore
+      // CLEANUP_PAUSE: Stop playback when closing mini player
+      if (activeVideoId) {
+        MediaRuntime.requestPause({ id: `mini-${activeVideoId}`, reason: 'visibility' });
       }
       setIsPlaying(false);
       setMiniProgress(0);

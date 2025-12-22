@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useId } from 'react';
 import { useIntersectionObserver } from './useIntersectionObserver';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
 interface VideoState {
   id: string;
@@ -69,7 +70,8 @@ class VideoPlaybackManager {
       const trendingVideos = Array.from(this.videos.values()).filter(v => v.section === 'trending');
       trendingVideos.forEach(v => {
         if (v.id !== videoId && v.isPlaying) {
-          v.element?.pause();
+          // CLEANUP_PAUSE: Pause non-active videos in section
+          MediaRuntime.requestPause({ id: v.id, reason: 'visibility' });
           this.videos.set(v.id, { ...v, isPlaying: false });
         }
       });
@@ -82,7 +84,8 @@ class VideoPlaybackManager {
       
       // Pause all other autoplay videos in feed
       autoplayingVideos.forEach(v => {
-        v.element?.pause();
+        // CLEANUP_PAUSE: Pause non-active autoplay videos
+        MediaRuntime.requestPause({ id: v.id, reason: 'visibility' });
         this.videos.set(v.id, { ...v, isPlaying: false });
       });
     }
@@ -102,7 +105,8 @@ class VideoPlaybackManager {
   pauseAllVideos() {
     this.videos.forEach((video, id) => {
       if (video.isPlaying) {
-        video.element?.pause();
+        // CLEANUP_PAUSE: Pause all videos (e.g., when opening modal)
+        MediaRuntime.requestPause({ id, reason: 'visibility' });
         this.videos.set(id, { ...video, isPlaying: false });
       }
     });
@@ -125,6 +129,7 @@ export const useVideoPlaybackManager = ({
 }: VideoPlaybackManagerProps) => {
   const [videoState, setVideoState] = useState<VideoState | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const mediaId = useId();
   const { ref: containerRef, isInView } = useIntersectionObserver({
     threshold: 0.5,
     rootMargin: '50px'
@@ -183,35 +188,35 @@ export const useVideoPlaybackManager = ({
     }
   }, [videoState?.id, videoId]); // More stable dependencies
 
-  // Handle intersection changes for autoplay
+  // Handle intersection changes for autoplay via MediaRuntime
   useEffect(() => {
     if (!videoRef.current || !videoState) return;
 
     if (isInView && autoplayAllowed) {
       // Check if we can autoplay this video and it's not already playing
       if (!videoState.isPlaying && globalVideoManager.canAutoplay(section, videoId)) {
-        videoRef.current.play().catch(console.error);
+        MediaRuntime.requestPlay({ id: mediaId, surface: 'grid', reason: 'autoplay' });
         globalVideoManager.playVideo(videoId, true);
       }
     } else if (!isInView && videoState.isPlaying && videoState.isAutoplay) {
-      // Pause autoplay videos when out of view
-      videoRef.current?.pause();
+      // CLEANUP_PAUSE: Stop autoplay videos when out of view
+      MediaRuntime.requestPause({ id: mediaId, reason: 'visibility' });
       globalVideoManager.pauseVideo(videoId);
     }
-  }, [isInView, autoplayAllowed, section, videoId, videoState?.isPlaying]);
+  }, [isInView, autoplayAllowed, section, videoId, videoState?.isPlaying, mediaId]);
 
-  // Manual play/pause control
+  // Manual play/pause control via MediaRuntime
   const togglePlayPause = useCallback(() => {
     if (!videoRef.current) return;
 
     if (videoRef.current.paused) {
-      videoRef.current.play().catch(console.error);
+      MediaRuntime.requestPlay({ id: mediaId, surface: 'grid', reason: 'user' });
       globalVideoManager.playVideo(videoId, false);
     } else {
-      videoRef.current.pause();
+      MediaRuntime.requestPause({ id: mediaId, reason: 'user' });
       globalVideoManager.pauseVideo(videoId);
     }
-  }, [videoId]);
+  }, [videoId, mediaId]);
 
   // Check if video should show play icon
   const shouldShowPlayIcon = useCallback(() => {

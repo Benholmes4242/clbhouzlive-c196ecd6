@@ -103,11 +103,10 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
       setHasPlayed(true);
       setShowVideo(true);
       
-      // Sync background video
+      // Sync background video time - bgVideo uses autoplay+muted+loop attributes
+      // so it plays automatically; we only need to sync its currentTime
       if (bgVideo) {
-        bgVideo.muted = true;
         bgVideo.currentTime = video.currentTime;
-        bgVideo.play().catch(() => {});
       }
       
       syncInterval = setInterval(syncVideos, 100);

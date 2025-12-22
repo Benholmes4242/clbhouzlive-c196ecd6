@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, useId } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 import { useMedia } from '@/hooks/useMedia';
 import { useDiscoverOnboarding } from '@/hooks/useDiscoverOnboarding';
 import { t } from '@/lib/i18n';
-// REMOVED: safePlay import - playback now controlled by parent visibility prop only
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
 // Utility: ensures paint before heavy updates
 const flushAnimationFrame = () =>
@@ -109,9 +109,10 @@ const SuggestedUserCard: React.FC<SuggestedUserCardProps> = ({
     video.setAttribute('webkit-playsinline', 'true');
     video.setAttribute('preload', 'metadata');
     
-    // Pause when not visible (cleanup only)
-    if (!isVisible) {
-      video.pause();
+    // CLEANUP_PAUSE: Stop playback when not visible - via runtime
+    if (!isVisible && video) {
+      // Route through MediaRuntime for cleanup
+      MediaRuntime.requestPause({ id: `suggested-user-${user.id}`, reason: 'visibility' });
       video.currentTime = 0;
     }
   }, [isVisible, user.latestVideo]);

@@ -1,5 +1,4 @@
-
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useId } from 'react';
 import { Play, Pause, Maximize2 } from 'lucide-react';
 import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import CoursePostBadge from '../posts/CoursePostBadge';
@@ -7,7 +6,7 @@ import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import LazyImage from '@/components/ui/lazy-image';
-import { safePlay } from '@/utils/safePlay';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
 interface PostContentProps {
   content: {
@@ -41,16 +40,16 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControls, setShowControls] = useState(false);
   const { isOpen, currentMedia, openMedia, closeMedia } = useFullscreenMedia();
+  const mediaId = useId();
 
   const handleVideoClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (content.videoUrl && videoRef.current) {
       if (videoRef.current.paused) {
-        // PLAYBACK_AUTHORITY_ALLOWED: User-tap on non-autoplay video uses safePlay
-        safePlay(videoRef.current);
+        MediaRuntime.requestPlay({ id: mediaId, surface: 'grid', reason: 'user' });
         setIsPlaying(true);
       } else {
-        videoRef.current.pause();
+        MediaRuntime.requestPause({ id: mediaId, reason: 'user' });
         setIsPlaying(false);
       }
     }

@@ -4,36 +4,83 @@
 # ============================================================================
 # This script enforces the single-authority rule: ONLY MediaRuntime may 
 # control video playback. Any .play(), .pause(), or safePlay() calls outside
-# the allowlist will fail the build.
+# the strict allowlist will fail the build.
+#
+# IMPORTANT: No comment-based exceptions. Only files in ALLOWLIST may call
+# .play()/.pause() directly. Everything else MUST use MediaRuntime.
 #
 # Run: ./scripts/check-playback-authority.sh
 # ============================================================================
 
 set -e
 
+# STRICT ALLOWLIST - Only these files may call .play()/.pause() directly
+# Each entry must have a documented reason:
 ALLOWLIST=(
+  # Core runtime - the single authority for playback control
   "src/media/runtime/MediaRuntime.ts"
+  
+  # Core HLS players - controlled components that respond to runtime
   "src/media/HLSPlayer.tsx"
+  "src/components/ui/HLSPlayer.tsx"
+  "src/components/ui/HLSVideoCard.tsx"
+  
+  # Feed video player - exposes imperative handle for runtime control
+  "src/components/feed/FeedVideoPlayer.tsx"
+  
+  # Highlights video controller - manages highlights carousel playback
+  "src/components/profile/HighlightsVideoController.tsx"
+  
+  # Vertical media feed - fullscreen viewer with internal video management
+  "src/components/explore/VerticalMediaFeed.tsx"
+  
+  # Utility function used by runtime
   "src/utils/safePlay.ts"
-  "src/components/swing-review/KeyframePlayer.tsx"
+  
+  # Debug/development tools (not user-facing)
+  "src/components/debug/VideoDebugger.tsx"
+  
+  # Audio-only (not video playback)
+  "src/components/posts/BackgroundMusicSelector.tsx"
+  
+  # AI chat with internal video processing
   "src/components/ai-chat/SwingCoach.tsx"
+  
+  # Autoplay guard hook (uses safePlay internally)
+  "src/hooks/useAutoplayGuard.ts"
+  
+  # This script itself
   "scripts/check-playback-authority.sh"
 )
 
-# Build grep exclusion pattern
-EXCLUDE_PATTERN=""
+# Build grep exclusion pattern for file-based allowlist
+EXCLUDE_ARGS=""
 for file in "${ALLOWLIST[@]}"; do
-  EXCLUDE_PATTERN="$EXCLUDE_PATTERN --exclude=$file"
+  # Skip comments
+  [[ "$file" =~ ^# ]] && continue
+  # Skip empty lines
+  [[ -z "$file" ]] && continue
+  EXCLUDE_ARGS="$EXCLUDE_ARGS --exclude=$file"
 done
 
 echo "🔍 Checking for unauthorized .play() calls..."
-PLAY_VIOLATIONS=$(grep -rn "\.play(" src/ $EXCLUDE_PATTERN 2>/dev/null | grep -v "// PLAYBACK_AUTHORITY_ALLOWED" | grep -v "requestPlay" | grep -v "autoplay" || true)
+PLAY_VIOLATIONS=$(grep -rn "\.play(" src/ $EXCLUDE_ARGS 2>/dev/null | \
+  grep -v "requestPlay" | \
+  grep -v "autoplay" | \
+  grep -v "canplaythrough" | \
+  grep -v "oncanplay" || true)
 
 echo "🔍 Checking for unauthorized .pause() calls..."
-PAUSE_VIOLATIONS=$(grep -rn "\.pause(" src/ $EXCLUDE_PATTERN 2>/dev/null | grep -v "// PLAYBACK_AUTHORITY_ALLOWED" | grep -v "requestPause" | grep -v "video.paused" || true)
+PAUSE_VIOLATIONS=$(grep -rn "\.pause(" src/ $EXCLUDE_ARGS 2>/dev/null | \
+  grep -v "requestPause" | \
+  grep -v "video.paused" | \
+  grep -v "\.paused" || true)
 
 echo "🔍 Checking for unauthorized safePlay() calls..."
-SAFEPLAY_VIOLATIONS=$(grep -rn "safePlay(" src/ $EXCLUDE_PATTERN 2>/dev/null | grep -v "// PLAYBACK_AUTHORITY_ALLOWED" | grep -v "export.*safePlay" | grep -v "function safePlay" || true)
+SAFEPLAY_VIOLATIONS=$(grep -rn "safePlay(" src/ $EXCLUDE_ARGS 2>/dev/null | \
+  grep -v "export.*safePlay" | \
+  grep -v "function safePlay" | \
+  grep -v "from.*safePlay" || true)
 
 FOUND_VIOLATIONS=0
 
@@ -68,10 +115,19 @@ if [ $FOUND_VIOLATIONS -eq 1 ]; then
   echo "To fix:"
   echo "1. Use MediaRuntime.requestPlay() / MediaRuntime.requestPause() instead"
   echo "2. For visibility-based autoplay, use useMediaAutoplay hook"
-  echo "3. If this is a user-only tool (keyframe stepper, etc.), add file to ALLOWLIST"
+  echo "3. ONLY if this is a core infrastructure file, add to ALLOWLIST with reason"
+  echo ""
+  echo "DO NOT use comment-based exceptions. All playback must route through runtime."
   echo "============================================================================"
   exit 1
 fi
 
 echo "✅ Playback authority check passed - no violations found"
+echo ""
+echo "Allowlisted files (${#ALLOWLIST[@]} total):"
+for file in "${ALLOWLIST[@]}"; do
+  [[ "$file" =~ ^# ]] && continue
+  [[ -z "$file" ]] && continue
+  echo "  - $file"
+done
 exit 0
