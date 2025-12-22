@@ -822,8 +822,8 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           objectFitClass,
           // GPU compositing hints for WebView - prevents flicker
           'will-change-opacity backface-hidden transform-gpu',
-          // Only show when first painted frame is ready AND poster has faded
-          hasFirstFrame && !isPosterVisible ? 'opacity-100' : 'opacity-0'
+          // Show when first painted frame is ready - poster fades out on top
+          hasFirstFrame ? 'opacity-100' : 'opacity-0'
         )}
         style={{ 
           backfaceVisibility: 'hidden',
