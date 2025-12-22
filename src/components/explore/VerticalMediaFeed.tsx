@@ -17,7 +17,7 @@ import TaggedText from '../posts/TaggedText';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
-import { useVideoManager } from '@/contexts/VideoManagerContext';
+import { useVideoManager } from '@/contexts/VideoManagerContext'; // DEPRECATED - stub for migration
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 
 interface VerticalMediaFeedProps {

@@ -20,7 +20,7 @@ import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
 import { useHlsUrlCache, warmHlsJs } from '@/hooks/useHlsUrlCache';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
-import { useVideoManager } from '@/contexts/VideoManagerContext';
+import { useVideoManager } from '@/contexts/VideoManagerContext'; // DEPRECATED - stub for migration
 import CommentsModal from '@/components/posts/CommentsModal';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';

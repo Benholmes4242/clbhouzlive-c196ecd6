@@ -15,8 +15,9 @@ import { SecurityHeaders } from "@/components/security/SecurityHeaders";
 import { AppBootstrapLoader } from "@/components/AppBootstrapLoader";
 import AuthWrapper from "@/components/auth/AuthWrapper";
 import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
-import { VideoManagerProvider } from './contexts/VideoManagerContext';
-import { VideoPlaybackManagerProvider } from './contexts/VideoPlaybackManager';
+// RETIRED: VideoManagerProvider and VideoPlaybackManagerProvider
+// These competed with MediaRuntime for playback control.
+// All playback is now centralized in MediaSystemProvider.
 import { MediaSystemProvider } from './media';
 import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
 import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
@@ -579,31 +580,29 @@ const AppInner: React.FC = () => {
                         <ScrollRestoration />
                         <MediaSystemProvider>
                           <GlobalAudioProvider>
-                            <VideoManagerProvider>
-                              <VideoPlaybackManagerProvider>
-                                <TopTenProvider>
-                                  <VideoPlaybackProvider>
-                                    <ErrorBoundary>
-                                    <AuthWrapper>
-                                      <SeasonWrapModal />
-                                      <AchievementToastWrapper />
-                                      <Suspense fallback={null}>
-                                        <div className="app-depth">
-                                          {/* No global header - each page renders its own ClubhouseHeaderNew */}
-                                          <AppRoutes />
-                                        </div>
-                                      </Suspense>
-                                      {/* Mini Player - persists across navigation */}
-                                      <Suspense fallback={null}>
-                                        <MiniPlayer />
-                                        <GlobalQueueDrawer />
-                                      </Suspense>
-                                    </AuthWrapper>
-                                    </ErrorBoundary>
-                                  </VideoPlaybackProvider>
-                                </TopTenProvider>
-                              </VideoPlaybackManagerProvider>
-                            </VideoManagerProvider>
+                            {/* RETIRED: VideoManagerProvider + VideoPlaybackManagerProvider removed */}
+                            {/* All playback control is now centralized in MediaSystemProvider */}
+                            <TopTenProvider>
+                              <VideoPlaybackProvider>
+                                <ErrorBoundary>
+                                <AuthWrapper>
+                                  <SeasonWrapModal />
+                                  <AchievementToastWrapper />
+                                  <Suspense fallback={null}>
+                                    <div className="app-depth">
+                                      {/* No global header - each page renders its own ClubhouseHeaderNew */}
+                                      <AppRoutes />
+                                    </div>
+                                  </Suspense>
+                                  {/* Mini Player - persists across navigation */}
+                                  <Suspense fallback={null}>
+                                    <MiniPlayer />
+                                    <GlobalQueueDrawer />
+                                  </Suspense>
+                                </AuthWrapper>
+                                </ErrorBoundary>
+                              </VideoPlaybackProvider>
+                            </TopTenProvider>
                           </GlobalAudioProvider>
                         </MediaSystemProvider>
                         <Toaster />

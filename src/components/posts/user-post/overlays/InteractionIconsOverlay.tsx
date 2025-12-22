@@ -1,27 +1,29 @@
 import React from 'react';
 import { Heart, MessageCircle, Share, VolumeX, Volume2 } from 'lucide-react';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
-import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 
 interface InteractionIconsOverlayProps {
   onInteractionClick: (e: React.MouseEvent, type: string) => void;
   currentMediaType?: 'image' | 'video';
 }
 
+/**
+ * InteractionIconsOverlay - Social interaction buttons for posts
+ * 
+ * REFACTORED: Removed useVideoPlaybackManager dependency.
+ * Mute state is handled via GlobalAudioContext only.
+ * MediaRuntime is the single playback authority.
+ */
 export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = ({
   onInteractionClick,
   currentMediaType = 'image'
 }) => {
   const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
-  const { muteAllVideos } = useVideoPlaybackManager();
 
   const handleMuteToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleGlobalMute();
-    // When globally muting, ensure all videos are immediately muted
-    if (!isGloballyMuted) {
-      muteAllVideos();
-    }
+    // GlobalAudioContext handles muting - no need for VideoPlaybackManager
   };
 
   return (
