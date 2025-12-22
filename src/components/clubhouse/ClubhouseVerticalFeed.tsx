@@ -19,7 +19,7 @@ import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
-import { useVideoManager } from '@/contexts/VideoManagerContext';
+import { useVideoManager } from '@/contexts/VideoManagerContext'; // DEPRECATED - stub for migration
 import { AudioStrip } from './AudioStrip';
 import { TopBar } from './social-dock/TopBar';
 

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useAutoplay } from '../hooks/useAutoplay';
 import { VideoFilter, FeedItemType } from '../types';
 import { FilterBar } from '../components/FilterBar';
 import { VideoCardWide } from '../components/VideoCardWide';
@@ -7,9 +6,15 @@ import { VideoCardPair } from '../components/VideoCardPair';
 import { SuggestedChannels } from '../components/SuggestedChannels';
 import { ShortsCarousel } from '../components/ShortsCarousel';
 
+/**
+ * VideosPage - Main videos feed page
+ * 
+ * REFACTORED: Removed useAutoplay hook dependency.
+ * Autoplay is now controlled exclusively by MediaRuntime.
+ * Components should register with useMediaAutoplay instead.
+ */
 export default function VideosPage() {
   const [filter, setFilter] = useState<VideoFilter>('All');
-  const { register } = useAutoplay();
   
   // Real data should be fetched here - mock data has been removed
   const feedItems: FeedItemType[] = [];
@@ -48,7 +53,6 @@ export default function VideosPage() {
                 <VideoCardWide
                   key={`wide-${index}`}
                   video={item.video}
-                  autoRegister={register}
                   onVideoClick={handleVideoClick}
                   onEchoToggle={handleEchoToggle}
                 />
@@ -60,13 +64,11 @@ export default function VideosPage() {
                 <div key={`pair-${index}`} className="grid grid-cols-2 gap-4">
                   <VideoCardPair
                     video={item.videos[0]}
-                    autoRegister={register}
                     onVideoClick={handleVideoClick}
                     onEchoToggle={handleEchoToggle}
                   />
                   <VideoCardPair
                     video={item.videos[1]}
-                    autoRegister={register}
                     onVideoClick={handleVideoClick}
                     onEchoToggle={handleEchoToggle}
                   />

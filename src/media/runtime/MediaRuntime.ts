@@ -203,17 +203,33 @@ class MediaRuntimeCore {
       return false;
     }
     
-    // DEV-only invariant: detect double-play attempts
+    // DEV-only invariant: detect double-play attempts and unauthorized plays
     if (import.meta.env.DEV) {
       if (this.state.activeMediaId && this.state.activeMediaId !== id) {
         const activeNode = this.registry.get(this.state.activeMediaId);
         if (activeNode && !activeNode.videoElement.paused) {
           console.warn(
-            '[MediaRuntime] ⚠️ INVARIANT: Attempting to play', id.slice(0, 8),
+            '[MediaRuntime] ⚠️ INVARIANT VIOLATION: Attempting to play', id.slice(0, 8),
             'while', this.state.activeMediaId.slice(0, 8), 'is still playing.',
-            'This should not happen - check for stray .play() calls.'
+            'This indicates competing playback controllers - check for stray .play() calls.',
+            '\nStack:', new Error().stack
           );
         }
+      }
+      
+      // Attach listener to detect unauthorized plays (one-time per node)
+      if (node && !(node.videoElement as any).__runtimeGuarded) {
+        (node.videoElement as any).__runtimeGuarded = true;
+        node.videoElement.addEventListener('play', () => {
+          if (this.state.activeMediaId !== id) {
+            console.warn(
+              '[MediaRuntime] ⚠️ UNAUTHORIZED PLAY: Video', id.slice(0, 8),
+              'started playing but runtime activeId is', this.state.activeMediaId?.slice(0, 8) || 'null',
+              '\nThis video bypassed MediaRuntime - find and remove the .play() call.',
+              '\nStack:', new Error().stack
+            );
+          }
+        });
       }
     }
     

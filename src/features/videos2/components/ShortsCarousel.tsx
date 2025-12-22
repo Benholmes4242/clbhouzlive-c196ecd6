@@ -2,16 +2,21 @@ import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { HLSVideo } from './HLSVideo';
 import { VideoItem } from '../types';
-import { useAutoplayInRail } from '../hooks/useAutoplayInRail';
 
 type ShortsCarouselProps = {
   videos: VideoItem[];
   onVideoClick: (id: string) => void;
 };
 
+/**
+ * ShortsCarousel - Horizontal scrolling shorts carousel
+ * 
+ * REFACTORED: Removed useAutoplayInRail hook dependency.
+ * Autoplay is now controlled exclusively by MediaRuntime.
+ * HLSVideo components should register with MediaRuntime for autoplay.
+ */
 export function ShortsCarousel({ videos, onVideoClick }: ShortsCarouselProps) {
   const railRef = useRef<HTMLDivElement>(null);
-  const { register } = useAutoplayInRail(railRef);
 
   const formatViews = (n: number): string => {
     if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
@@ -44,7 +49,6 @@ export function ShortsCarousel({ videos, onVideoClick }: ShortsCarouselProps) {
                 src={video.src}
                 poster={video.poster}
                 className="w-full h-full object-cover"
-                autoRegister={register}
               />
 
               {/* Views */}
