@@ -12,7 +12,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useMediaSystem } from './MediaSystemProvider';
+import { useMediaSystemSafe } from './MediaSystemProvider';
 import { useSlidingPanels } from '@/components/ui/SlidingPanelsContext';
 import { MediaRuntime } from './runtime';
 import type { MediaSurface } from './runtime';
@@ -70,7 +70,8 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
     scrollSettleDelay = 200,
   } = options;
   
-  const mediaSystem = useMediaSystem();
+  // Use safe version - MediaSystemProvider may not exist in all contexts
+  const mediaSystem = useMediaSystemSafe();
   
   // Panel animation state - freeze during transitions
   const { isAnimating: isPanelAnimating } = useSlidingPanels();

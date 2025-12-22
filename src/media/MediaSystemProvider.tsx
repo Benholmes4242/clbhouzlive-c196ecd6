@@ -61,6 +61,16 @@ const POSITION_SAVE_THROTTLE = 3000; // ms between saves
 // ============ Provider ============
 
 export const MediaSystemProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Deprecation warning - shown once
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      console.warn(
+        '⚠️ MediaSystemProvider is deprecated. All components should use MediaRuntime directly. ' +
+        'This provider will be removed in a future version.'
+      );
+    }
+  }, []);
+  
   // Media registry
   const registry = useRef<Map<string, MediaRegistration>>(new Map());
   

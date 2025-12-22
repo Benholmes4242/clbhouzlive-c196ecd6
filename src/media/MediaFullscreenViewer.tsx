@@ -17,7 +17,7 @@ import { X, Volume2, VolumeX, ChevronUp, ChevronDown, ChevronLeft, ChevronRight 
 import { useSwipeable } from 'react-swipeable';
 import { cn } from '@/lib/utils';
 import HLSPlayer, { HLSPlayerRef } from './HLSPlayer';
-import { useMediaSystem } from './MediaSystemProvider';
+import { useMediaSystemSafe } from './MediaSystemProvider';
 import { runtimeSetModalOpen, runtimeUserMute, runtimeClearOnFullscreenClose } from './runtime';
 import { MediaRuntime } from './runtime/MediaRuntime';
 
@@ -79,7 +79,7 @@ const MediaFullscreenViewer: React.FC<MediaFullscreenViewerProps> = ({
   const playerRef = useRef<HLSPlayerRef>(null);
   const prevPlayerRef = useRef<HLSPlayerRef>(null);
   const nextPlayerRef = useRef<HLSPlayerRef>(null);
-  const { isMuted, setMuted, pauseAll } = useMediaSystem();
+  const { isMuted, setMuted, pauseAll } = useMediaSystemSafe();
   
   const currentItem = items[currentIndex];
   const prevItem = items[currentIndex - 1];
