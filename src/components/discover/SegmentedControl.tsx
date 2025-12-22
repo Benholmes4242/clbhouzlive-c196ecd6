@@ -14,7 +14,7 @@ const tabs = [
   { id: 'shorts', label: 'Watch' },
   { id: 'videos', label: 'Videos' },
   { id: 'channels', label: 'Explore' },
-  { id: 'following', label: 'Following' }
+  { id: 'following', label: 'Community' }
 ];
 
 const SegmentedControl: React.FC<SegmentedControlProps> = ({ 
