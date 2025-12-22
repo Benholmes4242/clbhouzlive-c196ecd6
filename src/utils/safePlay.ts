@@ -45,18 +45,25 @@ export async function safePlay(
       }
       
       // Wait for video to have enough data to play (with timeout)
+      // NOTE: On iOS/Safari, readyState can stay at 0 until play() (or load()) is attempted.
+      // So we treat readiness as a best-effort hint, not a hard gate.
       if (video.readyState < 2) { // HAVE_CURRENT_DATA
         console.log(`[safePlay] Waiting for readyState >= 2 for video ${videoId}, attempt ${attempt}`);
+
+        // Kick off loading explicitly (helps some WebViews / iOS cases)
+        try {
+          video.load();
+        } catch {
+          // ignore
+        }
+
         const readyStateReached = await Promise.race([
           waitForReadyState(video, 2),
           new Promise<boolean>(resolve => setTimeout(() => resolve(false), maxWaitTime))
         ]);
-        
+
         if (!readyStateReached) {
-          console.warn(`[safePlay] ReadyState timeout for video ${videoId}, attempt ${attempt}`);
-          if (attempt === maxRetries) throw new Error('ReadyState timeout');
-          await delay(baseDelay * attempt);
-          continue;
+          console.warn(`[safePlay] ReadyState timeout for video ${videoId}, attempt ${attempt} (will still try play())`);
         }
       }
       
