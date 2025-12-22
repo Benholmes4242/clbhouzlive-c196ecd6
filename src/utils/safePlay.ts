@@ -37,7 +37,7 @@ export async function safePlay(
     return legacySafePlay(video);
   }
 
-  const { maxRetries = 4, baseDelay = 250, maxWaitTime = 1000 } = options;
+  const { maxRetries = 2, baseDelay = 100, maxWaitTime = 200 } = options;
   const videoId = video.src?.substring(video.src.lastIndexOf('/') + 1, video.src.lastIndexOf('/') + 9) || 'unknown';
   
   logVideoTelemetry('video_autoplay_attempted', { videoId });
@@ -57,27 +57,20 @@ export async function safePlay(
         await waitForVisibility();
       }
       
-      // Wait for video to have enough data to play (with timeout)
-      // NOTE: On iOS/Safari, readyState can stay at 0 until play() (or load()) is attempted.
-      // So we treat readiness as a best-effort hint, not a hard gate.
-      if (video.readyState < 2) { // HAVE_CURRENT_DATA
-        devLog(`[safePlay] Waiting for readyState >= 2 for video ${videoId}, attempt ${attempt}`);
-
+      // Don't wait for readyState >= 2, try playing immediately
+      // Modern browsers buffer while playing, no need to preload
+      if (video.readyState < 1) { // Only wait if HAVE_NOTHING
         // Kick off loading explicitly (helps some WebViews / iOS cases)
         try {
           video.load();
         } catch {
           // ignore
         }
-
-        const readyStateReached = await Promise.race([
-          waitForReadyState(video, 2),
-          new Promise<boolean>(resolve => setTimeout(() => resolve(false), maxWaitTime))
-        ]);
-
-        if (!readyStateReached) {
-          devWarn(`[safePlay] ReadyState timeout for video ${videoId}, attempt ${attempt} (will still try play())`);
-        }
+        
+        // Give it just 100ms to start loading
+        await delay(100);
+        
+        devLog(`[safePlay] Quick load kick for ${videoId}, readyState: ${video.readyState}`);
       }
       
       // iOS black-frame nudge - only if at beginning

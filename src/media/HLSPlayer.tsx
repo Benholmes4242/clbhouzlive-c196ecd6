@@ -205,27 +205,23 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   // ============ Sync External Autoplay State ============
   // React to autoplay prop changes to play/pause video without re-initializing HLS
   
-  // Debounced autoplay to prevent rapid play/pause cycles during scroll
+  // Immediate autoplay response - MediaRuntime handles state stability
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !isAttachedRef.current) return;
     
-    // Small delay to debounce rapid state changes
-    const timeoutId = setTimeout(() => {
-      if (autoplay) {
-        // Only play if not already playing
-        if (video.paused) {
-          safePlay(video);
-        }
-      } else {
-        // Only pause if currently playing
-        if (!video.paused) {
-          video.pause();
-        }
+    // No debounce - MediaRuntime already handles scroll settling
+    if (autoplay) {
+      // Only play if not already playing
+      if (video.paused) {
+        safePlay(video);
       }
-    }, 100); // 100ms debounce
-    
-    return () => clearTimeout(timeoutId);
+    } else {
+      // Only pause if currently playing
+      if (!video.paused) {
+        video.pause();
+      }
+    }
   }, [autoplay]);
   
   // ============ HLS Setup ============
