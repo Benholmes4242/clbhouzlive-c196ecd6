@@ -7,7 +7,7 @@ import { HiOutlineArrowSmLeft, HiOutlineArrowSmRight } from 'react-icons/hi';
 import { useSwipeable } from 'react-swipeable';
 import { useNavigate } from 'react-router-dom';
 import { useTrendingCard } from '@/hooks/useTrendingCard';
-import { useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
+import { useFullscreenVideoModal } from '@/hooks/useFullscreenVideoModal';
 import { useMediaAutoplay } from '@/media';
 import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
 
