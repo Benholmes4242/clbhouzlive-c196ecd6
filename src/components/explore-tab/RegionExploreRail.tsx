@@ -1,19 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface Region {
   id: string;
   name: string;
+  hoverCopy?: string;
   imageUrl?: string;
   courseCount?: number;
 }
 
 const REGIONS: Region[] = [
-  { id: 'uk-ireland', name: 'UK & Ireland', courseCount: 42 },
-  { id: 'continental-europe', name: 'Continental Europe', courseCount: 28 },
-  { id: 'usa', name: 'USA', courseCount: 45 },
-  { id: 'rest-of-world', name: 'Rest of World', courseCount: 31 },
+  { 
+    id: 'uk-ireland', 
+    name: 'UK & Ireland', 
+    hoverCopy: 'Timeless links and legendary fairways',
+    courseCount: 42 
+  },
+  { 
+    id: 'continental-europe', 
+    name: 'Continental Europe', 
+    hoverCopy: 'Drama, elevation, unforgettable settings',
+    courseCount: 28 
+  },
+  { 
+    id: 'usa', 
+    name: 'USA', 
+    hoverCopy: 'Championship courses across every landscape',
+    courseCount: 45 
+  },
+  { 
+    id: 'rest-of-world', 
+    name: 'Rest of the World', 
+    hoverCopy: 'Hidden gems waiting to be discovered',
+    courseCount: 31 
+  },
 ];
 
 interface RegionExploreRailProps {
@@ -24,21 +46,30 @@ interface RegionExploreRailProps {
 /**
  * RegionExploreRail - Explore by Region
  * 
- * Design:
- * - Horizontal rails
- * - Large course imagery
- * - Region name only
- * - No metrics (course count is subtle)
+ * Cinematic spec:
+ * - Section header: "Explore by Region"
+ * - Sub-copy: editorial description
+ * - Region cards with hover micro-copy
  */
 export const RegionExploreRail: React.FC<RegionExploreRailProps> = ({
   className,
   onRegionClick,
 }) => {
+  const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
+
   return (
-    <div className={cn("py-6", className)}>
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: 'easeOut', delay: 0.3 }}
+      className={cn("py-6", className)}
+    >
       {/* Section Header */}
       <div className="px-5 mb-4">
         <h3 className="text-lg font-serif text-foreground">Explore by Region</h3>
+        <p className="mt-1.5 text-sm text-muted-foreground font-light leading-relaxed max-w-md">
+          From rugged coastlines to rolling parkland, discover the world's greatest courses — one destination at a time.
+        </p>
       </div>
       
       {/* Horizontal scroll rail */}
@@ -48,6 +79,8 @@ export const RegionExploreRail: React.FC<RegionExploreRailProps> = ({
             <button
               key={region.id}
               onClick={() => onRegionClick?.(region.id)}
+              onMouseEnter={() => setHoveredRegion(region.id)}
+              onMouseLeave={() => setHoveredRegion(null)}
               className="flex-shrink-0 snap-start group"
             >
               <div className="relative w-44 md:w-56 aspect-[4/3] rounded-xl overflow-hidden">
@@ -61,7 +94,7 @@ export const RegionExploreRail: React.FC<RegionExploreRailProps> = ({
                 )} />
                 
                 {/* Overlay for hover effect */}
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-200" />
                 
                 {/* Bottom gradient */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
@@ -69,10 +102,20 @@ export const RegionExploreRail: React.FC<RegionExploreRailProps> = ({
                 {/* Content */}
                 <div className="absolute inset-0 flex flex-col justify-end p-4">
                   <h4 className="text-base font-medium text-white">{region.name}</h4>
+                  
+                  {/* Hover micro-copy - only shows on hover/tap */}
+                  {region.hoverCopy && (
+                    <p className={cn(
+                      "mt-1 text-xs text-white/70 font-light transition-all duration-200",
+                      hoveredRegion === region.id ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
+                    )}>
+                      {region.hoverCopy}
+                    </p>
+                  )}
                 </div>
                 
                 {/* Hover arrow indicator */}
-                <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                   <ChevronRight className="w-5 h-5 text-white/80" />
                 </div>
               </div>
@@ -80,7 +123,7 @@ export const RegionExploreRail: React.FC<RegionExploreRailProps> = ({
           ))}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
