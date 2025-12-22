@@ -308,8 +308,23 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   // Two-observer system for prebuffer and autoplay
   const nearRef = useRef<IntersectionObserver | null>(null);
   const playRef = useRef<IntersectionObserver | null>(null);
-  const [shouldAttachMap, setShouldAttachMap] = useState<Record<string, boolean>>({});
-  const [autoplayMap, setAutoplayMap] = useState<Record<string, boolean>>({});
+  // Initialize with first video pre-attached for instant load
+  const [shouldAttachMap, setShouldAttachMap] = useState<Record<string, boolean>>(() => {
+    const firstPost = posts[0];
+    if (firstPost && firstPost.type === 'video') {
+      return { [firstPost.id]: true };
+    }
+    return {};
+  });
+
+  // Initialize with first video set to autoplay
+  const [autoplayMap, setAutoplayMap] = useState<Record<string, boolean>>(() => {
+    const firstPost = posts[0];
+    if (firstPost && firstPost.type === 'video') {
+      return { [firstPost.id]: true };
+    }
+    return {};
+  });
 
   // Helper to safely disconnect observers
   const disconnectObserver = useCallback((observerRef: React.MutableRefObject<IntersectionObserver | null>) => {
