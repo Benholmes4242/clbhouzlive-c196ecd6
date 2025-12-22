@@ -1,4 +1,4 @@
-import React, { useState, useMemo, lazy, Suspense } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import CompactHeader from '@/components/header/CompactHeader';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 import { FadeInContent } from '@/components/ui/FadeInContent';
@@ -12,6 +12,7 @@ import SlidingPanels from '@/components/ui/SlidingPanels';
 import { useVideoLengthFilter } from '@/hooks/useVideoLengthFilter';
 import { DURATION_FILTERS } from '@/constants/videoFilters';
 import { ContinueWatchingSection } from '@/components/videos/ContinueWatchingSection';
+import { MediaRuntime } from '@/media';
 
 // import SuggestedUsersRedesigned from '@/components/discover/SuggestedUsersRedesigned'; // Stored for future use
 import DiscoverContent from '@/components/discover/DiscoverContent';
@@ -33,10 +34,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
 import Top100Pills from '@/components/courses/Top100Pills';
 
-// Lazy load heavy/inactive components for better initial bundle size
-const FollowingFeed = lazy(() => import('@/components/discover/FollowingFeed'));
-const VideosTab = lazy(() => import('@/components/videos/VideosTab'));
-const ExploreTab = lazy(() => import('@/components/explore-tab/ExploreTab'));
+// Direct imports (no lazy/Suspense) to avoid timing issues with autoplay registration
+import FollowingFeed from '@/components/discover/FollowingFeed';
+import VideosTab from '@/components/videos/VideosTab';
+import ExploreTab from '@/components/explore-tab/ExploreTab';
 
 type MainKey = 'shorts' | 'videos' | 'channels' | 'following';
 
@@ -201,6 +202,23 @@ const Discover = () => {
     // In real app: API call to follow user
   };
 
+  // Tab switch gate: freeze playback during animation, then force recompute
+  const handleTabTransitionStart = useCallback(() => {
+    if (import.meta.env.DEV) {
+      console.log('[Discover] Tab transition START - freezing MediaRuntime');
+    }
+    MediaRuntime.setUIState({ isPanelOpen: true, isScrolling: true });
+    MediaRuntime.pauseAll();
+  }, []);
+
+  const handleTabTransitionEnd = useCallback(() => {
+    if (import.meta.env.DEV) {
+      console.log('[Discover] Tab transition END - unfreezing MediaRuntime');
+    }
+    MediaRuntime.setUIState({ isPanelOpen: false, isScrolling: false });
+    // Force recompute even if IntersectionObserver hasn't fired yet
+    MediaRuntime.requestRecompute();
+  }, []);
   return (
     <PageRoot className="min-h-screen text-foreground bg-[var(--bg-page)]">
       <CompactHeader />
@@ -238,30 +256,22 @@ const Discover = () => {
             <SlidingPanels
               activeKey={main as MainKey}
               order={['shorts', 'videos', 'channels', 'following'] as const}
+              onTransitionStart={handleTabTransitionStart}
+              onTransitionEnd={handleTabTransitionEnd}
             >
               {(key: MainKey) => {
                 if (key === 'channels') {
-                  return (
-                    <Suspense fallback={null}>
-                      <ExploreTab onMediaClick={handleMediaClick} />
-                    </Suspense>
-                  );
+                  return <ExploreTab onMediaClick={handleMediaClick} />;
                 }
                 if (key === 'following') {
                   return (
                     <div className="md:container md:mx-auto md:px-0 mt-4">
-                      <Suspense fallback={null}>
-                        <FollowingFeed onMediaClick={handleMediaClick} />
-                      </Suspense>
+                      <FollowingFeed onMediaClick={handleMediaClick} />
                     </div>
                   );
                 }
                 if (key === 'videos') {
-                  return (
-                    <Suspense fallback={null}>
-                      <VideosTab onVideoClick={handleMediaClick} />
-                    </Suspense>
-                  );
+                  return <VideosTab onVideoClick={handleMediaClick} />;
                 }
                 // 'shorts' uses DiscoverContent
                 return (

@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getStreamPoster } from '@/utils/stream';
 import { OverlayCorners } from '@/components/shared/overlay';
-import { HLSPlayer, HLSPlayerRef } from '@/media';
+import { HLSPlayer, HLSPlayerRef, MediaRuntime } from '@/media';
+import { MEDIA_RUNTIME_V2 } from '@/config/featureFlags';
 
 interface HeroItem {
   id: string;
@@ -37,19 +38,74 @@ interface DiscoverHeroProps {
   onWatch?: (item: HeroItem) => void;
 }
 
+// Hero gets high priority (low sortIndex) so it plays before grid items
+const HERO_SORT_INDEX = -100;
+
 export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroProps) {
   const navigate = useNavigate();
   const playerRef = useRef<HLSPlayerRef>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [resolvedDuration, setResolvedDuration] = useState<number | undefined>(item?.durationSeconds);
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  // NOTE: DiscoverHero is now PASSIVE - no autoplay.
-  // The hero video only plays when user taps it (opens fullscreen).
-  // This prevents the hero's IntersectionObserver from competing with
-  // the grid autoplay system managed by MediaRuntime.
-  // 
-  // Previously this had its own observer that called play()/pause() directly,
-  // which caused "fighting" with grid autoplay and unpredictable behavior.
+  // Register hero video with MediaRuntime for unified autoplay
+  useEffect(() => {
+    if (!MEDIA_RUNTIME_V2 || !item || item.mediaType !== 'video' || !item.mediaUrl) {
+      return;
+    }
+
+    const startTime = performance.now();
+    const deadlineMs = 1500;
+    let rafId: number | null = null;
+    let registered = false;
+
+    const tryRegister = () => {
+      if (registered) return;
+      
+      const videoEl = playerRef.current?.getElement();
+      const containerEl = containerRef.current;
+      
+      if (videoEl && containerEl) {
+        registered = true;
+        if (import.meta.env.DEV) {
+          console.log('[DiscoverHero][register]', item.id.slice(0, 8), {
+            sortIndex: HERO_SORT_INDEX,
+            elapsedMs: Math.round(performance.now() - startTime),
+          });
+        }
+        MediaRuntime.registerMedia({
+          id: item.id,
+          element: videoEl,
+          surface: 'grid',
+          sortIndex: HERO_SORT_INDEX,
+          observeTarget: containerEl,
+        });
+      } else if (performance.now() - startTime < deadlineMs) {
+        rafId = requestAnimationFrame(tryRegister);
+      }
+    };
+
+    rafId = requestAnimationFrame(tryRegister);
+
+    return () => {
+      if (rafId !== null) cancelAnimationFrame(rafId);
+      if (registered && item?.id) {
+        MediaRuntime.unregisterMedia(item.id);
+      }
+    };
+  }, [item?.id, item?.mediaType, item?.mediaUrl]);
+
+  // Sync playing state with runtime
+  useEffect(() => {
+    if (!MEDIA_RUNTIME_V2 || !item) return;
+    
+    const unsubscribe = MediaRuntime.subscribe(() => {
+      const nowPlaying = MediaRuntime.isPlaying(item.id);
+      setIsPlaying(nowPlaying);
+    });
+    
+    return unsubscribe;
+  }, [item?.id]);
 
   // Update resolved duration when item changes
   useEffect(() => {
@@ -111,11 +167,12 @@ export default function DiscoverHero({ item, isLoading, onWatch }: DiscoverHeroP
             ref={playerRef}
             src={item.mediaUrl}
             poster={item.posterUrl}
-            autoplay={false}
+            autoplay={isPlaying}
             muted
             loop
             objectFit="cover"
             externallyManaged
+            mediaId={item.id}
             onLoadedData={handleLoadedData}
             className="absolute inset-0 w-full h-full"
           />
