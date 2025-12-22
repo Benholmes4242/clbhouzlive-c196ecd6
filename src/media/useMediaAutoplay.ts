@@ -67,7 +67,7 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
     startThreshold = 0.4,
     stopThreshold = 0.25,
     preloadMargin = 300,
-    scrollSettleDelay = 200,
+    scrollSettleDelay = 50, // Reduced from 200ms for instant response
   } = options;
   
   // Use safe version - MediaSystemProvider may not exist in all contexts
@@ -386,6 +386,7 @@ const syncPlayingFromRuntime = useCallback(() => {
       },
       {
         threshold: thresholds,
+        rootMargin: '100px 0px 100px 0px', // Start detecting 100px before entering viewport
       }
     );
     
