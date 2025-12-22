@@ -375,11 +375,14 @@ export default function BusinessPostCard({
           >
             {isVideo && hlsUrl ? (
               <>
-                <HLSPlayer
+              <HLSPlayer
                   ref={playerRef}
                   src={hlsUrl}
                   poster={thumbnailUrl || undefined}
+                  autoplay={isPlaying}
+                  muted
                   loop
+                  externallyManaged
                   onLoadedData={() => {
                     const el = playerRef.current?.getElement();
                     if (el) setVideoEl(el);
