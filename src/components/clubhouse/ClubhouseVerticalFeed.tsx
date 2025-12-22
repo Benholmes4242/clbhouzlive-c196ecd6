@@ -122,12 +122,8 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
     }
   }, [shouldAttach, isNearby]);
 
-  // Handle play/pause based on autoplay and isActive - route through HLSPlayer
-  // HLSPlayer's autoplay prop is controlled by parent, no direct play/pause calls needed
-  React.useEffect(() => {
-    // Playback is now controlled by HLSPlayer autoplay prop passed from ClubhouseVerticalFeed
-    // via the runtime bridge - no direct playerRef.play/pause calls
-  }, [autoplay, isActive]);
+  // Playback is now controlled directly by HLSPlayer autoplay prop
+  // No empty useEffect needed - HLSPlayer handles play/pause internally
 
   return (
     <div className="relative w-full h-full bg-black overflow-hidden">
@@ -139,7 +135,7 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
             poster={poster}
             muted={muted}
             loop
-            autoplay={false}
+            autoplay={autoplay && isActive && shouldAttach}
             showMuteButton={false}
             showPlayButton={false}
             objectFit="cover"
@@ -387,10 +383,10 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
           const id = e.target.getAttribute('data-postid');
           if (!id) return;
           logIntersectionEvent('playRef', id, e.isIntersecting, e.intersectionRatio);
-          setAutoplayMap((m) => ({ ...m, [id]: e.intersectionRatio >= 0.65 }));
+          setAutoplayMap((m) => ({ ...m, [id]: e.intersectionRatio >= 0.5 })); // 50% threshold for faster response
         });
       },
-      { root: null, threshold: [0.0, 0.65, 1.0] }
+      { root: null, threshold: [0.0, 0.5, 1.0] } // Reduced from 0.65 for instant response
     );
 
     nearRef.current = nearObserver;

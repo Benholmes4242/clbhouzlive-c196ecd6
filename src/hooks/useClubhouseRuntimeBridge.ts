@@ -99,6 +99,8 @@ export function useClubhouseRuntimeBridge({
   }, [posts, currentIndex, videoRefs, itemRefs]);
   
   // Feed snap index changes to runtime as candidate visibility
+  // NOTE: Autoplay is now controlled via autoplayMap → HLSPlayer autoplay prop
+  // We only update candidate state here for MediaRuntime tracking, NOT for playback control
   useEffect(() => {
     if (!posts.length) return;
     
@@ -115,7 +117,7 @@ export function useClubhouseRuntimeBridge({
     const prevId = posts[currentIndex - 1]?.id;
     const nextId = posts[currentIndex + 1]?.id;
     
-    // Mark centered item as 100% visible
+    // Mark centered item as 100% visible (for MediaRuntime tracking only)
     MediaRuntime.setCandidateState(centerId, { visible: true, ratio: 1 });
     
     // Mark prev/next as not visible
@@ -133,14 +135,9 @@ export function useClubhouseRuntimeBridge({
     
     prevCenterIdRef.current = centerId;
     
-    // Request autoplay for center (if not scrolling)
-    if (!isScrollingRef.current) {
-      MediaRuntime.requestPlay({
-        id: centerId,
-        surface: 'clubhouse',
-        reason: 'autoplay',
-      });
-    }
+    // REMOVED: MediaRuntime.requestPlay() call
+    // Playback is now controlled by autoplayMap → HLSPlayer autoplay prop
+    // This eliminates the dual-control conflict
     
     if (import.meta.env.DEV) {
       console.log('[ClubhouseBridge] Center changed to:', centerId.slice(0, 8));
