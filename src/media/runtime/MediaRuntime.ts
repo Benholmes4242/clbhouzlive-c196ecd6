@@ -8,7 +8,7 @@
  * - reason: 'user' always wins over autoplay
  * - Fullscreen playback wins over grid playback
  * - Autoplay never steals playback from a user-initiated action
- * - Only one video may be playing at any time globally
+ * - Multiple videos CAN autoplay concurrently when visible in viewport
  */
 
 import { safePlay } from '@/utils/safePlay';
@@ -49,7 +49,10 @@ export interface UserIntent {
 }
 
 export interface RuntimeState {
-  activeMediaId: string | null;
+  // Multiple videos can be actively playing (for concurrent autoplay)
+  activeMediaIds: Set<string>;
+  // Primary active = most recent user-initiated or first in sort order
+  primaryActiveId: string | null;
   activeSurface: MediaSurface | null;
   activeReason: PlaybackReason | null;
 }
@@ -77,7 +80,8 @@ const MAX_RETRIES = 1;
 class MediaRuntimeCore {
   private registry = new Map<string, MediaNode>();
   private state: RuntimeState = {
-    activeMediaId: null,
+    activeMediaIds: new Set(),
+    primaryActiveId: null,
     activeSurface: null,
     activeReason: null,
   };
@@ -154,11 +158,16 @@ class MediaRuntimeCore {
       // Clean up warm pool
       this.warmPool.delete(id);
       
-      // If this was the active media, clear state
-      if (this.state.activeMediaId === id) {
-        this.state.activeMediaId = null;
-        this.state.activeSurface = null;
-        this.state.activeReason = null;
+      // Remove from active set if present
+      this.state.activeMediaIds.delete(id);
+      if (this.state.primaryActiveId === id) {
+        // Pick next primary from remaining active IDs
+        const remaining = Array.from(this.state.activeMediaIds);
+        this.state.primaryActiveId = remaining[0] ?? null;
+        if (!this.state.primaryActiveId) {
+          this.state.activeSurface = null;
+          this.state.activeReason = null;
+        }
       }
       
       this.registry.delete(id);
@@ -203,28 +212,16 @@ class MediaRuntimeCore {
       return false;
     }
     
-    // DEV-only invariant: detect double-play attempts and unauthorized plays
+    // DEV-only invariant: detect unauthorized plays
     if (import.meta.env.DEV) {
-      if (this.state.activeMediaId && this.state.activeMediaId !== id) {
-        const activeNode = this.registry.get(this.state.activeMediaId);
-        if (activeNode && !activeNode.videoElement.paused) {
-          console.warn(
-            '[MediaRuntime] ⚠️ INVARIANT VIOLATION: Attempting to play', id.slice(0, 8),
-            'while', this.state.activeMediaId.slice(0, 8), 'is still playing.',
-            'This indicates competing playback controllers - check for stray .play() calls.',
-            '\nStack:', new Error().stack
-          );
-        }
-      }
-      
       // Attach listener to detect unauthorized plays (one-time per node)
       if (node && !(node.videoElement as any).__runtimeGuarded) {
         (node.videoElement as any).__runtimeGuarded = true;
         node.videoElement.addEventListener('play', () => {
-          if (this.state.activeMediaId !== id) {
+          if (!this.state.activeMediaIds.has(id)) {
             console.warn(
               '[MediaRuntime] ⚠️ UNAUTHORIZED PLAY: Video', id.slice(0, 8),
-              'started playing but runtime activeId is', this.state.activeMediaId?.slice(0, 8) || 'null',
+              'started playing but is not in activeMediaIds',
               '\nThis video bypassed MediaRuntime - find and remove the .play() call.',
               '\nStack:', new Error().stack
             );
@@ -241,37 +238,40 @@ class MediaRuntimeCore {
       return false;
     }
     
-    // Priority check: user > resume > autoplay
-    if (this.state.activeMediaId && this.state.activeMediaId !== id) {
-      const currentReason = this.state.activeReason;
-      
-      // User-initiated playback wins over everything
-      if (currentReason === 'user' && reason !== 'user') {
-        if (import.meta.env.DEV) {
-          console.log('[MediaRuntime] requestPlay blocked: user action active');
-        }
-        return false;
-      }
-      
-      // Fullscreen wins over grid
-      if (this.state.activeSurface === 'fullscreen' && surface === 'grid' && reason !== 'user') {
-        if (import.meta.env.DEV) {
-          console.log('[MediaRuntime] requestPlay blocked: fullscreen active');
-        }
-        return false;
-      }
+    // If already playing this one, skip
+    if (this.state.activeMediaIds.has(id)) {
+      return true;
     }
     
-    // Pause current before switching
-    if (this.state.activeMediaId && this.state.activeMediaId !== id) {
-      this.pauseInternal(this.state.activeMediaId);
+    // Priority check for user-initiated playback
+    // For user actions, we respect exclusive playback (pause others)
+    if (reason === 'user') {
+      // User action: pause all others and take exclusive control
+      this.state.activeMediaIds.forEach((activeId) => {
+        if (activeId !== id) {
+          this.pauseInternal(activeId);
+        }
+      });
+      this.state.activeMediaIds.clear();
+    }
+    
+    // Block grid autoplay if fullscreen is active with user reason
+    if (this.state.activeSurface === 'fullscreen' && surface === 'grid' && reason !== 'user') {
+      if (import.meta.env.DEV) {
+        console.log('[MediaRuntime] requestPlay blocked: fullscreen active');
+      }
+      return false;
     }
     
     // Attempt play
     const success = await safePlay(node.videoElement);
     
     if (success) {
-      this.state.activeMediaId = id;
+      this.state.activeMediaIds.add(id);
+      // Update primary active (first one or user-initiated)
+      if (reason === 'user' || !this.state.primaryActiveId) {
+        this.state.primaryActiveId = id;
+      }
       this.state.activeSurface = surface;
       this.state.activeReason = reason;
       
@@ -287,7 +287,8 @@ class MediaRuntimeCore {
       this.notifyListeners();
       
       if (import.meta.env.DEV) {
-        console.log('[MediaRuntime] Playing:', id.slice(0, 8), surface, reason);
+        console.log('[MediaRuntime] Playing:', id.slice(0, 8), surface, reason, 
+          'Total active:', this.state.activeMediaIds.size);
       }
     } else {
       this.telemetry.playFailure?.(id, 'blocked');
@@ -306,11 +307,21 @@ class MediaRuntimeCore {
     
     this.pauseInternal(id);
     
-    if (this.state.activeMediaId === id) {
+    if (this.state.activeMediaIds.has(id)) {
       this.telemetry.autoplayStop?.(id, reason);
-      this.state.activeMediaId = null;
-      this.state.activeSurface = null;
-      this.state.activeReason = null;
+      this.state.activeMediaIds.delete(id);
+      
+      // Update primary if this was it
+      if (this.state.primaryActiveId === id) {
+        const remaining = Array.from(this.state.activeMediaIds);
+        this.state.primaryActiveId = remaining[0] ?? null;
+      }
+      
+      // Clear surface/reason if no active media left
+      if (this.state.activeMediaIds.size === 0) {
+        this.state.activeSurface = null;
+        this.state.activeReason = null;
+      }
       this.notifyListeners();
     }
   }
@@ -325,13 +336,25 @@ class MediaRuntimeCore {
     });
     
     if (!exceptId) {
-      if (this.state.activeMediaId) {
-        this.telemetry.autoplayStop?.(this.state.activeMediaId, 'pauseAll');
-      }
-      this.state.activeMediaId = null;
+      // Stop all active media
+      this.state.activeMediaIds.forEach((activeId) => {
+        this.telemetry.autoplayStop?.(activeId, 'pauseAll');
+      });
+      this.state.activeMediaIds.clear();
+      this.state.primaryActiveId = null;
       this.state.activeSurface = null;
       this.state.activeReason = null;
       this.notifyListeners();
+    } else {
+      // Remove all except the specified ID
+      const toRemove = Array.from(this.state.activeMediaIds).filter(id => id !== exceptId);
+      toRemove.forEach((activeId) => {
+        this.telemetry.autoplayStop?.(activeId, 'pauseAll');
+        this.state.activeMediaIds.delete(activeId);
+      });
+      if (this.state.primaryActiveId && this.state.primaryActiveId !== exceptId) {
+        this.state.primaryActiveId = exceptId;
+      }
     }
   }
   
@@ -399,13 +422,8 @@ class MediaRuntimeCore {
   private evaluateBestCandidate(): void {
     if (this.isUIActive()) return;
     
-    // Don't switch away from active video while it's buffering (grace period)
-    if (Date.now() < this.bufferingSuppressUntil && this.state.activeMediaId) {
-      const activeNode = this.registry.get(this.state.activeMediaId);
-      if (activeNode?.isVisible) {
-        return; // Keep current active, it's buffering
-      }
-    }
+    // Don't evaluate during user-initiated playback
+    if (this.state.activeReason === 'user') return;
     
     // Get all visible candidates
     const candidates: MediaNode[] = [];
@@ -416,38 +434,41 @@ class MediaRuntimeCore {
       }
     });
     
-    // Sort by sortIndex (lower = higher priority)
-    candidates.sort((a, b) => a.sortIndex - b.sortIndex);
-    
-    const bestCandidate = candidates[0];
+    // Get IDs of visible candidates
+    const visibleIds = new Set(candidates.map(c => c.id));
     
     if (import.meta.env.DEV) {
-      console.log('[MediaRuntime] evaluateBestCandidate', bestCandidate?.id?.slice(0, 8) ?? 'none', {
-        candidateCount: candidates.length,
-        currentActive: this.state.activeMediaId?.slice(0, 8) ?? 'none',
-        currentReason: this.state.activeReason,
+      console.log('[MediaRuntime] evaluateBestCandidate', {
+        visibleCount: candidates.length,
+        currentActiveCount: this.state.activeMediaIds.size,
       });
     }
     
-    if (bestCandidate) {
-      // Don't switch if already playing this one
-      if (this.state.activeMediaId === bestCandidate.id) return;
-      
-      // Don't steal from user action
-      if (this.state.activeReason === 'user') return;
-      
-      // Request autoplay
-      this.requestPlay({
-        id: bestCandidate.id,
-        surface: bestCandidate.surface,
-        reason: 'autoplay',
-      });
-    } else if (this.state.activeMediaId && this.state.activeReason === 'autoplay') {
-      // No visible candidates, pause current autoplay
-      const activeNode = this.registry.get(this.state.activeMediaId);
-      if (activeNode && !activeNode.isVisible) {
-        this.requestPause({ id: this.state.activeMediaId, reason: 'no_visible' });
+    // Play all visible candidates that aren't already playing
+    for (const candidate of candidates) {
+      if (!this.state.activeMediaIds.has(candidate.id)) {
+        this.requestPlay({
+          id: candidate.id,
+          surface: candidate.surface,
+          reason: 'autoplay',
+        });
       }
+    }
+    
+    // Pause any active media that's no longer visible (for autoplay only)
+    const toStop: string[] = [];
+    this.state.activeMediaIds.forEach((activeId) => {
+      if (!visibleIds.has(activeId)) {
+        const node = this.registry.get(activeId);
+        // Only auto-pause autoplay videos, not user-initiated
+        if (node && !node.isVisible) {
+          toStop.push(activeId);
+        }
+      }
+    });
+    
+    for (const id of toStop) {
+      this.requestPause({ id, reason: 'no_visible' });
     }
   }
   
@@ -456,8 +477,8 @@ class MediaRuntimeCore {
   private enforceWarmPoolLimit(): void {
     if (this.warmPool.size <= MAX_WARM_PLAYERS + 1) return; // +1 for currently playing
     
-    // Get all warm IDs except active
-    const warmIds = Array.from(this.warmPool).filter(id => id !== this.state.activeMediaId);
+    // Get all warm IDs except active ones
+    const warmIds = Array.from(this.warmPool).filter(id => !this.state.activeMediaIds.has(id));
     
     // Sort by visibility ratio (detach least visible first)
     warmIds.sort((a, b) => {
@@ -569,7 +590,8 @@ class MediaRuntimeCore {
         break;
       case 'scrub':
         this.userIntent.lastScrub = now;
-        this.telemetry.scrubUsed?.(this.state.activeMediaId ?? 'unknown');
+        this.telemetry.scrubUsed?.(this.state.primaryActiveId ?? 'unknown');
+        break;
         break;
       case 'pause':
         this.userIntent.lastManualPause = now;
@@ -589,8 +611,8 @@ class MediaRuntimeCore {
    * Only applies to active autoplay (not user-initiated playback)
    */
   reportBuffering(id: string): void {
-    // Only suppress switching if this is the active autoplay video
-    if (id === this.state.activeMediaId && this.state.activeReason === 'autoplay') {
+    // Only suppress switching if this is an active autoplay video
+    if (this.state.activeMediaIds.has(id) && this.state.activeReason === 'autoplay') {
       this.bufferingSuppressUntil = Date.now() + BUFFERING_SUPPRESS_DURATION;
     }
   }
@@ -607,7 +629,12 @@ class MediaRuntimeCore {
   // ============ State Queries ============
   
   getActiveId(): string | null {
-    return this.state.activeMediaId;
+    // Return primary for backwards compatibility
+    return this.state.primaryActiveId;
+  }
+  
+  getActiveIds(): Set<string> {
+    return new Set(this.state.activeMediaIds);
   }
   
   getActiveSurface(): MediaSurface | null {
@@ -627,7 +654,7 @@ class MediaRuntimeCore {
   }
   
   isPlaying(id: string): boolean {
-    return this.state.activeMediaId === id;
+    return this.state.activeMediaIds.has(id);
   }
   
   // ============ Telemetry ============
@@ -659,7 +686,7 @@ class MediaRuntimeCore {
     return {
       registrySize: this.registry.size,
       warmPoolSize: this.warmPool.size,
-      activeMediaId: this.state.activeMediaId,
+      activeMediaId: this.state.primaryActiveId,
       activeSurface: this.state.activeSurface,
       uiState: { ...this.uiState },
     };
@@ -693,8 +720,8 @@ class MediaRuntimeCore {
   }
   
   recordBufferingStart(id: string): void {
-    // Only track for active autoplay
-    if (id !== this.state.activeMediaId) return;
+    // Only track for active media
+    if (!this.state.activeMediaIds.has(id)) return;
     
     if (!this.telemetryStats.bufferingStartedAt.has(id)) {
       this.telemetryStats.bufferingStartedAt.set(id, performance.now());
