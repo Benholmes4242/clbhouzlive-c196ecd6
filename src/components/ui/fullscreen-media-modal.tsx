@@ -1,6 +1,6 @@
-
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
+import HLSPlayer from '@/media/HLSPlayer';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import { useModalState } from '@/hooks/useModalDetector';
 import { Minimize2, Volume2, VolumeX, ChevronLeft, ChevronRight, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
@@ -9,11 +9,8 @@ import { useSwipeable } from 'react-swipeable';
 import { useTextExpansion } from '@/hooks/useTextExpansion';
 import { truncateToWords } from '@/utils/textUtils';
 import CoursePostBadge from '../posts/CoursePostBadge';
-import { UserInfoOverlay } from '../posts/user-post/overlays/UserInfoOverlay';
-import TaggedText from '../posts/TaggedText';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
@@ -21,7 +18,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from '@/components/ui/button';
 import { getFilterClass } from '@/utils/studioFilters';
 import { cn } from '@/lib/utils';
-
 interface FullscreenMediaModalProps {
   isOpen: boolean;
   onClose: (videoPosition?: number, videoMuted?: boolean) => void;
@@ -113,7 +109,7 @@ const FullscreenMediaModal = ({
   const videoRef = useRef<HTMLVideoElement>(null); // Keep for compatibility but EnhancedVideoPlayer manages its own video
   const isMobile = useIsMobile();
   const { isTextExpanded, handleMouseEnter, handleMouseLeave } = useTextExpansion();
-  const { registerVideo, unregisterVideo, pauseAllAndSetActive, storeVideoPosition, resumeVideoFromPosition } = useVideoPlaybackManager();
+  // MediaRuntime handles playback - direct integration, no deprecated hooks
   const { isGloballyMuted } = useGlobalAudio();
   const { user: currentUser } = useSupabaseSession();
   const { deletePost } = usePostDeletion();
@@ -256,37 +252,43 @@ const FullscreenMediaModal = ({
     }
   }, [isOpen, initialIndex, initialVideoMuted]);
 
-  // Auto-play video when modal opens or index changes
+  // Pause background videos when modal opens, request play for modal video
   useEffect(() => {
-    if (isOpen && mediaTypes[currentIndex] === 'video') {
-      // Use a timeout to prevent infinite loops
-      const timer = setTimeout(() => {
-        pauseAllAndSetActive(fullscreenVideoId.current);
-      }, 50);
-      return () => clearTimeout(timer);
+    if (isOpen) {
+      // Pause all background videos when modal opens
+      MediaRuntime.pauseAll();
+      
+      // Request play for the current video
+      if (mediaTypes[currentIndex] === 'video' && mediaUrls[currentIndex]) {
+        const mediaId = `modal-${fullscreenVideoId.current}-${currentIndex}`;
+        MediaRuntime.requestPlay({ id: mediaId, surface: 'fullscreen', reason: 'user' });
+      }
     }
-  }, [isOpen, currentIndex]);
+    
+    return () => {
+      // Cleanup: pause modal video when closing
+      if (isOpen && mediaTypes[currentIndex] === 'video') {
+        const mediaId = `modal-${fullscreenVideoId.current}-${currentIndex}`;
+        MediaRuntime.requestPause({ id: mediaId, reason: 'modal_close' });
+      }
+    };
+  }, [isOpen, currentIndex, mediaTypes, mediaUrls]);
 
   // Track if modal was ever actually opened (to prevent running on initial mount)
   const wasEverOpenRef = useRef(false);
   
-  // Cleanup when modal closes - restore feed video behavior
+  // Track if modal was opened for cleanup
   useEffect(() => {
     if (isOpen) {
       wasEverOpenRef.current = true;
     }
     
     if (!isOpen && wasEverOpenRef.current) {
-      // Unregister the fullscreen video
-      unregisterVideo(fullscreenVideoId.current);
-      
-      // When modal closes, allow feed videos to resume
-      // Only run if the modal was actually open before
-      const timer = setTimeout(() => {
-        pauseAllAndSetActive('');
-        console.log('🔊 Fullscreen modal closed, feed videos will resume');
-      }, 100);
-      return () => clearTimeout(timer);
+      // When modal closes, allow feed videos to resume naturally
+      // MediaRuntime visibility observers will handle resumption
+      if (import.meta.env.DEV) {
+        console.log('🔊 Fullscreen modal closed, feed videos will resume via visibility');
+      }
     }
   }, [isOpen]);
 
@@ -450,15 +452,17 @@ const FullscreenMediaModal = ({
             </div>
           ) : (
             <div className="relative w-full h-full bg-media-loading">
-              <EnhancedVideoPlayer
+              <HLSPlayer
                 key={`fullscreen-video-${currentIndex}-${mediaUrls[currentIndex]}`}
                 src={mediaUrls[currentIndex]}
-                className={cn("w-full h-full", filterClass)}
+                className={cn("w-full h-full object-contain", filterClass)}
                 muted={isMuted}
                 loop={true}
                 autoplay={true}
-                enableHLS={true}
-                objectFit="contain"
+                showMuteButton={false}
+                showPlayButton={false}
+                mediaId={`modal-${fullscreenVideoId.current}-${currentIndex}`}
+                externallyManaged={false}
               />
             </div>
           )}

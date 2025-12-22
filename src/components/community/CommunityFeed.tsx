@@ -55,11 +55,13 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
 
   const sentinelRef = useRef<HTMLDivElement>(null);
 
-  // Unified media autoplay
+  // Unified media autoplay with consistent thresholds
   const { registerMedia, playingIds } = useMediaAutoplay({
     mode: 'grid',
     preloadMargin: 300,
     scrollSettleDelay: 200,
+    startThreshold: 0.4,      // Consistent 40% visible to play
+    stopThreshold: 0.4,       // Consistent 40% visible to stop (60% invisible)
   });
 
   // Calculate date separators

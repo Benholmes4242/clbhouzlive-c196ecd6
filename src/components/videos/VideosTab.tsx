@@ -57,11 +57,13 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   const continueWatchingResult = useContinueWatching(6);
   const continueWatchingVideos = continueWatchingResult.videos;
 
-  // Unified media autoplay - uses default 0.4/0.25 thresholds for sentinel-based observation
+  // Unified media autoplay with consistent thresholds
   const { registerMedia, playingIds } = useMediaAutoplay({
     mode: 'grid',
     preloadMargin: 300,
     scrollSettleDelay: 200,
+    startThreshold: 0.4,      // Consistent 40% visible to play
+    stopThreshold: 0.4,       // Consistent 40% visible to stop (60% invisible)
   });
 
   // Lazy loading triggers for below-fold sections

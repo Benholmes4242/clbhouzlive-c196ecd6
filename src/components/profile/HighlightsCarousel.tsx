@@ -25,7 +25,11 @@ const MOBILE_QUERY = '(pointer: coarse), (hover: none)';
 const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, className = '' }) => {
   const { highlights, isLoading, error } = useTop100Highlights(userId);
   const railRef = useRef<HTMLDivElement>(null);
-  const { registerMedia, playingIds } = useMediaAutoplay({ surface: 'grid' });
+  const { registerMedia, playingIds } = useMediaAutoplay({ 
+    mode: 'grid',
+    startThreshold: 0.4,
+    stopThreshold: 0.4,
+  });
   
   // Session-wide mute persistence
   const [muted, setMuted] = useState(() => {
