@@ -281,11 +281,9 @@ export function buildUnifiedLayout(items: UnifiedMediaItem[]): LayoutRow[] {
 
 /**
  * Mark autoplay candidates in items array
- * Every 3rd video becomes a candidate
+ * ALL videos are now candidates - MediaRuntime handles visibility-based playback
  */
 export function markAutoplayCandidates(items: UnifiedMediaItem[]): UnifiedMediaItem[] {
-  let videoCount = 0;
-  
   return items.map((item, index) => {
     // Compute and set orientation
     const aspectRatio = computeAspectRatio(item);
@@ -300,12 +298,10 @@ export function markAutoplayCandidates(items: UnifiedMediaItem[]): UnifiedMediaI
       };
     }
     
-    const isCandidate = videoCount % 3 === 0;
-    videoCount++;
-    
+    // All videos are autoplay candidates - MediaRuntime decides based on visibility
     return {
       ...item,
-      isAutoplayCandidate: isCandidate,
+      isAutoplayCandidate: true,
       sortIndex: index,
       aspectRatio,
       orientation,

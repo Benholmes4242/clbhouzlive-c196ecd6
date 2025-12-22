@@ -103,13 +103,10 @@ export function useMediaAutoplay(options: UseMediaAutoplayOptions = {}) {
   
   // ============ Sync playingIds from runtime ============
   
-  const syncPlayingFromRuntime = useCallback(() => {
-    const activeId = MediaRuntime.getActiveId();
-    if (activeId) {
-      setPlayingIds(new Set([activeId]));
-    } else {
-      setPlayingIds(new Set());
-    }
+const syncPlayingFromRuntime = useCallback(() => {
+    // Get ALL active IDs for multi-video autoplay support
+    const activeIds = MediaRuntime.getActiveIds();
+    setPlayingIds(activeIds);
   }, []);
   
   // ============ Resume playback when panel animation completes ============

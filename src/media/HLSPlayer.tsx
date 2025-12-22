@@ -205,19 +205,27 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   // ============ Sync External Autoplay State ============
   // React to autoplay prop changes to play/pause video without re-initializing HLS
   
+  // Debounced autoplay to prevent rapid play/pause cycles during scroll
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !isAttachedRef.current) return;
-
-    if (autoplay) {
-      // Best-effort: let safePlay handle readiness (important on iOS where readyState may stay 0)
-      safePlay(video);
-    } else {
-      // Pause when autoplay becomes false
-      if (!video.paused) {
-        video.pause();
+    
+    // Small delay to debounce rapid state changes
+    const timeoutId = setTimeout(() => {
+      if (autoplay) {
+        // Only play if not already playing
+        if (video.paused) {
+          safePlay(video);
+        }
+      } else {
+        // Only pause if currently playing
+        if (!video.paused) {
+          video.pause();
+        }
       }
-    }
+    }, 100); // 100ms debounce
+    
+    return () => clearTimeout(timeoutId);
   }, [autoplay]);
   
   // ============ HLS Setup ============
@@ -818,8 +826,8 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
           objectFitClass,
           // GPU compositing hints for WebView - prevents flicker
           'will-change-opacity backface-hidden transform-gpu',
-          // Only show when first painted frame is ready
-          hasFirstFrame ? 'opacity-100' : 'opacity-0'
+          // Only show when first painted frame is ready AND poster has faded
+          hasFirstFrame && !isPosterVisible ? 'opacity-100' : 'opacity-0'
         )}
         style={{ 
           backfaceVisibility: 'hidden',

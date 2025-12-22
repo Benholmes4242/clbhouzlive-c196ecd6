@@ -108,7 +108,8 @@ export interface UnifiedGridConfig {
   // Autoplay settings
   autoplayEnabled?: boolean;
   maxAutoplay?: number;
-  visibilityThreshold?: number;
+  playThreshold?: number;     // Play when X% visible (0.4 = 40%)
+  pauseThreshold?: number;    // Pause when X% invisible (0.6 = 60% out of view)
   
   // Surface context (affects tap behavior)
   surface?: GridSurface;
