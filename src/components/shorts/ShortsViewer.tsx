@@ -5,6 +5,7 @@ import { useSwipeable } from 'react-swipeable';
 import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
 import { OverlayCorners, OVERLAY_TOP_LEFT, OVERLAY_TOP_RIGHT } from '@/components/shared/overlay';
 import { cn } from '@/lib/utils';
+import { safePlay } from '@/utils/safePlay';
 
 interface ShortsViewerProps {
   items: ExploreContentItem[];
@@ -91,10 +92,7 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
     video.loop = true;
     video.playsInline = true;
 
-    const playPromise = video.play();
-    if (playPromise) {
-      playPromise.catch(() => {});
-    }
+    safePlay(video);
 
     const updateProgress = () => {
       if (video.duration > 0) {

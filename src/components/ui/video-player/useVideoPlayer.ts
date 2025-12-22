@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
+import { safePlay } from '@/utils/safePlay';
 
 interface UseVideoPlayerProps {
   src: string;
@@ -77,9 +78,7 @@ export const useVideoPlayer = ({
     const handleLoadedMetadata = () => {
       // Enable autoplay when ready (regardless of current time position)
       if (autoplay && video.paused) {
-        video.play().catch(error => {
-          console.log('Autoplay prevented:', error);
-        });
+        safePlay(video);
       }
     };
 
@@ -92,9 +91,7 @@ export const useVideoPlayer = ({
     if (autoplay && video.paused && video.readyState >= 1) {
       // Use requestAnimationFrame for smoother autoplay timing
       requestAnimationFrame(() => {
-        video.play().catch(error => {
-          console.log('Autoplay prevented:', error);
-        });
+        safePlay(video);
       });
     }
 
@@ -121,9 +118,7 @@ export const useVideoPlayer = ({
       
       // If the video has some currentTime (was playing before), resume from that position
       // Otherwise start from beginning
-      video.play().catch(error => {
-        console.log('Autoplay resume prevented:', error);
-      });
+      safePlay(video);
     } else if (!autoplay && !video.paused) {
       // If autoplay is disabled but video is playing, pause it
       video.pause();
@@ -161,7 +156,7 @@ export const useVideoPlayer = ({
 
     if (video.paused) {
       console.log('▶️ Playing video');
-      video.play().catch(console.error);
+      safePlay(video);
     } else {
       console.log('⏸️ Pausing video');
       video.pause();
@@ -202,7 +197,7 @@ export const useVideoPlayer = ({
     
     // Maintain playing state - only resume if it was playing before
     if (wasPlaying && video.paused) {
-      video.play().catch(console.error);
+      safePlay(video);
     }
   };
 

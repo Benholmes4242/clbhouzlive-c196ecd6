@@ -5,6 +5,7 @@ import MediaSkeleton from './MediaSkeleton';
 import MediaErrorFallback from './MediaErrorFallback';
 import OverlayLabels from './OverlayLabels';
 import { ActivityMediaCardProps, AspectRatio } from './types';
+import { safePlay } from '@/utils/safePlay';
 
 /**
  * Premium media card component for Activity grid
@@ -43,7 +44,7 @@ const ActivityMediaCard: React.FC<ActivityMediaCardProps> = ({
     
     if (isVideo && videoRef.current) {
       videoRef.current.muted = true;
-      videoRef.current.play().catch(() => {});
+      safePlay(videoRef.current);
     }
   }, [supportsHover, isVideo]);
 

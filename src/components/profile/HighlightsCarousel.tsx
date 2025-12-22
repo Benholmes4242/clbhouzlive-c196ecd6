@@ -5,6 +5,7 @@ import { warmHls, getHlsUrl } from '@/utils/videoPreload';
 import HighlightVideo from './HighlightVideo';
 import HighlightOverlays from './HighlightOverlays';
 import { isElementMostlyInView } from '@/utils/videoPreload';
+import { safePlay } from '@/utils/safePlay';
 
 interface HighlightsCarouselProps {
   userId: string;
@@ -107,7 +108,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
           video.playsInline = true;
           
           try {
-            await video.play();
+            await safePlay(video);
           } catch (e) {
             // Silently handle autoplay failures
           }
