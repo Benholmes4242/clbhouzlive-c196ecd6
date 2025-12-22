@@ -1,3 +1,10 @@
+/**
+ * EnhancedMediaPreviewGrid - Media preview grid for post creation
+ * 
+ * Hover previews route through MediaRuntime.
+ * No direct play/pause calls.
+ */
+
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Edit3, RotateCw, Trash2, Image as ImageIcon, Video as VideoIcon, Upload, CheckCircle, AlertCircle, GripVertical, Play, ArrowUpRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -6,6 +13,7 @@ import { Progress } from '@/components/ui/progress';
 import PhotoEditor from './PhotoEditor';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { MediaRuntime, runtimeUserTap } from '@/media/runtime';
 
 interface MediaFile {
   file: File;
@@ -51,6 +59,31 @@ const EnhancedMediaPreviewGrid: React.FC<EnhancedMediaPreviewGridProps> = ({
   const [hoveredMedia, setHoveredMedia] = useState<string | null>(null);
   const [videoDurations, setVideoDurations] = useState<Record<string, string>>({});
   const videoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
+
+  // Register videos with MediaRuntime for hover preview
+  useEffect(() => {
+    mediaFiles.forEach((media) => {
+      if (media.file.type.startsWith('video/') && videoRefs.current[media.id]) {
+        const video = videoRefs.current[media.id];
+        if (video) {
+          MediaRuntime.registerMedia({
+            id: `preview-${media.id}`,
+            element: video,
+            surface: 'grid',
+            sortIndex: 0,
+          });
+        }
+      }
+    });
+
+    return () => {
+      mediaFiles.forEach((media) => {
+        if (media.file.type.startsWith('video/')) {
+          MediaRuntime.unregisterMedia(`preview-${media.id}`);
+        }
+      });
+    };
+  }, [mediaFiles]);
 
   // Format video duration as MM:SS
   const formatDuration = (seconds: number): string => {
@@ -142,15 +175,18 @@ const EnhancedMediaPreviewGrid: React.FC<EnhancedMediaPreviewGridProps> = ({
     setDragOverIndex(null);
   };
 
-  // Hover preview handlers
+  // Hover preview handlers - route through MediaRuntime
   const handleMouseEnter = (media: MediaFile) => {
     setHoveredMedia(media.id);
     if (media.file.type.startsWith('video/')) {
       const video = videoRefs.current[media.id];
       if (video) {
         video.currentTime = 0;
-        video.play().catch(() => {
-          // Ignore autoplay errors
+        // Route hover play through MediaRuntime as user intent
+        MediaRuntime.requestPlay({
+          id: `preview-${media.id}`,
+          surface: 'grid',
+          reason: 'user',
         });
       }
     }
@@ -159,9 +195,13 @@ const EnhancedMediaPreviewGrid: React.FC<EnhancedMediaPreviewGridProps> = ({
   const handleMouseLeave = (media: MediaFile) => {
     setHoveredMedia(null);
     if (media.file.type.startsWith('video/')) {
+      // Route hover pause through MediaRuntime
+      MediaRuntime.requestPause({
+        id: `preview-${media.id}`,
+        reason: 'user',
+      });
       const video = videoRefs.current[media.id];
       if (video) {
-        video.pause();
         video.currentTime = 0;
       }
     }
@@ -445,51 +485,49 @@ const EnhancedMediaPreviewGrid: React.FC<EnhancedMediaPreviewGridProps> = ({
         </div>
       </div>
 
-      {/* Full Screen Preview Modal */}
+      {/* Photo Editor Modal */}
+      {editingFile && (
+        <Dialog open={!!editingFile} onOpenChange={() => setEditingFileId(null)}>
+          <DialogContent className="max-w-4xl p-0">
+            <DialogTitle className="sr-only">Edit Photo</DialogTitle>
+            <VisuallyHidden>
+              <p>Edit and crop your photo</p>
+            </VisuallyHidden>
+            <PhotoEditor
+              image={editingFile}
+              onSave={handleEditSave}
+              onCancel={() => setEditingFileId(null)}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Preview Modal */}
       {previewMedia && (
         <Dialog open={!!previewMedia} onOpenChange={() => setPreviewMedia(null)}>
-          <DialogContent className="max-w-4xl w-full max-h-[90vh] p-0" aria-describedby={undefined}>
-            <VisuallyHidden>
-              <DialogTitle>Media preview</DialogTitle>
-            </VisuallyHidden>
-            <div className="relative w-full h-full flex items-center justify-center bg-black">
-              <button
-                onClick={() => setPreviewMedia(null)}
-                className="absolute top-4 right-4 z-20 w-8 h-8 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors"
-              >
-                <X className="h-4 w-4" />
-              </button>
-              
+          <DialogContent className="max-w-4xl p-4">
+            <DialogTitle className="sr-only">Media Preview</DialogTitle>
+            <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
               {previewMedia.file.type.startsWith('image/') ? (
                 <img
                   src={previewMedia.url}
-                  alt="Full preview"
-                  className="max-w-full max-h-full object-contain"
+                  alt="Preview"
+                  className="w-full h-full object-contain"
                   style={{ transform: `rotate(${previewMedia.rotation || 0}deg)` }}
                 />
               ) : (
                 <video
                   src={previewMedia.url}
-                  className="max-w-full max-h-full object-contain"
+                  className="w-full h-full object-contain"
                   style={{ transform: `rotate(${previewMedia.rotation || 0}deg)` }}
                   controls
                   autoPlay
-                  muted
+                  loop
                 />
               )}
             </div>
           </DialogContent>
         </Dialog>
-      )}
-
-      {/* Photo Editor Modal */}
-      {editingFile && (
-        <PhotoEditor
-          isOpen={!!editingFile}
-          onClose={() => setEditingFileId(null)}
-          imageFile={editingFile}
-          onSave={handleEditSave}
-        />
       )}
     </>
   );

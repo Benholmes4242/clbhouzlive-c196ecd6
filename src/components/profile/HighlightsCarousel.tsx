@@ -1,3 +1,10 @@
+/**
+ * HighlightsCarousel - Top 100 highlights carousel
+ * 
+ * Uses MediaRuntime for playback control.
+ * Observer only reports visibility - does NOT call play/pause.
+ */
+
 import React, { useRef, useCallback, useState, useEffect, useMemo } from 'react';
 import { VolumeX, Volume2 } from 'lucide-react';
 import { useTop100Highlights } from '@/hooks/useTop100Highlights';
@@ -5,7 +12,8 @@ import { warmHls, getHlsUrl } from '@/utils/videoPreload';
 import HighlightVideo from './HighlightVideo';
 import HighlightOverlays from './HighlightOverlays';
 import { isElementMostlyInView } from '@/utils/videoPreload';
-import { safePlay } from '@/utils/safePlay';
+import { MediaRuntime } from '@/media/runtime';
+import { useMediaAutoplay } from '@/media/useMediaAutoplay';
 
 interface HighlightsCarouselProps {
   userId: string;
@@ -17,6 +25,7 @@ const MOBILE_QUERY = '(pointer: coarse), (hover: none)';
 const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, className = '' }) => {
   const { highlights, isLoading, error } = useTop100Highlights(userId);
   const railRef = useRef<HTMLDivElement>(null);
+  const { registerMedia, playingIds } = useMediaAutoplay({ surface: 'grid' });
   
   // Session-wide mute persistence
   const [muted, setMuted] = useState(() => {
@@ -86,50 +95,18 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
     return null;
   };
 
-  // Intersection observer for autoplay/pause - NOT dependent on muted state
-  useEffect(() => {
-    const rail = railRef.current;
-    if (!rail || !highlights) return;
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(async (entry) => {
-        const itemEl = entry.target as HTMLElement;
-        const video = itemEl.querySelector('video') as HTMLVideoElement | null;
-        if (!video) return;
-
-        const index = Number(itemEl.dataset.index ?? -1);
-        
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.85) {
-          // Get the current mute state directly from localStorage
-          const currentMuted = JSON.parse(localStorage.getItem('journeyMuted') ?? 'true');
-          
-          // Set muted property directly on the element
-          video.muted = currentMuted;
-          video.playsInline = true;
-          
-          try {
-            await safePlay(video);
-          } catch (e) {
-            // Silently handle autoplay failures
-          }
-          
-          // Prefetch neighboring videos
-          prefetchAround(index);
-        } else {
-          // Pause when not in view
-          video.pause();
-        }
-      });
-    }, {
-      threshold: [0, 0.5, 0.85],
-      rootMargin: '0px'
+  // Toggle mute - apply to all visible videos
+  const handleMuteToggle = useCallback(() => {
+    const next = !muted;
+    setMuted(next);
+    localStorage.setItem('journeyMuted', JSON.stringify(next));
+    
+    // Immediately flip mute on the most visible video element
+    const visible = railRef.current?.querySelectorAll('video') ?? [];
+    visible.forEach(v => {
+      if (isElementMostlyInView(v)) (v as HTMLVideoElement).muted = next;
     });
-
-    // Observe all highlight items
-    rail.querySelectorAll('.highlights__item').forEach(item => observer.observe(item));
-
-    return () => observer.disconnect();
-  }, [highlights?.length, prefetchAround]); // Removed muted dependency
+  }, [muted]);
 
   if (isLoading) {
     return (
@@ -178,6 +155,8 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
         {highlights.map((highlight, index) => {
           const primaryMedia = highlight.post_media[0];
           const videoUid = primaryMedia?.media_type === 'video' ? extractVideoUid(primaryMedia.media_url) : null;
+          const mediaId = `highlight-${highlight.id}`;
+          const isPlaying = playingIds.has(mediaId);
           
           return (
             <article 
@@ -197,20 +176,15 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
                   highlight={highlight}
                   index={index}
                   onEnded={() => tryAutoAdvance(index)}
+                  mediaId={mediaId}
+                  isPlaying={isPlaying}
+                  registerMedia={registerMedia}
+                  muted={muted}
                 />
                 <button
                   className="unmute-btn"
                   aria-label={muted ? 'Unmute' : 'Mute'}
-                  onClick={() => {
-                    const next = !muted;
-                    setMuted(next);
-                    localStorage.setItem('journeyMuted', JSON.stringify(next));
-                    // Immediately flip mute on the most visible video element
-                    const visible = railRef.current?.querySelectorAll('video') ?? [];
-                    visible.forEach(v => {
-                      if (isElementMostlyInView(v)) (v as HTMLVideoElement).muted = next;
-                    });
-                  }}
+                  onClick={handleMuteToggle}
                   title={muted ? 'Unmute' : 'Mute'}
                 >
                   {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
