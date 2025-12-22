@@ -208,22 +208,10 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !isAttachedRef.current) return;
-    
+
     if (autoplay) {
-      // Only attempt to play if ready
-      if (video.readyState >= 2) {
-        safePlay(video);
-      } else {
-        // Wait for ready, then play
-        const handleCanPlay = () => {
-          video.removeEventListener('canplay', handleCanPlay);
-          if (autoplay && isAttachedRef.current) {
-            safePlay(video);
-          }
-        };
-        video.addEventListener('canplay', handleCanPlay);
-        return () => video.removeEventListener('canplay', handleCanPlay);
-      }
+      // Best-effort: let safePlay handle readiness (important on iOS where readyState may stay 0)
+      safePlay(video);
     } else {
       // Pause when autoplay becomes false
       if (!video.paused) {
@@ -280,7 +268,11 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       } catch {}
       
       // Check if native HLS supported (iOS/Safari)
-      const canPlayNatively = video.canPlayType('application/vnd.apple.mpegurl') !== '';
+      const canPlayNatively =
+        isIOS ||
+        video.canPlayType('application/vnd.apple.mpegurl') !== '' ||
+        video.canPlayType('application/vnd.apple.mpegURL') !== '' ||
+        video.canPlayType('application/x-mpegURL') !== '';
       
       if (canPlayNatively || !src.includes('.m3u8')) {
         // Native playback
