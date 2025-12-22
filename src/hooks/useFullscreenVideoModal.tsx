@@ -1,0 +1,42 @@
+import { useState, useCallback } from 'react';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
+
+interface VideoModalData {
+  src: string;
+  poster?: string;
+  user: {
+    id: string;
+    profile_photo_url?: string;
+    display_name?: string;
+    username?: string;
+  };
+  content?: string;
+}
+
+/**
+ * Hook for managing fullscreen video modal state.
+ * Pauses all playing media when modal opens.
+ */
+export const useFullscreenVideoModal = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [videoData, setVideoData] = useState<VideoModalData | null>(null);
+
+  const openModal = useCallback((data: VideoModalData) => {
+    // Pause all videos when opening modal via MediaRuntime
+    MediaRuntime.pauseAll();
+    setVideoData(data);
+    setIsOpen(true);
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setIsOpen(false);
+    setVideoData(null);
+  }, []);
+
+  return {
+    isOpen,
+    videoData,
+    openModal,
+    closeModal
+  };
+};

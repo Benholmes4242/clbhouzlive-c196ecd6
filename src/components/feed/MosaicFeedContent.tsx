@@ -6,7 +6,7 @@ import OptimisticPostCard from '../posts/OptimisticPostCard';
 import FeedVideoPlayer, { FeedVideoPlayerRef } from './FeedVideoPlayer';
 import { useNavigate } from 'react-router-dom';
 import { VideoPost, UserPostWithType } from './types';
-import { useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
+import { useFullscreenVideoModal } from '@/hooks/useFullscreenVideoModal';
 import { useMediaAutoplay } from '@/media';
 import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
 import Masonry from 'react-masonry-css';
