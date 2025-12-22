@@ -494,9 +494,10 @@ const EnhancedMediaPreviewGrid: React.FC<EnhancedMediaPreviewGridProps> = ({
               <p>Edit and crop your photo</p>
             </VisuallyHidden>
             <PhotoEditor
-              image={editingFile}
+              isOpen={!!editingFile}
+              onClose={() => setEditingFileId(null)}
+              imageFile={editingFile}
               onSave={handleEditSave}
-              onCancel={() => setEditingFileId(null)}
             />
           </DialogContent>
         </Dialog>

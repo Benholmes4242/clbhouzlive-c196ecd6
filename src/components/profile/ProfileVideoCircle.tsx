@@ -1,7 +1,8 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useId } from 'react';
 import { Play, Upload, Trash2, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
 interface ProfileVideoCircleProps {
   videoUrl?: string;
@@ -38,63 +39,52 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
   const [showVideo, setShowVideo] = useState(true); // true = show video, false = show photo
   const { toast } = useToast();
 
-  // Auto-play video once when component mounts and video is available
+  // Generate stable media ID
+  const mediaId = useId();
+
+  // User-tap-only playback - no autoplay. Register with runtime for coordination.
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !videoUrl || hasPlayed) return;
+    if (!video || !videoUrl) return;
 
-    const handleCanPlayThrough = async () => {
-      try {
-        video.muted = true; // Ensure muted for autoplay
-        video.currentTime = 0; // Start from beginning
-        await video.play();
-        setIsPlaying(true);
-        setHasPlayed(true);
-        setShowVideo(true); // Ensure video is visible when playing
-        
-        // Set up time update listener for smooth transition
-        const handleTimeUpdate = () => {
-          const currentTime = video.currentTime;
-          const duration = video.duration;
-          
-          // Start fade transition 1 second before video ends (only if profile photo exists)
-          if (profilePhotoUrl && duration && currentTime >= duration - 1 && showVideo) {
-            setShowVideo(false);
-          }
-        };
-        
-        // Set up ended listener for cleanup
-        const handleEnded = () => {
-          setIsPlaying(false);
-          video.currentTime = 0; // Reset to first frame
-          video.pause();
-          
-          // Ensure we've transitioned to photo if it exists
-          if (profilePhotoUrl) {
-            setShowVideo(false);
-          }
-        };
-        
-        video.addEventListener('timeupdate', handleTimeUpdate);
-        video.addEventListener('ended', handleEnded);
-        
-        return () => {
-          video.removeEventListener('timeupdate', handleTimeUpdate);
-          video.removeEventListener('ended', handleEnded);
-        };
-      } catch (error) {
-        console.error('Auto-play failed:', error);
-        setHasPlayed(true); // Mark as played even if failed to prevent retry
+    // Set up time update listener for smooth transition
+    const handleTimeUpdate = () => {
+      const currentTime = video.currentTime;
+      const duration = video.duration;
+      
+      // Start fade transition 1 second before video ends (only if profile photo exists)
+      if (profilePhotoUrl && duration && currentTime >= duration - 1 && showVideo) {
+        setShowVideo(false);
+      }
+    };
+    
+    // Set up ended listener for cleanup
+    const handleEnded = () => {
+      setIsPlaying(false);
+      video.currentTime = 0; // Reset to first frame
+      
+      // Ensure we've transitioned to photo if it exists
+      if (profilePhotoUrl) {
+        setShowVideo(false);
       }
     };
 
-    video.addEventListener('canplaythrough', handleCanPlayThrough);
-    video.load(); // Ensure video starts loading
-
+    // Handle play/pause state sync
+    const handlePlay = () => setIsPlaying(true);
+    const handlePause = () => setIsPlaying(false);
+    
+    video.addEventListener('timeupdate', handleTimeUpdate);
+    video.addEventListener('ended', handleEnded);
+    video.addEventListener('play', handlePlay);
+    video.addEventListener('pause', handlePause);
+    
     return () => {
-      video.removeEventListener('canplaythrough', handleCanPlayThrough);
+      video.removeEventListener('timeupdate', handleTimeUpdate);
+      video.removeEventListener('ended', handleEnded);
+      video.removeEventListener('play', handlePlay);
+      video.removeEventListener('pause', handlePause);
     };
-  }, [videoUrl, hasPlayed, profilePhotoUrl]);
+  }, [videoUrl, profilePhotoUrl, showVideo]);
 
   const handleFileSelect = () => {
     fileInputRef.current?.click();
@@ -190,17 +180,14 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
     }
   };
 
-  const replayVideo = async () => {
+  const replayVideo = () => {
     const video = videoRef.current;
     if (video && videoUrl) {
-      try {
-        video.currentTime = 0;
-        video.muted = isMuted;
-        await video.play();
-        setIsPlaying(true);
-      } catch (error) {
-        console.error('Replay failed:', error);
-      }
+      video.currentTime = 0;
+      video.muted = isMuted;
+      // Route through MediaRuntime for user-tap playback
+      MediaRuntime.requestPlay({ id: mediaId, surface: 'grid', reason: 'user' });
+      setHasPlayed(true);
     }
   };
 
