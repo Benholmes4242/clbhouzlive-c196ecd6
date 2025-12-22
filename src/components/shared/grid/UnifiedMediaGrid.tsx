@@ -33,9 +33,11 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
   const gridRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
 
-  // Set up autoplay hook - uses default 0.4/0.25 thresholds for sentinel-based observation
+  // Set up autoplay hook with configurable thresholds
   const { registerMedia, playingIds } = useMediaAutoplay({
     mode: 'grid',
+    startThreshold: config.playThreshold,
+    stopThreshold: config.pauseThreshold ? (1 - config.pauseThreshold) : undefined,
   });
 
   // Mark autoplay candidates and build layout

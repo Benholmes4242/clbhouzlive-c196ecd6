@@ -22,7 +22,8 @@ const WATCH_GRID_CONFIG: UnifiedGridConfig = {
   pageSize: 24,
   autoplayEnabled: true,
   maxAutoplay: 2,
-  visibilityThreshold: 0.6,
+  playThreshold: 0.4,      // Play when 40% visible
+  pauseThreshold: 0.6,     // Pause when 60% out of view
   surface: 'watch', // Watch surface - tap opens Shorts Player
 };
 
