@@ -53,6 +53,8 @@ interface MediaDisplayProps {
   };
   isDiscoverPage?: boolean;
   onCreatorClick?: (e: React.MouseEvent) => void;
+  // Video ref callback for media autoplay registration
+  videoRefCallback?: (el: HTMLVideoElement | null) => void;
 }
 
 const MediaDisplay: React.FC<MediaDisplayProps> = ({
@@ -76,7 +78,8 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   isAboveTheFold = false,
   user,
   isDiscoverPage = false,
-  onCreatorClick
+  onCreatorClick,
+  videoRefCallback
 }) => {
   // ✅ CRITICAL: Call ALL hooks unconditionally at the top to prevent hook order mismatch
   // Audio management: exclusive video audio hook - ensures only one video plays audio at a time
@@ -231,6 +234,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
               {...(isDiscoverPage ? discoverPreview : {})}
             >
               <EnhancedVideoPlayer
+                ref={videoRefCallback}
                 src={media.media_url}
                 poster={thumbnailUrl || undefined}
                 autoplay={true}

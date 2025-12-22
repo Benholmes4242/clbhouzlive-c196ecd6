@@ -68,14 +68,16 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
     canGoPrevious
   } = useFullscreenPostNavigation();
   
-  // Container ref callback for media registration
-  const containerRefCallback = useCallback((el: HTMLDivElement | null) => {
+  // Video ref callback for media registration - passed to MediaContainer
+  const videoRefCallback = useCallback((el: HTMLVideoElement | null) => {
     if (el) {
       const hasVideo = post.post_media?.some(m => m.media_type === 'video');
       if (hasVideo) {
-        registerMedia(el, mediaId, {
-          rect: el.getBoundingClientRect(),
-          visibilityRatio: 0,
+        registerMedia({
+          id: mediaId,
+          element: el,
+          isCandidate: true,
+          sortIndex: 0,
         });
       }
     }
@@ -179,7 +181,6 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
   
   return (
     <div 
-      ref={containerRefCallback}
       className="relative w-full bg-media-loading rounded-xl overflow-hidden"
       style={{ aspectRatio: '4/5' }}
     >
@@ -190,6 +191,7 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
         onMediaClick={() => {}} // Disable media click actions
         onSwipeLeft={handleSwipeLeft}
         onSwipeRight={handleSwipeRight}
+        videoRefCallback={videoRefCallback}
       >
         <UserInfoOverlay
           user={post.user}

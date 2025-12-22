@@ -130,20 +130,21 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
             const mediaId = `discover-trending-${video.id}`;
             const isPlaying = playingIds.has(mediaId);
             
-            // Container ref callback for media registration
-            const containerRefCallback = useCallback((el: HTMLDivElement | null) => {
+            // Video ref callback for media registration - will be passed to MediaDisplay
+            const videoRefCallback = useCallback((el: HTMLVideoElement | null) => {
               if (el) {
-                registerMedia(el, mediaId, {
-                  rect: el.getBoundingClientRect(),
-                  visibilityRatio: 0,
+                registerMedia({
+                  id: mediaId,
+                  element: el,
+                  isCandidate: true,
+                  sortIndex: actualIndex,
                 });
               }
-            }, [mediaId]);
+            }, [mediaId, actualIndex]);
             
             return (
               <div
                 key={`${video.id}-${actualIndex}`}
-                ref={containerRefCallback}
                 className="relative bg-muted overflow-hidden cursor-pointer group aspect-[1080/1350]"
                 style={{ borderRadius: '8px' }}
                 onClick={() => handleVideoClick(actualIndex)}
@@ -164,6 +165,7 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                   currentIndex={actualIndex}
                   loop={true}
                   hidePlayButton={true}
+                  videoRefCallback={videoRefCallback}
                 />
                 
                 {/* Overlay */}

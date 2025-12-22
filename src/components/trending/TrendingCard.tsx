@@ -80,19 +80,20 @@ const TrendingCard = () => {
       }
     };
 
-    // Container ref callback for media registration
-    const containerRefCallback = useCallback((el: HTMLDivElement | null) => {
+    // Video ref callback for media registration
+    const videoRefCallback = useCallback((el: HTMLVideoElement | null) => {
       if (el) {
-        registerMedia(el, mediaId, {
-          rect: el.getBoundingClientRect(),
-          visibilityRatio: 0,
+        registerMedia({
+          id: mediaId,
+          element: el,
+          isCandidate: true,
+          sortIndex: index,
         });
       }
-    }, [mediaId]);
+    }, [mediaId, index]);
     
     return (
       <div 
-        ref={containerRefCallback} 
         className="relative w-full aspect-[3/4] overflow-hidden bg-card group" 
         onClick={handleVideoClick}
       >
@@ -119,14 +120,13 @@ const TrendingCard = () => {
         {/* Single Video */}
         <div className="relative w-full h-full">
           <EnhancedVideoPlayer
+            ref={videoRefCallback}
             src={firstVideo.media_url}
             className="w-full h-full object-cover"
             autoplay={isPlaying}
             muted={true}
             loop={true}
             enableHLS={true}
-            externallyManaged={true}
-            mediaId={mediaId}
             onClick={handleVideoClick}
             onPlay={() => {}}
             onPause={() => {}}

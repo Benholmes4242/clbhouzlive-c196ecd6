@@ -1,9 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Maximize2, Play } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
 import OptimisticPostCard from '../posts/OptimisticPostCard';
-import FeedVideoPlayer from './FeedVideoPlayer';
+import FeedVideoPlayer, { FeedVideoPlayerRef } from './FeedVideoPlayer';
 import { useNavigate } from 'react-router-dom';
 import { VideoPost, UserPostWithType } from './types';
 import { useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
@@ -111,15 +111,20 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     const isPlaying = playingIds.has(mediaId);
     const shouldShowPlayIcon = hasVideo && !isPlaying;
 
-    // Container ref callback for media registration
-    const containerRef = useCallback((el: HTMLDivElement | null) => {
-      if (el && hasVideo) {
-        registerMedia(el, mediaId, {
-          rect: el.getBoundingClientRect(),
-          visibilityRatio: 0,
+    // Video ref for media registration
+    const videoPlayerRef = useRef<FeedVideoPlayerRef>(null);
+    
+    // Register video element when it becomes available
+    useEffect(() => {
+      if (hasVideo && videoPlayerRef.current?.element) {
+        registerMedia({
+          id: mediaId,
+          element: videoPlayerRef.current.element as HTMLVideoElement,
+          isCandidate: true,
+          sortIndex: index,
         });
       }
-    }, [mediaId, hasVideo]);
+    }, [hasVideo, mediaId, index, registerMedia]);
 
     // Get user info
     const username = isUserPost ? (item as UserPostWithType).user.username : (item as VideoPost).user.username;
@@ -149,7 +154,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     };
 
     return (
-      <div ref={containerRef} className="mosaic-tile group relative overflow-hidden bg-card">
+      <div className="mosaic-tile group relative overflow-hidden bg-card">
         {/* Media Container */}
         <div className={`relative w-full overflow-hidden ${aspectRatio}`} onClick={handleTileClick}>
           {hasMultipleMedia ? (
@@ -163,6 +168,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                   <div key={idx} className="flex-shrink-0 w-full h-full">
                      {mediaItem.media_type === 'video' ? (
                         <FeedVideoPlayer
+                          ref={idx === currentIndex ? videoPlayerRef : undefined}
                           src={mediaItem.media_url}
                           className="w-full h-full object-cover rounded-lg"
                          muted={true}
@@ -170,7 +176,6 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                          playsInline
                          preload={idx === currentIndex ? "metadata" : "none"}
                          onClick={handleTileClick}
-                         autoPlay={isPlaying && idx === currentIndex}
                        />
                      ) : (
                        <img
@@ -221,6 +226,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
             <div className="w-full h-full">
                {media[0]?.media_type === 'video' ? (
                  <FeedVideoPlayer
+                   ref={videoPlayerRef}
                    src={media[0].media_url}
                     className="w-full h-full object-cover rounded-lg"
                    muted={true}
@@ -228,7 +234,6 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                    playsInline
                    preload="metadata"
                    onClick={handleTileClick}
-                   autoPlay={isPlaying}
                  />
                ) : (
                  <img
