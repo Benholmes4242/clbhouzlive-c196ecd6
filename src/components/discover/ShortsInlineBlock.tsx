@@ -152,6 +152,7 @@ const ShortTile: React.FC<ShortTileProps> = ({ short, height, sortIndex, onClick
           showPlayButton={false}
           objectFit="cover"
           className="absolute inset-0 w-full h-full"
+          managedByMediaRuntime
         />
 
         {/* Gradient Overlay */}

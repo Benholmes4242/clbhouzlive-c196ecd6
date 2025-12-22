@@ -53,6 +53,7 @@ export interface HLSPlayerProps {
   externallyManaged?: boolean; // Disable internal play/pause on click
   startTime?: number; // Resume from position
   preload?: 'none' | 'metadata' | 'auto';
+  managedByMediaRuntime?: boolean; // If true, MediaRuntime controls playback; if false/undefined, handle autoplay directly
   
   // Scrubber
   showScrubber?: boolean; // Show progress scrubber (default: true if MEDIA_SCRUBBER_V1)
@@ -94,6 +95,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   externallyManaged = false,
   startTime,
   preload = 'metadata',
+  managedByMediaRuntime = false,
   showScrubber,
   mediaId,
 }, ref) => {
@@ -205,20 +207,33 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   // ============ Sync External Autoplay State ============
   // React to autoplay prop changes to play/pause video without re-initializing HLS
   
-  // Let MediaRuntime control playback - DO NOT call play() directly
-  // This effect only handles pausing when autoplay becomes false
+  // Smart autoplay: MediaRuntime-managed vs Standalone
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !isAttachedRef.current) return;
     
-    // Update muted state based on prop
+    // Update muted state
     video.muted = muted;
     
-    // Only handle pause - MediaRuntime handles play via requestPlay()
-    if (!autoplay && !video.paused) {
-      video.pause();
+    if (managedByMediaRuntime) {
+      // MediaRuntime-managed: Only handle pause, MediaRuntime calls play()
+      if (!autoplay && !video.paused) {
+        video.pause();
+      }
+      // DO NOT call play() - MediaRuntime handles it via requestPlay()
+    } else {
+      // Standalone mode: Handle autoplay directly (hero videos, modals, etc.)
+      if (autoplay && video.paused) {
+        // This is a standalone video not managed by MediaRuntime
+        // Safe to call play() directly
+        safePlay(video).catch(err => {
+          console.warn('[HLSPlayer] Standalone autoplay failed:', err);
+        });
+      } else if (!autoplay && !video.paused) {
+        video.pause();
+      }
     }
-  }, [autoplay, muted]);
+  }, [autoplay, muted, managedByMediaRuntime]);
   
   // ============ HLS Setup ============
   
