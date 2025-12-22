@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Maximize2, Play } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
@@ -6,7 +6,8 @@ import OptimisticPostCard from '../posts/OptimisticPostCard';
 import FeedVideoPlayer from './FeedVideoPlayer';
 import { useNavigate } from 'react-router-dom';
 import { VideoPost, UserPostWithType } from './types';
-import { useVideoPlaybackManager, useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
+import { useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
+import { useMediaAutoplay } from '@/media';
 import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
 import Masonry from 'react-masonry-css';
 
@@ -26,6 +27,13 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
   const [currentMediaIndex, setCurrentMediaIndex] = useState<{[key: string]: number}>({});
   const navigate = useNavigate();
   const modalManager = useFullscreenVideoModal();
+  
+  // Unified media autoplay system
+  const { registerMedia, playingIds } = useMediaAutoplay({
+    mode: 'grid',
+    startThreshold: 0.4,
+    stopThreshold: 0.35,
+  });
 
   const handlePrevMedia = (postId: string, mediaLength: number) => {
     setCurrentMediaIndex(prev => ({
@@ -88,7 +96,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     }
   };
 
-  // MediaTile Component - extracted to fix hook usage
+  // MediaTile Component - using unified media system
   const MediaTile: React.FC<{ item: VideoPost | UserPostWithType; index: number }> = ({ item, index }) => {
     const isUserPost = item.type === 'user_post';
     const media = isUserPost 
@@ -97,21 +105,26 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     const currentIndex = currentMediaIndex[item.id] || 0;
     const hasMultipleMedia = media.length > 1;
     
-    // Video playback management for feed section
+    // Check if this item has video
     const hasVideo = media.some(m => m.media_type === 'video');
-    const { videoRef, containerRef, isPlaying, shouldShowPlayIcon, togglePlayPause } = useVideoPlaybackManager({
-      section: 'feed',
-      videoId: item.id,
-      autoplayAllowed: hasVideo,
-      priority: index // Use stable index for priority
-    });
+    const mediaId = `mosaic-${item.id}`;
+    const isPlaying = playingIds.has(mediaId);
+    const shouldShowPlayIcon = hasVideo && !isPlaying;
+
+    // Container ref callback for media registration
+    const containerRef = useCallback((el: HTMLDivElement | null) => {
+      if (el && hasVideo) {
+        registerMedia(el, mediaId, {
+          rect: el.getBoundingClientRect(),
+          visibilityRatio: 0,
+        });
+      }
+    }, [mediaId, hasVideo]);
 
     // Get user info
     const username = isUserPost ? (item as UserPostWithType).user.username : (item as VideoPost).user.username;
     const displayName = isUserPost ? (item as UserPostWithType).user.display_name : (item as VideoPost).user.name;
     const caption = isUserPost ? (item as UserPostWithType).content : (item as VideoPost).content.description;
-
-    // Removed golf course tag logic
 
     // Generate three types of cards based on Pinterest style
     const cardTypes = [
@@ -135,11 +148,6 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
       handleMaximizeClick(item);
     };
 
-    const handlePlayButtonClick = (e: React.MouseEvent) => {
-      e.stopPropagation();
-      togglePlayPause();
-    };
-
     return (
       <div ref={containerRef} className="mosaic-tile group relative overflow-hidden bg-card">
         {/* Media Container */}
@@ -151,18 +159,18 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                 className="flex transition-transform duration-300 ease-out h-full"
                 style={{ transform: `translateX(-${currentIndex * 100}%)` }}
               >
-                {media.map((mediaItem, index) => (
-                  <div key={index} className="flex-shrink-0 w-full h-full">
+                {media.map((mediaItem, idx) => (
+                  <div key={idx} className="flex-shrink-0 w-full h-full">
                      {mediaItem.media_type === 'video' ? (
                         <FeedVideoPlayer
-                          ref={index === currentIndex && hasVideo ? videoRef : undefined}
                           src={mediaItem.media_url}
                           className="w-full h-full object-cover rounded-lg"
                          muted={true}
                          loop={true}
                          playsInline
-                         preload={index === currentIndex ? "metadata" : "none"}
+                         preload={idx === currentIndex ? "metadata" : "none"}
                          onClick={handleTileClick}
+                         autoPlay={isPlaying && idx === currentIndex}
                        />
                      ) : (
                        <img
@@ -196,11 +204,11 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                   
                   {/* Dots Indicator */}
                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-1 z-10">
-                    {media.map((_, index) => (
+                    {media.map((_, idx) => (
                       <div
-                        key={index}
+                        key={idx}
                         className={`w-2 h-2 rounded-full transition-colors ${
-                          index === currentIndex ? 'bg-black' : 'bg-black/40'
+                          idx === currentIndex ? 'bg-black' : 'bg-black/40'
                         }`}
                       />
                     ))}
@@ -213,7 +221,6 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
             <div className="w-full h-full">
                {media[0]?.media_type === 'video' ? (
                  <FeedVideoPlayer
-                   ref={videoRef}
                    src={media[0].media_url}
                     className="w-full h-full object-cover rounded-lg"
                    muted={true}
@@ -221,6 +228,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                    playsInline
                    preload="metadata"
                    onClick={handleTileClick}
+                   autoPlay={isPlaying}
                  />
                ) : (
                  <img
@@ -234,10 +242,10 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
           )}
           
           {/* Play button - top left (shows when video is paused) */}
-          {hasVideo && shouldShowPlayIcon && (
+          {shouldShowPlayIcon && (
             <div className="absolute top-2 left-2 z-20">
               <button 
-                onClick={handlePlayButtonClick}
+                onClick={(e) => e.stopPropagation()}
                 className="rounded-full p-2 text-white bg-black/50 hover:bg-black/70 transition-colors"
               >
                 <Play className="w-4 h-4" />

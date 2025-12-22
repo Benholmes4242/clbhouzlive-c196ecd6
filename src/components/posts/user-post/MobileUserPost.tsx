@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Heart, MessageCircle, Share, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSwipeable } from 'react-swipeable';
-import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useVideoPreloader } from '@/hooks/useVideoPreloader';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import LazyImage from '@/components/ui/lazy-image';
@@ -11,6 +10,7 @@ import PlayedAtLine from '../PlayedAtLine';
 import { UserPostData, GolfCourse } from './types';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
+import { useMediaAutoplay } from '@/media';
 
 interface MobileUserPostProps {
   post: UserPostData;
@@ -32,15 +32,31 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
   onDeletePost
 }) => {
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
-  const [debugInfo, setDebugInfo] = useState<string[]>([]);
   const [isVideoLoading, setIsVideoLoading] = useState(true);
   const { user } = useSupabaseSession();
   
-  const { ref: containerRef, isInView } = useIntersectionObserver({
-    threshold: 0.75, // Instagram-style 75% visibility
-    rootMargin: '50px'
+  // Unified media autoplay system
+  const mediaId = `mobile-${post.id}`;
+  const { registerMedia, playingIds } = useMediaAutoplay({
+    mode: 'feed',
+    startThreshold: 0.4,
+    stopThreshold: 0.35,
   });
+  
+  const isPlaying = playingIds.has(mediaId);
+
+  // Container ref callback for media registration
+  const containerRefCallback = useCallback((el: HTMLDivElement | null) => {
+    if (el) {
+      const hasVideo = post.post_media?.some(m => m.media_type === 'video');
+      if (hasVideo) {
+        registerMedia(el, mediaId, {
+          rect: el.getBoundingClientRect(),
+          visibilityRatio: 0,
+        });
+      }
+    }
+  }, [mediaId, post.post_media, registerMedia]);
 
   // Predictive preloading for smoother experience
   const allVideos = post.post_media
@@ -128,35 +144,10 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
       setIsVideoLoading(true);
     }
   }, [currentMedia?.media_url]);
-
-  useEffect(() => {
-    const now = new Date().toLocaleTimeString();
-    const debugMsg = `${now}: isInView=${isInView}, mediaType=${post.post_media?.[currentMediaIndex]?.media_type}, isHovered=${isHovered}`;
-    
-    console.log('🔍 MobileUserPost: useEffect triggered', {
-      isInView,
-      currentMediaIndex,
-      mediaType: post.post_media?.[currentMediaIndex]?.media_type,
-      postId: post.id,
-      isHovered
-    });
-    
-    setDebugInfo(prev => [...prev.slice(-4), debugMsg]); // Keep last 5 debug messages
-    
-    // For mobile, just use intersection observer for autoplay
-    if (isInView && post.post_media?.[currentMediaIndex]?.media_type === 'video') {
-      console.log('📱 MobileUserPost: Setting isHovered to true for video', post.id);
-      setIsHovered(true);
-    } else if (!isInView) {
-      console.log('📱 MobileUserPost: Setting isHovered to false (not in view)', post.id);
-      setIsHovered(false);
-    }
-    // Don't reset isHovered when still in view on mobile
-  }, [isInView, currentMediaIndex, post.post_media]);
   
   return (
     <div 
-      ref={containerRef}
+      ref={containerRefCallback}
       className="relative w-full bg-media-loading"
     >
       {/* Media Container */}
@@ -174,11 +165,13 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
             
             <EnhancedVideoPlayer
               src={currentMedia.media_url}
-              autoplay={isHovered}
+              autoplay={isPlaying}
               muted={true}
               loop={true}
               className="w-full h-full"
               enableHLS={true}
+              externallyManaged={true}
+              mediaId={mediaId}
               onPlay={() => setIsVideoLoading(false)}
               onPause={() => {}}
             />
@@ -289,21 +282,6 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
             <Share className="h-5 w-5" />
           </Button>
          </div>
-
-         {/* Debug Info Overlay - Only visible on mobile */}
-         {currentMedia.media_type === 'video' && (
-           <div className="absolute top-16 left-2 bg-black/80 text-white text-xs p-2 rounded max-w-[250px] z-30 font-mono">
-             <div className="font-bold mb-1">DEBUG INFO:</div>
-             <div>Post: {post.id.slice(-8)}</div>
-             <div>InView: {isInView ? 'YES' : 'NO'}</div>
-             <div>IsHovered: {isHovered ? 'YES' : 'NO'}</div>
-             <div>MediaType: {currentMedia.media_type}</div>
-             <div className="mt-1 text-yellow-300">Recent events:</div>
-             {debugInfo.slice(-3).map((info, idx) => (
-               <div key={idx} className="text-xs truncate">{info}</div>
-             ))}
-           </div>
-         )}
        </div>
 
       {/* Caption & Comments Area */}
