@@ -50,26 +50,18 @@ const ActivityGrid: React.FC<ActivityGridProps> = ({
   }, []);
 
   // Handle hover preview for videos on desktop
+  // NOTE: For grid hover previews, we use simple video element with autoplay
+  // attribute rather than calling .play() directly. The browser handles it.
   const handleMouseEnter = useCallback((item: ActivityGridItem) => {
     if (!supportsHover || item.type !== 'video') return;
     setHoveredId(item.id);
-    
-    const video = videoRefs.current.get(item.id);
-    if (video) {
-      video.muted = true;
-      video.play().catch(() => {});
-    }
+    // Video will autoplay via the autoPlay attribute when src is set
   }, [supportsHover]);
 
   const handleMouseLeave = useCallback((item: ActivityGridItem) => {
     if (!supportsHover) return;
     setHoveredId(null);
-    
-    const video = videoRefs.current.get(item.id);
-    if (video) {
-      video.pause();
-      video.currentTime = 0;
-    }
+    // Video will stop when src is cleared (see render logic)
   }, [supportsHover]);
 
   // Group posts by round for stacking
@@ -155,6 +147,7 @@ const ActivityGrid: React.FC<ActivityGridProps> = ({
                 muted
                 loop
                 preload="metadata"
+                autoPlay={isHovered}
               />
             ) : (
               <HighQualityImage

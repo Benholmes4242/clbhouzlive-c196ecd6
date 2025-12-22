@@ -278,40 +278,13 @@ const HLSVideoCard = forwardRef<HTMLVideoElement, HLSVideoCardProps>(({
     setAttached(false);
   }, [isNearby]);
 
-  // Intersection observer for autoplay - only when NOT externally managed
-  useEffect(() => {
-    const container = containerRef.current;
-    const video = videoRef.current;
-    if (!container || !video || externallyManaged) return;
-
-    const observer = new IntersectionObserver(
-      async (entries) => {
-        const [entry] = entries;
-        if (entry.isIntersecting) {
-          try {
-            await video.play();
-            onPlay?.();
-          } catch (error) {
-            // Autoplay failed, which is expected in some browsers
-            console.error('Autoplay failed:', error);
-          }
-        } else {
-          video.pause();
-          onPause?.();
-        }
-      },
-      { threshold: 0.5 }
-    );
-
-    observer.observe(container);
-
-    return () => {
-      observer.disconnect();
-      if (hlsInstanceRef.current) {
-        hlsInstanceRef.current.destroy();
-      }
-    };
-  }, [hlsUrl, externallyManaged, onPlay, onPause]);
+  // REMOVED: Intersection observer for autoplay
+  // Playback is now controlled by MediaRuntime via the autoplay prop.
+  // When externallyManaged=true, parent controls playback.
+  // When autoplay=true + attached, the useEffect above handles it.
+  // 
+  // This component should NOT decide when to play based on visibility.
+  // That is MediaRuntime's job via useMediaAutoplay.
 
   // Handle mute toggle
   const toggleMute = (e: React.MouseEvent) => {

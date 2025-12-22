@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { MapPin, X, Maximize2, VolumeX, Volume2 } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
-import { safePlay } from '@/utils/safePlay';
+// REMOVED: safePlay import - playback is now handled by HLSPlayer autoplay
 
 interface VideoHighlight {
   id: string;
@@ -134,33 +134,9 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId, b
     enabled: !!userId
   });
 
-  // Setup intersection observer for current video
-  useEffect(() => {
-    const currentVideo = videoRefs.current[currentIndex];
-    if (!currentVideo || videoHighlights.length === 0) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-        if (entry.isIntersecting) {
-          // Video is in view, play it
-          safePlay(currentVideo);
-        } else {
-          // Video is out of view, pause it
-          currentVideo.pause();
-        }
-      },
-      {
-        threshold: 0.5, // Trigger when 50% of video is visible
-      }
-    );
-
-    observer.observe(currentVideo);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [currentIndex, videoHighlights]);
+  // REMOVED: IntersectionObserver for autoplay
+  // Playback control is now MediaRuntime's responsibility.
+  // This component's video section has been removed anyway.
 
   // Handle swipe navigation
   const goToNext = () => {
