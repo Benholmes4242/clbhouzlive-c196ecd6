@@ -27,8 +27,8 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
   const railRef = useRef<HTMLDivElement>(null);
   const { registerMedia, playingIds } = useMediaAutoplay({ 
     mode: 'grid',
-    startThreshold: 0.4,
-    stopThreshold: 0.4,
+  startThreshold: 0.4,   // Play at 40% visible
+  stopThreshold: 0.35,   // Pause at 35% visible (provides hysteresis)
   });
   
   // Session-wide mute persistence
