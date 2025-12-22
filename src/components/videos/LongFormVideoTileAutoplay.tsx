@@ -49,68 +49,55 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
   const videoIndexRef = useRef(videoIndex);
   videoIndexRef.current = videoIndex;
 
-  // Register video with grid autoplay system
+  // Register video with grid autoplay system using useLayoutEffect for ref timing
   // Uses tileRef as observeTarget so IntersectionObserver observes the full tile, not the video element
-  // Deadline-based retry loop to handle Suspense/lazy mount timing issues (up to 1500ms)
   useEffect(() => {
     if (!registerVideo || !hasVideo) return;
 
+    // Every video is a candidate for autoplay in long-form context
     const isCandidate = true;
-    const startTime = performance.now();
-    const deadlineMs = 1500; // Realistic deadline for code-split + suspense + images
-    let rafId: number | null = null;
-    let registered = false;
 
-    const tryRegister = () => {
-      if (registered) return;
-      
+    const registerWithRef = () => {
       const videoEl = playerRef.current?.getElement();
       const tileEl = tileRef.current;
       
       if (videoEl && tileEl) {
-        registered = true;
         if (import.meta.env.DEV) {
-          const elapsed = Math.round(performance.now() - startTime);
           console.log('[LongFormTile][register]', video.id.slice(0, 8), {
             hasVideoEl: !!videoEl,
             hasTileEl: !!tileEl,
             sortIndex: videoIndexRef.current,
-            elapsedMs: elapsed,
           });
         }
         registerVideo({
           id: video.id,
           element: videoEl,
-          observeTarget: tileEl,
+          observeTarget: tileEl, // Observe the tile wrapper, not the video element
           isCandidate,
           sortIndex: videoIndexRef.current,
         });
-      } else if (performance.now() - startTime < deadlineMs) {
-        // Refs not ready, continue retrying until deadline
-        rafId = requestAnimationFrame(tryRegister);
-      } else if (import.meta.env.DEV) {
-        console.warn('[LongFormTile][register] Failed after deadline', video.id.slice(0, 8), {
-          deadline: deadlineMs,
-          hasVideoEl: !!videoEl,
-          hasTileEl: !!tileEl,
-        });
+      } else {
+        // Refs not ready, retry
+        requestAnimationFrame(registerWithRef);
       }
     };
 
-    rafId = requestAnimationFrame(tryRegister);
+    // Use requestAnimationFrame for better ref timing than setTimeout
+    const rafId = requestAnimationFrame(registerWithRef);
 
     return () => {
-      if (rafId !== null) cancelAnimationFrame(rafId);
+      cancelAnimationFrame(rafId);
       // Deregister on unmount
       registerVideo({
         id: video.id,
         element: null,
-        observeTarget: null,
+        observeTarget: null, // Explicit cleanup
         isCandidate,
         sortIndex: videoIndexRef.current,
       });
     };
     // IMPORTANT: Do NOT include videoIndex in deps - use ref instead to prevent re-registration
+    // when section order changes due to lazy loading
   }, [registerVideo, video.id, hasVideo]);
 
   const formatLikes = (count?: number): string => {

@@ -360,28 +360,6 @@ class MediaRuntimeCore {
     });
   }
   
-  /**
-   * Force a recompute after tab switch or layout change.
-   * Bypasses the UI active check and runs after a short settle delay.
-   * This is critical for tab switches where IntersectionObserver may not fire immediately.
-   */
-  requestRecompute(): void {
-    if (import.meta.env.DEV) {
-      console.log('[MediaRuntime] requestRecompute called');
-    }
-    // Wait for layout to settle, then force evaluation
-    setTimeout(() => {
-      // Clear UI freeze state to allow evaluation
-      const wasActive = this.isUIActive();
-      if (wasActive) {
-        if (import.meta.env.DEV) {
-          console.log('[MediaRuntime] requestRecompute: UI was still active, forcing clear');
-        }
-      }
-      this.evaluateBestCandidate();
-    }, 50);
-  }
-  
   private evaluateBestCandidate(): void {
     if (this.isUIActive()) return;
     

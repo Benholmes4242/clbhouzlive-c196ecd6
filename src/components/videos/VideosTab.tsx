@@ -250,17 +250,6 @@ export const VideosTab: React.FC<VideosTabProps> = ({
         className="mb-8"
       />
 
-      {/* 
-        Video sections with CONTINUOUS sortIndex across all sections.
-        This prevents gaps (0, 8, 13, 19) that distort autoplay candidate selection.
-        
-        Section order and indices:
-        - Recommended: indices 0-2 (3 videos)
-        - Trending: indices 3-4 (2 videos)
-        - Following: indices 5-7 (3 videos)
-        - Courses: indices 8-9 (2 videos)
-      */}
-      
       {/* Module 1: Recommended for you (loads immediately) */}
       <VideoSection
         title="Recommended for you"
@@ -289,7 +278,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
           className="mb-6"
           registerVideo={registerMedia}
           playingIds={playingIds}
-          startIndex={3}
+          startIndex={8}
         />
       </div>
 
@@ -305,7 +294,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
         className="mb-6"
         registerVideo={registerMedia}
         playingIds={playingIds}
-        startIndex={5}
+        startIndex={13}
       />
 
       {/* Module 4: Courses & destinations (lazy loaded) */}
@@ -321,7 +310,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
           className="mb-4"
           registerVideo={registerMedia}
           playingIds={playingIds}
-          startIndex={8}
+          startIndex={19}
         />
       </div>
     </div>
