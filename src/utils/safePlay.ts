@@ -9,6 +9,19 @@
 import { USE_SAFE_AUTOPLAY_V2 } from './featureFlags';
 import { logVideoTelemetry } from './videoTelemetry';
 
+// Dev-only logging helper
+const devLog = (message: string, ...args: any[]) => {
+  if (import.meta.env.DEV) {
+    console.log(message, ...args);
+  }
+};
+
+const devWarn = (message: string, ...args: any[]) => {
+  if (import.meta.env.DEV) {
+    console.warn(message, ...args);
+  }
+};
+
 interface SafePlayOptions {
   maxRetries?: number;
   baseDelay?: number;
@@ -34,13 +47,13 @@ export async function safePlay(
   video.playsInline = true;
   video.setAttribute('webkit-playsinline', 'true');
   
-  console.log(`[safePlay] Starting for video ${videoId}, readyState: ${video.readyState}, currentTime: ${video.currentTime}`);
+  devLog(`[safePlay] Starting for video ${videoId}, readyState: ${video.readyState}, currentTime: ${video.currentTime}`);
   
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       // If document is hidden, wait for visibility
       if (document.hidden) {
-        console.log(`[safePlay] Document hidden, waiting for visibility for video ${videoId}`);
+        devLog(`[safePlay] Document hidden, waiting for visibility for video ${videoId}`);
         await waitForVisibility();
       }
       
@@ -48,7 +61,7 @@ export async function safePlay(
       // NOTE: On iOS/Safari, readyState can stay at 0 until play() (or load()) is attempted.
       // So we treat readiness as a best-effort hint, not a hard gate.
       if (video.readyState < 2) { // HAVE_CURRENT_DATA
-        console.log(`[safePlay] Waiting for readyState >= 2 for video ${videoId}, attempt ${attempt}`);
+        devLog(`[safePlay] Waiting for readyState >= 2 for video ${videoId}, attempt ${attempt}`);
 
         // Kick off loading explicitly (helps some WebViews / iOS cases)
         try {
@@ -63,7 +76,7 @@ export async function safePlay(
         ]);
 
         if (!readyStateReached) {
-          console.warn(`[safePlay] ReadyState timeout for video ${videoId}, attempt ${attempt} (will still try play())`);
+          devWarn(`[safePlay] ReadyState timeout for video ${videoId}, attempt ${attempt} (will still try play())`);
         }
       }
       
@@ -71,23 +84,23 @@ export async function safePlay(
       if (video.currentTime === 0) {
         try { 
           video.currentTime = 0.001; 
-          console.log(`[safePlay] Applied iOS nudge for video ${videoId}`);
+          devLog(`[safePlay] Applied iOS nudge for video ${videoId}`);
         } catch {
           // Ignore errors setting currentTime
         }
       }
       
-      console.log(`[safePlay] Attempting play() for video ${videoId}, attempt ${attempt}`);
+      devLog(`[safePlay] Attempting play() for video ${videoId}, attempt ${attempt}`);
       await video.play();
-      console.log(`[safePlay] ✅ Successfully played video ${videoId} on attempt ${attempt}`);
+      devLog(`[safePlay] ✅ Successfully played video ${videoId} on attempt ${attempt}`);
       logVideoTelemetry('video_autoplay_succeeded', { videoId, attempt });
       return true;
       
     } catch (err: any) {
-      console.warn(`[safePlay] Attempt ${attempt}/${maxRetries} failed for video ${videoId}:`, err?.name || err);
+      devWarn(`[safePlay] Attempt ${attempt}/${maxRetries} failed for video ${videoId}:`, err?.name || err);
       
       if (err?.name === 'NotAllowedError' && attempt === maxRetries) {
-        console.warn(`[safePlay] 🚫 Final NotAllowedError for video ${videoId} - marking as blocked`);
+        devWarn(`[safePlay] 🚫 Final NotAllowedError for video ${videoId} - marking as blocked`);
         video.setAttribute('data-autoplay-blocked', '1');
         logVideoTelemetry('video_autoplay_blocked', { videoId, error: err?.name });
         return false;
@@ -100,7 +113,8 @@ export async function safePlay(
     }
   }
   
-  console.warn(`[safePlay] ❌ All ${maxRetries} attempts failed for video ${videoId}`);
+  // Keep error logs in production for monitoring
+  console.error(`[safePlay] ❌ All ${maxRetries} attempts failed for video ${videoId}`);
   video.setAttribute('data-autoplay-blocked', '1');
   logVideoTelemetry('video_autoplay_blocked', { videoId, reason: 'max_retries_exceeded' });
   return false;
@@ -135,7 +149,7 @@ export async function safePlayAfterAnimation(video: HTMLVideoElement): Promise<b
   if (modal) {
     const styles = getComputedStyle(modal);
     if (styles.opacity === '0' || styles.display === 'none') {
-      console.log('[safePlayAfterAnimation] Modal not yet visible, waiting...');
+      devLog('[safePlayAfterAnimation] Modal not yet visible, waiting...');
       await new Promise(resolve => setTimeout(resolve, 100));
     }
   }

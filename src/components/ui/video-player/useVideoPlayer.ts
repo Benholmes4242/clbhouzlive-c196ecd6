@@ -1,8 +1,7 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
-import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
-// REMOVED: safePlay import - playback routed through MediaRuntime
+// REMOVED: useVideoPlaybackManager - deprecated, now using MediaRuntime directly
 
 interface UseVideoPlayerProps {
   src: string;
@@ -31,7 +30,12 @@ export const useVideoPlayer = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(muted);
   const [showControls, setShowControls] = useState(false);
-  const { registerVideo, unregisterVideo, setActiveAudioVideo, muteAllOtherVideos } = useVideoPlaybackManager();
+  
+  // No-op stubs for deprecated VideoPlaybackManager functions
+  const registerVideo = useCallback((_id: string, _el: HTMLVideoElement) => {}, []);
+  const unregisterVideo = useCallback((_id: string) => {}, []);
+  const setActiveAudioVideo = useCallback((_id: string | null) => {}, []);
+  const muteAllOtherVideos = useCallback((_id: string) => {}, []);
   
   // Generate unique video ID for this player instance
   const videoId = useRef(`video-${src.split('/').pop()?.split('.')[0] || 'unknown'}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
