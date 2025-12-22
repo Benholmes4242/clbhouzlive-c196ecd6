@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Play, Pause, Maximize2 } from 'lucide-react';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
+import { safePlay } from '@/utils/safePlay';
 
 interface KeyframePlayerProps {
   videoUrl: string;
@@ -33,7 +34,8 @@ export const KeyframePlayer: React.FC<KeyframePlayerProps> = ({
       if (isPlaying) {
         videoRef.current.pause();
       } else {
-        videoRef.current.play();
+        // PLAYBACK_AUTHORITY_ALLOWED: User-tap on swing review player uses safePlay
+        safePlay(videoRef.current);
       }
       setIsPlaying(!isPlaying);
     }

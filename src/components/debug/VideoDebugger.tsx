@@ -53,6 +53,7 @@ const VideoDebugger: React.FC<VideoDebuggerProps> = ({ src, videoId }) => {
       // Try to load the video
       video.load();
       
+      // PLAYBACK_AUTHORITY_ALLOWED: Debug tool for testing raw playback behavior
       // Try to play after a short delay
       setTimeout(async () => {
         try {

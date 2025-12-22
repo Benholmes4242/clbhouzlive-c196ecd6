@@ -81,12 +81,7 @@ export default function CarouselSlide({ item, index = 0, isActive, onVideoRef, o
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
-  const handleVideoPlay = () => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = 0; // Start from beginning when playing
-      videoRef.current.play();
-    }
-  };
+  // NOTE: handleVideoPlay removed - video element is hidden and used only for metadata extraction
 
   // Generate video thumbnail
   const generateThumbnail = async (videoElement: HTMLVideoElement): Promise<string> => {

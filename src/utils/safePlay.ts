@@ -1,6 +1,9 @@
 /**
  * Safe video play utility with mobile-optimized autoplay handling
  * Handles readyState gating, iOS black frame fix, retry logic, and visibility handling
+ * 
+ * PLAYBACK_AUTHORITY_ALLOWED: This is the core safe playback utility used by MediaRuntime.
+ * All playback in the app should go through safePlay or MediaRuntime.requestPlay.
  */
 
 import { USE_SAFE_AUTOPLAY_V2 } from './featureFlags';
