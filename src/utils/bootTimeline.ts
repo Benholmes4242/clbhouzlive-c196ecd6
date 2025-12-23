@@ -66,7 +66,7 @@ export function logBootEvent(
   if (options.once && firedOnce.has(event)) return;
   if (options.once) firedOnce.add(event);
   
-  const now = performance.now();
+  const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
   const elapsed = now - APP_START_TIME;
   
   const entry: BootEvent = {
