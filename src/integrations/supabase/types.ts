@@ -2380,6 +2380,201 @@ export type Database = {
         }
         Relationships: []
       }
+      explore_course_themes: {
+        Row: {
+          course_id: string
+          created_at: string
+          id: string
+          theme_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          id?: string
+          theme_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          id?: string
+          theme_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "explore_course_themes_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "explore_course_themes_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: false
+            referencedRelation: "explore_themes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "explore_course_themes_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: false
+            referencedRelation: "vw_theme_activity_30d"
+            referencedColumns: ["theme_id"]
+          },
+        ]
+      }
+      explore_featured_courses: {
+        Row: {
+          active: boolean
+          card_media_url: string
+          card_type: string
+          course_id: string
+          created_at: string
+          id: string
+          play_url: string | null
+          sort_order: number
+          source_label: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          card_media_url: string
+          card_type?: string
+          course_id: string
+          created_at?: string
+          id?: string
+          play_url?: string | null
+          sort_order?: number
+          source_label: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          card_media_url?: string
+          card_type?: string
+          course_id?: string
+          created_at?: string
+          id?: string
+          play_url?: string | null
+          sort_order?: number
+          source_label?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "explore_featured_courses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      explore_region_members: {
+        Row: {
+          country: string
+          created_at: string
+          id: string
+          region_id: string
+          sub_country: string | null
+        }
+        Insert: {
+          country: string
+          created_at?: string
+          id?: string
+          region_id: string
+          sub_country?: string | null
+        }
+        Update: {
+          country?: string
+          created_at?: string
+          id?: string
+          region_id?: string
+          sub_country?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "explore_region_members_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "explore_regions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "explore_region_members_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "vw_region_activity_30d"
+            referencedColumns: ["region_id"]
+          },
+        ]
+      }
+      explore_regions: {
+        Row: {
+          created_at: string
+          hero_image_url: string | null
+          id: string
+          slug: string
+          sort_order: number
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          hero_image_url?: string | null
+          id?: string
+          slug: string
+          sort_order?: number
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          hero_image_url?: string | null
+          id?: string
+          slug?: string
+          sort_order?: number
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      explore_themes: {
+        Row: {
+          created_at: string
+          icon: string | null
+          id: string
+          slug: string
+          sort_order: number
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          slug: string
+          sort_order?: number
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          slug?: string
+          sort_order?: number
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       game_join_requests: {
         Row: {
           created_at: string
@@ -6586,6 +6781,43 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      vw_course_activity_30d: {
+        Row: {
+          course_id: string | null
+          last_moment_at: string | null
+          moments_30d: number | null
+          moments_7d: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vw_region_activity_30d: {
+        Row: {
+          moments_30d: number | null
+          moments_7d: number | null
+          region_id: string | null
+          slug: string | null
+          title: string | null
+        }
+        Relationships: []
+      }
+      vw_theme_activity_30d: {
+        Row: {
+          moments_30d: number | null
+          moments_7d: number | null
+          slug: string | null
+          theme_id: string | null
+          title: string | null
+        }
+        Relationships: []
       }
     }
     Functions: {

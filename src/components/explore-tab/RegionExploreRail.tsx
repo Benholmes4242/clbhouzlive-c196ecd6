@@ -2,46 +2,21 @@ import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
-
-interface Region {
-  id: string;
-  name: string;
-  hoverCopy?: string;
-  imageUrl?: string;
-  courseCount?: number;
-}
-
-const REGIONS: Region[] = [
-  { 
-    id: 'uk-ireland', 
-    name: 'UK & Ireland', 
-    hoverCopy: 'Timeless links and legendary fairways',
-    courseCount: 42 
-  },
-  { 
-    id: 'continental-europe', 
-    name: 'Continental Europe', 
-    hoverCopy: 'Drama, elevation, unforgettable settings',
-    courseCount: 28 
-  },
-  { 
-    id: 'usa', 
-    name: 'USA', 
-    hoverCopy: 'Championship courses across every landscape',
-    courseCount: 45 
-  },
-  { 
-    id: 'rest-of-world', 
-    name: 'Rest of the World', 
-    hoverCopy: 'Hidden gems waiting to be discovered',
-    courseCount: 31 
-  },
-];
+import { useNavigate } from 'react-router-dom';
+import { useExploreRegions, ExploreRegion } from '@/hooks/useExploreData';
 
 interface RegionExploreRailProps {
   className?: string;
   onRegionClick?: (regionId: string) => void;
 }
+
+// Gradient colors for regions
+const REGION_GRADIENTS: Record<string, string> = {
+  'uk-ireland': "bg-gradient-to-br from-slate-700 via-emerald-800 to-slate-900",
+  'continental-europe': "bg-gradient-to-br from-amber-800 via-slate-700 to-slate-900",
+  'usa': "bg-gradient-to-br from-blue-800 via-slate-700 to-slate-900",
+  'rest-of-world': "bg-gradient-to-br from-teal-800 via-slate-700 to-slate-900",
+};
 
 /**
  * RegionExploreRail - Explore by Region
@@ -55,7 +30,34 @@ export const RegionExploreRail: React.FC<RegionExploreRailProps> = ({
   className,
   onRegionClick,
 }) => {
+  const navigate = useNavigate();
+  const { data: regions, isLoading } = useExploreRegions();
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
+
+  const handleRegionClick = (region: ExploreRegion) => {
+    if (onRegionClick) {
+      onRegionClick(region.id);
+    }
+    navigate(`/discover/explore/region/${region.slug}`);
+  };
+
+  if (isLoading) {
+    return (
+      <div className={cn("py-6", className)}>
+        <div className="px-5 mb-4">
+          <div className="h-6 w-40 bg-muted animate-pulse rounded" />
+          <div className="h-4 w-64 bg-muted animate-pulse rounded mt-2" />
+        </div>
+        <div className="flex gap-3 overflow-x-auto px-5 pb-2">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="flex-shrink-0 w-44 aspect-[4/3] rounded-xl bg-muted animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (!regions?.length) return null;
 
   return (
     <motion.div
@@ -75,23 +77,28 @@ export const RegionExploreRail: React.FC<RegionExploreRailProps> = ({
       {/* Horizontal scroll rail */}
       <div className="relative">
         <div className="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-hide snap-x snap-mandatory">
-          {REGIONS.map((region) => (
+          {regions.map((region) => (
             <button
               key={region.id}
-              onClick={() => onRegionClick?.(region.id)}
+              onClick={() => handleRegionClick(region)}
               onMouseEnter={() => setHoveredRegion(region.id)}
               onMouseLeave={() => setHoveredRegion(null)}
               className="flex-shrink-0 snap-start group"
             >
               <div className="relative w-44 md:w-56 aspect-[4/3] rounded-xl overflow-hidden">
-                {/* Placeholder gradient - replace with actual imagery */}
-                <div className={cn(
-                  "absolute inset-0",
-                  region.id === 'uk-ireland' && "bg-gradient-to-br from-slate-700 via-emerald-800 to-slate-900",
-                  region.id === 'continental-europe' && "bg-gradient-to-br from-amber-800 via-slate-700 to-slate-900",
-                  region.id === 'usa' && "bg-gradient-to-br from-blue-800 via-slate-700 to-slate-900",
-                  region.id === 'rest-of-world' && "bg-gradient-to-br from-teal-800 via-slate-700 to-slate-900",
-                )} />
+                {/* Background - use hero_image_url or gradient */}
+                {region.hero_image_url ? (
+                  <img 
+                    src={region.hero_image_url} 
+                    alt={region.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className={cn(
+                    "absolute inset-0",
+                    REGION_GRADIENTS[region.slug] || "bg-gradient-to-br from-slate-700 to-slate-900"
+                  )} />
+                )}
                 
                 {/* Overlay for hover effect */}
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-200" />
@@ -101,16 +108,23 @@ export const RegionExploreRail: React.FC<RegionExploreRailProps> = ({
                 
                 {/* Content */}
                 <div className="absolute inset-0 flex flex-col justify-end p-4">
-                  <h4 className="text-base font-medium text-white">{region.name}</h4>
+                  <h4 className="text-base font-medium text-white">{region.title}</h4>
                   
-                  {/* Hover micro-copy - only shows on hover/tap */}
-                  {region.hoverCopy && (
+                  {/* Hover micro-copy */}
+                  {region.subtitle && (
                     <p className={cn(
                       "mt-1 text-xs text-white/70 font-light transition-all duration-200",
                       hoveredRegion === region.id ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
                     )}>
-                      {region.hoverCopy}
+                      {region.subtitle}
                     </p>
+                  )}
+                  
+                  {/* Activity indicator */}
+                  {(region.moments_7d ?? 0) > 0 && (
+                    <div className="mt-2 text-xs text-white/50">
+                      {region.moments_7d} moments this week
+                    </div>
                   )}
                 </div>
                 
