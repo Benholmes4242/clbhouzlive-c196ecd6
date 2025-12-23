@@ -19,6 +19,22 @@
  * - FIRST_VIDEO_PLAYING: First frame visible / playback started
  */
 
+// ============ Boot Timeline module proof ============
+if (typeof window !== 'undefined') {
+  console.log('[BootTimeline] module executed', window.location.href);
+} else {
+  console.log('[BootTimeline] module executed');
+}
+
+// ============ Time Source ============
+const CLOCK_NOW = () =>
+  typeof performance !== 'undefined' && typeof performance.now === 'function'
+    ? performance.now()
+    : Date.now();
+
+// Store the app start time immediately (same clock as events)
+const APP_START_TIME = CLOCK_NOW();
+
 // ============ Configuration ============
 
 const BOOT_TIMELINE_ENABLED = () => {
@@ -26,28 +42,41 @@ const BOOT_TIMELINE_ENABLED = () => {
   return localStorage.getItem('BOOT_TIMELINE') === 'true';
 };
 
-// Store the app start time immediately
-const APP_START_TIME = typeof performance !== 'undefined' ? performance.now() : Date.now();
-
 // ============ Types ============
 
 interface BootEvent {
   event: string;
-  timestamp: number;       // ms since page load
-  absoluteTime: number;    // Date.now()
-  metadata?: Record<string, unknown>;
+  timestamp: number; // ms since page load (same clock as APP_START_TIME)
+  absoluteTime: number; // Date.now()
+  metadata?: Record<string, any>;
 }
 
-interface BootTimeline {
+interface BootTimelineState {
   events: BootEvent[];
   startTime: number;
 }
 
+// ============ Public API (attach early) ============
+
+export const bootTimeline = {
+  enable: enableBootTimeline,
+  disable: disableBootTimeline,
+  getTimeline: getBootTimeline,
+  printSummary: printBootSummary,
+  isEnabled: BOOT_TIMELINE_ENABLED,
+  log: logBootEvent,
+};
+
+if (typeof window !== 'undefined') {
+  (window as any).bootTimeline = bootTimeline;
+  console.log('[BootTimeline] attached', !!(window as any).bootTimeline);
+}
+
 // ============ State ============
 
-const timeline: BootTimeline = {
+const timeline: BootTimelineState = {
   events: [],
-  startTime: APP_START_TIME
+  startTime: APP_START_TIME,
 };
 
 // Track one-time events
@@ -57,27 +86,27 @@ const firedOnce = new Set<string>();
 
 export function logBootEvent(
   event: string,
-  metadata?: Record<string, unknown>,
+  metadata?: Record<string, any>,
   options: { once?: boolean } = {}
 ) {
   if (!BOOT_TIMELINE_ENABLED()) return;
-  
+
   // Skip if "once" event already fired
   if (options.once && firedOnce.has(event)) return;
   if (options.once) firedOnce.add(event);
-  
-  const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+
+  const now = CLOCK_NOW();
   const elapsed = now - APP_START_TIME;
-  
+
   const entry: BootEvent = {
     event,
     timestamp: elapsed,
     absoluteTime: Date.now(),
-    metadata
+    metadata,
   };
-  
+
   timeline.events.push(entry);
-  
+
   // Console output with distinctive styling
   const style = getEventStyle(event);
   console.log(
@@ -92,10 +121,14 @@ export function logBootEvent(
 // ============ Convenience Functions ============
 
 export function logAppStart() {
-  logBootEvent('APP_START', { 
-    userAgent: navigator.userAgent.substring(0, 100),
-    connectionType: (navigator as any).connection?.effectiveType || 'unknown'
-  }, { once: true });
+  logBootEvent(
+    'APP_START',
+    {
+      userAgent: navigator.userAgent.substring(0, 100),
+      connectionType: (navigator as any).connection?.effectiveType || 'unknown',
+    },
+    { once: true }
+  );
 }
 
 export function logSessionStart() {
@@ -103,10 +136,14 @@ export function logSessionStart() {
 }
 
 export function logSessionReady(userId?: string) {
-  logBootEvent('SESSION_READY', { 
-    userId: userId?.substring(0, 8),
-    hasUser: !!userId 
-  }, { once: true });
+  logBootEvent(
+    'SESSION_READY',
+    {
+      userId: userId?.substring(0, 8),
+      hasUser: !!userId,
+    },
+    { once: true }
+  );
 }
 
 export function logSessionNone() {
@@ -114,9 +151,13 @@ export function logSessionNone() {
 }
 
 export function logRouteClubhouse() {
-  logBootEvent('ROUTE_CLUBHOUSE', { 
-    path: window.location.pathname 
-  }, { once: true });
+  logBootEvent(
+    'ROUTE_CLUBHOUSE',
+    {
+      path: window.location.pathname,
+    },
+    { once: true }
+  );
 }
 
 export function logOrangeLoaderShow() {
@@ -140,68 +181,99 @@ export function logFeedFetchStart() {
 }
 
 export function logFeedFetchSuccess(postCount: number) {
-  logBootEvent('FEED_FETCH_SUCCESS', { 
-    postCount,
-    timestamp: performance.now() 
-  }, { once: true });
+  logBootEvent(
+    'FEED_FETCH_SUCCESS',
+    {
+      postCount,
+      timestamp: CLOCK_NOW(),
+    },
+    { once: true }
+  );
 }
 
 export function logFirstCardRender(postId: string) {
-  logBootEvent('FIRST_CARD_RENDER', { 
-    postId: postId.substring(0, 8) 
-  }, { once: true });
+  logBootEvent(
+    'FIRST_CARD_RENDER',
+    {
+      postId: postId.substring(0, 8),
+    },
+    { once: true }
+  );
 }
 
 export function logFirstMediaPosterLoaded(postId: string) {
-  logBootEvent('FIRST_MEDIA_POSTER_LOADED', { 
-    postId: postId.substring(0, 8) 
-  }, { once: true });
+  logBootEvent(
+    'FIRST_MEDIA_POSTER_LOADED',
+    {
+      postId: postId.substring(0, 8),
+    },
+    { once: true }
+  );
 }
 
 export function logFirstVideoMounted(postId: string, src?: string) {
-  logBootEvent('FIRST_VIDEO_MOUNTED', { 
-    postId: postId.substring(0, 8),
-    hasSrc: !!src
-  }, { once: true });
+  logBootEvent(
+    'FIRST_VIDEO_MOUNTED',
+    {
+      postId: postId.substring(0, 8),
+      hasSrc: !!src,
+    },
+    { once: true }
+  );
 }
 
 export function logFirstVideoCanplay(postId: string) {
-  logBootEvent('FIRST_VIDEO_CANPLAY', { 
-    postId: postId.substring(0, 8) 
-  }, { once: true });
+  logBootEvent(
+    'FIRST_VIDEO_CANPLAY',
+    {
+      postId: postId.substring(0, 8),
+    },
+    { once: true }
+  );
 }
 
 export function logFirstVideoPlaying(postId: string) {
-  logBootEvent('FIRST_VIDEO_PLAYING', { 
-    postId: postId.substring(0, 8) 
-  }, { once: true });
+  logBootEvent(
+    'FIRST_VIDEO_PLAYING',
+    {
+      postId: postId.substring(0, 8),
+    },
+    { once: true }
+  );
 }
 
 export function logFirstVideoLoadedData(postId: string) {
-  logBootEvent('FIRST_VIDEO_LOADEDDATA', { 
-    postId: postId.substring(0, 8) 
-  }, { once: true });
+  logBootEvent(
+    'FIRST_VIDEO_LOADEDDATA',
+    {
+      postId: postId.substring(0, 8),
+    },
+    { once: true }
+  );
 }
 
 // ============ Summary & Analysis ============
 
-export function getBootTimeline(): BootTimeline {
+export function getBootTimeline(): BootTimelineState {
   return { ...timeline };
 }
 
 export function printBootSummary() {
   if (!BOOT_TIMELINE_ENABLED()) return;
-  
+
   const events = timeline.events;
   if (events.length === 0) {
     console.log('%c[BOOT] No events recorded', 'color: #888');
     return;
   }
-  
+
   console.log('%c\n═══════════════════════════════════════════════════════════', 'color: #f7931e');
-  console.log('%c                    BOOT TIMELINE SUMMARY                    ', 'color: #f7931e; font-weight: bold');
+  console.log(
+    '%c                    BOOT TIMELINE SUMMARY                    ',
+    'color: #f7931e; font-weight: bold'
+  );
   console.log('%c═══════════════════════════════════════════════════════════\n', 'color: #f7931e');
-  
+
   // Key milestones
   const milestones = [
     { from: 'APP_START', to: 'SESSION_READY', label: 'Session Resolution' },
@@ -214,34 +286,42 @@ export function printBootSummary() {
     { from: 'FIRST_VIDEO_MOUNTED', to: 'FIRST_VIDEO_PLAYING', label: 'Mount → Playing' },
     { from: 'APP_START', to: 'FIRST_VIDEO_PLAYING', label: '🎯 TOTAL: Start → First Frame' },
   ];
-  
-  const getEvent = (name: string) => events.find(e => e.event === name);
-  
+
+  const getEvent = (name: string) => events.find((e) => e.event === name);
+
   console.log('%cKey Timing Breakdowns:', 'color: #fff; font-weight: bold');
   console.log('');
-  
-  milestones.forEach(m => {
+
+  milestones.forEach((m) => {
     const fromEvent = getEvent(m.from);
     const toEvent = getEvent(m.to);
-    
+
     if (fromEvent && toEvent) {
       const duration = toEvent.timestamp - fromEvent.timestamp;
-      const style = duration > 1000 ? 'color: #ff6b6b' : 
-                    duration > 500 ? 'color: #ffa726' : 'color: #66bb6a';
-      console.log(`  %c${m.label.padEnd(30)} %c${duration.toFixed(0)}ms`, 'color: #aaa', style);
+      const style =
+        duration > 1000
+          ? 'color: #ff6b6b'
+          : duration > 500
+            ? 'color: #ffa726'
+            : 'color: #66bb6a';
+      console.log(
+        `  %c${m.label.padEnd(30)} %c${duration.toFixed(0)}ms`,
+        'color: #aaa',
+        style
+      );
     } else {
       console.log(`  %c${m.label.padEnd(30)} %c--`, 'color: #aaa', 'color: #666');
     }
   });
-  
+
   console.log('');
   console.log('%cFull Event Timeline:', 'color: #fff; font-weight: bold');
   console.log('');
-  
-  events.forEach(e => {
+
+  events.forEach((e) => {
     console.log(`  %c${formatTime(e.timestamp)} %c${e.event}`, 'color: #888', 'color: #fff');
   });
-  
+
   console.log('%c\n═══════════════════════════════════════════════════════════\n', 'color: #f7931e');
 }
 
@@ -271,7 +351,10 @@ function getEventStyle(event: string): string {
 
 export function enableBootTimeline() {
   localStorage.setItem('BOOT_TIMELINE', 'true');
-  console.log('%c[BOOT] Boot timeline enabled. Reload page to capture events.', 'color: #66bb6a; font-weight: bold');
+  console.log(
+    '%c[BOOT] Boot timeline enabled. Reload page to capture events.',
+    'color: #66bb6a; font-weight: bold'
+  );
 }
 
 export function disableBootTimeline() {
@@ -279,13 +362,3 @@ export function disableBootTimeline() {
   console.log('%c[BOOT] Boot timeline disabled.', 'color: #888');
 }
 
-// Expose to window for console access
-if (typeof window !== 'undefined') {
-  (window as any).bootTimeline = {
-    enable: enableBootTimeline,
-    disable: disableBootTimeline,
-    getTimeline: getBootTimeline,
-    printSummary: printBootSummary,
-    isEnabled: BOOT_TIMELINE_ENABLED
-  };
-}
