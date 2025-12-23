@@ -370,12 +370,12 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     if (!filteredPosts.length) return;
     if (!onReady) return;
     
-    // Wait for video to actually start playing (~3.5s after data ready based on logs)
+    // Wait for video to actually start playing
     const timer = setTimeout(() => {
       console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] READY_CALLBACK`);
       hasCalledOnReady.current = true;
       onReady();
-    }, 3500);
+    }, 1500);
     
     return () => clearTimeout(timer);
   }, [filteredPosts.length, onReady]);
