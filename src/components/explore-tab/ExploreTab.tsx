@@ -219,11 +219,8 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
 
   return (
     <div className={cn("min-h-screen", className)}>
-      {/* Sticky Command Center: Search + Sort + Pills */}
-      <div 
-        ref={searchContainerRef}
-        className="sticky top-0 z-40 bg-background"
-      >
+      {/* Command Center: Search + Sort + Pills */}
+      <div ref={searchContainerRef} className="relative">
         <DiscoverCommandCenter
           searchPlaceholder="Search courses, regions..."
           searchValue={searchQuery}
