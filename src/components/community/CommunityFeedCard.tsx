@@ -97,7 +97,7 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
     <div
       ref={tileRef}
       className={cn(
-        "group cursor-pointer bg-card overflow-hidden",
+        "group cursor-pointer bg-card border border-border/30 overflow-hidden",
         className
       )}
       onClick={handleCardClick}
