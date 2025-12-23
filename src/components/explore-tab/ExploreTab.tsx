@@ -1,12 +1,14 @@
 import React, { useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { Compass, Heart } from 'lucide-react';
 import ExploreHero from './ExploreHero';
 import Top100JourneySummary from './Top100JourneySummary';
 import RegionExploreRail from './RegionExploreRail';
 import ThemeExploreRail from './ThemeExploreRail';
 import CourseDiscoveryFeed from './CourseDiscoveryFeed';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
+import { useTrendingCourses, useExploreRegions } from '@/hooks/useExploreData';
 
 interface ExploreTabProps {
   onMediaClick?: (item: any) => void;
@@ -40,6 +42,10 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
     return (saved as SortOption) || 'newest';
   });
 
+  // Data hooks
+  const { data: trendingCourses } = useTrendingCourses(20);
+  const { data: regions } = useExploreRegions();
+
   const handleSortChange = useCallback((sort: SortOption) => {
     setSortOption(sort);
     localStorage.setItem(EXPLORE_SORT_KEY, sort);
@@ -68,17 +74,123 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
     navigate('/top100');
   };
 
-  const handleRegionClick = (regionId: string) => {
-    console.log('Region clicked:', regionId);
-  };
-
-  const handleThemeClick = (themeId: string) => {
-    console.log('Theme clicked:', themeId);
-  };
-
   const handleItemClick = (item: any) => {
-    console.log('Course content clicked:', item);
     onMediaClick?.(item);
+  };
+
+  // Render content based on active filter
+  const renderContent = () => {
+    switch (activeFilter) {
+      case 'courses':
+        return (
+          <div className="py-6">
+            <div className="px-5 mb-4">
+              <h3 className="text-lg font-serif text-foreground">All Courses</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Discover courses from around the world
+              </p>
+            </div>
+            <div className="px-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              {(trendingCourses || []).map(course => (
+                <button
+                  key={course.id}
+                  onClick={() => navigate(`/courses/${course.id}`)}
+                  className="text-left group"
+                >
+                  <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-surface-alt">
+                    {course.thumbnail_image ? (
+                      <img 
+                        src={course.thumbnail_image} 
+                        alt={course.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-emerald-800/50 via-slate-700/50 to-slate-900/50" />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                    {course.global_rank && (
+                      <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/60 rounded-full text-xs text-white font-medium">
+                        #{course.global_rank}
+                      </div>
+                    )}
+                    <div className="absolute bottom-0 left-0 right-0 p-3">
+                      <h4 className="text-sm font-medium text-white line-clamp-2">{course.name}</h4>
+                      <p className="text-xs text-white/60 mt-0.5 line-clamp-1">
+                        {course.sub_country || course.country}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'regions':
+        return (
+          <div className="py-6">
+            <div className="px-5 mb-4">
+              <h3 className="text-lg font-serif text-foreground">All Regions</h3>
+            </div>
+            <div className="px-5 grid grid-cols-2 gap-3">
+              {(regions || []).map(region => (
+                <button
+                  key={region.id}
+                  onClick={() => navigate(`/discover/explore/region/${region.slug}`)}
+                  className="text-left group"
+                >
+                  <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gradient-to-br from-emerald-800 via-slate-700 to-slate-900">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4">
+                      <h4 className="text-base font-medium text-white">{region.title}</h4>
+                      {region.subtitle && (
+                        <p className="mt-1 text-xs text-white/70">{region.subtitle}</p>
+                      )}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'bucket-list':
+        return (
+          <div className="px-5 py-16 text-center">
+            <div className="max-w-sm mx-auto">
+              <div className="w-16 h-16 mx-auto rounded-full bg-surface-alt/60 flex items-center justify-center mb-6">
+                <Heart className="w-8 h-8 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-serif text-foreground">No bucket list courses yet</h3>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                Save courses from Explore to build your list.
+              </p>
+              <button
+                onClick={() => setActiveFilter('courses')}
+                className="mt-6 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium"
+              >
+                Browse courses
+              </button>
+            </div>
+          </div>
+        );
+
+      default: // 'all'
+        return (
+          <>
+            <ExploreHero onExploreClick={handleExploreClick} />
+            <Top100JourneySummary
+              onStartJourney={handleStartJourney}
+              onContinueJourney={handleContinueJourney}
+            />
+            <div className="h-px bg-border/40 mx-5" />
+            <RegionExploreRail />
+            <ThemeExploreRail />
+            <div className="h-px bg-border/40 mx-5" />
+            <CourseDiscoveryFeed onItemClick={handleItemClick} />
+          </>
+        );
+    }
   };
 
   return (
@@ -94,29 +206,7 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
         onPillSelect={handleFilterChange}
       />
 
-      {/* Hero Section - Sets aspirational tone */}
-      <ExploreHero onExploreClick={handleExploreClick} />
-      
-      {/* Top 100 Journey Summary - Anchor to long-term goal */}
-      <Top100JourneySummary
-        onStartJourney={handleStartJourney}
-        onContinueJourney={handleContinueJourney}
-      />
-      
-      {/* Divider */}
-      <div className="h-px bg-border/40 mx-5" />
-      
-      {/* Explore by Region */}
-      <RegionExploreRail onRegionClick={handleRegionClick} />
-      
-      {/* Explore by Theme */}
-      <ThemeExploreRail onThemeClick={handleThemeClick} />
-      
-      {/* Divider */}
-      <div className="h-px bg-border/40 mx-5" />
-      
-      {/* Course-Led Discovery Feed */}
-      <CourseDiscoveryFeed onItemClick={handleItemClick} />
+      {renderContent()}
       
       {/* Bottom spacing */}
       <div className="h-8" />
