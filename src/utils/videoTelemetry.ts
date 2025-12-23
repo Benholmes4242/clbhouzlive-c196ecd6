@@ -1,6 +1,7 @@
 /**
  * Minimal telemetry for video autoplay analytics
  */
+import { DEBUG_MEDIA } from '@/media/debug';
 
 interface VideoTelemetryEvent {
   event: string;
@@ -28,7 +29,9 @@ export function logVideoTelemetry(eventName: string, additionalData?: Record<str
     ...additionalData
   };
 
-  console.log(`[VideoTelemetry] ${eventName}:`, event);
+  if (DEBUG_MEDIA) {
+    console.log(`[VideoTelemetry] ${eventName}:`, event);
+  }
   
   // Reset session events after 30 seconds to allow re-logging
   setTimeout(() => sessionEvents.delete(eventName), 30000);

@@ -20,10 +20,10 @@ import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
 // ============ Debug Logging ============
-const DEBUG_VIDEO_LIFECYCLE = true; // Toggle for verbose logging
+import { DEBUG_HLS_PLAYER } from '@/media/debug';
 const getTimestamp = () => performance.now().toFixed(2);
 const logDebug = (event: string, data?: any) => {
-  if (DEBUG_VIDEO_LIFECYCLE && import.meta.env.DEV) {
+  if (DEBUG_HLS_PLAYER) {
     console.log(`[${getTimestamp()}ms] [HLSPlayer] ${event}`, data || '');
   }
 };

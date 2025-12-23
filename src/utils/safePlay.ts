@@ -8,16 +8,17 @@
 
 import { USE_SAFE_AUTOPLAY_V2 } from './featureFlags';
 import { logVideoTelemetry } from './videoTelemetry';
+import { DEBUG_SAFE_PLAY } from '@/media/debug';
 
-// Dev-only logging helper
+// Dev-only logging helper (controlled by DEBUG_SAFE_PLAY flag)
 const devLog = (message: string, ...args: any[]) => {
-  if (import.meta.env.DEV) {
+  if (DEBUG_SAFE_PLAY) {
     console.log(message, ...args);
   }
 };
 
 const devWarn = (message: string, ...args: any[]) => {
-  if (import.meta.env.DEV) {
+  if (DEBUG_SAFE_PLAY) {
     console.warn(message, ...args);
   }
 };

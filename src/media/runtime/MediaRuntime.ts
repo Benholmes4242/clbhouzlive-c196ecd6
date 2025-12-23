@@ -12,6 +12,7 @@
  */
 
 import { safePlay } from '@/utils/safePlay';
+import { DEBUG_MEDIA_RUNTIME, DEBUG_MEDIA_TELEMETRY } from '@/media/debug';
 
 // ============ Types ============
 
@@ -147,7 +148,7 @@ class MediaRuntimeCore {
     // Tag element for callbacks
     element.dataset.runtimeMediaId = id;
     
-    if (import.meta.env.DEV) {
+    if (DEBUG_MEDIA_RUNTIME) {
       console.log('[MediaRuntime] Registered:', id.slice(0, 8), surface);
     }
   }
@@ -172,7 +173,7 @@ class MediaRuntimeCore {
       
       this.registry.delete(id);
       
-      if (import.meta.env.DEV) {
+      if (DEBUG_MEDIA_RUNTIME) {
         console.log('[MediaRuntime] Unregistered:', id.slice(0, 8));
       }
     }
@@ -208,7 +209,7 @@ class MediaRuntimeCore {
     const { id, surface, reason } = args;
     const node = this.registry.get(id);
     
-    if (import.meta.env.DEV) {
+    if (DEBUG_MEDIA_RUNTIME) {
       console.log(`[${startTime.toFixed(2)}ms] [MediaRuntime] REQUEST_PLAY`, {
         id: id.slice(0, 8),
         surface,
@@ -227,7 +228,7 @@ class MediaRuntimeCore {
     }
     
     // DEV-only invariant: detect unauthorized plays
-    if (import.meta.env.DEV) {
+    if (DEBUG_MEDIA_RUNTIME) {
       // Attach listener to detect unauthorized plays (one-time per node)
       if (node && !(node.videoElement as any).__runtimeGuarded) {
         (node.videoElement as any).__runtimeGuarded = true;
@@ -246,7 +247,7 @@ class MediaRuntimeCore {
     
     // Check intent suppression for autoplay
     if (reason === 'autoplay' && this.shouldSuppressAutoplay()) {
-      if (import.meta.env.DEV) {
+      if (DEBUG_MEDIA_RUNTIME) {
         console.log('[MediaRuntime] Autoplay suppressed due to recent user action');
       }
       return false;
@@ -254,7 +255,7 @@ class MediaRuntimeCore {
     
     // If already playing this one, skip
     if (this.state.activeMediaIds.has(id)) {
-      if (import.meta.env.DEV) {
+      if (DEBUG_MEDIA_RUNTIME) {
         console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] ALREADY_PLAYING`, { id: id.slice(0, 8) });
       }
       return true;
@@ -274,7 +275,7 @@ class MediaRuntimeCore {
     
     // Block grid autoplay if fullscreen is active with user reason
     if (this.state.activeSurface === 'fullscreen' && surface === 'grid' && reason !== 'user') {
-      if (import.meta.env.DEV) {
+      if (DEBUG_MEDIA_RUNTIME) {
         console.log('[MediaRuntime] requestPlay blocked: fullscreen active');
       }
       return false;
@@ -286,7 +287,7 @@ class MediaRuntimeCore {
     this.state.activeMediaIds.add(id);
     
     // Attempt play
-    if (import.meta.env.DEV) {
+    if (DEBUG_MEDIA_RUNTIME) {
       console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] CALLING_SAFEPLAY`, { 
         id: id.slice(0, 8),
         readyState: node.videoElement.readyState 
@@ -314,7 +315,7 @@ class MediaRuntimeCore {
       
       this.notifyListeners();
       
-      if (import.meta.env.DEV) {
+      if (DEBUG_MEDIA_RUNTIME) {
         console.log(`[${endTime.toFixed(2)}ms] [MediaRuntime] PLAY_SUCCESS`, {
           id: id.slice(0, 8),
           surface,
@@ -327,7 +328,7 @@ class MediaRuntimeCore {
       // ✅ FIX: Remove from activeMediaIds if play failed
       this.state.activeMediaIds.delete(id);
       
-      if (import.meta.env.DEV) {
+      if (DEBUG_MEDIA_RUNTIME) {
         console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] PLAY_FAILED`, { id: id.slice(0, 8) });
       }
       this.telemetry.playFailure?.(id, 'blocked');
@@ -812,7 +813,7 @@ class MediaRuntimeCore {
     this.telemetryStats.lastTtff = Math.round(ms);
     this.telemetry.timeToFirstFrame?.(id, ms);
     
-    if (import.meta.env.DEV) {
+    if (DEBUG_MEDIA_TELEMETRY) {
       console.log(`[MediaTelemetry] ttff ${id.slice(0, 8)} ${Math.round(ms)}ms`);
     }
   }
@@ -825,7 +826,7 @@ class MediaRuntimeCore {
       this.telemetryStats.bufferingStartedAt.set(id, performance.now());
       this.telemetryStats.isBuffering = true;
       
-      if (import.meta.env.DEV) {
+      if (DEBUG_MEDIA_TELEMETRY) {
         console.log(`[MediaTelemetry] bufferingStart ${id.slice(0, 8)}`);
       }
     }
@@ -839,7 +840,7 @@ class MediaRuntimeCore {
       this.telemetryStats.bufferingStartedAt.delete(id);
       this.telemetryStats.isBuffering = false;
       
-      if (import.meta.env.DEV) {
+      if (DEBUG_MEDIA_TELEMETRY) {
         console.log(`[MediaTelemetry] bufferingEnd ${id.slice(0, 8)} ${ms}ms`);
       }
     }
@@ -848,7 +849,7 @@ class MediaRuntimeCore {
   recordPlayFailure(id: string, reason: string): void {
     this.telemetry.playFailure?.(id, reason);
     
-    if (import.meta.env.DEV) {
+    if (DEBUG_MEDIA_TELEMETRY) {
       console.log(`[MediaTelemetry] playFailure ${id.slice(0, 8)} ${reason}`);
     }
   }
