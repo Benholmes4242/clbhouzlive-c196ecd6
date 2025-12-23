@@ -149,6 +149,8 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
               muted
               loop
               objectFit="cover"
+              managedByMediaRuntime={false}
+              mediaId={item.id}
               onLoadedData={() => {
                 logHero('VIDEO_LOADED_DATA', { itemId: item.id });
                 handleLoadedData();

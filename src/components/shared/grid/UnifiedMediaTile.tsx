@@ -206,6 +206,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
       />
 
       {/* Video layer - uses HLSPlayer (handles its own poster→video crossfade) */}
+      {/* FIX: Grid videos must be managed by MediaRuntime to prevent unauthorized plays */}
       {isVideo && isAutoplayCandidate && item.playbackUrl && config.autoplayEnabled && (
         <HLSPlayer
           ref={playerRef}
@@ -216,6 +217,8 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
           loop
           objectFit="cover"
           externallyManaged
+          managedByMediaRuntime={true}
+          mediaId={item.postId}
           onLoadedData={handleCanPlay}
           className="absolute inset-0 h-full w-full"
         />
