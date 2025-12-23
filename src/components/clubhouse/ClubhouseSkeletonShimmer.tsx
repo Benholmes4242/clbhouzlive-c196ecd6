@@ -48,34 +48,58 @@ const SkeletonBlock: React.FC<{
   </div>
 );
 
+// Match CinematicActionRail layout constants exactly
+const SLOT_HEIGHT = 64; // icon (44px) + gap (4px) + count container (16px)
+const ICON_SIZE = 44;
+const COUNT_HEIGHT = 16;
+const GAP = 12;
+const SLOT_COUNT = 5; // Mute, Like, Comment, Share, Save
+const TOTAL_RAIL_HEIGHT = SLOT_COUNT * SLOT_HEIGHT + (SLOT_COUNT - 1) * GAP;
+
 /**
- * Action rail skeleton - matches CinematicActionRail layout
+ * Action rail skeleton - matches CinematicActionRail layout exactly
+ * Uses same fixed slot heights and positioning as the real component
  */
 const ActionRailSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) => {
+  // Match real rail: Mute (no count), Like (count), Comment (count), Share (no count), Save (no count)
   const slots = [
-    { size: 44, hasCount: false }, // Mute
-    { size: 44, hasCount: true },  // Like
-    { size: 44, hasCount: true },  // Comment
-    { size: 44, hasCount: false }, // Share
-    { size: 44, hasCount: false }, // Save
+    { hasCount: false }, // Mute
+    { hasCount: true },  // Like
+    { hasCount: true },  // Comment
+    { hasCount: false }, // Share
+    { hasCount: false }, // Save
   ];
 
   return (
-    <div className="flex flex-col items-center gap-3">
+    <div 
+      className="flex flex-col items-center"
+      style={{ gap: GAP, height: TOTAL_RAIL_HEIGHT }}
+    >
       {slots.map((slot, i) => (
-        <div key={i} className="flex flex-col items-center gap-1">
+        <div 
+          key={i} 
+          className="flex flex-col items-center"
+          style={{ height: SLOT_HEIGHT }}
+        >
+          {/* Icon circle - fixed 44px */}
           <SkeletonBlock 
             isStatic={isStatic}
             className="rounded-full"
-            style={{ width: slot.size, height: slot.size }}
+            style={{ width: ICON_SIZE, height: ICON_SIZE }}
           />
-          {slot.hasCount && (
-            <SkeletonBlock 
-              isStatic={isStatic}
-              className="rounded-sm"
-              style={{ width: 24, height: 12 }}
-            />
-          )}
+          {/* Count container - ALWAYS in layout (matches real component) */}
+          <div 
+            className="flex items-center justify-center"
+            style={{ height: COUNT_HEIGHT, marginTop: 4 }}
+          >
+            {slot.hasCount && (
+              <SkeletonBlock 
+                isStatic={isStatic}
+                className="rounded-sm"
+                style={{ width: 20, height: 10 }}
+              />
+            )}
+          </div>
         </div>
       ))}
     </div>
@@ -83,39 +107,40 @@ const ActionRailSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) => {
 };
 
 /**
- * Creator capsule skeleton - matches CreatorCapsule layout
+ * Creator capsule skeleton - matches CreatorCapsule layout exactly
+ * Same positioning, sizing, and visual treatment
  */
 const CreatorCapsuleSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) => (
   <div 
-    className="flex flex-col gap-2 p-3 rounded-2xl bg-black/40 backdrop-blur-sm"
-    style={{ maxWidth: 280 }}
+    className="flex flex-col gap-2.5 p-3 rounded-sq-lg bg-black/50 backdrop-blur-2xl border border-white/10"
+    style={{ maxWidth: '75vw', minWidth: 200 }}
   >
-    {/* Top row: avatar + username */}
-    <div className="flex items-center gap-2">
+    {/* Top row: avatar + username (matches collapsed state) */}
+    <div className="flex items-center gap-3">
       <SkeletonBlock 
         isStatic={isStatic}
-        className="rounded-lg shrink-0"
-        style={{ width: 32, height: 32 }}
+        className="rounded-sq-md shrink-0"
+        style={{ width: 36, height: 36 }}
       />
-      <div className="flex flex-col gap-1.5 flex-1">
+      <div className="flex flex-col gap-1.5 flex-1 min-w-0">
         <SkeletonBlock 
           isStatic={isStatic}
           className="rounded-sm"
-          style={{ width: 100, height: 12 }}
+          style={{ width: 90, height: 12 }}
         />
         <SkeletonBlock 
           isStatic={isStatic}
           className="rounded-sm"
-          style={{ width: 140, height: 10 }}
+          style={{ width: 130, height: 10 }}
         />
       </div>
     </div>
     
-    {/* Caption line */}
+    {/* Caption line placeholder */}
     <SkeletonBlock 
       isStatic={isStatic}
       className="rounded-sm"
-      style={{ width: '90%', height: 10 }}
+      style={{ width: '85%', height: 10 }}
     />
   </div>
 );
@@ -172,9 +197,9 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
             {/* Hero media area skeleton - fills the viewport */}
             <MediaAreaSkeleton isStatic={isStatic} />
             
-            {/* Right-side action rail - positioned like CinematicActionRail */}
+            {/* Right-side action rail - positioned exactly like CinematicActionRail */}
             <div 
-              className="absolute right-3 flex flex-col items-center"
+              className="absolute right-4 flex flex-col items-center"
               style={{ 
                 top: '50%', 
                 transform: 'translateY(-50%)',
@@ -183,11 +208,11 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
               <ActionRailSkeleton isStatic={isStatic} />
             </div>
             
-            {/* Bottom-left creator capsule - positioned like CreatorCapsule */}
+            {/* Bottom-left creator capsule - positioned exactly like CreatorCapsule */}
             <div 
-              className="absolute left-3"
+              className="absolute left-4"
               style={{ 
-                bottom: 'calc(env(safe-area-inset-bottom, 0px) + 100px)',
+                bottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)',
               }}
             >
               <CreatorCapsuleSkeleton isStatic={isStatic} />
