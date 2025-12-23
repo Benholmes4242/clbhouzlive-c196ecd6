@@ -18,6 +18,13 @@ import type HlsType from 'hls.js';
 import { cn } from '@/lib/utils';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
+import { 
+  logFirstVideoMounted, 
+  logFirstVideoCanplay, 
+  logFirstVideoPlaying,
+  logFirstVideoLoadedData,
+  logFirstMediaPosterLoaded 
+} from '@/utils/bootTimeline';
 
 // ============ Debug Logging ============
 import { DEBUG_HLS_PLAYER } from '@/media/debug';
@@ -132,6 +139,11 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       hasPoster: !!poster,
       mediaId: mediaId?.slice(0, 8)
     });
+    
+    // Boot timeline: log first video mount
+    if (mediaId) {
+      logFirstVideoMounted(mediaId, src);
+    }
     
     return () => {
       logDebug('UNMOUNT', { src: shortSrc, mediaId: mediaId?.slice(0, 8) });
@@ -656,13 +668,24 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     }
     
     onLoadedData?.();
-  }, [onLoadedData, waitForFirstFrame]);
+    
+    // Boot timeline: log first video loadeddata and canplay
+    if (mediaId) {
+      logFirstVideoLoadedData(mediaId);
+      logFirstVideoCanplay(mediaId);
+    }
+  }, [onLoadedData, waitForFirstFrame, mediaId]);
   
   const handlePlay = useCallback(() => {
     if (!mountedRef.current) return;
     
     setIsPlaying(true);
     setHasError(false);
+    
+    // Boot timeline: log first video playing
+    if (mediaId) {
+      logFirstVideoPlaying(mediaId);
+    }
     
     // Start TTFF timer on play
     if (!ttffFiredRef.current && ttffStartRef.current === 0) {

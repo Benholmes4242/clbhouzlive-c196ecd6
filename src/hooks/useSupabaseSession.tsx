@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Session, User } from "@supabase/supabase-js";
 import { useSafeQueryClient } from '@/lib/useSafeQueryClient';
 import { cleanupOnLogout } from '@/utils/reactQueryCleanup';
+import { logSessionStart, logSessionReady, logSessionNone } from '@/utils/bootTimeline';
 
 export function useSupabaseSession() {
   const { queryClient, hasQueryClient } = useSafeQueryClient({
@@ -22,8 +23,16 @@ export function useSupabaseSession() {
     };
   }
 
+  const sessionStartLogged = useRef(false);
+  
   useEffect(() => {
     let mounted = true;
+    
+    // Log session start once
+    if (!sessionStartLogged.current) {
+      sessionStartLogged.current = true;
+      logSessionStart();
+    }
     
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -36,6 +45,13 @@ export function useSupabaseSession() {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        // Log session resolution
+        if (session?.user) {
+          logSessionReady(session.user.id);
+        } else {
+          logSessionNone();
+        }
       }
     });
 
@@ -45,6 +61,13 @@ export function useSupabaseSession() {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        // Log session resolution
+        if (session?.user) {
+          logSessionReady(session.user.id);
+        } else {
+          logSessionNone();
+        }
       }
     });
 
