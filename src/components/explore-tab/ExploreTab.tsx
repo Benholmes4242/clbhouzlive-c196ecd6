@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { Compass, Heart } from 'lucide-react';
@@ -8,6 +8,7 @@ import RegionExploreRail from './RegionExploreRail';
 import ThemeExploreRail from './ThemeExploreRail';
 import CourseDiscoveryFeed from './CourseDiscoveryFeed';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
+import ExploreSearchResults from './ExploreSearchResults';
 import { useTrendingCourses, useExploreRegions } from '@/hooks/useExploreData';
 
 interface ExploreTabProps {
@@ -33,9 +34,11 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
   className,
 }) => {
   const navigate = useNavigate();
+  const searchContainerRef = useRef<HTMLDivElement>(null);
   
   // Command center state
   const [searchQuery, setSearchQuery] = useState('');
+  const [showSearchResults, setShowSearchResults] = useState(false);
   const [activeFilter, setActiveFilter] = useState('all');
   const [sortOption, setSortOption] = useState<SortOption>(() => {
     const saved = localStorage.getItem(EXPLORE_SORT_KEY);
@@ -45,6 +48,27 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
   // Data hooks
   const { data: trendingCourses } = useTrendingCourses(20);
   const { data: regions } = useExploreRegions();
+
+  // Handle click outside to close search
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setShowSearchResults(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchQuery(value);
+    setShowSearchResults(value.trim().length >= 2);
+  }, []);
+
+  const handleSearchResultSelect = useCallback(() => {
+    setShowSearchResults(false);
+    setSearchQuery('');
+  }, []);
 
   const handleSortChange = useCallback((sort: SortOption) => {
     setSortOption(sort);
@@ -195,16 +219,31 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({
 
   return (
     <div className={cn("min-h-screen", className)}>
-      {/* Command Center: Search + Sort + Pills */}
-      <DiscoverCommandCenter
-        searchPlaceholder="Search courses, regions..."
-        searchValue={searchQuery}
-        onSearchChange={setSearchQuery}
-        sortValue={sortOption}
-        onSortChange={handleSortChange}
-        pills={pills}
-        onPillSelect={handleFilterChange}
-      />
+      {/* Sticky Command Center: Search + Sort + Pills */}
+      <div 
+        ref={searchContainerRef}
+        className="sticky top-0 z-40 bg-background"
+      >
+        <DiscoverCommandCenter
+          searchPlaceholder="Search courses, regions..."
+          searchValue={searchQuery}
+          onSearchChange={handleSearchChange}
+          sortValue={sortOption}
+          onSortChange={handleSortChange}
+          pills={pills}
+          onPillSelect={handleFilterChange}
+        />
+        
+        {/* Search Results Overlay */}
+        {showSearchResults && (
+          <div className="px-5 relative">
+            <ExploreSearchResults
+              query={searchQuery}
+              onSelect={handleSearchResultSelect}
+            />
+          </div>
+        )}
+      </div>
 
       {renderContent()}
       
