@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCommunityFeed, CommunityMediaFilter, CommunitySortOption } from '@/hooks/community/useCommunityFeed';
-import CommunityFilters from './CommunityFilters';
 import CommunityFeedCard from './CommunityFeedCard';
 import CommunityEmptyState from './CommunityEmptyState';
 import { DateSeparator } from './DateSeparator';
 import { useMediaAutoplay } from '@/media';
 import { calculateDateSeparators } from '@/utils/dateSeparators';
+import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 
 interface CommunityFeedProps {
   onMediaClick: (item: any) => void;
@@ -16,13 +16,23 @@ interface CommunityFeedProps {
 const FILTER_KEY = 'community-media-filter';
 const SORT_KEY = 'community-sort-option';
 
+const COMMUNITY_PILLS: { id: CommunityMediaFilter; label: string }[] = [
+  { id: 'all', label: 'All' },
+  { id: 'shorts', label: 'Shorts' },
+  { id: 'videos', label: 'Videos' },
+  { id: 'photos', label: 'Photos' },
+];
+
 /**
  * CommunityFeed - Posts from friends and followed users only
- * With filter pills (All/Shorts/Videos/Photos) and sorting options
+ * With unified command center (Search + Sort + Pills)
  */
 export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // Command center state
+  const [searchQuery, setSearchQuery] = useState('');
   
   // Persist filter/sort in localStorage
   const [mediaFilter, setMediaFilter] = useState<CommunityMediaFilter>(() => {
@@ -35,15 +45,33 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     return (saved as CommunitySortOption) || 'newest';
   });
 
-  const handleFilterChange = useCallback((filter: CommunityMediaFilter) => {
+  const handleFilterChange = useCallback((key: string) => {
+    const filter = key as CommunityMediaFilter;
     setMediaFilter(filter);
     localStorage.setItem(FILTER_KEY, filter);
   }, []);
 
-  const handleSortChange = useCallback((sort: CommunitySortOption) => {
-    setSortOption(sort);
-    localStorage.setItem(SORT_KEY, sort);
+  const handleSortChange = useCallback((sort: SortOption) => {
+    const communitySortMap: Record<SortOption, CommunitySortOption> = {
+      'newest': 'newest',
+      'most-liked': 'most-liked',
+      'most-discussed': 'most-discussed',
+      'friends-first': 'friends-first',
+    };
+    const mappedSort = communitySortMap[sort];
+    setSortOption(mappedSort);
+    localStorage.setItem(SORT_KEY, mappedSort);
   }, []);
+
+  // Build pills for command center
+  const pills: Pill[] = COMMUNITY_PILLS.map(p => ({
+    key: p.id,
+    label: p.label,
+    selected: mediaFilter === p.id,
+  }));
+
+  // Map community sort to command center sort
+  const commandCenterSort: SortOption = sortOption as SortOption;
 
   const {
     items,
@@ -105,49 +133,58 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   // Empty state: User has no community (no friends/follows)
   if (!loading && communityCount.friends === 0 && communityCount.following === 0) {
     return (
-      <>
-        <CommunityFilters
-          activeFilter={mediaFilter}
-          onFilterChange={handleFilterChange}
-          sortOption={sortOption}
+      <div className="min-h-screen pb-20 bg-[var(--bg-page)]">
+        <DiscoverCommandCenter
+          searchPlaceholder="Search posts..."
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          sortValue={commandCenterSort}
           onSortChange={handleSortChange}
+          pills={pills}
+          onPillSelect={handleFilterChange}
         />
         <CommunityEmptyState variant="no-community" />
-      </>
+      </div>
     );
   }
 
   // Has community but no posts
   if (!loading && items.length === 0 && (communityCount.friends > 0 || communityCount.following > 0)) {
     return (
-      <>
-        <CommunityFilters
-          activeFilter={mediaFilter}
-          onFilterChange={handleFilterChange}
-          sortOption={sortOption}
+      <div className="min-h-screen pb-20 bg-[var(--bg-page)]">
+        <DiscoverCommandCenter
+          searchPlaceholder="Search posts..."
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          sortValue={commandCenterSort}
           onSortChange={handleSortChange}
+          pills={pills}
+          onPillSelect={handleFilterChange}
         />
         <CommunityEmptyState variant="quiet" />
-      </>
+      </div>
     );
   }
 
   return (
     <div className="min-h-screen pb-20 bg-[var(--bg-page)]">
+      {/* Command Center: Search + Sort + Pills */}
+      <DiscoverCommandCenter
+        searchPlaceholder="Search posts..."
+        searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
+        sortValue={commandCenterSort}
+        onSortChange={handleSortChange}
+        pills={pills}
+        onPillSelect={handleFilterChange}
+      />
+
       {/* Subtitle */}
-      <div className="px-4 pt-3 pb-1">
+      <div className="px-4 pb-1">
         <p className="text-xs text-muted-foreground">
           Posts from people you follow and play with
         </p>
       </div>
-
-      {/* Filter Pills */}
-      <CommunityFilters
-        activeFilter={mediaFilter}
-        onFilterChange={handleFilterChange}
-        sortOption={sortOption}
-        onSortChange={handleSortChange}
-      />
 
       {/* Feed */}
       <div className="space-y-0 pt-2">
