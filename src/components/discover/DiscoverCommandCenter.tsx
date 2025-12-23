@@ -117,13 +117,13 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
             "w-full flex items-center justify-between px-4 py-3 text-sm transition-colors",
             "hover:bg-muted/50",
             sortValue === option.id
-              ? "text-foreground font-medium"
-              : "text-muted-foreground"
+              ? "text-primary font-medium"
+              : "text-foreground"
           )}
         >
           <span>{option.label}</span>
           {sortValue === option.id && (
-            <Check className="w-4 h-4 text-foreground" />
+            <Check className="w-4 h-4 text-primary" />
           )}
         </button>
       ))}
@@ -177,12 +177,12 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
               onClick={() => handleSortSelect(option.id)}
               className={cn(
                 "flex items-center justify-between cursor-pointer",
-                sortValue === option.id && "text-foreground font-medium"
+                sortValue === option.id && "text-primary font-medium"
               )}
             >
               <span>{option.label}</span>
               {sortValue === option.id && (
-                <Check className="w-4 h-4 text-foreground" />
+                <Check className="w-4 h-4 text-primary" />
               )}
             </DropdownMenuItem>
           ))}
