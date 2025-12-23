@@ -367,6 +367,47 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
 
   // Handle Shorts tab directly (no sliding panels needed)
   if (main === 'shorts') {
+    // Apply course clustering when 3+ items from same course in top 15
+    const clusteredGridContent = React.useMemo(() => {
+      if (!gridContent || gridContent.length === 0) return gridContent;
+      
+      // Check top 15 items for course clustering
+      const topItems = gridContent.slice(0, 15);
+      const courseCounts = new Map<string, { count: number; name: string; firstIndex: number }>();
+      
+      topItems.forEach((item, index) => {
+        const courseId = item.golfCourse?.id;
+        const courseName = item.golfCourse?.name;
+        if (courseId && courseName) {
+          if (!courseCounts.has(courseId)) {
+            courseCounts.set(courseId, { count: 1, name: courseName, firstIndex: index });
+          } else {
+            courseCounts.get(courseId)!.count++;
+          }
+        }
+      });
+      
+      // Find courses with 3+ items
+      const clusterCourses = Array.from(courseCounts.entries())
+        .filter(([, data]) => data.count >= 3)
+        .sort((a, b) => a[1].firstIndex - b[1].firstIndex);
+      
+      if (clusterCourses.length === 0) return gridContent;
+      
+      // Mark the first occurrence of each clustered course
+      const clusterHeaders = new Set(clusterCourses.map(([id]) => id));
+      return gridContent.map((item, index) => {
+        const courseId = item.golfCourse?.id;
+        if (courseId && clusterHeaders.has(courseId)) {
+          const courseData = courseCounts.get(courseId);
+          if (courseData && courseData.firstIndex === index) {
+            return { ...item, _clusterHeader: courseData.name };
+          }
+        }
+        return item;
+      });
+    }, [gridContent]);
+    
     return (
       <div className="watch-tab-content">
         {/* Command Center - Search + Sort + Pills */}
@@ -378,7 +419,11 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
           onSortChange={setWatchSortOption}
           pills={watchPills}
           onPillSelect={setWatchActiveFilter}
+          defaultSortValue="newest"
         />
+        
+        {/* Watch Section Gap Token: 16px between all major sections */}
+        <div className="h-4" /> {/* 16px gap: CommandCenter → Hero */}
         
         {/* Watch Hero - single featured item */}
         <DiscoverHero 
@@ -390,12 +435,16 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
           }}
         />
         
-        {/* Suggested Golfers - with 24-32px spacing handled in CSS */}
+        <div className="h-4" /> {/* 16px gap: Hero → Suggested Golfers */}
+        
+        {/* Suggested Golfers */}
         <LiveClubhouseStrip />
         
-        {/* Feed Grid */}
+        <div className="h-4" /> {/* 16px gap: Suggested Golfers → Grid */}
+        
+        {/* Feed Grid with course clustering */}
         <ShortsGrid 
-          items={gridContent || []} 
+          items={clusteredGridContent || []} 
           onOpen={onMediaClick}
           isLoading={loading}
           hasMore={hasMore}

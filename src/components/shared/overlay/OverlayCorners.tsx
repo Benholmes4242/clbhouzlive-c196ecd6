@@ -198,11 +198,11 @@ const OverlayCorners: React.FC<OverlayCornersProps> = ({
             </span>
           )}
           
-          {/* Creator name (for non-hero surfaces) */}
+          {/* Creator name (for non-hero surfaces) - clamped to 2 lines */}
           {showCreator && creatorName && !trendingLabel && (
             <button
               type="button"
-              className="text-white font-semibold text-sm leading-tight truncate block pointer-events-auto hover:underline text-left"
+              className="text-white font-semibold text-sm leading-tight pointer-events-auto hover:underline text-left line-clamp-2"
               style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}
               onClick={onCreatorClick}
             >

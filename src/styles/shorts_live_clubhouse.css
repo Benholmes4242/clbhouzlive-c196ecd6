@@ -1,14 +1,24 @@
 /* Live Clubhouse Strip Styles - Suggested Golfers */
 
-/* Row container - transparent background with proper vertical spacing */
+/* Row container - transparent background, no extra spacing (handled by parent) */
 .live-row {
   position: relative;
-  /* 24-32px spacing from hero above */
-  padding-top: 24px;
-  /* 24-32px spacing to feed below */
-  padding-bottom: 24px;
   padding-left: 4px;
+  padding-bottom: 8px;
   background: transparent;
+}
+
+/* Right edge scroll fade affordance - signals horizontal scroll */
+.live-row::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 32px;
+  background: linear-gradient(to left, hsl(var(--background)) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 10;
 }
 
 /* Section header - flex row with title and "See all" */
@@ -78,8 +88,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 84px;
-  height: 96px;
+  width: 72px;  /* Reduced from 84px - lighter feel */
+  height: 82px; /* Proportionally adjusted */
   padding: 0;
   border: 0;
   background: transparent;
@@ -173,7 +183,7 @@
 
 /* Sizing tokens */
 :root {
-  --lc-avatar-size: 84px;
+  --lc-avatar-size: 72px; /* Reduced from 84px */
   --lc-nearby-scale: 1.0;
   --lc-nearby-size: calc(var(--lc-avatar-size) * var(--lc-nearby-scale));
   --lc-nearby-border: 2px;
