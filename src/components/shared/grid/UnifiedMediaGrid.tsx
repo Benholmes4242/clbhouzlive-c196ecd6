@@ -5,6 +5,7 @@ import UnifiedMediaTile from './UnifiedMediaTile';
 import { useMediaAutoplay } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
+import { logGridMount, logGridDataReady } from '@/utils/gridAuditTimeline';
 
 // Debug logging for video lifecycle analysis
 const DEBUG_UNIFIED_GRID = true;
@@ -44,8 +45,9 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
   const loadingRef = useRef(false);
   const hasPreloadedFirst = useRef(false);
 
-  // Log mount
+  // Log mount - with audit timeline
   useEffect(() => {
+    logGridMount(config.surface || 'unknown', items.length);
     logGrid('MOUNT', { 
       itemsCount: items.length,
       surface: config.surface,
@@ -101,12 +103,13 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
   // Mark autoplay candidates and build layout
   const processedItems = useMemo(() => {
     const marked = markAutoplayCandidates(items);
+    logGridDataReady(config.surface || 'unknown', marked.length);
     logGrid('ITEMS_PROCESSED', { 
       total: items.length,
       autoplayCandidates: marked.filter(i => i.isAutoplayCandidate).length
     });
     return marked;
-  }, [items]);
+  }, [items, config.surface]);
 
   const layoutRows = useMemo(() => {
     return buildUnifiedLayout(processedItems);

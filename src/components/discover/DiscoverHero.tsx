@@ -6,6 +6,15 @@ import { OverlayCorners } from '@/components/shared/overlay';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
+import {
+  logHeroMount,
+  logHeroPosterLoad,
+  logHeroHlsLoadStart,
+  logHeroCanplay,
+  logHeroPlaying,
+  logHeroError,
+  logHeroLoadedData,
+} from '@/utils/gridAuditTimeline';
 
 // Debug logging for video lifecycle analysis
 const DEBUG_HERO = true;
@@ -78,8 +87,11 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
     }
   }, [item]);
 
-  // Log mount/unmount
+  // Log mount/unmount - with audit timeline
   useEffect(() => {
+    if (item) {
+      logHeroMount(item.id, item.mediaType);
+    }
     logHero('MOUNT', { 
       itemId: item?.id,
       mediaType: item?.mediaType,
@@ -107,6 +119,9 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
 
   // Get duration from video element if not provided
   const handleLoadedData = useCallback(() => {
+    if (item) {
+      logHeroLoadedData(item.id, playerRef.current?.getCurrentTime?.() || 0);
+    }
     logHero('HANDLE_LOADED_DATA_CALLED', { itemId: item?.id, hasDuration: !!item?.durationSeconds });
     if (playerRef.current && !item?.durationSeconds) {
       const d = playerRef.current.getDuration();
