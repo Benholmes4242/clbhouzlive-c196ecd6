@@ -79,6 +79,37 @@ if (BOOT_TIMELINE_TARGET) {
   console.log('[BootTimeline] attached', !!BOOT_TIMELINE_TARGET.bootTimeline);
 }
 
+// Message bridge for Lovable editor console (cross-origin iframe)
+// Allows enabling/printing even when you can't access window.bootTimeline directly.
+if (typeof window !== 'undefined' && !(window as any).__bootTimelineBridgeInstalled) {
+  (window as any).__bootTimelineBridgeInstalled = true;
+
+  const isAllowedOrigin = (origin: string) =>
+    /^https:\/\/(.*\.)?(lovable\.dev|lovable\.app|lovableproject\.com)$/.test(origin);
+
+  window.addEventListener('message', (event) => {
+    if (!event?.data) return;
+    if (event.origin && !isAllowedOrigin(event.origin)) return;
+
+    const data = event.data as any;
+    const type = typeof data === 'string' ? data : data.type;
+
+    switch (type) {
+      case 'BOOT_TIMELINE_ENABLE':
+        enableBootTimeline();
+        break;
+      case 'BOOT_TIMELINE_DISABLE':
+        disableBootTimeline();
+        break;
+      case 'BOOT_TIMELINE_PRINT_SUMMARY':
+        printBootSummary();
+        break;
+      default:
+        break;
+    }
+  });
+}
+
 // ============ State ============
 
 const timeline: BootTimelineState = {
