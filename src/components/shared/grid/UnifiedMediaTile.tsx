@@ -6,6 +6,7 @@ import { HLSPlayer, HLSPlayerRef, RegisterMediaFn } from '@/media';
 import { Images, Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
+import { logGridItemRender, logGridItemIntersect, logGridItemPlayAttempt } from '@/utils/gridAuditTimeline';
 
 // Debug logging for video lifecycle analysis
 const DEBUG_UNIFIED_TILE = true;
@@ -67,8 +68,9 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   const isAutoplayCandidate = item.isAutoplayCandidate ?? false;
   const isLandscape = variant === 'landscape';
 
-  // Log mount/unmount
+  // Log mount/unmount - with audit timeline
   useEffect(() => {
+    logGridItemRender(item.postId, index, isVideo);
     logTile('MOUNT', { 
       postId: item.postId,
       isVideo,
@@ -82,8 +84,11 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
     };
   }, []);
 
-  // Log isPlaying changes
+  // Log isPlaying changes - with audit timeline
   useEffect(() => {
+    if (isPlaying) {
+      logGridItemPlayAttempt(item.postId, 'isPlaying_prop_change');
+    }
     logTile('IS_PLAYING_CHANGE', { 
       postId: item.postId,
       isPlaying,
