@@ -107,7 +107,8 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   isActive?: boolean;
   postId: string; // Required for MediaRuntime integration
   eagerMount?: boolean; // Mount immediately without waiting for shouldAttach
-}>(({ src, muted, className, isMobile: isMobileProp = false, shouldAttach = false, autoplay = false, isNearby = true, isActive = true, postId, eagerMount = false }, ref) => {
+  onFirstFrameReady?: () => void; // Signal when first video frame is ready (for skeleton timing)
+}>(({ src, muted, className, isMobile: isMobileProp = false, shouldAttach = false, autoplay = false, isNearby = true, isActive = true, postId, eagerMount = false, onFirstFrameReady }, ref) => {
   // Generate HLS URL from source
   const uid = uidFromNode({ src });
   const hlsUrl = uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null;
@@ -148,6 +149,7 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
             className="absolute inset-0 w-full h-full"
             managedByMediaRuntime
             mediaId={postId}
+            onLoadedData={onFirstFrameReady}
           />
         </div>
       ) : (
@@ -1244,6 +1246,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                       isNearby={isNearby}
                       isActive={index === currentIndex}
                       postId={item.id}
+                      onFirstFrameReady={index === 0 ? handleFirstFrameReady : undefined}
                     />
                     
                     {/* Simple video controls overlay */}
