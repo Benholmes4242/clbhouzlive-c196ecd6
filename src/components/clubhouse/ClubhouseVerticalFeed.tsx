@@ -69,8 +69,6 @@ interface ClubhouseVerticalFeedProps {
   onTopZoneChange?: (isAtTop: boolean) => void;
   /** Fires when user performs a meaningful interaction (like, share, save, swipe, pause) */
   onMeaningfulInteraction?: () => void;
-  /** Fires when feed is ready (first video mounted) - used for skeleton fade */
-  onReady?: () => void;
 }
 
 // Helper to compute which video IDs to keep in memory
@@ -199,8 +197,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   onDismissNavOverlay,
   onNavOverlayRequest,
   onTopZoneChange,
-  onMeaningfulInteraction,
-  onReady
+  onMeaningfulInteraction
 }) => {
   const { isVisible: topBarVisible, resetTimer: resetTopBar } = useTopBarVisibility();
   const { user } = useSupabaseSession();
@@ -362,23 +359,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       }
     }
   }, [filteredPosts]);
-  
-  // Notify parent when feed is ready (first video playing) - used for skeleton fade
-  const hasCalledOnReady = useRef(false);
-  useEffect(() => {
-    if (hasCalledOnReady.current) return;
-    if (!filteredPosts.length) return;
-    if (!onReady) return;
-    
-    // Wait for video to actually start playing (~3.5s after data ready based on logs)
-    const timer = setTimeout(() => {
-      console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] READY_CALLBACK`);
-      hasCalledOnReady.current = true;
-      onReady();
-    }, 3500);
-    
-    return () => clearTimeout(timer);
-  }, [filteredPosts.length, onReady]);
   
   // Debug: Log state changes
   useEffect(() => {
