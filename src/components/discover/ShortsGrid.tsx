@@ -3,8 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { ExploreContentItem } from '@/components/explore/types';
 import { UnifiedMediaGrid, UnifiedGridConfig, exploreItemsToUnified, UnifiedMediaItem } from '@/components/shared/grid';
 
+// Extended type to include clustering metadata
+interface ClusteredExploreItem extends ExploreContentItem {
+  _clusterHeader?: string;
+}
+
 interface ShortsGridProps {
-  items: ExploreContentItem[];
+  items: ClusteredExploreItem[];
   onOpen: (item: ExploreContentItem, index: number) => void;
   isLoading?: boolean;
   hasMore?: boolean;
@@ -28,8 +33,25 @@ const WATCH_GRID_CONFIG: UnifiedGridConfig = {
 };
 
 /**
+ * CourseClusterHeader - Simple text header for course-grouped content
+ */
+function CourseClusterHeader({ courseName }: { courseName: string }) {
+  return (
+    <div className="col-span-2 px-4 py-3">
+      <h3 className="text-sm font-semibold text-foreground">
+        Trending at {courseName}
+      </h3>
+      <p className="text-xs text-muted-foreground">Popular right now</p>
+    </div>
+  );
+}
+
+/**
  * ShortsGrid - Watch page grid wrapper
  * Uses UnifiedMediaGrid with Watch-specific config
+ * 
+ * Supports course clustering - when items have _clusterHeader,
+ * renders a section header before them.
  * 
  * Tap behavior: Opens Shorts Fullscreen Player at tapped index
  */
@@ -45,7 +67,18 @@ export default function ShortsGrid({
 }: ShortsGridProps) {
   const navigate = useNavigate();
   
-  // Convert items to unified format
+  // Extract cluster headers and their positions
+  const clusterHeaders = React.useMemo(() => {
+    const headers: { index: number; courseName: string }[] = [];
+    items.forEach((item, index) => {
+      if (item._clusterHeader) {
+        headers.push({ index, courseName: item._clusterHeader });
+      }
+    });
+    return headers;
+  }, [items]);
+  
+  // Convert items to unified format (stripping the cluster metadata)
   const unifiedItems = React.useMemo(() => {
     return exploreItemsToUnified(items);
   }, [items]);
@@ -73,6 +106,84 @@ export default function ShortsGrid({
     onLike?.(itemId);
   }, [onLike]);
 
+  // If there are cluster headers, we need custom rendering
+  if (clusterHeaders.length > 0) {
+    // Build sections: for each cluster header, show header then items until next header
+    const sections: React.ReactNode[] = [];
+    let lastIndex = 0;
+    
+    clusterHeaders.forEach((header, headerIdx) => {
+      // Items before this header (if any, and not first header)
+      if (header.index > lastIndex) {
+        const beforeItems = unifiedItems.slice(lastIndex, header.index);
+        if (beforeItems.length > 0) {
+          sections.push(
+            <UnifiedMediaGrid
+              key={`section-${lastIndex}`}
+              items={beforeItems}
+              config={WATCH_GRID_CONFIG}
+              isLoading={false}
+              hasMore={false}
+              onItemClick={handleItemClick}
+              onLike={handleLike}
+              onAuthorClick={handleAuthorClick}
+              currentUserId={currentUserId}
+            />
+          );
+        }
+      }
+      
+      // Add the header
+      sections.push(
+        <CourseClusterHeader key={`header-${header.index}`} courseName={header.courseName} />
+      );
+      
+      // Determine where this section ends
+      const nextHeaderIndex = clusterHeaders[headerIdx + 1]?.index ?? unifiedItems.length;
+      const sectionItems = unifiedItems.slice(header.index, nextHeaderIndex);
+      
+      if (sectionItems.length > 0) {
+        sections.push(
+          <UnifiedMediaGrid
+            key={`section-${header.index}`}
+            items={sectionItems}
+            config={WATCH_GRID_CONFIG}
+            isLoading={headerIdx === clusterHeaders.length - 1 ? isLoading : false}
+            hasMore={headerIdx === clusterHeaders.length - 1 ? hasMore : false}
+            onLoadMore={headerIdx === clusterHeaders.length - 1 ? onLoadMore : undefined}
+            onItemClick={handleItemClick}
+            onLike={handleLike}
+            onAuthorClick={handleAuthorClick}
+            currentUserId={currentUserId}
+          />
+        );
+      }
+      
+      lastIndex = nextHeaderIndex;
+    });
+    
+    // Any remaining items after the last header
+    if (lastIndex < unifiedItems.length) {
+      sections.push(
+        <UnifiedMediaGrid
+          key={`section-final`}
+          items={unifiedItems.slice(lastIndex)}
+          config={WATCH_GRID_CONFIG}
+          isLoading={isLoading}
+          hasMore={hasMore}
+          onLoadMore={onLoadMore}
+          onItemClick={handleItemClick}
+          onLike={handleLike}
+          onAuthorClick={handleAuthorClick}
+          currentUserId={currentUserId}
+        />
+      );
+    }
+    
+    return <>{sections}</>;
+  }
+
+  // No clustering - render normally
   return (
     <UnifiedMediaGrid
       items={unifiedItems}

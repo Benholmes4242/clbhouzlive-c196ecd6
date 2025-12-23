@@ -33,6 +33,7 @@ interface DiscoverCommandCenterProps {
   sortLabel?: string;
   sortValue: SortOption;
   onSortChange: (sort: SortOption) => void;
+  defaultSortValue?: SortOption; // For visual indicator when non-default
   pills: Pill[];
   onPillSelect: (key: string) => void;
   showPills?: boolean;
@@ -61,11 +62,13 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
   onSearchChange,
   sortValue,
   onSortChange,
+  defaultSortValue = 'newest',
   pills,
   onPillSelect,
   showPills = true,
   className,
 }) => {
+  const isNonDefaultSort = sortValue !== defaultSortValue;
   const isMobile = useIsMobile();
   const [isFocused, setIsFocused] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -131,17 +134,19 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
   );
 
   const SortPill = () => {
+    const pillClasses = cn(
+      "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0",
+      "transition-colors active:scale-[0.98]",
+      isNonDefaultSort
+        ? "bg-foreground/15 text-foreground border border-foreground/30" // Non-default: stronger visual
+        : "bg-muted/60 text-foreground border border-border/40 hover:bg-muted" // Default
+    );
+    
     if (isMobile) {
       return (
         <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
           <DrawerTrigger asChild>
-            <button
-              className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0",
-                "bg-muted/60 text-foreground border border-border/40",
-                "hover:bg-muted transition-colors"
-              )}
-            >
+            <button className={pillClasses}>
               <ArrowUpDown className="w-3.5 h-3.5" />
               <span>Sort</span>
             </button>
@@ -159,13 +164,7 @@ export const DiscoverCommandCenter: React.FC<DiscoverCommandCenterProps> = ({
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button
-            className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0",
-              "bg-muted/60 text-foreground border border-border/40",
-              "hover:bg-muted transition-colors"
-            )}
-          >
+          <button className={pillClasses}>
             <ArrowUpDown className="w-3.5 h-3.5" />
             <span>Sort</span>
           </button>

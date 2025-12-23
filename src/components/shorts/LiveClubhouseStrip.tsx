@@ -68,7 +68,7 @@ export function LiveClubhouseStrip() {
           {[...Array(6)].map((_, idx) => (
             <div key={idx} className="lc-tile" role="option">
               <div className="lc-avatar-btn">
-                <div className="w-[84px] h-[84px] rounded-[20px] bg-muted animate-pulse" />
+                <div className="w-[72px] h-[72px] rounded-[18px] bg-muted animate-pulse" />
               </div>
               <div className="lc-label">
                 <div className="h-4 w-20 bg-muted animate-pulse rounded mb-1" />
@@ -159,7 +159,7 @@ function LiveTile({ creator, index }: { creator: any; index: number }) {
         aria-label={creator.display_name}
       >
         <SquircleAvatar
-          size={84}
+          size={72}
           src={creator.profile_photo_url}
           alt={creator.display_name}
         />
