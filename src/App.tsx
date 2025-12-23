@@ -476,6 +476,148 @@ const queryClient = new QueryClient({
   }),
 });
 
+// OPTIMIZATION: Prefetch clubhouse data immediately on app load
+// This starts data fetch before Clubhouse component mounts, saving ~1.2s
+import { VERTICAL_MIN_AR, VERTICAL_MAX_AR, FEATURE_FLAGS as CLUBHOUSE_FEATURE_FLAGS } from '@/config/featureFlags';
+import { getStreamPoster } from '@/utils/stream';
+
+const prefetchStart = performance.now();
+console.log(`[${prefetchStart.toFixed(2)}ms] [Prefetch] Starting immediate clubhouse data prefetch`);
+
+queryClient.prefetchInfiniteQuery({
+  queryKey: ['clubhouse-explore-shorts'],
+  queryFn: async () => {
+    const fetchStart = performance.now();
+    console.log(`[${fetchStart.toFixed(2)}ms] [Prefetch] Executing prefetch query`);
+    
+    // Build query matching fetchClubhouseExploreShorts logic
+    let query = supabase
+      .from('posts')
+      .select(`
+        id,
+        content,
+        created_at,
+        user_id,
+        post_media!inner (
+          id,
+          media_type,
+          media_url,
+          duration_seconds,
+          aspect_ratio,
+          orientation,
+          width,
+          height,
+          poster_url,
+          created_at
+        ),
+        post_tags (
+          id,
+          tagged_entity_id,
+          taggable_entities (
+            id,
+            entity_type,
+            entity_id,
+            name
+          )
+        )
+      `)
+      .order('created_at', { ascending: true, foreignTable: 'post_media' })
+      .order('created_at', { ascending: false })
+      .limit(1, { foreignTable: 'post_media' })
+      .eq('post_media.media_type', 'video')
+      .lte('post_media.duration_seconds', 119);
+
+    // Apply vertical-only filtering when flag is enabled
+    if (CLUBHOUSE_FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY) {
+      query = query
+        .not('post_media.width', 'is', null)
+        .not('post_media.height', 'is', null)
+        .not('post_media.aspect_ratio', 'is', null)
+        .gte('post_media.aspect_ratio', VERTICAL_MIN_AR)
+        .lte('post_media.aspect_ratio', VERTICAL_MAX_AR);
+    }
+
+    // OPTIMIZATION: Fetch only 5 posts initially for fastest first load
+    query = query.limit(5);
+
+    const { data: postsData, error } = await query;
+    const networkEnd = performance.now();
+    console.log(`[${networkEnd.toFixed(2)}ms] [Prefetch] Network completed in ${(networkEnd - fetchStart).toFixed(2)}ms, ${postsData?.length || 0} posts`);
+
+    if (error || !postsData?.length) {
+      return { posts: [], nextCursor: undefined };
+    }
+
+    // Filter valid posts
+    const validPosts = postsData.filter(post => {
+      const firstMedia = post.post_media?.[0];
+      return firstMedia?.media_type === 'video' && 
+             typeof firstMedia.duration_seconds === 'number' && 
+             firstMedia.duration_seconds < 120;
+    });
+
+    // Fetch user profiles
+    const userIds = [...new Set(validPosts.map(p => p.user_id))];
+    const { data: profiles } = await supabase
+      .from('user_profiles')
+      .select('id, display_name, username, profile_photo_url')
+      .in('id', userIds);
+
+    const profilesEnd = performance.now();
+    console.log(`[${profilesEnd.toFixed(2)}ms] [Prefetch] Profiles fetched, ${profiles?.length || 0} profiles`);
+
+    // Transform posts to match ExploreContentItem format
+    const formattedPosts = validPosts.map(post => {
+      const userProfile = profiles?.find(p => p.id === post.user_id);
+      const firstMedia = post.post_media[0];
+      
+      const golfCourseTag = (post.post_tags || []).find(
+        (tag: any) => tag.taggable_entities?.entity_type === 'golf_club'
+      );
+
+      return {
+        id: post.id,
+        type: 'video' as const,
+        src: firstMedia.media_url,
+        thumbnailSrc: getStreamPoster(firstMedia.media_url, '1s') || undefined,
+        title: post.content || 'Post',
+        likes: Math.floor(Math.random() * 500) + 50,
+        comments: Math.floor(Math.random() * 100) + 5,
+        shares: Math.floor(Math.random() * 50) + 1,
+        duration: firstMedia.duration_seconds ? `${firstMedia.duration_seconds}s` : undefined,
+        durationSeconds: firstMedia.duration_seconds,
+        aspectRatio: firstMedia.aspect_ratio,
+        width: firstMedia.width,
+        height: firstMedia.height,
+        createdAt: post.created_at,
+        user: {
+          id: post.user_id,
+          name: userProfile?.display_name || userProfile?.username || 'User',
+          username: userProfile?.username,
+          avatar: userProfile?.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+          verified: Math.random() > 0.7
+        },
+        golfCourse: golfCourseTag?.taggable_entities ? {
+          id: golfCourseTag.taggable_entities.entity_id,
+          name: golfCourseTag.taggable_entities.name,
+          country: 'Unknown'
+        } : null,
+        isFollowing: false,
+        media: [],
+      };
+    });
+
+    const totalEnd = performance.now();
+    console.log(`[${totalEnd.toFixed(2)}ms] [Prefetch] COMPLETE - Total: ${(totalEnd - prefetchStart).toFixed(2)}ms, ${formattedPosts.length} posts ready`);
+
+    return {
+      posts: formattedPosts,
+      nextCursor: formattedPosts.length > 0 ? formattedPosts[formattedPosts.length - 1].createdAt : undefined,
+    };
+  },
+  initialPageParam: null,
+});
+
 // Global focus re-auth to reduce retries
 function useReauthOnFocus() {
   useEffect(() => {
