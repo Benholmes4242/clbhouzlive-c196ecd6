@@ -476,6 +476,25 @@ const queryClient = new QueryClient({
   }),
 });
 
+// OPTIMIZATION 1: Prefetch Clubhouse data immediately on app load
+// This starts the data fetch ~1.2s earlier than waiting for component mount
+const prefetchStart = performance.now();
+console.log(`[${prefetchStart.toFixed(2)}ms] [Prefetch] Starting immediate clubhouse data prefetch`);
+
+queryClient.prefetchQuery({
+  queryKey: ['clubhouse-explore-shorts'],
+  queryFn: async () => {
+    const { fetchClubhouseExploreShorts } = await import('@/hooks/explore/useRealPostsFetcher');
+    const posts = await fetchClubhouseExploreShorts(5, null); // Fetch only 5 posts initially for speed
+    console.log(`[${performance.now().toFixed(2)}ms] [Prefetch] Prefetch completed with ${posts.length} posts`);
+    return {
+      posts,
+      nextCursor: posts.length > 0 ? posts[posts.length - 1].createdAt : undefined,
+      hasMore: posts.length >= 5,
+    };
+  },
+});
+
 // Global focus re-auth to reduce retries
 function useReauthOnFocus() {
   useEffect(() => {
