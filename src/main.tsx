@@ -1,4 +1,6 @@
-// Boot Timeline: Log app start as early as possible
+// Boot Timeline: Import for side effects (attaches to window)
+import './utils/bootTimeline';
+// Log app start immediately
 import { logAppStart } from './utils/bootTimeline';
 logAppStart();
 
