@@ -92,7 +92,7 @@ const OverlayCorners: React.FC<OverlayCornersProps> = ({
   creatorName,
   likes,
   showCreator = true,
-  showLikes = true,
+  showLikes = false, // Default to false - likes removed from tile overlays
   onCreatorClick,
   creatorAvatar,
   showAvatar = true,

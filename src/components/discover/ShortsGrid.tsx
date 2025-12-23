@@ -22,7 +22,7 @@ interface ShortsGridProps {
 // Grid config for Watch page
 const WATCH_GRID_CONFIG: UnifiedGridConfig = {
   showCreator: true,
-  showLikes: true,
+  showLikes: false, // Likes removed from tile overlays
   infiniteScroll: true,
   pageSize: 24,
   autoplayEnabled: true,
@@ -185,16 +185,25 @@ export default function ShortsGrid({
 
   // No clustering - render normally
   return (
-    <UnifiedMediaGrid
-      items={unifiedItems}
-      config={WATCH_GRID_CONFIG}
-      isLoading={isLoading}
-      hasMore={hasMore}
-      onLoadMore={onLoadMore}
-      onItemClick={handleItemClick}
-      onLike={handleLike}
-      onAuthorClick={handleAuthorClick}
-      currentUserId={currentUserId}
-    />
+    <>
+      <UnifiedMediaGrid
+        items={unifiedItems}
+        config={WATCH_GRID_CONFIG}
+        isLoading={isLoading}
+        hasMore={hasMore}
+        onLoadMore={onLoadMore}
+        onItemClick={handleItemClick}
+        onLike={handleLike}
+        onAuthorClick={handleAuthorClick}
+        currentUserId={currentUserId}
+      />
+      
+      {/* All caught up message */}
+      {!hasMore && unifiedItems.length > 0 && !isLoading && (
+        <div className="py-8 text-center">
+          <p className="text-sm text-muted-foreground">You're all caught up</p>
+        </div>
+      )}
+    </>
   );
 }

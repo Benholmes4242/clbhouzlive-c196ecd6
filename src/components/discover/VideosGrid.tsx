@@ -171,6 +171,13 @@ const VideosGrid: React.FC<VideosGridProps> = ({
           </div>
         )}
       </div>
+      
+      {/* All caught up message */}
+      {!hasMore && itemsToRender.length > 0 && !isLoading && (
+        <div className="py-8 text-center">
+          <p className="text-sm text-muted-foreground">You're all caught up</p>
+        </div>
+      )}
 
       {/* ShortsViewer */}
       {shortsViewerOpen && (
