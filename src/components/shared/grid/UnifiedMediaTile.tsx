@@ -7,6 +7,14 @@ import { Images, Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 
+// Debug logging for video lifecycle analysis
+const DEBUG_UNIFIED_TILE = true;
+const logTile = (event: string, data?: any) => {
+  if (!DEBUG_UNIFIED_TILE) return;
+  const timestamp = performance.now().toFixed(2);
+  console.log(`[${timestamp}ms] [UnifiedMediaTile] ${event}`, data || '');
+};
+
 interface UnifiedMediaTileProps {
   item: UnifiedMediaItem;
   config: UnifiedGridConfig;
@@ -59,18 +67,52 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
   const isAutoplayCandidate = item.isAutoplayCandidate ?? false;
   const isLandscape = variant === 'landscape';
 
+  // Log mount/unmount
+  useEffect(() => {
+    logTile('MOUNT', { 
+      postId: item.postId,
+      isVideo,
+      isAutoplayCandidate,
+      variant,
+      index,
+      isPlaying
+    });
+    return () => {
+      logTile('UNMOUNT', { postId: item.postId });
+    };
+  }, []);
+
+  // Log isPlaying changes
+  useEffect(() => {
+    logTile('IS_PLAYING_CHANGE', { 
+      postId: item.postId,
+      isPlaying,
+      isVideo,
+      isAutoplayCandidate 
+    });
+  }, [isPlaying, item.postId, isVideo, isAutoplayCandidate]);
+
   useEffect(() => {
     setResolvedDurationSeconds(item.durationSeconds);
   }, [item.durationSeconds]);
 
   // Register video with autoplay hook - using tile wrapper as observeTarget
   useEffect(() => {
-    if (!isVideo || !registerVideo || !config.autoplayEnabled) return;
+    if (!isVideo || !registerVideo || !config.autoplayEnabled) {
+      logTile('REGISTER_SKIPPED', { 
+        postId: item.postId, 
+        isVideo, 
+        hasRegisterVideo: !!registerVideo,
+        autoplayEnabled: config.autoplayEnabled 
+      });
+      return;
+    }
 
     const checkAndRegister = () => {
       const videoEl = playerRef.current?.getElement();
       const tileEl = tileRef.current;
       if (videoEl && tileEl) {
+        logTile('REGISTERING', { postId: item.postId, isAutoplayCandidate, sortIndex: item.sortIndex });
         registerVideo({
           id: item.postId,
           element: videoEl,
@@ -78,6 +120,8 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
           isCandidate: isAutoplayCandidate,
           sortIndex: item.sortIndex ?? 0,
         });
+      } else {
+        logTile('REGISTER_WAITING', { postId: item.postId, hasVideoEl: !!videoEl, hasTileEl: !!tileEl });
       }
     };
 
@@ -86,6 +130,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
 
     return () => {
       clearTimeout(retryTimer);
+      logTile('UNREGISTERING', { postId: item.postId });
       registerVideo({
         id: item.postId,
         element: null,
