@@ -17,7 +17,7 @@ const AIChat: React.FC = () => {
   const previousLocationRef = useRef(location.pathname);
 
   // Check if we're on an auth page or onboarding
-  const isAuthPage = location.pathname.startsWith('/auth') || location.pathname.startsWith('/onboarding');
+  const isAuthPage = location.pathname.startsWith('/auth') || location.pathname.startsWith('/create-profile') || location.pathname.startsWith('/onboarding');
   
   // Check if ProfileModalRouter is active
   const searchParams = new URLSearchParams(location.search);
