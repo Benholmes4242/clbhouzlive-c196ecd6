@@ -304,16 +304,18 @@ export const VideosTab: React.FC<VideosTabProps> = ({
 
   return (
     <div className={cn("min-h-screen pb-20", className)} style={{ background: BG_COLOR }}>
-      {/* Command Center: Search + Sort + Pills */}
-      <DiscoverCommandCenter
-        searchPlaceholder="Search videos, creators, courses..."
-        searchValue={searchQuery}
-        onSearchChange={handleSearch}
-        sortValue={sortOption}
-        onSortChange={handleSortChange}
-        pills={pills}
-        onPillSelect={handleCategorySelect}
-      />
+      {/* Sticky Command Center: Search + Sort + Pills */}
+      <div className="sticky top-0 z-30" style={{ background: BG_COLOR }}>
+        <DiscoverCommandCenter
+          searchPlaceholder="Search videos, creators, courses..."
+          searchValue={searchQuery}
+          onSearchChange={handleSearch}
+          sortValue={sortOption}
+          onSortChange={handleSortChange}
+          pills={pills}
+          onPillSelect={handleCategorySelect}
+        />
+      </div>
 
       {/* Continue Watching (only shows if user has in-progress videos) */}
       <ContinueWatchingSection
