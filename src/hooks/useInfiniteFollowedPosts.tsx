@@ -23,10 +23,8 @@ export const useInfiniteClubhouseShorts = () => {
       const queryStart = performance.now();
       console.log(`[${queryStart.toFixed(2)}ms] [QueryHook] Starting query function`);
       
-      // OPTIMIZATION 3: Reduced to 5 items for fastest initial load
-      // Subsequent pages will fetch more items
-      const isFirstPage = !pageParam;
-      const posts = await fetchClubhouseExploreShorts(isFirstPage ? 5 : 12, pageParam as string | null);
+      // Phase 1 Perf: Reduced from 30 to 12 items for faster initial load
+      const posts = await fetchClubhouseExploreShorts(12, pageParam as string | null);
       
       const queryEnd = performance.now();
       console.log(`[${queryEnd.toFixed(2)}ms] [QueryHook] Query completed in ${(queryEnd - queryStart).toFixed(2)}ms, ${posts.length} posts`);
