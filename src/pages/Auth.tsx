@@ -1,16 +1,10 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import AuthForm from "./auth/AuthForm";
-import ConfirmNotice from "./auth/ConfirmNotice";
-import AuthLayout from "./auth/AuthLayout";
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
-import type { AuthChangeEvent } from "@supabase/supabase-js";
 
 interface AuthProps {
   defaultSignUp?: boolean;
@@ -86,57 +80,23 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
   };
 
   return (
-    <>
-      <AuthLayout
-        isSignUp={isSignUp}
-        toggleAuthMode={() => {
-          clearAuthMessages();
-          setIsSignUp((s) => !s);
-        }}
-        submitting={submitting}
-      >
-        <AuthForm
-          isSignUp={isSignUp}
-          setIsSignUp={setIsSignUp}
-          setShowConfirmNotice={setShowConfirmNotice}
-          setErrorMsg={setErrorMsg}
-          setSubmitting={setSubmitting}
-          setResendMsg={setResendMsg}
-          lastResendEmail={lastResendEmail}
-          setEmail={setEmail}
-          setPassword={setPassword}
-          email={email}
-          password={password}
-          submitting={submitting}
-          showConfirmNotice={showConfirmNotice}
-          authNotice={authNotice}
-          setAuthNotice={setAuthNotice}
-        />
-        {/* Only show confirmation notice if explicitly needed (shouldn't happen with disabled email confirmation) */}
-        {showConfirmNotice && (
-          <div className="mb-3 text-center text-base text-primary-foreground bg-primary p-3 rounded">
-            Please check your email to confirm your account to become a member.
-          </div>
-        )}
-        {errorMsg && (
-          <div className="mb-3 text-destructive text-center text-base">{errorMsg}</div>
-        )}
-        {resendMsg && (
-          <div className="mb-3 text-green-700 text-center text-base">{resendMsg}</div>
-        )}
-        {showConfirmNotice && (
-          <ConfirmNotice
-            lastResendEmail={lastResendEmail}
-            password={password}
-            setResending={setResending}
-            resending={resending}
-            setResendMsg={setResendMsg}
-            setErrorMsg={setErrorMsg}
-          />
-        )}
-      </AuthLayout>
-      
-    </>
+    <AuthForm
+      isSignUp={isSignUp}
+      setIsSignUp={setIsSignUp}
+      setShowConfirmNotice={setShowConfirmNotice}
+      setErrorMsg={setErrorMsg}
+      setSubmitting={setSubmitting}
+      setResendMsg={setResendMsg}
+      lastResendEmail={lastResendEmail}
+      setEmail={setEmail}
+      setPassword={setPassword}
+      email={email}
+      password={password}
+      submitting={submitting}
+      showConfirmNotice={showConfirmNotice}
+      authNotice={authNotice}
+      setAuthNotice={setAuthNotice}
+    />
   );
 };
 export default Auth;
