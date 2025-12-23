@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -57,6 +57,7 @@ const defaultData: OnboardingData = {
  */
 const OnboardingV2: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useSupabaseSession();
   
   useHideBottomNav();
@@ -151,7 +152,9 @@ const OnboardingV2: React.FC = () => {
         has_completed_onboarding: true,
       });
       
-      navigate('/', { replace: true });
+      // Support redirect param for deep linking
+      const redirectPath = searchParams.get('redirect');
+      navigate(redirectPath || '/', { replace: true });
     } catch (err) {
       console.error('Error completing onboarding:', err);
     } finally {
