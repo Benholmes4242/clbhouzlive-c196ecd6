@@ -186,8 +186,8 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
         </p>
       </div>
 
-      {/* Feed */}
-      <div className="space-y-0 pt-2">
+      {/* Feed - 12px gap between cards like Videos tab */}
+      <div className="space-y-3 pt-2">
         {items.map((item, index) => (
           <React.Fragment key={item.id}>
             {/* Date Separator */}

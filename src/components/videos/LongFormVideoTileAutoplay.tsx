@@ -226,7 +226,7 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
 
         <button
           onClick={handleCreatorClick}
-          className="shrink-0 overflow-hidden border border-border/40 shadow-sm hover:ring-2 hover:ring-ring transition-all"
+          className="shrink-0 overflow-hidden shadow-sm transition-all"
           style={{
             width: '40px',
             aspectRatio: '1 / 1.05',

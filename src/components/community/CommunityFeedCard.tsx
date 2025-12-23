@@ -1,11 +1,10 @@
 import React, { useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { Heart, MessageCircle } from 'lucide-react';
+import { Heart, Play } from 'lucide-react';
 import { GolferAvatar } from '@/components/golfers/GolferAvatar';
 import { HLSPlayer, HLSPlayerRef, runtimeUserTap } from '@/media';
 import type { RegisterMediaFn } from '@/media';
 import type { CommunityContentItem } from '@/hooks/community/useCommunityFeed';
-import { formatDistanceToNowStrict } from 'date-fns';
 
 interface CommunityFeedCardProps {
   item: CommunityContentItem;
@@ -18,9 +17,8 @@ interface CommunityFeedCardProps {
 }
 
 /**
- * CommunityFeedCard - Card for Community tab with relationship indicator
- * Shows "Friend" or "Following" label next to the username
- * Photos NEVER show a video/play icon
+ * CommunityFeedCard - Card for Community tab matching Videos tab layout exactly
+ * Uses same structure as LongFormVideoTileAutoplay for consistency
  */
 export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
   item,
@@ -81,14 +79,6 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
     return count.toString();
   };
 
-  const formatTime = (dateString: string): string => {
-    try {
-      return formatDistanceToNowStrict(new Date(dateString), { addSuffix: false });
-    } catch {
-      return '';
-    }
-  };
-
   const handleCreatorClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (item.user?.id) {
@@ -107,7 +97,7 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
     <div
       ref={tileRef}
       className={cn(
-        "group cursor-pointer bg-card border-b border-border/30 overflow-hidden",
+        "group cursor-pointer bg-card overflow-hidden",
         className
       )}
       onClick={handleCardClick}
@@ -115,20 +105,30 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
       {/* Media Section - 16:9 aspect ratio */}
       <div className="relative w-full aspect-[16/9] overflow-hidden bg-muted">
         {isVideo && hasMedia ? (
-          <HLSPlayer
-            ref={playerRef}
-            src={item.src}
-            autoplay={isPlaying}
-            muted
-            loop
-            aspectRatio="16:9"
-            objectFit="cover"
-            externallyManaged
-            mediaId={item.id}
-            className="absolute inset-0 w-full h-full"
-          />
+          <>
+            <HLSPlayer
+              ref={playerRef}
+              src={item.src}
+              autoplay={isPlaying}
+              muted
+              loop
+              aspectRatio="16:9"
+              objectFit="cover"
+              externallyManaged
+              mediaId={item.id}
+              className="absolute inset-0 w-full h-full"
+            />
+            
+            {/* Play overlay on hover (only when not playing) */}
+            {!isPlaying && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/10 transition-colors">
+                <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                  <Play className="h-6 w-6 text-foreground ml-0.5" fill="currentColor" />
+                </div>
+              </div>
+            )}
+          </>
         ) : hasMedia ? (
-          /* Photo - NO play icon ever */
           <img
             src={item.src}
             alt={item.title || 'Photo'}
@@ -139,35 +139,48 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
           <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted-foreground/20" />
         )}
 
-        {/* Duration badge for videos only */}
+        {/* Subtle hover effect */}
+        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
+
+        {/* Likes - bottom left */}
+        <div 
+          className="absolute bottom-3 left-3 flex items-center gap-1 text-white/70 text-[10px] leading-none font-medium"
+          style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}
+        >
+          <Heart className="w-3 h-3" />
+          <span>{formatLikes(item.likeCount)}</span>
+        </div>
+
+        {/* Duration badge for videos - bottom right */}
         {isVideo && item.duration && (
           <div className="absolute bottom-3 right-3 px-2 py-0.5 bg-black/70 backdrop-blur-sm text-white text-xs font-medium rounded">
             {item.duration}
           </div>
         )}
-
-        {/* Engagement stats - bottom left */}
-        <div 
-          className="absolute bottom-3 left-3 flex items-center gap-3 text-white/80 text-xs"
-          style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}
-        >
-          <span className="flex items-center gap-1">
-            <Heart className="w-3.5 h-3.5" />
-            {formatLikes(item.likeCount)}
-          </span>
-          <span className="flex items-center gap-1">
-            <MessageCircle className="w-3.5 h-3.5" />
-            {formatLikes(item.commentCount)}
-          </span>
-        </div>
       </div>
 
-      {/* Meta Area */}
-      <div className="px-4 py-3 flex items-start gap-3">
-        {/* Avatar */}
+      {/* Meta Area - matches Videos tab layout */}
+      <div className="px-4 py-3 flex items-end justify-between gap-3">
+        <div className="flex-1 min-w-0 max-w-[80%]">
+          {/* Title/Caption */}
+          {item.title && (
+            <p className="text-sm text-foreground line-clamp-2 leading-snug">
+              {item.title}
+            </p>
+          )}
+          {/* Creator name */}
+          <button
+            onClick={handleCreatorClick}
+            className="text-xs text-muted-foreground mt-1 truncate block hover:text-foreground transition-colors"
+          >
+            {item.user?.name || 'User'}
+          </button>
+        </div>
+
+        {/* Avatar squircle - bottom right, no border/ring */}
         <button
           onClick={handleCreatorClick}
-          className="shrink-0 overflow-hidden border border-border/40 shadow-sm hover:ring-2 hover:ring-ring transition-all"
+          className="shrink-0 overflow-hidden shadow-sm transition-all"
           style={{
             width: '40px',
             aspectRatio: '1 / 1.05',
@@ -180,40 +193,6 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
             size={40}
           />
         </button>
-
-        <div className="flex-1 min-w-0">
-          {/* Username row with relationship and timestamp */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleCreatorClick}
-              className="text-sm font-medium text-foreground truncate hover:underline"
-            >
-              {item.user?.name || 'User'}
-            </button>
-            
-            {/* Relationship indicator - small label */}
-            <span className={cn(
-              "text-[10px] font-medium px-1.5 py-0.5 rounded-full",
-              item.relationshipType === 'friend' 
-                ? "bg-primary/10 text-primary" 
-                : "bg-muted text-muted-foreground"
-            )}>
-              {item.relationshipType === 'friend' ? 'Friend' : 'Following'}
-            </span>
-
-            {/* Timestamp */}
-            <span className="text-xs text-muted-foreground ml-auto">
-              {formatTime(item.createdAt)}
-            </span>
-          </div>
-
-          {/* Title/Content */}
-          {item.title && (
-            <p className="text-sm text-muted-foreground line-clamp-2 leading-snug mt-1">
-              {item.title}
-            </p>
-          )}
-        </div>
       </div>
     </div>
   );

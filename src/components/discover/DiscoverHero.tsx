@@ -197,9 +197,9 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
           </p>
         </div>
 
-        {/* Avatar - global squircle shape with tile-style border */}
+        {/* Avatar - global squircle shape, no border */}
         <div 
-          className="shrink-0 overflow-hidden border border-border/40 shadow-sm"
+          className="shrink-0 overflow-hidden shadow-sm"
           style={{
             width: '40px',
             aspectRatio: '1 / 1.05',
