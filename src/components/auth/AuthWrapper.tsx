@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useLocation, Navigate } from 'react-router-dom';
+import { logOrangeLoaderShow, logOrangeLoaderHide } from '@/utils/bootTimeline';
 
 interface AuthWrapperProps {
   children: React.ReactNode;
@@ -9,6 +10,17 @@ interface AuthWrapperProps {
 const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   const { user, loading } = useSupabaseSession();
   const location = useLocation();
+  const wasLoadingRef = useRef(false);
+
+  // Track orange loader show/hide for boot timeline
+  useEffect(() => {
+    if (loading && !wasLoadingRef.current) {
+      wasLoadingRef.current = true;
+      logOrangeLoaderShow();
+    } else if (!loading && wasLoadingRef.current) {
+      logOrangeLoaderHide();
+    }
+  }, [loading]);
 
   // Show loading while checking authentication
   if (loading) {

@@ -19,8 +19,14 @@ import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { cn } from '@/lib/utils';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+import { logRouteClubhouse, logLoadingPostsShow, logLoadingPostsHide } from '@/utils/bootTimeline';
 
 const Clubhouse = () => {
+  // Log route entry for boot timeline
+  useEffect(() => {
+    logRouteClubhouse();
+  }, []);
+  
   // Set header variant for clubhouse (glass-dark)
   useHeaderVariant('glass-dark');
   
@@ -47,6 +53,19 @@ const Clubhouse = () => {
     loadMore,
     isLoadingMore
   } = useInfiniteClubhouseShorts();
+
+  // Track loading posts state for boot timeline
+  const wasShowingLoadingRef = useRef(false);
+  useEffect(() => {
+    const showingLoading = isLoading && posts.length === 0;
+    if (showingLoading && !wasShowingLoadingRef.current) {
+      wasShowingLoadingRef.current = true;
+      logLoadingPostsShow();
+    } else if (!showingLoading && wasShowingLoadingRef.current) {
+      wasShowingLoadingRef.current = false;
+      logLoadingPostsHide();
+    }
+  }, [isLoading, posts.length]);
 
   // Navigation handlers
   const { handleTabClick } = useNavigationHandlers();

@@ -1,3 +1,6 @@
+// Boot Timeline: Log app start as early as possible
+import { logAppStart } from './utils/bootTimeline';
+logAppStart();
 
 import React from 'react'
 import { createRoot } from 'react-dom/client'

@@ -40,6 +40,7 @@ import {
   resetScrollMetrics,
   markPerformance
 } from '@/utils/clubhouseAudit';
+import { logFirstCardRender, logFirstMediaPosterLoaded } from '@/utils/bootTimeline';
 
 // Cinematic overlay components
 import { CinematicActionRail, CreatorCapsule, CommentsPage } from './cinematic';
@@ -1147,6 +1148,11 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
           }
 
           // Render full card for nearby items
+          // Boot timeline: log first card render (index 0 only)
+          if (index === 0) {
+            logFirstCardRender(item.id);
+          }
+          
           return (
             <div
               key={item.id}

@@ -1,12 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useOptimizedInfiniteQuery } from './useOptimizedQuery';
 import { useRealPostsFetcher } from './explore/useRealPostsFetcher';
 import { ExploreContentItem } from '@/components/explore/types';
+import { logFeedFetchStart, logFeedFetchSuccess } from '@/utils/bootTimeline';
 
 // NEW: Hook for Clubhouse explore feed (all users, short videos only)
 export const useInfiniteClubhouseShorts = () => {
   const { fetchClubhouseExploreShorts } = useRealPostsFetcher();
   const [allPosts, setAllPosts] = useState<ExploreContentItem[]>([]);
+  const fetchStartLogged = useRef(false);
 
   const {
     data,
@@ -20,8 +22,20 @@ export const useInfiniteClubhouseShorts = () => {
   } = useOptimizedInfiniteQuery({
     queryKey: ['clubhouse-explore-shorts'],
     queryFn: async ({ pageParam }: { pageParam: unknown }) => {
+      // Log fetch start once for boot timeline
+      if (!fetchStartLogged.current) {
+        fetchStartLogged.current = true;
+        logFeedFetchStart();
+      }
+      
       // Phase 1 Perf: Reduced from 30 to 12 items for faster initial load
       const posts = await fetchClubhouseExploreShorts(12, pageParam as string | null);
+      
+      // Log fetch success with post count (first page only)
+      if (!pageParam) {
+        logFeedFetchSuccess(posts.length);
+      }
+      
       return {
         posts,
         nextCursor: posts.length > 0 ? posts[posts.length - 1].createdAt : undefined,
