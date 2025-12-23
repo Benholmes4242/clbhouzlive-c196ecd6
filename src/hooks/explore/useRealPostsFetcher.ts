@@ -767,7 +767,8 @@ export const useRealPostsFetcher = () => {
   return { fetchRealPosts, fetchFriendsPosts, fetchClubhouseExploreShorts };
 };
 
-// Standalone export for prefetching in App.tsx (creates a temporary hook instance)
+// Standalone export for prefetching in App.tsx
+// This function is exported at the module level for use in App.tsx prefetching
 // This allows prefetching to work without React context
 export const fetchClubhouseExploreShorts = async (
   limit: number = 30,
