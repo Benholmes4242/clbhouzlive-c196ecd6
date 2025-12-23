@@ -73,8 +73,8 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
     };
   }, [registerVideo, item.id, isVideo, hasMedia]);
 
-  const formatLikes = (count?: number): string => {
-    if (!count) return '0';
+  const formatLikes = (count?: number): string | null => {
+    if (!count || count === 0) return null; // Hide when 0
     if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
     if (count >= 1000) return `${(count / 1000).toFixed(1)}K`;
     return count.toString();
@@ -94,11 +94,13 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
     onVideoClick?.(item.id);
   };
 
+  const likesDisplay = formatLikes(item.likeCount);
+
   return (
     <div
       ref={tileRef}
       className={cn(
-        "group cursor-pointer bg-card border border-border/30 overflow-hidden",
+        "group cursor-pointer bg-card border border-border/30 overflow-hidden mb-3",
         className
       )}
       onClick={handleCardClick}
@@ -143,14 +145,16 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
         {/* Subtle hover effect */}
         <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
 
-        {/* Likes - bottom left */}
-        <div 
-          className="absolute bottom-3 left-3 flex items-center gap-1 text-white/70 text-[10px] leading-none font-medium"
-          style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}
-        >
-          <Heart className="w-3 h-3" />
-          <span>{formatLikes(item.likeCount)}</span>
-        </div>
+        {/* Likes - bottom left (hidden when 0) */}
+        {likesDisplay && (
+          <div 
+            className="absolute bottom-3 left-3 flex items-center gap-1 text-white/70 text-[10px] leading-none font-medium"
+            style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}
+          >
+            <Heart className="w-3 h-3" />
+            <span>{likesDisplay}</span>
+          </div>
+        )}
 
         {/* Duration badge for videos - bottom right */}
         {isVideo && item.duration && (
@@ -169,8 +173,8 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
               {item.title}
             </p>
           )}
-          {/* Creator name · date · likes */}
-          <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+          {/* Creator name · date · likes (smaller meta row) */}
+          <div className="flex items-center gap-1 text-[11px] text-muted-foreground/80 mt-1.5">
             <button
               onClick={handleCreatorClick}
               className="hover:text-foreground transition-colors truncate"
@@ -179,8 +183,12 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
             </button>
             <span>·</span>
             <span>{item.createdAt ? formatDistanceToNow(new Date(item.createdAt), { addSuffix: true }) : 'Recently'}</span>
-            <span>·</span>
-            <span>{formatLikes(item.likeCount)} likes</span>
+            {likesDisplay && (
+              <>
+                <span>·</span>
+                <span>{likesDisplay} likes</span>
+              </>
+            )}
           </div>
         </div>
 

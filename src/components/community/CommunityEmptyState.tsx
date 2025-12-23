@@ -5,22 +5,27 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
 interface CommunityEmptyStateProps {
-  variant: 'no-community' | 'quiet';
+  variant: 'no-community' | 'quiet' | 'no-results';
   className?: string;
+  onClearFilter?: () => void;
 }
 
 /**
- * CommunityEmptyState - Phase 5 empty states for Community tab
+ * CommunityEmptyState - Empty states for Community tab
  * 
  * A) no-community: User has no friends/follows
  *    "Your Community is empty" with CTAs
  * 
  * B) quiet: Has friends/follows but no recent posts
  *    Soft nudge to be the first to post
+ * 
+ * C) no-results: Filter/search returned nothing
+ *    "No posts yet" with Clear filters button
  */
 export const CommunityEmptyState: React.FC<CommunityEmptyStateProps> = ({
   variant,
   className,
+  onClearFilter,
 }) => {
   const navigate = useNavigate();
 
@@ -58,6 +63,32 @@ export const CommunityEmptyState: React.FC<CommunityEmptyStateProps> = ({
               Discover golfers
             </Button>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // no-results variant - filter/search returned nothing
+  if (variant === 'no-results') {
+    return (
+      <div className={cn("px-5 py-16 text-center", className)}>
+        <div className="max-w-sm mx-auto">
+          <h3 className="text-base font-medium text-foreground">
+            No posts yet
+          </h3>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            Try another filter or search.
+          </p>
+          {onClearFilter && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onClearFilter}
+              className="mt-4"
+            >
+              Clear filters
+            </Button>
+          )}
         </div>
       </div>
     );
