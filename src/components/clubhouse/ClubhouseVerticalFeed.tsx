@@ -315,6 +315,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const [shouldAttachMap, setShouldAttachMap] = useState<Record<string, boolean>>(() => {
     const firstPost = posts[0];
     if (firstPost && firstPost.type === 'video') {
+      console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] INITIAL_ATTACH_MAP`, { firstPostId: firstPost.id.slice(0, 8) });
       return { [firstPost.id]: true };
     }
     return {};
@@ -324,10 +325,28 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const [autoplayMap, setAutoplayMap] = useState<Record<string, boolean>>(() => {
     const firstPost = posts[0];
     if (firstPost && firstPost.type === 'video') {
+      console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] INITIAL_AUTOPLAY_MAP`, { firstPostId: firstPost.id.slice(0, 8) });
       return { [firstPost.id]: true };
     }
     return {};
   });
+  
+  // Debug: Log state changes
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] AUTOPLAY_MAP_CHANGED`, 
+        Object.entries(autoplayMap).filter(([_, v]) => v).map(([k]) => k.slice(0, 8))
+      );
+    }
+  }, [autoplayMap]);
+  
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] SHOULD_ATTACH_MAP_CHANGED`, 
+        Object.entries(shouldAttachMap).filter(([_, v]) => v).map(([k]) => k.slice(0, 8))
+      );
+    }
+  }, [shouldAttachMap]);
 
   // Helper to safely disconnect observers
   const disconnectObserver = useCallback((observerRef: React.MutableRefObject<IntersectionObserver | null>) => {
@@ -400,6 +419,17 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         entries.forEach((e) => {
           const id = e.target.getAttribute('data-postid');
           if (!id) return;
+          
+          if (import.meta.env.DEV) {
+            console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] PLAY_OBSERVER`, {
+              id: id.slice(0, 8),
+              isIntersecting: e.isIntersecting,
+              intersectionRatio: e.intersectionRatio.toFixed(2),
+              threshold: 0.5,
+              willAutoplay: e.intersectionRatio >= 0.5
+            });
+          }
+          
           logIntersectionEvent('playRef', id, e.isIntersecting, e.intersectionRatio);
           setAutoplayMap((m) => ({ ...m, [id]: e.intersectionRatio >= 0.5 })); // 50% threshold for faster response
         });

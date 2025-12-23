@@ -19,6 +19,15 @@ import { cn } from '@/lib/utils';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
+// ============ Debug Logging ============
+const DEBUG_VIDEO_LIFECYCLE = true; // Toggle for verbose logging
+const getTimestamp = () => performance.now().toFixed(2);
+const logDebug = (event: string, data?: any) => {
+  if (DEBUG_VIDEO_LIFECYCLE && import.meta.env.DEV) {
+    console.log(`[${getTimestamp()}ms] [HLSPlayer] ${event}`, data || '');
+  }
+};
+
 // ============ Types ============
 
 export interface HLSPlayerProps {
@@ -112,6 +121,22 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   const ttffStartRef = useRef<number>(0);
   const ttffFiredRef = useRef(false);
   
+  // ============ Debug: Log Component Mount ============
+  useEffect(() => {
+    const shortSrc = src?.substring(src.lastIndexOf('/') + 1, src.lastIndexOf('/') + 9) || 'unknown';
+    logDebug('MOUNT', { 
+      src: shortSrc, 
+      autoplay, 
+      managedByMediaRuntime,
+      hasPoster: !!poster,
+      mediaId: mediaId?.slice(0, 8)
+    });
+    
+    return () => {
+      logDebug('UNMOUNT', { src: shortSrc, mediaId: mediaId?.slice(0, 8) });
+    };
+  }, []);
+  
   // State
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPosterVisible, setIsPosterVisible] = useState(true);
@@ -124,6 +149,26 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   // Buffering state for scrubber
   const [isBuffering, setIsBuffering] = useState(false);
   const [bufferedPct, setBufferedPct] = useState(0);
+  
+  // ============ Debug: Log State Changes ============
+  useEffect(() => {
+    logDebug('POSTER_VISIBILITY_CHANGE', { 
+      isPosterVisible,
+      hasFirstFrame,
+      videoReadyState: videoRef.current?.readyState,
+      mediaId: mediaId?.slice(0, 8)
+    });
+  }, [isPosterVisible]);
+  
+  useEffect(() => {
+    logDebug('FIRST_FRAME_CHANGE', { 
+      hasFirstFrame,
+      isPosterVisible,
+      videoTime: videoRef.current?.currentTime,
+      videoReadyState: videoRef.current?.readyState,
+      mediaId: mediaId?.slice(0, 8)
+    });
+  }, [hasFirstFrame]);
   
   // ============ Imperative Handle ============
   
@@ -212,6 +257,16 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     const video = videoRef.current;
     if (!video || !isAttachedRef.current) return;
     
+    logDebug('AUTOPLAY_EFFECT_TRIGGERED', {
+      autoplay,
+      managedByMediaRuntime,
+      videoPaused: video.paused,
+      videoReadyState: video.readyState,
+      hasFirstFrame,
+      isPosterVisible,
+      mediaId: mediaId?.slice(0, 8)
+    });
+    
     // Update muted state
     video.muted = muted;
     
@@ -298,6 +353,9 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     setIsPosterVisible(true);
     
     const setupSource = async () => {
+      const shortSrc = src?.substring(src.lastIndexOf('/') + 1, src.lastIndexOf('/') + 9) || 'unknown';
+      logDebug('HLS_LOAD_START', { src: shortSrc, mediaId: mediaId?.slice(0, 8) });
+      
       // Cleanup previous
       if (hlsRef.current) {
         try {
@@ -362,6 +420,12 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
           if (!mountedRef.current) return;
+          
+          logDebug('HLS_MANIFEST_PARSED', {
+            levels: hls.levels?.length,
+            readyState: video.readyState,
+            mediaId: mediaId?.slice(0, 8)
+          });
           
           // Apply start time after manifest loaded
           if (startTime && startTime > 0) {
@@ -503,6 +567,14 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     
     const markReady = () => {
       if (!mountedRef.current) return;
+      
+      logDebug('FIRST_FRAME_DETECTED', {
+        currentTime: video.currentTime,
+        readyState: video.readyState,
+        mediaId: mediaId?.slice(0, 8),
+        willHidePoster: true
+      });
+      
       // Cleanup any fallback listener
       if (timeUpdateListenerRef.current) {
         video.removeEventListener('timeupdate', timeUpdateListenerRef.current);
@@ -513,6 +585,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       if (mediaId && ttffStartRef.current > 0 && !ttffFiredRef.current) {
         ttffFiredRef.current = true;
         const ttffMs = performance.now() - ttffStartRef.current;
+        logDebug('TTFF_RECORDED', { ttffMs: ttffMs.toFixed(2), mediaId: mediaId?.slice(0, 8) });
         MediaRuntime.recordTtff(mediaId, ttffMs);
       }
       

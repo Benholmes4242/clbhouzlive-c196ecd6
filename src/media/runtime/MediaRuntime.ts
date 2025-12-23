@@ -204,8 +204,22 @@ class MediaRuntimeCore {
     surface: MediaSurface;
     reason: PlaybackReason;
   }): Promise<boolean> {
+    const startTime = performance.now();
     const { id, surface, reason } = args;
     const node = this.registry.get(id);
+    
+    if (import.meta.env.DEV) {
+      console.log(`[${startTime.toFixed(2)}ms] [MediaRuntime] REQUEST_PLAY`, {
+        id: id.slice(0, 8),
+        surface,
+        reason,
+        currentActiveCount: this.state.activeMediaIds.size,
+        isAlreadyActive: this.state.activeMediaIds.has(id),
+        nodeExists: !!node,
+        videoReadyState: node?.videoElement?.readyState,
+        videoPaused: node?.videoElement?.paused
+      });
+    }
     
     if (!node) {
       console.warn('[MediaRuntime] requestPlay: No node for', id);
@@ -240,6 +254,9 @@ class MediaRuntimeCore {
     
     // If already playing this one, skip
     if (this.state.activeMediaIds.has(id)) {
+      if (import.meta.env.DEV) {
+        console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] ALREADY_PLAYING`, { id: id.slice(0, 8) });
+      }
       return true;
     }
     
@@ -264,9 +281,16 @@ class MediaRuntimeCore {
     }
     
     // Attempt play
+    if (import.meta.env.DEV) {
+      console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] CALLING_SAFEPLAY`, { 
+        id: id.slice(0, 8),
+        readyState: node.videoElement.readyState 
+      });
+    }
     const success = await safePlay(node.videoElement);
     
     if (success) {
+      const endTime = performance.now();
       this.state.activeMediaIds.add(id);
       // Update primary active (first one or user-initiated)
       if (reason === 'user' || !this.state.primaryActiveId) {
@@ -287,10 +311,18 @@ class MediaRuntimeCore {
       this.notifyListeners();
       
       if (import.meta.env.DEV) {
-        console.log('[MediaRuntime] Playing:', id.slice(0, 8), surface, reason, 
-          'Total active:', this.state.activeMediaIds.size);
+        console.log(`[${endTime.toFixed(2)}ms] [MediaRuntime] PLAY_SUCCESS`, {
+          id: id.slice(0, 8),
+          surface,
+          reason,
+          timeTaken: (endTime - startTime).toFixed(2) + 'ms',
+          totalActive: this.state.activeMediaIds.size
+        });
       }
     } else {
+      if (import.meta.env.DEV) {
+        console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] PLAY_FAILED`, { id: id.slice(0, 8) });
+      }
       this.telemetry.playFailure?.(id, 'blocked');
     }
     
