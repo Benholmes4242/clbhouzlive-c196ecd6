@@ -241,7 +241,7 @@ export const useRealPostsFetcher = () => {
     durationFilter?: { from: number; to: number | null }
   ): Promise<ExploreContentItem[]> => {
     try {
-      // Build the query
+      // Build the base query with select
       let query = supabase
         .from('posts')
         .select(`
@@ -271,33 +271,23 @@ export const useRealPostsFetcher = () => {
               name
             )
           )
-        `)
-        .order('created_at', { ascending: false })
-        .range(currentOffset, currentOffset + postsPerPage - 1)
-        .limit(postsPerPage);
+        `);
 
+      // IMPORTANT: Apply filters BEFORE range/limit for correct pagination
       // Add media type filter if specified
       if (mediaFilter === FILTER_TYPES.SHORTS) {
         query = query
           .eq('post_media.media_type', MEDIA_TYPES.VIDEO)
+          .not('post_media.duration_seconds', 'is', null)
           .lte('post_media.duration_seconds', 180);
-        
-        // Apply Shorts subfilter
-        if (subFilter === 'trending') {
-          // Order by engagement (likes + comments + shares approximation)
-          query = query.order('created_at', { ascending: false });
-        } else if (subFilter === 'new') {
-          // Already ordered by created_at DESC
-          query = query.order('created_at', { ascending: false });
-        } else if (subFilter && ['golf-swing', 'hole-in-one', 'long-drive', 'fail'].includes(subFilter)) {
-          // Tag-based filtering - filter in post-processing since we can't efficiently query tags in this structure
-          // The filtering will happen client-side after fetch
-        }
       } else if (mediaFilter === FILTER_TYPES.VIDEOS) {
         query = query.eq('post_media.media_type', MEDIA_TYPES.VIDEO);
         
         // Apply duration filters if provided
         if (durationFilter) {
+          // Always exclude null durations when filtering by duration
+          query = query.not('post_media.duration_seconds', 'is', null);
+          
           if (durationFilter.from > 0) {
             query = query.gte('post_media.duration_seconds', durationFilter.from);
           }
@@ -309,21 +299,17 @@ export const useRealPostsFetcher = () => {
         query = query.eq('post_media.media_type', MEDIA_TYPES.IMAGE);
         
         // Apply Photos subfilters
-        if (subFilter === 'new') {
-          query = query.order('created_at', { ascending: false });
-        } else if (subFilter === 'popular') {
-          // For popular, we'll sort by created_at for now (engagement metrics would go here)
-          query = query.order('created_at', { ascending: false });
-        } else if (subFilter === 'courses') {
-          // Filter will happen post-processing for course-tagged posts
-        } else if (subFilter === 'portraits') {
-          // Server-side filter for portrait orientation
+        if (subFilter === 'portraits') {
           query = query.eq('post_media.image_orientation', 'portrait');
         } else if (subFilter === 'landscapes') {
-          // Server-side filter for landscape orientation
           query = query.eq('post_media.image_orientation', 'landscape');
         }
       }
+
+      // Apply ordering and pagination AFTER filters
+      query = query
+        .order('created_at', { ascending: false })
+        .range(currentOffset, currentOffset + postsPerPage - 1);
 
       const { data: postsData, error } = await query;
 
