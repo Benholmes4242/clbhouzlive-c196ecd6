@@ -215,17 +215,7 @@ const Discover = () => {
             </div>
             
             
-            {/* Filter Pills Row - show for non-videos/shorts tabs */}
-            {main !== 'videos' && main !== 'shorts' && (
-              <div className="pt-1 pb-3 pl-3">
-                <ExploreFilters 
-                  activeFilter={activeFilter}
-                  onFilterChange={() => {}} // No-op: pills will be subfilters
-                  main={main}
-                  sub={sub}
-                />
-              </div>
-            )}
+            {/* Filter Pills Row removed - now handled by DiscoverCommandCenter in each tab */}
 
             {/* Suggested Users - Below Tabs/Search */}
             {/* <div className="pt-1">
