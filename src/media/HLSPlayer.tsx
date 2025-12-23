@@ -110,6 +110,7 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
 }, ref) => {
   // Refs
   const videoRef = useRef<HTMLVideoElement>(null);
+  const posterRef = useRef<HTMLDivElement>(null); // Ref for synchronous poster hiding
   const hlsRef = useRef<HlsType | null>(null);
   const mountedRef = useRef(true);
   const firstFrameRequestedRef = useRef(false); // Guard against duplicate first-frame callbacks
@@ -589,6 +590,20 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         MediaRuntime.recordTtff(mediaId, ttffMs);
       }
       
+      // CRITICAL FIX: Hide poster and show video IMMEDIATELY via direct DOM manipulation
+      // This prevents the 60ms black flash caused by async React state updates
+      const posterEl = posterRef.current;
+      if (posterEl) {
+        posterEl.style.opacity = '0';
+        posterEl.style.pointerEvents = 'none';
+        logDebug('POSTER_HIDDEN_SYNC', { mediaId: mediaId?.slice(0, 8) });
+      }
+      
+      // Show video immediately
+      video.style.opacity = '1';
+      logDebug('VIDEO_SHOWN_SYNC', { mediaId: mediaId?.slice(0, 8) });
+      
+      // Then update React state for tracking (non-blocking)
       setHasFirstFrame(true);
       setIsPosterVisible(false);
     };
@@ -893,41 +908,41 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   
   return (
     <div className={cn('relative overflow-hidden bg-black', aspectClass, className)}>
-      {/* Poster Layer - ALWAYS mounted, only opacity transitions */}
-      {/* If poster is null/undefined, render a black placeholder to avoid broken img */}
-      {poster ? (
-        <img
-          src={poster}
-          alt=""
-          draggable={false}
-          className={cn(
-            'absolute inset-0 w-full h-full transition-opacity duration-150 ease-linear',
-            objectFitClass,
-            // GPU compositing hints for WebView
-            'will-change-opacity backface-hidden transform-gpu',
-            // Show poster until first real frame is painted
-            isPosterVisible ? 'opacity-100 z-10' : 'opacity-0 z-0'
-          )}
-          style={{ 
-            backfaceVisibility: 'hidden',
-            transform: 'translateZ(0)'
-          }}
-          onLoad={() => setIsPosterLoaded(true)}
-          onError={() => setIsPosterLoaded(false)}
-        />
-      ) : (
-        <div 
-          className={cn(
-            'absolute inset-0 w-full h-full bg-black transition-opacity duration-150 ease-linear',
-            'will-change-opacity backface-hidden transform-gpu',
-            isPosterVisible ? 'opacity-100 z-10' : 'opacity-0 z-0'
-          )}
-          style={{ 
-            backfaceVisibility: 'hidden',
-            transform: 'translateZ(0)'
-          }}
-        />
-      )}
+      {/* Poster Layer - ALWAYS mounted, uses ref for synchronous opacity control */}
+      {/* Direct DOM manipulation via posterRef prevents black flash */}
+      <div
+        ref={posterRef}
+        className={cn(
+          'absolute inset-0 w-full h-full transition-opacity duration-100 ease-linear',
+          // GPU compositing hints for WebView
+          'will-change-opacity backface-hidden transform-gpu',
+          // Initial z-index positioning
+          'z-10'
+        )}
+        style={{ 
+          backfaceVisibility: 'hidden',
+          transform: 'translateZ(0)',
+          // Initial opacity controlled by state, then overridden by direct DOM for sync
+          opacity: isPosterVisible ? 1 : 0,
+          pointerEvents: isPosterVisible ? 'auto' : 'none'
+        }}
+      >
+        {poster ? (
+          <img
+            src={poster}
+            alt=""
+            draggable={false}
+            className={cn(
+              'w-full h-full',
+              objectFitClass
+            )}
+            onLoad={() => setIsPosterLoaded(true)}
+            onError={() => setIsPosterLoaded(false)}
+          />
+        ) : (
+          <div className="w-full h-full bg-black" />
+        )}
+      </div>
       
       {/* Video Element - ALWAYS mounted, only opacity transitions */}
       <video

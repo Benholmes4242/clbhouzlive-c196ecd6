@@ -476,8 +476,67 @@ class MediaRuntimeCore {
       });
     }
     
-    // Play all visible candidates that aren't already playing
-    for (const candidate of candidates) {
+    // FIX: Enforce single video limit for grid surfaces
+    // Only allow one grid video to play at a time
+    const gridVideosPlaying = Array.from(this.state.activeMediaIds).filter(id => {
+      const media = this.registry.get(id);
+      return media?.surface === 'grid';
+    });
+    
+    // Separate candidates by surface
+    const gridCandidates = candidates.filter(c => c.surface === 'grid');
+    const otherCandidates = candidates.filter(c => c.surface !== 'grid');
+    
+    // For grid: only start a new video if none are playing, or current one scrolled away
+    if (gridCandidates.length > 0) {
+      if (gridVideosPlaying.length > 0) {
+        // Check if current grid video is still visible
+        const currentPlaying = this.registry.get(gridVideosPlaying[0]);
+        if (currentPlaying?.isVisible) {
+          // Current video still visible, don't start another grid video
+          if (import.meta.env.DEV) {
+            console.log('[MediaRuntime] BLOCKING_NEW_GRID_PLAY', {
+              reason: 'grid_video_already_playing',
+              currentlyPlaying: gridVideosPlaying[0].slice(0, 8)
+            });
+          }
+        } else {
+          // Current video no longer visible, stop it and pick best new one
+          this.requestPause({ id: gridVideosPlaying[0], reason: 'scroll_away' });
+          
+          // Pick best grid candidate (highest visibility ratio)
+          const bestGrid = gridCandidates.reduce((best, c) => 
+            c.visibilityRatio > (best?.visibilityRatio ?? 0) ? c : best, 
+            null as MediaNode | null
+          );
+          
+          if (bestGrid && !this.state.activeMediaIds.has(bestGrid.id)) {
+            this.requestPlay({
+              id: bestGrid.id,
+              surface: bestGrid.surface,
+              reason: 'autoplay',
+            });
+          }
+        }
+      } else {
+        // No grid videos playing - pick best one
+        const bestGrid = gridCandidates.reduce((best, c) => 
+          c.visibilityRatio > (best?.visibilityRatio ?? 0) ? c : best, 
+          null as MediaNode | null
+        );
+        
+        if (bestGrid && !this.state.activeMediaIds.has(bestGrid.id)) {
+          this.requestPlay({
+            id: bestGrid.id,
+            surface: bestGrid.surface,
+            reason: 'autoplay',
+          });
+        }
+      }
+    }
+    
+    // For non-grid surfaces (clubhouse, fullscreen), allow concurrent play
+    for (const candidate of otherCandidates) {
       if (!this.state.activeMediaIds.has(candidate.id)) {
         this.requestPlay({
           id: candidate.id,
