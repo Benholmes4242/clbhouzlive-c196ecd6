@@ -280,6 +280,11 @@ class MediaRuntimeCore {
       return false;
     }
     
+    // ✅ FIX: Add to activeMediaIds BEFORE calling safePlay
+    // This prevents the "UNAUTHORIZED PLAY" warning because the play event
+    // listener checks activeMediaIds - it needs to be set before video.play() fires
+    this.state.activeMediaIds.add(id);
+    
     // Attempt play
     if (import.meta.env.DEV) {
       console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] CALLING_SAFEPLAY`, { 
@@ -291,7 +296,6 @@ class MediaRuntimeCore {
     
     if (success) {
       const endTime = performance.now();
-      this.state.activeMediaIds.add(id);
       // Update primary active (first one or user-initiated)
       if (reason === 'user' || !this.state.primaryActiveId) {
         this.state.primaryActiveId = id;
@@ -320,6 +324,9 @@ class MediaRuntimeCore {
         });
       }
     } else {
+      // ✅ FIX: Remove from activeMediaIds if play failed
+      this.state.activeMediaIds.delete(id);
+      
       if (import.meta.env.DEV) {
         console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] PLAY_FAILED`, { id: id.slice(0, 8) });
       }
