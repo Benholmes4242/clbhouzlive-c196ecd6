@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import CompactHeader from '@/components/header/CompactHeader';
 import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
@@ -20,6 +20,8 @@ import { useCinemaDimContext } from '@/contexts/CinemaDimContext';
 import { cn } from '@/lib/utils';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { logRouteClubhouse, logLoadingPostsShow, logLoadingPostsHide } from '@/utils/bootTimeline';
+import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
+import { useClubhouseSkeletonTiming } from '@/hooks/useClubhouseSkeletonTiming';
 
 const Clubhouse = () => {
   // Log route entry for boot timeline
@@ -54,7 +56,14 @@ const Clubhouse = () => {
     isLoadingMore
   } = useInfiniteClubhouseShorts();
 
-  // Track loading posts state for boot timeline
+  // Skeleton timing for smooth loading experience
+  const { 
+    skeletonVisible, 
+    skeletonMode, 
+    signalFirstFrameReady 
+  } = useClubhouseSkeletonTiming(posts.length > 0);
+
+  // Track loading posts state for boot timeline (audit only)
   const wasShowingLoadingRef = useRef(false);
   useEffect(() => {
     const showingLoading = isLoading && posts.length === 0;
@@ -66,6 +75,11 @@ const Clubhouse = () => {
       logLoadingPostsHide();
     }
   }, [isLoading, posts.length]);
+
+  // Callback for when first video frame is ready
+  const handleFirstFrameReady = useCallback(() => {
+    signalFirstFrameReady();
+  }, [signalFirstFrameReady]);
 
   // Navigation handlers
   const { handleTabClick } = useNavigationHandlers();
@@ -229,6 +243,12 @@ const Clubhouse = () => {
       
       <CompactHeader />
 
+      {/* Skeleton Shimmer - Overlays content until first frame is ready */}
+      <ClubhouseSkeletonShimmer 
+        isVisible={skeletonVisible} 
+        isStatic={skeletonMode === 'static'} 
+      />
+
       {/* Main Content - Fullscreen Vertical Feed */}
       <div className="clubhouse-scroll">
         {/* New Season Banner */}
@@ -238,6 +258,7 @@ const Clubhouse = () => {
           </div>
         )}
 
+        {/* Always render feed when posts exist (skeleton handles loading UI) */}
         {posts.length > 0 ? (
           <ClubhouseVerticalFeed
             posts={posts}
@@ -251,16 +272,15 @@ const Clubhouse = () => {
             }}
             onCommentsOpenChange={setIsCommentsDrawerOpen}
             onPostDetailsOpen={() => console.log('Post details opened')}
+            onFirstFrameReady={handleFirstFrameReady}
           />
-        ) : isLoading ? (
-          <div className="flex items-center justify-center min-h-screen">
-            <div className="animate-pulse text-muted-foreground">Loading posts...</div>
-          </div>
-        ) : (
+        ) : !isLoading ? (
+          // Only show empty state when not loading and no posts
           <div className="flex items-center justify-center min-h-screen text-muted-foreground">
             No posts available
           </div>
-        )}
+        ) : null}
+        {/* Note: "Loading posts..." is now replaced by ClubhouseSkeletonShimmer */}
       </div>
 
       
