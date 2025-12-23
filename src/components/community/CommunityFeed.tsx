@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback, useState } from 'react';
+import React, { useEffect, useRef, useCallback, useState, useLayoutEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCommunityFeed, CommunityMediaFilter, CommunitySortOption } from '@/hooks/community/useCommunityFeed';
 import CommunityFeedCard from './CommunityFeedCard';
@@ -7,6 +7,8 @@ import { DateSeparator } from './DateSeparator';
 import { useMediaAutoplay } from '@/media';
 import { calculateDateSeparators } from '@/utils/dateSeparators';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
 
 interface CommunityFeedProps {
   onMediaClick: (item: any) => void;
@@ -82,6 +84,29 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
   } = useCommunityFeed({ mediaFilter, sortOption });
 
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const hasPreloadedFirst = useRef(false);
+
+  // CRITICAL: Preload first video immediately in layout phase (before paint)
+  useLayoutEffect(() => {
+    if (hasPreloadedFirst.current) return;
+    if (!items.length) return;
+
+    const firstVideo = items.find(item => item.type === 'video');
+    if (!firstVideo || !firstVideo.src) return;
+
+    hasPreloadedFirst.current = true;
+
+    const uid = uidFromNode({ src: firstVideo.src });
+    if (uid) {
+      const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+      if (import.meta.env.DEV) {
+        console.log(`[${performance.now().toFixed(2)}ms] [CommunityFeed] LAYOUT_EFFECT_PRELOAD`, { 
+          id: firstVideo.id.slice(0, 8) 
+        });
+      }
+      preloadHlsManifest(hlsUrl);
+    }
+  }, [items]);
 
   // Unified media autoplay with consistent thresholds
   const { registerMedia, playingIds } = useMediaAutoplay({

@@ -1,8 +1,10 @@
-import React, { useMemo, useRef, useEffect, useCallback } from 'react';
+import React, { useMemo, useRef, useEffect, useCallback, useLayoutEffect } from 'react';
 import { UnifiedMediaGridProps, UnifiedMediaItem, GRID_GAP_PX } from './types';
 import { buildUnifiedLayout, markAutoplayCandidates } from './layoutUtils';
 import UnifiedMediaTile from './UnifiedMediaTile';
 import { useMediaAutoplay } from '@/media';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
 
 // Debug logging for video lifecycle analysis
 const DEBUG_UNIFIED_GRID = true;
@@ -40,6 +42,7 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
 }) => {
   const gridRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
+  const hasPreloadedFirst = useRef(false);
 
   // Log mount
   useEffect(() => {
@@ -52,6 +55,33 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
       logGrid('UNMOUNT', { surface: config.surface });
     };
   }, []);
+
+  // CRITICAL: Preload first video immediately in layout phase (before paint)
+  // This eliminates the 2+ second React render delay on first load
+  useLayoutEffect(() => {
+    if (hasPreloadedFirst.current) return;
+    if (!items.length) return;
+
+    // Find first video item
+    const firstVideo = items.find(item => item.type === 'video');
+    if (!firstVideo) return;
+
+    hasPreloadedFirst.current = true;
+
+    // Preload HLS manifest immediately
+    const videoUrl = firstVideo.url;
+    if (videoUrl) {
+      const uid = uidFromNode({ src: videoUrl });
+      if (uid) {
+        const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+        logGrid('LAYOUT_EFFECT_PRELOAD', { 
+          id: firstVideo.id.slice(0, 8),
+          hlsUrl: hlsUrl.slice(0, 50)
+        });
+        preloadHlsManifest(hlsUrl);
+      }
+    }
+  }, [items]);
 
   // Set up autoplay hook with configurable thresholds
   const { registerMedia, playingIds } = useMediaAutoplay({
