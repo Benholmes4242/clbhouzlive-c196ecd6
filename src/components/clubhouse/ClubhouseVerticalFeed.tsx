@@ -962,6 +962,34 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   };
 
 
+  // Preload FIRST video immediately on mount (before intersection observers)
+  const hasPreloadedFirst = useRef(false);
+  useEffect(() => {
+    if (!filteredPosts || filteredPosts.length === 0) return;
+    if (hasPreloadedFirst.current) return;
+    
+    const firstPost = filteredPosts[0];
+    if (!firstPost || firstPost.media?.[0]?.media_type !== 'video') return;
+    
+    const src = firstPost.media[0]?.media_url;
+    if (!src) return;
+    
+    const uid = uidFromNode({ src });
+    if (!uid) return;
+    
+    hasPreloadedFirst.current = true;
+    const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+    
+    if (import.meta.env.DEV) {
+      console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] PRELOAD_FIRST_VIDEO`, { 
+        uid: uid.slice(0, 8),
+        hlsUrl: hlsUrl.slice(0, 50) + '...'
+      });
+    }
+    
+    preloadHlsManifest(hlsUrl);
+  }, [filteredPosts]);
+  
   // Preload next video HLS manifest
   useEffect(() => {
     if (!filteredPosts || filteredPosts.length === 0) return;
@@ -1065,7 +1093,17 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
             }));
           };
 
-          // Render lightweight placeholder for off-screen items
+          // Generate poster URL for placeholder
+          const placeholderPosterUrl = (() => {
+            const media = currentMedia;
+            if (media.media_type === 'video') {
+              const uid = uidFromNode({ src: media.media_url });
+              return uid ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` : undefined;
+            }
+            return media.media_url;
+          })();
+          
+          // Render lightweight placeholder with poster for off-screen items
           if (!isNearby) {
             return (
               <div
@@ -1088,7 +1126,17 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   scrollSnapAlign: 'start',
                   scrollSnapStop: 'always'
                 }}
-              />
+              >
+                {/* Show poster image immediately for perceived performance */}
+                {placeholderPosterUrl && (
+                  <img
+                    src={placeholderPosterUrl}
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                )}
+              </div>
             );
           }
 
@@ -1105,7 +1153,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 }
               }}
               className="relative w-full snap-start snap-always"
-              style={{ 
+              style={{
                 height: '100svh',
                 minHeight: '100svh',
                 maxHeight: '100svh',
