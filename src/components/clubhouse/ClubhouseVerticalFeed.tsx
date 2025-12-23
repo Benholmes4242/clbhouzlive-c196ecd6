@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef, useLayoutEffect } from 'react';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
 import { MapPin, UserPlus, UserCheck, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { SpeakerXMarkIcon, SpeakerWaveIcon } from '@heroicons/react/24/solid';
@@ -69,6 +69,8 @@ interface ClubhouseVerticalFeedProps {
   onTopZoneChange?: (isAtTop: boolean) => void;
   /** Fires when user performs a meaningful interaction (like, share, save, swipe, pause) */
   onMeaningfulInteraction?: () => void;
+  /** Fires when feed is ready (first video mounted) - used for skeleton fade */
+  onReady?: () => void;
 }
 
 // Helper to compute which video IDs to keep in memory
@@ -101,7 +103,9 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   autoplay?: boolean;
   isNearby?: boolean;
   isActive?: boolean;
-}>(({ src, muted, className, isMobile: isMobileProp = false, shouldAttach = false, autoplay = false, isNearby = true, isActive = true }, ref) => {
+  postId: string; // Required for MediaRuntime integration
+  eagerMount?: boolean; // Mount immediately without waiting for shouldAttach
+}>(({ src, muted, className, isMobile: isMobileProp = false, shouldAttach = false, autoplay = false, isNearby = true, isActive = true, postId, eagerMount = false }, ref) => {
   // Generate HLS URL from source
   const uid = uidFromNode({ src });
   const hlsUrl = uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null;
@@ -115,12 +119,12 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   // Handle attach/detach based on shouldAttach
   React.useEffect(() => {
     if (!playerRef.current) return;
-    if (shouldAttach) {
+    if (shouldAttach || eagerMount) {
       playerRef.current.attach();
     } else if (!isNearby) {
       playerRef.current.detach();
     }
-  }, [shouldAttach, isNearby]);
+  }, [shouldAttach, isNearby, eagerMount]);
 
   // Playback is now controlled directly by HLSPlayer autoplay prop
   // No empty useEffect needed - HLSPlayer handles play/pause internally
@@ -135,11 +139,13 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
             poster={poster}
             muted={muted}
             loop
-            autoplay={autoplay && isActive && shouldAttach}
+            autoplay={autoplay && isActive && (shouldAttach || eagerMount)}
             showMuteButton={false}
             showPlayButton={false}
             objectFit="cover"
             className="absolute inset-0 w-full h-full"
+            managedByMediaRuntime
+            mediaId={postId}
           />
         </div>
       ) : (
@@ -158,7 +164,19 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
       />
     </div>
   );
-}));
+}), (prevProps, nextProps) => {
+  // Custom comparison: only re-render if critical props change
+  return (
+    prevProps.src === nextProps.src &&
+    prevProps.muted === nextProps.muted &&
+    prevProps.shouldAttach === nextProps.shouldAttach &&
+    prevProps.autoplay === nextProps.autoplay &&
+    prevProps.isNearby === nextProps.isNearby &&
+    prevProps.isActive === nextProps.isActive &&
+    prevProps.postId === nextProps.postId &&
+    prevProps.eagerMount === nextProps.eagerMount
+  );
+});
 
 VideoWithAutoplay.displayName = 'VideoWithAutoplay';
 
@@ -181,7 +199,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   onDismissNavOverlay,
   onNavOverlayRequest,
   onTopZoneChange,
-  onMeaningfulInteraction
+  onMeaningfulInteraction,
+  onReady
 }) => {
   const { isVisible: topBarVisible, resetTimer: resetTopBar } = useTopBarVisibility();
   const { user } = useSupabaseSession();
@@ -308,8 +327,75 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   // Two-observer system for prebuffer and autoplay
   const nearRef = useRef<IntersectionObserver | null>(null);
   const playRef = useRef<IntersectionObserver | null>(null);
+  const hasPreloadedFirst = useRef(false);
+  
+  // Initialize maps empty - we'll populate in useLayoutEffect for speed
   const [shouldAttachMap, setShouldAttachMap] = useState<Record<string, boolean>>({});
   const [autoplayMap, setAutoplayMap] = useState<Record<string, boolean>>({});
+  
+  // CRITICAL: Use useLayoutEffect to set first video IMMEDIATELY before paint
+  // This eliminates the 2+ second React render delay
+  useLayoutEffect(() => {
+    if (hasPreloadedFirst.current) return;
+    if (!filteredPosts.length) return;
+    
+    const firstPost = filteredPosts[0];
+    if (!firstPost || firstPost.type !== 'video') return;
+    
+    hasPreloadedFirst.current = true;
+    
+    console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] LAYOUT_EFFECT_PRELOAD`, { 
+      firstPostId: firstPost.id.slice(0, 8) 
+    });
+    
+    // Set both maps synchronously in layout phase
+    setShouldAttachMap({ [firstPost.id]: true });
+    setAutoplayMap({ [firstPost.id]: true });
+    
+    // Also preload HLS manifest immediately
+    const mediaSrc = firstPost.media?.[0]?.media_url || firstPost.src;
+    if (mediaSrc) {
+      const uid = uidFromNode({ src: mediaSrc });
+      if (uid) {
+        const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+        preloadHlsManifest(hlsUrl);
+      }
+    }
+  }, [filteredPosts]);
+  
+  // Notify parent when feed is ready (first video playing) - used for skeleton fade
+  const hasCalledOnReady = useRef(false);
+  useEffect(() => {
+    if (hasCalledOnReady.current) return;
+    if (!filteredPosts.length) return;
+    if (!onReady) return;
+    
+    // Wait for video to actually start playing (~3.5s after data ready based on logs)
+    const timer = setTimeout(() => {
+      console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] READY_CALLBACK`);
+      hasCalledOnReady.current = true;
+      onReady();
+    }, 3500);
+    
+    return () => clearTimeout(timer);
+  }, [filteredPosts.length, onReady]);
+  
+  // Debug: Log state changes
+  useEffect(() => {
+    if (import.meta.env.DEV && Object.keys(autoplayMap).length > 0) {
+      console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] AUTOPLAY_MAP_CHANGED`, 
+        Object.entries(autoplayMap).filter(([_, v]) => v).map(([k]) => k.slice(0, 8))
+      );
+    }
+  }, [autoplayMap]);
+  
+  useEffect(() => {
+    if (import.meta.env.DEV && Object.keys(shouldAttachMap).length > 0) {
+      console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] SHOULD_ATTACH_MAP_CHANGED`, 
+        Object.entries(shouldAttachMap).filter(([_, v]) => v).map(([k]) => k.slice(0, 8))
+      );
+    }
+  }, [shouldAttachMap]);
 
   // Helper to safely disconnect observers
   const disconnectObserver = useCallback((observerRef: React.MutableRefObject<IntersectionObserver | null>) => {
@@ -382,6 +468,17 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         entries.forEach((e) => {
           const id = e.target.getAttribute('data-postid');
           if (!id) return;
+          
+          if (import.meta.env.DEV) {
+            console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] PLAY_OBSERVER`, {
+              id: id.slice(0, 8),
+              isIntersecting: e.isIntersecting,
+              intersectionRatio: e.intersectionRatio.toFixed(2),
+              threshold: 0.5,
+              willAutoplay: e.intersectionRatio >= 0.5
+            });
+          }
+          
           logIntersectionEvent('playRef', id, e.isIntersecting, e.intersectionRatio);
           setAutoplayMap((m) => ({ ...m, [id]: e.intersectionRatio >= 0.5 })); // 50% threshold for faster response
         });
@@ -914,6 +1011,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   };
 
 
+  // NOTE: Preload logic moved to useLayoutEffect at top of component for faster execution
+  
   // Preload next video HLS manifest
   useEffect(() => {
     if (!filteredPosts || filteredPosts.length === 0) return;
@@ -1017,7 +1116,17 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
             }));
           };
 
-          // Render lightweight placeholder for off-screen items
+          // Generate poster URL for placeholder
+          const placeholderPosterUrl = (() => {
+            const media = currentMedia;
+            if (media.media_type === 'video') {
+              const uid = uidFromNode({ src: media.media_url });
+              return uid ? `https://videodelivery.net/${uid}/thumbnails/thumbnail.jpg?height=600` : undefined;
+            }
+            return media.media_url;
+          })();
+          
+          // Render lightweight placeholder with poster for off-screen items
           if (!isNearby) {
             return (
               <div
@@ -1040,7 +1149,17 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   scrollSnapAlign: 'start',
                   scrollSnapStop: 'always'
                 }}
-              />
+              >
+                {/* Show poster image immediately for perceived performance */}
+                {placeholderPosterUrl && (
+                  <img
+                    src={placeholderPosterUrl}
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                )}
+              </div>
             );
           }
 
@@ -1057,7 +1176,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 }
               }}
               className="relative w-full snap-start snap-always"
-              style={{ 
+              style={{
                 height: '100svh',
                 minHeight: '100svh',
                 maxHeight: '100svh',
@@ -1122,6 +1241,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                       autoplay={!!autoplayMap[item.id]}
                       isNearby={isNearby}
                       isActive={index === currentIndex}
+                      postId={item.id}
                     />
                     
                     {/* Simple video controls overlay */}

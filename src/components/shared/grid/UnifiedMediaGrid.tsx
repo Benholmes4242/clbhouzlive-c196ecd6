@@ -4,6 +4,14 @@ import { buildUnifiedLayout, markAutoplayCandidates } from './layoutUtils';
 import UnifiedMediaTile from './UnifiedMediaTile';
 import { useMediaAutoplay } from '@/media';
 
+// Debug logging for video lifecycle analysis
+const DEBUG_UNIFIED_GRID = true;
+const logGrid = (event: string, data?: any) => {
+  if (!DEBUG_UNIFIED_GRID) return;
+  const timestamp = performance.now().toFixed(2);
+  console.log(`[${timestamp}ms] [UnifiedMediaGrid] ${event}`, data || '');
+};
+
 /**
  * Unified Media Grid - Single source of truth for Watch and Profile Activity grids
  * 
@@ -33,6 +41,18 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
   const gridRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
 
+  // Log mount
+  useEffect(() => {
+    logGrid('MOUNT', { 
+      itemsCount: items.length,
+      surface: config.surface,
+      autoplayEnabled: config.autoplayEnabled
+    });
+    return () => {
+      logGrid('UNMOUNT', { surface: config.surface });
+    };
+  }, []);
+
   // Set up autoplay hook with configurable thresholds
   const { registerMedia, playingIds } = useMediaAutoplay({
     mode: 'grid',
@@ -40,9 +60,22 @@ const UnifiedMediaGrid: React.FC<UnifiedMediaGridProps> = ({
     stopThreshold: config.pauseThreshold ? (1 - config.pauseThreshold) : undefined,
   });
 
+  // Log playingIds changes
+  useEffect(() => {
+    logGrid('PLAYING_IDS_CHANGE', { 
+      playingIds: Array.from(playingIds),
+      count: playingIds.size 
+    });
+  }, [playingIds]);
+
   // Mark autoplay candidates and build layout
   const processedItems = useMemo(() => {
-    return markAutoplayCandidates(items);
+    const marked = markAutoplayCandidates(items);
+    logGrid('ITEMS_PROCESSED', { 
+      total: items.length,
+      autoplayCandidates: marked.filter(i => i.isAutoplayCandidate).length
+    });
+    return marked;
   }, [items]);
 
   const layoutRows = useMemo(() => {

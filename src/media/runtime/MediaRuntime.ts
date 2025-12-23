@@ -204,8 +204,22 @@ class MediaRuntimeCore {
     surface: MediaSurface;
     reason: PlaybackReason;
   }): Promise<boolean> {
+    const startTime = performance.now();
     const { id, surface, reason } = args;
     const node = this.registry.get(id);
+    
+    if (import.meta.env.DEV) {
+      console.log(`[${startTime.toFixed(2)}ms] [MediaRuntime] REQUEST_PLAY`, {
+        id: id.slice(0, 8),
+        surface,
+        reason,
+        currentActiveCount: this.state.activeMediaIds.size,
+        isAlreadyActive: this.state.activeMediaIds.has(id),
+        nodeExists: !!node,
+        videoReadyState: node?.videoElement?.readyState,
+        videoPaused: node?.videoElement?.paused
+      });
+    }
     
     if (!node) {
       console.warn('[MediaRuntime] requestPlay: No node for', id);
@@ -240,6 +254,9 @@ class MediaRuntimeCore {
     
     // If already playing this one, skip
     if (this.state.activeMediaIds.has(id)) {
+      if (import.meta.env.DEV) {
+        console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] ALREADY_PLAYING`, { id: id.slice(0, 8) });
+      }
       return true;
     }
     
@@ -263,11 +280,22 @@ class MediaRuntimeCore {
       return false;
     }
     
+    // ✅ FIX: Add to activeMediaIds BEFORE calling safePlay
+    // This prevents the "UNAUTHORIZED PLAY" warning because the play event
+    // listener checks activeMediaIds - it needs to be set before video.play() fires
+    this.state.activeMediaIds.add(id);
+    
     // Attempt play
+    if (import.meta.env.DEV) {
+      console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] CALLING_SAFEPLAY`, { 
+        id: id.slice(0, 8),
+        readyState: node.videoElement.readyState 
+      });
+    }
     const success = await safePlay(node.videoElement);
     
     if (success) {
-      this.state.activeMediaIds.add(id);
+      const endTime = performance.now();
       // Update primary active (first one or user-initiated)
       if (reason === 'user' || !this.state.primaryActiveId) {
         this.state.primaryActiveId = id;
@@ -287,10 +315,21 @@ class MediaRuntimeCore {
       this.notifyListeners();
       
       if (import.meta.env.DEV) {
-        console.log('[MediaRuntime] Playing:', id.slice(0, 8), surface, reason, 
-          'Total active:', this.state.activeMediaIds.size);
+        console.log(`[${endTime.toFixed(2)}ms] [MediaRuntime] PLAY_SUCCESS`, {
+          id: id.slice(0, 8),
+          surface,
+          reason,
+          timeTaken: (endTime - startTime).toFixed(2) + 'ms',
+          totalActive: this.state.activeMediaIds.size
+        });
       }
     } else {
+      // ✅ FIX: Remove from activeMediaIds if play failed
+      this.state.activeMediaIds.delete(id);
+      
+      if (import.meta.env.DEV) {
+        console.log(`[${performance.now().toFixed(2)}ms] [MediaRuntime] PLAY_FAILED`, { id: id.slice(0, 8) });
+      }
       this.telemetry.playFailure?.(id, 'blocked');
     }
     
@@ -444,8 +483,67 @@ class MediaRuntimeCore {
       });
     }
     
-    // Play all visible candidates that aren't already playing
-    for (const candidate of candidates) {
+    // FIX: Enforce single video limit for grid surfaces
+    // Only allow one grid video to play at a time
+    const gridVideosPlaying = Array.from(this.state.activeMediaIds).filter(id => {
+      const media = this.registry.get(id);
+      return media?.surface === 'grid';
+    });
+    
+    // Separate candidates by surface
+    const gridCandidates = candidates.filter(c => c.surface === 'grid');
+    const otherCandidates = candidates.filter(c => c.surface !== 'grid');
+    
+    // For grid: only start a new video if none are playing, or current one scrolled away
+    if (gridCandidates.length > 0) {
+      if (gridVideosPlaying.length > 0) {
+        // Check if current grid video is still visible
+        const currentPlaying = this.registry.get(gridVideosPlaying[0]);
+        if (currentPlaying?.isVisible) {
+          // Current video still visible, don't start another grid video
+          if (import.meta.env.DEV) {
+            console.log('[MediaRuntime] BLOCKING_NEW_GRID_PLAY', {
+              reason: 'grid_video_already_playing',
+              currentlyPlaying: gridVideosPlaying[0].slice(0, 8)
+            });
+          }
+        } else {
+          // Current video no longer visible, stop it and pick best new one
+          this.requestPause({ id: gridVideosPlaying[0], reason: 'scroll_away' });
+          
+          // Pick best grid candidate (highest visibility ratio)
+          const bestGrid = gridCandidates.reduce((best, c) => 
+            c.visibilityRatio > (best?.visibilityRatio ?? 0) ? c : best, 
+            null as MediaNode | null
+          );
+          
+          if (bestGrid && !this.state.activeMediaIds.has(bestGrid.id)) {
+            this.requestPlay({
+              id: bestGrid.id,
+              surface: bestGrid.surface,
+              reason: 'autoplay',
+            });
+          }
+        }
+      } else {
+        // No grid videos playing - pick best one
+        const bestGrid = gridCandidates.reduce((best, c) => 
+          c.visibilityRatio > (best?.visibilityRatio ?? 0) ? c : best, 
+          null as MediaNode | null
+        );
+        
+        if (bestGrid && !this.state.activeMediaIds.has(bestGrid.id)) {
+          this.requestPlay({
+            id: bestGrid.id,
+            surface: bestGrid.surface,
+            reason: 'autoplay',
+          });
+        }
+      }
+    }
+    
+    // For non-grid surfaces (clubhouse, fullscreen), allow concurrent play
+    for (const candidate of otherCandidates) {
       if (!this.state.activeMediaIds.has(candidate.id)) {
         this.requestPlay({
           id: candidate.id,

@@ -5,6 +5,14 @@ import { getStreamPoster } from '@/utils/stream';
 import { OverlayCorners } from '@/components/shared/overlay';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 
+// Debug logging for video lifecycle analysis
+const DEBUG_HERO = true;
+const logHero = (event: string, data?: any) => {
+  if (!DEBUG_HERO) return;
+  const timestamp = performance.now().toFixed(2);
+  console.log(`[${timestamp}ms] [DiscoverHero] ${event}`, data || '');
+};
+
 interface HeroItem {
   id: string;
   contextLabel: string; // e.g. "Trending in golf"
@@ -52,6 +60,28 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
   const containerRef = useRef<HTMLDivElement>(null);
   const [resolvedDuration, setResolvedDuration] = useState<number | undefined>(item?.durationSeconds);
 
+  // Log mount/unmount
+  useEffect(() => {
+    logHero('MOUNT', { 
+      itemId: item?.id,
+      mediaType: item?.mediaType,
+      autoplay,
+      hasPoster: !!item?.posterUrl
+    });
+    return () => {
+      logHero('UNMOUNT', { itemId: item?.id });
+    };
+  }, []);
+
+  // Log autoplay prop changes
+  useEffect(() => {
+    logHero('AUTOPLAY_PROP_CHANGE', { 
+      autoplay, 
+      itemId: item?.id,
+      mediaType: item?.mediaType 
+    });
+  }, [autoplay, item?.id, item?.mediaType]);
+
   // Update resolved duration when item changes
   useEffect(() => {
     setResolvedDuration(item?.durationSeconds);
@@ -59,13 +89,14 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
 
   // Get duration from video element if not provided
   const handleLoadedData = useCallback(() => {
+    logHero('HANDLE_LOADED_DATA_CALLED', { itemId: item?.id, hasDuration: !!item?.durationSeconds });
     if (playerRef.current && !item?.durationSeconds) {
       const d = playerRef.current.getDuration();
       if (Number.isFinite(d) && d > 0 && d !== Infinity) {
         setResolvedDuration(d);
       }
     }
-  }, [item?.durationSeconds]);
+  }, [item?.durationSeconds, item?.id]);
 
   if (isLoading) {
     return (
@@ -108,17 +139,25 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
       <div className="relative w-full aspect-[16/9] overflow-hidden bg-muted">
         {/* Media - Image or Video */}
         {item.mediaType === 'video' && item.mediaUrl ? (
-          <HLSPlayer
-            ref={playerRef}
-            src={item.mediaUrl}
-            poster={item.posterUrl}
-            autoplay={autoplay}
-            muted
-            loop
-            objectFit="cover"
-            onLoadedData={handleLoadedData}
-            className="absolute inset-0 w-full h-full"
-          />
+          <>
+            {logHero('RENDER_VIDEO', { autoplay, src: item.mediaUrl?.slice(0, 50) })}
+            <HLSPlayer
+              ref={playerRef}
+              src={item.mediaUrl}
+              poster={item.posterUrl}
+              autoplay={autoplay}
+              muted
+              loop
+              objectFit="cover"
+              managedByMediaRuntime={false}
+              mediaId={item.id}
+              onLoadedData={() => {
+                logHero('VIDEO_LOADED_DATA', { itemId: item.id });
+                handleLoadedData();
+              }}
+              className="absolute inset-0 w-full h-full"
+            />
+          </>
         ) : (
           <img
             src={item.mediaUrl}
@@ -158,9 +197,9 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
           </p>
         </div>
 
-        {/* Avatar - global squircle shape with tile-style border */}
+        {/* Avatar - global squircle shape, no border */}
         <div 
-          className="shrink-0 overflow-hidden border border-border/40 shadow-sm"
+          className="shrink-0 overflow-hidden shadow-sm"
           style={{
             width: '40px',
             aspectRatio: '1 / 1.05',
