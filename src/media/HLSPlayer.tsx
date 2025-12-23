@@ -19,15 +19,6 @@ import { cn } from '@/lib/utils';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 
-// ============ Debug Logging ============
-const DEBUG_VIDEO_LIFECYCLE = true; // Toggle for verbose logging
-const getTimestamp = () => performance.now().toFixed(2);
-const logDebug = (event: string, data?: any) => {
-  if (DEBUG_VIDEO_LIFECYCLE && import.meta.env.DEV) {
-    console.log(`[${getTimestamp()}ms] [HLSPlayer] ${event}`, data || '');
-  }
-};
-
 // ============ Types ============
 
 export interface HLSPlayerProps {
@@ -62,7 +53,6 @@ export interface HLSPlayerProps {
   externallyManaged?: boolean; // Disable internal play/pause on click
   startTime?: number; // Resume from position
   preload?: 'none' | 'metadata' | 'auto';
-  managedByMediaRuntime?: boolean; // If true, MediaRuntime controls playback; if false/undefined, handle autoplay directly
   
   // Scrubber
   showScrubber?: boolean; // Show progress scrubber (default: true if MEDIA_SCRUBBER_V1)
@@ -104,13 +94,11 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   externallyManaged = false,
   startTime,
   preload = 'metadata',
-  managedByMediaRuntime = false,
   showScrubber,
   mediaId,
 }, ref) => {
   // Refs
   const videoRef = useRef<HTMLVideoElement>(null);
-  const posterRef = useRef<HTMLDivElement>(null); // Ref for synchronous poster hiding
   const hlsRef = useRef<HlsType | null>(null);
   const mountedRef = useRef(true);
   const firstFrameRequestedRef = useRef(false); // Guard against duplicate first-frame callbacks
@@ -121,22 +109,6 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   // TTFF timing ref
   const ttffStartRef = useRef<number>(0);
   const ttffFiredRef = useRef(false);
-  
-  // ============ Debug: Log Component Mount ============
-  useEffect(() => {
-    const shortSrc = src?.substring(src.lastIndexOf('/') + 1, src.lastIndexOf('/') + 9) || 'unknown';
-    logDebug('MOUNT', { 
-      src: shortSrc, 
-      autoplay, 
-      managedByMediaRuntime,
-      hasPoster: !!poster,
-      mediaId: mediaId?.slice(0, 8)
-    });
-    
-    return () => {
-      logDebug('UNMOUNT', { src: shortSrc, mediaId: mediaId?.slice(0, 8) });
-    };
-  }, []);
   
   // State
   const [isPlaying, setIsPlaying] = useState(false);
@@ -150,26 +122,6 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   // Buffering state for scrubber
   const [isBuffering, setIsBuffering] = useState(false);
   const [bufferedPct, setBufferedPct] = useState(0);
-  
-  // ============ Debug: Log State Changes ============
-  useEffect(() => {
-    logDebug('POSTER_VISIBILITY_CHANGE', { 
-      isPosterVisible,
-      hasFirstFrame,
-      videoReadyState: videoRef.current?.readyState,
-      mediaId: mediaId?.slice(0, 8)
-    });
-  }, [isPosterVisible]);
-  
-  useEffect(() => {
-    logDebug('FIRST_FRAME_CHANGE', { 
-      hasFirstFrame,
-      isPosterVisible,
-      videoTime: videoRef.current?.currentTime,
-      videoReadyState: videoRef.current?.readyState,
-      mediaId: mediaId?.slice(0, 8)
-    });
-  }, [hasFirstFrame]);
   
   // ============ Imperative Handle ============
   
@@ -253,75 +205,24 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   // ============ Sync External Autoplay State ============
   // React to autoplay prop changes to play/pause video without re-initializing HLS
   
-  // Smart autoplay: MediaRuntime-managed vs Standalone
+  // Immediate autoplay response - MediaRuntime handles state stability
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !isAttachedRef.current) return;
     
-    logDebug('AUTOPLAY_EFFECT_TRIGGERED', {
-      autoplay,
-      managedByMediaRuntime,
-      videoPaused: video.paused,
-      videoReadyState: video.readyState,
-      hasFirstFrame,
-      isPosterVisible,
-      mediaId: mediaId?.slice(0, 8)
-    });
-    
-    // Update muted state
-    video.muted = muted;
-    
-    if (managedByMediaRuntime) {
-      // MediaRuntime-managed: Route playback through MediaRuntime
-      if (autoplay && video.paused && mediaId) {
-        // Check if node is registered with MediaRuntime
-        const isRegistered = MediaRuntime.getNode(mediaId) !== undefined;
-        
-        if (isRegistered) {
-          // Node is registered - use MediaRuntime
-          MediaRuntime.requestPlay({
-            id: mediaId,
-            surface: 'clubhouse',
-            reason: 'autoplay',
-          });
-        } else {
-          // Node not yet registered - retry after a short delay
-          // This handles the race condition on initial page load
-          const retryTimeout = setTimeout(() => {
-            const stillRegistered = MediaRuntime.getNode(mediaId) !== undefined;
-            if (stillRegistered && video.paused && autoplayRef.current) {
-              MediaRuntime.requestPlay({
-                id: mediaId,
-                surface: 'clubhouse',
-                reason: 'autoplay',
-              });
-            } else if (video.paused && autoplayRef.current) {
-              // Fallback: if still not registered after delay, play directly
-              // This ensures the first video always starts
-              safePlay(video).catch(err => {
-                console.warn('[HLSPlayer] Fallback autoplay failed:', err);
-              });
-            }
-          }, 100);
-          
-          return () => clearTimeout(retryTimeout);
-        }
-      } else if (!autoplay && !video.paused) {
-        video.pause();
+    // No debounce - MediaRuntime already handles scroll settling
+    if (autoplay) {
+      // Only play if not already playing
+      if (video.paused) {
+        safePlay(video);
       }
     } else {
-      // Standalone mode: Handle autoplay directly (hero videos, modals, etc.)
-      if (autoplay && video.paused) {
-        // This is a standalone video not managed by MediaRuntime
-        // Safe to call play() directly
-        safePlay(video).catch(err => {
-          console.warn('[HLSPlayer] Standalone autoplay failed:', err);
-        });
-      } else if (!autoplay && !video.paused) {
+      // Only pause if currently playing
+      if (!video.paused) {
         video.pause();
       }
     }
-  }, [autoplay, muted, managedByMediaRuntime, mediaId]);
+  }, [autoplay]);
   
   // ============ HLS Setup ============
   
@@ -354,9 +255,6 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     setIsPosterVisible(true);
     
     const setupSource = async () => {
-      const shortSrc = src?.substring(src.lastIndexOf('/') + 1, src.lastIndexOf('/') + 9) || 'unknown';
-      logDebug('HLS_LOAD_START', { src: shortSrc, mediaId: mediaId?.slice(0, 8) });
-      
       // Cleanup previous
       if (hlsRef.current) {
         try {
@@ -422,12 +320,6 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
           if (!mountedRef.current) return;
           
-          logDebug('HLS_MANIFEST_PARSED', {
-            levels: hls.levels?.length,
-            readyState: video.readyState,
-            mediaId: mediaId?.slice(0, 8)
-          });
-          
           // Apply start time after manifest loaded
           if (startTime && startTime > 0) {
             video.currentTime = startTime;
@@ -440,8 +332,9 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
             } catch {}
           }
           
-          // DO NOT call safePlay() directly - MediaRuntime handles playback
-          // Just mark as ready, MediaRuntime will call play via requestPlay()
+          if (autoplayRef.current) {
+            safePlay(video);
+          }
         });
         
         hls.attachMedia(video);
@@ -568,14 +461,6 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
     
     const markReady = () => {
       if (!mountedRef.current) return;
-      
-      logDebug('FIRST_FRAME_DETECTED', {
-        currentTime: video.currentTime,
-        readyState: video.readyState,
-        mediaId: mediaId?.slice(0, 8),
-        willHidePoster: true
-      });
-      
       // Cleanup any fallback listener
       if (timeUpdateListenerRef.current) {
         video.removeEventListener('timeupdate', timeUpdateListenerRef.current);
@@ -586,24 +471,9 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
       if (mediaId && ttffStartRef.current > 0 && !ttffFiredRef.current) {
         ttffFiredRef.current = true;
         const ttffMs = performance.now() - ttffStartRef.current;
-        logDebug('TTFF_RECORDED', { ttffMs: ttffMs.toFixed(2), mediaId: mediaId?.slice(0, 8) });
         MediaRuntime.recordTtff(mediaId, ttffMs);
       }
       
-      // CRITICAL FIX: Hide poster and show video IMMEDIATELY via direct DOM manipulation
-      // This prevents the 60ms black flash caused by async React state updates
-      const posterEl = posterRef.current;
-      if (posterEl) {
-        posterEl.style.opacity = '0';
-        posterEl.style.pointerEvents = 'none';
-        logDebug('POSTER_HIDDEN_SYNC', { mediaId: mediaId?.slice(0, 8) });
-      }
-      
-      // Show video immediately
-      video.style.opacity = '1';
-      logDebug('VIDEO_SHOWN_SYNC', { mediaId: mediaId?.slice(0, 8) });
-      
-      // Then update React state for tracking (non-blocking)
       setHasFirstFrame(true);
       setIsPosterVisible(false);
     };
@@ -908,41 +778,41 @@ const HLSPlayer = forwardRef<HLSPlayerRef, HLSPlayerProps>(({
   
   return (
     <div className={cn('relative overflow-hidden bg-black', aspectClass, className)}>
-      {/* Poster Layer - ALWAYS mounted, uses ref for synchronous opacity control */}
-      {/* Direct DOM manipulation via posterRef prevents black flash */}
-      <div
-        ref={posterRef}
-        className={cn(
-          'absolute inset-0 w-full h-full transition-opacity duration-100 ease-linear',
-          // GPU compositing hints for WebView
-          'will-change-opacity backface-hidden transform-gpu',
-          // Initial z-index positioning
-          'z-10'
-        )}
-        style={{ 
-          backfaceVisibility: 'hidden',
-          transform: 'translateZ(0)',
-          // Initial opacity controlled by state, then overridden by direct DOM for sync
-          opacity: isPosterVisible ? 1 : 0,
-          pointerEvents: isPosterVisible ? 'auto' : 'none'
-        }}
-      >
-        {poster ? (
-          <img
-            src={poster}
-            alt=""
-            draggable={false}
-            className={cn(
-              'w-full h-full',
-              objectFitClass
-            )}
-            onLoad={() => setIsPosterLoaded(true)}
-            onError={() => setIsPosterLoaded(false)}
-          />
-        ) : (
-          <div className="w-full h-full bg-black" />
-        )}
-      </div>
+      {/* Poster Layer - ALWAYS mounted, only opacity transitions */}
+      {/* If poster is null/undefined, render a black placeholder to avoid broken img */}
+      {poster ? (
+        <img
+          src={poster}
+          alt=""
+          draggable={false}
+          className={cn(
+            'absolute inset-0 w-full h-full transition-opacity duration-150 ease-linear',
+            objectFitClass,
+            // GPU compositing hints for WebView
+            'will-change-opacity backface-hidden transform-gpu',
+            // Show poster until first real frame is painted
+            isPosterVisible ? 'opacity-100 z-10' : 'opacity-0 z-0'
+          )}
+          style={{ 
+            backfaceVisibility: 'hidden',
+            transform: 'translateZ(0)'
+          }}
+          onLoad={() => setIsPosterLoaded(true)}
+          onError={() => setIsPosterLoaded(false)}
+        />
+      ) : (
+        <div 
+          className={cn(
+            'absolute inset-0 w-full h-full bg-black transition-opacity duration-150 ease-linear',
+            'will-change-opacity backface-hidden transform-gpu',
+            isPosterVisible ? 'opacity-100 z-10' : 'opacity-0 z-0'
+          )}
+          style={{ 
+            backfaceVisibility: 'hidden',
+            transform: 'translateZ(0)'
+          }}
+        />
+      )}
       
       {/* Video Element - ALWAYS mounted, only opacity transitions */}
       <video

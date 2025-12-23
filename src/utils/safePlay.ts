@@ -32,8 +32,6 @@ export async function safePlay(
   video: HTMLVideoElement, 
   options: SafePlayOptions = {}
 ): Promise<boolean> {
-  const startTime = performance.now();
-  
   // Feature flag for rollback capability
   if (!USE_SAFE_AUTOPLAY_V2) {
     return legacySafePlay(video);
@@ -44,21 +42,12 @@ export async function safePlay(
   
   logVideoTelemetry('video_autoplay_attempted', { videoId });
   
-  // Enhanced debug logging
-  const readyStateNames = ['HAVE_NOTHING', 'HAVE_METADATA', 'HAVE_CURRENT_DATA', 'HAVE_FUTURE_DATA', 'HAVE_ENOUGH_DATA'];
-  devLog(`[${startTime.toFixed(2)}ms] [safePlay] START`, {
-    videoId,
-    readyState: video.readyState,
-    readyStateName: readyStateNames[video.readyState],
-    currentTime: video.currentTime,
-    paused: video.paused,
-    networkState: video.networkState
-  });
-  
   // Ensure proper preconditions for autoplay
   video.muted = true;
   video.playsInline = true;
   video.setAttribute('webkit-playsinline', 'true');
+  
+  devLog(`[safePlay] Starting for video ${videoId}, readyState: ${video.readyState}, currentTime: ${video.currentTime}`);
   
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -94,23 +83,14 @@ export async function safePlay(
         }
       }
       
-      devLog(`[${performance.now().toFixed(2)}ms] [safePlay] CALLING_PLAY`, {
-        videoId,
-        readyState: video.readyState,
-        attempt
-      });
+      devLog(`[safePlay] Attempting play() for video ${videoId}, attempt ${attempt}`);
       await video.play();
-      const endTime = performance.now();
-      devLog(`[${endTime.toFixed(2)}ms] [safePlay] ✅ SUCCESS`, {
-        videoId,
-        totalTime: (endTime - startTime).toFixed(2) + 'ms',
-        attempt
-      });
+      devLog(`[safePlay] ✅ Successfully played video ${videoId} on attempt ${attempt}`);
       logVideoTelemetry('video_autoplay_succeeded', { videoId, attempt });
       return true;
       
     } catch (err: any) {
-      devWarn(`[${performance.now().toFixed(2)}ms] [safePlay] Attempt ${attempt}/${maxRetries} FAILED for video ${videoId}:`, err?.name || err);
+      devWarn(`[safePlay] Attempt ${attempt}/${maxRetries} failed for video ${videoId}:`, err?.name || err);
       
       if (err?.name === 'NotAllowedError' && attempt === maxRetries) {
         devWarn(`[safePlay] 🚫 Final NotAllowedError for video ${videoId} - marking as blocked`);

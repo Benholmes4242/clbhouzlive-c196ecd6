@@ -127,7 +127,7 @@ export default React.memo(function ShortCard({
 
             {/* Avatar squircle - positioned 8px from right edge, 90% overlaps panel, 10% extends above */}
             <div
-              className="absolute right-[8px] bottom-[10px] w-[48px] h-[48px] rounded-[12px] overflow-hidden bg-black/40 backdrop-blur-md"
+              className="absolute right-[8px] bottom-[10px] w-[48px] h-[48px] rounded-[12px] overflow-hidden border border-white/30 bg-black/40 backdrop-blur-md"
               style={{
                 boxShadow: '0 16px 32px rgba(0, 0, 0, 0.6)'
               }}
@@ -173,7 +173,7 @@ export default React.memo(function ShortCard({
 
             {/* Avatar - bottom right, squircle (matching landscape style) */}
             <div
-              className="absolute right-3 bottom-3 w-[40px] h-[40px] rounded-[10px] overflow-hidden bg-black/40 backdrop-blur-md"
+              className="absolute right-3 bottom-3 w-[40px] h-[40px] rounded-[10px] overflow-hidden border border-white/30 bg-black/40 backdrop-blur-md"
               style={{
                 boxShadow: '0 16px 32px rgba(0, 0, 0, 0.6)'
               }}

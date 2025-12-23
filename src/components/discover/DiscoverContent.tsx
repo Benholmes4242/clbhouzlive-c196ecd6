@@ -20,7 +20,6 @@ import { useShortsSuggestions } from '@/hooks/useShortsSuggestions';
 import { buildInterleavedFeed, InterleavedItem } from '@/utils/interleaveFeed';
 import { toast } from 'sonner';
 import DiscoverHero, { createHeroItem } from '@/components/discover/DiscoverHero';
-import { DiscoverCommandCenter, SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
 
 // Wrapper to avoid useMemo inside render callback (fixes setState during render warning)
 function VideosGridWrapper({
@@ -134,47 +133,12 @@ function applyTagFilter(content: ExploreContentItem[], selectedTags: string[]): 
   });
 }
 
-// Shorts filter pills
-const SHORTS_PILLS = [
-  { key: 'all', label: 'All' },
-  { key: 'funny', label: 'Funny' },
-  { key: 'challenge', label: 'Challenge' },
-  { key: 'tips', label: 'Tips' },
-  { key: 'course-vlog', label: 'Course Vlog' },
-  { key: 'trick-shots', label: 'Trick Shots' },
-];
-
-export default function DiscoverContent({ onLike, onFollow, onMediaClick, searchQuery: externalSearchQuery, selectedTags = [] }: DiscoverContentProps) {
+export default function DiscoverContent({ onLike, onFollow, onMediaClick, searchQuery, selectedTags = [] }: DiscoverContentProps) {
   const navigate = useNavigate();
   const { main, sub, duration } = useDiscoverQuery();
   const [currentContent, setCurrentContent] = useState<ExploreContentItem[] | null>(null);
   const [recentHistory, setRecentHistory] = useState<Set<string>>(new Set());
   const [likedItems, setLikedItems] = useState<Record<string, boolean>>({});
-  
-  // Watch tab local state for command center
-  const [watchSearchQuery, setWatchSearchQuery] = useState('');
-  const [watchSortOption, setWatchSortOption] = useState<SortOption>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem('watch-sort') as SortOption) || 'newest';
-    }
-    return 'newest';
-  });
-  const [watchActiveFilter, setWatchActiveFilter] = useState('all');
-  
-  // Persist sort preference
-  useEffect(() => {
-    localStorage.setItem('watch-sort', watchSortOption);
-  }, [watchSortOption]);
-  
-  // Use external search query if provided, otherwise use local
-  const searchQuery = externalSearchQuery || watchSearchQuery;
-  
-  // Convert pills to DiscoverCommandCenter format
-  const watchPills: Pill[] = SHORTS_PILLS.map(pill => ({
-    key: pill.key,
-    label: pill.label,
-    selected: watchActiveFilter === pill.key,
-  }));
   
   // Fetch real Shorts data for inline blocks (only when on Videos tab)
   const { content: shortsContent, hasMore: hasMoreShorts, loadMore: loadMoreShorts } = useInfiniteExploreContent(
@@ -369,17 +333,6 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   if (main === 'shorts') {
     return (
       <div className="watch-tab-content">
-        {/* Command Center - Search + Sort + Pills */}
-        <DiscoverCommandCenter
-          searchPlaceholder="Search shorts, creators, courses…"
-          searchValue={watchSearchQuery}
-          onSearchChange={setWatchSearchQuery}
-          sortValue={watchSortOption}
-          onSortChange={setWatchSortOption}
-          pills={watchPills}
-          onPillSelect={setWatchActiveFilter}
-        />
-        
         {/* Watch Hero - single featured item */}
         <DiscoverHero 
           item={heroItem}

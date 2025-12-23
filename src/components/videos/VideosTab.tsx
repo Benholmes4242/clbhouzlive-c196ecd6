@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { VideoSearchBar } from './VideoSearchBar';
+import { VideoFilterChips, VideoCategory } from './VideoFilterChips';
 import { VideoSection } from './VideoSection';
 import { VideosEmptyState } from './VideosEmptyState';
 import { VideosSectionPage } from './VideosSectionPage';
@@ -16,22 +18,6 @@ import { useDiscoverySignals } from '@/hooks/useDiscoverySignals';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useMediaAutoplay } from '@/media';
 import { useContinueWatching } from '@/hooks/useContinueWatching';
-import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
-
-export type VideoCategory = 'all' | 'funny' | 'challenge' | 'course-vlog' | 'tips-coaching' | 'review' | 'other';
-
-const VIDEO_PILLS: { value: VideoCategory; label: string }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'funny', label: 'Funny' },
-  { value: 'challenge', label: 'Challenge' },
-  { value: 'course-vlog', label: 'Course Vlog' },
-  { value: 'tips-coaching', label: 'Tips & Coaching' },
-  { value: 'review', label: 'Review' },
-  { value: 'other', label: 'Other' },
-];
-
-// Local storage keys
-const VIDEOS_SORT_KEY = 'videos-sort-option';
 
 interface VideosTabProps {
   onVideoClick?: (id: string) => void;
@@ -56,13 +42,6 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-
-  // Command center state
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortOption, setSortOption] = useState<SortOption>(() => {
-    const saved = localStorage.getItem(VIDEOS_SORT_KEY);
-    return (saved as SortOption) || 'newest';
-  });
 
   // Preserve scroll position when navigating to/from videos
   const { savePosition } = useScrollRestoration('discover:videos');
@@ -127,15 +106,14 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   // Check URL params for mode
   const sectionParam = searchParams.get('section');
   const modeParam = searchParams.get('mode');
-  const urlSearchQuery = searchParams.get('q') || '';
+  const searchQuery = searchParams.get('q') || '';
   const categoryParam = (searchParams.get('category') || 'all') as VideoCategory;
 
   // Get followed user IDs for "From creators you follow" section
   const { followedIds } = useFollowedUsers();
 
   // Handle category selection - update URL
-  const handleCategorySelect = (categoryKey: string) => {
-    const category = categoryKey as VideoCategory;
+  const handleCategorySelect = (category: VideoCategory) => {
     const newParams = new URLSearchParams(searchParams);
     if (category === 'all') {
       newParams.delete('category');
@@ -144,19 +122,6 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     }
     setSearchParams(newParams);
   };
-
-  // Handle sort change with persistence
-  const handleSortChange = (sort: SortOption) => {
-    setSortOption(sort);
-    localStorage.setItem(VIDEOS_SORT_KEY, sort);
-  };
-
-  // Build pills for command center
-  const pills: Pill[] = VIDEO_PILLS.map(p => ({
-    key: p.value,
-    label: p.label,
-    selected: categoryParam === p.value,
-  }));
 
   // Category filter - undefined when 'all' (not the string 'all')
   const categoryFilter = categoryParam !== 'all' ? categoryParam : undefined;
@@ -235,15 +200,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   };
 
   const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    // If user presses enter or submits, navigate to search mode
-    // For now, just filter locally
-  };
-
-  const handleSearchSubmit = () => {
-    if (searchQuery.trim()) {
-      navigate(`/discover?main=videos&mode=search&q=${encodeURIComponent(searchQuery.trim())}`);
-    }
+    navigate(`/discover?main=videos&mode=search&q=${encodeURIComponent(query)}`);
   };
 
   const handleViewAll = (section: string) => {
@@ -255,10 +212,10 @@ export const VideosTab: React.FC<VideosTabProps> = ({
   };
 
   // If in search mode, render search results
-  if (modeParam === 'search' && urlSearchQuery) {
+  if (modeParam === 'search' && searchQuery) {
     return (
       <VideosSearchResults
-        query={urlSearchQuery}
+        query={searchQuery}
         category={categoryFilter}
         onBack={handleBackFromSearch}
         className={className}
@@ -276,15 +233,14 @@ export const VideosTab: React.FC<VideosTabProps> = ({
 
   return (
     <div className={cn("min-h-screen pb-20", className)} style={{ background: BG_COLOR }}>
-      {/* Command Center: Search + Sort + Pills */}
-      <DiscoverCommandCenter
-        searchPlaceholder="Search videos, creators, courses..."
-        searchValue={searchQuery}
-        onSearchChange={handleSearch}
-        sortValue={sortOption}
-        onSortChange={handleSortChange}
-        pills={pills}
-        onPillSelect={handleCategorySelect}
+      {/* Search bar - tight spacing from tabs */}
+      <VideoSearchBar onSearch={handleSearch} className="pt-4 mb-3" />
+
+      {/* Filter chips - same spacing to content */}
+      <VideoFilterChips
+        selected={categoryParam}
+        onSelect={handleCategorySelect}
+        className="mb-4"
       />
 
       {/* Continue Watching (only shows if user has in-progress videos) */}

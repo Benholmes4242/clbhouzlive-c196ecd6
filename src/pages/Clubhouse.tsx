@@ -196,8 +196,8 @@ const Clubhouse = () => {
     return () => document.body.classList.remove('route-clubhouse');
   }, []);
 
-  // Track when feed is ready to hide skeleton
-  const [feedReady, setFeedReady] = useState(false);
+  // No loading state needed - Suspense at route level handles it
+  // if (isLoading && posts.length === 0) return null;
 
   return (
     <PageRoot 
@@ -205,36 +205,6 @@ const Clubhouse = () => {
       className={cn("clubhouse-root", cinemaDim && "cinema-dim")} 
       style={{ "--bg-page": "#0F0F0F", position: 'relative', isolation: 'isolate', zIndex: 0 } as React.CSSProperties}
     >
-      {/* Instant loading skeleton - shows immediately while React renders */}
-      {!feedReady && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black">
-          <div className="w-full h-full bg-gradient-to-b from-gray-900 via-gray-800 to-black flex items-center justify-center">
-            <div className="flex flex-col items-center gap-4 text-white/50">
-              <svg 
-                className="animate-spin h-10 w-10" 
-                xmlns="http://www.w3.org/2000/svg" 
-                fill="none" 
-                viewBox="0 0 24 24"
-              >
-                <circle 
-                  className="opacity-25" 
-                  cx="12" 
-                  cy="12" 
-                  r="10" 
-                  stroke="currentColor" 
-                  strokeWidth="4"
-                />
-                <path 
-                  className="opacity-75" 
-                  fill="currentColor" 
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
-            </div>
-          </div>
-        </div>
-      )}
-      
       {/* Intersection sentinel for header fade-away */}
       <div id="clubhouse-sentinel" className="h-1 w-px absolute top-0 left-0" />
       
@@ -262,10 +232,11 @@ const Clubhouse = () => {
             }}
             onCommentsOpenChange={setIsCommentsDrawerOpen}
             onPostDetailsOpen={() => console.log('Post details opened')}
-            onReady={() => setFeedReady(true)}
           />
         ) : isLoading ? (
-          null // Skeleton already showing
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="animate-pulse text-muted-foreground">Loading posts...</div>
+          </div>
         ) : (
           <div className="flex items-center justify-center min-h-screen text-muted-foreground">
             No posts available
