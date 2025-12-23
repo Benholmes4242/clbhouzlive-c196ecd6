@@ -140,8 +140,9 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
           onSearchChange={setSearchQuery}
           sortValue={commandCenterSort}
           onSortChange={handleSortChange}
-          pills={pills}
-          onPillSelect={handleFilterChange}
+          pills={[]}
+          onPillSelect={() => {}}
+          showPills={false}
         />
         <CommunityEmptyState variant="no-community" />
       </div>
@@ -158,8 +159,9 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
           onSearchChange={setSearchQuery}
           sortValue={commandCenterSort}
           onSortChange={handleSortChange}
-          pills={pills}
-          onPillSelect={handleFilterChange}
+          pills={[]}
+          onPillSelect={() => {}}
+          showPills={false}
         />
         <CommunityEmptyState variant="quiet" />
       </div>
@@ -175,8 +177,9 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
         onSearchChange={setSearchQuery}
         sortValue={commandCenterSort}
         onSortChange={handleSortChange}
-        pills={pills}
-        onPillSelect={handleFilterChange}
+        pills={[]}
+        onPillSelect={() => {}}
+        showPills={false}
       />
 
       {/* Subtitle */}

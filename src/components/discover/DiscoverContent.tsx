@@ -20,6 +20,19 @@ import { useShortsSuggestions } from '@/hooks/useShortsSuggestions';
 import { buildInterleavedFeed, InterleavedItem } from '@/utils/interleaveFeed';
 import { toast } from 'sonner';
 import DiscoverHero, { createHeroItem } from '@/components/discover/DiscoverHero';
+import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
+
+// Local storage key for watch tab sort
+const WATCH_SORT_KEY = 'watch-sort-option';
+
+// Watch tab pills (Shorts categories)
+const WATCH_PILLS: { id: string; label: string }[] = [
+  { id: 'all', label: 'All' },
+  { id: 'funny', label: 'Funny' },
+  { id: 'tips', label: 'Tips' },
+  { id: 'highlights', label: 'Highlights' },
+  { id: 'courses', label: 'Courses' },
+];
 
 // Wrapper to avoid useMemo inside render callback (fixes setState during render warning)
 function VideosGridWrapper({
@@ -139,6 +152,25 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   const [currentContent, setCurrentContent] = useState<ExploreContentItem[] | null>(null);
   const [recentHistory, setRecentHistory] = useState<Set<string>>(new Set());
   const [likedItems, setLikedItems] = useState<Record<string, boolean>>({});
+  
+  // Watch tab command center state
+  const [watchSearchQuery, setWatchSearchQuery] = useState('');
+  const [watchActiveFilter, setWatchActiveFilter] = useState('all');
+  const [watchSortOption, setWatchSortOption] = useState<SortOption>(() => {
+    const saved = localStorage.getItem(WATCH_SORT_KEY);
+    return (saved as SortOption) || 'newest';
+  });
+
+  const handleWatchSortChange = useCallback((sort: SortOption) => {
+    setWatchSortOption(sort);
+    localStorage.setItem(WATCH_SORT_KEY, sort);
+  }, []);
+
+  const watchPills: Pill[] = WATCH_PILLS.map(p => ({
+    key: p.id,
+    label: p.label,
+    selected: watchActiveFilter === p.id,
+  }));
   
   // Fetch real Shorts data for inline blocks (only when on Videos tab)
   const { content: shortsContent, hasMore: hasMoreShorts, loadMore: loadMoreShorts } = useInfiniteExploreContent(
@@ -333,6 +365,17 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   if (main === 'shorts') {
     return (
       <div className="watch-tab-content">
+        {/* Command Center: Search + Sort + Pills */}
+        <DiscoverCommandCenter
+          searchPlaceholder="Search shorts, creators, courses..."
+          searchValue={watchSearchQuery}
+          onSearchChange={setWatchSearchQuery}
+          sortValue={watchSortOption}
+          onSortChange={handleWatchSortChange}
+          pills={watchPills}
+          onPillSelect={setWatchActiveFilter}
+        />
+
         {/* Watch Hero - single featured item */}
         <DiscoverHero 
           item={heroItem}
