@@ -375,7 +375,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] READY_CALLBACK`);
       hasCalledOnReady.current = true;
       onReady();
-    }, 1500);
+    }, 575);
     
     return () => clearTimeout(timer);
   }, [filteredPosts.length, onReady]);
