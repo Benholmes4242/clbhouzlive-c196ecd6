@@ -20,15 +20,8 @@ export const useInfiniteClubhouseShorts = () => {
   } = useOptimizedInfiniteQuery({
     queryKey: ['clubhouse-explore-shorts'],
     queryFn: async ({ pageParam }: { pageParam: unknown }) => {
-      const queryStart = performance.now();
-      console.log(`[${queryStart.toFixed(2)}ms] [QueryHook] Starting query function`);
-      
       // Phase 1 Perf: Reduced from 30 to 12 items for faster initial load
       const posts = await fetchClubhouseExploreShorts(12, pageParam as string | null);
-      
-      const queryEnd = performance.now();
-      console.log(`[${queryEnd.toFixed(2)}ms] [QueryHook] Query completed in ${(queryEnd - queryStart).toFixed(2)}ms, ${posts.length} posts`);
-      
       return {
         posts,
         nextCursor: posts.length > 0 ? posts[posts.length - 1].createdAt : undefined,
