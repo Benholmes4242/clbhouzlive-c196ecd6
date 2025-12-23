@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo, forwardRef, useLayoutEffect } from 'react';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
 import { MapPin, UserPlus, UserCheck, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { SpeakerXMarkIcon, SpeakerWaveIcon } from '@heroicons/react/24/solid';
@@ -102,7 +102,8 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   isNearby?: boolean;
   isActive?: boolean;
   postId: string; // Required for MediaRuntime integration
-}>(({ src, muted, className, isMobile: isMobileProp = false, shouldAttach = false, autoplay = false, isNearby = true, isActive = true, postId }, ref) => {
+  eagerMount?: boolean; // Mount immediately without waiting for shouldAttach
+}>(({ src, muted, className, isMobile: isMobileProp = false, shouldAttach = false, autoplay = false, isNearby = true, isActive = true, postId, eagerMount = false }, ref) => {
   // Generate HLS URL from source
   const uid = uidFromNode({ src });
   const hlsUrl = uid ? `https://videodelivery.net/${uid}/manifest/video.m3u8` : null;
@@ -116,12 +117,12 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
   // Handle attach/detach based on shouldAttach
   React.useEffect(() => {
     if (!playerRef.current) return;
-    if (shouldAttach) {
+    if (shouldAttach || eagerMount) {
       playerRef.current.attach();
     } else if (!isNearby) {
       playerRef.current.detach();
     }
-  }, [shouldAttach, isNearby]);
+  }, [shouldAttach, isNearby, eagerMount]);
 
   // Playback is now controlled directly by HLSPlayer autoplay prop
   // No empty useEffect needed - HLSPlayer handles play/pause internally
@@ -136,7 +137,7 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
             poster={poster}
             muted={muted}
             loop
-            autoplay={autoplay && isActive && shouldAttach}
+            autoplay={autoplay && isActive && (shouldAttach || eagerMount)}
             showMuteButton={false}
             showPlayButton={false}
             objectFit="cover"
@@ -161,7 +162,19 @@ const VideoWithAutoplay = React.memo(forwardRef<HTMLVideoElement, {
       />
     </div>
   );
-}));
+}), (prevProps, nextProps) => {
+  // Custom comparison: only re-render if critical props change
+  return (
+    prevProps.src === nextProps.src &&
+    prevProps.muted === nextProps.muted &&
+    prevProps.shouldAttach === nextProps.shouldAttach &&
+    prevProps.autoplay === nextProps.autoplay &&
+    prevProps.isNearby === nextProps.isNearby &&
+    prevProps.isActive === nextProps.isActive &&
+    prevProps.postId === nextProps.postId &&
+    prevProps.eagerMount === nextProps.eagerMount
+  );
+});
 
 VideoWithAutoplay.displayName = 'VideoWithAutoplay';
 
@@ -311,29 +324,45 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   // Two-observer system for prebuffer and autoplay
   const nearRef = useRef<IntersectionObserver | null>(null);
   const playRef = useRef<IntersectionObserver | null>(null);
-  // Initialize with first video pre-attached for instant load
-  const [shouldAttachMap, setShouldAttachMap] = useState<Record<string, boolean>>(() => {
-    const firstPost = posts[0];
-    if (firstPost && firstPost.type === 'video') {
-      console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] INITIAL_ATTACH_MAP`, { firstPostId: firstPost.id.slice(0, 8) });
-      return { [firstPost.id]: true };
+  const hasPreloadedFirst = useRef(false);
+  
+  // Initialize maps empty - we'll populate in useLayoutEffect for speed
+  const [shouldAttachMap, setShouldAttachMap] = useState<Record<string, boolean>>({});
+  const [autoplayMap, setAutoplayMap] = useState<Record<string, boolean>>({});
+  
+  // CRITICAL: Use useLayoutEffect to set first video IMMEDIATELY before paint
+  // This eliminates the 2+ second React render delay
+  useLayoutEffect(() => {
+    if (hasPreloadedFirst.current) return;
+    if (!filteredPosts.length) return;
+    
+    const firstPost = filteredPosts[0];
+    if (!firstPost || firstPost.type !== 'video') return;
+    
+    hasPreloadedFirst.current = true;
+    
+    console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] LAYOUT_EFFECT_PRELOAD`, { 
+      firstPostId: firstPost.id.slice(0, 8) 
+    });
+    
+    // Set both maps synchronously in layout phase
+    setShouldAttachMap({ [firstPost.id]: true });
+    setAutoplayMap({ [firstPost.id]: true });
+    
+    // Also preload HLS manifest immediately
+    const mediaSrc = firstPost.media?.[0]?.media_url || firstPost.src;
+    if (mediaSrc) {
+      const uid = uidFromNode({ src: mediaSrc });
+      if (uid) {
+        const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+        preloadHlsManifest(hlsUrl);
+      }
     }
-    return {};
-  });
-
-  // Initialize with first video set to autoplay
-  const [autoplayMap, setAutoplayMap] = useState<Record<string, boolean>>(() => {
-    const firstPost = posts[0];
-    if (firstPost && firstPost.type === 'video') {
-      console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] INITIAL_AUTOPLAY_MAP`, { firstPostId: firstPost.id.slice(0, 8) });
-      return { [firstPost.id]: true };
-    }
-    return {};
-  });
+  }, [filteredPosts]);
   
   // Debug: Log state changes
   useEffect(() => {
-    if (import.meta.env.DEV) {
+    if (import.meta.env.DEV && Object.keys(autoplayMap).length > 0) {
       console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] AUTOPLAY_MAP_CHANGED`, 
         Object.entries(autoplayMap).filter(([_, v]) => v).map(([k]) => k.slice(0, 8))
       );
@@ -341,7 +370,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   }, [autoplayMap]);
   
   useEffect(() => {
-    if (import.meta.env.DEV) {
+    if (import.meta.env.DEV && Object.keys(shouldAttachMap).length > 0) {
       console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] SHOULD_ATTACH_MAP_CHANGED`, 
         Object.entries(shouldAttachMap).filter(([_, v]) => v).map(([k]) => k.slice(0, 8))
       );
@@ -962,33 +991,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   };
 
 
-  // Preload FIRST video immediately on mount (before intersection observers)
-  const hasPreloadedFirst = useRef(false);
-  useEffect(() => {
-    if (!filteredPosts || filteredPosts.length === 0) return;
-    if (hasPreloadedFirst.current) return;
-    
-    const firstPost = filteredPosts[0];
-    if (!firstPost || firstPost.media?.[0]?.media_type !== 'video') return;
-    
-    const src = firstPost.media[0]?.media_url;
-    if (!src) return;
-    
-    const uid = uidFromNode({ src });
-    if (!uid) return;
-    
-    hasPreloadedFirst.current = true;
-    const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
-    
-    if (import.meta.env.DEV) {
-      console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] PRELOAD_FIRST_VIDEO`, { 
-        uid: uid.slice(0, 8),
-        hlsUrl: hlsUrl.slice(0, 50) + '...'
-      });
-    }
-    
-    preloadHlsManifest(hlsUrl);
-  }, [filteredPosts]);
+  // NOTE: Preload logic moved to useLayoutEffect at top of component for faster execution
   
   // Preload next video HLS manifest
   useEffect(() => {
