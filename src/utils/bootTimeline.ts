@@ -67,9 +67,16 @@ export const bootTimeline = {
   log: logBootEvent,
 };
 
-if (typeof window !== 'undefined') {
-  (window as any).bootTimeline = bootTimeline;
-  console.log('[BootTimeline] attached', !!(window as any).bootTimeline);
+const BOOT_TIMELINE_TARGET: any =
+  typeof window !== 'undefined'
+    ? window
+    : typeof globalThis !== 'undefined'
+      ? globalThis
+      : undefined;
+
+if (BOOT_TIMELINE_TARGET) {
+  BOOT_TIMELINE_TARGET.bootTimeline = bootTimeline;
+  console.log('[BootTimeline] attached', !!BOOT_TIMELINE_TARGET.bootTimeline);
 }
 
 // ============ State ============
