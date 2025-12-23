@@ -1,8 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useLayoutEffect } from 'react';
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2, Volume2, VolumeX } from 'lucide-react';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
 
 interface VideoData {
   videoUrl: string;
@@ -27,7 +29,23 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const preloadVideoRef = useRef<HTMLVideoElement>(null);
+  const hasPreloadedFirst = useRef(false);
   const isMobile = useIsMobile();
+
+  // Eager preload first video's HLS manifest on mount
+  useLayoutEffect(() => {
+    if (hasPreloadedFirst.current || !videos?.length) return;
+    
+    const firstVideo = videos[0];
+    if (firstVideo?.videoUrl) {
+      const uid = uidFromNode({ media_url: firstVideo.videoUrl });
+      if (uid) {
+        const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+        preloadHlsManifest(hlsUrl);
+        hasPreloadedFirst.current = true;
+      }
+    }
+  }, [videos]);
 
   const currentVideo = videos[currentVideoIndex];
   const nextVideoData = videos[(currentVideoIndex + 1) % videos.length];

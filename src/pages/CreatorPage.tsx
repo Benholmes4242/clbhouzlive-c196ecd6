@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { UserPlus, UserCheck, MoreHorizontal, Loader2, Settings, MapPin, Check } from 'lucide-react';
@@ -11,6 +11,8 @@ import { VideoSection } from '@/components/videos/VideoSection';
 import { VideosEmptyState } from '@/components/videos/VideosEmptyState';
 import { useMediaAutoplay } from '@/media';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -75,6 +77,23 @@ export const CreatorPage: React.FC = () => {
     sort: sortBy,
     limit: 50,
   });
+
+  const hasPreloadedFirst = useRef(false);
+
+  // Eager preload first video's HLS manifest on mount
+  useLayoutEffect(() => {
+    if (hasPreloadedFirst.current || !videos?.length) return;
+    
+    const firstVideo = videos[0];
+    if (firstVideo?.mediaUrl) {
+      const uid = uidFromNode({ media_url: firstVideo.mediaUrl });
+      if (uid) {
+        const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+        preloadHlsManifest(hlsUrl);
+        hasPreloadedFirst.current = true;
+      }
+    }
+  }, [videos]);
 
   const isFollowingCreator = isFollowing === 'following';
 

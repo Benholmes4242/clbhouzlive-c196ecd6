@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
 import { LongFormVideoTileAutoplay, LongFormVideo } from './LongFormVideoTileAutoplay';
 import type { RegisterMediaFn } from '@/media';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
 
 interface VideoSectionProps {
   title: string;
@@ -39,6 +41,23 @@ export const VideoSection: React.FC<VideoSectionProps> = ({
   playingIds,
   startIndex = 0,
 }) => {
+  const hasPreloadedFirst = useRef(false);
+
+  // Eager preload first video's HLS manifest on mount
+  useLayoutEffect(() => {
+    if (hasPreloadedFirst.current || videos.length === 0) return;
+    
+    const firstVideo = videos[0];
+    const mediaUrl = firstVideo.mediaUrl;
+    if (!mediaUrl) return;
+    
+    const uid = uidFromNode({ media_url: mediaUrl });
+    if (uid) {
+      const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+      preloadHlsManifest(hlsUrl);
+      hasPreloadedFirst.current = true;
+    }
+  }, [videos]);
   if (videos.length === 0 && emptyState) {
     return (
       <section className={cn("px-5", className)}>
