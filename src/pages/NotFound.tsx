@@ -29,7 +29,7 @@ const NotFound = () => {
             Go to Sign in
           </Link>
           <Link 
-            to="/" 
+            to="/clubhouse" 
             className="px-6 py-3 bg-secondary text-secondary-foreground rounded-xl font-medium hover:bg-secondary/80 transition-colors"
           >
             Go home

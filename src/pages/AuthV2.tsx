@@ -70,7 +70,7 @@ const AuthV2: React.FC = () => {
           navigate('/onboarding', { replace: true });
         } else {
           const redirectPath = searchParams.get('redirect');
-          navigate(redirectPath || '/', { replace: true });
+          navigate(redirectPath || '/clubhouse', { replace: true });
         }
       };
       checkAndRedirect();
