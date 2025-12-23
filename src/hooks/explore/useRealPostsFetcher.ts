@@ -538,11 +538,7 @@ export const useRealPostsFetcher = () => {
     limit: number = 30,
     cursor: string | null = null
   ): Promise<ExploreContentItem[]> => {
-    const fetchStart = performance.now();
-    console.log(`[${fetchStart.toFixed(2)}ms] [DataFetch] Starting clubhouse shorts fetch`);
-
     try {
-      const queryBuildStart = performance.now();
       let query = supabase
         .from('posts')
         .select(`
@@ -600,15 +596,7 @@ export const useRealPostsFetcher = () => {
 
       query = query.limit(limit);
 
-      const queryBuildEnd = performance.now();
-      console.log(`[${queryBuildEnd.toFixed(2)}ms] [DataFetch] Query built in ${(queryBuildEnd - queryBuildStart).toFixed(2)}ms`);
-
-      const networkStart = performance.now();
       const { data: postsData, error } = await query;
-      const networkEnd = performance.now();
-
-      console.log(`[${networkEnd.toFixed(2)}ms] [DataFetch] Network request completed in ${(networkEnd - networkStart).toFixed(2)}ms`);
-      console.log(`[${networkEnd.toFixed(2)}ms] [DataFetch] Returned ${postsData?.length || 0} raw posts`);
 
       if (error) {
         console.error('[DataFetch] Error:', error);
@@ -616,8 +604,6 @@ export const useRealPostsFetcher = () => {
       }
 
       if (!postsData || postsData.length === 0) {
-        const emptyEnd = performance.now();
-        console.log(`[${emptyEnd.toFixed(2)}ms] [DataFetch] Empty result, total time: ${(emptyEnd - fetchStart).toFixed(2)}ms`);
         return [];
       }
 
@@ -632,50 +618,14 @@ export const useRealPostsFetcher = () => {
         );
       });
 
-      // Telemetry: track filtering effectiveness (corrected naming)
-      const durationOnly = validPosts.length; // Passed <120s check
-
-      const missingMetadata = validPosts.filter(p => {
-        const m = p.post_media?.[0];
-        return !m?.aspect_ratio || !m?.width || !m?.height;
-      });
-
-      const verticalInBand = validPosts.filter(p => {
-        const m = p.post_media?.[0];
-        if (!m?.aspect_ratio) return false;
-        return m.aspect_ratio >= VERTICAL_MIN_AR && m.aspect_ratio <= VERTICAL_MAX_AR;
-      }).length;
-
-      console.info('[clubhouse-vertical-gate]', {
-        fetched_total: postsData.length,
-        eligible_after_duration: durationOnly,
-        eligible_vertical: verticalInBand, // Accurate: in 0.56-0.60 band
-        missing_metadata: missingMetadata.length,
-        filter_band: `${VERTICAL_MIN_AR}-${VERTICAL_MAX_AR} (W/H)`,
-        enabled: FEATURE_FLAGS.CLUBHOUSE_VERTICAL_ONLY
-      });
-
-      // Log sample IDs for backfill targeting
-      if (missingMetadata.length > 0) {
-        const sampleIds = missingMetadata.slice(0, 5).map(p => p.id);
-        console.warn('[clubhouse-vertical-gate] Missing metadata - sample IDs:', sampleIds);
-        console.warn(`⚠️ ${missingMetadata.length} videos need backfill. Run: import('/src/utils/runBackfillDimensions').then(m => m.runFullBackfill())`);
-      }
-
-      const filterEnd = performance.now();
-      console.log(`[${filterEnd.toFixed(2)}ms] [DataFetch] Post filtering completed in ${(filterEnd - networkEnd).toFixed(2)}ms, ${validPosts.length} valid posts`);
-
       // Get unique user IDs
-      const userIds = [...new Set(validPosts.map(post => post.user_id))];
+      const userIds = [...new Set(validPosts.map(post => post.user_id))] as string[];
       
       // Get user profiles
-      const profilesStart = performance.now();
       const { data: profiles, error: profilesError } = await supabase
         .from('user_profiles')
         .select('id, display_name, username, profile_photo_url')
         .in('id', userIds);
-      const profilesEnd = performance.now();
-      console.log(`[${profilesEnd.toFixed(2)}ms] [DataFetch] Profiles fetch completed in ${(profilesEnd - profilesStart).toFixed(2)}ms, ${profiles?.length || 0} profiles`);
 
       if (profilesError) {
         console.error('[DataFetch] Profiles error:', profilesError);
@@ -741,25 +691,9 @@ export const useRealPostsFetcher = () => {
         };
       });
 
-      const transformEnd = performance.now();
-      console.log(`[${transformEnd.toFixed(2)}ms] [DataFetch] Transform completed in ${(transformEnd - profilesEnd).toFixed(2)}ms`);
-      console.log(`[${transformEnd.toFixed(2)}ms] [DataFetch] TOTAL fetch time: ${(transformEnd - fetchStart).toFixed(2)}ms`);
-
-      // Dev logging
-      if (process.env.NODE_ENV !== 'production') {
-        const stats = formattedPosts.reduce((acc, p) => {
-          if (p.type === 'video' && p.durationSeconds && p.durationSeconds < 120) acc.short++;
-          else if (p.type === 'video') acc.long++;
-          else if (p.type === 'image') acc.photos++;
-          return acc;
-        }, { short: 0, long: 0, photos: 0 });
-        console.log('[clubhouse] page summary:', { total: formattedPosts.length, ...stats });
-      }
-
       return formattedPosts;
     } catch (error) {
-      const errorEnd = performance.now();
-      console.error(`[${errorEnd.toFixed(2)}ms] [DataFetch] Error after ${(errorEnd - fetchStart).toFixed(2)}ms:`, error);
+      console.error('[DataFetch] Error:', error);
       return [];
     }
   };
