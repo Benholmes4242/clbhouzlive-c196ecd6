@@ -211,13 +211,15 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
         </div>
       </div>
 
-      {/* Meta Area */}
+      {/* Meta Area - matches CommunityFeedCard layout */}
       <div className="px-4 py-3 flex items-end justify-between gap-3">
         <div className="flex-1 min-w-0 max-w-[80%]">
+          {/* Title */}
           <p className="text-sm text-foreground line-clamp-2 leading-snug">
             {video.title}
           </p>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+          {/* Creator name · date · likes (smaller meta row) */}
+          <div className="flex items-center gap-1 text-[11px] text-muted-foreground/80 mt-1.5">
             <button
               onClick={handleCreatorClick}
               className="hover:text-foreground transition-colors truncate"
@@ -226,8 +228,12 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
             </button>
             <span>·</span>
             <span>{video.createdAt ? formatDistanceToNow(new Date(video.createdAt), { addSuffix: true }) : 'Recently'}</span>
-            <span>·</span>
-            <span>{formatLikes(video.likes || video.views)} likes</span>
+            {(video.likes || video.views) ? (
+              <>
+                <span>·</span>
+                <span>{formatLikes(video.likes || video.views)} likes</span>
+              </>
+            ) : null}
           </div>
         </div>
 
