@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getStreamPoster } from '@/utils/stream';
 import { OverlayCorners } from '@/components/shared/overlay';
-import { HLSPlayer, HLSPlayerRef } from '@/media';
+import { HLSPlayer, HLSPlayerRef, useMediaAutoplay, MediaRuntime } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import {
@@ -71,6 +71,52 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
   const containerRef = useRef<HTMLDivElement>(null);
   const [resolvedDuration, setResolvedDuration] = useState<number | undefined>(item?.durationSeconds);
   const hasPreloadedRef = useRef(false);
+  const registeredIdRef = useRef<string | null>(null);
+
+  // MediaRuntime integration - use autoplay hook for high-priority hero video
+  const { registerMedia } = useMediaAutoplay({
+    mode: 'grid',
+    surface: 'grid', // Use 'grid' surface since hero is on discover page
+    startThreshold: 0.3, // Hero should start playing when 30% visible
+    stopThreshold: 0.1,
+  });
+
+  // Register hero video with MediaRuntime when element is ready
+  useEffect(() => {
+    if (!item || item.mediaType !== 'video' || !autoplay) return;
+    
+    // Wait for player to be ready and get video element
+    const checkAndRegister = () => {
+      const element = playerRef.current?.getElement();
+      if (element && registeredIdRef.current !== item.id) {
+        registeredIdRef.current = item.id;
+        registerMedia({
+          id: item.id,
+          element,
+          isCandidate: true,
+          sortIndex: 0, // High priority - hero gets sortIndex 0
+          observeTarget: containerRef.current,
+        });
+        
+        if (DEBUG_HERO) {
+          logHero('REGISTERED_WITH_MEDIARUNTIME', { id: item.id.slice(0, 8) });
+        }
+      }
+    };
+    
+    // Try immediately and again after short delay
+    checkAndRegister();
+    const timer = setTimeout(checkAndRegister, 100);
+    
+    return () => {
+      clearTimeout(timer);
+      // Unregister on cleanup
+      if (registeredIdRef.current) {
+        registerMedia({ id: registeredIdRef.current, element: null });
+        registeredIdRef.current = null;
+      }
+    };
+  }, [item?.id, item?.mediaType, autoplay, registerMedia]);
 
   // CRITICAL: Preload video HLS manifest immediately in layout phase
   useLayoutEffect(() => {
@@ -178,11 +224,12 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
               ref={playerRef}
               src={item.mediaUrl}
               poster={item.posterUrl}
-              autoplay={autoplay}
+              autoplay={false}
               muted
               loop
               objectFit="cover"
-              managedByMediaRuntime={false}
+              managedByMediaRuntime={true}
+              externallyManaged={true}
               mediaId={item.id}
               onLoadedData={() => {
                 logHero('VIDEO_LOADED_DATA', { itemId: item.id });

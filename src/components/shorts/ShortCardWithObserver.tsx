@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import ShortCard from './ShortCard';
-import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import { useMediaAutoplay } from '@/media';
 
 interface ShortCardWithObserverProps {
   item: ExploreContentItem;
@@ -20,16 +20,17 @@ interface ShortCardWithObserverProps {
 }
 
 /**
- * Wrapper around ShortCard that uses IntersectionObserver to control autoplay.
- * Uses dual-observer pattern like Clubhouse for optimal performance:
- * - Near observer (300px margin): Prebuffers video when approaching viewport
- * - Play observer (0.1 threshold): Triggers autoplay when in view
+ * Wrapper around ShortCard that uses MediaRuntime for playback control.
  * 
- * Autoplay follows pattern:
+ * Uses useMediaAutoplay hook for centralized playback:
+ * - Registers video with MediaRuntime
+ * - MediaRuntime handles visibility observation
+ * - Only one video plays at a time (priority system)
+ * 
+ * Autoplay pattern for portrait grids:
  * - Row 1: Left card plays (position 0), right paused (position 1)
  * - Row 2: Right card plays (position 3), left paused (position 2)
- * - Landscape: Always plays
- * Pattern repeats every 4 portrait cards
+ * - Landscape: Always candidate for autoplay
  */
 export default function ShortCardWithObserver({
   item,
@@ -46,76 +47,90 @@ export default function ShortCardWithObserver({
   isTrending,
   isSuggested
 }: ShortCardWithObserverProps) {
-  // State for dual-observer pattern
-  const [shouldAttach, setShouldAttach] = React.useState(false);
-  const [shouldAutoplay, setShouldAutoplay] = React.useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const videoElementRef = useRef<HTMLVideoElement | null>(null);
+  const registeredIdRef = useRef<string | null>(null);
   
-  // Container ref to share between both observers
-  const containerRef = React.useRef<HTMLDivElement>(null);
-
-  // Near observer - prebuffer when approaching viewport (300px margin)
-  const { ref: nearRef, isInView: isNear } = useIntersectionObserver({
-    threshold: 0,
-    rootMargin: '300px 0px 300px 0px'
+  // Use MediaRuntime for centralized playback control
+  const { registerMedia, playingIds } = useMediaAutoplay({
+    mode: 'grid',
+    surface: 'grid',
+    startThreshold: 0.4,
+    stopThreshold: 0.25,
   });
-
-  // Play observer - trigger autoplay when entering viewport (0% threshold)
-  const { ref: playRef, isInView } = useIntersectionObserver({
-    threshold: 0,
-    rootMargin: '0px'
-  });
-
-  // Combined ref to attach both observers synchronously (works in mobile)
-  const combinedRef = React.useCallback((el: HTMLDivElement | null) => {
-    containerRef.current = el;
-    if (el) {
-      nearRef.current = el;
-      playRef.current = el;
-    }
-  }, [nearRef, playRef]);
-
-  // Update attach state when near
-  React.useEffect(() => {
-    setShouldAttach(isNear);
-  }, [isNear]);
-
-  // Determine if this card should autoplay based on grid position and visibility
-  React.useEffect(() => {
-    if (!isInView) {
-      setShouldAutoplay(false);
-      return;
-    }
-
-    // Landscape cards always autoplay when in view
-    if (variant === 'landscape') {
-      setShouldAutoplay(true);
-      return;
-    }
+  
+  // Determine if this card should be a candidate based on grid position
+  const isCandidate = React.useMemo(() => {
+    // Landscape cards are always candidates
+    if (variant === 'landscape') return true;
     
     // Portrait cards follow alternating pattern
     // Row 1 (positions 0-1): position 0 plays
     // Row 2 (positions 2-3): position 3 plays
-    // Pattern repeats every 4 positions
     const positionInPattern = gridPosition % 4;
-    const shouldPlay = positionInPattern === 0 || positionInPattern === 3;
+    return positionInPattern === 0 || positionInPattern === 3;
+  }, [variant, gridPosition]);
+  
+  // Check if this is a video
+  const isVideo = item.type === 'video' || item.src?.includes('.mp4') || item.src?.includes('.webm');
+  
+  // Get video element from ShortCard's HLSPlayer
+  const findVideoElement = useCallback(() => {
+    if (!containerRef.current || !isVideo) return null;
+    return containerRef.current.querySelector('video') as HTMLVideoElement | null;
+  }, [isVideo]);
+  
+  // Register with MediaRuntime when video element is available
+  useEffect(() => {
+    if (!isVideo) return;
     
-    setShouldAutoplay(shouldPlay);
-  }, [isInView, variant, gridPosition]);
-
-  // Notify parent of visibility changes
-  React.useEffect(() => {
-    onVisibilityChange?.(item.id, isInView);
-  }, [isInView, item.id, onVisibilityChange]);
+    const registerVideo = () => {
+      const element = findVideoElement();
+      
+      if (element && registeredIdRef.current !== item.id) {
+        registeredIdRef.current = item.id;
+        videoElementRef.current = element;
+        
+        registerMedia({
+          id: item.id,
+          element,
+          isCandidate,
+          sortIndex: gridPosition,
+          observeTarget: containerRef.current,
+        });
+      }
+    };
+    
+    // Try immediately and again after short delay (for HLS mount timing)
+    registerVideo();
+    const timer = setTimeout(registerVideo, 150);
+    
+    return () => {
+      clearTimeout(timer);
+      // Unregister on cleanup
+      if (registeredIdRef.current) {
+        registerMedia({ id: registeredIdRef.current, element: null });
+        registeredIdRef.current = null;
+        videoElementRef.current = null;
+      }
+    };
+  }, [item.id, isVideo, isCandidate, gridPosition, registerMedia, findVideoElement]);
+  
+  // Notify parent of visibility changes (based on playingIds)
+  useEffect(() => {
+    const isPlaying = playingIds.has(item.id);
+    onVisibilityChange?.(item.id, isPlaying);
+  }, [playingIds, item.id, onVisibilityChange]);
 
   return (
-    <div ref={combinedRef}>
+    <div ref={containerRef}>
       <ShortCard
         item={item}
         onClick={onClick}
         height={height}
         isPinned={isPinned}
-        shouldAttach={shouldAttach}
-        autoplay={shouldAutoplay}
+        shouldAttach={true} // Always attach since MediaRuntime handles visibility
+        autoplay={false} // MediaRuntime controls playback
         onLike={onLike}
         onAuthorClick={onAuthorClick}
         currentUserId={currentUserId}

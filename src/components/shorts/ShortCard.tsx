@@ -75,12 +75,15 @@ export default React.memo(function ShortCard({
           <HLSPlayer
             src={hlsUrl}
             poster={posterUrl}
-            autoplay={autoplay}
+            autoplay={false}
             muted
             loop
             showMuteButton={false}
             showPlayButton={false}
             objectFit="cover"
+            managedByMediaRuntime={true}
+            externallyManaged={true}
+            mediaId={item.id}
             className="absolute inset-0 w-full h-full"
           />
         ) : (
