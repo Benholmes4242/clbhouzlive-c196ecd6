@@ -363,19 +363,19 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     }
   }, [filteredPosts]);
   
-  // Notify parent when feed is ready (first video mounted) - used for skeleton fade
+  // Notify parent when feed is ready (first video playing) - used for skeleton fade
   const hasCalledOnReady = useRef(false);
   useEffect(() => {
     if (hasCalledOnReady.current) return;
     if (!filteredPosts.length) return;
     if (!onReady) return;
     
-    // Small delay to ensure first frame is ready
+    // Wait for video to actually start playing (~3.5s after data ready based on logs)
     const timer = setTimeout(() => {
       console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] READY_CALLBACK`);
       hasCalledOnReady.current = true;
       onReady();
-    }, 150);
+    }, 3500);
     
     return () => clearTimeout(timer);
   }, [filteredPosts.length, onReady]);
