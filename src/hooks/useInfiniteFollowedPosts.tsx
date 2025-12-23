@@ -23,9 +23,8 @@ export const useInfiniteClubhouseShorts = () => {
       const queryStart = performance.now();
       console.log(`[${queryStart.toFixed(2)}ms] [QueryHook] Starting query function`);
       
-      // OPTIMIZATION: Reduced from 12 to 5 items for faster initial load
-      // App.tsx prefetches first 5 posts immediately, this fetches more on scroll
-      const posts = await fetchClubhouseExploreShorts(5, pageParam as string | null);
+      // Phase 1 Perf: Reduced from 30 to 12 items for faster initial load
+      const posts = await fetchClubhouseExploreShorts(12, pageParam as string | null);
       
       const queryEnd = performance.now();
       console.log(`[${queryEnd.toFixed(2)}ms] [QueryHook] Query completed in ${(queryEnd - queryStart).toFixed(2)}ms, ${posts.length} posts`);
