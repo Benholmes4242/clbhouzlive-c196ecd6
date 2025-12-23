@@ -86,6 +86,8 @@ const AuthCallback = lazy(() => import("./pages/auth/AuthCallback"));
 const Signup = lazy(() => import("./pages/Signup"));
 const Clubhouse = lazy(() => import("./pages/Clubhouse"));
 const CreateProfile = lazy(() => import("./pages/CreateProfile"));
+const AuthV2 = lazy(() => import("./pages/AuthV2"));
+const OnboardingV2 = lazy(() => import("./pages/OnboardingV2"));
 const AccountTypeOnboarding = lazy(() => import("./pages/onboarding/AccountTypeOnboarding"));
 const ProfileTestPage = lazy(() => import("./pages/ProfileTestPage"));
 const EditProfilePage = lazy(() => import("./pages/EditProfilePage"));
@@ -243,6 +245,8 @@ function AppRoutes() {
         <Route path="/auth" element={<AuthWrapped />} />
         <Route path="/auth/callback" element={<Suspense fallback={<GenericPageSkeleton />}><AuthCallback /></Suspense>} />
         <Route path="/signup" element={<Suspense fallback={<GenericPageSkeleton />}><Signup /></Suspense>} />
+        <Route path="/auth-v2" element={<Suspense fallback={<GenericPageSkeleton />}><AuthV2 /></Suspense>} />
+        <Route path="/onboarding" element={<Suspense fallback={<GenericPageSkeleton />}><OnboardingV2 /></Suspense>} />
         <Route path="/create-profile" element={<Suspense fallback={<GenericPageSkeleton />}><CreateProfile /></Suspense>} />
         <Route path="/onboarding/account-type" element={<Suspense fallback={<GenericPageSkeleton />}><AccountTypeOnboarding /></Suspense>} />
         <Route path="/profile" element={<ProfileWrapped />} />
