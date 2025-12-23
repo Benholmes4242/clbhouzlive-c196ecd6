@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useLayoutEffect, useRef } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { VideoSection } from './VideoSection';
@@ -17,6 +17,8 @@ import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useMediaAutoplay } from '@/media';
 import { useContinueWatching } from '@/hooks/useContinueWatching';
 import DiscoverCommandCenter, { SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
 
 export type VideoCategory = 'all' | 'funny' | 'challenge' | 'course-vlog' | 'tips-coaching' | 'review' | 'other';
 
@@ -86,6 +88,9 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     startThreshold: 0.4,   // Play at 40% visible
     stopThreshold: 0.35,   // Pause at 35% visible (provides hysteresis)
   });
+
+  // Track if first video has been preloaded
+  const hasPreloadedFirst = useRef(false);
 
   // Lazy loading triggers for below-fold sections
   const { ref: trendingRef, isInView: trendingInView } = useIntersectionObserver({ rootMargin: '200px' });
@@ -217,6 +222,28 @@ export const VideosTab: React.FC<VideosTabProps> = ({
       coursesVideos: courses,
     };
   }, [continueWatchingVideos, followedVideosRaw, recommendedVideosRaw, trendingVideosRaw, coursesVideosRaw]);
+
+  // CRITICAL: Preload first video immediately in layout phase (before paint)
+  useLayoutEffect(() => {
+    if (hasPreloadedFirst.current) return;
+    
+    // Find first video from any section (recommended has priority as it loads first)
+    const firstVideo = recommendedVideos[0] || followedVideos[0] || continueWatchingVideos[0];
+    if (!firstVideo?.mediaUrl) return;
+
+    hasPreloadedFirst.current = true;
+
+    const uid = uidFromNode({ src: firstVideo.mediaUrl });
+    if (uid) {
+      const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+      if (import.meta.env.DEV) {
+        console.log(`[${performance.now().toFixed(2)}ms] [VideosTab] LAYOUT_EFFECT_PRELOAD`, { 
+          id: firstVideo.id.slice(0, 8) 
+        });
+      }
+      preloadHlsManifest(hlsUrl);
+    }
+  }, [recommendedVideos, followedVideos, continueWatchingVideos]);
 
   const handleVideoClick = (id: string) => {
     savePosition();

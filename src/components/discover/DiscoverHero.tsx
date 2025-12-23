@@ -1,9 +1,11 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getStreamPoster } from '@/utils/stream';
 import { OverlayCorners } from '@/components/shared/overlay';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
 
 // Debug logging for video lifecycle analysis
 const DEBUG_HERO = true;
@@ -59,6 +61,22 @@ export default function DiscoverHero({ item, isLoading, onWatch, autoplay = true
   const playerRef = useRef<HLSPlayerRef>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [resolvedDuration, setResolvedDuration] = useState<number | undefined>(item?.durationSeconds);
+  const hasPreloadedRef = useRef(false);
+
+  // CRITICAL: Preload video HLS manifest immediately in layout phase
+  useLayoutEffect(() => {
+    if (hasPreloadedRef.current) return;
+    if (!item || item.mediaType !== 'video' || !item.mediaUrl) return;
+
+    hasPreloadedRef.current = true;
+
+    const uid = uidFromNode({ src: item.mediaUrl });
+    if (uid) {
+      const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+      logHero('LAYOUT_EFFECT_PRELOAD', { id: item.id.slice(0, 8) });
+      preloadHlsManifest(hlsUrl);
+    }
+  }, [item]);
 
   // Log mount/unmount
   useEffect(() => {
