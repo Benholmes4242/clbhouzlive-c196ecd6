@@ -17,6 +17,14 @@ import { MediaRuntime } from '@/media/runtime';
 import { useMediaAutoplay } from '@/media/useMediaAutoplay';
 import HLSPlayer, { HLSPlayerRef } from '@/media/HLSPlayer';
 
+// Debug logging for video lifecycle analysis
+const DEBUG_SHORTS_INLINE = true;
+const logShortsInline = (event: string, data?: any) => {
+  if (!DEBUG_SHORTS_INLINE) return;
+  const timestamp = performance.now().toFixed(2);
+  console.log(`[${timestamp}ms] [ShortsInlineBlock] ${event}`, data || '');
+};
+
 interface ShortsInlineBlockProps {
   shorts: ExploreContentItem[];
   onShortClick: (short: ExploreContentItem, index: number) => void;
@@ -87,6 +95,19 @@ const ShortTile: React.FC<ShortTileProps> = ({ short, height, sortIndex, onClick
   const { registerMedia, playingIds } = useMediaAutoplay({ surface: 'grid' });
   const isPlaying = playingIds.has(short.id);
 
+  // Log mount/unmount
+  useEffect(() => {
+    logShortsInline('TILE_MOUNT', { shortId: short.id, sortIndex });
+    return () => {
+      logShortsInline('TILE_UNMOUNT', { shortId: short.id });
+    };
+  }, [short.id, sortIndex]);
+
+  // Log isPlaying changes
+  useEffect(() => {
+    logShortsInline('IS_PLAYING_CHANGE', { shortId: short.id, isPlaying, inView });
+  }, [isPlaying, short.id, inView]);
+
   // Optimize thumbnail and poster URLs
   const basePosterUrl = short.thumbnailSrc || '';
   const posterUrl = basePosterUrl 
@@ -96,15 +117,20 @@ const ShortTile: React.FC<ShortTileProps> = ({ short, height, sortIndex, onClick
   // Handle tile impression analytics
   useEffect(() => {
     if (inView) {
+      logShortsInline('TILE_IN_VIEW', { shortId: short.id, sortIndex });
       analyticsEvents.track('shorts_tile_impression', { shortId: short.id });
     }
-  }, [inView, short.id]);
+  }, [inView, short.id, sortIndex]);
 
   // Register with MediaRuntime via useMediaAutoplay
   useEffect(() => {
     const video = playerRef.current?.getElement();
-    if (!video) return;
+    if (!video) {
+      logShortsInline('REGISTER_SKIPPED_NO_VIDEO', { shortId: short.id });
+      return;
+    }
 
+    logShortsInline('REGISTERING_WITH_MEDIA_RUNTIME', { shortId: short.id, sortIndex });
     registerMedia({
       id: short.id,
       element: video,
@@ -114,6 +140,7 @@ const ShortTile: React.FC<ShortTileProps> = ({ short, height, sortIndex, onClick
     });
 
     return () => {
+      logShortsInline('UNREGISTERING_FROM_MEDIA_RUNTIME', { shortId: short.id });
       registerMedia({ id: short.id, element: null });
     };
   }, [short.id, sortIndex, registerMedia]);
