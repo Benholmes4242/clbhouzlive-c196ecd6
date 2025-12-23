@@ -4,6 +4,7 @@ import { Play, Flame, Heart } from 'lucide-react';
 import { VideoQueueMenu } from './VideoQueueMenu';
 import { GolferAvatar } from '@/components/golfers/GolferAvatar';
 import { HLSPlayer, HLSPlayerRef, runtimeUserTap } from '@/media';
+import { formatDistanceToNow } from 'date-fns';
 import type { QueueItemMeta } from '@/hooks/useVideoQueue';
 import type { RegisterMediaFn } from '@/media';
 import type { LongFormVideo } from './LongFormVideoTile';
@@ -216,12 +217,18 @@ export const LongFormVideoTileAutoplay: React.FC<LongFormVideoTileAutoplayProps>
           <p className="text-sm text-foreground line-clamp-2 leading-snug">
             {video.title}
           </p>
-          <button
-            onClick={handleCreatorClick}
-            className="text-xs text-muted-foreground mt-1 truncate block hover:text-foreground transition-colors"
-          >
-            {video.creatorName}
-          </button>
+          <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+            <button
+              onClick={handleCreatorClick}
+              className="hover:text-foreground transition-colors truncate"
+            >
+              {video.creatorName}
+            </button>
+            <span>·</span>
+            <span>{video.createdAt ? formatDistanceToNow(new Date(video.createdAt), { addSuffix: true }) : 'Recently'}</span>
+            <span>·</span>
+            <span>{formatLikes(video.likes || video.views)} likes</span>
+          </div>
         </div>
 
         <button
