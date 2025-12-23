@@ -236,11 +236,18 @@ function AppRoutes() {
   return (
     <>
       <Routes location={routesLocation}>
-        {/* Auth */}
+        <Route path="/" element={<ClubhouseWrapped />} />
+        {/* Auth - AuthV2 is now the canonical auth route */}
         <Route path="/auth" element={<Suspense fallback={<GenericPageSkeleton />}><AuthV2 /></Suspense>} />
         <Route path="/auth/callback" element={<Suspense fallback={<GenericPageSkeleton />}><AuthCallback /></Suspense>} />
-        {/* Onboarding */}
+        {/* Redirects from old auth routes */}
+        <Route path="/auth-v2" element={<Navigate to="/auth" replace />} />
+        <Route path="/signup" element={<Navigate to="/auth" replace />} />
+        <Route path="/login" element={<Navigate to="/auth" replace />} />
+        {/* Onboarding - OnboardingV2 is now the canonical onboarding route */}
         <Route path="/onboarding" element={<Suspense fallback={<GenericPageSkeleton />}><OnboardingV2 /></Suspense>} />
+        <Route path="/create-profile" element={<Navigate to="/onboarding" replace />} />
+        <Route path="/onboarding/account-type" element={<Navigate to="/onboarding" replace />} />
         <Route path="/profile" element={<ProfileWrapped />} />
         <Route path="/profile/handicap" element={<Suspense fallback={<ProfileSkeleton />}><ProfileHandicapView /></Suspense>} />
         <Route path="/profile/quest" element={<Suspense fallback={<ProfileSkeleton />}><ProfileQuestView /></Suspense>} />

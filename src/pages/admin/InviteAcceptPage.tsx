@@ -31,9 +31,9 @@ export function InviteAcceptPage() {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
-      // Redirect to auth with return URL
+      // Redirect to login with return URL
       const returnUrl = encodeURIComponent(`/admin/invite-accept?token=${token}`);
-      navigate(`/auth?redirect=${returnUrl}`);
+      navigate(`/login?returnUrl=${returnUrl}`);
       return;
     }
 

@@ -1,0 +1,142 @@
+
+import React, { useState, useEffect, useRef } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import AuthForm from "./auth/AuthForm";
+import ConfirmNotice from "./auth/ConfirmNotice";
+import AuthLayout from "./auth/AuthLayout";
+import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
+import { useHideHeader } from '@/hooks/useHeaderVisibility';
+import { useSupabaseSession } from "@/hooks/useSupabaseSession";
+import type { AuthChangeEvent } from "@supabase/supabase-js";
+
+interface AuthProps {
+  defaultSignUp?: boolean;
+}
+
+type AuthNotice = {
+  type: 'success' | 'error';
+  message: string;
+} | null;
+
+const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
+  const [isSignUp, setIsSignUp] = useState(defaultSignUp);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [showConfirmNotice, setShowConfirmNotice] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [resendMsg, setResendMsg] = useState<string | null>(null);
+  const [authNotice, setAuthNotice] = useState<AuthNotice>(null);
+  const { user } = useSupabaseSession();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const lastResendEmail = useRef(""); // to avoid spamming resend if email field is empty
+  
+  // Hide bottom navigation and header on auth pages
+  useHideBottomNav();
+  useHideHeader();
+
+  // Helper to check profile and onboarding status
+  async function checkProfileAndOnboarding(userId: string): Promise<{
+    hasProfile: boolean;
+    hasCompletedOnboarding: boolean;
+  }> {
+    const { data } = await supabase
+      .from('user_profiles')
+      .select('id, has_completed_onboarding')
+      .eq('id', userId)
+      .maybeSingle();
+    
+    return {
+      hasProfile: !!data,
+      hasCompletedOnboarding: data?.has_completed_onboarding ?? false,
+    };
+  }
+
+  useEffect(() => {
+    // Only redirect if user is already authenticated when component mounts
+    if (user) {
+      const redirectUser = async () => {
+        const { hasProfile, hasCompletedOnboarding } = await checkProfileAndOnboarding(user.id);
+        const redirectPath = searchParams.get('redirect');
+        
+        if (!hasProfile || !hasCompletedOnboarding) {
+          // Profile doesn't exist or onboarding not complete - redirect to onboarding
+          navigate("/onboarding", { replace: true });
+        } else {
+          // Fully onboarded - go to requested page or home
+          navigate(redirectPath || "/", { replace: true });
+        }
+      };
+      
+      redirectUser();
+    }
+  }, [user, navigate, searchParams]);
+
+  // Clear all auth messages helper
+  const clearAuthMessages = () => {
+    setShowConfirmNotice(false);
+    setErrorMsg(null);
+    setResendMsg(null);
+    setAuthNotice(null);
+  };
+
+  return (
+    <>
+      <AuthLayout
+        isSignUp={isSignUp}
+        toggleAuthMode={() => {
+          clearAuthMessages();
+          setIsSignUp((s) => !s);
+        }}
+        submitting={submitting}
+      >
+        <AuthForm
+          isSignUp={isSignUp}
+          setIsSignUp={setIsSignUp}
+          setShowConfirmNotice={setShowConfirmNotice}
+          setErrorMsg={setErrorMsg}
+          setSubmitting={setSubmitting}
+          setResendMsg={setResendMsg}
+          lastResendEmail={lastResendEmail}
+          setEmail={setEmail}
+          setPassword={setPassword}
+          email={email}
+          password={password}
+          submitting={submitting}
+          showConfirmNotice={showConfirmNotice}
+          authNotice={authNotice}
+          setAuthNotice={setAuthNotice}
+        />
+        {/* Only show confirmation notice if explicitly needed (shouldn't happen with disabled email confirmation) */}
+        {showConfirmNotice && (
+          <div className="mb-3 text-center text-base text-primary-foreground bg-primary p-3 rounded">
+            Please check your email to confirm your account to become a member.
+          </div>
+        )}
+        {errorMsg && (
+          <div className="mb-3 text-destructive text-center text-base">{errorMsg}</div>
+        )}
+        {resendMsg && (
+          <div className="mb-3 text-green-700 text-center text-base">{resendMsg}</div>
+        )}
+        {showConfirmNotice && (
+          <ConfirmNotice
+            lastResendEmail={lastResendEmail}
+            password={password}
+            setResending={setResending}
+            resending={resending}
+            setResendMsg={setResendMsg}
+            setErrorMsg={setErrorMsg}
+          />
+        )}
+      </AuthLayout>
+      
+    </>
+  );
+};
+export default Auth;
