@@ -19,6 +19,8 @@ import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
 // These competed with MediaRuntime for playback control.
 // All playback is now centralized in MediaSystemProvider.
 import { MediaSystemProvider } from './media';
+// Eagerly preload hls.js at app startup to eliminate first-load delay
+import '@/utils/hlsLoader';
 import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
 import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { usePresenceTracker } from '@/hooks/usePresenceTracker';
