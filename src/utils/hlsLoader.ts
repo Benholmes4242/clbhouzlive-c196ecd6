@@ -1,4 +1,5 @@
 import type HlsType from 'hls.js';
+import { DEBUG_MEDIA } from '@/media/debug';
 
 let hlsLibPromise: Promise<typeof HlsType | null> | null = null;
 
@@ -13,7 +14,9 @@ function preloadHlsJs(): void {
   
   hlsLibPromise = import('hls.js')
     .then((mod) => {
-      console.log(`[${performance.now().toFixed(2)}ms] [HLS] hls.js preloaded successfully`);
+      if (DEBUG_MEDIA) {
+        console.log(`[${performance.now().toFixed(2)}ms] [HLS] hls.js preloaded successfully`);
+      }
       return (mod.default ?? mod) as typeof HlsType;
     })
     .catch((err) => {

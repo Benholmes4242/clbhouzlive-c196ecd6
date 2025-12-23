@@ -19,6 +19,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import { runtimeUserTap } from '@/media/runtime/runtimeIntent';
+import { DEBUG_MEDIA } from '@/media/debug';
 
 interface ClubhousePost {
   id: string;
@@ -73,7 +74,7 @@ export function useClubhouseRuntimeBridge({
           });
           registeredIdsRef.current.add(post.id);
           
-          if (import.meta.env.DEV) {
+          if (DEBUG_MEDIA) {
             console.log('[ClubhouseBridge] Registered:', post.id.slice(0, 8));
           }
         }
@@ -92,7 +93,7 @@ export function useClubhouseRuntimeBridge({
       MediaRuntime.unregisterMedia(id);
       registeredIdsRef.current.delete(id);
       
-      if (import.meta.env.DEV) {
+      if (DEBUG_MEDIA) {
         console.log('[ClubhouseBridge] Unregistered:', id.slice(0, 8));
       }
     });
@@ -139,7 +140,7 @@ export function useClubhouseRuntimeBridge({
     // Playback is now controlled by autoplayMap → HLSPlayer autoplay prop
     // This eliminates the dual-control conflict
     
-    if (import.meta.env.DEV) {
+    if (DEBUG_MEDIA) {
       console.log('[ClubhouseBridge] Center changed to:', centerId.slice(0, 8));
     }
   }, [posts, currentIndex]);

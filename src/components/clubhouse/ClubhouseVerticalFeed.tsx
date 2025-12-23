@@ -29,6 +29,7 @@ import { FEATURE_FLAGS, VERTICAL_MIN_AR, VERTICAL_MAX_AR } from '@/config/featur
 import { logClubhouseFiltering } from '@/utils/clubhouseTelemetry';
 import { useClubhouseRuntimeBridge } from '@/hooks/useClubhouseRuntimeBridge';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
+import { DEBUG_CLUBHOUSE_FEED } from '@/media/debug';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { useUserTop100CourseIds } from '@/hooks/useUserTop100CourseIds';
 import { 
@@ -341,9 +342,11 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     
     hasPreloadedFirst.current = true;
     
-    console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] LAYOUT_EFFECT_PRELOAD`, { 
-      firstPostId: firstPost.id.slice(0, 8) 
-    });
+    if (DEBUG_CLUBHOUSE_FEED) {
+      console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] LAYOUT_EFFECT_PRELOAD`, { 
+        firstPostId: firstPost.id.slice(0, 8) 
+      });
+    }
     
     // Set both maps synchronously in layout phase
     setShouldAttachMap({ [firstPost.id]: true });
@@ -362,7 +365,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   
   // Debug: Log state changes
   useEffect(() => {
-    if (import.meta.env.DEV && Object.keys(autoplayMap).length > 0) {
+    if (DEBUG_CLUBHOUSE_FEED && Object.keys(autoplayMap).length > 0) {
       console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] AUTOPLAY_MAP_CHANGED`, 
         Object.entries(autoplayMap).filter(([_, v]) => v).map(([k]) => k.slice(0, 8))
       );
@@ -370,7 +373,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   }, [autoplayMap]);
   
   useEffect(() => {
-    if (import.meta.env.DEV && Object.keys(shouldAttachMap).length > 0) {
+    if (DEBUG_CLUBHOUSE_FEED && Object.keys(shouldAttachMap).length > 0) {
       console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] SHOULD_ATTACH_MAP_CHANGED`, 
         Object.entries(shouldAttachMap).filter(([_, v]) => v).map(([k]) => k.slice(0, 8))
       );
@@ -449,7 +452,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
           const id = e.target.getAttribute('data-postid');
           if (!id) return;
           
-          if (import.meta.env.DEV) {
+          if (DEBUG_CLUBHOUSE_FEED) {
             console.log(`[${performance.now().toFixed(2)}ms] [ClubhouseVerticalFeed] PLAY_OBSERVER`, {
               id: id.slice(0, 8),
               isIntersecting: e.isIntersecting,
