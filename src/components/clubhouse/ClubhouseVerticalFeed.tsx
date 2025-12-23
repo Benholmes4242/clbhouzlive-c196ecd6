@@ -71,6 +71,8 @@ interface ClubhouseVerticalFeedProps {
   onTopZoneChange?: (isAtTop: boolean) => void;
   /** Fires when user performs a meaningful interaction (like, share, save, swipe, pause) */
   onMeaningfulInteraction?: () => void;
+  /** Fires when first video/image frame is ready to display (for skeleton timing) */
+  onFirstFrameReady?: () => void;
 }
 
 // Helper to compute which video IDs to keep in memory
@@ -199,10 +201,21 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   onDismissNavOverlay,
   onNavOverlayRequest,
   onTopZoneChange,
-  onMeaningfulInteraction
+  onMeaningfulInteraction,
+  onFirstFrameReady
 }) => {
   const { isVisible: topBarVisible, resetTimer: resetTopBar } = useTopBarVisibility();
   const { user } = useSupabaseSession();
+  
+  // Track if first frame ready has been signaled (only fire once)
+  const firstFrameReadyFiredRef = useRef(false);
+  
+  // Signal first frame ready (called from video loadeddata or image onload)
+  const handleFirstFrameReady = useCallback(() => {
+    if (firstFrameReadyFiredRef.current) return;
+    firstFrameReadyFiredRef.current = true;
+    onFirstFrameReady?.();
+  }, [onFirstFrameReady]);
   
   // Portrait-only aspect ratio constant (height/width >= 1.2)
   const PORTRAIT_MIN_AR = 1.2;
@@ -1259,6 +1272,10 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                       style={{ objectPosition: 'center center' }}
                       draggable={false}
                       loading="eager"
+                      onLoad={() => {
+                        // Signal first frame ready for first image post
+                        if (index === 0) handleFirstFrameReady();
+                      }}
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
                       }}
