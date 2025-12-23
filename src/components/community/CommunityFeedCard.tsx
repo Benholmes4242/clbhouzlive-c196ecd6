@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { Heart, Play } from 'lucide-react';
 import { GolferAvatar } from '@/components/golfers/GolferAvatar';
 import { HLSPlayer, HLSPlayerRef, runtimeUserTap } from '@/media';
+import { formatDistanceToNow } from 'date-fns';
 import type { RegisterMediaFn } from '@/media';
 import type { CommunityContentItem } from '@/hooks/community/useCommunityFeed';
 
@@ -168,13 +169,19 @@ export const CommunityFeedCard: React.FC<CommunityFeedCardProps> = ({
               {item.title}
             </p>
           )}
-          {/* Creator name */}
-          <button
-            onClick={handleCreatorClick}
-            className="text-xs text-muted-foreground mt-1 truncate block hover:text-foreground transition-colors"
-          >
-            {item.user?.name || 'User'}
-          </button>
+          {/* Creator name · date · likes */}
+          <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+            <button
+              onClick={handleCreatorClick}
+              className="hover:text-foreground transition-colors truncate"
+            >
+              {item.user?.name || 'User'}
+            </button>
+            <span>·</span>
+            <span>{item.createdAt ? formatDistanceToNow(new Date(item.createdAt), { addSuffix: true }) : 'Recently'}</span>
+            <span>·</span>
+            <span>{formatLikes(item.likeCount)} likes</span>
+          </div>
         </div>
 
         {/* Avatar squircle - bottom right, no border/ring */}
