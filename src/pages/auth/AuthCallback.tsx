@@ -32,14 +32,10 @@ const AuthCallback: React.FC = () => {
           console.error('Error checking profile:', profileError);
         }
 
-        if (!profile) {
-          // No profile exists - redirect to profile setup (always personal)
+        if (!profile || !profile.has_completed_onboarding) {
+          // No profile or onboarding not complete - redirect to onboarding
           setStatus("Setting up your profile...");
-          navigate('/create-profile', { replace: true });
-        } else if (!profile.has_completed_onboarding) {
-          // Profile exists but onboarding not complete
-          setStatus("Completing onboarding...");
-          navigate('/create-profile', { replace: true });
+          navigate('/onboarding', { replace: true });
         } else {
           // Fully onboarded - go to home
           setStatus("Welcome back!");

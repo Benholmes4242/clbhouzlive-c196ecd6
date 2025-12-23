@@ -77,18 +77,13 @@ import ClubhouseWrapped from "./pages/ClubhouseWrapped";
 import DiscoverWrapped from "./pages/DiscoverWrapped";
 import ProfileWrapped from "./pages/ProfileWrapped";
 import SettingsWrapped from "./pages/SettingsWrapped";
-import AuthWrapped from "./pages/AuthWrapped";
 import { useModalContext } from '@/contexts/ModalContext';
 
 // Lazy load other pages for better code splitting and loading screen experience
-const Auth = lazy(() => import("./pages/Auth"));
 const AuthCallback = lazy(() => import("./pages/auth/AuthCallback"));
-const Signup = lazy(() => import("./pages/Signup"));
 const Clubhouse = lazy(() => import("./pages/Clubhouse"));
-const CreateProfile = lazy(() => import("./pages/CreateProfile"));
 const AuthV2 = lazy(() => import("./pages/AuthV2"));
 const OnboardingV2 = lazy(() => import("./pages/OnboardingV2"));
-const AccountTypeOnboarding = lazy(() => import("./pages/onboarding/AccountTypeOnboarding"));
 const ProfileTestPage = lazy(() => import("./pages/ProfileTestPage"));
 const EditProfilePage = lazy(() => import("./pages/EditProfilePage"));
 const ProfileHandicapView = lazy(() => import("./pages/ProfileHandicapView"));
@@ -242,13 +237,17 @@ function AppRoutes() {
     <>
       <Routes location={routesLocation}>
         <Route path="/" element={<ClubhouseWrapped />} />
-        <Route path="/auth" element={<AuthWrapped />} />
+        {/* Auth - AuthV2 is now the canonical auth route */}
+        <Route path="/auth" element={<Suspense fallback={<GenericPageSkeleton />}><AuthV2 /></Suspense>} />
         <Route path="/auth/callback" element={<Suspense fallback={<GenericPageSkeleton />}><AuthCallback /></Suspense>} />
-        <Route path="/signup" element={<Suspense fallback={<GenericPageSkeleton />}><Signup /></Suspense>} />
-        <Route path="/auth-v2" element={<Suspense fallback={<GenericPageSkeleton />}><AuthV2 /></Suspense>} />
+        {/* Redirects from old auth routes */}
+        <Route path="/auth-v2" element={<Navigate to="/auth" replace />} />
+        <Route path="/signup" element={<Navigate to="/auth" replace />} />
+        <Route path="/login" element={<Navigate to="/auth" replace />} />
+        {/* Onboarding - OnboardingV2 is now the canonical onboarding route */}
         <Route path="/onboarding" element={<Suspense fallback={<GenericPageSkeleton />}><OnboardingV2 /></Suspense>} />
-        <Route path="/create-profile" element={<Suspense fallback={<GenericPageSkeleton />}><CreateProfile /></Suspense>} />
-        <Route path="/onboarding/account-type" element={<Suspense fallback={<GenericPageSkeleton />}><AccountTypeOnboarding /></Suspense>} />
+        <Route path="/create-profile" element={<Navigate to="/onboarding" replace />} />
+        <Route path="/onboarding/account-type" element={<Navigate to="/onboarding" replace />} />
         <Route path="/profile" element={<ProfileWrapped />} />
         <Route path="/profile/handicap" element={<Suspense fallback={<ProfileSkeleton />}><ProfileHandicapView /></Suspense>} />
         <Route path="/profile/quest" element={<Suspense fallback={<ProfileSkeleton />}><ProfileQuestView /></Suspense>} />
