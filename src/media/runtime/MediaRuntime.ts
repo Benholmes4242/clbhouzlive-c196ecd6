@@ -76,6 +76,17 @@ const SCRUB_SUPPRESS_DURATION = 600; // 600ms after scrub, suppress autoplay swi
 const BUFFERING_SUPPRESS_DURATION = 500; // 500ms grace for buffering videos
 const MAX_RETRIES = 1;
 
+// Concurrent video limits by surface
+const MAX_CONCURRENT_GRID_VIDEOS = 3; // Allow up to 3 grid videos simultaneously
+const MAX_CONCURRENT_FULLSCREEN = 1;  // Fullscreen/clubhouse: strict 1-at-a-time
+
+// Surface priority (lower = higher priority)
+const SURFACE_PRIORITY: Record<MediaSurface, number> = {
+  'clubhouse': 1,      // Highest - fullscreen feed
+  'fullscreen': 2,     // High - fullscreen modal
+  'grid': 3,           // Medium - grid videos
+};
+
 // ============ Singleton Runtime ============
 
 class MediaRuntimeCore {
@@ -273,12 +284,31 @@ class MediaRuntimeCore {
       this.state.activeMediaIds.clear();
     }
     
-    // Block grid autoplay if fullscreen is active with user reason
-    if (this.state.activeSurface === 'fullscreen' && surface === 'grid' && reason !== 'user') {
+    // Block grid autoplay if fullscreen/clubhouse is active with user reason
+    if ((this.state.activeSurface === 'fullscreen' || this.state.activeSurface === 'clubhouse') 
+        && surface === 'grid' && reason !== 'user') {
       if (DEBUG_MEDIA_RUNTIME) {
-        console.log('[MediaRuntime] requestPlay blocked: fullscreen active');
+        console.log('[MediaRuntime] requestPlay blocked: fullscreen/clubhouse active');
       }
       return false;
+    }
+    
+    // When clubhouse/fullscreen starts, pause ALL grid videos (priority system)
+    if ((surface === 'clubhouse' || surface === 'fullscreen') && reason !== 'autoplay') {
+      const gridVideos = Array.from(this.state.activeMediaIds).filter(activeId => {
+        const media = this.registry.get(activeId);
+        return media?.surface === 'grid';
+      });
+      
+      for (const gridId of gridVideos) {
+        this.pauseInternal(gridId);
+        this.state.activeMediaIds.delete(gridId);
+        this.telemetry.autoplayStop?.(gridId, 'priority_override');
+      }
+      
+      if (DEBUG_MEDIA_RUNTIME && gridVideos.length > 0) {
+        console.log('[MediaRuntime] Paused', gridVideos.length, 'grid videos for', surface);
+      }
     }
     
     // ✅ FIX: Add to activeMediaIds BEFORE calling safePlay
@@ -484,8 +514,7 @@ class MediaRuntimeCore {
       });
     }
     
-    // FIX: Enforce single video limit for grid surfaces
-    // Only allow one grid video to play at a time
+    // Grid video concurrency: allow up to MAX_CONCURRENT_GRID_VIDEOS (3)
     const gridVideosPlaying = Array.from(this.state.activeMediaIds).filter(id => {
       const media = this.registry.get(id);
       return media?.surface === 'grid';
@@ -495,51 +524,80 @@ class MediaRuntimeCore {
     const gridCandidates = candidates.filter(c => c.surface === 'grid');
     const otherCandidates = candidates.filter(c => c.surface !== 'grid');
     
-    // For grid: only start a new video if none are playing, or current one scrolled away
+    // Pause grid videos that are no longer visible
+    for (const playingId of gridVideosPlaying) {
+      const node = this.registry.get(playingId);
+      if (node && !node.isVisible) {
+        this.requestPause({ id: playingId, reason: 'scroll_away' });
+      }
+    }
+    
+    // Count currently playing visible grid videos
+    const visibleGridPlaying = gridVideosPlaying.filter(id => {
+      const node = this.registry.get(id);
+      return node?.isVisible;
+    });
+    
+    // For grid: allow up to MAX_CONCURRENT_GRID_VIDEOS to play
     if (gridCandidates.length > 0) {
-      if (gridVideosPlaying.length > 0) {
-        // Check if current grid video is still visible
-        const currentPlaying = this.registry.get(gridVideosPlaying[0]);
-        if (currentPlaying?.isVisible) {
-          // Current video still visible, don't start another grid video
-          if (import.meta.env.DEV) {
-            console.log('[MediaRuntime] BLOCKING_NEW_GRID_PLAY', {
-              reason: 'grid_video_already_playing',
-              currentlyPlaying: gridVideosPlaying[0].slice(0, 8)
+      // Sort by visibility ratio (highest first) then sortIndex (lowest first)
+      const sortedGridCandidates = [...gridCandidates].sort((a, b) => {
+        // Primary: visibility ratio (higher is better)
+        if (b.visibilityRatio !== a.visibilityRatio) {
+          return b.visibilityRatio - a.visibilityRatio;
+        }
+        // Secondary: sortIndex (lower is higher priority)
+        return a.sortIndex - b.sortIndex;
+      });
+      
+      // Start playing visible candidates up to the limit
+      for (const candidate of sortedGridCandidates) {
+        const currentGridCount = Array.from(this.state.activeMediaIds).filter(id => {
+          const media = this.registry.get(id);
+          return media?.surface === 'grid';
+        }).length;
+        
+        if (currentGridCount >= MAX_CONCURRENT_GRID_VIDEOS) {
+          // At limit - need to pause lowest priority if new one is higher
+          const activeGridNodes = Array.from(this.state.activeMediaIds)
+            .map(id => this.registry.get(id))
+            .filter((n): n is MediaNode => n?.surface === 'grid')
+            .sort((a, b) => {
+              // Sort by visibility (lower is lower priority)
+              if (a.visibilityRatio !== b.visibilityRatio) {
+                return a.visibilityRatio - b.visibilityRatio;
+              }
+              // Then by sortIndex (higher is lower priority)
+              return b.sortIndex - a.sortIndex;
             });
-          }
-        } else {
-          // Current video no longer visible, stop it and pick best new one
-          this.requestPause({ id: gridVideosPlaying[0], reason: 'scroll_away' });
           
-          // Pick best grid candidate (highest visibility ratio)
-          const bestGrid = gridCandidates.reduce((best, c) => 
-            c.visibilityRatio > (best?.visibilityRatio ?? 0) ? c : best, 
-            null as MediaNode | null
-          );
+          const lowestPriority = activeGridNodes[0];
           
-          if (bestGrid && !this.state.activeMediaIds.has(bestGrid.id)) {
-            this.requestPlay({
-              id: bestGrid.id,
-              surface: bestGrid.surface,
-              reason: 'autoplay',
-            });
+          // Only swap if candidate has higher visibility
+          if (lowestPriority && candidate.visibilityRatio > lowestPriority.visibilityRatio) {
+            this.requestPause({ id: lowestPriority.id, reason: 'priority_swap' });
+          } else {
+            // Can't add more, skip this candidate
+            continue;
           }
         }
-      } else {
-        // No grid videos playing - pick best one
-        const bestGrid = gridCandidates.reduce((best, c) => 
-          c.visibilityRatio > (best?.visibilityRatio ?? 0) ? c : best, 
-          null as MediaNode | null
-        );
         
-        if (bestGrid && !this.state.activeMediaIds.has(bestGrid.id)) {
+        // Start playing if not already
+        if (!this.state.activeMediaIds.has(candidate.id)) {
           this.requestPlay({
-            id: bestGrid.id,
-            surface: bestGrid.surface,
+            id: candidate.id,
+            surface: candidate.surface,
             reason: 'autoplay',
           });
         }
+      }
+      
+      if (import.meta.env.DEV) {
+        const finalGridCount = Array.from(this.state.activeMediaIds).filter(id => {
+          const media = this.registry.get(id);
+          return media?.surface === 'grid';
+        }).length;
+        console.log('[MediaRuntime] Grid videos playing:', finalGridCount, '/', MAX_CONCURRENT_GRID_VIDEOS);
       }
     }
     
