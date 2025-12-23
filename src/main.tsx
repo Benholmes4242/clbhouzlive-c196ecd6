@@ -3,6 +3,7 @@ import './utils/bootTimeline';
 // Log app start immediately
 import { logAppStart } from './utils/bootTimeline';
 logAppStart();
+console.log('[Entry] main.tsx executed', window.location.href);
 
 import React from 'react'
 import { createRoot } from 'react-dom/client'
