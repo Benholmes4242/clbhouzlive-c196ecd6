@@ -19,6 +19,7 @@ import {
 } from '@/components/auth-v2';
 
 type AuthStep = 'welcome' | 'email' | 'password' | 'create-password' | 'forgot-password';
+type AuthIntent = 'login' | 'signup';
 
 /**
  * AuthV2 - Immersive, world-class auth experience
@@ -41,6 +42,7 @@ const AuthV2: React.FC = () => {
 
   // State
   const [step, setStep] = useState<AuthStep>('welcome');
+  const [intent, setIntent] = useState<AuthIntent>('signup');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -122,12 +124,16 @@ const AuthV2: React.FC = () => {
       return;
     }
 
-    setLoading(true);
-    const exists = await checkEmailExists(email);
-    setIsExistingUser(exists);
-    setLoading(false);
-    
-    setStep(exists ? 'password' : 'create-password');
+    // LOGIN FLOW — explicit intent
+    if (intent === 'login') {
+      setIsExistingUser(true);
+      setStep('password');
+      return;
+    }
+
+    // SIGNUP FLOW — explicit intent
+    setIsExistingUser(false);
+    setStep('create-password');
   };
 
   const handleLogin = async () => {
@@ -238,6 +244,7 @@ const AuthV2: React.FC = () => {
 
   const closeSheet = () => {
     setStep('welcome');
+    setIntent('signup'); // Reset intent to default
     setEmail('');
     setPassword('');
     setConfirmPassword('');
@@ -293,14 +300,14 @@ const AuthV2: React.FC = () => {
           
           <AuthDivider />
           
-          <AuthSecondaryButton onClick={() => setStep('email')}>
+          <AuthSecondaryButton onClick={() => { setIntent('signup'); setStep('email'); }}>
             Continue with Email
           </AuthSecondaryButton>
 
           {/* Footer */}
           <div className="pt-4 text-center">
             <button
-              onClick={() => setStep('email')}
+              onClick={() => { setIntent('login'); setStep('email'); }}
               className="text-sm text-white/50 hover:text-white/70 transition-colors"
             >
               Already a member?{' '}
