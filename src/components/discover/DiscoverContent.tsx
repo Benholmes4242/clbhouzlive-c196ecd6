@@ -411,18 +411,20 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
   if (main === 'shorts') {
     
     return (
-      <div className="watch-tab-content">
-        {/* Command Center - Search + Sort + Pills */}
-        <DiscoverCommandCenter
-          searchPlaceholder="Search shorts, creators, courses…"
-          searchValue={watchSearchQuery}
-          onSearchChange={setWatchSearchQuery}
-          sortValue={watchSortOption}
-          onSortChange={setWatchSortOption}
-          pills={watchPills}
-          onPillSelect={setWatchActiveFilter}
-          defaultSortValue="newest"
-        />
+      <div className="watch-tab-content min-h-screen">
+        {/* Sticky Command Center - Search + Sort + Pills */}
+        <div className="sticky top-0 z-30 bg-[var(--bg-page)]">
+          <DiscoverCommandCenter
+            searchPlaceholder="Search shorts, creators, courses…"
+            searchValue={watchSearchQuery}
+            onSearchChange={setWatchSearchQuery}
+            sortValue={watchSortOption}
+            onSortChange={setWatchSortOption}
+            pills={watchPills}
+            onPillSelect={setWatchActiveFilter}
+            defaultSortValue="newest"
+          />
+        </div>
         
         {/* Watch Section Gap Token: 16px between all major sections */}
         <div className="h-4" /> {/* 16px gap: CommandCenter → Hero */}
