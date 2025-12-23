@@ -281,6 +281,7 @@ export const VideosTab: React.FC<VideosTabProps> = ({
     navigate('/discover?main=videos');
   };
 
+  // EARLY RETURNS AFTER ALL HOOKS - React hooks order rule
   // If in search mode, render search results
   if (modeParam === 'search' && urlSearchQuery) {
     return (

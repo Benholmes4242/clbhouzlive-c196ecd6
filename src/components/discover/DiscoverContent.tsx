@@ -365,48 +365,50 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     return currentContent.filter(item => item.id !== heroItem.id);
   }, [currentContent, heroItem]);
 
+  // Apply course clustering when 3+ items from same course in top 15 (for Shorts tab)
+  // MUST be called unconditionally to satisfy React hooks rules
+  const clusteredGridContent = React.useMemo(() => {
+    if (!gridContent || gridContent.length === 0) return gridContent;
+    
+    // Check top 15 items for course clustering
+    const topItems = gridContent.slice(0, 15);
+    const courseCounts = new Map<string, { count: number; name: string; firstIndex: number }>();
+    
+    topItems.forEach((item, index) => {
+      const courseId = item.golfCourse?.id;
+      const courseName = item.golfCourse?.name;
+      if (courseId && courseName) {
+        if (!courseCounts.has(courseId)) {
+          courseCounts.set(courseId, { count: 1, name: courseName, firstIndex: index });
+        } else {
+          courseCounts.get(courseId)!.count++;
+        }
+      }
+    });
+    
+    // Find courses with 3+ items
+    const clusterCourses = Array.from(courseCounts.entries())
+      .filter(([, data]) => data.count >= 3)
+      .sort((a, b) => a[1].firstIndex - b[1].firstIndex);
+    
+    if (clusterCourses.length === 0) return gridContent;
+    
+    // Mark the first occurrence of each clustered course
+    const clusterHeaders = new Set(clusterCourses.map(([id]) => id));
+    return gridContent.map((item, index) => {
+      const courseId = item.golfCourse?.id;
+      if (courseId && clusterHeaders.has(courseId)) {
+        const courseData = courseCounts.get(courseId);
+        if (courseData && courseData.firstIndex === index) {
+          return { ...item, _clusterHeader: courseData.name };
+        }
+      }
+      return item;
+    });
+  }, [gridContent]);
+
   // Handle Shorts tab directly (no sliding panels needed)
   if (main === 'shorts') {
-    // Apply course clustering when 3+ items from same course in top 15
-    const clusteredGridContent = React.useMemo(() => {
-      if (!gridContent || gridContent.length === 0) return gridContent;
-      
-      // Check top 15 items for course clustering
-      const topItems = gridContent.slice(0, 15);
-      const courseCounts = new Map<string, { count: number; name: string; firstIndex: number }>();
-      
-      topItems.forEach((item, index) => {
-        const courseId = item.golfCourse?.id;
-        const courseName = item.golfCourse?.name;
-        if (courseId && courseName) {
-          if (!courseCounts.has(courseId)) {
-            courseCounts.set(courseId, { count: 1, name: courseName, firstIndex: index });
-          } else {
-            courseCounts.get(courseId)!.count++;
-          }
-        }
-      });
-      
-      // Find courses with 3+ items
-      const clusterCourses = Array.from(courseCounts.entries())
-        .filter(([, data]) => data.count >= 3)
-        .sort((a, b) => a[1].firstIndex - b[1].firstIndex);
-      
-      if (clusterCourses.length === 0) return gridContent;
-      
-      // Mark the first occurrence of each clustered course
-      const clusterHeaders = new Set(clusterCourses.map(([id]) => id));
-      return gridContent.map((item, index) => {
-        const courseId = item.golfCourse?.id;
-        if (courseId && clusterHeaders.has(courseId)) {
-          const courseData = courseCounts.get(courseId);
-          if (courseData && courseData.firstIndex === index) {
-            return { ...item, _clusterHeader: courseData.name };
-          }
-        }
-        return item;
-      });
-    }, [gridContent]);
     
     return (
       <div className="watch-tab-content">
