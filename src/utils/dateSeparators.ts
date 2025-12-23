@@ -31,11 +31,10 @@ export function getDateBucketLabel(bucket: DateBucket): string {
     case 'yesterday':
       return 'Yesterday';
     case 'earlier-this-week':
-      return 'Earlier this week';
+      return 'This week';
     case 'last-week':
-      return 'Last week';
     case 'older':
-      return 'Older';
+      return 'Earlier';
   }
 }
 

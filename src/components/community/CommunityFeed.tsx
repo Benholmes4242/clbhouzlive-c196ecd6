@@ -155,19 +155,28 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
     navigate(`/golfer/${creatorUserId}`);
   }, [navigate]);
 
+  // Helper to clear filter
+  const handleClearFilter = useCallback(() => {
+    setMediaFilter('all');
+    localStorage.setItem(FILTER_KEY, 'all');
+  }, []);
+
   // Empty state: User has no community (no friends/follows)
   if (!loading && communityCount.friends === 0 && communityCount.following === 0) {
     return (
       <div className="min-h-screen pb-20 bg-[var(--bg-page)]">
-        <DiscoverCommandCenter
-          searchPlaceholder="Search posts..."
-          searchValue={searchQuery}
-          onSearchChange={setSearchQuery}
-          sortValue={commandCenterSort}
-          onSortChange={handleSortChange}
-          pills={pills}
-          onPillSelect={handleFilterChange}
-        />
+        {/* Sticky Command Center */}
+        <div className="sticky top-0 z-30 bg-[var(--bg-page)]">
+          <DiscoverCommandCenter
+            searchPlaceholder="Search posts..."
+            searchValue={searchQuery}
+            onSearchChange={setSearchQuery}
+            sortValue={commandCenterSort}
+            onSortChange={handleSortChange}
+            pills={pills}
+            onPillSelect={handleFilterChange}
+          />
+        </div>
         <CommunityEmptyState variant="no-community" />
       </div>
     );
@@ -175,8 +184,36 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
 
   // Has community but no posts
   if (!loading && items.length === 0 && (communityCount.friends > 0 || communityCount.following > 0)) {
+    // Check if this is due to a filter
+    const isFilteredEmpty = mediaFilter !== 'all';
+    
     return (
       <div className="min-h-screen pb-20 bg-[var(--bg-page)]">
+        {/* Sticky Command Center */}
+        <div className="sticky top-0 z-30 bg-[var(--bg-page)]">
+          <DiscoverCommandCenter
+            searchPlaceholder="Search posts..."
+            searchValue={searchQuery}
+            onSearchChange={setSearchQuery}
+            sortValue={commandCenterSort}
+            onSortChange={handleSortChange}
+            pills={pills}
+            onPillSelect={handleFilterChange}
+          />
+        </div>
+        {isFilteredEmpty ? (
+          <CommunityEmptyState variant="no-results" onClearFilter={handleClearFilter} />
+        ) : (
+          <CommunityEmptyState variant="quiet" />
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen pb-20 bg-[var(--bg-page)]">
+      {/* Sticky Command Center: Search + Sort + Pills + Subtitle */}
+      <div className="sticky top-0 z-30 bg-[var(--bg-page)]">
         <DiscoverCommandCenter
           searchPlaceholder="Search posts..."
           searchValue={searchQuery}
@@ -186,33 +223,16 @@ export default function CommunityFeed({ onMediaClick }: CommunityFeedProps) {
           pills={pills}
           onPillSelect={handleFilterChange}
         />
-        <CommunityEmptyState variant="quiet" />
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen pb-20 bg-[var(--bg-page)]">
-      {/* Command Center: Search + Sort + Pills */}
-      <DiscoverCommandCenter
-        searchPlaceholder="Search posts..."
-        searchValue={searchQuery}
-        onSearchChange={setSearchQuery}
-        sortValue={commandCenterSort}
-        onSortChange={handleSortChange}
-        pills={pills}
-        onPillSelect={handleFilterChange}
-      />
-
-      {/* Subtitle */}
-      <div className="px-4 pb-1">
-        <p className="text-xs text-muted-foreground">
-          Posts from people you follow and play with
-        </p>
+        {/* Subtitle - tighter spacing: 8px below pills, styled as secondary subheader */}
+        <div className="px-4 -mt-2 pb-3">
+          <p className="text-[11px] font-medium text-muted-foreground/70 uppercase tracking-wide truncate">
+            Posts from people you follow and play with
+          </p>
+        </div>
       </div>
 
-      {/* Feed - 12px gap between cards like Videos tab */}
-      <div className="space-y-3 pt-2">
+      {/* Feed */}
+      <div className="pt-1">
         {items.map((item, index) => (
           <React.Fragment key={item.id}>
             {/* Date Separator */}
