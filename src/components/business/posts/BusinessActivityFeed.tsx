@@ -3,11 +3,13 @@
  * Phase 1-6 implementation for business profile posts
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useLayoutEffect, useRef } from 'react';
 import { useBusinessPosts, BusinessPost } from '@/hooks/useBusinessPosts';
 import { useBusinessTaggedPosts, useHideTaggedPost } from '@/hooks/useBusinessTaggedPosts';
 import { useRealtimeBusinessPosts } from '@/hooks/useRealtimeBusinessPosts';
 import { BusinessMembership } from '@/hooks/useBusinessMembership';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import EnhancedCreateMomentModalCinematic from '@/components/post/EnhancedCreateMomentModal.cinematic';
 import { ComposerMediaItem } from '@/hooks/useSnapModal';
@@ -67,6 +69,29 @@ export function BusinessActivityFeed({
   });
 
   const canManage = membership?.canManage ?? false;
+  const hasPreloadedFirst = useRef(false);
+
+  // Eager preload first video's HLS manifest on mount
+  useLayoutEffect(() => {
+    if (hasPreloadedFirst.current) return;
+    
+    const allPosts = posts || [];
+    const firstVideoPost = allPosts.find(p => 
+      p.post_media?.some(m => m.media_type === 'video')
+    );
+    
+    if (firstVideoPost) {
+      const videoMedia = firstVideoPost.post_media?.find(m => m.media_type === 'video');
+      if (videoMedia?.media_url) {
+        const uid = uidFromNode({ media_url: videoMedia.media_url });
+        if (uid) {
+          const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+          preloadHlsManifest(hlsUrl);
+          hasPreloadedFirst.current = true;
+        }
+      }
+    }
+  }, [posts]);
 
   // Sort posts: pinned first, then by date
   const sortedPosts = useMemo(() => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
@@ -15,6 +15,8 @@ import { useCourseMediaSummary } from '@/hooks/useCourseMediaSummary';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useClubMedia } from '@/hooks/useClubMedia';
 import { MediaGridItem } from './MediaGridItem';
+import { uidFromNode } from '@/utils/cloudflareStreamTransform';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
 
 interface CourseMediaTabProps {
   courseId: string;
@@ -48,6 +50,7 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
   const [selectedMediaIndex, setSelectedMediaIndex] = useState<number | null>(null);
   const [modalPortalTarget, setModalPortalTarget] = useState<HTMLElement | null>(null);
   const [filterMode, setFilterMode] = useState<MediaFilterMode>('most_recent');
+  const hasPreloadedFirst = useRef(false);
 
   // Get portal target for fullscreen modal
   useEffect(() => {
@@ -58,7 +61,22 @@ const CourseMediaTab = ({ courseId, courseName, portalTarget }: CourseMediaTabPr
   // Phase 1 Fix #2: Use shared hook - single query for all media consumers
   const { data: mediaResp, isLoading, isError, refetch } = useClubMedia(courseId, 30);
 
-  // A3: Pre-warm HLS.js when media tab mounts with videos
+  // Eager preload first video's HLS manifest on mount (before paint)
+  useLayoutEffect(() => {
+    if (hasPreloadedFirst.current || !mediaResp?.length) return;
+    
+    const firstVideo = mediaResp.find(item => item.media_type === 'video');
+    if (firstVideo?.media_url) {
+      const uid = uidFromNode({ media_url: firstVideo.media_url });
+      if (uid) {
+        const hlsUrl = `https://videodelivery.net/${uid}/manifest/video.m3u8`;
+        preloadHlsManifest(hlsUrl);
+        hasPreloadedFirst.current = true;
+      }
+    }
+  }, [mediaResp]);
+
+  // A3: Pre-warm HLS.js when media tab mounts with videos (kept for additional warmup)
   useEffect(() => {
     if (mediaResp && mediaResp.length > 0) {
       const hasVideos = mediaResp.some(item => item.media_type === 'video');
