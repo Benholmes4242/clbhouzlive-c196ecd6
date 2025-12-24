@@ -13,12 +13,13 @@ interface SettingsSectionProps {
 }
 
 /**
- * SettingsSection - Light card container for grouping settings rows
+ * SettingsSection - Full-width panel (Business Profiles style)
  * 
  * Uses global light system:
- * - background: #FAFAFB (--surface-card)
+ * - background: #FAFAFB
  * - border: 1px solid rgba(31,36,40,0.06)
  * - radius: 16px
+ * - 12px gap between panels (page background shows through)
  */
 export function SettingsSection({ 
   title, 
@@ -30,12 +31,12 @@ export function SettingsSection({
   const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
 
   return (
-    <section className={cn('space-y-2', className)}>
+    <section className={cn('w-full max-w-full box-border', className)}>
       {/* Section header */}
       <button
         type="button"
         className={cn(
-          'w-full text-left px-3.5 flex items-center justify-between',
+          'w-full text-left px-3.5 flex items-center justify-between mb-2',
           collapsible && 'cursor-pointer'
         )}
         onClick={() => collapsible && setIsCollapsed(!isCollapsed)}
@@ -54,14 +55,14 @@ export function SettingsSection({
         )}
       </button>
 
-      {/* Card container */}
+      {/* Panel container - full width, no shadow */}
       {!isCollapsed && (
         <div
           className={cn(
+            'w-full max-w-full box-border',
             'rounded-[16px] overflow-hidden',
             'border border-[rgba(31,36,40,0.06)]',
-            'bg-[#FAFAFB]',
-            'shadow-[0_2px_8px_rgba(31,36,40,0.04)]'
+            'bg-[#FAFAFB]'
           )}
         >
           {children}
