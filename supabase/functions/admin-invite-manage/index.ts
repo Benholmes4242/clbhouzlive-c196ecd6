@@ -6,6 +6,7 @@ type Action =
   | "list_invites"
   | "resend_invite"
   | "revoke_invite"
+  | "revoke_bulk"
   | "accept_invite";
 
 const ALLOWED_ORIGINS = new Set([
@@ -142,6 +143,83 @@ serve(async (req: Request) => {
       if (error) throw error;
 
       return new Response(JSON.stringify({ ok: true }), {
+        status: 200, headers: { ...headers, "Content-Type": "application/json" },
+      });
+    }
+
+    if (action === "revoke_bulk") {
+      const { ids } = body;
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return new Response(JSON.stringify({ error: "ids[] required" }), {
+          status: 400, headers: { ...headers, "Content-Type": "application/json" },
+        });
+      }
+
+      console.log(`[admin-invite-manage] Bulk revoking ${ids.length} invites by admin ${actor.id}`);
+
+      const result = { success: [] as string[], failed: [] as { id: string; error: string }[] };
+
+      for (const id of ids) {
+        try {
+          // Check if invite is revocable (not accepted)
+          const { data: invite, error: fetchErr } = await svc
+            .from("admin_invitations")
+            .select("id, accepted_at")
+            .eq("id", id)
+            .single();
+
+          if (fetchErr || !invite) {
+            result.failed.push({ id, error: "Invite not found" });
+            continue;
+          }
+
+          if (invite.accepted_at) {
+            result.failed.push({ id, error: "Already accepted" });
+            continue;
+          }
+
+          const { error: delErr } = await svc.from("admin_invitations").delete().eq("id", id);
+          if (delErr) {
+            result.failed.push({ id, error: delErr.message });
+            continue;
+          }
+
+          result.success.push(id);
+        } catch (err: any) {
+          result.failed.push({ id, error: err.message || "Unknown error" });
+        }
+      }
+
+      // Audit log
+      const { error: auditErr } = await svc.from("admin_audit_log").insert({
+        admin_user_id: actor.id,
+        action: "invite_bulk_revoke",
+        details: {
+          total: ids.length,
+          successCount: result.success.length,
+          failCount: result.failed.length,
+          ids: ids,
+        },
+      });
+      if (auditErr) console.error("[admin-invite-manage] Audit error:", auditErr);
+
+      // Notification
+      const { error: notifErr } = await svc.from("admin_notifications").insert({
+        type: "bulk_invites_revoked",
+        title: "Bulk invites revoked",
+        message: `Revoked ${result.success.length} invites${result.failed.length > 0 ? `, ${result.failed.length} failed` : ""}`,
+        metadata: {
+          successCount: result.success.length,
+          failCount: result.failed.length,
+        },
+        audience: "full",
+        link: "/admin/invites",
+      });
+      if (notifErr) console.error("[admin-invite-manage] Notification error:", notifErr);
+
+      console.log(`[admin-invite-manage] Bulk revoke complete: ${result.success.length} succeeded, ${result.failed.length} failed`);
+
+      return new Response(JSON.stringify(result), {
         status: 200, headers: { ...headers, "Content-Type": "application/json" },
       });
     }

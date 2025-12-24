@@ -74,3 +74,6 @@ verify_jwt = true
 
 [functions.register-push-device]
 verify_jwt = true
+
+[functions.verify-bulk]
+verify_jwt = true

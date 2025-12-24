@@ -33,6 +33,11 @@ interface BusinessVerificationCardProps {
   request: VerificationRequest;
   myReview?: string;
   onClick: () => void;
+  // Bulk selection props
+  selectMode?: boolean;
+  selected?: boolean;
+  onSelect?: () => void;
+  selectable?: boolean;
 }
 
 const getStatusVariant = (status: string): StatusVariant => {
@@ -69,6 +74,10 @@ export function BusinessVerificationCard({
   request,
   myReview,
   onClick,
+  selectMode = false,
+  selected = false,
+  onSelect,
+  selectable = true,
 }: BusinessVerificationCardProps) {
   const business = request.business;
   const approvalCount = request.approval_count ?? 0;
@@ -118,6 +127,10 @@ export function BusinessVerificationCard({
         variant: getStatusVariant(request.status),
       }}
       onClick={onClick}
+      selectMode={selectMode}
+      selected={selected}
+      onSelect={onSelect}
+      selectable={selectable}
     />
   );
 }
