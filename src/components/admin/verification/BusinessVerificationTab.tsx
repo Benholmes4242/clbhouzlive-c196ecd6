@@ -36,6 +36,9 @@ import { Input } from '@/components/ui/input';
 import { VerificationHistoryTimeline } from './VerificationHistoryTimeline';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ENABLE_VERIFICATION_BYPASS } from '@/lib/featureFlags';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { BusinessVerificationCard, BusinessVerificationBottomSheet } from './mobile';
+import { AdminListSkeleton, AdminEmptyState } from '@/components/admin/mobile';
 
 interface VerificationRequest {
   id: string;
@@ -72,6 +75,7 @@ interface VerificationRequest {
 
 const BusinessVerificationTab = () => {
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [domainCheckModalOpen, setDomainCheckModalOpen] = useState(false);
@@ -82,6 +86,7 @@ const BusinessVerificationTab = () => {
   const [revokeConfirmed, setRevokeConfirmed] = useState(false);
   const [domainInput, setDomainInput] = useState('');
   const [activeTab, setActiveTab] = useState('pending');
+  const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
 
   useAdminVerificationQueueRealtime();
   const requestDomainCheck = useRequestDomainCheck();
@@ -755,47 +760,82 @@ const BusinessVerificationTab = () => {
           </TabsList>
         </div>
 
-        <TabsContent value="pending" className="mt-4 space-y-4">
-          <p className="text-sm text-muted-foreground">Each request requires two independent approvals. Any single rejection immediately rejects the request.</p>
+        <TabsContent value="pending" className="mt-4 space-y-3">
+          {!isMobile && <p className="text-sm text-muted-foreground">Each request requires two independent approvals. Any single rejection immediately rejects the request.</p>}
           {pendingRequests.length === 0 ? (
-            <Card className="p-8 text-center">
-              <Building2 className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
-              <h3 className="font-medium text-lg">No pending requests</h3>
-              <p className="text-muted-foreground text-sm mt-1">All caught up!</p>
-              <p className="text-muted-foreground/60 text-xs mt-0.5">Last checked just now</p>
-            </Card>
+            <AdminEmptyState icon={Building2} title="No pending requests" description="All caught up!" />
+          ) : isMobile ? (
+            pendingRequests.map(request => (
+              <BusinessVerificationCard
+                key={request.id}
+                request={request}
+                myReview={myReviewsByRequest.get(request.id)}
+                onClick={() => { setSelectedRequest(request); setMobileSheetOpen(true); }}
+              />
+            ))
           ) : pendingRequests.map(request => renderRequestCard(request, true))}
         </TabsContent>
 
-        <TabsContent value="approved" className="mt-4 space-y-4">
+        <TabsContent value="approved" className="mt-4 space-y-3">
           {approvedRequests.length === 0 ? (
-            <Card className="p-8 text-center">
-              <CheckCircle className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
-              <h3 className="font-medium text-lg">No approved requests</h3>
-              <p className="text-muted-foreground text-sm mt-1">Approved verifications will appear here.</p>
-            </Card>
+            <AdminEmptyState icon={CheckCircle} title="No approved requests" description="Approved verifications will appear here." />
+          ) : isMobile ? (
+            approvedRequests.map(request => (
+              <BusinessVerificationCard
+                key={request.id}
+                request={request}
+                myReview={myReviewsByRequest.get(request.id)}
+                onClick={() => { setSelectedRequest(request); setMobileSheetOpen(true); }}
+              />
+            ))
           ) : approvedRequests.map(request => renderRequestCard(request, false))}
         </TabsContent>
 
-        <TabsContent value="rejected" className="mt-4 space-y-4">
+        <TabsContent value="rejected" className="mt-4 space-y-3">
           {rejectedRequests.length === 0 ? (
-            <Card className="p-8 text-center">
-              <XCircle className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
-              <h3 className="font-medium text-lg">No rejected requests</h3>
-              <p className="text-muted-foreground text-sm mt-1">Rejected verifications will appear here.</p>
-            </Card>
+            <AdminEmptyState icon={XCircle} title="No rejected requests" description="Rejected verifications will appear here." />
+          ) : isMobile ? (
+            rejectedRequests.map(request => (
+              <BusinessVerificationCard
+                key={request.id}
+                request={request}
+                myReview={myReviewsByRequest.get(request.id)}
+                onClick={() => { setSelectedRequest(request); setMobileSheetOpen(true); }}
+              />
+            ))
           ) : rejectedRequests.map(request => renderRequestCard(request, false))}
         </TabsContent>
 
-        <TabsContent value="revoked" className="mt-4 space-y-4">
+        <TabsContent value="revoked" className="mt-4 space-y-3">
           {revokedRequests.length === 0 ? (
-            <Card className="p-8 text-center">
-              <ShieldOff className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
-              <h3 className="font-medium text-lg">No revoked verifications</h3>
-              <p className="text-muted-foreground text-sm mt-1">Businesses that had verification removed will appear here.</p>
-            </Card>
+            <AdminEmptyState icon={ShieldOff} title="No revoked verifications" description="Businesses that had verification removed will appear here." />
+          ) : isMobile ? (
+            revokedRequests.map(request => (
+              <BusinessVerificationCard
+                key={request.id}
+                request={request}
+                myReview={myReviewsByRequest.get(request.id)}
+                onClick={() => { setSelectedRequest(request); setMobileSheetOpen(true); }}
+              />
+            ))
           ) : revokedRequests.map(request => renderRequestCard(request, false))}
         </TabsContent>
+      </Tabs>
+
+      {/* Mobile Bottom Sheet */}
+      {isMobile && (
+        <BusinessVerificationBottomSheet
+          request={selectedRequest}
+          open={mobileSheetOpen}
+          onClose={() => { setMobileSheetOpen(false); setSelectedRequest(null); }}
+          myReview={selectedRequest ? myReviewsByRequest.get(selectedRequest.id) : undefined}
+          onApprove={() => selectedRequest && submitReviewMutation.mutate({ requestId: selectedRequest.id, decision: 'approved' })}
+          onReject={(reason) => selectedRequest && submitReviewMutation.mutate({ requestId: selectedRequest.id, decision: 'rejected', note: reason })}
+          onRequestDomainCheck={(domain) => selectedRequest && requestDomainCheck.mutateAsync({ requestId: selectedRequest.id, domain })}
+          onRevoke={selectedRequest?.status === 'approved' ? (reason) => selectedRequest?.business && revokeVerificationMutation.mutate({ businessId: selectedRequest.business.id, reason }) : undefined}
+          processing={processing}
+        />
+      )}
       </Tabs>
 
       {/* Approve Dialog */}
