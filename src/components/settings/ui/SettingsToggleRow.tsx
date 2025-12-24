@@ -48,7 +48,7 @@ export function SettingsToggleRow({
   return (
     <div
       className={cn(
-        'relative flex items-center justify-between',
+        'relative flex items-center justify-between w-full max-w-full box-border',
         'min-h-[52px] md:min-h-[56px]',
         'px-[14px] py-[12px]',
         disabled && 'opacity-50',
@@ -56,22 +56,22 @@ export function SettingsToggleRow({
         isLast && 'rounded-b-[12px]',
       )}
     >
-      {/* Left content */}
-      <div className="flex items-center gap-3 flex-1 min-w-0">
+      {/* Left content - min-width:0 prevents text from pushing layout wider */}
+      <div className="flex items-center gap-3 flex-1 min-w-0 overflow-hidden">
         {icon && (
           <div className="flex-shrink-0 w-[18px] h-[18px] text-[#5E666D]">
             {icon}
           </div>
         )}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="text-[15px] font-semibold text-[#1F2428] truncate">
+        <div className="flex-1 min-w-0 overflow-hidden">
+          <div className="flex items-center gap-2 overflow-hidden">
+            <span className="text-[15px] font-semibold text-[#1F2428] truncate overflow-hidden text-ellipsis">
               {title}
             </span>
             {isBeta && <SettingsBadge>Beta</SettingsBadge>}
           </div>
           {subtitle && (
-            <p className="text-[13px] font-normal text-[#5E666D] truncate mt-0.5">
+            <p className="text-[13px] font-normal text-[#5E666D] truncate overflow-hidden text-ellipsis mt-0.5">
               {subtitle}
             </p>
           )}

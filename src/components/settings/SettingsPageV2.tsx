@@ -217,10 +217,10 @@ export function SettingsPageV2() {
   const isPersonalProfile = profile?.profile_type !== 'business';
 
   return (
-    <PageRoot className="min-h-screen bg-[#F8FAFC]">
+    <PageRoot className="min-h-screen bg-[#F8FAFC] w-full max-w-full overflow-x-hidden box-border">
       <SettingsHeader onBack={() => navigate(-1)} />
       
-      <div className="max-w-2xl mx-auto px-4 md:px-6 py-6 pb-28 space-y-[18px] md:space-y-[22px]">
+      <div className="w-full max-w-2xl mx-auto px-4 md:px-6 py-6 pb-28 space-y-3 box-border overflow-hidden">
         
         {/* ========== ACCOUNT ========== */}
         <SettingsSection title="Account">
@@ -244,7 +244,7 @@ export function SettingsPageV2() {
             isLocked
             isLast
             rightContent={
-              <span className="text-[13px] text-[#97A1AA]">
+              <span className="text-[13px] text-[#97A1AA] max-w-[45%] truncate block">
                 @{profile?.username || 'not set'}
               </span>
             }
