@@ -19,10 +19,15 @@ export interface LeaderboardSnapshot {
   status: string | null;
 }
 
-export function useLeaderboard(tour: string, eventId: string) {
+export function useLeaderboard(tour: string | undefined, eventId: string | undefined) {
   return useQuery({
     queryKey: ['tourhub-leaderboard', tour, eventId],
     queryFn: async () => {
+      // Guard against missing params - this should not happen if enabled is set correctly
+      if (!tour || !eventId) {
+        return null;
+      }
+      
       // First try DB snapshot
       const { data: dbData, error: dbError } = await supabase
         .from('tourhub_leaderboard_latest')
@@ -81,6 +86,7 @@ export function useLeaderboard(tour: string, eventId: string) {
       return null;
     },
     staleTime: 30 * 1000, // 30 seconds for live data
-    enabled: !!tour && !!eventId,
+    retry: 1, // Only retry once to avoid hammering API
+    enabled: Boolean(tour) && Boolean(eventId) && eventId.length > 0,
   });
 }
