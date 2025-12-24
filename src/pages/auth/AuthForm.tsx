@@ -300,11 +300,26 @@ const AuthForm: React.FC<AuthFormProps> = ({
 
   // Determine which sheet is open
   const isSheetOpen = view !== 'entry';
-  const sheetTitle = 
-    view === 'email' ? (isSignUp ? 'Sign up with email' : 'Sign in with email') :
-    view === 'password' ? 'Enter password' :
-    view === 'signup' ? 'Create account' :
-    view === 'forgot' ? 'Reset password' : '';
+  
+  // Sheet titles and subtitles per spec
+  const getSheetContent = () => {
+    switch (view) {
+      case 'email':
+        return isSignUp 
+          ? { title: 'Get started', subtitle: 'Enter your email to begin.' }
+          : { title: 'Sign in with email', subtitle: 'Enter your email to continue.' };
+      case 'password':
+        return { title: 'Enter password', subtitle: 'Welcome back.' };
+      case 'signup':
+        return { title: 'Get started', subtitle: 'Enter your email to begin.' };
+      case 'forgot':
+        return { title: 'Reset password', subtitle: 'We\'ll send you a reset link.' };
+      default:
+        return { title: '', subtitle: '' };
+    }
+  };
+  
+  const { title: sheetTitle, subtitle: sheetSubtitle } = getSheetContent();
 
   return (
     <>
@@ -322,6 +337,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
         isOpen={isSheetOpen}
         onClose={handleCloseSheet}
         title={sheetTitle}
+        subtitle={sheetSubtitle}
       >
         {view === 'email' && (
           <EmailSheetContent
