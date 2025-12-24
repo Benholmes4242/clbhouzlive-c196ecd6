@@ -1,8 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 
 // Toggle wordmark visibility
 const SHOW_WORDMARK = false;
+
+// Rotating prestige lines
+const PRESTIGE_LINES = [
+  "St Andrews. Pinehurst. Royal Melbourne.",
+  "Golfers tracking rounds worldwide.",
+  "A place for every round you remember.",
+];
 
 interface AuthHeroScreenProps {
   onAppleSignIn: () => void;
@@ -19,6 +26,21 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
   onLoginClick,
   submitting,
 }) => {
+  const [prestigeIndex, setPrestigeIndex] = useState(0);
+  const [prestigeVisible, setPrestigeVisible] = useState(true);
+
+  // Rotate prestige lines every 5 seconds with cross-fade
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPrestigeVisible(false);
+      setTimeout(() => {
+        setPrestigeIndex((prev) => (prev + 1) % PRESTIGE_LINES.length);
+        setPrestigeVisible(true);
+      }, 400);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="fixed inset-0 flex flex-col">
       {/* Background - subtle near-black gradient (static, no motion) */}
@@ -29,22 +51,47 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         }}
       />
       
-      {/* Subtle vignette overlay */}
+      {/* Subtle vignette overlay - darkens edges by ~4-5% */}
       <div 
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse 100% 100% at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.4) 100%)',
+          background: 'radial-gradient(ellipse 100% 100% at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.35) 100%)',
+        }}
+      />
+      
+      {/* Ultra-fine grain texture overlay */}
+      <div 
+        className="absolute inset-0 pointer-events-none opacity-[0.025]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
         }}
       />
       
       {/* Content container */}
       <div className="relative flex-1 flex flex-col px-6 pt-safe">
-        {/* Logo section */}
-        <div className="flex justify-center items-center gap-2.5 pt-16 pb-8">
+        {/* Logo section - positioned at ~20% from top */}
+        <div 
+          className="flex justify-center items-center gap-2.5 animate-auth-logo-in"
+          style={{ 
+            paddingTop: '18vh',
+            paddingBottom: '2rem',
+          }}
+        >
+          {/* Subtle radial glow behind logo */}
+          <div 
+            className="absolute pointer-events-none"
+            style={{
+              width: '180px',
+              height: '180px',
+              background: 'radial-gradient(circle, rgba(247, 147, 30, 0.05) 0%, transparent 70%)',
+              filter: 'blur(30px)',
+              top: 'calc(18vh - 40px)',
+            }}
+          />
           <img
             src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
             alt="clbhouz"
-            className="h-[52px] w-auto"
+            className="h-[48px] w-auto relative z-10"
           />
           {SHOW_WORDMARK && (
             <span 
@@ -56,20 +103,41 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
           )}
         </div>
         
-        {/* Hero text */}
-        <div className="flex-1 flex flex-col justify-center items-center text-center -mt-16">
+        {/* Hero text - increased spacing, refined typography */}
+        <div className="flex-1 flex flex-col justify-center items-center text-center -mt-8">
           <h1 
-            className="text-[32px] font-bold text-white leading-tight mb-3"
-            style={{ fontFamily: 'SF Pro Display, system-ui, sans-serif' }}
+            className="text-[32px] font-semibold text-white leading-tight mb-4"
+            style={{ 
+              fontFamily: 'SF Pro Display, system-ui, sans-serif',
+              letterSpacing: '-0.01em',
+            }}
           >
             Your home of golf.
           </h1>
-          <p className="text-[15px] text-white/60 max-w-[280px]">
-            Share moments. Track your journey. Discover courses.
+          <p 
+            className="text-[15px] text-white/70 max-w-[280px] mb-6"
+            style={{ 
+              fontFamily: 'SF Pro Text, system-ui, sans-serif',
+              lineHeight: '1.5',
+            }}
+          >
+            Everything you play. Everything you remember.
+          </p>
+          
+          {/* Rotating prestige line */}
+          <p 
+            className="text-[13px] text-white/45 max-w-[300px] transition-opacity duration-[400ms]"
+            style={{ 
+              fontFamily: 'SF Pro Text, system-ui, sans-serif',
+              fontStyle: 'italic',
+              opacity: prestigeVisible ? 1 : 0,
+            }}
+          >
+            {PRESTIGE_LINES[prestigeIndex]}
           </p>
         </div>
         
-        {/* Action buttons - glass container matching Clubhouse header/footer */}
+        {/* Action buttons - glass container */}
         <div 
           className="pb-8 pt-6 -mx-6 px-6"
           style={{
@@ -80,11 +148,14 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
           }}
         >
           <div className="space-y-3">
-            {/* Apple button - white, black text */}
+            {/* Apple button - primary hero, white with subtle inner highlight */}
             <button
               onClick={onAppleSignIn}
               disabled={submitting}
-              className="w-full h-[52px] flex items-center justify-center gap-2.5 rounded-full bg-white text-[#0D0F11] font-medium text-[15px] transition-all active:scale-[0.98] disabled:opacity-50"
+              className="w-full h-[54px] flex items-center justify-center gap-2.5 rounded-full bg-white text-[#0D0F11] font-medium text-[15px] transition-all duration-150 active:scale-[0.98] active:brightness-95 disabled:opacity-50 mb-1"
+              style={{
+                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 2px 8px rgba(0, 0, 0, 0.15)',
+              }}
             >
               {submitting ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -98,15 +169,15 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               )}
             </button>
             
-            {/* Google button - dark graphite with border */}
+            {/* Google button - secondary, darker with hairline border */}
             <button
               onClick={onGoogleSignIn}
               disabled={submitting}
-              className="w-full h-[52px] flex items-center justify-center gap-2.5 rounded-full font-medium text-[15px] transition-all active:scale-[0.98] disabled:opacity-50"
+              className="w-full h-[54px] flex items-center justify-center gap-2.5 rounded-full font-medium text-[15px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50"
               style={{
-                background: 'rgba(30, 32, 36, 0.9)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                color: 'white',
+                background: 'rgba(26, 28, 32, 0.95)',
+                border: '1px solid rgba(255, 255, 255, 0.07)',
+                color: 'rgba(255, 255, 255, 0.9)',
               }}
             >
               {submitting ? (
@@ -124,34 +195,64 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               )}
             </button>
             
-            {/* Email button - dark graphite with border */}
+            {/* Email button - secondary, darker with hairline border */}
             <button
               onClick={onEmailSignUp}
               disabled={submitting}
-              className="w-full h-[52px] flex items-center justify-center gap-2.5 rounded-full font-medium text-[15px] transition-all active:scale-[0.98] disabled:opacity-50"
+              className="w-full h-[54px] flex items-center justify-center gap-2.5 rounded-full font-medium text-[15px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50"
               style={{
-                background: 'rgba(30, 32, 36, 0.9)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                color: 'white',
+                background: 'rgba(26, 28, 32, 0.95)',
+                border: '1px solid rgba(255, 255, 255, 0.07)',
+                color: 'rgba(255, 255, 255, 0.9)',
               }}
             >
               Continue with Email
             </button>
             
-            {/* Login link */}
-            <div className="text-center pt-2">
+            {/* Micro-trust line */}
+            <p 
+              className="text-center text-[12px] text-white/55 pt-2"
+              style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
+            >
+              No spam. No ads. Ever.
+            </p>
+            
+            {/* Login link - polished with increased tap target */}
+            <div className="text-center pt-1">
               <button
                 onClick={onLoginClick}
                 disabled={submitting}
-                className="text-[14px] text-white/60 hover:text-white/80 transition-colors"
+                className="text-[14px] text-white/55 hover:text-white/75 transition-colors py-2 px-4 -mx-4"
               >
                 Already a member?{' '}
-                <span className="text-[#F7931E] font-medium">Log in</span>
+                <span 
+                  className="font-medium hover:underline underline-offset-2"
+                  style={{ color: '#F7931E' }}
+                >
+                  Log in
+                </span>
               </button>
             </div>
           </div>
         </div>
       </div>
+      
+      {/* Logo entrance animation styles */}
+      <style>{`
+        @keyframes auth-logo-in {
+          from {
+            opacity: 0;
+            transform: scale(0.98);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        .animate-auth-logo-in {
+          animation: auth-logo-in 700ms ease-out forwards;
+        }
+      `}</style>
     </div>
   );
 };
