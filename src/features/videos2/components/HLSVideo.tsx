@@ -40,6 +40,53 @@ export function HLSVideo({
         enableWorker: true,
         lowLatencyMode: false,
         backBufferLength: 30,
+        startLevel: 0, // Start with lowest quality for fast first frame
+        abrEwmaDefaultEstimate: 500000, // 500kbps initial estimate
+      });
+      
+      // Log manifest parsing
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        const levels = hls.levels?.map((l, i) => ({
+          idx: i,
+          res: `${l.width}x${l.height}`,
+          kbps: Math.round((l.bitrate || 0) / 1000),
+        }));
+        console.log('[HLSVideo] MANIFEST_PARSED', {
+          url: hlsUrl?.slice(-40),
+          levels,
+          startLevel: hls.startLevel,
+        });
+      });
+      
+      // Log quality switches
+      hls.on(Hls.Events.LEVEL_SWITCHED, (_, data) => {
+        const level = hls.levels?.[data.level];
+        console.log('[HLSVideo] LEVEL_SWITCHED', {
+          level: data.level,
+          res: level ? `${level.width}x${level.height}` : 'N/A',
+          kbps: level?.bitrate ? Math.round(level.bitrate / 1000) : 'N/A',
+        });
+      });
+      
+      // Log fragment loading with timing
+      hls.on(Hls.Events.FRAG_LOADING, (_, data) => {
+        console.log('[HLSVideo] FRAG_LOADING', {
+          sn: data.frag.sn,
+          duration: data.frag.duration?.toFixed(2) + 's',
+          level: data.frag.level,
+        });
+      });
+      
+      hls.on(Hls.Events.FRAG_LOADED, (_, data) => {
+        const stats = data.frag.stats;
+        const bytes = stats?.total || 0;
+        const loadTime = (stats?.loading?.end || 0) - (stats?.loading?.start || 0);
+        console.log('[HLSVideo] FRAG_LOADED', {
+          sn: data.frag.sn,
+          sizeKB: (bytes / 1024).toFixed(1),
+          loadMs: loadTime.toFixed(0),
+          level: data.frag.level,
+        });
       });
       
       hls.loadSource(hlsUrl);
