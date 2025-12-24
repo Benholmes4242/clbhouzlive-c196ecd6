@@ -61,7 +61,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   // Theme-specific styling
   const LIGHT_BG = 'rgba(248, 250, 252, 0.95)';
   const LIGHT_BORDER = 'rgba(0, 0, 0, 0.06)';
-  const DIM_BG = 'rgba(15, 15, 15, 0.02)';
+  // Cinema dim: still keep some visibility for the header (was 0.02, now 0.65 for better visibility)
+  const DIM_BG = 'rgba(15, 15, 15, 0.65)';
   const DIM_BORDER = 'rgba(255, 255, 255, 0.06)';
   const STANDARD_BG = 'rgba(10, 10, 10, 0.95)';
   const STANDARD_BORDER = 'rgba(255, 255, 255, 0.06)';
@@ -82,8 +83,8 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
     return STANDARD_BORDER;
   };
   
-  // Hide brand (logo + wordmark) when dimmed on Clubhouse
-  const hideBrand = isDimmed && isClubhouseRoute;
+  // Keep brand visible on Clubhouse even when dimmed (was hiding it completely)
+  const hideBrand = false; // Previously: isDimmed && isClubhouseRoute
 
   return (
     <>
@@ -98,9 +99,10 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         )}
         style={{
           background: getBackground(),
-          backdropFilter: isDimmed ? 'none' : 'blur(20px)',
-          WebkitBackdropFilter: isDimmed ? 'none' : 'blur(20px)',
-          paddingTop: isDiscoverRoute ? '0px' : 'env(safe-area-inset-top)',
+          backdropFilter: isDimmed ? 'blur(12px)' : 'blur(20px)',
+          WebkitBackdropFilter: isDimmed ? 'blur(12px)' : 'blur(20px)',
+          // Always apply safe-area padding on all routes
+          paddingTop: 'env(safe-area-inset-top)',
           borderBottom: isSeamless ? 'none' : `1px solid ${getBorder()}`,
           boxShadow: isSeamless || isDimmed ? 'none' : useLightTheme ? '0 1px 3px rgba(0,0,0,0.04)' : undefined,
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}`,
