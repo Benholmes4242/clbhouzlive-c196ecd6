@@ -17,73 +17,76 @@ export interface LeaderboardSnapshot {
   fetched_at: string;
   round: number | null;
   status: string | null;
+  message?: string;
 }
+
+// Empty state messages based on status
+const EMPTY_MESSAGES = {
+  upcoming: "Leaderboard will appear when play begins.",
+  live: "Leaderboard loading…",
+  complete: "Historical results are syncing.",
+} as const;
 
 export function useLeaderboard(tour: string | undefined, eventId: string | undefined) {
   return useQuery({
     queryKey: ['tourhub-leaderboard', tour, eventId],
     queryFn: async () => {
-      // Guard against missing params - this should not happen if enabled is set correctly
+      // Guard against missing params
       if (!tour || !eventId) {
         return null;
       }
       
-      // First try DB snapshot
-      const { data: dbData, error: dbError } = await supabase
-        .from('tourhub_leaderboard_latest')
-        .select('*')
-        .eq('tour', tour)
-        .eq('espn_event_id', eventId)
-        .maybeSingle();
-      
-      if (dbData) {
-        // Leaders are stored in the payload field
-        const payload = dbData.payload as any;
-        const leadersRaw = payload?.leaders || [];
-        
-        return {
-          tour: dbData.tour,
-          espn_event_id: dbData.espn_event_id,
-          leaders: leadersRaw.map((l: any) => ({
-            position: l.position || l.pos || '-',
-            athleteId: l.athleteId,
-            playerName: l.playerName || l.name || 'Unknown',
-            score: l.score || '-',
-            today: l.today || '-',
-            thru: l.thru || '-',
-          })),
-          fetched_at: dbData.fetched_at,
-          round: dbData.round,
-          status: dbData.status,
-        } as LeaderboardSnapshot;
-      }
-      
-      // Fallback to edge function
-      const { data: fnData, error: fnError } = await supabase.functions.invoke('tourhub-leaderboard', {
-        body: { tour, event: eventId },
+      // Call the resolver edge function
+      const { data: fnData, error: fnError } = await supabase.functions.invoke('tourhub-resolver', {
+        method: 'GET',
+        body: null,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
-      
-      if (fnError) throw fnError;
-      
-      if (fnData?.leaders) {
-        return {
-          tour,
-          espn_event_id: eventId,
-          leaders: fnData.leaders.map((l: any) => ({
-            position: l.position || l.pos || '-',
-            athleteId: l.athleteId,
-            playerName: l.playerName || l.name || 'Unknown',
-            score: l.score || '-',
-            today: l.today || '-',
-            thru: l.thru || '-',
-          })),
-          fetched_at: new Date().toISOString(),
-          round: fnData.round || null,
-          status: fnData.status || null,
-        } as LeaderboardSnapshot;
+
+      // If invoke doesn't support query params, fall back to fetch
+      const response = await fetch(
+        `https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1/tourhub-resolver?tour=${encodeURIComponent(tour)}&event=${encodeURIComponent(eventId)}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        // Don't throw on 404 - event just not found
+        if (response.status === 404) {
+          return null;
+        }
+        throw new Error(`Resolver error: ${response.status}`);
       }
+
+      const data = await response.json();
       
-      return null;
+      // Normalize the response
+      const leaders = (data.leaders || []).map((l: Record<string, unknown>) => ({
+        position: String(l.pos || l.position || '-'),
+        athleteId: l.athleteId ? String(l.athleteId) : undefined,
+        playerName: String(l.name || l.playerName || 'Unknown'),
+        score: String(l.score || '-'),
+        today: l.today ? String(l.today) : '-',
+        thru: l.thru ? String(l.thru) : '-',
+      }));
+
+      const status = data.status as keyof typeof EMPTY_MESSAGES || 'upcoming';
+
+      return {
+        tour: data.tour || tour,
+        espn_event_id: data.espnEventId || eventId,
+        leaders,
+        fetched_at: data.generatedAt || new Date().toISOString(),
+        round: null,
+        status: data.status || null,
+        message: leaders.length === 0 ? (data.message || EMPTY_MESSAGES[status]) : undefined,
+      } as LeaderboardSnapshot;
     },
     staleTime: 30 * 1000, // 30 seconds for live data
     retry: 1, // Only retry once to avoid hammering API

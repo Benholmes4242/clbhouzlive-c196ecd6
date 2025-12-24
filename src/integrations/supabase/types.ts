@@ -5118,6 +5118,36 @@ export type Database = {
         }
         Relationships: []
       }
+      tourhub_event_enrichment: {
+        Row: {
+          created_at: string
+          data: Json
+          espn_event_id: string
+          id: string
+          provider: string
+          tour: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          espn_event_id: string
+          id?: string
+          provider?: string
+          tour: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          espn_event_id?: string
+          id?: string
+          provider?: string
+          tour?: string
+          year?: number
+        }
+        Relationships: []
+      }
       tourhub_event_mappings: {
         Row: {
           confidence: number
@@ -5127,6 +5157,7 @@ export type Database = {
           last_verified_at: string | null
           livegolf_event_id: string | null
           match_method: string
+          matched_by: string | null
           notes: string | null
           slashgolf_tourn_id: string | null
           tour: string
@@ -5141,6 +5172,7 @@ export type Database = {
           last_verified_at?: string | null
           livegolf_event_id?: string | null
           match_method?: string
+          matched_by?: string | null
           notes?: string | null
           slashgolf_tourn_id?: string | null
           tour: string
@@ -5155,6 +5187,7 @@ export type Database = {
           last_verified_at?: string | null
           livegolf_event_id?: string | null
           match_method?: string
+          matched_by?: string | null
           notes?: string | null
           slashgolf_tourn_id?: string | null
           tour?: string
@@ -5220,6 +5253,7 @@ export type Database = {
           fetched_at: string
           id: string
           payload: Json
+          provider: string
           round: number | null
           status: string | null
           tour: string
@@ -5229,6 +5263,7 @@ export type Database = {
           fetched_at?: string
           id?: string
           payload: Json
+          provider?: string
           round?: number | null
           status?: string | null
           tour: string
@@ -5238,6 +5273,7 @@ export type Database = {
           fetched_at?: string
           id?: string
           payload?: Json
+          provider?: string
           round?: number | null
           status?: string | null
           tour?: string
