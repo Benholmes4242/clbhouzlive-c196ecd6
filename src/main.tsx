@@ -1,5 +1,7 @@
 // Boot Timeline: Import for side effects (attaches to window)
 import './utils/bootTimeline';
+// Discover Timing: Import for side effects (attaches to window)
+import './utils/discoverTimeline';
 // Log app start immediately
 import { logAppStart } from './utils/bootTimeline';
 logAppStart();
