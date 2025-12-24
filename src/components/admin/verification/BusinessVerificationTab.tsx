@@ -836,7 +836,6 @@ const BusinessVerificationTab = () => {
           processing={processing}
         />
       )}
-      </Tabs>
 
       {/* Approve Dialog */}
       <AlertDialog open={approveDialogOpen} onOpenChange={setApproveDialogOpen}>
