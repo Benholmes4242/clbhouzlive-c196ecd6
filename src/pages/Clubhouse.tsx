@@ -240,8 +240,7 @@ const Clubhouse = () => {
         "--bg-page": "#0F0F0F", 
         position: 'relative', 
         isolation: 'isolate', 
-        zIndex: 0,
-        paddingTop: 'env(safe-area-inset-top)'
+        zIndex: 0
       } as React.CSSProperties}
     >
       {/* Intersection sentinel for header fade-away */}
