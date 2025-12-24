@@ -27,6 +27,7 @@ export function AdminUsersPage() {
   const readOnly = !can.dangerousOps;
   const [rows, setRows] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(25);
@@ -36,6 +37,7 @@ export function AdminUsersPage() {
 
   const load = async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const { data, error } = await supabase.rpc("get_users_paged", {
         q: q || null,
@@ -62,10 +64,11 @@ export function AdminUsersPage() {
       
       setRows(adminUsers);
       setTotal(typedData?.[0]?.total_count ?? 0);
-    } catch (e) {
+    } catch (e: any) {
       console.error("[AdminUsersPage] load failed:", e);
       setRows([]);
       setTotal(0);
+      setErrorMsg("Couldn't load users. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -93,7 +96,7 @@ export function AdminUsersPage() {
       "email","display_name","username","home_club","role","last_sign_in_at","created_at","id"
     ];
     const lines = [headers.join(",")];
-    rows.forEach((r: any) => {
+    rows.forEach((r) => {
       const vals = [
         r.email ?? "",
         r.display_name ?? "",
@@ -101,7 +104,7 @@ export function AdminUsersPage() {
         r.home_club ?? "",
         r.role ?? "",
         r.last_sign_in_at ?? "",
-        r.created_at ?? "",
+        r.auth_created_at ?? "",
         r.id
       ].map(v => `"${String(v).replace(/"/g,'""')}"`);
       lines.push(vals.join(","));
@@ -151,6 +154,15 @@ export function AdminUsersPage() {
                 </select>
               </div>
             </form>
+
+            {errorMsg && (
+              <div className="mb-4 p-4 rounded-lg border border-destructive/50 bg-destructive/10 flex items-center justify-between">
+                <p className="text-sm text-destructive">{errorMsg}</p>
+                <Button variant="outline" size="sm" onClick={load} disabled={loading}>
+                  Retry
+                </Button>
+              </div>
+            )}
 
             <UsersTable users={rows} readOnly={readOnly} />
 
