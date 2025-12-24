@@ -77,3 +77,12 @@ verify_jwt = true
 
 [functions.verify-bulk]
 verify_jwt = true
+
+[functions.tourhub-scoreboard]
+verify_jwt = false
+
+[functions.tourhub-leaderboard]
+verify_jwt = false
+
+[functions.tourhub-sync]
+verify_jwt = false
