@@ -33,9 +33,12 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const { cinemaDim, bumpChrome, isClubhousePage } = useCinemaDimContext();
   const isDimmed = isClubhousePage && cinemaDim;
   
-  // Determine if this is a clubhouse route
+  // Determine routes
   const isClubhouseRoute = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
   const isDiscoverRoute = location.pathname.startsWith('/discover');
+  
+  // Routes that should use sticky positioning (no safe-area padding in header)
+  const useStickyHeader = isClubhouseRoute || isDiscoverRoute;
   
   // Use light theme for non-clubhouse pages
   const useLightTheme = !isClubhouseRoute;
@@ -92,7 +95,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         className={cn(
           "compact-header clubhouse-header",
           isClubhouseRoute && "chrome-header",
-          isDiscoverRoute ? "sticky top-0 z-header w-full" : "fixed top-0 left-0 right-0 z-header",
+          useStickyHeader ? "sticky top-0 z-header w-full" : "fixed top-0 left-0 right-0 z-header",
           "h-14",
           className
         )}
@@ -100,7 +103,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           background: getBackground(),
           backdropFilter: isDimmed ? 'none' : 'blur(20px)',
           WebkitBackdropFilter: isDimmed ? 'none' : 'blur(20px)',
-          paddingTop: isDiscoverRoute ? '0px' : 'env(safe-area-inset-top)',
+          paddingTop: useStickyHeader ? '0px' : 'env(safe-area-inset-top)',
           borderBottom: isSeamless ? 'none' : `1px solid ${getBorder()}`,
           boxShadow: isSeamless || isDimmed ? 'none' : useLightTheme ? '0 1px 3px rgba(0,0,0,0.04)' : undefined,
           transition: `background-color 800ms ${CINEMA_EASE}, color 800ms ${CINEMA_EASE}, border-color 800ms ${CINEMA_EASE}`,
