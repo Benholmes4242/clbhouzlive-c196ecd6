@@ -6,6 +6,7 @@ import { useGameParticipants } from '@/features/game/hooks/useGameParticipants';
 import { formatHcp } from '@/lib/formatHcp';
 import { GameVisibilityBadge } from './GameVisibilityBadge';
 import type { GameVisibility } from '../types';
+import { getProfilePathById } from '@/lib/profileRoutes';
 
 interface AnonymousGameCardProps {
   game: {
@@ -82,7 +83,7 @@ export function AnonymousGameCard({ game, onRequestJoin, hasRequested, isAccepte
             {participants.slice(0, 3).map((p, idx) => (
               <React.Fragment key={p.user_id}>
                 <button
-                  onClick={() => navigate(`/profile/${p.username || p.user_id}`)}
+                  onClick={() => navigate(getProfilePathById(p.user_id, (p as any).creator_only, p.username))}
                   className="hover:text-white transition-colors"
                 >
                   {p.display_name}
