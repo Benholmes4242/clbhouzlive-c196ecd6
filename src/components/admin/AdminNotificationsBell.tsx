@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell } from "lucide-react";
+import { Bell, Check, CheckCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -9,17 +9,128 @@ import {
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAdminNotifications, AdminNotification } from "@/hooks/useAdminNotifications";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, isToday, parseISO } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AdminBottomSheet } from "@/components/admin/mobile/AdminBottomSheet";
 
-const NOTIFICATION_ICONS: Record<string, string> = {
-  verification_request: "📋",
-  invite_accepted: "✅",
-  expiring_access: "⏰",
-  bulk_complete: "📦",
+// Human-readable notification copy
+const NOTIFICATION_COPY: Record<string, { icon: string; formatTitle: (n: AdminNotification) => string; formatMessage: (n: AdminNotification) => string }> = {
+  verification_request: {
+    icon: "📋",
+    formatTitle: () => "New verification request",
+    formatMessage: (n) => {
+      const meta = n.metadata as Record<string, unknown>;
+      const type = meta?.type as string || "business";
+      const name = meta?.name as string || "";
+      return name 
+        ? `${type === "golfer" ? "A golfer" : "A business"} has requested verification: ${name}`
+        : `A ${type} has requested verification`;
+    },
+  },
+  invite_accepted: {
+    icon: "✅",
+    formatTitle: () => "Admin invite accepted",
+    formatMessage: (n) => {
+      const meta = n.metadata as Record<string, unknown>;
+      const email = meta?.email as string || "";
+      return email ? `${email} is now an admin` : "A new admin has joined";
+    },
+  },
+  expiring_access: {
+    icon: "⏰",
+    formatTitle: () => "Admin access expiring",
+    formatMessage: (n) => {
+      const meta = n.metadata as Record<string, unknown>;
+      const email = meta?.email as string || "";
+      const expiresIn = meta?.expires_in as string || "soon";
+      return email 
+        ? `${email}'s access expires ${expiresIn}`
+        : `Admin access expires ${expiresIn}`;
+    },
+  },
+  bulk_verification_complete: {
+    icon: "📦",
+    formatTitle: () => "Bulk verification completed",
+    formatMessage: (n) => {
+      const meta = n.metadata as Record<string, unknown>;
+      const approved = meta?.approved as number || 0;
+      const failed = meta?.failed as number || 0;
+      if (failed > 0) {
+        return `Approved ${approved} requests, ${failed} failed`;
+      }
+      return `Approved ${approved} requests`;
+    },
+  },
+  bulk_invites_revoked: {
+    icon: "🗑️",
+    formatTitle: () => "Invites revoked",
+    formatMessage: (n) => {
+      const meta = n.metadata as Record<string, unknown>;
+      const count = meta?.count as number || 0;
+      return `${count} invite${count !== 1 ? "s" : ""} revoked`;
+    },
+  },
+  admin_role_changed: {
+    icon: "🔐",
+    formatTitle: () => "Admin role updated",
+    formatMessage: (n) => {
+      const meta = n.metadata as Record<string, unknown>;
+      const email = meta?.email as string || "";
+      const action = meta?.action as string || "changed";
+      return email ? `${email}'s role was ${action}` : `An admin role was ${action}`;
+    },
+  },
 };
+
+// Fallback for unknown types
+const DEFAULT_COPY = {
+  icon: "🔔",
+  formatTitle: (n: AdminNotification) => n.title,
+  formatMessage: (n: AdminNotification) => n.message,
+};
+
+function getNotificationCopy(notification: AdminNotification) {
+  return NOTIFICATION_COPY[notification.type] || DEFAULT_COPY;
+}
+
+// Deep link mapping
+function getNotificationLink(notification: AdminNotification): string {
+  const meta = notification.metadata as Record<string, unknown>;
+  
+  switch (notification.type) {
+    case "verification_request":
+      const verType = meta?.type as string;
+      const requestId = meta?.request_id as string;
+      if (verType === "golfer") {
+        return requestId 
+          ? `/admin/verification?tab=golfer&request=${requestId}`
+          : "/admin/verification?tab=golfer";
+      }
+      return requestId 
+        ? `/admin/verification?tab=business&request=${requestId}`
+        : "/admin/verification?tab=business";
+    
+    case "invite_accepted":
+      const userId = meta?.user_id as string;
+      return userId ? `/admin/admins?user=${userId}` : "/admin/admins";
+    
+    case "expiring_access":
+      return "/admin/admins";
+    
+    case "bulk_verification_complete":
+      return "/admin/audit";
+    
+    case "bulk_invites_revoked":
+      return "/admin/audit";
+    
+    case "admin_role_changed":
+      return "/admin/admins";
+    
+    default:
+      return notification.link || "/admin";
+  }
+}
 
 interface NotificationItemProps {
   notification: AdminNotification;
@@ -28,7 +139,7 @@ interface NotificationItemProps {
 }
 
 function NotificationItem({ notification, isRead, onClick }: NotificationItemProps) {
-  const icon = NOTIFICATION_ICONS[notification.type] ?? "🔔";
+  const copy = getNotificationCopy(notification);
 
   return (
     <button
@@ -39,18 +150,18 @@ function NotificationItem({ notification, isRead, onClick }: NotificationItemPro
       )}
     >
       <div className="flex items-start gap-3">
-        <span className="text-lg flex-shrink-0">{icon}</span>
+        <span className="text-lg flex-shrink-0">{copy.icon}</span>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className={cn("text-sm", !isRead && "font-medium")}>
-              {notification.title}
+              {copy.formatTitle(notification)}
             </span>
             {!isRead && (
               <span className="h-2 w-2 rounded-full bg-primary flex-shrink-0" />
             )}
           </div>
           <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
-            {notification.message}
+            {copy.formatMessage(notification)}
           </p>
           <p className="text-xs text-muted-foreground/70 mt-1">
             {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
@@ -78,12 +189,15 @@ export function AdminNotificationsBell() {
 
   const handleNotificationClick = (notification: AdminNotification) => {
     markAsRead(notification.id);
-    if (notification.link) {
-      navigate(notification.link);
-    }
+    const link = getNotificationLink(notification);
+    navigate(link);
     setOpen(false);
     setMobileOpen(false);
   };
+
+  // Group notifications by Today/Earlier
+  const todayNotifications = notifications.filter(n => isToday(parseISO(n.created_at)));
+  const earlierNotifications = notifications.filter(n => !isToday(parseISO(n.created_at)));
 
   const bellButton = (
     <Button
@@ -109,9 +223,10 @@ export function AdminNotificationsBell() {
           <Button
             variant="ghost"
             size="sm"
-            className="text-xs h-7"
+            className="text-xs h-7 gap-1.5"
             onClick={() => markAllAsRead()}
           >
+            <CheckCheck className="h-3.5 w-3.5" />
             Mark all read
           </Button>
         )}
@@ -125,16 +240,44 @@ export function AdminNotificationsBell() {
           <div className="p-8 text-center">
             <Bell className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
             <p className="text-sm text-muted-foreground">No notifications</p>
+            <p className="text-xs text-muted-foreground/70 mt-1">You're all caught up</p>
           </div>
         ) : (
-          notifications.map((notification) => (
-            <NotificationItem
-              key={notification.id}
-              notification={notification}
-              isRead={isRead(notification)}
-              onClick={() => handleNotificationClick(notification)}
-            />
-          ))
+          <>
+            {/* Today section */}
+            {todayNotifications.length > 0 && (
+              <>
+                <div className="px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider bg-muted/30 sticky top-0">
+                  Today
+                </div>
+                {todayNotifications.map((notification) => (
+                  <NotificationItem
+                    key={notification.id}
+                    notification={notification}
+                    isRead={isRead(notification)}
+                    onClick={() => handleNotificationClick(notification)}
+                  />
+                ))}
+              </>
+            )}
+            
+            {/* Earlier section */}
+            {earlierNotifications.length > 0 && (
+              <>
+                <div className="px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider bg-muted/30 sticky top-0">
+                  Earlier
+                </div>
+                {earlierNotifications.map((notification) => (
+                  <NotificationItem
+                    key={notification.id}
+                    notification={notification}
+                    isRead={isRead(notification)}
+                    onClick={() => handleNotificationClick(notification)}
+                  />
+                ))}
+              </>
+            )}
+          </>
         )}
       </ScrollArea>
     </>
