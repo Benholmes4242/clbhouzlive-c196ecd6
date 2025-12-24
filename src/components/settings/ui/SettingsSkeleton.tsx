@@ -7,9 +7,9 @@ interface SettingsSkeletonProps {
 }
 
 /**
- * SettingsSkeleton - Loading state matching Clubhouse aesthetic
+ * SettingsSkeleton - Loading state matching global light system
  * 
- * Uses dark glass containers with subtle shimmer animation
+ * Uses light card containers with subtle shimmer animation
  */
 export function SettingsSkeleton({ 
   sections = [
@@ -33,19 +33,18 @@ export function SettingsSkeleton({
               className="h-3 rounded-md animate-pulse"
               style={{ 
                 width: `${section.title.length * 8}px`,
-                background: 'rgba(255,255,255,0.08)' 
+                background: 'rgba(31,36,40,0.08)' 
               }}
             />
           </div>
 
-          {/* Glass container */}
+          {/* Card container */}
           <div
-            className="rounded-[18px] overflow-hidden border border-white/5"
-            style={{
-              background: 'rgba(10,10,10,0.78)',
-              backdropFilter: 'blur(22px)',
-              WebkitBackdropFilter: 'blur(22px)',
-            }}
+            className={cn(
+              'rounded-[16px] overflow-hidden',
+              'border border-[rgba(31,36,40,0.06)]',
+              'bg-[#FAFAFB]'
+            )}
           >
             {Array.from({ length: section.rows }).map((_, rowIdx) => (
               <SkeletonRow 
@@ -70,25 +69,25 @@ function SkeletonRow({ isLast }: { isLast: boolean }) {
       {/* Icon circle */}
       <div 
         className="w-[18px] h-[18px] rounded-full animate-pulse"
-        style={{ background: 'rgba(255,255,255,0.06)' }}
+        style={{ background: 'rgba(31,36,40,0.07)' }}
       />
 
       {/* Text content */}
       <div className="flex-1 space-y-2">
         <div 
-          className="h-3 rounded-md shimmer-slide"
+          className="h-3 rounded-md"
           style={{ 
             width: `${titleWidth}%`,
-            background: 'linear-gradient(90deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.06) 100%)',
+            background: 'linear-gradient(90deg, rgba(31,36,40,0.08) 0%, rgba(31,36,40,0.12) 50%, rgba(31,36,40,0.08) 100%)',
             backgroundSize: '200% 100%',
             animation: 'shimmer-slide 1.4s ease-in-out infinite',
           }}
         />
         <div 
-          className="h-2.5 rounded-md shimmer-slide"
+          className="h-2.5 rounded-md"
           style={{ 
             width: `${subtitleWidth}%`,
-            background: 'linear-gradient(90deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.045) 100%)',
+            background: 'linear-gradient(90deg, rgba(31,36,40,0.06) 0%, rgba(31,36,40,0.10) 50%, rgba(31,36,40,0.06) 100%)',
             backgroundSize: '200% 100%',
             animation: 'shimmer-slide 1.4s ease-in-out infinite',
             animationDelay: '0.2s',
@@ -99,14 +98,14 @@ function SkeletonRow({ isLast }: { isLast: boolean }) {
       {/* Right control */}
       <div 
         className="w-10 h-3 rounded-md animate-pulse"
-        style={{ background: 'rgba(255,255,255,0.06)' }}
+        style={{ background: 'rgba(31,36,40,0.07)' }}
       />
 
       {/* Divider */}
       {!isLast && (
         <div 
           className="absolute bottom-0 left-[14px] right-[14px] h-[1px]"
-          style={{ background: 'rgba(255,255,255,0.06)' }}
+          style={{ background: 'rgba(31,36,40,0.06)' }}
         />
       )}
     </div>

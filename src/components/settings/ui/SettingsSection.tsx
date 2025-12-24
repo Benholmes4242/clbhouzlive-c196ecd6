@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { ChevronDown } from 'lucide-react';
 
 interface SettingsSectionProps {
   title: string;
@@ -12,13 +13,12 @@ interface SettingsSectionProps {
 }
 
 /**
- * SettingsSection - Glass container for grouping settings rows
+ * SettingsSection - Light card container for grouping settings rows
  * 
- * Uses Clbhouz dark glass spec:
- * - background: rgba(10,10,10,0.78)
- * - backdrop-filter: blur(22px)
- * - border: 1px solid rgba(255,255,255,0.05)
- * - radius: 18px
+ * Uses global light system:
+ * - background: #FAFAFB (--surface-card)
+ * - border: 1px solid rgba(31,36,40,0.06)
+ * - radius: 16px
  */
 export function SettingsSection({ 
   title, 
@@ -35,30 +35,34 @@ export function SettingsSection({
       <button
         type="button"
         className={cn(
-          'w-full text-left px-3.5',
+          'w-full text-left px-3.5 flex items-center justify-between',
           collapsible && 'cursor-pointer'
         )}
         onClick={() => collapsible && setIsCollapsed(!isCollapsed)}
         disabled={!collapsible}
       >
-        <h2 className="text-[13px] font-semibold tracking-[0.3px] text-white/60 uppercase">
+        <h2 className="text-[13px] font-semibold tracking-[0.3px] text-[#5E666D] uppercase">
           {title}
         </h2>
+        {collapsible && (
+          <ChevronDown 
+            className={cn(
+              'w-4 h-4 text-[#97A1AA] transition-transform duration-200',
+              isCollapsed && '-rotate-90'
+            )} 
+          />
+        )}
       </button>
 
-      {/* Glass container */}
+      {/* Card container */}
       {!isCollapsed && (
         <div
           className={cn(
-            'rounded-[18px] overflow-hidden',
-            'border border-white/5',
-            'shadow-[0_6px_30px_rgba(0,0,0,0.35)]'
+            'rounded-[16px] overflow-hidden',
+            'border border-[rgba(31,36,40,0.06)]',
+            'bg-[#FAFAFB]',
+            'shadow-[0_2px_8px_rgba(31,36,40,0.04)]'
           )}
-          style={{
-            background: 'rgba(10,10,10,0.78)',
-            backdropFilter: 'blur(22px)',
-            WebkitBackdropFilter: 'blur(22px)',
-          }}
         >
           {children}
         </div>

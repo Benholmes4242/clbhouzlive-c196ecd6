@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Bell, Info } from 'lucide-react';
+import { ArrowLeft, Info } from 'lucide-react';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
@@ -28,7 +28,7 @@ const defaultPrefs: NotificationPreferences = {
 };
 
 /**
- * NotificationSettingsPage - Detail screen for in-app notification preferences
+ * NotificationSettingsPage - Detail screen for in-app notification preferences (Light theme)
  */
 export function NotificationSettingsPage() {
   const navigate = useNavigate();
@@ -104,7 +104,7 @@ export function NotificationSettingsPage() {
 
   if (isLoading) {
     return (
-      <PageRoot className="min-h-screen bg-[#0A0A0A]">
+      <PageRoot className="min-h-screen bg-[#F8FAFC]">
         <DetailHeader title="In-app notifications" onBack={() => navigate('/settings')} />
         <div className="max-w-2xl mx-auto px-4 md:px-6 py-6">
           <SettingsSkeleton sections={[{ title: 'Notifications', rows: 7 }]} />
@@ -114,17 +114,16 @@ export function NotificationSettingsPage() {
   }
 
   return (
-    <PageRoot className="min-h-screen bg-[#0A0A0A]">
+    <PageRoot className="min-h-screen bg-[#F8FAFC]">
       <DetailHeader title="In-app notifications" onBack={() => navigate('/settings')} />
       
       <div className="max-w-2xl mx-auto px-4 md:px-6 py-6 pb-28 space-y-6">
         {/* Info note */}
         <div 
-          className="flex items-start gap-3 p-4 rounded-[14px] border border-white/5"
-          style={{ background: 'rgba(255,255,255,0.03)' }}
+          className="flex items-start gap-3 p-4 rounded-[14px] border border-[rgba(31,36,40,0.06)] bg-[#FAFAFB]"
         >
-          <Info className="w-4 h-4 text-white/40 mt-0.5 flex-shrink-0" />
-          <p className="text-[13px] text-white/50 leading-relaxed">
+          <Info className="w-4 h-4 text-[#97A1AA] mt-0.5 flex-shrink-0" />
+          <p className="text-[13px] text-[#5E666D] leading-relaxed">
             Preferences are saved. Push notifications are coming later.
           </p>
         </div>
@@ -195,21 +194,23 @@ export function NotificationSettingsPage() {
 function DetailHeader({ title, onBack }: { title: string; onBack: () => void }) {
   return (
     <header 
-      className="sticky top-0 z-50 px-4 py-3 flex items-center gap-3 border-b border-white/5"
+      className="sticky top-0 z-50 px-4 py-3 flex items-center gap-3"
       style={{
-        background: 'rgba(10,10,10,0.85)',
-        backdropFilter: 'blur(22px)',
-        WebkitBackdropFilter: 'blur(22px)',
+        background: 'rgba(248,250,252,0.85)',
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
+        borderBottom: '1px solid rgba(31,36,40,0.06)',
+        boxShadow: '0 6px 18px rgba(31,36,40,0.06)',
         paddingTop: 'max(env(safe-area-inset-top), 12px)',
       }}
     >
       <button
         onClick={onBack}
-        className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
+        className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[rgba(31,36,40,0.06)] transition-colors"
       >
-        <ArrowLeft className="w-5 h-5 text-white" />
+        <ArrowLeft className="w-5 h-5 text-[#1F2428]" />
       </button>
-      <h1 className="text-lg font-semibold text-white">{title}</h1>
+      <h1 className="text-lg font-semibold text-[#1F2428]">{title}</h1>
     </header>
   );
 }

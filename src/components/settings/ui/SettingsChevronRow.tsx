@@ -29,7 +29,7 @@ interface SettingsChevronRowProps {
 }
 
 /**
- * SettingsChevronRow - Navigational row with chevron or external link icon
+ * SettingsChevronRow - Navigational row with chevron or external link icon (light theme)
  */
 export function SettingsChevronRow({
   icon,
@@ -54,7 +54,7 @@ export function SettingsChevronRow({
         'min-h-[52px] md:min-h-[56px]',
         'px-[14px] py-[12px]',
         'transition-colors duration-[120ms]',
-        'cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.06]',
+        'cursor-pointer hover:bg-[rgba(31,36,40,0.03)] active:bg-[rgba(31,36,40,0.05)]',
         disabled && 'opacity-50 cursor-not-allowed',
         isFirst && 'rounded-t-[12px]',
         isLast && 'rounded-b-[12px]',
@@ -63,19 +63,19 @@ export function SettingsChevronRow({
       {/* Left content */}
       <div className="flex items-center gap-3 flex-1 min-w-0">
         {icon && (
-          <div className="flex-shrink-0 w-[18px] h-[18px] text-white/70">
+          <div className="flex-shrink-0 w-[18px] h-[18px] text-[#5E666D]">
             {icon}
           </div>
         )}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="text-[15px] font-semibold text-white truncate">
+            <span className="text-[15px] font-semibold text-[#1F2428] truncate">
               {title}
             </span>
             {isBeta && <SettingsBadge>Beta</SettingsBadge>}
           </div>
           {subtitle && (
-            <p className="text-[13px] font-normal text-white/60 truncate mt-0.5">
+            <p className="text-[13px] font-normal text-[#5E666D] truncate mt-0.5">
               {subtitle}
             </p>
           )}
@@ -85,12 +85,12 @@ export function SettingsChevronRow({
       {/* Right content */}
       <div className="flex-shrink-0 ml-3 flex items-center gap-2">
         {value && (
-          <span className="text-[13px] text-white/50">{value}</span>
+          <span className="text-[13px] text-[#97A1AA]">{value}</span>
         )}
         {isExternal ? (
-          <ExternalLink className="w-4 h-4 text-white/40" />
+          <ExternalLink className="w-4 h-4 text-[#97A1AA]" />
         ) : (
-          <ChevronRight className="w-4 h-4 text-white/40" />
+          <ChevronRight className="w-4 h-4 text-[#97A1AA]" />
         )}
       </div>
 
@@ -98,7 +98,7 @@ export function SettingsChevronRow({
       {showDivider && !isLast && (
         <div 
           className="absolute bottom-0 left-[14px] right-[14px] h-[1px]"
-          style={{ background: 'rgba(255,255,255,0.06)' }}
+          style={{ background: 'rgba(31,36,40,0.06)' }}
         />
       )}
     </button>

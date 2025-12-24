@@ -28,14 +28,14 @@ interface SettingsRowProps {
 }
 
 /**
- * SettingsRow - Single setting row with LinkedIn/Apple feel
+ * SettingsRow - Single setting row with LinkedIn/Apple light feel
  * 
  * Spacing:
  * - Row height min: 52px (mobile), 56px (desktop)
  * - Row padding: 14px left/right, 12px top/bottom
  * - Icon gap: 12px
- * - Title: 15px, weight 600
- * - Subtitle: 13px, weight 400, opacity ~70%
+ * - Title: 15px, weight 600, color #1F2428
+ * - Subtitle: 13px, weight 400, color #5E666D
  */
 export function SettingsRow({
   icon,
@@ -63,7 +63,7 @@ export function SettingsRow({
         'min-h-[52px] md:min-h-[56px]',
         'px-[14px] py-[12px]',
         'transition-colors duration-[120ms]',
-        isClickable && 'cursor-pointer hover:bg-white/[0.04] active:bg-white/[0.06]',
+        isClickable && 'cursor-pointer hover:bg-[rgba(31,36,40,0.03)] active:bg-[rgba(31,36,40,0.05)]',
         disabled && 'opacity-50 cursor-not-allowed',
         isFirst && 'rounded-t-[12px]',
         isLast && 'rounded-b-[12px]',
@@ -72,22 +72,22 @@ export function SettingsRow({
       {/* Left content */}
       <div className="flex items-center gap-3 flex-1 min-w-0">
         {icon && (
-          <div className="flex-shrink-0 w-[18px] h-[18px] text-white/70">
+          <div className="flex-shrink-0 w-[18px] h-[18px] text-[#5E666D]">
             {icon}
           </div>
         )}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="text-[15px] font-semibold text-white truncate">
+            <span className="text-[15px] font-semibold text-[#1F2428] truncate">
               {title}
             </span>
             {isBeta && <SettingsBadge>Beta</SettingsBadge>}
             {isLocked && (
-              <Lock className="w-3.5 h-3.5 text-white/40" />
+              <Lock className="w-3.5 h-3.5 text-[#97A1AA]" />
             )}
           </div>
           {subtitle && (
-            <p className="text-[13px] font-normal text-white/60 truncate mt-0.5">
+            <p className="text-[13px] font-normal text-[#5E666D] truncate mt-0.5">
               {subtitle}
             </p>
           )}
@@ -98,7 +98,7 @@ export function SettingsRow({
       <div className="flex-shrink-0 ml-3 flex items-center">
         {rightContent}
         {isClickable && !rightContent && (
-          <ChevronRight className="w-4 h-4 text-white/40" />
+          <ChevronRight className="w-4 h-4 text-[#97A1AA]" />
         )}
       </div>
 
@@ -106,7 +106,7 @@ export function SettingsRow({
       {showDivider && !isLast && (
         <div 
           className="absolute bottom-0 left-[14px] right-[14px] h-[1px]"
-          style={{ background: 'rgba(255,255,255,0.06)' }}
+          style={{ background: 'rgba(31,36,40,0.06)' }}
         />
       )}
     </div>
@@ -125,8 +125,8 @@ export function SettingsBadge({ children, variant = 'default' }: {
       className={cn(
         'text-[11px] font-medium px-2 py-0.5 rounded-full',
         'border',
-        variant === 'default' && 'bg-white/[0.08] border-white/10 text-white/70',
-        variant === 'destructive' && 'bg-red-500/20 border-red-500/30 text-red-400',
+        variant === 'default' && 'bg-[rgba(31,36,40,0.06)] border-[rgba(31,36,40,0.08)] text-[#5E666D]',
+        variant === 'destructive' && 'bg-red-50 border-red-200 text-red-600',
       )}
     >
       {children}
