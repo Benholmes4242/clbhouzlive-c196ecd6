@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,8 +27,7 @@ const UserAccountInfo: React.FC<UserAccountInfoProps> = ({
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   
-  // Password change states
-  const [currentPassword, setCurrentPassword] = useState('');
+  // Password change states - simplified (no current password)
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
@@ -95,7 +93,6 @@ const UserAccountInfo: React.FC<UserAccountInfoProps> = ({
       if (error) throw error;
 
       // Clear password fields
-      setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
 
@@ -134,7 +131,7 @@ const UserAccountInfo: React.FC<UserAccountInfoProps> = ({
                   id="username"
                   value={profile?.username ? `@${profile.username}` : 'Not set'}
                   disabled
-                  className="bg-gray-100"
+                  className="bg-muted"
                 />
                 <p className="text-sm text-muted-foreground">
                   Usernames cannot be changed. To request a change, please contact Clbhouz support.
@@ -164,26 +161,18 @@ const UserAccountInfo: React.FC<UserAccountInfoProps> = ({
           </CardContent>
         </Card>
 
-        {/* Password Change Section */}
+        {/* Password Change Section - Simplified */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lock className="h-5 w-5" />
-              Change Password
+              Set New Password
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Current Password */}
-            <div className="space-y-2">
-              <Label htmlFor="currentPassword">Current Password</Label>
-              <Input
-                id="currentPassword"
-                type="password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                placeholder="Enter your current password"
-              />
-            </div>
+            <p className="text-sm text-muted-foreground">
+              You're signed in, so you can set a new password directly.
+            </p>
 
             {/* New Password */}
             <div className="space-y-2">
@@ -212,10 +201,10 @@ const UserAccountInfo: React.FC<UserAccountInfoProps> = ({
             {/* Change Password Button */}
             <Button
               onClick={handlePasswordChange}
-              disabled={isUpdatingPassword || !currentPassword || !newPassword || !confirmPassword}
+              disabled={isUpdatingPassword || !newPassword || !confirmPassword}
               className="w-full"
             >
-              {isUpdatingPassword ? 'Updating Password...' : 'Change Password'}
+              {isUpdatingPassword ? 'Updating Password...' : 'Update Password'}
             </Button>
           </CardContent>
         </Card>
@@ -229,7 +218,7 @@ const UserAccountInfo: React.FC<UserAccountInfoProps> = ({
                 Danger Zone
               </h3>
               <p className="text-sm text-muted-foreground">
-                Once you delete your account, there is no going back. Please be certain.
+                Deleting your account will hide your profile and anonymize your data. This action can be reversed by contacting support.
               </p>
               <Button
                 variant="destructive"

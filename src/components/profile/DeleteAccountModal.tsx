@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   AlertDialog,
@@ -45,17 +44,24 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
 
     setIsDeleting(true);
     try {
-      // Note: In a production app, you might want to implement this via an edge function
-      // to handle cascading deletes and cleanup properly
-      const { error } = await supabase.auth.admin.deleteUser(
-        (await supabase.auth.getUser()).data.user?.id || ''
-      );
+      // Get current session for auth header
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('No active session');
+      }
+
+      // Call the edge function to perform soft delete
+      const { data, error } = await supabase.functions.invoke('delete-account', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
 
       if (error) throw error;
 
       toast({
         title: "Account deleted",
-        description: "Your account has been permanently deleted.",
+        description: "Your account has been deleted. You will be redirected.",
       });
 
       // Sign out and redirect
@@ -89,19 +95,22 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
           </AlertDialogTitle>
           <AlertDialogDescription className="space-y-4">
             <p>
-              Are you sure you want to permanently delete your account and all associated data? 
-              This action cannot be undone.
+              Are you sure you want to delete your account? 
+              Your profile will be hidden and your data will be anonymized.
             </p>
             <p className="font-medium">
-              This will permanently delete:
+              This will:
             </p>
             <ul className="list-disc list-inside space-y-1 text-sm">
-              <li>Your profile and personal information</li>
-              <li>All your posts and content</li>
-              <li>Your course ratings and reviews</li>
-              <li>Your Top 100 course tracking data</li>
-              <li>All messages and conversations</li>
+              <li>Hide your profile from other users</li>
+              <li>Anonymize your display name and username</li>
+              <li>Remove your bio and profile images</li>
+              <li>Sign you out of the app</li>
             </ul>
+            <p className="text-xs text-muted-foreground">
+              Your posts and reviews will remain but display as "Deleted User".
+              Contact support if you need to recover your account.
+            </p>
             <div className="space-y-2">
               <Label htmlFor="confirmation">
                 Type <strong>DELETE</strong> to confirm:

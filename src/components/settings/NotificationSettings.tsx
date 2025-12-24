@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Bell, Smartphone } from 'lucide-react';
+import { Bell, Info } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -17,13 +15,11 @@ interface NotificationPreferences {
   tagged_in_post: boolean;
   course_activity: boolean;
   golf_news: boolean;
-  push_enabled: boolean;
 }
 
 const NotificationSettings = () => {
   const { user } = useSupabaseSession();
   const { toast } = useToast();
-  const pushNotifications = usePushNotifications();
   const [preferences, setPreferences] = useState<NotificationPreferences>({
     new_follower: true,
     post_likes: true,
@@ -32,7 +28,6 @@ const NotificationSettings = () => {
     tagged_in_post: true,
     course_activity: false,
     golf_news: false,
-    push_enabled: false,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -55,7 +50,17 @@ const NotificationSettings = () => {
       if (error) throw error;
 
       if (data?.notification_preferences) {
-        setPreferences(data.notification_preferences as unknown as NotificationPreferences);
+        // Only pick the keys we care about (exclude push_enabled)
+        const prefs = data.notification_preferences as any;
+        setPreferences({
+          new_follower: prefs.new_follower ?? true,
+          post_likes: prefs.post_likes ?? true,
+          post_comments: prefs.post_comments ?? true,
+          post_shares: prefs.post_shares ?? true,
+          tagged_in_post: prefs.tagged_in_post ?? true,
+          course_activity: prefs.course_activity ?? false,
+          golf_news: prefs.golf_news ?? false,
+        });
       }
     } catch (error) {
       console.error('Error loading notification preferences:', error);
@@ -101,13 +106,6 @@ const NotificationSettings = () => {
     const newPreferences = { ...preferences, [key]: value };
     setPreferences(newPreferences);
     updatePreferences(newPreferences);
-  };
-
-  const requestPushPermission = async () => {
-    const success = await pushNotifications.requestPermission();
-    if (success) {
-      handlePreferenceChange('push_enabled', true);
-    }
   };
 
   const notificationTypes = [
@@ -163,118 +161,69 @@ const NotificationSettings = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bell className="h-5 w-5" />
-            Notification Settings
+            In-app Notifications
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-4">Loading preferences...</div>
+          <div className="text-center py-4 text-muted-foreground">Loading preferences...</div>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Push Notifications Setup */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Smartphone className="h-5 w-5" />
-            Push Notifications
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Enable push notifications to receive alerts even when the app is closed.
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Bell className="h-5 w-5" />
+          In-app Notifications
+          <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full font-normal">
+            Beta
+          </span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-1 mb-6">
+          <div className="flex items-start gap-2 p-3 rounded-md bg-muted/50">
+            <Info className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+            <p className="text-xs text-muted-foreground">
+              These preferences control in-app notifications. Push notifications are coming soon.
             </p>
-            
-            {!pushNotifications.isSupported && (
-              <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                <p className="text-sm text-yellow-800">
-                  Push notifications are not supported in this browser.
-                </p>
-              </div>
-            )}
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="push-enabled">Enable Push Notifications</Label>
-                <p className="text-xs text-muted-foreground">
-                  Get notifications on your device
-                </p>
+          </div>
+        </div>
+        
+        <div className="space-y-6">
+          {notificationTypes.map((type) => (
+            <div key={type.key} className="flex items-center justify-between">
+              <div className="flex items-start gap-3 flex-1">
+                <span className="text-lg">{type.icon}</span>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor={type.key} className="font-medium">
+                      {type.label}
+                    </Label>
+                    {type.optIn && (
+                      <span className="text-xs bg-muted px-2 py-1 rounded-full">
+                        Opt-in
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {type.description}
+                  </p>
+                </div>
               </div>
               <Switch
-                id="push-enabled"
-                checked={preferences.push_enabled && pushNotifications.isSupported}
-                onCheckedChange={(checked) => {
-                  if (checked) {
-                    requestPushPermission();
-                  } else {
-                    pushNotifications.unsubscribe();
-                    handlePreferenceChange('push_enabled', false);
-                  }
-                }}
-                disabled={isSaving || pushNotifications.isLoading || !pushNotifications.isSupported}
+                id={type.key}
+                checked={preferences[type.key]}
+                onCheckedChange={(checked) => handlePreferenceChange(type.key, checked)}
+                disabled={isSaving}
               />
             </div>
-            
-            {pushNotifications.isSupported && pushNotifications.permission === 'granted' && preferences.push_enabled && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={pushNotifications.showTestNotification}
-                className="w-full"
-              >
-                Send Test Notification
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Notification Types */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Bell className="h-5 w-5" />
-            Notification Preferences
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            {notificationTypes.map((type) => (
-              <div key={type.key} className="flex items-center justify-between">
-                <div className="flex items-start gap-3 flex-1">
-                  <span className="text-lg">{type.icon}</span>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <Label htmlFor={type.key} className="font-medium">
-                        {type.label}
-                      </Label>
-                      {type.optIn && (
-                        <span className="text-xs bg-muted px-2 py-1 rounded-full">
-                          Opt-in
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {type.description}
-                    </p>
-                  </div>
-                </div>
-                <Switch
-                  id={type.key}
-                  checked={preferences[type.key]}
-                  onCheckedChange={(checked) => handlePreferenceChange(type.key, checked)}
-                  disabled={isSaving}
-                />
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
