@@ -21,6 +21,7 @@ import { buildInterleavedFeed, InterleavedItem } from '@/utils/interleaveFeed';
 import { toast } from 'sonner';
 import DiscoverHero, { createHeroItem } from '@/components/discover/DiscoverHero';
 import { DiscoverCommandCenter, SortOption, Pill } from '@/components/discover/DiscoverCommandCenter';
+import { useHeroPreload } from '@/hooks/useHeroPreload';
 
 // Wrapper to avoid useMemo inside render callback (fixes setState during render warning)
 function VideosGridWrapper({
@@ -216,6 +217,10 @@ export default function DiscoverContent({ onLike, onFollow, onMediaClick, search
     hasMore, 
     loadMore 
   } = useInfiniteExploreContent(filterType, sub, durationFilter);
+
+  // CRITICAL: Preload hero video manifest as soon as content arrives
+  // This eliminates the 2.2s delay where preload only starts when Hero mounts
+  useHeroPreload(content);
 
   // Apply search filtering and tag filtering whenever content changes
   useEffect(() => {
