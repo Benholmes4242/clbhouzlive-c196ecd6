@@ -9,6 +9,7 @@ interface MinimalProfileData {
   id: string;
   username: string | null;
   creator_only: boolean;
+  deleted_at: string | null;
 }
 
 /**
@@ -30,7 +31,7 @@ export function useProfileLink(userId: string | null | undefined) {
 
       const { data, error } = await supabase
         .from('user_profiles')
-        .select('id, username, creator_only')
+        .select('id, username, creator_only, deleted_at')
         .eq('id', userId)
         .maybeSingle();
 
@@ -46,8 +47,14 @@ export function useProfileLink(userId: string | null | undefined) {
     gcTime: 10 * 60 * 1000,
   });
 
+  // Check if user is deleted
+  const isDeleted = data?.deleted_at != null;
+
   // Compute the profile URL from the fetched data
-  const profileUrl = data
+  // Return null for deleted users to indicate profile unavailable
+  const profileUrl = isDeleted
+    ? null
+    : data
     ? getProfilePathById(data.id, data.creator_only, data.username)
     : userId
     ? `/profile/${userId}` // Fallback while loading
@@ -56,11 +63,14 @@ export function useProfileLink(userId: string | null | undefined) {
   return {
     profileUrl,
     isLoading,
+    isDeleted,
     data,
     /**
      * Helper to get the path synchronously if you have partial data
+     * Returns null if user is deleted
      */
     getPath: (fallbackId?: string) => {
+      if (isDeleted) return null;
       if (data) {
         return getProfilePathById(data.id, data.creator_only, data.username);
       }
@@ -84,8 +94,9 @@ export async function prefetchProfileLinks(userIds: string[]): Promise<Map<strin
 
   const { data, error } = await supabase
     .from('user_profiles')
-    .select('id, username, creator_only')
-    .in('id', uniqueIds);
+    .select('id, username, creator_only, deleted_at')
+    .in('id', uniqueIds)
+    .is('deleted_at', null); // Only include non-deleted users
 
   if (error) {
     console.error('[prefetchProfileLinks] Error:', error);

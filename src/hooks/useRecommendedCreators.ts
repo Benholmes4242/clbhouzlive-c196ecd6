@@ -37,6 +37,7 @@ export function useRecommendedCreators(limit = 24) {
           .from('user_profiles')
           .select('id, username, display_name, profile_photo_url')
           .eq('is_public', true)
+          .is('deleted_at', null)
           .not('profile_photo_url', 'is', null)
           .not('display_name', 'is', null);
 

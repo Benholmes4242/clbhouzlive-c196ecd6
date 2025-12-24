@@ -48,17 +48,33 @@ const ProfilePageV2: React.FC = () => {
   
   // If viewing via /profile/:username, fetch that profile; otherwise show own profile
   const [profileUserId, setProfileUserId] = useState<string | undefined>(undefined);
+  const [isProfileDeleted, setIsProfileDeleted] = useState(false);
+  const [profileNotFound, setProfileNotFound] = useState(false);
   
   useEffect(() => {
     const fetchProfileByUsernameOrId = async () => {
+      setIsProfileDeleted(false);
+      setProfileNotFound(false);
+      
       if (routeUsername) {
         // Support both UUID and username in route param
-        const query = supabase.from('user_profiles').select('id');
-        const { data } = await (isUuid(routeUsername)
+        // Fetch id and deleted_at to check if profile exists and is active
+        const query = supabase.from('user_profiles').select('id, deleted_at');
+        const { data, error } = await (isUuid(routeUsername)
           ? query.eq('id', routeUsername)
           : query.eq('username', routeUsername)
-        ).single();
-        setProfileUserId(data?.id || undefined);
+        ).maybeSingle();
+        
+        if (error || !data) {
+          setProfileNotFound(true);
+          setProfileUserId(undefined);
+        } else if (data.deleted_at != null) {
+          // Profile is soft-deleted
+          setIsProfileDeleted(true);
+          setProfileUserId(undefined);
+        } else {
+          setProfileUserId(data.id);
+        }
       } else {
         setProfileUserId(user?.id);
       }
@@ -190,6 +206,31 @@ const ProfilePageV2: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center" style={{ background: BG_COLOR }}>
         <div className="w-8 h-8 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
       </div>
+    );
+  }
+
+  // Show "Profile unavailable" for deleted or not found profiles
+  if (isProfileDeleted || profileNotFound) {
+    return (
+      <PageRoot className="min-h-screen" style={{ background: BG_COLOR }}>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
+          <div className="w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center mb-6">
+            <span className="text-3xl text-slate-400">?</span>
+          </div>
+          <h1 className="text-2xl font-semibold text-slate-800 mb-2">
+            Profile unavailable
+          </h1>
+          <p className="text-slate-500 mb-6 max-w-sm">
+            This profile doesn't exist or is no longer available.
+          </p>
+          <button
+            onClick={() => navigate(-1)}
+            className="px-6 py-2 bg-slate-800 text-white rounded-full text-sm font-medium hover:bg-slate-700 transition-colors"
+          >
+            Go back
+          </button>
+        </div>
+      </PageRoot>
     );
   }
 

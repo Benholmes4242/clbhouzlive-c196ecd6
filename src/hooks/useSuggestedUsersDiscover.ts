@@ -50,6 +50,7 @@ export const useSuggestedUsersDiscover = () => {
         `)
         .neq('id', currentUser.id)
         .eq('is_public', true)
+        .is('deleted_at', null)
         .limit(50);
 
       console.log('Fetched users (excluding current):', usersWithPosts?.length, usersWithPosts?.map(u => ({ id: u.id, name: u.display_name })));

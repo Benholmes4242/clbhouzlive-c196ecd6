@@ -32,11 +32,12 @@ export function useFollowers(profileUserId: string | undefined) {
 
       const followerIds = followsData.map(f => f.follower_id);
 
-      // Fetch profiles for all followers
+      // Fetch profiles for all followers (belt & braces: filter deleted_at even with RLS)
       const { data: profiles, error: profilesError } = await supabase
         .from('user_profiles')
         .select('id, username, display_name, profile_photo_url, home_club, eg_handicap_index')
-        .in('id', followerIds);
+        .in('id', followerIds)
+        .is('deleted_at', null);
 
       if (profilesError) {
         console.error('Error fetching follower profiles:', profilesError);
@@ -78,11 +79,12 @@ export function useFollowing(profileUserId: string | undefined) {
 
       const followingIds = followsData.map(f => f.following_id);
 
-      // Fetch profiles for all following
+      // Fetch profiles for all following (belt & braces: filter deleted_at even with RLS)
       const { data: profiles, error: profilesError } = await supabase
         .from('user_profiles')
         .select('id, username, display_name, profile_photo_url, home_club, eg_handicap_index')
-        .in('id', followingIds);
+        .in('id', followingIds)
+        .is('deleted_at', null);
 
       if (profilesError) {
         console.error('Error fetching following profiles:', profilesError);
@@ -128,11 +130,12 @@ export function useFriends(profileUserId: string | undefined) {
         row.user_id === profileUserId ? row.friend_id : row.user_id
       );
 
-      // Fetch profiles for all friends
+      // Fetch profiles for all friends (belt & braces: filter deleted_at even with RLS)
       const { data: profiles, error: profilesError } = await supabase
         .from('user_profiles')
         .select('id, username, display_name, profile_photo_url, home_club, eg_handicap_index')
-        .in('id', friendIds);
+        .in('id', friendIds)
+        .is('deleted_at', null);
 
       if (profilesError) {
         console.error('Error fetching friend profiles:', profilesError);
