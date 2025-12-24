@@ -32,6 +32,8 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
   const usernameRef = useRef<HTMLInputElement>(null);
   const [checkingUsername, setCheckingUsername] = useState(false);
   const [suggestedUsernames, setSuggestedUsernames] = useState<string[]>([]);
+  const [usernameFocused, setUsernameFocused] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
   
   useEffect(() => {
     setTimeout(() => usernameRef.current?.focus(), 100);
@@ -85,7 +87,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
       } else {
         setSuggestedUsernames([]);
       }
-    } catch (error) {
+    } catch {
       setUsernameAvailable(null);
     } finally {
       setCheckingUsername(false);
@@ -96,7 +98,6 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
     const cleanValue = value.replace('@', '');
     setUsername(cleanValue);
     
-    // Debounce check
     const timeoutId = setTimeout(() => {
       checkUsernameAvailability(cleanValue);
     }, 500);
@@ -120,33 +121,41 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
     }
   };
 
-  // Input styling helper
+  const getInputBackground = (focused: boolean) => {
+    if (focused) return 'rgba(255, 255, 255, 0.08)';
+    return 'rgba(255, 255, 255, 0.05)';
+  };
+
   const getInputBorderColor = (state: boolean | null, isUsername: boolean = false) => {
     if (isUsername) {
       if (state === true) return '1px solid #2F9E44';
       if (state === false) return '1px solid #E03131';
     }
-    return '1px solid rgba(255, 255, 255, 0.08)';
+    return '1px solid rgba(255, 255, 255, 0.07)';
   };
 
   return (
-    <div className="space-y-4">
-      {/* Back button and email display */}
-      <div className="flex items-center gap-3 mb-2">
+    <div className="space-y-5">
+      {/* Back button and email display - breadcrumb style */}
+      <div 
+        className="flex items-center gap-2.5 py-2 px-3 rounded-xl -mx-1"
+        style={{ background: 'rgba(255, 255, 255, 0.03)' }}
+      >
         <button
           onClick={onBack}
           disabled={submitting}
-          className="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
+          className="w-7 h-7 flex items-center justify-center rounded-full transition-all active:scale-95"
           style={{ background: 'rgba(255, 255, 255, 0.08)' }}
         >
-          <ArrowLeft className="w-4 h-4 text-white/70" />
+          <ArrowLeft className="w-3.5 h-3.5 text-white/60" />
         </button>
-        <span className="text-white/60 text-[14px] truncate">{email}</span>
+        <span 
+          className="text-[13px] text-white/50 truncate"
+          style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
+        >
+          {email}
+        </span>
       </div>
-      
-      <p className="text-white/60 text-[14px]">
-        Create your clbhouz account.
-      </p>
       
       {/* Username */}
       <div>
@@ -157,14 +166,26 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
             value={username}
             onChange={(e) => handleUsernameChange(e.target.value)}
             onKeyDown={handleKeyDown}
+            onFocus={() => setUsernameFocused(true)}
+            onBlur={() => setUsernameFocused(false)}
             placeholder="Username"
             disabled={submitting}
-            className="w-full h-[52px] px-4 pr-10 rounded-2xl text-white placeholder:text-white/40 text-[15px] focus:outline-none transition-colors"
+            className="w-full h-[54px] px-4 pr-10 rounded-2xl text-white text-[15px] focus:outline-none transition-all duration-200"
             style={{
-              background: 'rgba(255, 255, 255, 0.06)',
+              fontFamily: 'SF Pro Text, system-ui, sans-serif',
+              background: getInputBackground(usernameFocused),
               border: getInputBorderColor(usernameAvailable, true),
+              boxShadow: usernameFocused 
+                ? 'inset 0 0 0 1px rgba(255, 255, 255, 0.04)' 
+                : 'none',
             }}
           />
+          <style>{`
+            input::placeholder {
+              color: rgba(255, 255, 255, 0.35);
+              font-size: 14px;
+            }
+          `}</style>
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
             {checkingUsername ? (
               <div className="w-4 h-4 border-2 border-white/30 border-t-white/70 rounded-full animate-spin" />
@@ -188,7 +209,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
                   key={suggestion}
                   type="button"
                   onClick={() => handleChipClick(suggestion)}
-                  className="px-3 py-1.5 rounded-full text-white text-[13px] transition-colors"
+                  className="px-3 py-1.5 rounded-full text-white text-[13px] transition-all active:scale-95"
                   style={{
                     background: 'rgba(255, 255, 255, 0.08)',
                   }}
@@ -214,12 +235,20 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           onKeyDown={handleKeyDown}
+          onFocus={() => setPasswordFocused(true)}
+          onBlur={() => setPasswordFocused(false)}
           placeholder="Create password"
           disabled={submitting}
-          className="w-full h-[52px] px-4 rounded-2xl text-white placeholder:text-white/40 text-[15px] focus:outline-none transition-colors"
+          className="w-full h-[54px] px-4 rounded-2xl text-white text-[15px] focus:outline-none transition-all duration-200"
           style={{
-            background: 'rgba(255, 255, 255, 0.06)',
-            border: passwordError ? '1px solid #E03131' : '1px solid rgba(255, 255, 255, 0.08)',
+            fontFamily: 'SF Pro Text, system-ui, sans-serif',
+            background: getInputBackground(passwordFocused),
+            border: passwordError 
+              ? '1px solid #E03131' 
+              : '1px solid rgba(255, 255, 255, 0.07)',
+            boxShadow: passwordFocused 
+              ? 'inset 0 0 0 1px rgba(255, 255, 255, 0.04)' 
+              : 'none',
           }}
           autoComplete="new-password"
         />
@@ -233,16 +262,24 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
         )}
       </div>
       
-      {/* Submit button - white, black text */}
+      {/* Submit button - premium white */}
       <button
         onClick={onSubmit}
         disabled={isDisabled}
-        className="w-full h-[52px] flex items-center justify-center rounded-full bg-white text-[#0D0F11] font-medium text-[15px] transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full h-[54px] flex items-center justify-center rounded-full text-[15px] transition-all duration-200 active:scale-[0.98]"
+        style={{
+          fontFamily: 'SF Pro Text, system-ui, sans-serif',
+          fontWeight: 500,
+          background: isDisabled ? 'rgba(255, 255, 255, 0.5)' : 'white',
+          color: '#0D0F11',
+          cursor: isDisabled ? 'not-allowed' : 'pointer',
+          opacity: isDisabled ? 0.6 : 1,
+        }}
       >
         {submitting ? (
           <Loader2 className="w-5 h-5 animate-spin" />
         ) : (
-          'Create Account'
+          'Continue'
         )}
       </button>
     </div>
