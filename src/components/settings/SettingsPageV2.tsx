@@ -334,33 +334,36 @@ export function SettingsPageV2() {
 
         {/* ========== NOTIFICATIONS ========== */}
         <SettingsSection title="Notifications">
-          {/* Push notifications toggle - only show if available */}
-          {pushState !== 'unavailable' && (
-            <SettingsToggleRow
-              icon={<Smartphone className="w-[18px] h-[18px]" />}
-              title="Push notifications"
-              subtitle={pushState === 'enabled' ? 'Enabled on this device.' : 'Get alerts when something important happens.'}
-              checked={pushState === 'enabled'}
-              onCheckedChange={async (checked) => {
-                if (checked) {
-                  await enablePush();
-                } else {
-                  await disablePush();
-                }
-              }}
-              disabled={isPushRegistering || pushState === 'denied'}
-              isLoading={isPushRegistering}
-              isFirst
-              helperNote={pushState === 'denied' ? 'Permission denied. Enable in device settings.' : undefined}
-            />
-          )}
+          {/* Push notifications toggle - show disabled state when unavailable */}
+          <SettingsToggleRow
+            icon={<Smartphone className="w-[18px] h-[18px]" />}
+            title="Push notifications"
+            subtitle={
+              pushState === 'unavailable' 
+                ? 'Available in the app.' 
+                : pushState === 'enabled' 
+                  ? 'Enabled on this device.' 
+                  : 'Get alerts when something important happens.'
+            }
+            checked={pushState === 'enabled'}
+            onCheckedChange={async (checked) => {
+              if (checked) {
+                await enablePush();
+              } else {
+                await disablePush();
+              }
+            }}
+            disabled={isPushRegistering || pushState === 'denied' || pushState === 'unavailable'}
+            isLoading={isPushRegistering}
+            isFirst
+            helperNote={pushState === 'denied' ? 'Permission denied. Enable in device settings.' : undefined}
+          />
           <SettingsChevronRow
             icon={<Bell className="w-[18px] h-[18px]" />}
             title="In-app notifications"
             subtitle="Choose what you're notified about."
             onClick={() => setShowNotificationsSheet(true)}
             isBeta
-            isFirst={pushState === 'unavailable'}
             isLast
           />
         </SettingsSection>
