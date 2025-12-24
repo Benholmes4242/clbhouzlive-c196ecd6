@@ -281,19 +281,36 @@ export function AdminInvitesPage() {
         ) : isMobile ? (
           /* Mobile: Card list */
           <div className="space-y-3">
-            {rows.map((invite) => (
-              <AdminListCard
-                key={invite.id}
-                primary={invite.email}
-                secondary={`${invite.role.charAt(0).toUpperCase() + invite.role.slice(1)} Admin`}
-                metadata={[
-                  { label: "Created", value: formatDistanceToNow(new Date(invite.created_at), { addSuffix: true }) },
-                  ...(invite.expires_at ? [{ label: "Expires", value: new Date(invite.expires_at).toLocaleDateString() }] : []),
-                ]}
-                status={getInviteStatus(invite)}
-                onClick={() => setSelectedInvite(invite)}
+            {/* Select mode header */}
+            {bulkSelect.selectMode && (
+              <SelectModeHeader
+                selectedCount={bulkSelect.selectedCount}
+                totalCount={bulkSelect.selectableCount}
+                allSelected={bulkSelect.allSelected}
+                onToggleAll={bulkSelect.toggleSelectAll}
+                onCancel={bulkSelect.exitSelectMode}
               />
-            ))}
+            )}
+            {rows.map((invite) => {
+              const isRevocable = !invite.accepted_at && (!invite.expires_at || new Date(invite.expires_at) > new Date());
+              return (
+                <AdminListCard
+                  key={invite.id}
+                  primary={invite.email}
+                  secondary={`${invite.role.charAt(0).toUpperCase() + invite.role.slice(1)} Admin`}
+                  metadata={[
+                    { label: "Created", value: formatDistanceToNow(new Date(invite.created_at), { addSuffix: true }) },
+                    ...(invite.expires_at ? [{ label: "Expires", value: new Date(invite.expires_at).toLocaleDateString() }] : []),
+                  ]}
+                  status={getInviteStatus(invite)}
+                  onClick={() => { if (!bulkSelect.selectMode) setSelectedInvite(invite); }}
+                  selectMode={bulkSelect.selectMode}
+                  selected={bulkSelect.isSelected(invite.id)}
+                  onSelect={() => bulkSelect.toggleSelect(invite.id)}
+                  selectable={isRevocable}
+                />
+              );
+            })}
           </div>
         ) : (
           /* Desktop: Table */
