@@ -366,7 +366,6 @@ export const MediaSystemProvider: React.FC<{ children: React.ReactNode }> = ({ c
   return (
     <MediaSystemContext.Provider value={value}>
       {children}
-      {import.meta.env.DEV && <MediaDevHud />}
     </MediaSystemContext.Provider>
   );
 };
