@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 
 interface EmailSheetContentProps {
@@ -16,12 +16,11 @@ const EmailSheetContent: React.FC<EmailSheetContentProps> = ({
   emailError,
   submitting,
   onContinue,
-  isLoginIntent,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [isFocused, setIsFocused] = useState(false);
   
   useEffect(() => {
-    // Auto-focus on mount
     setTimeout(() => inputRef.current?.focus(), 100);
   }, []);
 
@@ -34,15 +33,13 @@ const EmailSheetContent: React.FC<EmailSheetContentProps> = ({
     }
   };
 
+  const getInputBackground = () => {
+    if (isFocused) return 'rgba(255, 255, 255, 0.08)';
+    return 'rgba(255, 255, 255, 0.05)';
+  };
+
   return (
-    <div className="space-y-4">
-      <p className="text-white/60 text-[14px] mb-4">
-        {isLoginIntent 
-          ? "Enter your email to sign in to your account."
-          : "Enter your email to get started."
-        }
-      </p>
-      
+    <div className="space-y-5">
       <div>
         <input
           ref={inputRef}
@@ -50,25 +47,47 @@ const EmailSheetContent: React.FC<EmailSheetContentProps> = ({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Email address"
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          placeholder="Email"
           disabled={submitting}
-          className="w-full h-[52px] px-4 rounded-2xl text-white placeholder:text-white/40 text-[15px] focus:outline-none transition-colors"
+          className="w-full h-[54px] px-4 rounded-2xl text-white text-[15px] focus:outline-none transition-all duration-200"
           style={{
-            background: 'rgba(255, 255, 255, 0.06)',
-            border: emailError ? '1px solid #E03131' : '1px solid rgba(255, 255, 255, 0.08)',
+            fontFamily: 'SF Pro Text, system-ui, sans-serif',
+            background: getInputBackground(),
+            border: emailError 
+              ? '1px solid #E03131' 
+              : '1px solid rgba(255, 255, 255, 0.07)',
+            boxShadow: isFocused 
+              ? 'inset 0 0 0 1px rgba(255, 255, 255, 0.04)' 
+              : 'none',
           }}
           autoComplete="email"
         />
+        <style>{`
+          input::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 14px;
+          }
+        `}</style>
         {emailError && (
           <p className="text-[#E03131] text-[13px] mt-2">{emailError}</p>
         )}
       </div>
       
-      {/* Continue button - white, black text */}
+      {/* Continue button - premium white */}
       <button
         onClick={onContinue}
         disabled={isDisabled}
-        className="w-full h-[52px] flex items-center justify-center rounded-full bg-white text-[#0D0F11] font-medium text-[15px] transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full h-[54px] flex items-center justify-center rounded-full text-[15px] transition-all duration-200 active:scale-[0.98]"
+        style={{
+          fontFamily: 'SF Pro Text, system-ui, sans-serif',
+          fontWeight: 500,
+          background: isDisabled ? 'rgba(255, 255, 255, 0.5)' : 'white',
+          color: '#0D0F11',
+          cursor: isDisabled ? 'not-allowed' : 'pointer',
+          opacity: isDisabled ? 0.6 : 1,
+        }}
       >
         {submitting ? (
           <Loader2 className="w-5 h-5 animate-spin" />

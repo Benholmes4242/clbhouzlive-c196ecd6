@@ -94,6 +94,18 @@ html.lightbox-open {
 
 /* Glass panel utilities for Clubhouse overlays */
 :root {
+  /* ========================================
+     SAFE AREA INSETS - iOS/Android notch & status bar
+     ======================================== */
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+
+  /* Back-compat aliases (used by useChromeAnchors) */
+  --safe-top: var(--sat);
+  --safe-bottom: var(--sab);
+
   --radius-tile: 18px;
   
   /* ========================================
@@ -385,18 +397,30 @@ html.lightbox-open {
    Use on headerless pages to respect iOS notch/status bar
    ======================================== */
 .safe-top {
-  padding-top: max(env(safe-area-inset-top), 12px);
+  padding-top: max(var(--sat), 12px);
 }
 
 /* Compact header content offset - use when CompactHeader is present */
 .compact-header-offset {
-  padding-top: calc(56px + env(safe-area-inset-top));
+  padding-top: calc(56px + var(--sat));
 }
 
 /* Discover needs the compact header offset WITHOUT adding safe-area again
    (CompactHeader already handles safe-area padding internally). */
 .compact-header-offset-no-safe {
   padding-top: 56px;
+}
+
+/* ========================================
+   FIXED HEADER - Safe area positioning
+   For position:fixed headers that need to respect notch
+   ======================================== */
+.fixed-header-safe {
+  position: fixed;
+  top: var(--sat);
+  left: var(--sal);
+  right: var(--sar);
+  z-index: 50;
 }
 
 /* ========================================
@@ -417,9 +441,28 @@ html.lightbox-open {
 
 /* Activity-specific styles (backward compat) */
 .activity-page-root {
-  min-height: 100vh;
+  min-height: 100dvh;
   padding-bottom: 96px;
   background-color: hsl(var(--bg-page));
+}
+
+/* ========================================
+   APP SHELL - Safe Area & Viewport Handling
+   Global wrapper that respects iOS notch/status bar
+   ======================================== */
+.app-shell {
+  /* Extend to fill viewport, respecting safe areas */
+  min-height: 100dvh;
+  width: 100%;
+  
+  /* Safe area padding for notch/status bar */
+  padding-top: var(--sat);
+  padding-bottom: var(--sab);
+  padding-left: var(--sal);
+  padding-right: var(--sar);
+  
+  /* Ensure background extends behind safe areas */
+  background-color: var(--bg-page);
 }
 
 /* Fade mask utility for horizontal scroll rails */
@@ -449,18 +492,19 @@ html, body, #root {
   padding-top: 0 !important;
 }
 
-/* Ensure all headers are anchored flush to viewport top - applies to ALL pages */
+/* Ensure all headers respect safe-area but stay anchored to viewport top */
 .chrome-header,
 header[data-chrome="header"],
 header.global-header,
 [data-hides-on-scroll] {
   margin-top: 0 !important;
-  top: 0 !important;
+  /* Use safe-area offset on real devices, 0 in browser preview */
+  top: var(--sat, 0px) !important;
 }
 
 /* Override any container-level spacing that might create gaps above header */
 body > div:first-child,
-#root > div:first-child {
+#root > div:first-child:not(.app-shell) {
   margin-top: 0 !important;
   padding-top: 0 !important;
 }
