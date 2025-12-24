@@ -209,13 +209,6 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               Continue with Email
             </button>
             
-            {/* Micro-trust line */}
-            <p 
-              className="text-center text-[12px] text-white/55 pt-2"
-              style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
-            >
-              No spam. No ads. Ever.
-            </p>
             
             {/* Login link - polished with increased tap target */}
             <div className="text-center pt-1">
