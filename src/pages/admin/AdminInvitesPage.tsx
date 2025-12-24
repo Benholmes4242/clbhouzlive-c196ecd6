@@ -9,7 +9,7 @@ import { usePanelRole } from "@/hooks/usePanelRole";
 import { panelCan } from "@/lib/panelCan";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AdminListCard, AdminBottomSheet, AdminListSkeleton, AdminEmptyState, type StatusVariant } from "@/components/admin/mobile";
-import { Copy, Trash2, Mail, RefreshCw, AlertTriangle } from "lucide-react";
+import { Copy, Trash2, Mail, RefreshCw, AlertTriangle, CheckSquare } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { 
   AlertDialog,
@@ -21,6 +21,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useBulkSelect } from "@/hooks/useBulkSelect";
+import { BulkActionBar, SelectModeHeader } from "@/components/admin/BulkActionBar";
+import { SelectModeButton } from "@/components/admin/SelectModeButton";
+import { revokeBulkInvites } from "@/lib/adminBulkApi";
+import { toast as sonnerToast } from "sonner";
 
 type InviteRow = {
   id: string;
@@ -52,6 +57,35 @@ export function AdminInvitesPage() {
   const [selectedInvite, setSelectedInvite] = useState<InviteRow | null>(null);
   const [revokeConfirmOpen, setRevokeConfirmOpen] = useState(false);
   const [inviteToRevoke, setInviteToRevoke] = useState<InviteRow | null>(null);
+
+  // Get revocable invites (not accepted, not expired)
+  const revocableInvites = rows.filter(r => !r.accepted_at && (!r.expires_at || new Date(r.expires_at) > new Date()));
+
+  // Bulk selection for revocable invites
+  const bulkSelect = useBulkSelect(
+    rows,
+    (r) => !r.accepted_at && (!r.expires_at || new Date(r.expires_at) > new Date())
+  );
+
+  // Bulk revoke handler
+  const handleBulkRevoke = async () => {
+    try {
+      const result = await bulkSelect.executeBulk(async (ids) => {
+        return await revokeBulkInvites(ids);
+      });
+      sonnerToast.success(`Revoked ${result.success.length} invites`, {
+        description: result.failed.length > 0 ? `${result.failed.length} failed` : undefined,
+        action: {
+          label: 'View Audit Log',
+          onClick: () => window.location.href = '/admin/audit',
+        },
+      });
+      await load();
+      bulkSelect.exitSelectMode();
+    } catch (error: any) {
+      sonnerToast.error('Bulk revoke failed', { description: error.message });
+    }
+  };
 
   const load = async () => {
     setLoading(true);
@@ -159,10 +193,33 @@ export function AdminInvitesPage() {
             </h1>
             <p className="text-sm text-muted-foreground">Create and manage invitation links.</p>
           </div>
-          <Button variant="ghost" size="icon" onClick={load} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-          </Button>
+          <div className="flex items-center gap-2">
+            {revocableInvites.length > 0 && !bulkSelect.selectMode && (
+              <SelectModeButton onClick={bulkSelect.enterSelectMode} />
+            )}
+            <Button variant="ghost" size="icon" onClick={load} disabled={loading}>
+              <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            </Button>
+          </div>
         </div>
+
+        {/* Bulk action bar */}
+        {bulkSelect.selectMode && (
+          <BulkActionBar
+            selectedCount={bulkSelect.selectedCount}
+            onCancel={bulkSelect.exitSelectMode}
+            processing={!!bulkSelect.progress && bulkSelect.progress.processed < bulkSelect.progress.total}
+            progress={bulkSelect.progress}
+            actions={[
+              {
+                label: 'Revoke Selected',
+                onClick: handleBulkRevoke,
+                variant: 'destructive',
+                icon: <Trash2 className="h-4 w-4" />,
+              },
+            ]}
+          />
+        )}
 
         {/* Create invite form */}
         <Card>

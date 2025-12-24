@@ -35,6 +35,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { GolferVerificationCard, GolferVerificationBottomSheet } from './mobile';
 import { AdminEmptyState } from '@/components/admin/mobile';
+import { useBulkSelect } from '@/hooks/useBulkSelect';
+import { BulkActionBar, SelectModeHeader } from '@/components/admin/BulkActionBar';
+import { SelectModeButton } from '@/components/admin/SelectModeButton';
+import { verifyBulk } from '@/lib/adminBulkApi';
 
 // Show bypass button in non-production environments
 const ENABLE_BYPASS = import.meta.env.MODE !== 'production';
@@ -170,6 +174,53 @@ const GolferVerificationTab = () => {
   // Include both 'rejected' (admin rejection) and 'declined' (user declined invite) in rejected tab
   const rejectedRequests = requests?.filter(r => r.status === 'rejected' || r.status === 'declined') ?? [];
   const revokedRequests = requests?.filter(r => r.status === 'removed') ?? [];
+
+  // Bulk selection for pending requests only
+  const bulkSelect = useBulkSelect(
+    pendingRequests,
+    (r) => r.status === 'pending'
+  );
+
+  // Bulk action handlers
+  const handleBulkApprove = async () => {
+    try {
+      const result = await bulkSelect.executeBulk(async (ids) => {
+        return await verifyBulk('approve', 'golfer', ids);
+      });
+      toast.success(`Approved ${result.success.length} golfer verifications`, {
+        description: result.failed.length > 0 ? `${result.failed.length} failed` : undefined,
+        action: {
+          label: 'View Audit Log',
+          onClick: () => window.location.href = '/admin/audit',
+        },
+      });
+      queryClient.invalidateQueries({ queryKey: ['admin-golfer-verification-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-golfer-verifications-pending-count'] });
+      bulkSelect.exitSelectMode();
+    } catch (error: any) {
+      toast.error('Bulk approval failed', { description: error.message });
+    }
+  };
+
+  const handleBulkReject = async () => {
+    try {
+      const result = await bulkSelect.executeBulk(async (ids) => {
+        return await verifyBulk('reject', 'golfer', ids);
+      });
+      toast.success(`Rejected ${result.success.length} golfer verifications`, {
+        description: result.failed.length > 0 ? `${result.failed.length} failed` : undefined,
+        action: {
+          label: 'View Audit Log',
+          onClick: () => window.location.href = '/admin/audit',
+        },
+      });
+      queryClient.invalidateQueries({ queryKey: ['admin-golfer-verification-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-golfer-verifications-pending-count'] });
+      bulkSelect.exitSelectMode();
+    } catch (error: any) {
+      toast.error('Bulk rejection failed', { description: error.message });
+    }
+  };
 
   // Invite golfer mutation
   const inviteMutation = useMutation({
@@ -623,39 +674,68 @@ const GolferVerificationTab = () => {
         </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      {/* Bulk action bar (mobile: sticky bottom, desktop: inline) */}
+      {bulkSelect.selectMode && activeTab === 'pending' && (
+        <BulkActionBar
+          selectedCount={bulkSelect.selectedCount}
+          onCancel={bulkSelect.exitSelectMode}
+          processing={!!bulkSelect.progress && bulkSelect.progress.processed < bulkSelect.progress.total}
+          progress={bulkSelect.progress}
+          actions={[
+            {
+              label: 'Approve',
+              onClick: handleBulkApprove,
+              icon: <CheckCircle className="h-4 w-4" />,
+            },
+            {
+              label: 'Reject',
+              onClick: handleBulkReject,
+              variant: 'destructive',
+              icon: <XCircle className="h-4 w-4" />,
+            },
+          ]}
+        />
+      )}
+
+      <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); bulkSelect.exitSelectMode(); }}>
         {/* Status tabs - two-row grid layout, no horizontal scroll */}
         <div className="space-y-2">
-          {/* Top row: 4 tabs */}
-          <div className="grid grid-cols-4 gap-1.5">
-            <TabsList className="h-auto p-0 bg-transparent">
-              <TabsTrigger value="discover" className="w-full gap-1 text-xs md:text-sm px-2 md:px-3 py-2 data-[state=active]:bg-muted data-[state=active]:font-semibold">
-                <Radar className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                <span className="hidden sm:inline">Discover</span>
-              </TabsTrigger>
-            </TabsList>
-            <TabsList className="h-auto p-0 bg-transparent">
-              <TabsTrigger value="pending" className="w-full gap-1 text-xs md:text-sm px-2 md:px-3 py-2 data-[state=active]:bg-muted data-[state=active]:font-semibold">
-                Pending
-                {pendingRequests.length > 0 && (
-                  <span className="text-[10px] md:text-xs bg-amber-500/20 text-amber-600 px-1 py-0.5 rounded-full">
-                    {pendingRequests.length}
-                  </span>
-                )}
-              </TabsTrigger>
-            </TabsList>
-            <TabsList className="h-auto p-0 bg-transparent">
-              <TabsTrigger value="invited" className="w-full gap-1 text-xs md:text-sm px-2 md:px-3 py-2 data-[state=active]:bg-muted data-[state=active]:font-semibold">
-                Invited
-                <span className="text-[10px] md:text-xs opacity-60">({invitedRequests.length})</span>
-              </TabsTrigger>
-            </TabsList>
-            <TabsList className="h-auto p-0 bg-transparent">
-              <TabsTrigger value="approved" className="w-full gap-1 text-xs md:text-sm px-2 md:px-3 py-2 data-[state=active]:bg-muted data-[state=active]:font-semibold">
-                Verified
-                <span className="text-[10px] md:text-xs opacity-60">({approvedRequests.length})</span>
-              </TabsTrigger>
-            </TabsList>
+          {/* Top row: 4 tabs + Select button */}
+          <div className="flex items-center gap-2">
+            <div className="grid grid-cols-4 gap-1.5 flex-1">
+              <TabsList className="h-auto p-0 bg-transparent">
+                <TabsTrigger value="discover" className="w-full gap-1 text-xs md:text-sm px-2 md:px-3 py-2 data-[state=active]:bg-muted data-[state=active]:font-semibold">
+                  <Radar className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  <span className="hidden sm:inline">Discover</span>
+                </TabsTrigger>
+              </TabsList>
+              <TabsList className="h-auto p-0 bg-transparent">
+                <TabsTrigger value="pending" className="w-full gap-1 text-xs md:text-sm px-2 md:px-3 py-2 data-[state=active]:bg-muted data-[state=active]:font-semibold">
+                  Pending
+                  {pendingRequests.length > 0 && (
+                    <span className="text-[10px] md:text-xs bg-amber-500/20 text-amber-600 px-1 py-0.5 rounded-full">
+                      {pendingRequests.length}
+                    </span>
+                  )}
+                </TabsTrigger>
+              </TabsList>
+              <TabsList className="h-auto p-0 bg-transparent">
+                <TabsTrigger value="invited" className="w-full gap-1 text-xs md:text-sm px-2 md:px-3 py-2 data-[state=active]:bg-muted data-[state=active]:font-semibold">
+                  Invited
+                  <span className="text-[10px] md:text-xs opacity-60">({invitedRequests.length})</span>
+                </TabsTrigger>
+              </TabsList>
+              <TabsList className="h-auto p-0 bg-transparent">
+                <TabsTrigger value="approved" className="w-full gap-1 text-xs md:text-sm px-2 md:px-3 py-2 data-[state=active]:bg-muted data-[state=active]:font-semibold">
+                  Verified
+                  <span className="text-[10px] md:text-xs opacity-60">({approvedRequests.length})</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
+            {/* Select button - only show on pending tab when there are items */}
+            {activeTab === 'pending' && pendingRequests.length > 0 && !bulkSelect.selectMode && (
+              <SelectModeButton onClick={bulkSelect.enterSelectMode} />
+            )}
           </div>
           {/* Bottom row: 2 tabs */}
           <div className="grid grid-cols-2 gap-1.5">
@@ -679,7 +759,17 @@ const GolferVerificationTab = () => {
         </TabsContent>
 
         <TabsContent value="pending" className="mt-4 space-y-3">
-          {!isMobile && <p className="text-sm text-muted-foreground">Each request requires two independent approvals. Any single rejection immediately rejects the request.</p>}
+          {/* Select mode header */}
+          {bulkSelect.selectMode && (
+            <SelectModeHeader
+              selectedCount={bulkSelect.selectedCount}
+              totalCount={bulkSelect.selectableCount}
+              allSelected={bulkSelect.allSelected}
+              onToggleAll={bulkSelect.toggleSelectAll}
+              onCancel={bulkSelect.exitSelectMode}
+            />
+          )}
+          {!isMobile && !bulkSelect.selectMode && <p className="text-sm text-muted-foreground">Each request requires two independent approvals. Any single rejection immediately rejects the request.</p>}
           {pendingRequests.length === 0 ? (
             <AdminEmptyState icon={User} title="No pending requests" description="All caught up!" />
           ) : isMobile ? (
@@ -688,7 +778,11 @@ const GolferVerificationTab = () => {
                 key={request.id}
                 request={request}
                 myReview={myReviewsByRequest.get(request.id)}
-                onClick={() => { setSelectedRequest(request); setMobileSheetOpen(true); }}
+                onClick={() => { if (!bulkSelect.selectMode) { setSelectedRequest(request); setMobileSheetOpen(true); } }}
+                selectMode={bulkSelect.selectMode}
+                selected={bulkSelect.isSelected(request.id)}
+                onSelect={() => bulkSelect.toggleSelect(request.id)}
+                selectable={true}
               />
             ))
           ) : pendingRequests.map(request => renderRequestCard(request, true))}
